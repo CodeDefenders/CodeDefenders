@@ -13,6 +13,8 @@ public class AttackerPage extends HttpServlet {
     GameState gs;
     MutationTester mt;
 
+    String diffLog = "";
+
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
         gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
@@ -30,6 +32,8 @@ public class AttackerPage extends HttpServlet {
         out.println("<title>Attacker Window</title>");
         out.println("</head>");
         out.println("<body>");
+
+        out.println("<p>"+diffLog+"</p>");
 
         out.println("<p>Scores are currently Attacker: "+gs.getScore(ATTACKER)+", Defender: "+gs.getScore(DEFENDER)+"</p>");
         out.println("<p>Round is: "+gs.getRound()+"</p>");
@@ -79,6 +83,20 @@ public class AttackerPage extends HttpServlet {
     // Writes text as a Mutant to the appropriate place in the file system.
     private boolean createMutant(String mutantText, String name) throws IOException {
 
+        String original = "";
+        String line;
+
+        System.out.println(mutantText);
+
+        InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");
+        BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
+        while((line = is.readLine()) != null) {original += line + "\n";}
+
+        System.out.println(original);
+
+        diff_match_patch dmp = new diff_match_patch();
+        LinkedList<diff_match_patch.Diff> changes = dmp.diff_main(mutantText.trim().replace("\n", "").replace("\r", ""), original.trim().replace("\n", "").replace("\r", ""), true);
+
         // Setup folder the files will go in
         Long timestamp = System.currentTimeMillis();
         File folder = new File(getServletContext().getRealPath("/WEB-INF/mutants/"+timestamp));
@@ -93,6 +111,11 @@ public class AttackerPage extends HttpServlet {
 
         // Try and compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
         Mutant newMutant = new Mutant(folder, name);
+        newMutant.setDifferences(changes);
+        for (diff_match_patch.Diff d : newMutant.getRelevantChanges()) {
+            diffLog += d.toString();
+        }
+
         if (mt.compileMutant(newMutant)) {gs.addMutant(newMutant); return true;}
         else {folder.delete(); return false;}
     }
