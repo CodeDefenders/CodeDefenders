@@ -1,0 +1,48 @@
+<web-app>
+
+	<servlet>
+		<servlet-name>intropage</servlet-name>
+		<servlet-class>IntroPage</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>intropage</servlet-name>
+		<url-pattern>/intro</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>attackpage</servlet-name>
+		<servlet-class>AttackerPage</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>attackpage</servlet-name>
+		<url-pattern>/attacker</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>defenderpage</servlet-name>
+		<servlet-class>DefenderPage</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>defenderpage</servlet-name>
+		<url-pattern>/defender</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>contextupdater</servlet-name>
+		<servlet-class>ContextUpdater</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>contextupdater</servlet-name>
+		<url-pattern>/runmutationtests</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>test</servlet-name>
+		<servlet-class>TestingPage</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>test</servlet-name>
+		<url-pattern>/test</url-pattern>
+	</servlet-mapping>
+
+</web-app>

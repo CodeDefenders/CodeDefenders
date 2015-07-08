@@ -1,0 +1,46 @@
+<project default="" basedir=".">
+
+  <description>
+    Build File to handle mutation tests for a particular class
+  </description>
+
+  <property name="mutant" location="${mutant.file}/${classname}"/>
+  <property name="test" location="${test.file}/Test${classname}"/>
+
+  <target name="init">
+    <tstamp/>
+  </target>
+
+  <target name="compile" depends="init" description="compile the test and mutant">
+    <javac srcdir="${mutant.file}" includeantruntime="false"/>
+    <javac srcdir="${test.file}" classpath="classes/junit-4.11.jar; ${mutant.file}" includeantruntime="false"/>
+  </target>
+
+  <target name="test-original" depends="compile" description="run test on original code to ensure it passes">
+    <junit>
+
+      <!-- Sets the content of the classpath to the relevant original class -->
+      <classpath>
+        <pathelement location="resources/Book.class"/>
+      </classpath>
+
+      <test name="${test}"/>
+      
+    </junit>
+  </target>
+
+  <target name="test-mutant" depends="compile" description="run test on mutant to see if test fails">
+    <junit printsummary="true" haltonfailure="true">
+
+      <!-- Sets the content of the classpath to the mutant -->
+      <classpath>
+        <pathelement location="${mutant.file}"/>
+        <pathelement location="${test.file}"/>
+      </classpath>
+
+      <test name="Test${classname}"/>
+      
+    </junit>
+
+  </target>
+</project>
