@@ -95,7 +95,7 @@ public class AttackerPage extends HttpServlet {
         System.out.println(original);
 
         diff_match_patch dmp = new diff_match_patch();
-        LinkedList<diff_match_patch.Diff> changes = dmp.diff_main(mutantText.trim().replace("\n", "").replace("\r", ""), original.trim().replace("\n", "").replace("\r", ""), true);
+        LinkedList<diff_match_patch.Diff> changes = dmp.diff_main(original.trim().replace("\n", "").replace("\r", ""), mutantText.trim().replace("\n", "").replace("\r", ""), true);
 
         // Setup folder the files will go in
         Long timestamp = System.currentTimeMillis();
@@ -112,7 +112,7 @@ public class AttackerPage extends HttpServlet {
         // Try and compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
         Mutant newMutant = new Mutant(folder, name);
         newMutant.setDifferences(changes);
-        for (diff_match_patch.Diff d : newMutant.getRelevantChanges()) {
+        for (diff_match_patch.Diff d : newMutant.getDifferences()) {
             diffLog += d.toString();
         }
 

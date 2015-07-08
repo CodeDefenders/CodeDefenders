@@ -31,11 +31,32 @@ public class DefenderPage extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
 
+        int mutantNo = 1;
+        for (Mutant m : gs.getAliveMutants()) {
+
+            out.println("<h4> Mutant Number " + mutantNo + "</h4>");
+            for (diff_match_patch.Diff d : m.getDifferences()) {
+                if (d.operation == diff_match_patch.Operation.INSERT) {
+                    out.println("<p>Added: " + d.text+"</p>");
+                }
+                else {
+                    out.println("<p>Removed: " + d.text+"</p>");
+                }
+            }
+        }
+
         out.println("<p>Scores are currently Attacker: "+gs.getScore(ATTACKER)+", Defender: "+gs.getScore(DEFENDER)+"</p>");
         out.println("<p>Round is: "+gs.getRound()+"</p>");
         out.println("<p>There are "+gs.getAliveMutants().size()+" mutants alive </p>");
 
         if (gs.isTurn(DEFENDER)) {
+
+            InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");
+
+            String line;
+            BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
+            while((line = is.readLine()) != null)
+                out.println("<p>"+line+"</p>");
 
             out.println("<form action=\"/gammut/defender\" method=\"post\">");
             out.println("<input type=\"hidden\" name=\"user\" value=\"1\">");
