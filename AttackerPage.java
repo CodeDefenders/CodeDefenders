@@ -1,9 +1,8 @@
 import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.lang.reflect.*;
-import java.util.Scanner;
 import java.net.*;
 
 public class AttackerPage extends HttpServlet {
@@ -11,9 +10,14 @@ public class AttackerPage extends HttpServlet {
     public static final int ATTACKER = 0;
     public static final int DEFENDER = 1;
 
+    GameState gs;
+    MutationTester mt;
+
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        GameState gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
+        gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
+        mt = (MutationTester) getServletContext().getAttribute("gammut.mutationtester");
+
         PrintWriter out = response.getWriter();
 
         out.println("<html>");
@@ -56,34 +60,35 @@ public class AttackerPage extends HttpServlet {
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        // Open GameState for storing new data.
-        GameState gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
         // Get the text submitted by the user.
         String mutantText = request.getParameter("mutant");
-        // Write it to a Java File.
-        Mutant newMutant = writeMutantToJava(mutantText, "Book");
-        // Add a record of the mutant to the Game State.
-        gs.addMutant(newMutant);
-        // Set the GameState.
-        getServletContext().setAttribute("gammut.gamestate", gs);
-        gs.endTurn();
 
-        // Display as if get request received.
+        // If it can be written to file and compiled, end turn. Otherwise, dont.
+        if (createMutant(mutantText, "Book")) {
+            gs.endTurn();
+        }        
+
         doGet(request, response);
     }
 
     // Writes text as a Mutant to the appropriate place in the file system.
-    private Mutant writeMutantToJava(String mutantText, String name) throws IOException {
+    private boolean createMutant(String mutantText, String name) throws IOException {
 
+        // Setup folder the files will go in
         Long timestamp = System.currentTimeMillis();
         File folder = new File(getServletContext().getRealPath("/WEB-INF/mutants/"+timestamp));
         folder.mkdir();
 
+        // Write the String into a java file
         File mutant = new File(getServletContext().getRealPath("/WEB-INF/mutants/"+timestamp+"/"+name+".java"));
         FileWriter fw = new FileWriter(mutant);
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write(mutantText);
         bw.close();
-        return new Mutant(folder, name);
+
+        // Try and compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
+        Mutant newMutant = new Mutant(folder, name);
+        if (mt.compileMutant(newMutant)) {gs.addMutant(newMutant); return true;}
+        else {folder.delete(); return false;}
     }
 }

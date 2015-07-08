@@ -10,10 +10,14 @@ public class DefenderPage extends HttpServlet {
 
     String testError = "";
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws IOException, ServletException
-    {
-        GameState gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
+    GameState gs;
+    MutationTester mt;
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
+        gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
+        mt = (MutationTester)getServletContext().getAttribute("gammut.mutationtester");
+
         PrintWriter out = response.getWriter();
 
         out.println("<html>");
@@ -22,7 +26,7 @@ public class DefenderPage extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
 
-        out.println("<p>"+testError+"</p>");
+        out.println("<p>"+mt.getLog()+"</p>");
         out.println("<p>Scores are currently Attacker: "+gs.getScore(ATTACKER)+", Defender: "+gs.getScore(DEFENDER)+"</p>");
         out.println("<p>Round is: "+gs.getRound()+"</p>");
         out.println("<p>There are "+gs.getAliveMutants().size()+" mutants alive </p>");
@@ -60,29 +64,23 @@ public class DefenderPage extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        
-        // Open GameState for storing new data.
-        GameState gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
+
         // Get the text submitted by the user.
         String testText = request.getParameter("test");
         // Write it to a Java File.
-        Test newTest = writeTestToJava(testText, "Book");
-        // Add a record of the mutant to the Game State.
-        gs.addTest(newTest);
-        // Set the GameState.
-        getServletContext().setAttribute("gammut.gamestate", gs);
-
-        MutationTester mt = (MutationTester)getServletContext().getAttribute("gammut.mutationtester");
-        testError = mt.runMutationTests(gs.getTests(), gs.getMutants());
-
-        gs.endTurn();
+        
+        if (createTest(testText, "Book")) {
+            mt.runMutationTests(gs.getTests(), gs.getMutants());
+            gs.endTurn();
+        }
 
         // Display as if get request received.
         doGet(request, response);
     }
 
     // Writes text as a Test to the appropriate place in the file system.
-    public Test writeTestToJava(String testText, String name) throws IOException {
+    public boolean createTest(String testText, String name) throws IOException {
+
         Long timestamp = System.currentTimeMillis();
         File folder = new File(getServletContext().getRealPath("/WEB-INF/tests/"+timestamp));
         folder.mkdir();
@@ -92,6 +90,9 @@ public class DefenderPage extends HttpServlet {
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write(testText);
         bw.close();
-        return new Test(folder, name);
+
+        Test newTest = new Test(folder, name);
+        if (mt.compileTest(newTest)) {gs.addTest(newTest); return true;}
+        else {folder.delete(); return false;}
     }
 }
