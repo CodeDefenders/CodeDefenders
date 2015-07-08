@@ -26,7 +26,7 @@ public class DefenderPage extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
 
-        out.println("<p>"+mt.getLog()+"</p>");
+        out.println(mt.getLog());
         out.println("<p>Scores are currently Attacker: "+gs.getScore(ATTACKER)+", Defender: "+gs.getScore(DEFENDER)+"</p>");
         out.println("<p>Round is: "+gs.getRound()+"</p>");
         out.println("<p>There are "+gs.getAliveMutants().size()+" mutants alive </p>");
@@ -68,7 +68,7 @@ public class DefenderPage extends HttpServlet {
         // Get the text submitted by the user.
         String testText = request.getParameter("test");
         // Write it to a Java File.
-        
+
         if (createTest(testText, "Book")) {
             mt.runMutationTests(gs.getTests(), gs.getMutants());
             gs.endTurn();
