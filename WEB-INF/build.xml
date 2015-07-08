@@ -4,6 +4,11 @@
     Build File to handle mutation tests for a particular class
   </description>
 
+  <path id="test.cp">
+    <pathelement path="classes/junit-4.11.jar"/>
+    <pathelement path="resources"/>
+  </path>
+
   <!-- requires mutant to compile only -->
   <target name="compile-mutant" description="compile a single mutant">
     <javac srcdir="${mutant.file}" includeantruntime="false"/>
@@ -11,17 +16,18 @@
 
   <!-- requires test to compile, and the classname of the file you are testing -->
   <target name="compile-test" description="compile a single test">
-    <javac srcdir="${test.file}" classpath="classes/junit-4.11.jar; resources/${classname}.class" includeantruntime="false"/>
+    <javac srcdir="${test.file}" classpathref="test.cp" includeantruntime="false"/>
   </target>
 
   <!-- requires test to compile, and the classname of the file you are testing -->
   <target name="test-original" description="run test on original code to ensure it passes">
-    <junit>
+    <junit printsummary="true" haltonfailure="true">
       <!-- Sets the content of the classpath to the relevant original class -->
       <classpath>
-        <pathelement location="resources/Book.class"/>
+        <pathelement location="resources"/>
+        <pathelement location="${test.file}"/>
       </classpath>
-      <test name="${test.file}/Test${classname}"/>
+      <test name="Test${classname}"/>
     </junit>
   </target>
 

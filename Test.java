@@ -5,6 +5,8 @@ public class Test {
 	File folder;
 	String className;
 
+	boolean validTest = true;
+
 	private int pointsScored = 0;
 
 	public Test(File folder, String className) {
@@ -31,5 +33,13 @@ public class Test {
 
 	public int getPoints() {
 		return pointsScored;
+	}
+
+	public boolean isValidTest() {
+		return validTest;
+	}
+
+	public void setValidTest(boolean b) {
+		validTest = b;
 	}
 }

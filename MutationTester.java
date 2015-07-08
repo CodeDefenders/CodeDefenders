@@ -18,7 +18,7 @@ public class MutationTester {
 
 		for (Mutant m : mutants) {
 			for (Test t : tests) {
-				if (m.isAlive() && testOriginal(t)) {
+				if (m.isAlive() && t.isValidTest()) {
 					pass = testMutant(m, t);
 					if (!pass) {m.setAlive(false); t.scorePoints(1);}
 				}
@@ -47,7 +47,7 @@ public class MutationTester {
 	// Already knows the class name from the constructor of the Mutation Tester.
 	private boolean runAntTarget(String target, String mutantFile, String testFile) {
 		boolean result = true;
-		log += "<p> Running Ant Target: " + target;
+		log += "<p> Running Ant Target: " + target + "</p>";
 
 		ProcessBuilder pb = new ProcessBuilder("C:\\apache-ant-1.9.5\\bin\\ant.bat",
 												target,
@@ -59,11 +59,12 @@ public class MutationTester {
 		try {
 			Process p = pb.start();
 		    String line;
+		    BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    		while((line = is.readLine()) != null) {log += "<p>"+line+"</p>";}
     		BufferedReader es = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-    		while((line = es.readLine()) != null) {log += line; result = false;}
-		} catch (Exception ex) {log += ex.toString(); result = false;}
+    		while((line = es.readLine()) != null) {log += "<p>"+line+"</p>"; result = false;}
+		} catch (Exception ex) {log += "<p> Exception: " + ex.toString() + "</p>"; result = false;}
 
-		log += "</p>";
 		return result;
 	}
 

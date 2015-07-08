@@ -4,9 +4,7 @@ import javax.servlet.http.*;
 
 public class IntroPage extends HttpServlet {
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws IOException, ServletException
-    {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
         GameState gs = (GameState)getServletContext().getAttribute("gammut.gamestate");
         if (gs == null) {getServletContext().setAttribute("gammut.gamestate", new GameState());}

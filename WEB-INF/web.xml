@@ -37,12 +37,12 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>test</servlet-name>
-		<servlet-class>TestingPage</servlet-class>
+		<servlet-name>score</servlet-name>
+		<servlet-class>ScorePage</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>test</servlet-name>
-		<url-pattern>/test</url-pattern>
+		<servlet-name>score</servlet-name>
+		<url-pattern>/scores</url-pattern>
 	</servlet-mapping>
 
 </web-app>

@@ -5,7 +5,7 @@ public class GameState {
 	public static final int ATTACKER = 0;
 	public static final int DEFENDER = 1;
 
-	private int round = 0;
+	private int round = 1;
 
 	private int attackerScore = 0;
 	private int defenderScore = 0;
@@ -33,6 +33,11 @@ public class GameState {
 	// If it is the provided player's turn, return true. Otherwise return false.
 	public boolean isTurn(int player) {
 		if (player == turn) {return true;}
+		else {return false;}
+	}
+
+	public boolean isFinished() {
+		if (round > 3) {return true;}
 		else {return false;}
 	}
 

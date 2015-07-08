@@ -18,6 +18,11 @@ public class AttackerPage extends HttpServlet {
         gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
         mt = (MutationTester) getServletContext().getAttribute("gammut.mutationtester");
 
+        if (gs.isFinished()) {
+            RequestDispatcher dispatcher = request.getRequestDispatcher("scores");
+            dispatcher.forward(request, response);
+        }
+
         PrintWriter out = response.getWriter();
 
         out.println("<html>");
@@ -32,7 +37,7 @@ public class AttackerPage extends HttpServlet {
 
         if (gs.isTurn(ATTACKER)) {
 
-            InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");       
+            InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");
             
             out.println("<form action=\"/gammut/attacker\" method=\"post\">");
             out.println("<input type=\"hidden\" name=\"user\" value=\"0\">");

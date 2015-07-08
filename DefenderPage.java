@@ -18,6 +18,11 @@ public class DefenderPage extends HttpServlet {
         gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
         mt = (MutationTester)getServletContext().getAttribute("gammut.mutationtester");
 
+        if (gs.isFinished()) {
+            RequestDispatcher dispatcher = request.getRequestDispatcher("scores");
+            dispatcher.forward(request, response);
+        }
+
         PrintWriter out = response.getWriter();
 
         out.println("<html>");
@@ -26,7 +31,6 @@ public class DefenderPage extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
 
-        out.println(mt.getLog());
         out.println("<p>Scores are currently Attacker: "+gs.getScore(ATTACKER)+", Defender: "+gs.getScore(DEFENDER)+"</p>");
         out.println("<p>Round is: "+gs.getRound()+"</p>");
         out.println("<p>There are "+gs.getAliveMutants().size()+" mutants alive </p>");
@@ -58,6 +62,7 @@ public class DefenderPage extends HttpServlet {
 
         }
 
+        out.println("<p>"+mt.getLog()+"</p>");
         out.println("</body>");
         out.println("</html>");
 
@@ -68,7 +73,7 @@ public class DefenderPage extends HttpServlet {
         // Get the text submitted by the user.
         String testText = request.getParameter("test");
         // Write it to a Java File.
-
+        
         if (createTest(testText, "Book")) {
             mt.runMutationTests(gs.getTests(), gs.getMutants());
             gs.endTurn();
@@ -92,7 +97,16 @@ public class DefenderPage extends HttpServlet {
         bw.close();
 
         Test newTest = new Test(folder, name);
-        if (mt.compileTest(newTest)) {gs.addTest(newTest); return true;}
-        else {folder.delete(); return false;}
+
+        // Check the test actually passes when applied to the original code.
+        
+
+        if (mt.compileTest(newTest) && mt.testOriginal(newTest)) {
+            gs.addTest(newTest);
+            return true;
+        }
+
+        folder.delete(); 
+        return false;
     }
 }
