@@ -53,10 +53,12 @@ public class DefenderPage extends HttpServlet {
 
             InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");
 
+            out.println("<textarea name=\"source\" cols=\"100\" rows=\"50\" readonly>");
             String line;
             BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
             while((line = is.readLine()) != null)
-                out.println("<p>"+line+"</p>");
+                out.println(line);
+            out.println("</textarea>");
 
             out.println("<form action=\"/gammut/defender\" method=\"post\">");
             out.println("<input type=\"hidden\" name=\"user\" value=\"1\">");
