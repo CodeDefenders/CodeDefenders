@@ -18,18 +18,7 @@ public class IntroPage extends HttpServlet {
         }
         catch (ClassNotFoundException e) {}
 
-        response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
-
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<title>Intro Window</title>");
-        out.println("</head>");
-        out.println("<body>");
-        out.println("<h1>This is the intro window!</h1>");
-        out.println("<button><a href=\"/gammut/attacker\">Attacker</a></button>");
-        out.println("<button><a href=\"/gammut/defender\">Defender</a></button>");
-        out.println("</body>");
-        out.println("</html>");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("html/intro_view.jsp");
+        dispatcher.forward(request, response);
     }
 }

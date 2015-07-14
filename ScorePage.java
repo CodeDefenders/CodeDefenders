@@ -13,26 +13,12 @@ public class ScorePage extends HttpServlet {
 
         gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
 
-        response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
+        if (gs.getScore(ATTACKER) > gs.getScore(DEFENDER)) {request.setAttribute("result", 0);}
+        else if (gs.getScore(ATTACKER) < gs.getScore(DEFENDER)) {request.setAttribute("result", 1);}
+        else {request.setAttribute("result", 2);}
 
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<title>Final Scores</title>");
-        out.println("</head>");
-        out.println("<body>");
-        out.println("<h1>SCORE WINDOW</h1>");
-        if (gs.getScore(ATTACKER) > gs.getScore(DEFENDER)) {
-            out.println("<p>Attacker has won!</p>");
-        }
-        else if (gs.getScore(ATTACKER) < gs.getScore(DEFENDER)) {
-            out.println("<p>Defender has won!</p>");
-        }
-        else {
-            out.println("<p>It was a tie!</p>");
-        }
-        out.println("</body>");
-        out.println("</html>");
+        RequestDispatcher dispatcher = request.getRequestDispatcher("html/score_view.jsp");
+        dispatcher.forward(request, response);
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
