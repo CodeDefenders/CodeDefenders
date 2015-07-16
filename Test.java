@@ -1,3 +1,5 @@
+package gammut;
+
 import java.io.File;
 
 public class Test {

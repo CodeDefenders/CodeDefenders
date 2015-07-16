@@ -1,3 +1,5 @@
+package gammut;
+
 import java.io.*;
 import java.util.ArrayList;
 

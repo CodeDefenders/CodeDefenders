@@ -2,7 +2,7 @@
 
 	<servlet>
 		<servlet-name>intropage</servlet-name>
-		<servlet-class>IntroPage</servlet-class>
+		<servlet-class>gammut.IntroPage</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>intropage</servlet-name>
@@ -11,7 +11,7 @@
 
 	<servlet>
 		<servlet-name>attackpage</servlet-name>
-		<servlet-class>AttackerPage</servlet-class>
+		<servlet-class>gammut.AttackerPage</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>attackpage</servlet-name>
@@ -20,7 +20,7 @@
 
 	<servlet>
 		<servlet-name>defenderpage</servlet-name>
-		<servlet-class>DefenderPage</servlet-class>
+		<servlet-class>gammut.DefenderPage</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>defenderpage</servlet-name>
@@ -28,17 +28,8 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>contextupdater</servlet-name>
-		<servlet-class>ContextUpdater</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>contextupdater</servlet-name>
-		<url-pattern>/runmutationtests</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
 		<servlet-name>score</servlet-name>
-		<servlet-class>ScorePage</servlet-class>
+		<servlet-class>gammut.ScorePage</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>score</servlet-name>

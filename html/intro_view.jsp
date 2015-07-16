@@ -8,12 +8,16 @@
 
     <!-- Bootstrap -->
     <link href="${pageContext.request.contextPath}/html/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/html/css/introstyle.css" rel="stylesheet">
 </head>
 
 <body>
-	<h1>This is the intro window!</h1>
-	<button><a href=attacker>Attacker</a></button>
-	<button><a href=defender>Defender</a></button>
+	<div id="splash">
+		<h1>GamMut</h1>
+		<h2>Gamification of Mutation Testing</h2>
+		<button><a href=attacker>Play as the Attacker</a></button><br>
+		<button><a href=defender>Play as the Defender</a></button>
+	</div>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

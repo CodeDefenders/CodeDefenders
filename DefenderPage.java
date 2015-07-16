@@ -1,7 +1,10 @@
+package gammut;
+
 import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.util.ArrayList;
+import diff_match_patch.*;
 
 public class DefenderPage extends HttpServlet {
 

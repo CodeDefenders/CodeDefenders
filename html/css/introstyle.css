@@ -1,0 +1,10 @@
+#splash {
+    position:absolute;
+    width:400px;
+    height:300px;
+    z-index:15;
+    top:50%;
+    left:50%;
+    margin:-150px 0 0 -200px;
+    text-align:center;
+}

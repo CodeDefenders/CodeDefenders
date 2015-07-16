@@ -17,6 +17,8 @@
  * limitations under the License.
  */
 
+package diff_match_patch;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.net.URLDecoder;

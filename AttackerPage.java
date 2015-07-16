@@ -1,9 +1,12 @@
+package gammut;
+
 import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.util.*;
 import java.lang.reflect.*;
 import java.net.*;
+import diff_match_patch.*;
 
 public class AttackerPage extends HttpServlet {
 
@@ -27,17 +30,7 @@ public class AttackerPage extends HttpServlet {
 
         PrintWriter out = response.getWriter();
 
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<title>Attacker Window</title>");
-        out.println("</head>");
-        out.println("<body>");
-
         out.println("<p>"+diffLog+"</p>");
-
-        out.println("<p>Scores are currently Attacker: "+gs.getScore(ATTACKER)+", Defender: "+gs.getScore(DEFENDER)+"</p>");
-        out.println("<p>Round is: "+gs.getRound()+"</p>");
-        out.println("<p>There are "+gs.getAliveMutants().size()+" mutants alive </p>");
 
         if (gs.isTurn(ATTACKER)) {
 
@@ -62,9 +55,6 @@ public class AttackerPage extends HttpServlet {
             out.println("<h1>Waiting for Defender to take their turn</h1>");
 
         }
-
-        out.println("</body>");
-        out.println("</html>");
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

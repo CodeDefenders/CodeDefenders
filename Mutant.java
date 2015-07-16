@@ -1,5 +1,8 @@
+package gammut;
+
 import java.io.File;
 import java.util.*;
+import diff_match_patch.*;
 
 public class Mutant {
 
