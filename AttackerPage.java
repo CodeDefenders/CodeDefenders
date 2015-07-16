@@ -28,32 +28,14 @@ public class AttackerPage extends HttpServlet {
             dispatcher.forward(request, response);
         }
 
-        PrintWriter out = response.getWriter();
-
-        out.println("<p>"+diffLog+"</p>");
-
         if (gs.isTurn(ATTACKER)) {
-
-            InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");
-            
-            out.println("<form action=\"/gammut/attacker\" method=\"post\">");
-            out.println("<input type=\"hidden\" name=\"user\" value=\"0\">");
-            out.println("<textarea name=\"mutant\" cols=\"100\" rows=\"50\">");
-            String line;
-            BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
-            while((line = is.readLine()) != null)
-                out.println(line);
-            out.println("</textarea>");
-            out.println("<br><input type=\"submit\" value=\"Attack!\">");
-            out.println("</form>");
-
+            RequestDispatcher dispatcher = request.getRequestDispatcher("html/attacker_view.jsp");
+            dispatcher.forward(request, response);
         }
 
         else {
-
             response.setIntHeader("Refresh", 5);
             out.println("<h1>Waiting for Defender to take their turn</h1>");
-
         }
     }
 
@@ -76,13 +58,9 @@ public class AttackerPage extends HttpServlet {
         String original = "";
         String line;
 
-        System.out.println(mutantText);
-
         InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");
         BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
         while((line = is.readLine()) != null) {original += line + "\n";}
-
-        System.out.println(original);
 
         diff_match_patch dmp = new diff_match_patch();
         LinkedList<diff_match_patch.Diff> changes = dmp.diff_main(original.trim().replace("\n", "").replace("\r", ""), mutantText.trim().replace("\n", "").replace("\r", ""), true);
