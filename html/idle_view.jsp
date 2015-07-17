@@ -8,7 +8,7 @@
 
     <!-- Bootstrap -->
     <link href="${pageContext.request.contextPath}/html/css/bootstrap.min.css" rel="stylesheet">
-    <link href="${pageContext.request.contextPath}/html/css/introstyle.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/html/css/gamestyle.css" rel="stylesheet">
 </head>
 
 <body>

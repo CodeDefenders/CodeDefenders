@@ -8,11 +8,15 @@
 
     <!-- Bootstrap -->
     <link href="${pageContext.request.contextPath}/html/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/html/css/gamestyle.css" rel="stylesheet">
 
 	<title>Score Window</title>
 </head>
 
 <body>
+
+	<%@ page import="gammut.*" %>
+	<% GameState gs = (GameState) getServletContext().getAttribute("gammut.gamestate"); %>
 
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
@@ -28,18 +32,21 @@
    		</div>
 	</nav>
 
-	<%
-	switch((Integer)request.getAttribute("result")) {
-		case 0 :
-			out.println("Attacker has won");
-			break;
-		case 1 :
-			out.println("Defender has won");
-			break;
-		case 2 :
-			out.println("It was a draw");
-			break;
-	}%>
+
+
+	<div id="splash">
+		<% if (gs.getScore(0) > gs.getScore(1)) { %>
+			<h1> Attacker Has Won! </h1>
+		<% }
+	    
+	    if (gs.getScore(0) < gs.getScore(1)) { %>
+	    	<h1> Defender Has Won! </h1>
+	    <%}
+	    
+	    else { %>
+	    	<h1> It Was A Draw! </h1>
+	    <%}%>
+	</div>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

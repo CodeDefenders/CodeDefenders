@@ -19,10 +19,6 @@ public class ScorePage extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        if (gs.getScore(ATTACKER) > gs.getScore(DEFENDER)) {request.setAttribute("result", 0);}
-        else if (gs.getScore(ATTACKER) < gs.getScore(DEFENDER)) {request.setAttribute("result", 1);}
-        else {request.setAttribute("result", 2);}
-
         RequestDispatcher dispatcher = request.getRequestDispatcher("html/score_view.jsp");
         dispatcher.forward(request, response);
     }
