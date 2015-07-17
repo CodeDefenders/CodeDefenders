@@ -19,33 +19,17 @@ public class Mutant {
 	}
 
 
-	public String getFolder() {
-		return folder.getAbsolutePath();
-	}
+	public String getFolder() {return folder.getAbsolutePath();}
+	public String getJava() {return folder.getAbsolutePath() + className + ".java";}
+	public String getClassFile() {return folder.getAbsolutePath() + className + ".class";}
 
-	public String getJava() {
-		return folder.getAbsolutePath() + className + ".java";
-	}
-
-	public String getClassFile() {
-		return folder.getAbsolutePath() + className + ".class";
-	}
-
-	public boolean isAlive() {return alive;}
 	public void setAlive(boolean a) {alive = a;}
+	public boolean isAlive() {return alive;}
 
-	public void scorePoints(int p) {
-		pointsScored += p;
-	}
+	public void scorePoints(int p) {pointsScored += p;}
+	public int getPoints() {return pointsScored;}
 
-	public int getPoints() {
-		return pointsScored;
-	}
-
-	public void setDifferences(LinkedList<diff_match_patch.Diff> diffs) {
-		this.diffs = diffs;
-	}
-
+	public void setDifferences(LinkedList<diff_match_patch.Diff> diffs) {this.diffs = diffs;}
 	public ArrayList<diff_match_patch.Diff> getDifferences() {
 		ArrayList<diff_match_patch.Diff> diffArray = new ArrayList<diff_match_patch.Diff>();
 
@@ -57,4 +41,18 @@ public class Mutant {
 		return diffArray;
 	}
 
+	public String getHTMLReadout() {
+		String html = "";
+
+        for (diff_match_patch.Diff d : getDifferences()) {
+            if (d.operation == diff_match_patch.Operation.INSERT) {
+            		html += "<p> +: " + d.text;
+            }
+            else {
+            	html += "<p> -: " + d.text;
+            }
+        }
+        html += "<br>";
+        return html;
+	}
 }

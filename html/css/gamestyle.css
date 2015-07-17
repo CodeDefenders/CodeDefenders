@@ -1,0 +1,21 @@
+body { padding-top: 70px; }
+
+.blank_row {
+    height: 10px !important; /* Overwrite any previous rules */
+    background-color: #FFFFFF;
+}
+
+#info {
+	float: left;
+	margin: auto;
+    width: 50%;
+    padding: 0px 1%;
+}
+
+#code {
+	float: left;
+	margin: auto;
+    width: 50%;
+    padding: 0px 1%;
+}
+

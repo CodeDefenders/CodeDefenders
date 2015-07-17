@@ -13,6 +13,21 @@
 </head>
 
 <body>
+
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+  		<div class="container-fluid">
+    		<div class="navbar-header">
+      			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1">
+      			</button>
+    		</div>
+      		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
+          		<ul class="nav navbar-nav">
+            		<a class="navbar-brand" href="/gammut/intro">GamMut</a>
+          		</ul>
+      		</div>
+   		</div>
+	</nav>
+
 	<%
 	switch((Integer)request.getAttribute("result")) {
 		case 0 :

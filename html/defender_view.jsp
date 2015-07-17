@@ -8,17 +8,35 @@
 
     <!-- Bootstrap -->
     <link href="${pageContext.request.contextPath}/html/css/bootstrap.min.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/html/css/gamestyle.css" rel="stylesheet">
 </head>
 <body>
 
 	<%@ page import="gammut.*,java.io.*" %>
 	<% GameState gs = (GameState) getServletContext().getAttribute("gammut.gamestate"); %>
 
-	<div id="statbar">
-		<p>Scores are currently Attacker: <%= gs.getScore(0) %>, Defender: <%= gs.getScore(1) %> </p>
-	    <p>Round is: <%= gs.getRound() %> </p>
-	    <p>There are <%= gs.getAliveMutants().size() %> mutants alive </p>
-	</div>
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+  		<div class="container-fluid">
+    		<div class="navbar-header">
+      			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1">
+      			</button>
+    		</div>
+      		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
+          		<ul class="nav navbar-nav">
+            		<a class="navbar-brand" href="/gammut/intro">GamMut</a>
+            		<li class="navbar-brand">ATK: <%= gs.getScore(0) %> | DEF: <%= gs.getScore(1) %></li>
+            		<li class="navbar-brand">Round <%= gs.getRound() %></li>
+            		<li class="navbar-brand"><%= gs.getAliveMutants().size() %> Mutants are Alive</li>
+          		</ul>
+      		</div>
+   		</div>
+	</nav>
+
+	<%
+        for (Mutant m : gs.getAliveMutants()) {
+            %><%=m.getHTMLReadout()%><%
+        }
+    %>
 
 	<%
 	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");

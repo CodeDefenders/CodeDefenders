@@ -30,17 +30,6 @@ public class DefenderPage extends HttpServlet {
             dispatcher.forward(request, response);
         }
 
-        int mutantNo = 1;
-        for (Mutant m : gs.getAliveMutants()) {
-            
-            for (diff_match_patch.Diff d : m.getDifferences()) {
-                if (d.operation == diff_match_patch.Operation.INSERT) {
-                }
-                else {
-                }
-            }
-        }
-
         if (gs.isTurn(DEFENDER)) {
             RequestDispatcher dispatcher = request.getRequestDispatcher("html/defender_view.jsp");
             dispatcher.forward(request, response);
@@ -89,7 +78,7 @@ public class DefenderPage extends HttpServlet {
             return true;
         }
 
-        folder.delete(); 
+        folder.delete();
         return false;
     }
 }
