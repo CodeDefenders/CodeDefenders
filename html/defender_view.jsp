@@ -11,7 +11,41 @@
 </head>
 <body>
 
-	<%@ page import="gammut.*" %>
+	<%@ page import="gammut.*,java.io.*" %>
+	<% GameState gs = (GameState) getServletContext().getAttribute("gammut.gamestate"); %>
+
+	<div id="statbar">
+		<p>Scores are currently Attacker: <%= gs.getScore(0) %>, Defender: <%= gs.getScore(1) %> </p>
+	    <p>Round is: <%= gs.getRound() %> </p>
+	    <p>There are <%= gs.getAliveMutants().size() %> mutants alive </p>
+	</div>
+
+	<%
+	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");
+	    String line;
+	    String source = "";
+	    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
+	    while((line = is.readLine()) != null) {source+=line+"\n";}
+	%>
+	<textarea name="source" cols="100" rows="50" readonly><%=source%></textarea>
+
+	<form action="/gammut/defender" method="post">
+
+		<input type="hidden" name="user" value="1">
+        <textarea name="test" cols="100" rows="30">
+import org.junit.*;
+import static org.junit.Assert.*;
+
+public class TestBook {
+@Test
+public void test() {
+
+}
+}</textarea>
+
+	    <br>
+	    <input type="submit" value="Defend!">
+    </form>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

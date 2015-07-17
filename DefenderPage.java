@@ -30,72 +30,25 @@ public class DefenderPage extends HttpServlet {
             dispatcher.forward(request, response);
         }
 
-        PrintWriter out = response.getWriter();
-
-        out.println("<html>");
-        out.println("<head>");
-        out.println("<title>Defender Window</title>");
-        out.println("</head>");
-        out.println("<body>");
-
         int mutantNo = 1;
         for (Mutant m : gs.getAliveMutants()) {
-
-            out.println("<h4> Mutant Number " + mutantNo + "</h4>");
+            
             for (diff_match_patch.Diff d : m.getDifferences()) {
                 if (d.operation == diff_match_patch.Operation.INSERT) {
-                    out.println("<p>Added: " + d.text+"</p>");
                 }
                 else {
-                    out.println("<p>Removed: " + d.text+"</p>");
                 }
             }
         }
 
-        out.println("<p>Scores are currently Attacker: "+gs.getScore(ATTACKER)+", Defender: "+gs.getScore(DEFENDER)+"</p>");
-        out.println("<p>Round is: "+gs.getRound()+"</p>");
-        out.println("<p>There are "+gs.getAliveMutants().size()+" mutants alive </p>");
-
         if (gs.isTurn(DEFENDER)) {
-
-            InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");
-
-            out.println("<textarea name=\"source\" cols=\"100\" rows=\"50\" readonly>");
-            String line;
-            BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
-            while((line = is.readLine()) != null)
-                out.println(line);
-            out.println("</textarea>");
-
-            out.println("<form action=\"/gammut/defender\" method=\"post\">");
-            out.println("<input type=\"hidden\" name=\"user\" value=\"1\">");
-            out.println("<textarea name=\"test\" cols=\"100\" rows=\"30\">");
-            out.println("import org.junit.*;");
-            out.println("import static org.junit.Assert.*;");
-            out.println("");
-            out.println("public class TestBook {");
-            out.println("  @Test");
-            out.println("  public void test() {");
-            out.println("");
-            out.println("  }");
-            out.println("}");
-            out.println("</textarea>");
-            out.println("<br><input type=\"submit\" value=\"Defend!\">");
-            out.println("</form>");
-
+            RequestDispatcher dispatcher = request.getRequestDispatcher("html/defender_view.jsp");
+            dispatcher.forward(request, response);
         }
 
         else {
-
             response.setIntHeader("Refresh", 5);
-            out.println("<h1>Waiting for attacker input.</h1>");
-
         }
-
-        out.println("<p>"+mt.getLog()+"</p>");
-        out.println("</body>");
-        out.println("</html>");
-
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
