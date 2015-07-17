@@ -13,13 +13,17 @@ public class DefenderPage extends HttpServlet {
 
     String testError = "";
 
-    GameState gs;
-    MutationTester mt;
+    protected GameState gs;
+    protected MutationTester mt;
+
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
+        mt = (MutationTester) getServletContext().getAttribute("gammut.mutationtester");
+    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
-        gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
-        mt = (MutationTester)getServletContext().getAttribute("gammut.mutationtester");
 
         if (gs.isFinished()) {
             RequestDispatcher dispatcher = request.getRequestDispatcher("scores");

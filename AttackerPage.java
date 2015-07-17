@@ -13,15 +13,17 @@ public class AttackerPage extends HttpServlet {
     public static final int ATTACKER = 0;
     public static final int DEFENDER = 1;
 
-    GameState gs;
-    MutationTester mt;
+    protected GameState gs;
+    protected MutationTester mt;
 
-    String diffLog = "";
-
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
         gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
         mt = (MutationTester) getServletContext().getAttribute("gammut.mutationtester");
+    }
+
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
         if (gs.isFinished()) {
             RequestDispatcher dispatcher = request.getRequestDispatcher("scores");
@@ -35,7 +37,6 @@ public class AttackerPage extends HttpServlet {
 
         else {
             response.setIntHeader("Refresh", 5);
-            out.println("<h1>Waiting for Defender to take their turn</h1>");
         }
     }
 
@@ -80,9 +81,6 @@ public class AttackerPage extends HttpServlet {
         // Try and compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
         Mutant newMutant = new Mutant(folder, name);
         newMutant.setDifferences(changes);
-        for (diff_match_patch.Diff d : newMutant.getDifferences()) {
-            diffLog += d.toString();
-        }
 
         if (mt.compileMutant(newMutant)) {gs.addMutant(newMutant); return true;}
         else {folder.delete(); return false;}
