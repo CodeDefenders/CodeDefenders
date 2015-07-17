@@ -37,6 +37,8 @@ public class DefenderPage extends HttpServlet {
 
         else {
             response.setIntHeader("Refresh", 5);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("html/idle_view.jsp");
+            dispatcher.forward(request, response);
         }
     }
 
