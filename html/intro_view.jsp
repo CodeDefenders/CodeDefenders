@@ -30,8 +30,8 @@
 	<div id="splash">
 		<h1>GamMut</h1>
 		<h2>Gamification of Mutation Testing</h2>
-		<button><a href=attacker>Play as the Attacker</a></button><br>
-		<button><a href=defender>Play as the Defender</a></button>
+		<button class="btn btn-default"><a href=attacker>Play as the Attacker</a></button><br>
+		<button class="btn btn-default"><a href=defender>Play as the Defender</a></button>
 	</div>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

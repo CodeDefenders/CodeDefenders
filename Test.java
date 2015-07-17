@@ -44,4 +44,8 @@ public class Test {
 	public void setValidTest(boolean b) {
 		validTest = b;
 	}
+
+	public String getHTMLReadout() {
+		return "<p> dummy return </p>";
+	}
 }

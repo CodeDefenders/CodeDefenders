@@ -22,35 +22,96 @@
       			</button>
     		</div>
       		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
-          		<ul class="nav navbar-nav">
+          		<ul class="nav navbar-nav navbar-left">
             		<a class="navbar-brand" href="/gammut/intro">GamMut</a>
-            		<li class="navbar-brand">ATK: <%= gs.getScore(0) %> | DEF: <%= gs.getScore(1) %></li>
-            		<li class="navbar-brand">Round <%= gs.getRound() %></li>
-            		<li class="navbar-brand"><%= gs.getAliveMutants().size() %> Mutants are Alive</li>
+            		<li class="navbar-text">ATK: <%= gs.getScore(0) %> | DEF: <%= gs.getScore(1) %></li>
+            		<li class="navbar-text">Round <%= gs.getRound() %></li>
+            		<li class="navbar-text"><%= gs.getAliveMutants().size() %> Mutants are Alive</li>
+          		</ul>
+          		<ul class="nav navbar-nav navbar-right">
+          			<button type="submit" class="btn btn-default navbar-btn" form="def">Defend!</button>
           		</ul>
       		</div>
    		</div>
 	</nav>
 
-	<%
-        for (Mutant m : gs.getAliveMutants()) {
-            %><%=m.getHTMLReadout()%><%
-        }
-    %>
+	<div id="info">
 
-	<%
+		<h2> Mutants </h2>
+	    <table class="table table-hover table-responsive table-paragraphs">
+
+		<% 
+		boolean isMutants = false;
+		for (Mutant m : gs.getAliveMutants()) { 
+			isMutants = true;
+		%>
+
+			<tr>
+				<td class="col-sm-2"><%= "Greg" %></td>
+				<td class="col-sm-1"><%= "yes" %></td>
+			</tr>
+
+			<tr>
+				<td class="col-sm-3" colspan="2"><%= m.getHTMLReadout() %></td>
+			</tr>
+			<tr class="blank_row">
+				<td class="row-borderless" colspan="2"></td>
+			</tr>
+
+		<%
+		} 
+		if (!isMutants) {%>
+			<p> There are currently no mutants </p>
+		<%}
+		%>
+		</table>
+
+		<h2> Tests </h2>
+		<table class="table table-hover table-responsive table-paragraphs">
+
+		<% 
+		boolean isTests = false;
+		for (Test t : gs.getTests()) { 
+			isTests = true;
+		%>
+
+			<tr>
+				<td class="col-sm-2"><%= "Greg" %></td>
+				<td class="col-sm-1"><%= "yes" %></td>
+			</tr>
+
+			<tr>
+				<td class="col-sm-3" colspan="2"><%= t.getHTMLReadout() %></td>
+			</tr>
+			<tr class="blank_row">
+				<td class="row-borderless" colspan="2"></td>
+			</tr>
+
+		<%
+		} 
+		if (!isTests) {%>
+			<p> There are currently no tests </p>
+		<%}
+		%>
+		</table>
+
+		<h2> Source Code </h2>
+		<%
 	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");
 	    String line;
 	    String source = "";
 	    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
-	    while((line = is.readLine()) != null) {source+=line+"\n";}
-	%>
-	<textarea name="source" cols="100" rows="50" readonly><%=source%></textarea>
+	    while((line = is.readLine()) != null) {source+=line+"<br>";}
+		%>
+		<code><%=source%></code>
 
-	<form action="/gammut/defender" method="post">
+	</div>
 
-		<input type="hidden" name="user" value="1">
-        <textarea name="test" cols="100" rows="30">
+	<div id="code">
+		<form id="def" action="/gammut/defender" method="post">
+
+			<input type="hidden" name="user" value="1">
+	        <textarea name="test" cols="90" rows="30">
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -61,9 +122,9 @@ public void test() {
 }
 }</textarea>
 
-	    <br>
-	    <input type="submit" value="Defend!">
-    </form>
+		    <br>
+	    </form>
+	</div>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
