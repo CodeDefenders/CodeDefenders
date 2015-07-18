@@ -7,11 +7,6 @@ public class GameState {
 	public static final int ATTACKER = 0;
 	public static final int DEFENDER = 1;
 
-	private Class gameClass;
-
-	private int attackerID;
-	private int defenderID;
-
 	private int round = 1;
 
 	private int attackerScore = 0;

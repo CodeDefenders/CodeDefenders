@@ -8,7 +8,7 @@
 
     <!-- Bootstrap -->
     <link href="${pageContext.request.contextPath}/html/css/bootstrap.min.css" rel="stylesheet">
-    <link href="${pageContext.request.contextPath}/html/css/gamestyle.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/html/css/introstyle.css" rel="stylesheet">
 </head>
 
 <body>
@@ -30,8 +30,8 @@
 	<div id="splash">
 		<h1>GamMut</h1>
 		<h2>Gamification of Mutation Testing</h2>
-		<button class="btn btn-default"><a href=create>Create a New Game</a></button><br>
-		<button class="btn btn-default"><a href=join>Join an Existing Game</a></button>
+		<button class="btn btn-default"><a href=attacker>Play as the Attacker</a></button><br>
+		<button class="btn btn-default"><a href=defender>Play as the Defender</a></button>
 	</div>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
