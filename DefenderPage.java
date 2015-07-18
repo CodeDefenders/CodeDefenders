@@ -48,8 +48,8 @@ public class DefenderPage extends HttpServlet {
         String testText = request.getParameter("test");
         // Write it to a Java File.
         
-        if (createTest(testText, "Book")) {
-            mt.runMutationTests(gs.getTests(), gs.getMutants());
+        if (createTest(testText, gs.getClassName())) {
+            mt.runMutationTests(gs.getTests(), gs.getMutants(), gs.getClassName());
             gs.endTurn();
         }
 
@@ -75,7 +75,7 @@ public class DefenderPage extends HttpServlet {
         // Check the test actually passes when applied to the original code.
         
 
-        if (mt.compileTest(newTest) && mt.testOriginal(newTest)) {
+        if (mt.compileTest(newTest, name) && mt.testOriginal(newTest, name)) {
             gs.addTest(newTest);
             return true;
         }

@@ -100,7 +100,7 @@
 	    <form id="atk" action="/gammut/attacker" method="post">
 
 	    	<%
-			    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");
+			    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/"+gs.getClassName()+".java");
 			    String line;
 			    String source = "";
 			    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));

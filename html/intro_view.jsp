@@ -8,11 +8,12 @@
 
     <!-- Bootstrap -->
     <link href="${pageContext.request.contextPath}/html/css/bootstrap.min.css" rel="stylesheet">
-    <link href="${pageContext.request.contextPath}/html/css/introstyle.css" rel="stylesheet">
+    <link href="${pageContext.request.contextPath}/html/css/gamestyle.css" rel="stylesheet">
 </head>
 
 <body>
 
+  <%@ page import="gammut.*,java.io.*" %>
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
     		<div class="navbar-header">
@@ -30,6 +31,18 @@
 	<div id="splash">
 		<h1>GamMut</h1>
 		<h2>Gamification of Mutation Testing</h2>
+    <form action="/gammut/intro" method="post">
+      <% File resourcesFile = new File(getServletContext().getRealPath("/WEB-INF/resources")); %>
+      <select name="sourcecode">
+        <%
+        for (String s : resourcesFile.list()) { 
+          if (s.contains(".java")) {
+            %><option value=<%=s.substring(0, s.length()-5)%>><%=s.substring(0, s.length()-5)%></option><%
+          }
+        } %>
+      </select>
+      <input type="submit" value="Change Code">
+    </form>
 		<button class="btn btn-default"><a href=attacker>Play as the Attacker</a></button><br>
 		<button class="btn btn-default"><a href=defender>Play as the Defender</a></button>
 	</div>

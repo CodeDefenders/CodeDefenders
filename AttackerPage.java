@@ -48,7 +48,7 @@ public class AttackerPage extends HttpServlet {
         String mutantText = request.getParameter("mutant");
 
         // If it can be written to file and compiled, end turn. Otherwise, dont.
-        if (createMutant(mutantText, "Book")) {
+        if (createMutant(mutantText, gs.getClassName())) {
             gs.endTurn();
         }        
 
@@ -61,7 +61,7 @@ public class AttackerPage extends HttpServlet {
         String original = "";
         String line;
 
-        InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");
+        InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/"+name+".java");
         BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
         while((line = is.readLine()) != null) {original += line + "\n";}
 
@@ -84,7 +84,7 @@ public class AttackerPage extends HttpServlet {
         Mutant newMutant = new Mutant(folder, name);
         newMutant.setDifferences(changes);
 
-        if (mt.compileMutant(newMutant)) {gs.addMutant(newMutant); return true;}
+        if (mt.compileMutant(newMutant, name)) {gs.addMutant(newMutant); return true;}
         else {folder.delete(); return false;}
     }
 }

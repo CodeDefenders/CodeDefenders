@@ -9,6 +9,8 @@ public class GameState {
 
 	private int round = 1;
 
+	private String className;
+
 	private int attackerScore = 0;
 	private int defenderScore = 0;
 
@@ -20,6 +22,10 @@ public class GameState {
 	public GameState() {
 		turn = ATTACKER;
 	}
+
+
+	public void setClassName(String s) {className = s;}
+	public String getClassName() {return className;}
 
 	// Call at end of a player's turn for housekeeping wrt current turn and round number
 	public void endTurn() {

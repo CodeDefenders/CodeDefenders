@@ -97,7 +97,7 @@
 
 		<h2> Source Code </h2>
 		<%
-	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/Book.java");
+	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/"+gs.getClassName()+".java");
 	    String line;
 	    String source = "";
 	    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
@@ -115,7 +115,7 @@
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class TestBook {
+public class Test<%=gs.getClassName()%> {
 @Test
 public void test() {
 

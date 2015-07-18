@@ -5,15 +5,13 @@ import java.util.ArrayList;
 
 public class MutationTester {
 
-	private String className;
 	private String log;
 
-	public MutationTester(String className) {
-		this.className = className;
+	public MutationTester() {
 		log = "";
 	}
 
-	public void runMutationTests(ArrayList<Test> tests, ArrayList<Mutant> mutants) {
+	public void runMutationTests(ArrayList<Test> tests, ArrayList<Mutant> mutants, String className) {
 
 		Process mutationTest = null;
 		boolean pass;
@@ -21,7 +19,7 @@ public class MutationTester {
 		for (Mutant m : mutants) {
 			for (Test t : tests) {
 				if (m.isAlive() && t.isValidTest()) {
-					pass = testMutant(m, t);
+					pass = testMutant(m, t, className);
 					if (!pass) {m.setAlive(false); t.scorePoints(1);}
 				}
 			}
@@ -29,25 +27,25 @@ public class MutationTester {
 		}
 	}
 
-	public boolean compileMutant(Mutant m) {
-		return runAntTarget("compile-mutant", m.getFolder(), null);
+	public boolean compileMutant(Mutant m, String className) {
+		return runAntTarget("compile-mutant", m.getFolder(), null, className);
 	}
 
-	public boolean compileTest(Test t) {
-		return runAntTarget("compile-test", null, t.getFolder());
+	public boolean compileTest(Test t, String className) {
+		return runAntTarget("compile-test", null, t.getFolder(), className);
 	}
 
-	public boolean testOriginal(Test t) {
-		return runAntTarget("test-original", null, t.getFolder());
+	public boolean testOriginal(Test t, String className) {
+		return runAntTarget("test-original", null, t.getFolder(), className);
 	}
 
-	public boolean testMutant(Mutant m, Test t) {
-		return runAntTarget("test-mutant", m.getFolder(), t.getFolder());
+	public boolean testMutant(Mutant m, Test t, String className) {
+		return runAntTarget("test-mutant", m.getFolder(), t.getFolder(), className);
 	}
 
 	// Runs a specific Ant Target, given the name of the target and files to supply as arguments.
 	// Already knows the class name from the constructor of the Mutation Tester.
-	private boolean runAntTarget(String target, String mutantFile, String testFile) {
+	private boolean runAntTarget(String target, String mutantFile, String testFile, String className) {
 		boolean result = true;
 		log += "<p> Running Ant Target: " + target + "</p>";
 
