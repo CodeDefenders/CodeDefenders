@@ -28,10 +28,7 @@
 	</nav>
 
 	<div id="splash">
-		<h1>GamMut</h1>
-		<h2>Gamification of Mutation Testing</h2>
-		<button class="btn btn-default"><a href=create>Create a New Game</a></button><br>
-		<button class="btn btn-default"><a href=join>Join an Existing Game</a></button>
+		<h2>Existing Games</h2>
 	</div>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

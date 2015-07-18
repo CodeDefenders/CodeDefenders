@@ -13,6 +13,7 @@
 
 <body>
 
+  <%@ page import="gammut.*,java.io.*" %>
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
     		<div class="navbar-header">
@@ -28,10 +29,24 @@
 	</nav>
 
 	<div id="splash">
-		<h1>GamMut</h1>
-		<h2>Gamification of Mutation Testing</h2>
-		<button class="btn btn-default"><a href=create>Create a New Game</a></button><br>
-		<button class="btn btn-default"><a href=join>Join an Existing Game</a></button>
+		<h2>Create a New Game</h2>
+		<form id="create" action="/gammut/create" method="post">
+
+      I Will Play As:<br>
+      <input type="radio" name="role" value="atk" checked>Attacker<br>
+      <input type="radio" name="role" value="def">Defender<br>
+
+      <% File resourcesFile = new File(getServletContext().getRealPath("/WEB-INF/resources")); %>
+      <select>
+        <%
+        for (String s : resourcesFile.list()) { 
+          if (s.contains(".java")) {
+            %><option value=<%=s.substring(0, s.length()-5)%>><%=s.substring(0, s.length()-5)%></option><%
+          }
+        } %>
+      </select>
+        
+      </form>
 	</div>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
