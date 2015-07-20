@@ -67,6 +67,14 @@ public class AttackerPage extends HttpServlet {
 
         diff_match_patch dmp = new diff_match_patch();
         LinkedList<diff_match_patch.Diff> changes = dmp.diff_main(original.trim().replace("\n", "").replace("\r", ""), mutantText.trim().replace("\n", "").replace("\r", ""), true);
+        boolean noChange = true;
+        for (diff_match_patch.Diff d : changes) {
+            if (d.operation != diff_match_patch.Operation.EQUAL) {
+                noChange = false;
+            }
+        }
+
+        if (noChange) {return false;}
 
         // Setup folder the files will go in
         Long timestamp = System.currentTimeMillis();
