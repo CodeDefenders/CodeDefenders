@@ -11,13 +11,9 @@ public class ScorePage extends HttpServlet {
 
     protected GameState gs;
 
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-        gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
-    }
-
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
+        gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("html/score_view.jsp");
         dispatcher.forward(request, response);

@@ -19,11 +19,12 @@ public class DefenderPage extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
         mt = (MutationTester) getServletContext().getAttribute("gammut.mutationtester");
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
+        gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
 
         if (gs.isFinished()) {
             RequestDispatcher dispatcher = request.getRequestDispatcher("scores");
@@ -43,6 +44,14 @@ public class DefenderPage extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
+        int count = 0;
+        for (Mutant m : gs.getMutants()) {
+            System.out.println(request.getParameter("mutant"+count));
+            if (request.getParameter("mutant"+count) != null) {
+                m.setEquivalent(true);
+            }
+        }
 
         // Get the text submitted by the user.
         String testText = request.getParameter("test");

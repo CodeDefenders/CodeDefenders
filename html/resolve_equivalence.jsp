@@ -29,7 +29,7 @@
             		<li class="navbar-text"><%= gs.getAliveMutants().size() %> Mutants are Alive</li>
           		</ul>
           		<ul class="nav navbar-nav navbar-right">
-          			<button type="submit" class="btn btn-default navbar-btn" form="def">Defend!</button>
+          			<button type="submit" class="btn btn-default navbar-btn" form="equivalence">Resolve</button>
           		</ul>
       		</div>
    		</div>
@@ -40,19 +40,16 @@
 		<h2> Mutants </h2>
 	    <table class="table table-hover table-responsive table-paragraphs">
 
-		<% 
-		boolean isMutants = false;
-		int count = 0;
+		<%
+
 		for (Mutant m : gs.getAliveMutants()) { 
-			isMutants = true;
+			if (m.isEquivalent() && m.isAlive()) {
 		%>
 
 			<tr>
 				<td class="col-sm-1"><%= "Greg" %></td>
-				<td class="col-sm-1"><% if (m.isAlive()) {%><%="Alive"%><%} else {%><%="Dead"%><%} %></td>
-				<td class="col-sm-1">
-					<input type="checkbox" form="def" name="mutant<%=count%>" value="equivalent" <% if (m.isEquivalent()) {%><%="checked"%><%}%>>
-				</td>
+				<td class="col-sm-1">"Alive"</td>
+				<td class="col-sm-1">"Equivalent Mutant"</td>
 			</tr>
 
 			<tr>
@@ -62,12 +59,10 @@
 				<td class="row-borderless" colspan="3"></td>
 			</tr>
 
-		<%
-			count++;
-		} 
-		if (!isMutants) {%>
-			<p> There are currently no mutants </p>
-		<%}
+		<%	
+			break;
+			}
+		}
 		%>
 		</table>
 
@@ -113,7 +108,10 @@
 	</div>
 
 	<div id="code">
-		<form id="def" action="/gammut/defender" method="post">
+		<form id="equivalence" action="/gammut/attacker" method="post">
+
+			<input type="radio" name="supplytest" value="true">I Can Kill This
+			<input type="radio" name="supplytest" value="false">I Can't Kill This
 
 			<input type="hidden" name="user" value="1">
 	        <textarea name="test" cols="90" rows="30">

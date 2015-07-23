@@ -1,6 +1,7 @@
 package gammut;
 
-import java.io.File;
+import java.io.*;
+import javax.servlet.*;
 
 public class Test {
 
@@ -45,7 +46,8 @@ public class Test {
 		validTest = b;
 	}
 
-	public String getHTMLReadout() {
-		return "<p> dummy return </p>";
+	public String getHTMLReadout() throws IOException {
+
+        return "<p> info about the test </p>";
 	}
 }

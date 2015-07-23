@@ -13,7 +13,6 @@ public class MutationTester {
 
 	public void runMutationTests(ArrayList<Test> tests, ArrayList<Mutant> mutants, String className) {
 
-		Process mutationTest = null;
 		boolean pass;
 
 		for (Mutant m : mutants) {
@@ -24,6 +23,16 @@ public class MutationTester {
 				}
 			}
 			if (m.isAlive()) {m.scorePoints(1);}
+		}
+	}
+
+	public void runEquivalenceTest(Test test, Mutant mutant, String className) {
+
+		boolean pass;
+		if (mutant.isAlive() && test.isValidTest()) {
+			pass = testMutant(mutant, test, className);
+			if (!pass) {mutant.setAlive(false); mutant.scorePoints(3);}
+			else {mutant.setAlive(false); test.scorePoints(2);}
 		}
 	}
 

@@ -39,7 +39,7 @@
 			<h1> Attacker Has Won! </h1>
 		<% }
 	    
-	    if (gs.getScore(0) < gs.getScore(1)) { %>
+	    else if (gs.getScore(0) < gs.getScore(1)) { %>
 	    	<h1> Defender Has Won! </h1>
 	    <%}
 	    

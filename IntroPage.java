@@ -21,6 +21,7 @@ public class IntroPage extends HttpServlet {
     }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        gs = (GameState)getServletContext().getAttribute("gammut.gamestate");
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("html/intro_view.jsp");
         dispatcher.forward(request, response);
