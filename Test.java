@@ -7,6 +7,7 @@ public class Test {
 
 	File folder;
 	String className;
+	String text;
 
 	boolean validTest = true;
 
@@ -30,24 +31,17 @@ public class Test {
 		return folder.getAbsolutePath() + "Test" + className + ".class";
 	}
 
-	public void scorePoints(int p) {
-		pointsScored += p;
-	}
+	public void setText(String t) {text = t;}
+	public String getText() {return text;}
 
-	public int getPoints() {
-		return pointsScored;
-	}
+	public void scorePoints(int p) {pointsScored += p;}
+	public int getPoints() {return pointsScored;}
 
-	public boolean isValidTest() {
-		return validTest;
-	}
-
-	public void setValidTest(boolean b) {
-		validTest = b;
-	}
+	public void setValidTest(boolean b) {validTest = b;}
+	public boolean isValidTest() {return validTest;}
 
 	public String getHTMLReadout() throws IOException {
 
-        return "<p> info about the test </p>";
+        return "<code>" + getText().replace("\n", "<br>") + "</code>";
 	}
 }

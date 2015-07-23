@@ -48,7 +48,7 @@
 
 			<tr>
 				<td class="col-sm-2"><%= "Greg" %></td>
-				<td class="col-sm-1"><%= "yes" %></td>
+				<td class="col-sm-1"><% if (m.isAlive()) {%><%="Alive"%><%} else {%><%="Dead"%><%} %></td>
 			</tr>
 
 			<tr>

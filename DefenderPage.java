@@ -80,6 +80,7 @@ public class DefenderPage extends HttpServlet {
         bw.close();
 
         Test newTest = new Test(folder, name);
+        newTest.setText(testText);
 
         // Check the test actually passes when applied to the original code.
         
