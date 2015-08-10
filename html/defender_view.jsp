@@ -51,7 +51,7 @@
 				<td class="col-sm-1"><%= "Greg" %></td>
 				<td class="col-sm-1"><% if (m.isAlive()) {%><%="Alive"%><%} else {%><%="Dead"%><%} %></td>
 				<td class="col-sm-1">
-					<input type="checkbox" form="def" name="mutant<%=count%>" value="equivalent" <% if (m.isEquivalent()) {%><%="checked"%><%}%>>
+					Mark as Equivalent: <input type="checkbox" form="def" name="mutant<%=count%>" value="equivalent" <% if (m.isEquivalent()) {%><%="checked"%><%}%>>
 				</td>
 			</tr>
 
