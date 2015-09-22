@@ -1,12 +1,21 @@
 <web-app>
 
 	<servlet>
-		<servlet-name>loginpage</servlet-name>
+		<servlet-name>loginmanager</servlet-name>
 		<servlet-class>gammut.LoginManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>loginpage</servlet-name>
+		<servlet-name>loginmanager</servlet-name>
 		<url-pattern>/login</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>gameselectionmanager</servlet-name>
+		<servlet-class>gammut.GameSelectionManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>gameselectionmanager</servlet-name>
+		<url-pattern>/games</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -43,6 +52,15 @@
 	<servlet-mapping>
 		<servlet-name>score</servlet-name>
 		<url-pattern>/scores</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>updateclasses</servlet-name>
+		<servlet-class>gammut.UpdateAvailableClasses</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>updateclasses</servlet-name>
+		<url-pattern>/updateclasses</url-pattern>
 	</servlet-mapping>
 
 	<filter>
