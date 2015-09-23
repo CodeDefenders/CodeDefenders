@@ -14,13 +14,6 @@ public class AttackerPage extends HttpServlet {
     public static final int DEFENDER = 1;
 
     protected GameState gs;
-    protected MutationTester mt;
-
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-        mt = (MutationTester) getServletContext().getAttribute("gammut.mutationtester");
-    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         gs = (GameState) getServletContext().getAttribute("gammut.gamestate");
@@ -67,7 +60,7 @@ public class AttackerPage extends HttpServlet {
                         }
                     }
 
-                    mt.runEquivalenceTest(test, mutant, gs.getClassName());
+                    MutationTester.runEquivalenceTest(test, mutant, gs.getClassName());
                 }
             }
             else {
@@ -132,7 +125,7 @@ public class AttackerPage extends HttpServlet {
         Mutant newMutant = new Mutant(folder, name);
         newMutant.setDifferences(changes);
 
-        if (mt.compileMutant(newMutant, name)) {gs.addMutant(newMutant); return true;}
+        if (MutationTester.compileMutant(newMutant, name)) {gs.addMutant(newMutant); return true;}
         else {folder.delete(); return false;}
     }
 
@@ -155,7 +148,7 @@ public class AttackerPage extends HttpServlet {
         // Check the test actually passes when applied to the original code.
         
 
-        if (mt.compileTest(newTest, name) && mt.testOriginal(newTest, name)) {
+        if (MutationTester.compileTest(newTest, name) && MutationTester.testOriginal(newTest, name)) {
             gs.addTest(newTest);
             return newTest;
         }

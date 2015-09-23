@@ -5,13 +5,7 @@ import java.util.ArrayList;
 
 public class MutationTester {
 
-	private String log;
-
-	public MutationTester() {
-		log = "";
-	}
-
-	public void runMutationTests(ArrayList<Test> tests, ArrayList<Mutant> mutants, String className) {
+	public static void runMutationTests(ArrayList<Test> tests, ArrayList<Mutant> mutants, String className) {
 
 		boolean pass;
 
@@ -26,7 +20,7 @@ public class MutationTester {
 		}
 	}
 
-	public void runEquivalenceTest(Test test, Mutant mutant, String className) {
+	public static void runEquivalenceTest(Test test, Mutant mutant, String className) {
 
 		boolean pass;
 		if (mutant.isAlive() && test.isValidTest()) {
@@ -36,27 +30,28 @@ public class MutationTester {
 		}
 	}
 
-	public boolean compileMutant(Mutant m, String className) {
+	public static boolean compileMutant(Mutant m, String className) {
 		return runAntTarget("compile-mutant", m.getFolder(), null, className);
 	}
 
-	public boolean compileTest(Test t, String className) {
+	public static boolean compileTest(Test t, String className) {
 		return runAntTarget("compile-test", null, t.getFolder(), className);
 	}
 
-	public boolean testOriginal(Test t, String className) {
+	public static boolean testOriginal(Test t, String className) {
 		return runAntTarget("test-original", null, t.getFolder(), className);
 	}
 
-	public boolean testMutant(Mutant m, Test t, String className) {
+	public static boolean testMutant(Mutant m, Test t, String className) {
 		return runAntTarget("test-mutant", m.getFolder(), t.getFolder(), className);
 	}
 
 	// Runs a specific Ant Target, given the name of the target and files to supply as arguments.
 	// Already knows the class name from the constructor of the Mutation Tester.
-	private boolean runAntTarget(String target, String mutantFile, String testFile, String className) {
+	private static boolean runAntTarget(String target, String mutantFile, String testFile, String className) {
+		String log = "";
 		boolean result = true;
-		log += "<p> Running Ant Target: " + target + "</p>";
+		log += "Running Ant Target: " + target + "\n";
 
 		ProcessBuilder pb = new ProcessBuilder("C:\\apache-ant-1.9.5\\bin\\ant.bat",
 												target,
@@ -69,13 +64,11 @@ public class MutationTester {
 			Process p = pb.start();
 		    String line;
 		    BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
-    		while((line = is.readLine()) != null) {log += "<p>"+line+"</p>";}
+    		while((line = is.readLine()) != null) {log += line + "\n";}
     		BufferedReader es = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-    		while((line = es.readLine()) != null) {log += "<p>"+line+"</p>"; result = false;}
-		} catch (Exception ex) {log += "<p> Exception: " + ex.toString() + "</p>"; result = false;}
-
+    		while((line = es.readLine()) != null) {log += line + "\n"; result = false;}
+		} catch (Exception ex) {log += "Exception: " + ex.toString() + "\n"; result = false;}
+		System.out.println(log);
 		return result;
 	}
-
-	public String getLog() {return log;}
 }

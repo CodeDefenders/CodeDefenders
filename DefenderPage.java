@@ -14,13 +14,6 @@ public class DefenderPage extends HttpServlet {
     String testError = "";
 
     protected GameState gs;
-    protected MutationTester mt;
-
-    @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-        mt = (MutationTester) getServletContext().getAttribute("gammut.mutationtester");
-    }
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -58,7 +51,7 @@ public class DefenderPage extends HttpServlet {
         // Write it to a Java File.
         
         if (createTest(testText, gs.getClassName())) {
-            mt.runMutationTests(gs.getTests(), gs.getMutants(), gs.getClassName());
+            MutationTester.runMutationTests(gs.getTests(), gs.getMutants(), gs.getClassName());
             gs.endTurn();
         }
 
@@ -85,7 +78,7 @@ public class DefenderPage extends HttpServlet {
         // Check the test actually passes when applied to the original code.
         
 
-        if (mt.compileTest(newTest, name) && mt.testOriginal(newTest, name)) {
+        if (MutationTester.compileTest(newTest, name) && MutationTester.testOriginal(newTest, name)) {
             gs.addTest(newTest);
             return true;
         }
