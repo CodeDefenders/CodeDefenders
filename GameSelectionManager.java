@@ -109,6 +109,101 @@ public class GameSelectionManager extends HttpServlet {
         return gameList;
     }
 
+    public static String getNameForUser(int userId) {
+        Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+        String name = null;
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+            stmt = conn.createStatement();
+            System.out.println("Selecting all from classes where user ID = " + userId);
+            sql = String.format("SELECT * FROM users WHERE User_ID=%d;", userId);
+            ResultSet rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                name = rs.getString("Username");
+                System.out.println("got " + name);
+            }
+
+            stmt.close();
+            conn.close();
+            
+
+        } catch(SQLException se) {
+            System.out.println(se);
+            //Handle errors for JDBC
+        } catch(Exception e) {
+            System.out.println(e);
+            //Handle errors for Class.forName
+        } finally{
+            //finally block used to close resources
+            try {
+                if(stmt!=null)
+                   stmt.close();
+            } catch(SQLException se2) {}// nothing we can do
+
+            try {
+                if(conn!=null)
+                conn.close();
+            } catch(SQLException se) {
+                System.out.println(se);
+            }//end finally try
+        } //end try
+
+        return name;
+    }
+
+    public static String getNameForClass(int classId) {
+        Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+        String name = null;
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+            stmt = conn.createStatement();
+            System.out.println("Selecting all from classes where class ID = " + classId);
+            sql = String.format("SELECT * FROM classes WHERE Class_ID=%d;", classId);
+            ResultSet rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                name = rs.getString("Name");
+                System.out.println("got " + name);
+            }
+
+            stmt.close();
+            conn.close();
+            
+
+        } catch(SQLException se) {
+            System.out.println(se);
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch(Exception e) {
+            System.out.println(e);
+            //Handle errors for Class.forName
+        } finally{
+            //finally block used to close resources
+            try {
+                if(stmt!=null)
+                   stmt.close();
+            } catch(SQLException se2) {}// nothing we can do
+
+            try {
+                if(conn!=null)
+                conn.close();
+            } catch(SQLException se) {
+                System.out.println(se);
+            }//end finally try
+        } //end try
+
+        return name;
+    }
+
     public static ArrayList<Game> getAllGames() {
         Connection conn = null;
         Statement stmt = null;

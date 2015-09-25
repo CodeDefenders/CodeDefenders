@@ -30,16 +30,44 @@
 
   <h2> My Games </h2>
     <table class="table table-hover table-responsive table-paragraphs">
+      <tr>
+        <td class="col-sm-2">Game No.</td>
+        <td class="col-sm-2">Attacker</td>
+        <td class="col-sm-2">Defender</td>
+        <td class="col-sm-2">Game State</td>
+        <td class="col-sm-2">Class Tested</td>
+        <td class="col-sm-2"></td>
+      </tr>
+
 
     <% 
     boolean isGames = false;
+    String atkName;
+    String defName;
     int uid = (Integer)request.getSession().getAttribute("uid");
     for (Game g : GameSelectionManager.getGamesForUser(uid)) { 
       isGames = true;
+      
+      atkName = GameSelectionManager.getNameForUser(g.getAttackerId());
+      if (atkName == null) {atkName = "Empty";}
+
+      defName = GameSelectionManager.getNameForUser(g.getDefenderId());
+      if (defName == null) {defName = "Empty";}
     %>
 
       <tr>
-        <td class="col-sm-2"><%= "Game ID:" + g.getId() %></td>
+        <td class="col-sm-2"><%= g.getId() %></td>
+        <td class="col-sm-2"><%= atkName %></td>
+        <td class="col-sm-2"><%= defName %></td>
+        <td class="col-sm-2"><%= g.getState() %></td>
+        <td class="col-sm-2"><%= GameSelectionManager.getNameForClass(g.getClassId()) %></td>
+        <td class="col-sm-2">
+          <form id="view" action="/gammut/games" method="post">
+            <input type="hidden" name="formType" value="enterGame">
+            <input type="hidden" name="gameId" value=<%g.getId();%>>
+            <input type="submit" value="View">
+          </form>
+        </td>
       </tr>
 
     <%
