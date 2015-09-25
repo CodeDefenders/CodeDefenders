@@ -53,12 +53,12 @@ public class MutationTester {
 		boolean result = true;
 		log += "Running Ant Target: " + target + "\n";
 
-		ProcessBuilder pb = new ProcessBuilder("C:\\apache-ant-1.9.5\\bin\\ant.bat",
+		ProcessBuilder pb = new ProcessBuilder("%ANT_HOME%\\bin\\ant.bat",
 												target,
 												"-Dmutant.file="+mutantFile,
 												"-Dtest.file="+testFile,
 												"-Dclassname="+className);
-        pb.directory(new File("C:\\apache-tomcat-7.0.62\\webapps\\gammut\\WEB-INF"));
+        pb.directory(new File("%CATALINA_HOME%\\webapps\\gammut\\WEB-INF"));
 
 		try {
 			Process p = pb.start();
