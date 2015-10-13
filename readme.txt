@@ -15,11 +15,16 @@ JUnit (Java file already included)
 
 -- RUNNING THE WEB APP ON YOUR LOCAL MACHINE --
 
-1. Compile all the Java Code in the GamMut directory into WEB-INF\classes
-(Windows command used is "javac *.java -d WEB-INF\classes")
+To create war file, on the root directory, execute:
+$ make
 
-2. Package the project as a web archive
-(Windows command used is "jar cvf gammut.war html WEB-INF")
+Alternatively:
+
+1. Compile all the Java Code in the GamMut directory into WEB-INF/classes:
+$ javac *.java -d WEB-INF/classes
+
+2. Package the project as a web archive:
+$ jar cvf gammut.war html WEB-INF
 
 3. Store the gammut.war web archive file in the apache-tomcat-<version no.>\webapps folder
 

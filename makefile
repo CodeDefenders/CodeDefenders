@@ -1,11 +1,14 @@
 DOC_NAME:=main
 GEN:=generated_files
 FIG:=figures
+WARFILE:=gammut.war
 
 default: *.java
 	mkdir -p WEB-INF/classes
 	javac *.java -d WEB-INF/classes
-	jar cvf gammut.war html WEB-INF
-
+	jar cvf ${WARFILE} html WEB-INF
+	cp ${WARFILE} ${CATALINA_HOME}/webapps
+	${CATALINA_HOME}/bin/startup.sh
 clean:
-	rm -f WEB-INF/classes
+	rm -fR WEB-INF/classes
+	rm -f ${WARFILE}
