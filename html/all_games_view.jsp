@@ -22,11 +22,29 @@
     		</div>
       		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
           		<ul class="nav navbar-nav">
-            		<a class="navbar-brand" href="/gammut/intro">GamMut</a>
+            		<li><a class="navbar-brand" href="/gammut/intro">GamMut</a></li>
+                <li><a href="/gammut/html/user_games_view.jsp">My Games</a></li>
+                <li class="active"><a href="/gammut/html/all_games_view.jsp">All Games</a></li>
+                <li><a href="/gammut/html/create_game_view.jsp">Create Game</a></li>
+                <li><a href="/gammut/html/history_view.jsp">History</a></li>
           		</ul>
+              <ul class="nav navbar-nav navbar-right">
+                <li></li>
+                <li>
+                  <p class="navbar-text">
+                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span> 
+                    <%=request.getSession().getAttribute("username")%>
+                  </p>
+                </li>
+                <li><input type="submit" form="logout" class="btn btn-inverse navbar-btn" value="Log Out"/></li>
+              </ul>
       		</div>
    		</div>
 	</nav>
+
+  <form id="logout" action="/gammut/login" method="post">
+    <input type="hidden" name="formType" value="logOut">
+  </form>
 
   <h2> All Games </h2>
     <table class="table table-hover table-responsive table-paragraphs">

@@ -21,12 +21,12 @@ public class LoginManager extends HttpServlet {
 
         String username = (String)request.getParameter("username");
         String password = (String)request.getParameter("password");
-        String action = (String)request.getParameter("action");
+        String formType = (String)request.getParameter("formType");
         int uid;
 
-        System.out.println("Received form with "+username+password+action);
+        System.out.println("Received form with "+username+password+formType);
 
-        if (action.equals("create")) {
+        if (formType.equals("create")) {
             String confirm = (String)request.getParameter("confirm");
             System.out.println("Try to create");
             if ((uid = createAccount(username, password, confirm)) != -1) {
@@ -45,7 +45,7 @@ public class LoginManager extends HttpServlet {
             }
         }
 
-        else if (action.equals("login")) {
+        else if (formType.equals("login")) {
             if ((uid = loginAccount(username, password)) != -1) {
                 HttpSession session = request.getSession();
                 session.setAttribute("uid", uid);
@@ -59,6 +59,14 @@ public class LoginManager extends HttpServlet {
                 RequestDispatcher dispatcher = request.getRequestDispatcher("html/login_view.jsp");
                 dispatcher.forward(request, response);
             }
+        }
+
+        else if (formType.equals("logOut")) {
+            HttpSession session = request.getSession();
+            session.invalidate();
+            System.out.println("log out");
+            RequestDispatcher dispatcher = request.getRequestDispatcher("html/login_view.jsp");
+            dispatcher.forward(request, response);
         }
 
         else {

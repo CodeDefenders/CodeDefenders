@@ -31,7 +31,7 @@
   <div id="login">
     <h2>Existing Account</h2>
     <form action="/gammut/login" method="post">
-      <input type="hidden" name="action" value="login">
+      <input type="hidden" name="formType" value="login">
       Username:<input type="text" name="username"><br>
       Password:<input type="password" name="password"><br>
       <input type="submit" value="Login">
@@ -40,7 +40,7 @@
 	<div id="create">
 		<h2>Create Account</h2>
     <form action="/gammut/login" method="post">
-      <input type="hidden" name="action" value="create">
+      <input type="hidden" name="formType" value="create">
       Username:<input type="text" name="username"><br>
       Password:<input type="password" name="password"><br>
       Confirm Password:<input type="password" name="confirm"></br>
