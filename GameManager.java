@@ -21,7 +21,9 @@ public class GameManager extends HttpServlet {
         // Get the session information specific to the current user.
         HttpSession session = request.getSession();
         int uid = (int)session.getAttribute("uid");
-        int gid = (int)session.getAttribute("gid");        
+        int gid = (int)session.getAttribute("gid");
+
+        System.out.println("Getting game " + gid + " for " + uid);
 
         try {
 
@@ -35,6 +37,7 @@ public class GameManager extends HttpServlet {
 
             // If a game with the provided ID exists, store the data in a Game class and close the connection.
             if (rs.next()) {
+                System.out.println("Game with id " + gid + " exists");
                 Game activeGame = new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
                                     rs.getInt("CurrentRound"), rs.getInt("FinalRound"), rs.getString("ActivePlayer"), rs.getString("State"));
                 
@@ -50,6 +53,7 @@ public class GameManager extends HttpServlet {
 
                 // If the current user is one of the players in the game
                 if (activeGame.getAttackerId() == uid) {
+                    System.out.println("user is attacker");
                     session.setAttribute("game", activeGame);
 
                     for (Mutant m : getMutantsForGame(activeGame.getId())) {
@@ -60,6 +64,7 @@ public class GameManager extends HttpServlet {
                         }
                     }
                     
+                    System.out.println("Should be going to attacker page");
                     // If no mutants needed to be proved non-equivalent, direct to the Attacker Page.
                     RequestDispatcher dispatcher = request.getRequestDispatcher("html/attacker_view.jsp");
                     dispatcher.forward(request, response);
@@ -283,5 +288,53 @@ public class GameManager extends HttpServlet {
 
         */
         return false;
+    }
+
+    public static ArrayList<Test> getTestsForGame(int gid) {
+        ArrayList<Test> testList = new ArrayList<Test>();
+        /*
+        Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+
+        try {
+
+            // Load the Game Data with the provided ID.
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+
+            stmt = conn.createStatement();
+            sql = String.format("SELECT * FROM mutants WHERE Game_ID='%i'", gid);
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"), rs.getBlob("JavaFile").getBytes(), rs.getBlob("ClassFile").getBytes(), 
+                              rs.getBoolean("Alive"), rs.getBoolean("SuspectEquivalent"), rs.getBoolean("DeclaredEquivalent"), rs.getInt("Points"));
+                mutList.add(newMutant);
+            }
+
+            stmt.close();
+            conn.close();
+        }
+        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
+        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
+        finally {
+            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
+            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
+        }
+        */
+        return testList;
+    }
+
+    // create mutant method
+
+    public static File getJavaFile(int cid) {
+        File nullFile = null;
+        return nullFile;
+    }
+
+    public static File getClassFile(int cid) {
+        File nullFile = null;
+        return nullFile;
     }
 }

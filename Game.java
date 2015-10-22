@@ -1,5 +1,7 @@
 package gammut;
 
+import java.util.ArrayList;
+
 public class Game {
 
 	private int id;
@@ -23,7 +25,10 @@ public class Game {
 	}
 
 	public int getId() {return id;}
+	
 	public int getClassId() {return classId;}
+	public String getClassName() {return GameSelectionManager.getNameForClass(classId);}
+
 	public int getAttackerId() {System.out.println(attackerId); return attackerId;}
 	public int getDefenderId() {return defenderId;}
 
@@ -32,4 +37,25 @@ public class Game {
 
 	public String getActivePlayer() {return activePlayer;}
 	public String getState() {return state;}
+
+	public ArrayList<Mutant> getMutants() {return GameManager.getMutantsForGame(id);}
+	public ArrayList<Mutant> getAliveMutants() {
+		ArrayList<Mutant> aliveMutants = new ArrayList<Mutant>();
+		for (Mutant m : getMutants()) {
+			if (m.isAlive()) {
+				aliveMutants.add(m);
+			}
+		}
+		return aliveMutants;
+	}
+
+	public ArrayList<Test> getTests() {return GameManager.getTestsForGame(id);}
+
+	public int getAttackerScore() {
+		return 0;
+	}
+
+	public int getDefenderScore() {
+		return 0;
+	}
 }
