@@ -8,7 +8,6 @@ import java.sql.*;
 import java.nio.file.Files;
 import diff_match_patch.*;
 
-
 public class GameManager extends HttpServlet {
 
     // Based on info provided, navigate to the correct view for the user
@@ -209,16 +208,49 @@ public class GameManager extends HttpServlet {
         return mutList;
     }
 
+    public static ArrayList<Test> getTestsForGame(int gid) {
+        ArrayList<Test> testList = new ArrayList<Test>();
+        
+        Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+
+        try {
+
+            // Load the Game Data with the provided ID.
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+
+            stmt = conn.createStatement();
+            sql = String.format("SELECT * FROM tests WHERE Game_ID='%i'", gid);
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"), 
+                                   rs.getBlob("JavaFile").getBinaryStream(), rs.getBlob("ClassFile").getBinaryStream(), 
+                                   rs.getInt("Points"));
+                testList.add(newTest);
+            }
+
+            stmt.close();
+            conn.close();
+        }
+        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
+        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
+        finally {
+            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
+            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
+        }
+        
+        return testList;
+    }
+
     // Writes text as a Mutant to the appropriate place in the file system.
     public boolean createMutant(int gid, int cid, String mutantText) throws IOException {
 
         String className = GameSelectionManager.getNameForClass(cid);
 
-        String original = "";
-        String line;
-
-        byte[] javaFile = getJavaFile(cid);
-
+        byte[] javaFile = getJavaFileForClass(cid);
         String sourceCode = new String(javaFile);
 
         // Runs diff match patch between the two Strings to see if there are any differences.
@@ -253,8 +285,7 @@ public class GameManager extends HttpServlet {
             InputStream cStream = getServletContext().getResourceAsStream("/WEB-INF/mutants/"+gid+"/"+className+".class");
 
             Mutant newMutant = new Mutant(gid, jStream, cStream);
-
-            // code to add mutant to database
+            newMutant.insert();
 
             folder.delete(); 
             return true;
@@ -262,51 +293,157 @@ public class GameManager extends HttpServlet {
         else {folder.delete(); return false;}
     }
 
-    public static ArrayList<Test> getTestsForGame(int gid) {
-        ArrayList<Test> testList = new ArrayList<Test>();
-        /*
+    public boolean createTest(int gid, int cid, String testText) throws IOException {
+
+        String className = GameSelectionManager.getNameForClass(cid);
+
+        byte[] javaFile = getJavaFileForClass(cid);
+        String sourceCode = new String(javaFile);
+
+        File folder = new File(getServletContext().getRealPath("/WEB-INF/tests/"+gid));
+        folder.mkdir();
+
+        File test = new File(getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+className+".java"));
+        FileWriter testWriter = new FileWriter(test);
+        BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);
+        bufferedTestWriter.write(testText);
+        bufferedTestWriter.close();
+
+        File source = new File(getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/"+className+".java"));
+        FileWriter sourceWriter = new FileWriter(source);
+        BufferedWriter bufferedSourceWriter = new BufferedWriter(sourceWriter);
+        bufferedSourceWriter.write(sourceCode);
+        bufferedSourceWriter.close();
+
+        // Check the test actually passes when applied to the original code.
+        
+        if (MutationTester.compileTest(folder, className) && MutationTester.testOriginal(folder, className)) {
+
+            InputStream jStream = getServletContext().getResourceAsStream("/WEB-INF/tests/"+gid+"/Test"+className+".java");
+            InputStream cStream = getServletContext().getResourceAsStream("/WEB-INF/tests/"+gid+"/Test"+className+".class");
+
+            Test newTest = new Test(gid, jStream, cStream);
+            newTest.insert();
+
+            folder.delete();
+            return true;
+        }
+
+        folder.delete();
+        return false;
+    }
+
+    public static byte[] getJavaFileForClass(int cid) {
+
         Connection conn = null;
         Statement stmt = null;
         String sql = null;
 
         try {
-
-            // Load the Game Data with the provided ID.
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
-
             stmt = conn.createStatement();
-            sql = String.format("SELECT * FROM mutants WHERE Game_ID='%i'", gid);
+            sql = String.format("SELECT JavaFile FROM classes WHERE Class_ID=%d;", cid);
             ResultSet rs = stmt.executeQuery(sql);
 
-            while (rs.next()) {
-                Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"), rs.getBlob("JavaFile").getBytes(), rs.getBlob("ClassFile").getBytes(), 
-                              rs.getBoolean("Alive"), rs.getBoolean("SuspectEquivalent"), rs.getBoolean("DeclaredEquivalent"), rs.getInt("Points"));
-                mutList.add(newMutant);
+            if (rs.next()) {
+                InputStream jStream = rs.getBlob("JavaFile").getBinaryStream();
+                int nRead;
+
+                ByteArrayOutputStream jBuffer = new ByteArrayOutputStream();
+
+                while ((nRead = jStream.read()) != -1) {
+                    jBuffer.write(nRead);
+                }
+
+                jBuffer.flush();
+                byte[] javaFile = jBuffer.toByteArray();
+                stmt.close();
+                conn.close();
+                return javaFile;
             }
 
             stmt.close();
             conn.close();
-        }
-        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
-        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
-        finally {
-            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
-            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
-        }
-        */
-        return testList;
+            
+
+        } catch(SQLException se) {
+            System.out.println(se);
+            //Handle errors for JDBC
+        } catch(Exception e) {
+            System.out.println(e);
+            //Handle errors for Class.forName
+        } finally{
+            //finally block used to close resources
+            try {
+                if(stmt!=null)
+                   stmt.close();
+            } catch(SQLException se2) {}// nothing we can do
+
+            try {
+                if(conn!=null)
+                conn.close();
+            } catch(SQLException se) {
+                System.out.println(se);
+            }//end finally try
+        } //end try
+        return null;
     }
 
-    // create mutant method
+    public static byte[] getClassFileForClass(int cid) {
 
-    public static byte[] getJavaFile(int cid) {
-        byte[] array = new byte[4];
-        return array;
-    }
+        Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
 
-    public static byte[] getClassFile(int cid) {
-        byte[] array = new byte[4];
-        return array;
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+            stmt = conn.createStatement();
+            sql = String.format("SELECT ClassFile FROM classes WHERE Class_ID=%d;", cid);
+            ResultSet rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                InputStream cStream = rs.getBlob("ClassFile").getBinaryStream();
+                int nRead;
+
+                ByteArrayOutputStream cBuffer = new ByteArrayOutputStream();
+
+                while ((nRead = cStream.read()) != -1) {
+                    cBuffer.write(nRead);
+                }
+
+                cBuffer.flush();
+                byte[] classFile = cBuffer.toByteArray();
+                stmt.close();
+                conn.close();
+                return classFile;
+            }
+
+            stmt.close();
+            conn.close();
+            
+
+        } catch(SQLException se) {
+            System.out.println(se);
+            //Handle errors for JDBC
+        } catch(Exception e) {
+            System.out.println(e);
+            //Handle errors for Class.forName
+        } finally{
+            //finally block used to close resources
+            try {
+                if(stmt!=null)
+                   stmt.close();
+            } catch(SQLException se2) {}// nothing we can do
+
+            try {
+                if(conn!=null)
+                conn.close();
+            } catch(SQLException se) {
+                System.out.println(se);
+            }//end finally try
+        } //end try
+        return null;
     }
 }

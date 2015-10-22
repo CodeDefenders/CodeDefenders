@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.*;
 import java.io.*;
 import diff_match_patch.*;
+import java.sql.*;
 
 public class Mutant {
 
@@ -109,5 +110,36 @@ public class Mutant {
         }
         html += "<br>";
         return html;
+	}
+
+	public boolean insert() {
+
+		Connection conn = null;
+        PreparedStatement pstmt = null;
+        String sql = null;
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+
+            pstmt = conn.prepareStatement("INSERT INTO mutants (JavaFile, ClassFile, Game_ID) VALUES (?, ?, ?);");
+        	pstmt.setBinaryStream(1, new ByteArrayInputStream(javaFile));
+        	pstmt.setBinaryStream(2, new ByteArrayInputStream(classFile));
+        	pstmt.setInt(3, gameId);
+
+        	System.out.println("Executing statement: " + pstmt);
+        	pstmt.execute();
+
+        	conn.close();
+        	pstmt.close();
+        	return true;
+        }
+        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
+        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
+        finally {
+            try { if (pstmt!=null) {pstmt.close();} } catch(SQLException se2) {} // Nothing we can do
+            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
+        }
+        return false;
 	}
 }

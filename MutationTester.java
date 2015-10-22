@@ -34,12 +34,12 @@ public class MutationTester {
 		return runAntTarget("compile-mutant", f.getAbsolutePath(), null, className);
 	}
 
-	public static boolean compileTest(Test t, String className) {
-		return runAntTarget("compile-test", null, t.getFolder(), className);
+	public static boolean compileTest(File f, String className) {
+		return runAntTarget("compile-test", null, f.getAbsolutePath(), className);
 	}
 
-	public static boolean testOriginal(Test t, String className) {
-		return runAntTarget("test-original", null, t.getFolder(), className);
+	public static boolean testOriginal(File f, String className) {
+		return runAntTarget("test-original", null, f.getAbsolutePath(), className);
 	}
 
 	public static boolean testMutant(Mutant m, Test t, String className) {

@@ -22,9 +22,8 @@
   <!-- requires test to compile, and the classname of the file you are testing -->
   <target name="test-original" description="run test on original code to ensure it passes">
     <junit printsummary="true" haltonfailure="true">
-      <!-- Sets the content of the classpath to the relevant original class -->
+      <!-- Original class should be in the same folder as being tested -->
       <classpath>
-        <pathelement location="resources"/>
         <pathelement location="${test.file}"/>
       </classpath>
       <test name="Test${classname}"/>
