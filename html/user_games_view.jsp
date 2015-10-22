@@ -82,8 +82,8 @@
         <td class="col-sm-2">
           <form id="view" action="/gammut/games" method="post">
             <input type="hidden" name="formType" value="enterGame">
-            <input type="hidden" name="gameId" value=<%g.getId();%>>
-            <input type="submit" value="View">
+            <input type="hidden" name="game" value=<%=g.getId()%>>
+            <input type="submit" value="Enter Game">
           </form>
         </td>
       </tr>
