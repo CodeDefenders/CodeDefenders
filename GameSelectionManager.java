@@ -35,13 +35,12 @@ public class GameSelectionManager extends HttpServlet {
                     HttpSession session = request.getSession();
                     session.setAttribute("gid", gameId);
 
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("/game");
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("play");
                     dispatcher.forward(request, response);
                 }
 
                 else {
-                    RequestDispatcher dispatcher = request.getRequestDispatcher(request.getRequestURL().toString());
-                    dispatcher.forward(request, response);
+                    response.sendRedirect(request.getHeader("referer"));
                 }
                 
                 break;
@@ -56,13 +55,12 @@ public class GameSelectionManager extends HttpServlet {
                     HttpSession session = request.getSession();
                     session.setAttribute("gid", gameId);
 
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("/game");
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("play");
                     dispatcher.forward(request, response);
                 }
 
                 else {
-                    RequestDispatcher dispatcher = request.getRequestDispatcher(request.getRequestURL().toString());
-                    dispatcher.forward(request, response);
+                    response.sendRedirect(request.getHeader("referer"));
                 }
 
                 break;
@@ -76,14 +74,11 @@ public class GameSelectionManager extends HttpServlet {
                     HttpSession session = request.getSession();
                     session.setAttribute("gid", gameId);
                     
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("/game");
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("play");
                     dispatcher.forward(request, response);
                 }
 
-                else {
-                    RequestDispatcher dispatcher = request.getRequestDispatcher(request.getRequestURL().toString());
-                    dispatcher.forward(request, response);
-                }
+                else {response.sendRedirect(request.getHeader("referer"));}
 
                 break;
         }

@@ -1,47 +1,56 @@
 <web-app>
 
 	<servlet>
-		<servlet-name>loginmanager</servlet-name>
+		<servlet-name>loginManager</servlet-name>
 		<servlet-class>gammut.LoginManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>loginmanager</servlet-name>
+		<servlet-name>loginManager</servlet-name>
 		<url-pattern>/login</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>gameselectionmanager</servlet-name>
+		<servlet-name>gameSelectionManager</servlet-name>
 		<servlet-class>gammut.GameSelectionManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>gameselectionmanager</servlet-name>
+		<servlet-name>gameSelectionManager</servlet-name>
 		<url-pattern>/games</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>intropage</servlet-name>
+		<servlet-name>gameManager</servlet-name>
+		<servlet-class>gammut.GameManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>gameManager</servlet-name>
+		<url-pattern>/play</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>introPage</servlet-name>
 		<servlet-class>gammut.IntroPage</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>intropage</servlet-name>
+		<servlet-name>introPage</servlet-name>
 		<url-pattern>/intro</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>attackpage</servlet-name>
+		<servlet-name>attackPage</servlet-name>
 		<servlet-class>gammut.AttackerPage</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>attackpage</servlet-name>
+		<servlet-name>attackPage</servlet-name>
 		<url-pattern>/attacker</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>defenderpage</servlet-name>
+		<servlet-name>defenderPage</servlet-name>
 		<servlet-class>gammut.DefenderPage</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>defenderpage</servlet-name>
+		<servlet-name>defenderPage</servlet-name>
 		<url-pattern>/defender</url-pattern>
 	</servlet-mapping>
 
@@ -55,20 +64,20 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>updateclasses</servlet-name>
+		<servlet-name>updateClasses</servlet-name>
 		<servlet-class>gammut.UpdateAvailableClasses</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>updateclasses</servlet-name>
+		<servlet-name>updateClasses</servlet-name>
 		<url-pattern>/updateclasses</url-pattern>
 	</servlet-mapping>
 
 	<filter>
-	   <filter-name>loginfilter</filter-name>
+	   <filter-name>loginFilter</filter-name>
 	   <filter-class>gammut.LoginFilter</filter-class>
 	</filter>
 	<filter-mapping>
-	   <filter-name>loginfilter</filter-name>
+	   <filter-name>loginFilter</filter-name>
 	   <url-pattern>/intro</url-pattern>
 	</filter-mapping>
 
