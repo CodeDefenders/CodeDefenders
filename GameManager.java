@@ -6,6 +6,7 @@ import javax.servlet.http.*;
 import java.util.*;
 import java.sql.*;
 import java.nio.file.Files;
+import diff_match_patch.*;
 
 
 public class GameManager extends HttpServlet {
@@ -173,7 +174,7 @@ public class GameManager extends HttpServlet {
     public static ArrayList<Mutant> getMutantsForGame(int gid) {
 
         ArrayList<Mutant> mutList = new ArrayList<Mutant>();
-        /*
+        
         Connection conn = null;
         Statement stmt = null;
         String sql = null;
@@ -189,8 +190,9 @@ public class GameManager extends HttpServlet {
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
-                Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"), rs.getBlob("JavaFile").getBytes(), rs.getBlob("ClassFile").getBytes(), 
-                              rs.getBoolean("Alive"), rs.getBoolean("SuspectEquivalent"), rs.getBoolean("DeclaredEquivalent"), rs.getInt("Points"));
+                Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"), 
+                                   rs.getBlob("JavaFile").getBinaryStream(), rs.getBlob("ClassFile").getBinaryStream(), 
+                                   rs.getBoolean("Alive"), rs.getBoolean("SuspectEquivalent"), rs.getBoolean("DeclaredEquivalent"), rs.getInt("Points"));
                 mutList.add(newMutant);
             }
 
@@ -203,53 +205,25 @@ public class GameManager extends HttpServlet {
             try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
             try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
         }
-        */
+        
         return mutList;
     }
 
     // Writes text as a Mutant to the appropriate place in the file system.
-    public boolean createMutant(int gameId, int classId, String mutantText) throws IOException {
+    public boolean createMutant(int gid, int cid, String mutantText) throws IOException {
 
-        /*
-
-        // First get the class name from the class ID.
-        Connection conn = null;
-        Statement stmt = null;
-        String sql = null;
-
-        String className;
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
-
-            stmt = conn.createStatement();
-            sql = String.format("SELECT * FROM classes WHERE Class_ID='%i'", classId);
-            ResultSet rs = stmt.executeQuery(sql);
-
-            if (rs.next()) {className = rs.getString("Name");}
-
-            stmt.close();
-            conn.close();
-        }
-        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
-        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
-        finally {
-            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
-            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
-            return false;
-        }
+        String className = GameSelectionManager.getNameForClass(cid);
 
         String original = "";
         String line;
 
-        // Loads the original code that the mutant was created from into a String variable.
-        InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/"+className+".java");
-        BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
-        while((line = is.readLine()) != null) {original += line + "\n";}
+        byte[] javaFile = getJavaFile(cid);
+
+        String sourceCode = new String(javaFile);
 
         // Runs diff match patch between the two Strings to see if there are any differences.
         diff_match_patch dmp = new diff_match_patch();
-        LinkedList<diff_match_patch.Diff> changes = dmp.diff_main(original.trim().replace("\n", "").replace("\r", ""), mutantText.trim().replace("\n", "").replace("\r", ""), true);
+        LinkedList<diff_match_patch.Diff> changes = dmp.diff_main(sourceCode.trim().replace("\n", "").replace("\r", ""), mutantText.trim().replace("\n", "").replace("\r", ""), true);
         boolean noChange = true;
         for (diff_match_patch.Diff d : changes) {
             if (d.operation != diff_match_patch.Operation.EQUAL) {
@@ -261,12 +235,11 @@ public class GameManager extends HttpServlet {
         if (noChange) {return false;}
 
         // Setup folder the files will go in
-        Long timestamp = System.currentTimeMillis();
-        File folder = new File(getServletContext().getRealPath("/WEB-INF/mutants/"+timestamp));
+        File folder = new File(getServletContext().getRealPath("/WEB-INF/mutants/"+gid));
         folder.mkdir();
 
-        // Write the String into a java file
-        File mutant = new File(getServletContext().getRealPath("/WEB-INF/mutants/"+timestamp+"/"+name+".java"));
+        // Write the Mutant String into a java file
+        File mutant = new File(getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+className+".java"));
         FileWriter fw = new FileWriter(mutant);
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write(mutantText);
@@ -274,20 +247,19 @@ public class GameManager extends HttpServlet {
 
         // Try and compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
 
-        if (MutationTester.compileMutant(folder, name)) {
+        if (MutationTester.compileMutant(folder, className)) {
 
-            byte[] javaFile = Files.readAllBytes(getServletContext().getRealPath("/WEB-INF/mutants/"+timestamp+"/"+className+".java"));
-            byte[] classFile = Files.readAllBytes(getServletContext().getRealPath("/WEB-INF/mutants/"+timestamp+"/"+className+".class"));
+            InputStream jStream = getServletContext().getResourceAsStream("/WEB-INF/mutants/"+gid+"/"+className+".java");
+            InputStream cStream = getServletContext().getResourceAsStream("/WEB-INF/mutants/"+gid+"/"+className+".class");
 
-            Mutant newMutant = new Mutant(gameId, javaFile, classFile);
-            newMutant.insertMutant(); 
+            Mutant newMutant = new Mutant(gid, jStream, cStream);
+
+            // code to add mutant to database
+
             folder.delete(); 
             return true;
         }
         else {folder.delete(); return false;}
-
-        */
-        return false;
     }
 
     public static ArrayList<Test> getTestsForGame(int gid) {
@@ -328,13 +300,13 @@ public class GameManager extends HttpServlet {
 
     // create mutant method
 
-    public static File getJavaFile(int cid) {
-        File nullFile = null;
-        return nullFile;
+    public static byte[] getJavaFile(int cid) {
+        byte[] array = new byte[4];
+        return array;
     }
 
-    public static File getClassFile(int cid) {
-        File nullFile = null;
-        return nullFile;
+    public static byte[] getClassFile(int cid) {
+        byte[] array = new byte[4];
+        return array;
     }
 }

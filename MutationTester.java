@@ -30,8 +30,8 @@ public class MutationTester {
 		}
 	}
 
-	public static boolean compileMutant(Mutant m, String className) {
-		return runAntTarget("compile-mutant", m.getFolder(), null, className);
+	public static boolean compileMutant(File f, String className) {
+		return runAntTarget("compile-mutant", f.getAbsolutePath(), null, className);
 	}
 
 	public static boolean compileTest(Test t, String className) {
