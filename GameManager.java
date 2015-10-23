@@ -155,6 +155,7 @@ public class GameManager extends HttpServlet {
                 // If it can be written to file and compiled, end turn. Otherwise, dont.
                 if (createMutant(activeGame.getId(), activeGame.getClassId(), mutantText)) {
                     activeGame.endTurn();
+                    activeGame.update();
                 }
                 break;
 
@@ -167,6 +168,7 @@ public class GameManager extends HttpServlet {
                 if (createTest(activeGame.getId(), activeGame.getClassId(), testText)) {
                     MutationTester.runMutationTests(activeGame.getTests(), activeGame.getMutants(), activeGame.getClassName());
                     activeGame.endTurn();
+                    activeGame.update();
                 }
                 break;
         }
@@ -449,5 +451,40 @@ public class GameManager extends HttpServlet {
             }//end finally try
         } //end try
         return null;
+    }
+
+    public static int getClassForGame(int gid) {
+
+        int classId = -1;
+        
+        Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+
+        try {
+
+            // Load the Game Data with the provided ID.
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+
+            stmt = conn.createStatement();
+            sql = String.format("SELECT Class_ID FROM games WHERE Game_ID='%d'", gid);
+            ResultSet rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                classId = rs.getInt("Class_ID");
+            }
+
+            stmt.close();
+            conn.close();
+        }
+        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
+        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
+        finally {
+            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
+            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
+        }
+        
+        return classId;
     }
 }

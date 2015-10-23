@@ -1,6 +1,7 @@
 package gammut;
 
 import java.util.ArrayList;
+import java.sql.*;
 
 public class Game {
 
@@ -68,5 +69,48 @@ public class Game {
 
 		if (currentRound < finalRound) {currentRound++;}
 		else if ((currentRound == finalRound)&&(state.equals("IN PROGRESS"))) {state = "FINISHED";}
+	}
+
+	public boolean update() {
+
+		Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+
+            // Get all rows from the database which have the chosen username
+            stmt = conn.createStatement();
+            sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', ActivePlayer='%s', State='%s'",
+            					currentRound, finalRound, activePlayer, state);
+            stmt.execute(sql);  
+            return true;          
+
+        } catch(SQLException se) {
+            System.out.println(se);
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch(Exception e) {
+            System.out.println(e);
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally{
+            //finally block used to close resources
+            try {
+                if(stmt!=null)
+                   stmt.close();
+            } catch(SQLException se2) {}// nothing we can do
+
+            try {
+                if(conn!=null)
+                conn.close();
+            } catch(SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        } //end try
+
+        return false;
 	}
 }

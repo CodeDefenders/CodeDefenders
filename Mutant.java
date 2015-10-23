@@ -85,20 +85,40 @@ public class Mutant {
 	public int getPoints() {return points;}
 	public void removePoints() {points = 0;}
 
-	public void setDifferences(LinkedList<diff_match_patch.Diff> diffs) {this.diffs = diffs;}
 	public ArrayList<diff_match_patch.Diff> getDifferences() {
-		ArrayList<diff_match_patch.Diff> diffArray = new ArrayList<diff_match_patch.Diff>();
 
-		for (diff_match_patch.Diff d : diffs) {
-			if (d.operation != diff_match_patch.Operation.EQUAL) {
-				diffArray.add(d);
-			}
-		}
-		return diffArray;
+		int classId = GameManager.getClassForGame(gameId);
+		byte[] sourceFile = GameManager.getJavaFileForClass(classId);
+        String sourceCode = new String(sourceFile);
+        String mutantText = new String(javaFile);
+
+        // Runs diff match patch between the two Strings to see if there are any differences.
+        diff_match_patch dmp = new diff_match_patch();
+        ArrayList<diff_match_patch.Diff> changes = new ArrayList<diff_match_patch.Diff>();
+
+        LinkedList<diff_match_patch.Diff> diffs = dmp.diff_main(sourceCode.trim().replace("\n", "").replace("\r", ""), mutantText.trim().replace("\n", "").replace("\r", ""), true);
+        boolean noChange = true;
+        for (diff_match_patch.Diff d : diffs) {
+            if (d.operation != diff_match_patch.Operation.EQUAL) {
+            	changes.add(d);
+                noChange = false;
+            }
+        }
+        return changes;
 	}
 
 	public String getHTMLReadout() {
 		String html = "";
+
+        for (diff_match_patch.Diff d : getDifferences()) {
+            if (d.operation == diff_match_patch.Operation.INSERT) {
+            		html += "<p> +: " + d.text;
+            }
+            else {
+            	html += "<p> -: " + d.text;
+            }
+        }
+        html += "<br>";
         return html;
 	}
 
