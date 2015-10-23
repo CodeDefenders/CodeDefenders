@@ -99,16 +99,6 @@ public class Mutant {
 
 	public String getHTMLReadout() {
 		String html = "";
-
-        for (diff_match_patch.Diff d : getDifferences()) {
-            if (d.operation == diff_match_patch.Operation.INSERT) {
-            		html += "<p> +: " + d.text;
-            }
-            else {
-            	html += "<p> -: " + d.text;
-            }
-        }
-        html += "<br>";
         return html;
 	}
 

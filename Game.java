@@ -36,7 +36,10 @@ public class Game {
 	public int getFinalRound() {return finalRound;}
 
 	public String getActivePlayer() {return activePlayer;}
+	// ATTACKER, DEFENDER, NEITHER
+
 	public String getState() {return state;}
+	// CREATED, IN PROGRESS, FINISHED
 
 	public ArrayList<Mutant> getMutants() {return GameManager.getMutantsForGame(id);}
 	public ArrayList<Mutant> getAliveMutants() {
@@ -57,5 +60,13 @@ public class Game {
 
 	public int getDefenderScore() {
 		return 0;
+	}
+
+	public void endTurn() {
+		if (activePlayer.equals("ATTACKER")) {activePlayer = "DEFENDER";}
+		else if (activePlayer.equals("DEFENDER")) {activePlayer = "ATTACKER";}
+
+		if (currentRound < finalRound) {currentRound++;}
+		else if ((currentRound == finalRound)&&(state.equals("IN PROGRESS"))) {state = "FINISHED";}
 	}
 }

@@ -110,8 +110,8 @@
 	<div id="code">
 		<form id="equivalence" action="/gammut/attacker" method="post">
 
-			<input type="radio" name="supplytest" value="true">I Can Kill This
-			<input type="radio" name="supplytest" value="false">I Can't Kill This
+			<input type="radio" name="supplyTest" value="true">I Can Kill This
+			<input type="radio" name="supplyTest" value="false">I Can't Kill This
 
 			<input type="hidden" name="user" value="1">
 	        <textarea name="test" cols="90" rows="30">

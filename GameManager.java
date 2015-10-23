@@ -101,17 +101,19 @@ public class GameManager extends HttpServlet {
         switch (request.getParameter("formType")) {
             
             case "resolveEquivalence" :
+
                 /*
+                
                 // Check type of equivalence response.
-                if (request.getParameter("supplytest").equals("true")) {
+                if (request.getParameter("supplyTest").equals("true")) {
                     Test test = null;
                     Mutant mutant = null;
                     // Get the text submitted by the user.
                     String testText = request.getParameter("test");
-                    // Write it to a Java File.
-                    
+
+                    // If it can be written to a Java file.
                     if ((test = createTest(testText, gs.getClassName())) != null) {
-                        for (Mutant m : gs.getMutants()) {
+                        for (Mutant m : activeGame.getMutants()) {
                             if (m.isEquivalent() && m.isAlive()) {
                                 mutant = m;
                                 break;
@@ -129,41 +131,43 @@ public class GameManager extends HttpServlet {
                             break;
                         }
                     }
-                }*/
+                }
                 break;
 
             case "markEquivalence" :
-                /*
+
                 int count = 0;
                 for (Mutant m : gs.getMutants()) {
                     System.out.println(request.getParameter("mutant"+count));
                     if (request.getParameter("mutant"+count) != null) {
                         m.setEquivalent(true);
                     }
-                }*/
+                }
                 break;
 
+            */
+
             case "createMutant" :
-                /*
+
                 // Get the text submitted by the user.
                 String mutantText = request.getParameter("mutant");
 
                 // If it can be written to file and compiled, end turn. Otherwise, dont.
-                if (createMutant(activeGame.getGameId(), activeGame.getClassId(), mutantText)) {
-                    gs.endTurn();
-                }*/
+                if (createMutant(activeGame.getId(), activeGame.getClassId(), mutantText)) {
+                    activeGame.endTurn();
+                }
                 break;
 
             case "createTest" :
-                /*
+                
                 // Get the text submitted by the user.
                 String testText = request.getParameter("test");
-                // Write it to a Java File.
-                
-                if (createTest(testText, gs.getClassName())) {
-                    mt.runMutationTests(gs.getTests(), gs.getMutants(), gs.getClassName());
-                    gs.endTurn();
-                }*/
+
+                // If it can be written to file and compiled, end turn. Otherwise, dont.
+                if (createTest(activeGame.getId(), activeGame.getClassId(), testText)) {
+                    MutationTester.runMutationTests(activeGame.getTests(), activeGame.getMutants(), activeGame.getClassName());
+                    activeGame.endTurn();
+                }
                 break;
         }
 
@@ -185,7 +189,7 @@ public class GameManager extends HttpServlet {
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
 
             stmt = conn.createStatement();
-            sql = String.format("SELECT * FROM mutants WHERE Game_ID='%i'", gid);
+            sql = String.format("SELECT * FROM mutants WHERE Game_ID='%d'", gid);
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -222,7 +226,7 @@ public class GameManager extends HttpServlet {
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
 
             stmt = conn.createStatement();
-            sql = String.format("SELECT * FROM tests WHERE Game_ID='%i'", gid);
+            sql = String.format("SELECT * FROM tests WHERE Game_ID='%d'", gid);
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {

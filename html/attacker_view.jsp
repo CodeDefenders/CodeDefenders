@@ -97,7 +97,7 @@
 	</div>
     
     <div id="code">
-	    <form id="atk" action="/gammut/attacker" method="post">
+	    <form id="atk" action="/gammut/play" method="post">
 
 	    	<%
 			    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/"+game.getClassName()+".java");
@@ -107,7 +107,7 @@
 			    while((line = is.readLine()) != null) {source+=line+"\n";}
 			%>
 
-			<input type="hidden" name="user" value="0">
+			<input type="hidden" name="formType" value="createMutant">
 			<textarea name="mutant" cols="90" rows="50"><%=source%></textarea>
 		    <br>
 		    
