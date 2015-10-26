@@ -10,8 +10,7 @@ public class GameSelectionManager extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-        RequestDispatcher dispatcher = request.getRequestDispatcher("html/user_games_view.jsp");
-        dispatcher.forward(request, response);
+        response.sendRedirect("games/user");
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -35,8 +34,7 @@ public class GameSelectionManager extends HttpServlet {
                     HttpSession session = request.getSession();
                     session.setAttribute("gid", gameId);
 
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("play");
-                    dispatcher.forward(request, response);
+                    response.sendRedirect("play");
                 }
 
                 else {
@@ -55,8 +53,7 @@ public class GameSelectionManager extends HttpServlet {
                     HttpSession session = request.getSession();
                     session.setAttribute("gid", gameId);
 
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("play");
-                    dispatcher.forward(request, response);
+                    response.sendRedirect("play");
                 }
 
                 else {
@@ -74,8 +71,7 @@ public class GameSelectionManager extends HttpServlet {
                     HttpSession session = request.getSession();
                     session.setAttribute("gid", gameId);
                     
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("play");
-                    dispatcher.forward(request, response);
+                    response.sendRedirect("play");
                 }
 
                 else {response.sendRedirect(request.getHeader("referer"));}

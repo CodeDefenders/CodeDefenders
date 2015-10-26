@@ -36,8 +36,7 @@ public class LoginManager extends HttpServlet {
                 session.setAttribute("username", username);
                 session.setMaxInactiveInterval(1200);
 
-                RequestDispatcher dispatcher = request.getRequestDispatcher("html/user_games_view.jsp");
-                dispatcher.forward(request, response);
+                response.sendRedirect("games");
             }
             else {
                 RequestDispatcher dispatcher = request.getRequestDispatcher("html/login_view.jsp");
@@ -52,8 +51,7 @@ public class LoginManager extends HttpServlet {
                 session.setAttribute("username", username);
                 session.setMaxInactiveInterval(1200);
 
-                RequestDispatcher dispatcher = request.getRequestDispatcher("html/user_games_view.jsp");
-                dispatcher.forward(request, response);
+                response.sendRedirect("games");
             }
             else {
                 RequestDispatcher dispatcher = request.getRequestDispatcher("html/login_view.jsp");

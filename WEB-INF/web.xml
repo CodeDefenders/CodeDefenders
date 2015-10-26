@@ -72,6 +72,33 @@
 		<url-pattern>/updateclasses</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+	    <servlet-name>user_games_view.jsp</servlet-name>
+	    <jsp-file>/html/user_games_view.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>user_games_view.jsp</servlet-name>
+	    <url-pattern>/games/user</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+	    <servlet-name>all_games_view.jsp</servlet-name>
+	    <jsp-file>/html/all_games_view.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>all_games_view.jsp</servlet-name>
+	    <url-pattern>/games/all</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+	    <servlet-name>create_game_view.jsp</servlet-name>
+	    <jsp-file>/html/create_game_view.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>create_game_view.jsp</servlet-name>
+	    <url-pattern>/games/create</url-pattern>
+	</servlet-mapping>
+
 	<filter>
 	   <filter-name>loginFilter</filter-name>
 	   <filter-class>gammut.LoginFilter</filter-class>
