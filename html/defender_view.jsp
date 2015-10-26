@@ -113,9 +113,9 @@
 	</div>
 
 	<div id="code">
-		<form id="def" action="/gammut/defender" method="post">
+		<form id="def" action="/gammut/play" method="post">
 
-			<input type="hidden" name="user" value="1">
+			<input type="hidden" name="formType" value="createTest">
 	        <textarea name="test" cols="90" rows="30">
 import org.junit.*;
 import static org.junit.Assert.*;

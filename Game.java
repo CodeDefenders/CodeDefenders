@@ -30,7 +30,7 @@ public class Game {
 	public int getClassId() {return classId;}
 	public String getClassName() {return GameSelectionManager.getNameForClass(classId);}
 
-	public int getAttackerId() {System.out.println(attackerId); return attackerId;}
+	public int getAttackerId() {return attackerId;}
 	public int getDefenderId() {return defenderId;}
 
 	public int getCurrentRound() {return currentRound;}
@@ -65,10 +65,11 @@ public class Game {
 
 	public void endTurn() {
 		if (activePlayer.equals("ATTACKER")) {activePlayer = "DEFENDER";}
-		else if (activePlayer.equals("DEFENDER")) {activePlayer = "ATTACKER";}
-
-		if (currentRound < finalRound) {currentRound++;}
-		else if ((currentRound == finalRound)&&(state.equals("IN PROGRESS"))) {state = "FINISHED";}
+		else if (activePlayer.equals("DEFENDER")) {
+			activePlayer = "ATTACKER";
+			if (currentRound < finalRound) {currentRound++;}
+			else if ((currentRound == finalRound)&&(state.equals("IN PROGRESS"))) {state = "FINISHED";}
+		}
 	}
 
 	public boolean update() {
@@ -83,8 +84,8 @@ public class Game {
 
             // Get all rows from the database which have the chosen username
             stmt = conn.createStatement();
-            sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', ActivePlayer='%s', State='%s'",
-            					currentRound, finalRound, activePlayer, state);
+            sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', ActivePlayer='%s', State='%s' WHERE Game_ID='%d'",
+            					currentRound, finalRound, activePlayer, state, id);
             stmt.execute(sql);  
             return true;          
 

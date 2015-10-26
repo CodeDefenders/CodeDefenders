@@ -166,7 +166,7 @@ public class GameManager extends HttpServlet {
 
                 // If it can be written to file and compiled, end turn. Otherwise, dont.
                 if (createTest(activeGame.getId(), activeGame.getClassId(), testText)) {
-                    MutationTester.runMutationTests(activeGame.getTests(), activeGame.getMutants(), activeGame.getClassName());
+                    //MutationTester.runMutationTests(activeGame.getTests(), activeGame.getMutants(), activeGame.getClassName());
                     activeGame.endTurn();
                     activeGame.update();
                 }

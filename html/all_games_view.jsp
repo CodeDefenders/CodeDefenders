@@ -24,7 +24,7 @@
           		<ul class="nav navbar-nav">
             		<li><a class="navbar-brand" href="/gammut/intro">GamMut</a></li>
                 <li><a href="/gammut/games/user">My Games</a></li>
-                <li class="active"><a href="/gammut/games/all">All Games</a></li>
+                <li class="active"><a href="/gammut/games/all">Open Games</a></li>
                 <li><a href="/gammut/games/create">Create Game</a></li>
                 <li><a href="/gammut/games/history">History</a></li>
           		</ul>
@@ -48,22 +48,59 @@
 
   <h2> All Games </h2>
     <table class="table table-hover table-responsive table-paragraphs">
+      <tr>
+        <td class="col-sm-2">Game No.</td>
+        <td class="col-sm-2">Attacker</td>
+        <td class="col-sm-2">Defender</td>
+        <td class="col-sm-2">Game State</td>
+        <td class="col-sm-2">Class Tested</td>
+        <td class="col-sm-2"></td>
+      </tr>
+
 
     <% 
     boolean isGames = false;
+    String atkName;
+    String defName;
     int uid = (Integer)request.getSession().getAttribute("uid");
+    int atkId;
+    int defId;
     for (Game g : GameSelectionManager.getAllGames()) { 
       isGames = true;
+
+      atkId = g.getAttackerId();
+      defId = g.getDefenderId();
+
+      if ((atkId == uid)||(defId == uid)) {continue;}
+      
+      atkName = GameSelectionManager.getNameForUser(atkId);
+      defName = GameSelectionManager.getNameForUser(defId);
+
+      if ((atkName != null)&&(defName != null)) {continue;}
+
+      if (atkName == null) {atkName = "Empty";}
+      if (defName == null) {defName = "Empty";}
     %>
 
       <tr>
-        <td class="col-sm-2"><%= "Game ID:" + g.getId() %></td>
+        <td class="col-sm-2"><%= g.getId() %></td>
+        <td class="col-sm-2"><%= atkName %></td>
+        <td class="col-sm-2"><%= defName %></td>
+        <td class="col-sm-2"><%= g.getState() %></td>
+        <td class="col-sm-2"><%= GameSelectionManager.getNameForClass(g.getClassId()) %></td>
+        <td class="col-sm-2">
+          <form id="view" action="/gammut/games" method="post">
+            <input type="hidden" name="formType" value="joinGame">
+            <input type="hidden" name="game" value=<%=g.getId()%>>
+            <input type="submit" value="Join Game">
+          </form>
+        </td>
       </tr>
 
     <%
     } 
     if (!isGames) {%>
-      <p> There are currently no games </p>
+      <p> There are currently no open games </p>
     <%}
     %>
     </table>

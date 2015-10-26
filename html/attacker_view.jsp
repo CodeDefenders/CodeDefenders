@@ -52,7 +52,7 @@
 			</tr>
 
 			<tr>
-				<td class="col-sm-3" colspan="2"><%= m.getHTMLReadout() %></td>
+				<td class="col-sm-3" colspan="2"></td>
 			</tr>
 			<tr class="blank_row">
 				<td class="row-borderless" colspan="2"></td>

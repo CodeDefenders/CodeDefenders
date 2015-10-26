@@ -286,10 +286,12 @@ public class GameSelectionManager extends HttpServlet {
 
             stmt = conn.createStatement();
             sql = String.format("INSERT INTO games (%s, FinalRound, Class_ID) VALUES ('%d', '%d', '%d');", role, userId, maxRounds, classId);
-            ResultSet rs = stmt.executeQuery(sql);
+            stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+
+            ResultSet rs = stmt.getGeneratedKeys();
 
             if (rs.next()) {
-                int gameId = rs.getInt("Game_ID");
+                int gameId = rs.getInt(1);
                 stmt.close();
                 conn.close();
                 System.out.println("createGame: successfully created game with id: " + gameId);

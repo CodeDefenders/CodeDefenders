@@ -5,7 +5,7 @@
   </description>
 
   <path id="test.cp">
-    <pathelement path="classes/junit-4.11.jar"/>
+    <pathelement path="lib/junit-4.12.jar"/>
     <pathelement path="resources"/>
   </path>
 
