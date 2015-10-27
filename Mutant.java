@@ -16,23 +16,18 @@ public class Mutant {
 
 	private boolean alive = true;
 	private boolean equivalent = false;
-	private boolean suspectedEquivalent;
-	private boolean declaredEquivalent;
+	private boolean suspectedEquivalent = false;
+	private boolean declaredEquivalent = false;
 
-	private int points = 0;
+	private int roundCreated;
+	private int roundKilled;
 
-	private LinkedList<diff_match_patch.Diff> diffs;
-
-	File folder;
-	String className;
-
-	public Mutant(File folder, String className) {
-		this.folder = folder;
-		this.className = className;
-	}
-
+	// MUTANT CREATION 01: FROM USER
+	// Constructor to create a Mutant from a user created Java File and the compiled Class File.
+	// This is creating a new mutant.
 	public Mutant(int gid, InputStream jStream, InputStream cStream) {
 		this.gameId = gid;
+		this.roundCreated = GameManager.getCurrentRoundForGame(gid);
 
 		try {
 
@@ -60,30 +55,43 @@ public class Mutant {
 		catch (IOException e) {System.out.println(e);}
 	}
 
-	public Mutant(int mid, int gid, InputStream jStream, InputStream cStream, boolean alive, boolean sEquiv, boolean dEquiv, int points) {
+	// MUTANT CREATION 02: FROM DATABASE
+	// Constructor to create a Mutant from a MySQL Record in the mutants table.
+	// This is getting information for an existing mutant.
+	public Mutant(int mid, int gid, InputStream jStream, InputStream cStream, boolean alive, boolean sEquiv, boolean dEquiv, int rCreated, int rKilled) {
 		this(mid, jStream, cStream);
 
 		this.id = mid;
 		this.alive = alive;
 		this.suspectedEquivalent = sEquiv;
 		this.declaredEquivalent = dEquiv;
-		this.points = points;
+		this.roundCreated = rCreated;
+		this.roundKilled = rKilled;
 	}
-
-
-	public String getFolder() {return folder.getAbsolutePath();}
-	public String getJava() {return folder.getAbsolutePath() + className + ".java";}
-	public String getClassFile() {return folder.getAbsolutePath() + className + ".class";}
 
 	public void setEquivalent(boolean e) {equivalent = e;}
 	public boolean isEquivalent() {return equivalent;}
 
-	public void setAlive(boolean a) {alive = a;}
 	public boolean isAlive() {return alive;}
 
-	public void scorePoints(int p) {points += p;}
-	public int getPoints() {return points;}
-	public void removePoints() {points = 0;}
+	public void kill() {
+		alive = false;
+		roundKilled = GameManager.getCurrentRoundForGame(gameId) - roundCreated;
+	}
+
+	public int getPoints() {
+		int points = 0;
+		if (declaredEquivalent) {points = 0; return points;}
+
+		if (alive) {
+			points = GameManager.getCurrentRoundForGame(gameId) - roundCreated;
+			return points;
+		}
+		else {
+			points = roundKilled - roundCreated;
+			return points;
+		}
+	}
 
 	public ArrayList<diff_match_patch.Diff> getDifferences() {
 

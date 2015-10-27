@@ -197,7 +197,8 @@ public class GameManager extends HttpServlet {
             while (rs.next()) {
                 Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"), 
                                    rs.getBlob("JavaFile").getBinaryStream(), rs.getBlob("ClassFile").getBinaryStream(), 
-                                   rs.getBoolean("Alive"), rs.getBoolean("SuspectEquivalent"), rs.getBoolean("DeclaredEquivalent"), rs.getInt("Points"));
+                                   rs.getBoolean("Alive"), rs.getBoolean("SuspectEquivalent"), rs.getBoolean("DeclaredEquivalent"), 
+                                   rs.getInt("RoundCreated"), rs.getInt("RoundKilled"));
                 mutList.add(newMutant);
             }
 
@@ -234,7 +235,7 @@ public class GameManager extends HttpServlet {
             while (rs.next()) {
                 Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"), 
                                    rs.getBlob("JavaFile").getBinaryStream(), rs.getBlob("ClassFile").getBinaryStream(), 
-                                   rs.getInt("Points"));
+                                   rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"));
                 testList.add(newTest);
             }
 
@@ -486,5 +487,40 @@ public class GameManager extends HttpServlet {
         }
         
         return classId;
+    }
+
+    public static int getCurrentRoundForGame(int gid) {
+
+        int currentRound = -1;
+        
+        Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+
+        try {
+
+            // Load the Game Data with the provided ID.
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+
+            stmt = conn.createStatement();
+            sql = String.format("SELECT CurrentRound FROM games WHERE Game_ID='%d'", gid);
+            ResultSet rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                currentRound = rs.getInt("CurrentRound");
+            }
+
+            stmt.close();
+            conn.close();
+        }
+        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
+        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
+        finally {
+            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
+            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
+        }
+        
+        return currentRound;
     }
 }

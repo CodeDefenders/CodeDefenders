@@ -56,11 +56,21 @@ public class Game {
 	public ArrayList<Test> getTests() {return GameManager.getTestsForGame(id);}
 
 	public int getAttackerScore() {
-		return 0;
+		int totalScore = 0;
+
+		for (Mutant m : getMutants()) {
+			totalScore += m.getPoints();
+		}
+		return totalScore;
 	}
 
 	public int getDefenderScore() {
-		return 0;
+		int totalScore = 0;
+
+		for (Test t : getTests()) {
+			totalScore += t.getPoints();
+		}
+		return totalScore;
 	}
 
 	public void endTurn() {

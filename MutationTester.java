@@ -13,20 +13,20 @@ public class MutationTester {
 			for (Test t : tests) {
 				if (m.isAlive() && t.isValidTest()) {
 					pass = testMutant(m, t, className);
-					if (!pass) {m.setAlive(false); t.scorePoints(1);}
+					if (!pass) {m.kill(); t.killMutant();}
 				}
 			}
-			if (m.isAlive()) {m.scorePoints(1);}
 		}
 	}
 
 	public static void runEquivalenceTest(Test test, Mutant mutant, String className) {
 
+		// taken out scorePoints. need some way of awarding points for surviving an equivalence test.
 		boolean pass;
 		if (mutant.isAlive() && test.isValidTest()) {
 			pass = testMutant(mutant, test, className);
-			if (!pass) {mutant.setAlive(false); mutant.scorePoints(3);}
-			else {mutant.setAlive(false); test.scorePoints(2);}
+			if (!pass) {mutant.kill();}
+			else {mutant.kill();}
 		}
 	}
 
@@ -43,7 +43,8 @@ public class MutationTester {
 	}
 
 	public static boolean testMutant(Mutant m, Test t, String className) {
-		return runAntTarget("test-mutant", m.getFolder(), t.getFolder(), className);
+		// Need to overhaul the Mutation Testing process at end of round.
+		return true; //runAntTarget("test-mutant", m.getFolder(), t.getFolder(), className);
 	}
 
 	// Runs a specific Ant Target, given the name of the target and files to supply as arguments.

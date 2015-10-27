@@ -13,7 +13,7 @@
 <body>
 
 	<%@ page import="gammut.*,java.io.*" %>
-	<% GameState gs = (GameState) getServletContext().getAttribute("gammut.gamestate"); %>
+	<% Game game = (Game) session.getAttribute("game"); %>
 
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
@@ -24,9 +24,9 @@
       		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
           		<ul class="nav navbar-nav navbar-left">
             		<a class="navbar-brand" href="/gammut/intro">GamMut</a>
-            		<li class="navbar-text">ATK: <%= gs.getScore(0) %> | DEF: <%= gs.getScore(1) %></li>
-            		<li class="navbar-text">Round <%= gs.getRound() %></li>
-            		<li class="navbar-text"><%= gs.getAliveMutants().size() %> Mutants are Alive</li>
+            		<li class="navbar-text">ATK: <%= game.getAttackerScore() %> | DEF: <%= game.getDefenderScore() %></li>
+            		<li class="navbar-text">Round <%= game.getCurrentRound() %> of <%= game.getFinalRound() %></li>
+            		<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants are Alive</li>
           		</ul>
           		<ul class="nav navbar-nav navbar-right">
           			<button type="submit" class="btn btn-default navbar-btn" form="def">Defend!</button>
@@ -43,7 +43,7 @@
 		<% 
 		boolean isMutants = false;
 		int count = 0;
-		for (Mutant m : gs.getAliveMutants()) { 
+		for (Mutant m : game.getAliveMutants()) { 
 			isMutants = true;
 		%>
 
@@ -76,7 +76,7 @@
 
 		<% 
 		boolean isTests = false;
-		for (Test t : gs.getTests()) { 
+		for (Test t : game.getTests()) { 
 			isTests = true;
 		%>
 
@@ -102,7 +102,7 @@
 
 		<h2> Source Code </h2>
 		<%
-	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/"+gs.getClassName()+".java");
+	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/"+game.getClassName()+".java");
 	    String line;
 	    String source = "";
 	    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
@@ -120,7 +120,7 @@
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class Test<%=gs.getClassName()%> {
+public class Test<%=game.getClassName()%> {
 @Test
 public void test() {
 

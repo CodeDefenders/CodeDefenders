@@ -11,21 +11,15 @@ public class Test {
 	private byte[] javaFile;
 	private byte[] classFile;
 
-	File folder;
-	String className;
-	String text;
-
 	boolean validTest = true;
 
-	private int points = 0;
-
-	public Test(File folder, String className) {
-		this.folder = folder;
-		this.className = className;
-	}
+	private int roundCreated;
+	private int mutantsKilled = 0;
 
 	public Test(int gid, InputStream jStream, InputStream cStream) {
+
 		this.gameId = gid;
+		this.roundCreated = GameManager.getCurrentRoundForGame(gid);
 
 		try {
 
@@ -53,38 +47,24 @@ public class Test {
 		catch (IOException e) {System.out.println(e);}
 	}
 
-	public Test(int tid, int gid, InputStream jStream, InputStream cStream, int points) {
+	public Test(int tid, int gid, InputStream jStream, InputStream cStream, int roundCreated, int mutantsKilled) {
 		this(gid, jStream, cStream);
 
 		this.id = tid;
-		this.points = points;
+		this.roundCreated = roundCreated;
+		this.mutantsKilled = mutantsKilled;
 	}
 
+	public int getPoints() {return mutantsKilled;}
 
-	public String getFolder() {
-		return folder.getAbsolutePath();
-	}
-
-	public String getJava() {
-		return folder.getAbsolutePath() + "Test" + className + ".java";
-	}
-
-	public String getClassFile() {
-		return folder.getAbsolutePath() + "Test" + className + ".class";
-	}
-
-	public void setText(String t) {text = t;}
-	public String getText() {return text;}
-
-	public void scorePoints(int p) {points += p;}
-	public int getPoints() {return points;}
+	public void killMutant() {mutantsKilled++;}
 
 	public void setValidTest(boolean b) {validTest = b;}
 	public boolean isValidTest() {return validTest;}
 
 	public String getHTMLReadout() throws IOException {
 
-        return "<code>" + getText().replace("\n", "<br>") + "</code>";
+        return "<code>" + "</code>";
 	}
 
 	public boolean insert() {
@@ -97,10 +77,11 @@ public class Test {
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
 
-            pstmt = conn.prepareStatement("INSERT INTO tests (JavaFile, ClassFile, Game_ID) VALUES (?, ?, ?);");
+            pstmt = conn.prepareStatement("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated) VALUES (?, ?, ?, ?);");
         	pstmt.setBinaryStream(1, new ByteArrayInputStream(javaFile));
         	pstmt.setBinaryStream(2, new ByteArrayInputStream(classFile));
         	pstmt.setInt(3, gameId);
+        	pstmt.setInt(4, roundCreated);
 
         	System.out.println("Executing statement: " + pstmt);
         	pstmt.execute();

@@ -26,7 +26,7 @@
             		<a class="navbar-brand" href="/gammut/intro">GamMut</a>
             		<li class="navbar-text">ATK: <%= game.getAttackerScore() %> | DEF: <%= game.getDefenderScore() %></li>
             		<li class="navbar-text">Round <%= game.getCurrentRound() %> of <%= game.getFinalRound() %></li>
-            		<li class="navbar-text"><%= game.getMutants().size() %> Mutants are Alive</li>
+            		<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants are Alive</li>
           		</ul>
           		<ul class="nav navbar-nav navbar-right">
           			<button type="submit" class="btn btn-default navbar-btn" form="atk">Attack!</button>
