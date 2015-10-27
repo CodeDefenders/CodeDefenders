@@ -60,16 +60,21 @@
 
     <% 
     boolean isGames = false;
+    boolean canEnter;
     String atkName;
     String defName;
     int uid = (Integer)request.getSession().getAttribute("uid");
     for (Game g : GameSelectionManager.getGamesForUser(uid)) { 
       isGames = true;
+
+      if (g.getState().equals("FINISHED")) {continue;} // Dont display in active games if finished
+      if (g.getState().equals("IN PROGRESS")) {canEnter = true;} // If it is in progress you can enter.
+      else {canEnter = false;} // Otherwise, you can see it but you cant enter.
       
       atkName = GameSelectionManager.getNameForUser(g.getAttackerId());
-      if (atkName == null) {atkName = "Empty";}
-
       defName = GameSelectionManager.getNameForUser(g.getDefenderId());
+
+      if (atkName == null) {atkName = "Empty";}
       if (defName == null) {defName = "Empty";}
     %>
 
@@ -80,13 +85,21 @@
         <td class="col-sm-2"><%= g.getState() %></td>
         <td class="col-sm-2"><%= GameSelectionManager.getNameForClass(g.getClassId()) %></td>
         <td class="col-sm-2">
+
+        <%
+        if (canEnter) { %>
+
           <form id="view" action="/gammut/games" method="post">
             <input type="hidden" name="formType" value="enterGame">
             <input type="hidden" name="game" value=<%=g.getId()%>>
             <input type="submit" value="Enter Game">
           </form>
+
+          <% } %>
         </td>
       </tr>
+
+
 
     <%
     } 
