@@ -26,7 +26,7 @@
     		</div>
       		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
           		<ul class="nav navbar-nav">
-            		<a class="navbar-brand" href="/gammut/intro">GamMut</a>
+            		<a class="navbar-brand" href="/gammut/games">GamMut</a>
           		</ul>
       		</div>
    		</div>

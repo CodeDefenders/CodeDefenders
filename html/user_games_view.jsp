@@ -22,9 +22,9 @@
     		</div>
       		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
           		<ul class="nav navbar-nav">
-                <li><a class="navbar-brand" href="/gammut/intro">GamMut</a></li>
+                <li><a class="navbar-brand" href="/gammut/games">GamMut</a></li>
                 <li class="active"><a href="/gammut/games/user">My Games</a></li>
-                <li><a href="/gammut/games/all">All Games</a></li>
+                <li><a href="/gammut/games/open">Open Games</a></li>
                 <li><a href="/gammut/games/create">Create Game</a></li>
                 <li><a href="/gammut/games/history">History</a></li>
               </ul>

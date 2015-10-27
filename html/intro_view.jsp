@@ -22,7 +22,7 @@
     		</div>
       		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
           		<ul class="nav navbar-nav">
-            		<a class="navbar-brand" href="/gammut/intro">GamMut</a>
+            		<a class="navbar-brand" href="/gammut/games">GamMut</a>
           		</ul>
       		</div>
    		</div>
@@ -31,20 +31,8 @@
 	<div id="splash">
 		<h1>GamMut</h1>
 		<h2>Gamification of Mutation Testing</h2>
-    <form action="/gammut/intro" method="post">
-      <% File resourcesFile = new File(getServletContext().getRealPath("/WEB-INF/resources")); %>
-      <select name="sourcecode">
-        <%
-        for (String s : resourcesFile.list()) { 
-          if (s.contains(".java")) {
-            %><option value=<%=s.substring(0, s.length()-5)%>><%=s.substring(0, s.length()-5)%></option><%
-          }
-        } %>
-      </select>
-      <input type="submit" value="Change Code">
-    </form>
-		<button class="btn btn-default"><a href=attacker>Play as the Attacker</a></button><br>
-		<button class="btn btn-default"><a href=defender>Play as the Defender</a></button>
+    
+		<button class="btn btn-default"><a href=login>Create a New Account or Login</a></button><br>
 	</div>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

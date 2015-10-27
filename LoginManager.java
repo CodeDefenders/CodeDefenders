@@ -8,10 +8,7 @@ import java.sql.*;
 
 public class LoginManager extends HttpServlet {
 
-    GameState gs;
-
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        gs = (GameState)getServletContext().getAttribute("gammut.gamestate");
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("html/login_view.jsp");
         dispatcher.forward(request, response);

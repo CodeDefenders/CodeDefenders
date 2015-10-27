@@ -28,48 +28,21 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>introPage</servlet-name>
-		<servlet-class>gammut.IntroPage</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>introPage</servlet-name>
-		<url-pattern>/intro</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>attackPage</servlet-name>
-		<servlet-class>gammut.AttackerPage</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>attackPage</servlet-name>
-		<url-pattern>/attacker</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>defenderPage</servlet-name>
-		<servlet-class>gammut.DefenderPage</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>defenderPage</servlet-name>
-		<url-pattern>/defender</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>score</servlet-name>
-		<servlet-class>gammut.ScorePage</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>score</servlet-name>
-		<url-pattern>/scores</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
 		<servlet-name>updateClasses</servlet-name>
 		<servlet-class>gammut.UpdateAvailableClasses</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>updateClasses</servlet-name>
 		<url-pattern>/updateclasses</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+	    <servlet-name>intro_view.jsp</servlet-name>
+	    <jsp-file>/html/intro_view.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>intro_view.jsp</servlet-name>
+	    <url-pattern>/intro</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -82,12 +55,12 @@
 	</servlet-mapping>
 
 	<servlet>
-	    <servlet-name>all_games_view.jsp</servlet-name>
-	    <jsp-file>/html/all_games_view.jsp</jsp-file>
+	    <servlet-name>open_games_view.jsp</servlet-name>
+	    <jsp-file>/html/open_games_view.jsp</jsp-file>
 	</servlet>
 	<servlet-mapping>
-	    <servlet-name>all_games_view.jsp</servlet-name>
-	    <url-pattern>/games/all</url-pattern>
+	    <servlet-name>open_games_view.jsp</servlet-name>
+	    <url-pattern>/games/open</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -99,13 +72,22 @@
 	    <url-pattern>/games/create</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+	    <servlet-name>history_view.jsp</servlet-name>
+	    <jsp-file>/html/history_view.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+	    <servlet-name>history_view.jsp</servlet-name>
+	    <url-pattern>/games/history</url-pattern>
+	</servlet-mapping>
+
 	<filter>
 	   <filter-name>loginFilter</filter-name>
 	   <filter-class>gammut.LoginFilter</filter-class>
 	</filter>
 	<filter-mapping>
 	   <filter-name>loginFilter</filter-name>
-	   <url-pattern>/intro</url-pattern>
+	   <url-pattern>/*</url-pattern>
 	</filter-mapping>
 
 </web-app>

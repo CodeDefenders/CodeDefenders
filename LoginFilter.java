@@ -14,14 +14,22 @@ public class LoginFilter implements Filter  {
    public void  doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws java.io.IOException, ServletException {
 
       HttpServletRequest httpReq = (HttpServletRequest)request;
-      HttpSession session = httpReq.getSession();
-      Integer uid = (Integer)session.getAttribute("uid");
-      if (uid != null) {
-        chain.doFilter(request,response);
+
+      // If the path is going to login, no need to redirect.
+      String path = httpReq.getRequestURI();
+      if ((path.startsWith("/gammut/login"))||(path.startsWith("/gammut/intro"))) {
+        chain.doFilter(request, response);
       }
       else {
-        RequestDispatcher dispatcher = request.getRequestDispatcher("html/login_view.jsp");
-        dispatcher.forward(request, response);
+        HttpSession session = httpReq.getSession();
+        Integer uid = (Integer)session.getAttribute("uid");
+        if (uid != null) {
+          chain.doFilter(request,response);
+        }
+        else {
+          HttpServletResponse httpResp = (HttpServletResponse)response;
+          httpResp.sendRedirect("login");
+        }
       }
    }
 

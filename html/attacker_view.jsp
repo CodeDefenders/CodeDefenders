@@ -23,7 +23,7 @@
     		</div>
       		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
           		<ul class="nav navbar-nav navbar-left">
-            		<a class="navbar-brand" href="/gammut/intro">GamMut</a>
+            		<a class="navbar-brand" href="/gammut/games">GamMut</a>
             		<li class="navbar-text">ATK: <%= game.getAttackerScore() %> | DEF: <%= game.getDefenderScore() %></li>
             		<li class="navbar-text">Round <%= game.getCurrentRound() %> of <%= game.getFinalRound() %></li>
             		<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants are Alive</li>

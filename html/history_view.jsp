@@ -1,7 +1,7 @@
 <html>
 
 <head>
-	  <meta charset="utf-8">
+	<meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
@@ -13,6 +13,7 @@
 
 <body>
 
+  <%@ page import="gammut.*,java.io.*" %>
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
     		<div class="navbar-header">
@@ -21,16 +22,31 @@
     		</div>
       		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
           		<ul class="nav navbar-nav">
-            		<a class="navbar-brand" href="/gammut/intro">GamMut</a>
-          		</ul>
+                <li><a class="navbar-brand" href="/gammut/games">GamMut</a></li>
+                <li><a href="/gammut/games/user">My Games</a></li>
+                <li><a href="/gammut/games/open">Open Games</a></li>
+                <li><a href="/gammut/games/create">Create Game</a></li>
+                <li class="active"><a href="/gammut/games/history">History</a></li>
+              </ul>
+              <ul class="nav navbar-nav navbar-right">
+                <li></li>
+                <li>
+                  <p class="navbar-text">
+                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span> 
+                    <%=request.getSession().getAttribute("username")%>
+                  </p>
+                </li>
+                <li><input type="submit" form="logout" class="btn btn-inverse navbar-btn" value="Log Out"/></li>
+              </ul>
       		</div>
    		</div>
 	</nav>
 
-	<div id="splash">
-		<h2> It is not currently your turn </h2>
-    <h3> Please wait until the other player is finished </h3>
-	</div>
+  <form id="logout" action="/gammut/login" method="post">
+    <input type="hidden" name="formType" value="logOut">
+  </form>
+
+  <h2> View Past Games </h2>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
