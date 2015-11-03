@@ -56,7 +56,7 @@
 			</tr>
 
 			<tr>
-				<td class="col-sm-3" colspan="3"><%= m.getHTMLReadout() %></td>
+				<td class="col-sm-3" colspan="3"></td>
 			</tr>
 			<tr class="blank_row">
 				<td class="row-borderless" colspan="3"></td>
@@ -102,7 +102,7 @@
 
 		<h2> Source Code </h2>
 		<%
-	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/"+game.getClassName()+".java");
+	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/sources/"+game.getClassName()+".java");
 	    String line;
 	    String source = "";
 	    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));

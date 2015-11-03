@@ -52,8 +52,8 @@
     <input type="hidden" name="formType" value="createGame">
     Select the Class you will play
     <select name="class">
-      <option value="1">Book</option>
-      <option value="2">Dog</option>
+      <option value="5">Book</option>
+      <option value="6">Dog</option>
     </select> <br>
     <input type="radio" name="role" value="Attacker_ID">Play as Attacker<br>
     <input type="radio" name="role" value="Defender_ID">Play as Defender<br>

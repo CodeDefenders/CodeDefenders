@@ -1,5 +1,6 @@
 package gammut;
 
+import java.nio.*;
 import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -196,7 +197,7 @@ public class GameManager extends HttpServlet {
 
             while (rs.next()) {
                 Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"), 
-                                   rs.getBlob("JavaFile").getBinaryStream(), rs.getBlob("ClassFile").getBinaryStream(), 
+                                   rs.getString("JavaFile"), rs.getString("ClassFile"), 
                                    rs.getBoolean("Alive"), rs.getBoolean("SuspectEquivalent"), rs.getBoolean("DeclaredEquivalent"), 
                                    rs.getInt("RoundCreated"), rs.getInt("RoundKilled"));
                 mutList.add(newMutant);
@@ -234,7 +235,7 @@ public class GameManager extends HttpServlet {
 
             while (rs.next()) {
                 Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"), 
-                                   rs.getBlob("JavaFile").getBinaryStream(), rs.getBlob("ClassFile").getBinaryStream(), 
+                                   rs.getString("JavaFile"), rs.getString("ClassFile"), 
                                    rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"));
                 testList.add(newTest);
             }
@@ -257,8 +258,8 @@ public class GameManager extends HttpServlet {
 
         String className = GameSelectionManager.getNameForClass(cid);
 
-        byte[] javaFile = getJavaFileForClass(cid);
-        String sourceCode = new String(javaFile);
+        File sourceFile = getJavaFileForClass(cid);
+        String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
         // Runs diff match patch between the two Strings to see if there are any differences.
         diff_match_patch dmp = new diff_match_patch();
@@ -288,24 +289,23 @@ public class GameManager extends HttpServlet {
 
         if (MutationTester.compileMutant(folder, className)) {
 
-            InputStream jStream = getServletContext().getResourceAsStream("/WEB-INF/mutants/"+gid+"/"+className+".java");
-            InputStream cStream = getServletContext().getResourceAsStream("/WEB-INF/mutants/"+gid+"/"+className+".class");
+            String jFile = getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+className+".java");
+            String cFile = getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+className+".class");
 
-            Mutant newMutant = new Mutant(gid, jStream, cStream);
+            Mutant newMutant = new Mutant(gid, jFile, cFile);
             newMutant.insert();
 
-            folder.delete(); 
             return true;
         }
-        else {folder.delete(); return false;}
+        else {mutant.delete(); return false;}
     }
 
     public boolean createTest(int gid, int cid, String testText) throws IOException {
 
         String className = GameSelectionManager.getNameForClass(cid);
 
-        byte[] javaFile = getJavaFileForClass(cid);
-        String sourceCode = new String(javaFile);
+        File sourceFile = getJavaFileForClass(cid);
+        String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
         File folder = new File(getServletContext().getRealPath("/WEB-INF/tests/"+gid));
         folder.mkdir();
@@ -326,21 +326,20 @@ public class GameManager extends HttpServlet {
         
         if (MutationTester.compileTest(folder, className) && MutationTester.testOriginal(folder, className)) {
 
-            InputStream jStream = getServletContext().getResourceAsStream("/WEB-INF/tests/"+gid+"/Test"+className+".java");
-            InputStream cStream = getServletContext().getResourceAsStream("/WEB-INF/tests/"+gid+"/Test"+className+".class");
+            String jFile = getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+className+".java");
+            String cFile = getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+className+".class");
 
-            Test newTest = new Test(gid, jStream, cStream);
+            Test newTest = new Test(gid, jFile, cFile);
             newTest.insert();
-
-            folder.delete();
             return true;
         }
 
-        folder.delete();
+        test.delete();
+        source.delete();
         return false;
     }
 
-    public static byte[] getJavaFileForClass(int cid) {
+    public static File getJavaFileForClass(int cid) {
 
         Connection conn = null;
         Statement stmt = null;
@@ -354,17 +353,7 @@ public class GameManager extends HttpServlet {
             ResultSet rs = stmt.executeQuery(sql);
 
             if (rs.next()) {
-                InputStream jStream = rs.getBlob("JavaFile").getBinaryStream();
-                int nRead;
-
-                ByteArrayOutputStream jBuffer = new ByteArrayOutputStream();
-
-                while ((nRead = jStream.read()) != -1) {
-                    jBuffer.write(nRead);
-                }
-
-                jBuffer.flush();
-                byte[] javaFile = jBuffer.toByteArray();
+                File javaFile = new File(rs.getString("JavaFile"));
                 stmt.close();
                 conn.close();
                 return javaFile;
@@ -397,7 +386,7 @@ public class GameManager extends HttpServlet {
         return null;
     }
 
-    public static byte[] getClassFileForClass(int cid) {
+    public static File getClassFileForClass(int cid) {
 
         Connection conn = null;
         Statement stmt = null;
@@ -411,17 +400,8 @@ public class GameManager extends HttpServlet {
             ResultSet rs = stmt.executeQuery(sql);
 
             if (rs.next()) {
-                InputStream cStream = rs.getBlob("ClassFile").getBinaryStream();
-                int nRead;
+                File classFile = new File(rs.getString("ClassFile"));
 
-                ByteArrayOutputStream cBuffer = new ByteArrayOutputStream();
-
-                while ((nRead = cStream.read()) != -1) {
-                    cBuffer.write(nRead);
-                }
-
-                cBuffer.flush();
-                byte[] classFile = cBuffer.toByteArray();
                 stmt.close();
                 conn.close();
                 return classFile;

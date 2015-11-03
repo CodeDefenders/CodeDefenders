@@ -100,7 +100,7 @@
 	    <form id="atk" action="/gammut/play" method="post">
 
 	    	<%
-			    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/"+game.getClassName()+".java");
+			    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/sources/"+game.getClassName()+".java");
 			    String line;
 			    String source = "";
 			    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));

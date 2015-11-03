@@ -97,7 +97,7 @@
 
 		<h2> Source Code </h2>
 		<%
-	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/resources/"+gs.getClassName()+".java");
+	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/sources/"+gs.getClassName()+".java");
 	    String line;
 	    String source = "";
 	    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));

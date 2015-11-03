@@ -16,4 +16,7 @@ public class DatabaseAccess {
    static final String USER = "root";
    static final String PASS = "donotstandatmygraveandweep";
    
+   public static String addSlashes(String s) {
+   		return s.replaceAll("\\\\", "\\\\\\\\");
+   }
 } 

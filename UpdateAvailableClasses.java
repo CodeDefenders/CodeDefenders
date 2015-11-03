@@ -15,27 +15,24 @@ public class UpdateAvailableClasses extends HttpServlet {
 
     	System.out.println("Running UpdateAvailableClasses");
 
-    	File resourcesFile = new File(getServletContext().getRealPath("/WEB-INF/resources"));
+    	String sources = getServletContext().getRealPath("/WEB-INF/sources");
+        System.out.println(sources);
+        File sourcesFile = new File(sources);
     	ArrayList<String> classes = new ArrayList<String>();
 
-    	System.out.println("Got Resources path");
-
-    	for (String s : resourcesFile.list()) {
+    	for (String s : sourcesFile.list()) {
     		if (s.contains(".java")) {
             	classes.add(s.substring(0, s.length()-5));
           	}
     	}
 
-    	InputStream javaStream;
-    	InputStream classStream;
-
         Connection conn = null;
         Statement stmt = null;
         String sql = null;
-        PreparedStatement pstmt = null;
+        String javaFile;
+        String classFile;
 
         try {
-        	System.out.println("Trying to connect to db");
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
 
@@ -52,22 +49,18 @@ public class UpdateAvailableClasses extends HttpServlet {
 
             	System.out.println("Getting file paths");
             	// Get the path to each file to be stored.
-            	javaStream = getServletContext().getResourceAsStream("/WEB-INF/resources/"+s+".java");
-            	classStream = getServletContext().getResourceAsStream("/WEB-INF/resources/"+s+".class");
+            	javaFile = DatabaseAccess.addSlashes(sources+"/"+s+".java");
+            	classFile = DatabaseAccess.addSlashes(sources+"/"+s+".class");
 
-            	System.out.println("Adding to statement");
-            	// Add the blobs to the prepared statement
-            	pstmt = conn.prepareStatement("INSERT INTO classes (Name, JavaFile, ClassFile) VALUES (?, ?, ?);");
-            	pstmt.setString(1, s);
-            	pstmt.setBinaryStream(2, javaStream);
-            	pstmt.setBinaryStream(3, classStream);
-
-            	System.out.println("Executing statement: " + pstmt);
-            	pstmt.execute();
+            	// Add the blobs to the statement
+                System.out.println(javaFile);
+                System.out.println(classFile);
+            	stmt = conn.createStatement();
+                sql = String.format("INSERT INTO classes (Name, JavaFile, ClassFile) VALUES ('%s', '%s', '%s');", s, javaFile, classFile);
+            	stmt.execute(sql);
             }
 
             stmt.close();
-            pstmt.close();
             conn.close();
 
         } catch(SQLException se) {
@@ -76,7 +69,6 @@ public class UpdateAvailableClasses extends HttpServlet {
         } catch(Exception e) {
             System.out.println(e);
             //Handle errors for Class.forName
-            e.printStackTrace();
         } finally{
             //finally block used to close resources
             try {
@@ -88,12 +80,9 @@ public class UpdateAvailableClasses extends HttpServlet {
                 if(conn!=null)
                 conn.close();
             } catch(SQLException se) {
-                se.printStackTrace();
+                System.out.println(se);
             }//end finally try
         } //end try
-
-        RequestDispatcher dispatcher = request.getRequestDispatcher("html/login_view.jsp");
-        dispatcher.forward(request, response);
     }
 
 }
