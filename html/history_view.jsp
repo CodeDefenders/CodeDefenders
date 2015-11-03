@@ -47,6 +47,60 @@
   </form>
 
   <h2> View Past Games </h2>
+    <table class="table table-hover table-responsive table-paragraphs">
+      <tr>
+        <td class="col-sm-2">Game No.</td>
+        <td class="col-sm-2">Attacker</td>
+        <td class="col-sm-2">Defender</td>
+        <td class="col-sm-2">Class Tested</td>
+        <td class="col-sm-2"></td>
+      </tr>
+
+
+    <% 
+    boolean isGames = false;
+    String atkName;
+    String defName;
+    int uid = (Integer)request.getSession().getAttribute("uid");
+    int atkId;
+    int defId;
+    for (Game g : GameSelectionManager.getGamesForUser(uid)) { 
+
+      if (g.getState().equals("FINISHED")) {
+          atkId = g.getAttackerId();
+          defId = g.getDefenderId();
+
+          atkName = GameSelectionManager.getNameForUser(atkId);
+          defName = GameSelectionManager.getNameForUser(defId);
+
+      }
+      else {
+          continue;
+      }
+      
+    %>
+
+      <tr>
+        <td class="col-sm-2"><%= g.getId() %></td>
+        <td class="col-sm-2"><%= atkName %></td>
+        <td class="col-sm-2"><%= defName %></td>
+        <td class="col-sm-2"><%= GameSelectionManager.getNameForClass(g.getClassId()) %></td>
+        <td class="col-sm-2">
+          <form id="view" action="/gammut/games" method="post">
+            <input type="hidden" name="formType" value="enterGame">
+            <input type="hidden" name="game" value=<%=g.getId()%>>
+            <input type="submit" value="View Scores">
+          </form>
+        </td>
+      </tr>
+
+    <%
+    } 
+    if (!isGames) {%>
+      <p> There are currently no games in your history </p>
+    <%}
+    %>
+    </table>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
