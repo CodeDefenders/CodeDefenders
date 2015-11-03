@@ -9,6 +9,11 @@
     <!-- Bootstrap -->
     <link href="${pageContext.request.contextPath}/html/css/bootstrap.min.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/html/css/gamestyle.css" rel="stylesheet">
+
+    <script src="${pageContext.request.contextPath}/html/codemirror/lib/codemirror.js"></script>
+    <script src="${pageContext.request.contextPath}/html/codemirror/mode/javascript/javascript.js"></script>
+    <link href="${pageContext.request.contextPath}/html/codemirror/lib/codemirror.css" rel="stylesheet" >
+
 </head>
 <body>
 
@@ -108,15 +113,15 @@
 	    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
 	    while((line = is.readLine()) != null) {source+=line+"<br>";}
 		%>
-		<code><%=source%></code>
+		<pre><code><%=source%></code></pre>
 
 	</div>
 
-	<div id="code">
+	<div id="right">
 		<form id="def" action="/gammut/play" method="post">
 
 			<input type="hidden" name="formType" value="createTest">
-	        <textarea name="test" cols="90" rows="30">
+	        <textarea id="code" name="test" cols="90" rows="30">
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -134,6 +139,12 @@ public void test() {
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
+    <script src="${pageContext.request.contextPath}/html/js/bootstrap.min.js"></script>
+    <script> 
+	    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+	    lineNumbers: true,
+	    matchBrackets: true
+		}); 
+	</script>
 </body>
 </html>

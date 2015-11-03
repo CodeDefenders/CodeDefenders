@@ -96,7 +96,7 @@
 		</table>
 	</div>
     
-    <div id="code">
+    <div id="right">
 	    <form id="atk" action="/gammut/play" method="post">
 
 	    	<%
