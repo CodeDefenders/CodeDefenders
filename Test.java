@@ -19,7 +19,7 @@ public class Test {
 	public Test(int gid, String jFile, String cFile) {
 
 		this.gameId = gid;
-		this.roundCreated = GameManager.getCurrentRoundForGame(gid);
+		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gid).getCurrentRound();
 		this.javaFile = jFile;
 		this.classFile = cFile;
 	}

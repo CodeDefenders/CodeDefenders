@@ -6,7 +6,7 @@
 
   <path id="test.cp">
     <pathelement path="lib/junit-4.12.jar"/>
-    <pathelement path="resources"/>
+    <pathelement path="sources"/>
   </path>
 
   <!-- requires mutant to compile only -->
@@ -24,6 +24,7 @@
     <junit printsummary="true" haltonfailure="true">
       <!-- Original class should be in the same folder as being tested -->
       <classpath>
+        <pathelement location="sources"/>
         <pathelement location="${test.file}"/>
       </classpath>
       <test name="Test${classname}"/>

@@ -13,11 +13,6 @@ public class GameManager extends HttpServlet {
 
     // Based on info provided, navigate to the correct view for the user
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        
-        // Initialize MySQL datatypes to null before the try block.
-        Connection conn = null;
-        Statement stmt = null;
-        String sql = null;
 
         // Get the session information specific to the current user.
         HttpSession session = request.getSession();
@@ -26,69 +21,39 @@ public class GameManager extends HttpServlet {
 
         System.out.println("Getting game " + gid + " for " + uid);
 
-        try {
+        Game activeGame = DatabaseAccess.getGameForKey("Game_ID", gid);
 
-            // Load the Game Data with the provided ID.
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
-
-            stmt = conn.createStatement();
-            sql = String.format("SELECT * FROM games WHERE Game_ID='%d'", gid);
-            ResultSet rs = stmt.executeQuery(sql);
-
-            // If a game with the provided ID exists, store the data in a Game class and close the connection.
-            if (rs.next()) {
-                System.out.println("Game with id " + gid + " exists");
-                Game activeGame = new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
-                                    rs.getInt("CurrentRound"), rs.getInt("FinalRound"), rs.getString("ActivePlayer"), rs.getString("State"));
-                
-                stmt.close();
-                conn.close();
-
-                // If the game is finished, redirect to the score page. No uid checking needed, anyone can view.
-                if (activeGame.getState().equals("FINISHED")) {
-                    session.setAttribute("game", activeGame);
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("html/score_view.jsp");
-                    dispatcher.forward(request, response);
-                }
-
-                // If the current user is one of the players in the game
-                if (activeGame.getAttackerId() == uid) {
-                    System.out.println("user is attacker");
-                    session.setAttribute("game", activeGame);
-
-                    for (Mutant m : getMutantsForGame(activeGame.getId())) {
-                        // If at least one mutant needs to be proved non-equivalent, go to the Resolve Equivalence page.
-                        if (m.isEquivalent() && m.isAlive()) {
-                            RequestDispatcher dispatcher = request.getRequestDispatcher("html/resolve_equivalence.jsp");
-                            dispatcher.forward(request, response);
-                        }
-                    }
-                    
-                    System.out.println("Should be going to attacker page");
-                    // If no mutants needed to be proved non-equivalent, direct to the Attacker Page.
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("html/attacker_view.jsp");
-                    dispatcher.forward(request, response);
-                }
-
-                if (activeGame.getDefenderId() == uid) {
-                    session.setAttribute("game", activeGame);
-                    // Direct to the Defender Page.
-                    RequestDispatcher dispatcher = request.getRequestDispatcher("html/defender_view.jsp");
-                    dispatcher.forward(request, response);
-                }
-            }
-            else {
-                stmt.close();
-                conn.close();
-            }
-    
+        // If the game is finished, redirect to the score page. No uid checking needed, anyone can view.
+        if (activeGame.getState().equals("FINISHED")) {
+            session.setAttribute("game", activeGame);
+            RequestDispatcher dispatcher = request.getRequestDispatcher("html/score_view.jsp");
+            dispatcher.forward(request, response);
         }
-        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
-        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
-        finally {
-            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
-            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
+
+        // If the current user is one of the players in the game
+        if (activeGame.getAttackerId() == uid) {
+            System.out.println("user is attacker");
+            session.setAttribute("game", activeGame);
+
+            for (Mutant m : DatabaseAccess.getMutantsForGame(activeGame.getId())) {
+                // If at least one mutant needs to be proved non-equivalent, go to the Resolve Equivalence page.
+                if (m.isEquivalent() && m.isAlive()) {
+                    RequestDispatcher dispatcher = request.getRequestDispatcher("html/resolve_equivalence.jsp");
+                    dispatcher.forward(request, response);
+                }
+            }
+            
+            System.out.println("Should be going to attacker page");
+            // If no mutants needed to be proved non-equivalent, direct to the Attacker Page.
+            RequestDispatcher dispatcher = request.getRequestDispatcher("html/attacker_view.jsp");
+            dispatcher.forward(request, response);
+        }
+
+        if (activeGame.getDefenderId() == uid) {
+            session.setAttribute("game", activeGame);
+            // Direct to the Defender Page.
+            RequestDispatcher dispatcher = request.getRequestDispatcher("html/defender_view.jsp");
+            dispatcher.forward(request, response);
         }
 
         response.sendRedirect(request.getHeader("referer"));
@@ -177,88 +142,12 @@ public class GameManager extends HttpServlet {
         doGet(request, response);
     }
 
-    public static ArrayList<Mutant> getMutantsForGame(int gid) {
-
-        ArrayList<Mutant> mutList = new ArrayList<Mutant>();
-        
-        Connection conn = null;
-        Statement stmt = null;
-        String sql = null;
-
-        try {
-
-            // Load the Game Data with the provided ID.
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
-
-            stmt = conn.createStatement();
-            sql = String.format("SELECT * FROM mutants WHERE Game_ID='%d'", gid);
-            ResultSet rs = stmt.executeQuery(sql);
-
-            while (rs.next()) {
-                Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"), 
-                                   rs.getString("JavaFile"), rs.getString("ClassFile"), 
-                                   rs.getBoolean("Alive"), rs.getBoolean("SuspectEquivalent"), rs.getBoolean("DeclaredEquivalent"), 
-                                   rs.getInt("RoundCreated"), rs.getInt("RoundKilled"));
-                mutList.add(newMutant);
-            }
-
-            stmt.close();
-            conn.close();
-        }
-        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
-        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
-        finally {
-            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
-            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
-        }
-        
-        return mutList;
-    }
-
-    public static ArrayList<Test> getTestsForGame(int gid) {
-        ArrayList<Test> testList = new ArrayList<Test>();
-        
-        Connection conn = null;
-        Statement stmt = null;
-        String sql = null;
-
-        try {
-
-            // Load the Game Data with the provided ID.
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
-
-            stmt = conn.createStatement();
-            sql = String.format("SELECT * FROM tests WHERE Game_ID='%d'", gid);
-            ResultSet rs = stmt.executeQuery(sql);
-
-            while (rs.next()) {
-                Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"), 
-                                   rs.getString("JavaFile"), rs.getString("ClassFile"), 
-                                   rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"));
-                testList.add(newTest);
-            }
-
-            stmt.close();
-            conn.close();
-        }
-        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
-        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
-        finally {
-            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
-            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
-        }
-        
-        return testList;
-    }
-
     // Writes text as a Mutant to the appropriate place in the file system.
     public boolean createMutant(int gid, int cid, String mutantText) throws IOException {
 
-        String className = GameSelectionManager.getNameForClass(cid);
+        GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-        File sourceFile = getJavaFileForClass(cid);
+        File sourceFile = new File(classMutated.javaFile);
         String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
         // Runs diff match patch between the two Strings to see if there are any differences.
@@ -279,7 +168,7 @@ public class GameManager extends HttpServlet {
         folder.mkdir();
 
         // Write the Mutant String into a java file
-        File mutant = new File(getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+className+".java"));
+        File mutant = new File(getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+classMutated.name+".java"));
         FileWriter fw = new FileWriter(mutant);
         BufferedWriter bw = new BufferedWriter(fw);
         bw.write(mutantText);
@@ -287,10 +176,10 @@ public class GameManager extends HttpServlet {
 
         // Try and compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
 
-        if (MutationTester.compileMutant(folder, className)) {
+        if (MutationTester.compileMutant(folder, classMutated.name)) {
 
-            String jFile = getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+className+".java");
-            String cFile = getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+className+".class");
+            String jFile = getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+classMutated.name+".java");
+            String cFile = getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+classMutated.name+".class");
 
             Mutant newMutant = new Mutant(gid, jFile, cFile);
             newMutant.insert();
@@ -302,32 +191,26 @@ public class GameManager extends HttpServlet {
 
     public boolean createTest(int gid, int cid, String testText) throws IOException {
 
-        String className = GameSelectionManager.getNameForClass(cid);
+        GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-        File sourceFile = getJavaFileForClass(cid);
+        File sourceFile = new File(classUnderTest.javaFile);
         String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
         File folder = new File(getServletContext().getRealPath("/WEB-INF/tests/"+gid));
         folder.mkdir();
 
-        File test = new File(getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+className+".java"));
+        File test = new File(getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+classUnderTest.name+".java"));
         FileWriter testWriter = new FileWriter(test);
         BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);
         bufferedTestWriter.write(testText);
         bufferedTestWriter.close();
 
-        File source = new File(getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/"+className+".java"));
-        FileWriter sourceWriter = new FileWriter(source);
-        BufferedWriter bufferedSourceWriter = new BufferedWriter(sourceWriter);
-        bufferedSourceWriter.write(sourceCode);
-        bufferedSourceWriter.close();
-
         // Check the test actually passes when applied to the original code.
         
-        if (MutationTester.compileTest(folder, className) && MutationTester.testOriginal(folder, className)) {
+        if (MutationTester.compileTest(folder, classUnderTest.name) && MutationTester.testOriginal(folder, classUnderTest.name)) {
 
-            String jFile = getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+className+".java");
-            String cFile = getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+className+".class");
+            String jFile = getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+classUnderTest.name+".java");
+            String cFile = getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+classUnderTest.name+".class");
 
             Test newTest = new Test(gid, jFile, cFile);
             newTest.insert();
@@ -335,172 +218,6 @@ public class GameManager extends HttpServlet {
         }
 
         test.delete();
-        source.delete();
         return false;
-    }
-
-    public static File getJavaFileForClass(int cid) {
-
-        Connection conn = null;
-        Statement stmt = null;
-        String sql = null;
-
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
-            stmt = conn.createStatement();
-            sql = String.format("SELECT JavaFile FROM classes WHERE Class_ID=%d;", cid);
-            ResultSet rs = stmt.executeQuery(sql);
-
-            if (rs.next()) {
-                File javaFile = new File(rs.getString("JavaFile"));
-                stmt.close();
-                conn.close();
-                return javaFile;
-            }
-
-            stmt.close();
-            conn.close();
-            
-
-        } catch(SQLException se) {
-            System.out.println(se);
-            //Handle errors for JDBC
-        } catch(Exception e) {
-            System.out.println(e);
-            //Handle errors for Class.forName
-        } finally{
-            //finally block used to close resources
-            try {
-                if(stmt!=null)
-                   stmt.close();
-            } catch(SQLException se2) {}// nothing we can do
-
-            try {
-                if(conn!=null)
-                conn.close();
-            } catch(SQLException se) {
-                System.out.println(se);
-            }//end finally try
-        } //end try
-        return null;
-    }
-
-    public static File getClassFileForClass(int cid) {
-
-        Connection conn = null;
-        Statement stmt = null;
-        String sql = null;
-
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
-            stmt = conn.createStatement();
-            sql = String.format("SELECT ClassFile FROM classes WHERE Class_ID=%d;", cid);
-            ResultSet rs = stmt.executeQuery(sql);
-
-            if (rs.next()) {
-                File classFile = new File(rs.getString("ClassFile"));
-
-                stmt.close();
-                conn.close();
-                return classFile;
-            }
-
-            stmt.close();
-            conn.close();
-            
-
-        } catch(SQLException se) {
-            System.out.println(se);
-            //Handle errors for JDBC
-        } catch(Exception e) {
-            System.out.println(e);
-            //Handle errors for Class.forName
-        } finally{
-            //finally block used to close resources
-            try {
-                if(stmt!=null)
-                   stmt.close();
-            } catch(SQLException se2) {}// nothing we can do
-
-            try {
-                if(conn!=null)
-                conn.close();
-            } catch(SQLException se) {
-                System.out.println(se);
-            }//end finally try
-        } //end try
-        return null;
-    }
-
-    public static int getClassForGame(int gid) {
-
-        int classId = -1;
-        
-        Connection conn = null;
-        Statement stmt = null;
-        String sql = null;
-
-        try {
-
-            // Load the Game Data with the provided ID.
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
-
-            stmt = conn.createStatement();
-            sql = String.format("SELECT Class_ID FROM games WHERE Game_ID='%d'", gid);
-            ResultSet rs = stmt.executeQuery(sql);
-
-            if (rs.next()) {
-                classId = rs.getInt("Class_ID");
-            }
-
-            stmt.close();
-            conn.close();
-        }
-        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
-        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
-        finally {
-            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
-            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
-        }
-        
-        return classId;
-    }
-
-    public static int getCurrentRoundForGame(int gid) {
-
-        int currentRound = -1;
-        
-        Connection conn = null;
-        Statement stmt = null;
-        String sql = null;
-
-        try {
-
-            // Load the Game Data with the provided ID.
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
-
-            stmt = conn.createStatement();
-            sql = String.format("SELECT CurrentRound FROM games WHERE Game_ID='%d'", gid);
-            ResultSet rs = stmt.executeQuery(sql);
-
-            if (rs.next()) {
-                currentRound = rs.getInt("CurrentRound");
-            }
-
-            stmt.close();
-            conn.close();
-        }
-        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
-        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
-        finally {
-            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
-            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
-        }
-        
-        return currentRound;
     }
 }

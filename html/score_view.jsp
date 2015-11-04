@@ -16,7 +16,7 @@
 <body>
 
 	<%@ page import="gammut.*" %>
-	<% GameState gs = (GameState) getServletContext().getAttribute("gammut.gamestate"); %>
+	<% Game game = (Game) session.getAttribute("game"); %>
 
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
@@ -35,11 +35,11 @@
 
 
 	<div id="splash">
-		<% if (gs.getScore(0) > gs.getScore(1)) { %>
+		<% if (game.getAttackerScore() > game.getDefenderScore()) { %>
 			<h1> Attacker Has Won! </h1>
 		<% }
 	    
-	    else if (gs.getScore(0) < gs.getScore(1)) { %>
+	    else if (game.getAttackerScore() < game.getDefenderScore()) { %>
 	    	<h1> Defender Has Won! </h1>
 	    <%}
 	    

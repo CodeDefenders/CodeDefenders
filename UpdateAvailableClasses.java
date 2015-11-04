@@ -51,8 +51,7 @@ public class UpdateAvailableClasses extends HttpServlet {
             	// Get the path to each file to be stored.
             	javaFile = DatabaseAccess.addSlashes(sources+"/"+s+".java");
             	classFile = DatabaseAccess.addSlashes(sources+"/"+s+".class");
-
-            	// Add the blobs to the statement
+                
                 System.out.println(javaFile);
                 System.out.println(classFile);
             	stmt = conn.createStatement();

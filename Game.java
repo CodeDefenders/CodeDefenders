@@ -28,7 +28,7 @@ public class Game {
 	public int getId() {return id;}
 	
 	public int getClassId() {return classId;}
-	public String getClassName() {return GameSelectionManager.getNameForClass(classId);}
+	public String getClassName() {return DatabaseAccess.getClassForKey("Class_ID", classId).name;}
 
 	public int getAttackerId() {return attackerId;}
 	public int getDefenderId() {return defenderId;}
@@ -42,7 +42,7 @@ public class Game {
 	public String getState() {return state;}
 	// CREATED, IN PROGRESS, FINISHED
 
-	public ArrayList<Mutant> getMutants() {return GameManager.getMutantsForGame(id);}
+	public ArrayList<Mutant> getMutants() {return DatabaseAccess.getMutantsForGame(id);}
 	public ArrayList<Mutant> getAliveMutants() {
 		ArrayList<Mutant> aliveMutants = new ArrayList<Mutant>();
 		for (Mutant m : getMutants()) {
@@ -53,7 +53,7 @@ public class Game {
 		return aliveMutants;
 	}
 
-	public ArrayList<Test> getTests() {return GameManager.getTestsForGame(id);}
+	public ArrayList<Test> getTests() {return DatabaseAccess.getTestsForGame(id);}
 
 	public int getAttackerScore() {
 		int totalScore = 0;

@@ -65,7 +65,7 @@
     int uid = (Integer)request.getSession().getAttribute("uid");
     int atkId;
     int defId;
-    for (Game g : GameSelectionManager.getAllGames()) { 
+    for (Game g : DatabaseAccess.getAllGames()) { 
       isGames = true;
 
       atkId = g.getAttackerId();
@@ -73,8 +73,8 @@
 
       if ((atkId == uid)||(defId == uid)) {continue;}
       
-      atkName = GameSelectionManager.getNameForUser(atkId);
-      defName = GameSelectionManager.getNameForUser(defId);
+      atkName = DatabaseAccess.getUserForKey("User_ID", atkId).name;
+      defName = DatabaseAccess.getUserForKey("User_ID", defId).name;
 
       if ((atkName != null)&&(defName != null)) {continue;}
 
@@ -87,7 +87,7 @@
         <td class="col-sm-2"><%= atkName %></td>
         <td class="col-sm-2"><%= defName %></td>
         <td class="col-sm-2"><%= g.getState() %></td>
-        <td class="col-sm-2"><%= GameSelectionManager.getNameForClass(g.getClassId()) %></td>
+        <td class="col-sm-2"><%= DatabaseAccess.getClassForKey("Class_ID", g.getClassId()).name %></td>
         <td class="col-sm-2">
           <form id="view" action="/gammut/games" method="post">
             <input type="hidden" name="formType" value="joinGame">

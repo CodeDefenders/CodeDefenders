@@ -61,18 +61,23 @@
     <% 
     boolean isGames = false;
     boolean canEnter;
-    String atkName;
-    String defName;
+    String atkName = null;
+    String defName = null;
     int uid = (Integer)request.getSession().getAttribute("uid");
-    for (Game g : GameSelectionManager.getGamesForUser(uid)) { 
+    for (Game g : DatabaseAccess.getGamesForUser(uid)) { 
       isGames = true;
 
       if (g.getState().equals("FINISHED")) {continue;} // Dont display in active games if finished
       if (g.getState().equals("IN PROGRESS")) {canEnter = true;} // If it is in progress you can enter.
       else {canEnter = false;} // Otherwise, you can see it but you cant enter.
+
+      if (g.getAttackerId() != 0) {
+          atkName = DatabaseAccess.getUserForKey("User_ID", g.getAttackerId()).name;
+      }
       
-      atkName = GameSelectionManager.getNameForUser(g.getAttackerId());
-      defName = GameSelectionManager.getNameForUser(g.getDefenderId());
+      if (g.getDefenderId() != 0) {
+          defName = DatabaseAccess.getUserForKey("User_ID", g.getDefenderId()).name;
+      }
 
       if (atkName == null) {atkName = "Empty";}
       if (defName == null) {defName = "Empty";}
@@ -83,7 +88,7 @@
         <td class="col-sm-2"><%= atkName %></td>
         <td class="col-sm-2"><%= defName %></td>
         <td class="col-sm-2"><%= g.getState() %></td>
-        <td class="col-sm-2"><%= GameSelectionManager.getNameForClass(g.getClassId()) %></td>
+        <td class="col-sm-2"><%= DatabaseAccess.getClassForKey("Class_ID", g.getClassId()).name %></td>
         <td class="col-sm-2">
 
         <%

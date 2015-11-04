@@ -28,7 +28,7 @@ public class Mutant {
 	// This is creating a new mutant.
 	public Mutant(int gid, String jFile, String cFile) {
 		this.gameId = gid;
-		this.roundCreated = GameManager.getCurrentRoundForGame(gid);
+		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gid).getCurrentRound();
 		this.javaFile = jFile;
 		this.classFile = cFile;
 	}
@@ -54,7 +54,7 @@ public class Mutant {
 
 	public void kill() {
 		alive = false;
-		roundKilled = GameManager.getCurrentRoundForGame(gameId) - roundCreated;
+		roundKilled = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
 	}
 
 	public int getPoints() {
@@ -62,7 +62,7 @@ public class Mutant {
 		if (declaredEquivalent) {points = 0; return points;}
 
 		if (alive) {
-			points = GameManager.getCurrentRoundForGame(gameId) - roundCreated;
+			points = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound() - roundCreated;
 			return points;
 		}
 		else {
@@ -73,8 +73,9 @@ public class Mutant {
 
 	public ArrayList<diff_match_patch.Diff> getDifferences() throws IOException {
 
-		int classId = GameManager.getClassForGame(gameId);
-		File sourceFile = GameManager.getJavaFileForClass(classId);
+		int classId = DatabaseAccess.getGameForKey("Game_ID", gameId).getClassId();
+		File sourceFile = new File(DatabaseAccess.getClassForKey("Class_ID", classId).javaFile);
+
         String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
         File mutantFile = new File(javaFile);
