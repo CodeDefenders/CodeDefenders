@@ -55,8 +55,8 @@
       <option value="5">Book</option>
       <option value="6">Dog</option>
     </select> <br>
-    <input type="radio" name="role" value="Attacker_ID">Play as Attacker<br>
-    <input type="radio" name="role" value="Defender_ID">Play as Defender<br>
+    <input type="radio" name="role" value="ATTACKER">Play as Attacker<br>
+    <input type="radio" name="role" value="DEFENDER">Play as Defender<br>
     <input type="number" name="rounds" min="1" max="10">Number of Rounds<br>
     <input type="submit" value="Create">
   </form>

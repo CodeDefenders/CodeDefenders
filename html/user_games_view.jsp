@@ -61,20 +61,24 @@
     <% 
     boolean isGames = false;
     boolean canEnter;
-    String atkName = null;
-    String defName = null;
+    String atkName;
+    String defName;
     int uid = (Integer)request.getSession().getAttribute("uid");
     for (Game g : DatabaseAccess.getGamesForUser(uid)) { 
       isGames = true;
+      atkName = null;
+      defName = null;
 
       if (g.getState().equals("FINISHED")) {continue;} // Dont display in active games if finished
       if (g.getState().equals("IN PROGRESS")) {canEnter = true;} // If it is in progress you can enter.
       else {canEnter = false;} // Otherwise, you can see it but you cant enter.
 
+      System.out.println("ATKID" + g.getAttackerId());
       if (g.getAttackerId() != 0) {
           atkName = DatabaseAccess.getUserForKey("User_ID", g.getAttackerId()).name;
       }
       
+      System.out.println("DEFID" + g.getDefenderId());
       if (g.getDefenderId() != 0) {
           defName = DatabaseAccess.getUserForKey("User_ID", g.getDefenderId()).name;
       }

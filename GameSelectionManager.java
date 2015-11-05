@@ -18,6 +18,7 @@ public class GameSelectionManager extends HttpServlet {
         // Get their user id from the session.
         int uid = (Integer)request.getSession().getAttribute("uid");
         int gameId;
+        HttpSession session;
 
         switch (request.getParameter("formType")) {
             
@@ -29,8 +30,8 @@ public class GameSelectionManager extends HttpServlet {
                 String role = (String)request.getParameter("role");
 
                 // Create the game with supplied parameters and insert it in the database.
-                Game newGame = new Game(classId, uid, rounds, role);
-                newGame.insert();
+                Game nGame = new Game(classId, uid, rounds, role);
+                nGame.insert();
 
                 // Redirect to the game selection menu.
                 response.sendRedirect("games");
@@ -42,17 +43,17 @@ public class GameSelectionManager extends HttpServlet {
                 // Get the identifying information required to create a game from the submitted form.
                 gameId = Integer.parseInt((String)request.getParameter("game"));
 
-                Game activeGame = DatabaseAccess.getGameForKey("Game_ID", gameId);
+                Game jGame = DatabaseAccess.getGameForKey("Game_ID", gameId);
 
-                if (activeGame.getAttackerId() == 0) {activeGame.setAttackerId(uid);}
-                else {activeGame.setDefenderId(uid);}
+                if (jGame.getAttackerId() == 0) {jGame.setAttackerId(uid);}
+                else {jGame.setDefenderId(uid);}
 
-                activeGame.setStatus("IN PROGRESS");
-                activeGame.setActivePlayer("ATTACKER");
+                jGame.setState("IN PROGRESS");
+                jGame.setActivePlayer("ATTACKER");
 
-                activeGame.update();
+                jGame.update();
 
-                HttpSession session = request.getSession();
+                session = request.getSession();
                 session.setAttribute("gid", gameId);
 
                 response.sendRedirect("play");
@@ -62,16 +63,15 @@ public class GameSelectionManager extends HttpServlet {
             case "enterGame" :
 
                 gameId = Integer.parseInt((String)request.getParameter("game"));
-                Game activeGame = DatabaseAccess.getGameForKey("Game_ID", gameId);
+                Game eGame = DatabaseAccess.getGameForKey("Game_ID", gameId);
 
-                if (activeGame.isUserInGame(uid)) {
+                if (eGame.isUserInGame(uid)) {
 
-                    HttpSession session = request.getSession();
+                    session = request.getSession();
                     session.setAttribute("gid", gameId);
                     
                     response.sendRedirect("play");
                 }
-
                 else {response.sendRedirect(request.getHeader("referer"));}
 
                 break;

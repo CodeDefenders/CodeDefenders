@@ -67,14 +67,16 @@
     int defId;
     for (Game g : DatabaseAccess.getAllGames()) { 
       isGames = true;
+      atkName = null;
+      defName = null;
 
       atkId = g.getAttackerId();
       defId = g.getDefenderId();
 
       if ((atkId == uid)||(defId == uid)) {continue;}
-      
-      atkName = DatabaseAccess.getUserForKey("User_ID", atkId).name;
-      defName = DatabaseAccess.getUserForKey("User_ID", defId).name;
+
+      if (atkId != 0) {atkName = DatabaseAccess.getUserForKey("User_ID", atkId).name;}
+      if (defId != 0) {defName = DatabaseAccess.getUserForKey("User_ID", defId).name;}
 
       if ((atkName != null)&&(defName != null)) {continue;}
 

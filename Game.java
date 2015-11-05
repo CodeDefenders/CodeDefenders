@@ -29,6 +29,8 @@ public class Game {
 
 		this.activePlayer = "NEITHER";
 		this.state = "CREATED";
+		System.out.println(attackerId);
+		System.out.println(defenderId);
 	}
 
 	public Game(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, String activePlayer, String state) {
@@ -62,9 +64,11 @@ public class Game {
 
 	public String getActivePlayer() {return activePlayer;}
 	// ATTACKER, DEFENDER, NEITHER
+	public void setActivePlayer(String ap) {activePlayer = ap;}
 
 	public String getState() {return state;}
 	// CREATED, IN PROGRESS, FINISHED
+	public void setState(String s) {state = s;}
 
 	public ArrayList<Mutant> getMutants() {return DatabaseAccess.getMutantsForGame(id);}
 	public ArrayList<Mutant> getAliveMutants() {
@@ -118,7 +122,15 @@ public class Game {
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
 
             stmt = conn.createStatement();
-            sql = String.format("INSERT INTO games (Attacker_ID, Defender_ID, FinalRound, Class_ID) VALUES ('%d', '%d', '%d', '%d');", attackerId, defenderId, finalRound, classId);
+            System.out.println(attackerId);
+            System.out.println(defenderId);
+            if (attackerId != 0) {
+            	sql = String.format("INSERT INTO games (Attacker_ID, FinalRound, Class_ID) VALUES ('%d', '%d', '%d');", attackerId, finalRound, classId, id);
+            }
+            else {
+            	sql = String.format("INSERT INTO games (Defender_ID, FinalRound, Class_ID) VALUES ('%d', '%d', '%d');", defenderId, finalRound, classId, id);
+            }
+            
             stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
             ResultSet rs = stmt.getGeneratedKeys();
