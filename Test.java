@@ -71,4 +71,30 @@ public class Test {
         }
         return false;
 	}
+
+	public boolean update() {
+		Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+
+            stmt = conn.createStatement();
+            sql = String.format("UPDATE tests SET mutantsKilled='%d' WHERE Test_ID='%d';", mutantsKilled, id);
+            stmt.execute(sql);
+
+        	conn.close();
+        	stmt.close();
+        	return true;
+        }
+        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
+        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
+        finally {
+            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
+            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
+        }
+        return false;
+	}
 }

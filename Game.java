@@ -6,13 +6,30 @@ import java.sql.*;
 public class Game {
 
 	private int id;
+
 	private int classId;
+
 	private int attackerId;
 	private int defenderId;
+
 	private int currentRound;
 	private int finalRound;
+
 	private String activePlayer;
 	private String state;
+
+	public Game(int classId, int userId, int maxRounds, String role) {
+		this.classId = classId;
+
+		if (role.equals("ATTACKER")) {attackerId = userId;}
+		else {defenderId = userId;}
+
+		this.currentRound = 1;
+		this.finalRound = maxRounds;
+
+		this.activePlayer = "NEITHER";
+		this.state = "CREATED";
+	}
 
 	public Game(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, String activePlayer, String state) {
 		this.id = id;
@@ -32,6 +49,13 @@ public class Game {
 
 	public int getAttackerId() {return attackerId;}
 	public int getDefenderId() {return defenderId;}
+	public void setAttackerId(int aid) {attackerId = aid;}
+	public void setDefenderId(int did) {defenderId = did;}
+
+	public boolean isUserInGame(int uid) {
+		if ((uid == attackerId)||(uid == defenderId)) {return true;}
+		else {return false;}
+	}
 
 	public int getCurrentRound() {return currentRound;}
 	public int getFinalRound() {return finalRound;}
@@ -82,6 +106,54 @@ public class Game {
 		}
 	}
 
+	public boolean insert() {
+
+		Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+
+        // Attempt to insert game info into database
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+
+            stmt = conn.createStatement();
+            sql = String.format("INSERT INTO games (Attacker_ID, Defender_ID, FinalRound, Class_ID) VALUES ('%d', '%d', '%d', '%d');", attackerId, defenderId, finalRound, classId);
+            stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+
+            ResultSet rs = stmt.getGeneratedKeys();
+
+            if (rs.next()) {
+                id = rs.getInt(1);
+                stmt.close();
+                conn.close();
+                return true;
+            }
+
+        } catch(SQLException se) {
+            System.out.println(se);
+            //Handle errors for JDBC
+        } catch(Exception e) {
+            System.out.println(e);
+            //Handle errors for Class.forName
+        } finally{
+            //finally block used to close resources
+            try {
+                if(stmt!=null)
+                   stmt.close();
+            } catch(SQLException se2) {}// nothing we can do
+
+            try {
+                if(conn!=null)
+                conn.close();
+            } catch(SQLException se) {
+                System.out.println(se);
+            }//end finally try
+        } //end try
+
+        return false;
+	}
+
 	public boolean update() {
 
 		Connection conn = null;
@@ -94,8 +166,8 @@ public class Game {
 
             // Get all rows from the database which have the chosen username
             stmt = conn.createStatement();
-            sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', ActivePlayer='%s', State='%s' WHERE Game_ID='%d'",
-            					currentRound, finalRound, activePlayer, state, id);
+            sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActivePlayer='%s', State='%s' WHERE Game_ID='%d'",
+            					attackerId, defenderId, currentRound, finalRound, activePlayer, state, id);
             stmt.execute(sql);  
             return true;          
 
