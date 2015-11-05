@@ -50,7 +50,6 @@
 
 		<% 
 		boolean isMutants = false;
-		int count = 0;
 		for (Mutant m : game.getAliveMutants()) { 
 			isMutants = true;
 		%>
@@ -60,7 +59,7 @@
 				<td class="col-sm-1"><% if (m.isAlive()) {%><%="Alive"%><%} else {%><%="Dead"%><%} %></td>
 				<td class="col-sm-1">
 					<% if (game.getActivePlayer().equals("DEFENDER")) {%>
-					Mark as Equivalent: <input type="checkbox" form="equiv" name="mutant<%=count%>" value="equivalent">
+					Mark as Equivalent: <input type="checkbox" form="equiv" name="mutant<%=m.getId()%>" value="equivalent">
 					<%}%>
 				</td>
 			</tr>
@@ -73,7 +72,6 @@
 			</tr>
 
 		<%
-			count++;
 		} 
 		if (!isMutants) {%>
 			<p> There are currently no mutants </p>
@@ -123,6 +121,9 @@
 	</div>
 
 	<div id="right">
+		<form id="equiv" action="/gammut/play" method="post">
+			<input type=hidden name="formType" value="markEquivalences">
+		</form>
 		<form id="def" action="/gammut/play" method="post">
 
 			<input type="hidden" name="formType" value="createTest">

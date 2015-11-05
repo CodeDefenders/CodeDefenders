@@ -101,6 +101,11 @@ public class Game {
 		return totalScore;
 	}
 
+	public void passPriority() {
+		if (activePlayer.equals("ATTACKER")) {activePlayer = "DEFENDER";}
+		else if (activePlayer.equals("DEFENDER")) {activePlayer = "ATTACKER";}
+	}
+
 	public void endTurn() {
 		if (activePlayer.equals("ATTACKER")) {activePlayer = "DEFENDER";}
 		else if (activePlayer.equals("DEFENDER")) {

@@ -67,10 +67,9 @@ public class GameManager extends HttpServlet {
         switch (request.getParameter("formType")) {
             
             case "resolveEquivalence" :
-
-                /*
                 
                 // Check type of equivalence response.
+                // If user wanted to supply a test
                 if (request.getParameter("supplyTest").equals("true")) {
                     Test test = null;
                     Mutant mutant = null;
@@ -78,40 +77,49 @@ public class GameManager extends HttpServlet {
                     String testText = request.getParameter("test");
 
                     // If it can be written to a Java file.
-                    if ((test = createTest(testText, gs.getClassName())) != null) {
+                    if (createTest(activeGame.getId(), activeGame.getClassId(), testText)) {
                         for (Mutant m : activeGame.getMutants()) {
-                            if (m.isEquivalent() && m.isAlive()) {
+                            if (m.getEquivalent().equals("PENDING_TEST") && m.isAlive()) {
                                 mutant = m;
                                 break;
                             }
                         }
 
-                        MutationTester.runEquivalenceTest(test, mutant, gs.getClassName());
+                        MutationTester.runEquivalenceTest(test, mutant, activeGame.getClassName());
+                        activeGame.passPriority();
+                        activeGame.update();
                     }
                 }
+                // If the user didnt want to supply a test
                 else {
-                    for (Mutant m : gs.getMutants()) {
-                        if (m.isEquivalent() && m.isAlive()) {
-                            m.setAlive(false);
-                            m.removePoints();
+                    for (Mutant m : DatabaseAccess.getMutantsForGame(activeGame.getId())) {
+                        if (m.getEquivalent().equals("PENDING_TEST") && m.isAlive()) {
+                            m.kill();
+                            m.setEquivalent("DECLARED_YES");
+                            m.update();
+
+                            activeGame.passPriority();
+                            activeGame.update();
+
                             break;
                         }
                     }
                 }
                 break;
 
-            case "markEquivalence" :
+            case "markEquivalences" :
 
-                int count = 0;
-                for (Mutant m : gs.getMutants()) {
-                    System.out.println(request.getParameter("mutant"+count));
-                    if (request.getParameter("mutant"+count) != null) {
-                        m.setEquivalent(true);
+                boolean changeMade = false;
+                for (Mutant m : DatabaseAccess.getMutantsForGame(activeGame.getId())) {
+                    if (request.getParameter("mutant"+m.getId()) != null) {
+                        changeMade = true;
+                        m.setEquivalent("PENDING_TEST");
+                        m.update();
                     }
                 }
-                break;
+                if (changeMade) {activeGame.passPriority(); activeGame.update();}
 
-            */
+                break;
 
             case "createMutant" :
 

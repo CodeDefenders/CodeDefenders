@@ -45,6 +45,8 @@ public class Mutant {
 		this.roundKilled = rKilled;
 	}
 
+	public int getId() {return id;}
+
 	public String getEquivalent() {return equivalent;}
 	public void setEquivalent(String e) {equivalent = e;}
 

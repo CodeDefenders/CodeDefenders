@@ -43,7 +43,7 @@
 		<%
 
 		for (Mutant m : game.getAliveMutants()) { 
-			if (m.isEquivalent() && m.isAlive()) {
+			if (m.getEquivalent().equals("PENDING_TEST") && m.isAlive()) {
 		%>
 
 			<tr>
@@ -97,7 +97,7 @@
 
 		<h2> Source Code </h2>
 		<%
-	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/sources/"+gs.getClassName()+".java");
+	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/sources/"+game.getClassName()+".java");
 	    String line;
 	    String source = "";
 	    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
@@ -110,15 +110,17 @@
 	<div id="code">
 		<form id="equivalence" action="/gammut/play" method="post">
 
+			<input type="hidden" name="formType" value="resolveEquivalence">
+
 			<input type="radio" name="supplyTest" value="true">I Can Kill This
 			<input type="radio" name="supplyTest" value="false">I Can't Kill This
 
-			<input type="hidden" name="user" value="1">
+			
 	        <textarea name="test" cols="90" rows="30">
 import org.junit.*;
 import static org.junit.Assert.*;
 
-public class Test<%=gs.getClassName()%> {
+public class Test<%=game.getClassName()%> {
 @Test
 public void test() {
 
