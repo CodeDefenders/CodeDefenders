@@ -34,7 +34,10 @@
             		<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants are Alive</li>
           		</ul>
           		<ul class="nav navbar-nav navbar-right">
-          			<button type="submit" class="btn btn-default navbar-btn" form="def">Defend!</button>
+          			<% if (game.getActivePlayer().equals("DEFENDER")) {%>
+          				<button type="submit" class="btn btn-default navbar-btn" form="equiv">Mark Equivalences</button>
+          				<button type="submit" class="btn btn-default navbar-btn" form="def">Defend!</button>
+          			<%}%>
           		</ul>
       		</div>
    		</div>
@@ -56,7 +59,9 @@
 				<td class="col-sm-1"><%= "Greg" %></td>
 				<td class="col-sm-1"><% if (m.isAlive()) {%><%="Alive"%><%} else {%><%="Dead"%><%} %></td>
 				<td class="col-sm-1">
-					Mark as Equivalent: <input type="checkbox" form="def" name="mutant<%=count%>" value="equivalent" <% if (!m.getEquivalent().equals("ASSUMED_NO")) {%><%="checked"%><%}%>>
+					<% if (game.getActivePlayer().equals("DEFENDER")) {%>
+					Mark as Equivalent: <input type="checkbox" form="equiv" name="mutant<%=count%>" value="equivalent">
+					<%}%>
 				</td>
 			</tr>
 

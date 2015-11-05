@@ -13,7 +13,7 @@
 
 <body>
 	<%@ page import="gammut.*,java.io.*" %>
-	<% Game game = (Game) session.getAttribute("game"); System.out.println("ON ATK PAGE gid:" + game.getId()); %>
+	<% Game game = (Game) session.getAttribute("game"); %>
 
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
@@ -29,7 +29,7 @@
             		<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants are Alive</li>
           		</ul>
           		<ul class="nav navbar-nav navbar-right">
-          			<button type="submit" class="btn btn-default navbar-btn" form="atk">Attack!</button>
+          			<% if (game.getActivePlayer().equals("ATTACKER")) {%> <button type="submit" class="btn btn-default navbar-btn" form="atk">Attack!</button><%}%>
           		</ul>
       		</div>
    		</div>

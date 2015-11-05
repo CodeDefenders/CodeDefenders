@@ -21,18 +21,15 @@ public class GameManager extends HttpServlet {
 
         System.out.println("Getting game " + gid + " for " + uid);
 
-        System.out.println("GameManager 24");
         Game activeGame = DatabaseAccess.getGameForKey("Game_ID", gid);
-        System.out.println("ID of active game is: " + activeGame.getId());
 
-        // If the game is finished, redirect to the score page. No uid checking needed, anyone can view.
+        // If the game is finished, redirect to the score page.
         if (activeGame.getState().equals("FINISHED")) {
             session.setAttribute("game", activeGame);
             RequestDispatcher dispatcher = request.getRequestDispatcher("html/score_view.jsp");
             dispatcher.forward(request, response);
         }
 
-        // If the current user is one of the players in the game
         if (activeGame.getAttackerId() == uid) {
             System.out.println("user is attacker");
             session.setAttribute("game", activeGame);
