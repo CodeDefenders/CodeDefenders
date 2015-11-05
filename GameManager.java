@@ -21,7 +21,9 @@ public class GameManager extends HttpServlet {
 
         System.out.println("Getting game " + gid + " for " + uid);
 
+        System.out.println("GameManager 24");
         Game activeGame = DatabaseAccess.getGameForKey("Game_ID", gid);
+        System.out.println("ID of active game is: " + activeGame.getId());
 
         // If the game is finished, redirect to the score page. No uid checking needed, anyone can view.
         if (activeGame.getState().equals("FINISHED")) {
@@ -37,7 +39,8 @@ public class GameManager extends HttpServlet {
 
             for (Mutant m : DatabaseAccess.getMutantsForGame(activeGame.getId())) {
                 // If at least one mutant needs to be proved non-equivalent, go to the Resolve Equivalence page.
-                if (m.isEquivalent() && m.isAlive()) {
+                System.out.println("about to check if a mutant is equiv");
+                if (m.getEquivalent().equals("PENDING_TEST") && m.isAlive()) {
                     RequestDispatcher dispatcher = request.getRequestDispatcher("html/resolve_equivalence.jsp");
                     dispatcher.forward(request, response);
                 }

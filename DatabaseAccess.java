@@ -22,6 +22,8 @@ public class DatabaseAccess {
 
    	public static GameClass getClassForKey(String keyName, int id) {
 
+        System.out.println("getClassForKey: " + keyName + id);
+
         Connection conn = null;
         Statement stmt = null;
         String sql = null;
@@ -68,6 +70,9 @@ public class DatabaseAccess {
    	}
 
    	public static User getUserForKey(String keyName, int id) {
+
+        System.out.println("getUserForKey: " + keyName + id);
+
         Connection conn = null;
         Statement stmt = null;
         String sql = null;
@@ -113,6 +118,8 @@ public class DatabaseAccess {
     }
 
     public static Game getGameForKey(String keyName, int id) {
+
+        System.out.println("getGameForKey: " + keyName + id);
         
         Connection conn = null;
         Statement stmt = null;
@@ -137,16 +144,19 @@ public class DatabaseAccess {
             	return gameRecord;
             }
         }
-        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
-        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
+        catch(SQLException se) {System.out.println(se);} // Handle errors for JDBC
+        catch(Exception e) {System.out.println(e);} // Handle errors for Class.forName
         finally {
             try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
-            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
+            try { if(conn!=null) {conn.close();} } catch(SQLException se) {System.out.println(se); }
         }
         return null;
     }
 
     public static ArrayList<Game> getGamesForUser(int userId) {
+
+        System.out.println("getGamesForUser: " + userId);
+
         Connection conn = null;
         Statement stmt = null;
         String sql = null;
@@ -196,6 +206,9 @@ public class DatabaseAccess {
     }
 
     public static ArrayList<Game> getAllGames() {
+
+        System.out.println("getAllGames");
+
         Connection conn = null;
         Statement stmt = null;
         String sql = null;
@@ -246,6 +259,8 @@ public class DatabaseAccess {
 
     public static ArrayList<Mutant> getMutantsForGame(int gid) {
 
+        System.out.println("getMutantsForGame: " + gid);
+
         ArrayList<Mutant> mutList = new ArrayList<Mutant>();
         
         Connection conn = null;
@@ -265,7 +280,7 @@ public class DatabaseAccess {
             while (rs.next()) {
                 Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"), 
                                    rs.getString("JavaFile"), rs.getString("ClassFile"), 
-                                   rs.getBoolean("Alive"), rs.getBoolean("SuspectEquivalent"), rs.getBoolean("DeclaredEquivalent"), 
+                                   rs.getBoolean("Alive"), rs.getString("Equivalent"),
                                    rs.getInt("RoundCreated"), rs.getInt("RoundKilled"));
                 mutList.add(newMutant);
             }
@@ -273,17 +288,20 @@ public class DatabaseAccess {
             stmt.close();
             conn.close();
         }
-        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
-        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
+        catch(SQLException se) {System.out.println(se);} // Handle errors for JDBC
+        catch(Exception e) {System.out.println(e);} // Handle errors for Class.forName
         finally {
             try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
-            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
+            try { if(conn!=null) {conn.close();} } catch(SQLException se) {System.out.println(se);}
         }
         
         return mutList;
     }
 
     public static ArrayList<Test> getTestsForGame(int gid) {
+
+        System.out.println("getTestsForGame: " + gid);
+
         ArrayList<Test> testList = new ArrayList<Test>();
         
         Connection conn = null;

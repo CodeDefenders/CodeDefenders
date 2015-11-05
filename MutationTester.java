@@ -5,46 +5,57 @@ import java.util.ArrayList;
 
 public class MutationTester {
 
-	public static void runMutationTests(ArrayList<Test> tests, ArrayList<Mutant> mutants, String className) {
+	// Runs all the mutation tests for a particular game, using all the alive mutants and all tests
+	public static void runMutationTests(int gid) {
 
 		boolean pass;
 
-		for (Mutant m : mutants) {
-			for (Test t : tests) {
-				if (m.isAlive() && t.isValidTest()) {
-					pass = testMutant(m, t, className);
+		for (Mutant m : DatabaseAccess.getMutantsForGame(gid)) {
+			for (Test t : DatabaseAccess.getTestsForGame(gid)) {
+				if (m.isAlive()) {
+					// Run the test against the mutant and get the result
+					System.out.println("MutationTester");
+					pass = testMutant(m, t, DatabaseAccess.getGameForKey("Game_ID", gid).getClassName());
+					// If the test did NOT pass, the mutant was detected and should be killed.
 					if (!pass) {m.kill(); t.killMutant();}
 				}
 			}
 		}
 	}
 
+	// Runs an equivalence test using an attacker supplied test and a mutant thought to be equivalent
 	public static void runEquivalenceTest(Test test, Mutant mutant, String className) {
 
-		// taken out scorePoints. need some way of awarding points for surviving an equivalence test.
+		// As a result of this test, either the test the attacker has written kills the mutant or doesnt.
 		boolean pass;
-		if (mutant.isAlive() && test.isValidTest()) {
-			pass = testMutant(mutant, test, className);
-			if (!pass) {mutant.kill();}
-			else {mutant.kill();}
-		}
+		pass = testMutant(mutant, test, className);
+		// If the test did NOT pass, the mutant was detected and is proven to be non-equivalent
+		if (!pass) {mutant.setEquivalent("PROVEN_NOT");}
+		// If the test DID pass, the mutant went undetected and it is assumed to be equivalent.
+		else {mutant.setEquivalent("ASSUMED_YES");}
+		
+		// Then kill the mutant either way.
+		mutant.kill(); 
 	}
 
+	// Runs the related ant target that compiles a mutant
 	public static boolean compileMutant(File f, String className) {
 		return runAntTarget("compile-mutant", f.getAbsolutePath(), null, className);
 	}
 
+	// Runs the related ant target that compiles a test
 	public static boolean compileTest(File f, String className) {
 		return runAntTarget("compile-test", null, f.getAbsolutePath(), className);
 	}
 
+	// Runs the related ant target that ensures a test passes against the original code
 	public static boolean testOriginal(File f, String className) {
 		return runAntTarget("test-original", null, f.getAbsolutePath(), className);
 	}
 
+	// Runs the related ant target that runs a specified test for a specified mutant
 	public static boolean testMutant(Mutant m, Test t, String className) {
-		// Need to overhaul the Mutation Testing process at end of round.
-		return true; //runAntTarget("test-mutant", m.getFolder(), t.getFolder(), className);
+		return runAntTarget("test-mutant", m.getFolder(), t.getFolder(), className);
 	}
 
 	// Runs a specific Ant Target, given the name of the target and files to supply as arguments.

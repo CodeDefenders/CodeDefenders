@@ -16,9 +16,8 @@ public class Mutant {
 	private String classFile;
 
 	private boolean alive = true;
-	private boolean equivalent = false;
-	private boolean suspectedEquivalent = false;
-	private boolean declaredEquivalent = false;
+
+	private String equivalent;
 
 	private int roundCreated;
 	private int roundKilled;
@@ -28,6 +27,7 @@ public class Mutant {
 	// This is creating a new mutant.
 	public Mutant(int gid, String jFile, String cFile) {
 		this.gameId = gid;
+		System.out.println("Mutant Constructor");
 		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gid).getCurrentRound();
 		this.javaFile = jFile;
 		this.classFile = cFile;
@@ -36,19 +36,23 @@ public class Mutant {
 	// MUTANT CREATION 02: FROM DATABASE
 	// Constructor to create a Mutant from a MySQL Record in the mutants table.
 	// This is getting information for an existing mutant.
-	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, boolean sEquiv, boolean dEquiv, int rCreated, int rKilled) {
-		this(mid, jFile, cFile);
+	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, String equiv, int rCreated, int rKilled) {
+		this(gid, jFile, cFile);
 
 		this.id = mid;
 		this.alive = alive;
-		this.suspectedEquivalent = sEquiv;
-		this.declaredEquivalent = dEquiv;
+		this.equivalent = equiv;
 		this.roundCreated = rCreated;
 		this.roundKilled = rKilled;
 	}
 
-	public void setEquivalent(boolean e) {equivalent = e;}
-	public boolean isEquivalent() {return equivalent;}
+	public String getEquivalent() {return equivalent;}
+	public void setEquivalent(String e) {equivalent = e;}
+
+	public String getFolder() {
+		int lio = javaFile.lastIndexOf("/");
+		return javaFile.substring(0, lio-1);
+	}
 
 	public boolean isAlive() {return alive;}
 
@@ -59,7 +63,9 @@ public class Mutant {
 
 	public int getPoints() {
 		int points = 0;
-		if (declaredEquivalent) {points = 0; return points;}
+		if (equivalent.equals("DECLARED_YES")) {points = 0; return points;}
+		if (equivalent.equals("ASSUMED_YES")) {points = -1; return points;}
+		if (equivalent.equals("PROVEN_NO")) {points += 2;}
 
 		if (alive) {
 			points = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound() - roundCreated;
@@ -111,6 +117,10 @@ public class Mutant {
         return html;
 	}
 
+	// insert will run once after mutant creation.
+	// Stores values of JavaFile, ClassFile, GameID, RoundCreated in DB. These will not change once input.
+	// Default values for Equivalent (ASSUMED_NOT), Alive(1), RoundKilled(NULL) are assigned.
+	// Currently Mutant ID isnt set yet after insertion, if Mutant needs to be used straight away it needs a similar insert method to Game.
 	public boolean insert() {
 
 		Connection conn = null;
@@ -123,6 +133,36 @@ public class Mutant {
 
             stmt = conn.createStatement();
             sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated) VALUES ('%s', '%s', %d, %d);", DatabaseAccess.addSlashes(javaFile), DatabaseAccess.addSlashes(classFile), gameId, roundCreated);
+            stmt.execute(sql);
+
+        	conn.close();
+        	stmt.close();
+        	return true;
+        }
+        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
+        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
+        finally {
+            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
+            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
+        }
+        return false;
+	}
+
+	// update will run when changes to a mutant are made.
+	// Updates values of Equivalent, Alive, RoundKilled.
+	// These values update when Mutants are suspected of being equivalent, go through an equivalence test, or are killed.
+	public boolean update() {
+
+		Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+
+            stmt = conn.createStatement();
+            sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', RoundKilled='%d' WHERE Mutant_ID='%d';", equivalent, alive, roundKilled, id);
             stmt.execute(sql);
 
         	conn.close();

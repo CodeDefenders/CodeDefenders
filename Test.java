@@ -11,14 +11,13 @@ public class Test {
 	private String javaFile;
 	private String classFile;
 
-	boolean validTest = true;
-
 	private int roundCreated;
 	private int mutantsKilled = 0;
 
 	public Test(int gid, String jFile, String cFile) {
 
 		this.gameId = gid;
+		System.out.println("Test Constructor");
 		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gid).getCurrentRound();
 		this.javaFile = jFile;
 		this.classFile = cFile;
@@ -34,10 +33,12 @@ public class Test {
 
 	public int getPoints() {return mutantsKilled;}
 
-	public void killMutant() {mutantsKilled++;}
+	public String getFolder() {
+		int lio = javaFile.lastIndexOf("/");
+		return javaFile.substring(0, lio-1);
+	}
 
-	public void setValidTest(boolean b) {validTest = b;}
-	public boolean isValidTest() {return validTest;}
+	public void killMutant() {mutantsKilled++;}
 
 	public String getHTMLReadout() throws IOException {
 

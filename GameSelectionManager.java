@@ -28,18 +28,12 @@ public class GameSelectionManager extends HttpServlet {
                 int rounds = Integer.parseInt((String)request.getParameter("rounds"));
                 String role = (String)request.getParameter("role");
 
-                System.out.println("about to create game");
-                if ((gameId = createGame(classId, uid, rounds, role)) != -1) {
+                // Create the game with supplied parameters and insert it in the database.
+                Game newGame = new Game(classId, uid, rounds, role);
+                newGame.insert();
 
-                    HttpSession session = request.getSession();
-                    session.setAttribute("gid", gameId);
-
-                    response.sendRedirect("play");
-                }
-
-                else {
-                    response.sendRedirect(request.getHeader("referer"));
-                }
+                // Redirect to the game selection menu.
+                response.sendRedirect("games");
                 
                 break;
 
@@ -65,6 +59,7 @@ public class GameSelectionManager extends HttpServlet {
             case "enterGame" :
 
                 gameId = Integer.parseInt((String)request.getParameter("game"));
+                System.out.println("About to attempt to enter game: " + gameId);
 
                 if (canEnterGame(gameId, uid)) {
 
@@ -78,56 +73,6 @@ public class GameSelectionManager extends HttpServlet {
 
                 break;
         }
-    }
-
-    public static int createGame(int classId, int userId, int maxRounds, String role) {
-
-        Connection conn = null;
-        Statement stmt = null;
-        String sql = null;
-
-        // Attempt to insert game info into database
-        try {
-            Class.forName("com.mysql.jdbc.Driver");
-            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
-
-            stmt = conn.createStatement();
-            sql = String.format("INSERT INTO games (%s, FinalRound, Class_ID) VALUES ('%d', '%d', '%d');", role, userId, maxRounds, classId);
-            stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
-
-            ResultSet rs = stmt.getGeneratedKeys();
-
-            if (rs.next()) {
-                int gameId = rs.getInt(1);
-                stmt.close();
-                conn.close();
-                System.out.println("createGame: successfully created game with id: " + gameId);
-                return gameId;
-            }
-
-        } catch(SQLException se) {
-            System.out.println(se);
-            //Handle errors for JDBC
-        } catch(Exception e) {
-            System.out.println(e);
-            //Handle errors for Class.forName
-        } finally{
-            //finally block used to close resources
-            try {
-                if(stmt!=null)
-                   stmt.close();
-            } catch(SQLException se2) {}// nothing we can do
-
-            try {
-                if(conn!=null)
-                conn.close();
-            } catch(SQLException se) {
-                System.out.println(se);
-            }//end finally try
-        } //end try
-
-        System.out.println("createGame: failed to create game");
-        return -1;
     }
 
     public static boolean joinGame(int gameId, int userId) {

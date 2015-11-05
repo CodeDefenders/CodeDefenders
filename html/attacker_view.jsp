@@ -13,7 +13,7 @@
 
 <body>
 	<%@ page import="gammut.*,java.io.*" %>
-	<% Game game = (Game) session.getAttribute("game"); %>
+	<% Game game = (Game) session.getAttribute("game"); System.out.println("ON ATK PAGE gid:" + game.getId()); %>
 
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
