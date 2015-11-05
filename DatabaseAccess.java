@@ -22,8 +22,6 @@ public class DatabaseAccess {
 
    	public static GameClass getClassForKey(String keyName, int id) {
 
-        System.out.println("getClassForKey: " + keyName + id);
-
         Connection conn = null;
         Statement stmt = null;
         String sql = null;
@@ -71,8 +69,6 @@ public class DatabaseAccess {
 
    	public static User getUserForKey(String keyName, int id) {
 
-        System.out.println("getUserForKey: " + keyName + id);
-
         Connection conn = null;
         Statement stmt = null;
         String sql = null;
@@ -118,8 +114,6 @@ public class DatabaseAccess {
     }
 
     public static Game getGameForKey(String keyName, int id) {
-
-        System.out.println("getGameForKey: " + keyName + id);
         
         Connection conn = null;
         Statement stmt = null;
@@ -154,8 +148,6 @@ public class DatabaseAccess {
     }
 
     public static ArrayList<Game> getGamesForUser(int userId) {
-
-        System.out.println("getGamesForUser: " + userId);
 
         Connection conn = null;
         Statement stmt = null;
@@ -207,8 +199,6 @@ public class DatabaseAccess {
 
     public static ArrayList<Game> getAllGames() {
 
-        System.out.println("getAllGames");
-
         Connection conn = null;
         Statement stmt = null;
         String sql = null;
@@ -259,8 +249,6 @@ public class DatabaseAccess {
 
     public static ArrayList<Mutant> getMutantsForGame(int gid) {
 
-        System.out.println("getMutantsForGame: " + gid);
-
         ArrayList<Mutant> mutList = new ArrayList<Mutant>();
         
         Connection conn = null;
@@ -299,8 +287,6 @@ public class DatabaseAccess {
     }
 
     public static ArrayList<Test> getTestsForGame(int gid) {
-
-        System.out.println("getTestsForGame: " + gid);
 
         ArrayList<Test> testList = new ArrayList<Test>();
         

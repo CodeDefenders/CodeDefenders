@@ -17,7 +17,7 @@ public class MutationTester {
 					System.out.println("MutationTester");
 					pass = testMutant(m, t, DatabaseAccess.getGameForKey("Game_ID", gid).getClassName());
 					// If the test did NOT pass, the mutant was detected and should be killed.
-					if (!pass) {m.kill(); t.killMutant();}
+					if (!pass) {System.out.println("test didnt pass"); m.kill(); m.update(); t.killMutant(); t.update();}
 				}
 			}
 		}
@@ -35,7 +35,8 @@ public class MutationTester {
 		else {mutant.setEquivalent("ASSUMED_YES");}
 		
 		// Then kill the mutant either way.
-		mutant.kill(); 
+		mutant.kill();
+		mutant.update();
 	}
 
 	// Runs the related ant target that compiles a mutant

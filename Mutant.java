@@ -27,7 +27,6 @@ public class Mutant {
 	// This is creating a new mutant.
 	public Mutant(int gid, String jFile, String cFile) {
 		this.gameId = gid;
-		System.out.println("Mutant Constructor");
 		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gid).getCurrentRound();
 		this.javaFile = jFile;
 		this.classFile = cFile;
@@ -51,10 +50,13 @@ public class Mutant {
 
 	public String getFolder() {
 		int lio = javaFile.lastIndexOf("/");
+		if (lio == -1) {lio = javaFile.lastIndexOf("\\");}
 		return javaFile.substring(0, lio-1);
 	}
 
 	public boolean isAlive() {return alive;}
+
+	public int sqlAlive() {if (alive) {return 1;} else {return 0;}}
 
 	public void kill() {
 		alive = false;
@@ -153,6 +155,8 @@ public class Mutant {
 	// These values update when Mutants are suspected of being equivalent, go through an equivalence test, or are killed.
 	public boolean update() {
 
+		System.out.println("Updating Mutant");
+
 		Connection conn = null;
         Statement stmt = null;
         String sql = null;
@@ -162,7 +166,7 @@ public class Mutant {
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
 
             stmt = conn.createStatement();
-            sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', RoundKilled='%d' WHERE Mutant_ID='%d';", equivalent, alive, roundKilled, id);
+            sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', RoundKilled='%d' WHERE Mutant_ID='%d';", equivalent, sqlAlive(), roundKilled, id);
             stmt.execute(sql);
 
         	conn.close();

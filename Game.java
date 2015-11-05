@@ -125,10 +125,10 @@ public class Game {
             System.out.println(attackerId);
             System.out.println(defenderId);
             if (attackerId != 0) {
-            	sql = String.format("INSERT INTO games (Attacker_ID, FinalRound, Class_ID) VALUES ('%d', '%d', '%d');", attackerId, finalRound, classId, id);
+            	sql = String.format("INSERT INTO games (Attacker_ID, FinalRound, Class_ID) VALUES ('%d', '%d', '%d');", attackerId, finalRound, classId);
             }
             else {
-            	sql = String.format("INSERT INTO games (Defender_ID, FinalRound, Class_ID) VALUES ('%d', '%d', '%d');", defenderId, finalRound, classId, id);
+            	sql = String.format("INSERT INTO games (Defender_ID, FinalRound, Class_ID) VALUES ('%d', '%d', '%d');", defenderId, finalRound, classId);
             }
             
             stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);

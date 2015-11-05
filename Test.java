@@ -35,6 +35,7 @@ public class Test {
 
 	public String getFolder() {
 		int lio = javaFile.lastIndexOf("/");
+        if (lio == -1) {lio = javaFile.lastIndexOf("\\");}
 		return javaFile.substring(0, lio-1);
 	}
 
@@ -73,6 +74,8 @@ public class Test {
 	}
 
 	public boolean update() {
+
+        System.out.println("Updating Test");
 		Connection conn = null;
         Statement stmt = null;
         String sql = null;
