@@ -70,8 +70,8 @@
           atkId = g.getAttackerId();
           defId = g.getDefenderId();
 
-          atkName = DatabaseAccess.getUserForKey("User_ID", atkId).name;
-          defName = DatabaseAccess.getUserForKey("User_ID", defId).name;
+          atkName = DatabaseAccess.getUserForKey("User_ID", atkId).username;
+          defName = DatabaseAccess.getUserForKey("User_ID", defId).username;
 
       }
       else {

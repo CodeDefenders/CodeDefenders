@@ -50,14 +50,21 @@
 
   <form id="create" action="/gammut/games" method="post">
     <input type="hidden" name="formType" value="createGame">
+
     Select the Class you will play
     <select name="class">
-      <option value="5">Book</option>
-      <option value="6">Dog</option>
+
+    <% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
+        <option value="<%=c.id%>"><%=c.name%></option>
+    <%}%>
+
     </select> <br>
+
     <input type="radio" name="role" value="ATTACKER">Play as Attacker<br>
     <input type="radio" name="role" value="DEFENDER">Play as Defender<br>
+
     <input type="number" name="rounds" min="1" max="10">Number of Rounds<br>
+    
     <input type="submit" value="Create">
   </form>
 

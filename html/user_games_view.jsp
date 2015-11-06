@@ -73,14 +73,12 @@
       if (g.getState().equals("IN PROGRESS")) {canEnter = true;} // If it is in progress you can enter.
       else {canEnter = false;} // Otherwise, you can see it but you cant enter.
 
-      System.out.println("ATKID" + g.getAttackerId());
       if (g.getAttackerId() != 0) {
-          atkName = DatabaseAccess.getUserForKey("User_ID", g.getAttackerId()).name;
+          atkName = DatabaseAccess.getUserForKey("User_ID", g.getAttackerId()).username;
       }
       
-      System.out.println("DEFID" + g.getDefenderId());
       if (g.getDefenderId() != 0) {
-          defName = DatabaseAccess.getUserForKey("User_ID", g.getDefenderId()).name;
+          defName = DatabaseAccess.getUserForKey("User_ID", g.getDefenderId()).username;
       }
 
       if (atkName == null) {atkName = "Empty";}

@@ -67,6 +67,54 @@ public class DatabaseAccess {
         return null;
    	}
 
+    public static ArrayList<GameClass> getAllClasses() {
+        Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+        ArrayList<GameClass> classList = new ArrayList<GameClass>();
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+
+            stmt = conn.createStatement();
+            sql = "SELECT * FROM classes;";
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                classList.add(new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("JavaFile"), rs.getString("ClassFile")));
+            }
+
+            stmt.close();
+            conn.close();
+            
+
+        } catch(SQLException se) {
+            System.out.println(se);
+            //Handle errors for JDBC
+            se.printStackTrace();
+        } catch(Exception e) {
+            System.out.println(e);
+            //Handle errors for Class.forName
+            e.printStackTrace();
+        } finally{
+            //finally block used to close resources
+            try {
+                if(stmt!=null)
+                   stmt.close();
+            } catch(SQLException se2) {}// nothing we can do
+
+            try {
+                if(conn!=null)
+                conn.close();
+            } catch(SQLException se) {
+                se.printStackTrace();
+            }//end finally try
+        } //end try
+
+        return classList;
+    }
+
    	public static User getUserForKey(String keyName, int id) {
 
         Connection conn = null;
@@ -109,7 +157,55 @@ public class DatabaseAccess {
             }//end finally try
         } //end try
 
-        System.out.println("Couldn't find user for id: " + id);
+        return null;
+    }
+
+    public static User getUserForName(String username) {
+
+        Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+            stmt = conn.createStatement();
+            sql = String.format("SELECT * FROM users WHERE Username='%s';", username);
+            ResultSet rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                User newUser = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"));
+                stmt.close();
+                conn.close();
+                return newUser;
+            }
+            else {
+                stmt.close();
+                conn.close();
+                return null;
+            }         
+
+        } catch(SQLException se) {
+            System.out.println(se);
+            //Handle errors for JDBC
+        } catch(Exception e) {
+            System.out.println(e);
+            //Handle errors for Class.forName
+        } finally{
+            //finally block used to close resources
+            try {
+                if(stmt!=null)
+                   stmt.close();
+            } catch(SQLException se2) {}// nothing we can do
+
+            try {
+                if(conn!=null)
+                conn.close();
+            } catch(SQLException se) {
+                System.out.println(se);
+            }//end finally try
+        } //end try
+
         return null;
     }
 
