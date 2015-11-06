@@ -12,7 +12,7 @@
 </head>
 
 <body>
-	<%@ page import="gammut.*,java.io.*" %>
+	<%@ page import="gammut.*,java.io.*, java.util.*" %>
 	<% Game game = (Game) session.getAttribute("game"); %>
 
 	<nav class="navbar navbar-inverse navbar-fixed-top">
@@ -34,6 +34,17 @@
       		</div>
    		</div>
 	</nav>
+
+	<% 
+      ArrayList<String> messages = (ArrayList<String>) request.getAttribute("messages");
+      if (messages != null) {
+        for (String m : messages) { %>
+          <div class="alert alert-info">
+              <strong><%=m%></strong>
+          </div>
+        <% }
+      }
+  	%>
 
 	<div id="info">
 

@@ -62,6 +62,9 @@ public class GameManager extends HttpServlet {
     // Based on the data provided, update information for the game
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
+        ArrayList<String> messages = new ArrayList<String>();
+        request.setAttribute("messages", messages);
+
         Game activeGame = (Game)request.getSession().getAttribute("game");
 
         switch (request.getParameter("formType")) {
@@ -85,9 +88,13 @@ public class GameManager extends HttpServlet {
                             }
                         }
 
+                        // Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
                         MutationTester.runEquivalenceTest(test, mutant, activeGame.getClassName());
                         activeGame.passPriority();
                         activeGame.update();
+                    }
+                    else {
+                        messages.add("There Was An Error When Compiling The Test You Supplied");
                     }
                 }
                 // If the user didnt want to supply a test
@@ -97,6 +104,8 @@ public class GameManager extends HttpServlet {
                             m.kill();
                             m.setEquivalent("DECLARED_YES");
                             m.update();
+
+                            messages.add("Your Mutant Was Marked Equivalent And Killed");
 
                             activeGame.passPriority();
                             activeGame.update();
@@ -117,7 +126,14 @@ public class GameManager extends HttpServlet {
                         m.update();
                     }
                 }
-                if (changeMade) {activeGame.passPriority(); activeGame.update();}
+                if (changeMade) {
+                    messages.add("Waiting For Attacker To Respond To Marked Equivalencies");
+                    activeGame.passPriority();
+                    activeGame.update();
+                }
+                else {
+                    messages.add("You Didn't Mark Any Equivalencies");
+                }
 
                 break;
 
@@ -128,8 +144,13 @@ public class GameManager extends HttpServlet {
 
                 // If it can be written to file and compiled, end turn. Otherwise, dont.
                 if (createMutant(activeGame.getId(), activeGame.getClassId(), mutantText)) {
+                    messages.add("Your Mutant Was Compiled Successfully");
                     activeGame.endTurn();
                     activeGame.update();
+                }
+                else {
+                    messages.add("Your Mutant Failed To Compile");
+                    // Need to display error messages to user
                 }
                 break;
 
@@ -140,9 +161,14 @@ public class GameManager extends HttpServlet {
 
                 // If it can be written to file and compiled, end turn. Otherwise, dont.
                 if (createTest(activeGame.getId(), activeGame.getClassId(), testText)) {
+                    messages.add("Your Test Was Compiled Successfully");
                     MutationTester.runMutationTests(activeGame.getId());
                     activeGame.endTurn();
                     activeGame.update();
+                }
+                else {
+                    messages.add("Your Test Failed To Compile");
+                    // Need to display error messages to user
                 }
                 break;
         }

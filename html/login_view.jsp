@@ -13,7 +13,7 @@
 
 <body>
 
-  <%@ page import="gammut.*,java.io.*" %>
+  <%@ page import="gammut.*,java.io.*, java.util.*" %>
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
     		<div class="navbar-header">
@@ -27,6 +27,17 @@
       		</div>
    		</div>
 	</nav>
+
+  <% 
+      ArrayList<String> messages = (ArrayList<String>) request.getAttribute("messages");
+      if (messages != null) {
+        for (String m : messages) { %>
+          <div class="alert alert-info">
+              <strong><%=m%></strong>
+          </div>
+        <% }
+      }
+  %>
 
   <div id="login">
     <h2>Existing Account</h2>
