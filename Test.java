@@ -32,6 +32,7 @@ public class Test {
 	}
 
     public int getId() {return id;}
+    public int getGameId() {return gameId;}
 
 	public int getPoints() {return mutantsKilled;}
 

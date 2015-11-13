@@ -89,7 +89,7 @@ public class GameManager extends HttpServlet {
                         }
 
                         // Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
-                        MutationTester.runEquivalenceTest(test, mutant, activeGame.getClassName());
+                        MutationTester.runEquivalenceTest(test, mutant);
                         activeGame.passPriority();
                         activeGame.update();
                     }
@@ -214,7 +214,7 @@ public class GameManager extends HttpServlet {
 
         Mutant newMutant = new Mutant(gid, jFile, cFile);
 
-        int compileMutantId = MutationTester.compileMutant(newMutant, classMutated.name);
+        int compileMutantId = MutationTester.compileMutant(newMutant);
         TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", compileMutantId).get(0);
 
         if (compileMutantTarget.status.equals("SUCCESS")) {
@@ -247,11 +247,11 @@ public class GameManager extends HttpServlet {
 
         Test newTest = new Test(gid, jFile, cFile);
 
-        int compileTestId = MutationTester.compileTest(newTest, classUnderTest.name);
+        int compileTestId = MutationTester.compileTest(newTest);
         TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", compileTestId).get(0);
 
         if (compileTestTarget.status.equals("SUCCESS")) {
-            int testOriginalId = MutationTester.testOriginal(newTest, classUnderTest.name);
+            int testOriginalId = MutationTester.testOriginal(newTest);
             TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testOriginalId).get(0);
 
             if (testOriginalTarget.status.equals("SUCCESS")) {

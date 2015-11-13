@@ -46,6 +46,7 @@ public class Mutant {
 	}
 
 	public int getId() {return id;}
+	public int getGameId() {return gameId;}
 
 	public String getEquivalent() {return equivalent;}
 	public void setEquivalent(String e) {equivalent = e;}
