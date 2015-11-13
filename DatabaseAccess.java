@@ -419,4 +419,78 @@ public class DatabaseAccess {
         
         return testList;
     }
+
+    public static ArrayList<TargetExecution> getTargetExecutionsForKey(String keyname, int id) {
+        ArrayList<TargetExecution> executionList = new ArrayList<TargetExecution>();
+        
+        Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+
+        try {
+
+            // Load the Game Data with the provided ID.
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+
+            stmt = conn.createStatement();
+            sql = String.format("SELECT * FROM targetexecutions WHERE %s='%d'", keyname, id);
+            ResultSet rs = stmt.executeQuery(sql);
+
+            while (rs.next()) {
+                TargetExecution newExecution = new TargetExecution(rs.getInt("TargetExecution_ID"), rs.getInt("Test_ID"), 
+                                   rs.getInt("Mutant_ID"), rs.getString("Target"), 
+                                   rs.getString("Status"), rs.getString("Message"), rs.getString("Timestamp"));
+                executionList.add(newExecution);
+            }
+
+            stmt.close();
+            conn.close();
+        }
+        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
+        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
+        finally {
+            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
+            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
+        }
+        
+        return executionList;
+    }
+
+    public static TargetExecution getTargetExecutionForPair(int tid, int mid) {
+        
+        Connection conn = null;
+        Statement stmt = null;
+        String sql = null;
+
+        try {
+
+            // Load the Game Data with the provided ID.
+            Class.forName("com.mysql.jdbc.Driver");
+            conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
+
+            stmt = conn.createStatement();
+            sql = String.format("SELECT * FROM targetexecutions WHERE Test_ID='%d' AND Mutant_ID='%d'", tid, mid);
+            ResultSet rs = stmt.executeQuery(sql);
+
+            if (rs.next()) {
+                TargetExecution targetExecution = new TargetExecution(rs.getInt("TargetExecution_ID"), rs.getInt("Test_ID"), 
+                                   rs.getInt("Mutant_ID"), rs.getString("Target"), 
+                                   rs.getString("Status"), rs.getString("Message"), rs.getString("Timestamp"));
+                stmt.close();
+                conn.close();
+                return targetExecution;
+            }
+
+            
+        }
+        catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
+        catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
+        finally {
+            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
+            try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
+        }
+        
+        return null;
+    }
 } 

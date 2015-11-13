@@ -53,7 +53,7 @@ public class Mutant {
 	public String getFolder() {
 		int lio = javaFile.lastIndexOf("/");
 		if (lio == -1) {lio = javaFile.lastIndexOf("\\");}
-		return javaFile.substring(0, lio-1);
+		return javaFile.substring(0, lio);
 	}
 
 	public boolean isAlive() {return alive;}

@@ -33,7 +33,7 @@
 
   <!-- requires test, mutant, and the name of the class -->
   <target name="test-mutant" description="run test on mutant to see if test fails">
-    <junit printsummary="true" haltonfailure="true">
+    <junit printsummary="withOutAndErr" haltonfailure="false">
 
       <!-- Sets the content of the classpath to the mutant -->
       <classpath>

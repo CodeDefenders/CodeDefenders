@@ -47,6 +47,7 @@ CREATE TABLE `games` (
   `ActivePlayer` enum('ATTACKER','DEFENDER','NEITHER') NOT NULL DEFAULT 'NEITHER',
   `Class_ID` int(11) DEFAULT NULL,
   `State` enum('CREATED','IN PROGRESS','FINISHED') NOT NULL,
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`Game_ID`),
   KEY `Attacker_ID` (`Attacker_ID`),
   KEY `Defender_ID` (`Defender_ID`),
@@ -54,7 +55,7 @@ CREATE TABLE `games` (
   CONSTRAINT `games_ibfk_1` FOREIGN KEY (`Attacker_ID`) REFERENCES `users` (`User_ID`),
   CONSTRAINT `games_ibfk_2` FOREIGN KEY (`Defender_ID`) REFERENCES `users` (`User_ID`),
   CONSTRAINT `games_ibfk_3` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -69,15 +70,38 @@ CREATE TABLE `mutants` (
   `JavaFile` varchar(255) NOT NULL,
   `ClassFile` varchar(255) NOT NULL,
   `Alive` tinyint(1) NOT NULL DEFAULT '1',
-  `SuspectEquivalent` tinyint(1) NOT NULL DEFAULT '0',
-  `DeclaredEquivalent` tinyint(1) NOT NULL DEFAULT '0',
   `Game_ID` int(11) DEFAULT NULL,
   `RoundCreated` int(11) NOT NULL,
   `RoundKilled` int(11) DEFAULT NULL,
+  `Equivalent` enum('ASSUMED_NO','PENDING_TEST','DECLARED_YES','ASSUMED_YES','PROVEN_NO') NOT NULL,
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`Mutant_ID`),
   KEY `Game_ID` (`Game_ID`),
   CONSTRAINT `mutants_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `targetexecutions`
+--
+
+DROP TABLE IF EXISTS `targetexecutions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `targetexecutions` (
+  `TargetExecution_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Test_ID` int(11) DEFAULT NULL,
+  `Mutant_ID` int(11) DEFAULT NULL,
+  `Target` enum('CREATE_MUTANT','CREATE_TEST','TEST_ORIGINAL','TEST_MUTANT','TEST_EQUIVALENCE') NOT NULL,
+  `Status` enum('SUCCESS','FAIL','ERROR') NOT NULL,
+  `Message` varchar(2000) DEFAULT NULL,
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`TargetExecution_ID`),
+  KEY `Test_ID` (`Test_ID`),
+  KEY `Mutant_ID` (`Mutant_ID`),
+  CONSTRAINT `targetexecutions_ibfk_1` FOREIGN KEY (`Test_ID`) REFERENCES `tests` (`Test_ID`),
+  CONSTRAINT `targetexecutions_ibfk_2` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -94,10 +118,11 @@ CREATE TABLE `tests` (
   `ClassFile` varchar(255) NOT NULL,
   `RoundCreated` int(11) NOT NULL,
   `MutantsKilled` int(11) DEFAULT '0',
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`Test_ID`),
   KEY `Game_ID` (`Game_ID`),
   CONSTRAINT `tests_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -112,7 +137,7 @@ CREATE TABLE `users` (
   `Username` varchar(20) NOT NULL,
   `Password` varchar(20) NOT NULL,
   PRIMARY KEY (`User_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -124,4 +149,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-11-04 12:25:43
+-- Dump completed on 2015-11-13  2:38:43

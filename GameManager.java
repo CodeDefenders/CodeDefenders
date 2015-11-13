@@ -209,15 +209,16 @@ public class GameManager extends HttpServlet {
         bw.close();
 
         // Try and compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
+        String jFile = getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+classMutated.name+".java");
+        String cFile = getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+classMutated.name+".class");
 
-        if (MutationTester.compileMutant(folder, classMutated.name)) {
+        Mutant newMutant = new Mutant(gid, jFile, cFile);
 
-            String jFile = getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+classMutated.name+".java");
-            String cFile = getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+classMutated.name+".class");
+        int compileMutantId = MutationTester.compileMutant(newMutant, classMutated.name);
+        TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", compileMutantId).get(0);
 
-            Mutant newMutant = new Mutant(gid, jFile, cFile);
+        if (compileMutantTarget.status.equals("SUCCESS")) {
             newMutant.insert();
-
             return true;
         }
         else {mutant.delete(); return false;}
@@ -240,15 +241,29 @@ public class GameManager extends HttpServlet {
         bufferedTestWriter.close();
 
         // Check the test actually passes when applied to the original code.
-        
-        if (MutationTester.compileTest(folder, classUnderTest.name) && MutationTester.testOriginal(folder, classUnderTest.name)) {
 
-            String jFile = getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+classUnderTest.name+".java");
-            String cFile = getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+classUnderTest.name+".class");
+        String jFile = getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+classUnderTest.name+".java");
+        String cFile = getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+classUnderTest.name+".class");
 
-            Test newTest = new Test(gid, jFile, cFile);
-            newTest.insert();
-            return true;
+        Test newTest = new Test(gid, jFile, cFile);
+
+        int compileTestId = MutationTester.compileTest(newTest, classUnderTest.name);
+        TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", compileTestId).get(0);
+
+        if (compileTestTarget.status.equals("SUCCESS")) {
+            int testOriginalId = MutationTester.testOriginal(newTest, classUnderTest.name);
+            TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testOriginalId).get(0);
+
+            if (testOriginalTarget.status.equals("SUCCESS")) {
+                newTest.insert();
+                return true;
+            }
+            else {
+                // test would have failed against the original code
+            }
+        }
+        else {
+            // test didnt compile properly
         }
 
         test.delete();
