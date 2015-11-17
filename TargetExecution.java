@@ -32,39 +32,62 @@ public class TargetExecution {
 	public boolean insert() {
 		
 		Connection conn = null;
-        Statement stmt = null;
+        PreparedStatement pstmt = null;
         String sql = null;
 
         try {
+        	System.out.println("inserting targetexecution");
+        	System.out.println(testId + " " + mutantId + target + status + message);
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
 
-            stmt = conn.createStatement();
+            
 
             if (testId == 0) {
             	if (mutantId == 0) {
-            		sql = String.format("INSERT INTO targetexecutions (Target, Status, Message) VALUES ('%s', '%s', '%s');", target, status, message);
+            		System.out.println(target + status + message);
+            		pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Target, Status, Message) VALUES ('?', '?', '?');");
+            		pstmt.setString(1, target);
+            		pstmt.setString(2, status);
+            		pstmt.setString(3, message);
             	}
             	else {
-            		sql = String.format("INSERT INTO targetexecutions (Mutant_ID, Target, Status, Message) VALUES ('%d', '%s', '%s', '%s');", mutantId, target, status, message);
+            		System.out.println(mutantId + target + status + message);
+            		pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Mutant_ID, Target, Status, Message) VALUES ('?', '?', '?', '?');");
+            		pstmt.setInt(1, mutantId);
+            		pstmt.setString(2, target);
+            		pstmt.setString(3, status);
+            		pstmt.setString(4, message);
             	}
             }
             else {
             	if (mutantId == 0) {
-            		sql = String.format("INSERT INTO targetexecutions (Test_ID, Target, Status, Message) VALUES ('%d', '%s', '%s', '%s');", testId, target, status, message);
+            		System.out.println(testId + target + status + message);
+            		pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Test_ID, Target, Status, Message) VALUES ('?', '?', '?', '?');");
+            		pstmt.setInt(1, testId);
+            		pstmt.setString(2, target);
+            		pstmt.setString(3, status);
+            		pstmt.setString(4, message);
             	}
             	else {
-            		sql = String.format("INSERT INTO targetexecutions (Test_ID, Mutant_ID, Target, Status, Message) VALUES ('%d', '%d', '%s', '%s', '%s');", testId, mutantId, target, status, message);
+            		System.out.println(testId + " " + mutantId + target + status + message);
+            		pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Test_ID, Mutant_ID, Target, Status, Message) VALUES ('?', '?', '?', '?', '?');");
+            		pstmt.setInt(1, testId);
+            		pstmt.setInt(2, mutantId);
+            		pstmt.setString(3, target);
+            		pstmt.setString(4, status);
+            		pstmt.setString(5, message);
             	}
             }
 
-            stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+            pstmt.execute(sql, new String[]{"TargetExecution_ID"});
 
-            ResultSet rs = stmt.getGeneratedKeys();
+            ResultSet rs = pstmt.getGeneratedKeys();
 
             if (rs.next()) {
-                id = rs.getInt(1);
-                stmt.close();
+                this.id = rs.getInt(1);
+                System.out.println(this.id);
+                pstmt.close();
                 conn.close();
                 return true;
             }
@@ -72,7 +95,7 @@ public class TargetExecution {
         catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
         catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
         finally {
-            try { if (stmt!=null) {stmt.close();} } catch(SQLException se2) {} // Nothing we can do
+            try { if (pstmt!=null) {pstmt.close();} } catch(SQLException se2) {} // Nothing we can do
             try { if(conn!=null) {conn.close();} } catch(SQLException se) { System.out.println(se); }
         }
         return false;

@@ -79,23 +79,33 @@ public class GameManager extends HttpServlet {
                     // Get the text submitted by the user.
                     String testText = request.getParameter("test");
 
-                    // If it can be written to a Java file.
-                    if (createTest(activeGame.getId(), activeGame.getClassId(), testText)) {
-                        for (Mutant m : activeGame.getMutants()) {
-                            if (m.getEquivalent().equals("PENDING_TEST") && m.isAlive()) {
-                                mutant = m;
-                                break;
-                            }
-                        }
+                    // If it can be written to file and compiled, end turn. Otherwise, dont.
+                    int[] testExecutions = createTest(activeGame.getId(), activeGame.getClassId(), testText);
+                    TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testExecutions[0]).get(0);
 
-                        // Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
-                        MutationTester.runEquivalenceTest(test, mutant);
-                        activeGame.passPriority();
-                        activeGame.update();
+                    if (compileTestTarget.status.equals("SUCCESS")) {
+                        TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testExecutions[1]).get(0);
+                        if (testOriginalTarget.equals("SUCCESS")) {
+                            for (Mutant m : activeGame.getMutants()) {
+                                if (m.getEquivalent().equals("PENDING_TEST") && m.isAlive()) {
+                                    mutant = m;
+                                    break;
+                                }
+                            }
+
+                            // Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
+                            MutationTester.runEquivalenceTest(test, mutant);
+                            activeGame.passPriority();
+                            activeGame.update();
+                        }
+                        else {
+                            messages.add("There Was An Error When Compiling The Test You Supplied");
+                        }
                     }
                     else {
                         messages.add("There Was An Error When Compiling The Test You Supplied");
                     }
+                    
                 }
                 // If the user didnt want to supply a test
                 else {
@@ -142,16 +152,23 @@ public class GameManager extends HttpServlet {
                 // Get the text submitted by the user.
                 String mutantText = request.getParameter("mutant");
 
-                // If it can be written to file and compiled, end turn. Otherwise, dont.
-                if (createMutant(activeGame.getId(), activeGame.getClassId(), mutantText)) {
-                    messages.add("Your Mutant Was Compiled Successfully");
-                    activeGame.endTurn();
-                    activeGame.update();
+                int compileExecution = createMutant(activeGame.getId(), activeGame.getClassId(), mutantText);
+                if (compileExecution != -1) {
+                    TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", compileExecution).get(0);
+                    if (compileMutantTarget.status.equals("SUCCESS")) {
+                        messages.add("Your Mutant Was Compiled Successfully");
+                        activeGame.endTurn();
+                        activeGame.update();
+                    }
+                    else {
+                        messages.add("Your Mutant Failed To Compile");
+                        messages.add(compileMutantTarget.message);
+                    }
                 }
                 else {
-                    messages.add("Your Mutant Failed To Compile");
-                    // Need to display error messages to user
-                }
+                    // Create Mutant failed because there were no differences between mutant and original, returning -1
+                    messages.add("Your Mutant Was The Same As The Original");
+                }                
                 break;
 
             case "createTest" :
@@ -160,14 +177,24 @@ public class GameManager extends HttpServlet {
                 String testText = request.getParameter("test");
 
                 // If it can be written to file and compiled, end turn. Otherwise, dont.
-                if (createTest(activeGame.getId(), activeGame.getClassId(), testText)) {
-                    messages.add("Your Test Was Compiled Successfully");
-                    MutationTester.runMutationTests(activeGame.getId());
-                    activeGame.endTurn();
-                    activeGame.update();
+                int[] testExecutions = createTest(activeGame.getId(), activeGame.getClassId(), testText);
+                TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testExecutions[0]).get(0);
+
+                if (compileTestTarget.status.equals("SUCCESS")) {
+                    TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testExecutions[1]).get(0);
+                    if (testOriginalTarget.equals("SUCCESS")) {
+                        messages.add("Your Test Was Compiled Successfully");
+                        MutationTester.runMutationTests(activeGame.getId());
+                        activeGame.endTurn();
+                        activeGame.update();
+                    }
+                    else {
+                        messages.add("Your Tests Failed For The Original Code");
+                    }
                 }
                 else {
                     messages.add("Your Test Failed To Compile");
+                    messages.add(compileTestTarget.message);
                     // Need to display error messages to user
                 }
                 break;
@@ -177,7 +204,7 @@ public class GameManager extends HttpServlet {
     }
 
     // Writes text as a Mutant to the appropriate place in the file system.
-    public boolean createMutant(int gid, int cid, String mutantText) throws IOException {
+    public int createMutant(int gid, int cid, String mutantText) throws IOException {
 
         GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 
@@ -195,7 +222,7 @@ public class GameManager extends HttpServlet {
         }
 
         // If there were no differences, return, as the mutant is the same as original.
-        if (noChange) {return false;}
+        if (noChange) {return -1;}
 
         // Setup folder the files will go in
         File folder = new File(getServletContext().getRealPath("/WEB-INF/mutants/"+gid));
@@ -213,18 +240,14 @@ public class GameManager extends HttpServlet {
         String cFile = getServletContext().getRealPath("/WEB-INF/mutants/"+gid+"/"+classMutated.name+".class");
 
         Mutant newMutant = new Mutant(gid, jFile, cFile);
+        newMutant.insert();
 
         int compileMutantId = MutationTester.compileMutant(newMutant);
-        TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", compileMutantId).get(0);
 
-        if (compileMutantTarget.status.equals("SUCCESS")) {
-            newMutant.insert();
-            return true;
-        }
-        else {mutant.delete(); return false;}
+        return compileMutantId;
     }
 
-    public boolean createTest(int gid, int cid, String testText) throws IOException {
+    public int[] createTest(int gid, int cid, String testText) throws IOException {
 
         GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
@@ -246,27 +269,18 @@ public class GameManager extends HttpServlet {
         String cFile = getServletContext().getRealPath("/WEB-INF/tests/"+gid+"/Test"+classUnderTest.name+".class");
 
         Test newTest = new Test(gid, jFile, cFile);
+        newTest.insert();
 
         int compileTestId = MutationTester.compileTest(newTest);
         TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", compileTestId).get(0);
 
         if (compileTestTarget.status.equals("SUCCESS")) {
             int testOriginalId = MutationTester.testOriginal(newTest);
-            TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testOriginalId).get(0);
-
-            if (testOriginalTarget.status.equals("SUCCESS")) {
-                newTest.insert();
-                return true;
-            }
-            else {
-                // test would have failed against the original code
-            }
+            return new int[]{compileTestId, testOriginalId};
         }
         else {
-            // test didnt compile properly
+            return new int[]{compileTestId, -1};
         }
-
-        test.delete();
-        return false;
+        
     }
 }

@@ -16,11 +16,13 @@ public class MutationTester {
 		// Gets the classname for the mutant from the game it is in
 		String className = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
 		String[] resultArray = runAntTarget("compile-mutant", m.getFolder(), null, className);
+		System.out.println("compiling mutant");
 
 		// If the input stream returned a 'successful build' message, the mutant compiled correctly
 		if (resultArray[0].toLowerCase().contains("build successful")) {
 			// Create and insert a new target execution recording successful compile, with no message to report, and return its ID
 			TargetExecution newExec = new TargetExecution(0, m.getId(), "COMPILE_MUTANT", "SUCCESS", null);
+			System.out.println("about to insert");
 			newExec.insert();
 			return newExec.id;
 		}
@@ -30,6 +32,7 @@ public class MutationTester {
 			// New target execution recording failed compile, providing the return messages from the ant javac task
 			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]"));
 			TargetExecution newExec = new TargetExecution(0, m.getId(), "COMPILE_MUTANT", "FAIL", message);
+			System.out.println("about to insert");
 			newExec.insert();
 			return newExec.id;
 		}
@@ -225,7 +228,7 @@ public class MutationTester {
 		resultArray[0] = isLog;
 		resultArray[1] = esLog;
 		resultArray[2] = exLog;
-		resultArray[4] = debug;
+		resultArray[3] = debug;
 		System.out.println("is: " + isLog);
 		System.out.println("es: " + esLog);
 		System.out.println("ex: " + exLog);

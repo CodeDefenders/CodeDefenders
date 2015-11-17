@@ -61,11 +61,17 @@ public class Test {
 
             stmt = conn.createStatement();
             sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated) VALUES ('%s', '%s', %d, %d);", DatabaseAccess.addSlashes(javaFile), DatabaseAccess.addSlashes(classFile), gameId, roundCreated);
-            stmt.execute(sql);
+            
+            stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
-        	conn.close();
-        	stmt.close();
-        	return true;
+            ResultSet rs = stmt.getGeneratedKeys();
+
+            if (rs.next()) {
+                this.id = rs.getInt(1);
+                stmt.close();
+                conn.close();
+                return true;
+            }
         }
         catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
         catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName

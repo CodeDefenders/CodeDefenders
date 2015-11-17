@@ -222,7 +222,7 @@ public class DatabaseAccess {
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
 
             stmt = conn.createStatement();
-            sql = String.format("SELECT * FROM games WHERE %s='%d'", keyName, id);
+            sql = String.format("SELECT * FROM games WHERE %s='%d';", keyName, id);
             ResultSet rs = stmt.executeQuery(sql);
 
             if (rs.next()) {
@@ -358,7 +358,7 @@ public class DatabaseAccess {
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
 
             stmt = conn.createStatement();
-            sql = String.format("SELECT * FROM mutants WHERE Game_ID='%d'", gid);
+            sql = String.format("SELECT * FROM mutants WHERE Game_ID='%d';", gid);
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -397,7 +397,7 @@ public class DatabaseAccess {
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
 
             stmt = conn.createStatement();
-            sql = String.format("SELECT * FROM tests WHERE Game_ID='%d'", gid);
+            sql = String.format("SELECT * FROM tests WHERE Game_ID='%d';", gid);
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -434,7 +434,7 @@ public class DatabaseAccess {
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
 
             stmt = conn.createStatement();
-            sql = String.format("SELECT * FROM targetexecutions WHERE %s='%d'", keyname, id);
+            sql = String.format("SELECT * FROM targetexecutions WHERE %s='%d';", keyname, id);
             ResultSet rs = stmt.executeQuery(sql);
 
             while (rs.next()) {
@@ -470,7 +470,7 @@ public class DatabaseAccess {
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
 
             stmt = conn.createStatement();
-            sql = String.format("SELECT * FROM targetexecutions WHERE Test_ID='%d' AND Mutant_ID='%d'", tid, mid);
+            sql = String.format("SELECT * FROM targetexecutions WHERE Test_ID='%d' AND Mutant_ID='%d';", tid, mid);
             ResultSet rs = stmt.executeQuery(sql);
 
             if (rs.next()) {
