@@ -46,14 +46,14 @@ public class TargetExecution {
             if (testId == 0) {
             	if (mutantId == 0) {
             		System.out.println(target + status + message);
-            		pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Target, Status, Message) VALUES ('?', '?', '?');");
+            		pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Target, Status, Message) VALUES (?, ?, ?);", new String[]{"TargetExecution_ID"});
             		pstmt.setString(1, target);
             		pstmt.setString(2, status);
             		pstmt.setString(3, message);
             	}
             	else {
             		System.out.println(mutantId + target + status + message);
-            		pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Mutant_ID, Target, Status, Message) VALUES ('?', '?', '?', '?');");
+            		pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
             		pstmt.setInt(1, mutantId);
             		pstmt.setString(2, target);
             		pstmt.setString(3, status);
@@ -63,7 +63,7 @@ public class TargetExecution {
             else {
             	if (mutantId == 0) {
             		System.out.println(testId + target + status + message);
-            		pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Test_ID, Target, Status, Message) VALUES ('?', '?', '?', '?');");
+            		pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Test_ID, Target, Status, Message) VALUES (?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
             		pstmt.setInt(1, testId);
             		pstmt.setString(2, target);
             		pstmt.setString(3, status);
@@ -71,7 +71,7 @@ public class TargetExecution {
             	}
             	else {
             		System.out.println(testId + " " + mutantId + target + status + message);
-            		pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Test_ID, Mutant_ID, Target, Status, Message) VALUES ('?', '?', '?', '?', '?');");
+            		pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Test_ID, Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
             		pstmt.setInt(1, testId);
             		pstmt.setInt(2, mutantId);
             		pstmt.setString(3, target);
@@ -80,11 +80,14 @@ public class TargetExecution {
             	}
             }
 
-            pstmt.execute(sql, new String[]{"TargetExecution_ID"});
+            pstmt.execute();
+            System.out.println("executing the statement");
 
             ResultSet rs = pstmt.getGeneratedKeys();
 
+
             if (rs.next()) {
+                System.out.println("trying to get the key for ID");
                 this.id = rs.getInt(1);
                 System.out.println(this.id);
                 pstmt.close();
