@@ -58,12 +58,12 @@
 		%>
 
 			<tr>
-				<td class="col-sm-2"><%= "Greg" %></td>
+				<td class="col-sm-2"><%= "Mutant" %></td>
 				<td class="col-sm-1"><% if (m.isAlive()) {%><%="Alive"%><%} else {%><%="Dead"%><%} %></td>
 			</tr>
 
 			<tr>
-				<td class="col-sm-3" colspan="2"></td>
+				<td class="col-sm-3" colspan="2"><%= m.getHTMLReadout() %></td>
 			</tr>
 			<tr class="blank_row">
 				<td class="row-borderless" colspan="2"></td>
