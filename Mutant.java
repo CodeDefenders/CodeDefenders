@@ -133,16 +133,24 @@ public class Mutant {
         String sql = null;
 
         try {
+        	System.out.println("Inserting mutant");
             Class.forName("com.mysql.jdbc.Driver");
             conn = DriverManager.getConnection(DatabaseAccess.DB_URL,DatabaseAccess.USER,DatabaseAccess.PASS);
 
             stmt = conn.createStatement();
             sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated) VALUES ('%s', '%s', %d, %d);", DatabaseAccess.addSlashes(javaFile), DatabaseAccess.addSlashes(classFile), gameId, roundCreated);
-            stmt.execute(sql);
+            
+            stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
-        	conn.close();
-        	stmt.close();
-        	return true;
+            ResultSet rs = stmt.getGeneratedKeys();
+
+            if (rs.next()) {
+                this.id = rs.getInt(1);
+                System.out.println("setting mutant ID to: " + this.id);
+                stmt.close();
+                conn.close();
+                return true;
+            }
         }
         catch(SQLException se) {System.out.println(se); } // Handle errors for JDBC
         catch(Exception e) {System.out.println(e); } // Handle errors for Class.forName
