@@ -4,7 +4,7 @@ import java.nio.*;
 import java.nio.file.Files;
 import java.util.*;
 import java.io.*;
-import diff_match_patch.*;
+import difflib.*;
 import java.sql.*;
 
 public class Mutant {
@@ -82,43 +82,71 @@ public class Mutant {
 		}
 	}
 
-	public ArrayList<diff_match_patch.Diff> getDifferences() throws IOException {
+	public Patch getDifferences() throws IOException {
 
 		int classId = DatabaseAccess.getGameForKey("Game_ID", gameId).getClassId();
 		File sourceFile = new File(DatabaseAccess.getClassForKey("Class_ID", classId).javaFile);
+		File mutantFile = new File(javaFile);
 
-        String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
+		List<String> sourceLines = new LinkedList<String>();
+		List<String> mutantLines = new LinkedList<String>();
 
-        File mutantFile = new File(javaFile);
-        String mutantCode = new String(Files.readAllBytes(mutantFile.toPath()));
+        String line = "";
 
-        // Runs diff match patch between the two Strings to see if there are any differences.
-        diff_match_patch dmp = new diff_match_patch();
-        ArrayList<diff_match_patch.Diff> changes = new ArrayList<diff_match_patch.Diff>();
-
-        LinkedList<diff_match_patch.Diff> diffs = dmp.diff_main(sourceCode.trim().replace("\n", "").replace("\r", ""), mutantCode.trim().replace("\n", "").replace("\r", ""), true);
-        boolean noChange = true;
-        for (diff_match_patch.Diff d : diffs) {
-            if (d.operation != diff_match_patch.Operation.EQUAL) {
-            	changes.add(d);
-                noChange = false;
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(sourceFile));
+            while ((line = in.readLine()) != null) {
+                sourceLines.add(line);
             }
+        } 
+        catch (IOException e) {
+            e.printStackTrace();
         }
-        return changes;
+
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(mutantFile));
+            while ((line = in.readLine()) != null) {
+                mutantLines.add(line);
+            }
+        } 
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        difflib.Patch patch = DiffUtils.diff(sourceLines, mutantLines);
+
+        for (Delta delta: patch.getDeltas()) {
+                System.out.println(delta);
+        }
+
+        
+        return patch;
 	}
 
 	public String getHTMLReadout() throws IOException {
 		String html = "";
 
-        for (diff_match_patch.Diff d : getDifferences()) {
-            if (d.operation == diff_match_patch.Operation.INSERT) {
-            		html += "<p> +: " + d.text;
-            }
-            else {
-            	html += "<p> -: " + d.text;
-            }
-        }
-        html += "<br>";
+		Patch p = getDifferences();
+		Chunk c;
+		Delta.TYPE t;
+		int pos;
+
+		for (Delta d : p.getDeltas()) {
+			c = d.getOriginal();
+			t = d.getType();
+			pos = c.getPosition();
+			if (t == Delta.TYPE.CHANGE) {
+				html += "Made a change to Line: " + pos + "\n";
+			}
+			else if (t == Delta.TYPE.DELETE) {
+				html += "Removed Line: " + pos + "\n";
+			}
+			else {
+				html += "Added Line: " + pos + "\n";
+			}
+			
+		}
+
         return html;
 	}
 
