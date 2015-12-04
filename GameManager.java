@@ -182,7 +182,7 @@ public class GameManager extends HttpServlet {
 
                 if (compileTestTarget.status.equals("SUCCESS")) {
                     TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testExecutions[1]).get(0);
-                    if (testOriginalTarget.equals("SUCCESS")) {
+                    if (testOriginalTarget.status.equals("SUCCESS")) {
                         messages.add("Your Test Was Compiled Successfully");
                         MutationTester.runMutationTests(activeGame.getId());
                         activeGame.endTurn();

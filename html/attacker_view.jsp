@@ -9,6 +9,11 @@
     <!-- Bootstrap -->
     <link href="${pageContext.request.contextPath}/html/css/bootstrap.min.css" rel="stylesheet">
     <link href="${pageContext.request.contextPath}/html/css/gamestyle.css" rel="stylesheet">
+
+    <script src="${pageContext.request.contextPath}/html/codemirror/lib/codemirror.js"></script>
+    <script src="${pageContext.request.contextPath}/html/codemirror/mode/javascript/javascript.js"></script>
+    <link href="${pageContext.request.contextPath}/html/codemirror/lib/codemirror.css" rel="stylesheet" >
+
 </head>
 
 <body>
@@ -63,7 +68,11 @@
 			</tr>
 
 			<tr>
-				<td class="col-sm-3" colspan="2"><%= m.getHTMLReadout() %></td>
+				<td class="col-sm-3" colspan="2"><%
+					for (String change : m.getHTMLReadout()) {
+						%><p><%=change%><p><%
+					}
+				%></td>
 			</tr>
 			<tr class="blank_row">
 				<td class="row-borderless" colspan="2"></td>
@@ -82,23 +91,29 @@
 
 		<% 
 		boolean isTests = false;
+		int count = 1;
 		for (Test t : game.getTests()) { 
 			isTests = true;
 		%>
 
 			<tr>
-				<td class="col-sm-2"><%= "Greg" %></td>
+				<td class="col-sm-2"><%= "No: " + count %></td>
 				<td class="col-sm-1"><%= "yes" %></td>
 			</tr>
 
 			<tr>
-				<td class="col-sm-3" colspan="2"><%= t.getHTMLReadout() %></td>
+				<td class="col-sm-3" colspan="2"><%
+					for (String line : t.getHTMLReadout()) {
+						%><p><%=line%><p><%
+					}
+				%></td>
 			</tr>
 			<tr class="blank_row">
 				<td class="row-borderless" colspan="2"></td>
 			</tr>
 
 		<%
+			count++;
 		} 
 		if (!isTests) {%>
 			<p> There are currently no tests </p>
@@ -119,7 +134,7 @@
 			%>
 
 			<input type="hidden" name="formType" value="createMutant">
-			<textarea name="mutant" cols="90" rows="50"><%=source%></textarea>
+			<textarea id="code" name="mutant" cols="90" rows="50"><%=source%></textarea>
 		    <br>
 		    
 	    </form>
@@ -129,5 +144,12 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
+    <script> 
+	    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+	    lineNumbers: true,
+	    matchBrackets: true
+		}); 
+		editor.setSize("100%", 575);
+	</script>
 </body>
 </html>

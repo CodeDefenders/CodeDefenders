@@ -55,7 +55,7 @@ CREATE TABLE `games` (
   CONSTRAINT `games_ibfk_1` FOREIGN KEY (`Attacker_ID`) REFERENCES `users` (`User_ID`),
   CONSTRAINT `games_ibfk_2` FOREIGN KEY (`Defender_ID`) REFERENCES `users` (`User_ID`),
   CONSTRAINT `games_ibfk_3` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -78,7 +78,7 @@ CREATE TABLE `mutants` (
   PRIMARY KEY (`Mutant_ID`),
   KEY `Game_ID` (`Game_ID`),
   CONSTRAINT `mutants_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -92,7 +92,7 @@ CREATE TABLE `targetexecutions` (
   `TargetExecution_ID` int(11) NOT NULL AUTO_INCREMENT,
   `Test_ID` int(11) DEFAULT NULL,
   `Mutant_ID` int(11) DEFAULT NULL,
-  `Target` enum('CREATE_MUTANT','CREATE_TEST','TEST_ORIGINAL','TEST_MUTANT','TEST_EQUIVALENCE') NOT NULL,
+  `Target` enum('COMPILE_MUTANT','COMPILE_TEST','TEST_ORIGINAL','TEST_MUTANT','TEST_EQUIVALENCE') DEFAULT NULL,
   `Status` enum('SUCCESS','FAIL','ERROR') NOT NULL,
   `Message` varchar(2000) DEFAULT NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -101,7 +101,7 @@ CREATE TABLE `targetexecutions` (
   KEY `Mutant_ID` (`Mutant_ID`),
   CONSTRAINT `targetexecutions_ibfk_1` FOREIGN KEY (`Test_ID`) REFERENCES `tests` (`Test_ID`),
   CONSTRAINT `targetexecutions_ibfk_2` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -122,7 +122,7 @@ CREATE TABLE `tests` (
   PRIMARY KEY (`Test_ID`),
   KEY `Game_ID` (`Game_ID`),
   CONSTRAINT `tests_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -137,7 +137,7 @@ CREATE TABLE `users` (
   `Username` varchar(20) NOT NULL,
   `Password` varchar(20) NOT NULL,
   PRIMARY KEY (`User_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -149,4 +149,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-11-13  2:38:43
+-- Dump completed on 2015-12-04 15:54:48

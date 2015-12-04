@@ -66,7 +66,7 @@
 		%>
 
 			<tr>
-				<td class="col-sm-1"><%= "Greg" %></td>
+				<td class="col-sm-1"><%= "Mutant" %></td>
 				<td class="col-sm-1"><% if (m.isAlive()) {%><%="Alive"%><%} else {%><%="Dead"%><%} %></td>
 				<td class="col-sm-1">
 					<% if (game.getActivePlayer().equals("DEFENDER")) {%>
@@ -76,7 +76,11 @@
 			</tr>
 
 			<tr>
-				<td class="col-sm-3" colspan="3"></td>
+				<td class="col-sm-3" colspan="3"><%
+					for (String change : m.getHTMLReadout()) {
+						%><p><%=change%><p><%
+					}
+				%></td>
 			</tr>
 			<tr class="blank_row">
 				<td class="row-borderless" colspan="3"></td>
@@ -100,12 +104,16 @@
 		%>
 
 			<tr>
-				<td class="col-sm-2"><%= "Greg" %></td>
+				<td class="col-sm-2"><%= "Test" %></td>
 				<td class="col-sm-1"><%= "yes" %></td>
 			</tr>
 
 			<tr>
-				<td class="col-sm-3" colspan="2"><%= t.getHTMLReadout() %></td>
+				<td class="col-sm-3" colspan="2"><%
+					for (String line : t.getHTMLReadout()) {
+						%><p><%=line%><p><%
+					}
+				%></td>
 			</tr>
 			<tr class="blank_row">
 				<td class="row-borderless" colspan="2"></td>

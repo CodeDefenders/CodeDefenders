@@ -3,6 +3,7 @@ package gammut;
 import java.io.*;
 import javax.servlet.*;
 import java.sql.*;
+import java.util.*;
 
 public class Test {
 
@@ -44,9 +45,24 @@ public class Test {
 
 	public void killMutant() {mutantsKilled++;}
 
-	public String getHTMLReadout() throws IOException {
+	public List<String> getHTMLReadout() throws IOException {
 
-        return "<code>" + "</code>";
+        File testFile = new File(javaFile);
+        List<String> testLines = new LinkedList<String>();
+
+        String line = "";
+
+        try {
+            BufferedReader in = new BufferedReader(new FileReader(testFile));
+            while ((line = in.readLine()) != null) {
+                testLines.add(line);
+            }
+        } 
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return testLines;
 	}
 
 	public boolean insert() {

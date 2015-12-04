@@ -123,31 +123,33 @@ public class Mutant {
         return patch;
 	}
 
-	public String getHTMLReadout() throws IOException {
-		String html = "";
+	public List<String> getHTMLReadout() throws IOException {
 
 		Patch p = getDifferences();
 		Chunk c;
 		Delta.TYPE t;
 		int pos;
 
+		List<String> htmlMessages = new LinkedList<String>();
+
 		for (Delta d : p.getDeltas()) {
 			c = d.getOriginal();
 			t = d.getType();
-			pos = c.getPosition();
+			// position starts at 0 but code readout starts at 1
+			pos = c.getPosition() + 1;
 			if (t == Delta.TYPE.CHANGE) {
-				html += "Made a change to Line: " + pos + "\n";
+				htmlMessages.add("Made a change to Line: " + pos + "\n");
 			}
 			else if (t == Delta.TYPE.DELETE) {
-				html += "Removed Line: " + pos + "\n";
+				htmlMessages.add("Removed Line: " + pos + "\n");
 			}
 			else {
-				html += "Added Line: " + pos + "\n";
+				htmlMessages.add("Added Line: " + pos + "\n");
 			}
 			
 		}
 
-        return html;
+        return htmlMessages;
 	}
 
 	// insert will run once after mutant creation.
