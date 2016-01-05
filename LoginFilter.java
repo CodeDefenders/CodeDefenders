@@ -4,6 +4,7 @@ import java.io.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import java.util.*;
+import java.util.regex.*;
 
 // Implements Filter class
 public class LoginFilter implements Filter  {
@@ -11,16 +12,16 @@ public class LoginFilter implements Filter  {
    public void  init(FilterConfig config) throws ServletException { 
    }
 
+   @Override
    public void  doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws java.io.IOException, ServletException {
 
       HttpServletRequest httpReq = (HttpServletRequest)request;
 
       // If the path is going to login, no need to redirect.
       String path = httpReq.getRequestURI();
-      if ((path.startsWith("/gammut/login"))||(path.startsWith("/gammut/intro"))) {
+      if ((shouldExclude(httpReq))||(path.startsWith("/gammut/login"))||(path.startsWith("/gammut/intro"))) {
         chain.doFilter(request, response);
-      }
-      else {
+      } else {
         HttpSession session = httpReq.getSession();
         Integer uid = (Integer)session.getAttribute("uid");
         if (uid != null) {
@@ -34,5 +35,13 @@ public class LoginFilter implements Filter  {
    }
 
    public void destroy(){
+   }
+
+   private static Pattern excludeUrls = Pattern.compile("^.*/(css|js|images)/.*$", Pattern.CASE_INSENSITIVE);
+   private boolean shouldExclude(HttpServletRequest request) {
+       String url = request.getRequestURI().toString();
+       Matcher m = excludeUrls.matcher(url);
+
+       return (m.matches());
    }
 }
