@@ -1,4 +1,9 @@
-WARFILE:=gammut.war
+WARFILE := gammut.war
+
+CATALINA_HOME ?= /Users/jmr/lib/tomcat7
+ifeq (,$(wildcard ${CATALINA_HOME}))
+    $(error Tomcat dir does not exist!)
+endif
 
 default: *.java compile deploy
 compile:
