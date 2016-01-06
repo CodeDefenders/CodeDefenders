@@ -28,17 +28,24 @@
                         <resource>
                             <directory>src/main/resources</directory>
                             <includes>
-                                <include>js/*.js</include>
-                                <include>css/*.css</include>
+                                <include>**/*.js</include>
+                                <include>**/*.css</include>
                                 <include>fonts/*.*</include>
+                                <include>codemirror/**.*</include>
+                                <include>codemirror/bin/*</include>
+                                <include>**/*.html</include>
+                                <include>**/*.jpg</include>
+                                <include>**/*.png</include>
+                                <include>**/*.sh</include>
+                                <include>**/*.svg</include>
                             </includes>
                         </resource>
                     </webResources>
+                    <packagingExcludes>**/empty.tmp</packagingExcludes>
                 </configuration>
-
             </plugin>
         </plugins>
-
+        <finalName>${artifactId}</finalName>
     </build>
 
     <dependencies>

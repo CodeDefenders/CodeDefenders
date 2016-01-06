@@ -15,8 +15,6 @@ import java.util.regex.Pattern;
 // Implements Filter class
 public class LoginFilter implements Filter {
 
-	private static Pattern excludeUrls = Pattern.compile("^.*/(css|js|images)/.*$", Pattern.CASE_INSENSITIVE);
-
 	public void init(FilterConfig config) throws ServletException {
 	}
 
@@ -24,11 +22,9 @@ public class LoginFilter implements Filter {
 
 		HttpServletRequest httpReq = (HttpServletRequest) request;
 
-		// If the path is going to login, no need to redirect.
-		String path = httpReq.getRequestURI();
-		if ((shouldExclude(httpReq)) || (path.equals("/login")) || (path.equals("/")) || (path.equals("/index.jsp"))) {
+		if (shouldAllow(httpReq))
 			chain.doFilter(request, response);
-		} else {
+		else {
 			HttpSession session = httpReq.getSession();
 			Integer uid = (Integer) session.getAttribute("uid");
 			if (uid != null) {
@@ -43,10 +39,14 @@ public class LoginFilter implements Filter {
 	public void destroy() {
 	}
 
-	private boolean shouldExclude(HttpServletRequest request) {
-		String url = request.getRequestURI().toString();
-		Matcher m = excludeUrls.matcher(url);
+	private boolean shouldAllow(HttpServletRequest request) {
+		String path = request.getRequestURI().toString();
+		String context = request.getContextPath().toString();
+		if ((path.endsWith(context + "/")) || (path.endsWith(context + "/login")) || (path.endsWith(context + "/index.jsp")))
+			return true;
 
-		return (m.matches());
+		Pattern excludeUrls = Pattern.compile("^.*/(css|js|images)/.*$", Pattern.CASE_INSENSITIVE);
+		Matcher m = excludeUrls.matcher(path);
+		return m.matches();
 	}
 }

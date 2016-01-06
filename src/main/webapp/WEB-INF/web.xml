@@ -9,6 +9,10 @@
     </description>
     <display-name>Mutation Testing Game 2</display-name>
 
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+
     <servlet>
         <servlet-name>loginManager</servlet-name>
         <servlet-class>org.gammut.LoginManager</servlet-class>

@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 
 import static org.gammut.Constants.ATTACKER_VIEW_JSP;
@@ -112,7 +113,7 @@ public class GameManager extends HttpServlet {
 							}
 
 							// Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
-							MutationTester.runEquivalenceTest(test, mutant);
+							MutationTester.runEquivalenceTest(getServletContext(), test, mutant);
 							activeGame.passPriority();
 							activeGame.update();
 						} else {
@@ -191,13 +192,15 @@ public class GameManager extends HttpServlet {
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
 				int[] testExecutions = createTest(activeGame.getId(), activeGame.getClassId(), testText);
+				System.out.println("Result of test execution:");
+				System.out.println(Arrays.toString(testExecutions));
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testExecutions[0]).get(0);
 
 				if (compileTestTarget.status.equals("SUCCESS")) {
 					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testExecutions[1]).get(0);
 					if (testOriginalTarget.status.equals("SUCCESS")) {
 						messages.add("Your Test Was Compiled Successfully");
-						MutationTester.runMutationTests(activeGame.getId());
+						MutationTester.runMutationTests(getServletContext(), activeGame.getId());
 						activeGame.endTurn();
 						activeGame.update();
 					} else {
@@ -255,7 +258,7 @@ public class GameManager extends HttpServlet {
 		Mutant newMutant = new Mutant(gid, jFile, cFile);
 		newMutant.insert();
 
-		int compileMutantId = MutationTester.compileMutant(newMutant);
+		int compileMutantId = MutationTester.compileMutant(getServletContext(), newMutant);
 
 		return compileMutantId;
 	}
@@ -284,11 +287,11 @@ public class GameManager extends HttpServlet {
 		Test newTest = new Test(gid, jFile, cFile);
 		newTest.insert();
 
-		int compileTestId = MutationTester.compileTest(newTest);
+		int compileTestId = MutationTester.compileTest(getServletContext(), newTest);
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", compileTestId).get(0);
 
 		if (compileTestTarget.status.equals("SUCCESS")) {
-			int testOriginalId = MutationTester.testOriginal(newTest);
+			int testOriginalId = MutationTester.testOriginal(getServletContext(), newTest);
 			return new int[]{compileTestId, testOriginalId};
 		} else {
 			return new int[]{compileTestId, -1};

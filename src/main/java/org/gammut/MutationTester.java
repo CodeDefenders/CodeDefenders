@@ -1,8 +1,11 @@
 package org.gammut;
 
+import javax.servlet.ServletContext;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Map;
 
 // Class that handles compilation and testing by creating a Process with the relevant ant target
 public class MutationTester {
@@ -12,11 +15,13 @@ public class MutationTester {
 	// Inputs: Mutant object to be compiled
 	// Outputs: ID of the resulting TargetExecution
 
-	public static int compileMutant(Mutant m) {
+	public static int compileMutant(ServletContext context, Mutant m) {
 
 		// Gets the classname for the mutant from the game it is in
 		String className = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
-		String[] resultArray = runAntTarget("compile-mutant", m.getFolder(), null, className);
+		String[] resultArray = runAntTarget(context, "compile-mutant", m.getFolder(), null, className);
+		System.out.println("Compilation result:");
+		System.out.println(Arrays.toString(resultArray));
 		System.out.println("compiling mutant");
 
 		// If the input stream returned a 'successful build' message, the mutant compiled correctly
@@ -44,10 +49,10 @@ public class MutationTester {
 	// Inputs: Test object to be compiled
 	// Outputs: ID of the resulting TargetExecution
 
-	public static int compileTest(Test t) {
+	public static int compileTest(ServletContext context, Test t) {
 
 		String className = DatabaseAccess.getGameForKey("Game_ID", t.getGameId()).getClassName();
-		String[] resultArray = runAntTarget("compile-test", null, t.getFolder(), className);
+		String[] resultArray = runAntTarget(context, "compile-test", null, t.getFolder(), className);
 
 		// If the input stream returned a 'successful build' message, the test compiled correctly
 		if (resultArray[0].toLowerCase().contains("build successful")) {
@@ -71,10 +76,10 @@ public class MutationTester {
 
 	// Inputs: Test object to be run against the original class
 	// Outputs: ID of the resulting TargetExecution
-	public static int testOriginal(Test t) {
+	public static int testOriginal(ServletContext context, Test t) {
 
 		String className = DatabaseAccess.getGameForKey("Game_ID", t.getGameId()).getClassName();
-		String[] resultArray = runAntTarget("test-original", null, t.getFolder(), className);
+		String[] resultArray = runAntTarget(context, "test-original", null, t.getFolder(), className);
 
 		// If the test doesn't return failure
 		if (resultArray[0].toLowerCase().contains("failures: 0")) {
@@ -109,10 +114,10 @@ public class MutationTester {
 	// Inputs: A test object and a mutant to run it on
 	// Outputs: ID of the resulting TargetExecution
 
-	public static int testMutant(Mutant m, Test t) {
+	public static int testMutant(ServletContext context, Mutant m, Test t) {
 
 		String className = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
-		String[] resultArray = runAntTarget("test-mutant", m.getFolder(), t.getFolder(), className);
+		String[] resultArray = runAntTarget(context, "test-mutant", m.getFolder(), t.getFolder(), className);
 
 		// If the test doesn't return failure
 		if (resultArray[0].toLowerCase().contains("failures: 0")) {
@@ -143,7 +148,7 @@ public class MutationTester {
 	// Inputs: The ID of the game to run mutation tests for
 	// Outputs: None
 
-	public static void runMutationTests(int gid) {
+	public static void runMutationTests(ServletContext context, int gid) {
 
 		for (Mutant m : DatabaseAccess.getMutantsForGame(gid)) {
 			for (Test t : DatabaseAccess.getTestsForGame(gid)) {
@@ -152,7 +157,7 @@ public class MutationTester {
 					// If this mutant/test pairing hasnt been run before and the test might kill the mutant
 					if (DatabaseAccess.getTargetExecutionForPair(t.getId(), m.getId()) == null) {
 						// Run the test against the mutant and get the result
-						int targetId = testMutant(m, t);
+						int targetId = testMutant(context, m, t);
 
 						TargetExecution executedTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", targetId).get(0);
 
@@ -174,11 +179,11 @@ public class MutationTester {
 	// Inputs: Attacker created test and a mutant to run it on
 	// Outputs: None
 
-	public static void runEquivalenceTest(Test test, Mutant mutant) {
+	public static void runEquivalenceTest(ServletContext context, Test test, Mutant mutant) {
 		// The test created is new and was made by the attacker (there is no need to check if the mutant/test pairing has been run already)
 
 		// As a result of this test, either the test the attacker has written kills the mutant or doesnt.
-		int targetId = testMutant(mutant, test);
+		int targetId = testMutant(context, mutant, test);
 		TargetExecution executedTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", targetId).get(0);
 		// If the test did NOT pass, the mutant was detected and is proven to be non-equivalent
 		if (executedTarget.status.equals("FAIL")) {
@@ -203,20 +208,34 @@ public class MutationTester {
 	//    [2] : Any exceptions from running the process
 	//    [3] : Message indicating which target was run, and with which files
 
-	private static String[] runAntTarget(String target, String mutantFile, String testFile, String className) {
+	private static String[] runAntTarget(ServletContext context, String target, String mutantFile, String testFile, String className) {
 		String[] resultArray = new String[4];
 		String isLog = "";
 		String esLog = "";
 		String exLog = "";
 		String debug = "Running Ant Target: " + target + " with mFile: " + mutantFile + " and tFile: " + testFile;
 
-		ProcessBuilder pb = new ProcessBuilder(System.getProperty("ant.home", "C:/apache-ant-1.9.5") + "/bin/ant.bat",
-				target,
+		ProcessBuilder pb = new ProcessBuilder();
+		Map env = pb.environment();
+
+		String antHome = (String) env.get("ANT_HOME");
+		if (antHome == null)
+			antHome = System.getProperty("ant.home", "/usr");
+
+		String catalinaHome = (String) env.get("CATALINA_HOME");
+		if (catalinaHome == null)
+			catalinaHome = System.getProperty("catalina.home", "/usr/share/tomcat");
+
+		pb.command(antHome + "/bin/ant", target,
 				"-Dmutant.file=" + mutantFile,
 				"-Dtest.file=" + testFile,
 				"-Dclassname=" + className);
-		pb.directory(new File(System.getProperty("catalina.home", "C:/apache-tomcat-7.0.62") + "/webapps/gammut/WEB-INF/data"));
 
+		String buildFileDir = catalinaHome + "/webapps" + context.getContextPath() + "/WEB-INF/data";
+		pb.directory(new File(buildFileDir));
+		pb. redirectErrorStream(true);
+
+		System.out.println("Executing Ant Command: " + pb.command().toString());
 		try {
 			Process p = pb.start();
 			String line;
