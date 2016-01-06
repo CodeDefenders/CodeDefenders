@@ -57,7 +57,7 @@
         <td class="col-sm-2">Attacker</td>
         <td class="col-sm-2">Defender</td>
         <td class="col-sm-2">Game State</td>
-        <td class="col-sm-2">Class Tested</td>
+        <td class="col-sm-2">Class Under Test</td>
         <td class="col-sm-2"></td>
       </tr>
 
@@ -85,6 +85,10 @@
           defName = DatabaseAccess.getUserForKey("User_ID", g.getDefenderId()).username;
       }
 
+	    int turnId = g.getAttackerId();
+		if (g.getActivePlayer().equals("DEFENDER"))
+			turnId = g.getDefenderId();
+
       if (atkName == null) {atkName = "Empty";}
       if (defName == null) {defName = "Empty";}
     %>
@@ -96,14 +100,17 @@
         <td class="col-sm-2"><%= g.getState() %></td>
         <td class="col-sm-2"><%= DatabaseAccess.getClassForKey("Class_ID", g.getClassId()).name %></td>
         <td class="col-sm-2">
-
         <%
         if (canEnter) { %>
 
           <form id="view" action="games" method="post">
             <input type="hidden" name="formType" value="enterGame">
             <input type="hidden" name="game" value=<%=g.getId()%>>
-            <input type="submit" value="Enter Game">
+	          <% if (uid == turnId ) {%>
+                <input class="btn btn-default turn" type="submit" value="Your Turn">
+	          <% } else {%>
+	            <input  class="btn btn-default" type="submit" value="Enter Game">
+	          <% }%>
           </form>
 
           <% } %>

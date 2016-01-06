@@ -29,3 +29,18 @@
 }
 
 body { padding-top: 70px; }
+
+.turn {
+    background-color: #6FC643;
+    border: 1px solid #C0C0C0;
+    color: #FFF;
+    transition-property: background-color, border-color;
+    transition-duration: 150ms;
+    min-width: 100px;
+}
+
+.turn:hover {
+    color: #FFF;
+    background-color: #65B63D;
+    border-color: #ADADAD;
+}

@@ -57,7 +57,7 @@
         <td class="col-sm-2">Attacker</td>
         <td class="col-sm-2">Defender</td>
         <td class="col-sm-2">Game State</td>
-        <td class="col-sm-2">Class Tested</td>
+        <td class="col-sm-2">Class Under Test</td>
         <td class="col-sm-2"></td>
       </tr>
 
@@ -98,7 +98,7 @@
           <form id="view" action="games" method="post">
             <input type="hidden" name="formType" value="joinGame">
             <input type="hidden" name="game" value=<%=g.getId()%>>
-            <input type="submit" value="Join Game">
+            <input type="submit" class="btn btn-default" value="Join Game">
           </form>
         </td>
       </tr>

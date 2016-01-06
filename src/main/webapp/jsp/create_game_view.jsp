@@ -69,7 +69,7 @@
 
     <input type="number" name="rounds" min="1" max="10">Number of Rounds<br>
     
-    <input type="submit" value="Create">
+    <input type="submit" class="btn btn-default" value="Create">
   </form>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
