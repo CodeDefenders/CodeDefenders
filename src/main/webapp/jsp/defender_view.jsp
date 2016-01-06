@@ -103,6 +103,7 @@
 
 		<% 
 		boolean isTests = false;
+		int count = 1;
 		for (Test t : game.getTests()) { 
 			isTests = true;
 		%>
@@ -113,17 +114,21 @@
 			</tr>
 
 			<tr>
-				<td class="col-sm-3" colspan="2"><%
-					for (String line : t.getHTMLReadout()) {
-						%><p><%=line%><p><%
-					}
-				%></td>
+				<td class="col-sm-3" colspan="2">
+					<%
+						String utest = "";
+						for (String line : t.getHTMLReadout()) { utest += line + "\n"; }
+					%>
+					<pre><textarea id=<%="tc"+count%> name="utest" class="utest" cols="20" rows="10"><%=utest%></textarea></pre>
+				</td>
+
 			</tr>
 			<tr class="blank_row">
 				<td class="row-borderless" colspan="2"></td>
 			</tr>
 
 		<%
+			count++;
 		} 
 		if (!isTests) {%>
 			<p> There are currently no tests </p>
@@ -191,6 +196,14 @@ public class Test<%=game.getClassName()%> {
 		    matchBrackets: true,
 		    readOnly: true
 	    });
+	    var x = document.getElementsByClassName("utest");
+	    var i;
+	    for (i = 0; i < x.length; i++) {
+		    CodeMirror.fromTextArea(x[i], {
+			    lineNumbers: true,
+			    matchBrackets: true
+		    });
+	    }
     </script>
 </body>
 </html>

@@ -106,11 +106,13 @@
 			</tr>
 
 			<tr>
-				<td class="col-sm-3" colspan="2"><%
-					for (String line : t.getHTMLReadout()) {
-						%><p><%=line%><p><%
-					}
-				%></td>
+				<td class="col-sm-3" colspan="2">
+					<%
+						String utest = "";
+						for (String line : t.getHTMLReadout()) { utest += line + "\n"; }
+					%>
+					<pre><textarea id=<%="tc"+count%> name="utest" class="utest" cols="20" rows="10"><%=utest%></textarea></pre>
+				</td>
 			</tr>
 			<tr class="blank_row">
 				<td class="row-borderless" colspan="2"></td>
@@ -136,9 +138,9 @@
 			    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
 			    while((line = is.readLine()) != null) {source+=line+"\n";}
 			%>
-
+		    <h2>Create a Mutant Here</h2>
 			<input type="hidden" name="formType" value="createMutant">
-			<textarea id="code" name="mutant" cols="90" rows="50"><%=source%></textarea>
+			<pre><textarea id="code" name="mutant" cols="80" rows="50"><%=source%></textarea></pre>
 		    <br>
 
 	    </form>
@@ -150,10 +152,19 @@
     <script src="js/bootstrap.min.js"></script>
     <script>
 	    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-	    lineNumbers: true,
-	    matchBrackets: true
+	        lineNumbers: true,
+	        matchBrackets: true
 		});
 		editor.setSize("100%", 575);
+
+	    var x = document.getElementsByClassName("utest");
+	    var i;
+	    for (i = 0; i < x.length; i++) {
+		    CodeMirror.fromTextArea(x[i], {
+			    lineNumbers: true,
+			    matchBrackets: true
+		    });
+	    }
 	</script>
 </body>
 </html>
