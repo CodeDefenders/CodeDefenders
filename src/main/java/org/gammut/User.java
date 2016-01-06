@@ -1,5 +1,7 @@
 package org.gammut;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,7 +33,11 @@ public class User {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			sql = String.format("INSERT INTO users (Username, Password) VALUES ('%s', '%s');", username, password);
+
+			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			String safePassword = passwordEncoder.encode(password);
+
+			sql = String.format("INSERT INTO users (Username, Password) VALUES ('%s', '%s');", username, safePassword);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 

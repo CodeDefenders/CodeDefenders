@@ -1,5 +1,7 @@
 package org.gammut;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -35,16 +37,20 @@ public class LoginManager extends HttpServlet {
 			if (password.equals(confirm)) {
 				if (DatabaseAccess.getUserForName(username) == null) {
 					User newUser = new User(username, password);
-					newUser.insert();
+					if (newUser.insert()) {
+						HttpSession session = request.getSession();
+						session.setAttribute("uid", newUser.id);
+						session.setAttribute("username", newUser.username);
+						session.setAttribute("messages", messages);
 
-					HttpSession session = request.getSession();
-					session.setAttribute("uid", newUser.id);
-					session.setAttribute("username", newUser.username);
-					session.setAttribute("messages", messages);
+						session.setMaxInactiveInterval(1200);
 
-					session.setMaxInactiveInterval(1200);
-
-					response.sendRedirect("games");
+						response.sendRedirect("games");
+					} else {
+						messages.add("Could not create a user for you, sorry!");
+						RequestDispatcher dispatcher = request.getRequestDispatcher(LOGIN_VIEW_JSP);
+						dispatcher.forward(request, response);
+					}
 				} else {
 					messages.add("Username Is Already Taken");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(LOGIN_VIEW_JSP);
@@ -58,7 +64,9 @@ public class LoginManager extends HttpServlet {
 		} else if (formType.equals("login")) {
 			User activeUser = DatabaseAccess.getUserForName(username);
 
-			if ((activeUser != null) && (activeUser.password.equals(password))) {
+			String dbPassword = activeUser.password;
+			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			if ((activeUser != null) && passwordEncoder.matches(password, dbPassword)) {
 				HttpSession session = request.getSession();
 				session.setAttribute("uid", activeUser.id);
 				session.setAttribute("username", username);
