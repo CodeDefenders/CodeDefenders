@@ -5,9 +5,9 @@
          version="3.1">
 
     <description>
-        Mutation Testing Game 2.
+        Mutation Testing Game
     </description>
-    <display-name>Mutation Testing Game 2</display-name>
+    <display-name>Mutation Testing Game</display-name>
 
     <welcome-file-list>
         <welcome-file>index.jsp</welcome-file>
