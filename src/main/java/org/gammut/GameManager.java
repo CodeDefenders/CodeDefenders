@@ -267,8 +267,9 @@ public class GameManager extends HttpServlet {
 
 		File folder = new File(getServletContext().getRealPath(TESTS_DIR + gid));
 		folder.mkdir();
-
-		File test = new File(getServletContext().getRealPath(TESTS_DIR + gid + SEPARATOR + TEST_PREFIX + classUnderTest.name + JAVA_SOURCE_EXT));
+		String testSourceFileName = TESTS_DIR + gid + SEPARATOR + TEST_PREFIX + classUnderTest.name + JAVA_SOURCE_EXT;
+		String testClassFileName = TESTS_DIR + gid + SEPARATOR + TEST_PREFIX + classUnderTest.name + JAVA_CLASS_EXT;
+		File test = new File(getServletContext().getRealPath(testSourceFileName));
 		FileWriter testWriter = new FileWriter(test);
 		BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);
 		bufferedTestWriter.write(testText);
@@ -276,8 +277,8 @@ public class GameManager extends HttpServlet {
 
 		// Check the test actually passes when applied to the original code.
 
-		String jFile = getServletContext().getRealPath(TESTS_DIR + gid + SEPARATOR + TEST_PREFIX + classUnderTest.name + JAVA_SOURCE_EXT);
-		String cFile = getServletContext().getRealPath(TESTS_DIR + gid + SEPARATOR + TEST_PREFIX + classUnderTest.name + JAVA_CLASS_EXT);
+		String jFile = getServletContext().getRealPath(testSourceFileName);
+		String cFile = getServletContext().getRealPath(testClassFileName);
 
 		Test newTest = new Test(gid, jFile, cFile);
 		newTest.insert();

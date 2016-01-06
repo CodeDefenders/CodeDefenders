@@ -6,6 +6,7 @@
 
   <path id="test.cp">
     <pathelement path="../lib/junit-4.12.jar"/>
+    <pathelement path="../lib/hamcrest-all-1.3.jar"/>
     <pathelement path="sources"/>
   </path>
 
@@ -26,6 +27,7 @@
       <classpath>
         <pathelement location="sources"/>
         <pathelement location="${test.file}"/>
+	<path refid="test.cp" />
       </classpath>
       <test name="Test${classname}"/>
     </junit>
@@ -39,6 +41,7 @@
       <classpath>
         <pathelement location="${mutant.file}"/>
         <pathelement location="${test.file}"/>
+	<path refid="test.cp" />
       </classpath>
 
       <test name="Test${classname}"/>
