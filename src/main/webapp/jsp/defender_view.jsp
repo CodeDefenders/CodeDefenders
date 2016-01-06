@@ -52,7 +52,7 @@
       if (messages != null) {
         for (String m : messages) { %>
           <div class="alert alert-info">
-              <strong><%=m%></strong>
+              <pre><strong><%=m%></strong></pre>
           </div>
         <% }
       }
@@ -98,7 +98,7 @@
 		%>
 		</table>
 
-		<h2> Tests </h2>
+		<h2> Submitted Tests </h2>
 		<table class="table table-hover table-responsive table-paragraphs">
 
 		<% 
@@ -137,29 +137,31 @@
 	    String line;
 	    String source = "";
 	    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
-	    while((line = is.readLine()) != null) {source+=line+"<br>";}
+	    while((line = is.readLine()) != null) {source+=line+"\n";}
 		%>
-		<pre><code><%=source%></code></pre>
+		<pre>
+		<textarea id="sut" name="cut" cols="80" rows="30"><%=source%></textarea>
+		</pre>
 
 	</div>
 
 	<div id="right">
+		<h2> Write your JUnit test here!</h2>
 		<form id="equiv" action="play" method="post">
 			<input type=hidden name="formType" value="markEquivalences">
 		</form>
 		<form id="def" action="play" method="post">
-
 			<input type="hidden" name="formType" value="createTest">
-	        <textarea id="code" name="test" cols="90" rows="30">
+	        <pre><textarea id="code" name="test" cols="80" rows="30">
 import org.junit.*;
 import static org.junit.Assert.*;
 
 public class Test<%=game.getClassName()%> {
-@Test
-public void test() {
-
-}
-}</textarea>
+    @Test
+    public void test() {
+        // test here!
+    }
+}</textarea></pre>
 
 		    <br>
 	    </form>
@@ -170,10 +172,25 @@ public void test() {
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
     <script> 
-	    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
-	    lineNumbers: true,
-	    matchBrackets: true
-		}); 
-	</script>
+	    var editorTest = CodeMirror.fromTextArea(document.getElementById("code"), {
+	        lineNumbers: true,
+	        matchBrackets: true
+		});
+
+	    editorTest.on('beforeChange',function(cm,change) {
+		    var text = cm.getValue();
+		    var lines = text.split(/\r|\r\n|\n/);
+		    var readOnlyLines = [0,1,2,3,4,5];
+		    var readOnlyLinesEnd = [lines.length-1,lines.length-2];
+		    if ( ~readOnlyLines.indexOf(change.from.line) || ~readOnlyLinesEnd.indexOf(change.to.line)) {
+			    change.cancel();
+		    }
+	    });
+	    var editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
+		    lineNumbers: true,
+		    matchBrackets: true,
+		    readOnly: true
+	    });
+    </script>
 </body>
 </html>

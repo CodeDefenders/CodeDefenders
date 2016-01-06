@@ -49,7 +49,7 @@
       if (messages != null) {
         for (String m : messages) { %>
           <div class="alert alert-info">
-              <strong><%=m%></strong>
+              <pre><strong><%=m%></strong></pre>
           </div>
         <% }
       }
