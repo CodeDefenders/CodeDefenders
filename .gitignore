@@ -1,2 +1,7 @@
+*.log
+*.dot
+*.iml
 *.class
 *.war
+.idea
+target/
