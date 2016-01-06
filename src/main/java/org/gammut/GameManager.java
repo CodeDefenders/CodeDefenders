@@ -47,9 +47,7 @@ public class GameManager extends HttpServlet {
 			session.setAttribute("game", activeGame);
 			RequestDispatcher dispatcher = request.getRequestDispatcher(SCORE_VIEW_JSP);
 			dispatcher.forward(request, response);
-		}
-
-		if (activeGame.getAttackerId() == uid) {
+		} else if (activeGame.getAttackerId() == uid) {
 			System.out.println("user is attacker");
 			session.setAttribute("game", activeGame);
 
@@ -66,16 +64,13 @@ public class GameManager extends HttpServlet {
 			// If no mutants needed to be proved non-equivalent, direct to the Attacker Page.
 			RequestDispatcher dispatcher = request.getRequestDispatcher(ATTACKER_VIEW_JSP);
 			dispatcher.forward(request, response);
-		}
-
-		if (activeGame.getDefenderId() == uid) {
+		} else if (activeGame.getDefenderId() == uid) {
 			session.setAttribute("game", activeGame);
 			// Direct to the Defender Page.
 			RequestDispatcher dispatcher = request.getRequestDispatcher(DEFENDER_VIEW_JSP);
 			dispatcher.forward(request, response);
-		}
-
-		response.sendRedirect(request.getHeader("referer"));
+		} else
+			response.sendRedirect(request.getHeader("referer"));
 	}
 
 	// Based on the data provided, update information for the game
