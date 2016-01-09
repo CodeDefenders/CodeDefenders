@@ -1,5 +1,7 @@
 package org.gammut;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.Connection;
@@ -8,6 +10,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class User {
+
+	private static final Logger logger = LoggerFactory.getLogger(User.class);
 
 	public int id;
 	public String username;
@@ -33,9 +37,10 @@ public class User {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-
+			logger.debug("Calling BCryptPasswordEncoder.encode");
 			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 			String safePassword = passwordEncoder.encode(password);
+
 
 			sql = String.format("INSERT INTO users (Username, Password) VALUES ('%s', '%s');", username, safePassword);
 

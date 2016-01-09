@@ -1,5 +1,7 @@
 package org.gammut;
 
+import static org.gammut.Constants.LOGIN_VIEW_JSP;
+
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.servlet.RequestDispatcher;
@@ -10,8 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
-
-import static org.gammut.Constants.LOGIN_VIEW_JSP;
 
 public class LoginManager extends HttpServlet {
 
@@ -63,20 +63,25 @@ public class LoginManager extends HttpServlet {
 			}
 		} else if (formType.equals("login")) {
 			User activeUser = DatabaseAccess.getUserForName(username);
-
-			String dbPassword = activeUser.password;
-			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-			if ((activeUser != null) && passwordEncoder.matches(password, dbPassword)) {
-				HttpSession session = request.getSession();
-				session.setAttribute("uid", activeUser.id);
-				session.setAttribute("username", username);
-				session.setMaxInactiveInterval(1200);
-
-				response.sendRedirect("games");
-			} else {
-				messages.add("Username Does Not Exist Or Your Password Was Incorrect");
+			if (activeUser == null) {
+				messages.add("User could not be retrieved from DB");
 				RequestDispatcher dispatcher = request.getRequestDispatcher(LOGIN_VIEW_JSP);
 				dispatcher.forward(request, response);
+			} else {
+				String dbPassword = activeUser.password;
+				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+				if (passwordEncoder.matches(password, dbPassword)) {
+					HttpSession session = request.getSession();
+					session.setAttribute("uid", activeUser.id);
+					session.setAttribute("username", username);
+					session.setMaxInactiveInterval(1200);
+
+					response.sendRedirect("games");
+				} else {
+					messages.add("Username Does Not Exist Or Your Password Was Incorrect");
+					RequestDispatcher dispatcher = request.getRequestDispatcher(LOGIN_VIEW_JSP);
+					dispatcher.forward(request, response);
+				}
 			}
 		} else if (formType.equals("logOut")) {
 

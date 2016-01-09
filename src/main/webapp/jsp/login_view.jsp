@@ -43,25 +43,51 @@
       }
   %>
 
-  <div id="login">
-    <h2>Existing Account</h2>
-    <form action="login" method="post">
-      <input type="hidden" name="formType" value="login">
-      Username:<input type="text" name="username"><br>
-      Password:<input type="password" name="password"><br>
-      <input type="submit" value="Login">
-    </form>
 
-	<div id="create">
-		<h2>Create Account</h2>
-    <form action="login" method="post">
-      <input type="hidden" name="formType" value="create">
-      Username:<input type="text" name="username"><br>
-      Password:<input type="password" name="password"><br>
-      Confirm Password:<input type="password" name="confirm"></br>
-      <input type="submit" value="Create Account">
-    </form>
-	</div>
+  <div id="login" class="container">
+      <form  action="login" method="post" class="form-signin">
+          <input type="hidden" name="formType" value="login">
+          <h2 class="form-signin-heading">Sign in</h2>
+          <label for="inputUsername" class="sr-only">Username</label>
+          <input type="text" id="inputUsername" name="username" class="form-control" placeholder="Username" required autofocus>
+          <label for="inputPassword" class="sr-only">Password</label>
+          <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
+          <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+          <a href="#" class="text-center new-account" data-toggle="modal" data-target="#myModal">Create an account</a>
+      </form>
+  </div>
+
+
+  <!-- Modal -->
+  <div id="myModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+          <!-- Modal content-->
+          <div class="modal-content">
+              <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">Create new account</h4>
+              </div>
+              <div class="modal-body">
+	        <div id="create">
+                  <form  action="login" method="post" class="form-signin">
+                      <input type="hidden" name="formType" value="create">
+                      <label for="inputUsername" class="sr-only">Username</label>
+                      <input type="text" id="inputUsernameCreate" name="username" class="form-control" placeholder="Username" required autofocus>
+                      <label for="inputPassword" class="sr-only">Password</label>
+                      <input type="password" id="inputPasswordCreate" name="password" class="form-control" placeholder="Password" required>
+                      <label for="inputPassword" class="sr-only">Password</label>
+                      <input type="password" id="inputConfirmPassword" name="confirm" class="form-control" placeholder="Confirm Password" required>
+                      <button class="btn btn-lg btn-primary btn-block" type="submit">Create Account</button>
+                   </form>
+                </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              </div>
+          </div>
+
+      </div>
+  </div>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
