@@ -4,15 +4,15 @@
 }
 
 #info {
-	float: left;
-	margin: auto;
+    float: left;
+    margin: auto;
     width: 50%;
     padding: 0px 1%;
 }
 
 #right {
-	float: left;
-	margin: auto;
+    float: left;
+    margin: auto;
     width: 50%;
     padding: 0px 1%;
 }
@@ -28,8 +28,18 @@
     text-align:center;
 }
 
+textarea {
+    width:100px;
+    height: 150px;
+}
 
-body { padding-top: 70px; }
+body {
+    padding-top: 70px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* My turn button */
 
 .turn {
     background-color: #6FC643;
@@ -45,6 +55,8 @@ body { padding-top: 70px; }
     background-color: #65B63D;
     border-color: #ADADAD;
 }
+
+/* Sign-in form */
 
 .form-signin {
     max-width: 330px;
@@ -79,4 +91,59 @@ body { padding-top: 70px; }
     margin-bottom: 10px;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
+}
+
+/* Slider */
+
+.slick-slider {
+    overflow: visible !important;
+    position: relative;
+    max-width : 80%;
+    width : 80%;
+    align:center;
+    margin-left: 50px;
+    margin-right: 50px;
+    -moz-box-sizing: border-box;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -ms-touch-action: none;
+    touch-action: none;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+.slick-prev,
+.slick-next {
+    position: absolute;
+    line-height: 1;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    background: transparent;
+    color: transparent;
+}
+
+.slick-prev {
+    top: 50%;
+    left: -50px;
+}
+
+.slick-next {
+    top: 50%;
+    right: -50px;
+}
+
+.slick-prev:before {
+    content: '\2770';
+    color: gray;
+    font-size: 50px;
+}
+
+.slick-next:after {
+    content: '\2771';
+    color: gray;
+    font-size: 50px;
 }

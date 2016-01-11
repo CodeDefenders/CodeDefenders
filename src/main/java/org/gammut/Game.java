@@ -126,6 +126,16 @@ public class Game {
 		return aliveMutants;
 	}
 
+	public ArrayList<Mutant> getKilledMutants() {
+		ArrayList<Mutant> killedMutants = new ArrayList<Mutant>();
+		for (Mutant m : getMutants()) {
+			if (! m.isAlive()) {
+				killedMutants.add(m);
+			}
+		}
+		return killedMutants;
+	}
+
 	public ArrayList<Test> getTests() {
 		return DatabaseAccess.getTestsForGame(id);
 	}
