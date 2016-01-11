@@ -28,7 +28,7 @@ public class GameSelectionManager extends HttpServlet {
 				// Get the identifying information required to create a game from the submitted form.
 				int classId = Integer.parseInt((String) request.getParameter("class"));
 				int rounds = Integer.parseInt((String) request.getParameter("rounds"));
-				String role = (String) request.getParameter("role");
+				String role = request.getParameter("role") == null ? "DEFENDER" : "ATTACKER";
 
 				// Create the game with supplied parameters and insert it in the database.
 				Game nGame = new Game(classId, uid, rounds, role);

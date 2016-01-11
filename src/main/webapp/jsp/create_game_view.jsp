@@ -50,31 +50,35 @@
     <input type="hidden" name="formType" value="logOut">
   </form>
 
-  <h2> Create a Game </h2>
 
-  <form id="create" action="games" method="post">
+
+  <div id="creategame" class="container">
+  <form id="create" action="games" method="post" class="form-creategame">
+    <h2>Create Game</h2>
     <input type="hidden" name="formType" value="createGame">
-
-    Select the Class you will play
-    <select name="class">
-
+    <table class="tableform">
+      <tr>
+    <td>Java Class</td>
+    <td><select name="class" class="form-control">
     <% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
         <option value="<%=c.id%>"><%=c.name%></option>
     <%}%>
-
-    </select> <br>
-
-    <input type="radio" name="role" value="ATTACKER">Play as Attacker<br>
-    <input type="radio" name="role" value="DEFENDER">Play as Defender<br>
-
-    <input type="number" name="rounds" min="1" max="10">Number of Rounds<br>
-    
-    <input type="submit" class="btn btn-default" value="Create">
+    </select></td>
+  </tr>
+  <tr>
+    <td>Role</td> <td><input type="checkbox" id="role" name="role" class="form-control" data-size="large" data-toggle="toggle" data-on="Attacker" data-off="Defender" data-onstyle="success" data-offstyle="primary">
+    </tr>
+        <tr>
+    <td>Rounds</td><td><input class="form-control" type="number" name="rounds" min="1" max="10"></td>
+    </table>
+          <button class="btn btn-lg btn-primary btn-block" type="submit" value="Create">Create</button>
   </form>
-
+</div>
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
+    <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.0/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.0/js/bootstrap-toggle.min.js"></script>
 </body>
 </html>
