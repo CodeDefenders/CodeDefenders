@@ -1,5 +1,18 @@
 package org.gammut;
 
+import static org.gammut.Constants.ATTACKER_VIEW_JSP;
+import static org.gammut.Constants.DEFENDER_VIEW_JSP;
+import static org.gammut.Constants.Equivalence.DECLARED_YES;
+import static org.gammut.Constants.Equivalence.PENDING_TEST;
+import static org.gammut.Constants.JAVA_CLASS_EXT;
+import static org.gammut.Constants.JAVA_SOURCE_EXT;
+import static org.gammut.Constants.MUTANTS_DIR;
+import static org.gammut.Constants.RESOLVE_EQUIVALENCE_JSP;
+import static org.gammut.Constants.SCORE_VIEW_JSP;
+import static org.gammut.Constants.SEPARATOR;
+import static org.gammut.Constants.TESTS_DIR;
+import static org.gammut.Constants.TEST_PREFIX;
+
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,23 +31,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
-
-import static org.gammut.Constants.ATTACKER_VIEW_JSP;
-import static org.gammut.Constants.DEFENDER_VIEW_JSP;
-import static org.gammut.Constants.Equivalence.DECLARED_YES;
-import static org.gammut.Constants.Equivalence.PENDING_TEST;
-import static org.gammut.Constants.JAVA_CLASS_EXT;
-import static org.gammut.Constants.JAVA_SOURCE_EXT;
-import static org.gammut.Constants.MUTANTS_DIR;
-import static org.gammut.Constants.RESOLVE_EQUIVALENCE_JSP;
-import static org.gammut.Constants.SCORE_VIEW_JSP;
-import static org.gammut.Constants.SEPARATOR;
-import static org.gammut.Constants.TESTS_DIR;
-import static org.gammut.Constants.TEST_PREFIX;
 
 public class GameManager extends HttpServlet {
 
@@ -51,23 +48,22 @@ public class GameManager extends HttpServlet {
 		System.out.println("Getting game " + gid + " for " + uid);
 
 		Game activeGame = DatabaseAccess.getGameForKey("Game_ID", gid);
+		session.setAttribute("game", activeGame);
 
 		// If the game is finished, redirect to the score page.
 		if (activeGame.getState().equals("FINISHED")) {
-			session.setAttribute("game", activeGame);
 			RequestDispatcher dispatcher = request.getRequestDispatcher(SCORE_VIEW_JSP);
 			dispatcher.forward(request, response);
 		} else if (activeGame.getAttackerId() == uid) {
 			System.out.println("user is attacker");
-			session.setAttribute("game", activeGame);
-
 			ArrayList<Mutant> equivMutants = activeGame.getMutantsMarkedEquivalent();
 			if (equivMutants.isEmpty()) {
 				System.out.println("Redirecting to attacker page");
 				ArrayList<Mutant> aliveMutants = activeGame.getAliveMutants();
 				if (aliveMutants.isEmpty()) {
-					System.out.println("No Mutants Alive, flip turn.");
-					activeGame.passPriority();
+					System.out.println("No Mutants Alive, only attacker can play.");
+					activeGame.setActivePlayer("ATTACKER");
+					activeGame.update();
 				}
 				// If no mutants needed to be proved non-equivalent, direct to the Attacker Page.
 				RequestDispatcher dispatcher = request.getRequestDispatcher(ATTACKER_VIEW_JSP);
@@ -76,13 +72,12 @@ public class GameManager extends HttpServlet {
 				RequestDispatcher dispatcher = request.getRequestDispatcher(RESOLVE_EQUIVALENCE_JSP);
 				dispatcher.forward(request, response);
 			}
-		} else if (activeGame.getDefenderId() == uid) {
-			session.setAttribute("game", activeGame);
+		} else {
 			// Direct to the Defender Page.
 			RequestDispatcher dispatcher = request.getRequestDispatcher(DEFENDER_VIEW_JSP);
 			dispatcher.forward(request, response);
-		} else
-			response.sendRedirect(request.getHeader("referer"));
+		}// else
+			// response.sendRedirect(request.getHeader("referer"));
 	}
 
 	// Based on the data provided, update information for the game
@@ -94,19 +89,7 @@ public class GameManager extends HttpServlet {
 		request.setAttribute("messages", messages);
 
 		Game activeGame = (Game) request.getSession().getAttribute("game");
-		Map<String, String[]> map = request.getParameterMap();
-		Set s = map.entrySet();
-		Iterator it = s.iterator();
-		while(it.hasNext()){
 
-			Map.Entry<String,String[]> entry = (Map.Entry<String,String[]>)it.next();
-			String key             = entry.getKey();
-			String[] value         = entry.getValue();
-
-			System.out.println("Key: " + key);
-			for (int i = 0; i < value.length; i++)
-				System.out.println("-  Value: " + value[i].toString());
-		}
 		boolean responseCommitted = false;
 		switch (request.getParameter("formType")) {
 
@@ -152,7 +135,6 @@ public class GameManager extends HttpServlet {
 								response.sendRedirect("play");
 								responseCommitted = true;
 							}
-
 						} else {
 							System.out.println("testOriginalTarget: " + testOriginalTarget);
 							messages.add("An error occured while executing your test against the CUT.");
@@ -197,7 +179,6 @@ public class GameManager extends HttpServlet {
 				} else {
 					messages.add("You Didn't Mark Any Equivalencies");
 				}
-
 				break;
 
 			case "createMutant":
@@ -251,7 +232,7 @@ public class GameManager extends HttpServlet {
 				break;
 		}
 		if (! responseCommitted)
-			doGet(request, response);
+			response.sendRedirect("play");//doGet(request, response);
 	}
 
 	// Writes text as a Mutant to the appropriate place in the file system.

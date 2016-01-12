@@ -1,24 +1,25 @@
 package org.gammut;
 
+import static org.gammut.Constants.MUTANTS_DIR;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.apache.commons.io.FileUtils;
-import org.gammut.Constants;
-import org.gammut.GameManager;
-import org.gammut.LoginManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.io.PrintWriter;
-
-import static org.gammut.Constants.MUTANTS_DIR;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
 
 
 /**
@@ -116,7 +117,7 @@ public class GameManagerTest {
 	private File getCleanTmpGameDir(int gameId) throws IOException {
 		File folder = new File(FileUtils.getTempDirectory().getAbsolutePath() + "/testGamMut/" + gameId);
 		folder.delete();
-		folder.mkdir();
+		folder.mkdirs();
 		FileUtils.cleanDirectory(folder);
 		return folder;
 	}
