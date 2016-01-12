@@ -73,9 +73,7 @@
 %>
 
 <div class="row">
-	<div class="col-md-6">
-
-		<!--<div id="info">-->
+	<div id="info" class="col-md-6">
 
 		<h2>Mutants</h2>
 		<h3>Alive</h3>
@@ -165,8 +163,7 @@
 		</div> <!-- slider single-item -->
 	</div>  <!-- col-md6 left -->
 
-	<!--<div id="right">-->
-	<div class="col-md-6">
+	<div id="right" class="col-md-6">
 	    <form id="atk" action="play" method="post">
 
 		<%
