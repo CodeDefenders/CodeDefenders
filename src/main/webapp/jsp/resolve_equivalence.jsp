@@ -3,16 +3,35 @@
 
 <head>
 	<meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
 	<!-- App context -->
 	<base href="${pageContext.request.contextPath}/">
 
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<!-- Slick -->
+	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jquery.slick/1.5.9/slick.css"/>
+	<script type="text/javascript" src="//cdn.jsdelivr.net/jquery.slick/1.5.9/slick.min.js"></script>
+
 	<!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/gamestyle.css" rel="stylesheet">
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<link href="css/gamestyle.css" rel="stylesheet">
+
+	<script src="codemirror/lib/codemirror.js"></script>
+	<script src="codemirror/mode/javascript/javascript.js"></script>
+	<link href="codemirror/lib/codemirror.css" rel="stylesheet">
+
+	<script>
+		$(document).ready(function() {
+			$('.single-item').slick({
+				arrows: true,
+				infinite: true,
+				speed: 300
+			});
+		});
+	</script>
 </head>
 <body>
 
@@ -33,7 +52,7 @@
             		<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants are Alive</li>
           		</ul>
           		<ul class="nav navbar-nav navbar-right">
-          			<button type="submit" class="btn btn-default navbar-btn" form="equivalence">Resolve</button>
+          			<!--<button type="submit" class="btn btn-default navbar-btn" form="equivalence">Resolve</button>-->
           		</ul>
       		</div>
    		</div>
@@ -50,10 +69,10 @@
       }
   	%>
 
-	<div id="info">
+	<div id="info" class="col-md-6">
 
-		<h2> Mutants </h2>
-	    <table class="table table-hover table-responsive table-paragraphs">
+		<h2>Equivalent Mutant?</h2>
+		<table class="table table-hover table-responsive table-paragraphs">
 
 		<%
 
@@ -62,13 +81,10 @@
 		%>
 
 			<tr>
-				<td class="col-sm-1"><%= "Greg" %></td>
-				<td class="col-sm-1">"Alive"</td>
-				<td class="col-sm-1">"Equivalent Mutant"</td>
+				<td class="col-sm-1"><%= "Mutant" %></td>
 			</tr>
-
 			<tr>
-				<td class="col-sm-3" colspan="3"><%= m.getHTMLReadout() %></td>
+				<td class="col-sm-1" colspan="3"><%= m.getHTMLReadout() %></td>
 			</tr>
 			<tr class="blank_row">
 				<td class="row-borderless" colspan="3"></td>
@@ -82,33 +98,24 @@
 		</table>
 
 		<h2> Tests </h2>
-		<table class="table table-hover table-responsive table-paragraphs">
-
+		<div class="slider single-item">
 		<% 
 		boolean isTests = false;
+		int count = 1;
 		for (Test t : game.getTests()) { 
 			isTests = true;
+			String tc = "";
+			for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
 		%>
-
-			<tr>
-				<td class="col-sm-2"><%= "Greg" %></td>
-				<td class="col-sm-1"><%= "yes" %></td>
-			</tr>
-
-			<tr>
-				<td class="col-sm-3" colspan="2"><%= t.getHTMLReadout() %></td>
-			</tr>
-			<tr class="blank_row">
-				<td class="row-borderless" colspan="2"></td>
-			</tr>
-
+			<div><h4>Test <%=count%></h4><pre><textarea id=<%="tc"+count%> name="utest" class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
 		<%
+			count++;
 		} 
 		if (!isTests) {%>
-			<p> There are currently no tests </p>
+			<div><h2></h2><p> There are currently no tests </p></div>
 		<%}
 		%>
-		</table>
+		</div> <!-- slider single-item -->
 
 		<h2> Source Code </h2>
 		<%
@@ -116,22 +123,19 @@
 	    String line;
 	    String source = "";
 	    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
-	    while((line = is.readLine()) != null) {source+=line+"<br>";}
+	    while((line = is.readLine()) != null) {source+=line+"\n";}
 		%>
-		<code><%=source%></code>
+		<input type="hidden" name="formType" value="createMutant">
+		<pre><textarea class="utest" cols="80" rows="50"><%=source%></textarea></pre>
+	</div>  <!-- col-md6 left -->
 
-	</div>
-
-	<div id="code">
+	<div id="code" class="col-md-6">
 		<form id="equivalence" action="play" method="post">
-
 			<input type="hidden" name="formType" value="resolveEquivalence">
-
-			<input type="radio" name="supplyTest" value="true">I Can Kill This
-			<input type="radio" name="supplyTest" value="false">I Can't Kill This
-
-			
-	        <textarea name="test" cols="90" rows="30">
+			<input class="btn btn-default" name="acceptEquivalent" type="submit" value="Accept Equivalent">
+			<input class="btn btn-default turn" name="aejectEquivalent" type="submit" value="Submit Killing Test">
+			<h2>Not Equivalent? Write a killing test here:</h2>
+	        	<pre><textarea id="newtest" name="test" cols="90" rows="30">
 import org.junit.*;
 import static org.junit.Assert.*;
 
@@ -140,15 +144,28 @@ public class Test<%=game.getClassName()%> {
 public void test() {
 
 }
-}</textarea>
-
-		    <br>
+}</textarea></pre>
 	    </form>
-	</div>
+	</div>  <!-- col-md6 right -->
 
-	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="js/bootstrap.min.js"></script>
+<script>
+	var editor = CodeMirror.fromTextArea(document.getElementById("newtest"), {
+		lineNumbers: true,
+		matchBrackets: true
+	});
+	editor.setSize("100%", 575);
+
+	var x = document.getElementsByClassName("utest");
+	var i;
+	for (i = 0; i < x.length; i++) {
+		CodeMirror.fromTextArea(x[i], {
+			lineNumbers: true,
+			matchBrackets: true,
+			readOnly: true
+		});
+	}
+</script>
 </body>
 </html>

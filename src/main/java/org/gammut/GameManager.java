@@ -1,6 +1,8 @@
 package org.gammut;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -15,7 +17,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Set;
 
 import static org.gammut.Constants.ATTACKER_VIEW_JSP;
 import static org.gammut.Constants.DEFENDER_VIEW_JSP;
@@ -29,6 +34,8 @@ import static org.gammut.Constants.TESTS_DIR;
 import static org.gammut.Constants.TEST_PREFIX;
 
 public class GameManager extends HttpServlet {
+
+	private static final Logger logger = LoggerFactory.getLogger(GameManager.class);
 
 	// Based on info provided, navigate to the correct view for the user
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -51,19 +58,24 @@ public class GameManager extends HttpServlet {
 			System.out.println("user is attacker");
 			session.setAttribute("game", activeGame);
 
+			boolean equivMutants = false;
 			for (Mutant m : DatabaseAccess.getMutantsForGame(activeGame.getId())) {
 				// If at least one mutant needs to be proved non-equivalent, go to the Resolve Equivalence page.
 				System.out.println("about to check if a mutant is equiv");
 				if (m.getEquivalent().equals("PENDING_TEST") && m.isAlive()) {
-					RequestDispatcher dispatcher = request.getRequestDispatcher(RESOLVE_EQUIVALENCE_JSP);
-					dispatcher.forward(request, response);
+					equivMutants = true;
+					break;
 				}
 			}
-
-			System.out.println("Should be going to attacker page");
-			// If no mutants needed to be proved non-equivalent, direct to the Attacker Page.
-			RequestDispatcher dispatcher = request.getRequestDispatcher(ATTACKER_VIEW_JSP);
-			dispatcher.forward(request, response);
+			if (equivMutants) {
+				RequestDispatcher dispatcher = request.getRequestDispatcher(RESOLVE_EQUIVALENCE_JSP);
+				dispatcher.forward(request, response);
+			} else {
+				System.out.println("Should be going to attacker page");
+				// If no mutants needed to be proved non-equivalent, direct to the Attacker Page.
+				RequestDispatcher dispatcher = request.getRequestDispatcher(ATTACKER_VIEW_JSP);
+				dispatcher.forward(request, response);
+			}
 		} else if (activeGame.getDefenderId() == uid) {
 			session.setAttribute("game", activeGame);
 			// Direct to the Defender Page.
@@ -75,19 +87,42 @@ public class GameManager extends HttpServlet {
 
 	// Based on the data provided, update information for the game
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		logger.debug("Executing GameManager.doPost");
+		System.out.println("Executing GameManager.doPost");
 
 		ArrayList<String> messages = new ArrayList<String>();
 		request.setAttribute("messages", messages);
 
 		Game activeGame = (Game) request.getSession().getAttribute("game");
+		Map<String, String[]> map = request.getParameterMap();
+		Set s = map.entrySet();
+		Iterator it = s.iterator();
+		while(it.hasNext()){
+
+			Map.Entry<String,String[]> entry = (Map.Entry<String,String[]>)it.next();
+			String key             = entry.getKey();
+			String[] value         = entry.getValue();
+
+			System.out.println("Key is "+key+"<br>");
+
+			if(value.length>1){
+				for (int i = 0; i < value.length; i++) {
+					System.out.println("<li>" + value[i].toString() + "</li><br>");
+				}
+			}else
+				System.out.println("Value is "+value[0].toString()+"<br>");
+		}
 
 		switch (request.getParameter("formType")) {
 
 			case "resolveEquivalence":
-
+				logger.debug("Executing Action resolveEquivalence");
+				System.out.println("Game Manager Executing Action resolveEquivalence");
 				// Check type of equivalence response.
 				// If user wanted to supply a test
-				if (request.getParameter("supplyTest").equals("true")) {
+				if (request.getParameter("rejectEquivalent") != null) {
+					logger.debug("Equivalence rejected, going to process killing test");
+					System.out.println("Equivalence rejected, going to process killing test");
 					Test test = null;
 					Mutant mutant = null;
 					// Get the text submitted by the user.
@@ -112,26 +147,26 @@ public class GameManager extends HttpServlet {
 							activeGame.passPriority();
 							activeGame.update();
 						} else {
-							messages.add("There Was An Error When Compiling The Test You Supplied");
+							messages.add("An error occured while executing your test against the CUT.");
 						}
 					} else {
-						messages.add("There Was An Error When Compiling The Test You Supplied");
+						messages.add("An error occured while compiling your test.");
 					}
 
-				}
-				// If the user didnt want to supply a test
-				else {
+				} else if (request.getParameter("acceptEquivalent") != null) { // If the user didnt want to supply a test
+					logger.debug("Equivalence accepted");
+					System.out.println("Equivalence accepted");
 					for (Mutant m : DatabaseAccess.getMutantsForGame(activeGame.getId())) {
 						if (m.getEquivalent().equals("PENDING_TEST") && m.isAlive()) {
 							m.kill();
 							m.setEquivalent("DECLARED_YES");
 							m.update();
 
-							messages.add("Your Mutant Was Marked Equivalent And Killed");
+							messages.add("The mutant was marked Equivalent and killed");
 
 							activeGame.passPriority();
 							activeGame.update();
-
+							response.sendRedirect("play");
 							break;
 						}
 					}
