@@ -51,7 +51,11 @@
 				<a class="navbar-brand" href="games">GamMut</a>
 				<li class="navbar-text">ATK: <%= game.getAttackerScore() %> | DEF: <%= game.getDefenderScore() %></li>
 				<li class="navbar-text">Round <%= game.getCurrentRound() %> of <%= game.getFinalRound() %></li>
-				<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants are Alive</li>
+				<% if (game.getAliveMutants().size() == 1) {%>
+					<li class="navbar-text">1 Mutant Alive</li>
+				<% } else {%>
+					<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants Alive</li>
+				<% }%>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<% if (game.getActivePlayer().equals("ATTACKER")) {%>
@@ -80,12 +84,11 @@
 		<table class="table table-hover table-responsive table-paragraphs">
 
 		<%
-		int mCount = 1;
 		ArrayList<Mutant> mutantsAlive = game.getAliveMutants();
 		for (Mutant m : mutantsAlive) {
 		%>
 			<tr>
-				<td class="col-sm-1">Mutant <%=mCount%></td>
+				<td class="col-sm-1">Mutant <%= m.getId() %></td>
 				<td class="col-sm-3">
 				<%
 					for (String change : m.getHTMLReadout()) {
@@ -101,7 +104,6 @@
 			</tr>
 
 		<%
-			mCount++;
 		}
 		if (mutantsAlive.isEmpty()) {%>
 			<p>No mutants alive!</p>

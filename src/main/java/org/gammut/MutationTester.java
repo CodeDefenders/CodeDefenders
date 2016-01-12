@@ -1,14 +1,20 @@
 package org.gammut;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.servlet.ServletContext;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Map;
+import static org.gammut.Constants.Equivalence.*;
 
 // Class that handles compilation and testing by creating a Process with the relevant ant target
 public class MutationTester {
+
+	private static final Logger logger = LoggerFactory.getLogger(MutationTester.class);
 
 	// COMPILE MUTANT: Runs the related ant target that compiles a mutant
 
@@ -115,7 +121,8 @@ public class MutationTester {
 	// Outputs: ID of the resulting TargetExecution
 
 	public static int testMutant(ServletContext context, Mutant m, Test t) {
-
+		logger.debug("Running test {} on mutant {}", t.getId(), m.getId());
+		System.out.println("Running test " + t.getId() + " on mutant " + m.getId());
 		String className = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
 		String[] resultArray = runAntTarget(context, "test-mutant", m.getFolder(), t.getFolder(), className);
 
@@ -180,18 +187,22 @@ public class MutationTester {
 	// Outputs: None
 
 	public static void runEquivalenceTest(ServletContext context, Test test, Mutant mutant) {
+		logger.debug("Killing mutant in runEquivalenceTest.");
+		System.out.println("Killing mutant in equivalenceTest.");
 		// The test created is new and was made by the attacker (there is no need to check if the mutant/test pairing has been run already)
 
 		// As a result of this test, either the test the attacker has written kills the mutant or doesnt.
 		int targetId = testMutant(context, mutant, test);
 		TargetExecution executedTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", targetId).get(0);
-		// If the test did NOT pass, the mutant was detected and is proven to be non-equivalent
+
 		if (executedTarget.status.equals("FAIL")) {
-			mutant.setEquivalent("PROVEN_NOT");
-		}
-		// If the test DID pass, the mutant went undetected and it is assumed to be equivalent.
-		else {
-			mutant.setEquivalent("ASSUMED_YES");
+			// If the test did NOT pass, the mutant was detected and is proven to be non-equivalent
+			System.out.println("Mutant was killed, hence tagged not equivalent");
+			mutant.setEquivalent(PROVEN_NO.name());
+		} else {
+			// If the test DID pass, the mutant went undetected and it is assumed to be equivalent.
+			System.out.println("Test failed to kill the mutant, hence assumed equivalent");
+			mutant.setEquivalent(ASSUMED_YES.name());
 		}
 
 		// Then kill the mutant either way.

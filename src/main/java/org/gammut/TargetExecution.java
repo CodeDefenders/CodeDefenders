@@ -44,20 +44,19 @@ public class TargetExecution {
 		String sql = null;
 
 		try {
-			System.out.println("inserting targetexecution");
-			System.out.println(testId + " " + mutantId + target + status + message);
+			System.out.println("Inserting " + toString());
 
 			conn = DatabaseAccess.getConnection();
 
 			if (testId == 0) {
+				System.out.println("- No testId");
 				if (mutantId == 0) {
-					System.out.println(target + status + message);
+					System.out.println("- No mutantId");
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Target, Status, Message) VALUES (?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setString(1, target);
 					pstmt.setString(2, status);
 					pstmt.setString(3, message);
 				} else {
-					System.out.println(mutantId + target + status + message);
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setInt(1, mutantId);
 					pstmt.setString(2, target);
@@ -66,14 +65,13 @@ public class TargetExecution {
 				}
 			} else {
 				if (mutantId == 0) {
-					System.out.println(testId + target + status + message);
+					System.out.println("- No mutantId");
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Test_ID, Target, Status, Message) VALUES (?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setInt(1, testId);
 					pstmt.setString(2, target);
 					pstmt.setString(3, status);
 					pstmt.setString(4, message);
 				} else {
-					System.out.println(testId + " " + mutantId + target + status + message);
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Test_ID, Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setInt(1, testId);
 					pstmt.setInt(2, mutantId);
@@ -84,13 +82,13 @@ public class TargetExecution {
 			}
 
 			pstmt.execute();
-			System.out.println("executing the statement");
+			System.out.println("SQL statement executed");
 
 			ResultSet rs = pstmt.getGeneratedKeys();
 
 
 			if (rs.next()) {
-				System.out.println("trying to get the key for ID");
+				System.out.println("Retrieving execution keys for ID");
 				this.id = rs.getInt(1);
 				System.out.println(this.id);
 				pstmt.close();
@@ -120,4 +118,18 @@ public class TargetExecution {
 		}
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return "TargetExecution{" +
+				"id=" + id +
+				", testId=" + testId +
+				", mutantId=" + mutantId +
+				", target='" + target + '\'' +
+				", status='" + status + '\'' +
+				", message='" + message + '\'' +
+				", timestamp=" + timestamp +
+				'}';
+	}
+
 }

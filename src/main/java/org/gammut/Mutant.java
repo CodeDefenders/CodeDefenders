@@ -16,6 +16,8 @@ import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.gammut.Constants.Equivalence.*;
+
 public class Mutant {
 
 	private int id;
@@ -97,15 +99,15 @@ public class Mutant {
 
 	public int getPoints() {
 		int points = 0;
-		if (equivalent.equals("DECLARED_YES")) {
+		if (equivalent.equals(DECLARED_YES.name())) {
 			points = 0;
 			return points;
 		}
-		if (equivalent.equals("ASSUMED_YES")) {
+		if (equivalent.equals(ASSUMED_YES.name())) {
 			points = -1;
 			return points;
 		}
-		if (equivalent.equals("PROVEN_NO")) {
+		if (equivalent.equals(PROVEN_NO.name())) {
 			points += 2;
 		}
 
@@ -186,7 +188,7 @@ public class Mutant {
 
 	// insert will run once after mutant creation.
 	// Stores values of JavaFile, ClassFile, GameID, RoundCreated in DB. These will not change once input.
-	// Default values for Equivalent (ASSUMED_NOT), Alive(1), RoundKilled(NULL) are assigned.
+	// Default values for Equivalent (ASSUMED_NO), Alive(1), RoundKilled(NULL) are assigned.
 	// Currently Mutant ID isnt set yet after insertion, if Mutant needs to be used straight away it needs a similar insert method to Game.
 	public boolean insert() {
 

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -24,6 +25,8 @@ import java.util.Set;
 
 import static org.gammut.Constants.ATTACKER_VIEW_JSP;
 import static org.gammut.Constants.DEFENDER_VIEW_JSP;
+import static org.gammut.Constants.Equivalence.DECLARED_YES;
+import static org.gammut.Constants.Equivalence.PENDING_TEST;
 import static org.gammut.Constants.JAVA_CLASS_EXT;
 import static org.gammut.Constants.JAVA_SOURCE_EXT;
 import static org.gammut.Constants.MUTANTS_DIR;
@@ -58,22 +61,19 @@ public class GameManager extends HttpServlet {
 			System.out.println("user is attacker");
 			session.setAttribute("game", activeGame);
 
-			boolean equivMutants = false;
-			for (Mutant m : DatabaseAccess.getMutantsForGame(activeGame.getId())) {
-				// If at least one mutant needs to be proved non-equivalent, go to the Resolve Equivalence page.
-				System.out.println("about to check if a mutant is equiv");
-				if (m.getEquivalent().equals("PENDING_TEST") && m.isAlive()) {
-					equivMutants = true;
-					break;
+			ArrayList<Mutant> equivMutants = activeGame.getMutantsMarkedEquivalent();
+			if (equivMutants.isEmpty()) {
+				System.out.println("Redirecting to attacker page");
+				ArrayList<Mutant> aliveMutants = activeGame.getAliveMutants();
+				if (aliveMutants.isEmpty()) {
+					System.out.println("No Mutants Alive, flip turn.");
+					activeGame.passPriority();
 				}
-			}
-			if (equivMutants) {
-				RequestDispatcher dispatcher = request.getRequestDispatcher(RESOLVE_EQUIVALENCE_JSP);
-				dispatcher.forward(request, response);
-			} else {
-				System.out.println("Should be going to attacker page");
 				// If no mutants needed to be proved non-equivalent, direct to the Attacker Page.
 				RequestDispatcher dispatcher = request.getRequestDispatcher(ATTACKER_VIEW_JSP);
+				dispatcher.forward(request, response);
+			} else {
+				RequestDispatcher dispatcher = request.getRequestDispatcher(RESOLVE_EQUIVALENCE_JSP);
 				dispatcher.forward(request, response);
 			}
 		} else if (activeGame.getDefenderId() == uid) {
@@ -103,83 +103,90 @@ public class GameManager extends HttpServlet {
 			String key             = entry.getKey();
 			String[] value         = entry.getValue();
 
-			System.out.println("Key is "+key+"<br>");
-
-			if(value.length>1){
-				for (int i = 0; i < value.length; i++) {
-					System.out.println("<li>" + value[i].toString() + "</li><br>");
-				}
-			}else
-				System.out.println("Value is "+value[0].toString()+"<br>");
+			System.out.println("Key: " + key);
+			for (int i = 0; i < value.length; i++)
+				System.out.println("-  Value: " + value[i].toString());
 		}
-
+		boolean responseCommitted = false;
 		switch (request.getParameter("formType")) {
 
 			case "resolveEquivalence":
 				logger.debug("Executing Action resolveEquivalence");
 				System.out.println("Game Manager Executing Action resolveEquivalence");
+				int currentEquivMutantID = Integer.parseInt(request.getParameter("currentEquivMutant"));
+				Mutant mutant = activeGame.getMutantByID(currentEquivMutantID);
+				System.out.println("CurrentEquivMutant ID = " + currentEquivMutantID);
+
 				// Check type of equivalence response.
-				// If user wanted to supply a test
-				if (request.getParameter("rejectEquivalent") != null) {
-					logger.debug("Equivalence rejected, going to process killing test");
-					System.out.println("Equivalence rejected, going to process killing test");
-					Test test = null;
-					Mutant mutant = null;
+				if (request.getParameter("rejectEquivalent") != null) { // If user wanted to supply a test
+					logger.debug("Equivalence rejected, going to process killing test form mutant " + currentEquivMutantID);
+					System.out.println("Equivalence rejected, going to process killing test for mutant " + currentEquivMutantID);
+
 					// Get the text submitted by the user.
 					String testText = request.getParameter("test");
 
 					// If it can be written to file and compiled, end turn. Otherwise, dont.
-					int[] testExecutions = createTest(activeGame.getId(), activeGame.getClassId(), testText);
-					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testExecutions[0]).get(0);
+					Object[] testExecutions = createTest(activeGame.getId(), activeGame.getClassId(), testText);
+					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", (Integer)testExecutions[0]).get(0);
 
 					if (compileTestTarget.status.equals("SUCCESS")) {
-						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testExecutions[1]).get(0);
-						if (testOriginalTarget.equals("SUCCESS")) {
-							for (Mutant m : activeGame.getMutants()) {
-								if (m.getEquivalent().equals("PENDING_TEST") && m.isAlive()) {
-									mutant = m;
-									break;
+						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", (Integer)testExecutions[1]).get(0);
+						if (testOriginalTarget.status.equals("SUCCESS")) {
+							System.out.println("Test compiled and executed correctly.");
+							if (mutant.isAlive() && mutant.getEquivalent().equals(PENDING_TEST.name())) {
+								// Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
+								MutationTester.runEquivalenceTest(getServletContext(), (Test) testExecutions[2], mutant);
+								activeGame.passPriority();
+								activeGame.update();
+								Mutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
+								if (mutantAfterTest.isAlive()) {
+									messages.add("Your test failed to kill the mutant!");
 								}
+								response.sendRedirect("play");
+								responseCommitted = true;
+							} else {
+								System.out.println("Not running EquivalenceTest, mutant already dead?");
+								activeGame.passPriority();
+								activeGame.update();
+								messages.add("Yay, your test killed the muntant!");
+								response.sendRedirect("play");
+								responseCommitted = true;
 							}
 
-							// Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
-							MutationTester.runEquivalenceTest(getServletContext(), test, mutant);
-							activeGame.passPriority();
-							activeGame.update();
 						} else {
+							System.out.println("testOriginalTarget: " + testOriginalTarget);
 							messages.add("An error occured while executing your test against the CUT.");
 						}
 					} else {
+						System.out.println("compileTestTarget: " + compileTestTarget);
 						messages.add("An error occured while compiling your test.");
 					}
-
 				} else if (request.getParameter("acceptEquivalent") != null) { // If the user didnt want to supply a test
 					logger.debug("Equivalence accepted");
 					System.out.println("Equivalence accepted");
-					for (Mutant m : DatabaseAccess.getMutantsForGame(activeGame.getId())) {
-						if (m.getEquivalent().equals("PENDING_TEST") && m.isAlive()) {
-							m.kill();
-							m.setEquivalent("DECLARED_YES");
-							m.update();
+					if (mutant.isAlive() && mutant.getEquivalent().equals(PENDING_TEST.name())) {
+						mutant.kill();
+						mutant.setEquivalent(DECLARED_YES.name());
+						mutant.update();
 
-							messages.add("The mutant was marked Equivalent and killed");
+						messages.add("The mutant was marked Equivalent and killed");
 
+						if (! activeGame.getAliveMutants().isEmpty())
 							activeGame.passPriority();
-							activeGame.update();
-							response.sendRedirect("play");
-							break;
-						}
+
+						activeGame.update();
+						response.sendRedirect("play");
+						responseCommitted = true;
 					}
 				}
 				break;
-
 			case "markEquivalences":
 
 				boolean changeMade = false;
 				for (Mutant m : DatabaseAccess.getMutantsForGame(activeGame.getId())) {
 					if (request.getParameter("mutant" + m.getId()) != null) {
 						changeMade = true;
-						m.setEquivalent("PENDING_TEST");
+						m.setEquivalent(PENDING_TEST.name());
 						m.update();
 					}
 				}
@@ -221,13 +228,13 @@ public class GameManager extends HttpServlet {
 				String testText = request.getParameter("test");
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
-				int[] testExecutions = createTest(activeGame.getId(), activeGame.getClassId(), testText);
+				Object[] testExecutions = createTest(activeGame.getId(), activeGame.getClassId(), testText);
 				System.out.println("Result of test execution:");
 				System.out.println(Arrays.toString(testExecutions));
-				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testExecutions[0]).get(0);
+				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", (int)testExecutions[0]).get(0);
 
 				if (compileTestTarget.status.equals("SUCCESS")) {
-					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", testExecutions[1]).get(0);
+					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", (int)testExecutions[1]).get(0);
 					if (testOriginalTarget.status.equals("SUCCESS")) {
 						messages.add("Your Test Was Compiled Successfully");
 						MutationTester.runMutationTests(getServletContext(), activeGame.getId());
@@ -243,8 +250,8 @@ public class GameManager extends HttpServlet {
 				}
 				break;
 		}
-
-		doGet(request, response);
+		if (! responseCommitted)
+			doGet(request, response);
 	}
 
 	// Writes text as a Mutant to the appropriate place in the file system.
@@ -271,19 +278,20 @@ public class GameManager extends HttpServlet {
 		}
 
 		// Setup folder the files will go in
-		File folder = new File(getServletContext().getRealPath(MUTANTS_DIR + gid));
-		folder.mkdir();
+		File newMutantDir = getNextMutantSubDir(getServletContext().getRealPath(MUTANTS_DIR + SEPARATOR + gid));
 
+		System.out.println("NewMutantDir: " + newMutantDir.getAbsolutePath());
+		System.out.println("classMutated.name: " + classMutated.name);
 		// Write the Mutant String into a java file
-		File mutant = new File(getServletContext().getRealPath(MUTANTS_DIR + gid + SEPARATOR + classMutated.name + JAVA_SOURCE_EXT));
+		File mutant = new File(newMutantDir + SEPARATOR + classMutated.name + JAVA_SOURCE_EXT);
 		FileWriter fw = new FileWriter(mutant);
 		BufferedWriter bw = new BufferedWriter(fw);
 		bw.write(mutantText);
 		bw.close();
 
 		// Try and compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
-		String jFile = getServletContext().getRealPath(MUTANTS_DIR + gid + SEPARATOR + classMutated.name + JAVA_SOURCE_EXT);
-		String cFile = getServletContext().getRealPath(MUTANTS_DIR + gid + SEPARATOR + classMutated.name + JAVA_CLASS_EXT);
+		String jFile = newMutantDir + SEPARATOR + classMutated.name + JAVA_SOURCE_EXT;
+		String cFile = newMutantDir + SEPARATOR + classMutated.name + JAVA_CLASS_EXT;
 
 		Mutant newMutant = new Mutant(gid, jFile, cFile);
 		newMutant.insert();
@@ -293,17 +301,51 @@ public class GameManager extends HttpServlet {
 		return compileMutantId;
 	}
 
-	public int[] createTest(int gid, int cid, String testText) throws IOException {
+	public File getNextMutantSubDir(String mutantsPath) {
+		File folder = new File(mutantsPath);
+		folder.mkdir();
+		String[] directories = folder.list(new FilenameFilter() {
+			@Override
+			public boolean accept(File current, String name) {
+				return new File(current, name).isDirectory() && (isParsable(name));
+			}
+		});
+		Arrays.sort(directories);
+		String newPath;
+		if (directories.length == 0)
+			newPath = folder.getAbsolutePath() + SEPARATOR + "1";
+		else {
+			File lastDir = new File(directories[directories.length - 1]);
+			int newIndex = Integer.parseInt(lastDir.getName()) + 1;
+			newPath = mutantsPath + SEPARATOR + newIndex;
+		}
+		File newDir = new File(newPath);
+		newDir.mkdir();
+		return newDir;
+	}
+
+	public static boolean isParsable(String input){
+		boolean parsable = true;
+		try{
+			Integer.parseInt(input);
+		}catch(NumberFormatException e){
+			parsable = false;
+		}
+		return parsable;
+	}
+
+	public Object[] createTest(int gid, int cid, String testText) throws IOException {
+		// TODO: this needs to change, returning array of objects is awful
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
 		File sourceFile = new File(classUnderTest.javaFile);
 		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
-		File folder = new File(getServletContext().getRealPath(TESTS_DIR + gid));
+		File folder = new File(getServletContext().getRealPath(TESTS_DIR + SEPARATOR + gid));
 		folder.mkdir();
-		String testSourceFileName = TESTS_DIR + gid + SEPARATOR + TEST_PREFIX + classUnderTest.name + JAVA_SOURCE_EXT;
-		String testClassFileName = TESTS_DIR + gid + SEPARATOR + TEST_PREFIX + classUnderTest.name + JAVA_CLASS_EXT;
+		String testSourceFileName = TESTS_DIR + SEPARATOR + gid + SEPARATOR + TEST_PREFIX + classUnderTest.name + JAVA_SOURCE_EXT;
+		String testClassFileName = TESTS_DIR + SEPARATOR + gid + SEPARATOR + TEST_PREFIX + classUnderTest.name + JAVA_CLASS_EXT;
 		File test = new File(getServletContext().getRealPath(testSourceFileName));
 		FileWriter testWriter = new FileWriter(test);
 		BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);
@@ -323,9 +365,9 @@ public class GameManager extends HttpServlet {
 
 		if (compileTestTarget.status.equals("SUCCESS")) {
 			int testOriginalId = MutationTester.testOriginal(getServletContext(), newTest);
-			return new int[]{compileTestId, testOriginalId};
+			return new Object[]{compileTestId, testOriginalId, newTest};
 		} else {
-			return new int[]{compileTestId, -1};
+			return new Object[]{compileTestId, -1, newTest};
 		}
 
 	}

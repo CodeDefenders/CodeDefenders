@@ -49,7 +49,11 @@
             		<a class="navbar-brand" href="games">GamMut</a>
             		<li class="navbar-text">ATK: <%= game.getAttackerScore() %> | DEF: <%= game.getDefenderScore() %></li>
             		<li class="navbar-text">Round <%= game.getCurrentRound() %></li>
-            		<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants are Alive</li>
+		            <% if (game.getAliveMutants().size() == 1) {%>
+		            <li class="navbar-text">1 Mutant Alive</li>
+		            <% } else {%>
+		            <li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants Alive</li>
+		            <% }%>
           		</ul>
           		<ul class="nav navbar-nav navbar-right">
           			<!--<button type="submit" class="btn btn-default navbar-btn" form="equivalence">Resolve</button>-->
@@ -75,25 +79,37 @@
 		<table class="table table-hover table-responsive table-paragraphs">
 
 		<%
-
-		for (Mutant m : game.getAliveMutants()) { 
-			if (m.getEquivalent().equals("PENDING_TEST") && m.isAlive()) {
+			ArrayList<Mutant> equivMutants = game.getMutantsMarkedEquivalent();
+			if (! equivMutants.isEmpty()) {
+				Mutant m = equivMutants.get(0);
 		%>
 
 			<tr>
-				<td class="col-sm-1"><%= "Mutant" %></td>
+				<td class="col-sm-1">Mutant <%= m.getId() %><input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= m.getId() %>"></td>
 			</tr>
 			<tr>
-				<td class="col-sm-1" colspan="3"><%= m.getHTMLReadout() %></td>
+				<td class="col-sm-1" colspan="2">
+						<%
+					for (String change : m.getHTMLReadout()) {
+				%>
+					<p><%=change%><p>
+						<%
+					}
+				%>
+				</td>
 			</tr>
 			<tr class="blank_row">
-				<td class="row-borderless" colspan="3"></td>
+				<td class="row-borderless" colspan="2"></td>
 			</tr>
 
-		<%	
-			break;
+		<%
+			} else {
+		%>
+			<tr class="blank_row">
+				<td class="row-borderless" colspan="2">No equivalent mutant found.</td>
+			</tr>
+		<%
 			}
-		}
 		%>
 		</table>
 
@@ -130,10 +146,10 @@
 	</div>  <!-- col-md6 left -->
 
 	<div id="code" class="col-md-6">
-		<form id="equivalence" action="play" method="post">
+		<form id="equivalenceForm" action="play" method="post">
 			<input type="hidden" name="formType" value="resolveEquivalence">
 			<input class="btn btn-default" name="acceptEquivalent" type="submit" value="Accept Equivalent">
-			<input class="btn btn-default turn" name="aejectEquivalent" type="submit" value="Submit Killing Test">
+			<input class="btn btn-default turn" name="rejectEquivalent" type="submit" value="Submit Killing Test">
 			<h2>Not Equivalent? Write a killing test here:</h2>
 	        	<pre><textarea id="newtest" name="test" cols="90" rows="30">
 import org.junit.*;

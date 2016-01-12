@@ -16,10 +16,10 @@ public class GameSelectionManager extends HttpServlet {
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
+		HttpSession session = request.getSession();
 		// Get their user id from the session.
-		int uid = (Integer) request.getSession().getAttribute("uid");
+		int uid = (Integer) session.getAttribute("uid");
 		int gameId;
-		HttpSession session;
 
 		switch (request.getParameter("formType")) {
 
@@ -57,7 +57,6 @@ public class GameSelectionManager extends HttpServlet {
 
 				jGame.update();
 
-				session = request.getSession();
 				session.setAttribute("gid", gameId);
 
 				response.sendRedirect("play");
@@ -71,7 +70,6 @@ public class GameSelectionManager extends HttpServlet {
 
 				if (eGame.isUserInGame(uid)) {
 
-					session = request.getSession();
 					session.setAttribute("gid", gameId);
 
 					response.sendRedirect("play");

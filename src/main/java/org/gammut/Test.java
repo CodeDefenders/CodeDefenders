@@ -22,9 +22,7 @@ public class Test {
 	private int mutantsKilled = 0;
 
 	public Test(int gid, String jFile, String cFile) {
-
 		this.gameId = gid;
-		System.out.println("Test Constructor");
 		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gid).getCurrentRound();
 		this.javaFile = jFile;
 		this.classFile = cFile;

@@ -6,6 +6,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
+import static org.gammut.Constants.Equivalence.*;
+
 public class Game {
 
 	private int id;
@@ -134,6 +136,24 @@ public class Game {
 			}
 		}
 		return killedMutants;
+	}
+
+	public ArrayList<Mutant> getMutantsMarkedEquivalent() {
+		ArrayList<Mutant> equivMutants = new ArrayList<Mutant>();
+		for (Mutant m : getMutants()) {
+			if (m.isAlive() && m.getEquivalent().equals(PENDING_TEST.name())) {
+				equivMutants.add(m);
+			}
+		}
+		return equivMutants;
+	}
+
+	public Mutant getMutantByID(int mutantID) {
+		for (Mutant m : getMutants()) {
+			if (m.getId() == mutantID)
+				return m;
+		}
+		return null;
 	}
 
 	public ArrayList<Test> getTests() {
