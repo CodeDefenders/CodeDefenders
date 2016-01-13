@@ -73,22 +73,22 @@ public class GameManagerTest {
 	}
 
 	@Test
-	public void testGetNextMutantSubDirEmpty() throws IOException {
+	public void testGetNextSubDirEmpty() throws IOException {
 		File folder = getCleanTmpGameDir(1);
-		assertEquals(folder.getAbsolutePath() + "/1", new GameManager().getNextMutantSubDir(folder.getAbsolutePath()).getAbsolutePath());
+		assertEquals(folder.getAbsolutePath() + "/1", new GameManager().getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
 	}
 
 	@Test
-	public void testGetNextMutantSubDirNonEmpty() throws IOException {
+	public void testGetNextSubDirNonEmpty() throws IOException {
 		File folder = getCleanTmpGameDir(1);
 		File subfolder = new File(folder.getAbsolutePath() + "/1");
 		subfolder.delete();
 		subfolder.mkdir();
-		assertEquals(folder.getAbsolutePath() + "/2", new GameManager().getNextMutantSubDir(folder.getAbsolutePath()).getAbsolutePath());
+		assertEquals(folder.getAbsolutePath() + "/2", new GameManager().getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
 	}
 
 	@Test
-	public void testGetNextMutantSubDirTwo() throws IOException {
+	public void testGetNextSubDirTwo() throws IOException {
 		File folder = getCleanTmpGameDir(1);
 		File subfolder = new File(folder.getAbsolutePath() + "/1");
 		subfolder.delete();
@@ -96,11 +96,11 @@ public class GameManagerTest {
 		File subfolder2 = new File(folder.getAbsolutePath() + "/10");
 		subfolder2.delete();
 		subfolder2.mkdir();
-		assertEquals(folder.getAbsolutePath() + "/11", new GameManager().getNextMutantSubDir(folder.getAbsolutePath()).getAbsolutePath());
+		assertEquals(folder.getAbsolutePath() + "/11", new GameManager().getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
 	}
 
 	@Test
-	public void testGetNextMutantSubDirMore() throws IOException, ServletException {
+	public void testGetNextSubDirMore() throws IOException, ServletException {
 		File folder = getCleanTmpGameDir(1);
 		File subfolder = new File(folder.getAbsolutePath() + "/1");
 		subfolder.delete();
@@ -111,7 +111,7 @@ public class GameManagerTest {
 		File subfolder3 = new File(folder.getAbsolutePath() + "/foo11");
 		subfolder3.delete();
 		subfolder3.mkdir();
-		assertEquals(folder.getAbsolutePath() + "/11", new GameManager().getNextMutantSubDir(folder.getAbsolutePath()).getAbsolutePath());
+		assertEquals(folder.getAbsolutePath() + "/11", new GameManager().getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
 	}
 
 	private File getCleanTmpGameDir(int gameId) throws IOException {

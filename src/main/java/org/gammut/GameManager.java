@@ -259,7 +259,7 @@ public class GameManager extends HttpServlet {
 		}
 
 		// Setup folder the files will go in
-		File newMutantDir = getNextMutantSubDir(getServletContext().getRealPath(MUTANTS_DIR + SEPARATOR + gid));
+		File newMutantDir = getNextSubDir(getServletContext().getRealPath(MUTANTS_DIR + SEPARATOR + gid));
 
 		System.out.println("NewMutantDir: " + newMutantDir.getAbsolutePath());
 		System.out.println("classMutated.name: " + classMutated.name);
@@ -282,9 +282,9 @@ public class GameManager extends HttpServlet {
 		return compileMutantId;
 	}
 
-	public File getNextMutantSubDir(String mutantsPath) {
-		File folder = new File(mutantsPath);
-		folder.mkdir();
+	public File getNextSubDir(String path) {
+		File folder = new File(path);
+		folder.mkdirs();
 		String[] directories = folder.list(new FilenameFilter() {
 			@Override
 			public boolean accept(File current, String name) {
@@ -298,10 +298,10 @@ public class GameManager extends HttpServlet {
 		else {
 			File lastDir = new File(directories[directories.length - 1]);
 			int newIndex = Integer.parseInt(lastDir.getName()) + 1;
-			newPath = mutantsPath + SEPARATOR + newIndex;
+			newPath = path + SEPARATOR + newIndex;
 		}
 		File newDir = new File(newPath);
-		newDir.mkdir();
+		newDir.mkdirs();
 		return newDir;
 	}
 
@@ -323,22 +323,19 @@ public class GameManager extends HttpServlet {
 		File sourceFile = new File(classUnderTest.javaFile);
 		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
-		File folder = new File(getServletContext().getRealPath(TESTS_DIR + SEPARATOR + gid));
-		folder.mkdir();
-		String testSourceFileName = TESTS_DIR + SEPARATOR + gid + SEPARATOR + TEST_PREFIX + classUnderTest.name + JAVA_SOURCE_EXT;
-		String testClassFileName = TESTS_DIR + SEPARATOR + gid + SEPARATOR + TEST_PREFIX + classUnderTest.name + JAVA_CLASS_EXT;
-		File test = new File(getServletContext().getRealPath(testSourceFileName));
+		File newTestDir = getNextSubDir(getServletContext().getRealPath(TESTS_DIR + SEPARATOR + gid));
+
+		String javaFile = newTestDir + SEPARATOR + TEST_PREFIX + classUnderTest.name + JAVA_SOURCE_EXT;
+		String classFile = newTestDir + SEPARATOR + TEST_PREFIX + classUnderTest.name + JAVA_CLASS_EXT;
+
+		File test = new File(javaFile);
 		FileWriter testWriter = new FileWriter(test);
 		BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);
 		bufferedTestWriter.write(testText);
 		bufferedTestWriter.close();
 
 		// Check the test actually passes when applied to the original code.
-
-		String jFile = getServletContext().getRealPath(testSourceFileName);
-		String cFile = getServletContext().getRealPath(testClassFileName);
-
-		Test newTest = new Test(gid, jFile, cFile);
+		Test newTest = new Test(gid, javaFile, classFile);
 		newTest.insert();
 
 		int compileTestId = MutationTester.compileTest(getServletContext(), newTest);
