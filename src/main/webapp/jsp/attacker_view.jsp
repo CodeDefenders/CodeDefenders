@@ -30,6 +30,7 @@
 			$('.single-item').slick({
 				arrows: true,
 				infinite: true,
+				draggable: true,
 				speed: 300
 			});
 		});
