@@ -194,8 +194,7 @@
 		</form>
 		<form id="def" action="play" method="post">
 			<input type="hidden" name="formType" value="createTest">
-	        <pre><textarea id="code" name="test" cols="80" rows="30">
-import org.junit.*;
+	        <pre><textarea id="code" name="test" cols="80" rows="30">import org.junit.*;
 import static org.junit.Assert.*;
 
 public class Test<%=game.getClassName()%> {
@@ -229,6 +228,7 @@ public class Test<%=game.getClassName()%> {
 		matchBrackets: true,
 		readOnly: true
 	});
+	editorSUT.setSize("100%", 500);
 	var x = document.getElementsByClassName("utest");
 	var i;
 	for (i = 0; i < x.length; i++) {

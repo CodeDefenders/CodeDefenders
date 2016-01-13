@@ -190,7 +190,7 @@
 		lineNumbers: true,
 		matchBrackets: true
 	});
-	editor.setSize("100%", 575);
+	editor.setSize("100%", 500);
 
 	var x = document.getElementsByClassName("utest");
 	var i;

@@ -142,7 +142,7 @@
 	    while((line = is.readLine()) != null) {source+=line+"\n";}
 		%>
 		<input type="hidden" name="formType" value="createMutant">
-		<pre><textarea class="utest" cols="80" rows="50"><%=source%></textarea></pre>
+		<pre><textarea id="sut" cols="80" rows="50"><%=source%></textarea></pre>
 	</div>  <!-- col-md6 left -->
 
 	<div id="code" class="col-md-6">
@@ -151,15 +151,14 @@
 			<input class="btn btn-default" name="acceptEquivalent" type="submit" value="Accept Equivalent">
 			<input class="btn btn-default turn" name="rejectEquivalent" type="submit" value="Submit Killing Test">
 			<h2>Not Equivalent? Write a killing test here:</h2>
-	        	<pre><textarea id="newtest" name="test" cols="90" rows="30">
-import org.junit.*;
+	        <pre><textarea id="newtest" name="test" cols="80" rows="30">import org.junit.*;
 import static org.junit.Assert.*;
 
 public class Test<%=game.getClassName()%> {
-@Test
-public void test() {
-
-}
+    @Test
+    public void test() {
+        // test here!
+    }
 }</textarea></pre>
 	    </form>
 	</div>  <!-- col-md6 right -->
@@ -167,12 +166,25 @@ public void test() {
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="js/bootstrap.min.js"></script>
 <script>
-	var editor = CodeMirror.fromTextArea(document.getElementById("newtest"), {
+	var editorTest = CodeMirror.fromTextArea(document.getElementById("newtest"), {
 		lineNumbers: true,
 		matchBrackets: true
 	});
-	editor.setSize("100%", 575);
-
+	editorTest.on('beforeChange',function(cm,change) {
+		var text = cm.getValue();
+		var lines = text.split(/\r|\r\n|\n/);
+		var readOnlyLines = [0,1,2,3,4,5];
+		var readOnlyLinesEnd = [lines.length-1,lines.length-2];
+		if ( ~readOnlyLines.indexOf(change.from.line) || ~readOnlyLinesEnd.indexOf(change.to.line)) {
+			change.cancel();
+		}
+	});
+	editorTest.setSize("100%", 500);
+	var editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
+		lineNumbers: true,
+		matchBrackets: true
+	});
+	editorSUT.setSize("100%", 500);
 	var x = document.getElementsByClassName("utest");
 	var i;
 	for (i = 0; i < x.length; i++) {
