@@ -57,6 +57,7 @@
         <td class="col-sm-2">Attacker</td>
         <td class="col-sm-2">Defender</td>
         <td class="col-sm-2">Class Under Test</td>
+          <td class="col-sm-2">Level</td>
         <td class="col-sm-2"></td>
       </tr>
 
@@ -89,6 +90,7 @@
         <td class="col-sm-2"><%= atkName %></td>
         <td class="col-sm-2"><%= defName %></td>
         <td class="col-sm-2"><%= DatabaseAccess.getClassForKey("Class_ID", g.getClassId()).name %></td>
+        <td class="col-sm-2"><%= g.getLevel().name() %></td>
         <td class="col-sm-2">
           <form id="view" action="games" method="post">
             <input type="hidden" name="formType" value="enterGame">

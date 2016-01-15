@@ -23,7 +23,10 @@ public class Game {
 	private String activePlayer;
 	private String state;
 
-	public Game(int classId, int userId, int maxRounds, String role) {
+	public static enum Level {EASY, MEDIUM, HARD};
+	private Level level;
+
+	public Game(int classId, int userId, int maxRounds, String role, Level level) {
 		this.classId = classId;
 
 		if (role.equals("ATTACKER")) {
@@ -37,11 +40,11 @@ public class Game {
 
 		this.activePlayer = "NEITHER";
 		this.state = "CREATED";
-		System.out.println(attackerId);
-		System.out.println(defenderId);
+
+		this.level = level;
 	}
 
-	public Game(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, String activePlayer, String state) {
+	public Game(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, String activePlayer, String state, Level level) {
 		this.id = id;
 		this.attackerId = attackerId;
 		this.defenderId = defenderId;
@@ -50,6 +53,7 @@ public class Game {
 		this.finalRound = finalRound;
 		this.activePlayer = activePlayer;
 		this.state = state;
+		this.level = level;
 	}
 
 	public int getId() {
@@ -112,6 +116,14 @@ public class Game {
 	// CREATED, IN PROGRESS, FINISHED
 	public void setState(String s) {
 		state = s;
+	}
+
+	public Level getLevel() {
+		return this.level;
+	}
+
+	public void setLevel(Level level) {
+		this.level = level;
 	}
 
 	public ArrayList<Mutant> getMutants() {
@@ -213,9 +225,9 @@ public class Game {
 			System.out.println(attackerId);
 			System.out.println(defenderId);
 			if (attackerId != 0) {
-				sql = String.format("INSERT INTO games (Attacker_ID, FinalRound, Class_ID) VALUES ('%d', '%d', '%d');", attackerId, finalRound, classId);
+				sql = String.format("INSERT INTO games (Attacker_ID, FinalRound, Class_ID, Level) VALUES ('%d', '%d', '%d', '%s');", attackerId, finalRound, classId, level.name());
 			} else {
-				sql = String.format("INSERT INTO games (Defender_ID, FinalRound, Class_ID) VALUES ('%d', '%d', '%d');", defenderId, finalRound, classId);
+				sql = String.format("INSERT INTO games (Defender_ID, FinalRound, Class_ID, Level) VALUES ('%d', '%d', '%d', '%s');", defenderId, finalRound, classId, level.name());
 			}
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
@@ -265,8 +277,8 @@ public class Game {
 
 			// Get all rows from the database which have the chosen username
 			stmt = conn.createStatement();
-			sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActivePlayer='%s', State='%s' WHERE Game_ID='%d'",
-					attackerId, defenderId, currentRound, finalRound, activePlayer, state, id);
+			sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActivePlayer='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
+					attackerId, defenderId, currentRound, finalRound, activePlayer, state, level.name(), id);
 			stmt.execute(sql);
 			return true;
 

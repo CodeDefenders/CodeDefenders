@@ -29,9 +29,10 @@ public class GameSelectionManager extends HttpServlet {
 				int classId = Integer.parseInt((String) request.getParameter("class"));
 				int rounds = Integer.parseInt((String) request.getParameter("rounds"));
 				String role = request.getParameter("role") == null ? "DEFENDER" : "ATTACKER";
+				Game.Level level = request.getParameter("level") == null ? Game.Level.HARD : Game.Level.EASY;
 
 				// Create the game with supplied parameters and insert it in the database.
-				Game nGame = new Game(classId, uid, rounds, role);
+				Game nGame = new Game(classId, uid, rounds, role, level);
 				nGame.insert();
 
 				// Redirect to the game selection menu.

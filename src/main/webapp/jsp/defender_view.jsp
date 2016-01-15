@@ -22,6 +22,7 @@
 
 	<script src="codemirror/lib/codemirror.js"></script>
 	<script src="codemirror/mode/javascript/javascript.js"></script>
+	<script src="codemirror/mode/diff/diff.js"></script>
 	<link href="codemirror/lib/codemirror.css" rel="stylesheet">
 
 
@@ -30,8 +31,8 @@
 			$('.single-item').slick({
 				arrows: true,
 				infinite: true,
-				draggable: true,
-				speed: 300
+				speed: 300,
+				draggable:false
 			});
 		});
 	</script>
@@ -80,83 +81,18 @@
 %>
 
 <div class="row">
-	<div class="col-md-6">
-
-		<!--<div id="info">-->
-
-		<h2>Mutants</h2>
-		<h3>Alive</h3>
-		<table class="table table-hover table-responsive table-paragraphs">
-
+	<div id="info" class="col-md-6">
+		<h2>Class Under Test</h2>
 		<%
-		ArrayList<Mutant> mutantsAlive = game.getAliveMutants();
-		for (Mutant m : mutantsAlive) {
+			InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/data/sources/"+game.getClassName()+".java");
+			String line;
+			String source = "";
+			BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
+			while((line = is.readLine()) != null) {source+=line+"\n";}
 		%>
-			<tr>
-				<td class="col-sm-1">Mutant <%= m.getId() %></td>
-				<td class="col-sm-1">
-					<% if (game.getActivePlayer().equals("DEFENDER")) {%>
-					Mark as Equivalent: <input type="checkbox" form="equiv" name="mutant<%=m.getId()%>" value="equivalent">
-					<%}%>
-				</td>
-			</tr>
-			<tr>
-				<td class="col-sm-3" colspan="2">
-					<%
-						for (String change : m.getHTMLReadout()) {
-					%>
-						<p><%=change%><p>
-					<%
-						}
-					%>
-				</td>
-			</tr>
-			<tr class="blank_row">
-				<td class="row-borderless" colspan="2"></td>
-			</tr>
+		<pre><textarea id="sut" name="cut" cols="80" rows="30"><%=source%></textarea></pre>
 
-		<%
-		}
-		if (mutantsAlive.isEmpty()) {%>
-			<p>No mutants alive!</p>
-		<%}
-		%>
-		</table>
-
-		<h3>Killed</h3>
-		<table class="table table-hover table-responsive table-paragraphs">
-
-			<%
-				int kCount = 1;
-				ArrayList<Mutant> mutantsKilled = game.getKilledMutants();
-				for (Mutant m : mutantsKilled) {
-			%>
-			<tr>
-				<td class="col-sm-1">Mutant <%=kCount%></td>
-				<td class="col-sm-3">
-					<%
-						for (String change : m.getHTMLReadout()) {
-					%>
-					<p><%=change%><p>
-						<%
-					}
-				%>
-				</td>
-			</tr>
-			<tr class="blank_row">
-				<td class="row-borderless" colspan="2"></td>
-			</tr>
-
-			<%
-					kCount++;
-				}
-				if (mutantsKilled.isEmpty()) {%>
-			<p>No mutant was killed yet.</p>
-			<%}
-			%>
-		</table>
-
-		<h2> Submitted Tests </h2>
+		<h2> Submitted JUnit Tests </h2>
 		<div class="slider single-item">
 			<%
 				boolean isTests = false;
@@ -164,7 +100,7 @@
 				for (Test t : game.getTests()) {
 					isTests = true;
 					String tc = "";
-					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
+					for (String l : t.getHTMLReadout()) { tc += l + "\n"; }
 			%>
 			<div><h4>Test <%=count%></h4><pre><textarea id=<%="tc"+count%> name="utest" class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
 			<%
@@ -175,16 +111,6 @@
 			<%}
 			%>
 		</div> <!-- slider single-item -->
-
-		<h2> Source Code </h2>
-		<%
-			InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/data/sources/"+game.getClassName()+".java");
-			String line;
-			String source = "";
-			BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
-			while((line = is.readLine()) != null) {source+=line+"\n";}
-		%>
-		<pre><textarea id="sut" name="cut" cols="80" rows="30"><%=source%></textarea></pre>
 	</div> <!-- col-md6 left -->
 
 	<!--<div id="right">-->
@@ -205,6 +131,127 @@ public class Test<%=game.getClassName()%> {
     }
 }</textarea></pre>
 		</form>
+
+		<h2>Mutants</h2>
+		<!-- Nav tabs -->
+		<ul class="nav nav-tabs" role="tablist">
+			<li class="active">
+				<a href="#mutalivetab" role="tab" data-toggle="tab">Alive</a>
+			</li>
+			<li>
+				<a href="#mutkilledtab" role="tab" data-toggle="tab">Killed</a>
+			</li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane fade active in" id="mutalivetab">
+				<h3>Alive</h3>
+				<table class="table table-hover table-responsive table-paragraphs">
+					<%
+					ArrayList<Mutant> mutantsAlive = game.getAliveMutants();
+					if (! mutantsAlive.isEmpty()) {
+						for (Mutant m : mutantsAlive) {
+					%>
+					<tr>
+						<td>
+							<h4>Mutant <%= m.getId() %></h4>
+						</td>
+						<td>
+							<% if (game.getLevel().equals(Game.Level.EASY)) { %>
+							<a href="#" class="btn btn-default" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
+							<% } %>
+							<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
+								<div class="modal-dialog">
+									<!-- Modal content-->
+									<div class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal">&times;</button>
+											<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
+										</div>
+										<div class="modal-body">
+											<pre><textarea id="diff<%=m.getId()%>" class="mutdiff"><%=m.getPatchString()%></textarea></pre>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</td>
+						<td >
+							<% if (game.getActivePlayer().equals("DEFENDER")) {%>
+							Mark as Equivalent: <input type="checkbox" form="equiv" name="mutant<%=m.getId()%>" value="equivalent">
+							<%}%>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<% for (String change :	m.getHTMLReadout()) { %>
+							<p><%=change%><p>
+								<% } %>
+						</td>
+					</tr>
+					<%
+						}
+					} else {%>
+					<tr class="blank_row">
+						<td class="row-borderless" colspan="2">No mutants alive.</td>
+					</tr>
+					<%}
+					%>
+				</table>
+			</div>
+			<div class="tab-pane fade" id="mutkilledtab">
+				<h3>Killed</h3>
+				<table class="table table-hover table-responsive table-paragraphs">
+					<%
+					ArrayList<Mutant> mutantsKilled = game.getKilledMutants();
+					if (! mutantsKilled.isEmpty()) {
+						for (Mutant m : mutantsKilled) {
+					%>
+					<tr>
+						<td><h4>Mutant <%= m.getId() %></h4></td>
+						<td>
+							<% if (game.getLevel().equals(Game.Level.EASY)) { %>
+							<a href="#" class="btn btn-default" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
+							<% } %>
+							<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
+								<div class="modal-dialog">
+									<!-- Modal content-->
+									<div class="modal-content">
+										<div class="modal-header">
+											<button type="button" class="close" data-dismiss="modal">&times;</button>
+											<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
+										</div>
+										<div class="modal-body">
+											<pre><textarea id="diff<%=m.getId()%>" class="mutdiff"><%=m.getPatchString()%></textarea></pre>
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+										</div>
+									</div>
+								</div>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<% for (String change : m.getHTMLReadout()) { %>
+							<p><%=change%><p>
+								<% } %>
+						</td>
+					</tr>
+					<%
+						}
+					} else {%>
+					<tr class="blank_row">
+						<td class="row-borderless" colspan="2">No mutants killed.</td>
+					</tr>
+					<%}
+					%>
+				</table>
+			</div>
+		</div> <!-- tab-content -->
+
 	</div> <!-- col-md-6 right -->
 </div>
 
@@ -224,12 +271,14 @@ public class Test<%=game.getClassName()%> {
 			change.cancel();
 		}
 	});
+	editorTest.setSize("100%", 500);
 	var editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
 		lineNumbers: true,
 		matchBrackets: true,
 		readOnly: true
 	});
 	editorSUT.setSize("100%", 500);
+	/* Submitted tests */
 	var x = document.getElementsByClassName("utest");
 	var i;
 	for (i = 0; i < x.length; i++) {
@@ -239,6 +288,21 @@ public class Test<%=game.getClassName()%> {
 			readOnly: true
 		});
 	}
+	/* Mutants diffs */
+	$('.modal').on('shown.bs.modal', function() {
+		var codeMirrorContainer = $(this).find(".CodeMirror")[0];
+		if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+			codeMirrorContainer.CodeMirror.refresh();
+		} else {
+			var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
+				readOnly: true,
+				lineNumbers: false,
+				mode: "diff",
+				onCursorActivity: null
+			});
+			editorDiff.setSize("100%", 500);
+		}
+	});
 </script>
 </body>
 </html>

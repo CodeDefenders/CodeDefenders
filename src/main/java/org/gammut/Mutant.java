@@ -1,22 +1,25 @@
 package org.gammut;
 
+import static org.gammut.Constants.Equivalence.ASSUMED_YES;
+import static org.gammut.Constants.Equivalence.DECLARED_YES;
+import static org.gammut.Constants.Equivalence.PROVEN_NO;
+
 import difflib.Chunk;
 import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-
-import static org.gammut.Constants.Equivalence.*;
 
 public class Mutant {
 
@@ -120,43 +123,57 @@ public class Mutant {
 		}
 	}
 
-	public Patch getDifferences() throws IOException {
+	public Patch getDifferences() {
 
 		int classId = DatabaseAccess.getGameForKey("Game_ID", gameId).getClassId();
-		File sourceFile = new File(DatabaseAccess.getClassForKey("Class_ID", classId).javaFile);
+		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+
+		File sourceFile = new File(sut.javaFile);
 		File mutantFile = new File(javaFile);
 
-		List<String> sourceLines = new LinkedList<String>();
-		List<String> mutantLines = new LinkedList<String>();
-
-		String line = "";
-
+		List<String> sutLines = new ArrayList<>();
+		List<String> mutantLines = new ArrayList<>();
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(sourceFile));
-			while ((line = in.readLine()) != null) {
-				sourceLines.add(line);
-			}
+			sutLines = Files.readAllLines(sourceFile.toPath(), StandardCharsets.UTF_8);
+			mutantLines = Files.readAllLines(mutantFile.toPath(), StandardCharsets.UTF_8);
 		} catch (IOException e) {
-			e.printStackTrace();
+			e.printStackTrace(); // TODO handle properly
 		}
 
-		try {
-			BufferedReader in = new BufferedReader(new FileReader(mutantFile));
-			while ((line = in.readLine()) != null) {
-				mutantLines.add(line);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		Patch patch = DiffUtils.diff(sourceLines, mutantLines);
+		Patch patch = DiffUtils.diff(sutLines, mutantLines);
 
 		for (Delta delta : patch.getDeltas()) {
 			System.out.println(delta);
 		}
-
-
 		return patch;
+	}
+
+	public String getPatchString() {
+		int classId = DatabaseAccess.getGameForKey("Game_ID", gameId).getClassId();
+		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+
+		File sourceFile = new File(sut.javaFile);
+		File mutantFile = new File(javaFile);
+
+		List<String> sutLines = new ArrayList<>();
+		List<String> mutantLines = new ArrayList<>();
+		try {
+			sutLines = Files.readAllLines(sourceFile.toPath(), StandardCharsets.UTF_8);
+			mutantLines = Files.readAllLines(mutantFile.toPath(), StandardCharsets.UTF_8);
+		} catch (IOException e) {
+			e.printStackTrace();  // TODO handle properly
+		}
+		Patch patch = DiffUtils.diff(sutLines, mutantLines);
+		for (Delta delta : patch.getDeltas()) {
+			System.out.println(delta);
+		}
+		List<String> unifiedPatches = DiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
+		StringBuilder unifiedPatch = new StringBuilder();
+		for (String s : unifiedPatches) {
+			unifiedPatch.append(s + System.getProperty("line.separator"));
+		}
+		System.out.println("Mutant.getPatchString():\n" + unifiedPatch.toString());
+		return unifiedPatch.toString();
 	}
 
 	public List<String> getHTMLReadout() throws IOException {

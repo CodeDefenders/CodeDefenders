@@ -21,6 +21,7 @@
 
 	<script src="codemirror/lib/codemirror.js"></script>
 	<script src="codemirror/mode/javascript/javascript.js"></script>
+	<script src="codemirror/mode/diff/diff.js"></script>
 	<link href="codemirror/lib/codemirror.css" rel="stylesheet">
 
 	<script>
@@ -84,30 +85,46 @@
 			if (! equivMutants.isEmpty()) {
 				Mutant m = equivMutants.get(0);
 		%>
-
 			<tr>
-				<td class="col-sm-1">Mutant <%= m.getId() %><input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= m.getId() %>"></td>
-			</tr>
-			<tr>
-				<td class="col-sm-1" colspan="2">
-						<%
-					for (String change : m.getHTMLReadout()) {
-				%>
-					<p><%=change%><p>
-						<%
-					}
-				%>
+				<td>
+					<h4>Mutant <%= m.getId() %></h4>
+					<input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= m.getId() %>">
+				</td>
+				<td>
+					<% if (game.getLevel().equals(Game.Level.EASY)) { %>
+					<a href="#" class="btn btn-default" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
+					<% } %>
+					<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
+						<div class="modal-dialog">
+							<!-- Modal content-->
+							<div class="modal-content">
+								<div class="modal-header">
+									<button type="button" class="close" data-dismiss="modal">&times;</button>
+									<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
+								</div>
+								<div class="modal-body">
+									<pre><textarea id="diff<%=m.getId()%>" class="mutdiff"><%=m.getPatchString()%></textarea></pre>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								</div>
+							</div>
+						</div>
+					</div>
 				</td>
 			</tr>
-			<tr class="blank_row">
-				<td class="row-borderless" colspan="2"></td>
+			<tr>
+				<td colspan="2">
+					<% for (String change :	m.getHTMLReadout()) { %>
+					<p><%=change%><p>
+						<% } %>
+				</td>
 			</tr>
-
 		<%
 			} else {
 		%>
 			<tr class="blank_row">
-				<td class="row-borderless" colspan="2">No equivalent mutant found.</td>
+				<td class="row-borderless" colspan="2">No mutant alive is marked as equivalent.</td>
 			</tr>
 		<%
 			}
@@ -194,7 +211,22 @@ public class Test<%=game.getClassName()%> {
 			matchBrackets: true,
 			readOnly: true
 		});
-	}
+	};
+	/* Mutants diffs */
+	$('.modal').on('shown.bs.modal', function() {
+		var codeMirrorContainer = $(this).find(".CodeMirror")[0];
+		if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+			codeMirrorContainer.CodeMirror.refresh();
+		} else {
+			var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
+				readOnly: true,
+				lineNumbers: false,
+				mode: "diff",
+				onCursorActivity: null
+			});
+			editorDiff.setSize("100%", 500);
+		}
+	});
 </script>
 </body>
 </html>

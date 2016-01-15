@@ -42,6 +42,7 @@
                         </resource>
                     </webResources>
                     <packagingExcludes>**/empty.tmp</packagingExcludes>
+                    <excludes>src/main/resources/db/**</excludes>
                 </configuration>
             </plugin>
         </plugins>
