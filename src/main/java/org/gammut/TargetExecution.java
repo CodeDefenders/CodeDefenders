@@ -11,14 +11,16 @@ public class TargetExecution {
 	public int id;
 	public int testId;
 	public int mutantId;
-	public String target;
+	public Target target;
 	public String status;
 	public String message;
 	public Timestamp timestamp;
 
+	public enum Target { COMPILE_MUTANT, COMPILE_TEST, TEST_ORIGINAL, TEST_MUTANT, TEST_EQUIVALENCE }
+
 	// Constructors for inital creation of TargetExecution
 
-	public TargetExecution(int tid, int mid, String target, String status, String message) {
+	public TargetExecution(int tid, int mid, Target target, String status, String message) {
 		if (tid != 0) {
 			this.testId = tid;
 		}
@@ -31,7 +33,7 @@ public class TargetExecution {
 	}
 
 	// Constructor for TargetExecution retrieved from Database
-	public TargetExecution(int id, int tid, int mid, String target, String status, String message, String timestamp) {
+	public TargetExecution(int id, int tid, int mid, Target target, String status, String message, String timestamp) {
 		this(tid, mid, target, status, message);
 		this.id = id;
 		this.timestamp = Timestamp.valueOf(timestamp);
@@ -53,13 +55,13 @@ public class TargetExecution {
 				if (mutantId == 0) {
 					System.out.println("- No mutantId");
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Target, Status, Message) VALUES (?, ?, ?);", new String[]{"TargetExecution_ID"});
-					pstmt.setString(1, target);
+					pstmt.setString(1, target.name());
 					pstmt.setString(2, status);
 					pstmt.setString(3, message);
 				} else {
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setInt(1, mutantId);
-					pstmt.setString(2, target);
+					pstmt.setString(2, target.name());
 					pstmt.setString(3, status);
 					pstmt.setString(4, message);
 				}
@@ -68,14 +70,14 @@ public class TargetExecution {
 					System.out.println("- No mutantId");
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Test_ID, Target, Status, Message) VALUES (?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setInt(1, testId);
-					pstmt.setString(2, target);
+					pstmt.setString(2, target.name());
 					pstmt.setString(3, status);
 					pstmt.setString(4, message);
 				} else {
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Test_ID, Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setInt(1, testId);
 					pstmt.setInt(2, mutantId);
-					pstmt.setString(3, target);
+					pstmt.setString(3, target.name());
 					pstmt.setString(4, status);
 					pstmt.setString(5, message);
 				}

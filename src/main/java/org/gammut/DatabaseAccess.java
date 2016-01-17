@@ -1,5 +1,8 @@
 package org.gammut;
 
+import org.gammut.Mutant.Equivalence;
+import org.gammut.TargetExecution.Target;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -383,7 +386,7 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
-						rs.getBoolean("Alive"), rs.getString("Equivalent"),
+						rs.getBoolean("Alive"), Equivalence.valueOf(rs.getString("Equivalent")),
 						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"));
 				mutList.add(newMutant);
 			}
@@ -413,6 +416,53 @@ public class DatabaseAccess {
 		}
 
 		return mutList;
+	}
+
+	public static Mutant getMutant(Game game, int mutantID) {
+
+		Mutant newMutant = null;
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			String sql = sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d' AND Game_ID='%d';", mutantID, game.getId());
+			ResultSet rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
+						rs.getString("JavaFile"), rs.getString("ClassFile"),
+						rs.getBoolean("Alive"), Equivalence.valueOf(rs.getString("Equivalent")),
+						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"));
+			}
+
+			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			System.out.println(se);
+		} // Handle errors for JDBC
+		catch (Exception e) {
+			System.out.println(e);
+		} // Handle errors for Class.forName
+		finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException se2) {
+			} // Nothing we can do
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException se) {
+				System.out.println(se);
+			}
+		}
+
+		return newMutant;
 	}
 
 	public static ArrayList<Test> getTestsForGame(int gid) {
@@ -484,7 +534,7 @@ public class DatabaseAccess {
 
 			while (rs.next()) {
 				TargetExecution newExecution = new TargetExecution(rs.getInt("TargetExecution_ID"), rs.getInt("Test_ID"),
-						rs.getInt("Mutant_ID"), rs.getString("Target"),
+						rs.getInt("Mutant_ID"), Target.valueOf(rs.getString("Target")),
 						rs.getString("Status"), rs.getString("Message"), rs.getString("Timestamp"));
 				executionList.add(newExecution);
 			}
@@ -517,29 +567,37 @@ public class DatabaseAccess {
 	}
 
 	public static TargetExecution getTargetExecutionForPair(int tid, int mid) {
+		String sql = String.format("SELECT * FROM targetexecutions WHERE Test_ID='%d' AND Mutant_ID='%d';", tid, mid);
+		return getTargetExecutionSQL(sql);
+	}
 
+	public static TargetExecution getTargetExecutionForTest(Test test, Target target) {
+		String sql = String.format("SELECT * FROM targetexecutions WHERE Test_ID='%d' AND Target='%s';", test.getId(), target.name());
+		return getTargetExecutionSQL(sql);
+	}
+
+	public static TargetExecution getTargetExecutionForMutant(Mutant mutant, Target target) {
+		String sql = String.format("SELECT * FROM targetexecutions WHERE Mutant_ID='%d' AND Target='%s';", mutant.getId(), target.name());
+		return getTargetExecutionSQL(sql);
+	}
+
+	public static TargetExecution getTargetExecutionSQL(String sql) {
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = null;
 
 		try {
-
-			// Load the Game Data with the provided ID.
 			conn = getConnection();
 
 			stmt = conn.createStatement();
-			sql = String.format("SELECT * FROM targetexecutions WHERE Test_ID='%d' AND Mutant_ID='%d';", tid, mid);
 			ResultSet rs = stmt.executeQuery(sql);
-
 			if (rs.next()) {
 				TargetExecution targetExecution = new TargetExecution(rs.getInt("TargetExecution_ID"), rs.getInt("Test_ID"),
-						rs.getInt("Mutant_ID"), rs.getString("Target"),
+						rs.getInt("Mutant_ID"), Target.valueOf(rs.getString("Target")),
 						rs.getString("Status"), rs.getString("Message"), rs.getString("Timestamp"));
 				stmt.close();
 				conn.close();
 				return targetExecution;
 			}
-
 
 		} catch (SQLException se) {
 			System.out.println(se);
@@ -562,7 +620,6 @@ public class DatabaseAccess {
 				System.out.println(se);
 			}
 		}
-
 		return null;
 	}
-} 
+}

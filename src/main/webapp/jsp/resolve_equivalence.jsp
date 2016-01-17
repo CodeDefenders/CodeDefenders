@@ -29,66 +29,70 @@
 			$('.single-item').slick({
 				arrows: true,
 				infinite: true,
-				draggable: true,
-				speed: 300
+				speed: 300,
+				draggable:false
 			});
+			$('#messages-div').delay(10000).fadeOut();
 		});
 	</script>
 </head>
 <body>
 
-	<%@ page import="org.gammut.*,java.io.*, java.util.*" %>
-	<% Game game = (Game) session.getAttribute("game"); %>
+<%@ page import="org.gammut.*,java.io.*, java.util.*" %>
+<% Game game = (Game) session.getAttribute("game"); %>
 
-	<nav class="navbar navbar-inverse navbar-fixed-top">
-  		<div class="container-fluid">
-    		<div class="navbar-header">
-      			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1">
-      			</button>
-    		</div>
-      		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
-          		<ul class="nav navbar-nav navbar-left">
-            		<a class="navbar-brand" href="games">GamMut</a>
-            		<li class="navbar-text">ATK: <%= game.getAttackerScore() %> | DEF: <%= game.getDefenderScore() %></li>
-            		<li class="navbar-text">Round <%= game.getCurrentRound() %></li>
-		            <% if (game.getAliveMutants().size() == 1) {%>
-		            <li class="navbar-text">1 Mutant Alive</li>
-		            <% } else {%>
-		            <li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants Alive</li>
-		            <% }%>
-          		</ul>
-          		<ul class="nav navbar-nav navbar-right">
-          			<!--<button type="submit" class="btn btn-default navbar-btn" form="equivalence">Resolve</button>-->
-          		</ul>
-      		</div>
-   		</div>
-	</nav>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1">
+			</button>
+		</div>
+		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
+			<ul class="nav navbar-nav navbar-left">
+				<a class="navbar-brand" href="games">GamMut</a>
+				<li class="navbar-text">ATK: <%= game.getAttackerScore() %> | DEF: <%= game.getDefenderScore() %></li>
+				<li class="navbar-text">Round <%= game.getCurrentRound() %></li>
+				<% if (game.getAliveMutants().size() == 1) {%>
+				<li class="navbar-text">1 Mutant Alive</li>
+				<% } else {%>
+				<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants Alive</li>
+				<% }%>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<!--<button type="submit" class="btn btn-default navbar-btn" form="equivalence">Resolve</button>-->
+			</ul>
+		</div>
+	</div>
+</nav>
 
-	<% 
-      ArrayList<String> messages = (ArrayList<String>) request.getAttribute("messages");
-      if (messages != null) {
-        for (String m : messages) { %>
-          <div class="alert alert-info">
-              <strong><%=m%></strong>
-          </div>
-        <% }
-      }
-  	%>
+<%
+	ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
+	request.getSession().removeAttribute("messages");
+	if (messages != null && ! messages.isEmpty()) {
+%>
+<div class="alert alert-info" id="messages-div">
+	<% for (String m : messages) { %>
+	<pre><strong><%=m%></strong></pre>
+	<% } %>
+</div>
+<%	} %>
 
-	<div id="info" class="col-md-6">
+<div class="row-fluid">
+	<div class="col-md-6"> <!-- empty cell -->
+	</div>
 
-		<h2>Equivalent Mutant?</h2>
+	<div class="col-md-6">
+		<h2>Equivalent mutant?</h2>
 		<table class="table table-hover table-responsive table-paragraphs">
 
-		<%
-			ArrayList<Mutant> equivMutants = game.getMutantsMarkedEquivalent();
-			if (! equivMutants.isEmpty()) {
-				Mutant m = equivMutants.get(0);
-		%>
+			<%
+				ArrayList<Mutant> equivMutants = game.getMutantsMarkedEquivalent();
+				if (! equivMutants.isEmpty()) {
+					Mutant m = equivMutants.get(0);
+			%>
 			<tr>
 				<td>
 					<h4>Mutant <%= m.getId() %></h4>
-					<input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= m.getId() %>">
 				</td>
 				<td>
 					<a href="#" class="btn btn-default" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
@@ -110,74 +114,73 @@
 						</div>
 					</div>
 				</td>
+				<td>
+					<form id="equivalenceForm" action="play" method="post">
+						<input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= m.getId() %>">
+						<input type="hidden" name="formType" value="resolveEquivalence">
+						<input class="btn btn-default" name="acceptEquivalent" type="submit" value="Accept Equivalent">
+						<input class="btn btn-default turn" name="rejectEquivalent" type="submit" value="Submit Killing Test">
+					</form>
+				</td>
 			</tr>
 			<tr>
-				<td colspan="2">
+				<td colspan="3">
 					<% for (String change :	m.getHTMLReadout()) { %>
 					<p><%=change%><p>
 						<% } %>
 				</td>
 			</tr>
-		<%
+			<%
 			} else {
-		%>
+			%>
 			<tr class="blank_row">
 				<td class="row-borderless" colspan="2">No mutant alive is marked as equivalent.</td>
 			</tr>
-		<%
-			}
-		%>
+			<%
+				}
+			%>
 		</table>
+	</div> <!-- col-md6 right -->
+</div> <!-- row-fluid -->
 
+<div class="row-fluid">
+	<div class="col-md-6">
+		<h2> Source Code </h2>
+		<input type="hidden" name="formType" value="createMutant">
+		<pre><textarea id="sut" cols="80" rows="50"><%= game.getCUT().getAsString() %></textarea></pre>
+	</div> <!-- col-md6 left -->
+	<div class="col-md-6">
+		<h2>Not Equivalent? Write a killing test here</h2>
+        <pre>
+	        <textarea id="newtest" name="test" form="equivalenceForm" cols="80" rows="30"><%= game.getCUT().getTestTemplate() %></textarea>
+        </pre>
+	</div> <!-- col-md6 right -->
+</div> <!-- row-fluid -->
+
+<div class="row-fluid">
+	<div id="code" class="col-md-6">
 		<h2> Tests </h2>
 		<div class="slider single-item">
-		<% 
-		boolean isTests = false;
-		int count = 1;
-		for (Test t : game.getTests()) { 
-			isTests = true;
-			String tc = "";
-			for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
-		%>
+			<%
+				boolean isTests = false;
+				int count = 1;
+				for (Test t : game.getTests()) {
+					isTests = true;
+					String tc = "";
+					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
+			%>
 			<div><h4>Test <%=count%></h4><pre><textarea id=<%="tc"+count%> name="utest" class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
-		<%
-			count++;
-		} 
-		if (!isTests) {%>
+			<%
+					count++;
+				}
+				if (!isTests) {%>
 			<div><h2></h2><p> There are currently no tests </p></div>
-		<%}
-		%>
+			<%}
+			%>
 		</div> <!-- slider single-item -->
-
-		<h2> Source Code </h2>
-		<%
-	    InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/data/sources/"+game.getClassName()+".java");
-	    String line;
-	    String source = "";
-	    BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
-	    while((line = is.readLine()) != null) {source+=line+"\n";}
-		%>
-		<input type="hidden" name="formType" value="createMutant">
-		<pre><textarea id="sut" cols="80" rows="50"><%=source%></textarea></pre>
-	</div>  <!-- col-md6 left -->
-
-	<div id="code" class="col-md-6">
-		<form id="equivalenceForm" action="play" method="post">
-			<input type="hidden" name="formType" value="resolveEquivalence">
-			<input class="btn btn-default" name="acceptEquivalent" type="submit" value="Accept Equivalent">
-			<input class="btn btn-default turn" name="rejectEquivalent" type="submit" value="Submit Killing Test">
-			<h2>Not Equivalent? Write a killing test here:</h2>
-	        <pre><textarea id="newtest" name="test" cols="80" rows="30">import org.junit.*;
-import static org.junit.Assert.*;
-
-public class Test<%=game.getClassName()%> {
-    @Test
-    public void test() {
-        // test here!
-    }
-}</textarea></pre>
-	    </form>
-	</div>  <!-- col-md6 right -->
+	</div> <!-- col-md6 left -->
+	<div class="col-md-6"></div>
+</div>  <!-- row-fluid -->
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="js/bootstrap.min.js"></script>
@@ -189,7 +192,7 @@ public class Test<%=game.getClassName()%> {
 	editorTest.on('beforeChange',function(cm,change) {
 		var text = cm.getValue();
 		var lines = text.split(/\r|\r\n|\n/);
-		var readOnlyLines = [0,1,2,3,4,5];
+		var readOnlyLines = [0,1,2,3,4,5,6,7];
 		var readOnlyLinesEnd = [lines.length-1,lines.length-2];
 		if ( ~readOnlyLines.indexOf(change.from.line) || ~readOnlyLinesEnd.indexOf(change.to.line)) {
 			change.cancel();

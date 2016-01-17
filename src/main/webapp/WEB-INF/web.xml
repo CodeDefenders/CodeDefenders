@@ -36,6 +36,15 @@
     </servlet-mapping>
 
     <servlet>
+        <servlet-name>uploadManager</servlet-name>
+        <servlet-class>org.gammut.UploadManager</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>uploadManager</servlet-name>
+        <url-pattern>/upload</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
         <servlet-name>gameManager</servlet-name>
         <servlet-class>org.gammut.GameManager</servlet-class>
     </servlet>
@@ -87,6 +96,15 @@
     <servlet-mapping>
         <servlet-name>create_game_view.jsp</servlet-name>
         <url-pattern>/games/create</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>upload_class_view.jsp</servlet-name>
+        <jsp-file>/jsp/upload_class_view.jsp</jsp-file>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>upload_class_view.jsp</servlet-name>
+        <url-pattern>/games/upload</url-pattern>
     </servlet-mapping>
 
     <servlet>

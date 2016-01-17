@@ -1,169 +1,179 @@
 .blank_row {
-    height: 10px !important; /* Overwrite any previous rules */
-    background-color: #FFFFFF;
+	height: 10px !important; /* Overwrite any previous rules */
+	background-color: #FFFFFF;
 }
 
 #info {
-    float: left;
-    margin: auto;
-    width: 50%;
-    padding: 0px 1%;
+	float: left;
+	margin: auto;
+	width: 50%;
+	padding: 0px 1%;
 }
 
 #right {
-    float: left;
-    margin: auto;
-    width: 50%;
-    padding: 0px 1%;
+	float: left;
+	margin: auto;
+	width: 50%;
+	padding: 0px 1%;
 }
 
 #splash {
-    position:absolute;
-    width:400px;
-    height:300px;
-    z-index:15;
-    top:50%;
-    left:50%;
-    margin:-150px 0 0 -200px;
-    text-align:center;
+	position:absolute;
+	width:400px;
+	height:300px;
+	z-index:15;
+	top:50%;
+	left:50%;
+	margin:-150px 0 0 -200px;
+	text-align:center;
 }
 
 textarea {
-    width:100px;
-    height: 150px;
+	width:100px;
+	height: 150px;
 }
 
 body {
-    padding-top: 70px;
-    padding-left: 10px;
-    padding-right: 10px;
+	padding-top: 70px;
+	padding-left: 10px;
+	padding-right: 10px;
 }
 
 /* My turn button */
 
 .turn {
-    background-color: #6FC643;
-    border: 1px solid #C0C0C0;
-    color: #FFF;
-    transition-property: background-color, border-color;
-    transition-duration: 150ms;
-    min-width: 100px;
+	background-color: #6FC643;
+	border: 1px solid #C0C0C0;
+	color: #FFF;
+	transition-property: background-color, border-color;
+	transition-duration: 150ms;
+	min-width: 100px;
 }
 
 .turn:hover {
-    color: #FFF;
-    background-color: #65B63D;
-    border-color: #ADADAD;
+	color: #FFF;
+	background-color: #65B63D;
+	border-color: #ADADAD;
 }
 
 /* Sign-in form */
 
 
 .tableform {
-    border-collapse: separate;
-    border-spacing: 20px; 
-    font-size: 16px;
-    text-align: center;
-    line-height: 27px;
+	border-collapse: separate;
+	border-spacing: 20px;
+	font-size: 16px;
+	text-align: center;
+	line-height: 27px;
 }
 
 th, td {
-    padding: 5px;
-    text-align: left;
+	padding: 5px;
+	text-align: left;
 }
 
-.form-creategame,
+.form-upload {
+	padding: 15px;
+	margin: 0 auto;
+	max-width: 550px;
+}
+
+.form-creategame {
+	padding: 15px;
+	margin: 0 auto;
+	max-width: 450px;
+}
+
 .form-signin {
-    max-width: 330px;
-    padding: 15px;
-    margin: 0 auto;
+	padding: 15px;
+	margin: 0 auto;
+	max-width: 330px;
 }
-
 
 .form-creategame,
 .form-signin .form-signin-heading,
 .form-signin .checkbox {
-    margin-bottom: 10px;
+	margin-bottom: 10px;
 }
 .form-signin .checkbox {
-    font-weight: normal;
+	font-weight: normal;
 }
 
 .form-creategame .form-control,
 .form-signin .form-control {
-    position: relative;
-    height: auto;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
-    padding: 10px;
-    font-size: 16px;
+	position: relative;
+	height: auto;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	padding: 10px;
+	font-size: 16px;
 }
 
 .form-creategame .form-control:focus,
 .form-signin .form-control:focus {
-    z-index: 2;
+	z-index: 2;
 }
 
 .form-signin input[type="email"] {
-    margin-bottom: -1px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
+	margin-bottom: -1px;
+	border-bottom-right-radius: 0;
+	border-bottom-left-radius: 0;
 }
 .form-signin input[type="password"] {
-    margin-bottom: 10px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
+	margin-bottom: 10px;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
 }
 
 /* Slider */
 
 .slick-slider {
-    overflow: visible !important;
-    position: relative;
-    max-width : 80%;
-    width : 80%;
-    margin-left: 50px;
-    margin-right: 50px;
-    -moz-box-sizing: border-box;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -ms-touch-action: none;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	overflow: visible !important;
+	position: relative;
+	max-width : 80%;
+	width : 80%;
+	margin-left: 50px;
+	margin-right: 50px;
+	-moz-box-sizing: border-box;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	-ms-touch-action: none;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 .slick-prev,
 .slick-next {
-    position: absolute;
-    line-height: 1;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    background: transparent;
-    color: transparent;
+	position: absolute;
+	line-height: 1;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	background: transparent;
+	color: transparent;
 }
 
 .slick-prev {
-    top: 50%;
-    left: -50px;
+	top: 50%;
+	left: -50px;
 }
 
 .slick-next {
-    top: 50%;
-    right: -50px;
+	top: 50%;
+	right: -50px;
 }
 
 .slick-prev:before {
-    content: '\2770';
-    color: gray;
-    font-size: 50px;
+	content: '\2770';
+	color: gray;
+	font-size: 50px;
 }
 
 .slick-next:after {
-    content: '\2771';
-    color: gray;
-    font-size: 50px;
+	content: '\2771';
+	color: gray;
+	font-size: 50px;
 }

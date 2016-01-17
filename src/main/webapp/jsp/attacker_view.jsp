@@ -34,6 +34,7 @@
 				speed: 300,
 				draggable:false
 			});
+			$('#messages-div').delay(10000).fadeOut();
 		});
 	</script>
 </head>
@@ -68,17 +69,18 @@
 </nav>
 
 <%
-	ArrayList<String> messages = (ArrayList<String>) request.getAttribute("messages");
-	if (messages != null) {
-		for (String m : messages) { %>
-<div class="alert alert-info">
-	<pre><strong><%=m%></strong></pre>
-</div>
-<% }
-}
+	ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
+	request.getSession().removeAttribute("messages");
+	if (messages != null && ! messages.isEmpty()) {
 %>
+<div class="alert alert-info" id="messages-div">
+	<% for (String m : messages) { %>
+	<pre><strong><%=m%></strong></pre>
+	<% } %>
+</div>
+<%	} %>
 
-<div class="row">
+<div class="row-fluid">
 	<div id="info" class="col-md-6">
 
 		<h2>Mutants</h2>
@@ -214,17 +216,9 @@
 
 	<div id="right" class="col-md-6">
 	    <form id="atk" action="play" method="post">
-
-		<%
-			InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/data/sources/"+game.getClassName()+".java");
-			String line;
-			String source = "";
-			BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
-			while((line = is.readLine()) != null) {source+=line+"\n";}
-		%>
-		    <h2>Create a Mutant Here</h2>
+		    <h2>Create a mutant here</h2>
 			<input type="hidden" name="formType" value="createMutant">
-			<pre><textarea id="code" name="mutant" cols="80" rows="50"><%=source%></textarea></pre>
+			<pre><textarea id="code" name="mutant" cols="80" rows="50"><%=game.getCUT().getAsString()%></textarea></pre>
 			<br>
 		</form>
 	</div>

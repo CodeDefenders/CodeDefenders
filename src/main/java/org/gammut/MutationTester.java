@@ -1,15 +1,25 @@
 package org.gammut;
 
+import static org.gammut.AntRunner.runAntTarget;
+import static org.gammut.Constants.JAVA_CLASS_EXT;
+import static org.gammut.Mutant.Equivalence.ASSUMED_YES;
+import static org.gammut.Mutant.Equivalence.PROVEN_NO;
+import static org.gammut.TargetExecution.Target.COMPILE_MUTANT;
+import static org.gammut.TargetExecution.Target.COMPILE_TEST;
+import static org.gammut.TargetExecution.Target.TEST_MUTANT;
+import static org.gammut.TargetExecution.Target.TEST_ORIGINAL;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Map;
-import static org.gammut.Constants.Equivalence.*;
+import java.util.LinkedList;
 
 // Class that handles compilation and testing by creating a Process with the relevant ant target
 public class MutationTester {
@@ -21,33 +31,39 @@ public class MutationTester {
 	// Inputs: Mutant object to be compiled
 	// Outputs: ID of the resulting TargetExecution
 
-	public static int compileMutant(ServletContext context, Mutant m) {
+
+	public static Mutant compileMutant(ServletContext context, File dir, String jFile, int gameID, GameClass classMutated) {
+	//public static int compileMutant(ServletContext context, Mutant m2) {
 
 		// Gets the classname for the mutant from the game it is in
-		String className = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
-		String[] resultArray = runAntTarget(context, "compile-mutant", m.getFolder(), null, className);
+		String[] resultArray = runAntTarget(context, "compile-mutant", dir.getAbsolutePath(), null, classMutated.getBaseName(), null);
 		System.out.println("Compilation result:");
 		System.out.println(Arrays.toString(resultArray));
 		System.out.println("compiling mutant");
 
+		Mutant newMutant = null;
 		// If the input stream returned a 'successful build' message, the mutant compiled correctly
 		if (resultArray[0].toLowerCase().contains("build successful")) {
 			// Create and insert a new target execution recording successful compile, with no message to report, and return its ID
-			TargetExecution newExec = new TargetExecution(0, m.getId(), "COMPILE_MUTANT", "SUCCESS", null);
-			System.out.println("about to insert");
+			// Locate .class file
+			final String compiledClassName = classMutated.getBaseName() + JAVA_CLASS_EXT;
+			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
+			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
+			String cFile = matchingFiles.get(0).getAbsolutePath();
+			newMutant = new Mutant(gameID, jFile, cFile);
+			newMutant.insert();
+			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), COMPILE_MUTANT, "SUCCESS", null);
 			newExec.insert();
-			return newExec.id;
-		}
-
-		// Otherwise the mutant failed to compile
-		else {
+		} else {
+			// The mutant failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
 			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]"));
-			TargetExecution newExec = new TargetExecution(0, m.getId(), "COMPILE_MUTANT", "FAIL", message);
-			System.out.println("about to insert");
+			newMutant = new Mutant(gameID, jFile, null);
+			newMutant.insert();
+			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), COMPILE_MUTANT, "FAIL", message);
 			newExec.insert();
-			return newExec.id;
 		}
+		return newMutant;
 	}
 
 	// COMPILE TEST: Runs the related ant target that compiles a test
@@ -55,26 +71,34 @@ public class MutationTester {
 	// Inputs: Test object to be compiled
 	// Outputs: ID of the resulting TargetExecution
 
-	public static int compileTest(ServletContext context, Test t) {
+	public static Test compileTest(ServletContext context, File dir, String jFile, int gameID, GameClass classUnderTest) {
+	//public static int compileTest(ServletContext context, Test t) {
 
-		String className = DatabaseAccess.getGameForKey("Game_ID", t.getGameId()).getClassName();
-		String[] resultArray = runAntTarget(context, "compile-test", null, t.getFolder(), className);
+		String className = classUnderTest.getName();
+		String[] resultArray = runAntTarget(context, "compile-test", null, dir.getAbsolutePath(), className, null);
 
 		// If the input stream returned a 'successful build' message, the test compiled correctly
 		if (resultArray[0].toLowerCase().contains("build successful")) {
 			// Create and insert a new target execution recording successful compile, with no message to report, and return its ID
-			TargetExecution newExec = new TargetExecution(t.getId(), 0, "COMPILE_TEST", "SUCCESS", null);
+			// Locate .class file
+			final String compiledClassName = FilenameUtils.getBaseName(jFile) + JAVA_CLASS_EXT;
+			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
+			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
+			String cFile = matchingFiles.get(0).getAbsolutePath();
+			Test newTest = new Test(gameID, jFile, cFile);
+			newTest.insert();
+			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, COMPILE_TEST, "SUCCESS", null);
 			newExec.insert();
-			return newExec.id;
-		}
-
-		// Otherwise the test failed to compile
-		else {
+			return newTest;
+		} else {
+			// The test failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
 			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]"));
-			TargetExecution newExec = new TargetExecution(t.getId(), 0, "COMPILE_TEST", "FAIL", message);
+			Test newTest = new Test(gameID, jFile, null);
+			newTest.insert();
+			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, COMPILE_TEST, "FAIL", message);
 			newExec.insert();
-			return newExec.id;
+			return newTest;
 		}
 	}
 
@@ -82,34 +106,31 @@ public class MutationTester {
 
 	// Inputs: Test object to be run against the original class
 	// Outputs: ID of the resulting TargetExecution
-	public static int testOriginal(ServletContext context, Test t) {
+	public static int testOriginal(ServletContext context, File dir, Test t) {
 
 		String className = DatabaseAccess.getGameForKey("Game_ID", t.getGameId()).getClassName();
-		String[] resultArray = runAntTarget(context, "test-original", null, t.getFolder(), className);
+		String[] resultArray = runAntTarget(context, "test-original", null, dir.getAbsolutePath(), className, t.getFullyQualifiedClassName());
 
 		// If the test doesn't return failure
 		if (resultArray[0].toLowerCase().contains("failures: 0")) {
 			// If the test doesn't return error
 			if (resultArray[0].toLowerCase().contains("errors: 0")) {
 				// New Target execution recording successful test against original
-				TargetExecution newExec = new TargetExecution(t.getId(), 0, "TEST_ORIGINAL", "SUCCESS", null);
+				TargetExecution newExec = new TargetExecution(t.getId(), 0, TEST_ORIGINAL, "SUCCESS", null);
 				newExec.insert();
 				return newExec.id;
 			} else {
 				// New target execution recording failed test against original due to error
 				// Not sure on what circumstances cause a junit error, return all streams
 				String message = resultArray[0] + " " + resultArray[1] + " " + resultArray[2];
-				TargetExecution newExec = new TargetExecution(t.getId(), 0, "TEST_ORIGINAL", "ERROR", message);
+				TargetExecution newExec = new TargetExecution(t.getId(), 0, TEST_ORIGINAL, "ERROR", message);
 				newExec.insert();
 				return newExec.id;
 			}
-		}
-
-		// Otherwise the test failed
-		else {
+		} else {
 			// New target execution record failed test against original as it isn't valid
-			String message = "Your test is invalid as it couldnt pass against the original code";
-			TargetExecution newExec = new TargetExecution(t.getId(), 0, "TEST_ORIGINAL", "FAIL", message);
+			String message = "Test failed on the original class under test.";
+			TargetExecution newExec = new TargetExecution(t.getId(), 0, TEST_ORIGINAL, "FAIL", message);
 			newExec.insert();
 			return newExec.id;
 		}
@@ -120,34 +141,32 @@ public class MutationTester {
 	// Inputs: A test object and a mutant to run it on
 	// Outputs: ID of the resulting TargetExecution
 
-	public static int testMutant(ServletContext context, Mutant m, Test t) {
+	public static TargetExecution testMutant(ServletContext context, Mutant m, Test t) {
 		logger.debug("Running test {} on mutant {}", t.getId(), m.getId());
 		System.out.println("Running test " + t.getId() + " on mutant " + m.getId());
 		String className = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
-		String[] resultArray = runAntTarget(context, "test-mutant", m.getFolder(), t.getFolder(), className);
+		String[] resultArray = runAntTarget(context, "test-mutant", m.getFolder(), t.getFolder(), className, t.getFullyQualifiedClassName());
 
-		// If the test doesn't return failure
+		TargetExecution newExec = null;
+
 		if (resultArray[0].toLowerCase().contains("failures: 0")) {
-			// If the test doesn't return any errors
+			// If the test doesn't return failure
 			if (resultArray[0].toLowerCase().contains("errors: 0")) {
+				// If the test doesn't return any errors
 				// The test succeeded and a Target Execution for the mutant/test pairing is recorded. This means the test failed to detect the mutant
-				TargetExecution newExec = new TargetExecution(t.getId(), m.getId(), "TEST_MUTANT", "SUCCESS", null);
-				newExec.insert();
-				return newExec.id;
+				newExec = new TargetExecution(t.getId(), m.getId(), TEST_MUTANT, "SUCCESS", null);
 			} else {
 				// New target execution recording failed test against mutant due to error
 				// Not sure on what circumstances cause a junit error, return all streams
 				String message = resultArray[0] + " " + resultArray[1] + " " + resultArray[2];
-				TargetExecution newExec = new TargetExecution(t.getId(), 0, "TEST_MUTANT", "ERROR", message);
-				newExec.insert();
-				return newExec.id;
+				newExec = new TargetExecution(t.getId(), m.getId(), TEST_MUTANT, "ERROR", message);
 			}
 		} else {
 			// The test failed and a Target Execution for the mutant/test pairing is recorded. The test detected the mutant.
-			TargetExecution newExec = new TargetExecution(t.getId(), m.getId(), "TEST_MUTANT", "FAIL", null);
-			newExec.insert();
-			return newExec.id;
+			newExec = new TargetExecution(t.getId(), m.getId(), TEST_MUTANT, "FAIL", null);
 		}
+		newExec.insert();
+		return newExec;
 	}
 
 	// RUN MUTATION TESTS: Runs all the mutation tests for a particular game, using all the alive mutants and all tests
@@ -155,30 +174,69 @@ public class MutationTester {
 	// Inputs: The ID of the game to run mutation tests for
 	// Outputs: None
 
-	public static void runMutationTests(ServletContext context, int gid) {
-
-		for (Mutant m : DatabaseAccess.getMutantsForGame(gid)) {
-			for (Test t : DatabaseAccess.getTestsForGame(gid)) {
-				// If the mutant is alive
-				if (m.isAlive()) {
-					// If this mutant/test pairing hasnt been run before and the test might kill the mutant
-					if (DatabaseAccess.getTargetExecutionForPair(t.getId(), m.getId()) == null) {
-						// Run the test against the mutant and get the result
-						int targetId = testMutant(context, m, t);
-
-						TargetExecution executedTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", targetId).get(0);
-
-						// If the test did NOT pass, the mutant was detected and should be killed.
-						if (executedTarget.status.equals("FAIL")) {
-							m.kill();
-							m.update();
-							t.killMutant();
-							t.update();
-						}
-					}
-				}
-			}
+	public static void runTestOnAllMutants(ServletContext context, Game game, Test test, ArrayList<String> messages) {
+		int killed = 0;
+		ArrayList<Mutant> mutants = game.getAliveMutants();
+		for (Mutant mutant : mutants) {
+			killed += testVsMutant(context, test, mutant, messages) ? 1 : 0;
 		}
+		if (killed == 0)
+			if (mutants.size() == 0)
+				messages.add("Test submitted and ready to kill mutant!");
+			else
+				messages.add("Your test did not kill any mutant, just yet.");
+		else {
+			if (killed == 1) {
+				if (mutants.size() == 1)
+					messages.add("Great, your test killed the last mutant!");
+				else
+					messages.add("Good job, your test killed a mutants!");
+			} else {
+				messages.add(String.format("Awesome! Your test killed \"%d mutants!", killed));
+			}
+
+		}
+	}
+
+	public static void runAllTestsOnMutant(ServletContext context, Game game, Mutant mutant, ArrayList<String> messages) {
+		int killing = 0;
+		ArrayList<Test> tests = game.getTests();
+		for (Test test : tests) {
+			if (test.isValid())
+				// If this mutant/test pairing hasnt been run before and the test might kill the mutant
+				killing += testVsMutant(context, test, mutant, messages) ? 1 : 0;
+		}
+		if (killing == 0) {
+			if (tests.size() == 0)
+				messages.add("Mutant submitted, may the force be with it.");
+			else if (tests.size() == 1)
+				messages.add("Cool, your mutant is alive.");
+			else
+				messages.add(String.format("Awesome, your mutant survived %d existing tests!",tests.size()));
+		} else {
+			String nTests = killing == 1 ? "An existing test" : String.format("%d existing tests", killing);
+			messages.add(String.format("%s killed your mutant. Keep going!", nTests));
+		}
+
+	}
+
+	public static boolean testVsMutant(ServletContext context, Test test, Mutant mutant, ArrayList<String> messages) {
+		if (DatabaseAccess.getTargetExecutionForPair(test.getId(), mutant.getId()) == null) {
+			// Run the test against the mutant and get the result
+			TargetExecution executedTarget = testMutant(context, mutant, test);
+
+			// If the test did NOT pass, the mutant was detected and should be killed.
+			if (executedTarget.status.equals("FAIL")) {
+				System.out.println(String.format("TEST %d KILLED MUTANT %d", test.getId(), mutant.getId()));
+				mutant.kill();
+				mutant.update();
+				test.killMutant();
+				test.update();
+				return true;
+			}
+		} else
+			System.err.println(String.format("No execution result found for (m: %d,t: %d)", mutant.getId(), test.getId()));
+		return false;
 	}
 
 	// RUN EQUIVALENCE TEST: Runs an equivalence test using an attacker supplied test and a mutant thought to be equivalent
@@ -192,88 +250,22 @@ public class MutationTester {
 		// The test created is new and was made by the attacker (there is no need to check if the mutant/test pairing has been run already)
 
 		// As a result of this test, either the test the attacker has written kills the mutant or doesnt.
-		int targetId = testMutant(context, mutant, test);
-		TargetExecution executedTarget = DatabaseAccess.getTargetExecutionsForKey("TargetExecution_ID", targetId).get(0);
+		TargetExecution executedTarget = testMutant(context, mutant, test);
 
-		if (executedTarget.status.equals("FAIL")) {
+		if (executedTarget.status.equals("ERROR")) {
+			System.out.println("Error executing test on mutant.");
+			return;
+		} else if (executedTarget.status.equals("FAIL")) {
 			// If the test did NOT pass, the mutant was detected and is proven to be non-equivalent
 			System.out.println("Mutant was killed, hence tagged not equivalent");
-			mutant.setEquivalent(PROVEN_NO.name());
+			mutant.setEquivalent(PROVEN_NO);
 		} else {
 			// If the test DID pass, the mutant went undetected and it is assumed to be equivalent.
 			System.out.println("Test failed to kill the mutant, hence assumed equivalent");
-			mutant.setEquivalent(ASSUMED_YES.name());
+			mutant.setEquivalent(ASSUMED_YES);
 		}
-
-		// Then kill the mutant either way.
+		// Kill the mutant if it was killed by the test or if it's marked equivalent
 		mutant.kill();
 		mutant.update();
-	}
-
-	// RUN ANT TARGET: Runs a specific Ant Target in the build.xml file
-
-	// Inputs: The target to run, any file locations necessary for that target, and the name of the relevant class
-	// Outputs: String Array of length 4
-	//    [0] : Input Stream for the process
-	//    [1] : Error Stream for the process
-	//    [2] : Any exceptions from running the process
-	//    [3] : Message indicating which target was run, and with which files
-
-	private static String[] runAntTarget(ServletContext context, String target, String mutantFile, String testFile, String className) {
-		String[] resultArray = new String[4];
-		String isLog = "";
-		String esLog = "";
-		String exLog = "";
-		String debug = "Running Ant Target: " + target + " with mFile: " + mutantFile + " and tFile: " + testFile;
-
-		ProcessBuilder pb = new ProcessBuilder();
-		Map env = pb.environment();
-
-		String antHome = (String) env.get("ANT_HOME");
-		if (antHome == null)
-			antHome = System.getProperty("ant.home", "/usr");
-
-		String catalinaHome = (String) env.get("CATALINA_HOME");
-		if (catalinaHome == null)
-			catalinaHome = System.getProperty("catalina.home", "/usr/share/tomcat");
-
-		pb.command(antHome + "/bin/ant", target,
-				"-Dmutant.file=" + mutantFile,
-				"-Dtest.file=" + testFile,
-				"-Dclassname=" + className);
-
-		String buildFileDir = catalinaHome + "/webapps" + context.getContextPath() + "/WEB-INF/data";
-		pb.directory(new File(buildFileDir));
-		pb. redirectErrorStream(true);
-
-		System.out.println("Executing Ant Command: " + pb.command().toString());
-		try {
-			Process p = pb.start();
-			String line;
-
-			BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			while ((line = is.readLine()) != null) {
-				isLog += line + "\n";
-			}
-
-			BufferedReader es = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-			while ((line = es.readLine()) != null) {
-				esLog += line + "\n";
-			}
-
-		} catch (Exception ex) {
-			exLog += "Exception: " + ex.toString() + "\n";
-		}
-
-		resultArray[0] = isLog;
-		resultArray[1] = esLog;
-		resultArray[2] = exLog;
-		resultArray[3] = debug;
-		System.out.println("is: " + isLog);
-		System.out.println("es: " + esLog);
-		System.out.println("ex: " + exLog);
-		System.out.println("lg :" + debug);
-
-		return resultArray;
 	}
 }

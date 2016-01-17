@@ -8,7 +8,7 @@ endif
 default: clean compile deploy
 compile:
 	javac src/main/webapp/WEB-INF/data/sources/*.java
-	mvn clean compile package install war:war
+	mvn clean compile package install war:war tomcat7:deploy
 
 deploy:
 	${CATALINA_HOME}/bin/shutdown.sh

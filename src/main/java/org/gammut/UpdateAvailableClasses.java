@@ -1,15 +1,24 @@
 package org.gammut;
 
+import static org.gammut.Constants.CUTS_DIR;
+import static org.gammut.Constants.FILE_SEPARATOR;
+import static org.gammut.Constants.JAVA_SOURCE_EXT;
+
+import javassist.ClassPool;
+import javassist.CtClass;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedList;
 
 public class UpdateAvailableClasses extends HttpServlet {
 
@@ -17,73 +26,36 @@ public class UpdateAvailableClasses extends HttpServlet {
 
 		System.out.println("Running UpdateAvailableClasses");
 
-		String sources = getServletContext().getRealPath("/WEB-INF/data/sources");
-		System.out.println(sources);
-		File sourcesFile = new File(sources);
-		ArrayList<String> classes = new ArrayList<String>();
+		String cutsDirPath = getServletContext().getRealPath(CUTS_DIR);
+		System.out.println(cutsDirPath);
+		File cutsDirFile = new File(cutsDirPath);
 
-		for (String s : sourcesFile.list()) {
-			if (s.contains(".java")) {
-				classes.add(s.substring(0, s.length() - 5));
-			}
-		}
+		Collection<File> sutFiles = FileUtils.listFiles(cutsDirFile, new String[]{"java"}, true);
 
-		Connection conn = null;
-		Statement stmt = null;
-		String sql = null;
-		String javaFile;
-		String classFile;
+		/* Clear the list of CUTs in the DB */
+		GameClass.clear();
 
-		try {
-			conn = DatabaseAccess.getConnection();
+		ClassPool classPool = ClassPool.getDefault();
+		for (File sutFile : sutFiles) {
+			String name = FilenameUtils.getBaseName(sutFile.getName());
+			System.out.println("Getting file paths");
+			// Get the path to each file to be stored.
+			String sourceFileName = cutsDirPath + FILE_SEPARATOR + name + JAVA_SOURCE_EXT;
 
-
-			System.out.println("Gonna delete");
-			// First clear the table.
-			stmt = conn.createStatement();
-			sql = "DELETE FROM classes;";
-			stmt.execute(sql);
-
-			System.out.println("Starting to loop");
-			// For each differently named class in the resources folder.
-			for (String s : classes) {
-
-				System.out.println("Getting file paths");
-				// Get the path to each file to be stored.
-				javaFile = DatabaseAccess.addSlashes(sources + "/" + s + ".java");
-				classFile = DatabaseAccess.addSlashes(sources + "/" + s + ".class");
-
+			final String compiledClassName = name + Constants.JAVA_CLASS_EXT;
+			LinkedList<File> matchingFiles = (LinkedList)FileUtils.listFiles(cutsDirFile, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
+			if (! matchingFiles.isEmpty()) {
+				String compiledFileName = matchingFiles.get(0).getAbsolutePath();
+				String javaFile = DatabaseAccess.addSlashes(sourceFileName);
+				String classFile = DatabaseAccess.addSlashes(compiledFileName);
+				CtClass cc = classPool.makeClass(new FileInputStream(new File(compiledFileName)));
+				String fullyQualifiedName = cc.getName();
+				GameClass sut = new GameClass(fullyQualifiedName, javaFile, classFile);
+				sut.insert();
 				System.out.println(javaFile);
 				System.out.println(classFile);
-				stmt = conn.createStatement();
-				sql = String.format("INSERT INTO classes (Name, JavaFile, ClassFile) VALUES ('%s', '%s', '%s');", s, javaFile, classFile);
-				stmt.execute(sql);
 			}
-
-			stmt.close();
-			conn.close();
-
-		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				System.out.println(se);
-			}//end finally try
-		} //end try
+		}
 	}
 
 }

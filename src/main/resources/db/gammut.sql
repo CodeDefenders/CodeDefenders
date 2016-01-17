@@ -69,7 +69,7 @@ DROP TABLE IF EXISTS `mutants`;
 CREATE TABLE `mutants` (
   `Mutant_ID` int(11) NOT NULL AUTO_INCREMENT,
   `JavaFile` varchar(255) NOT NULL,
-  `ClassFile` varchar(255) NOT NULL,
+  `ClassFile` varchar(255),
   `Alive` tinyint(1) NOT NULL DEFAULT '1',
   `Game_ID` int(11) DEFAULT NULL,
   `RoundCreated` int(11) NOT NULL,
@@ -116,7 +116,7 @@ CREATE TABLE `tests` (
   `Test_ID` int(11) NOT NULL AUTO_INCREMENT,
   `Game_ID` int(11) NOT NULL,
   `JavaFile` varchar(255) NOT NULL,
-  `ClassFile` varchar(255) NOT NULL,
+  `ClassFile` varchar(255),
   `RoundCreated` int(11) NOT NULL,
   `MutantsKilled` int(11) DEFAULT '0',
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,

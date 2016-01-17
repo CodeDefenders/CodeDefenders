@@ -1,8 +1,8 @@
 package org.gammut;
 
-import static org.gammut.Constants.Equivalence.ASSUMED_YES;
-import static org.gammut.Constants.Equivalence.DECLARED_YES;
-import static org.gammut.Constants.Equivalence.PROVEN_NO;
+import static org.gammut.Mutant.Equivalence.ASSUMED_YES;
+import static org.gammut.Mutant.Equivalence.DECLARED_YES;
+import static org.gammut.Mutant.Equivalence.PROVEN_NO;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -31,7 +31,10 @@ public class Mutant {
 
 	private boolean alive = true;
 
-	private String equivalent;
+	private Equivalence equivalent;
+
+	/* Mutant Equivalence */
+	public enum Equivalence { ASSUMED_NO, PENDING_TEST, DECLARED_YES, ASSUMED_YES, PROVEN_NO}
 
 	private int roundCreated;
 	private int roundKilled;
@@ -44,12 +47,13 @@ public class Mutant {
 		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gid).getCurrentRound();
 		this.javaFile = jFile;
 		this.classFile = cFile;
+		this.equivalent = Equivalence.ASSUMED_NO;
 	}
 
 	// MUTANT CREATION 02: FROM DATABASE
 	// Constructor to create a Mutant from a MySQL Record in the mutants table.
 	// This is getting information for an existing mutant.
-	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, String equiv, int rCreated, int rKilled) {
+	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled) {
 		this(gid, jFile, cFile);
 
 		this.id = mid;
@@ -67,11 +71,11 @@ public class Mutant {
 		return gameId;
 	}
 
-	public String getEquivalent() {
+	public Equivalence getEquivalent() {
 		return equivalent;
 	}
 
-	public void setEquivalent(String e) {
+	public void setEquivalent(Equivalence e) {
 		equivalent = e;
 	}
 
@@ -88,11 +92,7 @@ public class Mutant {
 	}
 
 	public int sqlAlive() {
-		if (alive) {
-			return 1;
-		} else {
-			return 0;
-		}
+		return alive ? 1 : 0;
 	}
 
 	public void kill() {
@@ -139,13 +139,7 @@ public class Mutant {
 		} catch (IOException e) {
 			e.printStackTrace(); // TODO handle properly
 		}
-
-		Patch patch = DiffUtils.diff(sutLines, mutantLines);
-
-		for (Delta delta : patch.getDeltas()) {
-			System.out.println(delta);
-		}
-		return patch;
+		return DiffUtils.diff(sutLines, mutantLines);
 	}
 
 	public String getPatchString() {
@@ -164,15 +158,11 @@ public class Mutant {
 			e.printStackTrace();  // TODO handle properly
 		}
 		Patch patch = DiffUtils.diff(sutLines, mutantLines);
-		for (Delta delta : patch.getDeltas()) {
-			System.out.println(delta);
-		}
 		List<String> unifiedPatches = DiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
 		StringBuilder unifiedPatch = new StringBuilder();
 		for (String s : unifiedPatches) {
 			unifiedPatch.append(s + System.getProperty("line.separator"));
 		}
-		System.out.println("Mutant.getPatchString():\n" + unifiedPatch.toString());
 		return unifiedPatch.toString();
 	}
 
@@ -211,7 +201,6 @@ public class Mutant {
 
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = null;
 
 		try {
 			System.out.println("Inserting mutant");
@@ -219,7 +208,9 @@ public class Mutant {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated) VALUES ('%s', '%s', %d, %d);", DatabaseAccess.addSlashes(javaFile), DatabaseAccess.addSlashes(classFile), gameId, roundCreated);
+			String jFileDB = DatabaseAccess.addSlashes(javaFile);
+			String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
+			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated) VALUES ('%s', '%s', %d, %d);", jFileDB, cFileDB, gameId, roundCreated);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -265,13 +256,12 @@ public class Mutant {
 
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = null;
 
 		try {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', RoundKilled='%d' WHERE Mutant_ID='%d';", equivalent, sqlAlive(), roundKilled, id);
+			String sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', RoundKilled='%d' WHERE Mutant_ID='%d';", equivalent.name(), sqlAlive(), roundKilled, id);
 			stmt.execute(sql);
 
 			conn.close();

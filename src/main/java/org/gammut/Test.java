@@ -1,7 +1,11 @@
 package org.gammut;
 
+import javassist.ClassPool;
+import javassist.CtClass;
+
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
@@ -89,7 +93,10 @@ public class Test {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated) VALUES ('%s', '%s', %d, %d);", DatabaseAccess.addSlashes(javaFile), DatabaseAccess.addSlashes(classFile), gameId, roundCreated);
+			String jFileDB = DatabaseAccess.addSlashes(javaFile);
+			// class file can be null
+			String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
+			sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated) VALUES ('%s', '%s', %d, %d);", jFileDB, cFileDB, gameId, roundCreated);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -164,5 +171,23 @@ public class Test {
 			}
 		}
 		return false;
+	}
+
+	public String getFullyQualifiedClassName() {
+		if (classFile == null)
+			return null;
+
+		ClassPool classPool = ClassPool.getDefault();
+		CtClass cc = null;
+		try {
+			cc = classPool.makeClass(new FileInputStream(new File(classFile)));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return cc == null ? null : cc.getName();
+	}
+
+	public boolean isValid() {
+		return classFile != null;
 	}
 }

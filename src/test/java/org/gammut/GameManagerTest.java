@@ -8,6 +8,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import javassist.ClassPool;
+import javassist.CtClass;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -18,6 +20,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -122,4 +125,32 @@ public class GameManagerTest {
 		return folder;
 	}
 
+	@Test
+	public void test() throws IOException {
+		ClassPool classPool = ClassPool.getDefault();
+		CtClass cc = classPool.makeClass(new FileInputStream(new File("/Users/jmr/Desktop/Foo.class")));
+		CtClass cc2 = classPool.makeClass(new FileInputStream(new File("/Users/jmr/Desktop/org/foo/bar/Bar.class")));
+		System.out.println(cc.getName()); // returns the fully-qualified class name
+		System.out.println(cc2.getName()); // returns the fully-qualified class name
+
+	}
+
+	@Test
+	public void testSUTClass(){
+		assertEquals("Foo", new GameClass("Foo", "" , "").getBaseName());
+		assertEquals("Foo", new GameClass("org.Foo", "" , "").getBaseName());
+		assertEquals("Foo", new GameClass("org.foo.bar.algo.mas.Foo", "" , "").getBaseName());
+		assertEquals("", new GameClass("Foo", "" , "").getPackage());
+		assertEquals("org", new GameClass("org.Foo", "" , "").getPackage());
+		assertEquals("org.foo.bar.algo.mas", new GameClass("org.foo.bar.algo.mas.Foo", "" , "").getPackage());
+	}
+
+
+	@Test
+	public void test3(){
+
+		System.out.println(new GameClass("org.bar.Foo", "" , "").getTestTemplate());
+
+		System.out.println(String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', RoundKilled='%d' WHERE Mutant_ID='%d';", Mutant.Equivalence.ASSUMED_NO.name(), 0, 2, 109));
+	}
 }

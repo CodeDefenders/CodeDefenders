@@ -34,6 +34,7 @@
 				speed: 300,
 				draggable:false
 			});
+			$('#messages-div').delay(10000).fadeOut();
 		});
 	</script>
 </head>
@@ -61,7 +62,6 @@
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<% if (game.getActivePlayer().equals("DEFENDER")) {%>
-				<button type="submit" class="btn btn-default navbar-btn" form="equiv">Mark Equivalences</button>
 				<button type="submit" class="btn btn-default navbar-btn" form="def">Defend!</button>
 				<%}%>
 			</ul>
@@ -70,28 +70,33 @@
 </nav>
 
 <%
-	ArrayList<String> messages = (ArrayList<String>) request.getAttribute("messages");
-	if (messages != null) {
-		for (String m : messages) { %>
-<div class="alert alert-info">
-	<pre><strong><%=m%></strong></pre>
-</div>
-<% }
-}
+	ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
+	request.getSession().removeAttribute("messages");
+	if (messages != null && ! messages.isEmpty()) {
 %>
+<div class="alert alert-info" id="messages-div">
+	<% for (String m : messages) { %>
+	<pre><strong><%=m%></strong></pre>
+	<% } %>
+</div>
+<%	} %>
 
-<div class="row">
-	<div id="info" class="col-md-6">
+<div class="row-fluid">
+	<div class="col-md-6" id="info">
 		<h2>Class Under Test</h2>
-		<%
-			InputStream resourceContent = getServletContext().getResourceAsStream("/WEB-INF/data/sources/"+game.getClassName()+".java");
-			String line;
-			String source = "";
-			BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
-			while((line = is.readLine()) != null) {source+=line+"\n";}
-		%>
-		<pre><textarea id="sut" name="cut" cols="80" rows="30"><%=source%></textarea></pre>
+		<pre><textarea id="sut" name="cut" cols="80" rows="30"><%=game.getCUT().getAsString()%></textarea></pre>
+	</div> <!-- col-md6 left -->
+	<div class="col-md-6" id="right-top">
+		<h2> Write your JUnit test here</h2>
+		<form id="def" action="play" method="post">
+			<pre><textarea id="code" name="test" cols="80" rows="30"><%=game.getCUT().getTestTemplate()%></textarea></pre>
+			<input type="hidden" name="formType" value="createTest">
+		</form>
+	</div> <!-- col-md6 right top -->
+</div> <!-- row-fluid 1 -->
 
+<div class="row-fluid">
+	<div class="col-md-6" id="submitted-div">
 		<h2> Submitted JUnit Tests </h2>
 		<div class="slider single-item">
 			<%
@@ -111,27 +116,8 @@
 			<%}
 			%>
 		</div> <!-- slider single-item -->
-	</div> <!-- col-md6 left -->
-
-	<!--<div id="right">-->
-	<div class="col-md-6">
-		<h2> Write your JUnit test here!</h2>
-		<form id="equiv" action="play" method="post">
-			<input type=hidden name="formType" value="markEquivalences">
-		</form>
-		<form id="def" action="play" method="post">
-			<input type="hidden" name="formType" value="createTest">
-	        <pre><textarea id="code" name="test" cols="80" rows="30">import org.junit.*;
-import static org.junit.Assert.*;
-
-public class Test<%=game.getClassName()%> {
-    @Test
-    public void test() {
-        // test here!
-    }
-}</textarea></pre>
-		</form>
-
+	</div> <!-- col-md-6 left bottom -->
+	<div class="col-md-6" id="mutants-div">
 		<h2>Mutants</h2>
 		<!-- Nav tabs -->
 		<ul class="nav nav-tabs" role="tablist">
@@ -179,12 +165,16 @@ public class Test<%=game.getClassName()%> {
 						</td>
 						<td >
 							<% if (game.getActivePlayer().equals("DEFENDER")) {%>
-							Mark as Equivalent: <input type="checkbox" form="equiv" name="mutant<%=m.getId()%>" value="equivalent">
+							<form id="equiv" action="play" method="post">
+								<input type="hidden" name="formType" value="claimEquivalent">
+								<input type="hidden" name="mutantId" value="<%=m.getId()%>">
+								<button type="submit" class="btn btn-default navbar-btn">Claim Equivalent</button>
+							</form>
 							<%}%>
 						</td>
 					</tr>
 					<tr>
-						<td colspan="2">
+						<td colspan="3">
 							<% for (String change :	m.getHTMLReadout()) { %>
 							<p><%=change%><p>
 								<% } %>
@@ -249,8 +239,7 @@ public class Test<%=game.getClassName()%> {
 				</table>
 			</div>
 		</div> <!-- tab-content -->
-
-	</div> <!-- col-md-6 right -->
+	</div> <!-- col-md-6 right bottom -->
 </div>
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
@@ -263,7 +252,7 @@ public class Test<%=game.getClassName()%> {
 	editorTest.on('beforeChange',function(cm,change) {
 		var text = cm.getValue();
 		var lines = text.split(/\r|\r\n|\n/);
-		var readOnlyLines = [0,1,2,3,4,5];
+		var readOnlyLines = [0,1,2,3,4,5,6,7];
 		var readOnlyLinesEnd = [lines.length-1,lines.length-2];
 		if ( ~readOnlyLines.indexOf(change.from.line) || ~readOnlyLinesEnd.indexOf(change.to.line)) {
 			change.cancel();

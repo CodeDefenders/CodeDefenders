@@ -1,12 +1,12 @@
 package org.gammut;
 
+import static org.gammut.Mutant.Equivalence.PENDING_TEST;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-
-import static org.gammut.Constants.Equivalence.*;
 
 public class Game {
 
@@ -66,6 +66,10 @@ public class Game {
 
 	public String getClassName() {
 		return DatabaseAccess.getClassForKey("Class_ID", classId).name;
+	}
+
+	public GameClass getCUT() {
+		return DatabaseAccess.getClassForKey("Class_ID", classId);
 	}
 
 	public int getAttackerId() {
@@ -153,7 +157,7 @@ public class Game {
 	public ArrayList<Mutant> getMutantsMarkedEquivalent() {
 		ArrayList<Mutant> equivMutants = new ArrayList<Mutant>();
 		for (Mutant m : getMutants()) {
-			if (m.isAlive() && m.getEquivalent().equals(PENDING_TEST.name())) {
+			if (m.isAlive() && m.getEquivalent().equals(PENDING_TEST)) {
 				equivMutants.add(m);
 			}
 		}

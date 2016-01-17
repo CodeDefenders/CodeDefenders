@@ -26,8 +26,8 @@ public class GameSelectionManager extends HttpServlet {
 			case "createGame":
 
 				// Get the identifying information required to create a game from the submitted form.
-				int classId = Integer.parseInt((String) request.getParameter("class"));
-				int rounds = Integer.parseInt((String) request.getParameter("rounds"));
+				int classId = Integer.parseInt(request.getParameter("class"));
+				int rounds = Integer.parseInt(request.getParameter("rounds"));
 				String role = request.getParameter("role") == null ? "DEFENDER" : "ATTACKER";
 				Game.Level level = request.getParameter("level") == null ? Game.Level.HARD : Game.Level.EASY;
 
@@ -43,7 +43,7 @@ public class GameSelectionManager extends HttpServlet {
 			case "joinGame":
 
 				// Get the identifying information required to create a game from the submitted form.
-				gameId = Integer.parseInt((String) request.getParameter("game"));
+				gameId = Integer.parseInt(request.getParameter("game"));
 
 				Game jGame = DatabaseAccess.getGameForKey("Game_ID", gameId);
 
@@ -66,7 +66,7 @@ public class GameSelectionManager extends HttpServlet {
 
 			case "enterGame":
 
-				gameId = Integer.parseInt((String) request.getParameter("game"));
+				gameId = Integer.parseInt(request.getParameter("game"));
 				Game eGame = DatabaseAccess.getGameForKey("Game_ID", gameId);
 
 				if (eGame.isUserInGame(uid)) {
@@ -77,7 +77,10 @@ public class GameSelectionManager extends HttpServlet {
 				} else {
 					response.sendRedirect(request.getHeader("referer"));
 				}
-
+				break;
+			default:
+				System.err.println("Action not recognised");
+				response.sendRedirect(request.getHeader("referer"));
 				break;
 		}
 	}
