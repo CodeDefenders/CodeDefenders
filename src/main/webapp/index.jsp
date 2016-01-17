@@ -32,12 +32,14 @@
    		</div>
 	</nav>
 
-	<div id="splash">
+  <div class="container">
+	<div id="splash" class="jumbotron">
 		<h1>Code Defenders</h1>
-		<h2>A Mutation Testing Game</h2>
-		<a  type="button" class="btn btn-default"  href="login">Login</a>
+		<p>A Mutation Testing Game</p>
+		<p>
+		<a  class="btn btn-primary btn-large"  href="login">Enter</a>
 	</div>
-
+  </div>
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
