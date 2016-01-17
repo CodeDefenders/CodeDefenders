@@ -1,4 +1,4 @@
-package org.gammut;
+package org.codedefenders;
 
 import javassist.ClassPool;
 import javassist.CtClass;

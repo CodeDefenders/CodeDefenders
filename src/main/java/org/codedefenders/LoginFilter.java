@@ -1,4 +1,4 @@
-package org.gammut;
+package org.codedefenders;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;

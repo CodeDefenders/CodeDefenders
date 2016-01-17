@@ -17,8 +17,10 @@
 
 <body>
 
-  <%@ page import="org.gammut.*,java.io.*" %>
-	<nav class="navbar navbar-inverse navbar-fixed-top">
+  <%@ page import="org.codedefenders.*,java.io.*" %>
+  <%@ page import="org.codedefenders.DatabaseAccess" %>
+  <%@ page import="org.codedefenders.Game" %>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
     		<div class="navbar-header">
       			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1">
@@ -26,7 +28,7 @@
     		</div>
       		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
           		<ul class="nav navbar-nav">
-                <li><a class="navbar-brand" href="games">GamMut</a></li>
+                <li><a class="navbar-brand" href="games">Code Defenders</a></li>
                 <li class="active"><a href="games/user">My Games</a></li>
                 <li><a href="games/open">Open Games</a></li>
                 <li><a href="games/create">Create Game</a></li>
@@ -69,7 +71,7 @@
     String atkName;
     String defName;
     int uid = (Integer)request.getSession().getAttribute("uid");
-    for (Game g : DatabaseAccess.getGamesForUser(uid)) { 
+    for (Game g : DatabaseAccess.getGamesForUser(uid)) {
       isGames = true;
       atkName = null;
       defName = null;

@@ -17,7 +17,7 @@
 
 <body>
 
-  <%@ page import="org.gammut.*,java.io.*" %>
+  <%@ page import="org.codedefenders.*,java.io.*" %>
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
     		<div class="navbar-header">
@@ -26,16 +26,16 @@
     		</div>
       		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
           		<ul class="nav navbar-nav">
-            		<a class="navbar-brand" href="games">GamMut</a>
+            		<a class="navbar-brand" href="games">Code Defenders</a>
           		</ul>
       		</div>
    		</div>
 	</nav>
 
 	<div id="splash">
-		<h1>GamMut</h1>
-		<h2>Gamification of Mutation Testing</h2>
-		<a  type="button" class="btn btn-default"  href="login">Create a New Account or Login</a>
+		<h1>Code Defenders</h1>
+		<h2>A Mutation Testing Game</h2>
+		<a  type="button" class="btn btn-default"  href="login">Login</a>
 	</div>
 
 	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->

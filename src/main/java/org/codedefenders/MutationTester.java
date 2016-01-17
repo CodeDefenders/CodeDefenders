@@ -1,13 +1,9 @@
-package org.gammut;
+package org.codedefenders;
 
-import static org.gammut.AntRunner.runAntTarget;
-import static org.gammut.Constants.JAVA_CLASS_EXT;
-import static org.gammut.Mutant.Equivalence.ASSUMED_YES;
-import static org.gammut.Mutant.Equivalence.PROVEN_NO;
-import static org.gammut.TargetExecution.Target.COMPILE_MUTANT;
-import static org.gammut.TargetExecution.Target.COMPILE_TEST;
-import static org.gammut.TargetExecution.Target.TEST_MUTANT;
-import static org.gammut.TargetExecution.Target.TEST_ORIGINAL;
+import static org.codedefenders.AntRunner.runAntTarget;
+import static org.codedefenders.Constants.JAVA_CLASS_EXT;
+import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -52,7 +48,7 @@ public class MutationTester {
 			String cFile = matchingFiles.get(0).getAbsolutePath();
 			newMutant = new Mutant(gameID, jFile, cFile);
 			newMutant.insert();
-			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), COMPILE_MUTANT, "SUCCESS", null);
+			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "SUCCESS", null);
 			newExec.insert();
 		} else {
 			// The mutant failed to compile
@@ -60,7 +56,7 @@ public class MutationTester {
 			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]"));
 			newMutant = new Mutant(gameID, jFile, null);
 			newMutant.insert();
-			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), COMPILE_MUTANT, "FAIL", message);
+			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "FAIL", message);
 			newExec.insert();
 		}
 		return newMutant;
@@ -87,7 +83,7 @@ public class MutationTester {
 			String cFile = matchingFiles.get(0).getAbsolutePath();
 			Test newTest = new Test(gameID, jFile, cFile);
 			newTest.insert();
-			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, COMPILE_TEST, "SUCCESS", null);
+			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);
 			newExec.insert();
 			return newTest;
 		} else {
@@ -96,7 +92,7 @@ public class MutationTester {
 			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]"));
 			Test newTest = new Test(gameID, jFile, null);
 			newTest.insert();
-			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, COMPILE_TEST, "FAIL", message);
+			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "FAIL", message);
 			newExec.insert();
 			return newTest;
 		}
@@ -116,21 +112,21 @@ public class MutationTester {
 			// If the test doesn't return error
 			if (resultArray[0].toLowerCase().contains("errors: 0")) {
 				// New Target execution recording successful test against original
-				TargetExecution newExec = new TargetExecution(t.getId(), 0, TEST_ORIGINAL, "SUCCESS", null);
+				TargetExecution newExec = new TargetExecution(t.getId(), 0, TargetExecution.Target.TEST_ORIGINAL, "SUCCESS", null);
 				newExec.insert();
 				return newExec.id;
 			} else {
 				// New target execution recording failed test against original due to error
 				// Not sure on what circumstances cause a junit error, return all streams
 				String message = resultArray[0] + " " + resultArray[1] + " " + resultArray[2];
-				TargetExecution newExec = new TargetExecution(t.getId(), 0, TEST_ORIGINAL, "ERROR", message);
+				TargetExecution newExec = new TargetExecution(t.getId(), 0, TargetExecution.Target.TEST_ORIGINAL, "ERROR", message);
 				newExec.insert();
 				return newExec.id;
 			}
 		} else {
 			// New target execution record failed test against original as it isn't valid
 			String message = "Test failed on the original class under test.";
-			TargetExecution newExec = new TargetExecution(t.getId(), 0, TEST_ORIGINAL, "FAIL", message);
+			TargetExecution newExec = new TargetExecution(t.getId(), 0, TargetExecution.Target.TEST_ORIGINAL, "FAIL", message);
 			newExec.insert();
 			return newExec.id;
 		}
@@ -154,16 +150,16 @@ public class MutationTester {
 			if (resultArray[0].toLowerCase().contains("errors: 0")) {
 				// If the test doesn't return any errors
 				// The test succeeded and a Target Execution for the mutant/test pairing is recorded. This means the test failed to detect the mutant
-				newExec = new TargetExecution(t.getId(), m.getId(), TEST_MUTANT, "SUCCESS", null);
+				newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "SUCCESS", null);
 			} else {
 				// New target execution recording failed test against mutant due to error
 				// Not sure on what circumstances cause a junit error, return all streams
 				String message = resultArray[0] + " " + resultArray[1] + " " + resultArray[2];
-				newExec = new TargetExecution(t.getId(), m.getId(), TEST_MUTANT, "ERROR", message);
+				newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "ERROR", message);
 			}
 		} else {
 			// The test failed and a Target Execution for the mutant/test pairing is recorded. The test detected the mutant.
-			newExec = new TargetExecution(t.getId(), m.getId(), TEST_MUTANT, "FAIL", null);
+			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "FAIL", null);
 		}
 		newExec.insert();
 		return newExec;

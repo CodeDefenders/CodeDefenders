@@ -1,6 +1,4 @@
-package org.gammut;
-
-import static org.gammut.Constants.LOGIN_VIEW_JSP;
+package org.codedefenders;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -17,7 +15,7 @@ public class LoginManager extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-		RequestDispatcher dispatcher = request.getRequestDispatcher(LOGIN_VIEW_JSP);
+		RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 		dispatcher.forward(request, response);
 	}
 
@@ -48,24 +46,24 @@ public class LoginManager extends HttpServlet {
 						response.sendRedirect("games");
 					} else {
 						messages.add("Could not create a user for you, sorry!");
-						RequestDispatcher dispatcher = request.getRequestDispatcher(LOGIN_VIEW_JSP);
+						RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 						dispatcher.forward(request, response);
 					}
 				} else {
 					messages.add("Username Is Already Taken");
-					RequestDispatcher dispatcher = request.getRequestDispatcher(LOGIN_VIEW_JSP);
+					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
 				}
 			} else {
 				messages.add("Your Two Password Entries Did Not Match");
-				RequestDispatcher dispatcher = request.getRequestDispatcher(LOGIN_VIEW_JSP);
+				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 				dispatcher.forward(request, response);
 			}
 		} else if (formType.equals("login")) {
 			User activeUser = DatabaseAccess.getUserForName(username);
 			if (activeUser == null) {
 				messages.add("User could not be retrieved from DB");
-				RequestDispatcher dispatcher = request.getRequestDispatcher(LOGIN_VIEW_JSP);
+				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 				dispatcher.forward(request, response);
 			} else {
 				String dbPassword = activeUser.password;
@@ -79,7 +77,7 @@ public class LoginManager extends HttpServlet {
 					response.sendRedirect("games");
 				} else {
 					messages.add("Username Does Not Exist Or Your Password Was Incorrect");
-					RequestDispatcher dispatcher = request.getRequestDispatcher(LOGIN_VIEW_JSP);
+					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
 				}
 			}
@@ -89,11 +87,11 @@ public class LoginManager extends HttpServlet {
 			session.invalidate();
 
 			messages.add("Successfully Logged Out");
-			RequestDispatcher dispatcher = request.getRequestDispatcher(LOGIN_VIEW_JSP);
+			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 			dispatcher.forward(request, response);
 		} else {
 			messages.add("POST To LoginManager Didn't Supply A FormType Somehow");
-			RequestDispatcher dispatcher = request.getRequestDispatcher(LOGIN_VIEW_JSP);
+			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 			dispatcher.forward(request, response);
 		}
 	}

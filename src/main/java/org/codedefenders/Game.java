@@ -1,6 +1,6 @@
-package org.gammut;
+package org.codedefenders;
 
-import static org.gammut.Mutant.Equivalence.PENDING_TEST;
+import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 
 import java.sql.Connection;
 import java.sql.ResultSet;

@@ -1,4 +1,4 @@
-WEBAPP := gammut
+WEBAPP := codedefenders
 
 CATALINA_HOME ?= /Users/jmr/lib/tomcat7
 ifeq (,$(wildcard ${CATALINA_HOME}))

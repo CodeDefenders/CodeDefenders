@@ -19,7 +19,8 @@
 
 <body>
 
-	<%@ page import="org.gammut.*" %>
+	<%@ page import="org.codedefenders.*" %>
+	<%@ page import="org.codedefenders.Game" %>
 	<% Game game = (Game) session.getAttribute("game"); %>
 
 	<nav class="navbar navbar-inverse navbar-fixed-top">

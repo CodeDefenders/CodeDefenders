@@ -1,7 +1,4 @@
-package org.gammut;
-
-import org.gammut.Mutant.Equivalence;
-import org.gammut.TargetExecution.Target;
+package org.codedefenders;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -13,7 +10,7 @@ import java.util.ArrayList;
 public class DatabaseAccess {
 
 	public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	public static final String DB_URL = "jdbc:mysql://localhost/gammut";
+	public static final String DB_URL = "jdbc:mysql://localhost/codedefenders";
 
 	//  Database credentials
 	public static final String USER = "root";
@@ -386,7 +383,7 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
-						rs.getBoolean("Alive"), Equivalence.valueOf(rs.getString("Equivalent")),
+						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
 						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"));
 				mutList.add(newMutant);
 			}
@@ -434,7 +431,7 @@ public class DatabaseAccess {
 			if (rs.next()) {
 				newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
-						rs.getBoolean("Alive"), Equivalence.valueOf(rs.getString("Equivalent")),
+						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
 						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"));
 			}
 
@@ -534,7 +531,7 @@ public class DatabaseAccess {
 
 			while (rs.next()) {
 				TargetExecution newExecution = new TargetExecution(rs.getInt("TargetExecution_ID"), rs.getInt("Test_ID"),
-						rs.getInt("Mutant_ID"), Target.valueOf(rs.getString("Target")),
+						rs.getInt("Mutant_ID"), TargetExecution.Target.valueOf(rs.getString("Target")),
 						rs.getString("Status"), rs.getString("Message"), rs.getString("Timestamp"));
 				executionList.add(newExecution);
 			}
@@ -571,12 +568,12 @@ public class DatabaseAccess {
 		return getTargetExecutionSQL(sql);
 	}
 
-	public static TargetExecution getTargetExecutionForTest(Test test, Target target) {
+	public static TargetExecution getTargetExecutionForTest(Test test, TargetExecution.Target target) {
 		String sql = String.format("SELECT * FROM targetexecutions WHERE Test_ID='%d' AND Target='%s';", test.getId(), target.name());
 		return getTargetExecutionSQL(sql);
 	}
 
-	public static TargetExecution getTargetExecutionForMutant(Mutant mutant, Target target) {
+	public static TargetExecution getTargetExecutionForMutant(Mutant mutant, TargetExecution.Target target) {
 		String sql = String.format("SELECT * FROM targetexecutions WHERE Mutant_ID='%d' AND Target='%s';", mutant.getId(), target.name());
 		return getTargetExecutionSQL(sql);
 	}
@@ -592,7 +589,7 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 			if (rs.next()) {
 				TargetExecution targetExecution = new TargetExecution(rs.getInt("TargetExecution_ID"), rs.getInt("Test_ID"),
-						rs.getInt("Mutant_ID"), Target.valueOf(rs.getString("Target")),
+						rs.getInt("Mutant_ID"), TargetExecution.Target.valueOf(rs.getString("Target")),
 						rs.getString("Status"), rs.getString("Message"), rs.getString("Timestamp"));
 				stmt.close();
 				conn.close();

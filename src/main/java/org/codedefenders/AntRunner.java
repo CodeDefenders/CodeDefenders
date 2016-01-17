@@ -1,4 +1,4 @@
-package org.gammut;
+package org.codedefenders;
 
 import javax.servlet.ServletContext;
 import java.io.BufferedReader;

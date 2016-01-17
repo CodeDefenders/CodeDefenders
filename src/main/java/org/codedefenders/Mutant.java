@@ -1,8 +1,8 @@
-package org.gammut;
+package org.codedefenders;
 
-import static org.gammut.Mutant.Equivalence.ASSUMED_YES;
-import static org.gammut.Mutant.Equivalence.DECLARED_YES;
-import static org.gammut.Mutant.Equivalence.PROVEN_NO;
+import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.Mutant.Equivalence.DECLARED_YES;
+import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 
 import difflib.Chunk;
 import difflib.Delta;

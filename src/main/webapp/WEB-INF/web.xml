@@ -19,7 +19,7 @@
 
     <servlet>
         <servlet-name>loginManager</servlet-name>
-        <servlet-class>org.gammut.LoginManager</servlet-class>
+        <servlet-class>org.codedefenders.LoginManager</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>loginManager</servlet-name>
@@ -28,7 +28,7 @@
 
     <servlet>
         <servlet-name>gameSelectionManager</servlet-name>
-        <servlet-class>org.gammut.GameSelectionManager</servlet-class>
+        <servlet-class>org.codedefenders.GameSelectionManager</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>gameSelectionManager</servlet-name>
@@ -37,7 +37,7 @@
 
     <servlet>
         <servlet-name>uploadManager</servlet-name>
-        <servlet-class>org.gammut.UploadManager</servlet-class>
+        <servlet-class>org.codedefenders.UploadManager</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>uploadManager</servlet-name>
@@ -46,7 +46,7 @@
 
     <servlet>
         <servlet-name>gameManager</servlet-name>
-        <servlet-class>org.gammut.GameManager</servlet-class>
+        <servlet-class>org.codedefenders.GameManager</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>gameManager</servlet-name>
@@ -55,7 +55,7 @@
 
     <servlet>
         <servlet-name>updateClasses</servlet-name>
-        <servlet-class>org.gammut.UpdateAvailableClasses</servlet-class>
+        <servlet-class>org.codedefenders.UpdateAvailableClasses</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>updateClasses</servlet-name>
@@ -118,7 +118,7 @@
 
     <filter>
         <filter-name>loginFilter</filter-name>
-        <filter-class>org.gammut.LoginFilter</filter-class>
+        <filter-class>org.codedefenders.LoginFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>loginFilter</filter-name>

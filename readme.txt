@@ -1,4 +1,4 @@
-Steps for running the GamMut Web App
+Steps for running Code Defenders
 
 -- PREREQUISITES ON LOCAL MACHINE --
 
@@ -20,23 +20,23 @@ $ make
 
 Alternatively:
 
-1. Compile all the Java Code in the GamMut directory into WEB-INF/classes:
+1. Compile all the Java Code in the CodeDefenders directory into WEB-INF/classes:
 $ javac *.java -d WEB-INF/classes
 
 2. Package the project as a web archive:
-$ jar cvf gammut.war html WEB-INF
+$ jar cvf codedefenders.war html WEB-INF
 
-3. Store the gammut.war web archive file in the apache-tomcat-<version no.>\webapps folder
+3. Store the codedefenders.war web archive file in the apache-tomcat-<version no.>\webapps folder
 
 4. Ensure the Tomcat Server is running
 (Assuming env variables set up as in tomcat setup guide, command is "%CATALINA_HOME%\bin\startup.bat" on windows)
 
 5. Once the server is running, the system can be accessed at:
 
-localhost:8080/gammut/intro
-localhost:8080/gammut/attacker
-localhost:8080/gammut/defender
-localhost:8080/gammut/scores
+localhost:8080/intro
+localhost:8080/attacker
+localhost:8080/defender
+localhost:8080/scores
 
 -- EXPLANATION OF THE STRUCTURE OF THE PROJECT --
 

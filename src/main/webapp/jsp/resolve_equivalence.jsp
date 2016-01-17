@@ -38,7 +38,10 @@
 </head>
 <body>
 
-<%@ page import="org.gammut.*,java.io.*, java.util.*" %>
+<%@ page import="org.codedefenders.*,java.io.*, java.util.*" %>
+<%@ page import="org.codedefenders.Test" %>
+<%@ page import="org.codedefenders.Mutant" %>
+<%@ page import="org.codedefenders.Game" %>
 <% Game game = (Game) session.getAttribute("game"); %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -49,7 +52,7 @@
 		</div>
 		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
 			<ul class="nav navbar-nav navbar-left">
-				<a class="navbar-brand" href="games">GamMut</a>
+				<a class="navbar-brand" href="games">Code Defenders</a>
 				<li class="navbar-text">ATK: <%= game.getAttackerScore() %> | DEF: <%= game.getDefenderScore() %></li>
 				<li class="navbar-text">Round <%= game.getCurrentRound() %></li>
 				<% if (game.getAliveMutants().size() == 1) {%>

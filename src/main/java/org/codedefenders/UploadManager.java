@@ -1,7 +1,4 @@
-package org.gammut;
-
-import static org.gammut.Constants.CUTS_DIR;
-import static org.gammut.Constants.FILE_SEPARATOR;
+package org.codedefenders;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -67,7 +64,7 @@ public class UploadManager extends HttpServlet {
 						System.out.println("Uploading new CUT: " + fileName);
 
 						InputStream fileContent = item.getInputStream();
-						File targetFile = new File(getServletContext().getRealPath(CUTS_DIR + FILE_SEPARATOR + fileName));
+						File targetFile = new File(getServletContext().getRealPath(Constants.CUTS_DIR + Constants.FILE_SEPARATOR + fileName));
 						FileUtils.copyInputStreamToFile(fileContent, targetFile);
 						String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
 						String classFileName = compileNewCUT(getServletContext(), fileName);
@@ -102,7 +99,7 @@ public class UploadManager extends HttpServlet {
 		if (resultArray[0].toLowerCase().contains("build successful")) {
 			// If the input stream returned a 'successful build' message, the CUT compiled correctly
 			System.out.println("Compiled uploaded CUT successfully");
-			File f = new File(context.getRealPath(CUTS_DIR));
+			File f = new File(context.getRealPath(Constants.CUTS_DIR));
 			final String compiledClassName = FilenameUtils.getBaseName(className) + Constants.JAVA_CLASS_EXT;
 			LinkedList<File> matchingFiles = (LinkedList)FileUtils.listFiles(f, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
 			if (! matchingFiles.isEmpty())

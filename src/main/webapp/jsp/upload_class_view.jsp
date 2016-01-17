@@ -40,7 +40,7 @@
 
 <body>
 
-<%@ page import="org.gammut.*,java.io.*" %>
+<%@ page import="org.codedefenders.*,java.io.*" %>
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -49,7 +49,7 @@
 		</div>
 		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
 			<ul class="nav navbar-nav">
-				<li><a class="navbar-brand" href="games">GamMut</a></li>
+				<li><a class="navbar-brand" href="games">Code Defenders</a></li>
 				<li><a href="games/user">My Games</a></li>
 				<li><a href="games/open">Open Games</a></li>
 				<li class="active"><a href="games/create">Create Game</a></li>
