@@ -111,7 +111,7 @@ public class GameManager extends HttpServlet {
 								activeGame.update();
 								Mutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
 								if (mutantAfterTest.isAlive()) {
-									messages.add("Your test failed to kill the mutant!");
+									messages.add("Your test did not kill the mutant!");
 								}
 								response.sendRedirect("play");
 								responseCommitted = true;
@@ -126,10 +126,12 @@ public class GameManager extends HttpServlet {
 						} else {
 							System.out.println("testOriginalTarget: " + testOriginalTarget);
 							messages.add("An error occured while executing your test against the CUT.");
+							messages.add(testOriginalTarget.message);
 						}
 					} else {
 						System.out.println("compileTestTarget: " + compileTestTarget);
 						messages.add("An error occured while compiling your test.");
+						messages.add(compileTestTarget.message);
 					}
 				} else if (request.getParameter("acceptEquivalent") != null) { // If the user didnt want to supply a test
 					logger.debug("Equivalence accepted");
@@ -201,8 +203,10 @@ public class GameManager extends HttpServlet {
 					if (testOriginalTarget.status.equals("SUCCESS")) {
 						messages.add("Your Test Was Compiled Successfully");
 						MutationTester.runTestOnAllMutants(getServletContext(), activeGame, newTest, messages);
-					} else
+					} else {
 						messages.add("Oh no! Your test failed on the original class under test. You lose your turn.");
+						messages.add(testOriginalTarget.message);
+					}
 					activeGame.endTurn();
 					activeGame.update();
 				} else {
