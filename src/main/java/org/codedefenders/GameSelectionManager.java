@@ -53,7 +53,7 @@ public class GameSelectionManager extends HttpServlet {
 					jGame.setDefenderId(uid);
 				}
 
-				jGame.setState("IN PROGRESS");
+				jGame.setState(Game.State.ACTIVE);
 				jGame.setActivePlayer("ATTACKER");
 
 				jGame.update();

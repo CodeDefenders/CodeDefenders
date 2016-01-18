@@ -21,10 +21,14 @@ public class Game {
 	private int finalRound;
 
 	private String activePlayer;
-	private String state;
 
-	public static enum Level {EASY, MEDIUM, HARD};
+	private State state;
+
 	private Level level;
+
+	public enum State { CREATED, ACTIVE, FINISHED };
+	public enum Level { EASY, MEDIUM, HARD };
+	public enum Mode { SINGLE, DUEL, PARTY };
 
 	public Game(int classId, int userId, int maxRounds, String role, Level level) {
 		this.classId = classId;
@@ -39,12 +43,12 @@ public class Game {
 		this.finalRound = maxRounds;
 
 		this.activePlayer = "NEITHER";
-		this.state = "CREATED";
+		this.state = State.CREATED;
 
 		this.level = level;
 	}
 
-	public Game(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, String activePlayer, String state, Level level) {
+	public Game(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, String activePlayer, State state, Level level) {
 		this.id = id;
 		this.attackerId = attackerId;
 		this.defenderId = defenderId;
@@ -113,12 +117,12 @@ public class Game {
 		activePlayer = ap;
 	}
 
-	public String getState() {
+	public State getState() {
 		return state;
 	}
 
-	// CREATED, IN PROGRESS, FINISHED
-	public void setState(String s) {
+	// CREATED, ACTIVE, FINISHED
+	public void setState(State s) {
 		state = s;
 	}
 
@@ -209,8 +213,8 @@ public class Game {
 			activePlayer = "ATTACKER";
 			if (currentRound < finalRound) {
 				currentRound++;
-			} else if ((currentRound == finalRound) && (state.equals("IN PROGRESS"))) {
-				state = "FINISHED";
+			} else if ((currentRound == finalRound) && (state.equals(State.ACTIVE))) {
+				state = State.FINISHED;
 			}
 		}
 	}
@@ -282,7 +286,7 @@ public class Game {
 			// Get all rows from the database which have the chosen username
 			stmt = conn.createStatement();
 			sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActivePlayer='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
-					attackerId, defenderId, currentRound, finalRound, activePlayer, state, level.name(), id);
+					attackerId, defenderId, currentRound, finalRound, activePlayer, state.name(), level.name(), id);
 			stmt.execute(sql);
 			return true;
 

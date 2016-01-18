@@ -73,7 +73,7 @@
     int defId;
     for (Game g : DatabaseAccess.getGamesForUser(uid)) {
 
-      if (g.getState().equals("FINISHED")) {
+      if (g.getState().equals(Game.State.FINISHED)) {
           atkId = g.getAttackerId();
           defId = g.getDefenderId();
 

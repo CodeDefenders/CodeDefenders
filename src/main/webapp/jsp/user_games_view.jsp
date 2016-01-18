@@ -76,8 +76,8 @@
       atkName = null;
       defName = null;
 
-      if (g.getState().equals("FINISHED")) {continue;} // Dont display in active games if finished
-      if (g.getState().equals("IN PROGRESS")) {canEnter = true;} // If it is in progress you can enter.
+      if (g.getState().equals(Game.State.FINISHED)) {continue;} // Dont display in active games if finished
+      if (g.getState().equals(Game.State.ACTIVE)) {canEnter = true;} // If it is in progress you can enter.
       else {canEnter = false;} // Otherwise, you can see it but you cant enter.
 
       if (g.getAttackerId() != 0) {

@@ -20,6 +20,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
+import static org.codedefenders.Constants.FILE_SEPARATOR;
+import static org.codedefenders.Constants.JAVA_SOURCE_EXT;
+import static org.codedefenders.Constants.TESTS_DIR;
+import static org.codedefenders.Constants.TEST_PREFIX;
+
 public class GameManager extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory.getLogger(GameManager.class);
@@ -38,7 +43,7 @@ public class GameManager extends HttpServlet {
 		session.setAttribute("game", activeGame);
 
 		// If the game is finished, redirect to the score page.
-		if (activeGame.getState().equals("FINISHED")) {
+		if (activeGame.getState().equals(Game.State.FINISHED)) {
 			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.SCORE_VIEW_JSP);
 			dispatcher.forward(request, response);
 		} else if (activeGame.getAttackerId() == uid) {
@@ -116,7 +121,6 @@ public class GameManager extends HttpServlet {
 								response.sendRedirect("play");
 								responseCommitted = true;
 							} else {
-								System.out.println("Not running EquivalenceTest, mutant already dead?");
 								activeGame.passPriority();
 								activeGame.update();
 								messages.add("Yay, your test killed the muntant!");
@@ -243,13 +247,13 @@ public class GameManager extends HttpServlet {
 			return null;
 
 		// Setup folder the files will go in
-		File newMutantDir = getNextSubDir(getServletContext().getRealPath(Constants.MUTANTS_DIR + Constants.FILE_SEPARATOR + gid));
+		File newMutantDir = getNextSubDir(getServletContext().getRealPath(Constants.MUTANTS_DIR + FILE_SEPARATOR + gid));
 
 		System.out.println("NewMutantDir: " + newMutantDir.getAbsolutePath());
 		System.out.println("Class Mutated: " + classMutated.getName() + "(basename: " + classMutatedBaseName +")");
 
 		// Write the Mutant String into a java file
-		String mutantFileName = newMutantDir + Constants.FILE_SEPARATOR + classMutatedBaseName + Constants.JAVA_SOURCE_EXT;
+		String mutantFileName = newMutantDir + FILE_SEPARATOR + classMutatedBaseName + JAVA_SOURCE_EXT;
 		File mutantFile = new File(mutantFileName);
 		FileWriter fw = new FileWriter(mutantFile);
 		BufferedWriter bw = new BufferedWriter(fw);
@@ -272,11 +276,11 @@ public class GameManager extends HttpServlet {
 		Arrays.sort(directories);
 		String newPath;
 		if (directories.length == 0)
-			newPath = folder.getAbsolutePath() + Constants.FILE_SEPARATOR + "1";
+			newPath = folder.getAbsolutePath() + FILE_SEPARATOR + "1";
 		else {
 			File lastDir = new File(directories[directories.length - 1]);
 			int newIndex = Integer.parseInt(lastDir.getName()) + 1;
-			newPath = path + Constants.FILE_SEPARATOR + newIndex;
+			newPath = path + FILE_SEPARATOR + newIndex;
 		}
 		File newDir = new File(newPath);
 		newDir.mkdirs();
@@ -297,9 +301,9 @@ public class GameManager extends HttpServlet {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		File newTestDir = getNextSubDir(getServletContext().getRealPath(Constants.TESTS_DIR + Constants.FILE_SEPARATOR + gid));
+		File newTestDir = getNextSubDir(getServletContext().getRealPath(TESTS_DIR + FILE_SEPARATOR + gid));
 
-		String javaFile = newTestDir + Constants.FILE_SEPARATOR + Constants.TEST_PREFIX + classUnderTest.getBaseName() + Constants.JAVA_SOURCE_EXT;
+		String javaFile = newTestDir + FILE_SEPARATOR + TEST_PREFIX + classUnderTest.getBaseName() + JAVA_SOURCE_EXT;
 		File testFile = new File(javaFile);
 		FileWriter testWriter = new FileWriter(testFile);
 		BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);

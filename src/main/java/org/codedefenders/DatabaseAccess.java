@@ -225,7 +225,7 @@ public class DatabaseAccess {
 
 			if (rs.next()) {
 				Game gameRecord = new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
-						rs.getInt("CurrentRound"), rs.getInt("FinalRound"), rs.getString("ActivePlayer"), rs.getString("State"),
+						rs.getInt("CurrentRound"), rs.getInt("FinalRound"), rs.getString("ActivePlayer"), Game.State.valueOf(rs.getString("State")),
 						Game.Level.valueOf(rs.getString("Level")));
 
 				stmt.close();
@@ -271,8 +271,9 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			while (rs.next()) {
-				gameList.add(new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
-						rs.getInt("CurrentRound"), rs.getInt("FinalRound"), rs.getString("ActivePlayer"), rs.getString("State"),
+				gameList.add(new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
+						rs.getInt("Class_ID"), rs.getInt("CurrentRound"), rs.getInt("FinalRound"),
+						rs.getString("ActivePlayer"), Game.State.valueOf(rs.getString("State")),
 						Game.Level.valueOf(rs.getString("Level"))));
 			}
 
@@ -322,8 +323,9 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			while (rs.next()) {
-				gameList.add(new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
-						rs.getInt("CurrentRound"), rs.getInt("FinalRound"), rs.getString("ActivePlayer"), rs.getString("State"),
+				gameList.add(new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
+						rs.getInt("Class_ID"), rs.getInt("CurrentRound"), rs.getInt("FinalRound"),
+						rs.getString("ActivePlayer"), Game.State.valueOf(rs.getString("State")),
 						Game.Level.valueOf(rs.getString("Level"))));
 			}
 
