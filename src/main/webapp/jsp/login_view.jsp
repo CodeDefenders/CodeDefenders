@@ -17,7 +17,7 @@
 
 <body>
 
-  <%@ page import="org.codedefenders.*,java.io.*, java.util.*" %>
+  <%@ page import="java.util.*" %>
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
     		<div class="navbar-header">

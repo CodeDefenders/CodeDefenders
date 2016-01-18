@@ -19,7 +19,6 @@
 
 <body>
 
-	<%@ page import="org.codedefenders.*" %>
 	<%@ page import="org.codedefenders.Game" %>
 	<% Game game = (Game) session.getAttribute("game"); %>
 

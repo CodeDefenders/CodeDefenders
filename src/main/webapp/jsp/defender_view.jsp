@@ -40,10 +40,11 @@
 </head>
 
 <body>
-<%@ page import="org.codedefenders.*,java.io.*, java.util.*" %>
+<%@ page import="java.util.*" %>
 <%@ page import="org.codedefenders.Test" %>
 <%@ page import="org.codedefenders.Mutant" %>
 <%@ page import="org.codedefenders.Game" %>
+<%@ page import="org.codedefenders.Constants" %>
 <% Game game = (Game) session.getAttribute("game"); %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -64,7 +65,7 @@
 				<% }%>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<% if (game.getActivePlayer().equals("DEFENDER")) {%>
+				<% if (game.getState().equals(Game.State.ACTIVE) && game.getActivePlayer().equals("DEFENDER")) {%>
 				<button type="submit" class="btn btn-default navbar-btn" form="def">Defend!</button>
 				<%}%>
 			</ul>
@@ -83,6 +84,32 @@
 	<% } %>
 </div>
 <%	} %>
+
+<%
+	if (game.getState().equals(Game.State.FINISHED)) {
+		String message = Constants.DRAW_MESSAGE;
+		if (game.getAttackerScore() > game.getDefenderScore())
+			message = Constants.LOSER_MESSAGE;
+		else if (game.getDefenderScore() > game.getAttackerScore())
+			message = Constants.WINNER_MESSAGE;
+%>
+<div id="finishedModal" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">Game Over</h4>
+			</div>
+			<div class="modal-body">
+				<p><%=message%></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<%  } %>
 
 <div class="row-fluid">
 	<div class="col-md-6" id="info">
@@ -167,7 +194,7 @@
 							</div>
 						</td>
 						<td >
-							<% if (game.getActivePlayer().equals("DEFENDER")) {%>
+							<% if (game.getState().equals(Game.State.ACTIVE) && game.getActivePlayer().equals("DEFENDER")) {%>
 							<form id="equiv" action="play" method="post">
 								<input type="hidden" name="formType" value="claimEquivalent">
 								<input type="hidden" name="mutantId" value="<%=m.getId()%>">
@@ -293,6 +320,7 @@
 			editorDiff.setSize("100%", 500);
 		}
 	});
+	$('#finishedModal').modal('show');
 </script>
 </body>
 </html>

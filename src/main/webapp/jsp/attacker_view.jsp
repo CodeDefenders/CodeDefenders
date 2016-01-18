@@ -40,10 +40,12 @@
 </head>
 
 <body>
-<%@ page import="org.codedefenders.*,java.io.*, java.util.*" %>
+<%@ page import="java.util.*" %>
 <%@ page import="org.codedefenders.Test" %>
 <%@ page import="org.codedefenders.Mutant" %>
 <%@ page import="org.codedefenders.Game" %>
+<%@ page import="org.codedefenders.Constants" %>
+<%@ page import="static org.codedefenders.Game.State.ACTIVE" %>
 <% Game game = (Game) session.getAttribute("game"); %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -64,7 +66,7 @@
 				<% }%>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<% if (game.getActivePlayer().equals("ATTACKER")) {%>
+				<% if (game.getState().equals(ACTIVE) && game.getActivePlayer().equals("ATTACKER")) {%>
 				<button type="submit" class="btn btn-default navbar-btn" form="atk">Attack!</button><%}%>
 			</ul>
 		</div>
@@ -83,7 +85,33 @@
 </div>
 <%	} %>
 
-<div class="row-fluid">
+<%
+	if (game.getState().equals(Game.State.FINISHED)) {
+		String message = Constants.DRAW_MESSAGE;
+ 	    if (game.getAttackerScore() > game.getDefenderScore())
+	        message = Constants.WINNER_MESSAGE;
+		else if (game.getDefenderScore() > game.getAttackerScore())
+	        message = Constants.LOSER_MESSAGE;
+%>
+<div id="finishedModal" class="modal fade">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">Game Over</h4>
+			</div>
+			<div class="modal-body">
+				<p><%=message%></p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<%  } %>
+
+	<div class="row-fluid">
 	<div id="info" class="col-md-6">
 
 		<h2>Mutants</h2>
@@ -260,6 +288,7 @@
 			editorDiff.setSize("100%", 500);
 		}
 	});
+	$('#finishedModal').modal('show');
 </script>
 </body>
 </html>

@@ -43,11 +43,7 @@ public class GameManager extends HttpServlet {
 		session.setAttribute("game", activeGame);
 
 		// If the game is finished, redirect to the score page.
-		if (activeGame.getState().equals(Game.State.FINISHED)) {
-			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.SCORE_VIEW_JSP);
-			dispatcher.forward(request, response);
-		} else if (activeGame.getAttackerId() == uid) {
-			System.out.println("user is attacker");
+		if (activeGame.getAttackerId() == uid) {
 			ArrayList<Mutant> equivMutants = activeGame.getMutantsMarkedEquivalent();
 			if (equivMutants.isEmpty()) {
 				System.out.println("Redirecting to attacker page");
