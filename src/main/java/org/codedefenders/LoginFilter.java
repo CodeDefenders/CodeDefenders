@@ -31,7 +31,7 @@ public class LoginFilter implements Filter {
 				chain.doFilter(request, response);
 			} else {
 				HttpServletResponse httpResp = (HttpServletResponse) response;
-				httpResp.sendRedirect("login");
+				httpResp.sendRedirect("/login");
 			}
 		}
 	}
