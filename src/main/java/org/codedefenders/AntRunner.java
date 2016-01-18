@@ -33,7 +33,7 @@ public class AntRunner {
 		String antHome = (String) env.get("ANT_HOME");
 		if (antHome == null) {
 			System.err.println("ANT_HOME undefined.");
-			antHome = System.getProperty("ant.home", "/usr");
+			antHome = System.getProperty("ant.home", "/usr/local");
 		}
 
 		pb.command(antHome + "/bin/ant", target, // "-v", "-d", for verbose, debug
