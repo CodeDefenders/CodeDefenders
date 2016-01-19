@@ -38,10 +38,11 @@
 </head>
 <body>
 
-<%@ page import="org.codedefenders.*,java.io.*, java.util.*" %>
+<%@ page import="java.util.*" %>
 <%@ page import="org.codedefenders.Test" %>
 <%@ page import="org.codedefenders.Mutant" %>
 <%@ page import="org.codedefenders.Game" %>
+<%@ page import="static org.codedefenders.Game.State.ACTIVE" %>
 <% Game game = (Game) session.getAttribute("game"); %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -61,6 +62,13 @@
 				<% } else {%>
 				<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants Alive</li>
 				<% }%>
+				<li class="navbar-text">
+					<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
+						<span class="label label-primary turn-badge">Your turn</span>
+					<% } else { %>
+						<span class="label label-default turn-badge">Waiting</span>
+					<% } %>
+				</li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li></li>

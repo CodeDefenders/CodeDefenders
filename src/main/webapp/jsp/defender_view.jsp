@@ -45,6 +45,7 @@
 <%@ page import="org.codedefenders.Mutant" %>
 <%@ page import="org.codedefenders.Game" %>
 <%@ page import="org.codedefenders.Constants" %>
+<%@ page import="static org.codedefenders.Game.State.ACTIVE" %>
 <% Game game = (Game) session.getAttribute("game"); %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -64,6 +65,13 @@
 				<% } else {%>
 				<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants Alive</li>
 				<% }%>
+				<li class="navbar-text">
+					<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
+						<span class="label label-primary turn-badge">Your turn</span>
+					<% } else { %>
+						<span class="label label-default turn-badge">Waiting</span>
+					<% } %>
+				</li>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li>
@@ -127,7 +135,7 @@
 	</div> <!-- col-md6 left -->
 	<div class="col-md-6" id="right-top">
 		<h2> Write your JUnit test here
-			<% if (game.getState().equals(Game.State.ACTIVE) && game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
+			<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
 			<button type="submit" class="btn btn-primary btn-right" form="def">Defend!</button>
 			<%}%>
 		</h2>
@@ -216,7 +224,7 @@
 							</div>
 						</td>
 						<td >
-							<% if (game.getState().equals(Game.State.ACTIVE) && game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
+							<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
 							<form id="equiv" action="play" method="post">
 								<input type="hidden" name="formType" value="claimEquivalent">
 								<input type="hidden" name="mutantId" value="<%=m.getId()%>">

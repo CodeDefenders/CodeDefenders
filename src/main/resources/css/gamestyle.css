@@ -54,10 +54,8 @@ body {
     float: right;
 }
 
-.turn:hover {
-	color: #FFF;
-	background-color: #65B63D;
-	border-color: #ADADAD;
+.turn-badge {
+	font-size: 10pt;
 }
 
 /* Sign-in form */
