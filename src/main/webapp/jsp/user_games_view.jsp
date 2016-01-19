@@ -17,7 +17,6 @@
 
 <body>
 
-  <%@ page import="org.codedefenders.*,java.io.*" %>
   <%@ page import="org.codedefenders.DatabaseAccess" %>
   <%@ page import="org.codedefenders.Game" %>
   <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -89,7 +88,7 @@
       }
 
 	    int turnId = g.getAttackerId();
-		if (g.getActiveRole().equals("DEFENDER"))
+		if (g.getActiveRole().equals(Game.Role.DEFENDER))
 			turnId = g.getDefenderId();
 
       if (atkName == null) {atkName = "Empty";}
