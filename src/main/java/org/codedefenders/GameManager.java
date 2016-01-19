@@ -183,16 +183,16 @@ public class GameManager extends HttpServlet {
 				Mutant newMutant = createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid);
 				if (newMutant != null) {
 					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
-					if (compileMutantTarget.status.equals("SUCCESS")) {
+					if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
 						messages.add("Your mutant was compiled successfully.");
 						MutationTester.runAllTestsOnMutant(getServletContext(), activeGame, newMutant, messages);
 						activeGame.endTurn();
 						activeGame.update();
 					} else {
 						messages.add("Your mutant failed to compile. Try again.");
+						if (compileMutantTarget != null && compileMutantTarget.message != null && ! compileMutantTarget.message.isEmpty())
+							messages.add(compileMutantTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
-						newMutant.kill();
-						messages.add(compileMutantTarget.message);
 					}
 				} else {
 					// Create Mutant failed because there were no differences between mutant and original, returning -1
@@ -213,7 +213,7 @@ public class GameManager extends HttpServlet {
 				if (compileTestTarget.status.equals("SUCCESS")) {
 					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 					if (testOriginalTarget.status.equals("SUCCESS")) {
-						messages.add("Your Test Was Compiled Successfully");
+						messages.add("Your test was compiled successfully.");
 						MutationTester.runTestOnAllMutants(getServletContext(), activeGame, newTest, messages);
 					} else if (testOriginalTarget.status.equals("FAIL")) {
 						messages.add("Oh no! Your test failed on the original class under test. You lose your turn.");

@@ -44,11 +44,12 @@ public class Mutant {
 	// MUTANT CREATION 01: FROM USER
 	// Constructor to create a Mutant from a user created Java File and the compiled Class File.
 	// This is creating a new mutant.
-	public Mutant(int gameId, String jFile, String cFile, int ownerId) {
+	public Mutant(int gameId, String jFile, String cFile, boolean alive, int ownerId) {
 		this.gameId = gameId;
 		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
 		this.javaFile = jFile;
 		this.classFile = cFile;
+		this.alive = alive;
 		this.equivalent = Equivalence.ASSUMED_NO;
 		this.ownerId = ownerId;
 	}
@@ -57,10 +58,8 @@ public class Mutant {
 	// Constructor to create a Mutant from a MySQL Record in the mutants table.
 	// This is getting information for an existing mutant.
 	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int ownerId) {
-		this(gid, jFile, cFile, ownerId);
-
+		this(gid, jFile, cFile, alive, ownerId);
 		this.id = mid;
-		this.alive = alive;
 		this.equivalent = equiv;
 		this.roundCreated = rCreated;
 		this.roundKilled = rKilled;

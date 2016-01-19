@@ -35,7 +35,7 @@ public class MutationTester {
 				if (mutants.size() == 1)
 					messages.add("Great, your test killed the last mutant!");
 				else
-					messages.add("Good job, your test killed a mutants!");
+					messages.add("Good job, your test killed a mutant!");
 			} else {
 				messages.add(String.format("Awesome! Your test killed \"%d mutants!", killed));
 			}

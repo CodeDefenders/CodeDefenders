@@ -13,19 +13,19 @@
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-cut" description="compile a class under test">
-		<javac srcdir="${src.dir}" destdir="${src.dir}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" listfiles="yes"  fork="yes">
+		<javac srcdir="${src.dir}" destdir="${src.dir}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" listfiles="yes">
 			<include name="${classname}" />
 		</javac>
 	</target>
 
 	<!-- requires mutant to compile only -->
 	<target name="compile-mutant" description="compile a single mutant">
-		<javac srcdir="${mutant.file}" destdir="${mutant.file}" target="1.7" source="1.7" includeantruntime="false" fork="yes"/>
+		<javac srcdir="${mutant.file}" destdir="${mutant.file}" target="1.7" source="1.7" includeantruntime="false"/>
 	</target>
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-test" description="compile a single test">
-		<javac srcdir="${test.file}" destdir="${test.file}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" fork="yes"/>
+		<javac srcdir="${test.file}" destdir="${test.file}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false"/>
 	</target>
 
 	<target name="echo-path" description="Echo test path">
@@ -35,14 +35,14 @@
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="test-original" depends="echo-path" description="run test on original code to ensure it passes">
-		<junit printsummary="true" fork="no" haltonfailure="true" >
+		<junit printsummary="true" haltonfailure="false"  includeantruntime="false">
 			<!-- Original class should be in the same folder as being tested -->
 			<classpath>
 				<pathelement location="sources"/>
 				<pathelement location="${test.file}"/>
 				<pathelement path="${test.cp}"/>
-				<pathelement path="../lib/junit-4.12.jar"/>
-				<pathelement path="../lib/hamcrest-all-1.3.jar"/>
+				<pathelement location="../lib/junit-4.12.jar"/>
+				<pathelement location="../lib/hamcrest-all-1.3.jar"/>
 				<pathelement path="sources"/>
 				<pathelement path="${test.file}"/>
 			</classpath>
@@ -52,7 +52,7 @@
 
 	<!-- requires test, mutant, and the name of the class -->
 	<target name="test-mutant" description="run test on mutant to see if test fails">
-		<junit printsummary="withOutAndErr" haltonfailure="false">
+		<junit printsummary="withOutAndErr" haltonfailure="false" includeantruntime="false">
 
 			<!-- Sets the content of the classpath to the mutant -->
 			<classpath>

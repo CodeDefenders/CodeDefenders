@@ -142,7 +142,6 @@ public class AntRunner {
 		String[] resultArray = runAntTarget(context, "compile-mutant", dir.getAbsolutePath(), null, classMutated.getBaseName(), null);
 		System.out.println("Compilation result:");
 		System.out.println(Arrays.toString(resultArray));
-		System.out.println("compiling mutant");
 
 		Mutant newMutant = null;
 		// If the input stream returned a 'successful build' message, the mutant compiled correctly
@@ -153,7 +152,7 @@ public class AntRunner {
 			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
 			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
 			String cFile = matchingFiles.get(0).getAbsolutePath();
-			newMutant = new Mutant(gameID, jFile, cFile, ownerId);
+			newMutant = new Mutant(gameID, jFile, cFile, true, ownerId);
 			newMutant.insert();
 			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "SUCCESS", null);
 			newExec.insert();
@@ -161,7 +160,7 @@ public class AntRunner {
 			// The mutant failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
 			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]"));
-			newMutant = new Mutant(gameID, jFile, null, ownerId);
+			newMutant = new Mutant(gameID, jFile, null, false, ownerId);
 			newMutant.insert();
 			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "FAIL", message);
 			newExec.insert();
