@@ -220,7 +220,7 @@
 							<form id="equiv" action="play" method="post">
 								<input type="hidden" name="formType" value="claimEquivalent">
 								<input type="hidden" name="mutantId" value="<%=m.getId()%>">
-								<button type="submit" class="btn btn-default navbar-btn">Claim Equivalent</button>
+								<button type="submit" class="btn btn-default btn-right">Claim Equivalent</button>
 							</form>
 							<%}%>
 						</td>
