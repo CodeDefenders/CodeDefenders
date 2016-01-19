@@ -102,7 +102,7 @@
           <form id="view" action="games" method="post">
             <input type="hidden" name="formType" value="joinGame">
             <input type="hidden" name="game" value=<%=g.getId()%>>
-            <input type="submit" class="btn btn-default" value="Join Game">
+            <input type="submit" class="btn btn-primary" value="Join Game">
           </form>
         </td>
       </tr>

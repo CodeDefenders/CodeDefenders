@@ -111,7 +111,7 @@
             <input type="hidden" name="formType" value="enterGame">
             <input type="hidden" name="game" value=<%=g.getId()%>>
 	          <% if (uid == turnId ) {%>
-                <input class="btn btn-default turn" type="submit" value="Your Turn">
+                <input class="btn btn-primary" type="submit" value="Your Turn">
 	          <% } else {%>
 	            <input  class="btn btn-default" type="submit" value="Enter Game">
 	          <% }%>

@@ -57,6 +57,7 @@
 		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
 			<ul class="nav navbar-nav navbar-left">
 				<a class="navbar-brand" href="games">Code Defenders</a>
+				<li class="navbar-text">Game ID: <%= game.getId() %></li>
 				<li class="navbar-text">ATK: <%= game.getAttackerScore() %> | DEF: <%= game.getDefenderScore() %></li>
 				<li class="navbar-text">Round <%= game.getCurrentRound() %> of <%= game.getFinalRound() %></li>
 				<% if (game.getAliveMutants().size() == 1) {%>
@@ -66,12 +67,21 @@
 				<% }%>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
-				<button type="submit" class="btn btn-default navbar-btn" form="atk">Attack!</button><%}%>
+				<li>
+					<p class="navbar-text">
+						<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+						<%=request.getSession().getAttribute("username")%>
+					</p>
+				</li>
+				<li><input type="submit" form="logout" class="btn btn-inverse navbar-btn" value="Log Out"/></li>
 			</ul>
 		</div>
 	</div>
 </nav>
+
+<form id="logout" action="login" method="post">
+	<input type="hidden" name="formType" value="logOut">
+</form>
 
 <%
 	ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
@@ -136,7 +146,7 @@
 					<tr>
 						<td><h4>Mutant <%= m.getId() %></h4></td>
 						<td>
-							<a href="#" class="btn btn-default" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
+							<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 							<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
 								<div class="modal-dialog">
 									<!-- Modal content-->
@@ -185,7 +195,7 @@
 					<tr>
 						<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4></td>
 						<td class="col-sm-1">
-							<a href="#" class="btn btn-default" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
+							<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 							<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
 								<div class="modal-dialog">
 									<!-- Modal content-->
@@ -247,7 +257,10 @@
 
 	<div id="right" class="col-md-6">
 	    <form id="atk" action="play" method="post">
-		    <h2>Create a mutant here</h2>
+		    <h2>Create a mutant here
+			    <% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
+			    <button type="submit" class="btn btn-primary btn-right" form="atk">Attack!</button><%}%>
+		    </h2>
 			<input type="hidden" name="formType" value="createMutant">
 		    <%
 			    String mutantCode;

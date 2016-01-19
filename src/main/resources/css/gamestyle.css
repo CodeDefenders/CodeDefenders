@@ -46,15 +46,12 @@ body {
 	padding-right: 10px;
 }
 
-/* My turn button */
+.navbar-right {
+    padding-right: 10px;
+}
 
-.turn {
-	background-color: #6FC643;
-	border: 1px solid #C0C0C0;
-	color: #FFF;
-	transition-property: background-color, border-color;
-	transition-duration: 150ms;
-	min-width: 100px;
+.btn-diff, .btn-right {
+    float: right;
 }
 
 .turn:hover {
