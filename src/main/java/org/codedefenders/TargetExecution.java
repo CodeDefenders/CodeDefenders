@@ -57,13 +57,13 @@ public class TargetExecution {
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Target, Status, Message) VALUES (?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setString(1, target.name());
 					pstmt.setString(2, status);
-					pstmt.setString(3, message == null ? "" : message.substring(0,1999));
+					pstmt.setString(3, message == null ? "" : message.length() <= 2000 ? message : message.substring(0,1999));
 				} else {
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setInt(1, mutantId);
 					pstmt.setString(2, target.name());
 					pstmt.setString(3, status);
-					pstmt.setString(4, message == null ? "" : message.substring(0,1999));
+					pstmt.setString(4, message == null ? "" : message.length() <= 2000 ? message : message.substring(0,1999));
 				}
 			} else {
 				if (mutantId == 0) {
@@ -72,14 +72,14 @@ public class TargetExecution {
 					pstmt.setInt(1, testId);
 					pstmt.setString(2, target.name());
 					pstmt.setString(3, status);
-					pstmt.setString(4, message == null ? "" : message.substring(0,1999));
+					pstmt.setString(4, message == null ? "" : message.length() <= 2000 ? message : message.substring(0,1999));
 				} else {
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Test_ID, Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setInt(1, testId);
 					pstmt.setInt(2, mutantId);
 					pstmt.setString(3, target.name());
 					pstmt.setString(4, status);
-					pstmt.setString(5, message == null ? "" : message.substring(0,1999));
+					pstmt.setString(5, message == null ? "" : message.length() <= 2000 ? message : message.substring(0,1999));
 				}
 			}
 
