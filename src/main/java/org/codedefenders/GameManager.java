@@ -22,6 +22,8 @@ import java.util.LinkedList;
 
 import static org.codedefenders.Constants.FILE_SEPARATOR;
 import static org.codedefenders.Constants.JAVA_SOURCE_EXT;
+import static org.codedefenders.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
+import static org.codedefenders.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
 import static org.codedefenders.Constants.TESTS_DIR;
 import static org.codedefenders.Constants.TEST_PREFIX;
 
@@ -50,7 +52,7 @@ public class GameManager extends HttpServlet {
 				ArrayList<Mutant> aliveMutants = activeGame.getAliveMutants();
 				if (aliveMutants.isEmpty()) {
 					System.out.println("No Mutants Alive, only attacker can play.");
-					activeGame.setActivePlayer("ATTACKER");
+					activeGame.setActiveRole(Game.Role.ATTACKER);
 					activeGame.update();
 				}
 				// If no mutants needed to be proved non-equivalent, direct to the Attacker Page.
@@ -74,9 +76,10 @@ public class GameManager extends HttpServlet {
 		System.out.println("Executing GameManager.doPost");
 
 		ArrayList<String> messages = new ArrayList<String>();
-		request.getSession().setAttribute("messages", messages);
+		HttpSession session = request.getSession();
+		session.setAttribute("messages", messages);
 
-		Game activeGame = (Game) request.getSession().getAttribute("game");
+		Game activeGame = (Game) session.getAttribute("game");
 
 		boolean responseCommitted = false;
 		switch (request.getParameter("formType")) {
@@ -123,23 +126,28 @@ public class GameManager extends HttpServlet {
 								response.sendRedirect("play");
 								responseCommitted = true;
 							}
-						} else {
+						} else if  (testOriginalTarget.status.equals("FAIL")) {
 							System.out.println("testOriginalTarget: " + testOriginalTarget);
 							messages.add("An error occured while executing your test against the CUT.");
 							messages.add(testOriginalTarget.message);
+							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						} else { // ERROR
+							messages.add("An error occured while executing your test against the CUT.");
+							messages.add(testOriginalTarget.message);
+							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						}
 					} else {
 						System.out.println("compileTestTarget: " + compileTestTarget);
 						messages.add("An error occured while compiling your test.");
 						messages.add(compileTestTarget.message);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					}
 				} else if (request.getParameter("acceptEquivalent") != null) { // If the user didnt want to supply a test
 					logger.debug("Equivalence accepted");
 					System.out.println("Equivalence accepted");
 					if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
-						mutant.kill();
 						mutant.setEquivalent(Mutant.Equivalence.DECLARED_YES);
-						mutant.update();
+						mutant.kill();
 
 						messages.add("The mutant was marked Equivalent and killed");
 
@@ -155,9 +163,9 @@ public class GameManager extends HttpServlet {
 			case "claimEquivalent":
 				if (request.getParameter("mutantId") != null) {
 					int mutantId = Integer.parseInt(request.getParameter("mutantId"));
-					Mutant m = DatabaseAccess.getMutant(activeGame, mutantId);
-					m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-					m.update();
+					Mutant mutantClaimed = DatabaseAccess.getMutant(activeGame, mutantId);
+					mutantClaimed.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+					mutantClaimed.update();
 					messages.add("Waiting For Attacker To Respond To Marked Equivalencies");
 					activeGame.passPriority();
 					activeGame.update();
@@ -180,6 +188,8 @@ public class GameManager extends HttpServlet {
 						activeGame.update();
 					} else {
 						messages.add("Your mutant failed to compile. Try again.");
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+						newMutant.kill();
 						messages.add(compileMutantTarget.message);
 					}
 				} else {
@@ -203,15 +213,20 @@ public class GameManager extends HttpServlet {
 					if (testOriginalTarget.status.equals("SUCCESS")) {
 						messages.add("Your Test Was Compiled Successfully");
 						MutationTester.runTestOnAllMutants(getServletContext(), activeGame, newTest, messages);
-					} else {
+					} else if (testOriginalTarget.status.equals("FAIL")) {
 						messages.add("Oh no! Your test failed on the original class under test. You lose your turn.");
 						messages.add(testOriginalTarget.message);
+					} else {
+						messages.add("The execution of your test finished with an error. You lose your turn.");
+						messages.add(testOriginalTarget.message);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					}
 					activeGame.endTurn();
 					activeGame.update();
 				} else {
 					messages.add("Your test failed to compile. Try again, but with compilable code.");
 					messages.add(compileTestTarget.message);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 				}
 				break;
 		}
@@ -257,7 +272,7 @@ public class GameManager extends HttpServlet {
 		bw.close();
 
 		// Compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
-		return MutationTester.compileMutant(getServletContext(), newMutantDir, mutantFileName, gid, classMutated);
+		return AntRunner.compileMutant(getServletContext(), newMutantDir, mutantFileName, gid, classMutated);
 	}
 
 	public File getNextSubDir(String path) {
@@ -307,11 +322,11 @@ public class GameManager extends HttpServlet {
 		bufferedTestWriter.close();
 
 		// Check the test actually passes when applied to the original code.
-		Test newTest = MutationTester.compileTest(getServletContext(), newTestDir, javaFile, gid, classUnderTest);
+		Test newTest = AntRunner.compileTest(getServletContext(), newTestDir, javaFile, gid, classUnderTest);
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-			MutationTester.testOriginal(getServletContext(), newTestDir, newTest);
+			AntRunner.testOriginal(getServletContext(), newTestDir, newTest);
 		}
 		return newTest;
 	}

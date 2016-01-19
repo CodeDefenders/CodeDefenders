@@ -98,6 +98,7 @@ public class Mutant {
 	public void kill() {
 		alive = false;
 		roundKilled = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
+		update();
 	}
 
 	public int getPoints() {

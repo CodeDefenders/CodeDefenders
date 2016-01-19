@@ -155,7 +155,16 @@
 	<div class="col-md-6">
 		<h2>Not Equivalent? Write a killing test here</h2>
         <pre>
-	        <textarea id="newtest" name="test" form="equivalenceForm" cols="80" rows="30"><%= game.getCUT().getTestTemplate() %></textarea>
+			<%
+				String testCode;
+				String previousTestCode = (String) request.getSession().getAttribute("previousTest");
+				request.getSession().removeAttribute("previousTest");
+				if (previousTestCode != null) {
+				    testCode = previousTestCode;
+				} else
+					testCode = game.getCUT().getTestTemplate();
+			%>
+	        <textarea id="newtest" name="test" form="equivalenceForm" cols="80" rows="30"><%= testCode %></textarea>
         </pre>
 	</div> <!-- col-md6 right -->
 </div> <!-- row-fluid -->

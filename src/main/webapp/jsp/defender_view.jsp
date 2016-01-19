@@ -65,7 +65,7 @@
 				<% }%>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<% if (game.getState().equals(Game.State.ACTIVE) && game.getActivePlayer().equals("DEFENDER")) {%>
+				<% if (game.getState().equals(Game.State.ACTIVE) && game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
 				<button type="submit" class="btn btn-default navbar-btn" form="def">Defend!</button>
 				<%}%>
 			</ul>
@@ -119,7 +119,16 @@
 	<div class="col-md-6" id="right-top">
 		<h2> Write your JUnit test here</h2>
 		<form id="def" action="play" method="post">
-			<pre><textarea id="code" name="test" cols="80" rows="30"><%=game.getCUT().getTestTemplate()%></textarea></pre>
+			<%
+				String testCode;
+				String previousTestCode = (String) request.getSession().getAttribute("previousTest");
+				request.getSession().removeAttribute("previousTest");
+				if (previousTestCode != null) {
+					testCode = previousTestCode;
+				} else
+					testCode = game.getCUT().getTestTemplate();
+			%>
+			<pre><textarea id="code" name="test" cols="80" rows="30"><%= testCode %></textarea></pre>
 			<input type="hidden" name="formType" value="createTest">
 		</form>
 	</div> <!-- col-md6 right top -->
@@ -194,7 +203,7 @@
 							</div>
 						</td>
 						<td >
-							<% if (game.getState().equals(Game.State.ACTIVE) && game.getActivePlayer().equals("DEFENDER")) {%>
+							<% if (game.getState().equals(Game.State.ACTIVE) && game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
 							<form id="equiv" action="play" method="post">
 								<input type="hidden" name="formType" value="claimEquivalent">
 								<input type="hidden" name="mutantId" value="<%=m.getId()%>">

@@ -66,7 +66,7 @@
 				<% }%>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
-				<% if (game.getState().equals(ACTIVE) && game.getActivePlayer().equals("ATTACKER")) {%>
+				<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
 				<button type="submit" class="btn btn-default navbar-btn" form="atk">Attack!</button><%}%>
 			</ul>
 		</div>
@@ -249,7 +249,16 @@
 	    <form id="atk" action="play" method="post">
 		    <h2>Create a mutant here</h2>
 			<input type="hidden" name="formType" value="createMutant">
-			<pre><textarea id="code" name="mutant" cols="80" rows="50"><%=game.getCUT().getAsString()%></textarea></pre>
+		    <%
+			    String mutantCode;
+		        String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+		        request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+		        if (previousMutantCode != null) {
+					mutantCode = previousMutantCode;
+		        } else
+			        mutantCode = game.getCUT().getAsString();
+		    %>
+			<pre><textarea id="code" name="mutant" cols="80" rows="50"><%= mutantCode %></textarea></pre>
 			<br>
 		</form>
 	</div>

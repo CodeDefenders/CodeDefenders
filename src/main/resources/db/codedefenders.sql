@@ -44,7 +44,7 @@ CREATE TABLE `games` (
   `Defender_ID` int(11) DEFAULT NULL,
   `CurrentRound` tinyint(4) NOT NULL DEFAULT '1',
   `FinalRound` tinyint(4) NOT NULL DEFAULT '5',
-  `ActivePlayer` enum('ATTACKER','DEFENDER','NEITHER') NOT NULL DEFAULT 'NEITHER',
+  `ActiveRole` enum('ATTACKER','DEFENDER') NOT NULL DEFAULT 'ATTACKER',
   `Class_ID` int(11) DEFAULT NULL,
   `State` enum('CREATED','ACTIVE','FINISHED') NOT NULL DEFAULT 'CREATED',
   `Level` enum('EASY','MEDIUM','HARD') NOT NULL,

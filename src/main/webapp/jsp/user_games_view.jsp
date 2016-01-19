@@ -89,7 +89,7 @@
       }
 
 	    int turnId = g.getAttackerId();
-		if (g.getActivePlayer().equals("DEFENDER"))
+		if (g.getActiveRole().equals("DEFENDER"))
 			turnId = g.getDefenderId();
 
       if (atkName == null) {atkName = "Empty";}

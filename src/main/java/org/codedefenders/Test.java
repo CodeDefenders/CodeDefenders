@@ -62,6 +62,7 @@ public class Test {
 
 	public void killMutant() {
 		mutantsKilled++;
+		update();
 	}
 
 	public List<String> getHTMLReadout() throws IOException {

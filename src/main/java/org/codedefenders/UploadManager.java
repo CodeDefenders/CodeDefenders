@@ -67,7 +67,7 @@ public class UploadManager extends HttpServlet {
 						File targetFile = new File(getServletContext().getRealPath(Constants.CUTS_DIR + Constants.FILE_SEPARATOR + fileName));
 						FileUtils.copyInputStreamToFile(fileContent, targetFile);
 						String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
-						String classFileName = compileNewCUT(getServletContext(), fileName);
+						String classFileName = AntRunner.compileCUT(getServletContext(), fileName);
 						String classFileNameDB = DatabaseAccess.addSlashes(classFileName);
 
 						// get fully qualified name
@@ -87,29 +87,5 @@ public class UploadManager extends HttpServlet {
 		} catch (FileUploadException e) {
 			throw new ServletException("Cannot parse multipart request.", e);
 		}
-	}
-
-	private String compileNewCUT(ServletContext context, final String className) {
-
-		String[] resultArray = AntRunner.compileClass(context,className);
-		System.out.println("Compile New CUT, Compilation result:");
-		System.out.println(Arrays.toString(resultArray));
-
-		String pathCompiledClassName = null;
-		if (resultArray[0].toLowerCase().contains("build successful")) {
-			// If the input stream returned a 'successful build' message, the CUT compiled correctly
-			System.out.println("Compiled uploaded CUT successfully");
-			File f = new File(context.getRealPath(Constants.CUTS_DIR));
-			final String compiledClassName = FilenameUtils.getBaseName(className) + Constants.JAVA_CLASS_EXT;
-			LinkedList<File> matchingFiles = (LinkedList)FileUtils.listFiles(f, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
-			if (! matchingFiles.isEmpty())
-				pathCompiledClassName = matchingFiles.get(0).getAbsolutePath();
-		} else {
-			// Otherwise the CUT failed to compile
-			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]"));
-			System.err.println("Failed to compile uploaded CUT");
-			System.err.println(message);
-		}
-		return pathCompiledClassName;
 	}
 }

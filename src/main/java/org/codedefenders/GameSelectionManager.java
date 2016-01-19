@@ -28,7 +28,7 @@ public class GameSelectionManager extends HttpServlet {
 				// Get the identifying information required to create a game from the submitted form.
 				int classId = Integer.parseInt(request.getParameter("class"));
 				int rounds = Integer.parseInt(request.getParameter("rounds"));
-				String role = request.getParameter("role") == null ? "DEFENDER" : "ATTACKER";
+				Game.Role role = request.getParameter("role") == null ? Game.Role.DEFENDER : Game.Role.ATTACKER;
 				Game.Level level = request.getParameter("level") == null ? Game.Level.HARD : Game.Level.EASY;
 
 				// Create the game with supplied parameters and insert it in the database.
@@ -54,7 +54,7 @@ public class GameSelectionManager extends HttpServlet {
 				}
 
 				jGame.setState(Game.State.ACTIVE);
-				jGame.setActivePlayer("ATTACKER");
+				jGame.setActiveRole(Game.Role.ATTACKER);
 
 				jGame.update();
 

@@ -225,7 +225,7 @@ public class DatabaseAccess {
 
 			if (rs.next()) {
 				Game gameRecord = new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
-						rs.getInt("CurrentRound"), rs.getInt("FinalRound"), rs.getString("ActivePlayer"), Game.State.valueOf(rs.getString("State")),
+						rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
 						Game.Level.valueOf(rs.getString("Level")));
 
 				stmt.close();
@@ -273,7 +273,7 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				gameList.add(new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
 						rs.getInt("Class_ID"), rs.getInt("CurrentRound"), rs.getInt("FinalRound"),
-						rs.getString("ActivePlayer"), Game.State.valueOf(rs.getString("State")),
+						Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
 						Game.Level.valueOf(rs.getString("Level"))));
 			}
 
@@ -325,7 +325,7 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				gameList.add(new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
 						rs.getInt("Class_ID"), rs.getInt("CurrentRound"), rs.getInt("FinalRound"),
-						rs.getString("ActivePlayer"), Game.State.valueOf(rs.getString("State")),
+						Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
 						Game.Level.valueOf(rs.getString("Level"))));
 			}
 
@@ -465,12 +465,21 @@ public class DatabaseAccess {
 	}
 
 	public static ArrayList<Test> getTestsForGame(int gid) {
+		String sql = String.format("SELECT * FROM tests WHERE Game_ID='%d';", gid);
+		return getTests(sql);
+	}
+
+	public static ArrayList<Test> getExecutableTestsForGame(int gid) {
+		String sql = String.format("SELECT * FROM tests WHERE Game_ID='%d' AND ClassFile IS NOT NULL;", gid);
+		return getTests(sql);
+	}
+
+	private static ArrayList<Test> getTests(String sql) {
 
 		ArrayList<Test> testList = new ArrayList<Test>();
 
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = null;
 
 		try {
 
@@ -478,7 +487,6 @@ public class DatabaseAccess {
 			conn = getConnection();
 
 			stmt = conn.createStatement();
-			sql = String.format("SELECT * FROM tests WHERE Game_ID='%d';", gid);
 			ResultSet rs = stmt.executeQuery(sql);
 
 			while (rs.next()) {

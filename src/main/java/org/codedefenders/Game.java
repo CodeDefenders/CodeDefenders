@@ -20,20 +20,21 @@ public class Game {
 	private int currentRound;
 	private int finalRound;
 
-	private String activePlayer;
+	private Role activeRole;
 
 	private State state;
 
 	private Level level;
 
+	public enum Role { ATTACKER, DEFENDER };
 	public enum State { CREATED, ACTIVE, FINISHED };
 	public enum Level { EASY, MEDIUM, HARD };
 	public enum Mode { SINGLE, DUEL, PARTY };
 
-	public Game(int classId, int userId, int maxRounds, String role, Level level) {
+	public Game(int classId, int userId, int maxRounds, Role role, Level level) {
 		this.classId = classId;
 
-		if (role.equals("ATTACKER")) {
+		if (role.equals(Role.ATTACKER)) {
 			attackerId = userId;
 		} else {
 			defenderId = userId;
@@ -42,20 +43,20 @@ public class Game {
 		this.currentRound = 1;
 		this.finalRound = maxRounds;
 
-		this.activePlayer = "NEITHER";
+		this.activeRole = Role.ATTACKER;
 		this.state = State.CREATED;
 
 		this.level = level;
 	}
 
-	public Game(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, String activePlayer, State state, Level level) {
+	public Game(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, State state, Level level) {
 		this.id = id;
 		this.attackerId = attackerId;
 		this.defenderId = defenderId;
 		this.classId = classId;
 		this.currentRound = currentRound;
 		this.finalRound = finalRound;
-		this.activePlayer = activePlayer;
+		this.activeRole = activeRole;
 		this.state = state;
 		this.level = level;
 	}
@@ -108,13 +109,13 @@ public class Game {
 		return finalRound;
 	}
 
-	public String getActivePlayer() {
-		return activePlayer;
+	public Role getActiveRole() {
+		return activeRole;
 	}
 
 	// ATTACKER, DEFENDER, NEITHER
-	public void setActivePlayer(String ap) {
-		activePlayer = ap;
+	public void setActiveRole(Role role) {
+		activeRole = role;
 	}
 
 	public State getState() {
@@ -180,6 +181,10 @@ public class Game {
 		return DatabaseAccess.getTestsForGame(id);
 	}
 
+	public ArrayList<Test> getExecutableTests() {
+		return DatabaseAccess.getExecutableTestsForGame(id);
+	}
+
 	public int getAttackerScore() {
 		int totalScore = 0;
 
@@ -199,23 +204,26 @@ public class Game {
 	}
 
 	public void passPriority() {
-		if (activePlayer.equals("ATTACKER")) {
-			activePlayer = "DEFENDER";
-		} else if (activePlayer.equals("DEFENDER")) {
-			activePlayer = "ATTACKER";
-		}
+		if (activeRole.equals(Role.ATTACKER)) {
+			activeRole = Role.DEFENDER;
+		} else
+			activeRole = Role.ATTACKER;
 	}
 
 	public void endTurn() {
-		if (activePlayer.equals("ATTACKER")) {
-			activePlayer = "DEFENDER";
-		} else if (activePlayer.equals("DEFENDER")) {
-			activePlayer = "ATTACKER";
-			if (currentRound < finalRound) {
-				currentRound++;
-			} else if ((currentRound == finalRound) && (state.equals(State.ACTIVE))) {
-				state = State.FINISHED;
-			}
+		if (activeRole.equals(Role.ATTACKER)) {
+			activeRole = Role.DEFENDER;
+		} else {
+			activeRole = Role.ATTACKER;
+			endRound();
+		}
+	}
+
+	public void endRound() {
+		if (currentRound < finalRound) {
+			currentRound++;
+		} else if ((currentRound == finalRound) && (state.equals(State.ACTIVE))) {
+			state = State.FINISHED;
 		}
 	}
 
@@ -285,8 +293,8 @@ public class Game {
 
 			// Get all rows from the database which have the chosen username
 			stmt = conn.createStatement();
-			sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActivePlayer='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
-					attackerId, defenderId, currentRound, finalRound, activePlayer, state.name(), level.name(), id);
+			sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
+					attackerId, defenderId, currentRound, finalRound, activeRole, state.name(), level.name(), id);
 			stmt.execute(sql);
 			return true;
 

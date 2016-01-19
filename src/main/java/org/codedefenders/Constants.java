@@ -26,4 +26,8 @@ public class Constants {
 	public static final String WINNER_MESSAGE = "You won!";
 	public static final String LOSER_MESSAGE = "You won!";
 	public static final String DRAW_MESSAGE = "It was a draw!";
+
+	// JSP
+	public static final String SESSION_ATTRIBUTE_PREVIOUS_TEST = "previousTest";
+	public static final String SESSION_ATTRIBUTE_PREVIOUS_MUTANT = "previousMutant";
 }
