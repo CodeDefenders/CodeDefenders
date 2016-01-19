@@ -72,14 +72,17 @@ CREATE TABLE `mutants` (
   `JavaFile` varchar(255) NOT NULL,
   `ClassFile` varchar(255),
   `Alive` tinyint(1) NOT NULL DEFAULT '1',
-  `Game_ID` int(11) DEFAULT NULL,
+  `Game_ID` int(11) NOT NULL,
   `RoundCreated` int(11) NOT NULL,
   `RoundKilled` int(11) DEFAULT NULL,
   `Equivalent` enum('ASSUMED_NO','PENDING_TEST','DECLARED_YES','ASSUMED_YES','PROVEN_NO') NOT NULL,
+  `Owner_ID` int(11) NOT NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`Mutant_ID`),
   KEY `Game_ID` (`Game_ID`),
-  CONSTRAINT `mutants_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
+  KEY `Owner_ID` (`Owner_ID`),
+  CONSTRAINT `mutants_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`),
+  CONSTRAINT `mutants_ibfk_2` FOREIGN KEY (`Owner_ID`) REFERENCES `users` (`User_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=68 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -120,10 +123,13 @@ CREATE TABLE `tests` (
   `ClassFile` varchar(255),
   `RoundCreated` int(11) NOT NULL,
   `MutantsKilled` int(11) DEFAULT '0',
+  `Owner_ID` int(11) NOT NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`Test_ID`),
   KEY `Game_ID` (`Game_ID`),
-  CONSTRAINT `tests_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
+  KEY `Owner_ID` (`Owner_ID`),
+  CONSTRAINT `tests_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`),
+  CONSTRAINT `tests_ibfk_2` FOREIGN KEY (`Owner_ID`) REFERENCES `users` (`User_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

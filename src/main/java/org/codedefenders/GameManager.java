@@ -77,6 +77,8 @@ public class GameManager extends HttpServlet {
 
 		ArrayList<String> messages = new ArrayList<String>();
 		HttpSession session = request.getSession();
+		int uid = (Integer) session.getAttribute("uid");
+
 		session.setAttribute("messages", messages);
 
 		Game activeGame = (Game) session.getAttribute("game");
@@ -100,7 +102,7 @@ public class GameManager extends HttpServlet {
 					String testText = request.getParameter("test");
 
 					// If it can be written to file and compiled, end turn. Otherwise, dont.
-					Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText);
+					Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid);
 
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
@@ -178,7 +180,7 @@ public class GameManager extends HttpServlet {
 				// Get the text submitted by the user.
 				String mutantText = request.getParameter("mutant");
 
-				Mutant newMutant = createMutant(activeGame.getId(), activeGame.getClassId(), mutantText);
+				Mutant newMutant = createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid);
 				if (newMutant != null) {
 					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 					if (compileMutantTarget.status.equals("SUCCESS")) {
@@ -204,7 +206,7 @@ public class GameManager extends HttpServlet {
 				String testText = request.getParameter("test");
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
-				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText);
+				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid);
 				System.out.println("New Test " + newTest.getId());
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
@@ -235,7 +237,7 @@ public class GameManager extends HttpServlet {
 	}
 
 	// Writes text as a Mutant to the appropriate place in the file system.
-	public Mutant createMutant(int gid, int cid, String mutantText) throws IOException {
+	public Mutant createMutant(int gid, int cid, String mutantText, int ownerId) throws IOException {
 
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 		String classMutatedBaseName = classMutated.getBaseName();
@@ -272,7 +274,7 @@ public class GameManager extends HttpServlet {
 		bw.close();
 
 		// Compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
-		return AntRunner.compileMutant(getServletContext(), newMutantDir, mutantFileName, gid, classMutated);
+		return AntRunner.compileMutant(getServletContext(), newMutantDir, mutantFileName, gid, classMutated, ownerId);
 	}
 
 	public File getNextSubDir(String path) {
@@ -308,7 +310,7 @@ public class GameManager extends HttpServlet {
 		return parsable;
 	}
 
-	public Test createTest(int gid, int cid, String testText) throws IOException {
+	public Test createTest(int gid, int cid, String testText, int ownerId) throws IOException {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
@@ -322,7 +324,7 @@ public class GameManager extends HttpServlet {
 		bufferedTestWriter.close();
 
 		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(getServletContext(), newTestDir, javaFile, gid, classUnderTest);
+		Test newTest = AntRunner.compileTest(getServletContext(), newTestDir, javaFile, gid, classUnderTest, ownerId);
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {

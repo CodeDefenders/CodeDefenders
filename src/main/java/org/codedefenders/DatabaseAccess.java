@@ -386,7 +386,7 @@ public class DatabaseAccess {
 				Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
 						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
-						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"));
+						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Owner_ID"));
 				mutList.add(newMutant);
 			}
 
@@ -434,7 +434,7 @@ public class DatabaseAccess {
 				newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
 						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
-						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"));
+						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Owner_ID"));
 			}
 
 			stmt.close();
@@ -492,7 +492,7 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
-						rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"));
+						rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"), rs.getInt("Owner_ID"));
 				testList.add(newTest);
 			}
 

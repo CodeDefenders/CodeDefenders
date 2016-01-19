@@ -135,7 +135,7 @@ public class AntRunner {
 	 * @param classMutated
 	 * @return A {@link Mutant} object
 	 */
-	public static Mutant compileMutant(ServletContext context, File dir, String jFile, int gameID, GameClass classMutated) {
+	public static Mutant compileMutant(ServletContext context, File dir, String jFile, int gameID, GameClass classMutated, int ownerId) {
 		//public static int compileMutant(ServletContext context, Mutant m2) {
 
 		// Gets the classname for the mutant from the game it is in
@@ -153,7 +153,7 @@ public class AntRunner {
 			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
 			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
 			String cFile = matchingFiles.get(0).getAbsolutePath();
-			newMutant = new Mutant(gameID, jFile, cFile);
+			newMutant = new Mutant(gameID, jFile, cFile, ownerId);
 			newMutant.insert();
 			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "SUCCESS", null);
 			newExec.insert();
@@ -161,7 +161,7 @@ public class AntRunner {
 			// The mutant failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
 			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]"));
-			newMutant = new Mutant(gameID, jFile, null);
+			newMutant = new Mutant(gameID, jFile, null, ownerId);
 			newMutant.insert();
 			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "FAIL", message);
 			newExec.insert();
@@ -178,7 +178,7 @@ public class AntRunner {
 	 * @param classUnderTest
 	 * @return A {@link Test} object
 	 */
-	public static Test compileTest(ServletContext context, File dir, String jFile, int gameID, GameClass classUnderTest) {
+	public static Test compileTest(ServletContext context, File dir, String jFile, int gameID, GameClass classUnderTest, int ownerId) {
 		//public static int compileTest(ServletContext context, Test t) {
 
 		String className = classUnderTest.getName();
@@ -192,7 +192,7 @@ public class AntRunner {
 			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
 			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
 			String cFile = matchingFiles.get(0).getAbsolutePath();
-			Test newTest = new Test(gameID, jFile, cFile);
+			Test newTest = new Test(gameID, jFile, cFile, ownerId);
 			newTest.insert();
 			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);
 			newExec.insert();
@@ -201,7 +201,7 @@ public class AntRunner {
 			// The test failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
 			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]"));
-			Test newTest = new Test(gameID, jFile, null);
+			Test newTest = new Test(gameID, jFile, null, ownerId);
 			newTest.insert();
 			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "FAIL", message);
 			newExec.insert();

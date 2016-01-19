@@ -62,16 +62,6 @@ public class GameManagerTest {
 				.contains("My Expected String"));
 	}
 
-
-	@Test @Ignore
-	public void testCreateMutant() throws IOException {
-
-		GameManager gm = new GameManager();
-		gm.createTest(999, 999, "public class Foo { public int zero() { return 0; } }");
-		gm.createMutant(999, 999, "public class Foo { public int zero() { return 1; } }");
-
-	}
-
 	@Test
 	public void testGetNextSubDirEmpty() throws IOException {
 		File folder = getCleanTmpGameDir(1);

@@ -25,15 +25,18 @@ public class Test {
 	private int roundCreated;
 	private int mutantsKilled = 0;
 
-	public Test(int gid, String jFile, String cFile) {
-		this.gameId = gid;
-		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gid).getCurrentRound();
+	private int ownerId;
+
+	public Test(int gameId, String jFile, String cFile, int ownerId) {
+		this.gameId = gameId;
+		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
 		this.javaFile = jFile;
 		this.classFile = cFile;
+		this.ownerId = ownerId;
 	}
 
-	public Test(int tid, int gid, String jFile, String cFile, int roundCreated, int mutantsKilled) {
-		this(gid, jFile, cFile);
+	public Test(int tid, int gid, String jFile, String cFile, int roundCreated, int mutantsKilled, int ownerId) {
+		this(gid, jFile, cFile, ownerId);
 
 		this.id = tid;
 		this.roundCreated = roundCreated;
@@ -97,7 +100,7 @@ public class Test {
 			String jFileDB = DatabaseAccess.addSlashes(javaFile);
 			// class file can be null
 			String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
-			sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated) VALUES ('%s', '%s', %d, %d);", jFileDB, cFileDB, gameId, roundCreated);
+			sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Owner_ID) VALUES ('%s', '%s', %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, ownerId);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 

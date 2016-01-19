@@ -39,22 +39,25 @@ public class Mutant {
 	private int roundCreated;
 	private int roundKilled;
 
+	private int ownerId;
+
 	// MUTANT CREATION 01: FROM USER
 	// Constructor to create a Mutant from a user created Java File and the compiled Class File.
 	// This is creating a new mutant.
-	public Mutant(int gid, String jFile, String cFile) {
-		this.gameId = gid;
-		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gid).getCurrentRound();
+	public Mutant(int gameId, String jFile, String cFile, int ownerId) {
+		this.gameId = gameId;
+		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
 		this.javaFile = jFile;
 		this.classFile = cFile;
 		this.equivalent = Equivalence.ASSUMED_NO;
+		this.ownerId = ownerId;
 	}
 
 	// MUTANT CREATION 02: FROM DATABASE
 	// Constructor to create a Mutant from a MySQL Record in the mutants table.
 	// This is getting information for an existing mutant.
-	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled) {
-		this(gid, jFile, cFile);
+	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int ownerId) {
+		this(gid, jFile, cFile, ownerId);
 
 		this.id = mid;
 		this.alive = alive;
@@ -211,7 +214,7 @@ public class Mutant {
 			stmt = conn.createStatement();
 			String jFileDB = DatabaseAccess.addSlashes(javaFile);
 			String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
-			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated) VALUES ('%s', '%s', %d, %d);", jFileDB, cFileDB, gameId, roundCreated);
+			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Owner_ID) VALUES ('%s', '%s', %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, ownerId);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
