@@ -41,9 +41,14 @@ public class Mutant {
 
 	private int ownerId;
 
-	// MUTANT CREATION 01: FROM USER
-	// Constructor to create a Mutant from a user created Java File and the compiled Class File.
-	// This is creating a new mutant.
+	/**
+	 * Creates a mutant
+	 * @param gameId
+	 * @param jFile
+	 * @param cFile
+	 * @param alive
+	 * @param ownerId
+	 */
 	public Mutant(int gameId, String jFile, String cFile, boolean alive, int ownerId) {
 		this.gameId = gameId;
 		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
@@ -54,9 +59,18 @@ public class Mutant {
 		this.ownerId = ownerId;
 	}
 
-	// MUTANT CREATION 02: FROM DATABASE
-	// Constructor to create a Mutant from a MySQL Record in the mutants table.
-	// This is getting information for an existing mutant.
+	/**
+	 * Creates a mutant
+	 * @param mid
+	 * @param gid
+	 * @param jFile
+	 * @param cFile
+	 * @param alive
+	 * @param equiv
+	 * @param rCreated
+	 * @param rKilled
+	 * @param ownerId
+	 */
 	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int ownerId) {
 		this(gid, jFile, cFile, alive, ownerId);
 		this.id = mid;
@@ -97,6 +111,10 @@ public class Mutant {
 		return alive ? 1 : 0;
 	}
 
+	public int getOwnerId() {
+		return ownerId;
+	}
+
 	public void kill() {
 		alive = false;
 		roundKilled = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
@@ -104,25 +122,20 @@ public class Mutant {
 	}
 
 	public int getPoints() {
-		int points = 0;
-		if (equivalent.equals(DECLARED_YES.name())) {
-			points = 0;
-			return points;
-		}
-		if (equivalent.equals(ASSUMED_YES.name())) {
-			points = -1;
-			return points;
-		}
-		if (equivalent.equals(PROVEN_NO.name())) {
-			points += 2;
-		}
-
 		if (alive) {
-			points = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound() - roundCreated;
-			return points;
+			// if mutant is alive, as many points as rounds it has survived
+			// TODO: as many points as tests it has survived?
+			return DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound() - roundCreated;
 		} else {
-			points = roundKilled - roundCreated;
-			return points;
+			if (classFile == null) // non-compilable
+				return 0;
+			if (equivalent.equals(DECLARED_YES)) // accepted equivalent
+				return 0;
+			if (equivalent.equals(ASSUMED_YES)) // claimed, rejected, test did not kill it
+				return -1;
+			if (equivalent.equals(PROVEN_NO)) // claimed, rejected, test killed it
+				return 2;
+			return roundKilled - roundCreated; // rounds survived
 		}
 	}
 

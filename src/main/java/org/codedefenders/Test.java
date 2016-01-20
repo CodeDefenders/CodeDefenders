@@ -52,7 +52,10 @@ public class Test {
 	}
 
 	public int getPoints() {
-		return mutantsKilled;
+		if (ownerId == DatabaseAccess.getGameForKey("Game_ID", gameId).getDefenderId())
+			return mutantsKilled;
+		else
+			return 0;
 	}
 
 	public String getFolder() {
