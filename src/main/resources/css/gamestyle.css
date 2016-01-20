@@ -183,3 +183,13 @@ th, td {
 	color: gray;
 	font-size: 50px;
 }
+
+/* Read-only textareas */
+
+.readonly-pre .CodeMirror-focused .CodeMirror-cursor {
+    visibility: hidden; /* hide cursor */
+}
+
+.readonly-pre .CodeMirror-lines {
+    cursor : default; /* default pointer */
+}

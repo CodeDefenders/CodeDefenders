@@ -128,7 +128,7 @@
 									<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
 								</div>
 								<div class="modal-body">
-									<pre><textarea id="diff<%=m.getId()%>" class="mutdiff"><%=m.getPatchString()%></textarea></pre>
+									<pre class="readonly-pre"><textarea class="mutdiff readonly-textarea" id="diff<%=m.getId()%>"><%=m.getPatchString()%></textarea></pre>
 								</div>
 								<div class="modal-footer">
 									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -170,7 +170,7 @@
 	<div class="col-md-6">
 		<h2> Source Code </h2>
 		<input type="hidden" name="formType" value="createMutant">
-		<pre><textarea id="sut" cols="80" rows="50"><%= game.getCUT().getAsString() %></textarea></pre>
+		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" cols="80" rows="50"><%= game.getCUT().getAsString() %></textarea></pre>
 	</div> <!-- col-md6 left -->
 	<div class="col-md-6">
 		<h2>Not Equivalent? Write a killing test here</h2>
@@ -200,7 +200,7 @@
 					String tc = "";
 					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
 			%>
-			<div><h4>Test <%= t.getId() %></h4><pre><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
+			<div><h4>Test <%= t.getId() %></h4><pre class="readonly-pre"><textarea class="utest readonly-textarea" cols="20" rows="10"><%=tc%></textarea></pre></div>
 			<%
 				}
 				if (!isTests) {%>
@@ -231,7 +231,8 @@
 	editorTest.setSize("100%", 500);
 	var editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
 		lineNumbers: true,
-		matchBrackets: true
+		matchBrackets: true,
+		readOnly: true
 	});
 	editorSUT.setSize("100%", 500);
 	var x = document.getElementsByClassName("utest");
@@ -250,10 +251,9 @@
 			codeMirrorContainer.CodeMirror.refresh();
 		} else {
 			var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
-				readOnly: true,
 				lineNumbers: false,
 				mode: "diff",
-				onCursorActivity: null
+				readOnly: true /* onCursorActivity: null */
 			});
 			editorDiff.setSize("100%", 500);
 		}

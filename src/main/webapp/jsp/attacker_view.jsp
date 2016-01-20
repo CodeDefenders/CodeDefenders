@@ -128,9 +128,8 @@
 </div><!-- /.modal -->
 <%  } %>
 
-	<div class="row-fluid">
-	<div id="info" class="col-md-6">
-
+<div class="row-fluid">
+	<div class="col-md-6" id="mutants-div">
 		<h2>Mutants</h2>
 		<!-- Nav tabs -->
 		<ul class="nav nav-tabs" role="tablist">
@@ -163,7 +162,7 @@
 											<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
 										</div>
 										<div class="modal-body">
-											<pre><textarea id="diff<%=m.getId()%>" class="mutdiff"><%=m.getPatchString()%></textarea></pre>
+											<pre class="readonly-pre"><textarea class="mutdiff" id="diff<%=m.getId()%>"><%=m.getPatchString()%></textarea></pre>
 										</div>
 										<div class="modal-footer">
 											<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -212,7 +211,7 @@
 											<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
 										</div>
 										<div class="modal-body">
-											<pre><textarea id="diff<%=m.getId()%>" class="mutdiff"><%=m.getPatchString()%></textarea></pre>
+											<pre class="readonly-pre"><textarea class="mutdiff" id="diff<%=m.getId()%>"><%=m.getPatchString()%></textarea></pre>
 										</div>
 										<div class="modal-footer">
 											<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -240,7 +239,29 @@
 				</table>
 			</div>
 		</div> <!-- tab-content -->
-
+	</div> <!-- col-md6 mutants -->
+	<div class="col-md-6" id="newmut-div">
+		<form id="atk" action="play" method="post">
+			<h2>Create a mutant here
+				<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
+				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk">Attack!</button><%}%>
+			</h2>
+			<input type="hidden" name="formType" value="createMutant">
+			<%
+				String mutantCode;
+				String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+				request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+				if (previousMutantCode != null) {
+					mutantCode = previousMutantCode;
+				} else
+					mutantCode = game.getCUT().getAsString();
+			%>
+			<pre><textarea id="code" name="mutant" cols="80" rows="50"><%= mutantCode %></textarea></pre>
+		</form>
+	</div> <!-- col-md6 newmut -->
+</div> <!-- row-fluid -->
+<div class="row-fluid">
+	<div class="col-md-6" id="tests-div">
 		<h2> Tests </h2>
 		<div class="slider single-item">
 			<%
@@ -250,7 +271,7 @@
 					String tc = "";
 					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
 			%>
-			<div><h4>Test <%=t.getId()%></h4><pre><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
+			<div><h4>Test <%=t.getId()%></h4><pre class="readonly-pre"><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
 			<%
 				}
 				if (!isTests) {%>
@@ -258,29 +279,10 @@
 			<%}
 			%>
 		</div> <!-- slider single-item -->
-	</div>  <!-- col-md6 left -->
-
-	<div id="right" class="col-md-6">
-	    <form id="atk" action="play" method="post">
-		    <h2>Create a mutant here
-			    <% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
-			    <button type="submit" class="btn btn-primary btn-game btn-right" form="atk">Attack!</button><%}%>
-		    </h2>
-			<input type="hidden" name="formType" value="createMutant">
-		    <%
-			    String mutantCode;
-		        String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-		        request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-		        if (previousMutantCode != null) {
-					mutantCode = previousMutantCode;
-		        } else
-			        mutantCode = game.getCUT().getAsString();
-		    %>
-			<pre><textarea id="code" name="mutant" cols="80" rows="50"><%= mutantCode %></textarea></pre>
-			<br>
-		</form>
-	</div>
-</div>
+	</div> <!-- col-md6 mutants -->
+	<div class="col-md-6" id="empty-div">
+	</div> <!-- col-md6 empty -->
+</div> <!-- row-fluid -->
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="js/bootstrap.min.js"></script>
@@ -307,10 +309,9 @@
 			codeMirrorContainer.CodeMirror.refresh();
 		} else {
 			var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
-				readOnly: true,
 				lineNumbers: false,
 				mode: "diff",
-				onCursorActivity: null
+				readOnly: true /* onCursorActivity: null */
 			});
 			editorDiff.setSize("100%", 500);
 		}

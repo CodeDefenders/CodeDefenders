@@ -129,11 +129,11 @@
 <%  } %>
 
 <div class="row-fluid">
-	<div class="col-md-6" id="info">
+	<div class="col-md-6" id="cut-div">
 		<h2>Class Under Test</h2>
-		<pre><textarea id="sut" name="cut" cols="80" rows="30"><%=game.getCUT().getAsString()%></textarea></pre>
+		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30"><%=game.getCUT().getAsString()%></textarea></pre>
 	</div> <!-- col-md6 left -->
-	<div class="col-md-6" id="right-top">
+	<div class="col-md-6" id="utest-div">
 		<h2> Write your JUnit test here
 			<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
 			<button type="submit" class="btn btn-primary btn-game btn-right" form="def">Defend!</button>
@@ -166,7 +166,7 @@
 					String tc = "";
 					for (String l : t.getHTMLReadout()) { tc += l + "\n"; }
 			%>
-			<div><h4>Test <%= t.getId() %></h4><pre><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
+			<div><h4>Test <%= t.getId() %></h4><pre class="readonly-pre"><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
 			<%
 				}
 				if (!isTests) {%>
@@ -212,7 +212,7 @@
 											<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
 										</div>
 										<div class="modal-body">
-											<pre><textarea id="diff<%=m.getId()%>" class="mutdiff"><%=m.getPatchString()%></textarea></pre>
+											<pre class="readonly-pre"><textarea class="mutdiff" id="diff<%=m.getId()%>"><%=m.getPatchString()%></textarea></pre>
 										</div>
 										<div class="modal-footer">
 											<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -269,7 +269,7 @@
 											<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
 										</div>
 										<div class="modal-body">
-											<pre><textarea id="diff<%=m.getId()%>" class="mutdiff"><%=m.getPatchString()%></textarea></pre>
+											<pre class="readonly-pre"><textarea class="mutdiff" id="diff<%=m.getId()%>"><%=m.getPatchString()%></textarea></pre>
 										</div>
 										<div class="modal-footer">
 											<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -340,10 +340,9 @@
 			codeMirrorContainer.CodeMirror.refresh();
 		} else {
 			var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
-				readOnly: true,
 				lineNumbers: false,
 				mode: "diff",
-				onCursorActivity: null
+				readOnly: true /* onCursorActivity: null */
 			});
 			editorDiff.setSize("100%", 500);
 		}
