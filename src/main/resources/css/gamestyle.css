@@ -54,6 +54,10 @@ body {
     float: right;
 }
 
+.btn-game {
+	font-weight: 700;
+}
+
 .turn-badge {
 	font-size: 10pt;
 }

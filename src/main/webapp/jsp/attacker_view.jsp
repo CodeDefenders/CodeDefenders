@@ -266,7 +266,7 @@
 	    <form id="atk" action="play" method="post">
 		    <h2>Create a mutant here
 			    <% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
-			    <button type="submit" class="btn btn-primary btn-right" form="atk">Attack!</button><%}%>
+			    <button type="submit" class="btn btn-primary btn-game btn-right" form="atk">Attack!</button><%}%>
 		    </h2>
 			<input type="hidden" name="formType" value="createMutant">
 		    <%

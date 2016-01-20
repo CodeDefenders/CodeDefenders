@@ -136,7 +136,7 @@
 	<div class="col-md-6" id="right-top">
 		<h2> Write your JUnit test here
 			<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
-			<button type="submit" class="btn btn-primary btn-right" form="def">Defend!</button>
+			<button type="submit" class="btn btn-primary btn-game btn-right" form="def">Defend!</button>
 			<%}%>
 		</h2>
 		<form id="def" action="play" method="post">
