@@ -195,15 +195,13 @@
 		<div class="slider single-item">
 			<%
 				boolean isTests = false;
-				int count = 1;
 				for (Test t : game.getTests()) {
 					isTests = true;
 					String tc = "";
 					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
 			%>
-			<div><h4>Test <%=count%></h4><pre><textarea id=<%="tc"+count%> name="utest" class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
+			<div><h4>Test <%= t.getId() %></h4><pre><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
 			<%
-					count++;
 				}
 				if (!isTests) {%>
 			<div><h2></h2><p> There are currently no tests </p></div>
