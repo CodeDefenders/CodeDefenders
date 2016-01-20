@@ -193,3 +193,7 @@ th, td {
 .readonly-pre .CodeMirror-lines {
     cursor : default; /* default pointer */
 }
+
+.readonly-pre .CodeMirror {
+    background: #F5F5F5; /* #f7f7f7; */
+}
