@@ -10,7 +10,7 @@ import java.util.ArrayList;
 public class DatabaseAccess {
 
 	public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	public static final String DB_URL = "jdbc:mysql://localhost/codedefenders";
+	public static final String DB_URL = "jdbc:mysql://localhost/codedefenders?autoReconnect=true&useSSL=false";
 
 	//  Database credentials
 	public static final String USER = "root";
