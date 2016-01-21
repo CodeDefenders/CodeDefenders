@@ -131,7 +131,7 @@ public class Mutant {
 			// TODO: as many points as tests it has survived?
 			return DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound() - roundCreated;
 		} else {
-			if (classFile == null) // non-compilable
+			if (classFile == null || classFile.equals("null")) // non-compilable
 				return 0;
 			if (equivalent.equals(DECLARED_YES)) // accepted equivalent
 				return 0;
@@ -231,7 +231,7 @@ public class Mutant {
 			String jFileDB = DatabaseAccess.addSlashes(javaFile);
 			String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
 			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Owner_ID)" +
-					" VALUES ('%s', '%s', %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), ownerId);
+					" VALUES ('%s', '%s', %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), ownerId);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
