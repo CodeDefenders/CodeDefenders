@@ -102,7 +102,7 @@
 
 <div class="row-fluid">
 	<div class="col-md-6">
-		<h2> Source Code </h2>
+		<h2> Class Under Test </h2>
 		<input type="hidden" name="formType" value="createMutant">
 		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" cols="80" rows="50"><%= game.getCUT().getAsString() %></textarea></pre>
 		<h2> Tests </h2>

@@ -134,7 +134,7 @@
 		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30"><%=game.getCUT().getAsString()%></textarea></pre>
 	</div> <!-- col-md6 left -->
 	<div class="col-md-6" id="utest-div">
-		<h2> Write your JUnit test here
+		<h2> Write a new JUnit test here
 			<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
 			<button type="submit" class="btn btn-primary btn-game btn-right" form="def">Defend!</button>
 			<%}%>
@@ -157,7 +157,7 @@
 
 <div class="row-fluid">
 	<div class="col-md-6" id="submitted-div">
-		<h2> Submitted JUnit Tests </h2>
+		<h2> Submitted JUnit tests </h2>
 		<div class="slider single-item">
 			<%
 				boolean isTests = false;
