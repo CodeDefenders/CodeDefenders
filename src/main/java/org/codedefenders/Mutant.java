@@ -95,6 +95,10 @@ public class Mutant {
 		equivalent = e;
 	}
 
+	public String getClassFile() {
+		return classFile;
+	}
+
 	public String getFolder() {
 		int lio = javaFile.lastIndexOf("/");
 		if (lio == -1) {
@@ -226,7 +230,8 @@ public class Mutant {
 			stmt = conn.createStatement();
 			String jFileDB = DatabaseAccess.addSlashes(javaFile);
 			String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
-			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Owner_ID) VALUES ('%s', '%s', %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, ownerId);
+			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Owner_ID)" +
+					" VALUES ('%s', '%s', %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), ownerId);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 

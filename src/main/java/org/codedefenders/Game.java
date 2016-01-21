@@ -142,7 +142,7 @@ public class Game {
 	public ArrayList<Mutant> getAliveMutants() {
 		ArrayList<Mutant> aliveMutants = new ArrayList<Mutant>();
 		for (Mutant m : getMutants()) {
-			if (m.isAlive()) {
+			if (m.isAlive() && m.getClassFile() != null) {
 				aliveMutants.add(m);
 			}
 		}
@@ -150,9 +150,9 @@ public class Game {
 	}
 
 	public ArrayList<Mutant> getKilledMutants() {
-		ArrayList<Mutant> killedMutants = new ArrayList<Mutant>();
+		ArrayList<Mutant> killedMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
-			if (! m.isAlive()) {
+			if ((! m.isAlive()) && (m.getClassFile() != null)) {
 				killedMutants.add(m);
 			}
 		}
