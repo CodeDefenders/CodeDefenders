@@ -101,9 +101,28 @@
 <%	} %>
 
 <div class="row-fluid">
-	<div class="col-md-6"> <!-- empty cell -->
-	</div>
-
+	<div class="col-md-6">
+		<h2> Source Code </h2>
+		<input type="hidden" name="formType" value="createMutant">
+		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" cols="80" rows="50"><%= game.getCUT().getAsString() %></textarea></pre>
+		<h2> Tests </h2>
+		<div class="slider single-item">
+			<%
+				boolean isTests = false;
+				for (Test t : game.getTests()) {
+					isTests = true;
+					String tc = "";
+					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
+			%>
+			<div><h4>Test <%= t.getId() %></h4><pre class="readonly-pre"><textarea class="utest readonly-textarea" cols="20" rows="10"><%=tc%></textarea></pre></div>
+			<%
+				}
+				if (!isTests) {%>
+			<div><h2></h2><p> There are currently no tests </p></div>
+			<%}
+			%>
+		</div> <!-- slider single-item -->
+	</div> <!-- col-md6 left -->
 	<div class="col-md-6">
 		<h2>Equivalent mutant?</h2>
 		<table class="table table-hover table-responsive table-paragraphs">
@@ -141,8 +160,9 @@
 					<form id="equivalenceForm" action="play" method="post">
 						<input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= m.getId() %>">
 						<input type="hidden" name="formType" value="resolveEquivalence">
+						<div class="btn-right">
 						<input class="btn btn-default" name="acceptEquivalent" type="submit" value="Accept Equivalent">
-						<input class="btn btn-primary" name="rejectEquivalent" type="submit" value="Submit Killing Test">
+						<input class="btn btn-primary" name="rejectEquivalent" type="submit" value="Submit Killing Test">							</div>
 					</form>
 				</td>
 			</tr>
@@ -163,18 +183,8 @@
 				}
 			%>
 		</table>
-	</div> <!-- col-md6 right -->
-</div> <!-- row-fluid -->
 
-<div class="row-fluid">
-	<div class="col-md-6">
-		<h2> Source Code </h2>
-		<input type="hidden" name="formType" value="createMutant">
-		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" cols="80" rows="50"><%= game.getCUT().getAsString() %></textarea></pre>
-	</div> <!-- col-md6 left -->
-	<div class="col-md-6">
 		<h2>Not Equivalent? Write a killing test here</h2>
-        <pre>
 			<%
 				String testCode;
 				String previousTestCode = (String) request.getSession().getAttribute("previousTest");
@@ -184,34 +194,9 @@
 				} else
 					testCode = game.getCUT().getTestTemplate();
 			%>
-	        <textarea id="newtest" name="test" form="equivalenceForm" cols="80" rows="30"><%= testCode %></textarea>
-        </pre>
+	        <pre><textarea id="newtest" name="test" form="equivalenceForm" cols="80" rows="30"><%= testCode %></textarea></pre>
 	</div> <!-- col-md6 right -->
 </div> <!-- row-fluid -->
-
-<div class="row-fluid">
-	<div id="code" class="col-md-6">
-		<h2> Tests </h2>
-		<div class="slider single-item">
-			<%
-				boolean isTests = false;
-				for (Test t : game.getTests()) {
-					isTests = true;
-					String tc = "";
-					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
-			%>
-			<div><h4>Test <%= t.getId() %></h4><pre class="readonly-pre"><textarea class="utest readonly-textarea" cols="20" rows="10"><%=tc%></textarea></pre></div>
-			<%
-				}
-				if (!isTests) {%>
-			<div><h2></h2><p> There are currently no tests </p></div>
-			<%}
-			%>
-		</div> <!-- slider single-item -->
-	</div> <!-- col-md6 left -->
-	<div class="col-md-6"></div>
-</div>  <!-- row-fluid -->
-
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="js/bootstrap.min.js"></script>
 <script>

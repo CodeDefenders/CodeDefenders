@@ -188,7 +188,6 @@
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane fade active in" id="mutalivetab">
-				<h3>Alive</h3>
 				<table class="table table-hover table-responsive table-paragraphs">
 					<%
 					ArrayList<Mutant> mutantsAlive = game.getAliveMutants();
@@ -249,7 +248,6 @@
 				</table>
 			</div>
 			<div class="tab-pane fade" id="mutkilledtab">
-				<h3>Killed</h3>
 				<table class="table table-hover table-responsive table-paragraphs">
 					<%
 					ArrayList<Mutant> mutantsKilled = game.getKilledMutants();

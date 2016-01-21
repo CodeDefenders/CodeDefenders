@@ -142,7 +142,6 @@
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane fade active in" id="mutalivetab">
-				<h3>Alive</h3>
 				<table class="table table-hover table-responsive table-paragraphs">
 					<%
 					ArrayList<Mutant> mutantsAlive = game.getAliveMutants();
@@ -191,7 +190,6 @@
 				</table>
 			</div>
 			<div class="tab-pane fade" id="mutkilledtab">
-				<h3>Killed</h3>
 				<table class="table table-hover table-responsive table-paragraphs">
 					<%
 					ArrayList<Mutant> mutantsKilled = game.getKilledMutants();
@@ -239,7 +237,25 @@
 				</table>
 			</div>
 		</div> <!-- tab-content -->
+		<h2> Tests </h2>
+		<div class="slider single-item">
+			<%
+				boolean isTests = false;
+				for (Test t : game.getTests()) {
+					isTests = true;
+					String tc = "";
+					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
+			%>
+			<div><h4>Test <%=t.getId()%></h4><pre class="readonly-pre"><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
+			<%
+				}
+				if (!isTests) {%>
+			<div><h2></h2><p> There are currently no tests </p></div>
+			<%}
+			%>
+		</div> <!-- slider single-item -->
 	</div> <!-- col-md6 mutants -->
+
 	<div class="col-md-6" id="newmut-div">
 		<form id="atk" action="play" method="post">
 			<h2>Create a mutant here
@@ -259,29 +275,6 @@
 			<pre><textarea id="code" name="mutant" cols="80" rows="50"><%= mutantCode %></textarea></pre>
 		</form>
 	</div> <!-- col-md6 newmut -->
-</div> <!-- row-fluid -->
-<div class="row-fluid">
-	<div class="col-md-6" id="tests-div">
-		<h2> Tests </h2>
-		<div class="slider single-item">
-			<%
-				boolean isTests = false;
-				for (Test t : game.getTests()) {
-					isTests = true;
-					String tc = "";
-					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
-			%>
-			<div><h4>Test <%=t.getId()%></h4><pre class="readonly-pre"><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
-			<%
-				}
-				if (!isTests) {%>
-			<div><h2></h2><p> There are currently no tests </p></div>
-			<%}
-			%>
-		</div> <!-- slider single-item -->
-	</div> <!-- col-md6 mutants -->
-	<div class="col-md-6" id="empty-div">
-	</div> <!-- col-md6 empty -->
 </div> <!-- row-fluid -->
 
 <!-- Include all compiled plugins (below), or include individual files as needed -->
