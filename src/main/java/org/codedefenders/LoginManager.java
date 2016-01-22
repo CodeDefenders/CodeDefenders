@@ -41,8 +41,6 @@ public class LoginManager extends HttpServlet {
 						session.setAttribute("username", newUser.username);
 						session.setAttribute("messages", messages);
 
-						session.setMaxInactiveInterval(1200);
-
 						response.sendRedirect("games");
 					} else {
 						messages.add("Could not create a user for you, sorry!");
@@ -72,7 +70,6 @@ public class LoginManager extends HttpServlet {
 					HttpSession session = request.getSession();
 					session.setAttribute("uid", activeUser.id);
 					session.setAttribute("username", username);
-					session.setMaxInactiveInterval(1200);
 
 					response.sendRedirect("games");
 				} else {
