@@ -42,7 +42,11 @@ public class LoginFilter implements Filter {
 	private boolean shouldAllow(HttpServletRequest request) {
 		String path = request.getRequestURI().toString();
 		String context = request.getContextPath().toString();
-		if ((path.endsWith(context + "/")) || (path.endsWith(context + "/login")) || (path.endsWith(context + "/index.jsp")))
+		if ((path.endsWith(context + "/"))
+				|| (path.endsWith(context + "/login"))
+				|| (path.endsWith(context + "/contact"))
+				|| (path.endsWith(context + "/sendEmail"))
+				|| (path.endsWith(context + "/index.jsp")))
 			return true;
 
 		Pattern excludeUrls = Pattern.compile("^.*/(css|js|images)/.*$", Pattern.CASE_INSENSITIVE);

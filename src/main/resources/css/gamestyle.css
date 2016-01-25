@@ -44,14 +44,15 @@ body {
 	padding-top: 70px;
 	padding-left: 10px;
 	padding-right: 10px;
+	margin-bottom: 30px; /* footer height */
 }
 
 .navbar-right {
-    padding-right: 10px;
+	padding-right: 10px;
 }
 
 .btn-diff, .btn-right {
-    float: right;
+	float: right;
 }
 
 .btn-game {
@@ -82,6 +83,12 @@ th, td {
 	padding: 15px;
 	margin: 0 auto;
 	max-width: 550px;
+}
+
+.form-contact {
+	padding: 15px;
+	margin: 0 auto;
+	max-width: 450px;
 }
 
 .form-creategame {
@@ -196,4 +203,42 @@ th, td {
 
 .readonly-pre .CodeMirror {
     background: #F5F5F5; /* #f7f7f7; */
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+
+.footer {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 30px; /* footer height */
+	background-color: #f7f7f7;
+}
+
+.footer .container {
+	width: 100%;
+	padding: 0 15px;
+}
+
+.footer .container .text-muted {
+	margin: 5px 0;
+}
+
+.bigicon {
+	font-size: 35px;
+	color: #000;
+}
+
+.fieldset-auto-width {
+	display: inline-block;
+}
+
+textarea[id="inputMessage"] {
+    resize: none;
+}
+
+.pull-right {
+	float: right !important;
 }

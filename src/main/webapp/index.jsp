@@ -13,11 +13,17 @@
 	<!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/gamestyle.css" rel="stylesheet">
+
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script src="js/bootstrap.min.js"></script>
+
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 </head>
 
 <body>
 
-  <%@ page import="org.codedefenders.*,java.io.*" %>
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
     		<div class="navbar-header">
@@ -26,7 +32,7 @@
     		</div>
       		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
           		<ul class="nav navbar-nav">
-            		<a class="navbar-brand" href="games">Code Defenders</a>
+            		<a class="navbar-brand" href="/">Code Defenders</a>
           		</ul>
       		</div>
    		</div>
@@ -40,9 +46,15 @@
 		<a  class="btn btn-primary btn-large"  href="login">Enter</a>
 	</div>
   </div>
-	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="js/bootstrap.min.js"></script>
+
+	<!-- Footer -->
+	<footer class="footer">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-3"><p class="text-muted">Developed at The University of Sheffield</p></div>
+				<div class="col-md-1 pull-right"><a class="text-muted btn-right" href="contact">Contact Us</a></div>
+			</div>
+		</div>
+	</footer>
 </body>
 </html>

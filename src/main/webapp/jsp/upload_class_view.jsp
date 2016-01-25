@@ -49,7 +49,7 @@
 		</div>
 		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
 			<ul class="nav navbar-nav">
-				<li><a class="navbar-brand" href="games">Code Defenders</a></li>
+				<li><a class="navbar-brand" href="/">Code Defenders</a></li>
 				<li><a href="games/user">My Games</a></li>
 				<li><a href="games/open">Open Games</a></li>
 				<li class="active"><a href="games/create">Create Game</a></li>
@@ -79,5 +79,15 @@
 		<input id="fileUpload" name="fileUpload" type="file" class="file-loading" data-allowed-file-extensions='["java"]' data-show-preview="false" data-placeholder="No file" data-show-upload="true" data-show-remove="false" data-show-caption="true" data-buttonText="Find CUT">
 	</form>
 </div>
+
+<!-- Footer -->
+<footer class="footer">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3"><p class="text-muted">Developed at The University of Sheffield</p></div>
+			<div class="col-md-1 pull-right"><a class="text-muted btn-right" href="contact">Contact Us</a></div>
+		</div>
+	</div>
+</footer>
 </body>
 </html>

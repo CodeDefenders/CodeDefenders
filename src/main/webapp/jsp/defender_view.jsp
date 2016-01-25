@@ -56,7 +56,8 @@
 		</div>
 		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
 			<ul class="nav navbar-nav navbar-left">
-				<a class="navbar-brand" href="games">Code Defenders</a>
+				<a class="navbar-brand" href="/">Code Defenders</a>
+				<li><a href="games/user">My Games</a></li>
 				<li class="navbar-text">Game ID: <%= game.getId() %></li>
 				<li class="navbar-text">ATK: <%= game.getAttackerScore() %> | DEF: <%= game.getDefenderScore() %></li>
 				<li class="navbar-text">Round <%= game.getCurrentRound() %> of <%= game.getFinalRound() %></li>
@@ -347,5 +348,15 @@
 	});
 	$('#finishedModal').modal('show');
 </script>
+
+<!-- Footer -->
+<footer class="footer">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3"><p class="text-muted">Developed at The University of Sheffield</p></div>
+			<div class="col-md-1 pull-right"><a class="text-muted btn-right" href="contact">Contact Us</a></div>
+		</div>
+	</div>
+</footer>
 </body>
 </html>

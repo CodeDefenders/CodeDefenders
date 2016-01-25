@@ -125,8 +125,47 @@
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
 
+	<servlet>
+		<servlet-name>contact.jsp</servlet-name>
+		<jsp-file>/jsp/contact.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>contact.jsp</servlet-name>
+		<url-pattern>/contact</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>sendEmail</servlet-name>
+		<servlet-class>org.codedefenders.SendEmail</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>sendEmail</servlet-name>
+		<url-pattern>/sendEmail</url-pattern>
+	</servlet-mapping>
+
 	<resource-ref>
 		<res-ref-name>jdbc/codedefenders</res-ref-name>
 		<res-type>javax.sql.DataSource</res-type>
 	</resource-ref>
+
+	<!-- SMTP settings -->
+	<context-param>
+		<param-name>smtpHost</param-name>
+		<param-value>smtp.gmail.com</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>smtpPort</param-name>
+		<param-value>587</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>emailAddress</param-name>
+		<param-value>code.defenders@gmail.com</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>emailPassword</param-name>
+		<param-value>***REMOVED***</param-value>
+	</context-param>
 </web-app>

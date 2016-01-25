@@ -131,6 +131,11 @@
             <artifactId>javassist</artifactId>
             <version>3.20.0-GA</version>
         </dependency>
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.6-rc1</version>
+        </dependency>
 
     </dependencies>
 </project>

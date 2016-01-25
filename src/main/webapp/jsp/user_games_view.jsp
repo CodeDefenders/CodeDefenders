@@ -27,7 +27,7 @@
     		</div>
       		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
           		<ul class="nav navbar-nav">
-                <li><a class="navbar-brand" href="games">Code Defenders</a></li>
+                <li><a class="navbar-brand" href="/">Code Defenders</a></li>
                 <li class="active"><a href="games/user">My Games</a></li>
                 <li><a href="games/open">Open Games</a></li>
                 <li><a href="games/create">Create Game</a></li>
@@ -134,5 +134,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
+
+<!-- Footer -->
+<footer class="footer">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-3"><p class="text-muted">Developed at The University of Sheffield</p></div>
+			<div class="col-md-1 pull-right"><a class="text-muted btn-right" href="contact">Contact Us</a></div>
+		</div>
+	</div>
+</footer>
 </body>
 </html>
