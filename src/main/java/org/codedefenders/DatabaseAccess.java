@@ -1,7 +1,10 @@
 package org.codedefenders;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -9,12 +12,13 @@ import java.util.ArrayList;
 
 public class DatabaseAccess {
 
-	public static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	public static final String DB_URL = "jdbc:mysql://localhost/codedefenders?autoReconnect=true&useSSL=false";
-
-	//  Database credentials
-	public static final String USER = "root";
-	public static final String PASS = "***REMOVED***";
+	public static Connection getConnection() throws ClassNotFoundException, SQLException, NamingException {
+		Context initialContext = new InitialContext();
+		Context environmentContext = (Context) initialContext.lookup("java:comp/env");
+		String dataResourceName = "jdbc/codedefenders";
+		DataSource dataSource = (DataSource) environmentContext.lookup(dataResourceName);
+		return dataSource.getConnection();
+	}
 
 	public static String addSlashes(String s) {
 		return s.replaceAll("\\\\", "\\\\\\\\");
@@ -358,11 +362,6 @@ public class DatabaseAccess {
 		} //end try
 
 		return gameList;
-	}
-
-	public static Connection getConnection() throws ClassNotFoundException, SQLException {
-		Class.forName(JDBC_DRIVER);
-		return DriverManager.getConnection(DatabaseAccess.DB_URL, DatabaseAccess.USER, DatabaseAccess.PASS);
 	}
 
 	public static ArrayList<Mutant> getMutantsForGame(int gid) {
