@@ -27,14 +27,13 @@
 	<nav class="navbar navbar-inverse navbar-fixed-top">
   		<div class="container-fluid">
     		<div class="navbar-header">
-      			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1">
+      			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
       			</button>
+			    <a class="navbar-brand" href="/">
+				    <span><img class="logo" href="/" src="images/logo.png"/></span>
+				    Code Defenders
+			    </a>
     		</div>
-      		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
-          		<ul class="nav navbar-nav">
-            		<a class="navbar-brand" href="/">Code Defenders</a>
-          		</ul>
-      		</div>
    		</div>
 	</nav>
 

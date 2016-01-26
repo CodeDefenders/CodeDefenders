@@ -51,12 +51,15 @@
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
 			</button>
+			<a class="navbar-brand" href="/">
+				<span><img class="logo" href="/" src="images/logo.png"/></span>
+				Code Defenders
+			</a>
 		</div>
 		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
 			<ul class="nav navbar-nav navbar-left">
-				<a class="navbar-brand" href="/">Code Defenders</a>
 				<li><a href="games/user">My Games</a></li>
 				<li class="navbar-text">Game ID: <%= game.getId() %></li>
 				<li class="navbar-text">ATK: <%= game.getAttackerScore() %> | DEF: <%= game.getDefenderScore() %></li>
