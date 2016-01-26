@@ -1,5 +1,18 @@
 package org.codedefenders;
 
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseException;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.DoStmt;
+import com.github.javaparser.ast.stmt.ForStmt;
+import com.github.javaparser.ast.stmt.ForeachStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.WhileStmt;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -83,7 +98,6 @@ public class GameManager extends HttpServlet {
 
 		Game activeGame = (Game) session.getAttribute("game");
 
-		boolean responseCommitted = false;
 		switch (request.getParameter("formType")) {
 
 			case "resolveEquivalence":
@@ -103,6 +117,12 @@ public class GameManager extends HttpServlet {
 
 					// If it can be written to file and compiled, end turn. Otherwise, dont.
 					Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid);
+					if (newTest == null) {
+						messages.add("Your test is not valid. Remember the rules: Only one test and no conditionals or loops!");
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						response.sendRedirect("play");
+						return;
+					}
 
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
@@ -120,13 +140,13 @@ public class GameManager extends HttpServlet {
 									messages.add("Your test did not kill the mutant!");
 								}
 								response.sendRedirect("play");
-								responseCommitted = true;
+								return;
 							} else {
 								activeGame.passPriority();
 								activeGame.update();
 								messages.add("Yay, your test killed the muntant!");
 								response.sendRedirect("play");
-								responseCommitted = true;
+								return;
 							}
 						} else if  (testOriginalTarget.status.equals("FAIL")) {
 							System.out.println("testOriginalTarget: " + testOriginalTarget);
@@ -158,7 +178,7 @@ public class GameManager extends HttpServlet {
 
 						activeGame.update();
 						response.sendRedirect("play");
-						responseCommitted = true;
+						return;
 					}
 				}
 				break;
@@ -207,6 +227,12 @@ public class GameManager extends HttpServlet {
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
 				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid);
+				if (newTest == null) {
+					messages.add("Your test is not valid. Remember the rules: Only one test and no conditionals or loops!");
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+					response.sendRedirect("play");
+					return;
+				}
 				System.out.println("New Test " + newTest.getId());
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
@@ -232,8 +258,7 @@ public class GameManager extends HttpServlet {
 				}
 				break;
 		}
-		if (! responseCommitted)
-			response.sendRedirect("play");//doGet(request, response);
+		response.sendRedirect("play");//doGet(request, response);
 	}
 
 	// Writes text as a Mutant to the appropriate place in the file system.
@@ -310,18 +335,26 @@ public class GameManager extends HttpServlet {
 		return parsable;
 	}
 
+	/**
+	 *
+	 * @param gid
+	 * @param cid
+	 * @param testText
+	 * @param ownerId
+	 * @return {@code null} if test is not valid
+	 * @throws IOException
+	 */
 	public Test createTest(int gid, int cid, String testText, int ownerId) throws IOException {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
 		File newTestDir = getNextSubDir(getServletContext().getRealPath(TESTS_DIR + FILE_SEPARATOR + gid));
 
-		String javaFile = newTestDir + FILE_SEPARATOR + TEST_PREFIX + classUnderTest.getBaseName() + JAVA_SOURCE_EXT;
-		File testFile = new File(javaFile);
-		FileWriter testWriter = new FileWriter(testFile);
-		BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);
-		bufferedTestWriter.write(testText);
-		bufferedTestWriter.close();
+		String javaFile = createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
+
+		if (! validTestCode(javaFile)) {
+			return null;
+		}
 
 		// Check the test actually passes when applied to the original code.
 		Test newTest = AntRunner.compileTest(getServletContext(), newTestDir, javaFile, gid, classUnderTest, ownerId);
@@ -331,5 +364,55 @@ public class GameManager extends HttpServlet {
 			AntRunner.testOriginal(getServletContext(), newTestDir, newTest);
 		}
 		return newTest;
+	}
+
+	private String createJavaFile(File dir, String classBaseName, String testCode) throws IOException {
+		String javaFile = dir.getAbsolutePath() + FILE_SEPARATOR + TEST_PREFIX + classBaseName + JAVA_SOURCE_EXT;
+		File testFile = new File(javaFile);
+		FileWriter testWriter = new FileWriter(testFile);
+		BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);
+		bufferedTestWriter.write(testCode);
+		bufferedTestWriter.close();
+		return javaFile;
+	}
+
+	private boolean validTestCode(String javaFile) throws IOException {
+
+		CompilationUnit cu;
+		FileInputStream in = null;
+		try {
+			in = new FileInputStream(javaFile);
+			// parse the file
+			cu = JavaParser.parse(in);
+			// prints the resulting compilation unit to default system output
+			if (cu.getTypes().size() != 1) {
+				System.out.println("Invalid test suite contains more than one type declaration.");
+				return false;
+			}
+			TypeDeclaration clazz = cu.getTypes().get(0);
+			if (clazz.getMembers().size() != 1) {
+				System.out.println("Invalid test suite contains more than one method.");
+				return false;
+			}
+			MethodDeclaration test = (MethodDeclaration)clazz.getMembers().get(0);
+			BlockStmt testBody = test.getBody();
+			for (Node node : testBody.getChildrenNodes()) {
+				if (node instanceof ForeachStmt
+						|| node instanceof IfStmt
+						|| node instanceof ForStmt
+						|| node instanceof WhileStmt
+						|| node instanceof DoStmt) {
+					System.out.println("Invalid test contains " + node.getClass().getSimpleName() + " statement");
+					return false;
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} finally {
+			in.close();
+		}
+		return true;
 	}
 }
