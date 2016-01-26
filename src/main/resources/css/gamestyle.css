@@ -242,3 +242,13 @@ textarea[id="inputMessage"] {
 .pull-right {
 	float: right !important;
 }
+
+img.displayed {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	border-radius: 25px;
+	border: 5px solid #f5f5f5;
+	padding: 20px;
+	width:700px;
+}

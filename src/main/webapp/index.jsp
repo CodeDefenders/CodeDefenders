@@ -44,6 +44,7 @@
 		<p>A Mutation Testing Game</p>
 		<p>
 		<a  class="btn btn-primary btn-large"  href="login">Enter</a>
+		<p><img src="images/schema.jpeg" class="img-responsive displayed"/></p>
 	</div>
   </div>
 
