@@ -8,11 +8,14 @@ import difflib.Chunk;
 import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,6 +25,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Mutant {
+
+	private static final Logger logger = LoggerFactory.getLogger(Mutant.class);
 
 	private int id;
 	private int gameId;
@@ -151,14 +156,9 @@ public class Mutant {
 		File sourceFile = new File(sut.javaFile);
 		File mutantFile = new File(javaFile);
 
-		List<String> sutLines = new ArrayList<>();
-		List<String> mutantLines = new ArrayList<>();
-		try {
-			sutLines = Files.readAllLines(sourceFile.toPath(), StandardCharsets.UTF_8);
-			mutantLines = Files.readAllLines(mutantFile.toPath(), StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			e.printStackTrace(); // TODO handle properly
-		}
+		List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());
+		List<String> mutantLines = readLinesIfFileExist(mutantFile.toPath());
+
 		return DiffUtils.diff(sutLines, mutantLines);
 	}
 
@@ -169,14 +169,9 @@ public class Mutant {
 		File sourceFile = new File(sut.javaFile);
 		File mutantFile = new File(javaFile);
 
-		List<String> sutLines = new ArrayList<>();
-		List<String> mutantLines = new ArrayList<>();
-		try {
-			sutLines = Files.readAllLines(sourceFile.toPath(), StandardCharsets.UTF_8);
-			mutantLines = Files.readAllLines(mutantFile.toPath(), StandardCharsets.UTF_8);
-		} catch (IOException e) {
-			e.printStackTrace();  // TODO handle properly
-		}
+		List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());
+		List<String> mutantLines = readLinesIfFileExist(mutantFile.toPath());
+
 		Patch patch = DiffUtils.diff(sutLines, mutantLines);
 		List<String> unifiedPatches = DiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
 		StringBuilder unifiedPatch = new StringBuilder();
@@ -184,6 +179,20 @@ public class Mutant {
 			unifiedPatch.append(s + System.getProperty("line.separator"));
 		}
 		return unifiedPatch.toString();
+	}
+
+	private List<String> readLinesIfFileExist(Path path) {
+		List<String> lines = new ArrayList<>();
+		try {
+			if (Files.exists(path))
+				lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+			else
+				logger.error("File not found {}", path);
+		} catch (IOException e) {
+			e.printStackTrace();  // TODO handle properly
+		} finally {
+			return lines;
+		}
 	}
 
 	public List<String> getHTMLReadout() throws IOException {
@@ -223,7 +232,7 @@ public class Mutant {
 		Statement stmt = null;
 
 		try {
-			System.out.println("Inserting mutant");
+			logger.info("Inserting mutant");
 
 			conn = DatabaseAccess.getConnection();
 
@@ -245,9 +254,11 @@ public class Mutant {
 				return true;
 			}
 		} catch (SQLException se) {
+			logger.error(se.getMessage());
 			System.out.println(se);
 		} // Handle errors for JDBC
 		catch (Exception e) {
+			logger.error(e.getMessage());
 			System.out.println(e);
 		} // Handle errors for Class.forName
 		finally {
@@ -262,6 +273,7 @@ public class Mutant {
 					conn.close();
 				}
 			} catch (SQLException se) {
+				logger.error(se.getMessage());
 				System.out.println(se);
 			}
 		}
@@ -273,7 +285,7 @@ public class Mutant {
 	// These values update when Mutants are suspected of being equivalent, go through an equivalence test, or are killed.
 	public boolean update() {
 
-		System.out.println("Updating Mutant");
+		logger.info("Updating Mutant");
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -289,9 +301,11 @@ public class Mutant {
 			stmt.close();
 			return true;
 		} catch (SQLException se) {
+			logger.error(se.getMessage());
 			System.out.println(se);
 		} // Handle errors for JDBC
 		catch (Exception e) {
+			logger.error(e.getMessage());
 			System.out.println(e);
 		} // Handle errors for Class.forName
 		finally {
