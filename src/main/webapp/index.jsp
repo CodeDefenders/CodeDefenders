@@ -38,24 +38,16 @@
    		</div>
 	</nav>
 
-  <div class="container">
-	<div id="splash" class="jumbotron">
-		<h1>Code Defenders</h1>
-		<p>A Mutation Testing Game</p>
-		<p>
-		<a  class="btn btn-primary btn-large"  href="login">Enter</a>
-		<p><img src="images/schema.jpeg" class="img-responsive displayed"/></p>
-	</div>
-  </div>
-
-	<!-- Footer -->
-	<footer class="footer">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-3"><p class="text-muted">Developed at The University of Sheffield</p></div>
-				<div class="col-md-1 pull-right"><a class="text-muted btn-right" href="contact">Contact Us</a></div>
-			</div>
+	<div class="container">
+		<div id="splash" class="jumbotron">
+			<h1>Code Defenders</h1>
+			<p>A Mutation Testing Game</p>
+			<p>
+			<a  class="btn btn-primary btn-large"  href="login">Enter</a>
+			<p><img src="images/schema.jpeg" class="img-responsive displayed"/></p>
+			<p class="text-muted"  style="font-size:small;">Developed at The University of Sheffield</p>
+			<a class="text-muted" href="contact">Contact Us</a>
 		</div>
-	</footer>
+	</div>
 </body>
 </html>

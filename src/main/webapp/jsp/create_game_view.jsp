@@ -107,15 +107,5 @@
 		<button class="btn btn-lg btn-primary btn-block" type="submit" value="Create">Create</button>
 	</form>
 </div>
-
-<!-- Footer -->
-<footer class="footer">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-3"><p class="text-muted">Developed at The University of Sheffield</p></div>
-			<div class="col-md-1 pull-right"><a class="text-muted btn-right" href="contact">Contact Us</a></div>
-		</div>
-	</div>
-</footer>
 </body>
 </html>

@@ -58,15 +58,5 @@
 		<button class="btn btn-lg btn-primary btn-block" type="submit">Send</button>
 	</form>
 </div>
-
-<!-- Footer -->
-<footer class="footer">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-3"><p class="text-muted">Developed at The University of Sheffield</p></div>
-			<div class="col-md-1 pull-right"></div>
-		</div>
-	</div>
-</footer>
 </body>
 </html>

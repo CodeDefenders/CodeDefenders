@@ -79,15 +79,5 @@
 		<input id="fileUpload" name="fileUpload" type="file" class="file-loading" data-allowed-file-extensions='["java"]' data-show-preview="false" data-placeholder="No file" data-show-upload="true" data-show-remove="false" data-show-caption="true" data-buttonText="Find CUT">
 	</form>
 </div>
-
-<!-- Footer -->
-<footer class="footer">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-3"><p class="text-muted">Developed at The University of Sheffield</p></div>
-			<div class="col-md-1 pull-right"><a class="text-muted btn-right" href="contact">Contact Us</a></div>
-		</div>
-	</div>
-</footer>
 </body>
 </html>

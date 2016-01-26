@@ -113,16 +113,5 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
-
-<!-- Footer -->
-<footer class="footer">
-	<div class="container">
-		<div class="row">
-			<div class="col-md-3"><p class="text-muted">Developed at The University of Sheffield</p></div>
-			<div class="col-md-1 pull-right"><a class="text-muted btn-right" href="contact">Contact Us</a></div>
-		</div>
-	</div>
-</footer>
-
 </body>
 </html>
