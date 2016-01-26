@@ -58,10 +58,10 @@ public class SendEmail extends HttpServlet {
 			transport.send(msg);
 			transport.close();
 
-			request.getSession().setAttribute("emailSent", "Email Sent Successfully");
+			request.getSession().setAttribute("emailSent", "Thanks for your message, we'll get back to you soon! --The Code Defenders Team");
 		} catch (MessagingException messagingException) {
 			System.out.print(messagingException);
-			request.getSession().setAttribute("emailSent", "Error Sending Email.");
+			request.getSession().setAttribute("emailSent", "Sorry! The message was not sent. Please, try emailing us: {j.rojas,gordon.fraser}@sheffield.ac.uk.");
 		}
 		response.sendRedirect("contact");
 	}

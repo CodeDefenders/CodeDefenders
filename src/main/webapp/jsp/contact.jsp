@@ -33,6 +33,7 @@
 </nav>
 <%
 	String result = (String)request.getSession().getAttribute("emailSent");
+	request.getSession().removeAttribute("emailSent");
 	if (result != null) {
 %>
 <div class="alert alert-info" id="messages-div">
