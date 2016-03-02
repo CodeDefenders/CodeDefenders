@@ -45,6 +45,7 @@ public class LoginFilter implements Filter {
 		if ((path.endsWith(context + "/"))
 				|| (path.endsWith(context + "/login"))
 				|| (path.endsWith(context + "/contact"))
+				|| (path.endsWith(context + "/intro.html"))
 				|| (path.endsWith(context + "/sendEmail"))
 				|| (path.endsWith(context + "/index.jsp")))
 			return true;

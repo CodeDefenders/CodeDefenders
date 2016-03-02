@@ -46,6 +46,7 @@
 			<p><img src="images/schema.jpeg" class="img-responsive displayed"/></p>
 			<p class="text-muted"  style="font-size:small;">Developed at The University of Sheffield</p>
 			<a class="text-muted" href="contact">Contact Us</a>
+			<a class="text-muted" href="intro.html">Intro</a>
 		</div>
 	</div>
 </body>
