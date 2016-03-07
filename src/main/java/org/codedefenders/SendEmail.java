@@ -63,6 +63,6 @@ public class SendEmail extends HttpServlet {
 			System.out.print(messagingException);
 			request.getSession().setAttribute("emailSent", "Sorry! The message was not sent. Please, try emailing us: {j.rojas,gordon.fraser}@sheffield.ac.uk.");
 		}
-		response.sendRedirect("contact");
+		response.sendRedirect("/#contact");
 	}
 }

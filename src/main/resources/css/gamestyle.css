@@ -28,7 +28,27 @@
 #splash {
 	position: relative;
 	width: 100%;
-	height: 200px;
+	height: 650px;
+	z-index:15;
+	margin: auto;
+	text-align:center;
+	background-color: #fff;
+}
+
+#research {
+	position: relative;
+	width: 100%;
+	height: 650px;
+	z-index:15;
+	margin: auto;
+	text-align:center;
+	background-color: #fff;
+}
+
+#contact {
+	position: relative;
+	width: 100%;
+	height: 650px;
 	z-index:15;
 	margin: auto;
 	text-align:center;
@@ -262,4 +282,71 @@ img.logo {
     padding-left: 10px;
     padding-right: 10px;
     padding-bottom: 0px;
+}
+
+/* Link styles (used on .masthead-links as well) */
+.jumbotron a {
+	color: #000;
+	-webkit-transition: all .2s ease-in-out;
+	-moz-transition: all .2s ease-in-out;
+	transition: all .2s ease-in-out;
+}
+
+/* Textual links in masthead */
+.masthead-links {
+	margin: 0;
+	list-style: none;
+}
+.masthead-links li {
+	display: inline;
+	padding: 0 10px;
+	color: rgba(255,255,255,.25);
+}
+
+/* Papercite */
+
+.papercite_errors:before {
+	content: "Papercite errors";
+}
+
+.papercite_errors {
+	border: 1px solid red;
+	background: #eee;
+	padding: 5px;
+}
+
+.papercite_errors > div {
+	display: list-item;
+}
+
+.papercite_bibtex {
+	display: none;
+}
+
+.papercite_bibtex pre {
+	white-space: pre-wrap;
+}
+
+.papercite_toggle:link, .papercite_toggle:visited {
+	color: gray;
+	text-decoration: none;
+}
+
+
+.papercite_link, .papercite_link:link, .papercite_link:visited {
+	color: #222;
+	font-weight: bold;
+	text-decoration: none;
+	cursor: pointer;
+}
+.papercite_info {
+	color: #555;
+}
+
+.papercite_highlight {
+	font-weight: bold;
+}
+
+.bibtex {
+	text-align:center;
 }
