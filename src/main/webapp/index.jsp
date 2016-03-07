@@ -85,7 +85,7 @@
 						<div style="display: none" id="mutation16_bibtex">
 <pre><code class="tex bibtex">@inproceedings{Mutation16_CodeDefenders,
 	author = {
-	<Jos>'e</Jos> Miguel Rojas and Gordon Fraser},
+	Jos{\'e} Miguel Rojas and Gordon Fraser},
 	title = {Code Defenders: A Mutation Testing Game},
 	booktitle = {Proc. of The 11th International Workshop on Mutation Analysis},
 	series = {MUTATION'16},
