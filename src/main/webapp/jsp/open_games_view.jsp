@@ -20,6 +20,7 @@
 
 <%@ page import="org.codedefenders.DatabaseAccess" %>
 <%@ page import="org.codedefenders.Game" %>
+<%@ page import="java.util.ArrayList" %>
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -54,6 +55,18 @@
 <form id="logout" action="login" method="post">
 	<input type="hidden" name="formType" value="logOut">
 </form>
+
+<%
+	ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
+	request.getSession().removeAttribute("messages");
+	if (messages != null && ! messages.isEmpty()) {
+%>
+<div class="alert alert-info" id="messages-div">
+	<% for (String m : messages) { %>
+	<pre><strong><%=m%></strong></pre>
+	<% } %>
+</div>
+<%	} %>
 
 <h2> Open Games </h2>
 <table class="table table-hover table-responsive table-paragraphs">
