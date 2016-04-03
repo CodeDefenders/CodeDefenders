@@ -84,7 +84,7 @@
 						In <span style="font-style: italic">Proc. of The 11th International Workshop on Mutation Analysis</span>,  2016.<br/>
 						<a href="javascript:void(0)" onclick="javascript:var x=document.getElementById('mutation16_bibtex');x.style.display=x.style.display=='none'?'':'none'">[Bibtex]</a>
 						<div style="display: none" id="mutation16_bibtex">
-<pre><code class="tex bibtex">@inproceedings{Mutation16_CodeDefenders,
+<pre style="text-align: left"><code class="tex bibtex">@inproceedings{Mutation16_CodeDefenders,
 	author = {Jos{\'e} Miguel Rojas and Gordon Fraser},
 	title = {Code Defenders: A Mutation Testing Game},
 	booktitle = {Proc. of The 11th International Workshop on Mutation Analysis},
