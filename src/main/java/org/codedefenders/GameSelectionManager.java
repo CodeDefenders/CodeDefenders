@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class GameSelectionManager extends HttpServlet {
 
@@ -20,6 +21,9 @@ public class GameSelectionManager extends HttpServlet {
 		// Get their user id from the session.
 		int uid = (Integer) session.getAttribute("uid");
 		int gameId;
+
+		ArrayList<String> messages = new ArrayList<String>();
+		session.setAttribute("messages", messages);
 
 		switch (request.getParameter("formType")) {
 
@@ -47,21 +51,35 @@ public class GameSelectionManager extends HttpServlet {
 
 				Game jGame = DatabaseAccess.getGameForKey("Game_ID", gameId);
 
-				if (jGame.getAttackerId() == 0) {
-					jGame.setAttackerId(uid);
+				if ((jGame.getAttackerId() == uid) && (jGame.getDefenderId() == uid)) {
+					// uid is already in the game
+					if (jGame.getDefenderId() == uid)
+						messages.add("Already a defender in this game!");
+					else
+						messages.add("Already an attacker in this game!");
+					// either way, reload list of open games
+					response.sendRedirect(request.getHeader("referer"));
+					break;
 				} else {
-					jGame.setDefenderId(uid);
+					if (jGame.getAttackerId() == 0) {
+						jGame.setAttackerId(uid);
+						messages.add("Joined game as an attacker.");
+					} else if (jGame.getDefenderId() == 0) {
+						messages.add("Joined game as a defender.");
+						jGame.setDefenderId(uid);
+					} else {
+						messages.add("Game is no longer open.");
+						response.sendRedirect(request.getHeader("referer"));
+						break;
+					}
 				}
-
+				// user joined, update game
 				jGame.setState(Game.State.ACTIVE);
 				jGame.setActiveRole(Game.Role.ATTACKER);
-
 				jGame.update();
-
+				// go to play view
 				session.setAttribute("gid", gameId);
-
 				response.sendRedirect("play");
-
 				break;
 
 			case "enterGame":
