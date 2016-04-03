@@ -2,6 +2,7 @@
 <html>
 
 <head>
+	<title>Code Defenders</title>
 	<meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -62,7 +63,7 @@
 		<a  class="btn btn-primary btn-large"  href="login">Enter</a>
 		<p><img style="margin-top:20px" src="images/schema.jpeg" class="img-responsive displayed"/></p>
 		<p class="text-muted" style="font-size:small;">
-			Developed at The University of Sheffield
+			Developed at The University of Sheffield <br>Supported by the <a href="https://www.sheffield.ac.uk/sure">SURE (Sheffield Undergraduate Research Experience)</a> scheme
 		</p>
 	</div>
 
@@ -84,12 +85,10 @@
 						<a href="javascript:void(0)" onclick="javascript:var x=document.getElementById('mutation16_bibtex');x.style.display=x.style.display=='none'?'':'none'">[Bibtex]</a>
 						<div style="display: none" id="mutation16_bibtex">
 <pre><code class="tex bibtex">@inproceedings{Mutation16_CodeDefenders,
-	author = {
-	<Jos>'e</Jos> Miguel Rojas and Gordon Fraser},
+	author = {Jos{\'e} Miguel Rojas and Gordon Fraser},
 	title = {Code Defenders: A Mutation Testing Game},
 	booktitle = {Proc. of The 11th International Workshop on Mutation Analysis},
-	series = {MUTATION'16},
-	year = {2015},
+	year = {2016},
 	publisher = {IEEE},
 	note = {To appear}
 }</code></pre>
