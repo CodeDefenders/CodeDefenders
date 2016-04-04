@@ -11,6 +11,8 @@
 		<pathelement path="sources"/>
 	</path>
 
+	<property name="policyfile" location="security.policy" />
+
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-cut" description="compile a class under test">
 		<javac srcdir="${src.dir}" destdir="${src.dir}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" listfiles="yes">
@@ -47,6 +49,8 @@
 				<pathelement path="${test.file}"/>
 			</classpath>
 			<test name="${testClassname}"/>
+			<jvmarg value="-Djava.security.manager" />
+			<jvmarg value="-Djava.security.policy==${policyfile}" />
 		</junit>
 	</target>
 
@@ -62,6 +66,8 @@
 			</classpath>
 			<test name="${testClassname}"/>
 			<formatter type="plain" usefile="false"/>
+			<jvmarg value="-Djava.security.manager" />
+			<jvmarg value="-Djava.security.policy==${policyfile}" />
 		</junit>
 
 	</target>
