@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `classes`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `classes` (
   `Class_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `Name` varchar(20) NOT NULL,
+  `Name` varchar(255) NOT NULL,
   `JavaFile` varchar(255) NOT NULL,
   `ClassFile` varchar(255) NOT NULL,
   PRIMARY KEY (`Class_ID`)

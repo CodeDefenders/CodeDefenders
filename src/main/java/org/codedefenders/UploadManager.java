@@ -8,9 +8,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,8 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UploadManager extends HttpServlet {
@@ -34,8 +31,8 @@ public class UploadManager extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
 		HttpSession session = request.getSession();
-		// Get their user id from the session.
-		int uid = (Integer) session.getAttribute("uid");
+		ArrayList<String> messages = new ArrayList<>();
+		session.setAttribute("messages", messages);
 
 		System.out.println("Uploading CUT");
 
@@ -68,20 +65,30 @@ public class UploadManager extends HttpServlet {
 						FileUtils.copyInputStreamToFile(fileContent, targetFile);
 						String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
 						String classFileName = AntRunner.compileCUT(getServletContext(), fileName);
-						String classFileNameDB = DatabaseAccess.addSlashes(classFileName);
+						if (classFileName != null) {
+							String classFileNameDB = DatabaseAccess.addSlashes(classFileName);
 
-						// get fully qualified name
-						ClassPool classPool = ClassPool.getDefault();
-						CtClass cc = classPool.makeClass(new FileInputStream(new File(classFileName)));
-						String fullyQualifiedName = cc.getName();
+							// get fully qualified name
+							ClassPool classPool = ClassPool.getDefault();
+							CtClass cc = classPool.makeClass(new FileInputStream(new File(classFileName)));
+							String fullyQualifiedName = cc.getName();
 
-						// db insert
-						newSUT = new GameClass(fullyQualifiedName, javaFileNameDB, classFileNameDB);
-						newSUT.insert();
+							// db insert
+							newSUT = new GameClass(fullyQualifiedName, javaFileNameDB, classFileNameDB);
+							newSUT.insert();
 
-						response.sendRedirect("games/create");
-					} else
-						System.err.println("No class was selected.");
+							response.sendRedirect("games/create");
+
+						} else {
+							messages.add("We were unable to compile your class, please try with a simpler one (no dependencies)");
+							response.sendRedirect(request.getHeader("referer"));
+							break;
+						}
+					} else {
+						messages.add("No class was selected.");
+						response.sendRedirect(request.getHeader("referer"));
+						break;
+					}
 				}
 			}
 		} catch (FileUploadException e) {

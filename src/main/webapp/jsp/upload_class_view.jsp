@@ -42,6 +42,7 @@
 <body>
 
 <%@ page import="org.codedefenders.*,java.io.*" %>
+<%@ page import="java.util.ArrayList" %>
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -76,6 +77,18 @@
 <form id="logout" action="login" method="post">
 	<input type="hidden" name="formType" value="logOut">
 </form>
+
+<%
+	ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
+	request.getSession().removeAttribute("messages");
+	if (messages != null && ! messages.isEmpty()) {
+%>
+<div class="alert alert-info" id="messages-div">
+	<% for (String m : messages) { %>
+	<pre><strong><%=m%></strong></pre>
+	<% } %>
+</div>
+<%	} %>
 
 <div id="divUpload" class="container">
 	<form id="formUpload" action="upload" class="form-upload" method="post" enctype="multipart/form-data">

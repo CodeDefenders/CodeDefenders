@@ -1,5 +1,8 @@
 package org.codedefenders;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +15,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class GameClass {
+
+	private static final Logger logger = LoggerFactory.getLogger(GameClass.class);
 
 	public int id;
 	public String name; // fully qualified name
@@ -70,6 +75,7 @@ public class GameClass {
 
 	public boolean insert() {
 
+		logger.debug("Inserting class (Name={}, JavaFile={}, ClassFile={})", name, javaFile, classFile);
 		Connection conn = null;
 		Statement stmt = null;
 		String sql = String.format("INSERT INTO classes (Name, JavaFile, ClassFile) VALUES ('%s', '%s', '%s');", name, javaFile, classFile);
