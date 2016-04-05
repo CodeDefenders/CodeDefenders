@@ -239,13 +239,13 @@ public class GameManager extends HttpServlet {
 				if (compileTestTarget.status.equals("SUCCESS")) {
 					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 					if (testOriginalTarget.status.equals("SUCCESS")) {
-						messages.add("Your test was compiled successfully.");
+						messages.add("Great! Your test compiled and passed on the original class under test.");
 						MutationTester.runTestOnAllMutants(getServletContext(), activeGame, newTest, messages);
 					} else if (testOriginalTarget.status.equals("FAIL")) {
-						messages.add("Oh no! Your test failed on the original class under test. You lose your turn.");
+						messages.add("Your test failed on the original class under test. You lose your turn.");
 						messages.add(testOriginalTarget.message);
 					} else {
-						messages.add("The execution of your test finished with an error. You lose your turn.");
+						messages.add("Oh no! The execution of your test finished with an error. You lose your turn.");
 						messages.add(testOriginalTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					}
