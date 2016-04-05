@@ -168,7 +168,7 @@ public class GameClass {
 		sb.append(String.format("import org.junit.*;%n"));
 		sb.append(String.format("import static org.junit.Assert.*;%n%n"));
 		sb.append(String.format("public class Test%s {%n", getBaseName()));
-		sb.append(String.format("%c@Test%n",'\t'));
+		sb.append(String.format("%c@Test(timeout = 4000)%n",'\t'));
 		sb.append(String.format("%cpublic void test() throws Throwable {%n",'\t'));
 		sb.append(String.format("%c%c// test here!%n",'\t','\t'));
 		sb.append(String.format("%c}%n",'\t'));
