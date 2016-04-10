@@ -188,18 +188,21 @@ public class Game {
 	public int getAttackerScore() {
 		int totalScore = 0;
 
-		for (Mutant m : getMutants()) {
-			totalScore += m.getPoints();
-		}
+		for (Mutant m : getMutants())
+			totalScore += m.getAttackerPoints();
+
 		return totalScore;
 	}
 
 	public int getDefenderScore() {
 		int totalScore = 0;
 
-		for (Test t : getTests()) {
-			totalScore += t.getPoints();
-		}
+		for (Test t : getTests())
+			totalScore += t.getDefenderPoints();
+
+		for (Mutant m : getMutants())
+			totalScore += m.getDefenderPoints();
+
 		return totalScore;
 	}
 

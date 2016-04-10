@@ -51,7 +51,11 @@ public class Test {
 		return gameId;
 	}
 
-	public int getPoints() {
+	public int getAttackerPoints() {
+		return 0;
+	}
+
+	public int getDefenderPoints() {
 		if (ownerId == DatabaseAccess.getGameForKey("Game_ID", gameId).getDefenderId())
 			return mutantsKilled;
 		else

@@ -129,28 +129,29 @@ public class GameManager extends HttpServlet {
 					if (compileTestTarget.status.equals("SUCCESS")) {
 						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 						if (testOriginalTarget.status.equals("SUCCESS")) {
-							System.out.println("Test compiled and executed correctly.");
+							System.out.println("Test compiled and executed correctly against CUT.");
 							if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
 								// Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
 								MutationTester.runEquivalenceTest(getServletContext(), newTest, mutant);
 								activeGame.passPriority();
 								activeGame.update();
 								Mutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
-								if (mutantAfterTest.isAlive()) {
+								if (mutantAfterTest.isAlive())
 									messages.add("Your test did not kill the mutant!");
-								}
+								else
+									messages.add("Yay, your test killed the mutant!");
 								response.sendRedirect("play");
 								return;
 							} else {
 								activeGame.passPriority();
 								activeGame.update();
-								messages.add("Yay, your test killed the muntant!");
+								messages.add("Yay, your test killed the mutant!");
 								response.sendRedirect("play");
 								return;
 							}
 						} else if  (testOriginalTarget.status.equals("FAIL")) {
 							System.out.println("testOriginalTarget: " + testOriginalTarget);
-							messages.add("An error occured while executing your test against the CUT.");
+							messages.add("Your test failed against the CUT.");
 							messages.add(testOriginalTarget.message);
 							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						} else { // ERROR
@@ -171,7 +172,7 @@ public class GameManager extends HttpServlet {
 						mutant.setEquivalent(Mutant.Equivalence.DECLARED_YES);
 						mutant.kill();
 
-						messages.add("The mutant was marked Equivalent and killed");
+						messages.add("The mutant was marked equivalent.");
 
 						if (! activeGame.getAliveMutants().isEmpty())
 							activeGame.passPriority();

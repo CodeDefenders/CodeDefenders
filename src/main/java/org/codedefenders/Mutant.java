@@ -130,7 +130,7 @@ public class Mutant {
 		update();
 	}
 
-	public int getPoints() {
+	public int getAttackerPoints() {
 		if (alive) {
 			// if mutant is alive, as many points as rounds it has survived
 			// TODO: as many points as tests it has survived?
@@ -141,10 +141,28 @@ public class Mutant {
 			if (equivalent.equals(DECLARED_YES)) // accepted equivalent
 				return 0;
 			if (equivalent.equals(ASSUMED_YES)) // claimed, rejected, test did not kill it
-				return -1;
+				return 0;
 			if (equivalent.equals(PROVEN_NO)) // claimed, rejected, test killed it
 				return 2;
 			return roundKilled - roundCreated; // rounds survived
+		}
+	}
+
+	public int getDefenderPoints() {
+		if (alive) {
+			// if mutant is alive, as many points as rounds it has survived
+			// TODO: as many points as tests it has survived?
+			return DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound() - roundCreated;
+		} else {
+			if (classFile == null || classFile.equals("null")) // non-compilable
+				return 0;
+			if (equivalent.equals(DECLARED_YES)) // accepted equivalent
+				return 1;
+			if (equivalent.equals(ASSUMED_YES)) // claimed, rejected, test did not kill it
+				return 2;
+			if (equivalent.equals(PROVEN_NO)) // claimed, rejected, test killed it
+				return 0;
+			return 0;
 		}
 	}
 
