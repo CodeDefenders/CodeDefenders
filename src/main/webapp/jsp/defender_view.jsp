@@ -11,7 +11,9 @@
 	<!-- App context -->
 	<base href="${pageContext.request.contextPath}/">
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<!-- jQuery -->
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+
 	<!-- Slick -->
 	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jquery.slick/1.5.9/slick.css"/>
 	<script type="text/javascript" src="//cdn.jsdelivr.net/jquery.slick/1.5.9/slick.min.js"></script>

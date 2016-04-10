@@ -11,7 +11,12 @@
 	<!-- App context -->
 	<base href="${pageContext.request.contextPath}/">
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<!-- jQuery -->
+	<script type="text/javascript" src="js/jquery.min.js"></script>
+
+	<!-- Include all compiled plugins (below), or include individual files as needed -->
+	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+
 	<!-- Slick -->
 	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jquery.slick/1.5.9/slick.css"/>
 	<script type="text/javascript" src="//cdn.jsdelivr.net/jquery.slick/1.5.9/slick.min.js"></script>
@@ -202,8 +207,7 @@
 	        <pre><textarea id="newtest" name="test" form="equivalenceForm" cols="80" rows="30"><%= testCode %></textarea></pre>
 	</div> <!-- col-md6 right -->
 </div> <!-- row-fluid -->
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="js/bootstrap.min.js"></script>
+
 <script>
 	var editorTest = CodeMirror.fromTextArea(document.getElementById("newtest"), {
 		lineNumbers: true,
