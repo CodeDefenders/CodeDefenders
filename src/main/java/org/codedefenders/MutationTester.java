@@ -73,7 +73,7 @@ public class MutationTester {
 			TargetExecution executedTarget = AntRunner.testMutant(context, mutant, test);
 
 			// If the test did NOT pass, the mutant was detected and should be killed.
-			if (executedTarget.status.equals("FAIL")) {
+			if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
 				System.out.println(String.format("Test %d kills Mutant %d", test.getId(), mutant.getId()));
 				mutant.kill();
 				test.killMutant();
@@ -97,10 +97,7 @@ public class MutationTester {
 		// As a result of this test, either the test the attacker has written kills the mutant or doesnt.
 		TargetExecution executedTarget = AntRunner.testMutant(context, mutant, test);
 
-		if (executedTarget.status.equals("ERROR")) {
-			System.out.println("Error executing test on mutant.");
-			return;
-		} else if (executedTarget.status.equals("FAIL")) {
+		if (executedTarget.status.equals("ERROR") || executedTarget.status.equals("FAIL")) {
 			// If the test did NOT pass, the mutant was detected and is proven to be non-equivalent
 			System.out.println("Mutant was killed, hence tagged not equivalent");
 			mutant.setEquivalent(PROVEN_NO);
