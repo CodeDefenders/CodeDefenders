@@ -34,3 +34,8 @@ compilation and execution.
 ## Usage statistics
 
 Make sure all player activities are recorded in the database.
+
+## Dependencies
+
+Handle packages/projects/jar files
+
