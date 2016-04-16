@@ -133,7 +133,7 @@ public class GameManager extends HttpServlet {
 							if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
 								// Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
 								MutationTester.runEquivalenceTest(getServletContext(), newTest, mutant);
-								activeGame.passPriority();
+								activeGame.endRound();
 								activeGame.update();
 								Mutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
 								if (mutantAfterTest.isAlive())
@@ -143,7 +143,7 @@ public class GameManager extends HttpServlet {
 								response.sendRedirect("play");
 								return;
 							} else {
-								activeGame.passPriority();
+								activeGame.endRound();
 								activeGame.update();
 								messages.add("Yay, your test killed the mutant!");
 								response.sendRedirect("play");
@@ -173,10 +173,7 @@ public class GameManager extends HttpServlet {
 						mutant.kill();
 
 						messages.add("The mutant was marked equivalent.");
-
-						if (! activeGame.getAliveMutants().isEmpty())
-							activeGame.passPriority();
-
+						activeGame.endRound();
 						activeGame.update();
 						response.sendRedirect("play");
 						return;
