@@ -73,10 +73,14 @@
 				<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants Alive</li>
 				<% }%>
 				<li class="navbar-text">
-					<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
-						<span class="label label-primary turn-badge">Your turn</span>
+					<% if (game.getState().equals(ACTIVE)) {%>
+						<% if (game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
+							<span class="label label-primary turn-badge">Your turn</span>
+						<% } else { %>
+							<span class="label label-default turn-badge">Waiting</span>
+						<% } %>
 					<% } else { %>
-						<span class="label label-default turn-badge">Waiting</span>
+						<span class="label label-default turn-badge">Finished</span>
 					<% } %>
 				</li>
 			</ul>
