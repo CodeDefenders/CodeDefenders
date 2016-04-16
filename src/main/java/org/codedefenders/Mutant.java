@@ -134,7 +134,9 @@ public class Mutant {
 		if (alive) {
 			// if mutant is alive, as many points as rounds it has survived
 			// TODO: as many points as tests it has survived?
-			return DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound() - roundCreated;
+			int points = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound() - roundCreated; // rounds survived
+			logger.info("Alive mutant " + getId() + " contributes " + points + " attacker points");
+			return points;
 		} else {
 			if (classFile == null || classFile.equals("null")) // non-compilable
 				return 0;
@@ -142,18 +144,18 @@ public class Mutant {
 				return 0;
 			if (equivalent.equals(ASSUMED_YES)) // claimed, rejected, test did not kill it
 				return 0;
-			if (equivalent.equals(PROVEN_NO)) // claimed, rejected, test killed it
+			if (equivalent.equals(PROVEN_NO)) { // claimed, rejected, test killed it
+				logger.info("Claimed/rejected/killed mutant " + getId() + " contributes 2 attacker points");
 				return 2;
-			return roundKilled - roundCreated; // rounds survived
+			}
+			int points = roundKilled - roundCreated; // rounds survived
+			logger.info("Killed mutant " + getId() + " contributes " + points + " attacker points");
+			return points;
 		}
 	}
 
 	public int getDefenderPoints() {
-		if (alive) {
-			// if mutant is alive, as many points as rounds it has survived
-			// TODO: as many points as tests it has survived?
-			return DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound() - roundCreated;
-		} else {
+		if (! alive) {
 			if (classFile == null || classFile.equals("null")) // non-compilable
 				return 0;
 			if (equivalent.equals(DECLARED_YES)) // accepted equivalent
@@ -164,6 +166,7 @@ public class Mutant {
 				return 0;
 			return 0;
 		}
+		return 0;
 	}
 
 	public Patch getDifferences() {
