@@ -2,6 +2,9 @@ package org.codedefenders;
 
 import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,6 +12,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 public class Game {
+
+	private static final Logger logger = LoggerFactory.getLogger(Game.class);
 
 	private int id;
 
@@ -190,7 +195,7 @@ public class Game {
 
 		for (Mutant m : getMutants())
 			totalScore += m.getAttackerPoints();
-
+		logger.debug("Attacker Score: " + totalScore);
 		return totalScore;
 	}
 
@@ -202,7 +207,7 @@ public class Game {
 
 		for (Mutant m : getMutants())
 			totalScore += m.getDefenderPoints();
-
+		logger.debug("Defender Score: " + totalScore);
 		return totalScore;
 	}
 
