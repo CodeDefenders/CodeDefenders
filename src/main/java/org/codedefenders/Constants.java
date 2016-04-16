@@ -24,7 +24,7 @@ public class Constants {
 	public static final String SCORE_VIEW_JSP           = "jsp" + FILE_SEPARATOR + "score_view.jsp";
 
 	public static final String WINNER_MESSAGE = "You won!";
-	public static final String LOSER_MESSAGE = "You won!";
+	public static final String LOSER_MESSAGE = "You lost!";
 	public static final String DRAW_MESSAGE = "It was a draw!";
 
 	// JSP
