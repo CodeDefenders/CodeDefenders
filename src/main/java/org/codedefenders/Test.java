@@ -104,10 +104,11 @@ public class Test {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			String jFileDB = DatabaseAccess.addSlashes(javaFile);
+			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
 			// class file can be null
-			String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
-			sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Owner_ID) VALUES ('%s', '%s', %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, ownerId);
+			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
+			sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Owner_ID) " +
+					"VALUES (%s, %s, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, ownerId);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 

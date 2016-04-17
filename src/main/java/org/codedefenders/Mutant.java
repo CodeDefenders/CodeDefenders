@@ -156,7 +156,7 @@ public class Mutant {
 
 	public int getDefenderPoints() {
 		if (! alive) {
-			if (classFile == null || classFile.equals("null")) // non-compilable
+			if (classFile == null) // non-compilable
 				return 0;
 			if (equivalent.equals(DECLARED_YES)) // accepted equivalent
 				return 1;
@@ -258,10 +258,10 @@ public class Mutant {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			String jFileDB = DatabaseAccess.addSlashes(javaFile);
-			String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
+			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
+			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
 			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Owner_ID)" +
-					" VALUES ('%s', '%s', %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), ownerId);
+					" VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), ownerId);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 

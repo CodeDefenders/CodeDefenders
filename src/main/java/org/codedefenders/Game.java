@@ -145,9 +145,9 @@ public class Game {
 	}
 
 	public ArrayList<Mutant> getAliveMutants() {
-		ArrayList<Mutant> aliveMutants = new ArrayList<Mutant>();
+		ArrayList<Mutant> aliveMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
-			if (m.isAlive() && (! m.getClassFile().equals("null"))) {
+			if (m.isAlive() && (m.getClassFile() != null)) {
 				aliveMutants.add(m);
 			}
 		}
@@ -157,7 +157,7 @@ public class Game {
 	public ArrayList<Mutant> getKilledMutants() {
 		ArrayList<Mutant> killedMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
-			if ((! m.isAlive()) && (! m.getClassFile().equals("null"))) {
+			if (!m.isAlive() && (m.getClassFile() != null)) {
 				killedMutants.add(m);
 			}
 		}
@@ -165,7 +165,7 @@ public class Game {
 	}
 
 	public ArrayList<Mutant> getMutantsMarkedEquivalent() {
-		ArrayList<Mutant> equivMutants = new ArrayList<Mutant>();
+		ArrayList<Mutant> equivMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
 			if (m.isAlive() && m.getEquivalent().equals(PENDING_TEST)) {
 				equivMutants.add(m);
