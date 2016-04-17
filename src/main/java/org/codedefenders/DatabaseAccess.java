@@ -427,7 +427,7 @@ public class DatabaseAccess {
 			conn = getConnection();
 
 			stmt = conn.createStatement();
-			String sql = sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d' AND Game_ID='%d';", mutantID, game.getId());
+			String sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d' AND Game_ID='%d';", mutantID, game.getId());
 			ResultSet rs = stmt.executeQuery(sql);
 			if (rs.next()) {
 				newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
