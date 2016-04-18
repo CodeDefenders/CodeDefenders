@@ -96,6 +96,29 @@
 					</li>
 				</ul>
 		</div>
+		<div class="row-fluid">
+				<ul class="papercite_bibliography">
+					<li>
+						<a href="papers/ECSEE16_MutationEducation.pdf" title='Download PDF'>
+							<img src='images/pdf.png' alt="[PDF]"/>
+						</a>
+						Jos&eacute; Miguel Rojas and G. Fraser
+						&#8220;Teaching Mutation Testing using Gamification,&#8221;
+						In <span style="font-style: italic">Proc. of The European Conference of Software Engineering Education</span>,  2016.<br/>
+						<a href="javascript:void(0)" onclick="javascript:var x=document.getElementById('ecsee16_bibtex');x.style.display=x.style.display=='none'?'':'none'">[Bibtex]</a>
+						<div style="display: none" id="ecsee16_bibtex">
+<pre style="text-align: left"><code class="tex bibtex">@inproceedings{ECSEE16_MutationEducation,
+	author = {Jos{\'e} Miguel Rojas and Gordon Fraser},
+	title = {Teaching Mutation Testing using Gamification},
+	booktitle = {Proc. of The European Conference of Software Engineering Education (ECSEE)},
+	year = {2016},
+	publisher = {Shaker Publishing},
+	note = {To appear}
+}</code></pre>
+						</div>
+					</li>
+				</ul>
+		</div>
 	</div>
 
 	<hr>
