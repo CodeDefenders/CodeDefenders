@@ -248,11 +248,11 @@
 				</table>
 			</div>
 		</div> <!-- tab-content -->
-		<h2> Tests </h2>
+		<h2> JUnit Tests </h2>
 		<div class="slider single-item">
 			<%
 				boolean isTests = false;
-				for (Test t : game.getTests()) {
+				for (Test t : game.getExecutableTests()) {
 					isTests = true;
 					String tc = "";
 					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }

@@ -168,11 +168,11 @@
 
 <div class="row-fluid">
 	<div class="col-md-6" id="submitted-div">
-		<h2> Submitted JUnit tests </h2>
+		<h2> JUnit tests </h2>
 		<div class="slider single-item">
 			<%
 				boolean isTests = false;
-				for (Test t : game.getTests()) {
+				for (Test t : game.getExecutableTests()) {
 					isTests = true;
 					String tc = "";
 					for (String l : t.getHTMLReadout()) { tc += l + "\n"; }
