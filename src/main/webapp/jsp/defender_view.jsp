@@ -318,6 +318,8 @@
 <script>
 	var editorTest = CodeMirror.fromTextArea(document.getElementById("code"), {
 		lineNumbers: true,
+		indentUnit: 4,
+		indentWithTabs: true,
 		matchBrackets: true
 	});
 	editorTest.on('beforeChange',function(cm,change) {

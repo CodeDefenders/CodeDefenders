@@ -297,6 +297,8 @@
 <script>
 	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
 		lineNumbers: true,
+		indentUnit: 4,
+		indentWithTabs: true,
 		matchBrackets: true
 	});
 	editor.setSize("100%", 500);

@@ -214,6 +214,8 @@
 <script>
 	var editorTest = CodeMirror.fromTextArea(document.getElementById("newtest"), {
 		lineNumbers: true,
+		indentUnit: 4,
+		indentWithTabs: true,
 		matchBrackets: true
 	});
 	editorTest.on('beforeChange',function(cm,change) {
