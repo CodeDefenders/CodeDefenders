@@ -34,6 +34,11 @@ public class Constants {
 	public static final String TEST_DID_NOT_PASS_ON_CUT_MESSAGE = "Your test did not pass on the original class under test. Try again.";
 	public static final String TEST_KILLED_CLAIMED_MUTANT_MESSAGE = "Yay, your test killed the allegedly equivalent mutant!";
 	public static final String TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE = "Oh no, your test did not kill the possibly equivalent mutant!";
+	public static final String TEST_SUBMITTED_MESSAGE = "Test submitted and ready to kill mutants!";
+	public static final String TEST_KILLED_ZERO_MESSAGE = "Your test did not kill any mutant, just yet.";
+	public static final String TEST_KILLED_LAST_MESSAGE = "Great, your test killed the last mutant!";
+	public static final String TEST_KILLED_ONE_MESSAGE = "Great, your test killed a mutant!";
+	public static final String TEST_KILLED_N_MESSAGE = "Awesome! Your test killed %d mutants!"; // number of mutants
 
 	public static final String MUTANT_COMPILED_MESSAGE = "Your mutant was compiled successfully.";
 	public static final String MUTANT_ACCEPTED_EQUIVALENT_MESSAGE = "The mutant was marked equivalent.";
@@ -41,7 +46,10 @@ public class Constants {
 	public static final String MUTANT_IDENTICAL_MESSAGE = "Your mutant is not quite a mutant, it's identical to the class under test!";
 	public static final String MUTANT_CLAIMED_EQUIVALENT_MESSAGE = "Mutant claimed as equivalent, waiting for attacker to respond.";
 	public static final String MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE = "Something went wrong claiming equivalent mutant"; // TODO: How?
-
+	public static final String MUTANT_KILLED_BY_TEST_MESSAGE = "Test %d killed your mutant. Better luck in your next turn!"; // test
+	public static final String MUTANT_SUBMITTED_MESSAGE = "Mutant submitted, may the force be with it.";
+	public static final String MUTANT_ALIVE_1_MESSAGE = "Cool, your mutant is alive.";
+	public static final String MUTANT_ALIVE_N_MESSAGE = "Awesome, your mutant survived %d existing tests!"; // number of tests
 	// JSP
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_TEST = "previousTest";
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_MUTANT = "previousMutant";

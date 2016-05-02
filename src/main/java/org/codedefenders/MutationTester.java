@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletContext;
 import java.util.ArrayList;
 
+import static org.codedefenders.Constants.*;
 import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
 import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 
@@ -27,17 +28,17 @@ public class MutationTester {
 		}
 		if (killed == 0)
 			if (mutants.size() == 0)
-				messages.add("Test submitted and ready to kill mutant!");
+				messages.add(TEST_SUBMITTED_MESSAGE);
 			else
-				messages.add("Your test did not kill any mutant, just yet.");
+				messages.add(TEST_KILLED_ZERO_MESSAGE);
 		else {
 			if (killed == 1) {
 				if (mutants.size() == 1)
-					messages.add("Great, your test killed the last mutant!");
+					messages.add(TEST_KILLED_LAST_MESSAGE);
 				else
-					messages.add("Good job, your test killed a mutant!");
+					messages.add(TEST_KILLED_ONE_MESSAGE);
 			} else {
-				messages.add(String.format("Awesome! Your test killed %d mutants!", killed));
+				messages.add(String.format(TEST_KILLED_N_MESSAGE, killed));
 			}
 
 		}
@@ -48,16 +49,16 @@ public class MutationTester {
 		for (Test test : tests) {
 			// If this mutant/test pairing hasnt been run before and the test might kill the mutant
 			if (testVsMutant(context, test, mutant)) {
-				messages.add(String.format("Test %d killed your mutant. Keep going!", test.getId()));
+				messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
 				return;
 			}
 		}
 		if (tests.size() == 0)
-			messages.add("Mutant submitted, may the force be with it.");
+			messages.add(MUTANT_SUBMITTED_MESSAGE);
 		else if (tests.size() <= 1)
-			messages.add("Cool, your mutant is alive.");
+			messages.add(MUTANT_ALIVE_1_MESSAGE);
 		else
-			messages.add(String.format("Awesome, your mutant survived %d existing tests!",tests.size()));
+			messages.add(String.format(MUTANT_ALIVE_N_MESSAGE,tests.size()));
 	}
 
 	/**
