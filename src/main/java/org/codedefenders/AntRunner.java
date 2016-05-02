@@ -159,7 +159,7 @@ public class AntRunner {
 		} else {
 			// The mutant failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
-			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]"));
+			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(context.getRealPath(Constants.DATA_DIR), "");
 			newMutant = new Mutant(gameID, jFile, null, false, ownerId);
 			newMutant.insert();
 			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "FAIL", message);
@@ -199,7 +199,7 @@ public class AntRunner {
 		} else {
 			// The test failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
-			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]"));
+			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(context.getRealPath(Constants.DATA_DIR), "");
 			Test newTest = new Test(gameID, jFile, null, ownerId);
 			newTest.insert();
 			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "FAIL", message);
