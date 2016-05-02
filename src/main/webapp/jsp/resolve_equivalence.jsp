@@ -126,7 +126,7 @@
 		<div class="slider single-item">
 			<%
 				boolean isTests = false;
-				for (Test t : game.getTests()) {
+				for (Test t : game.getExecutableTests()) {
 					isTests = true;
 					String tc = "";
 					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
