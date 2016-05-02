@@ -69,17 +69,21 @@
 				<li><a href="games/user">My Games</a></li>
 				<li class="navbar-text">Game ID: <%= game.getId() %></li>
 				<li class="navbar-text">ATK: <%= game.getAttackerScore() %> | DEF: <%= game.getDefenderScore() %></li>
-				<li class="navbar-text">Round <%= game.getCurrentRound() %></li>
+				<li class="navbar-text">Round <%= game.getCurrentRound() %> of <%= game.getFinalRound() %></li>
 				<% if (game.getAliveMutants().size() == 1) {%>
 				<li class="navbar-text">1 Mutant Alive</li>
 				<% } else {%>
 				<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants Alive</li>
 				<% }%>
 				<li class="navbar-text">
-					<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
-						<span class="label label-primary turn-badge">Your turn</span>
+					<% if (game.getState().equals(ACTIVE)) {%>
+						<% if (game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
+							<span class="label label-primary turn-badge">Your turn</span>
+						<% } else { %>
+							<span class="label label-default turn-badge">Waiting</span>
+						<% } %>
 					<% } else { %>
-						<span class="label label-default turn-badge">Waiting</span>
+						<span class="label label-default turn-badge">Finished</span>
 					<% } %>
 				</li>
 			</ul>
