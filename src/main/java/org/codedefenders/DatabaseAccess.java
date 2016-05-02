@@ -469,7 +469,13 @@ public class DatabaseAccess {
 	}
 
 	public static ArrayList<Test> getExecutableTestsForGame(int gid) {
-		String sql = String.format("SELECT * FROM tests WHERE Game_ID='%d' AND ClassFile IS NOT NULL;", gid);
+		String stmt = "SELECT tests.* FROM tests "
+				+ "INNER JOIN targetexecutions ex on tests.Test_ID = ex.Test_ID "
+				+ "WHERE tests.Game_ID='%d' AND tests.ClassFile IS NOT NULL " // only compilable tests
+				+ "AND ex.Target='TEST_ORIGINAL' AND ex.Status='SUCCESS';"; // that pass on original CUT
+
+		//String sql = String.format("SELECT * FROM tests WHERE Game_ID='%d' AND ClassFile IS NOT NULL;", gid);
+		String sql = String.format(stmt, gid);
 		return getTests(sql);
 	}
 
