@@ -149,13 +149,10 @@ public class GameManager extends HttpServlet {
 								response.sendRedirect("play");
 								return;
 							}
-						} else if  (testOriginalTarget.status.equals("FAIL")) {
+						} else {
+							//  (testOriginalTarget.status.equals("FAIL") || testOriginalTarget.status.equals("ERROR")
 							System.out.println("testOriginalTarget: " + testOriginalTarget);
-							messages.add("Your test failed against the CUT.");
-							messages.add(testOriginalTarget.message);
-							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						} else { // ERROR
-							messages.add("An error occured while executing your test against the CUT.");
+							messages.add("Your test did not pass on the original class under test. Try again.");
 							messages.add(testOriginalTarget.message);
 							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						}
@@ -239,16 +236,14 @@ public class GameManager extends HttpServlet {
 					if (testOriginalTarget.status.equals("SUCCESS")) {
 						messages.add("Great! Your test compiled and passed on the original class under test.");
 						MutationTester.runTestOnAllMutants(getServletContext(), activeGame, newTest, messages);
-					} else if (testOriginalTarget.status.equals("FAIL")) {
-						messages.add("Your test failed on the original class under test. You lose your turn.");
-						messages.add(testOriginalTarget.message);
+						activeGame.endTurn();
+						activeGame.update();
 					} else {
-						messages.add("Oh no! The execution of your test finished with an error. You lose your turn.");
+						// testOriginalTarget.status.equals("FAIL") || testOriginalTarget.status.equals("ERROR")
+						messages.add("Your test did not pass on the original class under test. Try again.");
 						messages.add(testOriginalTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					}
-					activeGame.endTurn();
-					activeGame.update();
 				} else {
 					messages.add("Your test failed to compile. Try again, but with compilable code.");
 					messages.add(compileTestTarget.message);
