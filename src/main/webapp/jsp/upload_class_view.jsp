@@ -2,37 +2,31 @@
 <html>
 
 <head>
-	<title>Code Defenders - Upload Class</title>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
+	<!-- Title -->
+	<title>Code Defenders - Upload Class</title>
+
 	<!-- App context -->
 	<base href="${pageContext.request.contextPath}/">
 
 	<!-- jQuery -->
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-
-	<!-- Include all compiled plugins (below), or include individual files as needed -->
-	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script src="js/jquery.min.js" type="text/javascript" ></script>
 
 	<!-- Bootstrap -->
-	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<script src="js/bootstrap.min.js" type="text/javascript" ></script>
+	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
 	<!-- Bootstrap plugins -->
-	<!-- toggle -->
-	<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.0/css/bootstrap-toggle.min.css" rel="stylesheet">
-	<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.0/js/bootstrap-toggle.min.js"></script>
-	<!-- select -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.9.3/css/bootstrap-select.min.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.9.3/js/bootstrap-select.min.js"></script>
 	<!-- fileinput -->
-	<script src="js/fileinput.min.js" type="text/javascript"></script>
-	<link href="css/fileinput.min.css" media="all" rel="stylesheet" type="text/css" />
+	<script src="js/fileinput.min.js" type="text/javascript" ></script>
+	<link href="css/fileinput.min.css" rel="stylesheet" type="text/css" media="all" />
 
 	<!-- Game -->
-	<link href="css/gamestyle.css" rel="stylesheet">
+	<link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
 
 	<script>
 		$(document).on('ready', function() {
@@ -43,7 +37,6 @@
 
 <body>
 
-<%@ page import="org.codedefenders.*,java.io.*" %>
 <%@ page import="java.util.ArrayList" %>
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container-fluid">

@@ -2,33 +2,36 @@
 <html>
 
 <head>
-	<title>Code Defenders - Equivalence Challenge</title>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
+	<!-- Title -->
+	<title>Code Defenders - Equivalence Challenge</title>
+
 	<!-- App context -->
 	<base href="${pageContext.request.contextPath}/">
 
 	<!-- jQuery -->
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-
-	<!-- Include all compiled plugins (below), or include individual files as needed -->
-	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script src="js/jquery.min.js" type="text/javascript" ></script>
 
 	<!-- Slick -->
-	<link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jquery.slick/1.5.9/slick.css"/>
-	<script type="text/javascript" src="//cdn.jsdelivr.net/jquery.slick/1.5.9/slick.min.js"></script>
+	<link href="css/slick_1.5.9.css" rel="stylesheet" type="text/css" />
+	<script src="js/slick_1.5.9.min.js" type="text/javascript" ></script>
 
 	<!-- Bootstrap -->
-	<link href="css/bootstrap.min.css" rel="stylesheet">
-	<link href="css/gamestyle.css" rel="stylesheet">
+	<script src="js/bootstrap.min.js" type="text/javascript" ></script>
+	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
-	<script src="codemirror/lib/codemirror.js"></script>
-	<script src="codemirror/mode/javascript/javascript.js"></script>
-	<script src="codemirror/mode/diff/diff.js"></script>
-	<link href="codemirror/lib/codemirror.css" rel="stylesheet">
+	<!-- Codemirror -->
+	<script src="codemirror/lib/codemirror.js" type="text/javascript" ></script>
+	<script src="codemirror/mode/javascript/javascript.js" type="text/javascript" ></script>
+	<script src="codemirror/mode/diff/diff.js" type="text/javascript" ></script>
+	<link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
+
+	<!-- Game -->
+	<link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
 
 	<script>
 		$(document).ready(function() {

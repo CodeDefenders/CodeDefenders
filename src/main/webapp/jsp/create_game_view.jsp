@@ -2,35 +2,34 @@
 <html>
 
 <head>
-	<title>Code Defenders - Create Game</title>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
+	<!-- Title -->
+	<title>Code Defenders - Create Game</title>
+
 	<!-- App context -->
 	<base href="${pageContext.request.contextPath}/">
 
 	<!-- jQuery -->
-	<script type="text/javascript" src="js/jquery_2.min.js"></script>
+	<script src="js/jquery.min.js" type="text/javascript" ></script>
 
 	<!-- Bootstrap -->
-	<script src="js/bootstrap.min.js" type="text/javascript"></script>
-	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<script src="js/bootstrap.min.js" type="text/javascript" ></script>
+	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
 	<!-- Bootstrap plugins -->
 	<!-- toggle -->
-	<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.0/css/bootstrap-toggle.min.css" rel="stylesheet">
-	<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.0/js/bootstrap-toggle.min.js"></script>
+	<link href="css/bootstrap-toggle_2.2.0.min.css" rel="stylesheet" type="text/css" />
+	<script src="js/bootstrap-toggle_2.2.0.min.js" type="text/javascript" ></script>
 	<!-- select -->
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.9.3/css/bootstrap-select.min.css">
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.9.3/js/bootstrap-select.min.js"></script>
-	<!-- fileinput -->
-	<script src="js/fileinput.min.js" type="text/javascript"></script>
-	<link href="css/fileinput.min.css" media="all" rel="stylesheet" type="text/css" />
+	<link href="css/bootstrap-select_1.9.3.min.css" rel="stylesheet" type="text/css" />
+	<script src="js/bootstrap-select_1.9.3.min.js" type="text/javascript" ></script>
 
 	<!-- Game -->
-	<link href="css/gamestyle.css" rel="stylesheet">
+	<link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
 
 	<script>
 		$(document).on('ready', function() {

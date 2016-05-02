@@ -7,18 +7,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
 
+	<!-- Title -->
+	<title>Code Defenders - Score Board</title>
+
 	<!-- App context -->
 	<base href="${pageContext.request.contextPath}/">
 
 	<!-- jQuery -->
-	<script type="text/javascript" src="js/jquery.min.js"></script>
-
-	<!-- Include all compiled plugins (below), or include individual files as needed -->
-	<script type="text/javascript" src="js/bootstrap.min.js"></script>
+	<script src="js/jquery.min.js" type="text/javascript" ></script>
 
 	<!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/gamestyle.css" rel="stylesheet">
+	<script src="js/bootstrap.min.js" type="text/javascript" ></script>
+	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+	<!-- Game -->
+	<link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
 
 	<title>Score Window</title>
 </head>
@@ -49,17 +52,7 @@
 
 
 	<div id="splash">
-		<% if (game.getAttackerScore() > game.getDefenderScore()) { %>
-			<h1> Attacker Has Won! </h1>
-		<% }
-	    
-	    else if (game.getAttackerScore() < game.getDefenderScore()) { %>
-	    	<h1> Defender Has Won! </h1>
-	    <%}
-	    
-	    else { %>
-	    	<h1> It Was A Draw! </h1>
-	    <%}%>
+		<h1> TBD </h1>
 	</div>
 
 </body>
