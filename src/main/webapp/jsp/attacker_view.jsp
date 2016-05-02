@@ -120,10 +120,10 @@
 <%
 	if (game.getState().equals(Game.State.FINISHED)) {
 		String message = Constants.DRAW_MESSAGE;
- 	    if (game.getAttackerScore() > game.getDefenderScore())
-	        message = Constants.WINNER_MESSAGE;
+		if (game.getAttackerScore() > game.getDefenderScore())
+			message = Constants.WINNER_MESSAGE;
 		else if (game.getDefenderScore() > game.getAttackerScore())
-	        message = Constants.LOSER_MESSAGE;
+			message = Constants.LOSER_MESSAGE;
 %>
 <div id="finishedModal" class="modal fade">
 	<div class="modal-dialog">
@@ -199,7 +199,6 @@
 					<tr class="blank_row">
 						<td class="row-borderless" colspan="2">No mutants alive.</td>
 					</tr>
-
 					<%}
 					%>
 				</table>
@@ -292,8 +291,6 @@
 	</div> <!-- col-md6 newmut -->
 </div> <!-- row-fluid -->
 
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="js/bootstrap.min.js"></script>
 <script>
 	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
 		lineNumbers: true,
