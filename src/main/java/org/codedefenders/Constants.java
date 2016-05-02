@@ -23,9 +23,24 @@ public class Constants {
 	public static final String DEFENDER_VIEW_JSP        = "jsp" + FILE_SEPARATOR + "defender_view.jsp";
 	public static final String SCORE_VIEW_JSP           = "jsp" + FILE_SEPARATOR + "score_view.jsp";
 
+	// Messages
 	public static final String WINNER_MESSAGE = "You won!";
 	public static final String LOSER_MESSAGE = "You lost!";
 	public static final String DRAW_MESSAGE = "It was a draw!";
+
+	public static final String TEST_DID_NOT_COMPILE_MESSAGE = "Your test did not compile. Try again, but with compilable code.";
+	public static final String TEST_INVALID_MESSAGE = "Your test is not valid. Remember the rules: Only one test, no conditionals and no loops!";
+	public static final String TEST_PASSED_ON_CUT_MESSAGE = "Great! Your test compiled and passed on the original class under test.";
+	public static final String TEST_DID_NOT_PASS_ON_CUT_MESSAGE = "Your test did not pass on the original class under test. Try again.";
+	public static final String TEST_KILLED_CLAIMED_MUTANT_MESSAGE = "Yay, your test killed the allegedly equivalent mutant!";
+	public static final String TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE = "Oh no, your test did not kill the possibly equivalent mutant!";
+
+	public static final String MUTANT_COMPILED_MESSAGE = "Your mutant was compiled successfully.";
+	public static final String MUTANT_ACCEPTED_EQUIVALENT_MESSAGE = "The mutant was marked equivalent.";
+	public static final String MUTANT_UNCOMPILABLE_MESSAGE = "Your mutant failed to compile. Try again.";
+	public static final String MUTANT_IDENTICAL_MESSAGE = "Your mutant is not quite a mutant, it's identical to the class under test!";
+	public static final String MUTANT_CLAIMED_EQUIVALENT_MESSAGE = "Mutant claimed as equivalent, waiting for attacker to respond.";
+	public static final String MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE = "Something went wrong claiming equivalent mutant"; // TODO: How?
 
 	// JSP
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_TEST = "previousTest";

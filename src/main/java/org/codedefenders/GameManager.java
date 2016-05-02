@@ -34,12 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 
-import static org.codedefenders.Constants.FILE_SEPARATOR;
-import static org.codedefenders.Constants.JAVA_SOURCE_EXT;
-import static org.codedefenders.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
-import static org.codedefenders.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
-import static org.codedefenders.Constants.TESTS_DIR;
-import static org.codedefenders.Constants.TEST_PREFIX;
+import static org.codedefenders.Constants.*;
 
 public class GameManager extends HttpServlet {
 
@@ -117,7 +112,7 @@ public class GameManager extends HttpServlet {
 					// If it can be written to file and compiled, end turn. Otherwise, dont.
 					Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid);
 					if (newTest == null) {
-						messages.add("Your test is not valid. Remember the rules: Only one test and no conditionals or loops!");
+						messages.add(TEST_INVALID_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						response.sendRedirect("play");
 						return;
@@ -128,7 +123,7 @@ public class GameManager extends HttpServlet {
 					if (compileTestTarget.status.equals("SUCCESS")) {
 						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 						if (testOriginalTarget.status.equals("SUCCESS")) {
-							System.out.println("Test compiled and executed correctly against CUT.");
+							System.out.println(TEST_PASSED_ON_CUT_MESSAGE);
 							if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
 								// Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
 								MutationTester.runEquivalenceTest(getServletContext(), newTest, mutant);
@@ -136,28 +131,28 @@ public class GameManager extends HttpServlet {
 								activeGame.update();
 								Mutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
 								if (mutantAfterTest.isAlive())
-									messages.add("Your test did not kill the mutant!");
+									messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
 								else
-									messages.add("Yay, your test killed the mutant!");
+									messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
 								response.sendRedirect("play");
 								return;
 							} else {
 								activeGame.endRound();
 								activeGame.update();
-								messages.add("Yay, your test killed the mutant!");
+								messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
 								response.sendRedirect("play");
 								return;
 							}
 						} else {
 							//  (testOriginalTarget.status.equals("FAIL") || testOriginalTarget.status.equals("ERROR")
 							System.out.println("testOriginalTarget: " + testOriginalTarget);
-							messages.add("Your test did not pass on the original class under test. Try again.");
+							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 							messages.add(testOriginalTarget.message);
 							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						}
 					} else {
 						System.out.println("compileTestTarget: " + compileTestTarget);
-						messages.add("An error occured while compiling your test.");
+						messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
 						messages.add(compileTestTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					}
@@ -168,7 +163,7 @@ public class GameManager extends HttpServlet {
 						mutant.setEquivalent(Mutant.Equivalence.DECLARED_YES);
 						mutant.kill();
 
-						messages.add("The mutant was marked equivalent.");
+						messages.add(MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 						activeGame.endRound();
 						activeGame.update();
 						response.sendRedirect("play");
@@ -182,11 +177,11 @@ public class GameManager extends HttpServlet {
 					Mutant mutantClaimed = DatabaseAccess.getMutant(activeGame, mutantId);
 					mutantClaimed.setEquivalent(Mutant.Equivalence.PENDING_TEST);
 					mutantClaimed.update();
-					messages.add("Waiting For Attacker To Respond To Marked Equivalencies");
+					messages.add(MUTANT_CLAIMED_EQUIVALENT_MESSAGE);
 					activeGame.passPriority();
 					activeGame.update();
 				} else
-					messages.add("Something went wrong claiming equivalent mutant");
+					messages.add(MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE);
 				break;
 
 			case "createMutant":
@@ -198,19 +193,19 @@ public class GameManager extends HttpServlet {
 				if (newMutant != null) {
 					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 					if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
-						messages.add("Your mutant was compiled successfully.");
+						messages.add(MUTANT_COMPILED_MESSAGE);
 						MutationTester.runAllTestsOnMutant(getServletContext(), activeGame, newMutant, messages);
 						activeGame.endTurn();
 						activeGame.update();
 					} else {
-						messages.add("Your mutant failed to compile. Try again.");
+						messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
 						if (compileMutantTarget != null && compileMutantTarget.message != null && ! compileMutantTarget.message.isEmpty())
 							messages.add(compileMutantTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
 					}
 				} else {
 					// Create Mutant failed because there were no differences between mutant and original, returning -1
-					messages.add("Your mutant is not quite a mutant, it's identical to the class under test!");
+					messages.add(MUTANT_IDENTICAL_MESSAGE);
 				}
 				break;
 
@@ -222,7 +217,7 @@ public class GameManager extends HttpServlet {
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
 				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid);
 				if (newTest == null) {
-					messages.add("Your test is not valid. Remember the rules: Only one test and no conditionals or loops!");
+					messages.add(TEST_INVALID_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					response.sendRedirect("play");
 					return;
@@ -233,18 +228,18 @@ public class GameManager extends HttpServlet {
 				if (compileTestTarget.status.equals("SUCCESS")) {
 					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 					if (testOriginalTarget.status.equals("SUCCESS")) {
-						messages.add("Great! Your test compiled and passed on the original class under test.");
+						messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 						MutationTester.runTestOnAllMutants(getServletContext(), activeGame, newTest, messages);
 						activeGame.endTurn();
 						activeGame.update();
 					} else {
 						// testOriginalTarget.status.equals("FAIL") || testOriginalTarget.status.equals("ERROR")
-						messages.add("Your test did not pass on the original class under test. Try again.");
+						messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 						messages.add(testOriginalTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					}
 				} else {
-					messages.add("Your test failed to compile. Try again, but with compilable code.");
+					messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
 					messages.add(compileTestTarget.message);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 				}
