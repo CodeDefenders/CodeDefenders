@@ -22,6 +22,7 @@ public class Constants {
 	public static final String ATTACKER_VIEW_JSP        = "jsp" + FILE_SEPARATOR + "attacker_view.jsp";
 	public static final String DEFENDER_VIEW_JSP        = "jsp" + FILE_SEPARATOR + "defender_view.jsp";
 	public static final String SCORE_VIEW_JSP           = "jsp" + FILE_SEPARATOR + "score_view.jsp";
+	public static final String UTESTING_VIEW_JSP        = "jsp" + FILE_SEPARATOR + "utesting_view.jsp";
 
 	// Messages
 	public static final String WINNER_MESSAGE = "You won!";

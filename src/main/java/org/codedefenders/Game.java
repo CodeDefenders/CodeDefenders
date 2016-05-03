@@ -31,10 +31,12 @@ public class Game {
 
 	private Level level;
 
+	private Mode mode;
+
 	public enum Role { ATTACKER, DEFENDER };
 	public enum State { CREATED, ACTIVE, FINISHED };
 	public enum Level { EASY, MEDIUM, HARD };
-	public enum Mode { SINGLE, DUEL, PARTY };
+	public enum Mode { SINGLE, DUEL, PARTY, UTESTING };
 
 	public Game(int classId, int userId, int maxRounds, Role role, Level level) {
 		this.classId = classId;
@@ -52,9 +54,10 @@ public class Game {
 		this.state = State.CREATED;
 
 		this.level = level;
+		this.mode = Mode.DUEL;
 	}
 
-	public Game(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, State state, Level level) {
+	public Game(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, State state, Level level, Mode mode) {
 		this.id = id;
 		this.attackerId = attackerId;
 		this.defenderId = defenderId;
@@ -64,6 +67,7 @@ public class Game {
 		this.activeRole = activeRole;
 		this.state = state;
 		this.level = level;
+		this.mode = mode;
 	}
 
 	public int getId() {
@@ -301,8 +305,12 @@ public class Game {
 
 			// Get all rows from the database which have the chosen username
 			stmt = conn.createStatement();
-			sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
-					attackerId, defenderId, currentRound, finalRound, activeRole, state.name(), level.name(), id);
+			if (this.mode.equals(Mode.UTESTING))
+				sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
+						currentRound, finalRound, activeRole, state.name(), level.name(), id);
+			else
+				sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
+						attackerId, defenderId, currentRound, finalRound, activeRole, state.name(), level.name(), id);
 			stmt.execute(sql);
 			return true;
 

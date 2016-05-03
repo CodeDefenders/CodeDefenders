@@ -230,7 +230,7 @@ public class DatabaseAccess {
 			if (rs.next()) {
 				Game gameRecord = new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
 						rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
-						Game.Level.valueOf(rs.getString("Level")));
+						Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode")));
 
 				stmt.close();
 				conn.close();
@@ -278,7 +278,7 @@ public class DatabaseAccess {
 				gameList.add(new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
 						rs.getInt("Class_ID"), rs.getInt("CurrentRound"), rs.getInt("FinalRound"),
 						Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
-						Game.Level.valueOf(rs.getString("Level"))));
+						Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode"))));
 			}
 
 			stmt.close();
@@ -330,7 +330,7 @@ public class DatabaseAccess {
 				gameList.add(new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
 						rs.getInt("Class_ID"), rs.getInt("CurrentRound"), rs.getInt("FinalRound"),
 						Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
-						Game.Level.valueOf(rs.getString("Level"))));
+						Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode"))));
 			}
 
 			stmt.close();
@@ -526,6 +526,54 @@ public class DatabaseAccess {
 		}
 
 		return testList;
+	}
+
+	public static Game getActiveUnitTestingSession(int userId) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = null;
+
+		try {
+
+			// Load the Game Data with the provided ID.
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			sql = String.format("SELECT * FROM games WHERE Defender_ID='%d' AND Mode='UTESTING' AND State='ACTIVE';", userId);
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				Game gameRecord = new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
+						rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
+						Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode")));
+
+				stmt.close();
+				conn.close();
+				return gameRecord;
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+		} // Handle errors for JDBC
+		catch (Exception e) {
+			System.out.println(e);
+		} // Handle errors for Class.forName
+		finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException se2) {
+			} // Nothing we can do
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException se) {
+				System.out.println(se);
+			}
+		}
+		return null;
 	}
 
 	public static ArrayList<TargetExecution> getTargetExecutionsForKey(String keyname, int id) {
