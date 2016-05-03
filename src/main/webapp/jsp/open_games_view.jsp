@@ -97,7 +97,7 @@
 		int uid = (Integer)request.getSession().getAttribute("uid");
 		int atkId;
 		int defId;
-		for (Game g : DatabaseAccess.getAllGames()) {
+		for (Game g : DatabaseAccess.getOpenGames()) {
 			isGames = true;
 			atkName = null;
 			defName = null;
