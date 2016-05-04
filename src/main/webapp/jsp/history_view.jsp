@@ -29,6 +29,7 @@
 
 <%@ page import="org.codedefenders.DatabaseAccess" %>
 <%@ page import="org.codedefenders.Game" %>
+<%@ page import="org.codedefenders.User" %>
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -83,20 +84,13 @@
 		int uid = (Integer)request.getSession().getAttribute("uid");
 		int atkId;
 		int defId;
-		for (Game g : DatabaseAccess.getGamesForUser(uid)) {
-
-			if (g.getState().equals(Game.State.FINISHED)) {
-				atkId = g.getAttackerId();
-				defId = g.getDefenderId();
-
-				atkName = DatabaseAccess.getUserForKey("User_ID", atkId).username;
-				defName = DatabaseAccess.getUserForKey("User_ID", defId).username;
-
-			}
-			else {
-				continue;
-			}
-
+		for (Game g : DatabaseAccess.getHistoryForUser(uid)) {
+			atkId = g.getAttackerId();
+			defId = g.getDefenderId();
+			User attacker = DatabaseAccess.getUserForKey("User_ID", atkId);
+			User defender = DatabaseAccess.getUserForKey("User_ID", defId);
+			atkName = attacker == null ? "-" : attacker.username;
+			defName = defender == null ? "-" : defender.username;
 	%>
 
 	<tr>
