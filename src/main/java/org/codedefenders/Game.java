@@ -144,6 +144,10 @@ public class Game {
 		this.level = level;
 	}
 
+	public Mode getMode() {
+		return this.mode;
+	}
+
 	public ArrayList<Mutant> getMutants() {
 		return DatabaseAccess.getMutantsForGame(id);
 	}
