@@ -26,7 +26,7 @@
 
 	<!-- Codemirror -->
 	<script src="codemirror/lib/codemirror.js" type="text/javascript" ></script>
-	<script src="codemirror/mode/javascript/javascript.js" type="text/javascript" ></script>
+	<script src="codemirror/mode/clike/clike.js" type="text/javascript" ></script>
 	<script src="codemirror/mode/diff/diff.js" type="text/javascript" ></script>
 	<link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
 
@@ -318,7 +318,8 @@
 		lineNumbers: true,
 		indentUnit: 4,
 		indentWithTabs: true,
-		matchBrackets: true
+		matchBrackets: true,
+		mode: "text/x-java"
 	});
 	editorTest.on('beforeChange',function(cm,change) {
 		var text = cm.getValue();
@@ -333,6 +334,7 @@
 	var editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
 		lineNumbers: true,
 		matchBrackets: true,
+		mode: "text/x-java",
 		readOnly: true
 	});
 	editorSUT.setSize("100%", 500);
@@ -343,6 +345,7 @@
 		CodeMirror.fromTextArea(x[i], {
 			lineNumbers: true,
 			matchBrackets: true,
+			mode: "text/x-java",
 			readOnly: true
 		});
 	}
