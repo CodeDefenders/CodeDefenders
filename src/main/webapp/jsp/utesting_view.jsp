@@ -67,7 +67,10 @@
 		</div>
 		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
 			<ul class="nav navbar-nav navbar-left">
-				<li><a href="games/user">My Games</a></li>
+				<% if (uTestingSession != null) { %>
+				<li class="navbar-text">Unit Testing Session ID: <%= uTestingSession.getId() %></li>
+				<li class="navbar-text">Test <%= uTestingSession.getCurrentRound() %> of <%= uTestingSession.getFinalRound() %></li>
+				<% } %>
 			</ul>
 			<ul class="nav navbar-nav navbar-right">
 				<li>
@@ -102,7 +105,7 @@
 	if (uTestingSession == null) {
 %>
 <div class="row-fluid">
-	<h2> No unit testing session available for you at the moment. </h2>
+	<h3> No unit testing session available at the moment. </h3>
 </div>
 <%  } else { %>
 
