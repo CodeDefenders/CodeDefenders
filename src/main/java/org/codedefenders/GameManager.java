@@ -184,6 +184,15 @@ public class GameManager extends HttpServlet {
 					messages.add(MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE);
 				break;
 
+			case "whoseTurn":
+				int gid = Integer.parseInt(request.getParameter("gameID"));
+				activeGame = DatabaseAccess.getGameForKey("Game_ID", gid);
+				String turn = activeGame.getActiveRole().equals(Game.Role.ATTACKER) ? "attacker" : "defender";
+				response.setContentType("application/json");
+				response.setCharacterEncoding("UTF-8");
+				response.getWriter().write(turn);
+				return;
+
 			case "createMutant":
 
 				// Get the text submitted by the user.

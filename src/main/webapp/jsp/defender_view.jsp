@@ -363,6 +363,21 @@
 			editorDiff.setSize("100%", 500);
 		}
 	});
+
+	<% if (game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
+	function checkForUpdate(){
+		$.post('/play', {
+			formType: "whoseTurn",
+			gameID: <%= game.getId() %>
+		}, function(data){
+			if(data=="defender"){
+				window.location.reload();
+			}
+		},"text");
+	}
+	setInterval("checkForUpdate()", 10000);
+	<% } %>
+
 	$('#finishedModal').modal('show');
 </script>
 </body>
