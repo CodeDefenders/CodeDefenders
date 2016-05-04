@@ -52,7 +52,8 @@
 <%@ page import="org.codedefenders.Game" %>
 <%@ page import="org.codedefenders.Constants" %>
 <%@ page import="static org.codedefenders.Game.State.ACTIVE" %>
-<% Game uTestingSession = (Game) session.getAttribute("uTestingSession"); %>
+<%@ page import="static org.codedefenders.Game.State.FINISHED" %>
+<% Game uTestingSession = (Game) session.getAttribute("game"); %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container-fluid">
@@ -98,7 +99,7 @@
 <%	} %>
 
 <%
-	if (uTestingSession == null || uTestingSession.getState().equals(Game.State.FINISHED)) {
+	if (uTestingSession == null) {
 %>
 <div class="row-fluid">
 	<h2> No unit testing session available for you at the moment. </h2>
@@ -112,9 +113,11 @@
 	</div> <!-- col-md6 left -->
 	<div class="col-md-6" id="utest-div">
 		<h2> Write a new JUnit test here
-			<% if (uTestingSession.getState().equals(ACTIVE)) {%>
+			<% if (uTestingSession.getState().equals(FINISHED)) {%>
+			<button class="btn btn-primary btn-game btn-right disabled">Finished</button>
+			<%} else { %>
 			<button type="submit" class="btn btn-primary btn-game btn-right" form="def">Submit</button>
-			<%}%>
+			<%} %>
 		</h2>
 		<form id="def" action="utesting" method="post">
 			<%

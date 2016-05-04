@@ -29,6 +29,7 @@
 
 <%@ page import="org.codedefenders.DatabaseAccess" %>
 <%@ page import="org.codedefenders.Game" %>
+<%@ page import="java.util.ArrayList" %>
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container-fluid">
 		<div class="navbar-header">
@@ -75,22 +76,19 @@
 		<td class="col-sm-2">Level</td>
 		<td class="col-sm-2"></td>
 	</tr>
-
-
-	<%
-		boolean isGames = false;
-		boolean canEnter;
-		String atkName;
-		String defName;
-		int uid = (Integer)request.getSession().getAttribute("uid");
-		for (Game g : DatabaseAccess.getGamesForUser(uid)) {
-			isGames = true;
+<%
+	String atkName;
+	String defName;
+	int uid = (Integer)request.getSession().getAttribute("uid");
+	ArrayList<Game> games = DatabaseAccess.getGamesForUser(uid);
+	if (games.isEmpty()) {
+%>
+	<p> You are not currently in any games. </p>
+<%
+	} else {
+		for (Game g : games) {
 			atkName = null;
 			defName = null;
-
-			if (g.getState().equals(Game.State.FINISHED)) {continue;} // Dont display in active games if finished
-			if (g.getState().equals(Game.State.ACTIVE)) {canEnter = true;} // If it is in progress you can enter.
-			else {canEnter = false;} // Otherwise, you can see it but you cant enter.
 
 			if (g.getAttackerId() != 0) {
 				atkName = DatabaseAccess.getUserForKey("User_ID", g.getAttackerId()).username;
@@ -106,8 +104,7 @@
 
 			if (atkName == null) {atkName = "Empty";}
 			if (defName == null) {defName = "Empty";}
-	%>
-
+%>
 	<tr>
 		<td class="col-sm-2"><%= g.getId() %></td>
 		<td class="col-sm-2"><%= atkName %></td>
@@ -116,31 +113,32 @@
 		<td class="col-sm-2"><%= DatabaseAccess.getClassForKey("Class_ID", g.getClassId()).name %></td>
 		<td class="col-sm-2"><%= g.getLevel().name() %></td>
 		<td class="col-sm-2">
-			<%
-				if (canEnter) { %>
-
+<%
+			if (g.getState().equals(Game.State.ACTIVE)) { // Can enter only if game is in progress.
+				String btnLabel = "Your Turn";
+				if (g.getMode().equals(Game.Mode.UTESTING)) {
+					btnLabel = "Enter";
+				}
+%>
 			<form id="view" action="games" method="post">
 				<input type="hidden" name="formType" value="enterGame">
-				<input type="hidden" name="game" value=<%=g.getId()%>>
+				<input type="hidden" name="game" value="<%=g.getId()%>">
 				<% if (uid == turnId ) {%>
-				<input class="btn btn-primary" type="submit" value="Your Turn">
+				<input class="btn btn-primary" type="submit" value="<%=btnLabel%>">
 				<% } else {%>
 				<input  class="btn btn-default" type="submit" value="Enter Game">
 				<% }%>
 			</form>
 
-			<% } %>
+<%
+			}
+%>
 		</td>
 	</tr>
-
-
-
-	<%
-		}
-		if (!isGames) {%>
-	<p> You are not currently in any games </p>
-	<%}
-	%>
+<%
+		} // for (Game g : games)
+	} // if (games.isEmpty())
+%>
 </table>
 
 </body>

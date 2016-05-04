@@ -116,6 +116,15 @@
 		<url-pattern>/games/history</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>utesting</servlet-name>
+		<servlet-class>org.codedefenders.UnitTesting</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>utesting</servlet-name>
+		<url-pattern>/utesting</url-pattern>
+	</servlet-mapping>
+
 	<filter>
 		<filter-name>loginFilter</filter-name>
 		<filter-class>org.codedefenders.LoginFilter</filter-class>

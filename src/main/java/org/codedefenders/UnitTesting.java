@@ -51,9 +51,17 @@ public class UnitTesting extends HttpServlet {
 		// Get the session information specific to the current user.
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
-
-		Game uTestingSession = DatabaseAccess.getActiveUnitTestingSession(uid);
-		session.setAttribute("uTestingSession", uTestingSession);
+		Object ogid = session.getAttribute("gid");
+		Game activeGame;
+		if (ogid == null) {
+			System.out.println("Getting active unit testing session for user " + uid);
+			activeGame = DatabaseAccess.getActiveUnitTestingSession(uid);
+		} else {
+			int gid = (Integer) ogid;
+			System.out.println("Getting game " + gid + " for " + uid);
+			activeGame = DatabaseAccess.getGameForKey("Game_ID", gid);
+		}
+		session.setAttribute("game", activeGame);
 
 		RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.UTESTING_VIEW_JSP);
 		dispatcher.forward(request, response);
@@ -65,16 +73,14 @@ public class UnitTesting extends HttpServlet {
 		ArrayList<String> messages = new ArrayList<>();
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
-
+		Game activeGame = (Game) session.getAttribute("game");
 		session.setAttribute("messages", messages);
-
-		Game uTestingSession = (Game) session.getAttribute("uTestingSession");
 
 		// Get the text submitted by the user.
 		String testText = request.getParameter("test");
 
 		// If it can be written to file and compiled, end turn. Otherwise, dont.
-		Test newTest = createTest(uTestingSession.getId(), uTestingSession.getClassId(), testText, uid);
+		Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid);
 		if (newTest == null) {
 			messages.add(TEST_INVALID_MESSAGE);
 			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -88,8 +94,8 @@ public class UnitTesting extends HttpServlet {
 			TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 			if (testOriginalTarget.status.equals("SUCCESS")) {
 				messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-				uTestingSession.endRound();
-				uTestingSession.update();
+				activeGame.endRound();
+				activeGame.update();
 			} else {
 				// testOriginalTarget.status.equals("FAIL") || testOriginalTarget.status.equals("ERROR")
 				messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
