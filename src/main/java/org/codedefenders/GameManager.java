@@ -48,7 +48,13 @@ public class GameManager extends HttpServlet {
 		// Get the session information specific to the current user.
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
-		int gid = (Integer) session.getAttribute("gid");
+		Object ogid = session.getAttribute("gid");
+		if (ogid == null) {
+			response.sendRedirect("games/user");
+			return;
+		}
+
+		int gid = (Integer) ogid;
 
 		System.out.println("Getting game " + gid + " for " + uid);
 
