@@ -35,6 +35,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 
 import static org.codedefenders.Constants.*;
+import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 
 public class GameManager extends HttpServlet {
 
@@ -130,10 +132,13 @@ public class GameManager extends HttpServlet {
 								activeGame.endRound();
 								activeGame.update();
 								Mutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
-								if (mutantAfterTest.isAlive())
+								if (mutantAfterTest.getEquivalent().equals(ASSUMED_YES)) {
+									logger.info("Test failed to kill the mutant, hence assumed equivalent");
 									messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
-								else
+								} else { // PROVEN_NO
+									logger.info("Mutant was killed, hence tagged not equivalent");
 									messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
+								}
 								response.sendRedirect("play");
 								return;
 							} else {

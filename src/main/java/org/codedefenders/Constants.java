@@ -33,8 +33,8 @@ public class Constants {
 	public static final String TEST_INVALID_MESSAGE = "Your test is not valid. Remember the rules: Only one test, no conditionals and no loops!";
 	public static final String TEST_PASSED_ON_CUT_MESSAGE = "Great! Your test compiled and passed on the original class under test.";
 	public static final String TEST_DID_NOT_PASS_ON_CUT_MESSAGE = "Your test did not pass on the original class under test. Try again.";
-	public static final String TEST_KILLED_CLAIMED_MUTANT_MESSAGE = "Yay, your test killed the allegedly equivalent mutant!";
-	public static final String TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE = "Oh no, your test did not kill the possibly equivalent mutant!";
+	public static final String TEST_KILLED_CLAIMED_MUTANT_MESSAGE = "Yay, your test killed the allegedly equivalent mutant! You won the duel.";
+	public static final String TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE = "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel.";
 	public static final String TEST_SUBMITTED_MESSAGE = "Test submitted and ready to kill mutants!";
 	public static final String TEST_KILLED_ZERO_MESSAGE = "Your test did not kill any mutant, just yet.";
 	public static final String TEST_KILLED_LAST_MESSAGE = "Great, your test killed the last mutant!";

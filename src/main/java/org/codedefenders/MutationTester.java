@@ -91,8 +91,7 @@ public class MutationTester {
 	// Outputs: None
 
 	public static void runEquivalenceTest(ServletContext context, Test test, Mutant mutant) {
-		logger.debug("Killing mutant in runEquivalenceTest.");
-		System.out.println("Killing mutant in equivalenceTest.");
+		logger.info("Running equivalence test.");
 		// The test created is new and was made by the attacker (there is no need to check if the mutant/test pairing has been run already)
 
 		// As a result of this test, either the test the attacker has written kills the mutant or doesnt.
@@ -100,11 +99,9 @@ public class MutationTester {
 
 		if (executedTarget.status.equals("ERROR") || executedTarget.status.equals("FAIL")) {
 			// If the test did NOT pass, the mutant was detected and is proven to be non-equivalent
-			System.out.println("Mutant was killed, hence tagged not equivalent");
 			mutant.setEquivalent(PROVEN_NO);
 		} else {
 			// If the test DID pass, the mutant went undetected and it is assumed to be equivalent.
-			System.out.println("Test failed to kill the mutant, hence assumed equivalent");
 			mutant.setEquivalent(ASSUMED_YES);
 		}
 		// Kill the mutant if it was killed by the test or if it's marked equivalent
