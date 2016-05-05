@@ -49,6 +49,7 @@
 				<pathelement path="${test.file}"/>
 			</classpath>
 			<test name="${testClassname}"/>
+			<formatter type="plain" usefile="false"/>
 			<jvmarg value="-Djava.security.manager" />
 			<jvmarg value="-Djava.security.policy==${policyfile}" />
 		</junit>

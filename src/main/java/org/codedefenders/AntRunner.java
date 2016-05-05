@@ -88,7 +88,7 @@ public class AntRunner {
 			}
 		} else {
 			// New target execution record failed test against original as it isn't valid
-			String message = "Test failed on the original class under test.";
+			String message = resultArray[0].substring(resultArray[0].indexOf("[junit]"));
 			TargetExecution newExec = new TargetExecution(t.getId(), 0, TargetExecution.Target.TEST_ORIGINAL, "FAIL", message);
 			newExec.insert();
 			return newExec.id;
