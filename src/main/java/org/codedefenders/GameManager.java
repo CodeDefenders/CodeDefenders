@@ -83,8 +83,6 @@ public class GameManager extends HttpServlet {
 
 	// Based on the data provided, update information for the game
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		logger.debug("Executing GameManager.doPost");
-		System.out.println("Executing GameManager.doPost");
 
 		ArrayList<String> messages = new ArrayList<String>();
 		HttpSession session = request.getSession();
@@ -397,6 +395,11 @@ public class GameManager extends HttpServlet {
 			}
 			MethodDeclaration test = (MethodDeclaration)clazz.getMembers().get(0);
 			BlockStmt testBody = test.getBody();
+			if (testBody.getStmts().isEmpty()) {
+				System.out.println("Empty test (no statement).");
+				return false;
+			}
+
 			for (Node node : testBody.getChildrenNodes()) {
 				if (node instanceof ForeachStmt
 						|| node instanceof IfStmt
