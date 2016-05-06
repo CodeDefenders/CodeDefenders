@@ -266,7 +266,7 @@ public class DatabaseAccess {
 	 * @return
 	 */
 	public static ArrayList<Game> getGamesForUser(int userId) {
-		String sql = String.format("SELECT * FROM games WHERE Attacker_ID=%d OR Defender_ID=%d AND State!='FINISHED';", userId, userId);
+		String sql = String.format("SELECT * FROM games WHERE (Attacker_ID=%d OR Defender_ID=%d) AND State!='FINISHED';", userId, userId);
 		return getGames(sql);
 	}
 
@@ -276,7 +276,7 @@ public class DatabaseAccess {
 	 * @return
 	 */
 	public static ArrayList<Game> getHistoryForUser(int userId) {
-		String sql = String.format("SELECT * FROM games WHERE Attacker_ID=%d OR Defender_ID=%d AND State='FINISHED';", userId, userId);
+		String sql = String.format("SELECT * FROM games WHERE (Attacker_ID=%d OR Defender_ID=%d) AND State='FINISHED';", userId, userId);
 		return getGames(sql);
 	}
 
