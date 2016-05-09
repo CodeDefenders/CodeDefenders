@@ -71,10 +71,10 @@ public class LoginManager extends HttpServlet {
 					session.setAttribute("uid", activeUser.id);
 					session.setAttribute("username", username);
 					Object from = session.getAttribute("loginFrom");
-					if (from == null)
+					if (from != null && ! ((String) from).endsWith("/favicon.ico")) {
+						response.sendRedirect((String) from);
+					} else
 						response.sendRedirect("games");
-					else
-						response.sendRedirect((String)from);
 				} else {
 					messages.add("Username Does Not Exist Or Your Password Was Incorrect");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
