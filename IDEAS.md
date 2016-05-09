@@ -39,3 +39,6 @@ Make sure all player activities are recorded in the database.
 
 Handle packages/projects/jar files
 
+## Wishlist
+
+* Log of messages per game/user
