@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component name="dataSourceStorage">
+  <data-source name="MySQL - codedefenders@localhost" uuid="112956c6-59f3-458e-bcd0-862b76278735">
+    <database-info product="MySQL" version="5.7.12" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.35 ( Revision: 5fb9c5849535c13917c2cf9baaece6ef9693ef27 )">
+      <extra-name-characters>#@</extra-name-characters>
+      <identifier-quote-string>`</identifier-quote-string>
+    </database-info>
+    <case-sensitivity plain-identifiers="mixed" quoted-identifiers="upper"/>
+    <database-model serializer="dbm" rdbms="MYSQL" format-version="2.5">
+      <schema id="1" name="codedefenders"/>
+      <table id="2" parent="1" name="classes"/>
+      <table id="3" parent="1" name="games"/>
+      <table id="4" parent="1" name="mutants"/>
+      <table id="5" parent="1" name="targetexecutions"/>
+      <table id="6" parent="1" name="tests"/>
+      <table id="7" parent="1" name="users"/>
+      <routine id="8" parent="1" name="expGames">
+        <routine-kind>PROCEDURE</routine-kind>
+      </routine>
+      <column id="9" parent="2" name="Class_ID">
+        <mandatory>1</mandatory>
+        <data-type>int(11)</data-type>
+        <sequence-identity>1</sequence-identity>
+      </column>
+      <column id="10" parent="2" name="Name">
+        <mandatory>1</mandatory>
+        <data-type>varchar(20)</data-type>
+      </column>
+      <column id="11" parent="2" name="JavaFile">
+        <mandatory>1</mandatory>
+        <data-type>varchar(255)</data-type>
+      </column>
+      <column id="12" parent="2" name="ClassFile">
+        <mandatory>1</mandatory>
+        <data-type>varchar(255)</data-type>
+      </column>
+      <key id="13" parent="2" name="PRIMARY">
+        <columns>Class_ID</columns>
+        <primary>1</primary>
+      </key>
+      <column id="14" parent="3" name="Game_ID">
+        <mandatory>1</mandatory>
+        <data-type>int(11)</data-type>
+        <sequence-identity>1</sequence-identity>
+      </column>
+      <column id="15" parent="3" name="Attacker_ID">
+        <data-type>int(11)</data-type>
+      </column>
+      <column id="16" parent="3" name="Defender_ID">
+        <data-type>int(11)</data-type>
+      </column>
+      <column id="17" parent="3" name="CurrentRound">
+        <mandatory>1</mandatory>
+        <data-type>tinyint(4)</data-type>
+        <default-expression>&apos;1&apos;</default-expression>
+      </column>
+      <column id="18" parent="3" name="FinalRound">
+        <mandatory>1</mandatory>
+        <data-type>tinyint(4)</data-type>
+        <default-expression>&apos;5&apos;</default-expression>
+      </column>
+      <column id="19" parent="3" name="ActiveRole">
+        <mandatory>1</mandatory>
+        <data-type>enum(&apos;ATTACKER&apos;, &apos;DEFENDER&apos;)</data-type>
+        <default-expression>&apos;ATTACKER&apos;</default-expression>
+      </column>
+      <column id="20" parent="3" name="Class_ID">
+        <data-type>int(11)</data-type>
+      </column>
+      <column id="21" parent="3" name="State">
+        <mandatory>1</mandatory>
+        <data-type>enum(&apos;CREATED&apos;, &apos;ACTIVE&apos;, &apos;FINISHED&apos;)</data-type>
+        <default-expression>&apos;CREATED&apos;</default-expression>
+      </column>
+      <column id="22" parent="3" name="Level">
+        <mandatory>1</mandatory>
+        <data-type>enum(&apos;EASY&apos;, &apos;MEDIUM&apos;, &apos;HARD&apos;)</data-type>
+      </column>
+      <column id="23" parent="3" name="Mode">
+        <data-type>enum(&apos;SINGLE&apos;, &apos;DUEL&apos;, &apos;UTESTING&apos;)</data-type>
+        <default-expression>&apos;DUEL&apos;</default-expression>
+      </column>
+      <column id="24" parent="3" name="Timestamp">
+        <mandatory>1</mandatory>
+        <data-type>timestamp</data-type>
+        <default-expression>&apos;CURRENT_TIMESTAMP&apos;</default-expression>
+      </column>
+      <index id="25" parent="3" name="Attacker_ID">
+        <columns>Attacker_ID</columns>
+        <desc-columns></desc-columns>
+      </index>
+      <index id="26" parent="3" name="Class_ID">
+        <columns>Class_ID</columns>
+        <desc-columns></desc-columns>
+      </index>
+      <index id="27" parent="3" name="Defender_ID">
+        <columns>Defender_ID</columns>
+        <desc-columns></desc-columns>
+      </index>
+      <key id="28" parent="3" name="PRIMARY">
+        <columns>Game_ID</columns>
+        <primary>1</primary>
+      </key>
+      <foreign-key id="29" parent="3" name="games_ibfk_1">
+        <columns>Attacker_ID</columns>
+        <ref-key>~.users.PRIMARY</ref-key>
+        <cascade-update-rule>restrict</cascade-update-rule>
+        <cascade-delete-rule>restrict</cascade-delete-rule>
+      </foreign-key>
+      <foreign-key id="30" parent="3" name="games_ibfk_2">
+        <columns>Defender_ID</columns>
+        <ref-key>~.users.PRIMARY</ref-key>
+        <cascade-update-rule>restrict</cascade-update-rule>
+        <cascade-delete-rule>restrict</cascade-delete-rule>
+      </foreign-key>
+      <foreign-key id="31" parent="3" name="games_ibfk_3">
+        <columns>Class_ID</columns>
+        <ref-key>~.classes.PRIMARY</ref-key>
+        <cascade-update-rule>restrict</cascade-update-rule>
+        <cascade-delete-rule>restrict</cascade-delete-rule>
+      </foreign-key>
+      <column id="32" parent="4" name="Mutant_ID">
+        <mandatory>1</mandatory>
+        <data-type>int(11)</data-type>
+        <sequence-identity>1</sequence-identity>
+      </column>
+      <column id="33" parent="4" name="JavaFile">
+        <mandatory>1</mandatory>
+        <data-type>varchar(255)</data-type>
+      </column>
+      <column id="34" parent="4" name="ClassFile">
+        <data-type>varchar(255)</data-type>
+      </column>
+      <column id="35" parent="4" name="Alive">
+        <mandatory>1</mandatory>
+        <data-type>tinyint(1)</data-type>
+        <default-expression>&apos;1&apos;</default-expression>
+      </column>
+      <column id="36" parent="4" name="Game_ID">
+        <mandatory>1</mandatory>
+        <data-type>int(11)</data-type>
+      </column>
+      <column id="37" parent="4" name="RoundCreated">
+        <mandatory>1</mandatory>
+        <data-type>int(11)</data-type>
+      </column>
+      <column id="38" parent="4" name="RoundKilled">
+        <data-type>int(11)</data-type>
+      </column>
+      <column id="39" parent="4" name="Equivalent">
+        <mandatory>1</mandatory>
+        <data-type>enum(&apos;ASSUMED_NO&apos;, &apos;PENDING_TEST&apos;, &apos;DECLARED_YES&apos;, &apos;ASSUMED_YES&apos;, &apos;PROVEN_NO&apos;)</data-type>
+      </column>
+      <column id="40" parent="4" name="Owner_ID">
+        <mandatory>1</mandatory>
+        <data-type>int(11)</data-type>
+      </column>
+      <column id="41" parent="4" name="Timestamp">
+        <mandatory>1</mandatory>
+        <data-type>timestamp</data-type>
+        <default-expression>&apos;CURRENT_TIMESTAMP&apos;</default-expression>
+      </column>
+      <index id="42" parent="4" name="Game_ID">
+        <columns>Game_ID</columns>
+        <desc-columns></desc-columns>
+      </index>
+      <index id="43" parent="4" name="Owner_ID">
+        <columns>Owner_ID</columns>
+        <desc-columns></desc-columns>
+      </index>
+      <key id="44" parent="4" name="PRIMARY">
+        <columns>Mutant_ID</columns>
+        <primary>1</primary>
+      </key>
+      <foreign-key id="45" parent="4" name="mutants_ibfk_1">
+        <columns>Game_ID</columns>
+        <ref-key>~.games.PRIMARY</ref-key>
+        <cascade-update-rule>restrict</cascade-update-rule>
+        <cascade-delete-rule>restrict</cascade-delete-rule>
+      </foreign-key>
+      <foreign-key id="46" parent="4" name="mutants_ibfk_2">
+        <columns>Owner_ID</columns>
+        <ref-key>~.users.PRIMARY</ref-key>
+        <cascade-update-rule>restrict</cascade-update-rule>
+        <cascade-delete-rule>restrict</cascade-delete-rule>
+      </foreign-key>
+      <column id="47" parent="5" name="TargetExecution_ID">
+        <mandatory>1</mandatory>
+        <data-type>int(11)</data-type>
+        <sequence-identity>1</sequence-identity>
+      </column>
+      <column id="48" parent="5" name="Test_ID">
+        <data-type>int(11)</data-type>
+      </column>
+      <column id="49" parent="5" name="Mutant_ID">
+        <data-type>int(11)</data-type>
+      </column>
+      <column id="50" parent="5" name="Target">
+        <data-type>enum(&apos;COMPILE_MUTANT&apos;, &apos;COMPILE_TEST&apos;, &apos;TEST_ORIGINAL&apos;, &apos;TEST_MUTANT&apos;, &apos;TEST_EQUIVALENCE&apos;)</data-type>
+      </column>
+      <column id="51" parent="5" name="Status">
+        <mandatory>1</mandatory>
+        <data-type>enum(&apos;SUCCESS&apos;, &apos;FAIL&apos;, &apos;ERROR&apos;)</data-type>
+      </column>
+      <column id="52" parent="5" name="Message">
+        <data-type>varchar(2000)</data-type>
+      </column>
+      <column id="53" parent="5" name="Timestamp">
+        <mandatory>1</mandatory>
+        <data-type>timestamp</data-type>
+        <default-expression>&apos;CURRENT_TIMESTAMP&apos;</default-expression>
+      </column>
+      <index id="54" parent="5" name="Mutant_ID">
+        <columns>Mutant_ID</columns>
+        <desc-columns></desc-columns>
+      </index>
+      <index id="55" parent="5" name="Test_ID">
+        <columns>Test_ID</columns>
+        <desc-columns></desc-columns>
+      </index>
+      <key id="56" parent="5" name="PRIMARY">
+        <columns>TargetExecution_ID</columns>
+        <primary>1</primary>
+      </key>
+      <foreign-key id="57" parent="5" name="targetexecutions_ibfk_1">
+        <columns>Test_ID</columns>
+        <ref-key>~.tests.PRIMARY</ref-key>
+        <cascade-update-rule>restrict</cascade-update-rule>
+        <cascade-delete-rule>restrict</cascade-delete-rule>
+      </foreign-key>
+      <foreign-key id="58" parent="5" name="targetexecutions_ibfk_2">
+        <columns>Mutant_ID</columns>
+        <ref-key>~.mutants.PRIMARY</ref-key>
+        <cascade-update-rule>restrict</cascade-update-rule>
+        <cascade-delete-rule>restrict</cascade-delete-rule>
+      </foreign-key>
+      <column id="59" parent="6" name="Test_ID">
+        <mandatory>1</mandatory>
+        <data-type>int(11)</data-type>
+        <sequence-identity>1</sequence-identity>
+      </column>
+      <column id="60" parent="6" name="Game_ID">
+        <mandatory>1</mandatory>
+        <data-type>int(11)</data-type>
+      </column>
+      <column id="61" parent="6" name="JavaFile">
+        <mandatory>1</mandatory>
+        <data-type>varchar(255)</data-type>
+      </column>
+      <column id="62" parent="6" name="ClassFile">
+        <data-type>varchar(255)</data-type>
+      </column>
+      <column id="63" parent="6" name="RoundCreated">
+        <mandatory>1</mandatory>
+        <data-type>int(11)</data-type>
+      </column>
+      <column id="64" parent="6" name="MutantsKilled">
+        <data-type>int(11)</data-type>
+        <default-expression>&apos;0&apos;</default-expression>
+      </column>
+      <column id="65" parent="6" name="Owner_ID">
+        <mandatory>1</mandatory>
+        <data-type>int(11)</data-type>
+      </column>
+      <column id="66" parent="6" name="Timestamp">
+        <mandatory>1</mandatory>
+        <data-type>timestamp</data-type>
+        <default-expression>&apos;CURRENT_TIMESTAMP&apos;</default-expression>
+      </column>
+      <index id="67" parent="6" name="Game_ID">
+        <columns>Game_ID</columns>
+        <desc-columns></desc-columns>
+      </index>
+      <index id="68" parent="6" name="Owner_ID">
+        <columns>Owner_ID</columns>
+        <desc-columns></desc-columns>
+      </index>
+      <key id="69" parent="6" name="PRIMARY">
+        <columns>Test_ID</columns>
+        <primary>1</primary>
+      </key>
+      <foreign-key id="70" parent="6" name="tests_ibfk_1">
+        <columns>Game_ID</columns>
+        <ref-key>~.games.PRIMARY</ref-key>
+        <cascade-update-rule>restrict</cascade-update-rule>
+        <cascade-delete-rule>restrict</cascade-delete-rule>
+      </foreign-key>
+      <foreign-key id="71" parent="6" name="tests_ibfk_2">
+        <columns>Owner_ID</columns>
+        <ref-key>~.users.PRIMARY</ref-key>
+        <cascade-update-rule>restrict</cascade-update-rule>
+        <cascade-delete-rule>restrict</cascade-delete-rule>
+      </foreign-key>
+      <column id="72" parent="7" name="User_ID">
+        <mandatory>1</mandatory>
+        <data-type>int(11)</data-type>
+        <sequence-identity>1</sequence-identity>
+      </column>
+      <column id="73" parent="7" name="Username">
+        <mandatory>1</mandatory>
+        <data-type>varchar(20)</data-type>
+      </column>
+      <column id="74" parent="7" name="Password">
+        <mandatory>1</mandatory>
+        <data-type>char(60)</data-type>
+      </column>
+      <key id="75" parent="7" name="PRIMARY">
+        <columns>User_ID</columns>
+        <primary>1</primary>
+      </key>
+    </database-model>
+  </data-source>
+</component>
