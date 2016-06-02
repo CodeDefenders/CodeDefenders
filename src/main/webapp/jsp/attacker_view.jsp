@@ -1,13 +1,134 @@
+<<<<<<< HEAD
 <% String pageTitle="Attacking Class"; %>
 <%@ include file="/jsp/header_game.jsp" %>
+=======
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+	<!-- Title -->
+	<title>Code Defenders - Attack</title>
+
+	<!-- App context -->
+	<base href="${pageContext.request.contextPath}/">
+
+	<!-- jQuery -->
+	<script src="js/jquery.min.js" type="text/javascript" ></script>
+
+	<!-- Slick -->
+	<link href="css/slick_1.5.9.css" rel="stylesheet" type="text/css" />
+	<script src="js/slick_1.5.9.min.js" type="text/javascript" ></script>
+
+	<!-- Bootstrap -->
+	<script src="js/bootstrap.min.js" type="text/javascript" ></script>
+	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+	<!-- Codemirror -->
+	<script src="codemirror/lib/codemirror.js" type="text/javascript" ></script>
+	<script src="codemirror/mode/clike/clike.js" type="text/javascript" ></script>
+	<script src="codemirror/mode/diff/diff.js" type="text/javascript" ></script>
+	<link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
+
+	<!-- Game -->
+	<link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
+
+	<script>
+		$(document).ready(function() {
+			$('.single-item').slick({
+				arrows: true,
+				infinite: true,
+				speed: 300,
+				draggable:false
+			});
+			$('#messages-div').delay(10000).fadeOut();
+		});
+	</script>
+</head>
+
+<body>
+<%@ page import="java.util.*" %>
+<%@ page import="org.codedefenders.Test" %>
+<%@ page import="org.codedefenders.Mutant" %>
+<%@ page import="org.codedefenders.Game" %>
+<%@ page import="org.codedefenders.Constants" %>
+<%@ page import="static org.codedefenders.Game.State.ACTIVE" %>
+<% Game game = (Game) session.getAttribute("game"); %>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+			</button>
+			<a class="navbar-brand" href="/">
+				<span><img class="logo" href="/" src="images/logo.png"/></span>
+				Code Defenders
+			</a>
+		</div>
+		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
+			<ul class="nav navbar-nav navbar-left">
+				<li><a href="games/user">My Games</a></li>
+				<li class="navbar-text">Game ID: <%= game.getId() %></li>
+				<li class="navbar-text">ATK: <%= game.getAttackerScore() %> | DEF: <%= game.getDefenderScore() %></li>
+				<li class="navbar-text">Round <%= game.getCurrentRound() %> of <%= game.getFinalRound() %></li>
+				<% if (game.getAliveMutants().size() == 1) {%>
+				<li class="navbar-text">1 Mutant Alive</li>
+				<% } else {%>
+				<li class="navbar-text"><%= game.getAliveMutants().size() %> Mutants Alive</li>
+				<% }%>
+				<li class="navbar-text">
+					<% if (game.getState().equals(ACTIVE)) {%>
+						<% if (game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
+							<span class="label label-primary turn-badge">Your turn</span>
+						<% } else { %>
+							<span class="label label-default turn-badge">Waiting</span>
+						<% } %>
+					<% } else { %>
+						<span class="label label-default turn-badge">Finished</span>
+					<% } %>
+				</li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li>
+					<p class="navbar-text">
+						<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+						<%=request.getSession().getAttribute("username")%>
+					</p>
+				</li>
+				<li><input type="submit" form="logout" class="btn btn-inverse navbar-btn" value="Log Out"/></li>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<form id="logout" action="login" method="post">
+	<input type="hidden" name="formType" value="logOut">
+</form>
+
+<%
+	ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
+	request.getSession().removeAttribute("messages");
+	if (messages != null && ! messages.isEmpty()) {
+%>
+<div class="alert alert-info" id="messages-div">
+	<% for (String m : messages) { %>
+	<pre><strong><%=m%></strong></pre>
+	<% } %>
+</div>
+<%	} %>
+>>>>>>> 37098c05c265c5f6f462ceae5c51150a1695cb37
 
 <%
 	if (game.getState().equals(Game.State.FINISHED)) {
 		String message = Constants.DRAW_MESSAGE;
- 	    if (game.getAttackerScore() > game.getDefenderScore())
-	        message = Constants.WINNER_MESSAGE;
+		if (game.getAttackerScore() > game.getDefenderScore())
+			message = Constants.WINNER_MESSAGE;
 		else if (game.getDefenderScore() > game.getAttackerScore())
-	        message = Constants.LOSER_MESSAGE;
+			message = Constants.LOSER_MESSAGE;
 %>
 <div id="finishedModal" class="modal fade">
 	<div class="modal-dialog">
@@ -83,7 +204,6 @@
 					<tr class="blank_row">
 						<td class="row-borderless" colspan="2">No mutants alive.</td>
 					</tr>
-
 					<%}
 					%>
 				</table>
@@ -136,11 +256,11 @@
 				</table>
 			</div>
 		</div> <!-- tab-content -->
-		<h2> Tests </h2>
+		<h2> JUnit Tests </h2>
 		<div class="slider single-item">
 			<%
 				boolean isTests = false;
-				for (Test t : game.getTests()) {
+				for (Test t : game.getExecutableTests()) {
 					isTests = true;
 					String tc = "";
 					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
@@ -176,12 +296,13 @@
 	</div> <!-- col-md6 newmut -->
 </div> <!-- row-fluid -->
 
-<!-- Include all compiled plugins (below), or include individual files as needed -->
-<script src="js/bootstrap.min.js"></script>
 <script>
 	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
 		lineNumbers: true,
-		matchBrackets: true
+		indentUnit: 4,
+		indentWithTabs: true,
+		matchBrackets: true,
+		mode: "text/x-java"
 	});
 	editor.setSize("100%", 500);
 
@@ -191,6 +312,7 @@
 		CodeMirror.fromTextArea(x[i], {
 			lineNumbers: true,
 			matchBrackets: true,
+			mode: "text/x-java",
 			readOnly: true
 		});
 	}
@@ -208,6 +330,21 @@
 			editorDiff.setSize("100%", 500);
 		}
 	});
+
+	<% if (game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
+	function checkForUpdate(){
+		$.post('/play', {
+			formType: "whoseTurn",
+			gameID: <%= game.getId() %>
+		}, function(data){
+			if(data=="attacker"){
+				window.location.reload();
+			}
+		},'text');
+	}
+	setInterval("checkForUpdate()", 10000);
+	<% } %>
+
 	$('#finishedModal').modal('show');
 </script>
 <%@ include file="/jsp/footer.jsp" %>

@@ -62,6 +62,11 @@ public class UploadManager extends HttpServlet {
 
 						InputStream fileContent = item.getInputStream();
 						File targetFile = new File(getServletContext().getRealPath(Constants.CUTS_DIR + Constants.FILE_SEPARATOR + fileName));
+						if (targetFile.exists()) {
+							messages.add("A class with the same name already exists, please try with a different one.");
+							response.sendRedirect(request.getHeader("referer"));
+							break;
+						}
 						FileUtils.copyInputStreamToFile(fileContent, targetFile);
 						String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
 						String classFileName = AntRunner.compileCUT(getServletContext(), fileName);

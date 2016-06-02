@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletContext;
 import java.util.ArrayList;
 
+import static org.codedefenders.Constants.*;
 import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
 import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 
@@ -27,17 +28,17 @@ public class MutationTester {
 		}
 		if (killed == 0)
 			if (mutants.size() == 0)
-				messages.add("Test submitted and ready to kill mutant!");
+				messages.add(TEST_SUBMITTED_MESSAGE);
 			else
-				messages.add("Your test did not kill any mutant, just yet.");
+				messages.add(TEST_KILLED_ZERO_MESSAGE);
 		else {
 			if (killed == 1) {
 				if (mutants.size() == 1)
-					messages.add("Great, your test killed the last mutant!");
+					messages.add(TEST_KILLED_LAST_MESSAGE);
 				else
-					messages.add("Good job, your test killed a mutant!");
+					messages.add(TEST_KILLED_ONE_MESSAGE);
 			} else {
-				messages.add(String.format("Awesome! Your test killed \"%d mutants!", killed));
+				messages.add(String.format(TEST_KILLED_N_MESSAGE, killed));
 			}
 
 		}
@@ -48,16 +49,16 @@ public class MutationTester {
 		for (Test test : tests) {
 			// If this mutant/test pairing hasnt been run before and the test might kill the mutant
 			if (testVsMutant(context, test, mutant)) {
-				messages.add(String.format("Test %d killed your mutant. Keep going!", test.getId()));
+				messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
 				return;
 			}
 		}
 		if (tests.size() == 0)
-			messages.add("Mutant submitted, may the force be with it.");
+			messages.add(MUTANT_SUBMITTED_MESSAGE);
 		else if (tests.size() <= 1)
-			messages.add("Cool, your mutant is alive.");
+			messages.add(MUTANT_ALIVE_1_MESSAGE);
 		else
-			messages.add(String.format("Awesome, your mutant survived %d existing tests!",tests.size()));
+			messages.add(String.format(MUTANT_ALIVE_N_MESSAGE,tests.size()));
 	}
 
 	/**
@@ -73,7 +74,7 @@ public class MutationTester {
 			TargetExecution executedTarget = AntRunner.testMutant(context, mutant, test);
 
 			// If the test did NOT pass, the mutant was detected and should be killed.
-			if (executedTarget.status.equals("FAIL")) {
+			if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
 				System.out.println(String.format("Test %d kills Mutant %d", test.getId(), mutant.getId()));
 				mutant.kill();
 				test.killMutant();
@@ -90,23 +91,17 @@ public class MutationTester {
 	// Outputs: None
 
 	public static void runEquivalenceTest(ServletContext context, Test test, Mutant mutant) {
-		logger.debug("Killing mutant in runEquivalenceTest.");
-		System.out.println("Killing mutant in equivalenceTest.");
+		logger.info("Running equivalence test.");
 		// The test created is new and was made by the attacker (there is no need to check if the mutant/test pairing has been run already)
 
 		// As a result of this test, either the test the attacker has written kills the mutant or doesnt.
 		TargetExecution executedTarget = AntRunner.testMutant(context, mutant, test);
 
-		if (executedTarget.status.equals("ERROR")) {
-			System.out.println("Error executing test on mutant.");
-			return;
-		} else if (executedTarget.status.equals("FAIL")) {
+		if (executedTarget.status.equals("ERROR") || executedTarget.status.equals("FAIL")) {
 			// If the test did NOT pass, the mutant was detected and is proven to be non-equivalent
-			System.out.println("Mutant was killed, hence tagged not equivalent");
 			mutant.setEquivalent(PROVEN_NO);
 		} else {
 			// If the test DID pass, the mutant went undetected and it is assumed to be equivalent.
-			System.out.println("Test failed to kill the mutant, hence assumed equivalent");
 			mutant.setEquivalent(ASSUMED_YES);
 		}
 		// Kill the mutant if it was killed by the test or if it's marked equivalent

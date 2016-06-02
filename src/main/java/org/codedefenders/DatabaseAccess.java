@@ -230,7 +230,7 @@ public class DatabaseAccess {
 			if (rs.next()) {
 				Game gameRecord = new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
 						rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
-						Game.Level.valueOf(rs.getString("Level")));
+						Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode")));
 
 				stmt.close();
 				conn.close();
@@ -260,83 +260,64 @@ public class DatabaseAccess {
 		return null;
 	}
 
+	/**
+	 * Returns list of <b>active</b> games for a user
+	 * @param userId
+	 * @return
+	 */
 	public static ArrayList<Game> getGamesForUser(int userId) {
+		String sql = String.format("SELECT * FROM games WHERE (Attacker_ID=%d OR Defender_ID=%d) AND State!='FINISHED';", userId, userId);
+		return getGames(sql);
+	}
 
-		Connection conn = null;
-		Statement stmt = null;
-		String sql = null;
-		ArrayList<Game> gameList = new ArrayList<Game>();
-
-		try {
-			conn = getConnection();
-
-			stmt = conn.createStatement();
-			sql = String.format("SELECT * FROM games WHERE Attacker_ID=%d OR Defender_ID=%d;", userId, userId);
-			ResultSet rs = stmt.executeQuery(sql);
-
-			while (rs.next()) {
-				gameList.add(new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
-						rs.getInt("Class_ID"), rs.getInt("CurrentRound"), rs.getInt("FinalRound"),
-						Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
-						Game.Level.valueOf(rs.getString("Level"))));
-			}
-
-			stmt.close();
-			conn.close();
-
-
-		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-			se.printStackTrace();
-		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-			e.printStackTrace();
-		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}//end finally try
-		} //end try
-
-		return gameList;
+	/**
+	 * Returns list of <b>finished</b> games for a user
+	 * @param userId
+	 * @return
+	 */
+	public static ArrayList<Game> getHistoryForUser(int userId) {
+		String sql = String.format("SELECT * FROM games WHERE (Attacker_ID=%d OR Defender_ID=%d) AND State='FINISHED';", userId, userId);
+		return getGames(sql);
 	}
 
 	public static ArrayList<Game> getAllGames() {
+		String sql = "SELECT * FROM games;";
+		return getGames(sql);
+	}
 
+	public static ArrayList<Game> getOpenGames() {
+		String sql = "SELECT * FROM games where (Mode='DUEL' AND State='CREATED') OR (Mode='PARTY' AND State!='FINISHED');";
+		return getGames(sql);
+	}
+
+	public static Game getActiveUnitTestingSession(int userId) {
+		String sql = String.format("SELECT * FROM games WHERE Defender_ID='%d' AND Mode='UTESTING' AND State='ACTIVE';", userId);
+		ArrayList<Game> games = getGames(sql);
+		if (games.isEmpty())
+			return null;
+		else
+			return games.get(0);
+	}
+
+	public static ArrayList<Game> getGames(String sql) {
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = null;
-		ArrayList<Game> gameList = new ArrayList<Game>();
+		ArrayList<Game> gameList = new ArrayList<>();
 
 		try {
 			conn = getConnection();
 
 			stmt = conn.createStatement();
-			sql = "SELECT * FROM games;";
 			ResultSet rs = stmt.executeQuery(sql);
 
 			while (rs.next()) {
 				gameList.add(new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
 						rs.getInt("Class_ID"), rs.getInt("CurrentRound"), rs.getInt("FinalRound"),
 						Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
-						Game.Level.valueOf(rs.getString("Level"))));
+						Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode"))));
 			}
-
 			stmt.close();
 			conn.close();
-
-
 		} catch (SQLException se) {
 			System.out.println(se);
 			//Handle errors for JDBC
@@ -366,7 +347,7 @@ public class DatabaseAccess {
 
 	public static ArrayList<Mutant> getMutantsForGame(int gid) {
 
-		ArrayList<Mutant> mutList = new ArrayList<Mutant>();
+		ArrayList<Mutant> mutList = new ArrayList<>();
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -427,7 +408,7 @@ public class DatabaseAccess {
 			conn = getConnection();
 
 			stmt = conn.createStatement();
-			String sql = sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d' AND Game_ID='%d';", mutantID, game.getId());
+			String sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d' AND Game_ID='%d';", mutantID, game.getId());
 			ResultSet rs = stmt.executeQuery(sql);
 			if (rs.next()) {
 				newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
@@ -469,13 +450,19 @@ public class DatabaseAccess {
 	}
 
 	public static ArrayList<Test> getExecutableTestsForGame(int gid) {
-		String sql = String.format("SELECT * FROM tests WHERE Game_ID='%d' AND ClassFile IS NOT NULL;", gid);
+		String stmt = "SELECT tests.* FROM tests "
+				+ "INNER JOIN targetexecutions ex on tests.Test_ID = ex.Test_ID "
+				+ "WHERE tests.Game_ID='%d' AND tests.ClassFile IS NOT NULL " // only compilable tests
+				+ "AND ex.Target='TEST_ORIGINAL' AND ex.Status='SUCCESS';"; // that pass on original CUT
+
+		//String sql = String.format("SELECT * FROM tests WHERE Game_ID='%d' AND ClassFile IS NOT NULL;", gid);
+		String sql = String.format(stmt, gid);
 		return getTests(sql);
 	}
 
 	private static ArrayList<Test> getTests(String sql) {
 
-		ArrayList<Test> testList = new ArrayList<Test>();
+		ArrayList<Test> testList = new ArrayList<>();
 
 		Connection conn = null;
 		Statement stmt = null;

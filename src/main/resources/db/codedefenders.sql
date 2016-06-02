@@ -48,7 +48,7 @@ CREATE TABLE `games` (
   `Class_ID` int(11) DEFAULT NULL,
   `State` enum('CREATED','ACTIVE','FINISHED') NOT NULL DEFAULT 'CREATED',
   `Level` enum('EASY','MEDIUM','HARD') NOT NULL,
-  `Mode` enum('SINGLE','DUEL') NOT NULL DEFAULT 'DUEL',
+  `Mode` enum('SINGLE','DUEL', 'PARTY', 'UTESTING') NOT NULL DEFAULT 'DUEL',
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`Game_ID`),
   KEY `Attacker_ID` (`Attacker_ID`),

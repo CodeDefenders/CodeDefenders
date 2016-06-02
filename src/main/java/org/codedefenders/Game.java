@@ -2,6 +2,9 @@ package org.codedefenders;
 
 import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -9,6 +12,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 public class Game {
+
+	private static final Logger logger = LoggerFactory.getLogger(Game.class);
 
 	private int id;
 
@@ -26,10 +31,12 @@ public class Game {
 
 	private Level level;
 
+	private Mode mode;
+
 	public enum Role { ATTACKER, DEFENDER };
 	public enum State { CREATED, ACTIVE, FINISHED };
 	public enum Level { EASY, MEDIUM, HARD };
-	public enum Mode { SINGLE, DUEL, PARTY };
+	public enum Mode { SINGLE, DUEL, PARTY, UTESTING };
 
 	public Game(int classId, int userId, int maxRounds, Role role, Level level) {
 		this.classId = classId;
@@ -47,9 +54,10 @@ public class Game {
 		this.state = State.CREATED;
 
 		this.level = level;
+		this.mode = Mode.DUEL;
 	}
 
-	public Game(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, State state, Level level) {
+	public Game(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, State state, Level level, Mode mode) {
 		this.id = id;
 		this.attackerId = attackerId;
 		this.defenderId = defenderId;
@@ -59,6 +67,7 @@ public class Game {
 		this.activeRole = activeRole;
 		this.state = state;
 		this.level = level;
+		this.mode = mode;
 	}
 
 	public int getId() {
@@ -135,14 +144,18 @@ public class Game {
 		this.level = level;
 	}
 
+	public Mode getMode() {
+		return this.mode;
+	}
+
 	public ArrayList<Mutant> getMutants() {
 		return DatabaseAccess.getMutantsForGame(id);
 	}
 
 	public ArrayList<Mutant> getAliveMutants() {
-		ArrayList<Mutant> aliveMutants = new ArrayList<Mutant>();
+		ArrayList<Mutant> aliveMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
-			if (m.isAlive() && (! m.getClassFile().equals("null"))) {
+			if (m.isAlive() && (m.getClassFile() != null)) {
 				aliveMutants.add(m);
 			}
 		}
@@ -152,7 +165,7 @@ public class Game {
 	public ArrayList<Mutant> getKilledMutants() {
 		ArrayList<Mutant> killedMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
-			if ((! m.isAlive()) && (! m.getClassFile().equals("null"))) {
+			if (!m.isAlive() && (m.getClassFile() != null)) {
 				killedMutants.add(m);
 			}
 		}
@@ -160,7 +173,7 @@ public class Game {
 	}
 
 	public ArrayList<Mutant> getMutantsMarkedEquivalent() {
-		ArrayList<Mutant> equivMutants = new ArrayList<Mutant>();
+		ArrayList<Mutant> equivMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
 			if (m.isAlive() && m.getEquivalent().equals(PENDING_TEST)) {
 				equivMutants.add(m);
@@ -188,18 +201,21 @@ public class Game {
 	public int getAttackerScore() {
 		int totalScore = 0;
 
-		for (Mutant m : getMutants()) {
-			totalScore += m.getPoints();
-		}
+		for (Mutant m : getMutants())
+			totalScore += m.getAttackerPoints();
+		logger.debug("Attacker Score: " + totalScore);
 		return totalScore;
 	}
 
 	public int getDefenderScore() {
 		int totalScore = 0;
 
-		for (Test t : getTests()) {
-			totalScore += t.getPoints();
-		}
+		for (Test t : getTests())
+			totalScore += t.getDefenderPoints();
+
+		for (Mutant m : getMutants())
+			totalScore += m.getDefenderPoints();
+		logger.debug("Defender Score: " + totalScore);
 		return totalScore;
 	}
 
@@ -293,8 +309,12 @@ public class Game {
 
 			// Get all rows from the database which have the chosen username
 			stmt = conn.createStatement();
-			sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
-					attackerId, defenderId, currentRound, finalRound, activeRole, state.name(), level.name(), id);
+			if (this.mode.equals(Mode.UTESTING))
+				sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
+						currentRound, finalRound, activeRole, state.name(), level.name(), id);
+			else
+				sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
+						attackerId, defenderId, currentRound, finalRound, activeRole, state.name(), level.name(), id);
 			stmt.execute(sql);
 			return true;
 

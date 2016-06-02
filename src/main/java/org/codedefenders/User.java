@@ -41,8 +41,10 @@ public class User {
 			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 			String safePassword = passwordEncoder.encode(password);
 
-
-			sql = String.format("INSERT INTO users (Username, Password) VALUES ('%s', '%s');", username, safePassword);
+			if (id <= 0)
+				sql = String.format("INSERT INTO users (Username, Password) VALUES ('%s', '%s');", username, safePassword);
+			else
+				sql = String.format("INSERT INTO users (User_ID, Username, Password) VALUES (%d, '%s', '%s');", id, username, safePassword);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 

@@ -1,6 +1,86 @@
 <% String pageTitle="Open Games"; %>
 <%@ include file="/jsp/header.jsp" %>
 
+<<<<<<< HEAD
+=======
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+	<!-- Title -->
+	<title>Code Defenders - Join Game</title>
+
+	<!-- App context -->
+	<base href="${pageContext.request.contextPath}/">
+
+	<!-- jQuery -->
+	<script src="js/jquery.min.js" type="text/javascript" ></script>
+
+	<!-- Bootstrap -->
+	<script src="js/bootstrap.min.js" type="text/javascript" ></script>
+	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+
+	<!-- Game -->
+	<link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
+
+</head>
+
+<body>
+
+<%@ page import="org.codedefenders.DatabaseAccess" %>
+<%@ page import="org.codedefenders.Game" %>
+<%@ page import="java.util.ArrayList" %>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+	<div class="container-fluid">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+			</button>
+			<a class="navbar-brand" href="/">
+				<span><img class="logo" href="/" src="images/logo.png"/></span>
+				Code Defenders
+			</a>
+		</div>
+		<div class= "collapse navbar-collapse" id="navbar-collapse-1">
+			<ul class="nav navbar-nav">
+				<li><a href="games/user">My Games</a></li>
+				<li class="active"><a href="games/open">Open Games</a></li>
+				<li><a href="games/create">Create Game</a></li>
+				<li><a href="games/history">History</a></li>
+			</ul>
+			<ul class="nav navbar-nav navbar-right">
+				<li></li>
+				<li>
+					<p class="navbar-text">
+						<span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+						<%=request.getSession().getAttribute("username")%>
+					</p>
+				</li>
+				<li><input type="submit" form="logout" class="btn btn-inverse navbar-btn" value="Log Out"/></li>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<form id="logout" action="login" method="post">
+	<input type="hidden" name="formType" value="logOut">
+</form>
+
+<%
+	ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
+	request.getSession().removeAttribute("messages");
+	if (messages != null && ! messages.isEmpty()) {
+%>
+<div class="alert alert-info" id="messages-div">
+	<% for (String m : messages) { %>
+	<pre><strong><%=m%></strong></pre>
+	<% } %>
+</div>
+<%	} %>
+
+<h2> Open Games </h2>
+>>>>>>> 37098c05c265c5f6f462ceae5c51150a1695cb37
 <table class="table table-hover table-responsive table-paragraphs">
 	<tr>
 		<td class="col-sm-2">Game No.</td>
@@ -20,7 +100,7 @@
 		int uid = (Integer)request.getSession().getAttribute("uid");
 		int atkId;
 		int defId;
-		for (Game g : DatabaseAccess.getAllGames()) {
+		for (Game g : DatabaseAccess.getOpenGames()) {
 			isGames = true;
 			atkName = null;
 			defName = null;
@@ -63,5 +143,10 @@
 	%>
 </table>
 
+<<<<<<< HEAD
 
 <%@ include file="/jsp/footer.jsp" %>
+=======
+</body>
+</html>
+>>>>>>> 37098c05c265c5f6f462ceae5c51150a1695cb37

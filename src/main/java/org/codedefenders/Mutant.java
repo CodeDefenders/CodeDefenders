@@ -130,22 +130,43 @@ public class Mutant {
 		update();
 	}
 
-	public int getPoints() {
+	public int getAttackerPoints() {
 		if (alive) {
 			// if mutant is alive, as many points as rounds it has survived
 			// TODO: as many points as tests it has survived?
-			return DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound() - roundCreated;
+			int points = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound() - roundCreated; // rounds survived
+			logger.info("Alive mutant " + getId() + " contributes " + points + " attacker points");
+			return points;
 		} else {
 			if (classFile == null || classFile.equals("null")) // non-compilable
 				return 0;
 			if (equivalent.equals(DECLARED_YES)) // accepted equivalent
 				return 0;
 			if (equivalent.equals(ASSUMED_YES)) // claimed, rejected, test did not kill it
-				return -1;
-			if (equivalent.equals(PROVEN_NO)) // claimed, rejected, test killed it
+				return 0;
+			if (equivalent.equals(PROVEN_NO)) { // claimed, rejected, test killed it
+				logger.info("Claimed/rejected/killed mutant " + getId() + " contributes 2 attacker points");
 				return 2;
-			return roundKilled - roundCreated; // rounds survived
+			}
+			int points = roundKilled - roundCreated; // rounds survived
+			logger.info("Killed mutant " + getId() + " contributes " + points + " attacker points");
+			return points;
 		}
+	}
+
+	public int getDefenderPoints() {
+		if (! alive) {
+			if (classFile == null) // non-compilable
+				return 0;
+			if (equivalent.equals(DECLARED_YES)) // accepted equivalent
+				return 1;
+			if (equivalent.equals(ASSUMED_YES)) // claimed, rejected, test did not kill it
+				return 2;
+			if (equivalent.equals(PROVEN_NO)) // claimed, rejected, test killed it
+				return 0;
+			return 0;
+		}
+		return 0;
 	}
 
 	public Patch getDifferences() {
@@ -237,10 +258,10 @@ public class Mutant {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			String jFileDB = DatabaseAccess.addSlashes(javaFile);
-			String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
+			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
+			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
 			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Owner_ID)" +
-					" VALUES ('%s', '%s', %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), ownerId);
+					" VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), ownerId);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 

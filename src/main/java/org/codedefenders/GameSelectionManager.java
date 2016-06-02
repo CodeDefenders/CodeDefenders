@@ -88,10 +88,11 @@ public class GameSelectionManager extends HttpServlet {
 				Game eGame = DatabaseAccess.getGameForKey("Game_ID", gameId);
 
 				if (eGame.isUserInGame(uid)) {
-
 					session.setAttribute("gid", gameId);
-
-					response.sendRedirect("play");
+					if (eGame.getMode().equals(Game.Mode.UTESTING))
+						response.sendRedirect("utesting");
+					else
+						response.sendRedirect("play");
 				} else {
 					response.sendRedirect(request.getHeader("referer"));
 				}
