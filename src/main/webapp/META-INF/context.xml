@@ -5,6 +5,6 @@
 			maxActive="100" maxIdle="30" maxWait="10000"
 			url="jdbc:mysql://localhost:3306/codedefenders"
 			driverClassName="com.mysql.jdbc.Driver"
-			username="root" password="***REMOVED***"
+			username="root" password="thomas"
 	/>
 </Context>

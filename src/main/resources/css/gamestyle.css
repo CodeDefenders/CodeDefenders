@@ -61,9 +61,9 @@ textarea {
 }
 
 body {
-	padding-top: 70px;
-	padding-left: 10px;
-	padding-right: 10px;
+	padding-top: 0px;
+	padding-left: 0px;
+	padding-right: 0px;
 	margin-bottom: 30px; /* footer height */
 }
 
@@ -242,6 +242,16 @@ th, td {
 	padding: 0 15px;
 }
 
+.main-title {
+	font-family: "Lucida Console", Monaco, monospace;
+	color: #ffffff;
+	font-size: 48px;
+}
+
+.button.tab-link, .button.list-item{
+	text-transform: lowercase;
+}
+
 .footer .container .text-muted {
 	margin: 5px 0;
 }
@@ -253,6 +263,10 @@ th, td {
 
 .fieldset-auto-width {
 	display: inline-block;
+}
+
+.top {
+	height: 64px;
 }
 
 textarea[id="inputMessage"] {
