@@ -118,8 +118,12 @@ public class AntRunner {
 				pathCompiledClassName = matchingFiles.get(0).getAbsolutePath();
 		} else {
 			// Otherwise the CUT failed to compile
-			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]"));
 			System.err.println("Failed to compile uploaded CUT");
+			int index = resultArray[0].indexOf("javac");
+			String message = resultArray[0];
+			if (index >= 0){
+				message = message.substring(message.indexOf("javac"));
+			}
 			System.err.println(message);
 		}
 		return pathCompiledClassName;
@@ -239,7 +243,15 @@ public class AntRunner {
 			antHome = System.getProperty("ant.home", "/usr/local");
 		}
 
-		pb.command(antHome + "/bin/ant", target, // "-v", "-d", for verbose, debug
+		String command = antHome + "/bin/ant";
+
+		if (System.getProperty("os.name").toLowerCase().contains("windows")){
+			command += ".bat";
+		}
+
+		command.replace("\\", "\\\\");
+
+		pb.command(command, target, // "-v", "-d", for verbose, debug
 				"-Dsrc.dir=" + context.getRealPath(Constants.CUTS_DIR),
 				"-Dmutant.file=" + mutantFile,
 				"-Dtest.file=" + testFile,

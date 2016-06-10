@@ -6,6 +6,30 @@
 .bg-red {
   background-color: #e51c23;
 }
+
+.table {
+  width: 100%;
+}
+
+.clear {
+  clear: both;
+  float: left;
+}
+
+.game-container {
+  border: 1px solid black;
+  -webkit-border-radius:5px;
+  -moz-border-radius:5px;
+  border-radius:5px;
+  padding: 10px;
+  margin: 10px;
+}
+
+#messages strong {
+  text-align: center;
+  width: 100%;
+}
+
 .bg-red .bg-minus-1,
 .bg-red.bg-minus-1 {
   background-color: #e84e40;

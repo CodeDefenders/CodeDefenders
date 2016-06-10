@@ -20,7 +20,7 @@
 	<script src="js/bootstrap.min.js" type="text/javascript" ></script>
 	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
-	<!-- Game -->
+	<!-- MultiplayerGame -->
 	<link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
 
 </head>

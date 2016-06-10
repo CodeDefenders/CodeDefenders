@@ -1,9 +1,5 @@
-<% String pageTitle="MultiplayerGame Creation"; %>
-<%@ include file="/jsp/header.jsp" %>
-
-
 <div id="creategame" class="container">
-	<form id="create" action="games" method="post" class="form-creategame">
+	<form id="create" action="multiplayer/games" method="post" class="form-creategame">
 		<h2>Create Game</h2>
 		<input type="hidden" name="formType" value="createGame">
 		<table class="tableform">
@@ -21,10 +17,10 @@
 				</td>
 			</tr>
 			<tr>
-				<td>Role</td> <td><input type="checkbox" id="role" name="role" class="form-control" data-size="large" data-toggle="toggle" data-on="Attacker" data-off="Defender" data-onstyle="success" data-offstyle="primary"></td>
+				<td>Line Coverage Goal</td><td><input type="text" value="0.8" name="line_cov" /></td>
 			</tr>
 			<tr>
-				<td>Rounds</td><td><input class="form-control" type="number" name="rounds" value="3" min="1" max="10"></td>
+				<td>Mutation Goal</td><td><input type="text" value="0.5" name="mutant_cov"></td>
 			</tr>
 			<tr>
 				<td>Level</td> <td><input type="checkbox" id="level" name="level" class="form-control" data-size="large" data-toggle="toggle" data-on="Easy" data-off="Hard" data-onstyle="info" data-offstyle="warning">
@@ -33,4 +29,3 @@
 		<button class="btn btn-lg btn-primary btn-block" type="submit" value="Create">Create</button>
 	</form>
 </div>
-<%@ include file="/jsp/footer.jsp" %>

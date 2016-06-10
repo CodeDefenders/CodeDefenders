@@ -125,6 +125,7 @@
 		<url-pattern>/utesting</url-pattern>
 	</servlet-mapping>
 
+
 	<filter>
 		<filter-name>loginFilter</filter-name>
 		<filter-class>org.codedefenders.LoginFilter</filter-class>
@@ -151,6 +152,43 @@
 		<servlet-name>sendEmail</servlet-name>
 		<url-pattern>/sendEmail</url-pattern>
 	</servlet-mapping>
+
+
+	<!-- multiplayer servlets -->
+	<servlet>
+		<servlet-name>multiplayerGameSelectionManager</servlet-name>
+		<servlet-class>org.codedefenders.multiplayer.MultiplayerGameSelectionManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>multiplayerGameSelectionManager</servlet-name>
+		<url-pattern>/multiplayer/games</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>multiplayerGameUser</servlet-name>
+		<jsp-file>/jsp/multiplayer/user_games_view.jsp</jsp-file>	</servlet>
+	<servlet-mapping>
+		<servlet-name>multiplayerGameUser</servlet-name>
+		<url-pattern>/multiplayer/games/user</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>multiplayerGame</servlet-name>
+		<jsp-file>/jsp/multiplayer/game_view.jsp</jsp-file>	</servlet>
+	<servlet-mapping>
+		<servlet-name>multiplayerGame</servlet-name>
+		<url-pattern>/multiplayer/play</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>multiplayerGameView</servlet-name>
+		<jsp-file>/jsp/multiplayer/create_game_view.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>multiplayerGameView</servlet-name>
+		<url-pattern>/multiplayer/games/create</url-pattern>
+	</servlet-mapping>
+	<!-- end multiplayer servlets -->
 
 	<resource-ref>
 		<res-ref-name>jdbc/codedefenders</res-ref-name>

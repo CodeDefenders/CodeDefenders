@@ -102,7 +102,7 @@ public class GameManager extends HttpServlet {
 
 			case "resolveEquivalence":
 				logger.debug("Executing Action resolveEquivalence");
-				System.out.println("Game Manager Executing Action resolveEquivalence");
+				System.out.println("MultiplayerGame Manager Executing Action resolveEquivalence");
 				int currentEquivMutantID = Integer.parseInt(request.getParameter("currentEquivMutant"));
 				Mutant mutant = activeGame.getMutantByID(currentEquivMutantID);
 				System.out.println("CurrentEquivMutant ID = " + currentEquivMutantID);
@@ -303,7 +303,7 @@ public class GameManager extends HttpServlet {
 		bw.write(mutantText);
 		bw.close();
 
-		// Compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
+		// Compile the mutant - if you can, add it to the MultiplayerGame State, otherwise, delete these files created.
 		return AntRunner.compileMutant(getServletContext(), newMutantDir, mutantFileName, gid, classMutated, ownerId);
 	}
 

@@ -30,7 +30,7 @@
 	<script src="codemirror/mode/diff/diff.js" type="text/javascript" ></script>
 	<link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
 
-	<!-- Game -->
+	<!-- MultiplayerGame -->
 	<link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
 
 	<script>

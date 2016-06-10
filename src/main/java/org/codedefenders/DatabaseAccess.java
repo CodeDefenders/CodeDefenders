@@ -1,5 +1,10 @@
 package org.codedefenders;
 
+import org.codedefenders.multiplayer.MultiplayerGame;
+import org.codedefenders.multiplayer.MultiplayerMutant;
+import org.codedefenders.multiplayer.Participance;
+
+import javax.mail.Part;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -220,7 +225,7 @@ public class DatabaseAccess {
 
 		try {
 
-			// Load the Game Data with the provided ID.
+			// Load the MultiplayerGame Data with the provided ID.
 			conn = getConnection();
 
 			stmt = conn.createStatement();
@@ -268,6 +273,75 @@ public class DatabaseAccess {
 	public static ArrayList<Game> getGamesForUser(int userId) {
 		String sql = String.format("SELECT * FROM games WHERE (Attacker_ID=%d OR Defender_ID=%d) AND State!='FINISHED';", userId, userId);
 		return getGames(sql);
+	}
+
+	public static ArrayList<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
+		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
+				"LEFT JOIN attackers as a ON a.Game_ID=m.id " +
+				"LEFT JOIN defenders as d ON d.Game_ID=m.id " +
+				"WHERE (a.id=%d OR d.id=%d OR m.Creator_ID=%d);", userId, userId, userId);
+		return getMultiplayerGames(sql);
+	}
+
+	public static Participance getParticipance(int userId, int gameId){
+		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
+				"LEFT JOIN attackers AS a ON a.Game_ID = m.ID " +
+				"LEFT JOIN defenders AS d ON d.Game_ID = d.ID " +
+				"WHERE m.ID = %d AND (m.Creator_ID=%d OR d.User_ID=%d OR a.User_ID=%d)",
+				gameId, userId, userId, userId);
+
+		Connection conn = null;
+		Statement stmt = null;
+		Participance participance = Participance.NONE;
+
+		try {
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				try {
+					rs.getInt("a.ID");
+					participance = Participance.ATTACKER;
+				} catch (NullPointerException | SQLException e){}
+				try {
+					rs.getInt("d.ID");
+					participance = Participance.DEFENDER;
+				} catch (NullPointerException | SQLException e){}
+				}
+			try {
+				if (rs.getInt("m.Creator_ID") == userId) {
+					participance = Participance.CREATOR;
+				}
+			} catch (NullPointerException | SQLException e){}
+			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			System.out.println(se);
+			//Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			//Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			//finally block used to close resources
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException se2) {
+			}// nothing we can do
+
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}//end finally try
+		} //end try
+
+		return participance;
 	}
 
 	/**
@@ -345,6 +419,113 @@ public class DatabaseAccess {
 		return gameList;
 	}
 
+	public static MultiplayerGame getMultiplayerGame(int id){
+		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
+				"WHERE ID=%d", id);
+
+		return getMultiplayerGames(sql).get(0);
+	}
+
+	public static ArrayList<MultiplayerGame> getMultiplayerGames(String sql) {
+		Connection conn = null;
+		Statement stmt = null;
+		ArrayList<MultiplayerGame> gameList = new ArrayList<>();
+
+		try {
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				MultiplayerGame mg = new MultiplayerGame(rs.getInt("Class_ID"), rs.getInt("Creator_ID"),
+						Game.Level.valueOf(rs.getString("Level")), (float)rs.getDouble("Coverage_Goal"),
+						(float)rs.getDouble("Mutant_Goal"), rs.getInt("Price"));
+				mg.setId(rs.getInt("ID"));
+				gameList.add(mg);
+			}
+			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			System.out.println(se);
+			//Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			//Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			//finally block used to close resources
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException se2) {
+			}// nothing we can do
+
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				se.printStackTrace();
+			}//end finally try
+		} //end try
+
+		return gameList;
+	}
+
+	public static ArrayList<MultiplayerMutant> getMutantsForAttackers(int[] attackers) {
+
+		ArrayList<MultiplayerMutant> mutList = new ArrayList<>();
+
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = null;
+
+		try {
+
+			// Load the MultiplayerGame Data with the provided ID.
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			for (int i : attackers) {
+				sql = String.format("SELECT * FROM mutants WHERE Attacker_ID='%d';", i);
+				ResultSet rs = stmt.executeQuery(sql);
+
+				while (rs.next()) {
+					MultiplayerMutant newMutant = new MultiplayerMutant(rs.getInt("Game_ID"),
+							rs.getString("JavaFile"), rs.getString("ClassFile"),
+							rs.getBoolean("Alive"), rs.getInt("Attacker_ID"));
+					mutList.add(newMutant);
+				}
+			}
+
+			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			System.out.println(se);
+		} // Handle errors for JDBC
+		catch (Exception e) {
+			System.out.println(e);
+		} // Handle errors for Class.forName
+		finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException se2) {
+			} // Nothing we can do
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException se) {
+				System.out.println(se);
+			}
+		}
+
+		return mutList;
+	}
+
 	public static ArrayList<Mutant> getMutantsForGame(int gid) {
 
 		ArrayList<Mutant> mutList = new ArrayList<>();
@@ -355,7 +536,7 @@ public class DatabaseAccess {
 
 		try {
 
-			// Load the Game Data with the provided ID.
+			// Load the MultiplayerGame Data with the provided ID.
 			conn = getConnection();
 
 			stmt = conn.createStatement();
@@ -469,7 +650,7 @@ public class DatabaseAccess {
 
 		try {
 
-			// Load the Game Data with the provided ID.
+			// Load the MultiplayerGame Data with the provided ID.
 			conn = getConnection();
 
 			stmt = conn.createStatement();
@@ -518,7 +699,7 @@ public class DatabaseAccess {
 
 		try {
 
-			// Load the Game Data with the provided ID.
+			// Load the MultiplayerGame Data with the provided ID.
 			conn = getConnection();
 
 			stmt = conn.createStatement();

@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>Code Defenders - Attack</title>
+    <title>Code Defenders - <%= pageTitle %></title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -12,28 +12,33 @@
     <base href="${pageContext.request.contextPath}/">
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <!-- Slick -->
-    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/jquery.slick/1.5.9/slick.css"/>
-    <script type="text/javascript" src="//cdn.jsdelivr.net/jquery.slick/1.5.9/slick.min.js"></script>
+    <!-- jQuery -->
+    <script src="js/jquery.min.js" type="text/javascript" ></script>
 
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Slick -->
+    <link href="css/slick_1.5.9.css" rel="stylesheet" type="text/css" />
+    <script src="js/slick_1.5.9.min.js" type="text/javascript" ></script>
+
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
 
 
     <!-- Bootstrap -->
-    <link href="css/bootstrap.min.css" rel="stylesheet">
-    <link href="css/gamestyle.css" rel="stylesheet">
+    <script src="js/bootstrap.min.js" type="text/javascript" ></script>
+    <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
     <!-- Leaf -->
     <link href="css/base.css" rel="stylesheet">
     <script type="text/javascript" src="js/script.js"></script>
 
-    <script src="codemirror/lib/codemirror.js"></script>
-    <script src="codemirror/mode/javascript/javascript.js"></script>
-    <script src="codemirror/mode/diff/diff.js"></script>
-    <link href="codemirror/lib/codemirror.css" rel="stylesheet">
+    <!-- Codemirror -->
+    <script src="codemirror/lib/codemirror.js" type="text/javascript" ></script>
+    <script src="codemirror/mode/clike/clike.js" type="text/javascript" ></script>
+    <script src="codemirror/mode/diff/diff.js" type="text/javascript" ></script>
+    <link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
+
+    <!-- MultiplayerGame -->
+    <link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
 
 
     <script>
@@ -59,6 +64,7 @@
 <%@ page import="org.codedefenders.Game" %>
 <%@ page import="static org.codedefenders.Game.State.ACTIVE" %>
 <%@ page import="org.codedefenders.GameClass" %>
+<%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
     <% Game game = (Game) session.getAttribute("game"); %>
 <div class="top bg-grey bg-plus-4 text-white" style="padding-bottom:0px;">
     <div class="full-width">
@@ -160,7 +166,9 @@
     <div class="full-width">
         <div class="bg-plus-2" style="padding:2px 0;">
         </div>
-        <h2 class="full-width page-title"><%= pageTitle %></h2>
+        <% if (pageTitle != null) { %>
+            <h2 class="full-width page-title"><%= pageTitle %></h2>
+        <% } %>
         <div class="nest">
             <div class="crow fly">
                 <div class="crow fly">

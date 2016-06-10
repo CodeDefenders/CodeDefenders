@@ -68,7 +68,7 @@ public class GameSelectionManager extends HttpServlet {
 						messages.add("Joined game as a defender.");
 						jGame.setDefenderId(uid);
 					} else {
-						messages.add("Game is no longer open.");
+						messages.add("MultiplayerGame is no longer open.");
 						response.sendRedirect(request.getHeader("referer"));
 						break;
 					}

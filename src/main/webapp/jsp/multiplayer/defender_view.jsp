@@ -1,6 +1,3 @@
-<% String pageTitle="Defending Class"; %>
-<%@ include file="/jsp/header_game.jsp" %>
-
 <%
 	if (game.getState().equals(Game.State.FINISHED)) {
 		String message = Constants.DRAW_MESSAGE;
@@ -264,4 +261,3 @@
 
 	$('#finishedModal').modal('show');
 </script>
-<%@ include file="/jsp/footer_game.jsp" %>

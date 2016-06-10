@@ -1,13 +1,11 @@
-package org.codedefenders;
-
-import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.Mutant.Equivalence.DECLARED_YES;
-import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
+package org.codedefenders.multiplayer;
 
 import difflib.Chunk;
 import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
+import org.codedefenders.DatabaseAccess;
+import org.codedefenders.GameClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,9 +22,11 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Mutant {
+import static org.codedefenders.Mutant.Equivalence.*;
 
-	private static final Logger logger = LoggerFactory.getLogger(Mutant.class);
+public class MultiplayerMutant {
+
+	private static final Logger logger = LoggerFactory.getLogger(MultiplayerMutant.class);
 
 	private int id;
 	private int gameId;
@@ -40,10 +40,6 @@ public class Mutant {
 
 	/* Mutant Equivalence */
 	public enum Equivalence { ASSUMED_NO, PENDING_TEST, DECLARED_YES, ASSUMED_YES, PROVEN_NO}
-
-	private int roundCreated;
-	private int roundKilled;
-
 	private int ownerId;
 
 	/**
@@ -54,34 +50,13 @@ public class Mutant {
 	 * @param alive
 	 * @param ownerId
 	 */
-	public Mutant(int gameId, String jFile, String cFile, boolean alive, int ownerId) {
+	public MultiplayerMutant(int gameId, String jFile, String cFile, boolean alive, int attackerId) {
 		this.gameId = gameId;
-		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
 		this.javaFile = jFile;
 		this.classFile = cFile;
 		this.alive = alive;
 		this.equivalent = Equivalence.ASSUMED_NO;
-		this.ownerId = ownerId;
-	}
-
-	/**
-	 * Creates a mutant
-	 * @param mid
-	 * @param gid
-	 * @param jFile
-	 * @param cFile
-	 * @param alive
-	 * @param equiv
-	 * @param rCreated
-	 * @param rKilled
-	 * @param ownerId
-	 */
-	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int ownerId) {
-		this(gid, jFile, cFile, alive, ownerId);
-		this.id = mid;
-		this.equivalent = equiv;
-		this.roundCreated = rCreated;
-		this.roundKilled = rKilled;
+		this.ownerId = attackerId;
 	}
 
 	public int getId() {
@@ -126,47 +101,7 @@ public class Mutant {
 
 	public void kill() {
 		alive = false;
-		roundKilled = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
 		update();
-	}
-
-	public int getAttackerPoints() {
-		if (alive) {
-			// if mutant is alive, as many points as rounds it has survived
-			// TODO: as many points as tests it has survived?
-			int points = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound() - roundCreated; // rounds survived
-			logger.info("Alive mutant " + getId() + " contributes " + points + " attacker points");
-			return points;
-		} else {
-			if (classFile == null || classFile.equals("null")) // non-compilable
-				return 0;
-			if (equivalent.equals(DECLARED_YES)) // accepted equivalent
-				return 0;
-			if (equivalent.equals(ASSUMED_YES)) // claimed, rejected, test did not kill it
-				return 0;
-			if (equivalent.equals(PROVEN_NO)) { // claimed, rejected, test killed it
-				logger.info("Claimed/rejected/killed mutant " + getId() + " contributes 2 attacker points");
-				return 2;
-			}
-			int points = roundKilled - roundCreated; // rounds survived
-			logger.info("Killed mutant " + getId() + " contributes " + points + " attacker points");
-			return points;
-		}
-	}
-
-	public int getDefenderPoints() {
-		if (! alive) {
-			if (classFile == null) // non-compilable
-				return 0;
-			if (equivalent.equals(DECLARED_YES)) // accepted equivalent
-				return 1;
-			if (equivalent.equals(ASSUMED_YES)) // claimed, rejected, test did not kill it
-				return 2;
-			if (equivalent.equals(PROVEN_NO)) // claimed, rejected, test killed it
-				return 0;
-			return 0;
-		}
-		return 0;
 	}
 
 	public Patch getDifferences() {
@@ -260,8 +195,8 @@ public class Mutant {
 			stmt = conn.createStatement();
 			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
 			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
-			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Owner_ID)" +
-					" VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), ownerId);
+			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Attacker_ID)" +
+					" VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, -1, sqlAlive(), ownerId);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -315,7 +250,8 @@ public class Mutant {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			String sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', RoundKilled='%d' WHERE Mutant_ID='%d';", equivalent.name(), sqlAlive(), roundKilled, id);
+			String sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d' WHERE Mutant_ID='%d';",
+					equivalent.name(), sqlAlive(), id);
 			stmt.execute(sql);
 
 			conn.close();
