@@ -35,6 +35,7 @@ import static org.codedefenders.Constants.FILE_SEPARATOR;
 import static org.codedefenders.Constants.JAVA_SOURCE_EXT;
 import static org.codedefenders.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
 import static org.codedefenders.Constants.TESTS_DIR;
+import static org.codedefenders.Constants.DATA_DIR;
 import static org.codedefenders.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.Constants.TEST_INVALID_MESSAGE;
@@ -80,7 +81,7 @@ public class UnitTesting extends HttpServlet {
 		String testText = request.getParameter("test");
 
 		// If it can be written to file and compiled, end turn. Otherwise, dont.
-		Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid);
+		Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
 		if (newTest == null) {
 			messages.add(TEST_INVALID_MESSAGE);
 			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -151,14 +152,15 @@ public class UnitTesting extends HttpServlet {
 	 * @param cid
 	 * @param testText
 	 * @param ownerId
+	 * @param subDirectory - Directy inside data to store information
 	 * @return {@code null} if test is not valid
 	 * @throws IOException
 	 */
-	public Test createTest(int gid, int cid, String testText, int ownerId) throws IOException {
+	public Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		File newTestDir = getNextSubDir(getServletContext().getRealPath(TESTS_DIR + FILE_SEPARATOR + gid));
+		File newTestDir = getNextSubDir(getServletContext().getRealPath(DATA_DIR + FILE_SEPARATOR + subDirectory + FILE_SEPARATOR + gid + FILE_SEPARATOR + TESTS_DIR + FILE_SEPARATOR + ownerId));
 
 		String javaFile = createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 

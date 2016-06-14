@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import static org.codedefenders.Mutant.Equivalence.*;
+import static org.codedefenders.Mutant.Equivalence;
 
 public class MultiplayerMutant {
 
@@ -38,9 +38,7 @@ public class MultiplayerMutant {
 
 	private Equivalence equivalent;
 
-	/* Mutant Equivalence */
-	public enum Equivalence { ASSUMED_NO, PENDING_TEST, DECLARED_YES, ASSUMED_YES, PROVEN_NO}
-	private int ownerId;
+	private int attackerId;
 
 	/**
 	 * Creates a mutant
@@ -56,7 +54,7 @@ public class MultiplayerMutant {
 		this.classFile = cFile;
 		this.alive = alive;
 		this.equivalent = Equivalence.ASSUMED_NO;
-		this.ownerId = attackerId;
+		this.attackerId = attackerId;
 	}
 
 	public int getId() {
@@ -88,15 +86,11 @@ public class MultiplayerMutant {
 	}
 
 	public boolean isAlive() {
-		return alive;
+		System.out.println(alive); return alive;
 	}
 
 	public int sqlAlive() {
 		return alive ? 1 : 0;
-	}
-
-	public int getOwnerId() {
-		return ownerId;
 	}
 
 	public void kill() {
@@ -196,7 +190,7 @@ public class MultiplayerMutant {
 			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
 			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
 			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Attacker_ID)" +
-					" VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, -1, sqlAlive(), ownerId);
+					" VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, -1, sqlAlive(), attackerId);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 

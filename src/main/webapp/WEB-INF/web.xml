@@ -188,6 +188,15 @@
 		<servlet-name>multiplayerGameView</servlet-name>
 		<url-pattern>/multiplayer/games/create</url-pattern>
 	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>multiplayerGameManager</servlet-name>
+		<servlet-class>org.codedefenders.multiplayer.MultiplayerGameManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>multiplayerGameManager</servlet-name>
+		<url-pattern>/multiplayer/move</url-pattern>
+	</servlet-mapping>
 	<!-- end multiplayer servlets -->
 
 	<resource-ref>

@@ -1,5 +1,7 @@
 package org.codedefenders;
 
+import org.codedefenders.multiplayer.MultiplayerGame;
+import org.codedefenders.multiplayer.MultiplayerMutant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,11 +46,52 @@ public class MutationTester {
 		}
 	}
 
+	public static void runTestOnAllMultiplayerMutants(ServletContext context, MultiplayerGame game, Test test, ArrayList<String> messages) {
+		int killed = 0;
+		ArrayList<MultiplayerMutant> mutants = game.getAliveMutants();
+		for (MultiplayerMutant mutant : mutants) {
+			killed += testVsMultiplayerMutant(context, test, mutant) ? 1 : 0;
+		}
+		if (killed == 0)
+			if (mutants.size() == 0)
+				messages.add(TEST_SUBMITTED_MESSAGE);
+			else
+				messages.add(TEST_KILLED_ZERO_MESSAGE);
+		else {
+			if (killed == 1) {
+				if (mutants.size() == 1)
+					messages.add(TEST_KILLED_LAST_MESSAGE);
+				else
+					messages.add(TEST_KILLED_ONE_MESSAGE);
+			} else {
+				messages.add(String.format(TEST_KILLED_N_MESSAGE, killed));
+			}
+
+		}
+	}
+
 	public static void runAllTestsOnMutant(ServletContext context, Game game, Mutant mutant, ArrayList<String> messages) {
 		ArrayList<Test> tests = game.getExecutableTests();
 		for (Test test : tests) {
 			// If this mutant/test pairing hasnt been run before and the test might kill the mutant
 			if (testVsMutant(context, test, mutant)) {
+				messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
+				return;
+			}
+		}
+		if (tests.size() == 0)
+			messages.add(MUTANT_SUBMITTED_MESSAGE);
+		else if (tests.size() <= 1)
+			messages.add(MUTANT_ALIVE_1_MESSAGE);
+		else
+			messages.add(String.format(MUTANT_ALIVE_N_MESSAGE,tests.size()));
+	}
+
+	public static void runAllTestsOnMultiplayerMutant(ServletContext context, MultiplayerGame game, MultiplayerMutant mutant, ArrayList<String> messages) {
+		ArrayList<Test> tests = game.getExecutableTests();
+		for (Test test : tests) {
+			// If this mutant/test pairing hasnt been run before and the test might kill the mutant
+			if (testVsMultiplayerMutant(context, test, mutant)) {
 				messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
 				return;
 			}
@@ -85,12 +128,47 @@ public class MutationTester {
 		return false;
 	}
 
+	private static boolean testVsMultiplayerMutant(ServletContext context, Test test, MultiplayerMutant mutant) {
+		if (DatabaseAccess.getTargetExecutionForPair(test.getId(), mutant.getId()) == null) {
+			// Run the test against the mutant and get the result
+			TargetExecution executedTarget = AntRunner.testMutant(context, mutant, test);
+
+			// If the test did NOT pass, the mutant was detected and should be killed.
+			if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
+				System.out.println(String.format("Test %d kills Mutant %d", test.getId(), mutant.getId()));
+				mutant.kill();
+				test.killMutant();
+				return true;
+			}
+		} else
+			System.err.println(String.format("No execution result found for (m: %d,t: %d)", mutant.getId(), test.getId()));
+		return false;
+	}
+
 	// RUN EQUIVALENCE TEST: Runs an equivalence test using an attacker supplied test and a mutant thought to be equivalent
 
 	// Inputs: Attacker created test and a mutant to run it on
 	// Outputs: None
 
 	public static void runEquivalenceTest(ServletContext context, Test test, Mutant mutant) {
+		logger.info("Running equivalence test.");
+		// The test created is new and was made by the attacker (there is no need to check if the mutant/test pairing has been run already)
+
+		// As a result of this test, either the test the attacker has written kills the mutant or doesnt.
+		TargetExecution executedTarget = AntRunner.testMutant(context, mutant, test);
+
+		if (executedTarget.status.equals("ERROR") || executedTarget.status.equals("FAIL")) {
+			// If the test did NOT pass, the mutant was detected and is proven to be non-equivalent
+			mutant.setEquivalent(PROVEN_NO);
+		} else {
+			// If the test DID pass, the mutant went undetected and it is assumed to be equivalent.
+			mutant.setEquivalent(ASSUMED_YES);
+		}
+		// Kill the mutant if it was killed by the test or if it's marked equivalent
+		mutant.kill();
+	}
+
+	public static void runEquivalenceTest(ServletContext context, Test test, MultiplayerMutant mutant) {
 		logger.info("Running equivalence test.");
 		// The test created is new and was made by the attacker (there is no need to check if the mutant/test pairing has been run already)
 

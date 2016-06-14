@@ -1,28 +1,3 @@
-<%
-	if (game.getState().equals(Game.State.FINISHED)) {
-		String message = Constants.DRAW_MESSAGE;
-		if (game.getAttackerScore() > game.getDefenderScore())
-			message = Constants.WINNER_MESSAGE;
-		else if (game.getDefenderScore() > game.getAttackerScore())
-			message = Constants.LOSER_MESSAGE;
-%>
-<div id="finishedModal" class="modal fade">
-	<div class="modal-dialog">
-		<div class="modal-content">
-			<div class="modal-header">
-				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-				<h4 class="modal-title">Game Over</h4>
-			</div>
-			<div class="modal-body">
-				<p><%=message%></p>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-			</div>
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
-<%  } %>
 
 <div class="row-fluid">
 	<div class="col-md-6" id="mutants-div">
@@ -40,9 +15,8 @@
 			<div class="tab-pane fade active in" id="mutalivetab">
 				<table class="table table-hover table-responsive table-paragraphs">
 					<%
-					ArrayList<Mutant> mutantsAlive = game.getAliveMutants();
 					if (! mutantsAlive.isEmpty()) {
-						for (Mutant m : mutantsAlive) {
+						for (MultiplayerMutant m : mutantsAlive) {
 					%>
 					<tr>
 						<td><h4>Mutant <%= m.getId() %></h4></td>
@@ -87,9 +61,8 @@
 			<div class="tab-pane fade" id="mutkilledtab">
 				<table class="table table-hover table-responsive table-paragraphs">
 					<%
-					ArrayList<Mutant> mutantsKilled = game.getKilledMutants();
 					if (! mutantsKilled.isEmpty()) {
-						for (Mutant m : mutantsKilled) {
+						for (MultiplayerMutant m : mutantsKilled) {
 					%>
 					<tr>
 						<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4></td>
@@ -135,8 +108,8 @@
 		<h2> JUnit Tests </h2>
 		<div class="slider single-item">
 			<%
-				boolean isTests = false;
-				for (Test t : game.getExecutableTests()) {
+
+				for (Test t : mg.getExecutableTests()) {
 					isTests = true;
 					String tc = "";
 					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
@@ -152,12 +125,12 @@
 	</div> <!-- col-md6 mutants -->
 
 	<div class="col-md-6" id="newmut-div">
-		<form id="atk" action="play" method="post">
+		<form id="atk" action="/multiplayer/move" method="post">
 			<h2>Create a mutant here
-				<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
-				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk">Attack!</button><%}%>
+				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk">Attack!</button>
 			</h2>
 			<input type="hidden" name="formType" value="createMutant">
+			<input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
 			<%
 				String mutantCode;
 				String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
@@ -165,7 +138,7 @@
 				if (previousMutantCode != null) {
 					mutantCode = previousMutantCode;
 				} else
-					mutantCode = game.getCUT().getAsString();
+					mutantCode = mg.getCUT().getAsString();
 			%>
 			<pre><textarea id="code" name="mutant" cols="80" rows="50"><%= mutantCode %></textarea></pre>
 		</form>
@@ -206,20 +179,6 @@
 			editorDiff.setSize("100%", 500);
 		}
 	});
-
-	<% if (game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
-	function checkForUpdate(){
-		$.post('/play', {
-			formType: "whoseTurn",
-			gameID: <%= game.getId() %>
-		}, function(data){
-			if(data=="attacker"){
-				window.location.reload();
-			}
-		},'text');
-	}
-	setInterval("checkForUpdate()", 10000);
-	<% } %>
 
 	$('#finishedModal').modal('show');
 </script>

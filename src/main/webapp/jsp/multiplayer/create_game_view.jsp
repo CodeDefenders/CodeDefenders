@@ -1,3 +1,5 @@
+<% String pageTitle = "Create Battleground"; %>
+<%@ include file="/jsp/header.jsp"%>
 <div id="creategame" class="container">
 	<form id="create" action="multiplayer/games" method="post" class="form-creategame">
 		<h2>Create Game</h2>
@@ -29,3 +31,4 @@
 		<button class="btn btn-lg btn-primary btn-block" type="submit" value="Create">Create</button>
 	</form>
 </div>
+<%@ include file="/jsp/footer.jsp" %>

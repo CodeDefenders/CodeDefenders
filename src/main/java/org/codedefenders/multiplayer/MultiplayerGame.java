@@ -119,13 +119,15 @@ public class MultiplayerGame {
 		this.level = level;
 	}
 
-	public ArrayList<Mutant> getMutants() {
-		return DatabaseAccess.getMutantsForGame(id);
+
+	public ArrayList<MultiplayerMutant> getMutants() {
+		int[] attackers = getAttackerIds();
+		return DatabaseAccess.getMutantsForAttackers(attackers);
 	}
 
-	public ArrayList<Mutant> getAliveMutants() {
-		ArrayList<Mutant> aliveMutants = new ArrayList<>();
-		for (Mutant m : getMutants()) {
+	public ArrayList<MultiplayerMutant> getAliveMutants() {
+		ArrayList<MultiplayerMutant> aliveMutants = new ArrayList<>();
+		for (MultiplayerMutant m : getMutants()) {
 			if (m.isAlive() && (m.getClassFile() != null)) {
 				aliveMutants.add(m);
 			}
@@ -133,9 +135,9 @@ public class MultiplayerGame {
 		return aliveMutants;
 	}
 
-	public ArrayList<Mutant> getKilledMutants() {
-		ArrayList<Mutant> killedMutants = new ArrayList<>();
-		for (Mutant m : getMutants()) {
+	public ArrayList<MultiplayerMutant> getKilledMutants() {
+		ArrayList<MultiplayerMutant> killedMutants = new ArrayList<>();
+		for (MultiplayerMutant m : getMutants()) {
 			if (!m.isAlive() && (m.getClassFile() != null)) {
 				killedMutants.add(m);
 			}
@@ -143,9 +145,9 @@ public class MultiplayerGame {
 		return killedMutants;
 	}
 
-	public ArrayList<Mutant> getMutantsMarkedEquivalent() {
-		ArrayList<Mutant> equivMutants = new ArrayList<>();
-		for (Mutant m : getMutants()) {
+	public ArrayList<MultiplayerMutant> getMutantsMarkedEquivalent() {
+		ArrayList<MultiplayerMutant> equivMutants = new ArrayList<>();
+		for (MultiplayerMutant m : getMutants()) {
 			if (m.isAlive() && m.getEquivalent().equals(PENDING_TEST)) {
 				equivMutants.add(m);
 			}
@@ -153,8 +155,8 @@ public class MultiplayerGame {
 		return equivMutants;
 	}
 
-	public Mutant getMutantByID(int mutantID) {
-		for (Mutant m : getMutants()) {
+	public MultiplayerMutant getMutantByID(int mutantID) {
+		for (MultiplayerMutant m : getMutants()) {
 			if (m.getId() == mutantID)
 				return m;
 		}
@@ -166,9 +168,88 @@ public class MultiplayerGame {
 	}
 
 	public ArrayList<Test> getExecutableTests() {
-		return DatabaseAccess.getExecutableTestsForGame(id);
+		ArrayList<Test> allTests = new ArrayList<>();
+		int[] defenders = getDefenderIds();
+		for (int i = 0; i < defenders.length; i++){
+			ArrayList<Test> tests = DatabaseAccess.getExecutableTestsForMultiplayerGame(defenders[i]);
+			allTests.addAll(tests);
+		}
+		return allTests;
 	}
 
+	public int[] getDefenderIds(){
+		return DatabaseAccess.getDefendersForMultiplayerGame(getId());
+	}
+
+	public int[] getAttackerIds(){
+		return DatabaseAccess.getAttackersForMultiplayerGame(getId());
+	}
+
+	public boolean addUserAsAttacker(int userId) {
+		String sql = String.format("INSERT INTO attackers " +
+						"(Game_ID, User_ID, Points) VALUES " +
+						"(%d, %d, 0);",
+				id, userId);
+
+		return runStatement(sql);
+	}
+
+	public boolean addUserAsDefender(int userId) {
+		String sql = String.format("INSERT INTO defenders " +
+						"(Game_ID, User_ID, Points) VALUES " +
+						"(%d, %d, 0);",
+				id, userId);
+
+		return runStatement(sql);
+	}
+
+	public boolean runStatement(String sql) {
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		System.out.println(sql);
+
+		// Attempt to insert game info into database
+		try {
+			conn = DatabaseAccess.getConnection();
+
+			stmt = conn.createStatement();
+			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+
+			ResultSet rs = stmt.getGeneratedKeys();
+
+			if (rs.next()) {
+				id = rs.getInt(1);
+				stmt.close();
+				conn.close();
+				return true;
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+			//Handle errors for JDBC
+		} catch (Exception e) {
+			System.out.println(e);
+			//Handle errors for Class.forName
+		} finally {
+			//finally block used to close resources
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException se2) {
+			}// nothing we can do
+
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				System.out.println(se);
+			}//end finally try
+		} //end try
+
+		return false;
+	}
 
 	public boolean insert() {
 
@@ -234,8 +315,8 @@ public class MultiplayerGame {
 			// Get all rows from the database which have the chosen username
 			stmt = conn.createStatement();
 				sql = String.format("UPDATE multiplayer_games SET " +
-						"Class_ID = '%s', Level = '%s', Price = %d, Defender_Value=%d, Attacker_Value=%d, Coverage_Goal=%d" +
-						", Mutant_Goal=%d WHERE Game_ID='%d'",
+						"Class_ID = '%s', Level = '%s', Price = %f, Defender_Value=%d, Attacker_Value=%d, Coverage_Goal=%f" +
+						", Mutant_Goal=%f WHERE ID='%d'",
 						classId, level.name(), price, defenderValue, attackerValue, lineCoverage, mutantCoverage, id);
 			stmt.execute(sql);
 			return true;
@@ -268,6 +349,6 @@ public class MultiplayerGame {
 	}
 
 	public Participance getParticipance(int userId){
-		return Participance.CREATOR;
+		return DatabaseAccess.getParticipance(userId, getId());
 	}
 }

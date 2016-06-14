@@ -3,6 +3,7 @@ package org.codedefenders;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.codedefenders.multiplayer.MultiplayerMutant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +32,41 @@ public class AntRunner {
 	 * @return A {@link TargetExecution} object
 	 */
 	public static TargetExecution testMutant(ServletContext context, Mutant m, Test t) {
+		logger.debug("Running test {} on mutant {}", t.getId(), m.getId());
+		System.out.println("Running test " + t.getId() + " on mutant " + m.getId());
+		String className = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
+		String[] resultArray = runAntTarget(context, "test-mutant", m.getFolder(), t.getFolder(), className, t.getFullyQualifiedClassName());
+
+		TargetExecution newExec = null;
+
+		if (resultArray[0].toLowerCase().contains("failures: 0")) {
+			// If the test doesn't return failure
+			if (resultArray[0].toLowerCase().contains("errors: 0")) {
+				// If the test doesn't return any errors
+				// The test succeeded and a Target Execution for the mutant/test pairing is recorded. This means the test failed to detect the mutant
+				newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "SUCCESS", null);
+			} else {
+				// New target execution recording failed test against mutant due to error
+				// Not sure on what circumstances cause a junit error, return all streams
+				String message = resultArray[0] + " " + resultArray[1] + " " + resultArray[2];
+				newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "ERROR", message);
+			}
+		} else {
+			// The test failed and a Target Execution for the mutant/test pairing is recorded. The test detected the mutant.
+			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "FAIL", null);
+		}
+		newExec.insert();
+		return newExec;
+	}
+
+	/**
+	 * Executes a test against a mutant
+	 * @param context
+	 * @param m A {@link MultiplayerMutant} object
+	 * @param t A {@link Test} object
+	 * @return A {@link TargetExecution} object
+	 */
+	public static TargetExecution testMutant(ServletContext context, MultiplayerMutant m, Test t) {
 		logger.debug("Running test {} on mutant {}", t.getId(), m.getId());
 		System.out.println("Running test " + t.getId() + " on mutant " + m.getId());
 		String className = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
@@ -173,6 +209,48 @@ public class AntRunner {
 	}
 
 	/**
+	 * Compiles mutant
+	 * @param context
+	 * @param dir
+	 * @param jFile
+	 * @param gameID
+	 * @param classMutated
+	 * @return A {@link Mutant} object
+	 */
+	public static MultiplayerMutant compileMultiplayerMutant(ServletContext context, File dir, String jFile, int gameID, GameClass classMutated, int ownerId) {
+		//public static int compileMutant(ServletContext context, Mutant m2) {
+
+		// Gets the classname for the mutant from the game it is in
+		String[] resultArray = runAntTarget(context, "compile-mutant", dir.getAbsolutePath(), null, classMutated.getBaseName(), null);
+		System.out.println("Compilation result:");
+		System.out.println(Arrays.toString(resultArray));
+
+		MultiplayerMutant newMutant = null;
+		// If the input stream returned a 'successful build' message, the mutant compiled correctly
+		if (resultArray[0].toLowerCase().contains("build successful")) {
+			// Create and insert a new target execution recording successful compile, with no message to report, and return its ID
+			// Locate .class file
+			final String compiledClassName = classMutated.getBaseName() + JAVA_CLASS_EXT;
+			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
+			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
+			String cFile = matchingFiles.get(0).getAbsolutePath();
+			newMutant = new MultiplayerMutant(gameID, jFile, cFile, true, ownerId);
+			newMutant.insert();
+			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "SUCCESS", null);
+			newExec.insert();
+		} else {
+			// The mutant failed to compile
+			// New target execution recording failed compile, providing the return messages from the ant javac task
+			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(context.getRealPath(Constants.DATA_DIR), "");
+			newMutant = new MultiplayerMutant(gameID, jFile, null, false, ownerId);
+			newMutant.insert();
+			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "FAIL", message);
+			newExec.insert();
+		}
+		return newMutant;
+	}
+
+	/**
 	 * Compiles test
 	 * @param context
 	 * @param dir
@@ -203,7 +281,7 @@ public class AntRunner {
 		} else {
 			// The test failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
-			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(context.getRealPath(Constants.DATA_DIR), "");
+			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(context.getRealPath(Constants.DATA_DIR).replace("\\", "\\\\"), "");
 			Test newTest = new Test(gameID, jFile, null, ownerId);
 			newTest.insert();
 			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "FAIL", message);

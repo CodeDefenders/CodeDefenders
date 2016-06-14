@@ -65,6 +65,11 @@
 <%@ page import="static org.codedefenders.Game.State.ACTIVE" %>
 <%@ page import="org.codedefenders.GameClass" %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="org.codedefenders.DatabaseAccess" %>
+<%@ page import="org.codedefenders.multiplayer.Participance" %>
+<%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
     <% Game game = (Game) session.getAttribute("game"); %>
 <div class="top bg-grey bg-plus-4 text-white" style="padding-bottom:0px;">
     <div class="full-width">

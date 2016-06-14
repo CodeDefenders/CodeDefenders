@@ -23,19 +23,16 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             int gameId = Integer.parseInt(sId);
             MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
 
-            System.out.println(sId);
-
-            Participance p = mg.getParticipance(uid);
-
-            System.out.print(gameId + ": " + p);
-
-            switch (p){
-                case ATTACKER: case DEFENDER: case CREATOR:
-                    response.sendRedirect("/multiplayer/play?id=" + gameId);
-                    break;
-                default:
-                    response.sendRedirect("/games/user");
-                    break;
+            if (mg != null) {
+                String redirect = "/multiplayer/play?id=" + gameId;
+                if (request.getParameter("attacker") != null){
+                    redirect += "&attacker=1";
+                } else if (request.getParameter("defender") != null){
+                    redirect += "&defender=1";
+                }
+                response.sendRedirect(redirect);
+            } else {
+                response.sendRedirect("/games/user");
             }
 
         } catch (NumberFormatException nfe){

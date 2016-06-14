@@ -103,18 +103,18 @@
 			switch(participance){
 				case ATTACKER:
 					%>
-			<a href="multiplayer/games?id= <%= g.getId() %>">Attack</a>
+			<a href="multiplayer/games?id=<%= g.getId() %>">Attack</a>
 			<%
 					break;
 				case CREATOR:
 			%>
-			<a href="multiplayer/games?id= <%= g.getId() %>">Observe</a>
+			<a href="multiplayer/games?id=<%= g.getId() %>">Observe</a>
 			<%
 
 					break;
 				case DEFENDER:
 			%>
-			<a href="multiplayer/games?id= <%= g.getId() %>">Defend</a>
+			<a href="multiplayer/games?id=<%= g.getId() %>">Defend</a>
 			<%
 
 					break;

@@ -26,6 +26,15 @@ public class Test {
 	private int mutantsKilled = 0;
 
 	private int ownerId;
+	private int defenderId = -1;
+
+	public void setDefenderId(int defId){
+		defenderId = defId;
+	}
+
+	public int getDefenderId(){
+		return defenderId;
+	}
 
 	public Test(int gameId, String jFile, String cFile, int ownerId) {
 		this.gameId = gameId;
@@ -107,8 +116,13 @@ public class Test {
 			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
 			// class file can be null
 			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
-			sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Owner_ID) " +
-					"VALUES (%s, %s, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, ownerId);
+			if (defenderId >= 0){
+				sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Owner_ID, Defender_ID) " +
+						"VALUES (%s, %s, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, ownerId, defenderId);
+			} else {
+				sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Owner_ID) " +
+						"VALUES (%s, %s, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, ownerId);
+			}
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -155,7 +169,11 @@ public class Test {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			sql = String.format("UPDATE tests SET mutantsKilled='%d' WHERE Test_ID='%d';", mutantsKilled, id);
+			if (defenderId >= 0){
+				sql = String.format("UPDATE tests SET mutantsKilled='%d', Defender_ID=%d WHERE Test_ID='%d';", mutantsKilled, defenderId, id);
+			} else {
+				sql = String.format("UPDATE tests SET mutantsKilled='%d' WHERE Test_ID='%d';", mutantsKilled, id);
+			}
 			stmt.execute(sql);
 
 			conn.close();
