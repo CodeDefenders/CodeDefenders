@@ -277,9 +277,10 @@ public class DatabaseAccess {
 
 	public static ArrayList<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
 		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
-				"LEFT JOIN attackers as a ON a.Game_ID=m.id " +
-				"LEFT JOIN defenders as d ON d.Game_ID=m.id " +
-				"WHERE (a.User_ID=%d OR d.User_ID=%d OR m.Creator_ID=%d);", userId, userId, userId);
+				"LEFT JOIN attackers as a ON a.Game_ID=m.ID " +
+				"LEFT JOIN defenders as d ON d.Game_ID=m.ID " +
+				"WHERE (a.User_ID=%d OR d.User_ID=%d OR m.Creator_ID=%d) " +
+				"GROUP BY m.ID;", userId, userId, userId);
 		return getMultiplayerGames(sql);
 	}
 
@@ -294,9 +295,9 @@ public class DatabaseAccess {
 	public static Participance getParticipance(int userId, int gameId){
 		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
 				"LEFT JOIN attackers AS a ON a.Game_ID = m.ID " +
-				"LEFT JOIN defenders AS d ON d.Game_ID = d.ID " +
-				"WHERE m.ID = %d AND (m.Creator_ID=%d OR d.User_ID=%d OR a.User_ID=%d)",
-				gameId, userId, userId, userId);
+				"LEFT JOIN defenders AS d ON d.Game_ID = m.ID " +
+				"WHERE m.ID = %d AND (m.Creator_ID=%d OR (d.User_ID=%d AND d.Game_ID=%d) OR (a.User_ID=%d AND a.Game_ID=%d))",
+				gameId, userId, userId, gameId, userId, gameId);
 
 		Connection conn = null;
 		Statement stmt = null;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component name="dataSourceStorage">
-  <data-source name="MySQL - @localhost" uuid="65fec5e4-caa0-4a0c-b8f1-2a6d06632c3a">
+  <data-source name="MySQL - codedefenders@localhost" uuid="77683f2c-05ed-49ff-8227-0257a62ed620">
     <database-info product="" version="" jdbc-version="" driver-name="" driver-version=""/>
   </data-source>
 </component>

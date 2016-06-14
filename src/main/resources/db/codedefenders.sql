@@ -1,5 +1,3 @@
-CREATE DATABASE  IF NOT EXISTS `codedefenders` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `codedefenders`;
 -- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
 --
 -- Host: localhost    Database: codedefenders
@@ -18,100 +16,209 @@ USE `codedefenders`;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Dumping data for table `attackers`
+-- Table structure for table `attackers`
 --
 
-LOCK TABLES `attackers` WRITE;
-/*!40000 ALTER TABLE `attackers` DISABLE KEYS */;
-/*!40000 ALTER TABLE `attackers` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `attackers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `attackers` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Game_ID` int(11) DEFAULT NULL,
+  `User_ID` int(11) DEFAULT NULL,
+  `Points` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `classes`
+-- Table structure for table `classes`
 --
 
-LOCK TABLES `classes` WRITE;
-/*!40000 ALTER TABLE `classes` DISABLE KEYS */;
-INSERT INTO `classes` VALUES (1,'ArrayExamples','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.java','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.class'),(2,'ArrayExamples','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.java','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.class'),(3,'ArrayExamples','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.java','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.class'),(4,'ArrayExamples','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.java','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.class'),(5,'ArrayExamples','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.java','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.class'),(6,'ArrayExamples','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.java','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.class'),(7,'ArrayExamples','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.java','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\sources\\ArrayExamples.class');
-/*!40000 ALTER TABLE `classes` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `classes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `classes` (
+  `Class_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Name` varchar(255) NOT NULL,
+  `JavaFile` varchar(255) NOT NULL,
+  `ClassFile` varchar(255) NOT NULL,
+  PRIMARY KEY (`Class_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `defenders`
+-- Table structure for table `defenders`
 --
 
-LOCK TABLES `defenders` WRITE;
-/*!40000 ALTER TABLE `defenders` DISABLE KEYS */;
-/*!40000 ALTER TABLE `defenders` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `defenders`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `defenders` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Game_ID` int(11) DEFAULT NULL,
+  `User_ID` int(11) DEFAULT NULL,
+  `Points` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `games`
+-- Table structure for table `games`
 --
 
-LOCK TABLES `games` WRITE;
-/*!40000 ALTER TABLE `games` DISABLE KEYS */;
-INSERT INTO `games` VALUES (1,NULL,1,1,3,'ATTACKER',1,'CREATED','EASY','DUEL','2016-06-02 15:01:32'),(2,2,1,2,3,'ATTACKER',1,'ACTIVE','HARD','DUEL','2016-06-02 15:06:50'),(3,NULL,1,1,3,'ATTACKER',1,'CREATED','HARD','DUEL','2016-06-02 15:16:55'),(4,1,2,1,3,'DEFENDER',1,'ACTIVE','HARD','DUEL','2016-06-02 17:50:21');
-/*!40000 ALTER TABLE `games` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `games`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `games` (
+  `Game_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Attacker_ID` int(11) DEFAULT NULL,
+  `Defender_ID` int(11) DEFAULT NULL,
+  `CurrentRound` tinyint(4) NOT NULL DEFAULT '1',
+  `FinalRound` tinyint(4) NOT NULL DEFAULT '5',
+  `ActiveRole` enum('ATTACKER','DEFENDER') NOT NULL DEFAULT 'ATTACKER',
+  `Class_ID` int(11) DEFAULT NULL,
+  `State` enum('CREATED','ACTIVE','FINISHED') NOT NULL DEFAULT 'CREATED',
+  `Level` enum('EASY','MEDIUM','HARD') NOT NULL,
+  `Mode` enum('SINGLE','DUEL','PARTY','UTESTING') NOT NULL DEFAULT 'DUEL',
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`Game_ID`),
+  KEY `Attacker_ID` (`Attacker_ID`),
+  KEY `Defender_ID` (`Defender_ID`),
+  KEY `Class_ID` (`Class_ID`),
+  CONSTRAINT `games_ibfk_1` FOREIGN KEY (`Attacker_ID`) REFERENCES `users` (`User_ID`),
+  CONSTRAINT `games_ibfk_2` FOREIGN KEY (`Defender_ID`) REFERENCES `users` (`User_ID`),
+  CONSTRAINT `games_ibfk_3` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `multiplayer_games`
+-- Table structure for table `multiplayer_games`
 --
 
-LOCK TABLES `multiplayer_games` WRITE;
-/*!40000 ALTER TABLE `multiplayer_games` DISABLE KEYS */;
-/*!40000 ALTER TABLE `multiplayer_games` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `multiplayer_games`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `multiplayer_games` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Class_ID` int(11) DEFAULT NULL,
+  `Level` enum('EASY','MEDIUM','HARD') DEFAULT NULL,
+  `Timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `Creator_ID` int(11) DEFAULT NULL,
+  `Price` int(11) DEFAULT NULL,
+  `Defender_Value` int(11) DEFAULT NULL,
+  `Attacker_Value` int(11) DEFAULT NULL,
+  `Coverage_Goal` decimal(5,0) DEFAULT NULL,
+  `Mutant_Goal` decimal(5,0) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `mutant_killers`
+-- Table structure for table `mutant_killers`
 --
 
-LOCK TABLES `mutant_killers` WRITE;
-/*!40000 ALTER TABLE `mutant_killers` DISABLE KEYS */;
-/*!40000 ALTER TABLE `mutant_killers` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `mutant_killers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mutant_killers` (
+  `ID` int(11) NOT NULL,
+  `Mutant_ID` int(11) DEFAULT NULL,
+  `Test_ID` int(11) DEFAULT NULL,
+  `Points` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `mutants`
+-- Table structure for table `mutants`
 --
 
-LOCK TABLES `mutants` WRITE;
-/*!40000 ALTER TABLE `mutants` DISABLE KEYS */;
-INSERT INTO `mutants` VALUES (1,'C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\mutants\\2\\1\\ArrayExamples.java','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\mutants\\2\\1\\ArrayExamples.class',1,2,1,NULL,'ASSUMED_NO',2,'2016-06-02 15:19:15',NULL),(2,'C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\mutants\\4\\1\\ArrayExamples.java','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\mutants\\4\\1\\ArrayExamples.class',1,4,1,NULL,'ASSUMED_NO',1,'2016-06-02 17:50:57',NULL);
-/*!40000 ALTER TABLE `mutants` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `mutants`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `mutants` (
+  `Mutant_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `JavaFile` varchar(255) NOT NULL,
+  `ClassFile` varchar(255) DEFAULT NULL,
+  `Alive` tinyint(1) NOT NULL DEFAULT '1',
+  `Game_ID` int(11) NOT NULL,
+  `RoundCreated` int(11) NOT NULL,
+  `RoundKilled` int(11) DEFAULT NULL,
+  `Equivalent` enum('ASSUMED_NO','PENDING_TEST','DECLARED_YES','ASSUMED_YES','PROVEN_NO') NOT NULL,
+  `Owner_ID` int(11) DEFAULT NULL,
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `Attacker_ID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`Mutant_ID`),
+  KEY `Game_ID` (`Game_ID`),
+  KEY `Owner_ID` (`Owner_ID`),
+  CONSTRAINT `mutants_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`),
+  CONSTRAINT `mutants_ibfk_2` FOREIGN KEY (`Owner_ID`) REFERENCES `users` (`User_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `targetexecutions`
+-- Table structure for table `targetexecutions`
 --
 
-LOCK TABLES `targetexecutions` WRITE;
-/*!40000 ALTER TABLE `targetexecutions` DISABLE KEYS */;
-INSERT INTO `targetexecutions` VALUES (1,NULL,1,'COMPILE_MUTANT','SUCCESS','','2016-06-02 15:19:15'),(2,NULL,2,'COMPILE_MUTANT','SUCCESS','','2016-06-02 17:50:57'),(3,1,NULL,'COMPILE_TEST','SUCCESS','','2016-06-02 18:00:01'),(4,1,NULL,'TEST_ORIGINAL','SUCCESS','','2016-06-02 18:00:01'),(5,1,1,'TEST_MUTANT','SUCCESS','','2016-06-02 18:00:02');
-/*!40000 ALTER TABLE `targetexecutions` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `targetexecutions`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `targetexecutions` (
+  `TargetExecution_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Test_ID` int(11) DEFAULT NULL,
+  `Mutant_ID` int(11) DEFAULT NULL,
+  `Target` enum('COMPILE_MUTANT','COMPILE_TEST','TEST_ORIGINAL','TEST_MUTANT','TEST_EQUIVALENCE') DEFAULT NULL,
+  `Status` enum('SUCCESS','FAIL','ERROR') NOT NULL,
+  `Message` varchar(2000) DEFAULT NULL,
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`TargetExecution_ID`),
+  KEY `Test_ID` (`Test_ID`),
+  KEY `Mutant_ID` (`Mutant_ID`),
+  CONSTRAINT `targetexecutions_ibfk_1` FOREIGN KEY (`Test_ID`) REFERENCES `tests` (`Test_ID`),
+  CONSTRAINT `targetexecutions_ibfk_2` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `tests`
+-- Table structure for table `tests`
 --
 
-LOCK TABLES `tests` WRITE;
-/*!40000 ALTER TABLE `tests` DISABLE KEYS */;
-INSERT INTO `tests` VALUES (1,2,'C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\tests\\2\\1\\TestArrayExamples.java','C:\\Program Files\\Apache Software Foundation\\Tomcat 7.0\\webapps\\ROOT\\WEB-INF\\data\\tests\\2\\1\\TestArrayExamples.class',1,0,1,'2016-06-02 18:00:01',NULL);
-/*!40000 ALTER TABLE `tests` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `tests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tests` (
+  `Test_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Game_ID` int(11) NOT NULL,
+  `JavaFile` varchar(255) NOT NULL,
+  `ClassFile` varchar(255) DEFAULT NULL,
+  `RoundCreated` int(11) NOT NULL,
+  `MutantsKilled` int(11) DEFAULT '0',
+  `Owner_ID` int(11) NOT NULL,
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `Defender_ID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`Test_ID`),
+  KEY `Game_ID` (`Game_ID`),
+  KEY `Owner_ID` (`Owner_ID`),
+  CONSTRAINT `tests_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`),
+  CONSTRAINT `tests_ibfk_2` FOREIGN KEY (`Owner_ID`) REFERENCES `users` (`User_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `users`
+-- Table structure for table `users`
 --
 
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'tom','$2a$10$ObbFuSbAwpnelkLJRC7R4O/OQNW8.0hhIfUKslsaxGHHp9X1vXYFS'),(2,'t','$2a$10$qXDKpli3e3LsJObuc10jY.Ox8F40j.XLLM226fCFy3QYIXTg8w2SW');
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
-UNLOCK TABLES;
+DROP TABLE IF EXISTS `users`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `users` (
+  `User_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Username` varchar(20) NOT NULL,
+  `Password` char(60) NOT NULL,
+  PRIMARY KEY (`User_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -122,4 +229,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-06-03 16:36:55
+-- Dump completed on 2016-06-14 13:58:35

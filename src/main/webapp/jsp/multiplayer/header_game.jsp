@@ -1,5 +1,5 @@
 <% String pTitle = pageTitle;
-pageTitle = "In Game";
+pageTitle = null;
 %>
 <%@ include file="/jsp/header.jsp" %>
 </div></div></div></div></div>
@@ -13,29 +13,20 @@ pageTitle = "In Game";
 <%@ page import="org.codedefenders.GameClass" %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerMutant" %>
 <%@ page import="static org.codedefenders.Game.State.ACTIVE" %>
-<h2 class="full-width page-title"><%= pTitle %></h2>
 <div class="game-container">
-<nav>
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
-            </button>
-            <a class="navbar-brand" href="/">
-                Game Stats:
-            </a>
+<nav class="nest" style="width: 80%; margin-left: auto; margin-right: auto;">
+    <div class="crow fly">
+        <div style="text-align: left">
+            <h3><%= p %></h3>
         </div>
-        <div class= "collapse navbar-collapse" id="navbar-collapse-1">
-            <ul class="nav navbar-nav navbar-left">
-                <li class="navbar-text">Game ID: <%= mg.getId() %></li>
+        <div style="text-align: center"><h1><%= mg.getCUT().getName() %></h1></div>
+        <div style="text-align: right"><h3>
                 <% if (mg.getAliveMutants().size() == 1) {%>
-                <li class="navbar-text">1 Mutant Alive</li>
+                    1 Mutant Alive
                 <% } else {%>
-                <li class="navbar-text"><%= mg.getAliveMutants().size() %> Mutants Alive</li>
-                <% }%>
-                <li class="navbar-text">
-                    <span class="label label-primary turn-badge">Your turn</span>
-                </li>
-            </ul>
+                    <%= mg.getAliveMutants().size() %> Mutants Alive
+                <% }%></h3>
         </div>
     </div>
 </nav>
+<div class="clear"></div>

@@ -13,14 +13,13 @@
     boolean isTests = false;
 
     MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
+    Participance p = mg.getParticipance(uid);
     %>
 <%@ include file="/jsp/multiplayer/header_game.jsp" %>
 <%
     ArrayList<MultiplayerMutant> mutantsAlive = mg.getAliveMutants();
     ArrayList<MultiplayerMutant> mutantsKilled = mg.getKilledMutants();
     //ArrayList<String> messages = new ArrayList<String>();
-
-    Participance p = mg.getParticipance(uid);
 
     switch (p){
         case ATTACKER:

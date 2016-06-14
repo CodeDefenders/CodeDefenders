@@ -1,37 +1,38 @@
 <component name="ArtifactManager">
   <artifact type="war" name="CodeDefenders">
-    <output-path>$PROJECT_DIR$/classes/artifacts/CodeDefenders</output-path>
+    <output-path>$PROJECT_DIR$/out/artifacts/CodeDefenders</output-path>
     <root id="archive" name="CodeDefenders.war">
-      <element id="dir-copy" path="$PROJECT_DIR$/src/main/resources" />
-      <element id="dir-copy" path="$PROJECT_DIR$/src/main/webapp" />
       <element id="directory" name="WEB-INF">
         <element id="directory" name="classes">
-          <element id="module-output" name="codedefenders" />
+          <element id="module-output" name="CodeDefenders" />
         </element>
         <element id="directory" name="lib">
-          <element id="library" level="project" name="Maven: com.github.javaparser:javaparser-core:2.3.0" />
           <element id="library" level="project" name="Maven: com.googlecode.java-diff-utils:diffutils:1.2.1" />
-          <element id="library" level="project" name="Maven: commons-fileupload:commons-fileupload:1.3.1" />
           <element id="library" level="project" name="Maven: commons-io:commons-io:2.4" />
-          <element id="library" level="project" name="Maven: javax.activation:activation:1.1" />
-          <element id="library" level="project" name="Maven: javax.mail:mail:1.4.6-rc1" />
           <element id="library" level="project" name="Maven: javax.servlet:servlet-api:2.5" />
           <element id="library" level="project" name="Maven: junit:junit:4.12" />
           <element id="library" level="project" name="Maven: mysql:mysql-connector-java:5.1.38" />
           <element id="library" level="project" name="Maven: org.bitbucket.cowwoc:diff-match-patch:1.1" />
           <element id="library" level="project" name="Maven: org.hamcrest:hamcrest-all:1.3" />
           <element id="library" level="project" name="Maven: org.hamcrest:hamcrest-core:1.3" />
-          <element id="library" level="project" name="Maven: org.javassist:javassist:3.20.0-GA" />
-          <element id="library" level="project" name="Maven: org.mockito:mockito-core:1.9.5" />
-          <element id="library" level="project" name="Maven: org.objenesis:objenesis:1.0" />
-          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.20" />
-          <element id="library" level="project" name="Maven: org.slf4j:slf4j-simple:1.7.20" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.7" />
           <element id="library" level="project" name="Maven: org.springframework.security:spring-security-crypto:3.1.0.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-asm:3.0.6.RELEASE" />
           <element id="library" level="project" name="Maven: org.springframework:spring-core:3.0.6.RELEASE" />
+          <element id="library" level="project" name="Maven: org.javassist:javassist:3.20.0-GA" />
+          <element id="library" level="project" name="Maven: commons-fileupload:commons-fileupload:1.3.1" />
+          <element id="library" level="project" name="Maven: javax.activation:activation:1.1" />
+          <element id="library" level="project" name="Maven: javax.mail:mail:1.4.6-rc1" />
+          <element id="library" level="project" name="Maven: com.github.javaparser:javaparser-core:2.3.0" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.20" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-simple:1.7.20" />
         </element>
+        <element id="file-copy" path="$PROJECT_DIR$/src/main/webapp/WEB-INF/web.xml" />
       </element>
-      <element id="dir-copy" path="$PROJECT_DIR$/src/main/webapp/META-INF" />
+      <element id="dir-copy" path="$PROJECT_DIR$/src/main/resources" />
+      <element id="directory" name="META-INF" />
+      <element id="dir-copy" path="$PROJECT_DIR$/src/main/webapp" />
+      <element id="javaee-facet-resources" facet="CodeDefenders/web/Web" />
     </root>
   </artifact>
 </component>
