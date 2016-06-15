@@ -11,6 +11,7 @@ public class Constants {
 	public static String CUTS_DIR    = DATA_DIR + FILE_SEPARATOR + "sources";
 	public static String MUTANTS_DIR = DATA_DIR + FILE_SEPARATOR + "mutants";
 	public static String TESTS_DIR   = DATA_DIR + FILE_SEPARATOR + "tests";
+	public static String AI_DIR      = DATA_DIR + FILE_SEPARATOR + "ai";
 
 	public static final String TEST_PREFIX = "Test";
 	public static final String JAVA_SOURCE_EXT = ".java";

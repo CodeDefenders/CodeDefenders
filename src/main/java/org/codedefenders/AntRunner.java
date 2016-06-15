@@ -208,6 +208,11 @@ public class AntRunner {
 		}
 	}
 
+	public static void generateMutants(ServletContext context, final String className) {
+		String[] resultArray = runAntTarget(context, "mutant-gen", null, null, className, null);
+
+	}
+
 	/**
 	 * Runs a specific Ant target in the build.xml file
 	 *
