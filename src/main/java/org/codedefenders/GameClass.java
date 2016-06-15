@@ -78,7 +78,7 @@ public class GameClass {
 		logger.debug("Inserting class (Name={}, JavaFile={}, ClassFile={})", name, javaFile, classFile);
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = String.format("INSERT INTO classes (Name, JavaFile, ClassFile) VALUES ('%s', '%s', '%s');", name, javaFile, classFile);
+		String sql = String.format("INSERT INTO classes (Name, JavaFile, ClassFile, MutantsReady, TestsReady) VALUES ('%s', '%s', '%s', '0', '0');", name, javaFile, classFile);
 
 		// Attempt to insert game info into database
 		try {
