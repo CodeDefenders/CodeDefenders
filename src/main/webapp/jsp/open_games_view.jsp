@@ -1,6 +1,6 @@
 <% String pageTitle="Open Games"; %>
 <%@ include file="/jsp/header.jsp" %>
-<div>
+<div class="full-width">
 <table class="table table-hover table-responsive table-paragraphs">
 	<tr>
 		<td class="col-sm-2">Game No.</td>

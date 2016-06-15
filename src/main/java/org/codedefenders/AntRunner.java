@@ -59,6 +59,25 @@ public class AntRunner {
 		return newExec;
 	}
 
+
+	/**
+	 * Executes a test against a mutant
+	 * @param context
+	 * @param t A {@link Test} object
+	 * @param c A {@link GameClass} object
+	 * @return A {@link TargetExecution} object
+	 */
+	public static int[] getLinesCovered(ServletContext context, Test t, GameClass c) {
+		logger.debug("Running test {} on class {}", t.getId(), c.getName());
+		String[] resultArray = runAntTarget(context, "test-coverage", null, t.getFolder(), c.getName(), t.getFullyQualifiedClassName());
+
+		for (String s :resultArray){
+			System.out.println(s);
+		}
+
+		return new int[0];
+	}
+
 	/**
 	 * Executes a test against a mutant
 	 * @param context
@@ -329,12 +348,22 @@ public class AntRunner {
 
 		command.replace("\\", "\\\\");
 
-		pb.command(command, target, // "-v", "-d", for verbose, debug
-				"-Dsrc.dir=" + context.getRealPath(Constants.CUTS_DIR),
-				"-Dmutant.file=" + mutantFile,
-				"-Dtest.file=" + testFile,
-				"-Dclassname=" + className,
-				"-DtestClassname=" + testClassName);
+		if (mutantFile == null){
+			pb.command(command, target, // "-v", "-d", for verbose, debug
+					"-Dsrc.dir=" + context.getRealPath(Constants.CUTS_DIR),
+					"-Dtest.file=" + testFile,
+					"-Dclassname=" + className,
+					"-DtestClassname=" + testClassName);
+		} else {
+			pb.command(command, target, // "-v", "-d", for verbose, debug
+					"-Dsrc.dir=" + context.getRealPath(Constants.CUTS_DIR),
+					"-Dmutant.file=" + mutantFile,
+					"-Dtest.file=" + testFile,
+					"-Dclassname=" + className,
+					"-DtestClassname=" + testClassName);
+		}
+
+
 
 		String buildFileDir = context.getRealPath(Constants.DATA_DIR);
 		pb.directory(new File(buildFileDir));

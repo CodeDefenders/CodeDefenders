@@ -52,6 +52,10 @@ public class MutationTester {
 		for (MultiplayerMutant mutant : mutants) {
 			killed += testVsMultiplayerMutant(context, test, mutant) ? 1 : 0;
 		}
+
+		int[] linesCovered = AntRunner.getLinesCovered(context, test, game.getCUT());
+		test.setLinesCovered(linesCovered);
+
 		if (killed == 0)
 			if (mutants.size() == 0)
 				messages.add(TEST_SUBMITTED_MESSAGE);

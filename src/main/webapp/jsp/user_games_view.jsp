@@ -14,8 +14,8 @@
 <%
 	} else {
 		%>
-<div>
-	<h2>Duels</h2>
+<div class="w-100">
+	<h3>Duels</h3>
 <table><tr><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>
 	<%
 		for (Game g : games) {
@@ -75,7 +75,7 @@
 </table>
 	<a href="/games/create">Create Duel</a>
 	<hr />
-	<h2>Battlegrounds</h2>
+	<h3>Battlegrounds</h3>
 <%
 	ArrayList<MultiplayerGame> mgames = DatabaseAccess.getMultiplayerGamesForUser(uid);
 	if (mgames.isEmpty()) {

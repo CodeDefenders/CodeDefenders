@@ -28,8 +28,18 @@ public class Test {
 	private int ownerId;
 	private int defenderId = -1;
 
+	private int[] linesCovered = new int[0];
+
 	public void setDefenderId(int defId){
 		defenderId = defId;
+	}
+
+	public void setLinesCovered (int[] lines){
+		linesCovered = lines;
+	}
+
+	public int[] getLinesCovered(){
+		return linesCovered;
 	}
 
 	public int getDefenderId(){
@@ -169,10 +179,20 @@ public class Test {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
+
+			String linesCoveredString = "";
+
+			for (int i : linesCovered){
+				linesCoveredString += i + ",";
+			}
+
+			//-1 for the left over comma
+			linesCoveredString = linesCoveredString.substring(0, linesCoveredString.length()-1);
+
 			if (defenderId >= 0){
-				sql = String.format("UPDATE tests SET mutantsKilled='%d', Defender_ID=%d WHERE Test_ID='%d';", mutantsKilled, defenderId, id);
+				sql = String.format("UPDATE tests SET mutantsKilled='%d', Defender_ID=%d, Lines_Covered='%s' WHERE Test_ID='%d';", mutantsKilled, defenderId, id, linesCoveredString);
 			} else {
-				sql = String.format("UPDATE tests SET mutantsKilled='%d' WHERE Test_ID='%d';", mutantsKilled, id);
+				sql = String.format("UPDATE tests SET mutantsKilled='%d', Lines_Covered='%s' WHERE Test_ID='%d';", mutantsKilled, id, linesCoveredString);
 			}
 			stmt.execute(sql);
 

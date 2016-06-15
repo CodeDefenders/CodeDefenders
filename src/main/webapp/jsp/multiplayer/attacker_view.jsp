@@ -36,6 +36,20 @@
 	});
 	editor.setSize("100%", 500);
 
+	highlightCoverage = function(){
+		highlightLine([1, 2, 5, 6], COVERED_COLOR, null);
+	};
+	highlightMutants = function(){
+		highlightLine([3, 4, 5, 7], UNCOVERED_COLOR, null);
+	};
+	editor.on("viewportChange", function(){
+		highlightCoverage();
+		highlightMutants();
+	});
+
+	highlightCoverage();
+	highlightMutants();
+
 	var x = document.getElementsByClassName("utest");
 	var i;
 	for (i = 0; i < x.length; i++) {

@@ -40,6 +40,7 @@
 
     <!-- MultiplayerGame -->
     <link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="js/game_highlighting.js"></script>
 
 
     <script>
@@ -176,5 +177,5 @@
             <h2 class="full-width page-title"><%= pageTitle %></h2>
         <% } %>
         <div class="nest">
-            <div class="crow fly">
-                <div class="crow fly">
+            <div class="crow fly no-gutter">
+                <div class="crow fly no-gutter">

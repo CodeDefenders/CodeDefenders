@@ -156,5 +156,17 @@
 			<version>2.3.0</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>jacoco-maven-plugin</artifactId>
+			<version>0.7.7.201606060606</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>org.jacoco.ant</artifactId>
+			<version>0.7.7.201606060606</version>
+		</dependency>
+
 	</dependencies>
 </project>
