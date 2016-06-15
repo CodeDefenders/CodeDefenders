@@ -13,8 +13,8 @@
 
 	<property name="policyfile" location="security.policy" />
 	<property name="mutOp" value=":ALL"/>
-	<property name="major.home" value="/usr/share/major"/>
-	<property name="evosuite.home" value="/usr/share/evosuite"/>
+	<property name="major.home" value="/var/lib/major"/>
+	<property name="evosuite.home" value="/var/lib/evosuite"/>
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-cut" description="compile a class under test">
@@ -79,7 +79,7 @@
 		<exec executable="${major.home}/bin/javac">
 			<arg value="-XMutator${mutOp}"/>
 			<arg value="-J-Dmajor.export.mutants=true"/>
-			<arg value="-J-Dmajor.export.directory=${basedir}/ai/mutants${classname}"/>
+			<arg value="-J-Dmajor.export.directory=${basedir}/ai/mutants/${classname}"/>
 			<arg value="${src.dir}/${classname}"/>
 		</exec>
 	</target>
