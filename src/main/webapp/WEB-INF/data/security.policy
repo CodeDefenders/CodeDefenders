@@ -72,7 +72,7 @@ grant {
   permission java.net.NetPermission "*";
   permission java.lang.reflect.ReflectPermission "*";
   permission java.util.logging.LoggingPermission "control";
-  permission java.io.FilePermission "/usr/share/tomcat/webapps/ROOT/WEB-INF/data", "write";
+  permission java.io.FilePermission "../", "write";
   permission java.io.FilePermission "<<ALL FILES>>", "read";
   permission java.awt.AWTPermission "*";
   permission java.util.PropertyPermission "*", "read";

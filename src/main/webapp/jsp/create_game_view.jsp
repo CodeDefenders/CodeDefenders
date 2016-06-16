@@ -1,4 +1,4 @@
-<% String pageTitle="MultiplayerGame Creation"; %>
+<% String pageTitle="Duel Creation"; %>
 <%@ include file="/jsp/header.jsp" %>
 
 

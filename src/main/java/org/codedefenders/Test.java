@@ -2,6 +2,8 @@ package org.codedefenders;
 
 import javassist.ClassPool;
 import javassist.CtClass;
+import org.codedefenders.multiplayer.LineCoverage;
+import org.codedefenders.multiplayer.LineCovered;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -28,19 +30,21 @@ public class Test {
 	private int ownerId;
 	private int defenderId = -1;
 
-	private int[] linesCovered = new int[0];
+	private LineCoverage lineCoverage = LineCoverage.NONE;
+
+	public void setLineCoverage(LineCoverage lc){
+		lineCoverage = lc;
+	}
+
+	public LineCoverage getLineCoverage(){
+		return lineCoverage;
+	}
 
 	public void setDefenderId(int defId){
 		defenderId = defId;
 	}
 
-	public void setLinesCovered (int[] lines){
-		linesCovered = lines;
-	}
 
-	public int[] getLinesCovered(){
-		return linesCovered;
-	}
 
 	public int getDefenderId(){
 		return defenderId;
@@ -107,7 +111,7 @@ public class Test {
 				testLines.add(line);
 			}
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.err.println(e.getLocalizedMessage());
 		}
 
 		return testLines;
@@ -181,18 +185,39 @@ public class Test {
 			stmt = conn.createStatement();
 
 			String linesCoveredString = "";
+			String linesUncoveredString = "";
+			if (lineCoverage != null) {
+				for (int i : lineCoverage.getLinesCovered()) {
+					linesCoveredString += i + ",";
+				}
 
-			for (int i : linesCovered){
-				linesCoveredString += i + ",";
+				for (int i : lineCoverage.getLinesUncovered()) {
+					linesUncoveredString += i + ",";
+				}
+				if (linesCoveredString.length() > 0) {
+					linesCoveredString = linesCoveredString.substring(0, linesCoveredString.length() - 1);
+				}
+
+				if (linesUncoveredString.length() > 0) {
+					linesUncoveredString = linesUncoveredString.substring(0, linesUncoveredString.length() - 1);
+				}
 			}
 
 			//-1 for the left over comma
-			linesCoveredString = linesCoveredString.substring(0, linesCoveredString.length()-1);
 
 			if (defenderId >= 0){
-				sql = String.format("UPDATE tests SET mutantsKilled='%d', Defender_ID=%d, Lines_Covered='%s' WHERE Test_ID='%d';", mutantsKilled, defenderId, id, linesCoveredString);
+				sql = String.format("UPDATE tests SET mutantsKilled='%d', " +
+						"Defender_ID=%d, " +
+						"Lines_Covered='%s', " +
+						"Lines_Uncovered='%s' " +
+						"WHERE Test_ID='%d';",
+						mutantsKilled, defenderId, linesCoveredString, linesUncoveredString, id);
 			} else {
-				sql = String.format("UPDATE tests SET mutantsKilled='%d', Lines_Covered='%s' WHERE Test_ID='%d';", mutantsKilled, id, linesCoveredString);
+				sql = String.format("UPDATE tests SET mutantsKilled='%d', " +
+						"Lines_Covered='%s', " +
+						"Lines_Uncovered='%s' " +
+						"WHERE Test_ID='%d';",
+						mutantsKilled, linesCoveredString, linesUncoveredString, id);
 			}
 			stmt.execute(sql);
 

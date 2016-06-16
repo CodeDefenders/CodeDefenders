@@ -1,5 +1,6 @@
 package org.codedefenders;
 
+import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.multiplayer.MultiplayerMutant;
 import org.slf4j.Logger;
@@ -53,8 +54,10 @@ public class MutationTester {
 			killed += testVsMultiplayerMutant(context, test, mutant) ? 1 : 0;
 		}
 
-		int[] linesCovered = AntRunner.getLinesCovered(context, test, game.getCUT());
-		test.setLinesCovered(linesCovered);
+		LineCoverage lc = AntRunner.getLinesCovered(context, test, game.getCUT());
+		test.setLineCoverage(lc);
+
+		test.update();
 
 		if (killed == 0)
 			if (mutants.size() == 0)

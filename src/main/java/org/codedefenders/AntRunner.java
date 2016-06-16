@@ -3,6 +3,9 @@ package org.codedefenders;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.codedefenders.multiplayer.CoverageGenerator;
+import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerMutant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +13,9 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletContext;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
@@ -67,15 +72,52 @@ public class AntRunner {
 	 * @param c A {@link GameClass} object
 	 * @return A {@link TargetExecution} object
 	 */
-	public static int[] getLinesCovered(ServletContext context, Test t, GameClass c) {
+	public static LineCoverage getLinesCovered(ServletContext context, Test t, GameClass c) {
 		logger.debug("Running test {} on class {}", t.getId(), c.getName());
-		String[] resultArray = runAntTarget(context, "test-coverage", null, t.getFolder(), c.getName(), t.getFullyQualifiedClassName());
+		String[] resultArray = runAntTarget(context, "test-original", null, t.getFolder(), c.getName(), t.getFullyQualifiedClassName());
+
+
+		//String[] results2 = processJacoco(context,  t.getFolder());
 
 		for (String s :resultArray){
 			System.out.println(s);
 		}
 
-		return new int[0];
+//		for (String s : results2){
+//			System.out.println(s);
+//		}
+
+		CoverageGenerator cg = new CoverageGenerator(
+				new File(t.getFolder()),
+				new File(context.getRealPath("WEB-INF/data/sources")));
+
+		try {
+			cg.create(c.getName());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		ArrayList<Integer> linesCovered = cg.getLinesCovered();
+
+		Integer[] r = new Integer[linesCovered.size()];
+
+		linesCovered.toArray(r);
+
+		LineCoverage lc = new LineCoverage();
+
+		lc.setLinesCovered(r);
+
+		ArrayList<Integer> linesUncovered = cg.getLinesUncovered();
+
+		r = new Integer[linesUncovered.size()];
+
+		linesUncovered.toArray(r);
+
+		lc.setLinesUncovered(r);
+
+		System.out.println(lc.toString());
+
+		return lc;
 	}
 
 	/**
@@ -397,6 +439,68 @@ public class AntRunner {
 		System.out.println("es: " + esLog);
 		System.out.println("ex: " + exLog);
 		System.out.println("lg :" + debug);
+
+		return resultArray;
+	}
+
+	private static String[] processJacoco(ServletContext context, String testFile) {
+		String[] resultArray = new String[4];
+		String isLog = "";
+		String esLog = "";
+		String exLog = "";
+
+		ProcessBuilder pb = new ProcessBuilder();
+		Map env = pb.environment();
+
+		String antHome = (String) env.get("ANT_HOME");
+		if (antHome == null) {
+			System.err.println("ANT_HOME undefined.");
+			antHome = System.getProperty("ant.home", "/usr/local");
+		}
+
+		String command = antHome + "/bin/ant";
+
+		if (System.getProperty("os.name").toLowerCase().contains("windows")){
+			command += ".bat";
+		}
+
+		command.replace("\\", "\\\\");
+			pb.command(command, "process-jacoco", // "-v", "-d", for verbose, debug
+					"-Dsrc.dir=" + context.getRealPath(Constants.CUTS_DIR),
+					"-Dtest.file=" + testFile);
+
+
+
+		String buildFileDir = context.getRealPath(Constants.DATA_DIR);
+		pb.directory(new File(buildFileDir));
+		pb. redirectErrorStream(true);
+
+		System.out.println("Executing Ant Command: " + pb.command().toString());
+		System.out.println("Executing from directory: " + buildFileDir);
+		try {
+			Process p = pb.start();
+			String line;
+
+			BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			while ((line = is.readLine()) != null) {
+				isLog += line + "\n";
+			}
+
+			BufferedReader es = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			while ((line = es.readLine()) != null) {
+				esLog += line + "\n";
+			}
+
+		} catch (Exception ex) {
+			exLog += "Exception: " + ex.toString() + "\n";
+		}
+
+		resultArray[0] = isLog;
+		resultArray[1] = esLog;
+		resultArray[2] = exLog;
+		System.out.println("is: " + isLog);
+		System.out.println("es: " + esLog);
+		System.out.println("ex: " + exLog);
 
 		return resultArray;
 	}

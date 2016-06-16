@@ -59,10 +59,14 @@
 	editorSUT.setSize("100%", 500);
 
 	highlightCoverage = function(){
-		highlightLine([1, 2, 5, 6], COVERED_COLOR, null);
+		highlightLine([<% for (Integer i : linesCovered.keySet()){%>
+				<%=i%>,
+				<% } %>], COVERED_COLOR, null);
 	};
 	highlightMutants = function(){
-		highlightLine([3, 4, 5, 7], UNCOVERED_COLOR, null);
+		highlightLine([<% for (Integer i : linesUncovered){%>
+			<%=i%>,
+			<% } %>], UNCOVERED_COLOR, null);
 	};
 	editorSUT.on("viewportChange", function(){
 		highlightCoverage();

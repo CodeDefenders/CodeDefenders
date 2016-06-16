@@ -4,6 +4,25 @@
         <%
             isTests = false;
             for (Test t : mg.getExecutableTests()) {
+                for (Integer luc : t.getLineCoverage().getLinesUncovered()){
+                    if (!linesUncovered.contains(luc) && !linesCovered.containsKey(luc)){
+                        linesUncovered.add(luc);
+                    }
+                }
+
+
+                for (Integer lc : t.getLineCoverage().getLinesCovered()){
+                    if (!linesCovered.containsKey(lc)){
+                        linesCovered.put(lc, new ArrayList<Test>());
+                    }
+
+                    if (linesUncovered.contains(lc)){
+                        linesUncovered.remove(lc);
+                    }
+
+                    linesCovered.get(lc).add(t);
+                }
+
                 isTests = true;
                 String tc = "";
                 for (String l : t.getHTMLReadout()) { tc += l + "\n"; }

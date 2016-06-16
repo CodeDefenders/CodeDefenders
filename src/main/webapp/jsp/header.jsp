@@ -28,6 +28,13 @@
     <script src="js/bootstrap.min.js" type="text/javascript" ></script>
     <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
+    <link href="css/bootstrap-toggle_2.2.0.min.css" rel="stylesheet" type="text/css" />
+    <script src="js/bootstrap-toggle_2.2.0.min.js" type="text/javascript" ></script>
+    <!-- select -->
+    <link href="css/bootstrap-select_1.9.3.min.css" rel="stylesheet" type="text/css" />
+    <script src="js/bootstrap-select_1.9.3.min.js" type="text/javascript" ></script>
+
+
     <!-- Leaf -->
     <link href="css/base.css" rel="stylesheet">
     <script type="text/javascript" src="js/script.js"></script>

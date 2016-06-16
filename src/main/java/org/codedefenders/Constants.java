@@ -9,6 +9,7 @@ public class Constants {
 
 	public static String DATA_DIR    = FILE_SEPARATOR + "WEB-INF" + FILE_SEPARATOR + "data";
 	public static String CUTS_DIR    = DATA_DIR + FILE_SEPARATOR + "sources";
+	public static String INSTRUMENTED_DIR    = DATA_DIR + FILE_SEPARATOR + "jacoco";
 	public static String MUTANTS_DIR = "mutants";
 	public static String TESTS_DIR   = "tests";
 

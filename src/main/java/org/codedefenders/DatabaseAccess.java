@@ -1,5 +1,6 @@
 package org.codedefenders;
 
+import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.multiplayer.MultiplayerMutant;
 import org.codedefenders.multiplayer.Participance;
@@ -930,6 +931,28 @@ public class DatabaseAccess {
 				Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
 						rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"), rs.getInt("Owner_ID"));
+				String lcs = rs.getString("Lines_Covered");
+				String lucs = rs.getString("Lines_Uncovered");
+				if (lcs != null && lucs != null && lcs.length() > 0 && lucs.length() > 0) {
+					String[] covered = lcs.split(",");
+					String[] uncovered = lucs.split(",");
+					Integer[] cov = new Integer[covered.length];
+					Integer[] uncov = new Integer[uncovered.length];
+					for (int i = 0; i < covered.length; i++) {
+						cov[i] = Integer.parseInt(covered[i]);
+					}
+					for (int i = 0; i < uncovered.length; i++) {
+						uncov[i] = Integer.parseInt(uncovered[i]);
+					}
+
+					LineCoverage lc = new LineCoverage();
+
+					lc.setLinesUncovered(uncov);
+					lc.setLinesCovered(cov);
+
+					newTest.setLineCoverage(lc);
+				}
+
 				testList.add(newTest);
 			}
 
@@ -939,7 +962,7 @@ public class DatabaseAccess {
 			System.out.println(se);
 		} // Handle errors for JDBC
 		catch (Exception e) {
-			System.out.println(e);
+			e.printStackTrace();
 		} // Handle errors for Class.forName
 		finally {
 			try {

@@ -12,6 +12,10 @@
     }
     boolean isTests = false;
 
+    HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<Integer, ArrayList<Test>>();
+
+    ArrayList<Integer> linesUncovered = new ArrayList<Integer>();
+
     MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
     Participance p = mg.getParticipance(uid);
     %>
@@ -32,7 +36,6 @@
             %><%@ include file="/jsp/multiplayer/creator_view.jsp" %><%
             break;
         default:
-            System.out.println("Entered Page Display");
             if (request.getParameter("defender") != null){
                 mg.addUserAsDefender(uid);
             } else if (request.getParameter("attacker") != null){
