@@ -1,4 +1,6 @@
-
+<%
+	codeDivName = "cut-div";
+%>
 <div class="row-fluid">
 	<div class="col-md-6" id="cut-div">
 		<h2>Class Under Test</h2>
@@ -58,23 +60,7 @@
 	});
 	editorSUT.setSize("100%", 500);
 
-	highlightCoverage = function(){
-		highlightLine([<% for (Integer i : linesCovered.keySet()){%>
-				<%=i%>,
-				<% } %>], COVERED_COLOR, null);
-	};
-	highlightMutants = function(){
-		highlightLine([<% for (Integer i : linesUncovered){%>
-			<%=i%>,
-			<% } %>], UNCOVERED_COLOR, null);
-	};
-	editorSUT.on("viewportChange", function(){
-		highlightCoverage();
-		highlightMutants();
-	});
-
-	highlightCoverage();
-	highlightMutants();
+	<%@ include file="/jsp/multiplayer/game_highlighting.jsp" %>
 
 	/* Submitted tests */
 	var x = document.getElementsByClassName("utest");

@@ -1,4 +1,4 @@
-
+<% codeDivName = "newmut-div"; %>
 <div class="row-fluid">
 
 
@@ -27,28 +27,16 @@
 </div> <!-- row-fluid -->
 
 <script>
-	var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+	var editorSUT = CodeMirror.fromTextArea(document.getElementById("code"), {
 		lineNumbers: true,
 		indentUnit: 4,
 		indentWithTabs: true,
 		matchBrackets: true,
 		mode: "text/x-java"
 	});
-	editor.setSize("100%", 500);
+	editorSUT.setSize("100%", 500);
 
-	highlightCoverage = function(){
-		highlightLine([1, 2, 5, 6], COVERED_COLOR, null);
-	};
-	highlightMutants = function(){
-		highlightLine([3, 4, 5, 7], UNCOVERED_COLOR, null);
-	};
-	editor.on("viewportChange", function(){
-		highlightCoverage();
-		highlightMutants();
-	});
-
-	highlightCoverage();
-	highlightMutants();
+	<%@ include file="/jsp/multiplayer/game_highlighting.jsp" %>
 
 	var x = document.getElementsByClassName("utest");
 	var i;

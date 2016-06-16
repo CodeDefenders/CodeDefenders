@@ -16,6 +16,8 @@
 
     ArrayList<Integer> linesUncovered = new ArrayList<Integer>();
 
+    String codeDivName = "cut-div";
+
     MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
     Participance p = mg.getParticipance(uid);
     %>
