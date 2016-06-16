@@ -82,8 +82,12 @@ public class UploadManager extends HttpServlet {
 							newSUT = new GameClass(fullyQualifiedName, javaFileNameDB, classFileNameDB);
 							newSUT.insert();
 
-							//TODO: Process class here.
+							//TODO: Process class here. Use multithreading.
+							//Generate mutant classes.
 							AntRunner.generateMutants(getServletContext(), fileName);
+							//Compile mutant classes.
+							//Generate tests.
+							//Run tests on mutants to determine potential equivalents.
 
 							response.sendRedirect("games/create");
 
