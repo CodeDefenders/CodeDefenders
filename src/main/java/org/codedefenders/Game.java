@@ -148,6 +148,8 @@ public class Game {
 		return this.mode;
 	}
 
+	protected void setMode(Mode newMode) { this.mode = newMode; }
+
 	public ArrayList<Mutant> getMutants() {
 		return DatabaseAccess.getMutantsForGame(id);
 	}
