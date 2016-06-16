@@ -45,7 +45,7 @@ public class SingleplayerGame extends Game {
 
 	/**
 	 * Make AI turn based upon their role
-	 * May have to wait for compile times
+	 * May have to wait for compile tim
 	 */
 	private void aiMakeTurn() {
 		if(aiRole.equals(Role.ATTACKER)) {

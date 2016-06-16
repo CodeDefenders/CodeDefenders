@@ -21,7 +21,9 @@
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-cut" description="compile a class under test">
-		<javac srcdir="${src.dir}" destdir="${src.dir}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" listfiles="yes">
+		<echo>Javac version: ${ant.javac.version}</echo>
+		<echo>Java version: ${ant.java.version}</echo>
+		<javac srcdir="${src.dir}" destdir="${src.dir}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" listfiles="yes" fork="yes">
 			<include name="${classname}" />
 		</javac>
 	</target>
@@ -78,7 +80,7 @@
 		</junit>
 	</target>
 
-	<target name="mutant-gen" description="generate mutants using major">
+	<target name="mutant-gen-cut" description="generate mutants using major">
 		<exec executable="${major.home}/bin/javac">
 			<arg value="-XMutator${mutOp}"/>
 			<arg value="-J-Dmajor.export.mutants=true"/>
@@ -87,14 +89,25 @@
 		</exec>
 	</target>
 
-	<target name="test-gen-class" description="generate unit tests from class using evosuite">
-		<!--<mkdir dir="${basedir}/ai/tests/${classname.only}"/> <!-- create test dir -->
-		<java jar="${evosuite.home}/evosuite-1.0.3.jar">
+	<target name="test-gen-cut" description="generate unit tests from class using evosuite">
+		<java jar="${evosuite.home}/evosuite-1.0.3.jar" fork="yes">
 			<arg value="-generateSuite"/>
 			<arg value="-class ${classname.only}"/> <!-- CUT name, without extension -->
 			<arg value="-projectCP ${src.dir}"/> <!-- "project" classpath, where CUT stored -->
-			<!-- <arg value="-base_dir ${basedir}/ai/tests/${classname.only}"/> <!-- Location to store result classes. -->
+			<arg value="-Dtest_dir ${basedir}/ai/tests/${classname.only}"/> <!-- Location to store result classes. -->
+			<arg value="-Dshow_progress false"/> <!-- Location to store result classes. -->
 		</java>
+	</target>
+
+	<target name="test-gen-cut-BROKEN" description="generate unit tests from class using evosuite">
+		<exec executable="java">
+			<arg value="-jar ${evosuite.home}/evosuite-1.0.3.jar"/>
+			<arg value="-generateSuite"/>
+			<arg value="-class ${classname.only}"/> <!-- CUT name, without extension -->
+			<arg value="-projectCP ${src.dir}"/> <!-- "project" classpath, where CUT stored -->
+			<arg value="-Dtest_dir ${basedir}/ai/tests/${classname.only}"/> <!-- Location to store result classes. -->
+			<arg value="-Dshow_progress false"/> <!-- Location to store result classes. -->
+		</exec>
 	</target>
 
 </project>

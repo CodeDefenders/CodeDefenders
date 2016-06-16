@@ -69,7 +69,9 @@ public class UploadManager extends HttpServlet {
 						}
 						FileUtils.copyInputStreamToFile(fileContent, targetFile);
 						String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
+						//Compile original class.
 						String classFileName = AntRunner.compileCUT(getServletContext(), fileName);
+
 						if (classFileName != null) {
 							String classFileNameDB = DatabaseAccess.addSlashes(classFileName);
 
@@ -82,12 +84,15 @@ public class UploadManager extends HttpServlet {
 							newSUT = new GameClass(fullyQualifiedName, javaFileNameDB, classFileNameDB);
 							newSUT.insert();
 
-							//TODO: Process class here. Use multithreading.
-							//Generate mutant classes.
-							AntRunner.generateMutants(getServletContext(), fileName);
-							//Compile mutant classes.
+							//TODO: Process class here. Use multithreading?
 							//Generate tests.
+							AntRunner.generateTestsFromCUT(getServletContext(), fileName);
+							//Generate mutant classes. Note that this overwrites original compiled class
+							AntRunner.generateMutantsFromCUT(getServletContext(), fileName);
+							//Compile mutant classes.
+
 							//Run tests on mutants to determine potential equivalents.
+
 
 							response.sendRedirect("games/create");
 

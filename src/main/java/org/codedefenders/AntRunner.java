@@ -208,9 +208,17 @@ public class AntRunner {
 		}
 	}
 
-	public static void generateMutants(ServletContext context, final String className) {
-		String[] resultArray = runAntTarget(context, "mutant-gen", null, null, className, null);
+	/**
+	 * Generates mutant classes
+	 * @param context
+	 * @param className CUT filename
+	 */
+	public static void generateMutantsFromCUT(ServletContext context, final String className) {
+		String[] resultArray = runAntTarget(context, "mutant-gen-cut", null, null, className, null);
+	}
 
+	public static void generateTestsFromCUT(ServletContext context, final String className) {
+		String[] resultArray = runAntTarget(context, "test-gen-cut", null, null, className, null);
 	}
 
 	/**
