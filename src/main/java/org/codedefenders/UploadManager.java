@@ -87,6 +87,8 @@ public class UploadManager extends HttpServlet {
 							//TODO: Process class here. Use multithreading?
 							//Generate tests.
 							AntRunner.generateTestsFromCUT(getServletContext(), fileName);
+							//Compile tests.
+							AntRunner.compileGeneratedTests(getServletContext(), fileName);
 							//Generate mutant classes. Note that this overwrites original compiled class
 							AntRunner.generateMutantsFromCUT(getServletContext(), fileName);
 							//Compile mutant classes.
@@ -99,6 +101,7 @@ public class UploadManager extends HttpServlet {
 							response.sendRedirect("games/create");
 
 						} else {
+							//TODO: Alternate method of catching errors?
 							messages.add("We were unable to compile your class, please try with a simpler one (no dependencies)");
 							response.sendRedirect(request.getHeader("referer"));
 							break;

@@ -209,7 +209,7 @@ public class AntRunner {
 	}
 
 	/**
-	 * Generates mutant classes
+	 * Generates mutant classes using Major
 	 * @param context
 	 * @param className CUT filename
 	 */
@@ -217,25 +217,43 @@ public class AntRunner {
 		String[] resultArray = runAntTarget(context, "mutant-gen-cut", null, null, className, null);
 	}
 
+	/**
+	 * Generates tests using EvoSuite
+	 * @param context
+	 * @param className CUT filename
+	 */
 	public static void generateTestsFromCUT(ServletContext context, final String className) {
 		String[] resultArray = runAntTarget(context, "test-gen-cut", null, null, className, null);
 	}
 
 	/**
-	 * Runs a specific Ant target in the build.xml file
-	 *
+	 * Compiles generated test suite
 	 * @param context
-	 * @param target An Ant target
-	 * @param mutantFile
-	 * @param testFile
-	 * @param className Class
-	 * @param testClassName
-	 * @return String Array of length 4
-	 * [0] : Input Stream for the process
-	 * [1] : Error Stream for the process
-	 * [2] : Any exceptions from running the process
-	 * [3] : Message indicating which target was run, and with which files
+	 * @param dir
+	 * @param jFile
+	 * @param gameID
+	 * @param classUnderTest
+	 * @return A {@link Test} object
 	 */
+	public static void compileGeneratedTests(ServletContext context, final String className) {
+		String[] resultArray = runAntTarget(context, "compile-gen-test", null, null, className, null);
+	}
+
+		/**
+		 * Runs a specific Ant target in the build.xml file
+		 *
+		 * @param context
+		 * @param target An Ant target
+		 * @param mutantFile
+		 * @param testFile
+		 * @param className Class
+		 * @param testClassName
+		 * @return String Array of length 4
+		 * [0] : Input Stream for the process
+		 * [1] : Error Stream for the process
+		 * [2] : Any exceptions from running the process
+		 * [3] : Message indicating which target was run, and with which files
+		 */
 	private static String[] runAntTarget(ServletContext context, String target, String mutantFile, String testFile, String className, String testClassName) {
 		String[] resultArray = new String[4];
 		String isLog = "";

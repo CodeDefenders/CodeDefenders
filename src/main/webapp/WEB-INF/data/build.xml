@@ -18,6 +18,7 @@
 
 	<!-- Get classname minus .java extension -->
 	<basename property="classname.only" file="${classname}" suffix=".java"/>
+	<property name="gen.tests.dir" value="${basedir}/ai/tests"/>
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-cut" description="compile a class under test">
@@ -99,6 +100,10 @@
 			<arg line="-Dshow_progress false"/> <!-- Disable printing of progress bars -->
 			<arg line="-generateSuite"/>
 		</java>
+	</target>
+
+	<target name="compile-gen-test" description="compile a generated test">
+		<javac srcdir="${gen.tests.dir}/${classname.only}" destdir="${gen.tests.dir}/${classname.only}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false"/>
 	</target>
 
 </project>
