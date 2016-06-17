@@ -16,17 +16,19 @@ public class SingleplayerGame extends Game {
 		setMode(Mode.SINGLE); //Singleplayer
 		playerRole = role; //Set player's role
 		//Set ai's role
-		if(playerRole.equals(Role.ATTACKER)) {
-			aiRole = Role.DEFENDER;
+		if(playerRole.equals(Game.Role.ATTACKER)) {
+			aiRole = Game.Role.DEFENDER;
 		} else {
-			aiRole = Role.ATTACKER;
+			aiRole = Game.Role.ATTACKER;
 		}
 
 		//Finally, set game as active, don't need to wait for another player.
-		setState(State.ACTIVE);
+		setState(Game.State.ACTIVE);
 
 		//TODO: Remove next line, forces difficulty to HARD.
-		setLevel(Level.HARD);
+		setLevel(Game.Level.HARD);
+
+
 	}
 
 	/**

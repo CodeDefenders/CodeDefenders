@@ -229,14 +229,19 @@ public class AntRunner {
 	/**
 	 * Compiles generated test suite
 	 * @param context
-	 * @param dir
-	 * @param jFile
-	 * @param gameID
-	 * @param classUnderTest
-	 * @return A {@link Test} object
+	 * @param className
 	 */
 	public static void compileGenTestSuite(ServletContext context, final String className) {
-		String[] resultArray = runAntTarget(context, "compile-gen-test", null, null, className, null);
+		String[] resultArray = runAntTarget(context, "compile-gen-tests", null, null, className, null);
+	}
+
+	/**
+	 * Compiles generated mutants
+	 * @param context
+	 * @param className
+	 */
+	public static void compileGenMutants(ServletContext context, final String className) {
+		String[] resultArray = runAntTarget(context, "compile-gen-mutants", null, null, className, null);
 	}
 
 		/**

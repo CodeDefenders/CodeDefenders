@@ -37,7 +37,7 @@ public class GameSelectionManager extends HttpServlet {
 				String modeName = request.getParameter("mode");
 				Game.Role role = request.getParameter("role") == null ? Game.Role.DEFENDER : Game.Role.ATTACKER;
 				Game.Level level = request.getParameter("level") == null ? Game.Level.HARD : Game.Level.EASY;
-				Game.Mode mode;
+				Game.Mode mode = null;
 
 				switch (modeName) {
 					case "sing": mode = Game.Mode.SINGLE; break;
