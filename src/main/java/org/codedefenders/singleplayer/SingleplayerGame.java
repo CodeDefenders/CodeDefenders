@@ -24,6 +24,9 @@ public class SingleplayerGame extends Game {
 
 		//Finally, set game as active, don't need to wait for another player.
 		setState(State.ACTIVE);
+
+		//TODO: Remove next line, forces difficulty to HARD.
+		setLevel(Level.HARD);
 	}
 
 	/**
@@ -68,5 +71,11 @@ public class SingleplayerGame extends Game {
 	 */
 	private void aiDefenderTurn() {
 		//Use defender strategy to select generated test(s)
+		if(getLevel().equals(Level.HARD)) {
+			//Use harder difficulty.
+			//Run all generated tests for class.
+		} else {
+			//Use easy difficulty - implementation not yet decided.
+		}
 	}
 }

@@ -1,5 +1,7 @@
 package org.codedefenders;
 
+import org.codedefenders.singleplayer.SingleplayerGame;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -32,12 +34,29 @@ public class GameSelectionManager extends HttpServlet {
 				// Get the identifying information required to create a game from the submitted form.
 				int classId = Integer.parseInt(request.getParameter("class"));
 				int rounds = Integer.parseInt(request.getParameter("rounds"));
+				String modeName = request.getParameter("mode");
 				Game.Role role = request.getParameter("role") == null ? Game.Role.DEFENDER : Game.Role.ATTACKER;
 				Game.Level level = request.getParameter("level") == null ? Game.Level.HARD : Game.Level.EASY;
+				Game.Mode mode;
 
-				// Create the game with supplied parameters and insert it in the database.
-				Game nGame = new Game(classId, uid, rounds, role, level);
-				nGame.insert();
+				switch (modeName) {
+					case "sing": mode = Game.Mode.SINGLE; break;
+					case "duel": mode = Game.Mode.DUEL; break;
+					case "prty": mode = Game.Mode.PARTY; break;
+					case "utst": mode = Game.Mode.UTESTING; break;
+					default: mode = Game.Mode.SINGLE;
+				}
+
+				if(mode.equals(Game.Mode.SINGLE)) {
+					//Create singleplayer game.
+					SingleplayerGame nGame = new SingleplayerGame(classId, uid, rounds, role, level);
+					nGame.insert();
+				} else {
+					// Create the game with supplied parameters and insert it in the database.
+					Game nGame = new Game(classId, uid, rounds, role, level);
+					nGame.insert();
+				}
+
 
 				// Redirect to the game selection menu.
 				response.sendRedirect("games");
