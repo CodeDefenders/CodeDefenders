@@ -93,6 +93,8 @@ public class UploadManager extends HttpServlet {
 
 							//Run tests on mutants to determine potential equivalents.
 
+							//May have to recompile original class without major.
+
 
 							response.sendRedirect("games/create");
 

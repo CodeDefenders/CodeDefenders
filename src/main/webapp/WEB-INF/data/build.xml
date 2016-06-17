@@ -21,8 +21,6 @@
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-cut" description="compile a class under test">
-		<echo>Javac version: ${ant.javac.version}</echo>
-		<echo>Java version: ${ant.java.version}</echo>
 		<javac srcdir="${src.dir}" destdir="${src.dir}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" listfiles="yes" fork="yes">
 			<include name="${classname}" />
 		</javac>
@@ -90,12 +88,16 @@
 	</target>
 
 	<target name="test-gen-cut" description="generate unit tests from class using evosuite">
-		<java jar="${evosuite.home}/evosuite.jar" fork="yes">
-			<arg value="-generateSuite"/>
-			<arg value="-class sources.${classname.only}"/> <!-- CUT name, without extension -->
-			<arg value="-projectCP ${src.dir}"/> <!-- "project" classpath, where CUT stored -->
-			<arg value="-Dtest_dir ${basedir}/ai/tests/${classname.only}"/> <!-- Location to store result classes. -->
-			<arg value="-Dshow_progress false"/> <!-- Location to store result classes. -->
+		<echo message="src dir: ${src.dir}"/>
+		<echo message="base dir: ${basedir}"/>
+		<java jar="${evosuite.home}/evosuite.jar" fork="true">
+			<arg line="-base_dir ${basedir}/"/>
+			<arg line="-target sources/"/> <!-- directory of CUT -->
+			<arg line="-class ${classname.only}"/> <!-- CUT name, without extension -->
+			<arg line="-Dtest_dir ai/tests/${classname.only}"/> <!-- Location to store result classes. -->
+			<arg line="-Dreport_dir ai/tests/${classname.only}"/> <!-- Location to store result classes. -->
+			<arg line="-Dshow_progress false"/> <!-- Disable printing of progress bars -->
+			<arg line="-generateSuite"/>
 		</java>
 	</target>
 
