@@ -235,7 +235,7 @@ public class AntRunner {
 	 * @param classUnderTest
 	 * @return A {@link Test} object
 	 */
-	public static void compileGeneratedTests(ServletContext context, final String className) {
+	public static void compileGenTestSuite(ServletContext context, final String className) {
 		String[] resultArray = runAntTarget(context, "compile-gen-test", null, null, className, null);
 	}
 

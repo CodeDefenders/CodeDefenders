@@ -88,7 +88,7 @@ public class UploadManager extends HttpServlet {
 							//Generate tests.
 							AntRunner.generateTestsFromCUT(getServletContext(), fileName);
 							//Compile tests.
-							AntRunner.compileGeneratedTests(getServletContext(), fileName);
+							AntRunner.compileGenTestSuite(getServletContext(), fileName);
 							//Generate mutant classes. Note that this overwrites original compiled class
 							AntRunner.generateMutantsFromCUT(getServletContext(), fileName);
 							//Compile mutant classes.
