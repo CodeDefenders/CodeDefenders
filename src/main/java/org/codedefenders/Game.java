@@ -2,6 +2,7 @@ package org.codedefenders;
 
 import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 
+import org.codedefenders.singleplayer.AIPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,6 +33,8 @@ public class Game {
 	private Level level;
 
 	private Mode mode;
+
+	protected AIPlayer ai;
 
 	public enum Role { ATTACKER, DEFENDER };
 	public enum State { CREATED, ACTIVE, FINISHED };
