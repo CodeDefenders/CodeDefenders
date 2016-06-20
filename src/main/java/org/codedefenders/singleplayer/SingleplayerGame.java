@@ -21,11 +21,9 @@ public class SingleplayerGame extends Game {
 			setDefenderId(1);
 		} else {
 			aiRole = Game.Role.ATTACKER;
-			setAttackerId(1);
+			setAttackerId(1); //Potentially inefficient?
 		}
-
-		//Finally, set game as active, don't need to wait for another player.
-		setState(Game.State.ACTIVE);
+		setMode(Mode.SINGLE); //Set singleplayer mode.
 
 		//TODO: Remove next line, forces difficulty to HARD.
 		setLevel(Game.Level.HARD);
@@ -80,6 +78,7 @@ public class SingleplayerGame extends Game {
 			//Run all generated tests for class.
 
 			//Print something to show this block executes
+			System.out.println("IT LIVES");
 		} else {
 			//Use easy difficulty - implementation not yet decided.
 		}

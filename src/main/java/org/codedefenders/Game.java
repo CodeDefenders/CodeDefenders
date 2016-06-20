@@ -315,8 +315,8 @@ public class Game {
 				sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
 						currentRound, finalRound, activeRole, state.name(), level.name(), id);
 			else
-				sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
-						attackerId, defenderId, currentRound, finalRound, activeRole, state.name(), level.name(), id);
+				sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s', Mode='%s' WHERE Game_ID='%d'",
+						attackerId, defenderId, currentRound, finalRound, activeRole, state.name(), level.name(), mode.name(), id);
 			stmt.execute(sql);
 			return true;
 
