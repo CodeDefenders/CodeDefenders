@@ -63,6 +63,7 @@ public class GameSelectionManager extends HttpServlet {
 						nGame.insert();
 						nGame.setState(Game.State.ACTIVE);
 						nGame.update();
+						nGame.tryFirstTurn();
 					} else {
 						// Create the game with supplied parameters and insert it in the database.
 						Game nGame = new Game(classId, uid, rounds, role, level);

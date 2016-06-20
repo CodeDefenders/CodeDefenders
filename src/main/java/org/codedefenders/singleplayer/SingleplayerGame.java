@@ -12,7 +12,6 @@ public class SingleplayerGame extends Game {
 
 	public SingleplayerGame (int classId, int userId, int maxRounds, Role role, Level level) {
 		super(classId, userId, maxRounds, role, level);
-		setMode(Mode.SINGLE); //Singleplayer
 
 		//Set ai's role
 		if(role.equals(Game.Role.ATTACKER)) {
@@ -26,6 +25,15 @@ public class SingleplayerGame extends Game {
 
 		//TODO: Remove next line, forces difficulty to HARD.
 		setLevel(Game.Level.HARD);
+	}
+
+	/**
+	 * Make the first turn if AI is an attacker.
+	 */
+	public void tryFirstTurn() {
+		if(ai.role.equals(Role.ATTACKER)) {
+			ai.makeTurn();
+		}
 	}
 
 }

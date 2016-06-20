@@ -2,6 +2,8 @@ package org.codedefenders;
 
 import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 
+import org.codedefenders.singleplayer.AIAttacker;
+import org.codedefenders.singleplayer.AIDefender;
 import org.codedefenders.singleplayer.AIPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +36,7 @@ public class Game {
 
 	private Mode mode;
 
-	protected AIPlayer ai;
+	protected AIPlayer ai = null;
 
 	public enum Role { ATTACKER, DEFENDER };
 	public enum State { CREATED, ACTIVE, FINISHED };
@@ -71,6 +73,11 @@ public class Game {
 		this.state = state;
 		this.level = level;
 		this.mode = mode;
+
+		//Set AI if it exists.
+		if(attackerId == 1) { ai = new AIAttacker(this); }
+		if(defenderId == 1) { ai = new AIDefender(this); }
+
 	}
 
 	public int getId() {
@@ -237,6 +244,10 @@ public class Game {
 		} else {
 			activeRole = Role.ATTACKER;
 			endRound();
+		}
+		if(ai != null) {
+			//Make the ai's turn if it exists.
+			ai.makeTurn();
 		}
 	}
 

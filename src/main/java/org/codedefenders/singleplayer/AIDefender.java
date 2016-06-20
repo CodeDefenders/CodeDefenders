@@ -14,7 +14,5 @@ public class AIDefender extends AIPlayer{
 	public void turnHard() {
 		//Run all generated tests for class.
 
-		//Print something to show this block executes
-		System.out.println("IT LIVES");
 	}
 }

@@ -15,24 +15,29 @@ public class AIPlayer {
 		game = g;
 	}
 
+	/**
+	 * Make the AI's turn if it is its turn.
+	 */
 	public void makeTurn() {
-		switch (game.getLevel()) {
-			case EASY: turnEasy(); break;
-			case MEDIUM: turnMedium(); break;
-			case HARD: turnHard(); break;
-			default: turnHard(); break;
-		}
+		if (game.getActiveRole().equals(role)) {
+			switch (game.getLevel()) {
+				case EASY: turnEasy(); break;
+				case MEDIUM: turnMedium(); break;
+				case HARD: turnHard(); break;
+				default: turnHard(); break;
+			}
 
-		game.endTurn();
+			game.endTurn();
+		}
 	}
 
 	public void turnEasy() {
-
+		//Override
 	}
 	public void turnMedium() {
-
+		//Override
 	}
 	public void turnHard() {
-
+		//Override
 	}
 }
