@@ -32,8 +32,15 @@ public class GameSelectionManager extends HttpServlet {
 			case "createGame":
 
 				// Get the identifying information required to create a game from the submitted form.
-				//TODO: Handle null class parameter error.
-				int classId = Integer.parseInt(request.getParameter("class"));
+
+				int classId = 0;
+				try {
+					classId = Integer.parseInt(request.getParameter("class"));
+				} catch (NumberFormatException e) {
+					response.sendRedirect("games/create");
+					//TODO: Make an error message appear.
+				}
+
 				int rounds = Integer.parseInt(request.getParameter("rounds"));
 				String modeName = request.getParameter("mode");
 				Game.Role role = request.getParameter("role") == null ? Game.Role.DEFENDER : Game.Role.ATTACKER;
@@ -48,21 +55,24 @@ public class GameSelectionManager extends HttpServlet {
 					default: mode = Game.Mode.SINGLE;
 				}
 
-				if(mode.equals(Game.Mode.SINGLE)) {
-					//Create singleplayer game.
-					SingleplayerGame nGame = new SingleplayerGame(classId, uid, rounds, role, level);
-					nGame.insert();
-					nGame.setState(Game.State.ACTIVE);
-					nGame.update();
-				} else {
-					// Create the game with supplied parameters and insert it in the database.
-					Game nGame = new Game(classId, uid, rounds, role, level);
-					nGame.insert();
+				if (classId != 0) {
+					//Valid class selected.
+					if(mode.equals(Game.Mode.SINGLE)) {
+						//Create singleplayer game.
+						SingleplayerGame nGame = new SingleplayerGame(classId, uid, rounds, role, level);
+						nGame.insert();
+						nGame.setState(Game.State.ACTIVE);
+						nGame.update();
+					} else {
+						// Create the game with supplied parameters and insert it in the database.
+						Game nGame = new Game(classId, uid, rounds, role, level);
+						nGame.insert();
+					}
+
+
+					// Redirect to the game selection menu.
+					response.sendRedirect("games");
 				}
-
-
-				// Redirect to the game selection menu.
-				response.sendRedirect("games");
 
 				break;
 
