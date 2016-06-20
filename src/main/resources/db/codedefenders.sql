@@ -27,8 +27,6 @@ CREATE TABLE `classes` (
   `Name` varchar(255) NOT NULL,
   `JavaFile` varchar(255) NOT NULL,
   `ClassFile` varchar(255) NOT NULL,
-  `MutantsReady` tinyint(1) NOT NULL,
-  `TestsReady` tinyint(1) NOT NULL,
   PRIMARY KEY (`Class_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -160,3 +158,5 @@ CREATE TABLE `users` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2015-12-04 15:54:48
+
+INSERT INTO `users` VALUES (1, 'AI', 'DUMMY_INACCESSIBLE');

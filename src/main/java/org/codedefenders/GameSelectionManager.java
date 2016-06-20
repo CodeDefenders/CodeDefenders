@@ -32,6 +32,7 @@ public class GameSelectionManager extends HttpServlet {
 			case "createGame":
 
 				// Get the identifying information required to create a game from the submitted form.
+				//TODO: Handle null class parameter error.
 				int classId = Integer.parseInt(request.getParameter("class"));
 				int rounds = Integer.parseInt(request.getParameter("rounds"));
 				String modeName = request.getParameter("mode");
@@ -51,6 +52,8 @@ public class GameSelectionManager extends HttpServlet {
 					//Create singleplayer game.
 					SingleplayerGame nGame = new SingleplayerGame(classId, uid, rounds, role, level);
 					nGame.insert();
+					nGame.setState(Game.State.ACTIVE);
+					nGame.update();
 				} else {
 					// Create the game with supplied parameters and insert it in the database.
 					Game nGame = new Game(classId, uid, rounds, role, level);

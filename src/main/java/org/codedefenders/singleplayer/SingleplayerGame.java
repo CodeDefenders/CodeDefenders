@@ -18,8 +18,10 @@ public class SingleplayerGame extends Game {
 		//Set ai's role
 		if(playerRole.equals(Game.Role.ATTACKER)) {
 			aiRole = Game.Role.DEFENDER;
+			setDefenderId(1);
 		} else {
 			aiRole = Game.Role.ATTACKER;
+			setAttackerId(1);
 		}
 
 		//Finally, set game as active, don't need to wait for another player.
@@ -76,6 +78,8 @@ public class SingleplayerGame extends Game {
 		if(getLevel().equals(Level.HARD)) {
 			//Use harder difficulty.
 			//Run all generated tests for class.
+
+			//Print something to show this block executes
 		} else {
 			//Use easy difficulty - implementation not yet decided.
 		}
