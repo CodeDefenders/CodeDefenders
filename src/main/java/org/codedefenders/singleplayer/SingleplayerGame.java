@@ -16,10 +16,10 @@ public class SingleplayerGame extends Game {
 		//Set ai's role
 		if(role.equals(Game.Role.ATTACKER)) {
 			setDefenderId(1);
-			ai = new AIDefender(this);
+			ai = new AiDefender(this);
 		} else {
 			setAttackerId(1); //Potentially inefficient?
-			ai = new AIAttacker(this);
+			ai = new AiAttacker(this);
 		}
 		setMode(Mode.SINGLE); //Set singleplayer mode.
 

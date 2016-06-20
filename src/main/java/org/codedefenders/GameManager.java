@@ -266,6 +266,22 @@ public class GameManager extends HttpServlet {
 		response.sendRedirect("play");//doGet(request, response);
 	}
 
+	public void submitAiTestFullSuite(Game g) {
+		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", g.getClassId());
+		String cBaseName = classUnderTest.getBaseName();
+
+		String dir = getServletContext().getRealPath(AI_DIR + FILE_SEPARATOR +
+				"tests" + cBaseName);
+
+		String jFile = dir + FILE_SEPARATOR + cBaseName + "EvoSuiteTest" + JAVA_SOURCE_EXT;
+		String cFile = dir + FILE_SEPARATOR + cBaseName + "EvoSuiteTest" + JAVA_CLASS_EXT;
+		// Check the test actually passes when applied to the original code.
+		Test newTest = new Test(g.getId(), jFile, cFile, 1);
+		newTest.insert();
+
+		MutationTester.runTestOnAllMutants(getServletContext(), g, newTest, new ArrayList<String>());
+	}
+
 	// Writes text as a Mutant to the appropriate place in the file system.
 	public Mutant createMutant(int gid, int cid, String mutantText, int ownerId) throws IOException {
 

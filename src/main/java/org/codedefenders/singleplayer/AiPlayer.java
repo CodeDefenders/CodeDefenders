@@ -5,13 +5,12 @@ import org.codedefenders.Game;
 /**
  * Created by midcode on 20/06/16.
  */
-public class AIPlayer {
+public class AiPlayer {
 
-	private Game game;
-
+	protected Game game;
 	protected Game.Role role;
 
-	public AIPlayer(Game g) {
+	public AiPlayer(Game g) {
 		game = g;
 	}
 
