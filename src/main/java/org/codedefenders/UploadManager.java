@@ -61,7 +61,7 @@ public class UploadManager extends HttpServlet {
 						System.out.println("Uploading new CUT: " + fileName);
 
 						InputStream fileContent = item.getInputStream();
-						File targetFile = new File(getServletContext().getRealPath(Constants.CUTS_DIR + Constants.F_SEP + fileName));
+						File targetFile = new File(Constants.CUTS_DIR + Constants.F_SEP + fileName);
 						if (targetFile.exists()) {
 							messages.add("A class with the same name already exists, please try with a different one.");
 							response.sendRedirect(request.getHeader("referer"));
