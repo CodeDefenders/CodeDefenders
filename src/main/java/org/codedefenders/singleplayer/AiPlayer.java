@@ -3,7 +3,8 @@ package org.codedefenders.singleplayer;
 import org.codedefenders.Game;
 
 /**
- * Created by midcode on 20/06/16.
+ * @author Ben Clegg
+ * Base class for AI players.
  */
 public class AiPlayer {
 

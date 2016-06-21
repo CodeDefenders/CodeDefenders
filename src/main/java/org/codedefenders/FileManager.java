@@ -8,7 +8,7 @@ import static org.codedefenders.Constants.JAVA_SOURCE_EXT;
 import static org.codedefenders.Constants.TEST_PREFIX;
 
 /**
- * Created by midcode on 21/06/16.
+ * Some utility functions for files.
  */
 public class FileManager {
 

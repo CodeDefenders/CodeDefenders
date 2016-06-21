@@ -3,7 +3,7 @@ package org.codedefenders.singleplayer;
 import org.codedefenders.Game;
 
 /**
- * Created by midcode on 15/06/16.
+ * @author Ben Clegg
  * Set up a singleplayer game.
  * Logic still handled by Game class.
  */
@@ -22,9 +22,6 @@ public class SingleplayerGame extends Game {
 			ai = new AiAttacker(this);
 		}
 		setMode(Mode.SINGLE); //Set singleplayer mode.
-
-		//TODO: Remove next line, forces difficulty to HARD.
-		setLevel(Game.Level.HARD);
 	}
 
 	/**

@@ -10,9 +10,6 @@ import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static org.codedefenders.Constants.AI_DIR;
-import static org.codedefenders.Constants.FILE_SEPARATOR;
-
 public class GameSelectionManager extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
