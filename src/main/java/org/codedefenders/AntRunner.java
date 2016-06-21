@@ -125,14 +125,13 @@ public class AntRunner {
 
 	/**
 	 * Compiles mutant
-	 * @param context
 	 * @param dir
 	 * @param jFile
 	 * @param gameID
 	 * @param classMutated
 	 * @return A {@link Mutant} object
 	 */
-	public static Mutant compileMutant(ServletContext context, File dir, String jFile, int gameID, GameClass classMutated, int ownerId) {
+	public static Mutant compileMutant(File dir, String jFile, int gameID, GameClass classMutated, int ownerId) {
 		//public static int compileMutant(ServletContext context, Mutant m2) {
 
 		// Gets the classname for the mutant from the game it is in
@@ -156,7 +155,7 @@ public class AntRunner {
 		} else {
 			// The mutant failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
-			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(context.getRealPath(Constants.DATA_DIR), "");
+			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(Constants.DATA_DIR, "");
 			newMutant = new Mutant(gameID, jFile, null, false, ownerId);
 			newMutant.insert();
 			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "FAIL", message);

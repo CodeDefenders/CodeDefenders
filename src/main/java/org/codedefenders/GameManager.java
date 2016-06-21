@@ -307,7 +307,7 @@ public class GameManager extends HttpServlet {
 			return null;
 
 		// Setup folder the files will go in
-		File newMutantDir = FileManager.getNextSubDir(getServletContext().getRealPath(Constants.MUTANTS_DIR + F_SEP + gid));
+		File newMutantDir = FileManager.getNextSubDir(Constants.MUTANTS_DIR + F_SEP + gid);
 
 		System.out.println("NewMutantDir: " + newMutantDir.getAbsolutePath());
 		System.out.println("Class Mutated: " + classMutated.getName() + "(basename: " + classMutatedBaseName +")");
@@ -321,7 +321,7 @@ public class GameManager extends HttpServlet {
 		bw.close();
 
 		// Compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
-		return AntRunner.compileMutant(getServletContext(), newMutantDir, mutantFileName, gid, classMutated, ownerId);
+		return AntRunner.compileMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
 	}
 
 
