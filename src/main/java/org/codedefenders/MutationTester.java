@@ -20,11 +20,11 @@ public class MutationTester {
 	// Inputs: The ID of the game to run mutation tests for
 	// Outputs: None
 
-	public static void runTestOnAllMutants(ServletContext context, Game game, Test test, ArrayList<String> messages) {
+	public static void runTestOnAllMutants(Game game, Test test, ArrayList<String> messages) {
 		int killed = 0;
 		ArrayList<Mutant> mutants = game.getAliveMutants();
 		for (Mutant mutant : mutants) {
-			killed += testVsMutant(context, test, mutant) ? 1 : 0;
+			killed += testVsMutant(test, mutant) ? 1 : 0;
 		}
 		if (killed == 0)
 			if (mutants.size() == 0)
@@ -44,11 +44,11 @@ public class MutationTester {
 		}
 	}
 
-	public static void runAllTestsOnMutant(ServletContext context, Game game, Mutant mutant, ArrayList<String> messages) {
+	public static void runAllTestsOnMutant(Game game, Mutant mutant, ArrayList<String> messages) {
 		ArrayList<Test> tests = game.getExecutableTests();
 		for (Test test : tests) {
 			// If this mutant/test pairing hasnt been run before and the test might kill the mutant
-			if (testVsMutant(context, test, mutant)) {
+			if (testVsMutant(test, mutant)) {
 				messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
 				return;
 			}
@@ -63,15 +63,14 @@ public class MutationTester {
 
 	/**
 	 * Returns {@code true} iff {@code test} kills {@code mutant}.
-	 * @param context
 	 * @param test
 	 * @param mutant
 	 * @return
 	 */
-	private static boolean testVsMutant(ServletContext context, Test test, Mutant mutant) {
+	private static boolean testVsMutant(Test test, Mutant mutant) {
 		if (DatabaseAccess.getTargetExecutionForPair(test.getId(), mutant.getId()) == null) {
 			// Run the test against the mutant and get the result
-			TargetExecution executedTarget = AntRunner.testMutant(context, mutant, test);
+			TargetExecution executedTarget = AntRunner.testMutant(mutant, test);
 
 			// If the test did NOT pass, the mutant was detected and should be killed.
 			if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
@@ -90,12 +89,12 @@ public class MutationTester {
 	// Inputs: Attacker created test and a mutant to run it on
 	// Outputs: None
 
-	public static void runEquivalenceTest(ServletContext context, Test test, Mutant mutant) {
+	public static void runEquivalenceTest(Test test, Mutant mutant) {
 		logger.info("Running equivalence test.");
 		// The test created is new and was made by the attacker (there is no need to check if the mutant/test pairing has been run already)
 
 		// As a result of this test, either the test the attacker has written kills the mutant or doesnt.
-		TargetExecution executedTarget = AntRunner.testMutant(context, mutant, test);
+		TargetExecution executedTarget = AntRunner.testMutant(mutant, test);
 
 		if (executedTarget.status.equals("ERROR") || executedTarget.status.equals("FAIL")) {
 			// If the test did NOT pass, the mutant was detected and is proven to be non-equivalent
