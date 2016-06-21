@@ -112,39 +112,6 @@ public class UnitTesting extends HttpServlet {
 		response.sendRedirect("utesting");
 	}
 
-	public File getNextSubDir(String path) {
-		File folder = new File(path);
-		folder.mkdirs();
-		String[] directories = folder.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File current, String name) {
-				return new File(current, name).isDirectory() && (isParsable(name));
-			}
-		});
-		Arrays.sort(directories);
-		String newPath;
-		if (directories.length == 0)
-			newPath = folder.getAbsolutePath() + F_SEP + "1";
-		else {
-			File lastDir = new File(directories[directories.length - 1]);
-			int newIndex = Integer.parseInt(lastDir.getName()) + 1;
-			newPath = path + F_SEP + newIndex;
-		}
-		File newDir = new File(newPath);
-		newDir.mkdirs();
-		return newDir;
-	}
-
-	public static boolean isParsable(String input){
-		boolean parsable = true;
-		try{
-			Integer.parseInt(input);
-		}catch(NumberFormatException e){
-			parsable = false;
-		}
-		return parsable;
-	}
-
 	/**
 	 *
 	 * @param gid
@@ -158,9 +125,9 @@ public class UnitTesting extends HttpServlet {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		File newTestDir = getNextSubDir(getServletContext().getRealPath(TESTS_DIR + F_SEP + gid));
+		File newTestDir = FileManager.getNextSubDir(getServletContext().getRealPath(TESTS_DIR + F_SEP + gid));
 
-		String javaFile = createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
+		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
 		if (! validTestCode(javaFile)) {
 			return null;
@@ -174,16 +141,6 @@ public class UnitTesting extends HttpServlet {
 			AntRunner.testOriginal(newTestDir, newTest);
 		}
 		return newTest;
-	}
-
-	private String createJavaFile(File dir, String classBaseName, String testCode) throws IOException {
-		String javaFile = dir.getAbsolutePath() + F_SEP + TEST_PREFIX + classBaseName + JAVA_SOURCE_EXT;
-		File testFile = new File(javaFile);
-		FileWriter testWriter = new FileWriter(testFile);
-		BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);
-		bufferedTestWriter.write(testCode);
-		bufferedTestWriter.close();
-		return javaFile;
 	}
 
 	private boolean validTestCode(String javaFile) throws IOException {
