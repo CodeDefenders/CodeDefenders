@@ -229,27 +229,19 @@ public class AntRunner {
 	}
 
 	/**
-	 * Compiles generated mutants
-	 * @param className
+	 * Runs a specific Ant target in the build.xml file
+	 *
+	 * @param target An Ant target
+	 * @param mutantFile
+	 * @param testFile
+	 * @param className Class
+	 * @param testClassName
+	 * @return String Array of length 4
+	 * [0] : Input Stream for the process
+	 * [1] : Error Stream for the process
+	 * [2] : Any exceptions from running the process
+	 * [3] : Message indicating which target was run, and with which files
 	 */
-	public static void compileGenMutants(final String className) {
-		String[] resultArray = runAntTarget("compile-gen-mutants", null, null, className, null);
-	}
-
-		/**
-		 * Runs a specific Ant target in the build.xml file
-		 *
-		 * @param target An Ant target
-		 * @param mutantFile
-		 * @param testFile
-		 * @param className Class
-		 * @param testClassName
-		 * @return String Array of length 4
-		 * [0] : Input Stream for the process
-		 * [1] : Error Stream for the process
-		 * [2] : Any exceptions from running the process
-		 * [3] : Message indicating which target was run, and with which files
-		 */
 	private static String[] runAntTarget(String target, String mutantFile, String testFile, String className, String testClassName) {
 		String[] resultArray = new String[4];
 		String isLog = "";

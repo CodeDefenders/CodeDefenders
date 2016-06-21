@@ -94,16 +94,6 @@
 		<move file="${codedef.home}/mutants.log" tofile="${ai.mutants.dir}/${classname.only}.log"/>
 	</target>
 
-	<target name="compile-gen-mutants" description="compile generated mutants">
-		<javac sourcepath=""
-			   srcdir="${ai.mutants.dir}/${classname.only}"
-			   destdir="${ai.mutants.dir}/${classname.only}"
-			   target="1.7" source="1.7" classpathref="test.cp"
-			   includeantruntime="false">
-			<include name="**/*.java"/>
-		</javac>
-	</target>
-
 	<target name="test-gen-cut" description="generate unit tests from class using evosuite">
 		<java jar="${evosuite.home}/evosuite.jar" fork="true">
 			<arg line="-base_dir ${codedef.home}/"/>

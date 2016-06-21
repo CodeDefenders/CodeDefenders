@@ -80,15 +80,12 @@ public class UploadManager extends HttpServlet {
 							CtClass cc = classPool.makeClass(new FileInputStream(new File(classFileName)));
 							String fullyQualifiedName = cc.getName();
 
-							//TODO: Process class here. Use multithreading?
 							//Generate tests.
 							AntRunner.generateTestsFromCUT(fileName);
 							//Compile tests.
 							AntRunner.compileGenTestSuite(fileName);
 							//Generate mutant classes. Note that this overwrites original compiled class
 							AntRunner.generateMutantsFromCUT(fileName);
-							//Compile mutant classes.
-							//TODO: Fix AntRunner.compileGenMutants(getServletContext(), fileName);
 
 							//Run tests on mutants to determine potential equivalents.
 
