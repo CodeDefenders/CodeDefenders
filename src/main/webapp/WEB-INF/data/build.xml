@@ -13,17 +13,19 @@
 
 	<property name="policyfile" location="security.policy" />
 	<property name="mutOp" value=":ALL"/>
-	<property name="major.home" value="/var/lib/major"/>
-	<property name="evosuite.home" value="/var/lib/evosuite"/>
+	<property name="codedef.home" value="/var/lib/codedefenders"/>
+	<property name="major.home" value="${codedef.home}/major"/>
+	<property name="evosuite.home" value="${codedef.home}/evosuite"/>
 
 	<!-- Get classname minus .java extension -->
 	<basename property="classname.only" file="${classname}" suffix=".java"/>
-	<property name="gen.tests.dir" value="${basedir}/ai/tests"/>
-	<property name="gen.mutants.dir" value="${basedir}/ai/mutants"/>
+	<property name="cuts.dir" value="${codedef.home}/sources"/>
+	<property name="ai.tests.dir" value="${codedef.home}/ai/tests"/>
+	<property name="ai.mutants.dir" value="${codedef.home}/ai/mutants"/>
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-cut" description="compile a class under test">
-		<javac srcdir="${src.dir}" destdir="${src.dir}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" listfiles="yes" fork="yes">
+		<javac srcdir="${cuts.dir}" destdir="${cuts.dir}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" listfiles="yes" fork="yes">
 			<include name="${classname}" />
 		</javac>
 	</target>
@@ -84,15 +86,15 @@
 		<exec executable="${major.home}/bin/javac">
 			<arg value="-XMutator${mutOp}"/>
 			<arg value="-J-Dmajor.export.mutants=true"/>
-			<arg value="-J-Dmajor.export.directory=${basedir}/ai/mutants/${classname.only}"/>
-			<arg value="${src.dir}/${classname}"/>
+			<arg value="-J-Dmajor.export.directory=${ai.mutants.dir}/${classname.only}"/>
+			<arg value="${cuts.dir}/${classname}"/>
 		</exec>
 	</target>
 
 	<target name="compile-gen-mutants" description="compile generated mutants">
 		<javac sourcepath=""
-			   srcdir="${gen.mutants.dir}/${classname.only}"
-			   destdir="${gen.mutants.dir}/${classname.only}"
+			   srcdir="${ai.mutants.dir}/${classname.only}"
+			   destdir="${ai.mutants.dir}/${classname.only}"
 			   target="1.7" source="1.7" classpathref="test.cp"
 			   includeantruntime="false">
 			<include name="**/*.java"/>
@@ -100,10 +102,8 @@
 	</target>
 
 	<target name="test-gen-cut" description="generate unit tests from class using evosuite">
-		<echo message="src dir: ${src.dir}"/>
-		<echo message="base dir: ${basedir}"/>
 		<java jar="${evosuite.home}/evosuite.jar" fork="true">
-			<arg line="-base_dir ${basedir}/"/>
+			<arg line="-base_dir ${codedef.home}/"/>
 			<arg line="-target sources/"/> <!-- directory of CUT -->
 			<arg line="-class ${classname.only}"/> <!-- CUT name, without extension -->
 			<arg line="-Dtest_dir ai/tests/${classname.only}"/> <!-- Location to store result classes. -->
@@ -114,7 +114,7 @@
 	</target>
 
 	<target name="compile-gen-tests" description="compile a generated test suite">
-		<javac srcdir="${gen.tests.dir}/${classname.only}" destdir="${gen.tests.dir}/${classname.only}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false"/>
+		<javac srcdir="${ai.tests.dir}/${classname.only}" destdir="${ai.tests.dir}/${classname.only}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false"/>
 	</target>
 
 
