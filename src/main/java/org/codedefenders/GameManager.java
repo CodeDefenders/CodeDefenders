@@ -267,17 +267,19 @@ public class GameManager extends HttpServlet {
 	}
 
 	public void submitAiTestFullSuite(Game g) {
+		//Get class being tested.
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", g.getClassId());
 		String cBaseName = classUnderTest.getBaseName();
 
+		//Get test suite location.
 		String dir = AI_DIR + F_SEP + "tests" + F_SEP + cBaseName;
-
 		String jFile = dir + F_SEP + cBaseName + "EvoSuiteTest" + JAVA_SOURCE_EXT;
 		String cFile = dir + F_SEP + cBaseName + "EvoSuiteTest" + JAVA_CLASS_EXT;
 		// Check the test actually passes when applied to the original code.
 		Test newTest = new Test(g.getId(), jFile, cFile, 1);
 		newTest.insert();
 
+		//Run the tests on existing mutants.
 		MutationTester.runTestOnAllMutants(g, newTest, new ArrayList<String>());
 	}
 

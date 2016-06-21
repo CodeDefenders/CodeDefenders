@@ -19,7 +19,7 @@ public class AiDefender extends AiPlayer {
 		if(game.getTests().isEmpty()) {
 			//Add test suite to game if it isn't present.
 			GameManager gm = new GameManager();
-			gm.submitAiTestFullSuite(game); //TODO: Find solution to passing ServletContext.
+			gm.submitAiTestFullSuite(game);
 		}
 		//Do nothing else, test is automatically re-run on new mutants by GameManager.
 		//TODO: Add equivalence check.
