@@ -132,7 +132,7 @@ public class GameManager extends HttpServlet {
 							System.out.println(TEST_PASSED_ON_CUT_MESSAGE);
 							if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
 								// Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
-								MutationTester.runEquivalenceTest(getServletContext(), newTest, mutant);
+								MutationTester.runEquivalenceTest(newTest, mutant);
 								activeGame.endRound();
 								activeGame.update();
 								Mutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
@@ -212,7 +212,7 @@ public class GameManager extends HttpServlet {
 					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 					if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
 						messages.add(MUTANT_COMPILED_MESSAGE);
-						MutationTester.runAllTestsOnMutant(getServletContext(), activeGame, newMutant, messages);
+						MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
 						activeGame.endTurn();
 						activeGame.update();
 					} else {
@@ -247,7 +247,7 @@ public class GameManager extends HttpServlet {
 					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 					if (testOriginalTarget.status.equals("SUCCESS")) {
 						messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-						MutationTester.runTestOnAllMutants(getServletContext(), activeGame, newTest, messages);
+						MutationTester.runTestOnAllMutants(activeGame, newTest, messages);
 						activeGame.endTurn();
 						activeGame.update();
 					} else {
@@ -270,16 +270,15 @@ public class GameManager extends HttpServlet {
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", g.getClassId());
 		String cBaseName = classUnderTest.getBaseName();
 
-		String dir = getServletContext().getRealPath(AI_DIR + FILE_SEPARATOR +
-				"tests" + cBaseName);
+		String dir = AI_DIR + F_SEP + "tests" + F_SEP + cBaseName;
 
-		String jFile = dir + FILE_SEPARATOR + cBaseName + "EvoSuiteTest" + JAVA_SOURCE_EXT;
-		String cFile = dir + FILE_SEPARATOR + cBaseName + "EvoSuiteTest" + JAVA_CLASS_EXT;
+		String jFile = dir + F_SEP + cBaseName + "EvoSuiteTest" + JAVA_SOURCE_EXT;
+		String cFile = dir + F_SEP + cBaseName + "EvoSuiteTest" + JAVA_CLASS_EXT;
 		// Check the test actually passes when applied to the original code.
 		Test newTest = new Test(g.getId(), jFile, cFile, 1);
 		newTest.insert();
 
-		MutationTester.runTestOnAllMutants(getServletContext(), g, newTest, new ArrayList<String>());
+		MutationTester.runTestOnAllMutants(g, newTest, new ArrayList<String>());
 	}
 
 	// Writes text as a Mutant to the appropriate place in the file system.
@@ -306,13 +305,13 @@ public class GameManager extends HttpServlet {
 			return null;
 
 		// Setup folder the files will go in
-		File newMutantDir = getNextSubDir(getServletContext().getRealPath(Constants.MUTANTS_DIR + FILE_SEPARATOR + gid));
+		File newMutantDir = getNextSubDir(getServletContext().getRealPath(Constants.MUTANTS_DIR + F_SEP + gid));
 
 		System.out.println("NewMutantDir: " + newMutantDir.getAbsolutePath());
 		System.out.println("Class Mutated: " + classMutated.getName() + "(basename: " + classMutatedBaseName +")");
 
 		// Write the Mutant String into a java file
-		String mutantFileName = newMutantDir + FILE_SEPARATOR + classMutatedBaseName + JAVA_SOURCE_EXT;
+		String mutantFileName = newMutantDir + F_SEP + classMutatedBaseName + JAVA_SOURCE_EXT;
 		File mutantFile = new File(mutantFileName);
 		FileWriter fw = new FileWriter(mutantFile);
 		BufferedWriter bw = new BufferedWriter(fw);
@@ -335,11 +334,11 @@ public class GameManager extends HttpServlet {
 		Arrays.sort(directories);
 		String newPath;
 		if (directories.length == 0)
-			newPath = folder.getAbsolutePath() + FILE_SEPARATOR + "1";
+			newPath = folder.getAbsolutePath() + F_SEP + "1";
 		else {
 			File lastDir = new File(directories[directories.length - 1]);
 			int newIndex = Integer.parseInt(lastDir.getName()) + 1;
-			newPath = path + FILE_SEPARATOR + newIndex;
+			newPath = path + F_SEP + newIndex;
 		}
 		File newDir = new File(newPath);
 		newDir.mkdirs();
@@ -369,7 +368,7 @@ public class GameManager extends HttpServlet {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		File newTestDir = getNextSubDir(getServletContext().getRealPath(TESTS_DIR + FILE_SEPARATOR + gid));
+		File newTestDir = getNextSubDir(TESTS_DIR + F_SEP + gid);
 
 		String javaFile = createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
@@ -378,17 +377,17 @@ public class GameManager extends HttpServlet {
 		}
 
 		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(getServletContext(), newTestDir, javaFile, gid, classUnderTest, ownerId);
+		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-			AntRunner.testOriginal(getServletContext(), newTestDir, newTest);
+			AntRunner.testOriginal(newTestDir, newTest);
 		}
 		return newTest;
 	}
 
 	private String createJavaFile(File dir, String classBaseName, String testCode) throws IOException {
-		String javaFile = dir.getAbsolutePath() + FILE_SEPARATOR + TEST_PREFIX + classBaseName + JAVA_SOURCE_EXT;
+		String javaFile = dir.getAbsolutePath() + F_SEP + TEST_PREFIX + classBaseName + JAVA_SOURCE_EXT;
 		File testFile = new File(javaFile);
 		FileWriter testWriter = new FileWriter(testFile);
 		BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);

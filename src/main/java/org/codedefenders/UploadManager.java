@@ -61,7 +61,7 @@ public class UploadManager extends HttpServlet {
 						System.out.println("Uploading new CUT: " + fileName);
 
 						InputStream fileContent = item.getInputStream();
-						File targetFile = new File(getServletContext().getRealPath(Constants.CUTS_DIR + Constants.FILE_SEPARATOR + fileName));
+						File targetFile = new File(getServletContext().getRealPath(Constants.CUTS_DIR + Constants.F_SEP + fileName));
 						if (targetFile.exists()) {
 							messages.add("A class with the same name already exists, please try with a different one.");
 							response.sendRedirect(request.getHeader("referer"));
@@ -70,7 +70,7 @@ public class UploadManager extends HttpServlet {
 						FileUtils.copyInputStreamToFile(fileContent, targetFile);
 						String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
 						//Compile original class.
-						String classFileName = AntRunner.compileCUT(getServletContext(), fileName);
+						String classFileName = AntRunner.compileCUT(fileName);
 
 						if (classFileName != null) {
 							String classFileNameDB = DatabaseAccess.addSlashes(classFileName);
@@ -82,11 +82,11 @@ public class UploadManager extends HttpServlet {
 
 							//TODO: Process class here. Use multithreading?
 							//Generate tests.
-							AntRunner.generateTestsFromCUT(getServletContext(), fileName);
+							AntRunner.generateTestsFromCUT(fileName);
 							//Compile tests.
-							AntRunner.compileGenTestSuite(getServletContext(), fileName);
+							AntRunner.compileGenTestSuite(fileName);
 							//Generate mutant classes. Note that this overwrites original compiled class
-							AntRunner.generateMutantsFromCUT(getServletContext(), fileName);
+							AntRunner.generateMutantsFromCUT(fileName);
 							//Compile mutant classes.
 							//TODO: Fix AntRunner.compileGenMutants(getServletContext(), fileName);
 
