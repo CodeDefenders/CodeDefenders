@@ -1,7 +1,15 @@
 package org.codedefenders;
 
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Logger;
 
 import static org.codedefenders.Constants.F_SEP;
 import static org.codedefenders.Constants.JAVA_SOURCE_EXT;
@@ -54,4 +62,19 @@ public class FileManager {
 		}
 		return parsable;
 	}
+
+	public static List<String> readLines(Path path) {
+		List<String> lines = new ArrayList<>();
+		try {
+			if (Files.exists(path))
+				lines = Files.readAllLines(path, StandardCharsets.UTF_8);
+			else
+				System.out.println("File not found {}" + path);
+		} catch (IOException e) {
+			e.printStackTrace();  // TODO handle properly
+		} finally {
+			return lines;
+		}
+	}
+
 }

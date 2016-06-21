@@ -1,6 +1,14 @@
 package org.codedefenders.singleplayer;
 
+import org.codedefenders.FileManager;
 import org.codedefenders.Game;
+
+import java.io.FileReader;
+import java.nio.file.Path;
+import java.util.List;
+import java.io.File;
+
+import static org.codedefenders.Constants.*;
 
 /**
  * @author Ben Clegg
@@ -8,25 +16,64 @@ import org.codedefenders.Game;
  */
 public class AiAttacker extends AiPlayer {
 
-	private int mutantsTotal = 1; //TODO: Find actual mutants total.
-
 	public AiAttacker(Game g) {
 		super(g);
 		role = Game.Role.ATTACKER;
 	}
 
+	private int totalMutants() {
+		return getMutantList().size();
+	}
+
+	private List<String> getMutantList() {
+		String loc = AI_DIR + F_SEP + "mutants" + F_SEP + game.getClassName() + ".log";
+		File f = new File(loc);
+		List<String> l = FileManager.readLines(f.toPath());
+		//TODO: Handle errors.
+		return l;
+	}
+
+	/**
+	 *
+	 * @param mutantNum The mutant to use.
+	 * @return The class after the mutant has been applied.
+	 */
+	private String mutatedCUT(int mutantNum) {
+		//Get the mutant information from the log.
+		String mInfo = getMutantList().get(mutantNum);
+		//Split into each component.
+		String[] splitInfo = mInfo.split(":");
+		/*
+		0 = Mutant's id
+		1 = Name of mutation operator
+		2 = Original operator symbol
+		3 = New operator symbol
+		4 = Full name of mutated method
+		5 = Line number of CUT
+		6 = 'from' |==> 'to'  (<NO-OP> means empty string)
+		 */
+		//Only really need values 5 and 6.
+		//Use replace option?
+	}
+
 	public void turnHard() {
 		//Use only one mutant per round.
 		//Perhaps modify the line with the least test coverage?
+
+		//TODO: Determine by test coverage. Use medium behaviour for now.
+		turnMedium();
 	}
 
 	public void turnMedium() {
 		//Use one randomly selected mutant per round.
+		//Don't reuse mutant.
+		String classCopy = game.getCUT().getAsString();
 	}
 
 	public void turnEasy() {
 		//Use "multiple" mutants per round, up to maximum amount.
 		//Mutants are combined to make a single mutant, which would therefore be easier to detect and kill.
-		double maxNumMutants = Math.floor(mutantsTotal / game.getFinalRound());
+		//Will have to check line number is different if using multiple mutants.
+		double maxNumMutants = Math.floor(totalMutants() / game.getFinalRound());
 	}
 }
