@@ -8,7 +8,7 @@
 	<path id="test.cp">
 		<pathelement path="../lib/junit-4.12.jar"/>
 		<pathelement path="../lib/hamcrest-all-1.3.jar"/>
-		<pathelement path="sources"/>
+		<pathelement path="${codedef.home}/sources"/>
 	</path>
 
 	<property name="policyfile" location="security.policy" />
