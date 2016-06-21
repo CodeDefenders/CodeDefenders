@@ -274,7 +274,7 @@ public class AntRunner {
 
 		String buildFileDir = Constants.DATA_DIR;
 		pb.directory(new File(buildFileDir));
-		pb. redirectErrorStream(true);
+		pb.redirectErrorStream(true);
 
 		System.out.println("Executing Ant Command: " + pb.command().toString());
 		System.out.println("Executing from directory: " + buildFileDir);
