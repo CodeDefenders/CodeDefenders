@@ -14,7 +14,7 @@ public class AiDefender extends AiPlayer {
 		super(g);
 		role = Game.Role.DEFENDER;
 	}
-	public void turnHard() {
+	public boolean turnHard() {
 		//Run all generated tests for class.
 		if(game.getTests().isEmpty()) {
 			//Add test suite to game if it isn't present.
@@ -24,17 +24,20 @@ public class AiDefender extends AiPlayer {
 		//Do nothing else, test is automatically re-run on new mutants by GameManager.
 		//TODO: Add equivalence check.
 		//Call equivalent only if test suite passes on mutant.
+		return true;
 	}
 
-	public void turnMedium() {
+	public boolean turnMedium() {
 		//Choose all tests which cover modified line(s)?
 		//Perhaps just 1 or 2?
 		//Perhaps higher chance of equivalence call? May happen due to weaker testing.
+		return true;
 	}
 
-	public void turnEasy() {
+	public boolean turnEasy() {
 		//Choose a random test which covers the modified line(s)?
 		//Perhaps just a random test?
 		//Perhaps higher chance of equivalence call? May happen due to weaker testing.
+		return true;
 	}
 }

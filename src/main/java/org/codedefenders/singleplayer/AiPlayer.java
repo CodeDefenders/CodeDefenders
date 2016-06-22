@@ -20,24 +20,34 @@ public class AiPlayer {
 	 */
 	public void makeTurn() {
 		if (game.getActiveRole().equals(role)) {
-			switch (game.getLevel()) {
-				case EASY: turnEasy(); break;
-				case MEDIUM: turnMedium(); break;
-				case HARD: turnHard(); break;
-				default: turnHard(); break;
+			for (int i = 0; i < 3; i++) {
+				if (tryTurn()) { break; }
 			}
-
 			game.endTurn();
 		}
 	}
 
-	public void turnEasy() {
-		//Override
+	public boolean tryTurn() {
+		boolean b = false;
+		switch (game.getLevel()) {
+			case EASY: b = turnEasy(); break;
+			case MEDIUM: b = turnMedium(); break;
+			case HARD: b = turnHard(); break;
+			default: b = turnHard(); break;
+		}
+		return b;
 	}
-	public void turnMedium() {
+
+	public boolean turnEasy() {
 		//Override
+		return true;
 	}
-	public void turnHard() {
+	public boolean turnMedium() {
 		//Override
+		return true;
+	}
+	public boolean turnHard() {
+		//Override
+		return true;
 	}
 }

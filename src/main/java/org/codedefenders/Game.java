@@ -250,6 +250,7 @@ public class Game {
 			//Make the ai's turn if it exists.
 			ai.makeTurn();
 		}
+		update();
 	}
 
 	public void endRound() {

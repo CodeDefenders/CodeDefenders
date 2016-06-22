@@ -1,12 +1,15 @@
 package org.codedefenders.singleplayer;
 
-import org.codedefenders.FileManager;
-import org.codedefenders.Game;
+import org.codedefenders.*;
+import sun.misc.Regexp;
 
 import java.io.FileReader;
+import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
+import java.util.regex.Pattern;
 
 import static org.codedefenders.Constants.*;
 
@@ -38,7 +41,7 @@ public class AiAttacker extends AiPlayer {
 	 * @param mutantNum The mutant to use.
 	 * @return The class after the mutant has been applied.
 	 */
-	private String mutatedCUT(int mutantNum) {
+	private MutantPatch getMutantPatch(int mutantNum) {
 		//Get the mutant information from the log.
 		String mInfo = getMutantList().get(mutantNum);
 		//Split into each component.
@@ -54,26 +57,99 @@ public class AiAttacker extends AiPlayer {
 		 */
 		//Only really need values 5 and 6.
 		//Use replace option?
+
+		int lineNum = Integer.parseInt(splitInfo[5]);
+		String[] beforeAfter = splitInfo[6].split(Pattern.quote(" |==> ")); //Before = 0, After = 1
+
+		return new MutantPatch(lineNum, beforeAfter);
 	}
 
-	public void turnHard() {
+	private List<String> doPatch(List<String> lines, MutantPatch patch) {
+		//Copy contents of original lines.
+		List<String> newLines = new ArrayList<String>(lines);
+		String l = newLines.get(patch.getLineNum() - 1);
+		String newLine = l.replaceFirst(patch.getOriginal(), patch.getReplacement().replace("QE", ""));
+		newLines.set(patch.getLineNum() - 1, newLine);
+		return newLines;
+	}
+
+	public boolean turnHard() {
 		//Use only one mutant per round.
 		//Perhaps modify the line with the least test coverage?
 
 		//TODO: Determine by test coverage. Use medium behaviour for now.
-		turnMedium();
+		return turnMedium();
 	}
 
-	public void turnMedium() {
-		//Use one randomly selected mutant per round.
-		//Don't reuse mutant.
-		String classCopy = game.getCUT().getAsString();
+	public boolean turnMedium() {
+		//Use one randomly selected mutant per round, without reusing an old one.
+
+		//Get original lines.
+		File cutFile = new File(game.getCUT().javaFile);
+		List<String> cutLines = FileManager.readLines(cutFile.toPath());
+		//Choose a mutant.
+		//TODO: Don't reuse mutant.
+		int mId = (int)Math.floor(Math.random() * totalMutants());
+		//int mId = 23;
+		//Patch lines with selected mutant.
+		MutantPatch p = getMutantPatch(mId);
+		List<String> newLines = doPatch(cutLines, p);
+		String mText = "";
+		for (String l : newLines) {
+			mText += l + "\n";
+		}
+		GameManager gm = new GameManager();
+		try {
+			//Create mutant and insert it into the database.
+			Mutant m = gm.createMutant(game.getId(), game.getClassId(), mText, 1);
+			if (!m.insert()) {
+				//Try again if inserting fails.
+				return false;
+			}
+			//TODO: More error checking.
+			ArrayList<String> messages = new ArrayList<String>();
+			MutationTester.runAllTestsOnMutant(game, m, messages);
+		} catch (IOException e) {
+			//Try again if an exception.
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
-	public void turnEasy() {
+	public boolean turnEasy() {
 		//Use "multiple" mutants per round, up to maximum amount.
 		//Mutants are combined to make a single mutant, which would therefore be easier to detect and kill.
 		//Will have to check line number is different if using multiple mutants.
 		double maxNumMutants = Math.floor(totalMutants() / game.getFinalRound());
+
+		return true;
 	}
+}
+
+class MutantPatch {
+	private int line;
+	private String original;
+	private String replacement;
+
+	protected MutantPatch(int lineNumber, String[] beforeAfter) {
+		line = lineNumber;
+		original = beforeAfter[0];
+		replacement = beforeAfter[1];
+		if (replacement.matches("<NO-OP>")) {
+			replacement = "";
+			original += ";";
+		}
+	}
+
+	protected int getLineNum() {
+		return line;
+	}
+	protected String getOriginal() {
+		return original;
+	}
+	protected String getReplacement() {
+		return replacement;
+	}
+
 }

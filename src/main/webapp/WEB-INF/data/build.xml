@@ -54,8 +54,6 @@
 				<pathelement location="sources"/>
 				<pathelement location="${test.file}"/>
 				<pathelement path="${test.cp}"/>
-				<pathelement location="../lib/junit-4.12.jar"/>
-				<pathelement location="../lib/hamcrest-all-1.3.jar"/>
 				<pathelement path="sources"/>
 				<pathelement path="${test.file}"/>
 			</classpath>
