@@ -73,6 +73,21 @@ public class AiAttacker extends AiPlayer {
 		return newLines;
 	}
 
+	private String createMutantString(int mutantID) {
+		//Get original lines.
+		File cutFile = new File(game.getCUT().javaFile);
+		List<String> cutLines = FileManager.readLines(cutFile.toPath());
+		//TODO: Don't reuse mutant.
+		//Patch lines with selected mutant.
+		MutantPatch p = getMutantPatch(mutantID);
+		List<String> newLines = doPatch(cutLines, p);
+		String mText = "";
+		for (String l : newLines) {
+			mText += l + "\n";
+		}
+		return mText;
+	}
+
 	public boolean turnHard() {
 		//Use only one mutant per round.
 		//Perhaps modify the line with the least test coverage?
@@ -81,23 +96,16 @@ public class AiAttacker extends AiPlayer {
 		return turnMedium();
 	}
 
+	/**
+	 *
+	 * @return true if mutant generation succeeds.
+	 */
 	public boolean turnMedium() {
 		//Use one randomly selected mutant per round, without reusing an old one.
+		int mId = (int)Math.floor(Math.random() * totalMutants()); //Choose a mutant.
 
-		//Get original lines.
-		File cutFile = new File(game.getCUT().javaFile);
-		List<String> cutLines = FileManager.readLines(cutFile.toPath());
-		//Choose a mutant.
-		//TODO: Don't reuse mutant.
-		int mId = (int)Math.floor(Math.random() * totalMutants());
-		//int mId = 23;
-		//Patch lines with selected mutant.
-		MutantPatch p = getMutantPatch(mId);
-		List<String> newLines = doPatch(cutLines, p);
-		String mText = "";
-		for (String l : newLines) {
-			mText += l + "\n";
-		}
+		String mText = createMutantString(mId); //Create mutant string.
+
 		GameManager gm = new GameManager();
 		try {
 			//Create mutant and insert it into the database.
