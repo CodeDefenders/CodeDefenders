@@ -89,8 +89,6 @@ public class UploadManager extends HttpServlet {
 
 							//Run tests on mutants to determine potential equivalents.
 
-							//May have to recompile original class without major.
-
 
 							// db insert
 							newSUT = new GameClass(fullyQualifiedName, javaFileNameDB, classFileNameDB);
