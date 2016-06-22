@@ -102,10 +102,6 @@ public class AiAttacker extends AiPlayer {
 		try {
 			//Create mutant and insert it into the database.
 			Mutant m = gm.createMutant(game.getId(), game.getClassId(), mText, 1);
-			if (!m.insert()) {
-				//Try again if inserting fails.
-				return false;
-			}
 			//TODO: More error checking.
 			ArrayList<String> messages = new ArrayList<String>();
 			MutationTester.runAllTestsOnMutant(game, m, messages);
