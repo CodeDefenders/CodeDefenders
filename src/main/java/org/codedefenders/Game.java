@@ -39,10 +39,10 @@ public class Game {
 	protected AiPlayer ai = null;
 	protected String aiDir = null;
 
-	public enum Role { ATTACKER, DEFENDER };
-	public enum State { CREATED, ACTIVE, FINISHED };
-	public enum Level { EASY, MEDIUM, HARD };
-	public enum Mode { SINGLE, DUEL, PARTY, UTESTING };
+	public enum Role { ATTACKER, DEFENDER }
+	public enum State { CREATED, ACTIVE, FINISHED }
+	public enum Level { EASY, MEDIUM, HARD }
+	public enum Mode { SINGLE, DUEL, PARTY, UTESTING }
 
 	public Game(int classId, int userId, int maxRounds, Role role, Level level) {
 		this.classId = classId;

@@ -3,11 +3,8 @@ package org.codedefenders.singleplayer;
 import difflib.Patch;
 import difflib.PatchFailedException;
 import org.codedefenders.*;
-import sun.misc.Regexp;
 
-import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
@@ -25,7 +22,8 @@ public class AiAttacker extends AiPlayer {
 		RANDOM, //Randomly select mutant.
 		COVERAGE, //Select random mutant by least covered lines.
 		FIRST //Choose the first mutant, for debugging.
-	};
+	}
+
 	public AiAttacker(Game g) {
 		super(g);
 		role = Game.Role.ATTACKER;
@@ -44,7 +42,7 @@ public class AiAttacker extends AiPlayer {
 	}
 
 	/**
-	 *
+	 * Get information for a given mutant.
 	 * @param mutantNum The mutant to use.
 	 * @return The class after the mutant has been applied.
 	 */
@@ -71,6 +69,12 @@ public class AiAttacker extends AiPlayer {
 		return new MutantPatch(lineNum, beforeAfter);
 	}
 
+	/**
+	 * Modify a list of strings from a class to have a mutant.
+	 * @param lines original class's lines.
+	 * @param patch the mutant's patch information.
+	 * @return the new list of lines.
+	 */
 	private List<String> doPatch(List<String> lines, MutantPatch patch) {
 		//Copy contents of original lines.
 		List<String> newLines = new ArrayList<String>(lines);
@@ -80,8 +84,13 @@ public class AiAttacker extends AiPlayer {
 		return newLines;
 	}
 
+	/**
+	 * Get the text of the full mutated class.
+	 * @param strategy which mutant selection strategy to use.
+	 * @return the mutant's text, or nothing if too many mutants which already exist have been made.
+	 */
 	private String createMutantString(GenerationMethod strategy) {
-		for (int i = 0; i < 5; i++) {
+		for (int i = 0; i < 10; i++) {
 			int mId = 1;
 			if(strategy.equals(GenerationMethod.RANDOM)) {
 				mId = (int)Math.floor(Math.random() * totalMutants()); //Choose a mutant.
@@ -139,17 +148,21 @@ public class AiAttacker extends AiPlayer {
 		return true;
 	}
 
+	/**
+	 * Hard difficulty attacker turn.
+	 * @return true if mutant generation succeeds, or if no non-existing mutants have been found to prevent infinite loop.
+	 */
 	public boolean turnHard() {
 		//Use only one mutant per round.
 		//Perhaps modify the line with the least test coverage?
 
-		//TODO: Determine by test coverage. Using medium behaviour for now.
+		//TODO: Determine by lowest test coverage. Using medium behaviour for now.
 		return turnMedium();
 	}
 
 	/**
-	 *
-	 * @return true if mutant generation succeeds.
+	 * Medium difficulty attacker turn.
+	 * @return true if mutant generation succeeds, or if no non-existing mutants have been found to prevent infinite loop.
 	 */
 	public boolean turnMedium() {
 		//Use one randomly selected mutant per round, without reusing an old one.
@@ -157,6 +170,7 @@ public class AiAttacker extends AiPlayer {
 		if(mText.isEmpty()) {
 			//End the game if all empty strings exist.
 			System.out.println("Attempted mutants exist.");
+			//TODO: Check that this works.
 			game.setState(Game.State.FINISHED);
 			game.update();
 			return true;
@@ -165,6 +179,10 @@ public class AiAttacker extends AiPlayer {
 		return createMutant(mText);
 	}
 
+	/**
+	 * Easy difficulty attacker turn.
+	 * @return true if mutant generation succeeds, or if no non-existing mutants have been found to prevent infinite loop.
+	 */
 	public boolean turnEasy() {
 		//Use "multiple" mutants per round, up to maximum amount.
 		//Mutants are combined to make a single mutant, which would therefore be easier to detect and kill.
@@ -180,6 +198,11 @@ class MutantPatch {
 	private String original;
 	private String replacement;
 
+	/**
+	 * A datatype to represent key mutant information
+	 * @param lineNumber The linenumber which the mutant is applied to
+	 * @param beforeAfter Sub-strings of the mutated line, before and after mutation.
+	 */
 	protected MutantPatch(int lineNumber, String[] beforeAfter) {
 		line = lineNumber;
 		original = beforeAfter[0];
