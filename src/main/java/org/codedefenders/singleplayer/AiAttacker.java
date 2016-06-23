@@ -21,6 +21,11 @@ import static org.codedefenders.Constants.*;
  */
 public class AiAttacker extends AiPlayer {
 
+	private enum GenerationMethod {
+		RANDOM, //Randomly select mutant.
+		COVERAGE, //Select random mutant by least covered lines.
+		FIRST //Choose the first mutant, for debugging.
+	};
 	public AiAttacker(Game g) {
 		super(g);
 		role = Game.Role.ATTACKER;
@@ -75,9 +80,15 @@ public class AiAttacker extends AiPlayer {
 		return newLines;
 	}
 
-	private String createMutantString() {
+	private String createMutantString(GenerationMethod strategy) {
 		for (int i = 0; i < 5; i++) {
-			int mId = (int)Math.floor(Math.random() * totalMutants()); //Choose a mutant.
+			int mId = 1;
+			if(strategy.equals(GenerationMethod.RANDOM)) {
+				mId = (int)Math.floor(Math.random() * totalMutants()); //Choose a mutant.
+			}
+			else if (strategy.equals(GenerationMethod.COVERAGE)) {
+				//Coverage method.
+			}
 			//Get original lines.
 			File cutFile = new File(game.getCUT().javaFile);
 			List<String> cutLines = FileManager.readLines(cutFile.toPath());
@@ -142,7 +153,7 @@ public class AiAttacker extends AiPlayer {
 	 */
 	public boolean turnMedium() {
 		//Use one randomly selected mutant per round, without reusing an old one.
-		String mText = createMutantString(); //Create mutant string.
+		String mText = createMutantString(GenerationMethod.RANDOM); //Create mutant string.
 		if(mText.isEmpty()) {
 			//End the game if all empty strings exist.
 			System.out.println("Attempted mutants exist.");
