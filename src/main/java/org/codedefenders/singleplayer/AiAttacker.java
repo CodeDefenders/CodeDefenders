@@ -1,5 +1,7 @@
 package org.codedefenders.singleplayer;
 
+import difflib.Patch;
+import difflib.PatchFailedException;
 import org.codedefenders.*;
 import sun.misc.Regexp;
 
@@ -73,43 +75,48 @@ public class AiAttacker extends AiPlayer {
 		return newLines;
 	}
 
-	private String createMutantString(int mutantID) {
-		//Get original lines.
-		File cutFile = new File(game.getCUT().javaFile);
-		List<String> cutLines = FileManager.readLines(cutFile.toPath());
-		//TODO: Don't reuse mutant.
-		//Patch lines with selected mutant.
-		MutantPatch p = getMutantPatch(mutantID);
-		List<String> newLines = doPatch(cutLines, p);
-		String mText = "";
-		for (String l : newLines) {
-			mText += l + "\n";
+	private String createMutantString() {
+		for (int i = 0; i < 5; i++) {
+			int mId = (int)Math.floor(Math.random() * totalMutants()); //Choose a mutant.
+			//Get original lines.
+			File cutFile = new File(game.getCUT().javaFile);
+			List<String> cutLines = FileManager.readLines(cutFile.toPath());
+			//TODO: Don't reuse mutant.
+			//Patch lines with selected mutant.
+			MutantPatch p = getMutantPatch(mId);
+			List<String> newLines = doPatch(cutLines, p);
+			String mText = "";
+			if(isUnique(newLines, cutLines)) {
+				for (String l : newLines) {
+					mText += l + "\n";
+				}
+				return mText;
+			}
 		}
-		return mText;
+		return ""; //Return empty string if all attempted mutants already exist.
 	}
 
-	public boolean turnHard() {
-		//Use only one mutant per round.
-		//Perhaps modify the line with the least test coverage?
-
-		//TODO: Determine by test coverage. Use medium behaviour for now.
-		return turnMedium();
+	private boolean isUnique(List<String> patched, List<String> cut) {
+		ArrayList<Mutant> existingMuts = game.getAliveMutants();
+		for (Mutant m : existingMuts) {
+			List<String> original = new ArrayList<String>(cut);
+			Patch p = m.getDifferences();
+			try {
+				if(patched.equals(p.applyTo(original))) {
+					return false;
+				}
+			} catch (PatchFailedException e) {
+				e.printStackTrace();
+			}
+		}
+		return true;
 	}
 
-	/**
-	 *
-	 * @return true if mutant generation succeeds.
-	 */
-	public boolean turnMedium() {
-		//Use one randomly selected mutant per round, without reusing an old one.
-		int mId = (int)Math.floor(Math.random() * totalMutants()); //Choose a mutant.
-
-		String mText = createMutantString(mId); //Create mutant string.
-
+	private boolean createMutant(String mutantText) {
 		GameManager gm = new GameManager();
 		try {
 			//Create mutant and insert it into the database.
-			Mutant m = gm.createMutant(game.getId(), game.getClassId(), mText, 1);
+			Mutant m = gm.createMutant(game.getId(), game.getClassId(), mutantText, 1);
 			//TODO: More error checking.
 			ArrayList<String> messages = new ArrayList<String>();
 			MutationTester.runAllTestsOnMutant(game, m, messages);
@@ -119,6 +126,32 @@ public class AiAttacker extends AiPlayer {
 			return false;
 		}
 		return true;
+	}
+
+	public boolean turnHard() {
+		//Use only one mutant per round.
+		//Perhaps modify the line with the least test coverage?
+
+		//TODO: Determine by test coverage. Using medium behaviour for now.
+		return turnMedium();
+	}
+
+	/**
+	 *
+	 * @return true if mutant generation succeeds.
+	 */
+	public boolean turnMedium() {
+		//Use one randomly selected mutant per round, without reusing an old one.
+		String mText = createMutantString(); //Create mutant string.
+		if(mText.isEmpty()) {
+			//End the game if all empty strings exist.
+			System.out.println("Attempted mutants exist.");
+			game.setState(Game.State.FINISHED);
+			game.update();
+			return true;
+		}
+
+		return createMutant(mText);
 	}
 
 	public boolean turnEasy() {
