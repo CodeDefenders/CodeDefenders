@@ -52,15 +52,18 @@ public class AiDefender extends AiPlayer {
 		if(testText.isEmpty()) {
 			//TODO: Handle empty test.
 		}
-		try {
-			Test t = gm.createTest(game.getId(), game.getClassId(), testText, 1);
-			ArrayList<String> messages = new ArrayList<String>();
-			MutationTester.runTestOnAllMutants(game, t, messages);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
+		else {
+			try {
+				Test t = gm.createTest(game.getId(), game.getClassId(), testText, 1);
+				ArrayList<String> messages = new ArrayList<String>();
+				MutationTester.runTestOnAllMutants(game, t, messages);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 
@@ -88,23 +91,26 @@ public class AiDefender extends AiPlayer {
 		int testCount = -1; //Current test, start at -1 as first test is 0.
 
 		for (String l : suite) {
-			if(l.contains("import ")) {
-				//Add any line with import.
-				t += l + "\n";
-			}
-			if(l.contains("public class ")) {
-				//Class declaration, write it.
-				t += l + "\n";
-			}
-			if(l.contains("public void test")) {
-				//Start of a test.
-				testCount ++;
-				if(testCount == testNumber) {
-					//Test requested. Start tracking braces.
-					brOpen ++;
+			if(testCount != testNumber) {
+				if(l.contains("import ")) {
+					//Add any line with import.
+					t += l + "\n";
+				}
+				else if(l.contains("public class ")) {
+					//Class declaration, write it.
+					t += l + "\n";
+				}
+				else if(l.contains("public void test")) {
+					//Start of a test.
+					testCount ++;
+					if(testCount == testNumber) {
+						//Test requested. Start tracking braces.
+						brOpen ++;
+						t += l + "\n";
+					}
 				}
 			}
-			if(testCount == testNumber) {
+			else {
 				//Write every line and track braces.
 				t += l + "\n";
 				//TODO: Check character escapes.
@@ -117,12 +123,14 @@ public class AiDefender extends AiPlayer {
 						//Every opened bracket has been closed.
 						//Finish off the file.
 						t += "}"; //Close class declaration.
+						System.out.println(t);
 						return t; //Return the string.
 						//No point in wasting CPU time reading rest of file.
 					}
 				}
 			}
 		}
+		System.out.println(t);
 		return "";
 	}
 
