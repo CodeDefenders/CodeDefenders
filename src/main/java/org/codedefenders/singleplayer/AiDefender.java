@@ -47,7 +47,6 @@ public class AiDefender extends AiPlayer {
 		GameManager gm = new GameManager();
 		//TODO: Check
 		int tNum = (int) Math.floor(Math.random() * getNumberOfTests());
-
 		String testText = getTestText(tNum);
 		if(testText.isEmpty()) {
 			//TODO: Handle empty test.
@@ -97,8 +96,8 @@ public class AiDefender extends AiPlayer {
 					t += l + "\n";
 				}
 				else if(l.contains("public class ")) {
-					//Class declaration, write it.
-					t += l + "\n";
+					//Class declaration, write correct one in place.
+					t += "public class Test" + game.getClassName() + " {";
 				}
 				else if(l.contains("public void test")) {
 					//Start of a test.
