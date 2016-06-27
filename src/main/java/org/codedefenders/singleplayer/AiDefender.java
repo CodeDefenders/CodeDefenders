@@ -25,7 +25,12 @@ public class AiDefender extends AiPlayer {
 		if(game.getTests().isEmpty()) {
 			//Add test suite to game if it isn't present.
 			GameManager gm = new GameManager();
-			//gm.submitAiTestFullSuite(game);
+			Test newTest = gm.submitAiTestFullSuite(game);
+			newTest.insert();
+			//Run the tests on existing mutants.
+			MutationTester.runTestOnAllMutants(game, newTest, new ArrayList<String>());
+
+			/*
 			for(int i = 0; i < getNumberOfTests(); i++) {
 				try {
 					makeTestFromSuite(gm, i);
@@ -34,6 +39,7 @@ public class AiDefender extends AiPlayer {
 					return false; //TODO: Correct handling.
 				}
 			}
+			*/
 		}
 		//Do nothing else, test is automatically re-run on new mutants by GameManager.
 		//TODO: Add equivalence check.

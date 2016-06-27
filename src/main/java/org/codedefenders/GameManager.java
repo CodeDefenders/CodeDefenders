@@ -30,6 +30,7 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -266,7 +267,7 @@ public class GameManager extends HttpServlet {
 		response.sendRedirect("play");//doGet(request, response);
 	}
 
-	public void submitAiTestFullSuite(Game g) {
+	public Test submitAiTestFullSuite(Game g) {
 		//Get class being tested.
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", g.getClassId());
 		String cBaseName = classUnderTest.getBaseName();
@@ -275,12 +276,21 @@ public class GameManager extends HttpServlet {
 		String dir = AI_DIR + F_SEP + "tests" + F_SEP + cBaseName;
 		String jFile = dir + F_SEP + cBaseName + "EvoSuiteTest" + JAVA_SOURCE_EXT;
 		String cFile = dir + F_SEP + cBaseName + "EvoSuiteTest" + JAVA_CLASS_EXT;
-		// Check the test actually passes when applied to the original code.
-		Test newTest = new Test(g.getId(), jFile, cFile, 1);
-		newTest.insert();
 
-		//Run the tests on existing mutants.
-		MutationTester.runTestOnAllMutants(g, newTest, new ArrayList<String>());
+		int gid = g.getId();
+		//File newTestDir = FileManager.getNextSubDir(TESTS_DIR + F_SEP + gid);
+		File newTestDir = new File(dir);
+		Test newTest = AntRunner.compileTest(newTestDir, jFile, gid, classUnderTest, 1);
+		//Inefficient, but need to recompile test.
+		//TODO: Add DatabaseAccess function which gets TargetExecution of same test.
+
+		// Check the test actually passes when applied to the original code.
+		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
+			AntRunner.testOriginal(newTestDir, newTest);
+		}
+
+		return newTest;
 	}
 
 	// Writes text as a Mutant to the appropriate place in the file system.
