@@ -29,17 +29,7 @@ public class AiDefender extends AiPlayer {
 			newTest.insert();
 			//Run the tests on existing mutants.
 			MutationTester.runTestOnAllMutants(game, newTest, new ArrayList<String>());
-
-			/*
-			for(int i = 0; i < getNumberOfTests(); i++) {
-				try {
-					makeTestFromSuite(gm, i);
-				} catch (IOException e) {
-					e.printStackTrace();
-					return false; //TODO: Correct handling.
-				}
-			}
-			*/
+			
 		}
 		//Do nothing else, test is automatically re-run on new mutants by GameManager.
 		//TODO: Add equivalence check.
@@ -71,6 +61,7 @@ public class AiDefender extends AiPlayer {
 	}
 
 	private void makeTestFromSuite(GameManager gameManager, int testNum) throws IOException{
+		//TODO: Prevent test re-use.
 		String testText = getTestText(testNum);
 		if(testText.isEmpty()) {
 			//TODO: Handle empty test.
