@@ -25,7 +25,15 @@ public class AiDefender extends AiPlayer {
 		if(game.getTests().isEmpty()) {
 			//Add test suite to game if it isn't present.
 			GameManager gm = new GameManager();
-			gm.submitAiTestFullSuite(game);
+			//gm.submitAiTestFullSuite(game);
+			for(int i = 0; i < getNumberOfTests(); i++) {
+				try {
+					makeTestFromSuite(gm, i);
+				} catch (IOException e) {
+					e.printStackTrace();
+					return false; //TODO: Correct handling.
+				}
+			}
 		}
 		//Do nothing else, test is automatically re-run on new mutants by GameManager.
 		//TODO: Add equivalence check.
@@ -47,22 +55,25 @@ public class AiDefender extends AiPlayer {
 		GameManager gm = new GameManager();
 		//TODO: Check
 		int tNum = (int) Math.floor(Math.random() * getNumberOfTests());
-		String testText = getTestText(tNum);
+		try {
+			makeTestFromSuite(gm, tNum);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	private void makeTestFromSuite(GameManager gameManager, int testNum) throws IOException{
+		String testText = getTestText(testNum);
 		if(testText.isEmpty()) {
 			//TODO: Handle empty test.
 		}
 		else {
-			try {
-				Test t = gm.createTest(game.getId(), game.getClassId(), testText, 1);
-				ArrayList<String> messages = new ArrayList<String>();
-				MutationTester.runTestOnAllMutants(game, t, messages);
-			} catch (IOException e) {
-				e.printStackTrace();
-				return false;
-			}
-			return true;
+			Test t = gameManager.createTest(game.getId(), game.getClassId(), testText, 1);
+			ArrayList<String> messages = new ArrayList<String>();
+			MutationTester.runTestOnAllMutants(game, t, messages);
 		}
-		return false;
 	}
 
 
