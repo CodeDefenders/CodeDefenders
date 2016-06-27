@@ -29,7 +29,11 @@ public class SingleplayerGame extends Game {
 	 */
 	public void tryFirstTurn() {
 		if(ai.role.equals(Role.ATTACKER)) {
+			//If attacker, add mutant and advance turn.
 			ai.makeTurn();
+		} else {
+			//Defender adds tests without advancing turn.
+			ai.tryTurn();
 		}
 	}
 
