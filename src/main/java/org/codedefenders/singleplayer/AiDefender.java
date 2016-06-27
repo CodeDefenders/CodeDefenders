@@ -97,7 +97,7 @@ public class AiDefender extends AiPlayer {
 				}
 				else if(l.contains("public class ")) {
 					//Class declaration, write correct one in place.
-					t += "public class Test" + game.getClassName() + " {";
+					t += "public class Test" + game.getClassName() + " { \n";
 				}
 				else if(l.contains("public void test")) {
 					//Start of a test.
@@ -105,7 +105,9 @@ public class AiDefender extends AiPlayer {
 					if(testCount == testNumber) {
 						//Test requested. Start tracking braces.
 						brOpen ++;
-						t += l + "\n";
+						//t += l + "\n";
+						t += "@Test(timeout = 4000) \n";
+						t += "public void test() throws Throwable { \n";
 					}
 				}
 			}
