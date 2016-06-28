@@ -189,7 +189,7 @@ public class AiAttacker extends AiPlayer {
 		//Will have to check line number is different if using multiple mutants.
 		double maxNumMutants = Math.floor(totalMutants() / game.getFinalRound());
 
-		return true;
+		return turnMedium(); //use medium for now
 	}
 }
 

@@ -195,6 +195,7 @@ public class GameManager extends HttpServlet {
 							mutantClaimed.setEquivalent(Mutant.Equivalence.PROVEN_NO);
 							mutantClaimed.update();
 						}
+						activeGame.endTurn();
 					} else {
 						mutantClaimed.setEquivalent(Mutant.Equivalence.PENDING_TEST);
 						mutantClaimed.update();
