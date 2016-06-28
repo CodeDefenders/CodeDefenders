@@ -218,11 +218,7 @@ public class GameManager extends HttpServlet {
 
 						if(activeGame.getMode().equals(Game.Mode.SINGLE)) {
 							//Singleplayer - check for potential equivalent.
-							if(AntRunner.potentialEquivalent(newMutant)) {
-								//Is potentially equiv - mark as equivalent and update.
-								newMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-								newMutant.update();
-							}
+							equivMutantAuto(newMutant);
 						}
 						activeGame.endTurn();
 						//activeGame.update();
@@ -275,6 +271,14 @@ public class GameManager extends HttpServlet {
 				break;
 		}
 		response.sendRedirect("play");//doGet(request, response);
+	}
+
+	public void equivMutantAuto(Mutant m) {
+		if(AntRunner.potentialEquivalent(m)) {
+			//Is potentially equiv - mark as equivalent and update.
+			m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+			m.update();
+		}
 	}
 
 	public Test submitAiTestFullSuite(Game g) {
