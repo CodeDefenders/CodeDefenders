@@ -29,7 +29,7 @@ public class AiDefender extends AiPlayer {
 			newTest.insert();
 			//Run the tests on existing mutants.
 			MutationTester.runTestOnAllMutants(game, newTest, new ArrayList<String>());
-			
+
 		}
 		//Do nothing else, test is automatically re-run on new mutants by GameManager.
 		//TODO: Add equivalence check.

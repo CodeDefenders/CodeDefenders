@@ -14,6 +14,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
 
+import static org.codedefenders.Constants.AI_DIR;
+import static org.codedefenders.Constants.F_SEP;
 import static org.codedefenders.Constants.JAVA_CLASS_EXT;
 
 /**
@@ -55,6 +57,23 @@ public class AntRunner {
 		}
 		newExec.insert();
 		return newExec;
+	}
+
+	public static boolean potentialEquivalent(Mutant m) {
+		logger.debug("Checking if mutant {} is potentially equivalent.", m.getId());
+		String cName = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
+		String suiteDir = AI_DIR + F_SEP + "tests" + F_SEP + cName;
+
+		String[] resultArray = runAntTarget("test-mutant", m.getFolder(), suiteDir, cName, cName + "EvoSuiteTest");
+		if (resultArray[0].toLowerCase().contains("failures: 0")) {
+			// If the test doesn't return failure
+			if (resultArray[0].toLowerCase().contains("errors: 0")) {
+				// If the test doesn't return any errors
+				// Test succeeded, so could be equivalent.
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

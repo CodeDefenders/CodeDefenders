@@ -209,11 +209,21 @@ public class GameManager extends HttpServlet {
 				String mutantText = request.getParameter("mutant");
 
 				Mutant newMutant = createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid);
+
 				if (newMutant != null) {
 					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 					if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
 						messages.add(MUTANT_COMPILED_MESSAGE);
 						MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
+
+						if(activeGame.getMode().equals(Game.Mode.SINGLE)) {
+							//Singleplayer - check for potential equivalent.
+							if(AntRunner.potentialEquivalent(newMutant)) {
+								//Is potentially equiv - mark as equivalent and update.
+								newMutant.setEquivalent(Mutant.Equivalence.ASSUMED_YES);
+								newMutant.update();
+							}
+						}
 						activeGame.endTurn();
 						//activeGame.update();
 					} else {
