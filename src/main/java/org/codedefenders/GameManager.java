@@ -190,7 +190,7 @@ public class GameManager extends HttpServlet {
 						if(AntRunner.potentialEquivalent(mutantClaimed)) {
 							//Is potentially equiv - mark as equivalent and update.
 							mutantClaimed.setEquivalent(Mutant.Equivalence.DECLARED_YES);
-							mutantClaimed.update();
+							mutantClaimed.kill();
 						} else {
 							mutantClaimed.setEquivalent(Mutant.Equivalence.PROVEN_NO);
 							mutantClaimed.update();
