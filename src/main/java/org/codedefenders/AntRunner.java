@@ -60,7 +60,7 @@ public class AntRunner {
 	}
 
 	public static boolean potentialEquivalent(Mutant m) {
-		logger.debug("Checking if mutant {} is potentially equivalent.", m.getId());
+		System.out.println("Checking if mutant " + m.getId() + " is potentially equivalent.");
 		String cName = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
 		String suiteDir = AI_DIR + F_SEP + "tests" + F_SEP + cName;
 

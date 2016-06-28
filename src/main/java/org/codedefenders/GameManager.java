@@ -220,7 +220,7 @@ public class GameManager extends HttpServlet {
 							//Singleplayer - check for potential equivalent.
 							if(AntRunner.potentialEquivalent(newMutant)) {
 								//Is potentially equiv - mark as equivalent and update.
-								newMutant.setEquivalent(Mutant.Equivalence.ASSUMED_YES);
+								newMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
 								newMutant.update();
 							}
 						}
