@@ -185,10 +185,22 @@ public class GameManager extends HttpServlet {
 				if (request.getParameter("mutantId") != null) {
 					int mutantId = Integer.parseInt(request.getParameter("mutantId"));
 					Mutant mutantClaimed = DatabaseAccess.getMutant(activeGame, mutantId);
-					mutantClaimed.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-					mutantClaimed.update();
-					messages.add(MUTANT_CLAIMED_EQUIVALENT_MESSAGE);
-					activeGame.passPriority();
+					if(activeGame.getMode().equals(Game.Mode.SINGLE)) {
+						//Singleplayer - use automatic system.
+						if(AntRunner.potentialEquivalent(mutantClaimed)) {
+							//Is potentially equiv - mark as equivalent and update.
+							mutantClaimed.setEquivalent(Mutant.Equivalence.DECLARED_YES);
+							mutantClaimed.update();
+						} else {
+							mutantClaimed.setEquivalent(Mutant.Equivalence.PROVEN_NO);
+							mutantClaimed.update();
+						}
+					} else {
+						mutantClaimed.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+						mutantClaimed.update();
+						messages.add(MUTANT_CLAIMED_EQUIVALENT_MESSAGE);
+						activeGame.passPriority();
+					}
 					activeGame.update();
 				} else
 					messages.add(MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE);
@@ -218,10 +230,19 @@ public class GameManager extends HttpServlet {
 
 						if(activeGame.getMode().equals(Game.Mode.SINGLE)) {
 							//Singleplayer - check for potential equivalent.
-							equivMutantAuto(newMutant);
+							if(AntRunner.potentialEquivalent(newMutant)) {
+								//Is potentially equiv - mark as equivalent and update.
+								newMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+								newMutant.update();
+								//activeGame.passPriority();
+								activeGame.update();
+							} else {
+								activeGame.endTurn();
+							}
+						} else {
+							activeGame.endTurn();
 						}
-						activeGame.endTurn();
-						//activeGame.update();
+						activeGame.update();
 					} else {
 						messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
 						if (compileMutantTarget != null && compileMutantTarget.message != null && ! compileMutantTarget.message.isEmpty())
@@ -271,14 +292,6 @@ public class GameManager extends HttpServlet {
 				break;
 		}
 		response.sendRedirect("play");//doGet(request, response);
-	}
-
-	public void equivMutantAuto(Mutant m) {
-		if(AntRunner.potentialEquivalent(m)) {
-			//Is potentially equiv - mark as equivalent and update.
-			m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-			m.update();
-		}
 	}
 
 	public Test submitAiTestFullSuite(Game g) {
