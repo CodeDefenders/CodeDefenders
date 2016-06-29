@@ -80,50 +80,23 @@ public class AiAttacker extends AiPlayer {
 
 	/**
 	 * Get the text of the full mutated class.
-	 * @param strategy which mutant selection strategy to use.
+	 * @param mutantNumber number of the mutant to use.
 	 * @return the mutant's text, or nothing if too many mutants which already exist have been made.
 	 */
-	private String createMutantString(GenerationMethod strategy) {
-		for (int i = 0; i < 10; i++) {
-			int mId = 1;
-			if(strategy.equals(GenerationMethod.RANDOM)) {
-				mId = (int)Math.floor(Math.random() * totalMutants()); //Choose a mutant.
-			}
-			else if (strategy.equals(GenerationMethod.COVERAGE)) {
-				//Coverage method.
-			}
-			//Get original lines.
-			File cutFile = new File(game.getCUT().javaFile);
-			List<String> cutLines = FileManager.readLines(cutFile.toPath());
-			//TODO: Don't reuse mutant.
-			//Patch lines with selected mutant.
-			MutantPatch p = getMutantPatch(mId);
-			List<String> newLines = doPatch(cutLines, p);
-			String mText = "";
-			if(isUnique(newLines, cutLines)) {
-				for (String l : newLines) {
-					mText += l + "\n";
-				}
-				return mText;
-			}
-		}
-		return ""; //Return empty string if all attempted mutants already exist.
-	}
+	private String createMutantString(int mutantNumber) {
+		//Get original lines.
+		File cutFile = new File(game.getCUT().javaFile);
+		List<String> cutLines = FileManager.readLines(cutFile.toPath());
+		//TODO: Don't reuse mutant.
+		//Patch lines with selected mutant.
+		MutantPatch p = getMutantPatch(mutantNumber);
+		List<String> newLines = doPatch(cutLines, p);
+		String mText = "";
 
-	private boolean isUnique(List<String> patched, List<String> cut) {
-		ArrayList<Mutant> existingMuts = game.getAliveMutants();
-		for (Mutant m : existingMuts) {
-			List<String> original = new ArrayList<String>(cut);
-			Patch p = m.getDifferences();
-			try {
-				if(patched.equals(p.applyTo(original))) {
-					return false;
-				}
-			} catch (PatchFailedException e) {
-				e.printStackTrace();
-			}
+		for (String l : newLines) {
+			mText += l + "\n";
 		}
-		return true;
+		return mText;
 	}
 
 	private boolean createMutant(String mutantText) {
@@ -140,6 +113,40 @@ public class AiAttacker extends AiPlayer {
 			return false;
 		}
 		return true;
+	}
+
+	private int selectMutant(GenerationMethod strategy) throws Exception {
+		ArrayList<Integer> usedMutants = DatabaseAccess.getUsedAiMutantsForGame(game);
+		Exception e = new Exception("No choices remain");
+
+		if(usedMutants.size() == totalMutants()) {
+			throw e;
+		}
+
+		int m = -1;
+		for (int i = 0; i < 10; i++) {
+			//Try standard strategy to select a mutant.
+			if(strategy.equals(GenerationMethod.RANDOM)) {
+				m = (int) Math.floor(Math.random() * totalMutants()); //Choose a mutant.
+			}
+			//TODO: Other generation strategies
+
+			if ((!usedMutants.contains(m)) && (m != -1)) {
+				//Found an unused mutant.
+				return m;
+			}
+		}
+
+		//If standard strategy fails, make a choice linearly.
+		for (int x = 0; x < totalMutants(); x++) {
+			if(!usedMutants.contains(x)) {
+				//Found an unused mutant.
+				return x;
+			}
+		}
+
+		//Something went wrong.
+		throw e;
 	}
 
 	/**
@@ -160,17 +167,26 @@ public class AiAttacker extends AiPlayer {
 	 */
 	public boolean turnMedium() {
 		//Use one randomly selected mutant per round, without reusing an old one.
-		String mText = createMutantString(GenerationMethod.RANDOM); //Create mutant string.
-		if(mText.isEmpty()) {
-			//End the game if all empty strings exist.
-			System.out.println("Attempted mutants exist.");
-			//TODO: Check that this works.
-			game.setState(Game.State.FINISHED);
-			game.update();
-			return true;
-		}
+		try {
+			int mId = selectMutant(GenerationMethod.RANDOM); //Select unused mutant.
+			//Throws exception if none found.
+			String mText = createMutantString(mId); //Create mutant string.
 
-		return createMutant(mText);
+			if(mText.isEmpty()) {
+				//Text wasn't added.
+				return false;
+			}
+
+			boolean added = createMutant(mText);
+			if (added) {
+				//Mutant successfully created, set it as used.
+				DatabaseAccess.setAiMutantAsUsed(mId, game);
+			}
+			return added;
+		} catch (Exception e) {
+			//No unused mutants exist, so don't add another.
+		}
+		return true;
 	}
 
 	/**

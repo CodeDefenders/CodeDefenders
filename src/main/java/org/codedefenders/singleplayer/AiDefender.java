@@ -97,6 +97,7 @@ public class AiDefender extends AiPlayer {
 			}
 		}
 
+		//Something went wrong.
 		throw e;
 	}
 

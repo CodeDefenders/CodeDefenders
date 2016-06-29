@@ -504,6 +504,66 @@ public class DatabaseAccess {
 		return false;
 	}
 
+	public static ArrayList<Integer> getUsedAiMutantsForGame(Game g) {
+		ArrayList<Integer> mutantList = new ArrayList<Integer>();
+
+		Connection conn =  null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			String sql = String.format("SELECT * FROM usedaimutants WHERE Game_ID='%d';", g.getId());
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				mutantList.add(rs.getInt("Value"));
+			}
+			stmt.close();
+			conn.close();
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(conn, stmt);
+		}
+
+		return mutantList;
+	}
+
+	public static boolean setAiMutantAsUsed(int mutantNumber, Game g) {
+		Connection conn =  null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			String sql = String.format("INSERT INTO usedaimutants (Value, Game_ID) VALUES ('%d', '%d');", mutantNumber, g.getId());
+
+			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+
+			ResultSet rs = stmt.getGeneratedKeys();
+
+			if (rs.next()) {
+				stmt.close();
+				conn.close();
+				return true;
+			}
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(conn, stmt);
+		}
+		return false;
+	}
+
 	public static void cleanup(Connection c, Statement s) {
 		try {
 			if (s != null) {
