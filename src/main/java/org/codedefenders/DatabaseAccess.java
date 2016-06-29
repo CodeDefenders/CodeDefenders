@@ -456,7 +456,7 @@ public class DatabaseAccess {
 			String sql = String.format("SELECT * FROM usedaitests WHERE Game_ID='%d';", g.getId());
 			ResultSet rs = stmt.executeQuery(sql);
 
-			if (rs.next()) {
+			while (rs.next()) {
 				testList.add(rs.getInt("Value"));
 			}
 			stmt.close();

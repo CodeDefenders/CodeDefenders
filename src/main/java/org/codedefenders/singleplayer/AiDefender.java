@@ -69,9 +69,9 @@ public class AiDefender extends AiPlayer {
 	private int selectTest(GenerationMethod strategy) throws Exception {
 		ArrayList<Integer> usedTests = DatabaseAccess.getUsedAiTestsForGame(game);
 		int totalTests = getNumberOfTests();
+		Exception e = new Exception("No choices remain.");
 
 		if(usedTests.size() == totalTests) {
-			Exception e = new Exception("No choices remain.");
 			throw e;
 		}
 		int t = -1;
@@ -97,8 +97,7 @@ public class AiDefender extends AiPlayer {
 			}
 		}
 
-
-		return t;
+		throw e;
 	}
 
 	private void makeTestFromSuite(GameManager gameManager, int testNum) throws IOException{
