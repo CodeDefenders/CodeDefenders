@@ -2,6 +2,7 @@ package org.codedefenders.singleplayer;
 
 import org.codedefenders.*;
 
+import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -49,15 +50,55 @@ public class AiDefender extends AiPlayer {
 		//Perhaps just a random test?
 		//Perhaps higher chance of equivalence call? May happen due to weaker testing.
 		GameManager gm = new GameManager();
-		//TODO: Check
-		int tNum = (int) Math.floor(Math.random() * getNumberOfTests());
 		try {
-			makeTestFromSuite(gm, tNum);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
+			int tNum = selectTest(GenerationMethod.RANDOM);
+			try {
+				makeTestFromSuite(gm, tNum);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+		} catch (Exception e) {
+			//Assume no more choices remain.
+			//Do nothing.
 		}
+
 		return true;
+	}
+
+	private int selectTest(GenerationMethod strategy) throws Exception {
+		ArrayList<Integer> usedTests = DatabaseAccess.getUsedAiTestsForGame(game);
+		int totalTests = getNumberOfTests();
+
+		if(usedTests.size() == totalTests) {
+			Exception e = new Exception("No choices remain.");
+			throw e;
+		}
+		int t = -1;
+
+		for (int i = 0; i <= 3; i++) {
+			//Try to get test by default strategy.
+			if (strategy.equals(GenerationMethod.RANDOM)) {
+				t = (int) Math.floor(Math.random() * getNumberOfTests());
+			}
+			//TODO: Other strategies.
+
+			if ((!usedTests.contains(t)) && (t != -1)) {
+				//Strategy found an unused test.
+				return t;
+			}
+		}
+
+		//If standard strategy fails, choose first non-selected test.
+		for (int x = 0; x < totalTests; x++) {
+			if(!usedTests.contains(x)) {
+				//Unused test found.
+				return x;
+			}
+		}
+
+
+		return t;
 	}
 
 	private void makeTestFromSuite(GameManager gameManager, int testNum) throws IOException{
@@ -70,6 +111,7 @@ public class AiDefender extends AiPlayer {
 			Test t = gameManager.createTest(game.getId(), game.getClassId(), testText, 1);
 			ArrayList<String> messages = new ArrayList<String>();
 			MutationTester.runTestOnAllMutants(game, t, messages);
+			DatabaseAccess.setAiTestAsUsed(testNum, game);
 		}
 	}
 

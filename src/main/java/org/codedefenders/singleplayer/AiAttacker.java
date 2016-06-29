@@ -18,12 +18,6 @@ import static org.codedefenders.Constants.*;
  */
 public class AiAttacker extends AiPlayer {
 
-	private enum GenerationMethod {
-		RANDOM, //Randomly select mutant.
-		COVERAGE, //Select random mutant by least covered lines.
-		FIRST //Choose the first mutant, for debugging.
-	}
-
 	public AiAttacker(Game g) {
 		super(g);
 		role = Game.Role.ATTACKER;

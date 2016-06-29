@@ -8,6 +8,12 @@ import org.codedefenders.Game;
  */
 public class AiPlayer {
 
+	public enum GenerationMethod {
+		RANDOM, //Randomly select mutant.
+		COVERAGE, //Select random mutant by least covered lines.
+		FIRST //Choose the first mutant, for debugging.
+	}
+
 	protected Game game;
 	protected Game.Role role;
 
