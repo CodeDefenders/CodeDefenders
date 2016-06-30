@@ -33,7 +33,7 @@ public class SingleplayerGame extends Game {
 			ai.makeTurn();
 		} else {
 			//Defender adds tests without advancing turn.
-			ai.tryTurn();
+			//ai.tryTurn();
 		}
 	}
 

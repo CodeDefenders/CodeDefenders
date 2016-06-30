@@ -534,6 +534,12 @@ public class DatabaseAccess {
 		return mutantList;
 	}
 
+	/**
+	 *
+	 * @param mutantNumber the number of the mutant
+	 * @param g the game the mutant belongs to
+	 * @return
+	 */
 	public static boolean setAiMutantAsUsed(int mutantNumber, Game g) {
 		Connection conn =  null;
 		Statement stmt = null;
