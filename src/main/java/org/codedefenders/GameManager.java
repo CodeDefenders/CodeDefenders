@@ -292,6 +292,16 @@ public class GameManager extends HttpServlet {
 				}
 				break;
 		}
+		if(activeGame.getMode().equals(Game.Mode.SINGLE)) {
+			//Singleplayer game, show messages depending on state.
+			if(activeGame.getAttackerId() == uid) {
+				//Player attacker
+				messages.add("The AI has created a test!");
+			} else {
+				//Player defender
+				messages.add("The AI has created a mutant!");
+			}
+		}
 		response.sendRedirect("play");//doGet(request, response);
 	}
 
