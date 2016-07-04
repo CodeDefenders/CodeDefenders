@@ -18,7 +18,7 @@ public class SingleplayerGame extends Game {
 			setDefenderId(1);
 			ai = new AiDefender(this);
 		} else {
-			setAttackerId(1);
+			setAttackerId(1); 
 			ai = new AiAttacker(this);
 		}
 		setMode(Mode.SINGLE); //Set singleplayer mode.
@@ -31,9 +31,6 @@ public class SingleplayerGame extends Game {
 		if(ai.role.equals(Role.ATTACKER)) {
 			//If attacker, add mutant and advance turn.
 			ai.makeTurn();
-		} else {
-			//Defender adds tests without advancing turn.
-			//ai.tryTurn();
 		}
 	}
 

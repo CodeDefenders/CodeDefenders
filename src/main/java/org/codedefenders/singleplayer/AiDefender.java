@@ -164,7 +164,6 @@ public class AiDefender extends AiPlayer {
 			else {
 				//Write every line and track braces.
 				t += l + "\n";
-				//TODO: Check character escapes.
 				if(l.contains("{")) {
 					brOpen ++;
 				}
