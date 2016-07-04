@@ -60,11 +60,11 @@ public class EvoSuiteMaker {
 		File dir = new File(AI_DIR + F_SEP + "tests" + F_SEP + cutTitle);
 		String contents = "";
 		//Original test ids.
-		contents += "<ids>";
+		contents += "<tests> \n";
 		for (int n : testIds) {
-			contents += n + ",";
+			contents += "\t<test>" + n + "</test> \n";
 		}
-		contents += "</ids> \n";
+		contents += "</tests> \n";
 
 		//Number of tests.
 		contents += "<quantity>" + testIds.size() + "</quantity> \n";
