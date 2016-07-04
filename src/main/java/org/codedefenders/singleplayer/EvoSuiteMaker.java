@@ -51,12 +51,12 @@ public class EvoSuiteMaker {
 			return false;
 		}
 
-		makeInfoFile(testIds);
+		makeInfoFile(testIds, dummyGame.getId());
 
 		return true; //Success
 	}
 
-	private boolean makeInfoFile(ArrayList<Integer> testIds) {
+	private boolean makeInfoFile(ArrayList<Integer> testIds, int dummyGameId) {
 		File dir = new File(AI_DIR + F_SEP + "tests" + F_SEP + cutTitle);
 		String contents = "";
 		//Original test ids.
@@ -68,6 +68,8 @@ public class EvoSuiteMaker {
 
 		//Number of tests.
 		contents += "<quantity>" + testIds.size() + "</quantity> \n";
+		//ID of dummy game.
+		contents += "<dummygame>" + dummyGameId + "</dummyGameId> \n";
 
 		try {
 			FileManager.createTestInfoFile(dir, cutTitle, contents);
