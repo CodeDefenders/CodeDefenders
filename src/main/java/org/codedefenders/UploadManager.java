@@ -8,6 +8,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.codedefenders.singleplayer.EvoSuiteMaker;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -80,19 +81,23 @@ public class UploadManager extends HttpServlet {
 							CtClass cc = classPool.makeClass(new FileInputStream(new File(classFileName)));
 							String fullyQualifiedName = cc.getName();
 
+							// db insert
+							newSUT = new GameClass(fullyQualifiedName, javaFileNameDB, classFileNameDB);
+							newSUT.insert();
+
+							EvoSuiteMaker evo = new EvoSuiteMaker(newSUT.id);
+							evo.makeSuite();
+							//TODO: REMOVE OLD FUNCTIONALITY.
 							//Generate tests.
-							AntRunner.generateTestsFromCUT(fileName);
+							//AntRunner.generateTestsFromCUT(fileName);
 							//Compile tests.
 							AntRunner.compileGenTestSuite(fileName);
+
+
 							//Generate mutant classes. Note that this overwrites original compiled class
 							AntRunner.generateMutantsFromCUT(fileName);
 
 							//Run tests on mutants to determine potential equivalents.
-
-
-							// db insert
-							newSUT = new GameClass(fullyQualifiedName, javaFileNameDB, classFileNameDB);
-							newSUT.insert();
 
 							response.sendRedirect("games/create");
 

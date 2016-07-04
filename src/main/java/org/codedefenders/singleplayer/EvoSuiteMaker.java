@@ -1,8 +1,9 @@
 package org.codedefenders.singleplayer;
 
-import org.codedefenders.FileManager;
+import org.codedefenders.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,9 +12,44 @@ import static org.codedefenders.Constants.*;
 public class EvoSuiteMaker {
 
 	private String cutTitle;
+	private int cId;
+	private GameClass cut;
 
-	public EvoSuiteMaker(String cutName) {
-		cutTitle = cutName;
+	public EvoSuiteMaker(int classId) {
+		cId = classId;
+		cut = DatabaseAccess.getClassForKey("Class_ID", cId);
+		cutTitle = cut.getBaseName();
+	}
+
+	public boolean makeSuite() {
+		AntRunner.generateTestsFromCUT(cutTitle);
+		//Need a dummy game to add test to.
+		Game dummyGame = new Game(cId, 1, 3, Game.Role.ATTACKER, Game.Level.EASY);
+		dummyGame.insert();
+		dummyGame.setDefenderId(1);
+		dummyGame.setState(Game.State.ACTIVE);
+		dummyGame.update();
+
+		ArrayList<String> testStrings = getTestStrings();
+		int numTests = testStrings.size();
+		try {
+			for (String t : testStrings) {
+				File newTestDir = FileManager.getNextSubDir(AI_DIR + F_SEP + "tests" +
+						F_SEP + cutTitle + F_SEP);
+				String jFile = FileManager.createJavaFile(newTestDir, cutTitle, t);
+				Test newTest = AntRunner.compileTest(newTestDir, jFile, dummyGame.getId(), cut, 1);
+				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+
+				if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
+					AntRunner.testOriginal(newTestDir, newTest);
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

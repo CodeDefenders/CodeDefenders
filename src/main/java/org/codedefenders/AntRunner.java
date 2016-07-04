@@ -189,6 +189,7 @@ public class AntRunner {
 	 * @param jFile
 	 * @param gameID
 	 * @param classUnderTest
+	 * @param ownerId
 	 * @return A {@link Test} object
 	 */
 	public static Test compileTest(File dir, String jFile, int gameID, GameClass classUnderTest, int ownerId) {
