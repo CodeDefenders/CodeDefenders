@@ -31,7 +31,8 @@ public class EvoSuiteMaker {
 		dummyGame.update();
 
 		ArrayList<String> testStrings = getTestStrings();
-		int numTests = testStrings.size();
+		ArrayList<Integer> testIds = new ArrayList<Integer>();
+
 		try {
 			for (String t : testStrings) {
 				File newTestDir = FileManager.getNextSubDir(AI_DIR + F_SEP + "tests" +
@@ -42,6 +43,7 @@ public class EvoSuiteMaker {
 
 				if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
 					AntRunner.testOriginal(newTestDir, newTest);
+					testIds.add(newTest.getId());
 				}
 			}
 		} catch (IOException e) {
@@ -49,15 +51,26 @@ public class EvoSuiteMaker {
 			return false;
 		}
 
-		makeInfoFile(numTests);
+		makeInfoFile(testIds);
 
 		return true; //Success
 	}
 
-	private boolean makeInfoFile(int numberTests) {
+	private boolean makeInfoFile(ArrayList<Integer> testIds) {
 		File dir = new File(AI_DIR + F_SEP + "tests" + F_SEP + cutTitle);
+		String contents = "";
+		//Original test ids.
+		contents += "<ids>";
+		for (int n : testIds) {
+			contents += n + ",";
+		}
+		contents += "</ids> \n";
+
+		//Number of tests.
+		contents += "<quantity>" + testIds.size() + "</quantity> \n";
+
 		try {
-			FileManager.createTestInfoFile(dir, cutTitle, String.valueOf(numberTests));
+			FileManager.createTestInfoFile(dir, cutTitle, contents);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -119,7 +132,6 @@ public class EvoSuiteMaker {
 					if(brOpen == brClose) {
 						//Every opened bracket has been closed.
 						//Finish off the file.
-						System.out.println(t);
 						//Add class start, test buffer and
 						//closing brace for class declaration.
 						tests.add(sharedStart + t + "} \n");
