@@ -85,13 +85,11 @@ public class UploadManager extends HttpServlet {
 							newSUT = new GameClass(fullyQualifiedName, javaFileNameDB, classFileNameDB);
 							newSUT.insert();
 
+							//Generate and compile tests.
 							EvoSuiteMaker evo = new EvoSuiteMaker(newSUT.id);
 							evo.makeSuite();
-							//TODO: REMOVE OLD FUNCTIONALITY.
-							//Generate tests.
 							//AntRunner.generateTestsFromCUT(fileName);
-							//Compile tests.
-							AntRunner.compileGenTestSuite(fileName);
+							//AntRunner.compileGenTestSuite(fileName);
 
 
 							//Generate mutant classes. Note that this overwrites original compiled class

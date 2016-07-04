@@ -49,6 +49,19 @@ public class EvoSuiteMaker {
 			return false;
 		}
 
+		makeInfoFile(numTests);
+
+		return true; //Success
+	}
+
+	private boolean makeInfoFile(int numberTests) {
+		File dir = new File(AI_DIR + F_SEP + "tests" + F_SEP + cutTitle);
+		try {
+			FileManager.createTestInfoFile(dir, cutTitle, String.valueOf(numberTests));
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 		return true;
 	}
 

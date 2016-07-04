@@ -3,6 +3,7 @@ package org.codedefenders;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.Buffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,14 +12,22 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
-import static org.codedefenders.Constants.F_SEP;
-import static org.codedefenders.Constants.JAVA_SOURCE_EXT;
-import static org.codedefenders.Constants.TEST_PREFIX;
+import static org.codedefenders.Constants.*;
 
 /**
  * Some utility functions for files.
  */
 public class FileManager {
+
+	public static String createTestInfoFile(File dir, String classBaseName, String contents) throws IOException {
+		String path = dir.getAbsolutePath() + F_SEP + classBaseName + TEST_INFO_EXT;
+		File infoFile = new File(path);
+		FileWriter infoWriter = new FileWriter(infoFile);
+		BufferedWriter bInfoWriter = new BufferedWriter(infoWriter);
+		bInfoWriter.write(contents);
+		bInfoWriter.close();
+		return path;
+	}
 
 	public static String createJavaFile(File dir, String classBaseName, String testCode) throws IOException {
 		String javaFile = dir.getAbsolutePath() + F_SEP + TEST_PREFIX + classBaseName + JAVA_SOURCE_EXT;

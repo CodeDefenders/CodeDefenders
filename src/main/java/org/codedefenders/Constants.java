@@ -17,7 +17,7 @@ public class Constants {
 	public static final String TEST_PREFIX = "Test";
 	public static final String JAVA_SOURCE_EXT = ".java";
 	public static final String JAVA_CLASS_EXT = ".class";
-
+	public static final String TEST_INFO_EXT = ".tests";
 
 	public static final String LOGIN_VIEW_JSP           = "jsp" + F_SEP + "login_view.jsp";
 	public static final String RESOLVE_EQUIVALENCE_JSP  = "jsp" + F_SEP + "resolve_equivalence.jsp";
