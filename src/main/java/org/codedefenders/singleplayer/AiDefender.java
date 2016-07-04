@@ -10,6 +10,7 @@ import java.util.List;
 
 import static org.codedefenders.Constants.AI_DIR;
 import static org.codedefenders.Constants.F_SEP;
+import static org.codedefenders.Constants.TEST_INFO_EXT;
 
 /**
  * @author Ben Clegg
@@ -51,9 +52,11 @@ public class AiDefender extends AiPlayer {
 		//Perhaps higher chance of equivalence call? May happen due to weaker testing.
 		GameManager gm = new GameManager();
 		try {
-			int tNum = selectTest(GenerationMethod.RANDOM);
+			IndexContents ind = new IndexContents(game.getClassName());
+
+			int tNum = selectTest(GenerationMethod.RANDOM, ind);
 			try {
-				makeTestFromSuite(gm, tNum);
+				useTestFromSuite(tNum, ind);
 			} catch (IOException e) {
 				e.printStackTrace();
 				return false;
@@ -66,9 +69,10 @@ public class AiDefender extends AiPlayer {
 		return true;
 	}
 
-	private int selectTest(GenerationMethod strategy) throws Exception {
+	private int selectTest(GenerationMethod strategy, IndexContents indexCon) throws Exception {
+
 		ArrayList<Integer> usedTests = DatabaseAccess.getUsedAiTestsForGame(game);
-		int totalTests = getNumberOfTests();
+		int totalTests = indexCon.getNumTests();
 		Exception e = new Exception("No choices remain.");
 
 		if(usedTests.size() == totalTests) {
@@ -76,12 +80,21 @@ public class AiDefender extends AiPlayer {
 		}
 		int t = -1;
 
+		Game dummyGame = DatabaseAccess.getGameForKey("Game_ID", indexCon.getDummyGameId());
+		ArrayList<Test> origTests = dummyGame.getTests();
+
 		for (int i = 0; i <= 3; i++) {
 			//Try to get test by default strategy.
+			int n = 0;
 			if (strategy.equals(GenerationMethod.RANDOM)) {
-				t = (int) Math.floor(Math.random() * getNumberOfTests());
+				n = (int) Math.floor(Math.random() * totalTests);
+				//0 -> totalTests - 1.
 			}
 			//TODO: Other strategies.
+
+			//Get original test from dummy game's list of tests.
+			Test origT = origTests.get(n);
+			t = origT.getId();
 
 			if ((!usedTests.contains(t)) && (t != -1)) {
 				//Strategy found an unused test.
@@ -101,11 +114,56 @@ public class AiDefender extends AiPlayer {
 		throw e;
 	}
 
-	private void useTestFromSuite(int testNum) throws IOException {
+	private void useTestFromSuite(int origTestNum, IndexContents indexCon) throws IOException {
+		Game dummyGame = DatabaseAccess.getGameForKey("Game_ID", indexCon.getDummyGameId());
+		ArrayList<Test> origTests = dummyGame.getTests();
 
-		ArrayList<String> messages = new ArrayList<String>();
-		MutationTester.runTestOnAllMutants(game, t, messages);
-		DatabaseAccess.setAiTestAsUsed(testNum, game);
+		Test origT = null;
+
+		for (Test t : origTests) {
+			if(t.getId() == origTestNum) {
+				origT = t;
+				break;
+			}
+		}
+
+		if(origT != null) {
+			Test t = new Test(game.getId(), JFILE, CFILE, 1);
+			ArrayList<String> messages = new ArrayList<String>();
+			MutationTester.runTestOnAllMutants(game, t, messages);
+			DatabaseAccess.setAiTestAsUsed(origTestNum, game);
+		}
+	}
+
+}
+
+class IndexContents {
+
+	private ArrayList<Integer> testIds;
+	private int dummyGameId;
+	private int numTests;
+
+	public IndexContents(String className) {
+		//Parse the test index file of a given class.
+		File f = new File(AI_DIR + F_SEP + "tests" + F_SEP +
+				className + F_SEP + className + TEST_INFO_EXT);
+		List<String> lines = FileManager.readLines(f.toPath());
+
+		for (String l : lines) {
+
+		}
+	}
+
+	public ArrayList<Integer> getTestIds() {
+		return testIds;
+	}
+
+	public int getNumTests() {
+		return numTests;
+	}
+
+	public int getDummyGameId() {
+		return dummyGameId;
 	}
 
 }

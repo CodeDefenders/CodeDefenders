@@ -19,7 +19,7 @@ import static org.codedefenders.Constants.*;
  */
 public class FileManager {
 
-	public static String createTestInfoFile(File dir, String classBaseName, String contents) throws IOException {
+	public static String createTestIndexFile(File dir, String classBaseName, String contents) throws IOException {
 		String path = dir.getAbsolutePath() + F_SEP + classBaseName + TEST_INFO_EXT;
 		File infoFile = new File(path);
 		FileWriter infoWriter = new FileWriter(infoFile);
