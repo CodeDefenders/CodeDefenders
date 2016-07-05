@@ -36,23 +36,9 @@ public class MajorMaker {
 			//Each mutant in mutants log.
 
 			//Get required mutant info.
-			String[] splitInfo = info.split(":");
-			/*
-			0 = Mutant's id
-			1 = Name of mutation operator
-			2 = Original operator symbol
-			3 = New operator symbol
-			4 = Full name of mutated method
-			5 = Line number of CUT
-			6 = 'from' |==> 'to'  (<NO-OP> means empty string)
-			 */
-			//Only really need values 5 and 6.
-			//Use replace option?
-			int lineNum = Integer.parseInt(splitInfo[5]);
-			String[] beforeAfter = splitInfo[6].split(Pattern.quote(" |==> ")); //Before = 0, After = 1
+			MutantPatch mP = createMutantPatch(info);
 
-			MutantPatch mP = new MutantPatch(lineNum, beforeAfter);
-
+			//Modify original contents with mutant.
 			List<String> newLines = doPatch(cutLines, mP);
 			String mText = "";
 			for (String l : newLines) {
@@ -81,6 +67,25 @@ public class MajorMaker {
 		String newLine = l.replaceFirst(patch.getOriginal(), patch.getReplacement().replace("QE", ""));
 		newLines.set(patch.getLineNum() - 1, newLine);
 		return newLines;
+	}
+
+	private MutantPatch createMutantPatch(String mutantInfo) {
+		String[] splitInfo = mutantInfo.split(":");
+			/*
+			0 = Mutant's id
+			1 = Name of mutation operator
+			2 = Original operator symbol
+			3 = New operator symbol
+			4 = Full name of mutated method
+			5 = Line number of CUT
+			6 = 'from' |==> 'to'  (<NO-OP> means empty string)
+			 */
+		//Only really need values 5 and 6.
+		//Use replace option?
+		int lineNum = Integer.parseInt(splitInfo[5]);
+		String[] beforeAfter = splitInfo[6].split(Pattern.quote(" |==> ")); //Before = 0, After = 1
+
+		return new MutantPatch(lineNum, beforeAfter);
 	}
 
 	private boolean createMutant(String mutantText) {

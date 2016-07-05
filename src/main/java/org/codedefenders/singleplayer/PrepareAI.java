@@ -19,5 +19,6 @@ public class PrepareAI {
 
 		//TODO: Find how many tests "kill" mutants.
 		//Don't actually kill mutants to run all tests.
+		//Perhaps rank mutants in how many tests kill them.
 	}
 }
