@@ -9,6 +9,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.codedefenders.singleplayer.EvoSuiteMaker;
+import org.codedefenders.singleplayer.PrepareAI;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -85,6 +86,7 @@ public class UploadManager extends HttpServlet {
 							newSUT = new GameClass(fullyQualifiedName, javaFileNameDB, classFileNameDB);
 							newSUT.insert();
 
+							/*
 							//Generate and compile tests.
 							EvoSuiteMaker evo = new EvoSuiteMaker(newSUT.id);
 							evo.makeSuite();
@@ -94,6 +96,10 @@ public class UploadManager extends HttpServlet {
 
 							//Generate mutant classes. Note that this overwrites original compiled class
 							AntRunner.generateMutantsFromCUT(fileName);
+							*/
+
+							//Prepare AI classes.
+							PrepareAI p = new PrepareAI(newSUT.id);
 
 							//Run tests on mutants to determine potential equivalents.
 

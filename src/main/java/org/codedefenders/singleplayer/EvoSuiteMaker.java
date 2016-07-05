@@ -14,22 +14,19 @@ public class EvoSuiteMaker {
 	private String cutTitle;
 	private int cId;
 	private GameClass cut;
+	Game dGame;
 
-	public EvoSuiteMaker(int classId) {
+	public EvoSuiteMaker(int classId, Game dummyGame) {
 		cId = classId;
 		cut = DatabaseAccess.getClassForKey("Class_ID", cId);
 		cutTitle = cut.getBaseName();
+		dGame = dummyGame;
 	}
 
 	public boolean makeSuite() {
 		AntRunner.generateTestsFromCUT(cutTitle);
 		AntRunner.compileGenTestSuite(cutTitle);
 		//Need a dummy game to add test to.
-		Game dummyGame = new Game(cId, 1, 3, Game.Role.ATTACKER, Game.Level.EASY);
-		dummyGame.insert();
-		dummyGame.setDefenderId(1);
-		dummyGame.setState(Game.State.ACTIVE);
-		dummyGame.update();
 
 		ArrayList<String> testStrings = getTestStrings();
 		ArrayList<Integer> testIds = new ArrayList<Integer>();
@@ -39,7 +36,7 @@ public class EvoSuiteMaker {
 				File newTestDir = FileManager.getNextSubDir(AI_DIR + F_SEP + "tests" +
 						F_SEP + cutTitle + F_SEP);
 				String jFile = FileManager.createJavaFile(newTestDir, cutTitle, t);
-				Test newTest = AntRunner.compileTest(newTestDir, jFile, dummyGame.getId(), cut, 1);
+				Test newTest = AntRunner.compileTest(newTestDir, jFile, dGame.getId(), cut, 1);
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 				if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
@@ -52,7 +49,7 @@ public class EvoSuiteMaker {
 			return false;
 		}
 
-		makeIndexFile(testIds, dummyGame.getId());
+		makeIndexFile(testIds, dGame.getId());
 
 		return true; //Success
 	}
