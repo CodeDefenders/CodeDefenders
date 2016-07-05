@@ -23,6 +23,7 @@ public class EvoSuiteMaker {
 
 	public boolean makeSuite() {
 		AntRunner.generateTestsFromCUT(cutTitle);
+		AntRunner.compileGenTestSuite(cutTitle);
 		//Need a dummy game to add test to.
 		Game dummyGame = new Game(cId, 1, 3, Game.Role.ATTACKER, Game.Level.EASY);
 		dummyGame.insert();
@@ -59,17 +60,21 @@ public class EvoSuiteMaker {
 	private boolean makeIndexFile(ArrayList<Integer> testIds, int dummyGameId) {
 		File dir = new File(AI_DIR + F_SEP + "tests" + F_SEP + cutTitle);
 		String contents = "";
+		contents += "<?xml version=\"1.0\"?> \n";
+		contents += "<testindex> \n";
 		//Original test ids.
-		contents += "<tests> \n";
+		contents += "\t<tests> \n";
 		for (int n : testIds) {
-			contents += "\t<test>" + n + "</test> \n";
+			contents += "\t\t<test>" + n + "</test> \n";
 		}
-		contents += "</tests> \n";
+		contents += "\t</tests> \n";
 
 		//Number of tests.
-		contents += "<quantity>" + testIds.size() + "</quantity> \n";
+		contents += "\t<quantity>" + testIds.size() + "</quantity> \n";
 		//ID of dummy game.
-		contents += "<dummygame>" + dummyGameId + "</dummygame> \n";
+		contents += "\t<dummygame>" + dummyGameId + "</dummygame> \n";
+
+		contents += "</testindex> \n";
 
 		try {
 			FileManager.createTestIndexFile(dir, cutTitle, contents);

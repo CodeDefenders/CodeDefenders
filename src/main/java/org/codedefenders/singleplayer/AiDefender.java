@@ -1,16 +1,19 @@
 package org.codedefenders.singleplayer;
 
 import org.codedefenders.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import javax.xml.crypto.Data;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.codedefenders.Constants.AI_DIR;
-import static org.codedefenders.Constants.F_SEP;
-import static org.codedefenders.Constants.TEST_INFO_EXT;
+import static org.codedefenders.Constants.*;
 
 /**
  * @author Ben Clegg
@@ -50,7 +53,6 @@ public class AiDefender extends AiPlayer {
 		//Choose a random test which covers the modified line(s)?
 		//Perhaps just a random test?
 		//Perhaps higher chance of equivalence call? May happen due to weaker testing.
-		GameManager gm = new GameManager();
 		try {
 			IndexContents ind = new IndexContents(game.getClassName());
 
@@ -128,10 +130,14 @@ public class AiDefender extends AiPlayer {
 		}
 
 		if(origT != null) {
-			Test t = new Test(game.getId(), JFILE, CFILE, 1);
+			String jFile = origT.getFolder() + F_SEP + "Test" + dummyGame.getClassName() + JAVA_SOURCE_EXT;
+			String cFile = origT.getFolder() + F_SEP + "Test" + dummyGame.getClassName() + JAVA_CLASS_EXT;
+			Test t = new Test(game.getId(), jFile, cFile, 1);
 			ArrayList<String> messages = new ArrayList<String>();
 			MutationTester.runTestOnAllMutants(game, t, messages);
 			DatabaseAccess.setAiTestAsUsed(origTestNum, game);
+			t.insert();
+			t.update();
 		}
 	}
 
@@ -144,14 +150,35 @@ class IndexContents {
 	private int numTests;
 
 	public IndexContents(String className) {
+		testIds = new ArrayList<Integer>();
+		dummyGameId = -1;
+		numTests = -1;
 		//Parse the test index file of a given class.
-		File f = new File(AI_DIR + F_SEP + "tests" + F_SEP +
-				className + F_SEP + className + TEST_INFO_EXT);
-		List<String> lines = FileManager.readLines(f.toPath());
+		try {
+			File f = new File(AI_DIR + F_SEP + "tests" + F_SEP +
+					className + F_SEP + className + TEST_INFO_EXT);
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuild = dbFactory.newDocumentBuilder();
+			Document d = dBuild.parse(f);
 
-		for (String l : lines) {
+			d.getDocumentElement().normalize();
 
+			NodeList tIdNodes = d.getElementsByTagName("test");
+			for (int i = 0; i < tIdNodes.getLength(); i++) {
+				Node tIdNode = tIdNodes.item(i);
+				testIds.add(Integer.parseInt(tIdNode.getTextContent()));
+			}
+			NodeList q = d.getElementsByTagName("quantity");
+			numTests = Integer.parseInt(q.item(0).getTextContent());
+			NodeList g = d.getElementsByTagName("dummygame");
+			dummyGameId = Integer.parseInt(g.item(0).getTextContent());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			//TODO: Handle errors.
 		}
+
+
 	}
 
 	public ArrayList<Integer> getTestIds() {
