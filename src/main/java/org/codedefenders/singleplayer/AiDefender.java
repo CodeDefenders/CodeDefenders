@@ -133,11 +133,16 @@ public class AiDefender extends AiPlayer {
 			String jFile = origT.getFolder() + F_SEP + "Test" + dummyGame.getClassName() + JAVA_SOURCE_EXT;
 			String cFile = origT.getFolder() + F_SEP + "Test" + dummyGame.getClassName() + JAVA_CLASS_EXT;
 			Test t = new Test(game.getId(), jFile, cFile, 1);
+			t.insert();
+			t.update();
+			TargetExecution newExec = new TargetExecution(t.getId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);
+			newExec.insert();
 			ArrayList<String> messages = new ArrayList<String>();
 			MutationTester.runTestOnAllMutants(game, t, messages);
 			DatabaseAccess.setAiTestAsUsed(origTestNum, game);
-			t.insert();
-			t.update();
+			File dir = new File(origT.getFolder());
+			AntRunner.testOriginal(dir, t);
+			game.update();
 		}
 	}
 
