@@ -3,6 +3,7 @@ package org.codedefenders.singleplayer;
 import org.codedefenders.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -29,6 +30,7 @@ public class MajorMaker {
 
 		File cutFile = new File(cut.javaFile);
 		List<String> cutLines = FileManager.readLines(cutFile.toPath());
+		int numValidMutants = 0;
 
 		for (String info : getMutantList()) {
 			//Each mutant in mutants log.
@@ -56,10 +58,10 @@ public class MajorMaker {
 			for (String l : newLines) {
 				mText += l + "\n";
 			}
-
-			//Write to java file in next available folder.
-			//Compile file.
-			//Create & insert mutant.
+			if (createMutant(mText)) {
+				//Successfully created and compiled(?) mutant.
+				numValidMutants ++;
+			}
 		}
 
 
@@ -79,6 +81,23 @@ public class MajorMaker {
 		String newLine = l.replaceFirst(patch.getOriginal(), patch.getReplacement().replace("QE", ""));
 		newLines.set(patch.getLineNum() - 1, newLine);
 		return newLines;
+	}
+
+	private boolean createMutant(String mutantText) {
+		GameManager gm = new GameManager();
+		try {
+			//Create mutant and insert it into the database.
+			//TODO: CHECK MUTANT COMPILES
+			Mutant m = gm.createMutant(dGame.getId(), dGame.getClassId(), mutantText, 1);
+			//TODO: More error checking.
+			ArrayList<String> messages = new ArrayList<String>();
+			MutationTester.runAllTestsOnMutant(dGame, m, messages);
+		} catch (IOException e) {
+			//Try again if an exception.
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 	private List<String> getMutantList() {
