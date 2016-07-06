@@ -51,11 +51,13 @@ public class FileManager {
 		Arrays.sort(directories);
 		String newPath;
 		if (directories.length == 0)
-			newPath = folder.getAbsolutePath() + F_SEP + "1";
+			newPath = folder.getAbsolutePath() + F_SEP + "001";
 		else {
 			File lastDir = new File(directories[directories.length - 1]);
 			int newIndex = Integer.parseInt(lastDir.getName()) + 1;
-			newPath = path + F_SEP + newIndex;
+			String formatted = String.format("%03d", newIndex);
+
+			newPath = path + F_SEP + formatted;
 		}
 		File newDir = new File(newPath);
 		newDir.mkdirs();

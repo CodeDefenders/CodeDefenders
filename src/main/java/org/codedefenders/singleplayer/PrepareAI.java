@@ -11,11 +11,12 @@ public class PrepareAI {
 		dummyGame.setState(Game.State.ACTIVE);
 		dummyGame.update();
 
-		MajorMaker mMake = new MajorMaker(classId, dummyGame);
-		mMake.createMutants();
 
 		EvoSuiteMaker esMake = new EvoSuiteMaker(classId, dummyGame);
 		esMake.makeSuite();
+
+		MajorMaker mMake = new MajorMaker(classId, dummyGame);
+		mMake.createMutants();
 
 		//TODO: Find how many tests "kill" mutants.
 		//Don't actually kill mutants to run all tests.

@@ -1,15 +1,21 @@
 package org.codedefenders.singleplayer;
 
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.*;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import static org.codedefenders.Constants.AI_DIR;
 import static org.codedefenders.Constants.F_SEP;
+import static org.codedefenders.Constants.JAVA_SOURCE_EXT;
 
 public class MajorMaker {
 
@@ -47,6 +53,7 @@ public class MajorMaker {
 			if (createMutant(mText)) {
 				//Successfully created and compiled(?) mutant.
 				numValidMutants ++;
+				//TODO: Add to xml.
 			}
 		}
 
@@ -89,11 +96,53 @@ public class MajorMaker {
 	}
 
 	private boolean createMutant(String mutantText) {
+
+		try {
+			File srcFile = new File(cut.javaFile);
+			String srcCode = new String(Files.readAllBytes(srcFile.toPath()));
+
+			// Runs diff match patch between the two Strings to see if there are any differences.
+			DiffMatchPatch dmp = new DiffMatchPatch();
+			LinkedList<DiffMatchPatch.Diff> changes = dmp.diffMain(srcCode.trim().replace("\n", "").replace("\r", ""), mutantText.trim().replace("\n", "").replace("\r", ""), true);
+			boolean noChange = true;
+			for (DiffMatchPatch.Diff d : changes) {
+				if (d.operation != DiffMatchPatch.Operation.EQUAL) {
+					noChange = false;
+				}
+			}
+			// If there were no differences, return, as the mutant is the same as original.
+			if (noChange)
+				return false;
+
+			// Setup folder the files will go in
+			File newMutantDir = FileManager.getNextSubDir(AI_DIR + F_SEP + "mutants" + F_SEP + cutTitle);
+
+			// Write the Mutant String into a java file
+			String mutantFileName = newMutantDir + F_SEP + cutTitle + JAVA_SOURCE_EXT;
+			File mutantFile = new File(mutantFileName);
+			FileWriter fw = new FileWriter(mutantFile);
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(mutantText);
+			bw.close();
+
+			// Compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
+			Mutant m = null;
+			m = AntRunner.compileMutant(newMutantDir, mutantFileName, dGame.getId(), cut, 1);
+			if(m != null) {
+				return true;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
+
+
+		/*
 		GameManager gm = new GameManager();
 		try {
 			//Create mutant and insert it into the database.
 			//TODO: CHECK MUTANT COMPILES
-			Mutant m = gm.createMutant(dGame.getId(), dGame.getClassId(), mutantText, 1);
+			Mutant m = gm.createMutant(dGame.getId(), cut.id, mutantText, 1);
 			//TODO: More error checking.
 			ArrayList<String> messages = new ArrayList<String>();
 			MutationTester.runAllTestsOnMutant(dGame, m, messages);
@@ -103,6 +152,7 @@ public class MajorMaker {
 			return false;
 		}
 		return true;
+		*/
 	}
 
 	private List<String> getMutantList() {

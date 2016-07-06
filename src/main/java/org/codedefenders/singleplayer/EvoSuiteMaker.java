@@ -128,22 +128,30 @@ public class EvoSuiteMaker {
 			else {
 				//Write every line and track braces.
 				t += l + "\n";
-				if(l.contains("{")) {
-					brOpen ++;
+				if(l.endsWith(";"))
+				{
+					//Normal line, no braces.
 				}
-				if(l.contains("}")) {
-					brClose ++;
-					if(brOpen == brClose) {
-						//Every opened bracket has been closed.
-						//Finish off the file.
-						//Add class start, test buffer and
-						//closing brace for class declaration.
-						tests.add(sharedStart + t + "} \n");
-						//Reset test buffer and brace counters.
-						t = "";
-						brOpen = 0;
-						brClose = 0;
-						inTest = false;
+				else
+				{
+					//Can have braces.
+					if(l.contains("{")) {
+						brOpen ++;
+					}
+					if(l.contains("}")) {
+						brClose ++;
+						if(brOpen == brClose) {
+							//Every opened bracket has been closed.
+							//Finish off the file.
+							//Add class start, test buffer and
+							//closing brace for class declaration.
+							tests.add(sharedStart + t + "} \n");
+							//Reset test buffer and brace counters.
+							t = "";
+							brOpen = 0;
+							brClose = 0;
+							inTest = false;
+						}
 					}
 				}
 			}
