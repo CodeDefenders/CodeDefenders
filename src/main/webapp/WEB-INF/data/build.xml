@@ -90,7 +90,7 @@
 			<arg value="-XMutator${mutOp}"/>
 			<!--<arg value="-J-Dmajor.export.mutants=true"/>-->
 			<arg value="-J-Dmajor.export.directory=${ai.mutants.dir}/${classname.only}"/>
-			<arg value="${cuts.dir}/${classname}"/>
+			<arg value="${cuts.dir}/${classname}.java"/>
 		</exec>
 		<!--Move the generated log file to the correct location-->
 		<move file="${codedef.home}/mutants.log" tofile="${ai.mutants.dir}/${classname.only}.log"/>
