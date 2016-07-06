@@ -36,7 +36,7 @@ public class MajorMaker {
 
 		File cutFile = new File(cut.javaFile);
 		List<String> cutLines = FileManager.readLines(cutFile.toPath());
-		int numValidMutants = 0;
+		ArrayList<Mutant> validMutants = new ArrayList<Mutant>();
 
 		for (String info : getMutantList()) {
 			//Each mutant in mutants log.
@@ -50,14 +50,39 @@ public class MajorMaker {
 			for (String l : newLines) {
 				mText += l + "\n";
 			}
-			if (createMutant(mText)) {
+			Mutant m = createMutant(mText);
+			if (m != null) {
 				//Successfully created and compiled(?) mutant.
-				numValidMutants ++;
-				//TODO: Add to xml.
+				validMutants.add(m);
 			}
 		}
 
+		createMutantIndex(validMutants);
 
+		return true;
+	}
+
+	public boolean createMutantIndex(ArrayList<Mutant> mutants) {
+		File dir = new File(AI_DIR + F_SEP + "mutants" + F_SEP + cutTitle);
+
+		String xml = "?xml version=\"1.0\"?>\n";
+		xml += "<mutantindex>\n";
+		xml += "\t<mutants>\n";
+		for(Mutant m : mutants) {
+			xml += "\t\t<mutant>\n";
+			xml += "\t\t\t<id>" + m.getId() + "</id>\n";
+			xml += "\t\t</mutant>\n";
+		}
+		xml += "\t</mutants>\n";
+		xml += "\t<quantity>" + mutants.size() + "</quantity>\n";
+		xml += "</mutantindex>\n";
+
+		try {
+			FileManager.createIndexXML(dir, "MutantsIndex", xml);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
 		return true;
 	}
 
@@ -95,7 +120,7 @@ public class MajorMaker {
 		return new MutantPatch(lineNum, beforeAfter);
 	}
 
-	private boolean createMutant(String mutantText) {
+	private Mutant createMutant(String mutantText) {
 
 		try {
 			File srcFile = new File(cut.javaFile);
@@ -112,7 +137,7 @@ public class MajorMaker {
 			}
 			// If there were no differences, return, as the mutant is the same as original.
 			if (noChange)
-				return false;
+				return null;
 
 			// Setup folder the files will go in
 			File newMutantDir = FileManager.getNextSubDir(AI_DIR + F_SEP + "mutants" + F_SEP + cutTitle);
@@ -126,15 +151,12 @@ public class MajorMaker {
 			bw.close();
 
 			// Compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
-			Mutant m = null;
-			m = AntRunner.compileMutant(newMutantDir, mutantFileName, dGame.getId(), cut, 1);
-			if(m != null) {
-				return true;
-			}
+			return AntRunner.compileMutant(newMutantDir, mutantFileName, dGame.getId(), cut, 1);
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return null;
 
 
 		/*

@@ -74,7 +74,7 @@ public class EvoSuiteMaker {
 		contents += "</testindex> \n";
 
 		try {
-			FileManager.createTestIndexFile(dir, contents);
+			FileManager.createIndexXML(dir, "TestsIndex", contents);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;

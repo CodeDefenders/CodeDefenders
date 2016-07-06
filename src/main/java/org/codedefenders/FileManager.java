@@ -19,8 +19,8 @@ import static org.codedefenders.Constants.*;
  */
 public class FileManager {
 
-	public static String createTestIndexFile(File dir, String contents) throws IOException {
-		String path = dir.getAbsolutePath() + F_SEP + "TestsIndex" + TEST_INFO_EXT;
+	public static String createIndexXML(File dir, String fileName, String contents) throws IOException {
+		String path = dir.getAbsolutePath() + F_SEP + fileName + ".xml";
 		File infoFile = new File(path);
 		FileWriter infoWriter = new FileWriter(infoFile);
 		BufferedWriter bInfoWriter = new BufferedWriter(infoWriter);
