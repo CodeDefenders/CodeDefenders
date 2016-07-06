@@ -161,7 +161,7 @@ class IndexContents {
 		//Parse the test index file of a given class.
 		try {
 			File f = new File(AI_DIR + F_SEP + "tests" + F_SEP +
-					className + F_SEP + className + TEST_INFO_EXT);
+					className + F_SEP + "TestsIndex" + TEST_INFO_EXT);
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuild = dbFactory.newDocumentBuilder();
 			Document d = dBuild.parse(f);
