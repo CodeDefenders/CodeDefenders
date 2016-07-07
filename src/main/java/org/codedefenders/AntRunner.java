@@ -25,6 +25,10 @@ public class AntRunner {
 
 	private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
 
+	public static boolean testKillsMutant(Mutant m, Test t) {
+		return true;
+	}
+
 	/**
 	 * Executes a test against a mutant
 	 * @param m A {@link Mutant} object
