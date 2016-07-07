@@ -37,6 +37,8 @@ public class UploadManager extends HttpServlet {
 		System.out.println("Uploading CUT");
 
 		String classId = null;
+		String fileName = null;
+		InputStream fileContent = null;
 		GameClass newSUT = null;
 
 		// Get actual parameters, because of the upload component, I can't do request.getParameter before fetching the file
@@ -44,7 +46,7 @@ public class UploadManager extends HttpServlet {
 			List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
 			for (FileItem item : items) {
 				if (item.isFormField()) {
-					// Process regular form field
+					// Process class alias
 					String fieldName = item.getFieldName();
 					String fieldValue = item.getString();
 					System.out.println("Upload parameter {" + fieldName + ":" + fieldValue + "}");
@@ -53,48 +55,54 @@ public class UploadManager extends HttpServlet {
 					else
 						System.out.println("Unrecognized parameter");
 				} else {
-					// Process form file field (input type="file").
+					// Process class file
 					String fieldName = item.getFieldName();
-					String fileName = FilenameUtils.getName(item.getName());
+					fileName = FilenameUtils.getName(item.getName());
 					System.out.println("Upload file parameter {" + fieldName + ":" + fileName + "}");
-					if (fieldName.equals("fileUpload") && !fileName.isEmpty()) {
-						System.out.println("Uploading new CUT: " + fileName);
-
-						InputStream fileContent = item.getInputStream();
-						File targetFile = new File(getServletContext().getRealPath(Constants.CUTS_DIR + Constants.FILE_SEPARATOR + fileName));
-						if (targetFile.exists()) {
-							messages.add("A class with the same name already exists, please try with a different one.");
-							response.sendRedirect(request.getHeader("referer"));
-							break;
-						}
-						FileUtils.copyInputStreamToFile(fileContent, targetFile);
-						String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
-						String classFileName = AntRunner.compileCUT(getServletContext(), fileName);
-						if (classFileName != null) {
-							String classFileNameDB = DatabaseAccess.addSlashes(classFileName);
-
-							// get fully qualified name
-							ClassPool classPool = ClassPool.getDefault();
-							CtClass cc = classPool.makeClass(new FileInputStream(new File(classFileName)));
-							String fullyQualifiedName = cc.getName();
-
-							// db insert
-							newSUT = new GameClass(fullyQualifiedName, javaFileNameDB, classFileNameDB);
-							newSUT.insert();
-
-							response.sendRedirect("games/create");
-
-						} else {
-							messages.add("We were unable to compile your class, please try with a simpler one (no dependencies)");
-							response.sendRedirect(request.getHeader("referer"));
-							break;
-						}
-					} else {
-						messages.add("No class was selected.");
-						response.sendRedirect(request.getHeader("referer"));
-						break;
-					}
+					if (fieldName.equals("fileUpload") && !fileName.isEmpty())
+						fileContent = item.getInputStream();
 				}
+			}
+			// two arguments processed?
+			if (classId == null || fileContent == null) {
+				messages.add("Please provide unique identifier and a .java file.");
+				response.sendRedirect(request.getHeader("referer"));
+				return;
+			}
+			// check that class alias is unique
+			if (GameClass.existUniqueClassID(classId)) {
+				messages.add("A class with identifier " + classId + " already exists, please use a different name.");
+				response.sendRedirect(request.getHeader("referer"));
+				return;
+			}
+
+			File targetFile = new File(getServletContext().getRealPath(Constants.CUTS_DIR +
+					Constants.FILE_SEPARATOR + fileName));
+			if (targetFile.exists()) {
+				messages.add("A class with the same name already exists, please try with a different one.");
+				response.sendRedirect(request.getHeader("referer"));
+			}
+			FileUtils.copyInputStreamToFile(fileContent, targetFile);
+			String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
+			String classFileName = AntRunner.compileCUT(getServletContext(), fileName);
+			if (classFileName != null) {
+				String classFileNameDB = DatabaseAccess.addSlashes(classFileName);
+
+				// get fully qualified name
+				//ClassPool classPool = ClassPool.getDefault();
+				//CtClass cc = classPool.makeClass(new FileInputStream(new File(classFileName)));
+				//String fullyQualifiedName = cc.getName();
+
+				// db insert
+				newSUT = new GameClass(classId, javaFileNameDB, classFileNameDB);
+				newSUT.insert();
+
+				response.sendRedirect("games/create");
+
+			} else {
+				messages.add("We were unable to compile your class, please try with a simpler one (no dependencies)");
+				response.sendRedirect(request.getHeader("referer"));
+				return;
 			}
 		} catch (FileUploadException e) {
 			throw new ServletException("Cannot parse multipart request.", e);
