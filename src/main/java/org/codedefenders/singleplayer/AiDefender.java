@@ -97,7 +97,6 @@ public class AiDefender extends AiPlayer {
 			}
 		}
 
-		//TODO: CHECK THIS BLOCK:
 		//If standard strategy fails, choose first non-selected test.
 		for (int x = 0; x < totalTests; x++) {
 

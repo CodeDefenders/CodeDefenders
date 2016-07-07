@@ -95,14 +95,13 @@ public class AiAttacker extends AiPlayer {
 			}
 		}
 
-		//TODO: CHECK THIS BLOCK:
 		//If standard strategy fails, make a choice linearly.
 		for (int x = 0; x < totalMutants; x++) {
 
 			Mutant origM = origMutants.get(x);
 			m = origM.getId();
 
-			if(!usedMutants.contains(x)) {
+			if(!usedMutants.contains(m)) {
 				//Found an unused mutant.
 				return m;
 			}
