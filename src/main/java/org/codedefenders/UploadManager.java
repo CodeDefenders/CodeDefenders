@@ -99,7 +99,7 @@ public class UploadManager extends HttpServlet {
 							*/
 
 							//Prepare AI classes.
-							PrepareAI p = new PrepareAI(newSUT.id);
+							PrepareAI.createTestsAndMutants(newSUT.id);
 
 							//Run tests on mutants to determine potential equivalents.
 

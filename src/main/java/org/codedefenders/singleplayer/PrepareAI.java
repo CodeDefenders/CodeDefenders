@@ -1,10 +1,17 @@
 package org.codedefenders.singleplayer;
 
+import org.codedefenders.AntRunner;
 import org.codedefenders.Game;
+import org.codedefenders.Mutant;
+import org.codedefenders.Test;
 
 public class PrepareAI {
 
-	public PrepareAI(int classId) {
+	public PrepareAI() {
+
+	}
+
+	public static void createTestsAndMutants(int classId) {
 		Game dummyGame = new Game(classId, 1, 3, Game.Role.ATTACKER, Game.Level.EASY);
 		dummyGame.insert();
 		dummyGame.setDefenderId(1);
@@ -17,6 +24,13 @@ public class PrepareAI {
 
 		MajorMaker mMake = new MajorMaker(classId, dummyGame);
 		mMake.createMutants();
+
+		for (Test t : dummyGame.getTests()) {
+			for (Mutant m : dummyGame.getMutants()) {
+				//Find if mutant killed by test.
+				AntRunner.testKillsMutant(m, t);
+			}
+		}
 
 		//Create XML files.
 		esMake.createTestIndex();
