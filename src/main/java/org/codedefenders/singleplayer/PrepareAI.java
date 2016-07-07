@@ -18,6 +18,10 @@ public class PrepareAI {
 		MajorMaker mMake = new MajorMaker(classId, dummyGame);
 		mMake.createMutants();
 
+		//Create XML files.
+		esMake.createTestIndex();
+		mMake.createMutantIndex();
+
 		//TODO: Find how many tests "kill" mutants.
 		//Don't actually kill mutants to run all tests.
 		//Perhaps rank mutants in how many tests kill them.

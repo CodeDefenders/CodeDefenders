@@ -14,7 +14,8 @@ public class EvoSuiteMaker {
 	private String cutTitle;
 	private int cId;
 	private GameClass cut;
-	Game dGame;
+	private Game dGame;
+	private ArrayList<Integer> testIds;
 
 	public EvoSuiteMaker(int classId, Game dummyGame) {
 		cId = classId;
@@ -29,7 +30,7 @@ public class EvoSuiteMaker {
 		//Need a dummy game to add test to.
 
 		ArrayList<String> testStrings = getTestStrings();
-		ArrayList<Integer> testIds = new ArrayList<Integer>();
+		testIds = new ArrayList<Integer>();
 
 		try {
 			for (String t : testStrings) {
@@ -49,12 +50,10 @@ public class EvoSuiteMaker {
 			return false;
 		}
 
-		makeIndexFile(testIds, dGame.getId());
-
 		return true; //Success
 	}
 
-	private boolean makeIndexFile(ArrayList<Integer> testIds, int dummyGameId) {
+	public boolean createTestIndex() {
 		File dir = new File(AI_DIR + F_SEP + "tests" + F_SEP + cutTitle);
 		String contents = "";
 		contents += "<?xml version=\"1.0\"?> \n";
@@ -69,7 +68,7 @@ public class EvoSuiteMaker {
 		//Number of tests.
 		contents += "\t<quantity>" + testIds.size() + "</quantity> \n";
 		//ID of dummy game.
-		contents += "\t<dummygame>" + dummyGameId + "</dummygame> \n";
+		contents += "\t<dummygame>" + dGame.getId() + "</dummygame> \n";
 
 		contents += "</testindex> \n";
 

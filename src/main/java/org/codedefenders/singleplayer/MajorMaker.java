@@ -22,7 +22,8 @@ public class MajorMaker {
 	private String cutTitle;
 	private int cId;
 	private GameClass cut;
-	Game dGame;
+	private Game dGame;
+	private ArrayList<Mutant> validMutants;
 
 	public MajorMaker(int classId, Game dummyGame) {
 		cId = classId;
@@ -36,7 +37,7 @@ public class MajorMaker {
 
 		File cutFile = new File(cut.javaFile);
 		List<String> cutLines = FileManager.readLines(cutFile.toPath());
-		ArrayList<Mutant> validMutants = new ArrayList<Mutant>();
+		validMutants = new ArrayList<Mutant>();
 
 		for (String info : getMutantList()) {
 			//Each mutant in mutants log.
@@ -57,25 +58,23 @@ public class MajorMaker {
 			}
 		}
 
-		createMutantIndex(validMutants, dGame.getId());
-
 		return true;
 	}
 
-	public boolean createMutantIndex(ArrayList<Mutant> mutants, int dummyGameId) {
+	public boolean createMutantIndex() {
 		File dir = new File(AI_DIR + F_SEP + "mutants" + F_SEP + cutTitle);
 
 		String xml = "<?xml version=\"1.0\"?>\n";
 		xml += "<mutantindex>\n";
 		xml += "\t<mutants>\n";
-		for(Mutant m : mutants) {
+		for(Mutant m : validMutants) {
 			xml += "\t\t<mutant ";
 			xml += "id=\"" + m.getId() + "\" ";
 			xml += " />\n";
 		}
 		xml += "\t</mutants>\n";
-		xml += "\t<quantity>" + mutants.size() + "</quantity>\n";
-		xml += "\t<dummygame>" + dummyGameId + "</dummygame> \n";
+		xml += "\t<quantity>" + validMutants.size() + "</quantity>\n";
+		xml += "\t<dummygame>" + dGame.getId() + "</dummygame> \n";
 
 		xml += "</mutantindex>\n";
 
