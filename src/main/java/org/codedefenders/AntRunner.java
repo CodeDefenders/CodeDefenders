@@ -26,7 +26,13 @@ public class AntRunner {
 	private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
 
 	public static boolean testKillsMutant(Mutant m, Test t) {
-		return true;
+		String className = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
+		String[] resultArray = runAntTarget("test-mutant", m.getFolder(), t.getFolder(), className, t.getFullyQualifiedClassName());
+		if (resultArray[0].toLowerCase().contains("failures: 0")) {
+			//Mutant killed.
+			return true;
+		}
+		return false;
 	}
 
 	/**
