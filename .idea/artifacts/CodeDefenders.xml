@@ -81,7 +81,6 @@
       <element id="dir-copy" path="$PROJECT_DIR$/src/main/resources" />
       <element id="directory" name="META-INF" />
       <element id="dir-copy" path="$PROJECT_DIR$/src/main/webapp" />
-      <element id="javaee-facet-resources" facet="CodeDefenders/web/Web" />
     </root>
   </artifact>
 </component>

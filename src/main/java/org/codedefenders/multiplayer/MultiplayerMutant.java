@@ -38,7 +38,9 @@ public class MultiplayerMutant {
 
 	private Equivalence equivalent;
 
-	private int attackerId;
+	private int playerId;
+
+	private int score;
 
 	/**
 	 * Creates a mutant
@@ -46,15 +48,31 @@ public class MultiplayerMutant {
 	 * @param jFile
 	 * @param cFile
 	 * @param alive
-	 * @param ownerId
+	 * @param playerId
 	 */
-	public MultiplayerMutant(int gameId, String jFile, String cFile, boolean alive, int attackerId) {
+	public MultiplayerMutant(int mutantId, int gameId, String jFile, String cFile, String equivalent, boolean alive, int playerId) {
+		id = mutantId;
 		this.gameId = gameId;
 		this.javaFile = jFile;
 		this.classFile = cFile;
 		this.alive = alive;
-		this.equivalent = Equivalence.ASSUMED_NO;
-		this.attackerId = attackerId;
+		this.equivalent = Equivalence.valueOf(equivalent);
+		this.playerId = playerId;
+
+		score = 0;
+	}
+
+
+	public int getPlayerId(){
+		return playerId;
+	}
+
+	public int getScore(){
+		return score;
+	}
+
+	public void setScore(int score){
+		this.score += score;
 	}
 
 	public int getId() {
@@ -86,7 +104,7 @@ public class MultiplayerMutant {
 	}
 
 	public boolean isAlive() {
-		System.out.println(alive); return alive;
+		return alive;
 	}
 
 	public int sqlAlive() {
@@ -95,12 +113,13 @@ public class MultiplayerMutant {
 
 	public void kill() {
 		alive = false;
+		equivalent = Equivalence.PROVEN_NO;
 		update();
 	}
 
 	public Patch getDifferences() {
 
-		int classId = DatabaseAccess.getGameForKey("Game_ID", gameId).getClassId();
+		int classId = DatabaseAccess.getMultiplayerGame(gameId).getClassId();
 		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
 		File sourceFile = new File(sut.javaFile);
@@ -113,7 +132,7 @@ public class MultiplayerMutant {
 	}
 
 	public String getPatchString() {
-		int classId = DatabaseAccess.getGameForKey("Game_ID", gameId).getClassId();
+		int classId = DatabaseAccess.getMultiplayerGame(gameId).getClassId();
 		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
 		File sourceFile = new File(sut.javaFile);
@@ -189,8 +208,8 @@ public class MultiplayerMutant {
 			stmt = conn.createStatement();
 			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
 			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
-			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Attacker_ID)" +
-					" VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, -1, sqlAlive(), attackerId);
+			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points)" +
+					" VALUES (%s, %s, %d, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, -1, sqlAlive(), playerId, score);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -244,8 +263,8 @@ public class MultiplayerMutant {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			String sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d' WHERE Mutant_ID='%d';",
-					equivalent.name(), sqlAlive(), id);
+			String sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', Points=%d WHERE Mutant_ID='%d';",
+					equivalent.name(), sqlAlive(), score, id);
 			stmt.execute(sql);
 
 			conn.close();

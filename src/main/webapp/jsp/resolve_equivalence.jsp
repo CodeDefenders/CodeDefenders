@@ -59,12 +59,12 @@
 				</td>
 				<td>
 					<form id="equivalenceForm" action="play" method="post">
-						<input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= m.getId() %>">
-						<input type="hidden" name="formType" value="resolveEquivalence">
-						<div class="btn-right">
+					<input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= m.getId() %>">
+					<input type="hidden" name="formType" value="resolveEquivalence">
+					<div class="btn-right">
 						<input class="btn btn-default" name="acceptEquivalent" type="submit" value="Accept Equivalent">
 						<input class="btn btn-primary" name="rejectEquivalent" type="submit" value="Submit Killing Test">							</div>
-					</form>
+				</form>
 				</td>
 			</tr>
 			<tr>

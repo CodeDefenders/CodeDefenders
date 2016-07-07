@@ -1,8 +1,9 @@
 /*
  Base css file. The compiled .css from this file should be the only file included on your web
 */
-@import "../js/libs/waves/dist/waves.css";
-@import "../fonts/icomoon/style.css";
+/*@import "../js/libs/waves/dist/waves.css";*/
+/*@import "../fonts/icomoon/style.css";*/
+
 .bg-red {
   background-color: #e51c23;
 }
@@ -5138,7 +5139,6 @@ a:hover {
 html {
   font-size: 62.5%;
   -webkit-tap-highlight-color: rgba(0,0,0,0);
-  font-family: sans-serif;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   -webkit-font-smoothing: antialiased;
@@ -6117,22 +6117,22 @@ a.list-item:hover {
 a.list-item:hover:hover {
   color: #009688;
 }
-.modal {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: rgba(0,0,0,0.5);
-}
-.modal .modal-inner {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-}
+/*.modal {*/
+  /*content: '';*/
+  /*position: absolute;*/
+  /*top: 0;*/
+  /*right: 0;*/
+  /*bottom: 0;*/
+  /*left: 0;*/
+  /*background-color: rgba(0,0,0,0.5);*/
+/*}*/
+/*.modal .modal-inner {*/
+  /*position: absolute;*/
+  /*top: 0;*/
+  /*right: 0;*/
+  /*bottom: 0;*/
+  /*left: 0;*/
+/*}*/
 /*.slider {*/
   /*overflow: hidden;*/
   /*position: relative;*/
@@ -6454,13 +6454,7 @@ a.tile {
   -ms-transform: rotateY(-180deg);
   transform: rotateY(-180deg);
 }
-body {
-  font-family: 'Roboto', arial;
-  font-size: 14px;
-  line-height: 22px;
-  color: #424242;
-  background-color: #fafafa;
-}
+
 a {
   color: #00bcd4;
   text-decoration: none;

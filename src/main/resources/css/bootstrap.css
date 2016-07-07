@@ -5918,7 +5918,7 @@ button.close {
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 1050;
+  z-index: 100050;
   display: none;
   overflow: hidden;
   -webkit-overflow-scrolling: touch;
@@ -5966,7 +5966,7 @@ button.close {
   right: 0;
   bottom: 0;
   left: 0;
-  z-index: 1040;
+  z-index: 100040;
   background-color: #000;
 }
 .modal-backdrop.fade {
@@ -6035,7 +6035,7 @@ button.close {
 }
 .tooltip {
   position: absolute;
-  z-index: 1070;
+  z-index: 100070;
   display: block;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 12px;
@@ -6152,7 +6152,7 @@ button.close {
   position: absolute;
   top: 0;
   left: 0;
-  z-index: 1060;
+  z-index: 100060;
   display: none;
   max-width: 276px;
   padding: 1px;

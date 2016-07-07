@@ -260,7 +260,7 @@ public class Mutant {
 			stmt = conn.createStatement();
 			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
 			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
-			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Owner_ID)" +
+			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID)" +
 					" VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), ownerId);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);

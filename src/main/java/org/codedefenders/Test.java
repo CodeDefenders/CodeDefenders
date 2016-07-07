@@ -3,7 +3,6 @@ package org.codedefenders;
 import javassist.ClassPool;
 import javassist.CtClass;
 import org.codedefenders.multiplayer.LineCoverage;
-import org.codedefenders.multiplayer.LineCovered;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -27,10 +26,11 @@ public class Test {
 	private int roundCreated;
 	private int mutantsKilled = 0;
 
-	private int ownerId;
-	private int defenderId = -1;
+	private int playerId;
 
 	private LineCoverage lineCoverage = LineCoverage.NONE;
+
+	private int score;
 
 	public void setLineCoverage(LineCoverage lc){
 		lineCoverage = lc;
@@ -40,26 +40,39 @@ public class Test {
 		return lineCoverage;
 	}
 
-	public void setDefenderId(int defId){
-		defenderId = defId;
+	public void setPlayerId(int id){
+		playerId = id;
 	}
 
 
 
-	public int getDefenderId(){
-		return defenderId;
+	public int getPlayerId(){
+		return playerId;
 	}
 
-	public Test(int gameId, String jFile, String cFile, int ownerId) {
+	public int getScore(){
+		return score;
+	}
+
+	public void setScore(int s){
+		score += s;
+	}
+
+	public Test(int gameId, String jFile, String cFile, int playerId) {
 		this.gameId = gameId;
-		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
+		try {
+			this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
+		} catch (NullPointerException e) {
+			//multiplayer game
+		}
 		this.javaFile = jFile;
 		this.classFile = cFile;
-		this.ownerId = ownerId;
+		this.playerId = playerId;
+		score = 0;
 	}
 
-	public Test(int tid, int gid, String jFile, String cFile, int roundCreated, int mutantsKilled, int ownerId) {
-		this(gid, jFile, cFile, ownerId);
+	public Test(int tid, int gid, String jFile, String cFile, int roundCreated, int mutantsKilled, int playerId) {
+		this(gid, jFile, cFile, playerId);
 
 		this.id = tid;
 		this.roundCreated = roundCreated;
@@ -79,7 +92,7 @@ public class Test {
 	}
 
 	public int getDefenderPoints() {
-		if (ownerId == DatabaseAccess.getGameForKey("Game_ID", gameId).getDefenderId())
+		if (playerId == DatabaseAccess.getGameForKey("Game_ID", gameId).getDefenderId())
 			return mutantsKilled;
 		else
 			return 0;
@@ -130,13 +143,8 @@ public class Test {
 			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
 			// class file can be null
 			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
-			if (defenderId >= 0){
-				sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Owner_ID, Defender_ID) " +
-						"VALUES (%s, %s, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, ownerId, defenderId);
-			} else {
-				sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Owner_ID) " +
-						"VALUES (%s, %s, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, ownerId);
-			}
+			sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points) " +
+						"VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, playerId, score);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -205,20 +213,14 @@ public class Test {
 
 			//-1 for the left over comma
 
-			if (defenderId >= 0){
-				sql = String.format("UPDATE tests SET mutantsKilled='%d', " +
-						"Defender_ID=%d, " +
-						"Lines_Covered='%s', " +
-						"Lines_Uncovered='%s' " +
-						"WHERE Test_ID='%d';",
-						mutantsKilled, defenderId, linesCoveredString, linesUncoveredString, id);
-			} else {
-				sql = String.format("UPDATE tests SET mutantsKilled='%d', " +
-						"Lines_Covered='%s', " +
-						"Lines_Uncovered='%s' " +
-						"WHERE Test_ID='%d';",
-						mutantsKilled, linesCoveredString, linesUncoveredString, id);
-			}
+
+			sql = String.format("UPDATE tests SET mutantsKilled='%d', " +
+					"Player_ID=%d, " +
+					"Lines_Covered='%s', " +
+					"Lines_Uncovered='%s'," +
+					"Points = %d " +
+					"WHERE Test_ID='%d';",
+					mutantsKilled, playerId, linesCoveredString, linesUncoveredString, score, id);
 			stmt.execute(sql);
 
 			conn.close();

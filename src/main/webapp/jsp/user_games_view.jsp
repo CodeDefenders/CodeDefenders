@@ -7,16 +7,26 @@
 	String atkName;
 	String defName;
 	int uid = (Integer)request.getSession().getAttribute("uid");
-	ArrayList<Game> games = DatabaseAccess.getGamesForUser(uid);
+	ArrayList<Game> games = DatabaseAccess.getGamesForUser(uid); %>
+<div class="w-100">
+	<h2>Duels</h2>
+<table class="table table-hover table-responsive table-paragraphs">
+	<tr>
+		<th class="col-sm-2">Game No.</th>
+		<th class="col-sm-2">Attacker</th>
+		<th class="col-sm-2">Defender</th>
+		<th class="col-sm-2">Game State</th>
+		<th class="col-sm-2">Class Under Test</th>
+		<th class="col-sm-2">Level</th>
+		<th class="col-sm-2"></th>
+	</tr>
+	<%
 	if (games.isEmpty()) {
 %>
-	<p> You are not currently in any games. </p>
+	<tr><td colspan="7"> You are not currently in any games.</td></tr>
 <%
 	} else {
 		%>
-<div class="w-100">
-	<h3>Duels</h3>
-<table><tr><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>
 	<%
 		for (Game g : games) {
 			atkName = null;
@@ -75,18 +85,18 @@
 </table>
 	<a href="/games/create">Create Duel</a>
 	<hr />
-	<h3>Battlegrounds</h3>
+	<h2>Battlegrounds</h2>
+	<table class="table table-hover table-responsive table-paragraphs"><tr><th>Game ID</th><th>Owner</th><th>
+		Price
+	</th><th>Level</th><th>Actions</th></tr>
 <%
 	ArrayList<MultiplayerGame> mgames = DatabaseAccess.getMultiplayerGamesForUser(uid);
 	if (mgames.isEmpty()) {
 %>
-<p> You are not currently in any games. </p>
+<tr><td colspan="5"> You are not currently in any games. </td></tr>
 <%
 } else {
 %>
-<table><tr><th>Game ID</th><th>Owner</th><th>Participation</th><th>Coverage Goal</th><th>Mutant Coverage Goal</th><th>
-	Price
-</th><th>Level</th><th>Actions</th></tr>
 	<%
 		for (MultiplayerGame g : mgames) {
 			Participance participance = g.getParticipance(uid);
@@ -94,9 +104,6 @@
 	<tr>
 		<td class="col-sm-2"><%= g.getId() %></td>
 		<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
-		<td class="col-sm-2"><%= participance %></td>
-		<td class="col-sm-2"><%= g.getLineCoverage() %></td>
-		<td class="col-sm-2"><%= g.getMutantCoverage() %></td>
 		<td class="col-sm-2"><%= g.getPrice() %></td>
 		<td class="col-sm-2"><%= g.getLevel().name() %></td>
 		<td class="col-sm-2"><%

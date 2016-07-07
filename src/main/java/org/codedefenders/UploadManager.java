@@ -82,7 +82,7 @@ public class UploadManager extends HttpServlet {
 							newSUT = new GameClass(fullyQualifiedName, javaFileNameDB, classFileNameDB);
 							newSUT.insert();
 
-							response.sendRedirect("games/create");
+							response.sendRedirect("games/user");
 
 						} else {
 							messages.add("We were unable to compile your class, please try with a simpler one (no dependencies)");

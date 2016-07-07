@@ -9,10 +9,10 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.stmt.*;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.*;
+import org.codedefenders.scoring.Scorer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -44,7 +44,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 		switch (request.getParameter("formType")) {
 
-			case "resolveEquivalence":
+			case "resolveEquivalence": {
 				logger.debug("Executing Action resolveEquivalence");
 				System.out.println("MultiplayerGame Manager Executing Action resolveEquivalence");
 				int currentEquivMutantID = Integer.parseInt(request.getParameter("currentEquivMutant"));
@@ -52,85 +52,75 @@ public class MultiplayerGameManager extends HttpServlet {
 				System.out.println("CurrentEquivMutant ID = " + currentEquivMutantID);
 
 				// Check type of equivalence response.
-				if (request.getParameter("rejectEquivalent") != null) { // If user wanted to supply a test
-					logger.debug("Equivalence rejected, going to process killing test form mutant " + currentEquivMutantID);
-					System.out.println("Equivalence rejected, going to process killing test for mutant " + currentEquivMutantID);
+				//logger.debug("Equivalence rejected, going to process killing test form mutant " + currentEquivMutantID);
+				//System.out.println("Equivalence rejected, going to process killing test for mutant " + currentEquivMutantID);
 
-					// Get the text submitted by the user.
-					String testText = request.getParameter("test");
+				// Get the text submitted by the user.
+				String testText = request.getParameter("test");
 
-					// If it can be written to file and compiled, end turn. Otherwise, dont.
-					Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
-					if (newTest == null) {
-						messages.add(TEST_INVALID_MESSAGE);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect("play");
-						return;
-					}
+				int defId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
 
-					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+				// If it can be written to file and compiled, end turn. Otherwise, dont.
+				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, defId, "mp");
 
-					if (compileTestTarget.status.equals("SUCCESS")) {
-						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
-						if (testOriginalTarget.status.equals("SUCCESS")) {
-							System.out.println(TEST_PASSED_ON_CUT_MESSAGE);
-							if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
-								// Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
-								MutationTester.runEquivalenceTest(getServletContext(), newTest, mutant);
-								activeGame.update();
-								MultiplayerMutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
-								if (mutantAfterTest.getEquivalent().equals(ASSUMED_YES)) {
-									logger.info("Test failed to kill the mutant, hence assumed equivalent");
-									messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
-								} else { // PROVEN_NO
-									logger.info("Mutant was killed, hence tagged not equivalent");
-									messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
-								}
-								response.sendRedirect("play");
-								return;
-							} else {
-								activeGame.update();
+				if (newTest == null) {
+					messages.add(TEST_INVALID_MESSAGE);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+					response.sendRedirect("multiplayer/play");
+					return;
+				}
+
+				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+
+				if (compileTestTarget.status.equals("SUCCESS")) {
+					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+					if (testOriginalTarget.status.equals("SUCCESS")) {
+						System.out.println(TEST_PASSED_ON_CUT_MESSAGE);
+						if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
+							// Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
+
+							MutationTester.runEquivalenceTest(getServletContext(), newTest, mutant);
+							activeGame.update();
+							MultiplayerMutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
+							if (mutantAfterTest.getEquivalent().equals(ASSUMED_YES)) {
+								logger.info("Test failed to kill the mutant, hence assumed equivalent");
+								messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
+							} else { // PROVEN_NO
+								logger.info("Mutant was killed, hence tagged not equivalent");
 								messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
-								response.sendRedirect("play");
-								return;
+
+								newTest.setPlayerId(defId);
+								ArrayList<MultiplayerMutant> mm = new ArrayList<MultiplayerMutant>();
+								mm.add(mutantAfterTest);
+								newTest.setScore(Scorer.score(activeGame, newTest, mm));
+								newTest.update();
 							}
+
+							MutationTester.runTestOnAllMultiplayerMutants(getServletContext(), activeGame, newTest, messages);
+							activeGame.update();
+
+							response.sendRedirect("play");
+							return;
 						} else {
-							//  (testOriginalTarget.status.equals("FAIL") || testOriginalTarget.status.equals("ERROR")
-							System.out.println("testOriginalTarget: " + testOriginalTarget);
-							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
-							messages.add(testOriginalTarget.message);
-							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+							activeGame.update();
+							messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
+							response.sendRedirect("play");
+							return;
 						}
 					} else {
-						System.out.println("compileTestTarget: " + compileTestTarget);
-						messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
-						messages.add(compileTestTarget.message);
+						//  (testOriginalTarget.status.equals("FAIL") || testOriginalTarget.status.equals("ERROR")
+						System.out.println("testOriginalTarget: " + testOriginalTarget);
+						messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
+						messages.add(testOriginalTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					}
-				} else if (request.getParameter("acceptEquivalent") != null) { // If the user didnt want to supply a test
-					logger.debug("Equivalence accepted");
-					System.out.println("Equivalence accepted");
-					if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
-						mutant.setEquivalent(Mutant.Equivalence.DECLARED_YES);
-						mutant.kill();
-
-						messages.add(MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
-						activeGame.update();
-						response.sendRedirect("play");
-						return;
-					}
+				} else {
+					System.out.println("compileTestTarget: " + compileTestTarget);
+					messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+					messages.add(compileTestTarget.message);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 				}
-				break;
-			case "claimEquivalent":
-				if (request.getParameter("mutantId") != null) {
-					int mutantId = Integer.parseInt(request.getParameter("mutantId"));
-					MultiplayerMutant mutantClaimed = DatabaseAccess.getMultiplayerMutant(mutantId);
-					mutantClaimed.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-					mutantClaimed.update();
-					messages.add(MUTANT_CLAIMED_EQUIVALENT_MESSAGE);
-					activeGame.update();
-				} else
-					messages.add(MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE);
+			}
 				break;
 
 			case "createMutant":
@@ -138,7 +128,7 @@ public class MultiplayerGameManager extends HttpServlet {
 				// Get the text submitted by the user.
 				String mutantText = request.getParameter("mutant");
 
-				int attackerId = DatabaseAccess.getAttackerIdForMultiplayerGame(uid, gameId);
+				int attackerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
 
 				MultiplayerMutant newMutant = createMultiplayerMutant(activeGame.getId(), activeGame.getClassId(), mutantText, attackerId, "mp");
 				if (newMutant != null) {
@@ -165,9 +155,9 @@ public class MultiplayerGameManager extends HttpServlet {
 				String testText = request.getParameter("test");
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
-				int defenderId = DatabaseAccess.getDefenderIdForMultiplayerGame(uid, gameId);
+				int defenderId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
 				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
-				newTest.setDefenderId(defenderId);
+				newTest.setPlayerId(defenderId);
 				newTest.update();
 				System.out.println("Defender " + defenderId + " submitted new test");
 				if (newTest == null) {
@@ -301,7 +291,7 @@ public class MultiplayerGameManager extends HttpServlet {
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-			AntRunner.testOriginal(getServletContext(), newTestDir, newTest);
+			AntRunner.testOriginal(getServletContext(), newTestDir, newTest, DatabaseAccess.getMultiplayerGame(gid).getClassName());
 		}
 		return newTest;
 	}

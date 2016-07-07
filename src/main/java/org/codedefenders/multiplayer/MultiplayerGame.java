@@ -1,5 +1,6 @@
 package org.codedefenders.multiplayer;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,8 +10,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
+import static org.codedefenders.Mutant.Equivalence.ASSUMED_NO;
 import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
+import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 
 public class MultiplayerGame {
 
@@ -86,13 +91,15 @@ public class MultiplayerGame {
 		this.price = price;
 	}
 
-	public MultiplayerGame(int classId, int creatorId, Game.Level level, float lineCoverage, float mutantCoverage, float price) {
+	public MultiplayerGame(int classId, int creatorId, Game.Level level, float lineCoverage, float mutantCoverage, float price,int defenderValue, int attackerValue) {
 		this.classId = classId;
 		this.creatorId = creatorId;
 		this.level = level;
 		this.lineCoverage = lineCoverage;
 		this.mutantCoverage = mutantCoverage;
 		this.price = price;
+		this.defenderValue = defenderValue;
+		this.attackerValue = attackerValue;
 	}
 
 	public int getId() {
@@ -119,16 +126,18 @@ public class MultiplayerGame {
 		this.level = level;
 	}
 
+	//private List<Mutant> mutants = null;
+
 
 	public ArrayList<MultiplayerMutant> getMutants() {
-		int[] attackers = getAttackerIds();
+		int[] attackers = getPlayerIds();
 		return DatabaseAccess.getMutantsForAttackers(attackers);
 	}
 
 	public ArrayList<MultiplayerMutant> getAliveMutants() {
 		ArrayList<MultiplayerMutant> aliveMutants = new ArrayList<>();
 		for (MultiplayerMutant m : getMutants()) {
-			if (m.isAlive() && (m.getClassFile() != null)) {
+			if (m.isAlive() && m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO) && (m.getClassFile() != null)) {
 				aliveMutants.add(m);
 			}
 		}
@@ -148,7 +157,7 @@ public class MultiplayerGame {
 	public ArrayList<MultiplayerMutant> getMutantsMarkedEquivalent() {
 		ArrayList<MultiplayerMutant> equivMutants = new ArrayList<>();
 		for (MultiplayerMutant m : getMutants()) {
-			if (m.isAlive() && m.getEquivalent().equals(PENDING_TEST)) {
+			if (!m.getEquivalent().equals(ASSUMED_NO) && !m.getEquivalent().equals(PROVEN_NO)) {
 				equivMutants.add(m);
 			}
 		}
@@ -164,12 +173,12 @@ public class MultiplayerGame {
 	}
 
 	public ArrayList<Test> getTests() {
-		return DatabaseAccess.getTestsForGame(id);
+		return getExecutableTests();
 	}
 
 	public ArrayList<Test> getExecutableTests() {
 		ArrayList<Test> allTests = new ArrayList<>();
-		int[] defenders = getDefenderIds();
+		int[] defenders = getPlayerIds();
 		for (int i = 0; i < defenders.length; i++){
 			ArrayList<Test> tests = DatabaseAccess.getExecutableTestsForMultiplayerGame(defenders[i]);
 			allTests.addAll(tests);
@@ -185,20 +194,22 @@ public class MultiplayerGame {
 		return DatabaseAccess.getAttackersForMultiplayerGame(getId());
 	}
 
+	public int[] getPlayerIds() { return ArrayUtils.addAll(getDefenderIds(), getAttackerIds());}
+
 	public boolean addUserAsAttacker(int userId) {
-		String sql = String.format("INSERT INTO attackers " +
-						"(Game_ID, User_ID, Points) VALUES " +
-						"(%d, %d, 0);",
-				id, userId);
+		String sql = String.format("INSERT INTO players " +
+						"(Game_ID, User_ID, Points, Role) VALUES " +
+						"(%d, %d, 0, '%s');",
+				id, userId, Participance.ATTACKER);
 
 		return runStatement(sql);
 	}
 
 	public boolean addUserAsDefender(int userId) {
-		String sql = String.format("INSERT INTO defenders " +
-						"(Game_ID, User_ID, Points) VALUES " +
-						"(%d, %d, 0);",
-				id, userId);
+		String sql = String.format("INSERT INTO players " +
+						"(Game_ID, User_ID, Points, Role) VALUES " +
+						"(%d, %d, 0, '%s');",
+				id, userId, Participance.DEFENDER);
 
 		return runStatement(sql);
 	}
@@ -351,4 +362,41 @@ public class MultiplayerGame {
 	public Participance getParticipance(int userId){
 		return DatabaseAccess.getParticipance(userId, getId());
 	}
+
+	public HashMap<Integer, Integer> getMutantScores(){
+		HashMap<Integer, Integer> mutantScores = new HashMap<Integer, Integer>();
+
+		ArrayList<MultiplayerMutant> allMutants = new ArrayList<MultiplayerMutant>();
+		allMutants.addAll(getAliveMutants());
+		allMutants.addAll(getKilledMutants());
+		for (MultiplayerMutant mm : getMutantsMarkedEquivalent()){
+			if (!mm.getEquivalent().equals(Mutant.Equivalence.DECLARED_YES) && !mm.getEquivalent().equals(Mutant.Equivalence.ASSUMED_YES)){
+				allMutants.add(mm);
+			}
+		}
+
+
+		for (MultiplayerMutant mm : allMutants){
+			if (!mutantScores.containsKey(mm.getPlayerId())){
+				mutantScores.put(mm.getPlayerId(), 0);
+			}
+
+			mutantScores.put(mm.getPlayerId(), mutantScores.get(mm.getPlayerId())+mm.getScore());
+		}
+		return mutantScores;
+	}
+
+	public HashMap<Integer, Integer> getTestScores(){
+		HashMap<Integer, Integer> testScores = new HashMap<Integer, Integer>();
+
+		for (Test tt : getTests()){
+			if (!testScores.containsKey(tt.getPlayerId())){
+				testScores.put(tt.getPlayerId(), 0);
+			}
+			testScores.put(tt.getPlayerId(), testScores.get(tt.getPlayerId()) + tt.getScore());
+		}
+
+		return testScores;
+	}
+
 }

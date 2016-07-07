@@ -1,61 +1,12 @@
-<!DOCTYPE html>
-<html>
+<% String pageTitle = "Login"; %>
 
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-
-	<!-- Title -->
-	<title>Code Defenders - Login</title>
-
-    <!-- App context -->
-    <base href="${pageContext.request.contextPath}/">
-
-	<!-- jQuery -->
-	<script src="js/jquery.min.js" type="text/javascript" ></script>
-
-	<!-- Bootstrap -->
-	<script src="js/bootstrap.min.js" type="text/javascript" ></script>
-	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-
-	<!-- MultiplayerGame -->
-	<link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
-
-</head>
-
-<body>
-
-  <%@ page import="java.util.*" %>
-	<nav class="navbar navbar-inverse navbar-fixed-top">
-  		<div class="container-fluid">
-		    <div class="navbar-header">
-			    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
-			    </button>
-			    <a class="navbar-brand" href="/">
-				    <span><img class="logo" href="/" src="images/logo.png"/></span>
-				    Code Defenders
-			    </a>
-		    </div>
-   		</div>
-	</nav>
+<%@ include file="/jsp/header_logout.jsp" %>
 
   <%
 	  Object uid = request.getSession().getAttribute("uid");
 	  Object username = request.getSession().getAttribute("username");
 	  if (uid != null && username != null)
 		  response.sendRedirect("games");
-  %>
-  <% 
-      ArrayList<String> messages = (ArrayList<String>) request.getAttribute("messages");
-      if (messages != null) {
-        for (String m : messages) { %>
-          <div class="alert alert-info">
-              <strong><%=m%></strong>
-          </div>
-        <% }
-      }
   %>
 
 
@@ -103,6 +54,4 @@
 
       </div>
   </div>
-
-</body>
-</html>
+<%@ include file="/jsp/footer_logout.jsp" %>

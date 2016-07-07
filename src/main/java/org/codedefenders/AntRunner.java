@@ -130,7 +130,7 @@ public class AntRunner {
 	public static TargetExecution testMutant(ServletContext context, MultiplayerMutant m, Test t) {
 		logger.debug("Running test {} on mutant {}", t.getId(), m.getId());
 		System.out.println("Running test " + t.getId() + " on mutant " + m.getId());
-		String className = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
+		String className = DatabaseAccess.getMultiplayerGame(m.getGameId()).getClassName();
 		String[] resultArray = runAntTarget(context, "test-mutant", m.getFolder(), t.getFolder(), className, t.getFullyQualifiedClassName());
 
 		TargetExecution newExec = null;
@@ -162,9 +162,8 @@ public class AntRunner {
 	 * @param t A {@link Test} object
 	 * @return A {@link TargetExecution} object
 	 */
-	public static int testOriginal(ServletContext context, File dir, Test t) {
-
-		String className = DatabaseAccess.getGameForKey("Game_ID", t.getGameId()).getClassName();
+	public static int testOriginal(ServletContext context, File dir, Test t, String className) {
+		
 		String[] resultArray = runAntTarget(context, "test-original", null, dir.getAbsolutePath(), className, t.getFullyQualifiedClassName());
 
 		// If the test doesn't return failure
@@ -295,15 +294,15 @@ public class AntRunner {
 			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
 			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
 			String cFile = matchingFiles.get(0).getAbsolutePath();
-			newMutant = new MultiplayerMutant(gameID, jFile, cFile, true, ownerId);
+			newMutant = new MultiplayerMutant(-1, gameID, jFile, cFile, "ASSUMED_NO", true, ownerId);
 			newMutant.insert();
 			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "SUCCESS", null);
 			newExec.insert();
 		} else {
 			// The mutant failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
-			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(context.getRealPath(Constants.DATA_DIR), "");
-			newMutant = new MultiplayerMutant(gameID, jFile, null, false, ownerId);
+			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(context.getRealPath(Constants.DATA_DIR).replace("\\", "\\\\"), "");
+			newMutant = new MultiplayerMutant(-1, gameID, jFile, null, "ASSUMED_NO", false, ownerId);
 			newMutant.insert();
 			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "FAIL", message);
 			newExec.insert();

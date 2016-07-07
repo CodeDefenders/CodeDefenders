@@ -278,9 +278,8 @@ public class DatabaseAccess {
 
 	public static ArrayList<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
 		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
-				"LEFT JOIN attackers as a ON a.Game_ID=m.ID " +
-				"LEFT JOIN defenders as d ON d.Game_ID=m.ID " +
-				"WHERE (a.User_ID=%d OR d.User_ID=%d OR m.Creator_ID=%d) " +
+				"LEFT JOIN players as p ON p.Game_ID=m.ID " +
+				"WHERE (p.User_ID=%d OR m.Creator_ID=%d) " +
 				"GROUP BY m.ID;", userId, userId, userId);
 		return getMultiplayerGames(sql);
 	}
@@ -288,17 +287,15 @@ public class DatabaseAccess {
 	public static ArrayList<MultiplayerGame> getMultiplayerGamesExcludingUser(int userId) {
 		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
 				"WHERE m.Creator_ID!=%d AND NOT EXISTS " +
-				"(SELECT * FROM attackers AS a WHERE a.User_ID=%d AND a.Game_ID=m.ID) AND NOT EXISTS " +
-				"(SELECT * FROM defenders AS d WHERE d.User_ID=%d AND d.Game_ID=m.ID);", userId, userId, userId);
+				"(SELECT * FROM players AS p WHERE p.User_ID=%d AND p.Game_ID=m.ID);", userId, userId, userId);
 		return getMultiplayerGames(sql);
 	}
 
 	public static Participance getParticipance(int userId, int gameId){
 		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
-				"LEFT JOIN attackers AS a ON a.Game_ID = m.ID " +
-				"LEFT JOIN defenders AS d ON d.Game_ID = m.ID " +
-				"WHERE m.ID = %d AND (m.Creator_ID=%d OR (d.User_ID=%d AND d.Game_ID=%d) OR (a.User_ID=%d AND a.Game_ID=%d))",
-				gameId, userId, userId, gameId, userId, gameId);
+				"LEFT JOIN players AS p ON p.Game_ID = m.ID " +
+				"WHERE m.ID = %d AND (m.Creator_ID=%d OR (p.User_ID=%d AND p.Game_ID=%d))",
+				gameId, userId, userId, gameId);
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -311,21 +308,15 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			while (rs.next()) {
-				try {
-					if (rs.getInt("a.User_ID") == userId) {
-						participance = Participance.ATTACKER;
-					}
-				} catch (NullPointerException | SQLException e){}
-				try {
-					if (rs.getInt("d.User_ID") == userId) {
-						participance = Participance.DEFENDER;
-					}
-				} catch (NullPointerException | SQLException e){}
-				try {
-					if (rs.getInt("Creator_ID") == userId) {
-						participance = Participance.CREATOR;
-					}
-				} catch (NullPointerException | SQLException e){}
+				if (rs.getInt("Creator_ID") == userId) {
+					participance = Participance.CREATOR;
+				} else {
+					try {
+						participance = Participance.valueOf(rs.getString("Role"));
+					} catch (NullPointerException | SQLException e){}
+
+				}
+
 			}
 			stmt.close();
 			conn.close();
@@ -456,7 +447,8 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				MultiplayerGame mg = new MultiplayerGame(rs.getInt("Class_ID"), rs.getInt("Creator_ID"),
 						Game.Level.valueOf(rs.getString("Level")), (float)rs.getDouble("Coverage_Goal"),
-						(float)rs.getDouble("Mutant_Goal"), rs.getInt("Price"));
+						(float)rs.getDouble("Mutant_Goal"), rs.getInt("Price"), rs.getInt("Defender_Value"),
+						rs.getInt("Attacker_Value"));
 				mg.setId(rs.getInt("ID"));
 				gameList.add(mg);
 			}
@@ -504,13 +496,14 @@ public class DatabaseAccess {
 
 			stmt = conn.createStatement();
 			for (int i : attackers) {
-				sql = String.format("SELECT * FROM mutants WHERE Attacker_ID=%d;", i);
+				sql = String.format("SELECT * FROM mutants WHERE Player_ID=%d;", i);
 				ResultSet rs = stmt.executeQuery(sql);
 
 				while (rs.next()) {
-					MultiplayerMutant newMutant = new MultiplayerMutant(rs.getInt("Game_ID"),
-							rs.getString("JavaFile"), rs.getString("ClassFile"),
-							rs.getBoolean("Alive"), rs.getInt("Attacker_ID"));
+					MultiplayerMutant newMutant = new MultiplayerMutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
+							rs.getString("JavaFile"), rs.getString("ClassFile"), rs.getString("Equivalent"),
+							rs.getBoolean("Alive"), rs.getInt("Player_ID"));
+					newMutant.setScore(rs.getInt("Points"));
 					mutList.add(newMutant);
 				}
 			}
@@ -563,7 +556,7 @@ public class DatabaseAccess {
 				Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
 						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
-						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Owner_ID"));
+						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
 				mutList.add(newMutant);
 			}
 
@@ -611,7 +604,7 @@ public class DatabaseAccess {
 				newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
 						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
-						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Owner_ID"));
+						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
 			}
 
 			stmt.close();
@@ -655,8 +648,8 @@ public class DatabaseAccess {
 			String sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d';", mutantID);
 			ResultSet rs = stmt.executeQuery(sql);
 			if (rs.next()) {
-				newMutant = new MultiplayerMutant(rs.getInt("Game_ID"),
-						rs.getString("JavaFile"), rs.getString("ClassFile"),
+				newMutant = new MultiplayerMutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
+						rs.getString("JavaFile"), rs.getString("ClassFile"), rs.getString("Equivalent"),
 						rs.getBoolean("Alive"), rs.getInt("Attacker_ID"));
 			}
 
@@ -706,7 +699,7 @@ public class DatabaseAccess {
 	public static ArrayList<Test> getExecutableTestsForMultiplayerGame(int defenderId) {
 		String stmt = "SELECT tests.* FROM tests "
 				+ "INNER JOIN targetexecutions ex on tests.Test_ID = ex.Test_ID "
-				+ "WHERE tests.Defender_ID='%d' AND tests.ClassFile IS NOT NULL " // only compilable tests
+				+ "WHERE tests.Player_ID='%d' AND tests.ClassFile IS NOT NULL " // only compilable tests
 				+ "AND ex.Target='TEST_ORIGINAL' AND ex.Status='SUCCESS';"; // that pass on original CUT
 
 		//String sql = String.format("SELECT * FROM tests WHERE Game_ID='%d' AND ClassFile IS NOT NULL;", gid);
@@ -714,53 +707,9 @@ public class DatabaseAccess {
 		return getTests(sql);
 	}
 
-	public static int getDefenderIdForMultiplayerGame(int userId, int gameId) {
-		String sql = String.format("SELECT * FROM defenders AS d " +
-				"WHERE d.User_ID = %d AND d.Game_ID = %d", userId, gameId); // that pass on original CUT
-
-		Connection conn = null;
-		Statement stmt = null;
-		try {
-
-			// Load the MultiplayerGame Data with the provided ID.
-			conn = getConnection();
-
-			stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(sql);
-
-			if (rs.next()) {
-				return rs.getInt("d.ID");
-			}
-
-			stmt.close();
-			conn.close();
-		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
-		}
-		return 0;
-	}
-
-	public static int getAttackerIdForMultiplayerGame(int userId, int gameId) {
-		String sql = String.format("SELECT * FROM attackers AS a " +
-				"WHERE a.User_ID = %d AND a.Game_ID = %d", userId, gameId); // that pass on original CUT
+	public static int getPlayerIdForMultiplayerGame(int userId, int gameId) {
+		String sql = String.format("SELECT * FROM players AS p " +
+				"WHERE p.User_ID = %d AND p.Game_ID = %d", userId, gameId); // that pass on original CUT
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -803,8 +752,8 @@ public class DatabaseAccess {
 	}
 
 	public static int[] getDefendersForMultiplayerGame(int gameId) {
-		String sql = String.format("SELECT * FROM defenders AS d " +
-				"WHERE d.Game_ID = %d", gameId); // that pass on original CUT
+		String sql = String.format("SELECT * FROM players " +
+				"WHERE Game_ID = %d AND Role='%s'", gameId, Participance.DEFENDER); // that pass on original CUT
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -858,8 +807,8 @@ public class DatabaseAccess {
 	}
 
 	public static int[] getAttackersForMultiplayerGame(int gameId) {
-		String sql = String.format("SELECT * FROM attackers " +
-				"WHERE Game_ID = %d", gameId); // that pass on original CUT
+		String sql = String.format("SELECT * FROM players " +
+				"WHERE Game_ID = %d AND Role='%s'", gameId, Participance.ATTACKER); // that pass on original CUT
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -930,7 +879,7 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
-						rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"), rs.getInt("Owner_ID"));
+						rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"), rs.getInt("Player_ID"));
 				String lcs = rs.getString("Lines_Covered");
 				String lucs = rs.getString("Lines_Uncovered");
 				if (lcs != null && lucs != null && lcs.length() > 0 && lucs.length() > 0) {
@@ -951,6 +900,8 @@ public class DatabaseAccess {
 					lc.setLinesCovered(cov);
 
 					newTest.setLineCoverage(lc);
+
+					newTest.setScore(rs.getInt("Points"));
 				}
 
 				testList.add(newTest);

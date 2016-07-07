@@ -1,8 +1,10 @@
 package org.codedefenders;
 
+import com.sun.org.apache.xpath.internal.operations.Mult;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.multiplayer.MultiplayerMutant;
+import org.codedefenders.scoring.Scorer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,12 +52,31 @@ public class MutationTester {
 	public static void runTestOnAllMultiplayerMutants(ServletContext context, MultiplayerGame game, Test test, ArrayList<String> messages) {
 		int killed = 0;
 		ArrayList<MultiplayerMutant> mutants = game.getAliveMutants();
+		mutants.addAll(game.getMutantsMarkedEquivalent());
+		ArrayList<MultiplayerMutant> killedMutants = new ArrayList<MultiplayerMutant>();
 		for (MultiplayerMutant mutant : mutants) {
-			killed += testVsMultiplayerMutant(context, test, mutant) ? 1 : 0;
+			boolean k = testVsMultiplayerMutant(context, game, test, mutant);
+			if (k){
+				killed++;
+				killedMutants.add(mutant);
+			}
+		}
+
+		ArrayList<Test> tests = new ArrayList<Test>();
+		tests.add(test);
+
+		for (MultiplayerMutant mm : mutants){
+			if (mm.isAlive()){
+				mm.setScore(Scorer.score(game, mm, tests));
+
+				mm.update();
+			}
 		}
 
 		LineCoverage lc = AntRunner.getLinesCovered(context, test, game.getCUT());
 		test.setLineCoverage(lc);
+
+		test.setScore(Scorer.score(game, test, killedMutants));
 
 		test.update();
 
@@ -98,8 +119,11 @@ public class MutationTester {
 		ArrayList<Test> tests = game.getExecutableTests();
 		for (Test test : tests) {
 			// If this mutant/test pairing hasnt been run before and the test might kill the mutant
-			if (testVsMultiplayerMutant(context, test, mutant)) {
+			if (testVsMultiplayerMutant(context, game, test, mutant)) {
 				messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
+				ArrayList<MultiplayerMutant> mlist = new ArrayList<MultiplayerMutant>();
+				mlist.add(mutant);
+				test.setScore(Scorer.score(game, test, mlist));
 				return;
 			}
 		}
@@ -109,6 +133,8 @@ public class MutationTester {
 			messages.add(MUTANT_ALIVE_1_MESSAGE);
 		else
 			messages.add(String.format(MUTANT_ALIVE_N_MESSAGE,tests.size()));
+		mutant.setScore(Scorer.score(game, mutant, tests));
+		mutant.update();
 	}
 
 	/**
@@ -135,7 +161,7 @@ public class MutationTester {
 		return false;
 	}
 
-	private static boolean testVsMultiplayerMutant(ServletContext context, Test test, MultiplayerMutant mutant) {
+	private static boolean testVsMultiplayerMutant(ServletContext context, MultiplayerGame g, Test test, MultiplayerMutant mutant) {
 		if (DatabaseAccess.getTargetExecutionForPair(test.getId(), mutant.getId()) == null) {
 			// Run the test against the mutant and get the result
 			TargetExecution executedTarget = AntRunner.testMutant(context, mutant, test);
@@ -144,6 +170,9 @@ public class MutationTester {
 			if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
 				System.out.println(String.format("Test %d kills Mutant %d", test.getId(), mutant.getId()));
 				mutant.kill();
+				ArrayList<MultiplayerMutant> mlist = new ArrayList<MultiplayerMutant>();
+
+				mlist.add(mutant);
 				test.killMutant();
 				return true;
 			}
@@ -188,6 +217,7 @@ public class MutationTester {
 		} else {
 			// If the test DID pass, the mutant went undetected and it is assumed to be equivalent.
 			mutant.setEquivalent(ASSUMED_YES);
+			mutant.setScore(0);
 		}
 		// Kill the mutant if it was killed by the test or if it's marked equivalent
 		mutant.kill();

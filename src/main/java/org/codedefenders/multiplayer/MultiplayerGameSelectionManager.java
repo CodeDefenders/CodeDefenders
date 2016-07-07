@@ -58,7 +58,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         // Create the game with supplied parameters and insert it in the database.
         MultiplayerGame nGame = new MultiplayerGame(classId, uid, level, (float) lineCoverage,
-                (float) mutantCoverage, 1f);
+                (float) mutantCoverage, 1f, 100, 100);
         nGame.insert();
 
         // Redirect to the game selection menu.

@@ -9,10 +9,6 @@
 	</description>
 	<display-name>Code Defenders</display-name>
 
-	<welcome-file-list>
-		<welcome-file>index.jsp</welcome-file>
-	</welcome-file-list>
-
 	<session-config>
 		<session-timeout>0</session-timeout>
 	</session-config>
@@ -63,12 +59,23 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>index.jsp</servlet-name>
-		<jsp-file>/index.jsp</jsp-file>
+		<servlet-name>intro</servlet-name>
+		<jsp-file>/jsp/index.jsp</jsp-file>
 	</servlet>
+
 	<servlet-mapping>
-		<servlet-name>index.jsp</servlet-name>
+		<servlet-name>intro</servlet-name>
 		<url-pattern>/intro</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>index</servlet-name>
+		<jsp-file>/jsp/index.jsp</jsp-file>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>index</servlet-name>
+		<url-pattern></url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -224,4 +231,8 @@
 		<param-name>emailPassword</param-name>
 		<param-value>***REMOVED***</param-value>
 	</context-param>
+
+	<!--<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>-->
 </web-app>

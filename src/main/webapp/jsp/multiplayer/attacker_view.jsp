@@ -1,11 +1,7 @@
 <% codeDivName = "newmut-div"; %>
 <div class="row-fluid">
 
-
-	<%@include file="/jsp/multiplayer/game_unit_tests.jsp"%>
-	<%@include file="/jsp/multiplayer/game_mutants.jsp"%>
-
-	<div class="col-md-6" id="newmut-div">
+	<div class="col-md-6" id="newmut-div" style="float: right">
 		<form id="atk" action="/multiplayer/move" method="post">
 			<h2>Create a mutant here
 				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk">Attack!</button>
@@ -25,6 +21,9 @@
 		</form>
 	</div> <!-- col-md6 newmut -->
 </div> <!-- row-fluid -->
+
+<%@include file="/jsp/multiplayer/game_unit_tests.jsp"%>
+<%@include file="/jsp/multiplayer/game_mutants.jsp"%>
 
 <script>
 	var editorSUT = CodeMirror.fromTextArea(document.getElementById("code"), {

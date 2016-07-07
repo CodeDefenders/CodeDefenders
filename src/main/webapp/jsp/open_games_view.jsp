@@ -1,15 +1,16 @@
 <% String pageTitle="Open Games"; %>
 <%@ include file="/jsp/header.jsp" %>
 <div class="full-width">
+	<h2>Duels</h2>
 <table class="table table-hover table-responsive table-paragraphs">
 	<tr>
-		<td class="col-sm-2">Game No.</td>
-		<td class="col-sm-2">Attacker</td>
-		<td class="col-sm-2">Defender</td>
-		<td class="col-sm-2">Game State</td>
-		<td class="col-sm-2">Class Under Test</td>
-		<td class="col-sm-2">Level</td>
-		<td class="col-sm-2"></td>
+		<th class="col-sm-2">Game No.</th>
+		<th class="col-sm-2">Attacker</th>
+		<th class="col-sm-2">Defender</th>
+		<th class="col-sm-2">Game State</th>
+		<th class="col-sm-2">Class Under Test</th>
+		<th class="col-sm-2">Level</th>
+		<th class="col-sm-2"></th>
 	</tr>
 
 
@@ -58,32 +59,30 @@
 	<%
 		}
 		if (!isGames) {%>
-	<p> There are currently no open games </p>
+	<tr><td colspan="8"> There are currently no open games </td></tr>
 	<%}
 	%>
 </table>
 	<a href="/games/create">Create Duel</a>
 	<hr />
 	<h2>Battlegrounds</h2>
+	<table class="table table-hover table-responsive table-paragraphs"><tr><th>Game ID</th><th>Owner</th><th>
+		Price
+	</th><th>Level</th><th>Actions</th></tr>
 	<%
 		ArrayList<MultiplayerGame> mgames = DatabaseAccess.getMultiplayerGamesExcludingUser(uid);
 		if (mgames.isEmpty()) {
 	%>
-	<p> There are currently no open games. </p>
+	<tr><td colspan="5"> There are currently no open games. </td></tr>
 	<%
 	} else {
 	%>
-	<table><tr><th>Game ID</th><th>Owner</th><th>Coverage Goal</th><th>Mutant Coverage Goal</th><th>
-		Price
-	</th><th>Level</th><th>Actions</th></tr>
 		<%
 			for (MultiplayerGame g : mgames) {
 		%>
 		<tr>
 			<td class="col-sm-2"><%= g.getId() %></td>
 			<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
-			<td class="col-sm-2"><%= g.getLineCoverage() %></td>
-			<td class="col-sm-2"><%= g.getMutantCoverage() %></td>
 			<td class="col-sm-2"><%= g.getPrice() %></td>
 			<td class="col-sm-2"><%= g.getLevel().name() %></td>
 			<td class="col-sm-2">
@@ -93,9 +92,10 @@
 		</tr>
 		<%
 				} // for (MultiplayerGame g : games) %>
-		</table>
 	 <% } // if (games.isEmpty())
 		%>
+	</table>
+
 	<a href="/multiplayer/games/create">Create Battleground</a>
 
 </div>

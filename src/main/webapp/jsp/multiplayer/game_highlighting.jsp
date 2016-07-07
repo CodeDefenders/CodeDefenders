@@ -1,17 +1,30 @@
 highlightCoverage = function(){
 highlightLine([<% for (Integer i : linesCovered.keySet()){%>
-<%=i%>,
+[<%=i%>, <%=((float)linesCovered.get(i).size() / (float) tests.size())%>],
 <% } %>], COVERED_COLOR, "<%="#" + codeDivName%>");
 };
-highlightMutants = function(){
-highlightLine([<% for (Integer i : linesUncovered){%>
-<%=i%>,
-<% } %>], UNCOVERED_COLOR, "<%="#" + codeDivName%>");
+
+
+
+showMutants = function(){
+    mutantLine([
+        <% for (Integer line : mutantLines.keySet()) {
+        %>
+        [<%= line %>,
+            <%= mutantLines.get(line).size() %>, [
+            <% for(MultiplayerMutant mm : mutantLines.get(line)){%>
+                <%= mm.getId() %>,
+            <%}%>
+        ]],
+        <%
+            } %>
+    ],"<%="#" + codeDivName%>", <%= p.equals(Participance.DEFENDER)? "true" : "false" %>);
 };
 editorSUT.on("viewportChange", function(){
-highlightCoverage();
-highlightMutants();
+    showMutants();
+    highlightCoverage();
 });
-
-highlightCoverage();
-highlightMutants();
+$(document).ready(function(){
+    showMutants();
+    highlightCoverage();
+});
