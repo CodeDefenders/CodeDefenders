@@ -42,19 +42,12 @@ public class AiDefender extends AiPlayer {
 		return true;
 	}
 
-	public boolean turnMedium() {
-		//Choose all tests which cover modified line(s)?
-		//Perhaps just 1 or 2?
-		//Perhaps higher chance of equivalence call? May happen due to weaker testing.
-		return turnHard();
-	}
-
 	public boolean turnEasy() {
 		//Choose a random test which covers the modified line(s)?
 		//Perhaps just a random test?
 		//Perhaps higher chance of equivalence call? May happen due to weaker testing.
 		try {
-			IndexContents ind = new IndexContents(game.getClassName());
+			TestsIndexContents ind = new TestsIndexContents(game.getClassName());
 
 			int tNum = selectTest(GenerationMethod.RANDOM, ind);
 			try {
@@ -71,7 +64,7 @@ public class AiDefender extends AiPlayer {
 		return true;
 	}
 
-	private int selectTest(GenerationMethod strategy, IndexContents indexCon) throws Exception {
+	private int selectTest(GenerationMethod strategy, TestsIndexContents indexCon) throws Exception {
 
 		ArrayList<Integer> usedTests = DatabaseAccess.getUsedAiTestsForGame(game);
 		int totalTests = indexCon.getNumTests();
@@ -104,11 +97,16 @@ public class AiDefender extends AiPlayer {
 			}
 		}
 
+		//TODO: CHECK THIS BLOCK:
 		//If standard strategy fails, choose first non-selected test.
 		for (int x = 0; x < totalTests; x++) {
-			if(!usedTests.contains(x)) {
+
+			Test origT = origTests.get(x);
+			t = origT.getId();
+
+			if(!usedTests.contains(t)) {
 				//Unused test found.
-				return x;
+				return t;
 			}
 		}
 
@@ -116,7 +114,7 @@ public class AiDefender extends AiPlayer {
 		throw e;
 	}
 
-	private void useTestFromSuite(int origTestNum, IndexContents indexCon) throws IOException {
+	private void useTestFromSuite(int origTestNum, TestsIndexContents indexCon) throws IOException {
 		Game dummyGame = DatabaseAccess.getGameForKey("Game_ID", indexCon.getDummyGameId());
 		ArrayList<Test> origTests = dummyGame.getTests();
 
@@ -148,13 +146,13 @@ public class AiDefender extends AiPlayer {
 
 }
 
-class IndexContents {
+class TestsIndexContents {
 
 	private ArrayList<Integer> testIds;
 	private int dummyGameId;
 	private int numTests;
 
-	public IndexContents(String className) {
+	public TestsIndexContents(String className) {
 		testIds = new ArrayList<Integer>();
 		dummyGameId = -1;
 		numTests = -1;

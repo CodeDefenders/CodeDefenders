@@ -37,7 +37,6 @@ public class AiPlayer {
 		boolean b = false;
 		switch (game.getLevel()) {
 			case EASY: b = turnEasy(); break;
-			case MEDIUM: b = turnMedium(); break;
 			case HARD: b = turnHard(); break;
 			default: b = turnHard(); break;
 		}
@@ -45,10 +44,6 @@ public class AiPlayer {
 	}
 
 	public boolean turnEasy() {
-		//Override
-		return true;
-	}
-	public boolean turnMedium() {
 		//Override
 		return true;
 	}

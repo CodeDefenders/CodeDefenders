@@ -57,24 +57,26 @@ public class MajorMaker {
 			}
 		}
 
-		createMutantIndex(validMutants);
+		createMutantIndex(validMutants, dGame.getId());
 
 		return true;
 	}
 
-	public boolean createMutantIndex(ArrayList<Mutant> mutants) {
+	public boolean createMutantIndex(ArrayList<Mutant> mutants, int dummyGameId) {
 		File dir = new File(AI_DIR + F_SEP + "mutants" + F_SEP + cutTitle);
 
-		String xml = "?xml version=\"1.0\"?>\n";
+		String xml = "<?xml version=\"1.0\"?>\n";
 		xml += "<mutantindex>\n";
 		xml += "\t<mutants>\n";
 		for(Mutant m : mutants) {
-			xml += "\t\t<mutant>\n";
-			xml += "\t\t\t<id>" + m.getId() + "</id>\n";
-			xml += "\t\t</mutant>\n";
+			xml += "\t\t<mutant ";
+			xml += "id=\"" + m.getId() + "\" ";
+			xml += " />\n";
 		}
 		xml += "\t</mutants>\n";
 		xml += "\t<quantity>" + mutants.size() + "</quantity>\n";
+		xml += "\t<dummygame>" + dummyGameId + "</dummygame> \n";
+
 		xml += "</mutantindex>\n";
 
 		try {

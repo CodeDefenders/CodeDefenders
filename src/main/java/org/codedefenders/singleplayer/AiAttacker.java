@@ -3,8 +3,14 @@ package org.codedefenders.singleplayer;
 import difflib.Patch;
 import difflib.PatchFailedException;
 import org.codedefenders.*;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.io.File;
@@ -23,132 +29,6 @@ public class AiAttacker extends AiPlayer {
 		role = Game.Role.ATTACKER;
 	}
 
-	private int totalMutants() {
-		return getMutantList().size();
-	}
-
-	private List<String> getMutantList() {
-		String loc = AI_DIR + F_SEP + "mutants" + F_SEP + game.getClassName() + ".log";
-		File f = new File(loc);
-		List<String> l = FileManager.readLines(f.toPath());
-		//TODO: Handle errors.
-		return l;
-	}
-
-	/**
-	 * Get information for a given mutant.
-	 * @param mutantNum The mutant to use.
-	 * @return The class after the mutant has been applied.
-	 */
-	private MutantPatch getMutantPatch(int mutantNum) {
-		//Get the mutant information from the log.
-		String mInfo = getMutantList().get(mutantNum);
-		//Split into each component.
-		String[] splitInfo = mInfo.split(":");
-		/*
-		0 = Mutant's id
-		1 = Name of mutation operator
-		2 = Original operator symbol
-		3 = New operator symbol
-		4 = Full name of mutated method
-		5 = Line number of CUT
-		6 = 'from' |==> 'to'  (<NO-OP> means empty string)
-		 */
-		//Only really need values 5 and 6.
-		//Use replace option?
-
-		int lineNum = Integer.parseInt(splitInfo[5]);
-		String[] beforeAfter = splitInfo[6].split(Pattern.quote(" |==> ")); //Before = 0, After = 1
-
-		return new MutantPatch(lineNum, beforeAfter);
-	}
-
-	/**
-	 * Modify a list of strings from a class to have a mutant.
-	 * @param lines original class's lines.
-	 * @param patch the mutant's patch information.
-	 * @return the new list of lines.
-	 */
-	private List<String> doPatch(List<String> lines, MutantPatch patch) {
-		//Copy contents of original lines.
-		List<String> newLines = new ArrayList<String>(lines);
-		String l = newLines.get(patch.getLineNum() - 1);
-		String newLine = l.replaceFirst(patch.getOriginal(), patch.getReplacement().replace("QE", ""));
-		newLines.set(patch.getLineNum() - 1, newLine);
-		return newLines;
-	}
-
-	/**
-	 * Get the text of the full mutated class.
-	 * @param mutantNumber number of the mutant to use.
-	 * @return the mutant's text, or nothing if too many mutants which already exist have been made.
-	 */
-	private String createMutantString(int mutantNumber) {
-		//Get original lines.
-		File cutFile = new File(game.getCUT().javaFile);
-		List<String> cutLines = FileManager.readLines(cutFile.toPath());
-		//TODO: Don't reuse mutant.
-		//Patch lines with selected mutant.
-		MutantPatch p = getMutantPatch(mutantNumber);
-		List<String> newLines = doPatch(cutLines, p);
-		String mText = "";
-
-		for (String l : newLines) {
-			mText += l + "\n";
-		}
-		return mText;
-	}
-
-	private boolean createMutant(String mutantText) {
-		GameManager gm = new GameManager();
-		try {
-			//Create mutant and insert it into the database.
-			Mutant m = gm.createMutant(game.getId(), game.getClassId(), mutantText, 1);
-			//TODO: More error checking.
-			ArrayList<String> messages = new ArrayList<String>();
-			MutationTester.runAllTestsOnMutant(game, m, messages);
-		} catch (IOException e) {
-			//Try again if an exception.
-			e.printStackTrace();
-			return false;
-		}
-		return true;
-	}
-
-	private int selectMutant(GenerationMethod strategy) throws Exception {
-		ArrayList<Integer> usedMutants = DatabaseAccess.getUsedAiMutantsForGame(game);
-		Exception e = new Exception("No choices remain");
-
-		if(usedMutants.size() == totalMutants()) {
-			throw e;
-		}
-
-		int m = -1;
-		for (int i = 0; i < 10; i++) {
-			//Try standard strategy to select a mutant.
-			if(strategy.equals(GenerationMethod.RANDOM)) {
-				m = (int) Math.floor(Math.random() * totalMutants()); //Choose a mutant.
-			}
-			//TODO: Other generation strategies
-
-			if ((!usedMutants.contains(m)) && (m != -1)) {
-				//Found an unused mutant.
-				return m;
-			}
-		}
-
-		//If standard strategy fails, make a choice linearly.
-		for (int x = 0; x < totalMutants(); x++) {
-			if(!usedMutants.contains(x)) {
-				//Found an unused mutant.
-				return x;
-			}
-		}
-
-		//Something went wrong.
-		throw e;
-	}
-
 	/**
 	 * Hard difficulty attacker turn.
 	 * @return true if mutant generation succeeds, or if no non-existing mutants have been found to prevent infinite loop.
@@ -157,36 +37,8 @@ public class AiAttacker extends AiPlayer {
 		//Use only one mutant per round.
 		//Perhaps modify the line with the least test coverage?
 
-		//TODO: Determine by lowest test coverage. Using medium behaviour for now.
-		return turnMedium();
-	}
-
-	/**
-	 * Medium difficulty attacker turn.
-	 * @return true if mutant generation succeeds, or if no non-existing mutants have been found to prevent infinite loop.
-	 */
-	public boolean turnMedium() {
-		//Use one randomly selected mutant per round, without reusing an old one.
-		try {
-			int mId = selectMutant(GenerationMethod.RANDOM); //Select unused mutant.
-			//Throws exception if none found.
-			String mText = createMutantString(mId); //Create mutant string.
-
-			if(mText.isEmpty()) {
-				//Text wasn't added.
-				return false;
-			}
-
-			boolean added = createMutant(mText);
-			if (added) {
-				//Mutant successfully created, set it as used.
-				DatabaseAccess.setAiMutantAsUsed(mId, game);
-			}
-			return added;
-		} catch (Exception e) {
-			//No unused mutants exist, so don't add another.
-		}
-		return true;
+		//TODO: Determine by lowest test coverage. Using easy behaviour for now.
+		return turnEasy();
 	}
 
 	/**
@@ -194,11 +46,151 @@ public class AiAttacker extends AiPlayer {
 	 * @return true if mutant generation succeeds, or if no non-existing mutants have been found to prevent infinite loop.
 	 */
 	public boolean turnEasy() {
-		//Use "multiple" mutants per round, up to maximum amount.
-		//Mutants are combined to make a single mutant, which would therefore be easier to detect and kill.
-		//Will have to check line number is different if using multiple mutants.
-		double maxNumMutants = Math.floor(totalMutants() / game.getFinalRound());
+		try {
+			MutantsIndexContents ind = new MutantsIndexContents(game.getClassName());
 
-		return turnMedium(); //use medium for now
+			int mNum = selectMutant(GenerationMethod.RANDOM, ind);
+			try {
+				useMutantFromSuite(mNum, ind);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
+		} catch (Exception e) {
+			//Assume no more unused mutants remain, do nothing.
+		}
+
+		return true;
 	}
+
+
+	private int selectMutant(GenerationMethod strategy, MutantsIndexContents indexCon) throws Exception {
+		ArrayList<Integer> usedMutants = DatabaseAccess.getUsedAiMutantsForGame(game);
+		Exception e = new Exception("No unused mutants remain.");
+		int totalMutants = indexCon.getNumMutants();
+
+		if(usedMutants.size() == totalMutants) {
+			throw e;
+		}
+		int m = -1;
+
+		Game dummyGame = DatabaseAccess.getGameForKey("Game_ID", indexCon.getDummyGameId());
+		ArrayList<Mutant> origMutants = dummyGame.getMutants();
+
+		for (int i = 0; i < 10; i++) {
+			//Try standard strategy to select a mutant.
+			int n = 0;
+			if(strategy.equals(GenerationMethod.RANDOM)) {
+				n = (int) Math.floor(Math.random() * totalMutants);
+				//0 -> totalMutants - 1.
+			}
+			//TODO: Other generation strategies
+
+			Mutant origM = origMutants.get(n);
+			m = origM.getId();
+
+			if ((!usedMutants.contains(m)) && (m != -1)) {
+				//Found an unused mutant.
+				return m;
+			}
+		}
+
+		//TODO: CHECK THIS BLOCK:
+		//If standard strategy fails, make a choice linearly.
+		for (int x = 0; x < totalMutants; x++) {
+
+			Mutant origM = origMutants.get(x);
+			m = origM.getId();
+
+			if(!usedMutants.contains(x)) {
+				//Found an unused mutant.
+				return m;
+			}
+		}
+
+		//Something went wrong.
+		throw e;
+	}
+
+	private void useMutantFromSuite(int origMutNum, MutantsIndexContents indexCon) throws IOException {
+		Game dummyGame = DatabaseAccess.getGameForKey("Game_ID", indexCon.getDummyGameId());
+		ArrayList<Mutant> origMutants = dummyGame.getMutants();
+
+		Mutant origM = null;
+
+		for (Mutant m : origMutants) {
+			if(m.getId() == origMutNum) {
+				origM = m;
+				break;
+			}
+		}
+
+		if(origM != null) {
+			String jFile = origM.getFolder() + F_SEP + dummyGame.getClassName() + JAVA_SOURCE_EXT;
+			String cFile = origM.getFolder() + F_SEP + dummyGame.getClassName() + JAVA_CLASS_EXT;
+			Mutant m = new Mutant(game.getId(), jFile, cFile, true, 1);
+			m.insert();
+			m.update();
+
+			ArrayList<String> messages = new ArrayList<String>();
+			MutationTester.runAllTestsOnMutant(game, m, messages);
+			DatabaseAccess.setAiMutantAsUsed(origMutNum, game);
+			game.update();
+		}
+	}
+
+}
+
+
+class MutantsIndexContents {
+
+	private ArrayList<Integer> mutantIds;
+	private int dummyGameId;
+	private int numMutants;
+
+	public MutantsIndexContents(String className) {
+		mutantIds = new ArrayList<Integer>();
+		dummyGameId = -1;
+		numMutants = -1;
+		//Parse the test index file of a given class.
+		try {
+			File f = new File(AI_DIR + F_SEP + "mutants" + F_SEP +
+					className + F_SEP + "MutantsIndex.xml");
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuild = dbFactory.newDocumentBuilder();
+			Document d = dBuild.parse(f);
+
+			d.getDocumentElement().normalize();
+
+			NodeList mutNodes = d.getElementsByTagName("mutant");
+			for (int i = 0; i < mutNodes.getLength(); i++) {
+				Node mutNode = mutNodes.item(i);
+				Node id = mutNode.getAttributes().getNamedItem("id");
+				mutantIds.add(Integer.parseInt(id.getTextContent()));
+			}
+			NodeList q = d.getElementsByTagName("quantity");
+			numMutants = Integer.parseInt(q.item(0).getTextContent());
+			NodeList g = d.getElementsByTagName("dummygame");
+			dummyGameId = Integer.parseInt(g.item(0).getTextContent());
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			//TODO: Handle errors.
+		}
+
+
+	}
+
+	public ArrayList<Integer> getMutantIds() {
+		return mutantIds;
+	}
+
+	public int getNumMutants() {
+		return numMutants;
+	}
+
+	public int getDummyGameId() {
+		return dummyGameId;
+	}
+
 }
