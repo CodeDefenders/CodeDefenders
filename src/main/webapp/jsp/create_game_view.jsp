@@ -98,6 +98,17 @@
 				</td>
 			</tr>
 			<tr>
+				<td>Gamemode</td>
+				<td>
+					<select name="mode" class="form-control selectpicker" data-size="large">
+						<option value="sing">Singleplayer</option>
+						<option value="duel">Duel</option>
+						<option value="prty">Party</option>
+						<option value="utst">Unit Testing</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
 				<td>Role</td> <td><input type="checkbox" id="role" name="role" class="form-control" data-size="large" data-toggle="toggle" data-on="Attacker" data-off="Defender" data-onstyle="success" data-offstyle="primary"></td>
 			</tr>
 			<tr>

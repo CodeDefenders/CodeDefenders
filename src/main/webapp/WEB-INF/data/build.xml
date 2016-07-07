@@ -5,17 +5,29 @@
 		Build File to handle mutation tests for a particular class
 	</description>
 
+	<property name="policyfile" location="security.policy" />
+	<property name="mutOp" value=":ALL"/>
+	<property name="codedef.home" value="/var/lib/codedefenders"/>
+	<property name="major.home" value="${codedef.home}/lib/major"/>
+	<property name="evosuite.home" value="${codedef.home}/lib/evosuite"/>
+
+	<property name="cuts.dir" value="${codedef.home}/sources"/>
+	<property name="ai.tests.dir" value="${codedef.home}/ai/tests"/>
+	<property name="ai.mutants.dir" value="${codedef.home}/ai/mutants"/>
+
 	<path id="test.cp">
-		<pathelement path="../lib/junit-4.12.jar"/>
-		<pathelement path="../lib/hamcrest-all-1.3.jar"/>
-		<pathelement path="sources"/>
+		<pathelement path="${codedef.home}/lib/junit-4.12.jar"/>
+		<pathelement path="${codedef.home}/lib/hamcrest-all-1.3.jar"/>
+		<pathelement path="${major.home}/config/config.jar"/>
+		<pathelement path="${codedef.home}/sources"/>
 	</path>
 
-	<property name="policyfile" location="security.policy" />
+	<!-- Get classname minus .java extension -->
+	<basename property="classname.only" file="${classname}" suffix=".java"/>
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-cut" description="compile a class under test">
-		<javac srcdir="${src.dir}" destdir="${src.dir}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" listfiles="yes">
+		<javac srcdir="${cuts.dir}" destdir="${cuts.dir}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" listfiles="yes" fork="yes">
 			<include name="${classname}" />
 		</javac>
 	</target>
@@ -43,8 +55,9 @@
 				<pathelement location="sources"/>
 				<pathelement location="${test.file}"/>
 				<pathelement path="${test.cp}"/>
-				<pathelement location="../lib/junit-4.12.jar"/>
-				<pathelement location="../lib/hamcrest-all-1.3.jar"/>
+				<pathelement location="${codedef.home}/lib/junit-4.12.jar"/>
+				<pathelement location="${codedef.home}/lib/hamcrest-all-1.3.jar"/>
+				<pathelement location="${major.home}/config/config.jar"/>
 				<pathelement path="sources"/>
 				<pathelement path="${test.file}"/>
 			</classpath>
@@ -70,6 +83,35 @@
 			<jvmarg value="-Djava.security.manager" />
 			<jvmarg value="-Djava.security.policy==${policyfile}" />
 		</junit>
-
 	</target>
+
+	<target name="mutant-gen-cut" description="generate mutants using major">
+		<exec executable="${major.home}/bin/javac">
+			<arg value="-XMutator${mutOp}"/>
+			<!--<arg value="-J-Dmajor.export.mutants=true"/>-->
+			<arg value="-J-Dmajor.export.directory=${ai.mutants.dir}/${classname.only}"/>
+			<arg value="${cuts.dir}/${classname}.java"/>
+		</exec>
+		<!--Move the generated log file to the correct location-->
+		<move file="${codedef.home}/mutants.log" tofile="${ai.mutants.dir}/${classname.only}.log"/>
+	</target>
+
+	<target name="test-gen-cut" description="generate unit tests from class using evosuite">
+		<java jar="${evosuite.home}/evosuite.jar" fork="true">
+			<arg line="-base_dir ${codedef.home}/"/>
+			<arg line="-target sources/"/> <!-- directory of CUT -->
+			<arg line="-class ${classname.only}"/> <!-- CUT name, without extension -->
+			<arg line="-Dtest_dir ai/tests/${classname.only}"/> <!-- Location to store result classes. -->
+			<arg line="-Dreport_dir ai/tests/${classname.only}"/> <!-- Location to store result classes. -->
+			<arg line="-Dshow_progress false"/> <!-- Disable printing of progress bars -->
+			<arg line="-generateSuite"/>
+		</java>
+	</target>
+
+	<target name="compile-gen-tests" description="compile a generated test suite">
+		<javac srcdir="${ai.tests.dir}/${classname.only}" destdir="${ai.tests.dir}/${classname.only}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false"/>
+	</target>
+
+
+
 </project>

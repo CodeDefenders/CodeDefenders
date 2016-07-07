@@ -22,7 +22,7 @@ public class UpdateAvailableClasses extends HttpServlet {
 
 		System.out.println("Running UpdateAvailableClasses");
 
-		String cutsDirPath = getServletContext().getRealPath(Constants.CUTS_DIR);
+		String cutsDirPath = Constants.CUTS_DIR;
 		System.out.println(cutsDirPath);
 		File cutsDirFile = new File(cutsDirPath);
 
@@ -36,7 +36,7 @@ public class UpdateAvailableClasses extends HttpServlet {
 			String name = FilenameUtils.getBaseName(sutFile.getName());
 			System.out.println("Getting file paths");
 			// Get the path to each file to be stored.
-			String sourceFileName = cutsDirPath + Constants.FILE_SEPARATOR + name + Constants.JAVA_SOURCE_EXT;
+			String sourceFileName = cutsDirPath + Constants.F_SEP + name + Constants.JAVA_SOURCE_EXT;
 
 			final String compiledClassName = name + Constants.JAVA_CLASS_EXT;
 			LinkedList<File> matchingFiles = (LinkedList)FileUtils.listFiles(cutsDirFile, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());

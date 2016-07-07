@@ -8,6 +8,8 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.codedefenders.singleplayer.EvoSuiteMaker;
+import org.codedefenders.singleplayer.PrepareAI;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -63,49 +65,55 @@ public class UploadManager extends HttpServlet {
 						fileContent = item.getInputStream();
 				}
 			}
-			// two arguments processed?
-			if (classId == null || fileContent == null) {
-				messages.add("Please provide unique identifier and a .java file.");
-				response.sendRedirect(request.getHeader("referer"));
-				return;
-			}
-			// check that class alias is unique
-			if (GameClass.existUniqueClassID(classId)) {
-				messages.add("A class with identifier " + classId + " already exists, please use a different name.");
-				response.sendRedirect(request.getHeader("referer"));
-				return;
-			}
-
-			File targetFile = new File(getServletContext().getRealPath(Constants.CUTS_DIR +
-					Constants.FILE_SEPARATOR + fileName));
-			if (targetFile.exists()) {
-				messages.add("A class with the same name already exists, please try with a different one.");
-				response.sendRedirect(request.getHeader("referer"));
-			}
-			FileUtils.copyInputStreamToFile(fileContent, targetFile);
-			String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
-			String classFileName = AntRunner.compileCUT(getServletContext(), fileName);
-			if (classFileName != null) {
-				String classFileNameDB = DatabaseAccess.addSlashes(classFileName);
-
-				// get fully qualified name
-				//ClassPool classPool = ClassPool.getDefault();
-				//CtClass cc = classPool.makeClass(new FileInputStream(new File(classFileName)));
-				//String fullyQualifiedName = cc.getName();
-
-				// db insert
-				newSUT = new GameClass(classId, javaFileNameDB, classFileNameDB);
-				newSUT.insert();
-
-				response.sendRedirect("games/create");
-
-			} else {
-				messages.add("We were unable to compile your class, please try with a simpler one (no dependencies)");
-				response.sendRedirect(request.getHeader("referer"));
-				return;
-			}
 		} catch (FileUploadException e) {
 			throw new ServletException("Cannot parse multipart request.", e);
+		}
+
+		// two arguments processed?
+		if (classId == null || fileContent == null) {
+			messages.add("Please provide unique identifier and a .java file.");
+			response.sendRedirect(request.getHeader("referer"));
+			return;
+		}
+		// check that class alias is unique
+		if (GameClass.existUniqueClassID(classId)) {
+			messages.add("A class with identifier " + classId + " already exists, please use a different name.");
+			response.sendRedirect(request.getHeader("referer"));
+			return;
+		}
+		File targetFile = new File(Constants.CUTS_DIR + Constants.F_SEP + fileName);
+		if (targetFile.exists()) {
+			messages.add("A class with the same name already exists, please try with a different one.");
+			response.sendRedirect(request.getHeader("referer"));
+			return;
+		}
+		FileUtils.copyInputStreamToFile(fileContent, targetFile);
+		String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
+		//Compile original class.
+		String classFileName = AntRunner.compileCUT(fileName);
+
+		if (classFileName != null) {
+			String classFileNameDB = DatabaseAccess.addSlashes(classFileName);
+
+			// get fully qualified name
+			//ClassPool classPool = ClassPool.getDefault();
+			//CtClass cc = classPool.makeClass(new FileInputStream(new File(classFileName)));
+			//String fullyQualifiedName = cc.getName();
+
+			// db insert
+			newSUT = new GameClass(classId, javaFileNameDB, classFileNameDB);
+			newSUT.insert();
+
+			//Prepare AI classes, by generating tests and mutants.
+			PrepareAI p = new PrepareAI(newSUT.id);
+
+			response.sendRedirect("games/create");
+
+		} else {
+			//TODO: Alternate method of catching errors?
+			messages.add("We were unable to compile your class, please try with a simpler one (no dependencies)");
+			response.sendRedirect(request.getHeader("referer"));
+			return;
 		}
 	}
 }

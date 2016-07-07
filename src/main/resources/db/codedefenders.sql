@@ -86,6 +86,39 @@ CREATE TABLE `mutants` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+
+--
+-- Table structure for table `usedaitests`
+--
+DROP TABLE IF EXISTS `usedaitests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `usedaitests` (
+  `UsedTest_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Value` int(11) DEFAULT NULL,
+  `Game_ID` int(11) NOT NULL,
+  PRIMARY KEY (`UsedTest_ID`),
+  KEY `Game_ID` (`Game_ID`),
+  CONSTRAINT `usedaitests_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `usedaimutants`
+--
+DROP TABLE IF EXISTS `usedaimutants`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `usedaimutants` (
+  `UsedMutant_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Value` int(11) DEFAULT NULL,
+  `Game_ID` int(11) NOT NULL,
+  PRIMARY KEY (`UsedMutant_ID`),
+  KEY `Game_ID` (`Game_ID`),
+  CONSTRAINT `usedaimutants_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 --
 -- Table structure for table `targetexecutions`
 --
@@ -158,3 +191,5 @@ CREATE TABLE `users` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2015-12-04 15:54:48
+
+INSERT INTO `users` VALUES (1, 'AI', 'DUMMY_INACCESSIBLE');

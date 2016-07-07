@@ -2,6 +2,9 @@ package org.codedefenders;
 
 import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 
+import org.codedefenders.singleplayer.AiAttacker;
+import org.codedefenders.singleplayer.AiDefender;
+import org.codedefenders.singleplayer.AiPlayer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,10 +36,13 @@ public class Game {
 
 	private Mode mode;
 
-	public enum Role { ATTACKER, DEFENDER };
-	public enum State { CREATED, ACTIVE, FINISHED };
-	public enum Level { EASY, MEDIUM, HARD };
-	public enum Mode { SINGLE, DUEL, PARTY, UTESTING };
+	protected AiPlayer ai = null;
+	protected String aiDir = null;
+
+	public enum Role { ATTACKER, DEFENDER }
+	public enum State { CREATED, ACTIVE, FINISHED }
+	public enum Level { EASY, MEDIUM, HARD }
+	public enum Mode { SINGLE, DUEL, PARTY, UTESTING }
 
 	public Game(int classId, int userId, int maxRounds, Role role, Level level) {
 		this.classId = classId;
@@ -68,6 +74,11 @@ public class Game {
 		this.state = state;
 		this.level = level;
 		this.mode = mode;
+
+		//Set AI if it exists.
+		if(attackerId == 1) { ai = new AiAttacker(this); }
+		if(defenderId == 1) { ai = new AiDefender(this); }
+
 	}
 
 	public int getId() {
@@ -147,6 +158,8 @@ public class Game {
 	public Mode getMode() {
 		return this.mode;
 	}
+
+	protected void setMode(Mode newMode) { this.mode = newMode; }
 
 	public ArrayList<Mutant> getMutants() {
 		return DatabaseAccess.getMutantsForGame(id);
@@ -233,6 +246,11 @@ public class Game {
 			activeRole = Role.ATTACKER;
 			endRound();
 		}
+		if(ai != null) {
+			//Make the ai's turn if it exists.
+			ai.makeTurn();
+		}
+		update();
 	}
 
 	public void endRound() {
@@ -313,8 +331,8 @@ public class Game {
 				sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
 						currentRound, finalRound, activeRole, state.name(), level.name(), id);
 			else
-				sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
-						attackerId, defenderId, currentRound, finalRound, activeRole, state.name(), level.name(), id);
+				sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s', Mode='%s' WHERE Game_ID='%d'",
+						attackerId, defenderId, currentRound, finalRound, activeRole, state.name(), level.name(), mode.name(), id);
 			stmt.execute(sql);
 			return true;
 

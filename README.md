@@ -9,6 +9,13 @@ This is Code Defenders, a mutation testing game.
 - Maven
 - MySQL
 
+## Data Storage
+Code Defenders must store data in /var/lib/codedefenders/
+The tomcat user (and possibly the user running Code Defenders) must
+have full permissions on this directory.
+Major and Evosuite must be stored in their respective folders within
+this directory (codedefenders/major and codedefenders/evosuite).
+
 ## Deployment
 
 To compile and deploy the first time:
