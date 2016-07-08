@@ -55,21 +55,29 @@ public class EvoSuiteMaker {
 
 	public boolean createTestIndex() {
 		File dir = new File(AI_DIR + F_SEP + "tests" + F_SEP + cutTitle);
+
+		int goodTests = 0;
+
 		String xml = "";
 		xml += "<?xml version=\"1.0\"?> \n";
 		xml += "<testindex> \n";
 		//Original test ids.
 		xml += "\t<tests> \n";
 		for (Test t : validTests) {
-			xml += "\t\t<test ";
-			xml += "id=\"" + t.getId() + "\" ";
-			xml += "kills=\"" + t.getAiMutantsKilled() + "\" ";
-			xml += "/>\n";
+			int mKilled = t.getAiMutantsKilled();
+			//If the test kills at least one mutant, use it in the future.
+			if(mKilled > 0) {
+				xml += "\t\t<test ";
+				xml += "id=\"" + t.getId() + "\" ";
+				xml += "kills=\"" + mKilled + "\" ";
+				xml += "/>\n";
+				goodTests ++;
+			}
 		}
 		xml += "\t</tests> \n";
 
 		//Number of tests.
-		xml += "\t<quantity>" + validTests.size() + "</quantity> \n";
+		xml += "\t<quantity>" + goodTests + "</quantity> \n";
 		//ID of dummy game.
 		xml += "\t<dummygame>" + dGame.getId() + "</dummygame> \n";
 
