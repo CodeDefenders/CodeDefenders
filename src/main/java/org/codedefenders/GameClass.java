@@ -175,4 +175,40 @@ public class GameClass {
 		sb.append(String.format("}"));
 		return sb.toString();
 	}
+
+	public static boolean existUniqueClassID(String classID) {
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = String.format("SELECT * FROM classes WHERE Name = '%s';", classID);
+		try {
+			conn = DatabaseAccess.getConnection();
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			boolean exist = stmt.getResultSet().next();
+			stmt.close();
+			conn.close();
+			return exist;
+		} catch (SQLException se) {
+			System.out.println(se);
+			//Handle errors for JDBC
+		} catch (Exception e) {
+			System.out.println(e);
+			//Handle errors for Class.forName
+		} finally {
+			//finally block used to close resources
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException se2) {
+			}// nothing we can do
+
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				System.out.println(se);
+			}//end finally try
+		} //end try
+		return false;
+	}
 }
