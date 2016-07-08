@@ -27,6 +27,8 @@ public class Test {
 
 	private int ownerId;
 
+	private int aiMutantsKilled = 0; //How many generated mutants this test kills.
+
 	public Test(int gameId, String jFile, String cFile, int ownerId) {
 		this.gameId = gameId;
 		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
@@ -155,7 +157,7 @@ public class Test {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			sql = String.format("UPDATE tests SET mutantsKilled='%d' WHERE Test_ID='%d';", mutantsKilled, id);
+			sql = String.format("UPDATE tests SET mutantsKilled='%d', NumberAiMutantsKilled='%d' WHERE Test_ID='%d';", mutantsKilled, aiMutantsKilled, id);
 			stmt.execute(sql);
 
 			conn.close();
@@ -201,5 +203,15 @@ public class Test {
 
 	public boolean isValid() {
 		return classFile != null;
+	}
+
+	public void setAiMutantsKilled(int count) {
+		aiMutantsKilled = count;
+	}
+	public int getAiMutantsKilled() {
+		return aiMutantsKilled;
+	}
+	public void incrementAiMutantsKilled() {
+		aiMutantsKilled ++;
 	}
 }

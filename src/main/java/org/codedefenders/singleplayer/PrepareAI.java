@@ -5,6 +5,8 @@ import org.codedefenders.Game;
 import org.codedefenders.Mutant;
 import org.codedefenders.Test;
 
+import java.util.ArrayList;
+
 public class PrepareAI {
 
 	public PrepareAI() {
@@ -25,11 +27,25 @@ public class PrepareAI {
 		MajorMaker mMake = new MajorMaker(classId, dummyGame);
 		mMake.createMutants();
 
-		for (Test t : dummyGame.getTests()) {
-			for (Mutant m : dummyGame.getMutants()) {
+		ArrayList<Test> tests = dummyGame.getTests();
+		ArrayList<Mutant> mutants = dummyGame.getMutants();
+
+		for (Test t : tests) {
+			for (Mutant m : mutants) {
 				//Find if mutant killed by test.
-				AntRunner.testKillsMutant(m, t);
+				if(AntRunner.testKillsMutant(m, t)) {
+					m.incrementTimesKilledAi();
+					t.incrementAiMutantsKilled();
+				}
 			}
+		}
+
+		//Store kill counts to SQL.
+		for (Test t : tests) {
+			t.update();
+		}
+		for (Mutant m: mutants) {
+			m.update();
 		}
 
 		//Create XML files.
