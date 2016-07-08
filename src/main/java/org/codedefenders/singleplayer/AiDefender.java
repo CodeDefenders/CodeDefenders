@@ -165,10 +165,11 @@ class TestsIndexContents {
 
 			d.getDocumentElement().normalize();
 
-			NodeList tIdNodes = d.getElementsByTagName("test");
-			for (int i = 0; i < tIdNodes.getLength(); i++) {
-				Node tIdNode = tIdNodes.item(i);
-				testIds.add(Integer.parseInt(tIdNode.getTextContent()));
+			NodeList tNodes = d.getElementsByTagName("test");
+			for (int i = 0; i < tNodes.getLength(); i++) {
+				Node tNode = tNodes.item(i);
+				Node id = tNode.getAttributes().getNamedItem("id");
+				testIds.add(Integer.parseInt(id.getTextContent()));
 			}
 			NodeList q = d.getElementsByTagName("quantity");
 			numTests = Integer.parseInt(q.item(0).getTextContent());

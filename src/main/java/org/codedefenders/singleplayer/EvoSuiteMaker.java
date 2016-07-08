@@ -55,25 +55,28 @@ public class EvoSuiteMaker {
 
 	public boolean createTestIndex() {
 		File dir = new File(AI_DIR + F_SEP + "tests" + F_SEP + cutTitle);
-		String contents = "";
-		contents += "<?xml version=\"1.0\"?> \n";
-		contents += "<testindex> \n";
+		String xml = "";
+		xml += "<?xml version=\"1.0\"?> \n";
+		xml += "<testindex> \n";
 		//Original test ids.
-		contents += "\t<tests> \n";
+		xml += "\t<tests> \n";
 		for (Test t : validTests) {
-			contents += "\t\t<test>" + t.getId() + "</test> \n";
+			xml += "\t\t<test ";
+			xml += "id=\"" + t.getId() + "\" ";
+			xml += "kills=\"" + t.getAiMutantsKilled() + "\" ";
+			xml += "/>\n";
 		}
-		contents += "\t</tests> \n";
+		xml += "\t</tests> \n";
 
 		//Number of tests.
-		contents += "\t<quantity>" + validTests.size() + "</quantity> \n";
+		xml += "\t<quantity>" + validTests.size() + "</quantity> \n";
 		//ID of dummy game.
-		contents += "\t<dummygame>" + dGame.getId() + "</dummygame> \n";
+		xml += "\t<dummygame>" + dGame.getId() + "</dummygame> \n";
 
-		contents += "</testindex> \n";
+		xml += "</testindex> \n";
 
 		try {
-			FileManager.createIndexXML(dir, "TestsIndex", contents);
+			FileManager.createIndexXML(dir, "TestsIndex", xml);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
