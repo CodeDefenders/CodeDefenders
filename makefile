@@ -1,7 +1,7 @@
 # after it has been deployed a first time
-TOMCAT_PASSWORD=\*\*\*REMOVED\*\*\*/
-MYSQL_PASSWORD=\*\*\*REMOVED\*\*\*/
-EMAIL_PASSWORD=\*\*\*REMOVED\*\*\*/
+TOMCAT_PASSWORD=\*\*\*REMOVED\*\*\*
+MYSQL_PASSWORD=\*\*\*REMOVED\*\*\*
+EMAIL_PASSWORD=\*\*\*REMOVED\*\*\*
 default:
 	mvn clean compile package install war:war tomcat7:redeploy
 
