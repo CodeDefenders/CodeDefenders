@@ -15,7 +15,7 @@ public class EvoSuiteMaker {
 	private int cId;
 	private GameClass cut;
 	private Game dGame;
-	private ArrayList<Integer> testIds;
+	private ArrayList<Test> validTests;
 
 	public EvoSuiteMaker(int classId, Game dummyGame) {
 		cId = classId;
@@ -30,7 +30,7 @@ public class EvoSuiteMaker {
 		//Need a dummy game to add test to.
 
 		ArrayList<String> testStrings = getTestStrings();
-		testIds = new ArrayList<Integer>();
+		validTests = new ArrayList<Test>();
 
 		try {
 			for (String t : testStrings) {
@@ -42,7 +42,7 @@ public class EvoSuiteMaker {
 
 				if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
 					AntRunner.testOriginal(newTestDir, newTest);
-					testIds.add(newTest.getId());
+					validTests.add(newTest);
 				}
 			}
 		} catch (IOException e) {
@@ -60,13 +60,13 @@ public class EvoSuiteMaker {
 		contents += "<testindex> \n";
 		//Original test ids.
 		contents += "\t<tests> \n";
-		for (int n : testIds) {
-			contents += "\t\t<test>" + n + "</test> \n";
+		for (Test t : validTests) {
+			contents += "\t\t<test>" + t.getId() + "</test> \n";
 		}
 		contents += "\t</tests> \n";
 
 		//Number of tests.
-		contents += "\t<quantity>" + testIds.size() + "</quantity> \n";
+		contents += "\t<quantity>" + validTests.size() + "</quantity> \n";
 		//ID of dummy game.
 		contents += "\t<dummygame>" + dGame.getId() + "</dummygame> \n";
 

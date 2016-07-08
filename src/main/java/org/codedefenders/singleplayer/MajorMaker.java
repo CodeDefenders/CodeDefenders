@@ -70,7 +70,7 @@ public class MajorMaker {
 		for(Mutant m : validMutants) {
 			xml += "\t\t<mutant ";
 			xml += "id=\"" + m.getId() + "\" ";
-			//xml += "killed=\"" + m.getTimesKilledAi() + "\" ";
+			xml += "killed=\"" + m.getTimesKilledAi() + "\" ";
 			xml += "/>\n";
 		}
 		xml += "\t</mutants>\n";

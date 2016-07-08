@@ -209,6 +209,10 @@ public class Test {
 		aiMutantsKilled = count;
 	}
 	public int getAiMutantsKilled() {
+		if(aiMutantsKilled == 0) {
+			//Retrieve from DB.
+			aiMutantsKilled = DatabaseAccess.getNumAiMutantsKilledByTest(getId());
+		}
 		return aiMutantsKilled;
 	}
 	public void incrementAiMutantsKilled() {

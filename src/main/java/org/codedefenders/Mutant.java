@@ -353,6 +353,10 @@ public class Mutant {
 		killedByAITests = count;
 	}
 	public int getTimesKilledAi() {
+		if(killedByAITests == 0) {
+			//Retrieve from DB.
+			killedByAITests = DatabaseAccess.getNumTestsKillMutant(getId());
+		}
 		return killedByAITests;
 	}
 	public void incrementTimesKilledAi() {
