@@ -63,6 +63,7 @@
 <body class="page-grid">
 <%@ page import="java.util.*" %>
 <%@ page import="org.codedefenders.Test" %>
+<%@ page import="org.codedefenders.User" %>
 <%@ page import="org.codedefenders.Mutant" %>
 <%@ page import="org.codedefenders.Game" %>
 <%@ page import="org.codedefenders.Constants" %>
@@ -93,7 +94,7 @@
                                         Code Defenders
                                     </div>
                                     <div class="w-6">
-                                        <span><img class="logo" href="/" src="images/logo.png"/></span>
+                                        <!--<span><img class="logo" href="/" src="images/pass.png"/></span>-->
                                     </div>
                                 </div>
                             </a>

@@ -1,5 +1,6 @@
-<% String pageTitle="MultiplayerGame History"; %>
+<% String pageTitle="Game History"; %>
 <%@ include file="/jsp/header.jsp" %>
+<div>
 <h2> View Past Games </h2>
 <table class="table table-hover table-responsive table-paragraphs">
 	<tr>
@@ -50,6 +51,6 @@
 	<%}
 	%>
 </table>
-
+</div>
 
 <%@ include file="/jsp/footer.jsp" %>

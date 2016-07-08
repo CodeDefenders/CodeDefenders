@@ -13,7 +13,7 @@
         });
     });
 </script>
-<div class="menu-top bg-light-blue .minus-2 text-white" style="height: 50px; padding: 10px;">
+<div class="menu-top bg-light-blue .minus-2 text-white" style="padding: 5px;">
     <div class="full-width" style="padding-top: 3px;">
         <div class="nest">
             <div class="crow">
