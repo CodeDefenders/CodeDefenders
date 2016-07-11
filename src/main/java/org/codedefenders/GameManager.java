@@ -27,17 +27,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 
 import static org.codedefenders.Constants.*;
 import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 
 public class GameManager extends HttpServlet {
 
@@ -311,7 +307,7 @@ public class GameManager extends HttpServlet {
 		String cBaseName = classUnderTest.getBaseName();
 
 		//Get test suite location.
-		String dir = AI_DIR + F_SEP + "tests" + F_SEP + cBaseName;
+		String dir = AI_DIR + F_SEP + "tests" + F_SEP + classUnderTest.getAlias();
 		String jFile = dir + F_SEP + cBaseName + "EvoSuiteTest" + JAVA_SOURCE_EXT;
 		String cFile = dir + F_SEP + cBaseName + "EvoSuiteTest" + JAVA_CLASS_EXT;
 
@@ -337,7 +333,7 @@ public class GameManager extends HttpServlet {
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 		String classMutatedBaseName = classMutated.getBaseName();
 
-		File sourceFile = new File(classMutated.javaFile);
+		File sourceFile = new File(classMutated.getJavaFile());
 		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
 		// Runs diff match patch between the two Strings to see if there are any differences.

@@ -47,7 +47,7 @@ public class AiAttacker extends AiPlayer {
 	 */
 	public boolean turnEasy() {
 		try {
-			MutantsIndexContents ind = new MutantsIndexContents(game.getClassName());
+			MutantsIndexContents ind = new MutantsIndexContents(game.getCUT());
 
 			int mNum = selectMutant(GenerationMethod.RANDOM, ind);
 			try {
@@ -125,8 +125,8 @@ public class AiAttacker extends AiPlayer {
 		}
 
 		if(origM != null) {
-			String jFile = origM.getFolder() + F_SEP + dummyGame.getClassName() + JAVA_SOURCE_EXT;
-			String cFile = origM.getFolder() + F_SEP + dummyGame.getClassName() + JAVA_CLASS_EXT;
+			String jFile = origM.getSourceFile();
+			String cFile = origM.getClassFile();
 			Mutant m = new Mutant(game.getId(), jFile, cFile, true, 1);
 			m.insert();
 			m.update();
@@ -147,14 +147,15 @@ class MutantsIndexContents {
 	private int dummyGameId;
 	private int numMutants;
 
-	public MutantsIndexContents(String className) {
+	public MutantsIndexContents(GameClass cut) {
+
 		mutantIds = new ArrayList<Integer>();
 		dummyGameId = -1;
 		numMutants = -1;
 		//Parse the test index file of a given class.
 		try {
 			File f = new File(AI_DIR + F_SEP + "mutants" + F_SEP +
-					className + F_SEP + "MutantsIndex.xml");
+					cut.getAlias() + F_SEP + "MutantsIndex.xml");
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuild = dbFactory.newDocumentBuilder();
 			Document d = dBuild.parse(f);

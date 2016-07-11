@@ -46,7 +46,7 @@ public class UpdateAvailableClasses extends HttpServlet {
 				String classFile = DatabaseAccess.addSlashes(compiledFileName);
 				CtClass cc = classPool.makeClass(new FileInputStream(new File(compiledFileName)));
 				String fullyQualifiedName = cc.getName();
-				GameClass sut = new GameClass(fullyQualifiedName, javaFile, classFile);
+				GameClass sut = new GameClass(fullyQualifiedName, fullyQualifiedName, javaFile, classFile);
 				sut.insert();
 				System.out.println(javaFile);
 				System.out.println(classFile);

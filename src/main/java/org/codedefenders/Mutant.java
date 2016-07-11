@@ -100,6 +100,10 @@ public class Mutant {
 		equivalent = e;
 	}
 
+	public String getSourceFile() {
+		return javaFile;
+	}
+
 	public String getClassFile() {
 		return classFile;
 	}
@@ -174,7 +178,7 @@ public class Mutant {
 		int classId = DatabaseAccess.getGameForKey("Game_ID", gameId).getClassId();
 		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
-		File sourceFile = new File(sut.javaFile);
+		File sourceFile = new File(sut.getJavaFile());
 		File mutantFile = new File(javaFile);
 
 		List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());
@@ -187,7 +191,7 @@ public class Mutant {
 		int classId = DatabaseAccess.getGameForKey("Game_ID", gameId).getClassId();
 		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
-		File sourceFile = new File(sut.javaFile);
+		File sourceFile = new File(sut.getJavaFile());
 		File mutantFile = new File(javaFile);
 
 		List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());

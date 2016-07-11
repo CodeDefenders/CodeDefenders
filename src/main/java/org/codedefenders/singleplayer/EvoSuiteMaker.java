@@ -1,5 +1,6 @@
 package org.codedefenders.singleplayer;
 
+import com.sun.tools.internal.jxc.apt.Const;
 import org.codedefenders.*;
 
 import java.io.File;
@@ -11,7 +12,6 @@ import static org.codedefenders.Constants.*;
 
 public class EvoSuiteMaker {
 
-	private String cutTitle;
 	private int cId;
 	private GameClass cut;
 	private Game dGame;
@@ -20,23 +20,22 @@ public class EvoSuiteMaker {
 	public EvoSuiteMaker(int classId, Game dummyGame) {
 		cId = classId;
 		cut = DatabaseAccess.getClassForKey("Class_ID", cId);
-		cutTitle = cut.getBaseName();
 		dGame = dummyGame;
 	}
 
 	public boolean makeSuite() {
-		AntRunner.generateTestsFromCUT(cutTitle);
-		AntRunner.compileGenTestSuite(cutTitle);
+		AntRunner.generateTestsFromCUT(cut);
+		AntRunner.compileGenTestSuite(cut);
 		//Need a dummy game to add test to.
 
 		ArrayList<String> testStrings = getTestStrings();
-		testIds = new ArrayList<Integer>();
+		testIds = new ArrayList<>();
 
 		try {
 			for (String t : testStrings) {
 				File newTestDir = FileManager.getNextSubDir(AI_DIR + F_SEP + "tests" +
-						F_SEP + cutTitle + F_SEP);
-				String jFile = FileManager.createJavaFile(newTestDir, cutTitle, t);
+						F_SEP + cut.getAlias());
+				String jFile = FileManager.createJavaFile(newTestDir, cut.getBaseName(), t);
 				Test newTest = AntRunner.compileTest(newTestDir, jFile, dGame.getId(), cut, 1);
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
@@ -54,7 +53,7 @@ public class EvoSuiteMaker {
 	}
 
 	public boolean createTestIndex() {
-		File dir = new File(AI_DIR + F_SEP + "tests" + F_SEP + cutTitle);
+		File dir = new File(AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias());
 		String contents = "";
 		contents += "<?xml version=\"1.0\"?> \n";
 		contents += "<testindex> \n";
@@ -86,8 +85,9 @@ public class EvoSuiteMaker {
 	 * @return test suite
 	 */
 	private List<String> getTestSuiteLines() {
-		String loc = AI_DIR + F_SEP + "tests" + F_SEP + cutTitle +
-				F_SEP + cutTitle + "EvoSuiteTest.java";
+		String packageDir = cut.getPackage().replace(".", Constants.F_SEP);
+		String loc = AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias() +
+				F_SEP + packageDir + F_SEP + cut.getBaseName() + "EvoSuiteTest.java";
 		File f = new File(loc);
 		return FileManager.readLines(f.toPath());
 	}
@@ -113,7 +113,7 @@ public class EvoSuiteMaker {
 				}
 				else if(l.contains("public class ")) {
 					//Class declaration, write correct one in place.
-					sharedStart += "public class Test" + cutTitle + " { \n";
+					sharedStart += "public class Test" + cut.getBaseName() + " { \n";
 				}
 				else if(l.contains("public void test")) {
 					//Start of a test.

@@ -202,4 +202,20 @@ public class Test {
 	public boolean isValid() {
 		return classFile != null;
 	}
+
+	public String getJavaFile() {
+		return javaFile;
+	}
+
+	public void setJavaFile(String javaFile) {
+		this.javaFile = javaFile;
+	}
+
+	public String getClassFile() {
+		return classFile;
+	}
+
+	public void setClassFile(String classFile) {
+		this.classFile = classFile;
+	}
 }
