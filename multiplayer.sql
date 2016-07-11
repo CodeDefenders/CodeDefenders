@@ -28,7 +28,7 @@ CREATE TABLE `classes` (
   `JavaFile` varchar(255) NOT NULL,
   `ClassFile` varchar(255) NOT NULL,
   PRIMARY KEY (`Class_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=218 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=221 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -76,10 +76,16 @@ CREATE TABLE `multiplayer_games` (
   `Price` int(11) DEFAULT NULL,
   `Defender_Value` int(11) DEFAULT '100',
   `Attacker_Value` int(11) DEFAULT '100',
-  `Coverage_Goal` decimal(5,0) DEFAULT NULL,
-  `Mutant_Goal` decimal(5,0) DEFAULT NULL,
+  `Coverage_Goal` float DEFAULT NULL,
+  `Mutant_Goal` float DEFAULT NULL,
+  `Attackers_Needed` int(11) DEFAULT '0',
+  `Defenders_Needed` int(11) DEFAULT '0',
+  `Finish_Time` bigint(64) DEFAULT '0',
+  `Attackers_Limit` int(11) DEFAULT '0',
+  `Defenders_Limit` int(11) DEFAULT '0',
+  `Status` enum('WAITING','STARTED','FINISHED') DEFAULT 'WAITING',
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -102,7 +108,7 @@ CREATE TABLE `mutants` (
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Points` int(11) DEFAULT '0',
   PRIMARY KEY (`Mutant_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=120 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -119,7 +125,7 @@ CREATE TABLE `players` (
   `Points` int(11) NOT NULL,
   `Role` enum('ATTACKER','DEFENDER') NOT NULL,
   PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=24 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -142,7 +148,7 @@ CREATE TABLE `targetexecutions` (
   KEY `Mutant_ID` (`Mutant_ID`),
   CONSTRAINT `targetexecutions_ibfk_1` FOREIGN KEY (`Test_ID`) REFERENCES `tests` (`Test_ID`),
   CONSTRAINT `targetexecutions_ibfk_2` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=596 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=614 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -165,7 +171,7 @@ CREATE TABLE `tests` (
   `Lines_Uncovered` longtext,
   `Points` int(11) DEFAULT '0',
   PRIMARY KEY (`Test_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=192 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -192,4 +198,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-07-08 14:06:05
+-- Dump completed on 2016-07-11 16:33:40
