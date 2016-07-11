@@ -56,4 +56,18 @@ public class PrepareAI {
 		//Don't actually kill mutants to run all tests.
 		//Perhaps rank mutants in how many tests kill them.
 	}
+
+	/**
+	 * Select an index of an arraylist, with a bias to earlier values.
+	 * @param length Number of indexes in the arraylist.
+	 * @param bias The bias power to use. >1 biases towards earlier indexes, <1 biases towards later indexes.
+	 * @return the resulting index.
+	 */
+	public static int biasedSelection(int length, double bias) {
+
+		//Generate a random number biased towards smaller values.
+		double r = Math.pow(Math.random(), bias);
+
+		return (int) Math.floor(r * length);
+	}
 }

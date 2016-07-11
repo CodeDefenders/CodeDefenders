@@ -52,4 +52,9 @@ public class AiPlayer {
 		//Override
 		return true;
 	}
+
+	protected boolean runTurn(GenerationMethod strat) {
+		//Override
+		return true;
+	}
 }

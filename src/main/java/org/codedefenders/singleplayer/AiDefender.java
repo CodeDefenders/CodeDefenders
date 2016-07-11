@@ -11,6 +11,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static org.codedefenders.Constants.*;
@@ -26,30 +28,20 @@ public class AiDefender extends AiPlayer {
 		role = Game.Role.DEFENDER;
 	}
 	public boolean turnHard() {
-		//Run all generated tests for class.
-		if(game.getTests().isEmpty()) {
-			//Add test suite to game if it isn't present.
-			GameManager gm = new GameManager();
-			Test newTest = gm.submitAiTestFullSuite(game);
-			newTest.insert();
-			//Run the tests on existing mutants.
-			MutationTester.runTestOnAllMutants(game, newTest, new ArrayList<String>());
-
-		}
-		//Do nothing else, test is automatically re-run on new mutants by GameManager.
-		//TODO: Add equivalence check.
-		//Call equivalent only if test suite passes on mutant.
-		return true;
+		//Choose test which kills a high number of generated mutants.
+		return runTurn(GenerationMethod.KILLCOUNT);
 	}
 
 	public boolean turnEasy() {
-		//Choose a random test which covers the modified line(s)?
-		//Perhaps just a random test?
-		//Perhaps higher chance of equivalence call? May happen due to weaker testing.
+		//Choose random test.
+		return runTurn(GenerationMethod.RANDOM);
+	}
+
+	protected boolean runTurn(GenerationMethod strat) {
 		try {
 			TestsIndexContents ind = new TestsIndexContents(game.getClassName());
 
-			int tNum = selectTest(GenerationMethod.RANDOM, ind);
+			int tNum = selectTest(strat, ind);
 			try {
 				useTestFromSuite(tNum, ind);
 			} catch (IOException e) {
@@ -80,21 +72,31 @@ public class AiDefender extends AiPlayer {
 
 		for (int i = 0; i <= 3; i++) {
 			//Try to get test by default strategy.
-			int n = 0;
+			int n = -1;
 			if (strategy.equals(GenerationMethod.RANDOM)) {
 				n = (int) Math.floor(Math.random() * totalTests);
 				//0 -> totalTests - 1.
 			}
+			else if (strategy.equals(GenerationMethod.KILLCOUNT)) {
+				//Sort tests in order of killcount.
+				Collections.sort(origTests, new TestComparator());
+				//Get an index, using a random number biased towards earlier index.
+				n = PrepareAI.biasedSelection(origTests.size(), 0.1);
+			}
 			//TODO: Other strategies.
 
-			//Get original test from dummy game's list of tests.
-			Test origT = origTests.get(n);
-			t = origT.getId();
+			//Check that an id has been retrieved.
+			if(n >= 0) {
+				//Get original test from dummy game's list of tests.
+				Test origT = origTests.get(n);
+				t = origT.getId();
 
-			if ((!usedTests.contains(t)) && (t != -1)) {
-				//Strategy found an unused test.
-				return t;
+				if ((!usedTests.contains(t)) && (t != -1)) {
+					//Strategy found an unused test.
+					return t;
+				}
 			}
+
 		}
 
 		//If standard strategy fails, choose first non-selected test.
@@ -196,4 +198,11 @@ class TestsIndexContents {
 		return dummyGameId;
 	}
 
+}
+
+class TestComparator implements Comparator<Test> {
+	@Override
+	public int compare(Test t1, Test t2) {
+		return t1.getAiMutantsKilled() - t2.getAiMutantsKilled();
+	}
 }

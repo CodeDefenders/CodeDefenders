@@ -12,6 +12,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.io.File;
 import java.util.regex.Pattern;
@@ -34,11 +36,8 @@ public class AiAttacker extends AiPlayer {
 	 * @return true if mutant generation succeeds, or if no non-existing mutants have been found to prevent infinite loop.
 	 */
 	public boolean turnHard() {
-		//Use only one mutant per round.
-		//Perhaps modify the line with the least test coverage?
-
-		//TODO: Determine by lowest test coverage. Using easy behaviour for now.
-		return turnEasy();
+		//Choose a mutant which is killed by few generated tests.
+		return runTurn(GenerationMethod.KILLCOUNT);
 	}
 
 	/**
@@ -46,10 +45,15 @@ public class AiAttacker extends AiPlayer {
 	 * @return true if mutant generation succeeds, or if no non-existing mutants have been found to prevent infinite loop.
 	 */
 	public boolean turnEasy() {
+		//Choose a random mutant.
+		return runTurn(GenerationMethod.RANDOM);
+	}
+
+	protected boolean runTurn(GenerationMethod strat) {
 		try {
 			MutantsIndexContents ind = new MutantsIndexContents(game.getClassName());
 
-			int mNum = selectMutant(GenerationMethod.RANDOM, ind);
+			int mNum = selectMutant(strat, ind);
 			try {
 				useMutantFromSuite(mNum, ind);
 			} catch (IOException e) {
@@ -79,20 +83,29 @@ public class AiAttacker extends AiPlayer {
 
 		for (int i = 0; i < 10; i++) {
 			//Try standard strategy to select a mutant.
-			int n = 0;
+			int n = -1;
 			if(strategy.equals(GenerationMethod.RANDOM)) {
 				n = (int) Math.floor(Math.random() * totalMutants);
 				//0 -> totalMutants - 1.
 			}
+			else if(strategy.equals(GenerationMethod.KILLCOUNT)) {
+				//Sort tests in order of killcount.
+				Collections.sort(origMutants, new MutantComparator());
+				//Get an index, using a random number biased towards later index.
+				n = PrepareAI.biasedSelection(origMutants.size(), 1.9);
+			}
 			//TODO: Other generation strategies
 
-			Mutant origM = origMutants.get(n);
-			m = origM.getId();
+			if(n >= 0) {
+				Mutant origM = origMutants.get(n);
+				m = origM.getId();
 
-			if ((!usedMutants.contains(m)) && (m != -1)) {
-				//Found an unused mutant.
-				return m;
+				if ((!usedMutants.contains(m)) && (m != -1)) {
+					//Found an unused mutant.
+					return m;
+				}
 			}
+
 		}
 
 		//If standard strategy fails, make a choice linearly.
@@ -192,4 +205,11 @@ class MutantsIndexContents {
 		return dummyGameId;
 	}
 
+}
+
+class MutantComparator implements Comparator<Mutant> {
+	@Override
+	public int compare(Mutant m1, Mutant m2) {
+		return m1.getTimesKilledAi() - m2.getTimesKilledAi();
+	}
 }
