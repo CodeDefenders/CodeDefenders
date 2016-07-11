@@ -279,7 +279,15 @@ public class DatabaseAccess {
 	public static ArrayList<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
 		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
 				"LEFT JOIN players as p ON p.Game_ID=m.ID " +
-				"WHERE (p.User_ID=%d OR m.Creator_ID=%d) " +
+				"WHERE (p.User_ID=%d OR m.Creator_ID=%d) AND m.Status != 'FINISHED' " +
+				"GROUP BY m.ID;", userId, userId, userId);
+		return getMultiplayerGames(sql);
+	}
+
+	public static ArrayList<MultiplayerGame> getFinishedMultiplayerGamesForUser(int userId) {
+		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
+				"LEFT JOIN players as p ON p.Game_ID=m.ID " +
+				"WHERE (p.User_ID=%d OR m.Creator_ID=%d) AND m.Status = 'FINISHED' " +
 				"GROUP BY m.ID;", userId, userId, userId);
 		return getMultiplayerGames(sql);
 	}

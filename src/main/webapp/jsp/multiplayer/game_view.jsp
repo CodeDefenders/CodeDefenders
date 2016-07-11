@@ -25,7 +25,7 @@
 
     MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
     if (mg.getStatus().equals(MultiplayerGame.Status.FINISHED)) {
-        response.sendRedirect("/multiplayer/games/user");
+        response.sendRedirect("/games/user");
     }
     Participance p = mg.getParticipance(uid);
 

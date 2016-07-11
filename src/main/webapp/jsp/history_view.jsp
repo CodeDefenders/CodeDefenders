@@ -51,6 +51,61 @@
 	<%}
 	%>
 </table>
+	<hr />
+	<h2>Battlegrounds</h2>
+	<table class="table table-hover table-responsive table-paragraphs"><tr><th>Game ID</th><th>Owner</th><th>
+		Price
+	</th><th>Level</th><th>Actions</th></tr>
+		<%
+			ArrayList<MultiplayerGame> mgames = DatabaseAccess.getFinishedMultiplayerGamesForUser(uid);
+			if (mgames.isEmpty()) {
+		%>
+		<tr><td colspan="5"> You have complete no games. </td></tr>
+		<%
+		} else {
+		%>
+		<%
+			for (MultiplayerGame g : mgames) {
+				Participance participance = g.getParticipance(uid);
+		%>
+		<tr>
+			<td class="col-sm-2"><%= g.getId() %></td>
+			<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
+			<td class="col-sm-2"><%= g.getPrice() %></td>
+			<td class="col-sm-2"><%= g.getLevel().name() %></td>
+			<td class="col-sm-2"><%
+				switch(participance){
+					case ATTACKER:
+			%>
+				<a href="multiplayer/games?id=<%= g.getId() %>">Attack</a>
+				<%
+						break;
+					case CREATOR:
+				%>
+				<a href="multiplayer/games?id=<%= g.getId() %>">Observe</a>
+				<%
+
+						break;
+					case DEFENDER:
+				%>
+				<a href="multiplayer/games?id=<%= g.getId() %>">Defend</a>
+				<%
+
+							break;
+						default:
+
+							break;
+					}
+
+				%></td>
+		</tr>
+		<%
+				} // for (MultiplayerGame g : games)
+			} // if (games.isEmpty())
+		%>
+	</table>
+
+</div>
 </div>
 
 <%@ include file="/jsp/footer.jsp" %>
