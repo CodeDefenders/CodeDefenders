@@ -160,6 +160,15 @@
 		<url-pattern>/sendEmail</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>logout</servlet-name>
+		<servlet-class>org.codedefenders.LogoutManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>logout</servlet-name>
+		<url-pattern>/logout</url-pattern>
+	</servlet-mapping>
+
 
 	<!-- multiplayer servlets -->
 	<servlet>

@@ -15,15 +15,15 @@
                     <div class="tabs-blue-grey ws-12">
                         <ul class="inline">
                             <li>
-                                <div class="button tab-link text-white relative bg-minus-1 ws-12">
-                                    <p style="text-align: left; display: inline; width:70%">
+                                <div class="button tab-link text-white relative bg-minus-1 ws-12" style="min-width: 100px; text-align: center;">
+                                    <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                                    <p style="display: inline; width:70%">
                                         <%=request.getSession().getAttribute("username")%>
                                     </p>
-                                    <span style="text-align: right" class="glyphicon glyphicon-user" aria-hidden="true"></span>
                                     <div class="bg-white relative drop down-left card baseline-padding ws-12">
                                         <ul class="unstyled">
                                             <li>
-                                                <a href="#" class="text-white list-item" onclick="$('.logout').submit();">
+                                                <a href="/logout" class="text-white list-item">
                                                     <span class="glyphicon glyphicon-remove"></span>
                                                     logout
                                                 </a>

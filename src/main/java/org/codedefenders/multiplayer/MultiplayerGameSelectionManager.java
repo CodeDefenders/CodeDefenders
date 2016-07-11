@@ -58,8 +58,15 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         // Create the game with supplied parameters and insert it in the database.
         MultiplayerGame nGame = new MultiplayerGame(classId, uid, level, (float) lineCoverage,
-                (float) mutantCoverage, 1f, 100, 100);
+                (float) mutantCoverage, 1f, 100, 100,
+                Integer.parseInt(request.getParameter("defenderLimit")), Integer.parseInt(request.getParameter("attackerLimit")),
+                Integer.parseInt(request.getParameter("minDefenders")), Integer.parseInt(request.getParameter("minAttackers")),
+                Long.parseLong(request.getParameter("finishTime")), MultiplayerGame.Status.WAITING.name());
         nGame.insert();
+
+        //rs.getInt("Defender_Limit"), rs.getInt("Attacker_Limit"),
+        //rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getLong("Finish_Time"),
+        //        rs.getString("Status")
 
         // Redirect to the game selection menu.
         response.sendRedirect("games");

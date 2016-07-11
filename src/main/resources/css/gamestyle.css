@@ -1,12 +1,16 @@
 @import 'https://fonts.googleapis.com/css?family=Open+Sans|Ubuntu';
 
-  body {
+body {
 	/*font-family: 'Roboto', arial;*/
 	  font-family: 'Ubuntu', 'Open Sans', sans-serif;
 	font-size: 14px;
 	line-height: 22px;
 	color: #424242;
 	background-color: #fafafa;
+}
+
+.menu-top .bg-light-blue .minus-2 {
+	background-color: rgb(0, 151, 209);
 }
 
 .main-title {

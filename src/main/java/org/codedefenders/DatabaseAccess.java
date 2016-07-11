@@ -448,7 +448,9 @@ public class DatabaseAccess {
 				MultiplayerGame mg = new MultiplayerGame(rs.getInt("Class_ID"), rs.getInt("Creator_ID"),
 						Game.Level.valueOf(rs.getString("Level")), (float)rs.getDouble("Coverage_Goal"),
 						(float)rs.getDouble("Mutant_Goal"), rs.getInt("Price"), rs.getInt("Defender_Value"),
-						rs.getInt("Attacker_Value"));
+						rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
+						rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getLong("Finish_Time"),
+								rs.getString("Status"));
 				mg.setId(rs.getInt("ID"));
 				gameList.add(mg);
 			}

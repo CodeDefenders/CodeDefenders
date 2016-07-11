@@ -24,6 +24,9 @@
     String codeDivName = "cut-div";
 
     MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
+    if (mg.getStatus().equals(MultiplayerGame.Status.FINISHED)) {
+        response.sendRedirect("/multiplayer/games/user");
+    }
     Participance p = mg.getParticipance(uid);
 
     List<Test> tests = mg.getExecutableTests();

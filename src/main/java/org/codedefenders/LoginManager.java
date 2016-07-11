@@ -81,18 +81,6 @@ public class LoginManager extends HttpServlet {
 					dispatcher.forward(request, response);
 				}
 			}
-		} else if (formType.equals("logOut")) {
-
-			HttpSession session = request.getSession();
-			session.invalidate();
-
-			messages.add("Successfully Logged Out");
-			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-			dispatcher.forward(request, response);
-		} else {
-			messages.add("POST To LoginManager Didn't Supply A FormType Somehow");
-			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-			dispatcher.forward(request, response);
 		}
 	}
 }

@@ -25,6 +25,10 @@
     <script src="js/bootstrap.min.js" type="text/javascript" ></script>
     <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
+    <!-- JQuery UI -->
+    <script src="js/jquery-ui.js" type="text/javascript" ></script>
+    <link href="css/jquery-ui.css" rel="stylesheet" type="text/css" />
+
     <link href="css/bootstrap-toggle_2.2.0.min.css" rel="stylesheet" type="text/css" />
     <script src="js/bootstrap-toggle_2.2.0.min.js" type="text/javascript" ></script>
     <!-- select -->
@@ -78,7 +82,7 @@
 <%@ page import="org.codedefenders.multiplayer.Participance" %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
     <% Game game = (Game) session.getAttribute("game"); %>
-<div class="menu-top bg-blue-grey bg-base text-white" style="padding-bottom:0px;">
+<div class="menu-top bg-grey bg-plus-4 text-white" style="padding-bottom:0px;">
     <div class="full-width">
         <div class="nest">
             <div class="crow fly nogutter">
@@ -103,6 +107,6 @@
                 </div>
             </div>
         </div>
-        <div class="bg-plus-1" style="padding:2px 0; margin-bottom: 0px; margin-top: 5px;"></div>
+        <div class="bg-plus-3" style="padding:2px 0; margin-bottom: 0px; margin-top: 5px;"></div>
     </div>
 </div>

@@ -21,6 +21,10 @@ public class MultiplayerGame {
 
 	private static final Logger logger = LoggerFactory.getLogger(MultiplayerGame.class);
 
+	public enum Status {
+		WAITING, STARTED, FINISHED;
+	}
+
 	private int id;
 
 	private int classId;
@@ -32,11 +36,25 @@ public class MultiplayerGame {
 	private float lineCoverage;
 	private float mutantCoverage;
 	private float price;
+	private int attackerLimit;
+	private int defenderLimit;
+	private int minAttackers;
+	private int minDefenders;
+	private long finishTime;
+	private Status status;
 
 	private Game.Level level;
 
 	public void setId(int id) {
 		this.id = id;
+		if (this.status != Status.FINISHED && finishTime < System.currentTimeMillis()){
+			this.status = Status.FINISHED;
+			update();
+		}
+	}
+
+	public Status getStatus(){
+		return status;
 	}
 
 	public void setClassId(int classId) {
@@ -91,7 +109,11 @@ public class MultiplayerGame {
 		this.price = price;
 	}
 
-	public MultiplayerGame(int classId, int creatorId, Game.Level level, float lineCoverage, float mutantCoverage, float price,int defenderValue, int attackerValue) {
+	public MultiplayerGame(int classId, int creatorId, Game.Level level,
+						   float lineCoverage, float mutantCoverage, float price,
+						   int defenderValue, int attackerValue, int defenderLimit,
+						   int attackerLimit, int minDefenders, int minAttackers,
+						   long finishTime, String status) {
 		this.classId = classId;
 		this.creatorId = creatorId;
 		this.level = level;
@@ -100,6 +122,12 @@ public class MultiplayerGame {
 		this.price = price;
 		this.defenderValue = defenderValue;
 		this.attackerValue = attackerValue;
+		this.defenderLimit = defenderLimit;
+		this.attackerLimit = attackerLimit;
+		this.minDefenders = minDefenders;
+		this.minAttackers = minAttackers;
+		this.status = Status.valueOf(status);
+		this.finishTime = finishTime;
 	}
 
 	public int getId() {
@@ -197,21 +225,27 @@ public class MultiplayerGame {
 	public int[] getPlayerIds() { return ArrayUtils.addAll(getDefenderIds(), getAttackerIds());}
 
 	public boolean addUserAsAttacker(int userId) {
-		String sql = String.format("INSERT INTO players " +
-						"(Game_ID, User_ID, Points, Role) VALUES " +
-						"(%d, %d, 0, '%s');",
-				id, userId, Participance.ATTACKER);
+		if (status != Status.FINISHED && (defenderLimit == 0 || getDefenderIds().length < defenderLimit)) {
+			String sql = String.format("INSERT INTO players " +
+							"(Game_ID, User_ID, Points, Role) VALUES " +
+							"(%d, %d, 0, '%s');",
+					id, userId, Participance.ATTACKER);
 
-		return runStatement(sql);
+			return runStatement(sql);
+		}
+		return false;
 	}
 
 	public boolean addUserAsDefender(int userId) {
-		String sql = String.format("INSERT INTO players " +
-						"(Game_ID, User_ID, Points, Role) VALUES " +
-						"(%d, %d, 0, '%s');",
-				id, userId, Participance.DEFENDER);
+		if (status != Status.FINISHED && (attackerLimit == 0 || getAttackerIds().length < attackerLimit)) {
+			String sql = String.format("INSERT INTO players " +
+							"(Game_ID, User_ID, Points, Role) VALUES " +
+							"(%d, %d, 0, '%s');",
+					id, userId, Participance.DEFENDER);
 
-		return runStatement(sql);
+			return runStatement(sql);
+		}
+		return false;
 	}
 
 	public boolean runStatement(String sql) {
@@ -274,9 +308,12 @@ public class MultiplayerGame {
 
 			stmt = conn.createStatement();
 			sql = String.format("INSERT INTO multiplayer_games " +
-					"(Class_ID, Level, Price, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID) VALUES " +
-					"('%s', 	'%s', '%f', 	'%d',			'%d',			'%f',			'%f',		'%d');",
-					classId, level.name(), price, defenderValue, attackerValue, lineCoverage, mutantCoverage, creatorId);
+					"(Class_ID, Level, Price, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " +
+					"Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Finish_Time, Status) VALUES " +
+					"('%s', 	'%s', '%f', 	'%d',			'%d',			'%f',			'%f',		'%d'," +
+					"'%d',				'%d',				'%d',			'%d',			'%d',		'%s');",
+					classId, level.name(), price, defenderValue, attackerValue, lineCoverage, mutantCoverage, creatorId,
+					minAttackers, minDefenders, attackerLimit, defenderLimit, finishTime, status.name());
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -327,8 +364,8 @@ public class MultiplayerGame {
 			stmt = conn.createStatement();
 				sql = String.format("UPDATE multiplayer_games SET " +
 						"Class_ID = '%s', Level = '%s', Price = %f, Defender_Value=%d, Attacker_Value=%d, Coverage_Goal=%f" +
-						", Mutant_Goal=%f WHERE ID='%d'",
-						classId, level.name(), price, defenderValue, attackerValue, lineCoverage, mutantCoverage, id);
+						", Mutant_Goal=%f, Status='%s' WHERE ID='%d'",
+						classId, level.name(), price, defenderValue, attackerValue, lineCoverage, mutantCoverage, status.name(), id);
 			stmt.execute(sql);
 			return true;
 

@@ -1,3 +1,5 @@
+<% if (p.equals(Participance.DEFENDER) || p.equals(Participance.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){
+%>
 <div class="col-md-6">
     <h2> JUnit tests </h2>
     <div class="slider single-item">
@@ -28,11 +30,7 @@
                 for (String l : t.getHTMLReadout()) { tc += l + "\n"; }
         %>
         <div><h4>Test <%= t.getId() %></h4><pre class="readonly-pre"><textarea class="utest" cols="20" rows="10">
-                <% if (p.equals(Participance.DEFENDER) || p.equals(Participance.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){
-                %><%=tc%><%
-                } else { %>
-//Only available to attackers in easy game mode.
-                <%}%>
+                <%=tc%>
         </textarea></pre></div>
         <%
             }
@@ -45,3 +43,4 @@
         %>
     </div> <!-- slider single-item -->
 </div> <!-- col-md-6 left bottom -->
+<% } %>
