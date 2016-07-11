@@ -68,9 +68,9 @@
           <label for="inputPassword" class="sr-only">Password</label>
           <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
           <div>
-              <input type="checkbox" id="consentOK" style="margin-right:5px;">I understand and consent that the mutants and tests I create in the game will be used for research purposes.
+              <input type="checkbox" id="consentOK" style="margin-right:5px;" checked>I understand and consent that the mutants and tests I create in the game will be used for research purposes.
           </div>
-          <button class="btn btn-lg btn-primary btn-block" id="signInButton" type="submit" disabled>Sign in</button>
+          <button class="btn btn-lg btn-primary btn-block" id="signInButton" type="submit">Sign in</button>
           <a href="#" class="text-center new-account" data-toggle="modal" data-target="#myModal">Create an account</a>
       </form>
   </div>
