@@ -94,7 +94,7 @@ public class AiAttacker extends AiPlayer {
 
 				//Get an index, using a random number biased towards earlier index.
 				//Note mutants with low killcount are more likely to be equivalent.
-				n = PrepareAI.biasedSelection(origMutants.size(), 1.4);
+				n = PrepareAI.biasedSelection(origMutants.size(), 1.7);
 			}
 			//TODO: Other generation strategies
 
