@@ -118,7 +118,11 @@ public class EvoSuiteMaker {
 
 			if(!inTest) {
 				//Not in test.
-				if(l.contains("import ")) {
+				if(l.startsWith("package ")) {
+					//Add any line with package.
+					sharedStart += l + "\n";
+				}
+				else if(l.startsWith("import ")) {
 					//Add any line with import.
 					sharedStart += l + "\n";
 				}
