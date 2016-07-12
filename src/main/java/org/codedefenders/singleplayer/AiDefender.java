@@ -67,8 +67,12 @@ public class AiDefender extends AiPlayer {
 		}
 		int t = -1;
 
-		Game dummyGame = DatabaseAccess.getGameForKey("Game_ID", indexCon.getDummyGameId());
-		ArrayList<Test> origTests = dummyGame.getTests();
+		//Get available tests, only ones in the xml file
+		//Prevents usage of useless tests
+		ArrayList<Test> origTests = new ArrayList<Test>();
+		for (int tId : indexCon.getTestIds()) {
+			origTests.add(DatabaseAccess.getTestForId(tId));
+		}
 
 		for (int i = 0; i <= 3; i++) {
 			//Try to get test by default strategy.
@@ -80,8 +84,10 @@ public class AiDefender extends AiPlayer {
 			else if (strategy.equals(GenerationMethod.KILLCOUNT)) {
 				//Sort tests in order of killcount.
 				Collections.sort(origTests, new TestComparator());
-				//Get an index, using a random number biased towards earlier index.
-				n = PrepareAI.biasedSelection(origTests.size(), 0.1);
+
+				//Get an index, using a random number biased towards later index.
+				//More extreme than attacker due to smaller sample size.
+				n = PrepareAI.biasedSelection(origTests.size(), 0.6);
 			}
 			//TODO: Other strategies.
 

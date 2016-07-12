@@ -91,8 +91,10 @@ public class AiAttacker extends AiPlayer {
 			else if(strategy.equals(GenerationMethod.KILLCOUNT)) {
 				//Sort tests in order of killcount.
 				Collections.sort(origMutants, new MutantComparator());
-				//Get an index, using a random number biased towards later index.
-				n = PrepareAI.biasedSelection(origMutants.size(), 1.9);
+
+				//Get an index, using a random number biased towards earlier index.
+				//Note mutants with low killcount are more likely to be equivalent.
+				n = PrepareAI.biasedSelection(origMutants.size(), 1.4);
 			}
 			//TODO: Other generation strategies
 

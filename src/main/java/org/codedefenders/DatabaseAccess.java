@@ -646,6 +646,11 @@ public class DatabaseAccess {
 		return getTests(sql);
 	}
 
+	public static Test getTestForId(int tid) {
+		String sql = String.format("SELECT * FROM tests WHERE Test_ID='%d';", tid);
+		return getTests(sql).get(0);
+	}
+
 	public static ArrayList<Test> getExecutableTestsForGame(int gid) {
 		String stmt = "SELECT tests.* FROM tests "
 				+ "INNER JOIN targetexecutions ex on tests.Test_ID = ex.Test_ID "

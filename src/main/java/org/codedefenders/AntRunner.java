@@ -29,10 +29,10 @@ public class AntRunner {
 		String className = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
 		String[] resultArray = runAntTarget("test-mutant", m.getFolder(), t.getFolder(), className, t.getFullyQualifiedClassName());
 		if (resultArray[0].toLowerCase().contains("failures: 0")) {
-			//Mutant killed.
-			return true;
+			//Mutant not killed.
+			return false;
 		}
-		return false;
+		return true;
 	}
 
 	/**
