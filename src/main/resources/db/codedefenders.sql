@@ -16,22 +16,6 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `attackers`
---
-
-DROP TABLE IF EXISTS `attackers`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `attackers` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `Game_ID` int(11) DEFAULT NULL,
-  `User_ID` int(11) DEFAULT NULL,
-  `Points` int(11) DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `classes`
 --
 
@@ -45,23 +29,7 @@ CREATE TABLE `classes` (
   `ClassFile` varchar(255) NOT NULL,
   `Alias` varchar(50) NOT NULL,
   PRIMARY KEY (`Class_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `defenders`
---
-
-DROP TABLE IF EXISTS `defenders`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `defenders` (
-  `ID` int(11) NOT NULL AUTO_INCREMENT,
-  `Game_ID` int(11) DEFAULT NULL,
-  `User_ID` int(11) DEFAULT NULL,
-  `Points` int(11) DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=221 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -90,7 +58,7 @@ CREATE TABLE `games` (
   CONSTRAINT `games_ibfk_1` FOREIGN KEY (`Attacker_ID`) REFERENCES `users` (`User_ID`),
   CONSTRAINT `games_ibfk_2` FOREIGN KEY (`Defender_ID`) REFERENCES `users` (`User_ID`),
   CONSTRAINT `games_ibfk_3` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -107,28 +75,26 @@ CREATE TABLE `multiplayer_games` (
   `Timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `Creator_ID` int(11) DEFAULT NULL,
   `Price` int(11) DEFAULT NULL,
-  `Defender_Value` int(11) DEFAULT NULL,
-  `Attacker_Value` int(11) DEFAULT NULL,
-  `Coverage_Goal` decimal(5,0) DEFAULT NULL,
-  `Mutant_Goal` decimal(5,0) DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `mutant_killers`
---
-
-DROP TABLE IF EXISTS `mutant_killers`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `mutant_killers` (
-  `ID` int(11) NOT NULL,
-  `Mutant_ID` int(11) DEFAULT NULL,
-  `Test_ID` int(11) DEFAULT NULL,
-  `Points` int(11) DEFAULT NULL,
-  PRIMARY KEY (`ID`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `Defender_Value` int(11) DEFAULT '100',
+  `Attacker_Value` int(11) DEFAULT '100',
+  `Coverage_Goal` float DEFAULT NULL,
+  `Mutant_Goal` float DEFAULT NULL,
+  `Attackers_Needed` int(11) DEFAULT '0',
+  `Defenders_Needed` int(11) DEFAULT '0',
+  `Finish_Time` bigint(64) DEFAULT '0',
+  `Attackers_Limit` int(11) DEFAULT '0',
+  `Defenders_Limit` int(11) DEFAULT '0',
+  `Status` enum('WAITING','STARTED','FINISHED') DEFAULT 'WAITING',
+  `CurrentRound` tinyint(4) NOT NULL DEFAULT '1',
+  `FinalRound` tinyint(4) NOT NULL DEFAULT '5',
+  `ActiveRole` enum('ATTACKER','DEFENDER') NOT NULL DEFAULT 'ATTACKER',
+  `Mode` enum('SINGLE','DUEL','PARTY','UTESTING') NOT NULL DEFAULT 'DUEL',
+  PRIMARY KEY (`ID`),
+  KEY `fk_creatorId_idx` (`Creator_ID`),
+  KEY `fk_className_idx` (`Class_ID`),
+  CONSTRAINT `fk_className` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -147,48 +113,39 @@ CREATE TABLE `mutants` (
   `RoundCreated` int(11) NOT NULL,
   `RoundKilled` int(11) DEFAULT NULL,
   `Equivalent` enum('ASSUMED_NO','PENDING_TEST','DECLARED_YES','ASSUMED_YES','PROVEN_NO') NOT NULL,
+  `Player_ID` int(11) DEFAULT NULL,
   `Owner_ID` int(11) DEFAULT NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `Attacker_ID` int(11) DEFAULT NULL,
+  `Points` int(11) DEFAULT '0',
   PRIMARY KEY (`Mutant_ID`),
-  KEY `Game_ID` (`Game_ID`),
-  KEY `Owner_ID` (`Owner_ID`),
-  CONSTRAINT `mutants_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`),
-  CONSTRAINT `mutants_ibfk_2` FOREIGN KEY (`Owner_ID`) REFERENCES `users` (`User_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
-
---
--- Table structure for table `usedaitests`
---
-DROP TABLE IF EXISTS `usedaitests`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `usedaitests` (
-  `UsedTest_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `Value` int(11) DEFAULT NULL,
-  `Game_ID` int(11) NOT NULL,
-  PRIMARY KEY (`UsedTest_ID`),
-  KEY `Game_ID` (`Game_ID`),
-  CONSTRAINT `usedaitests_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+  KEY `fk_gameId_idx` (`Game_ID`),
+  KEY `fk_playerId_idx` (`Player_ID`),
+  KEY `fk_ownerId_idx` (`Owner_ID`),
+  CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `multiplayer_games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ownerId_muts` FOREIGN KEY (`Owner_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `usedaimutants`
+-- Table structure for table `players`
 --
-DROP TABLE IF EXISTS `usedaimutants`;
+
+DROP TABLE IF EXISTS `players`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `usedaimutants` (
-  `UsedMutant_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `Value` int(11) DEFAULT NULL,
+CREATE TABLE `players` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `User_ID` int(11) NOT NULL,
   `Game_ID` int(11) NOT NULL,
-  PRIMARY KEY (`UsedMutant_ID`),
-  KEY `Game_ID` (`Game_ID`),
-  CONSTRAINT `usedaimutants_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+  `Points` int(11) NOT NULL,
+  `Role` enum('ATTACKER','DEFENDER') NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `fk_gameId_players_idx` (`Game_ID`),
+  KEY `fk_userId_players_idx` (`User_ID`),
+  CONSTRAINT `fk_gameId_players` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_userId_players` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -211,7 +168,7 @@ CREATE TABLE `targetexecutions` (
   KEY `Mutant_ID` (`Mutant_ID`),
   CONSTRAINT `targetexecutions_ibfk_1` FOREIGN KEY (`Test_ID`) REFERENCES `tests` (`Test_ID`),
   CONSTRAINT `targetexecutions_ibfk_2` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=614 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -228,15 +185,55 @@ CREATE TABLE `tests` (
   `ClassFile` varchar(255) DEFAULT NULL,
   `RoundCreated` int(11) NOT NULL,
   `MutantsKilled` int(11) DEFAULT '0',
+  `Player_ID` int(11) NOT NULL,
   `Owner_ID` int(11) NOT NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `Defender_ID` int(11) DEFAULT NULL,
+  `Lines_Covered` longtext,
+  `Lines_Uncovered` longtext,
+  `Points` int(11) DEFAULT '0',
   PRIMARY KEY (`Test_ID`),
+  KEY `fk_playerId_idx` (`Player_ID`),
+  KEY `fk_ownerId_tests_idx` (`Owner_ID`),
+  KEY `fk_gameId_tests_idx` (`Game_ID`),
+  KEY `fk_playerId_tests_idx` (`Player_ID`),
+  CONSTRAINT `fk_gameId_tests` FOREIGN KEY (`Game_ID`) REFERENCES `multiplayer_games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_ownerId_tests` FOREIGN KEY (`Owner_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `usedaimutants`
+--
+
+DROP TABLE IF EXISTS `usedaimutants`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `usedaimutants` (
+  `UsedMutant_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Value` int(11) DEFAULT NULL,
+  `Game_ID` int(11) NOT NULL,
+  PRIMARY KEY (`UsedMutant_ID`),
   KEY `Game_ID` (`Game_ID`),
-  KEY `Owner_ID` (`Owner_ID`),
-  CONSTRAINT `tests_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`),
-  CONSTRAINT `tests_ibfk_2` FOREIGN KEY (`Owner_ID`) REFERENCES `users` (`User_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+  CONSTRAINT `usedaimutants_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `usedaitests`
+--
+
+DROP TABLE IF EXISTS `usedaitests`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `usedaitests` (
+  `UsedTest_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Value` int(11) DEFAULT NULL,
+  `Game_ID` int(11) NOT NULL,
+  PRIMARY KEY (`UsedTest_ID`),
+  KEY `Game_ID` (`Game_ID`),
+  CONSTRAINT `usedaitests_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -251,7 +248,7 @@ CREATE TABLE `users` (
   `Username` varchar(20) NOT NULL,
   `Password` char(60) NOT NULL,
   PRIMARY KEY (`User_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -263,4 +260,4 @@ CREATE TABLE `users` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
-INSERT INTO `users` VALUES (1, 'AI', 'DUMMY_INACCESSIBLE');
+-- Dump completed on 2016-07-12 19:17:58

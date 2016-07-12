@@ -48,7 +48,7 @@ public class MutationTester {
 
 		}
 	}
-	
+
 	public static void runTestOnAllMultiplayerMutants(ServletContext context, MultiplayerGame game, Test test, ArrayList<String> messages) {
 		int killed = 0;
 		ArrayList<MultiplayerMutant> mutants = game.getAliveMutants();
