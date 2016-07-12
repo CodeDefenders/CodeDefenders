@@ -38,7 +38,7 @@ public class UploadManager extends HttpServlet {
 
 		System.out.println("Uploading CUT");
 
-		String classId = null;
+		String classAlias = null;
 		String fileName = null;
 		InputStream fileContent = null;
 		GameClass newSUT = null;
@@ -53,7 +53,7 @@ public class UploadManager extends HttpServlet {
 					String fieldValue = item.getString();
 					System.out.println("Upload parameter {" + fieldName + ":" + fieldValue + "}");
 					if (fieldName.equals("classAlias"))
-						classId = fieldValue;
+						classAlias = fieldValue;
 					else
 						System.out.println("Unrecognized parameter");
 				} else {
@@ -70,18 +70,19 @@ public class UploadManager extends HttpServlet {
 		}
 
 		// two arguments processed?
-		if (classId == null || fileContent == null) {
+		if (classAlias == null || fileContent == null) {
 			messages.add("Please provide unique identifier and a .java file.");
 			response.sendRedirect(request.getHeader("referer"));
 			return;
 		}
 		// check that class alias is unique
-		if (GameClass.existUniqueClassID(classId)) {
-			messages.add("A class with identifier " + classId + " already exists, please use a different name.");
+		if (GameClass.existUniqueClassID(classAlias)) {
+			messages.add("A class with identifier " + classAlias + " already exists, please use a different name.");
 			response.sendRedirect(request.getHeader("referer"));
 			return;
 		}
-		File targetFile = new File(Constants.CUTS_DIR + Constants.F_SEP + fileName);
+		File targetFile = new File(Constants.CUTS_DIR + Constants.F_SEP + classAlias
+				+ Constants.F_SEP + fileName);
 		if (targetFile.exists()) {
 			messages.add("A class with the same name already exists, please try with a different one.");
 			response.sendRedirect(request.getHeader("referer"));
@@ -89,23 +90,26 @@ public class UploadManager extends HttpServlet {
 		}
 		FileUtils.copyInputStreamToFile(fileContent, targetFile);
 		String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
-		//Compile original class.
-		String classFileName = AntRunner.compileCUT(fileName);
+		// Create CUT, temporarily using file name as class name for compilation
+		newSUT = new GameClass("", classAlias, javaFileNameDB, "");
+		//Compile original class, using alias as directory name
+		String classFileName = AntRunner.compileCUT(newSUT);
 
 		if (classFileName != null) {
 			String classFileNameDB = DatabaseAccess.addSlashes(classFileName);
 
 			// get fully qualified name
-			//ClassPool classPool = ClassPool.getDefault();
-			//CtClass cc = classPool.makeClass(new FileInputStream(new File(classFileName)));
-			//String fullyQualifiedName = cc.getName();
+			ClassPool classPool = ClassPool.getDefault();
+			CtClass cc = classPool.makeClass(new FileInputStream(new File(classFileName)));
+			String classQualifiedName = cc.getName();
 
 			// db insert
-			newSUT = new GameClass(classId, javaFileNameDB, classFileNameDB);
+			newSUT.setName(classQualifiedName);
+			newSUT.setClassFile(classFileNameDB);
 			newSUT.insert();
 
 			//Prepare AI classes, by generating tests and mutants.
-			PrepareAI.createTestsAndMutants(newSUT.id);
+			PrepareAI.createTestsAndMutants(newSUT.getId());
 
 			response.sendRedirect("games/create");
 

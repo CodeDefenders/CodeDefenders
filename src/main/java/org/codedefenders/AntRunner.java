@@ -13,10 +13,9 @@ import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
 
-import static org.codedefenders.Constants.AI_DIR;
-import static org.codedefenders.Constants.F_SEP;
-import static org.codedefenders.Constants.JAVA_CLASS_EXT;
+import static org.codedefenders.Constants.*;
 
 /**
  * @author Jose Rojas
@@ -44,8 +43,9 @@ public class AntRunner {
 	public static TargetExecution testMutant(Mutant m, Test t) {
 		logger.debug("Running test {} on mutant {}", t.getId(), m.getId());
 		System.out.println("Running test " + t.getId() + " on mutant " + m.getId());
-		String className = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
-		String[] resultArray = runAntTarget("test-mutant", m.getFolder(), t.getFolder(), className, t.getFullyQualifiedClassName());
+		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
+
+		String[] resultArray = runAntTarget("test-mutant", m.getFolder(), t.getFolder(), cut, t.getFullyQualifiedClassName());
 
 		TargetExecution newExec = null;
 
@@ -71,10 +71,10 @@ public class AntRunner {
 
 	public static boolean potentialEquivalent(Mutant m) {
 		System.out.println("Checking if mutant " + m.getId() + " is potentially equivalent.");
-		String cName = DatabaseAccess.getGameForKey("Game_ID", m.getGameId()).getClassName();
-		String suiteDir = AI_DIR + F_SEP + "tests" + F_SEP + cName;
+		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
+		String suiteDir = AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias();
 
-		String[] resultArray = runAntTarget("test-mutant", m.getFolder(), suiteDir, cName, cName + "EvoSuiteTest");
+		String[] resultArray = runAntTarget("test-mutant", m.getFolder(), suiteDir, cut, cut.getName() + "EvoSuiteTest");
 		if (resultArray[0].toLowerCase().contains("failures: 0")) {
 			// If the test doesn't return failure
 			if (resultArray[0].toLowerCase().contains("errors: 0")) {
@@ -94,8 +94,8 @@ public class AntRunner {
 	 */
 	public static int testOriginal(File dir, Test t) {
 
-		String className = DatabaseAccess.getGameForKey("Game_ID", t.getGameId()).getClassName();
-		String[] resultArray = runAntTarget("test-original", null, dir.getAbsolutePath(), className, t.getFullyQualifiedClassName());
+		GameClass cut = DatabaseAccess.getClassForGame(t.getGameId());
+		String[] resultArray = runAntTarget("test-original", null, dir.getAbsolutePath(), cut, t.getFullyQualifiedClassName());
 
 		// If the test doesn't return failure
 		if (resultArray[0].toLowerCase().contains("failures: 0")) {
@@ -124,12 +124,13 @@ public class AntRunner {
 
 	/**
 	 * Compiles CUT
-	 * @param className
+	 *
+	 * @param cut
 	 * @return The Path to the compiled CUT
 	 */
-	public static String compileCUT(final String className) {
+	public static String compileCUT(GameClass cut) {
 
-		String[] resultArray = runAntTarget("compile-cut", null, null, className, null);
+		String[] resultArray = runAntTarget("compile-cut", null, null, cut, null);
 		System.out.println("Compile New CUT, Compilation result:");
 		System.out.println(Arrays.toString(resultArray));
 
@@ -137,8 +138,8 @@ public class AntRunner {
 		if (resultArray[0].toLowerCase().contains("build successful")) {
 			// If the input stream returned a 'successful build' message, the CUT compiled correctly
 			System.out.println("Compiled uploaded CUT successfully");
-			File f = new File(Constants.CUTS_DIR);
-			final String compiledClassName = FilenameUtils.getBaseName(className) + Constants.JAVA_CLASS_EXT;
+			File f = new File(CUTS_DIR + Constants.F_SEP + cut.getAlias());
+			final String compiledClassName = FilenameUtils.getBaseName(cut.getJavaFile()) + Constants.JAVA_CLASS_EXT;
 			LinkedList<File> matchingFiles = (LinkedList)FileUtils.listFiles(f, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
 			if (! matchingFiles.isEmpty())
 				pathCompiledClassName = matchingFiles.get(0).getAbsolutePath();
@@ -157,14 +158,14 @@ public class AntRunner {
 	 * @param dir
 	 * @param jFile
 	 * @param gameID
-	 * @param classMutated
+	 * @param cut
 	 * @return A {@link Mutant} object
 	 */
-	public static Mutant compileMutant(File dir, String jFile, int gameID, GameClass classMutated, int ownerId) {
+	public static Mutant compileMutant(File dir, String jFile, int gameID, GameClass cut, int ownerId) {
 		//public static int compileMutant(ServletContext context, Mutant m2) {
 
 		// Gets the classname for the mutant from the game it is in
-		String[] resultArray = runAntTarget("compile-mutant", dir.getAbsolutePath(), null, classMutated.getBaseName(), null);
+		String[] resultArray = runAntTarget("compile-mutant", dir.getAbsolutePath(), null, cut, null);
 		System.out.println("Compilation result:");
 		System.out.println(Arrays.toString(resultArray));
 
@@ -173,7 +174,7 @@ public class AntRunner {
 		if (resultArray[0].toLowerCase().contains("build successful")) {
 			// Create and insert a new target execution recording successful compile, with no message to report, and return its ID
 			// Locate .class file
-			final String compiledClassName = classMutated.getBaseName() + JAVA_CLASS_EXT;
+			final String compiledClassName = cut.getBaseName() + JAVA_CLASS_EXT;
 			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
 			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
 			String cFile = matchingFiles.get(0).getAbsolutePath();
@@ -198,15 +199,14 @@ public class AntRunner {
 	 * @param dir
 	 * @param jFile
 	 * @param gameID
-	 * @param classUnderTest
+	 * @param cut
 	 * @param ownerId
 	 * @return A {@link Test} object
 	 */
-	public static Test compileTest(File dir, String jFile, int gameID, GameClass classUnderTest, int ownerId) {
+	public static Test compileTest(File dir, String jFile, int gameID, GameClass cut, int ownerId) {
 		//public static int compileTest(ServletContext context, Test t) {
 
-		String className = classUnderTest.getName();
-		String[] resultArray = runAntTarget("compile-test", null, dir.getAbsolutePath(), className, null);
+		String[] resultArray = runAntTarget("compile-test", null, dir.getAbsolutePath(), cut, null);
 
 		// If the input stream returned a 'successful build' message, the test compiled correctly
 		if (resultArray[0].toLowerCase().contains("build successful")) {
@@ -235,26 +235,27 @@ public class AntRunner {
 
 	/**
 	 * Generates mutant classes using Major
-	 * @param className CUT filename
+	 * @param cut game class
 	 */
-	public static void generateMutantsFromCUT(final String className) {
-		String[] resultArray = runAntTarget("mutant-gen-cut", null, null, className, null);
+	public static void generateMutantsFromCUT(final GameClass cut) {
+
+		String[] resultArray = runAntTarget("mutant-gen-cut", null, null, cut, null);
 	}
 
 	/**
 	 * Generates tests using EvoSuite
-	 * @param className CUT filename
+	 * @param cut CUT filename
 	 */
-	public static void generateTestsFromCUT(final String className) {
-		String[] resultArray = runAntTarget("test-gen-cut", null, null, className, null);
+	public static void generateTestsFromCUT(final GameClass cut) {
+		String[] resultArray = runAntTarget("test-gen-cut", null, null, cut, null);
 	}
 
 	/**
 	 * Compiles generated test suite
-	 * @param className
+	 * @param cut
 	 */
-	public static void compileGenTestSuite(final String className) {
-		String[] resultArray = runAntTarget("compile-gen-tests", null, null, className, null);
+	public static void compileGenTestSuite(final GameClass cut) {
+		String[] resultArray = runAntTarget("compile-gen-tests", null, null, cut, null);
 	}
 
 	/**
@@ -262,8 +263,8 @@ public class AntRunner {
 	 *
 	 * @param target An Ant target
 	 * @param mutantFile
-	 * @param testFile
-	 * @param className Class
+	 * @param testDir
+	 * @param cut Class
 	 * @param testClassName
 	 * @return String Array of length 4
 	 * [0] : Input Stream for the process
@@ -271,12 +272,12 @@ public class AntRunner {
 	 * [2] : Any exceptions from running the process
 	 * [3] : Message indicating which target was run, and with which files
 	 */
-	private static String[] runAntTarget(String target, String mutantFile, String testFile, String className, String testClassName) {
+	private static String[] runAntTarget(String target, String mutantFile, String testDir, GameClass cut, String testClassName) {
 		String[] resultArray = new String[4];
 		String isLog = "";
 		String esLog = "";
 		String exLog = "";
-		String debug = "Running Ant Target: " + target + " with mFile: " + mutantFile + " and tFile: " + testFile;
+		String debug = "Running Ant Target: " + target + " with mFile: " + mutantFile + " and tFile: " + testDir;
 
 		ProcessBuilder pb = new ProcessBuilder();
 		Map env = pb.environment();
@@ -287,10 +288,17 @@ public class AntRunner {
 			antHome = System.getProperty("ant.home", "/usr/local");
 		}
 
+		// The location of the source file depends on the package,
+		// e.g., for foo.bar.C, EvoSuite will create foo/bar/CEvoSuiteTests.java
+		String srcDir = cut.getAlias() + Constants.F_SEP + cut.getPackage().replace(".", Constants.F_SEP);
+
 		pb.command(antHome + "/bin/ant", target, // "-v", "-d", for verbose, debug
 				"-Dmutant.file=" + mutantFile,
-				"-Dtest.file=" + testFile,
-				"-Dclassname=" + className,
+				"-Dtest.file=" + testDir,
+				"-Dcut.dir=" + CUTS_DIR + F_SEP + cut.getAlias(),
+				"-Dclassalias=" + cut.getAlias(),
+				"-Dclassbasename=" + cut.getBaseName(),
+				"-Dclassname=" + cut.getName(),
 				"-DtestClassname=" + testClassName);
 
 		String buildFileDir = Constants.DATA_DIR;

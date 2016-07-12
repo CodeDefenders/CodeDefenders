@@ -78,20 +78,27 @@ public class DatabaseAccess {
 		return numMutants;
 	}
 
-	public static GameClass getClassForKey(String keyName, int id) {
+	public static GameClass getClassForGame(int gameId) {
+		String sql = String.format("SELECT classes.* from classes INNER JOIN games ON classes.Class_ID = games.Class_ID WHERE games.Game_ID=%d;", gameId);
+		return getClass(sql);
+	}
 
+	public static GameClass getClassForKey(String keyName, int id) {
+		String sql = String.format("SELECT * FROM classes WHERE %s=%d;", keyName, id);
+		return getClass(sql);
+	}
+
+	private static GameClass getClass(String sql) {
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = null;
 
 		try {
 			conn = getConnection();
 			stmt = conn.createStatement();
-			sql = String.format("SELECT * FROM classes WHERE %s=%d;", keyName, id);
 			ResultSet rs = stmt.executeQuery(sql);
 
 			if (rs.next()) {
-				GameClass classRecord = new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("JavaFile"), rs.getString("ClassFile"));
+				GameClass classRecord = new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile"));
 				stmt.close();
 				conn.close();
 				return classRecord;
@@ -139,7 +146,7 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			while (rs.next()) {
-				classList.add(new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("JavaFile"), rs.getString("ClassFile")));
+				classList.add(new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile")));
 			}
 
 			stmt.close();

@@ -39,7 +39,7 @@ public class AiDefender extends AiPlayer {
 
 	protected boolean runTurn(GenerationMethod strat) {
 		try {
-			TestsIndexContents ind = new TestsIndexContents(game.getClassName());
+			TestsIndexContents ind = new TestsIndexContents(game.getCUT());
 
 			int tNum = selectTest(strat, ind);
 			try {
@@ -135,8 +135,8 @@ public class AiDefender extends AiPlayer {
 		}
 
 		if(origT != null) {
-			String jFile = origT.getFolder() + F_SEP + "Test" + dummyGame.getClassName() + JAVA_SOURCE_EXT;
-			String cFile = origT.getFolder() + F_SEP + "Test" + dummyGame.getClassName() + JAVA_CLASS_EXT;
+			String jFile = origT.getJavaFile();
+			String cFile = origT.getClassFile();
 			Test t = new Test(game.getId(), jFile, cFile, 1);
 			t.insert();
 			t.update();
@@ -159,14 +159,14 @@ class TestsIndexContents {
 	private int dummyGameId;
 	private int numTests;
 
-	public TestsIndexContents(String className) {
+	public TestsIndexContents(GameClass cut) {
 		testIds = new ArrayList<Integer>();
 		dummyGameId = -1;
 		numTests = -1;
 		//Parse the test index file of a given class.
 		try {
 			File f = new File(AI_DIR + F_SEP + "tests" + F_SEP +
-					className + F_SEP + "TestsIndex" + TEST_INFO_EXT);
+					cut.getAlias() + F_SEP + "TestsIndex" + TEST_INFO_EXT);
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuild = dbFactory.newDocumentBuilder();
 			Document d = dBuild.parse(f);
