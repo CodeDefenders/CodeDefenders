@@ -18,20 +18,26 @@ public class GameClass {
 
 	private static final Logger logger = LoggerFactory.getLogger(GameClass.class);
 
-	public int id;
-	public String name; // fully qualified name
-	public String javaFile;
-	public String classFile;
+	private int id;
+	private String name; // fully qualified name
+	private String alias;
+	private String javaFile;
+	private String classFile;
 
-	public GameClass(String name, String jFile, String cFile) {
+	public GameClass(String name, String alias, String jFile, String cFile) {
 		this.name = name;
+		this.alias = alias;
 		this.javaFile = jFile;
 		this.classFile = cFile;
 	}
 
-	public GameClass(int id, String name, String jFile, String cFile) {
-		this(name, jFile, cFile);
+	public GameClass(int id, String name, String alias, String jFile, String cFile) {
+		this(name, alias, jFile, cFile);
 		this.id = id;
+	}
+
+	public int getId() {
+		return id;
 	}
 
 	public String getName() {
@@ -49,6 +55,14 @@ public class GameClass {
 
 	public String getPackage() {
 		return (name.contains(".")) ? name.substring(0, name.lastIndexOf('.')) : "";
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(String alias) {
+		alias = alias;
 	}
 
 	public String getAsString() {
@@ -75,10 +89,10 @@ public class GameClass {
 
 	public boolean insert() {
 
-		logger.debug("Inserting class (Name={}, JavaFile={}, ClassFile={})", name, javaFile, classFile);
+		logger.debug("Inserting class (Name={}, Alias={}, JavaFile={}, ClassFile={})", name, alias, javaFile, classFile);
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = String.format("INSERT INTO classes (Name, JavaFile, ClassFile) VALUES ('%s', '%s', '%s');", name, javaFile, classFile);
+		String sql = String.format("INSERT INTO classes (Name, Alias, JavaFile, ClassFile) VALUES ('%s', '%s', '%s', '%s');", name, alias, javaFile, classFile);
 
 		// Attempt to insert game info into database
 		try {
@@ -174,5 +188,57 @@ public class GameClass {
 		sb.append(String.format("%c}%n",'\t'));
 		sb.append(String.format("}"));
 		return sb.toString();
+	}
+
+	public static boolean existUniqueClassID(String classID) {
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = String.format("SELECT * FROM classes WHERE Name = '%s';", classID);
+		try {
+			conn = DatabaseAccess.getConnection();
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			boolean exist = stmt.getResultSet().next();
+			stmt.close();
+			conn.close();
+			return exist;
+		} catch (SQLException se) {
+			System.out.println(se);
+			//Handle errors for JDBC
+		} catch (Exception e) {
+			System.out.println(e);
+			//Handle errors for Class.forName
+		} finally {
+			//finally block used to close resources
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException se2) {
+			}// nothing we can do
+
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				System.out.println(se);
+			}//end finally try
+		} //end try
+		return false;
+	}
+
+	public String getJavaFile() {
+		return javaFile;
+	}
+
+	public void setJavaFile(String javaFile) {
+		this.javaFile = javaFile;
+	}
+
+	public String getClassFile() {
+		return classFile;
+	}
+
+	public void setClassFile(String classFile) {
+		this.classFile = classFile;
 	}
 }

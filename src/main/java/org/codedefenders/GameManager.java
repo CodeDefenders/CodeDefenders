@@ -27,16 +27,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 
 import static org.codedefenders.Constants.*;
 import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 
 public class GameManager extends HttpServlet {
 
@@ -132,7 +129,7 @@ public class GameManager extends HttpServlet {
 							System.out.println(TEST_PASSED_ON_CUT_MESSAGE);
 							if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
 								// Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
-								MutationTester.runEquivalenceTest(getServletContext(), newTest, mutant);
+								MutationTester.runEquivalenceTest(newTest, mutant);
 								activeGame.endRound();
 								activeGame.update();
 								Mutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
@@ -184,10 +181,23 @@ public class GameManager extends HttpServlet {
 				if (request.getParameter("mutantId") != null) {
 					int mutantId = Integer.parseInt(request.getParameter("mutantId"));
 					Mutant mutantClaimed = DatabaseAccess.getMutant(activeGame, mutantId);
-					mutantClaimed.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-					mutantClaimed.update();
-					messages.add(MUTANT_CLAIMED_EQUIVALENT_MESSAGE);
-					activeGame.passPriority();
+					if(activeGame.getMode().equals(Game.Mode.SINGLE)) {
+						//Singleplayer - use automatic system.
+						if(AntRunner.potentialEquivalent(mutantClaimed)) {
+							//Is potentially equiv - mark as equivalent and update.
+							mutantClaimed.setEquivalent(Mutant.Equivalence.DECLARED_YES);
+							mutantClaimed.kill();
+						} else {
+							mutantClaimed.setEquivalent(Mutant.Equivalence.PROVEN_NO);
+							mutantClaimed.update();
+						}
+						activeGame.endTurn();
+					} else {
+						mutantClaimed.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+						mutantClaimed.update();
+						messages.add(MUTANT_CLAIMED_EQUIVALENT_MESSAGE);
+						activeGame.passPriority();
+					}
 					activeGame.update();
 				} else
 					messages.add(MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE);
@@ -212,8 +222,22 @@ public class GameManager extends HttpServlet {
 					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 					if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
 						messages.add(MUTANT_COMPILED_MESSAGE);
-						MutationTester.runAllTestsOnMutant(getServletContext(), activeGame, newMutant, messages);
-						activeGame.endTurn();
+						MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
+
+						if(activeGame.getMode().equals(Game.Mode.SINGLE)) {
+							//Singleplayer - check for potential equivalent.
+							if(AntRunner.potentialEquivalent(newMutant)) {
+								//Is potentially equiv - mark as equivalent and update.
+								newMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+								newMutant.update();
+								//activeGame.passPriority();
+								activeGame.update();
+							} else {
+								activeGame.endTurn();
+							}
+						} else {
+							activeGame.endTurn();
+						}
 						activeGame.update();
 					} else {
 						messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
@@ -247,7 +271,7 @@ public class GameManager extends HttpServlet {
 					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 					if (testOriginalTarget.status.equals("SUCCESS")) {
 						messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-						MutationTester.runTestOnAllMutants(getServletContext(), activeGame, newTest, messages);
+						MutationTester.runTestOnAllMutants(activeGame, newTest, messages);
 						activeGame.endTurn();
 						activeGame.update();
 					} else {
@@ -263,7 +287,43 @@ public class GameManager extends HttpServlet {
 				}
 				break;
 		}
+		if(activeGame.getMode().equals(Game.Mode.SINGLE)) {
+			//Singleplayer game, show messages depending on state.
+			if(activeGame.getAttackerId() == uid) {
+				//Player attacker
+				messages.add("The AI has created a test!");
+			} else {
+				//Player defender
+				messages.add("The AI has created a mutant!");
+			}
+		}
 		response.sendRedirect("play");//doGet(request, response);
+	}
+
+	public Test submitAiTestFullSuite(Game g) {
+		//Get class being tested.
+		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", g.getClassId());
+		String cBaseName = classUnderTest.getBaseName();
+
+		//Get test suite location.
+		String dir = AI_DIR + F_SEP + "tests" + F_SEP + classUnderTest.getAlias();
+		String jFile = dir + F_SEP + cBaseName + "EvoSuiteTest" + JAVA_SOURCE_EXT;
+		String cFile = dir + F_SEP + cBaseName + "EvoSuiteTest" + JAVA_CLASS_EXT;
+
+		int gid = g.getId();
+		//File newTestDir = FileManager.getNextSubDir(TESTS_DIR + F_SEP + gid);
+		File newTestDir = new File(dir);
+		Test newTest = AntRunner.compileTest(newTestDir, jFile, gid, classUnderTest, 1);
+		//Inefficient, but need to recompile test.
+		//TODO: Add DatabaseAccess function which gets TargetExecution of same test.
+
+		// Check the test actually passes when applied to the original code.
+		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
+			AntRunner.testOriginal(newTestDir, newTest);
+		}
+
+		return newTest;
 	}
 
 	// Writes text as a Mutant to the appropriate place in the file system.
@@ -272,7 +332,7 @@ public class GameManager extends HttpServlet {
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 		String classMutatedBaseName = classMutated.getBaseName();
 
-		File sourceFile = new File(classMutated.javaFile);
+		File sourceFile = new File(classMutated.getJavaFile());
 		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
 		// Runs diff match patch between the two Strings to see if there are any differences.
@@ -290,13 +350,13 @@ public class GameManager extends HttpServlet {
 			return null;
 
 		// Setup folder the files will go in
-		File newMutantDir = getNextSubDir(getServletContext().getRealPath(Constants.DATA_DIR + FILE_SEPARATOR + subDirectory + FILE_SEPARATOR + gid + FILE_SEPARATOR + Constants.MUTANTS_DIR + FILE_SEPARATOR + ownerId));
+		File newMutantDir = FileManager.getNextSubDir(Constants.DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + Constants.MUTANTS_DIR + F_SEP + ownerId));
 
 		System.out.println("NewMutantDir: " + newMutantDir.getAbsolutePath());
 		System.out.println("Class Mutated: " + classMutated.getName() + "(basename: " + classMutatedBaseName +")");
 
 		// Write the Mutant String into a java file
-		String mutantFileName = newMutantDir + FILE_SEPARATOR + classMutatedBaseName + JAVA_SOURCE_EXT;
+		String mutantFileName = newMutantDir + F_SEP + classMutatedBaseName + JAVA_SOURCE_EXT;
 		File mutantFile = new File(mutantFileName);
 		FileWriter fw = new FileWriter(mutantFile);
 		BufferedWriter bw = new BufferedWriter(fw);
@@ -304,41 +364,9 @@ public class GameManager extends HttpServlet {
 		bw.close();
 
 		// Compile the mutant - if you can, add it to the MultiplayerGame State, otherwise, delete these files created.
-		return AntRunner.compileMutant(getServletContext(), newMutantDir, mutantFileName, gid, classMutated, ownerId);
+		return AntRunner.compileMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
 	}
 
-	public File getNextSubDir(String path) {
-		File folder = new File(path);
-		folder.mkdirs();
-		String[] directories = folder.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File current, String name) {
-				return new File(current, name).isDirectory() && (isParsable(name));
-			}
-		});
-		Arrays.sort(directories);
-		String newPath;
-		if (directories.length == 0)
-			newPath = folder.getAbsolutePath() + FILE_SEPARATOR + "1";
-		else {
-			File lastDir = new File(directories[directories.length - 1]);
-			int newIndex = Integer.parseInt(lastDir.getName()) + 1;
-			newPath = path + FILE_SEPARATOR + newIndex;
-		}
-		File newDir = new File(newPath);
-		newDir.mkdirs();
-		return newDir;
-	}
-
-	public static boolean isParsable(String input){
-		boolean parsable = true;
-		try{
-			Integer.parseInt(input);
-		}catch(NumberFormatException e){
-			parsable = false;
-		}
-		return parsable;
-	}
 
 	/**
 	 *
@@ -354,33 +382,24 @@ public class GameManager extends HttpServlet {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		File newTestDir = getNextSubDir(getServletContext().getRealPath(DATA_DIR + FILE_SEPARATOR + subDirectory + FILE_SEPARATOR + gid + FILE_SEPARATOR + TESTS_DIR + FILE_SEPARATOR + ownerId));
+		File newTestDir = FileManager.getNextSubDir(getServletContext().getRealPath(DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + TESTS_DIR + F_SEP + ownerId));
 
-		String javaFile = createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
+		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
 		if (! validTestCode(javaFile)) {
 			return null;
 		}
 
 		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(getServletContext(), newTestDir, javaFile, gid, classUnderTest, ownerId);
+		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-			AntRunner.testOriginal(getServletContext(), newTestDir, newTest, DatabaseAccess.getGameForKey("Game_ID", newTest.getGameId()).getClassName());
+			AntRunner.testOriginal(newTestDir, newTest, DatabaseAccess.getGameForKey("Game_ID", newTest.getGameId()).getClassName());
 		}
 		return newTest;
 	}
 
-	private String createJavaFile(File dir, String classBaseName, String testCode) throws IOException {
-		String javaFile = dir.getAbsolutePath() + FILE_SEPARATOR + TEST_PREFIX + classBaseName + JAVA_SOURCE_EXT;
-		File testFile = new File(javaFile);
-		FileWriter testWriter = new FileWriter(testFile);
-		BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);
-		bufferedTestWriter.write(testCode);
-		bufferedTestWriter.close();
-		return javaFile;
-	}
 
 	private boolean validTestCode(String javaFile) throws IOException {
 

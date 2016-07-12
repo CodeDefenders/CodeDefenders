@@ -18,7 +18,10 @@
           <input type="text" id="inputUsername" name="username" class="form-control" placeholder="Username" required autofocus>
           <label for="inputPassword" class="sr-only">Password</label>
           <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
-          <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+          <div>
+              <input type="checkbox" id="consentOK" style="margin-right:5px;" checked>I understand and consent that the mutants and tests I create in the game will be used for research purposes.
+          </div>
+          <button class="btn btn-lg btn-primary btn-block" id="signInButton" type="submit">Sign in</button>
           <a href="#" class="text-center new-account" data-toggle="modal" data-target="#myModal">Create an account</a>
       </form>
   </div>
@@ -54,4 +57,14 @@
 
       </div>
   </div>
+<script>
+  $('#consentOK').click(function () {
+        if ($(this).is(':checked')) {
+            // if consent checkbox is checked
+            document.getElementById("signInButton").disabled = false;
+        } else {
+            document.getElementById("signInButton").disabled = true;
+        }
+  });
+</script>
 <%@ include file="/jsp/footer_logout.jsp" %>

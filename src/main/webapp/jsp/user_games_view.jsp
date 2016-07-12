@@ -53,7 +53,7 @@
 		<td class="col-sm-2"><%= atkName %></td>
 		<td class="col-sm-2"><%= defName %></td>
 		<td class="col-sm-2"><%= g.getState() %></td>
-		<td class="col-sm-2"><%= DatabaseAccess.getClassForKey("Class_ID", g.getClassId()).name %></td>
+		<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
 		<td class="col-sm-2"><%= g.getLevel().name() %></td>
 		<td class="col-sm-2">
 <%

@@ -12,12 +12,23 @@
 				<td>
 					<select name="class" class="form-control selectpicker" data-size="large" >
 						<% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
-						<option value="<%=c.id%>"><%=c.name%></option>
+						<option value="<%=c.getId()%>"><%=c.getAlias()%></option>
 						<%}%>
 					</select>
 				</td>
 				<td>
 					<a href="games/upload" class="text-center new-account">Upload Class</a>
+				</td>
+			</tr>
+			<tr>
+				<td>Gamemode</td>
+				<td>
+					<select name="mode" class="form-control selectpicker" data-size="large">
+						<option value="sing">Singleplayer</option>
+						<option value="duel">Duel</option>
+						<option value="prty">Party</option>
+						<option value="utst">Unit Testing</option>
+					</select>
 				</td>
 			</tr>
 			<tr>

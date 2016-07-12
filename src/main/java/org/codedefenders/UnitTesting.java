@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static org.codedefenders.Constants.FILE_SEPARATOR;
+import static org.codedefenders.Constants.F_SEP;
 import static org.codedefenders.Constants.JAVA_SOURCE_EXT;
 import static org.codedefenders.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
 import static org.codedefenders.Constants.TESTS_DIR;
@@ -113,39 +113,6 @@ public class UnitTesting extends HttpServlet {
 		response.sendRedirect("utesting");
 	}
 
-	public File getNextSubDir(String path) {
-		File folder = new File(path);
-		folder.mkdirs();
-		String[] directories = folder.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File current, String name) {
-				return new File(current, name).isDirectory() && (isParsable(name));
-			}
-		});
-		Arrays.sort(directories);
-		String newPath;
-		if (directories.length == 0)
-			newPath = folder.getAbsolutePath() + FILE_SEPARATOR + "1";
-		else {
-			File lastDir = new File(directories[directories.length - 1]);
-			int newIndex = Integer.parseInt(lastDir.getName()) + 1;
-			newPath = path + FILE_SEPARATOR + newIndex;
-		}
-		File newDir = new File(newPath);
-		newDir.mkdirs();
-		return newDir;
-	}
-
-	public static boolean isParsable(String input){
-		boolean parsable = true;
-		try{
-			Integer.parseInt(input);
-		}catch(NumberFormatException e){
-			parsable = false;
-		}
-		return parsable;
-	}
-
 	/**
 	 *
 	 * @param gid
@@ -160,32 +127,26 @@ public class UnitTesting extends HttpServlet {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		File newTestDir = getNextSubDir(getServletContext().getRealPath(DATA_DIR + FILE_SEPARATOR + subDirectory + FILE_SEPARATOR + gid + FILE_SEPARATOR + TESTS_DIR + FILE_SEPARATOR + ownerId));
+//<<<<<<< HEAD
+		File newTestDir = FileManager.getNextSubDir(getServletContext().getRealPath(DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + TESTS_DIR + F_SEP + ownerId));
+//=======
+//		File newTestDir = FileManager.getNextSubDir(getServletContext().getRealPath(TESTS_DIR + F_SEP + gid));
+//>>>>>>> origin
 
-		String javaFile = createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
+		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
 		if (! validTestCode(javaFile)) {
 			return null;
 		}
 
 		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(getServletContext(), newTestDir, javaFile, gid, classUnderTest, ownerId);
+		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
 			AntRunner.testOriginal(getServletContext(), newTestDir, newTest,DatabaseAccess.getGameForKey("Game_ID", newTest.getGameId()).getClassName());
 		}
 		return newTest;
-	}
-
-	private String createJavaFile(File dir, String classBaseName, String testCode) throws IOException {
-		String javaFile = dir.getAbsolutePath() + FILE_SEPARATOR + TEST_PREFIX + classBaseName + JAVA_SOURCE_EXT;
-		File testFile = new File(javaFile);
-		FileWriter testWriter = new FileWriter(testFile);
-		BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);
-		bufferedTestWriter.write(testCode);
-		bufferedTestWriter.close();
-		return javaFile;
 	}
 
 	private boolean validTestCode(String javaFile) throws IOException {

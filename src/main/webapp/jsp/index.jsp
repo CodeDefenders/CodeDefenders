@@ -8,7 +8,8 @@
 		<a  class="btn btn-primary btn-large"  href="login">Enter</a>
 		<p><img style="margin-top:20px" src="images/schema.jpeg" class="img-responsive displayed"/></p>
 		<p class="text-muted" style="font-size:small;">
-			Developed at The University of Sheffield <br>Supported by the <a href="https://www.sheffield.ac.uk/sure">SURE (Sheffield Undergraduate Research Experience)</a> scheme
+			Developed at The University of Sheffield <br />Supported by the <a href="https://www.sheffield.ac.uk/sure">SURE (Sheffield Undergraduate Research Experience)</a> scheme <br />
+			<b>Important note:</b> Internet Explorer not currently supported.
 		</p>
 	</div>
 <%@ include file="/jsp/footer_logout.jsp" %>

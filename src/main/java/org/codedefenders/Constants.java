@@ -5,25 +5,26 @@ package org.codedefenders;
  */
 public class Constants {
 
-	public static final String FILE_SEPARATOR = System.getProperty("file.separator");
+	public static final String F_SEP = System.getProperty("file.separator");
 
-	public static String DATA_DIR    = FILE_SEPARATOR + "WEB-INF" + FILE_SEPARATOR + "data";
-	public static String CUTS_DIR    = DATA_DIR + FILE_SEPARATOR + "sources";
-	public static String INSTRUMENTED_DIR    = DATA_DIR + FILE_SEPARATOR + "jacoco";
-	public static String MUTANTS_DIR = "mutants";
-	public static String TESTS_DIR   = "tests";
+	public static String DATA_DIR = "C:\\work\\codedefenders\\data";
+	//public static String DATA_DIR    = F_SEP + "WEB-INF" + F_SEP + "data";
+	public static String CUTS_DIR    = DATA_DIR + F_SEP + "sources";
+	public static String MUTANTS_DIR = DATA_DIR + F_SEP + "mutants";
+	public static String TESTS_DIR   = DATA_DIR + F_SEP + "tests";
+	public static String AI_DIR      = DATA_DIR + F_SEP + "ai";
 
 	public static final String TEST_PREFIX = "Test";
 	public static final String JAVA_SOURCE_EXT = ".java";
 	public static final String JAVA_CLASS_EXT = ".class";
+	public static final String TEST_INFO_EXT = ".xml";
 
-
-	public static final String LOGIN_VIEW_JSP           = "jsp" + FILE_SEPARATOR + "login_view.jsp";
-	public static final String RESOLVE_EQUIVALENCE_JSP  = "jsp" + FILE_SEPARATOR + "resolve_equivalence.jsp";
-	public static final String ATTACKER_VIEW_JSP        = "jsp" + FILE_SEPARATOR + "attacker_view.jsp";
-	public static final String DEFENDER_VIEW_JSP        = "jsp" + FILE_SEPARATOR + "defender_view.jsp";
-	public static final String SCORE_VIEW_JSP           = "jsp" + FILE_SEPARATOR + "score_view.jsp";
-	public static final String UTESTING_VIEW_JSP        = "jsp" + FILE_SEPARATOR + "utesting_view.jsp";
+	public static final String LOGIN_VIEW_JSP           = "jsp" + F_SEP + "login_view.jsp";
+	public static final String RESOLVE_EQUIVALENCE_JSP  = "jsp" + F_SEP + "resolve_equivalence.jsp";
+	public static final String ATTACKER_VIEW_JSP        = "jsp" + F_SEP + "attacker_view.jsp";
+	public static final String DEFENDER_VIEW_JSP        = "jsp" + F_SEP + "defender_view.jsp";
+	public static final String SCORE_VIEW_JSP           = "jsp" + F_SEP + "score_view.jsp";
+	public static final String UTESTING_VIEW_JSP        = "jsp" + F_SEP + "utesting_view.jsp";
 
 	// Messages
 	public static final String WINNER_MESSAGE = "You won!";
