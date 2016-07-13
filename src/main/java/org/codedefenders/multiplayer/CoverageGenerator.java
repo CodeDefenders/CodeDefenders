@@ -51,7 +51,8 @@ public class CoverageGenerator {
         analyzer.analyzeAll(classesDirectory);
 
         for (IClassCoverage cc : coverageBuilder.getClasses()){
-            if (cc.getName() != null && cc.getName().startsWith(clazz)) {
+            String fullyQualifiedName = cc.getName().replace("/",".");
+            if (fullyQualifiedName != null && fullyQualifiedName.startsWith(clazz)) {
                 for (int i = cc.getFirstLine(); i <= cc.getLastLine(); i++) {
                     ILine line = cc.getLine(i);
                     if (line.getInstructionCounter().getStatus() == ICounter.FULLY_COVERED) {
