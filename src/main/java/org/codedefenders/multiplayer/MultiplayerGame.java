@@ -139,7 +139,7 @@ public class MultiplayerGame {
 	}
 
 	public String getClassName() {
-		return DatabaseAccess.getClassForKey("Class_ID", classId).name;
+		return DatabaseAccess.getClassForKey("Class_ID", classId).getName();
 	}
 
 	public GameClass getCUT() {

@@ -1,6 +1,5 @@
 package org.codedefenders.singleplayer;
 
-import com.sun.tools.internal.jxc.apt.Const;
 import org.codedefenders.*;
 
 import java.io.File;

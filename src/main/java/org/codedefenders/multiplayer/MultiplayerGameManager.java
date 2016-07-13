@@ -196,7 +196,7 @@ public class MultiplayerGameManager extends HttpServlet {
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 		String classMutatedBaseName = classMutated.getBaseName();
 
-		File sourceFile = new File(classMutated.javaFile);
+		File sourceFile = new File(classMutated.getJavaFile());
 		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
 		// Runs diff match patch between the two Strings to see if there are any differences.
@@ -214,13 +214,13 @@ public class MultiplayerGameManager extends HttpServlet {
 			return null;
 
 		// Setup folder the files will go in
-		File newMutantDir = getNextSubDir(getServletContext().getRealPath(Constants.DATA_DIR + FILE_SEPARATOR + subDirectory + FILE_SEPARATOR + gid + FILE_SEPARATOR + Constants.MUTANTS_DIR + FILE_SEPARATOR + ownerId));
+		File newMutantDir = FileManager.getNextSubDir(getServletContext().getRealPath(Constants.DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + Constants.MUTANTS_DIR + F_SEP + ownerId));
 
 		System.out.println("NewMutantDir: " + newMutantDir.getAbsolutePath());
 		System.out.println("Class Mutated: " + classMutated.getName() + "(basename: " + classMutatedBaseName +")");
 
 		// Write the Mutant String into a java file
-		String mutantFileName = newMutantDir + FILE_SEPARATOR + classMutatedBaseName + JAVA_SOURCE_EXT;
+		String mutantFileName = newMutantDir + F_SEP + classMutatedBaseName + JAVA_SOURCE_EXT;
 		File mutantFile = new File(mutantFileName);
 		FileWriter fw = new FileWriter(mutantFile);
 		BufferedWriter bw = new BufferedWriter(fw);
@@ -229,29 +229,6 @@ public class MultiplayerGameManager extends HttpServlet {
 
 		// Compile the mutant - if you can, add it to the MultiplayerGame State, otherwise, delete these files created.
 		return AntRunner.compileMultiplayerMutant(getServletContext(), newMutantDir, mutantFileName, gid, classMutated, ownerId);
-	}
-
-	public File getNextSubDir(String path) {
-		File folder = new File(path);
-		folder.mkdirs();
-		String[] directories = folder.list(new FilenameFilter() {
-			@Override
-			public boolean accept(File current, String name) {
-				return new File(current, name).isDirectory() && (isParsable(name));
-			}
-		});
-		Arrays.sort(directories);
-		String newPath;
-		if (directories.length == 0)
-			newPath = folder.getAbsolutePath() + FILE_SEPARATOR + "1";
-		else {
-			File lastDir = new File(directories[directories.length - 1]);
-			int newIndex = Integer.parseInt(lastDir.getName()) + 1;
-			newPath = path + FILE_SEPARATOR + newIndex;
-		}
-		File newDir = new File(newPath);
-		newDir.mkdirs();
-		return newDir;
 	}
 
 	public static boolean isParsable(String input){
@@ -278,7 +255,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		File newTestDir = getNextSubDir(getServletContext().getRealPath(DATA_DIR + FILE_SEPARATOR + subDirectory + FILE_SEPARATOR + gid + FILE_SEPARATOR + TESTS_DIR + FILE_SEPARATOR + ownerId));
+		File newTestDir = FileManager.getNextSubDir(getServletContext().getRealPath(DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + TESTS_DIR + F_SEP + ownerId));
 
 		String javaFile = createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
@@ -287,17 +264,17 @@ public class MultiplayerGameManager extends HttpServlet {
 		}
 
 		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(getServletContext(), newTestDir, javaFile, gid, classUnderTest, ownerId);
+		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-			AntRunner.testOriginal(getServletContext(), newTestDir, newTest, DatabaseAccess.getMultiplayerGame(gid).getClassName());
+			AntRunner.testOriginal(newTestDir, newTest);
 		}
 		return newTest;
 	}
 
 	private String createJavaFile(File dir, String classBaseName, String testCode) throws IOException {
-		String javaFile = dir.getAbsolutePath() + FILE_SEPARATOR + TEST_PREFIX + classBaseName + JAVA_SOURCE_EXT;
+		String javaFile = dir.getAbsolutePath() + F_SEP + TEST_PREFIX + classBaseName + JAVA_SOURCE_EXT;
 		File testFile = new File(javaFile);
 		FileWriter testWriter = new FileWriter(testFile);
 		BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);

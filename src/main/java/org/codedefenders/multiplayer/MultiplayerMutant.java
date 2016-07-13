@@ -122,7 +122,7 @@ public class MultiplayerMutant {
 		int classId = DatabaseAccess.getMultiplayerGame(gameId).getClassId();
 		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
-		File sourceFile = new File(sut.javaFile);
+		File sourceFile = new File(sut.getJavaFile());
 		File mutantFile = new File(javaFile);
 
 		List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());
@@ -135,7 +135,7 @@ public class MultiplayerMutant {
 		int classId = DatabaseAccess.getMultiplayerGame(gameId).getClassId();
 		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
-		File sourceFile = new File(sut.javaFile);
+		File sourceFile = new File(sut.getJavaFile());
 		File mutantFile = new File(javaFile);
 
 		List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());

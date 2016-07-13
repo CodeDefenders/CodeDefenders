@@ -350,7 +350,7 @@ public class GameManager extends HttpServlet {
 			return null;
 
 		// Setup folder the files will go in
-		File newMutantDir = FileManager.getNextSubDir(Constants.DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + Constants.MUTANTS_DIR + F_SEP + ownerId));
+		File newMutantDir = FileManager.getNextSubDir(Constants.DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + Constants.MUTANTS_DIR + F_SEP + ownerId);
 
 		System.out.println("NewMutantDir: " + newMutantDir.getAbsolutePath());
 		System.out.println("Class Mutated: " + classMutated.getName() + "(basename: " + classMutatedBaseName +")");
@@ -395,7 +395,7 @@ public class GameManager extends HttpServlet {
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-			AntRunner.testOriginal(newTestDir, newTest, DatabaseAccess.getGameForKey("Game_ID", newTest.getGameId()).getClassName());
+			AntRunner.testOriginal(newTestDir, newTest);
 		}
 		return newTest;
 	}

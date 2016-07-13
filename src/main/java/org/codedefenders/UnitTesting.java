@@ -144,7 +144,7 @@ public class UnitTesting extends HttpServlet {
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-			AntRunner.testOriginal(getServletContext(), newTestDir, newTest,DatabaseAccess.getGameForKey("Game_ID", newTest.getGameId()).getClassName());
+			AntRunner.testOriginal(newTestDir, newTest);
 		}
 		return newTest;
 	}
