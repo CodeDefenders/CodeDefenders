@@ -72,7 +72,6 @@ public class AntRunner {
 
 	/**
 	 * Executes a test against a mutant
-	 * @param context
 	 * @param t A {@link Test} object
 	 * @param c A {@link GameClass} object
 	 * @return A {@link TargetExecution} object
@@ -94,7 +93,7 @@ public class AntRunner {
 
 		CoverageGenerator cg = new CoverageGenerator(
 				new File(t.getFolder()),
-				new File(Constants.CUTS_DIR));
+				new File(Constants.CUTS_DIR + F_SEP + c.getAlias()));
 
 		try {
 			cg.create(c.getName());
@@ -127,7 +126,6 @@ public class AntRunner {
 
 	/**
 	 * Executes a test against a mutant
-	 * @param context
 	 * @param m A {@link MultiplayerMutant} object
 	 * @param t A {@link Test} object
 	 * @return A {@link TargetExecution} object
@@ -294,7 +292,6 @@ public class AntRunner {
 
 	/**
 	 * Compiles mutant
-	 * @param context
 	 * @param dir
 	 * @param jFile
 	 * @param gameID
@@ -441,8 +438,6 @@ public class AntRunner {
 			command += ".bat";
 			command = command.replace("/", "\\").replace("\\", "\\\\");
 		}
-
-		String srcDir = cut.getAlias() + Constants.F_SEP + cut.getPackage().replace(".", Constants.F_SEP);
 
 		pb.command(command, target, // "-v", "-d", for verbose, debug
 				"-Dmutant.file=" + mutantFile,
