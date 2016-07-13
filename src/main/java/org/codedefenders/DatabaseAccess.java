@@ -279,8 +279,15 @@ public class DatabaseAccess {
 	 * @return
 	 */
 	public static ArrayList<Game> getGamesForUser(int userId) {
-		String sql = String.format("SELECT * FROM games WHERE (Attacker_ID=%d OR Defender_ID=%d) AND State!='FINISHED';", userId, userId);
+		// TODO: Write proper query to get players info into attacker and deffender ids
+		return new ArrayList<Game>();
+		/*
+		String sql = String.format("SELECT * FROM games AS m " +
+				"LEFT JOIN players as p ON p.Game_ID=m.ID " +
+				"WHERE m.Mode != 'PARTY' AND (p.User_ID=%d OR m.Creator_ID=%d) AND m.Status != 'FINISHED' " +
+				"GROUP BY m.ID;", userId, userId, userId);
 		return getGames(sql);
+		*/
 	}
 
 	public static ArrayList<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
@@ -378,7 +385,7 @@ public class DatabaseAccess {
 	}
 
 	public static ArrayList<Game> getOpenGames() {
-		String sql = "SELECT * FROM games where (Mode='DUEL' AND State='CREATED') OR (Mode='PARTY' AND State!='FINISHED');";
+		String sql = "SELECT * FROM games where (Mode='DUEL' AND Status='CREATED') OR (Mode='PARTY' AND Status!='FINISHED');";
 		return getGames(sql);
 	}
 

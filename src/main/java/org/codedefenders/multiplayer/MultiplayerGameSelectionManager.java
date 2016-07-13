@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Enumeration;
 
 public class MultiplayerGameSelectionManager extends HttpServlet {
 
@@ -61,7 +60,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 (float) mutantCoverage, 1f, 100, 100,
                 Integer.parseInt(request.getParameter("defenderLimit")), Integer.parseInt(request.getParameter("attackerLimit")),
                 Integer.parseInt(request.getParameter("minDefenders")), Integer.parseInt(request.getParameter("minAttackers")),
-                Long.parseLong(request.getParameter("finishTime")), MultiplayerGame.Status.WAITING.name());
+                Long.parseLong(request.getParameter("finishTime")), MultiplayerGame.Status.CREATED.name());
         nGame.insert();
 
         //rs.getInt("Defender_Limit"), rs.getInt("Attacker_Limit"),

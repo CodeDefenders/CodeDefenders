@@ -22,7 +22,7 @@ public class MultiplayerGame {
 	private static final Logger logger = LoggerFactory.getLogger(MultiplayerGame.class);
 
 	public enum Status {
-		WAITING, STARTED, FINISHED;
+		CREATED, ACTIVE, FINISHED;
 	}
 
 	private int id;
