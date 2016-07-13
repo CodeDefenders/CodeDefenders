@@ -284,30 +284,30 @@ public class DatabaseAccess {
 	}
 
 	public static ArrayList<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
-		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
+		String sql = String.format("SELECT * FROM games AS m " +
 				"LEFT JOIN players as p ON p.Game_ID=m.ID " +
-				"WHERE (p.User_ID=%d OR m.Creator_ID=%d) AND m.Status != 'FINISHED' " +
+				"WHERE m.Mode = 'PARTY' AND (p.User_ID=%d OR m.Creator_ID=%d) AND m.Status != 'FINISHED' " +
 				"GROUP BY m.ID;", userId, userId, userId);
 		return getMultiplayerGames(sql);
 	}
 
 	public static ArrayList<MultiplayerGame> getFinishedMultiplayerGamesForUser(int userId) {
-		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
+		String sql = String.format("SELECT * FROM games AS m " +
 				"LEFT JOIN players as p ON p.Game_ID=m.ID " +
-				"WHERE (p.User_ID=%d OR m.Creator_ID=%d) AND m.Status = 'FINISHED' " +
+				"WHERE (p.User_ID=%d OR m.Creator_ID=%d) AND m.Status = 'FINISHED' AND m.Mode='PARTY'" +
 				"GROUP BY m.ID;", userId, userId, userId);
 		return getMultiplayerGames(sql);
 	}
 
 	public static ArrayList<MultiplayerGame> getMultiplayerGamesExcludingUser(int userId) {
-		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
-				"WHERE m.Creator_ID!=%d AND NOT EXISTS " +
+		String sql = String.format("SELECT * FROM games AS m " +
+				"WHERE m.Mode='PARTY' AND m.Creator_ID!=%d AND NOT EXISTS " +
 				"(SELECT * FROM players AS p WHERE p.User_ID=%d AND p.Game_ID=m.ID);", userId, userId, userId);
 		return getMultiplayerGames(sql);
 	}
 
 	public static Participance getParticipance(int userId, int gameId){
-		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
+		String sql = String.format("SELECT * FROM games AS m " +
 				"LEFT JOIN players AS p ON p.Game_ID = m.ID " +
 				"WHERE m.ID = %d AND (m.Creator_ID=%d OR (p.User_ID=%d AND p.Game_ID=%d))",
 				gameId, userId, userId, gameId);
@@ -438,8 +438,8 @@ public class DatabaseAccess {
 	}
 
 	public static MultiplayerGame getMultiplayerGame(int id){
-		String sql = String.format("SELECT * FROM multiplayer_games AS m " +
-				"WHERE ID=%d", id);
+		String sql = String.format("SELECT * FROM games AS m " +
+				"WHERE ID=%d AND m.Mode='PARTY'", id);
 
 		ArrayList<MultiplayerGame> mgs = getMultiplayerGames(sql);
 		if (mgs.size() > 0){

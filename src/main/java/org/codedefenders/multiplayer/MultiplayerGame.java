@@ -307,11 +307,11 @@ public class MultiplayerGame {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			sql = String.format("INSERT INTO multiplayer_games " +
+			sql = String.format("INSERT INTO games " +
 					"(Class_ID, Level, Price, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " +
-					"Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Finish_Time, Status) VALUES " +
+					"Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Finish_Time, Status, Mode) VALUES " +
 					"('%s', 	'%s', '%f', 	'%d',			'%d',			'%f',			'%f',		'%d'," +
-					"'%d',				'%d',				'%d',			'%d',			'%d',		'%s');",
+					"'%d',				'%d',				'%d',			'%d',			'%d',		'%s', 'PARTY');",
 					classId, level.name(), price, defenderValue, attackerValue, lineCoverage, mutantCoverage, creatorId,
 					minAttackers, minDefenders, attackerLimit, defenderLimit, finishTime, status.name());
 
@@ -362,7 +362,7 @@ public class MultiplayerGame {
 
 			// Get all rows from the database which have the chosen username
 			stmt = conn.createStatement();
-				sql = String.format("UPDATE multiplayer_games SET " +
+				sql = String.format("UPDATE games SET " +
 						"Class_ID = '%s', Level = '%s', Price = %f, Defender_Value=%d, Attacker_Value=%d, Coverage_Goal=%f" +
 						", Mutant_Goal=%f, Status='%s' WHERE ID='%d'",
 						classId, level.name(), price, defenderValue, attackerValue, lineCoverage, mutantCoverage, status.name(), id);

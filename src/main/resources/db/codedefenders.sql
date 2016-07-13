@@ -40,35 +40,6 @@ DROP TABLE IF EXISTS `games`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `games` (
-  `Game_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `Attacker_ID` int(11) DEFAULT NULL,
-  `Defender_ID` int(11) DEFAULT NULL,
-  `CurrentRound` tinyint(4) NOT NULL DEFAULT '1',
-  `FinalRound` tinyint(4) NOT NULL DEFAULT '5',
-  `ActiveRole` enum('ATTACKER','DEFENDER') NOT NULL DEFAULT 'ATTACKER',
-  `Class_ID` int(11) DEFAULT NULL,
-  `State` enum('CREATED','ACTIVE','FINISHED') NOT NULL DEFAULT 'CREATED',
-  `Level` enum('EASY','MEDIUM','HARD') NOT NULL,
-  `Mode` enum('SINGLE','DUEL','PARTY','UTESTING') NOT NULL DEFAULT 'DUEL',
-  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`Game_ID`),
-  KEY `Attacker_ID` (`Attacker_ID`),
-  KEY `Defender_ID` (`Defender_ID`),
-  KEY `Class_ID` (`Class_ID`),
-  CONSTRAINT `games_ibfk_1` FOREIGN KEY (`Attacker_ID`) REFERENCES `users` (`User_ID`),
-  CONSTRAINT `games_ibfk_2` FOREIGN KEY (`Defender_ID`) REFERENCES `users` (`User_ID`),
-  CONSTRAINT `games_ibfk_3` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=17 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `multiplayer_games`
---
-
-DROP TABLE IF EXISTS `multiplayer_games`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `multiplayer_games` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Class_ID` int(11) DEFAULT NULL,
   `Level` enum('EASY','MEDIUM','HARD') DEFAULT NULL,
@@ -92,6 +63,7 @@ CREATE TABLE `multiplayer_games` (
   PRIMARY KEY (`ID`),
   KEY `fk_creatorId_idx` (`Creator_ID`),
   KEY `fk_className_idx` (`Class_ID`),
+  CONSTRAINT `fk_classId` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_className` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
@@ -121,7 +93,7 @@ CREATE TABLE `mutants` (
   KEY `fk_gameId_idx` (`Game_ID`),
   KEY `fk_playerId_idx` (`Player_ID`),
   KEY `fk_ownerId_idx` (`Owner_ID`),
-  CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `multiplayer_games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ownerId_muts` FOREIGN KEY (`Owner_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
@@ -141,9 +113,9 @@ CREATE TABLE `players` (
   `Points` int(11) NOT NULL,
   `Role` enum('ATTACKER','DEFENDER') NOT NULL,
   PRIMARY KEY (`ID`),
-  KEY `fk_gameId_players_idx` (`Game_ID`),
   KEY `fk_userId_players_idx` (`User_ID`),
-  CONSTRAINT `fk_gameId_players` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  KEY `fk_gameId_players_idx` (`Game_ID`),
+  CONSTRAINT `fk_gameId_players` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_userId_players` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -196,7 +168,7 @@ CREATE TABLE `tests` (
   KEY `fk_ownerId_tests_idx` (`Owner_ID`),
   KEY `fk_gameId_tests_idx` (`Game_ID`),
   KEY `fk_playerId_tests_idx` (`Player_ID`),
-  CONSTRAINT `fk_gameId_tests` FOREIGN KEY (`Game_ID`) REFERENCES `multiplayer_games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_gameId_tests` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_ownerId_tests` FOREIGN KEY (`Owner_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8;
@@ -214,8 +186,8 @@ CREATE TABLE `usedaimutants` (
   `Value` int(11) DEFAULT NULL,
   `Game_ID` int(11) NOT NULL,
   PRIMARY KEY (`UsedMutant_ID`),
-  KEY `Game_ID` (`Game_ID`),
-  CONSTRAINT `usedaimutants_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
+  KEY `fk_gameId_ai_mutants_idx` (`Game_ID`),
+  CONSTRAINT `fk_gameId_ai_mutants` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -231,8 +203,8 @@ CREATE TABLE `usedaitests` (
   `Value` int(11) DEFAULT NULL,
   `Game_ID` int(11) NOT NULL,
   PRIMARY KEY (`UsedTest_ID`),
-  KEY `Game_ID` (`Game_ID`),
-  CONSTRAINT `usedaitests_ibfk_1` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`Game_ID`)
+  KEY `fk_gameId_ai_test_idx` (`Game_ID`),
+  CONSTRAINT `fk_gameId_ai_test` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -249,6 +221,19 @@ CREATE TABLE `users` (
   `Password` char(60) NOT NULL,
   PRIMARY KEY (`User_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-07-13 11:18:20
+
 
 
 INSERT INTO `users` VALUES (1, 'AI', 'DUMMY_INACCESSIBLE');
