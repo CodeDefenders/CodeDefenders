@@ -7,7 +7,7 @@ public class Constants {
 
 	public static final String F_SEP = System.getProperty("file.separator");
 
-	public static String DATA_DIR = "C:\\work\\codedefenders\\data";
+	public static String DATA_DIR = "C:\\work\\cdef";
 	//public static String DATA_DIR    = F_SEP + "WEB-INF" + F_SEP + "data";
 	public static String CUTS_DIR    = DATA_DIR + F_SEP + "sources";
 	public static String MUTANTS_DIR = DATA_DIR + F_SEP + "mutants";

@@ -49,13 +49,13 @@ public class MutationTester {
 		}
 	}
 
-	public static void runTestOnAllMultiplayerMutants(ServletContext context, MultiplayerGame game, Test test, ArrayList<String> messages) {
+	public static void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages) {
 		int killed = 0;
 		ArrayList<MultiplayerMutant> mutants = game.getAliveMutants();
 		mutants.addAll(game.getMutantsMarkedEquivalent());
 		ArrayList<MultiplayerMutant> killedMutants = new ArrayList<MultiplayerMutant>();
 		for (MultiplayerMutant mutant : mutants) {
-			boolean k = testVsMultiplayerMutant(context, game, test, mutant);
+			boolean k = testVsMultiplayerMutant(game, test, mutant);
 			if (k){
 				killed++;
 				killedMutants.add(mutant);
@@ -73,7 +73,7 @@ public class MutationTester {
 			}
 		}
 
-		LineCoverage lc = AntRunner.getLinesCovered(context, test, game.getCUT());
+		LineCoverage lc = AntRunner.getLinesCovered(test, game.getCUT());
 		test.setLineCoverage(lc);
 
 		test.setScore(Scorer.score(game, test, killedMutants));
@@ -115,11 +115,11 @@ public class MutationTester {
 			messages.add(String.format(MUTANT_ALIVE_N_MESSAGE,tests.size()));
 	}
 
-	public static void runAllTestsOnMultiplayerMutant(ServletContext context, MultiplayerGame game, MultiplayerMutant mutant, ArrayList<String> messages) {
+	public static void runAllTestsOnMultiplayerMutant(MultiplayerGame game, MultiplayerMutant mutant, ArrayList<String> messages) {
 		ArrayList<Test> tests = game.getExecutableTests();
 		for (Test test : tests) {
 			// If this mutant/test pairing hasnt been run before and the test might kill the mutant
-			if (testVsMultiplayerMutant(context, game, test, mutant)) {
+			if (testVsMultiplayerMutant(game, test, mutant)) {
 				messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
 				ArrayList<MultiplayerMutant> mlist = new ArrayList<MultiplayerMutant>();
 				mlist.add(mutant);
@@ -160,10 +160,10 @@ public class MutationTester {
 		return false;
 	}
 
-	private static boolean testVsMultiplayerMutant(ServletContext context, MultiplayerGame g, Test test, MultiplayerMutant mutant) {
+	private static boolean testVsMultiplayerMutant(MultiplayerGame g, Test test, MultiplayerMutant mutant) {
 		if (DatabaseAccess.getTargetExecutionForPair(test.getId(), mutant.getId()) == null) {
 			// Run the test against the mutant and get the result
-			TargetExecution executedTarget = AntRunner.testMutant(context, mutant, test);
+			TargetExecution executedTarget = AntRunner.testMutant(mutant, test);
 
 			// If the test did NOT pass, the mutant was detected and should be killed.
 			if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
@@ -203,12 +203,12 @@ public class MutationTester {
 		mutant.kill();
 	}
 
-	public static void runEquivalenceTest(ServletContext context, Test test, MultiplayerMutant mutant) {
+	public static void runEquivalenceTest(Test test, MultiplayerMutant mutant) {
 		logger.info("Running equivalence test.");
 		// The test created is new and was made by the attacker (there is no need to check if the mutant/test pairing has been run already)
 
 		// As a result of this test, either the test the attacker has written kills the mutant or doesnt.
-		TargetExecution executedTarget = AntRunner.testMutant(context, mutant, test);
+		TargetExecution executedTarget = AntRunner.testMutant(mutant, test);
 
 		if (executedTarget.status.equals("ERROR") || executedTarget.status.equals("FAIL")) {
 			// If the test did NOT pass, the mutant was detected and is proven to be non-equivalent

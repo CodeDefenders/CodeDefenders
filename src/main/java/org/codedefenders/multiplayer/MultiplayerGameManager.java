@@ -79,7 +79,7 @@ public class MultiplayerGameManager extends HttpServlet {
 						if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
 							// Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
 
-							MutationTester.runEquivalenceTest(getServletContext(), newTest, mutant);
+							MutationTester.runEquivalenceTest(newTest, mutant);
 							activeGame.update();
 							MultiplayerMutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
 							if (mutantAfterTest.getEquivalent().equals(ASSUMED_YES)) {
@@ -96,7 +96,7 @@ public class MultiplayerGameManager extends HttpServlet {
 								newTest.update();
 							}
 
-							MutationTester.runTestOnAllMultiplayerMutants(getServletContext(), activeGame, newTest, messages);
+							MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
 							activeGame.update();
 
 							response.sendRedirect("play");
@@ -135,7 +135,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMultiplayerMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 					if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
 						messages.add(MUTANT_COMPILED_MESSAGE);
-						MutationTester.runAllTestsOnMultiplayerMutant(getServletContext(), activeGame, newMutant, messages);
+						MutationTester.runAllTestsOnMultiplayerMutant(activeGame, newMutant, messages);
 						activeGame.update();
 					} else {
 						messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
@@ -173,7 +173,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 					if (testOriginalTarget.status.equals("SUCCESS")) {
 						messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-						MutationTester.runTestOnAllMultiplayerMutants(getServletContext(), activeGame, newTest, messages);
+						MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
 						activeGame.update();
 					} else {
 						// testOriginalTarget.status.equals("FAIL") || testOriginalTarget.status.equals("ERROR")
@@ -214,7 +214,7 @@ public class MultiplayerGameManager extends HttpServlet {
 			return null;
 
 		// Setup folder the files will go in
-		File newMutantDir = FileManager.getNextSubDir(getServletContext().getRealPath(Constants.DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + Constants.MUTANTS_DIR + F_SEP + ownerId));
+		File newMutantDir = FileManager.getNextSubDir(Constants.MUTANTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
 
 		System.out.println("NewMutantDir: " + newMutantDir.getAbsolutePath());
 		System.out.println("Class Mutated: " + classMutated.getName() + "(basename: " + classMutatedBaseName +")");
@@ -228,7 +228,7 @@ public class MultiplayerGameManager extends HttpServlet {
 		bw.close();
 
 		// Compile the mutant - if you can, add it to the MultiplayerGame State, otherwise, delete these files created.
-		return AntRunner.compileMultiplayerMutant(getServletContext(), newMutantDir, mutantFileName, gid, classMutated, ownerId);
+		return AntRunner.compileMultiplayerMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
 	}
 
 	public static boolean isParsable(String input){
@@ -255,7 +255,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		File newTestDir = FileManager.getNextSubDir(getServletContext().getRealPath(DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + TESTS_DIR + F_SEP + ownerId));
+		File newTestDir = FileManager.getNextSubDir(TESTS_DIR+ F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
 
 		String javaFile = createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 

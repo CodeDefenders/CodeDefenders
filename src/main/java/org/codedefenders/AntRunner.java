@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.ConsoleHandler;
+import java.util.logging.FileHandler;
 
 import static org.codedefenders.Constants.*;
 
@@ -76,7 +77,7 @@ public class AntRunner {
 	 * @param c A {@link GameClass} object
 	 * @return A {@link TargetExecution} object
 	 */
-	public static LineCoverage getLinesCovered(ServletContext context, Test t, GameClass c) {
+	public static LineCoverage getLinesCovered(Test t, GameClass c) {
 		logger.debug("Running test {} on class {}", t.getId(), c.getName());
 		String[] resultArray = runAntTarget("test-original", null, t.getFolder(), c, t.getFullyQualifiedClassName());
 
@@ -93,7 +94,7 @@ public class AntRunner {
 
 		CoverageGenerator cg = new CoverageGenerator(
 				new File(t.getFolder()),
-				new File(context.getRealPath("WEB-INF/data/sources")));
+				new File("WEB-INF/data/sources"));
 
 		try {
 			cg.create(c.getName());
@@ -131,7 +132,7 @@ public class AntRunner {
 	 * @param t A {@link Test} object
 	 * @return A {@link TargetExecution} object
 	 */
-	public static TargetExecution testMutant(ServletContext context, MultiplayerMutant m, Test t) {
+	public static TargetExecution testMutant(MultiplayerMutant m, Test t) {
 		logger.debug("Running test {} on mutant {}", t.getId(), m.getId());
 		System.out.println("Running test " + t.getId() + " on mutant " + m.getId());
 		GameClass cut = DatabaseAccess.getMultiplayerGame(m.getGameId()).getCUT();
@@ -300,7 +301,7 @@ public class AntRunner {
 	 * @param classMutated
 	 * @return A {@link Mutant} object
 	 */
-	public static MultiplayerMutant compileMultiplayerMutant(ServletContext context, File dir, String jFile, int gameID, GameClass classMutated, int ownerId) {
+	public static MultiplayerMutant compileMultiplayerMutant(File dir, String jFile, int gameID, GameClass classMutated, int ownerId) {
 		//public static int compileMutant(ServletContext context, Mutant m2) {
 
 		// Gets the classname for the mutant from the game it is in
@@ -324,7 +325,7 @@ public class AntRunner {
 		} else {
 			// The mutant failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
-			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(context.getRealPath(Constants.DATA_DIR).replace("\\", "\\\\"), "");
+			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(Constants.DATA_DIR, "");
 			newMutant = new MultiplayerMutant(-1, gameID, jFile, null, "ASSUMED_NO", false, ownerId);
 			newMutant.insert();
 			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "FAIL", message);
@@ -421,6 +422,8 @@ public class AntRunner {
 		ProcessBuilder pb = new ProcessBuilder();
 		Map env = pb.environment();
 
+
+
 		String antHome = (String) env.get("ANT_HOME");
 		if (antHome == null) {
 			System.err.println("ANT_HOME undefined.");
@@ -431,13 +434,12 @@ public class AntRunner {
 
 		if (System.getProperty("os.name").toLowerCase().contains("windows")){
 			command += ".bat";
+			command = command.replace("/", "\\").replace("\\", "\\\\");
 		}
-
-		command.replace("\\", "\\\\");
 
 		String srcDir = cut.getAlias() + Constants.F_SEP + cut.getPackage().replace(".", Constants.F_SEP);
 
-		pb.command(antHome + "/bin/ant", target, // "-v", "-d", for verbose, debug
+		pb.command(command, target, // "-v", "-d", for verbose, debug
 				"-Dmutant.file=" + mutantFile,
 				"-Dtest.file=" + testDir,
 				"-Dcut.dir=" + CUTS_DIR + F_SEP + cut.getAlias(),

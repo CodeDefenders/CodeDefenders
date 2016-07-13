@@ -350,7 +350,7 @@ public class GameManager extends HttpServlet {
 			return null;
 
 		// Setup folder the files will go in
-		File newMutantDir = FileManager.getNextSubDir(Constants.DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + Constants.MUTANTS_DIR + F_SEP + ownerId);
+		File newMutantDir = FileManager.getNextSubDir(Constants.MUTANTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
 
 		System.out.println("NewMutantDir: " + newMutantDir.getAbsolutePath());
 		System.out.println("Class Mutated: " + classMutated.getName() + "(basename: " + classMutatedBaseName +")");
@@ -382,7 +382,7 @@ public class GameManager extends HttpServlet {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		File newTestDir = FileManager.getNextSubDir(getServletContext().getRealPath(DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + TESTS_DIR + F_SEP + ownerId));
+		File newTestDir = FileManager.getNextSubDir(getServletContext().getRealPath(TESTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId));
 
 		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 

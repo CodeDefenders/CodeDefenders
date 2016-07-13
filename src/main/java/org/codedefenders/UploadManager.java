@@ -112,7 +112,7 @@ public class UploadManager extends HttpServlet {
 			//Prepare AI classes, by generating tests and mutants.
 			new PrepareAI(newSUT.getId());
 
-			response.sendRedirect("games/create");
+			response.sendRedirect("games/user");
 
 		} else {
 			//TODO: Alternate method of catching errors?

@@ -5,23 +5,24 @@
 		Build File to handle mutation tests for a particular class
 	</description>
 
-	<property name="policyfile" location="security.policy" />
-	<property name="mutOp" value=":ALL"/>
-	<property name="codedef.home" value="C:\work\cdef"/>
-	<property name="major.home" value="${codedef.home}/lib/major"/>
-	<property name="evosuite.home" value="${codedef.home}/lib/evosuite"/>
-	<property name="ai.tests.dir" value="${codedef.home}/ai/tests"/>
-	<property name="ai.mutants.dir" value="${codedef.home}/ai/mutants"/>
-
-	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpath="${codedef.home}/lib/org.jacoco.ant-0.7.7.201606060606.jar">
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml">
 		<classpath>
-			<pathelement location="${codedef.home}/lib/org.jacoco.ant-0.7.7.201606060606.jar"/>
-			<pathelement location="${codedef.home}/lib/org.jacoco.core-0.7.7.201606060606.jar"/>
-			<pathelement location="${codedef.home}/lib/org.jacoco.agent-0.7.7.201606060606.jar"/>
-			<pathelement location="${codedef.home}/lib/org.jacoco.report-0.7.7.201606060606.jar"/>
-			<pathelement location="${codedef.home}/lib/asm-debug-all-5.1.jar"/>
+			<pathelement location="../lib/org.jacoco.ant-0.7.7.201606060606.jar"/>
+			<pathelement location="../lib/org.jacoco.core-0.7.7.201606060606.jar"/>
+			<pathelement location="../lib/org.jacoco.agent-0.7.7.201606060606.jar"/>
+			<pathelement location="../lib/org.jacoco.report-0.7.7.201606060606.jar"/>
+			<pathelement location="../lib/asm-debug-all-5.1.jar"/>
 		</classpath>
 	</taskdef>
+
+	<property name="policyfile" location="security.policy" />
+	<property name="mutOp" value=":ALL"/>
+	<property name="codedef.home" value="/var/lib/codedefenders"/>
+	<property name="major.home" value="${codedef.home}/lib/major"/>
+	<property name="evosuite.home" value="${codedef.home}/lib/evosuite"/>
+
+	<property name="ai.tests.dir" value="${codedef.home}/ai/tests"/>
+	<property name="ai.mutants.dir" value="${codedef.home}/ai/mutants"/>
 
 	<path id="nocut.cp">
 		<pathelement path="${codedef.home}/lib/junit-4.12.jar"/>
@@ -32,10 +33,10 @@
 	<path id="test.cp">
 		<pathelement path="${codedef.home}/lib/junit-4.12.jar"/>
 		<pathelement path="${codedef.home}/lib/hamcrest-all-1.3.jar"/>
-		<pathelement path="${codedef.home}/lib/org.jacoco.ant-0.7.7.201606060606.jar"/>
-		<pathelement path="${codedef.home}/lib/org.jacoco.core-0.7.7.201606060606.jar"/>
-		<pathelement path="${codedef.home}/lib/org.jacoco.agent-0.7.7.201606060606.jar"/>
-		<pathelement path="${codedef.home}/lib/org.jacoco.report-0.7.7.201606060606.jar"/>
+		<pathelement path="../lib/org.jacoco.ant-0.7.7.201606060606.jar"/>
+		<pathelement path="../lib/org.jacoco.core-0.7.7.201606060606.jar"/>
+		<pathelement path="../lib/org.jacoco.agent-0.7.7.201606060606.jar"/>
+		<pathelement path="../lib/org.jacoco.report-0.7.7.201606060606.jar"/>
 		<pathelement path="${major.home}/config/config.jar"/>
 		<pathelement path="${cut.dir}"/>
 	</path>
