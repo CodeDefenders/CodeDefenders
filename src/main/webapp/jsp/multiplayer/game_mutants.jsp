@@ -82,7 +82,8 @@ if (p == Participance.ATTACKER && true){
 					<tr>
 						<td><h4>Mutant <%= m.getId() %></h4></td>
 						<td>
-							<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
+							<% if (p.equals(Participance.ATTACKER) || p.equals(Participance.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){ %>
+								<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 							<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
 								<div class="modal-dialog">
 									<!-- Modal content-->
@@ -93,11 +94,8 @@ if (p == Participance.ATTACKER && true){
 										</div>
 										<div class="modal-body">
 											<pre class="readonly-pre"><textarea class="mutdiff" id="diff<%=m.getId()%>">
-												<% if (p.equals(Participance.ATTACKER) || p.equals(Participance.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){
-													%><%=m.getPatchString()%><%
-												} else { %>
-													Only available to Defenders in easy game mode.
-												<%}%></textarea></pre>
+													%><%=m.getPatchString()%>
+												</textarea></pre>
 										</div>
 										<div class="modal-footer">
 											<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -105,6 +103,7 @@ if (p == Participance.ATTACKER && true){
 									</div>
 								</div>
 							</div>
+							<% } %>
 						</td>
 					</tr>
 					<tr>

@@ -27,6 +27,7 @@ public class Test {
 	private int mutantsKilled = 0;
 
 	private int playerId;
+	private int ownerId;
 
 	private LineCoverage lineCoverage = LineCoverage.NONE;
 
@@ -50,6 +51,16 @@ public class Test {
 		return playerId;
 	}
 
+	public void setOwnerId(int id){
+		ownerId = id;
+	}
+
+
+
+	public int getOwnerId(){
+		return ownerId;
+	}
+
 	public int getScore(){
 		return score;
 	}
@@ -58,16 +69,18 @@ public class Test {
 		score += s;
 	}
 
-	public Test(int gameId, String jFile, String cFile, int playerId) {
+	public Test(int gameId, String jFile, String cFile, int ownerId) {
 		this.gameId = gameId;
 		try {
-			this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
+			Game g = DatabaseAccess.getGameForKey("ID", gameId);
+			if (g != null)
+				this.roundCreated = g.getCurrentRound();
 		} catch (NullPointerException e) {
 			//multiplayer game
 		}
 		this.javaFile = jFile;
 		this.classFile = cFile;
-		this.playerId = playerId;
+		this.ownerId = ownerId;
 		score = 0;
 	}
 
@@ -92,7 +105,7 @@ public class Test {
 	}
 
 	public int getDefenderPoints() {
-		if (playerId == DatabaseAccess.getGameForKey("Game_ID", gameId).getDefenderId())
+		if (playerId == DatabaseAccess.getGameForKey("ID", gameId).getDefenderId())
 			return mutantsKilled;
 		else
 			return 0;
@@ -143,8 +156,8 @@ public class Test {
 			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
 			// class file can be null
 			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
-			sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points) " +
-						"VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, playerId, score);
+			sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Owner_ID, Points) " +
+						"VALUES (%s, %s, %d, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, playerId, ownerId, score);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 

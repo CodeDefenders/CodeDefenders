@@ -61,7 +61,7 @@ public class MultiplayerGameManager extends HttpServlet {
 				int defId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
-				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, defId, "mp");
+				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, defId, "mp");
 
 				if (newTest == null) {
 					messages.add(TEST_INVALID_MESSAGE);
@@ -156,7 +156,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
 				int defenderId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
-				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
+				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, defenderId, "mp");
 				newTest.setPlayerId(defenderId);
 				newTest.update();
 				System.out.println("Defender " + defenderId + " submitted new test");
@@ -251,7 +251,7 @@ public class MultiplayerGameManager extends HttpServlet {
 	 * @return {@code null} if test is not valid
 	 * @throws IOException
 	 */
-	public Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
+	public Test createTest(int gid, int cid, String testText, int ownerId, int playerId, String subDirectory) throws IOException {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
@@ -264,7 +264,7 @@ public class MultiplayerGameManager extends HttpServlet {
 		}
 
 		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
+		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId, playerId);
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {

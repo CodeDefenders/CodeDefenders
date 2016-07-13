@@ -1,3 +1,11 @@
+//Jacoco permissions
+
+grant codeBase "file:lib/*" {
+      permission java.security.AllPermission;
+};
+
+
+
 //java.policyjava.policyinstall_root/java/jre/lib/security/java.policy
 
 // Standard extensions get all permissions by default
@@ -72,9 +80,9 @@ grant {
   permission java.net.NetPermission "*";
   permission java.lang.reflect.ReflectPermission "*";
   permission java.util.logging.LoggingPermission "control";
-  permission java.io.FilePermission "../", "write";
+  permission java.io.FilePermission "/", "write";
   permission java.io.FilePermission "<<ALL FILES>>", "read";
   permission java.awt.AWTPermission "*";
   permission java.util.PropertyPermission "*", "read";
-};
 
+};

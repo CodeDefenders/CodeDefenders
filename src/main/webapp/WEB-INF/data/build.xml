@@ -7,21 +7,11 @@
 
 	<property name="policyfile" location="security.policy" />
 	<property name="mutOp" value=":ALL"/>
-	<property name="codedef.home" value="C:\work\cdef"/>
+	<property name="codedef.home" value="C:/work/cdef"/>
 	<property name="major.home" value="${codedef.home}/lib/major"/>
 	<property name="evosuite.home" value="${codedef.home}/lib/evosuite"/>
 	<property name="ai.tests.dir" value="${codedef.home}/ai/tests"/>
 	<property name="ai.mutants.dir" value="${codedef.home}/ai/mutants"/>
-
-	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml" classpath="${codedef.home}/lib/org.jacoco.ant-0.7.7.201606060606.jar">
-		<classpath>
-			<pathelement location="${codedef.home}/lib/org.jacoco.ant-0.7.7.201606060606.jar"/>
-			<pathelement location="${codedef.home}/lib/org.jacoco.core-0.7.7.201606060606.jar"/>
-			<pathelement location="${codedef.home}/lib/org.jacoco.agent-0.7.7.201606060606.jar"/>
-			<pathelement location="${codedef.home}/lib/org.jacoco.report-0.7.7.201606060606.jar"/>
-			<pathelement location="${codedef.home}/lib/asm-debug-all-5.1.jar"/>
-		</classpath>
-	</taskdef>
 
 	<path id="nocut.cp">
 		<pathelement path="${codedef.home}/lib/junit-4.12.jar"/>
@@ -40,13 +30,18 @@
 		<pathelement path="${cut.dir}"/>
 	</path>
 
+	<taskdef uri="antlib:org.jacoco.ant" resource="org/jacoco/ant/antlib.xml"
+			 classpath="${codedef.home}/lib/org.jacoco.ant-0.7.7.201606060606.jar">
+		<classpath refid="test.cp" />
+	</taskdef>
+
 	<!-- Get classname minus .java extension -->
 	<basename property="classname.only" file="${classname}" suffix=".java"/>
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-cut" description="compile a class under test">
 		<javac srcdir="${cut.dir}" destdir="${cut.dir}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" listfiles="yes" fork="yes"
-		debug="true">
+			   debug="true">
 			<!-- <include name="${classname}" /> -->
 		</javac>
 	</target>
@@ -58,7 +53,7 @@
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-test" description="compile a single test">
-		<classpath refid="test.cp" />
+		<!--<classpath refid="test.cp" />-->
 		<javac srcdir="${test.file}" destdir="${test.file}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false"/>
 	</target>
 
@@ -69,8 +64,7 @@
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="test-original" depends="echo-path" description="run test on original code to ensure it passes">
-		<jacoco:coverage enabled="true" destFile="${test.file}/jacoco.exec" dumponexit="true"
-		classdumpdir="">
+		<jacoco:coverage enabled="true" destFile="${test.file}/jacoco.exec">
 			<junit printsummary="true" haltonfailure="false"  includeantruntime="true" fork="true" clonevm="true">
 				<classpath refid="test.cp" />
 				<classpath location="${test.file}"/>

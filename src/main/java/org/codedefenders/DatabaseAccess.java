@@ -31,7 +31,7 @@ public class DatabaseAccess {
 	}
 
 	public static GameClass getClassForGame(int gameId) {
-		String sql = String.format("SELECT classes.* from classes INNER JOIN games ON classes.Class_ID = games.Class_ID WHERE games.Game_ID=%d;", gameId);
+		String sql = String.format("SELECT classes.* from classes INNER JOIN games ON classes.Class_ID = games.Class_ID WHERE games.ID=%d;", gameId);
 		return getClass(sql);
 	}
 
@@ -237,11 +237,11 @@ public class DatabaseAccess {
 			conn = getConnection();
 
 			stmt = conn.createStatement();
-			sql = String.format("SELECT * FROM games WHERE %s='%d';", keyName, id);
+			sql = String.format("SELECT * FROM games WHERE %s='%d' AND Mode!='PARTY';", keyName, id);
 			ResultSet rs = stmt.executeQuery(sql);
 
 			if (rs.next()) {
-				Game gameRecord = new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
+				Game gameRecord = new Game(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
 						rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
 						Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode")));
 
@@ -403,7 +403,7 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			while (rs.next()) {
-				gameList.add(new Game(rs.getInt("Game_ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
+				gameList.add(new Game(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
 						rs.getInt("Class_ID"), rs.getInt("CurrentRound"), rs.getInt("FinalRound"),
 						Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
 						Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode"))));

@@ -94,7 +94,7 @@ public class AntRunner {
 
 		CoverageGenerator cg = new CoverageGenerator(
 				new File(t.getFolder()),
-				new File("WEB-INF/data/sources"));
+				new File(Constants.CUTS_DIR));
 
 		try {
 			cg.create(c.getName());
@@ -344,6 +344,10 @@ public class AntRunner {
 	 * @return A {@link Test} object
 	 */
 	public static Test compileTest(File dir, String jFile, int gameID, GameClass cut, int ownerId) {
+		return compileTest(dir, jFile, gameID, cut, ownerId, 0);
+	}
+
+	public static Test compileTest(File dir, String jFile, int gameID, GameClass cut, int ownerId, int playerId) {
 		//public static int compileTest(ServletContext context, Test t) {
 
 		String[] resultArray = runAntTarget("compile-test", null, dir.getAbsolutePath(), cut, null);
@@ -357,6 +361,7 @@ public class AntRunner {
 			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
 			String cFile = matchingFiles.get(0).getAbsolutePath();
 			Test newTest = new Test(gameID, jFile, cFile, ownerId);
+			newTest.setPlayerId(playerId);
 			newTest.insert();
 			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);
 			newExec.insert();
