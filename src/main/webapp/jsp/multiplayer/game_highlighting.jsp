@@ -18,7 +18,7 @@ showMutants = function(){
         ]],
         <%
             } %>
-    ],"<%="#" + codeDivName%>", <%= p.equals(Participance.DEFENDER)? "true" : "false" %>);
+    ],"<%="#" + codeDivName%>", <%= role.equals(Role.DEFENDER)? "true" : "false" %>);
 };
 editorSUT.on("viewportChange", function(){
     showMutants();

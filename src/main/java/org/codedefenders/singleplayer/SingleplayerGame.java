@@ -1,6 +1,7 @@
 package org.codedefenders.singleplayer;
 
 import org.codedefenders.Game;
+import org.codedefenders.Role;
 
 /**
  * @author Ben Clegg
@@ -14,7 +15,7 @@ public class SingleplayerGame extends Game {
 		super(classId, userId, maxRounds, role, level);
 
 		//Set ai's role
-		if(role.equals(Game.Role.ATTACKER)) {
+		if(role.equals(Role.ATTACKER)) {
 			setDefenderId(1);
 			ai = new AiDefender(this);
 		} else {
@@ -22,6 +23,7 @@ public class SingleplayerGame extends Game {
 			ai = new AiAttacker(this);
 		}
 		setMode(Mode.SINGLE); //Set singleplayer mode.
+		setState(State.ACTIVE);
 	}
 
 	/**

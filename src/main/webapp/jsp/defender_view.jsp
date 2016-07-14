@@ -1,3 +1,5 @@
+<%@ page import="static org.codedefenders.AbstractGame.State.ACTIVE" %>
+<%@ page import="org.codedefenders.*" %>
 <% String pageTitle="Defending Class"; %>
 <%@ include file="/jsp/header_game.jsp" %>
 
@@ -34,7 +36,7 @@
 	</div> <!-- col-md6 left -->
 	<div class="col-md-6" id="utest-div">
 		<h2> Write a new JUnit test here
-			<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
+			<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Role.DEFENDER)) {%>
 			<button type="submit" class="btn btn-primary btn-game btn-right" form="def" onClick="this.form.submit(); this.disabled=true; this.value='Defending...';">Defend!</button>
 			<%}%>
 		</h2>
@@ -60,8 +62,36 @@
 		<div class="slider single-item">
 			<%
 				boolean isTests = false;
-				for (Test t : game.getExecutableTests()) {
+
+				Role role = game.getRole(uid);
+
+				String codeDivName = "cut-div";
+				HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<Integer, ArrayList<Test>>();
+				ArrayList<Integer> linesUncovered = new ArrayList<Integer>();
+				List<Test> tests = game.getExecutableTests();
+
+				for (Test t : tests) {
 					isTests = true;
+
+					for (Integer luc : t.getLineCoverage().getLinesUncovered()){
+						if (!linesUncovered.contains(luc) && !linesCovered.containsKey(luc)){
+							linesUncovered.add(luc);
+						}
+					}
+
+
+					for (Integer lc : t.getLineCoverage().getLinesCovered()){
+						if (!linesCovered.containsKey(lc)){
+							linesCovered.put(lc, new ArrayList<Test>());
+						}
+
+						if (linesUncovered.contains(lc)){
+							linesUncovered.remove(lc);
+						}
+
+						linesCovered.get(lc).add(t);
+					}
+
 					String tc = "";
 					for (String l : t.getHTMLReadout()) { tc += l + "\n"; }
 			%>
@@ -89,8 +119,24 @@
 			<div class="tab-pane fade active in" id="mutalivetab">
 				<table class="table table-hover table-responsive table-paragraphs">
 					<%
-					ArrayList<Mutant> mutantsAlive = game.getAliveMutants();
-					if (! mutantsAlive.isEmpty()) {
+						ArrayList<Mutant> mutantsAlive = game.getAliveMutants();
+
+						ArrayList<Mutant> mutantsEquiv =  game.getMutantsMarkedEquivalent();
+
+						HashMap<Integer, ArrayList<Mutant>> mutantLines = new HashMap<Integer, ArrayList<Mutant>>();
+
+						for (Mutant m : mutantsAlive) {
+							List<String> lines = m.getHTMLReadout();
+							for (String l : lines){
+								int line = Integer.parseInt(l.split(":")[1].trim());
+								if (!mutantLines.containsKey(line)){
+									mutantLines.put(line, new ArrayList<Mutant>());
+								}
+								mutantLines.get(line).add(m);
+							}
+						}
+
+						if (! mutantsAlive.isEmpty()) {
 						for (Mutant m : mutantsAlive) {
 					%>
 					<tr>
@@ -120,7 +166,7 @@
 							</div>
 						</td>
 						<td >
-							<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
+							<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Role.DEFENDER)) {%>
 							<form id="equiv" action="play" method="post">
 								<input type="hidden" name="formType" value="claimEquivalent">
 								<input type="hidden" name="mutantId" value="<%=m.getId()%>">
@@ -222,6 +268,37 @@
 		readOnly: true
 	});
 	editorSUT.setSize("100%", 500);
+
+	highlightCoverage = function(){
+		highlightLine([<% for (Integer i : linesCovered.keySet()){%>
+			[<%=i%>, <%=((float)linesCovered.get(i).size() / (float) tests.size())%>],
+			<% } %>], COVERED_COLOR, "<%="#" + codeDivName%>");
+	};
+
+	showMutants = function(){
+		mutantLine([
+			<% for (Integer line : mutantLines.keySet()) {
+            %>
+			[<%= line %>,
+				<%= mutantLines.get(line).size() %>, [
+				<% for(Mutant mm : mutantLines.get(line)){%>
+				<%= mm.getId() %>,
+				<%}%>
+			]],
+			<%
+                } %>
+		],"<%="#" + codeDivName%>", <%= role.equals(Role.DEFENDER)? "true" : "false" %>);
+	};
+	editorSUT.on("viewportChange", function(){
+		showMutants();
+		highlightCoverage();
+	});
+	$(document).ready(function(){
+		showMutants();
+		highlightCoverage();
+	});
+
+
 	/* Submitted tests */
 	var x = document.getElementsByClassName("utest");
 	var i;
@@ -248,7 +325,7 @@
 		}
 	});
 
-	<% if (game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
+	<% if (game.getActiveRole().equals(Role.ATTACKER)) {%>
 	function checkForUpdate(){
 		$.post('/play', {
 			formType: "whoseTurn",

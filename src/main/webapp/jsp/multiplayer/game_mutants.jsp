@@ -1,9 +1,9 @@
 <%@ page import="org.codedefenders.Game" %>
-<%@ page import="org.codedefenders.multiplayer.Participance" %>
+<%@ page import="org.codedefenders.Role" %>
 <div class="col-md-6" id="mutants-div">
 		<h2>Mutants</h2>
 <%
-if (p == Participance.ATTACKER && true){
+if (role == Role.ATTACKER && true){
     int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
 
     MultiplayerMutant equiv = null;
@@ -82,7 +82,7 @@ if (p == Participance.ATTACKER && true){
 					<tr>
 						<td><h4>Mutant <%= m.getId() %></h4></td>
 						<td>
-							<% if (p.equals(Participance.ATTACKER) || p.equals(Participance.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){ %>
+							<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){ %>
 								<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 							<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
 								<div class="modal-dialog">

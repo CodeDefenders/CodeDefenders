@@ -55,7 +55,7 @@ public class GameManager extends HttpServlet {
 
 		System.out.println("Getting game " + gid + " for " + uid);
 
-		Game activeGame = DatabaseAccess.getGameForKey("Game_ID", gid);
+		Game activeGame = DatabaseAccess.getGameForKey("ID", gid);
 		session.setAttribute("game", activeGame);
 
 		// If the game is finished, redirect to the score page.
@@ -66,7 +66,7 @@ public class GameManager extends HttpServlet {
 				ArrayList<Mutant> aliveMutants = activeGame.getAliveMutants();
 				if (aliveMutants.isEmpty()) {
 					System.out.println("No Mutants Alive, only attacker can play.");
-					activeGame.setActiveRole(Game.Role.ATTACKER);
+					activeGame.setActiveRole(Role.ATTACKER);
 					activeGame.update();
 				}
 				// If no mutants needed to be proved non-equivalent, direct to the Attacker Page.
@@ -150,7 +150,7 @@ public class GameManager extends HttpServlet {
 								return;
 							}
 						} else {
-							//  (testOriginalTarget.status.equals("FAIL") || testOriginalTarget.status.equals("ERROR")
+							//  (testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
 							System.out.println("testOriginalTarget: " + testOriginalTarget);
 							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 							messages.add(testOriginalTarget.message);
@@ -205,8 +205,8 @@ public class GameManager extends HttpServlet {
 
 			case "whoseTurn":
 				int gid = Integer.parseInt(request.getParameter("gameID"));
-				activeGame = DatabaseAccess.getGameForKey("Game_ID", gid);
-				String turn = activeGame.getActiveRole().equals(Game.Role.ATTACKER) ? "attacker" : "defender";
+				activeGame = DatabaseAccess.getGameForKey("ID", gid);
+				String turn = activeGame.getActiveRole().equals(Role.ATTACKER) ? "attacker" : "defender";
 				response.setContentType("application/json");
 				response.setCharacterEncoding("UTF-8");
 				response.getWriter().write(turn);
@@ -256,8 +256,10 @@ public class GameManager extends HttpServlet {
 				// Get the text submitted by the user.
 				String testText = request.getParameter("test");
 
+				int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, activeGame.getId());
+
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
-				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
+				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, playerId, "sp");
 				if (newTest == null) {
 					messages.add(TEST_INVALID_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -275,7 +277,7 @@ public class GameManager extends HttpServlet {
 						activeGame.endTurn();
 						activeGame.update();
 					} else {
-						// testOriginalTarget.status.equals("FAIL") || testOriginalTarget.status.equals("ERROR")
+						// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
 						messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 						messages.add(testOriginalTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -373,16 +375,16 @@ public class GameManager extends HttpServlet {
 	 * @param gid
 	 * @param cid
 	 * @param testText
-	 * @param ownerId
+	 * @param playerId
 	 * @param subDirectory - Directory inside data for test to go
 	 * @return {@code null} if test is not valid
 	 * @throws IOException
 	 */
-	public Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
+	public Test createTest(int gid, int cid, String testText, int playerId, String subDirectory) throws IOException {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		File newTestDir = FileManager.getNextSubDir(getServletContext().getRealPath(TESTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId));
+		File newTestDir = FileManager.getNextSubDir(TESTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + playerId);
 
 		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
@@ -391,7 +393,7 @@ public class GameManager extends HttpServlet {
 		}
 
 		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
+		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, playerId);
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {

@@ -27,7 +27,6 @@ public class Test {
 	private int mutantsKilled = 0;
 
 	private int playerId;
-	private int ownerId;
 
 	private LineCoverage lineCoverage = LineCoverage.NONE;
 
@@ -51,16 +50,6 @@ public class Test {
 		return playerId;
 	}
 
-	public void setOwnerId(int id){
-		ownerId = id;
-	}
-
-
-
-	public int getOwnerId(){
-		return ownerId;
-	}
-
 	public int getScore(){
 		return score;
 	}
@@ -69,7 +58,7 @@ public class Test {
 		score += s;
 	}
 
-	public Test(int gameId, String jFile, String cFile, int ownerId) {
+	public Test(int gameId, String jFile, String cFile, int playerId) {
 		this.gameId = gameId;
 		try {
 			Game g = DatabaseAccess.getGameForKey("ID", gameId);
@@ -80,7 +69,7 @@ public class Test {
 		}
 		this.javaFile = jFile;
 		this.classFile = cFile;
-		this.ownerId = ownerId;
+		this.playerId = playerId;
 		score = 0;
 	}
 
@@ -156,8 +145,8 @@ public class Test {
 			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
 			// class file can be null
 			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
-			sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Owner_ID, Points) " +
-						"VALUES (%s, %s, %d, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, playerId, ownerId, score);
+			sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points) " +
+						"VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, playerId, score);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -228,12 +217,11 @@ public class Test {
 
 
 			sql = String.format("UPDATE tests SET mutantsKilled='%d', " +
-					"Player_ID=%d, " +
 					"Lines_Covered='%s', " +
 					"Lines_Uncovered='%s'," +
 					"Points = %d " +
 					"WHERE Test_ID='%d';",
-					mutantsKilled, playerId, linesCoveredString, linesUncoveredString, score, id);
+					mutantsKilled, linesCoveredString, linesUncoveredString, score, id);
 			stmt.execute(sql);
 
 			conn.close();

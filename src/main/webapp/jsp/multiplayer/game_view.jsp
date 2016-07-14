@@ -1,5 +1,6 @@
 <% String pageTitle="In Game"; %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.*" %>
 <%
     // Get their user id from the session.
     int uid = (Integer) session.getAttribute("uid");
@@ -24,10 +25,10 @@
     String codeDivName = "cut-div";
 
     MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
-    if (mg.getStatus().equals(MultiplayerGame.Status.FINISHED)) {
+    if (mg.getState().equals(AbstractGame.State.FINISHED)) {
         response.sendRedirect("/games/user");
     }
-    Participance p = mg.getParticipance(uid);
+    Role role = mg.getRole(uid);
 
     List<Test> tests = mg.getExecutableTests();
 %>
@@ -43,7 +44,7 @@
 
     HashMap<Integer, ArrayList<MultiplayerMutant>> mutantLines = new HashMap<Integer, ArrayList<MultiplayerMutant>>();
 
-    if (p.equals(Participance.DEFENDER) && request.getParameter("equivLine") != null){
+    if (role.equals(Role.DEFENDER) && request.getParameter("equivLine") != null){
         try {
             int equivLine = Integer.parseInt(request.getParameter("equivLine"));
 
@@ -64,7 +65,7 @@
             mutantsAlive = mg.getAliveMutants();
 
         } catch (NumberFormatException e){}
-    } else if (p.equals(Participance.ATTACKER) && request.getParameter("acceptEquiv") != null){
+    } else if (role.equals(Role.ATTACKER) && request.getParameter("acceptEquiv") != null){
         try {
             int mutId = Integer.parseInt(request.getParameter("acceptEquiv"));
 
@@ -104,7 +105,7 @@
 
     <%@ include file="/jsp/multiplayer/game_scoreboard.jsp" %>
 
-    <% switch (p){
+    <% switch (role){
         case ATTACKER:
             %><%@ include file="/jsp/multiplayer/attacker_view.jsp" %><%
             break;
@@ -116,9 +117,9 @@
             break;
         default:
             if (request.getParameter("defender") != null){
-                mg.addUserAsDefender(uid);
+                mg.addPlayer(uid, Role.DEFENDER);
             } else if (request.getParameter("attacker") != null){
-                mg.addUserAsAttacker(uid);
+                mg.addPlayer(uid, Role.ATTACKER);
             } else {
                 response.sendRedirect("multiplayer/games/user");
                 break;

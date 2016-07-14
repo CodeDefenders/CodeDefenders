@@ -1,4 +1,4 @@
-<% if (p.equals(Participance.DEFENDER) || p.equals(Participance.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){
+<% if (role.equals(Role.DEFENDER) || role.equals(Role.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){
 %>
 <div class="col-md-6">
     <h2> JUnit tests </h2>
@@ -35,10 +35,7 @@
         <%
             }
             if (!isTests) {%>
-        <div><h4>T0</h4><pre class="readonly-pre"><textarea class="utest" cols="20" rows="10">
-//No Unit Tests Found
-//
-//&#9785;</textarea></pre></div>
+        <div><h2></h2><p> There are currently no tests </p></div>
         <%}
         %>
     </div> <!-- slider single-item -->

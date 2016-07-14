@@ -58,10 +58,8 @@ public class MultiplayerGameManager extends HttpServlet {
 				// Get the text submitted by the user.
 				String testText = request.getParameter("test");
 
-				int defId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
-
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
-				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, defId, "mp");
+				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
 
 				if (newTest == null) {
 					messages.add(TEST_INVALID_MESSAGE);
@@ -89,7 +87,6 @@ public class MultiplayerGameManager extends HttpServlet {
 								logger.info("Mutant was killed, hence tagged not equivalent");
 								messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
 
-								newTest.setPlayerId(defId);
 								ArrayList<MultiplayerMutant> mm = new ArrayList<MultiplayerMutant>();
 								mm.add(mutantAfterTest);
 								newTest.setScore(Scorer.score(activeGame, newTest, mm));
@@ -108,7 +105,7 @@ public class MultiplayerGameManager extends HttpServlet {
 							return;
 						}
 					} else {
-						//  (testOriginalTarget.status.equals("FAIL") || testOriginalTarget.status.equals("ERROR")
+						//  (testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
 						System.out.println("testOriginalTarget: " + testOriginalTarget);
 						messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 						messages.add(testOriginalTarget.message);
@@ -155,18 +152,16 @@ public class MultiplayerGameManager extends HttpServlet {
 				String testText = request.getParameter("test");
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
-				int defenderId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
-				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, defenderId, "mp");
-				newTest.setPlayerId(defenderId);
-				newTest.update();
-				System.out.println("Defender " + defenderId + " submitted new test");
+				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
+				logger.info("New Test " + newTest.getId() + " by user " + uid);
+
 				if (newTest == null) {
 					messages.add(TEST_INVALID_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					response.sendRedirect("play");
 					return;
 				}
-				System.out.println("New Test " + newTest.getId());
+
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 				if (compileTestTarget.status.equals("SUCCESS")) {
@@ -176,7 +171,7 @@ public class MultiplayerGameManager extends HttpServlet {
 						MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
 						activeGame.update();
 					} else {
-						// testOriginalTarget.status.equals("FAIL") || testOriginalTarget.status.equals("ERROR")
+						// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
 						messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 						messages.add(testOriginalTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -251,9 +246,11 @@ public class MultiplayerGameManager extends HttpServlet {
 	 * @return {@code null} if test is not valid
 	 * @throws IOException
 	 */
-	public Test createTest(int gid, int cid, String testText, int ownerId, int playerId, String subDirectory) throws IOException {
+	public Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
+
+		int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gid);
 
 		File newTestDir = FileManager.getNextSubDir(TESTS_DIR+ F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
 
@@ -264,7 +261,7 @@ public class MultiplayerGameManager extends HttpServlet {
 		}
 
 		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId, playerId);
+		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, playerId);
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {

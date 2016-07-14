@@ -1,5 +1,6 @@
 package org.codedefenders.multiplayer;
 
+import org.codedefenders.AbstractGame;
 import org.codedefenders.DatabaseAccess;
 import org.codedefenders.Game;
 
@@ -60,12 +61,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 (float) mutantCoverage, 1f, 100, 100,
                 Integer.parseInt(request.getParameter("defenderLimit")), Integer.parseInt(request.getParameter("attackerLimit")),
                 Integer.parseInt(request.getParameter("minDefenders")), Integer.parseInt(request.getParameter("minAttackers")),
-                Long.parseLong(request.getParameter("finishTime")), MultiplayerGame.Status.CREATED.name());
+                Long.parseLong(request.getParameter("finishTime")), AbstractGame.State.CREATED.name());
         nGame.insert();
 
         //rs.getInt("Defender_Limit"), rs.getInt("Attacker_Limit"),
         //rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getLong("Finish_Time"),
-        //        rs.getString("Status")
+        //        rs.getString("State")
 
         // Redirect to the game selection menu.
         response.sendRedirect("games");

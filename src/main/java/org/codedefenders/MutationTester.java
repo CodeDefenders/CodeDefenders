@@ -47,6 +47,10 @@ public class MutationTester {
 			}
 
 		}
+		// coverage information
+		LineCoverage lc = AntRunner.getLinesCovered(test, game.getCUT());
+		test.setLineCoverage(lc);
+		test.update();
 	}
 
 	public static void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages) {

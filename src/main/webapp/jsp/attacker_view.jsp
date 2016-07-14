@@ -1,8 +1,10 @@
+<%@ page import="org.codedefenders.*" %>
+<%@ page import="static org.codedefenders.AbstractGame.State.ACTIVE" %>
 <% String pageTitle="Attacking Class"; %>
 <%@ include file="/jsp/header_game.jsp" %>
 
 <%
-	if (game.getState().equals(Game.State.FINISHED)) {
+	if (game.getState().equals(AbstractGame.State.FINISHED)) {
 		String message = Constants.DRAW_MESSAGE;
 		if (game.getAttackerScore() > game.getDefenderScore())
 			message = Constants.WINNER_MESSAGE;
@@ -157,7 +159,7 @@
 	<div class="col-md-6" id="newmut-div">
 		<form id="atk" action="play" method="post">
 			<h2>Create a mutant here
-				<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Game.Role.ATTACKER)) {%>
+				<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Role.ATTACKER)) {%>
 				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk" onClick="this.form.submit(); this.disabled=true; this.value='Attacking...';">Attack!</button><%}%>
 			</h2>
 			<input type="hidden" name="formType" value="createMutant">
@@ -210,7 +212,7 @@
 		}
 	});
 
-	<% if (game.getActiveRole().equals(Game.Role.DEFENDER)) {%>
+	<% if (game.getActiveRole().equals(Role.DEFENDER)) {%>
 	function checkForUpdate(){
 		$.post('/play', {
 			formType: "whoseTurn",

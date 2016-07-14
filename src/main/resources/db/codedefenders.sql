@@ -86,7 +86,6 @@ CREATE TABLE `mutants` (
   `RoundKilled` int(11) DEFAULT NULL,
   `Equivalent` enum('ASSUMED_NO','PENDING_TEST','DECLARED_YES','ASSUMED_YES','PROVEN_NO') NOT NULL,
   `Player_ID` int(11) DEFAULT NULL,
-  `Owner_ID` int(11) DEFAULT NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Points` int(11) DEFAULT '0',
   PRIMARY KEY (`Mutant_ID`),
@@ -94,7 +93,6 @@ CREATE TABLE `mutants` (
   KEY `fk_playerId_idx` (`Player_ID`),
   KEY `fk_ownerId_idx` (`Owner_ID`),
   CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ownerId_muts` FOREIGN KEY (`Owner_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -158,7 +156,6 @@ CREATE TABLE `tests` (
   `RoundCreated` int(11) NOT NULL,
   `MutantsKilled` int(11) DEFAULT '0',
   `Player_ID` int(11) NOT NULL,
-  `Owner_ID` int(11) NOT NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Lines_Covered` longtext,
   `Lines_Uncovered` longtext,
@@ -169,7 +166,6 @@ CREATE TABLE `tests` (
   KEY `fk_gameId_tests_idx` (`Game_ID`),
   KEY `fk_playerId_tests_idx` (`Player_ID`),
   CONSTRAINT `fk_gameId_tests` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_ownerId_tests` FOREIGN KEY (`Owner_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

@@ -9,15 +9,14 @@ pageTitle = null;
 <%@ page import="org.codedefenders.Game" %>
 <%@ page import="org.codedefenders.Constants" %>
 <%@ page import="org.codedefenders.DatabaseAccess" %>
-<%@ page import="org.codedefenders.Game" %>
 <%@ page import="org.codedefenders.GameClass" %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerMutant" %>
-<%@ page import="static org.codedefenders.Game.State.ACTIVE" %>
+<%@ page import="static org.codedefenders.AbstractGame.State.ACTIVE" %>
 <div class="game-container">
 <nav class="nest" style="width: 80%; margin-left: auto; margin-right: auto;">
     <div class="crow fly">
         <div style="text-align: left">
-            <h3><%= p %></h3>
+            <h3><%= role %></h3>
         </div>
         <div style="text-align: center"><h1><%= mg.getCUT().getName() %></h1></div>
         <div>

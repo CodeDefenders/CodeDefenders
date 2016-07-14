@@ -44,7 +44,7 @@ public class Mutant {
 	private int roundCreated;
 	private int roundKilled;
 
-	private int ownerId;
+	private int playerId;
 
 	/**
 	 * Creates a mutant
@@ -52,16 +52,16 @@ public class Mutant {
 	 * @param jFile
 	 * @param cFile
 	 * @param alive
-	 * @param ownerId
+	 * @param playerId
 	 */
-	public Mutant(int gameId, String jFile, String cFile, boolean alive, int ownerId) {
+	public Mutant(int gameId, String jFile, String cFile, boolean alive, int playerId) {
 		this.gameId = gameId;
-		this.roundCreated = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
+		this.roundCreated = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
 		this.javaFile = jFile;
 		this.classFile = cFile;
 		this.alive = alive;
 		this.equivalent = Equivalence.ASSUMED_NO;
-		this.ownerId = ownerId;
+		this.playerId = playerId;
 	}
 
 	/**
@@ -124,13 +124,13 @@ public class Mutant {
 		return alive ? 1 : 0;
 	}
 
-	public int getOwnerId() {
-		return ownerId;
+	public int getPlayerId() {
+		return playerId;
 	}
 
 	public void kill() {
 		alive = false;
-		roundKilled = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound();
+		roundKilled = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
 		update();
 	}
 
@@ -138,7 +138,7 @@ public class Mutant {
 		if (alive) {
 			// if mutant is alive, as many points as rounds it has survived
 			// TODO: as many points as tests it has survived?
-			int points = DatabaseAccess.getGameForKey("Game_ID", gameId).getCurrentRound() - roundCreated; // rounds survived
+			int points = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound() - roundCreated; // rounds survived
 			logger.info("Alive mutant " + getId() + " contributes " + points + " attacker points");
 			return points;
 		} else {
@@ -175,7 +175,7 @@ public class Mutant {
 
 	public Patch getDifferences() {
 
-		int classId = DatabaseAccess.getGameForKey("Game_ID", gameId).getClassId();
+		int classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
 		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
 		File sourceFile = new File(sut.getJavaFile());
@@ -188,7 +188,7 @@ public class Mutant {
 	}
 
 	public String getPatchString() {
-		int classId = DatabaseAccess.getGameForKey("Game_ID", gameId).getClassId();
+		int classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
 		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
 		File sourceFile = new File(sut.getJavaFile());
@@ -265,7 +265,7 @@ public class Mutant {
 			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
 			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
 			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID)" +
-					" VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), ownerId);
+					" VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), playerId);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 

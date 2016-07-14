@@ -5,8 +5,6 @@ import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 import org.codedefenders.singleplayer.AiAttacker;
 import org.codedefenders.singleplayer.AiDefender;
 import org.codedefenders.singleplayer.AiPlayer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -14,13 +12,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class Game {
-
-	private static final Logger logger = LoggerFactory.getLogger(Game.class);
-
-	private int id;
-
-	private int classId;
+public class Game extends AbstractGame {
 
 	private int attackerId;
 	private int defenderId;
@@ -30,19 +22,8 @@ public class Game {
 
 	private Role activeRole;
 
-	private State state;
-
-	private Level level;
-
-	private Mode mode;
-
 	protected AiPlayer ai = null;
 	protected String aiDir = null;
-
-	public enum Role { ATTACKER, DEFENDER }
-	public enum State { CREATED, ACTIVE, FINISHED }
-	public enum Level { EASY, MEDIUM, HARD }
-	public enum Mode { SINGLE, DUEL, PARTY, UTESTING }
 
 	public Game(int classId, int userId, int maxRounds, Role role, Level level) {
 		this.classId = classId;
@@ -79,22 +60,6 @@ public class Game {
 		if(attackerId == 1) { ai = new AiAttacker(this); }
 		if(defenderId == 1) { ai = new AiDefender(this); }
 
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public int getClassId() {
-		return classId;
-	}
-
-	public String getClassName() {
-		return DatabaseAccess.getClassForKey("Class_ID", classId).getName();
-	}
-
-	public GameClass getCUT() {
-		return DatabaseAccess.getClassForKey("Class_ID", classId);
 	}
 
 	public int getAttackerId() {
@@ -138,29 +103,6 @@ public class Game {
 		activeRole = role;
 	}
 
-	public State getState() {
-		return state;
-	}
-
-	// CREATED, ACTIVE, FINISHED
-	public void setState(State s) {
-		state = s;
-	}
-
-	public Level getLevel() {
-		return this.level;
-	}
-
-	public void setLevel(Level level) {
-		this.level = level;
-	}
-
-	public Mode getMode() {
-		return this.mode;
-	}
-
-	protected void setMode(Mode newMode) { this.mode = newMode; }
-
 	public ArrayList<Mutant> getMutants() {
 		return DatabaseAccess.getMutantsForGame(id);
 	}
@@ -203,6 +145,7 @@ public class Game {
 		return null;
 	}
 
+	@Override
 	public ArrayList<Test> getTests() {
 		return DatabaseAccess.getTestsForGame(id);
 	}
@@ -261,11 +204,26 @@ public class Game {
 		}
 	}
 
+	public boolean addPlayer(int userId, Role role) {
+
+		String sql = String.format("INSERT INTO players (Game_ID, User_ID, Points, Role) " +
+				"VALUES (%d, %d, 0, '%s');", id, userId, role);
+		if (runStatement(sql)) {
+			if (role.equals(Role.ATTACKER))
+				attackerId = userId;
+			else
+				defenderId = userId;
+			return true;
+		};
+		return false;
+	}
+
+	@Override
 	public boolean insert() {
 
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = null;
+		String sql = String.format("INSERT INTO games (Class_ID, Creator_ID, FinalRound, Level) VALUES ('%d', '%d', '%d', '%s');", classId, (attackerId != 0) ? attackerId : defenderId, finalRound, level.name());
 
 		// Attempt to insert game info into database
 		try {
@@ -274,11 +232,6 @@ public class Game {
 			stmt = conn.createStatement();
 			System.out.println(attackerId);
 			System.out.println(defenderId);
-			if (attackerId != 0) {
-				sql = String.format("INSERT INTO games (Attacker_ID, FinalRound, Class_ID, Level) VALUES ('%d', '%d', '%d', '%s');", attackerId, finalRound, classId, level.name());
-			} else {
-				sql = String.format("INSERT INTO games (Defender_ID, FinalRound, Class_ID, Level) VALUES ('%d', '%d', '%d', '%s');", defenderId, finalRound, classId, level.name());
-			}
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -316,6 +269,7 @@ public class Game {
 		return false;
 	}
 
+	@Override
 	public boolean update() {
 
 		Connection conn = null;
@@ -328,11 +282,11 @@ public class Game {
 			// Get all rows from the database which have the chosen username
 			stmt = conn.createStatement();
 			if (this.mode.equals(Mode.UTESTING))
-				sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s' WHERE Game_ID='%d'",
-						currentRound, finalRound, activeRole, state.name(), level.name(), id);
+				sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', State='%s' WHERE ID='%d'",
+						currentRound, finalRound, state.name(), id);
 			else
-				sql = String.format("UPDATE games SET Attacker_ID='%d', Defender_ID='%d', CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s', Level='%s', Mode='%s' WHERE Game_ID='%d'",
-						attackerId, defenderId, currentRound, finalRound, activeRole, state.name(), level.name(), mode.name(), id);
+				sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s' WHERE ID='%d'",
+						currentRound, finalRound, activeRole, state.name(), id);
 			stmt.execute(sql);
 			return true;
 

@@ -2,8 +2,6 @@ package org.codedefenders.multiplayer;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -11,19 +9,11 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import static org.codedefenders.Mutant.Equivalence.ASSUMED_NO;
-import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 
-public class MultiplayerGame {
-
-	private static final Logger logger = LoggerFactory.getLogger(MultiplayerGame.class);
-
-	public enum Status {
-		CREATED, ACTIVE, FINISHED;
-	}
+public class MultiplayerGame extends AbstractGame {
 
 	private int id;
 
@@ -41,20 +31,20 @@ public class MultiplayerGame {
 	private int minAttackers;
 	private int minDefenders;
 	private long finishTime;
-	private Status status;
+	private State state;
 
 	private Game.Level level;
 
 	public void setId(int id) {
 		this.id = id;
-		if (this.status != Status.FINISHED && finishTime < System.currentTimeMillis()){
-			this.status = Status.FINISHED;
+		if (this.state != State.FINISHED && finishTime < System.currentTimeMillis()){
+			this.state = State.FINISHED;
 			update();
 		}
 	}
 
-	public Status getStatus(){
-		return status;
+	public State getState(){
+		return state;
 	}
 
 	public void setClassId(int classId) {
@@ -126,7 +116,7 @@ public class MultiplayerGame {
 		this.attackerLimit = attackerLimit;
 		this.minDefenders = minDefenders;
 		this.minAttackers = minAttackers;
-		this.status = Status.valueOf(status);
+		this.state = State.valueOf(status);
 		this.finishTime = finishTime;
 	}
 
@@ -224,76 +214,23 @@ public class MultiplayerGame {
 
 	public int[] getPlayerIds() { return ArrayUtils.addAll(getDefenderIds(), getAttackerIds());}
 
-	public boolean addUserAsAttacker(int userId) {
-		if (status != Status.FINISHED && (defenderLimit == 0 || getDefenderIds().length < defenderLimit)) {
+	public boolean addPlayer(int userId, Role role) {
+		if (state != State.FINISHED && canJoinGame(role)) {
 			String sql = String.format("INSERT INTO players " +
 							"(Game_ID, User_ID, Points, Role) VALUES " +
 							"(%d, %d, 0, '%s');",
-					id, userId, Participance.ATTACKER);
+					id, userId, role);
 
 			return runStatement(sql);
 		}
 		return false;
 	}
 
-	public boolean addUserAsDefender(int userId) {
-		if (status != Status.FINISHED && (attackerLimit == 0 || getAttackerIds().length < attackerLimit)) {
-			String sql = String.format("INSERT INTO players " +
-							"(Game_ID, User_ID, Points, Role) VALUES " +
-							"(%d, %d, 0, '%s');",
-					id, userId, Participance.DEFENDER);
-
-			return runStatement(sql);
-		}
-		return false;
-	}
-
-	public boolean runStatement(String sql) {
-
-		Connection conn = null;
-		Statement stmt = null;
-
-		System.out.println(sql);
-
-		// Attempt to insert game info into database
-		try {
-			conn = DatabaseAccess.getConnection();
-
-			stmt = conn.createStatement();
-			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
-
-			ResultSet rs = stmt.getGeneratedKeys();
-
-			if (rs.next()) {
-				id = rs.getInt(1);
-				stmt.close();
-				conn.close();
-				return true;
-			}
-
-		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				System.out.println(se);
-			}//end finally try
-		} //end try
-
-		return false;
+	private boolean canJoinGame(Role role) {
+		if (role.equals(Role.ATTACKER))
+			return (attackerLimit == 0 || getAttackerIds().length < attackerLimit);
+		else
+			return (defenderLimit == 0 || getDefenderIds().length < defenderLimit);
 	}
 
 	public boolean insert() {
@@ -309,11 +246,11 @@ public class MultiplayerGame {
 			stmt = conn.createStatement();
 			sql = String.format("INSERT INTO games " +
 					"(Class_ID, Level, Price, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " +
-					"Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Finish_Time, Status, Mode) VALUES " +
+					"Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Finish_Time, State, Mode) VALUES " +
 					"('%s', 	'%s', '%f', 	'%d',			'%d',			'%f',			'%f',		'%d'," +
 					"'%d',				'%d',				'%d',			'%d',			'%d',		'%s', 'PARTY');",
 					classId, level.name(), price, defenderValue, attackerValue, lineCoverage, mutantCoverage, creatorId,
-					minAttackers, minDefenders, attackerLimit, defenderLimit, finishTime, status.name());
+					minAttackers, minDefenders, attackerLimit, defenderLimit, finishTime, state.name());
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -364,8 +301,8 @@ public class MultiplayerGame {
 			stmt = conn.createStatement();
 				sql = String.format("UPDATE games SET " +
 						"Class_ID = '%s', Level = '%s', Price = %f, Defender_Value=%d, Attacker_Value=%d, Coverage_Goal=%f" +
-						", Mutant_Goal=%f, Status='%s' WHERE ID='%d'",
-						classId, level.name(), price, defenderValue, attackerValue, lineCoverage, mutantCoverage, status.name(), id);
+						", Mutant_Goal=%f, State='%s' WHERE ID='%d'",
+						classId, level.name(), price, defenderValue, attackerValue, lineCoverage, mutantCoverage, state.name(), id);
 			stmt.execute(sql);
 			return true;
 
@@ -394,10 +331,6 @@ public class MultiplayerGame {
 		} //end try
 
 		return false;
-	}
-
-	public Participance getParticipance(int userId){
-		return DatabaseAccess.getParticipance(userId, getId());
 	}
 
 	public HashMap<Integer, Integer> getMutantScores(){
@@ -435,5 +368,4 @@ public class MultiplayerGame {
 
 		return testScores;
 	}
-
 }

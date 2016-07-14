@@ -26,7 +26,7 @@ public class AiAttacker extends AiPlayer {
 
 	public AiAttacker(Game g) {
 		super(g);
-		role = Game.Role.ATTACKER;
+		role = Role.ATTACKER;
 	}
 
 	/**

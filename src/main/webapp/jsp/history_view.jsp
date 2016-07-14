@@ -1,3 +1,4 @@
+<%@ page import="org.codedefenders.*" %>
 <% String pageTitle="Game History"; %>
 <%@ include file="/jsp/header.jsp" %>
 <div>
@@ -66,7 +67,7 @@
 		%>
 		<%
 			for (MultiplayerGame g : mgames) {
-				Participance participance = g.getParticipance(uid);
+				Role role = g.getRole(uid);
 		%>
 		<tr>
 			<td class="col-sm-2"><%= g.getId() %></td>
@@ -74,7 +75,7 @@
 			<td class="col-sm-2"><%= g.getPrice() %></td>
 			<td class="col-sm-2"><%= g.getLevel().name() %></td>
 			<td class="col-sm-2"><%
-				switch(participance){
+				switch(role){
 					case ATTACKER:
 			%>
 				<a href="multiplayer/games?id=<%= g.getId() %>">Attack</a>

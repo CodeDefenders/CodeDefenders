@@ -1,6 +1,7 @@
 package org.codedefenders.singleplayer;
 
 import org.codedefenders.Game;
+import org.codedefenders.Role;
 
 /**
  * @author Ben Clegg
@@ -15,7 +16,7 @@ public class AiPlayer {
 	}
 
 	protected Game game;
-	protected Game.Role role;
+	protected Role role;
 
 	public AiPlayer(Game g) {
 		game = g;

@@ -110,7 +110,7 @@ public class UploadManager extends HttpServlet {
 			newSUT.insert();
 
 			//Prepare AI classes, by generating tests and mutants.
-			new PrepareAI(newSUT.getId());
+			//new PrepareAI(newSUT.getId());
 
 			response.sendRedirect("games/user");
 

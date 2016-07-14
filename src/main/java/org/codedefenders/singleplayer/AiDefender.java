@@ -23,7 +23,7 @@ public class AiDefender extends AiPlayer {
 
 	public AiDefender(Game g) {
 		super(g);
-		role = Game.Role.DEFENDER;
+		role = Role.DEFENDER;
 	}
 	public boolean turnHard() {
 		//Run all generated tests for class.

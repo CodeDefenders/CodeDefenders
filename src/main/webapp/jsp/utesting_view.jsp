@@ -51,8 +51,8 @@
 <%@ page import="org.codedefenders.Test" %>
 <%@ page import="org.codedefenders.Game" %>
 <%@ page import="org.codedefenders.Constants" %>
-<%@ page import="static org.codedefenders.Game.State.ACTIVE" %>
-<%@ page import="static org.codedefenders.Game.State.FINISHED" %>
+<%@ page import="static org.codedefenders.AbstractGame.State.ACTIVE" %>
+<%@ page import="static org.codedefenders.AbstractGame.State.FINISHED" %>
 <% Game uTestingSession = (Game) session.getAttribute("game"); %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">

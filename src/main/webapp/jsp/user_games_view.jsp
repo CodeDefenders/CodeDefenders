@@ -1,6 +1,6 @@
-<%@ page import="org.codedefenders.DatabaseAccess" %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
-<%@ page import="org.codedefenders.multiplayer.Participance" %>
+<%@ page import="org.codedefenders.Role" %>
+<%@ page import="org.codedefenders.*" %>
 <% String pageTitle="My Games"; %>
 <%@ include file="/jsp/header.jsp" %>
 	<%
@@ -41,7 +41,7 @@
 			}
 
 			int turnId = g.getAttackerId();
-			if (g.getActiveRole().equals(Game.Role.DEFENDER))
+			if (g.getActiveRole().equals(Role.DEFENDER))
 				turnId = g.getDefenderId();
 
 			if (atkName == null) {atkName = "Empty";}
@@ -57,7 +57,7 @@
 		<td class="col-sm-2"><%= g.getLevel().name() %></td>
 		<td class="col-sm-2">
 <%
-			if (g.getState().equals(Game.State.ACTIVE)) { // Can enter only if game is in progress.
+			if (g.getState().equals(AbstractGame.State.ACTIVE)) { // Can enter only if game is in progress.
 				String btnLabel = "Your Turn";
 				if (g.getMode().equals(Game.Mode.UTESTING)) {
 					btnLabel = "Enter";
@@ -99,7 +99,7 @@
 %>
 	<%
 		for (MultiplayerGame g : mgames) {
-			Participance participance = g.getParticipance(uid);
+			Role role = g.getRole(uid);
 	%>
 	<tr>
 		<td class="col-sm-2"><%= g.getId() %></td>
@@ -107,7 +107,7 @@
 		<td class="col-sm-2"><%= g.getPrice() %></td>
 		<td class="col-sm-2"><%= g.getLevel().name() %></td>
 		<td class="col-sm-2"><%
-			switch(participance){
+			switch(role){
 				case ATTACKER:
 					%>
 			<a href="multiplayer/games?id=<%= g.getId() %>">Attack</a>

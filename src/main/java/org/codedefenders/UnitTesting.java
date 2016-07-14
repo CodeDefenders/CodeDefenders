@@ -100,7 +100,7 @@ public class UnitTesting extends HttpServlet {
 				if (activeGame.getState().equals(Game.State.FINISHED))
 					messages.add("Great! Unit testing goal achieved. Session finished.");
 			} else {
-				// testOriginalTarget.status.equals("FAIL") || testOriginalTarget.status.equals("ERROR")
+				// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
 				messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 				messages.add(testOriginalTarget.message);
 				session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);

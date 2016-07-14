@@ -33,7 +33,7 @@
                 Integer.parseInt(request.getParameter("minDefenders")),
                 Integer.parseInt(request.getParameter("minAttackers")),
                 Long.parseLong(request.getParameter("finishTime")),
-                MultiplayerGame.Status.CREATED.name());
+                MultiplayerGame.State.CREATED.name());
 
                 */
 			%>

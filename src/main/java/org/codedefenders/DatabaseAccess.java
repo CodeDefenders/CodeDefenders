@@ -3,9 +3,7 @@ package org.codedefenders;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.multiplayer.MultiplayerMutant;
-import org.codedefenders.multiplayer.Participance;
 
-import javax.mail.Part;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -237,12 +235,19 @@ public class DatabaseAccess {
 			conn = getConnection();
 
 			stmt = conn.createStatement();
-			sql = String.format("SELECT * FROM games WHERE %s='%d' AND Mode!='PARTY';", keyName, id);
+			sql = String.format("SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," +
+					"g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" +
+					"IFNULL(att.User_ID,0) AS Attacker_ID, IFNULL(def.User_ID,0) AS Defender_ID\n" +
+					"FROM games as g\n" +
+					"LEFT JOIN players as att ON g.ID=att.Game_ID  AND att.Role='ATTACKER'\n" +
+					"LEFT JOIN players AS def ON g.ID=def.Game_ID AND def.Role='DEFENDER'\n" +
+					"WHERE g.%s='%d';\n", keyName, id);
+
 			ResultSet rs = stmt.executeQuery(sql);
 
 			if (rs.next()) {
 				Game gameRecord = new Game(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
-						rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
+						rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), AbstractGame.State.valueOf(rs.getString("State")),
 						Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode")));
 
 				stmt.close();
@@ -279,21 +284,22 @@ public class DatabaseAccess {
 	 * @return
 	 */
 	public static ArrayList<Game> getGamesForUser(int userId) {
-		// TODO: Write proper query to get players info into attacker and deffender ids
-		return new ArrayList<Game>();
-		/*
-		String sql = String.format("SELECT * FROM games AS m " +
-				"LEFT JOIN players as p ON p.Game_ID=m.ID " +
-				"WHERE m.Mode != 'PARTY' AND (p.User_ID=%d OR m.Creator_ID=%d) AND m.Status != 'FINISHED' " +
-				"GROUP BY m.ID;", userId, userId, userId);
+
+		String sql = String.format("SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," +
+				"g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" +
+				"IFNULL(att.User_ID,0) AS Attacker_ID, IFNULL(def.User_ID,0) AS Defender_ID\n" +
+				"FROM games as g\n" +
+				"LEFT JOIN players as att ON g.ID=att.Game_ID  AND att.Role='ATTACKER'\n" +
+				"LEFT JOIN players AS def ON g.ID=def.Game_ID AND def.Role='DEFENDER'\n" +
+				"WHERE g.Mode != 'PARTY' AND (g.Creator_ID=%d OR IFNULL(att.User_ID,0)=%d OR IFNULL(def.User_ID,0)=%d);\n", userId, userId, userId);
+
 		return getGames(sql);
-		*/
 	}
 
 	public static ArrayList<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
 		String sql = String.format("SELECT * FROM games AS m " +
 				"LEFT JOIN players as p ON p.Game_ID=m.ID " +
-				"WHERE m.Mode = 'PARTY' AND (p.User_ID=%d OR m.Creator_ID=%d) AND m.Status != 'FINISHED' " +
+				"WHERE m.Mode = 'PARTY' AND (p.User_ID=%d OR m.Creator_ID=%d) AND m.State != 'FINISHED' " +
 				"GROUP BY m.ID;", userId, userId, userId);
 		return getMultiplayerGames(sql);
 	}
@@ -301,7 +307,7 @@ public class DatabaseAccess {
 	public static ArrayList<MultiplayerGame> getFinishedMultiplayerGamesForUser(int userId) {
 		String sql = String.format("SELECT * FROM games AS m " +
 				"LEFT JOIN players as p ON p.Game_ID=m.ID " +
-				"WHERE (p.User_ID=%d OR m.Creator_ID=%d) AND m.Status = 'FINISHED' AND m.Mode='PARTY'" +
+				"WHERE (p.User_ID=%d OR m.Creator_ID=%d) AND m.State = 'FINISHED' AND m.Mode='PARTY'" +
 				"GROUP BY m.ID;", userId, userId, userId);
 		return getMultiplayerGames(sql);
 	}
@@ -313,7 +319,7 @@ public class DatabaseAccess {
 		return getMultiplayerGames(sql);
 	}
 
-	public static Participance getParticipance(int userId, int gameId){
+	public static Role getRole(int userId, int gameId){
 		String sql = String.format("SELECT * FROM games AS m " +
 				"LEFT JOIN players AS p ON p.Game_ID = m.ID " +
 				"WHERE m.ID = %d AND (m.Creator_ID=%d OR (p.User_ID=%d AND p.Game_ID=%d))",
@@ -321,7 +327,7 @@ public class DatabaseAccess {
 
 		Connection conn = null;
 		Statement stmt = null;
-		Participance participance = Participance.NONE;
+		Role role = Role.NONE;
 
 		try {
 			conn = getConnection();
@@ -331,10 +337,10 @@ public class DatabaseAccess {
 
 			while (rs.next()) {
 				if (rs.getInt("Creator_ID") == userId) {
-					participance = Participance.CREATOR;
+					role = Role.CREATOR;
 				} else {
 					try {
-						participance = Participance.valueOf(rs.getString("Role"));
+						role = Role.valueOf(rs.getString("Role"));
 					} catch (NullPointerException | SQLException e){}
 
 				}
@@ -366,7 +372,7 @@ public class DatabaseAccess {
 			}//end finally try
 		} //end try
 
-		return participance;
+		return role;
 	}
 
 	/**
@@ -385,7 +391,15 @@ public class DatabaseAccess {
 	}
 
 	public static ArrayList<Game> getOpenGames() {
-		String sql = "SELECT * FROM games where (Mode='DUEL' AND Status='CREATED') OR (Mode='PARTY' AND Status!='FINISHED');";
+
+		String sql = String.format("SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," +
+				"g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" +
+				"IFNULL(att.User_ID,0) AS Attacker_ID, IFNULL(def.User_ID,0) AS Defender_ID\n" +
+				"FROM games as g\n" +
+				"LEFT JOIN players as att ON g.ID=att.Game_ID  AND att.Role='ATTACKER'\n" +
+				"LEFT JOIN players AS def ON g.ID=def.Game_ID AND def.Role='DEFENDER'\n" +
+				"WHERE g.Mode = 'DUEL' AND g.State = 'CREATED';");
+
 		return getGames(sql);
 	}
 
@@ -412,7 +426,7 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				gameList.add(new Game(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
 						rs.getInt("Class_ID"), rs.getInt("CurrentRound"), rs.getInt("FinalRound"),
-						Game.Role.valueOf(rs.getString("ActiveRole")), Game.State.valueOf(rs.getString("State")),
+						Role.valueOf(rs.getString("ActiveRole")), AbstractGame.State.valueOf(rs.getString("State")),
 						Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode"))));
 			}
 			stmt.close();
@@ -472,7 +486,7 @@ public class DatabaseAccess {
 						(float)rs.getDouble("Mutant_Goal"), rs.getInt("Price"), rs.getInt("Defender_Value"),
 						rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
 						rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getLong("Finish_Time"),
-								rs.getString("Status"));
+								rs.getString("State"));
 				mg.setId(rs.getInt("ID"));
 				gameList.add(mg);
 			}
@@ -920,7 +934,7 @@ public class DatabaseAccess {
 
 	public static int[] getDefendersForMultiplayerGame(int gameId) {
 		String sql = String.format("SELECT * FROM players " +
-				"WHERE Game_ID = %d AND Role='%s'", gameId, Participance.DEFENDER); // that pass on original CUT
+				"WHERE Game_ID = %d AND Role='%s'", gameId, Role.DEFENDER); // that pass on original CUT
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -975,7 +989,7 @@ public class DatabaseAccess {
 
 	public static int[] getAttackersForMultiplayerGame(int gameId) {
 		String sql = String.format("SELECT * FROM players " +
-				"WHERE Game_ID = %d AND Role='%s'", gameId, Participance.ATTACKER); // that pass on original CUT
+				"WHERE Game_ID = %d AND Role='%s'", gameId, Role.ATTACKER); // that pass on original CUT
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -1120,7 +1134,7 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				TargetExecution newExecution = new TargetExecution(rs.getInt("TargetExecution_ID"), rs.getInt("Test_ID"),
 						rs.getInt("Mutant_ID"), TargetExecution.Target.valueOf(rs.getString("Target")),
-						rs.getString("Status"), rs.getString("Message"), rs.getString("Timestamp"));
+						rs.getString("State"), rs.getString("Message"), rs.getString("Timestamp"));
 				executionList.add(newExecution);
 			}
 

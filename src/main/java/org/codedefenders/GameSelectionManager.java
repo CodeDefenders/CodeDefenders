@@ -43,7 +43,7 @@ public class GameSelectionManager extends HttpServlet {
 
 				int rounds = Integer.parseInt(request.getParameter("rounds"));
 				String modeName = request.getParameter("mode");
-				Game.Role role = request.getParameter("role") == null ? Game.Role.DEFENDER : Game.Role.ATTACKER;
+				Role role = request.getParameter("role") == null ? Role.DEFENDER : Role.ATTACKER;
 				Game.Level level = request.getParameter("level") == null ? Game.Level.HARD : Game.Level.EASY;
 				Game.Mode mode = null;
 
@@ -62,13 +62,15 @@ public class GameSelectionManager extends HttpServlet {
 						//Create singleplayer game.
 						SingleplayerGame nGame = new SingleplayerGame(classId, uid, rounds, role, level);
 						nGame.insert();
-						nGame.setState(Game.State.ACTIVE);
-						nGame.update();
 						nGame.tryFirstTurn();
 					} else {
 						// Create the game with supplied parameters and insert it in the database.
 						Game nGame = new Game(classId, uid, rounds, role, level);
 						nGame.insert();
+						if (nGame.getAttackerId() != 0)
+							nGame.addPlayer(uid, Role.ATTACKER);
+						else
+							nGame.addPlayer(uid, Role.DEFENDER);
 					}
 
 
@@ -83,9 +85,9 @@ public class GameSelectionManager extends HttpServlet {
 				// Get the identifying information required to create a game from the submitted form.
 				gameId = Integer.parseInt(request.getParameter("game"));
 
-				Game jGame = DatabaseAccess.getGameForKey("Game_ID", gameId);
+				Game jGame = DatabaseAccess.getGameForKey("ID", gameId);
 
-				if ((jGame.getAttackerId() == uid) && (jGame.getDefenderId() == uid)) {
+				if ((jGame.getAttackerId() == uid) || (jGame.getDefenderId() == uid)) {
 					// uid is already in the game
 					if (jGame.getDefenderId() == uid)
 						messages.add("Already a defender in this game!");
@@ -96,30 +98,30 @@ public class GameSelectionManager extends HttpServlet {
 					break;
 				} else {
 					if (jGame.getAttackerId() == 0) {
-						jGame.setAttackerId(uid);
+						jGame.addPlayer(uid, Role.ATTACKER);
 						messages.add("Joined game as an attacker.");
 					} else if (jGame.getDefenderId() == 0) {
 						messages.add("Joined game as a defender.");
-						jGame.setDefenderId(uid);
+						jGame.addPlayer(uid, Role.DEFENDER);
 					} else {
-						messages.add("MultiplayerGame is no longer open.");
+						messages.add("Game is no longer open.");
 						response.sendRedirect(request.getHeader("referer"));
 						break;
 					}
+					// user joined, update game
+					jGame.setState(Game.State.ACTIVE);
+					jGame.setActiveRole(Role.ATTACKER);
+					jGame.update();
+					// go to play view
+					session.setAttribute("gid", gameId);
+					response.sendRedirect("play");
+					break;
 				}
-				// user joined, update game
-				jGame.setState(Game.State.ACTIVE);
-				jGame.setActiveRole(Game.Role.ATTACKER);
-				jGame.update();
-				// go to play view
-				session.setAttribute("gid", gameId);
-				response.sendRedirect("play");
-				break;
 
 			case "enterGame":
 
 				gameId = Integer.parseInt(request.getParameter("game"));
-				Game eGame = DatabaseAccess.getGameForKey("Game_ID", gameId);
+				Game eGame = DatabaseAccess.getGameForKey("ID", gameId);
 
 				if (eGame.isUserInGame(uid)) {
 					session.setAttribute("gid", gameId);
