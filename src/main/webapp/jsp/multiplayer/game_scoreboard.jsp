@@ -1,4 +1,8 @@
-<%@ page import="java.util.HashMap" %><%
+<%@ page import="java.util.HashMap" %>
+<%@ page import="org.codedefenders.DatabaseAccess" %>
+<%@ page import="org.codedefenders.User" %>
+<%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
+<%
 
     HashMap mutantScores = mg.getMutantScores();
 
@@ -19,26 +23,34 @@
             </div>
             <div class="modal-body">
                 <table class="scoreboard">
-                    <tr class="attacker header"><th>Attackers</th><th>Mutation+Equivalence Points</th><th>Total Points</th></tr>
+                    <tr class="attacker header"><th>Attackers</th><th>Mutants</th><th>Mutation+Equivalence Points</th><th>Total Points</th></tr>
                     <%
                     for (int index = 0; index < attackers.length; index++){
                         int i = attackers[index];
+                        User aUser = DatabaseAccess.getUserFromPlayer(i);
                         int total = 0;
+                        int counter = 0;
                         %>
                         <tr class="attacker"><td>
-                                <%=i%>
+                                <%=aUser.username%>
                             </td>
                             <td><%
+                                if (mutantScores.containsKey(i) && mutantScores.get(i) != null){ %>
+                                <%= ((MultiplayerGame.PlayerScore)mutantScores.get(i)).getQuantity() %>
+                                <% } else { %>
+                                0
+                                <% } %></td>
+                            <td><%
                                 if (mutantScores.containsKey(i) && mutantScores.get(i) != null){
-                                    total += ((Integer)mutantScores.get(i)).intValue(); %>
-                                <%= mutantScores.get(i)%>
+                                    total += ((MultiplayerGame.PlayerScore)mutantScores.get(i)).getTotalScore(); %>
+                                <%= ((MultiplayerGame.PlayerScore)mutantScores.get(i)).getTotalScore() %>
                                 <% } else { %>
                                     0
                                 <% }
 
                                   if (testScores.containsKey(i) && testScores.get(i) != null){
-                                    total += ((Integer)testScores.get(i)).intValue(); %>
-                                    +<%=testScores.get(i) %>
+                                    total += ((MultiplayerGame.PlayerScore)testScores.get(i)).getTotalScore(); %>
+                                    +<%= ((MultiplayerGame.PlayerScore)testScores.get(i)).getTotalScore() %>
                                     <% } %></td>
                             <td>
                                 <%= total %>
@@ -50,15 +62,21 @@
                     <%
                         for (int index = 0; index < defenders.length; index++){
                             int i = defenders[index];
+                            User dUser = DatabaseAccess.getUserFromPlayer(i);
                             int total = 0;
                     %>
-                    <tr class="defender header"><th>Defenders</th><th></th><th>Total Points</th></tr>
+                    <tr class="defender header"><th>Defenders</th><th>Tests</th><th></th><th>Total Points</th></tr>
                     <tr class="defender"><td>
-                        <%=i%>
+                        <%=dUser.username%>
                     </td>
                         <td><%
+                            if (testScores.containsKey(i) && testScores.get(i) != null){ %>
+                                <%= ((MultiplayerGame.PlayerScore)testScores.get(i)).getQuantity() %>
+
+                            <% } %></td>
+                        <td><%
                             if (testScores.containsKey(i) && testScores.get(i) != null){
-                                    total += ((Integer)testScores.get(i)).intValue(); %>
+                                    total += ((MultiplayerGame.PlayerScore)testScores.get(i)).getTotalScore(); %>
 
                             <% } %></td>
                         <td>

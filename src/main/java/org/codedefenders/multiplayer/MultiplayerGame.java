@@ -333,8 +333,44 @@ public class MultiplayerGame extends AbstractGame {
 		return false;
 	}
 
-	public HashMap<Integer, Integer> getMutantScores(){
-		HashMap<Integer, Integer> mutantScores = new HashMap<Integer, Integer>();
+	public class PlayerScore {
+		private int playerId;
+		private int totalScore;
+		private int quantity;
+
+		public PlayerScore(int playerId) {
+			this.playerId = playerId;
+			this.totalScore = 0;
+			this.quantity = 0;
+		}
+
+		public int getPlayerId() {
+			return playerId;
+		}
+
+		public int getTotalScore() {
+			return totalScore;
+		}
+
+		public int getQuantity() {
+			return quantity;
+		}
+
+		public void setPlayerId(int playerId) {
+			this.playerId = playerId;
+		}
+
+		public void increaseTotalScore(int score) {
+			this.totalScore += score;
+		}
+
+		public void increaseQuantity() {
+			quantity++;
+		}
+	}
+
+	public HashMap<Integer, PlayerScore> getMutantScores(){
+		HashMap<Integer, PlayerScore> mutantScores = new HashMap<Integer, PlayerScore>();
 
 		ArrayList<MultiplayerMutant> allMutants = new ArrayList<MultiplayerMutant>();
 		allMutants.addAll(getAliveMutants());
@@ -348,22 +384,26 @@ public class MultiplayerGame extends AbstractGame {
 
 		for (MultiplayerMutant mm : allMutants){
 			if (!mutantScores.containsKey(mm.getPlayerId())){
-				mutantScores.put(mm.getPlayerId(), 0);
+				mutantScores.put(mm.getPlayerId(), new PlayerScore(mm.getPlayerId()));
 			}
 
-			mutantScores.put(mm.getPlayerId(), mutantScores.get(mm.getPlayerId())+mm.getScore());
+			PlayerScore ps = mutantScores.get(mm.getPlayerId());
+			ps.increaseQuantity();
+			ps.increaseTotalScore(mm.getScore());
 		}
 		return mutantScores;
 	}
 
-	public HashMap<Integer, Integer> getTestScores(){
-		HashMap<Integer, Integer> testScores = new HashMap<Integer, Integer>();
+	public HashMap<Integer, PlayerScore> getTestScores(){
+		HashMap<Integer, PlayerScore> testScores = new HashMap<Integer, PlayerScore>();
 
 		for (Test tt : getTests()){
 			if (!testScores.containsKey(tt.getPlayerId())){
-				testScores.put(tt.getPlayerId(), 0);
+				testScores.put(tt.getPlayerId(), new PlayerScore(tt.getPlayerId()));
 			}
-			testScores.put(tt.getPlayerId(), testScores.get(tt.getPlayerId()) + tt.getScore());
+			PlayerScore ps = testScores.get(tt.getPlayerId());
+			ps.increaseQuantity();
+			ps.increaseTotalScore(tt.getScore());
 		}
 
 		return testScores;

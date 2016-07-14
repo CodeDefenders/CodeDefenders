@@ -87,14 +87,9 @@
                         <div class="tabs-blue-grey">
                             <a href="/" class="main-title">
                                 <div class="crow">
-                                    <div class="w-6">
+                                    <div class="ws-12" style="font-size: 36px; text-align: center;">
                                         <span><img class="logo" href="/" src="images/logo.png"/></span>
-                                    </div>
-                                    <div class="w-88" style="font-size: 36px; text-align: center;">
                                         Code Defenders
-                                    </div>
-                                    <div class="w-6">
-                                        <!--<span><img class="logo" href="/" src="images/pass.png"/></span>-->
                                     </div>
                                 </div>
                             </a>

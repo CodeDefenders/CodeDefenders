@@ -1,6 +1,6 @@
 <% if (role.equals(Role.DEFENDER) || role.equals(Role.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){
 %>
-<div class="col-md-6">
+<div class="ws-6">
     <h2> JUnit tests </h2>
     <div class="slider single-item">
         <%

@@ -130,6 +130,53 @@ public class DatabaseAccess {
 		return classList;
 	}
 
+	public static User getUserFromPlayer(int playerId) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			sql = String.format("SELECT * FROM users AS u " +
+					"LEFT JOIN players AS p ON p.User_ID=u.User_ID " +
+					"WHERE p.ID='%d';", playerId);
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"));
+
+				stmt.close();
+				conn.close();
+				return userRecord;
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+			//Handle errors for JDBC
+		} catch (Exception e) {
+			System.out.println(e);
+			//Handle errors for Class.forName
+		} finally {
+			//finally block used to close resources
+			try {
+				if (stmt != null)
+					stmt.close();
+			} catch (SQLException se2) {
+			}// nothing we can do
+
+			try {
+				if (conn != null)
+					conn.close();
+			} catch (SQLException se) {
+				System.out.println(se);
+			}//end finally try
+		} //end try
+
+		return null;
+	}
+
 	public static User getUserForKey(String keyName, int id) {
 
 		Connection conn = null;

@@ -1,7 +1,7 @@
 <%@ page import="org.codedefenders.Game" %>
 <%@ page import="org.codedefenders.Role" %>
-<div class="col-md-6" id="mutants-div">
-		<h2>Mutants</h2>
+<div class="ws-12" id="mutants-div">
+		<h2>Existing Mutants</h2>
 <%
 if (role == Role.ATTACKER && true){
     int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
@@ -61,27 +61,32 @@ if (role == Role.ATTACKER && true){
 
  if (renderMutants) { %>
 		<!-- Nav tabs -->
-		<ul class="nav nav-tabs" role="tablist">
-			<li class="active">
-				<a href="#mutalivetab" role="tab" data-toggle="tab">Alive</a>
-			</li>
-			<li>
-				<a href="#mutkilledtab" role="tab" data-toggle="tab">Killed</a>
-			</li>
-            <li>
-                <a href="#mutequivtab" role="tab" data-toggle="tab">Equivalent</a>
-            </li>
-		</ul>
-		<div class="tab-content">
+		<div class="tabs bg-grey bg-minus-3" role="tablist">
+			<div class="crow fly no-gutter down">
+
+				<div>
+					<a class="tab-link button text-black" href="#mutalivetab" role="tab" data-toggle="tab">Alive (<%= mutantsAlive.size() %>)</a>
+				</div>
+				<div>
+					<a class="tab-link button text-black" href="#mutkilledtab" role="tab" data-toggle="tab">Killed(<%= mutantsKilled.size() %>)</a>
+				</div>
+				<div>
+					<a class="tab-link button text-black" href="#mutequivtab" role="tab" data-toggle="tab">Equivalent(<%= mutantsEquiv.size() %>)</a>
+				</div>
+			</div>
+		<div class="tab-content bg-grey">
 			<div class="tab-pane fade active in" id="mutalivetab">
-				<table class="table table-hover table-responsive table-paragraphs">
+				<table class="table table-hover table-responsive table-paragraphs bg-white">
 					<%
 					if (! mutantsAlive.isEmpty()) {
 						for (MultiplayerMutant m : mutantsAlive) {
 					%>
 					<tr>
-						<td><h4>Mutant <%= m.getId() %></h4></td>
-						<td>
+						<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4>
+							<% for (String change : m.getHTMLReadout()) { %>
+							<p><%=change%><p>
+							<% } %></td>
+						<td class="col-sm-1">
 							<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){ %>
 								<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 							<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
@@ -106,31 +111,27 @@ if (role == Role.ATTACKER && true){
 							<% } %>
 						</td>
 					</tr>
-					<tr>
-						<td colspan="3">
-							<% for (String change :	m.getHTMLReadout()) { %>
-							<p><%=change%><p>
-								<% } %>
-						</td>
-					</tr>
 					<%
 						}
 					} else {%>
-					<tr class="blank_row">
-						<td class="row-borderless" colspan="2">No mutants alive.</td>
+					<tr>
+						<td class="col-sm-1" colspan="2">No mutants alive.</td>
 					</tr>
 					<%}
 					%>
 				</table>
 			</div>
-			<div class="tab-pane fade" id="mutkilledtab">
-				<table class="table table-hover table-responsive table-paragraphs">
+			<div class="tab-pane fade  bg-grey" id="mutkilledtab">
+				<table class="table table-hover table-responsive table-paragraphs bg-white">
 					<%
 					if (! mutantsKilled.isEmpty()) {
 						for (MultiplayerMutant m : mutantsKilled) {
 					%>
 					<tr>
-						<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4></td>
+						<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4>
+							<% for (String change : m.getHTMLReadout()) { %>
+							<p><%=change%><p>
+							<% } %></td>
 						<td class="col-sm-1">
 							<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 							<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
@@ -152,31 +153,27 @@ if (role == Role.ATTACKER && true){
 							</div>
 						</td>
 					</tr>
-					<tr>
-						<td class="col-sm-1" colspan="3">
-							<% for (String change : m.getHTMLReadout()) { %>
-							<p><%=change%><p>
-								<% } %>
-						</td>
-					</tr>
 					<%
 						}
 					} else {%>
-					<tr class="blank_row">
-						<td class="row-borderless" colspan="2">No mutants killed.</td>
+					<tr>
+						<td  class="col-sm-1" colspan="2">No mutants killed.</td>
 					</tr>
 					<%}
 					%>
 				</table>
 			</div>
-            <div class="tab-pane fade" id="mutequivtab">
-				<table class="table table-hover table-responsive table-paragraphs">
+            <div class="tab-pane fade  bg-grey" id="mutequivtab">
+				<table class="table table-hover table-responsive table-paragraphs bg-white">
 					<%
 					if (! mutantsEquiv.isEmpty()) {
 						for (MultiplayerMutant m : mutantsEquiv) {
 					%>
 					<tr>
-						<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4></td>
+						<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4>
+							<% for (String change : m.getHTMLReadout()) { %>
+							<p><%=change%><p>
+							<% } %></td>
 						<td class="col-sm-1">
 							<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 							<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
@@ -198,27 +195,19 @@ if (role == Role.ATTACKER && true){
 							</div>
 						</td>
 					</tr>
-					<tr>
-						<td class="col-sm-1" colspan="3">
-							<% for (String change : m.getHTMLReadout()) { %>
-							<div class="nest crow fly">
-							<p><%=change%></p>
-							<p><%=m.getEquivalent() %></p>
-							</div<
-								<% } %>
-						</td>
-					</tr>
 					<%
 						}
 					} else {%>
-					<tr class="blank_row">
-						<td class="row-borderless" colspan="2">No mutants equivalent.</td>
+					<tr>
+						<td class="col-sm-1">No mutants equivalent.</td>
 					</tr>
 					<%}
 					%>
 				</table>
 			</div>
+		</div>
 		</div> <!-- tab-content -->
+
 
 	<% } %>
 

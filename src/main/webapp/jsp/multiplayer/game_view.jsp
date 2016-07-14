@@ -104,7 +104,7 @@
 %>
 
     <%@ include file="/jsp/multiplayer/game_scoreboard.jsp" %>
-
+<div class="crow fly no-gutter up">
     <% switch (role){
         case ATTACKER:
             %><%@ include file="/jsp/multiplayer/attacker_view.jsp" %><%
@@ -131,4 +131,8 @@
             break;
     }
 %>
+    </div>
+<script>
+<%@ include file="/jsp/multiplayer/game_highlighting.jsp" %>
+</script>
 <%@ include file="/jsp/multiplayer/footer_game.jsp" %>
