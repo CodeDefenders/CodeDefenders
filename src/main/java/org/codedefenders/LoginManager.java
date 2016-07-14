@@ -71,7 +71,9 @@ public class LoginManager extends HttpServlet {
 					session.setAttribute("uid", activeUser.id);
 					session.setAttribute("username", username);
 					Object from = session.getAttribute("loginFrom");
-					if (from != null && ! ((String) from).endsWith(".ico") && ! ((String) from).endsWith(".css")) {
+					if (from != null && ! ((String) from).endsWith(".ico")
+							&& ! ((String) from).endsWith(".css")
+							&& ! ((String) from).endsWith(".js")) {
 						response.sendRedirect((String) from);
 					} else
 						response.sendRedirect("games");
