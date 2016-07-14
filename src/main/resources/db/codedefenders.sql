@@ -55,7 +55,7 @@ CREATE TABLE `games` (
   `Finish_Time` bigint(64) DEFAULT '0',
   `Attackers_Limit` int(11) DEFAULT '0',
   `Defenders_Limit` int(11) DEFAULT '0',
-  `Status` enum('CREATED','ACTIVE','FINISHED') DEFAULT 'CREATED',
+  `State` enum('CREATED','ACTIVE','FINISHED') DEFAULT 'CREATED',
   `CurrentRound` tinyint(4) NOT NULL DEFAULT '1',
   `FinalRound` tinyint(4) NOT NULL DEFAULT '5',
   `ActiveRole` enum('ATTACKER','DEFENDER') NOT NULL DEFAULT 'ATTACKER',
