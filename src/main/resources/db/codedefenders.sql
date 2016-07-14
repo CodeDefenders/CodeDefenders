@@ -91,7 +91,6 @@ CREATE TABLE `mutants` (
   PRIMARY KEY (`Mutant_ID`),
   KEY `fk_gameId_idx` (`Game_ID`),
   KEY `fk_playerId_idx` (`Player_ID`),
-  KEY `fk_ownerId_idx` (`Owner_ID`),
   CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
@@ -162,7 +161,6 @@ CREATE TABLE `tests` (
   `Points` int(11) DEFAULT '0',
   PRIMARY KEY (`Test_ID`),
   KEY `fk_playerId_idx` (`Player_ID`),
-  KEY `fk_ownerId_tests_idx` (`Owner_ID`),
   KEY `fk_gameId_tests_idx` (`Game_ID`),
   KEY `fk_playerId_tests_idx` (`Player_ID`),
   CONSTRAINT `fk_gameId_tests` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
