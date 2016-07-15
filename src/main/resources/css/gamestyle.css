@@ -123,10 +123,6 @@ body {
 	width: 100%;
 }
 
-.navbar-right {
-	padding-right: 10px;
-}
-
 .btn-diff, .btn-right {
 	float: right;
 }
@@ -137,6 +133,10 @@ body {
 
 .turn-badge {
 	font-size: 10pt;
+	color: #fff;
+}
+.turn-badge:hover {
+	color: #fff;
 }
 
 /* Sign-in form */
@@ -341,11 +341,48 @@ img.logo {
     max-width:45px;
 }
 
+nav {
+    text-align:center;
+}
+
+nav ul {
+    margin: 0;
+    padding: 0;
+    display:inline-block;
+    list-style: none;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+}
+nav li {
+    margin: 0;
+    display:inline-block;
+}
+nav li a {
+    display: block;
+    padding: 5px 5px;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+.navbar-right {
+	padding-right: 10px;
+}
+
 .navbar-brand {
     padding-top: 0px;
     padding-left: 10px;
     padding-right: 10px;
     padding-bottom: 0px;
+}
+
+.navbar-nav {
+	float: none;
+	margin: 0 auto;
+}
+
+.navbar-text {
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 
 /* Link styles (used on .masthead-links as well) */
