@@ -68,7 +68,8 @@ public class MajorMaker {
 		for(Mutant m : validMutants) {
 			xml += "\t\t<mutant ";
 			xml += "id=\"" + m.getId() + "\" ";
-			xml += " />\n";
+			xml += "killed=\"" + m.getTimesKilledAi() + "\" ";
+			xml += "/>\n";
 		}
 		xml += "\t</mutants>\n";
 		xml += "\t<quantity>" + validMutants.size() + "</quantity>\n";
@@ -157,23 +158,6 @@ public class MajorMaker {
 		}
 		return null;
 
-
-		/*
-		GameManager gm = new GameManager();
-		try {
-			//Create mutant and insert it into the database.
-			//TODO: CHECK MUTANT COMPILES
-			Mutant m = gm.createMutant(dGame.getId(), cut.id, mutantText, 1);
-			//TODO: More error checking.
-			ArrayList<String> messages = new ArrayList<String>();
-			MutationTester.runAllTestsOnMutant(dGame, m, messages);
-		} catch (IOException e) {
-			//Try again if an exception.
-			e.printStackTrace();
-			return false;
-		}
-		return true;
-		*/
 	}
 
 	private List<String> getMutantList() {

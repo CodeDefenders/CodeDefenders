@@ -14,7 +14,7 @@ public class EvoSuiteMaker {
 	private int cId;
 	private GameClass cut;
 	private Game dGame;
-	private ArrayList<Integer> testIds;
+	private ArrayList<Test> validTests;
 
 	public EvoSuiteMaker(int classId, Game dummyGame) {
 		cId = classId;
@@ -28,19 +28,21 @@ public class EvoSuiteMaker {
 		//Need a dummy game to add test to.
 
 		ArrayList<String> testStrings = getTestStrings();
-		testIds = new ArrayList<>();
+		validTests = new ArrayList<Test>();
 
 		try {
 			for (String t : testStrings) {
 				File newTestDir = FileManager.getNextSubDir(AI_DIR + F_SEP + "tests" +
 						F_SEP + cut.getAlias());
 				String jFile = FileManager.createJavaFile(newTestDir, cut.getBaseName(), t);
-				Test newTest = AntRunner.compileTest(newTestDir, jFile, dGame.getId(), cut, 1);
+				dGame.addPlayer(1, Role.DEFENDER);
+				int playerID = DatabaseAccess.getPlayerIdForMultiplayerGame(1, dGame.getId());
+				Test newTest = AntRunner.compileTest(newTestDir, jFile, dGame.getId(), cut, playerID);
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 				if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
 					AntRunner.testOriginal(newTestDir, newTest);
-					testIds.add(newTest.getId());
+					validTests.add(newTest);
 				}
 			}
 		} catch (IOException e) {
@@ -53,25 +55,37 @@ public class EvoSuiteMaker {
 
 	public boolean createTestIndex() {
 		File dir = new File(AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias());
-		String contents = "";
-		contents += "<?xml version=\"1.0\"?> \n";
-		contents += "<testindex> \n";
+
+		int goodTests = 0;
+
+		String xml = "";
+		xml += "<?xml version=\"1.0\"?> \n";
+		xml += "<testindex> \n";
+
 		//Original test ids.
-		contents += "\t<tests> \n";
-		for (int n : testIds) {
-			contents += "\t\t<test>" + n + "</test> \n";
+		xml += "\t<tests> \n";
+		for (Test t : validTests) {
+			int mKilled = t.getAiMutantsKilled();
+			//If the test kills at least one mutant, use it in the future.
+			if(mKilled > 0) {
+				xml += "\t\t<test ";
+				xml += "id=\"" + t.getId() + "\" ";
+				xml += "kills=\"" + mKilled + "\" ";
+				xml += "/>\n";
+				goodTests ++;
+			}
 		}
-		contents += "\t</tests> \n";
+		xml += "\t</tests> \n";
 
 		//Number of tests.
-		contents += "\t<quantity>" + testIds.size() + "</quantity> \n";
+		xml += "\t<quantity>" + goodTests + "</quantity> \n";
 		//ID of dummy game.
-		contents += "\t<dummygame>" + dGame.getId() + "</dummygame> \n";
+		xml += "\t<dummygame>" + dGame.getId() + "</dummygame> \n";
 
-		contents += "</testindex> \n";
+		xml += "</testindex> \n";
 
 		try {
-			FileManager.createIndexXML(dir, "TestsIndex", contents);
+			FileManager.createIndexXML(dir, "TestsIndex", xml);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
@@ -106,7 +120,11 @@ public class EvoSuiteMaker {
 
 			if(!inTest) {
 				//Not in test.
-				if(l.contains("import ")) {
+				if(l.startsWith("package ")) {
+					//Add any line with package.
+					sharedStart += l + "\n";
+				}
+				else if(l.startsWith("import ")) {
 					//Add any line with import.
 					sharedStart += l + "\n";
 				}

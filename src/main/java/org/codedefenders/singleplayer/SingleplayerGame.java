@@ -19,7 +19,7 @@ public class SingleplayerGame extends Game {
 			setDefenderId(1);
 			ai = new AiDefender(this);
 		} else {
-			setAttackerId(1); 
+			setAttackerId(1);
 			ai = new AiAttacker(this);
 		}
 		setMode(Mode.SINGLE); //Set singleplayer mode.

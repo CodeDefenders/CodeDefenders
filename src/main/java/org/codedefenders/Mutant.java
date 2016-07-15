@@ -46,6 +46,8 @@ public class Mutant {
 
 	private int playerId;
 
+	private int killedByAITests = 0; //How many times this mutant is killed by an AI test.
+
 	/**
 	 * Creates a mutant
 	 * @param gameId
@@ -319,7 +321,7 @@ public class Mutant {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			String sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', RoundKilled='%d' WHERE Mutant_ID='%d';", equivalent.name(), sqlAlive(), roundKilled, id);
+			String sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', RoundKilled='%d', NumberAiKillingTests='%d' WHERE Mutant_ID='%d';", equivalent.name(), sqlAlive(), roundKilled, killedByAITests, id);
 			stmt.execute(sql);
 
 			conn.close();
@@ -349,5 +351,19 @@ public class Mutant {
 			}
 		}
 		return false;
+	}
+
+	public void setTimesKilledAi(int count) {
+		killedByAITests = count;
+	}
+	public int getTimesKilledAi() {
+		if(killedByAITests == 0) {
+			//Retrieve from DB.
+			killedByAITests = DatabaseAccess.getNumTestsKillMutant(getId());
+		}
+		return killedByAITests;
+	}
+	public void incrementTimesKilledAi() {
+		killedByAITests ++;
 	}
 }
