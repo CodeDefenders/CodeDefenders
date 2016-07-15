@@ -85,7 +85,7 @@
                 <div>
                     <div>
                         <div class="tabs-blue-grey">
-                            <a href="/" class="main-title">
+                            <a href="/" class="main-title" id="site-logo">
                                 <div class="crow">
                                     <div class="ws-12" style="font-size: 36px; text-align: center;">
                                         <span><img class="logo" href="/" src="images/logo.png"/></span>
