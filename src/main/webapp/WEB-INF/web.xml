@@ -1,20 +1,4 @@
-Skip to content
-		This repository
-		Search
-		Pull requests
-		Issues
-		Gist
-		@BenClegg
-		Unwatch 6
-		Unstar 1
-		Fork 0 jmrojas/CodeDefenders
-		Code  Pull requests 0  Wiki  Pulse  Graphs
-		Tree: 6d47ce4012 Find file CodeDefenders/src/main/webapp/WEB-INF/web.xml
-		1b963ba  on 25 Jan
-		@jmrojas jmrojas contact form and footer
-		1 contributor
-		RawBlameHistory    172 lines (149 sloc)  4.6 KB
-		<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
@@ -185,5 +169,3 @@ Skip to content
 		<param-value>***REMOVED***</param-value>
 	</context-param>
 </web-app>
-		Contact GitHub API Training Shop Blog About
-		© 2016 GitHub, Inc. Terms Privacy Security Status Help
