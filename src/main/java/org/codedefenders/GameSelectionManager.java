@@ -62,6 +62,13 @@ public class GameSelectionManager extends HttpServlet {
 						//Create singleplayer game.
 						SingleplayerGame nGame = new SingleplayerGame(classId, uid, rounds, role, level);
 						nGame.insert();
+						if (nGame.getDefenderId() == 1) {
+							nGame.addPlayer(uid, Role.ATTACKER);
+							nGame.addPlayer(1, Role.DEFENDER);
+						} else {
+							nGame.addPlayer(uid, Role.DEFENDER);
+							nGame.addPlayer(1, Role.ATTACKER);
+						}
 						nGame.tryFirstTurn();
 					} else {
 						// Create the game with supplied parameters and insert it in the database.

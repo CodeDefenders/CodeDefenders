@@ -12,6 +12,7 @@ public class AiPlayer {
 	public enum GenerationMethod {
 		RANDOM, //Randomly select mutant.
 		COVERAGE, //Select random mutant by least covered lines.
+		KILLCOUNT, //Number of mutants a test kills, or number of tests that kill mutant.
 		FIRST //Choose the first mutant, for debugging.
 	}
 
@@ -49,6 +50,11 @@ public class AiPlayer {
 		return true;
 	}
 	public boolean turnHard() {
+		//Override
+		return true;
+	}
+
+	protected boolean runTurn(GenerationMethod strat) {
 		//Override
 		return true;
 	}

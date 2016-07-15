@@ -84,7 +84,9 @@
 %>
 </table>
 	<a href="/games/create">Create Duel</a>
+
 	<hr />
+
 	<h2>Battlegrounds</h2>
 	<table class="table table-hover table-responsive table-paragraphs"><tr><th>Game ID</th><th>Owner</th><th>
 		Price

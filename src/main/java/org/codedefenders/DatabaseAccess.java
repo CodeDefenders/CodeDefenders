@@ -28,6 +28,60 @@ public class DatabaseAccess {
 		return s.replaceAll("\\\\", "\\\\\\\\");
 	}
 
+	public static int getNumAiMutantsKilledByTest(int tId) {
+		String sql = String.format("SELECT * FROM tests WHERE Test_ID='%d';", tId);
+		return getInt(sql, "NumberAiMutantsKilled");
+	}
+
+	public static int getNumTestsKillMutant(int mId) {
+		String sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d';", mId);
+		return getInt(sql, "NumberAiKillingTests");
+	}
+
+	public static int getInt(String sql, String att) {
+		Connection conn = null;
+		Statement stmt = null;
+
+		int numMutants = 0;
+
+		try {
+
+			// Load the Game Data with the provided ID.
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				numMutants = rs.getInt(att);
+			}
+
+			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			System.out.println(se);
+		} // Handle errors for JDBC
+		catch (Exception e) {
+			System.out.println(e);
+		} // Handle errors for Class.forName
+		finally {
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException se2) {
+			} // Nothing we can do
+			try {
+				if (conn != null) {
+					conn.close();
+				}
+			} catch (SQLException se) {
+				System.out.println(se);
+			}
+		}
+		return numMutants;
+	}
+
 	public static GameClass getClassForGame(int gameId) {
 		String sql = String.format("SELECT classes.* from classes INNER JOIN games ON classes.Class_ID = games.Class_ID WHERE games.ID=%d;", gameId);
 		return getClass(sql);
@@ -911,6 +965,11 @@ public class DatabaseAccess {
 	public static ArrayList<Test> getTestsForGame(int gid) {
 		String sql = String.format("SELECT * FROM tests WHERE Game_ID='%d';", gid);
 		return getTests(sql);
+	}
+
+	public static Test getTestForId(int tid) {
+		String sql = String.format("SELECT * FROM tests WHERE Test_ID='%d';", tid);
+		return getTests(sql).get(0);
 	}
 
 	public static ArrayList<Test> getExecutableTestsForGame(int gid) {

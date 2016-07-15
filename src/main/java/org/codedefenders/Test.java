@@ -58,6 +58,8 @@ public class Test {
 		score += s;
 	}
 
+	private int aiMutantsKilled = 0; //How many generated mutants this test kills.
+
 	public Test(int gameId, String jFile, String cFile, int playerId) {
 		this.gameId = gameId;
 		try {
@@ -217,11 +219,12 @@ public class Test {
 
 
 			sql = String.format("UPDATE tests SET mutantsKilled='%d', " +
+					"NumberAiMutantsKilled='%d', " +
 					"Lines_Covered='%s', " +
 					"Lines_Uncovered='%s'," +
 					"Points = %d " +
 					"WHERE Test_ID='%d';",
-					mutantsKilled, linesCoveredString, linesUncoveredString, score, id);
+					mutantsKilled, aiMutantsKilled, linesCoveredString, linesUncoveredString, score, id);
 			stmt.execute(sql);
 
 			conn.close();
@@ -269,6 +272,19 @@ public class Test {
 		return classFile != null;
 	}
 
+	public void setAiMutantsKilled(int count) {
+		aiMutantsKilled = count;
+	}
+	public int getAiMutantsKilled() {
+		if(aiMutantsKilled == 0) {
+			//Retrieve from DB.
+			aiMutantsKilled = DatabaseAccess.getNumAiMutantsKilledByTest(getId());
+		}
+		return aiMutantsKilled;
+	}
+	public void incrementAiMutantsKilled() {
+		aiMutantsKilled++;
+	}
 	public String getJavaFile() {
 		return javaFile;
 	}

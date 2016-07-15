@@ -86,6 +86,7 @@ CREATE TABLE `mutants` (
   `RoundKilled` int(11) DEFAULT NULL,
   `Equivalent` enum('ASSUMED_NO','PENDING_TEST','DECLARED_YES','ASSUMED_YES','PROVEN_NO') NOT NULL,
   `Player_ID` int(11) DEFAULT NULL,
+  `NumberAiKillingTests` int(11) DEFAULT '0',
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Points` int(11) DEFAULT '0',
   PRIMARY KEY (`Mutant_ID`),
@@ -155,6 +156,7 @@ CREATE TABLE `tests` (
   `RoundCreated` int(11) NOT NULL,
   `MutantsKilled` int(11) DEFAULT '0',
   `Player_ID` int(11) NOT NULL,
+  `NumberAiMutantsKilled` int(11) DEFAULT '0',
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Lines_Covered` longtext,
   `Lines_Uncovered` longtext,
@@ -227,7 +229,5 @@ CREATE TABLE `users` (
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2016-07-13 11:18:20
-
-
 
 INSERT INTO `users` VALUES (1, 'AI', 'DUMMY_INACCESSIBLE');
