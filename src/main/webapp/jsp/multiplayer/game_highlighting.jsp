@@ -7,24 +7,41 @@ highlightLine([<% for (Integer i : linesCovered.keySet()){%>
 
 
 showMutants = function(){
-    mutantLine([
-        <% for (Integer line : mutantLines.keySet()) {
-        %>
-        [<%= line %>,
-            <%= mutantLines.get(line).size() %>, [
-            <% for(MultiplayerMutant mm : mutantLines.get(line)){%>
-                <%= mm.getId() %>,
-            <%}%>
-        ]],
-        <%
-            } %>
-    ],"<%="#" + codeDivName%>", <%= role.equals(Role.DEFENDER)? "true" : "false" %>);
+mutantLine([
+<% for (Integer line : mutantLines.keySet()) {
+%>
+[<%= line %>,
+<%= mutantLines.get(line).size() %>, [
+<% for(MultiplayerMutant mm : mutantLines.get(line)){%>
+<%= mm.getId() %>,
+<%}%>
+]],
+<%
+    } %>
+],"<%="#" + codeDivName%>", <%= role.equals(Role.DEFENDER)? "true" : "false" %>);
+};
+
+showKilledMutants = function(){
+mutantKilledLine([
+<% for (Integer line : mutantKilledLines.keySet()) {
+%>
+[<%= line %>,
+<%= mutantKilledLines.get(line).size() %>, [
+<% for(MultiplayerMutant mm : mutantKilledLines.get(line)){%>
+<%= mm.getId() %>,
+<%}%>
+]],
+<%
+    } %>
+],"<%="#" + codeDivName%>");
 };
 editorSUT.on("viewportChange", function(){
     showMutants();
+    showKilledMutants();
     highlightCoverage();
 });
 $(document).ready(function(){
     showMutants();
+    showKilledMutants();
     highlightCoverage();
 });

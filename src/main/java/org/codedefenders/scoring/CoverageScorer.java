@@ -33,38 +33,24 @@ public class CoverageScorer extends Scorer {
             if (mm.getId() ==m.getId()){
                 continue;
             }
-            List<String> lines = null;
-            try {
-                lines = m.getHTMLReadout();
-                for (String l : lines){
-                    int line = Integer.parseInt(l.split(":")[1].trim());
-                    if (!mutantLines.containsKey(line)){
-                        mutantLines.put(line, new ArrayList<MultiplayerMutant>());
-                    }
-
-                    mutantLines.get(line).add(m);
-
+            for (int line : m.getLines()){
+                if (!mutantLines.containsKey(line)){
+                    mutantLines.put(line, new ArrayList<MultiplayerMutant>());
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+
+                mutantLines.get(line).add(m);
+
             }
 
         }
 
         int lineScore = g.getAttackerValue();
-        List<String> lines = null;
-        try {
-            lines = mm.getHTMLReadout();
-            for (String l : lines){
-                int line = Integer.parseInt(l.split(":")[1].trim());
-                if (mutantLines.containsKey(line)){
-                    float percent = mutants.size() == 0 ? 1f : 1f - (mutantLines.get(line).size() / (float)mutants.size());
-                    lineScore = (int)(lineScore * percent);
-                }
-
+        for (int line : mm.getLines()){
+            if (mutantLines.containsKey(line)){
+                float percent = mutants.size() == 0 ? 1f : 1f - (mutantLines.get(line).size() / (float)mutants.size());
+                lineScore = (int)(lineScore * percent);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
         }
 
         return lineScore;
