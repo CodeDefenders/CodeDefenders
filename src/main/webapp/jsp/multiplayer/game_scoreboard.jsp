@@ -23,7 +23,7 @@
             </div>
             <div class="modal-body">
                 <table class="scoreboard">
-                    <tr class="attacker header"><th>Attackers</th><th>Mutants</th><th>Mutation+Equivalence Points</th><th>Total Points</th></tr>
+                    <tr class="attacker header"><th>Attackers</th><th>Mutants</th><th>Alive, Killed, Equivalent</th><th>Total Points</th></tr>
                     <%
                     for (int index = 0; index < attackers.length; index++){
                         int i = attackers[index];
@@ -40,32 +40,37 @@
                                 <% } else { %>
                                 0
                                 <% } %></td>
-                            <td><%
+                            <td>
+                                <%
+                                    if (mutantScores.containsKey(i) && mutantScores.get(i) != null){%>
+                                <%= ((MultiplayerGame.PlayerScore)mutantScores.get(i)).getAdditionalInformation() %>
+                                <% } else { %>
+                                    0, 0, 0
+                                <% } %>
+                            </td>
+                            <td>
+                                <%
                                 if (mutantScores.containsKey(i) && mutantScores.get(i) != null){
                                     total += ((MultiplayerGame.PlayerScore)mutantScores.get(i)).getTotalScore(); %>
-                                <%= ((MultiplayerGame.PlayerScore)mutantScores.get(i)).getTotalScore() %>
-                                <% } else { %>
-                                    0
-                                <% }
-
-                                  if (testScores.containsKey(i) && testScores.get(i) != null){
+                            <% } else { %>
+                                  0
+                            <% }
+                                if (testScores.containsKey(i) && testScores.get(i) != null){
                                     total += ((MultiplayerGame.PlayerScore)testScores.get(i)).getTotalScore(); %>
-                                    +<%= ((MultiplayerGame.PlayerScore)testScores.get(i)).getTotalScore() %>
-                                    <% } %></td>
-                            <td>
+                            <% } %>
                                 <%= total %>
                             </td>
                         </tr>
                 <%
                     }
                 %>
+                    <tr class="defender header"><th>Defenders</th><th>Tests</th><th>Mutants Killed</th><th>Total Points</th></tr>
                     <%
                         for (int index = 0; index < defenders.length; index++){
                             int i = defenders[index];
                             User dUser = DatabaseAccess.getUserFromPlayer(i);
                             int total = 0;
                     %>
-                    <tr class="defender header"><th>Defenders</th><th>Tests</th><th></th><th>Total Points</th></tr>
                     <tr class="defender"><td>
                         <%=dUser.username%>
                     </td>
@@ -77,7 +82,7 @@
                         <td><%
                             if (testScores.containsKey(i) && testScores.get(i) != null){
                                     total += ((MultiplayerGame.PlayerScore)testScores.get(i)).getTotalScore(); %>
-
+                            <%= ((MultiplayerGame.PlayerScore)testScores.get(i)).getAdditionalInformation()%>
                             <% } %></td>
                         <td>
                             <%= total %>

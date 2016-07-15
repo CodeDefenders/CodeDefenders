@@ -42,8 +42,11 @@ public class MultiplayerMutant {
 
 	private int score;
 
+	private int[] lines = null;
+
 	/**
 	 * Creates a mutant
+	 *
 	 * @param gameId
 	 * @param jFile
 	 * @param cFile
@@ -63,15 +66,15 @@ public class MultiplayerMutant {
 	}
 
 
-	public int getPlayerId(){
+	public int getPlayerId() {
 		return playerId;
 	}
 
-	public int getScore(){
+	public int getScore() {
 		return score;
 	}
 
-	public void setScore(int score){
+	public void setScore(int score) {
 		this.score += score;
 	}
 
@@ -294,5 +297,31 @@ public class MultiplayerMutant {
 			}
 		}
 		return false;
+	}
+
+	private boolean linesCalculated = false;
+
+	public int[] getLines() {
+		if (linesCalculated){
+			return lines;
+		}
+		try {
+			List<String> ls = getHTMLReadout();
+			lines = new int[ls.size()];
+			for (int i = 0; i < ls.size(); i++) {
+				String l = ls.get(i);
+				lines[i] = Integer.parseInt(l.split(":")[1].trim());
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (lines == null){
+			lines = new int[0];
+		}
+
+		linesCalculated = true;
+
+		return lines;
 	}
 }

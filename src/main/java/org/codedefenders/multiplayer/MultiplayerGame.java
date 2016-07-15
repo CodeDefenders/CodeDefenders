@@ -10,8 +10,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static org.codedefenders.Mutant.Equivalence.ASSUMED_NO;
-import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
+import static org.codedefenders.Mutant.Equivalence.*;
 
 public class MultiplayerGame extends AbstractGame {
 
@@ -337,6 +336,15 @@ public class MultiplayerGame extends AbstractGame {
 		private int playerId;
 		private int totalScore;
 		private int quantity;
+		private String additionalInformation;
+
+		public String getAdditionalInformation() {
+			return additionalInformation;
+		}
+
+		public void setAdditionalInformation(String additionalInformation) {
+			this.additionalInformation = additionalInformation;
+		}
 
 		public PlayerScore(int playerId) {
 			this.playerId = playerId;
@@ -372,6 +380,10 @@ public class MultiplayerGame extends AbstractGame {
 	public HashMap<Integer, PlayerScore> getMutantScores(){
 		HashMap<Integer, PlayerScore> mutantScores = new HashMap<Integer, PlayerScore>();
 
+		HashMap<Integer, Integer> mutantsAlive = new HashMap<Integer, Integer>();
+		HashMap<Integer, Integer> mutantsKilled = new HashMap<Integer, Integer>();
+		HashMap<Integer, Integer> mutantsEquiv = new HashMap<Integer, Integer>();
+
 		ArrayList<MultiplayerMutant> allMutants = new ArrayList<MultiplayerMutant>();
 		allMutants.addAll(getAliveMutants());
 		allMutants.addAll(getKilledMutants());
@@ -385,25 +397,52 @@ public class MultiplayerGame extends AbstractGame {
 		for (MultiplayerMutant mm : allMutants){
 			if (!mutantScores.containsKey(mm.getPlayerId())){
 				mutantScores.put(mm.getPlayerId(), new PlayerScore(mm.getPlayerId()));
+				mutantsAlive.put(mm.getPlayerId(), 0);
+				mutantsEquiv.put(mm.getPlayerId(), 0);
+				mutantsKilled.put(mm.getPlayerId(), 0);
 			}
 
 			PlayerScore ps = mutantScores.get(mm.getPlayerId());
 			ps.increaseQuantity();
 			ps.increaseTotalScore(mm.getScore());
+
+			if (mm.getEquivalent().equals(ASSUMED_YES) || mm.getEquivalent().equals(DECLARED_YES)){
+				mutantsEquiv.put(mm.getPlayerId(), mutantsEquiv.get(mm.getPlayerId())+1);
+			} else if (mm.isAlive()){
+				mutantsAlive.put(mm.getPlayerId(), mutantsAlive.get(mm.getPlayerId())+1);
+			} else {
+				mutantsKilled.put(mm.getPlayerId(), mutantsKilled.get(mm.getPlayerId())+1);
+			}
+
 		}
+
+		for (int i : mutantsKilled.keySet()){
+			PlayerScore ps = mutantScores.get(i);
+			ps.setAdditionalInformation(mutantsAlive.get(i) + ", " + mutantsKilled.get(i) + ", " + mutantsKilled.get((i)));
+		}
+
 		return mutantScores;
 	}
 
 	public HashMap<Integer, PlayerScore> getTestScores(){
 		HashMap<Integer, PlayerScore> testScores = new HashMap<Integer, PlayerScore>();
-
+		HashMap<Integer, Integer> mutantsKilled = new HashMap<Integer, Integer>();
 		for (Test tt : getTests()){
 			if (!testScores.containsKey(tt.getPlayerId())){
 				testScores.put(tt.getPlayerId(), new PlayerScore(tt.getPlayerId()));
+				mutantsKilled.put(tt.getPlayerId(), 0);
 			}
 			PlayerScore ps = testScores.get(tt.getPlayerId());
 			ps.increaseQuantity();
 			ps.increaseTotalScore(tt.getScore());
+
+			mutantsKilled.put(tt.getPlayerId(), mutantsKilled.get(tt.getPlayerId())+1);
+
+		}
+
+		for (int i : mutantsKilled.keySet()){
+			PlayerScore ps = testScores.get(i);
+			ps.setAdditionalInformation("" + mutantsKilled.get(i));
 		}
 
 		return testScores;

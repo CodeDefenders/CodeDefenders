@@ -137,7 +137,23 @@ public class MutationTester {
 			messages.add(MUTANT_ALIVE_1_MESSAGE);
 		else
 			messages.add(String.format(MUTANT_ALIVE_N_MESSAGE,tests.size()));
-		mutant.setScore(Scorer.score(game, mutant, tests));
+		ArrayList<Test> missedTests = new ArrayList<Test>();
+
+		for (Test t : tests){
+			for (int lm : mutant.getLines()){
+				boolean found = false;
+				for (int lc : t.getLineCoverage().getLinesCovered()){
+					if (lc == lm){
+						found = true;
+						missedTests.add(t);
+					}
+				}
+				if (found){
+					break;
+				}
+			}
+		}
+		mutant.setScore(Scorer.score(game, mutant, missedTests));
 		mutant.update();
 	}
 

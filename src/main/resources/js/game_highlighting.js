@@ -51,7 +51,7 @@ var mutantLine = function (lineQuant, superDiv, defender){
 
         var content = '<span style="background-color: #f00; color: #fff;" id="mutationPopup"> ' + quant + ' mutants on line ' + lineNum + ' (Mutants: ' + mutantsOnLine + ')';
         if (defender) {
-            content += '<a href="multiplayer/play?equivLine=' + lineQuant[l][0] + '"> Mark Line Equivalent </a>';
+            content += '<a href="multiplayer/play?equivLine=' + lineQuant[l][0] + '" style="color: #FEFCFC"> Mark Line Equivalent </a>';
         }
         content += '</span>'
 
