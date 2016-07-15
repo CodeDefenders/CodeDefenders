@@ -230,6 +230,4 @@ CREATE TABLE `users` (
 
 -- Dump completed on 2016-07-13 11:18:20
 
-SELECT @@SQL_MODE;
-
 INSERT INTO `users` VALUES (1, 'AI', 'DUMMY_INACCESSIBLE');

@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
 	<Resource
@@ -5,6 +6,6 @@
 			maxActive="100" maxIdle="30" maxWait="10000"
 			url="jdbc:mysql://localhost:3306/codedefenders"
 			driverClassName="com.mysql.jdbc.Driver"
-			username="root" password="sql"
+			username="root" password="***REMOVED***"
 	/>
 </Context>

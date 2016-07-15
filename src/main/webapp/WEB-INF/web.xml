@@ -1,4 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
+Skip to content
+		This repository
+		Search
+		Pull requests
+		Issues
+		Gist
+		@BenClegg
+		Unwatch 6
+		Unstar 1
+		Fork 0 jmrojas/CodeDefenders
+		Code  Pull requests 0  Wiki  Pulse  Graphs
+		Tree: 6d47ce4012 Find file CodeDefenders/src/main/webapp/WEB-INF/web.xml
+		1b963ba  on 25 Jan
+		@jmrojas jmrojas contact form and footer
+		1 contributor
+		RawBlameHistory    172 lines (149 sloc)  4.6 KB
+		<?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
 		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
@@ -8,6 +24,10 @@
 		Code Defenders: A Mutation Testing Game
 	</description>
 	<display-name>Code Defenders</display-name>
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
 
 	<session-config>
 		<session-timeout>0</session-timeout>
@@ -59,23 +79,12 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>intro</servlet-name>
-		<jsp-file>/jsp/index.jsp</jsp-file>
+		<servlet-name>index.jsp</servlet-name>
+		<jsp-file>/index.jsp</jsp-file>
 	</servlet>
-
 	<servlet-mapping>
-		<servlet-name>intro</servlet-name>
+		<servlet-name>index.jsp</servlet-name>
 		<url-pattern>/intro</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>index</servlet-name>
-		<jsp-file>/jsp/index.jsp</jsp-file>
-	</servlet>
-
-	<servlet-mapping>
-		<servlet-name>index</servlet-name>
-		<url-pattern></url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -123,16 +132,6 @@
 		<url-pattern>/games/history</url-pattern>
 	</servlet-mapping>
 
-	<servlet>
-		<servlet-name>utesting</servlet-name>
-		<servlet-class>org.codedefenders.UnitTesting</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>utesting</servlet-name>
-		<url-pattern>/utesting</url-pattern>
-	</servlet-mapping>
-
-
 	<filter>
 		<filter-name>loginFilter</filter-name>
 		<filter-class>org.codedefenders.LoginFilter</filter-class>
@@ -160,61 +159,6 @@
 		<url-pattern>/sendEmail</url-pattern>
 	</servlet-mapping>
 
-	<servlet>
-		<servlet-name>logout</servlet-name>
-		<servlet-class>org.codedefenders.LogoutManager</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>logout</servlet-name>
-		<url-pattern>/logout</url-pattern>
-	</servlet-mapping>
-
-
-	<!-- multiplayer servlets -->
-	<servlet>
-		<servlet-name>multiplayerGameSelectionManager</servlet-name>
-		<servlet-class>org.codedefenders.multiplayer.MultiplayerGameSelectionManager</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>multiplayerGameSelectionManager</servlet-name>
-		<url-pattern>/multiplayer/games</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>multiplayerGameUser</servlet-name>
-		<jsp-file>/jsp/multiplayer/user_games_view.jsp</jsp-file>	</servlet>
-	<servlet-mapping>
-		<servlet-name>multiplayerGameUser</servlet-name>
-		<url-pattern>/multiplayer/games/user</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>multiplayerGame</servlet-name>
-		<jsp-file>/jsp/multiplayer/game_view.jsp</jsp-file>	</servlet>
-	<servlet-mapping>
-		<servlet-name>multiplayerGame</servlet-name>
-		<url-pattern>/multiplayer/play</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>multiplayerGameView</servlet-name>
-		<jsp-file>/jsp/multiplayer/create_game_view.jsp</jsp-file>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>multiplayerGameView</servlet-name>
-		<url-pattern>/multiplayer/games/create</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>multiplayerGameManager</servlet-name>
-		<servlet-class>org.codedefenders.multiplayer.MultiplayerGameManager</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>multiplayerGameManager</servlet-name>
-		<url-pattern>/multiplayer/move</url-pattern>
-	</servlet-mapping>
-	<!-- end multiplayer servlets -->
-
 	<resource-ref>
 		<res-ref-name>jdbc/codedefenders</res-ref-name>
 		<res-type>javax.sql.DataSource</res-type>
@@ -240,8 +184,6 @@
 		<param-name>emailPassword</param-name>
 		<param-value>***REMOVED***</param-value>
 	</context-param>
-
-	<!--<welcome-file-list>
-		<welcome-file>index.jsp</welcome-file>
-	</welcome-file-list>-->
 </web-app>
+		Contact GitHub API Training Shop Blog About
+		© 2016 GitHub, Inc. Terms Privacy Security Status Help
