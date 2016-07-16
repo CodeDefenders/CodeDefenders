@@ -21,7 +21,7 @@
 				</td>
 			</tr>
 			<tr>
-				<td>Gamemode</td>
+				<td>Mode</td>
 				<td>
 					<select name="mode" class="form-control selectpicker" data-size="large">
 						<option value="sing">Singleplayer</option>
