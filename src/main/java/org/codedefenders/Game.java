@@ -2,8 +2,8 @@ package org.codedefenders;
 
 import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 
-import org.codedefenders.singleplayer.AiAttacker;
-import org.codedefenders.singleplayer.AiDefender;
+import org.codedefenders.singleplayer.automated.attacker.AiAttacker;
+import org.codedefenders.singleplayer.automated.defender.AiDefender;
 import org.codedefenders.singleplayer.AiPlayer;
 
 import java.sql.Connection;
@@ -21,9 +21,6 @@ public class Game extends AbstractGame {
 	private int finalRound;
 
 	private Role activeRole;
-
-	protected AiPlayer ai = null;
-	protected String aiDir = null;
 
 	public Game(int classId, int userId, int maxRounds, Role role, Level level) {
 		this.classId = classId;
@@ -55,11 +52,6 @@ public class Game extends AbstractGame {
 		this.state = state;
 		this.level = level;
 		this.mode = mode;
-
-		//Set AI if it exists.
-		if(attackerId == 1) { ai = new AiAttacker(this); }
-		if(defenderId == 1) { ai = new AiDefender(this); }
-
 	}
 
 	public int getAttackerId() {
@@ -189,10 +181,6 @@ public class Game extends AbstractGame {
 			activeRole = Role.ATTACKER;
 			endRound();
 		}
-		if(ai != null) {
-			//Make the ai's turn if it exists.
-			ai.makeTurn();
-		}
 		update();
 	}
 
@@ -223,15 +211,14 @@ public class Game extends AbstractGame {
 
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = String.format("INSERT INTO games (Class_ID, Creator_ID, FinalRound, Level) VALUES ('%d', '%d', '%d', '%s');", classId, (attackerId != 0) ? attackerId : defenderId, finalRound, level.name());
+		String sql = String.format("INSERT INTO games (Class_ID, Creator_ID, FinalRound, Level, Mode, State) VALUES ('%d', '%d', '%d', '%s', '%s', '%s');", classId, (attackerId != 0) ? attackerId : defenderId, finalRound, level.name(), mode.name(), state.name());
+		logger.info(sql);
 
 		// Attempt to insert game info into database
 		try {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			System.out.println(attackerId);
-			System.out.println(defenderId);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 

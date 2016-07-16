@@ -3,6 +3,7 @@ package org.codedefenders;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.multiplayer.MultiplayerMutant;
+import org.codedefenders.singleplayer.SinglePlayerGame;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -347,9 +348,15 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			if (rs.next()) {
-				Game gameRecord = new Game(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
-						rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), AbstractGame.State.valueOf(rs.getString("State")),
-						Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode")));
+				Game gameRecord;
+				if (rs.getString("Mode").equals(Game.Mode.SINGLE.name()))
+					gameRecord = new SinglePlayerGame(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
+							rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), AbstractGame.State.valueOf(rs.getString("State")),
+							Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode")));
+				else
+					gameRecord = new Game(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
+							rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), AbstractGame.State.valueOf(rs.getString("State")),
+							Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode")));
 
 				stmt.close();
 				conn.close();

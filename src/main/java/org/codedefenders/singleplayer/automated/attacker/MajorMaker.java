@@ -1,7 +1,8 @@
-package org.codedefenders.singleplayer;
+package org.codedefenders.singleplayer.automated.attacker;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.*;
+import org.codedefenders.singleplayer.automated.defender.AiDefender;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -151,7 +152,7 @@ public class MajorMaker {
 			bw.close();
 
 			// Compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
-			return AntRunner.compileMutant(newMutantDir, mutantFileName, dGame.getId(), cut, 1);
+			return AntRunner.compileMutant(newMutantDir, mutantFileName, dGame.getId(), cut, AiAttacker.ID);
 
 		} catch (IOException e) {
 			e.printStackTrace();

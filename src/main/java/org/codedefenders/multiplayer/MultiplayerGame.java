@@ -14,12 +14,6 @@ import static org.codedefenders.Mutant.Equivalence.*;
 
 public class MultiplayerGame extends AbstractGame {
 
-	private int id;
-
-	private int classId;
-
-
-	private int creatorId;
 	private int defenderValue;
 	private int attackerValue;
 	private float lineCoverage;
@@ -30,9 +24,7 @@ public class MultiplayerGame extends AbstractGame {
 	private int minAttackers;
 	private int minDefenders;
 	private long finishTime;
-	private State state;
 
-	private Game.Level level;
 
 	public void setId(int id) {
 		this.id = id;
@@ -40,22 +32,6 @@ public class MultiplayerGame extends AbstractGame {
 			this.state = State.FINISHED;
 			update();
 		}
-	}
-
-	public State getState(){
-		return state;
-	}
-
-	public void setClassId(int classId) {
-		this.classId = classId;
-	}
-
-	public int getCreatorId() {
-		return creatorId;
-	}
-
-	public void setCreatorId(int creatorId) {
-		this.creatorId = creatorId;
 	}
 
 	public int getDefenderValue() {
@@ -106,6 +82,7 @@ public class MultiplayerGame extends AbstractGame {
 		this.classId = classId;
 		this.creatorId = creatorId;
 		this.level = level;
+		this.mode = Mode.PARTY;
 		this.lineCoverage = lineCoverage;
 		this.mutantCoverage = mutantCoverage;
 		this.price = price;
@@ -118,33 +95,6 @@ public class MultiplayerGame extends AbstractGame {
 		this.state = State.valueOf(status);
 		this.finishTime = finishTime;
 	}
-
-	public int getId() {
-		return id;
-	}
-
-	public int getClassId() {
-		return classId;
-	}
-
-	public String getClassName() {
-		return DatabaseAccess.getClassForKey("Class_ID", classId).getName();
-	}
-
-	public GameClass getCUT() {
-		return DatabaseAccess.getClassForKey("Class_ID", classId);
-	}
-
-	public Game.Level getLevel() {
-		return this.level;
-	}
-
-	public void setLevel(Game.Level level) {
-		this.level = level;
-	}
-
-	//private List<Mutant> mutants = null;
-
 
 	public ArrayList<MultiplayerMutant> getMutants() {
 		int[] attackers = getPlayerIds();

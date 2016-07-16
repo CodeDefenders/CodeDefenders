@@ -250,8 +250,6 @@ public class MultiplayerGameManager extends HttpServlet {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gid);
-
 		File newTestDir = FileManager.getNextSubDir(TESTS_DIR+ F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
 
 		String javaFile = createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
@@ -261,7 +259,7 @@ public class MultiplayerGameManager extends HttpServlet {
 		}
 
 		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, playerId);
+		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {

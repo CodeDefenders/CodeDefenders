@@ -264,10 +264,10 @@ public class AntRunner {
 	 * @param jFile
 	 * @param gameID
 	 * @param cut
+	 * @param ownerId
 	 * @return A {@link Mutant} object
 	 */
 	public static Mutant compileMutant(File dir, String jFile, int gameID, GameClass cut, int ownerId) {
-		//public static int compileMutant(ServletContext context, Mutant m2) {
 
 		// Gets the classname for the mutant from the game it is in
 		String[] resultArray = runAntTarget("compile-mutant", dir.getAbsolutePath(), null, cut, null);
@@ -348,13 +348,15 @@ public class AntRunner {
 	 * @param jFile
 	 * @param gameID
 	 * @param cut
-	 * @param playerId
+	 * @param ownerId
 	 * @return A {@link Test} object
 	 */
-	public static Test compileTest(File dir, String jFile, int gameID, GameClass cut, int playerId) {
+	public static Test compileTest(File dir, String jFile, int gameID, GameClass cut, int ownerId) {
 		//public static int compileTest(ServletContext context, Test t) {
 
 		String[] resultArray = runAntTarget("compile-test", null, dir.getAbsolutePath(), cut, null);
+
+		int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gameID);
 
 		// If the input stream returned a 'successful build' message, the test compiled correctly
 		if (resultArray[0].toLowerCase().contains("build successful")) {
@@ -364,6 +366,7 @@ public class AntRunner {
 			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
 			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
 			String cFile = matchingFiles.get(0).getAbsolutePath();
+
 			Test newTest = new Test(gameID, jFile, cFile, playerId);
 			newTest.insert();
 			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);

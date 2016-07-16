@@ -1,6 +1,8 @@
 package org.codedefenders;
 
-import org.codedefenders.singleplayer.SingleplayerGame;
+import org.codedefenders.singleplayer.SinglePlayerGame;
+import org.codedefenders.singleplayer.automated.attacker.AiAttacker;
+import org.codedefenders.singleplayer.automated.defender.AiDefender;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -60,14 +62,14 @@ public class GameSelectionManager extends HttpServlet {
 
 					if(mode.equals(Game.Mode.SINGLE)) {
 						//Create singleplayer game.
-						SingleplayerGame nGame = new SingleplayerGame(classId, uid, rounds, role, level);
+						SinglePlayerGame nGame = new SinglePlayerGame(classId, uid, rounds, role, level);
 						nGame.insert();
-						if (nGame.getDefenderId() == 1) {
+						if (role.equals(Role.ATTACKER)) {
 							nGame.addPlayer(uid, Role.ATTACKER);
-							nGame.addPlayer(1, Role.DEFENDER);
+							nGame.addPlayer(AiDefender.ID, Role.DEFENDER);
 						} else {
 							nGame.addPlayer(uid, Role.DEFENDER);
-							nGame.addPlayer(1, Role.ATTACKER);
+							nGame.addPlayer(AiAttacker.ID, Role.ATTACKER);
 						}
 						nGame.tryFirstTurn();
 					} else {

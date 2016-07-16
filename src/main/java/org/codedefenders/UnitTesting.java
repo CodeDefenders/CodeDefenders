@@ -60,7 +60,7 @@ public class UnitTesting extends HttpServlet {
 		} else {
 			int gid = (Integer) ogid;
 			System.out.println("Getting game " + gid + " for " + uid);
-			activeGame = DatabaseAccess.getGameForKey("Game_ID", gid);
+			activeGame = DatabaseAccess.getGameForKey("ID", gid);
 		}
 		session.setAttribute("game", activeGame);
 

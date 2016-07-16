@@ -13,6 +13,7 @@ import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+import org.codedefenders.singleplayer.SinglePlayerGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -230,7 +231,6 @@ public class GameManager extends HttpServlet {
 								//Is potentially equiv - mark as equivalent and update.
 								newMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
 								newMutant.update();
-								//activeGame.passPriority();
 								activeGame.update();
 							} else {
 								activeGame.endTurn();
@@ -256,10 +256,8 @@ public class GameManager extends HttpServlet {
 				// Get the text submitted by the user.
 				String testText = request.getParameter("test");
 
-				int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, activeGame.getId());
-
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
-				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, playerId, "sp");
+				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
 				if (newTest == null) {
 					messages.add(TEST_INVALID_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -300,32 +298,6 @@ public class GameManager extends HttpServlet {
 			}
 		}
 		response.sendRedirect("play");//doGet(request, response);
-	}
-
-	public Test submitAiTestFullSuite(Game g) {
-		//Get class being tested.
-		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", g.getClassId());
-		String cBaseName = classUnderTest.getBaseName();
-
-		//Get test suite location.
-		String dir = AI_DIR + F_SEP + "tests" + F_SEP + classUnderTest.getAlias();
-		String jFile = dir + F_SEP + cBaseName + "EvoSuiteTest" + JAVA_SOURCE_EXT;
-		String cFile = dir + F_SEP + cBaseName + "EvoSuiteTest" + JAVA_CLASS_EXT;
-
-		int gid = g.getId();
-		//File newTestDir = FileManager.getNextSubDir(TESTS_DIR + F_SEP + gid);
-		File newTestDir = new File(dir);
-		Test newTest = AntRunner.compileTest(newTestDir, jFile, gid, classUnderTest, 1);
-		//Inefficient, but need to recompile test.
-		//TODO: Add DatabaseAccess function which gets TargetExecution of same test.
-
-		// Check the test actually passes when applied to the original code.
-		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
-		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-			AntRunner.testOriginal(newTestDir, newTest);
-		}
-
-		return newTest;
 	}
 
 	// Writes text as a Mutant to the appropriate place in the file system.
@@ -375,16 +347,16 @@ public class GameManager extends HttpServlet {
 	 * @param gid
 	 * @param cid
 	 * @param testText
-	 * @param playerId
+	 * @param ownerId
 	 * @param subDirectory - Directory inside data for test to go
 	 * @return {@code null} if test is not valid
 	 * @throws IOException
 	 */
-	public Test createTest(int gid, int cid, String testText, int playerId, String subDirectory) throws IOException {
+	public Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		File newTestDir = FileManager.getNextSubDir(TESTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + playerId);
+		File newTestDir = FileManager.getNextSubDir(TESTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
 
 		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
@@ -393,7 +365,7 @@ public class GameManager extends HttpServlet {
 		}
 
 		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, playerId);
+		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {

@@ -1,4 +1,4 @@
-package org.codedefenders.singleplayer;
+package org.codedefenders.singleplayer.automated.attacker;
 
 class MutantPatch {
 	private int line;

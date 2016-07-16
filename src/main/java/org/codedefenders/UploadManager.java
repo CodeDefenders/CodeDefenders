@@ -8,7 +8,6 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.codedefenders.singleplayer.EvoSuiteMaker;
 import org.codedefenders.singleplayer.PrepareAI;
 
 import javax.servlet.ServletException;

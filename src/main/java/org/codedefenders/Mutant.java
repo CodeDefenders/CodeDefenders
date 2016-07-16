@@ -76,10 +76,10 @@ public class Mutant {
 	 * @param equiv
 	 * @param rCreated
 	 * @param rKilled
-	 * @param ownerId
+	 * @param playerId
 	 */
-	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int ownerId) {
-		this(gid, jFile, cFile, alive, ownerId);
+	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId) {
+		this(gid, jFile, cFile, alive, playerId);
 		this.id = mid;
 		this.equivalent = equiv;
 		this.roundCreated = rCreated;

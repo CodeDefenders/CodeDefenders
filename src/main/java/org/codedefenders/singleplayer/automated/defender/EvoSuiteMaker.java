@@ -1,4 +1,4 @@
-package org.codedefenders.singleplayer;
+package org.codedefenders.singleplayer.automated.defender;
 
 import org.codedefenders.*;
 
@@ -35,9 +35,7 @@ public class EvoSuiteMaker {
 				File newTestDir = FileManager.getNextSubDir(AI_DIR + F_SEP + "tests" +
 						F_SEP + cut.getAlias());
 				String jFile = FileManager.createJavaFile(newTestDir, cut.getBaseName(), t);
-				dGame.addPlayer(1, Role.DEFENDER);
-				int playerID = DatabaseAccess.getPlayerIdForMultiplayerGame(1, dGame.getId());
-				Test newTest = AntRunner.compileTest(newTestDir, jFile, dGame.getId(), cut, playerID);
+				Test newTest = AntRunner.compileTest(newTestDir, jFile, dGame.getId(), cut, AiDefender.ID);
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 				if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {

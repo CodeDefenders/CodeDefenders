@@ -16,6 +16,7 @@ public abstract class AbstractGame {
 	protected static final Logger logger = LoggerFactory.getLogger(Game.class);
 	protected int id;
 	protected int classId;
+	protected int creatorId;
 	protected State state;
 	protected Level level;
 	protected Mode mode;
@@ -34,6 +35,10 @@ public abstract class AbstractGame {
 
 	public GameClass getCUT() {
 		return DatabaseAccess.getClassForKey("Class_ID", classId);
+	}
+
+	public int getCreatorId() {
+		return creatorId;
 	}
 
 	public State getState() {

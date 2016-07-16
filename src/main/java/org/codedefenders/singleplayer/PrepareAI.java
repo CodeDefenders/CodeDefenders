@@ -1,6 +1,10 @@
 package org.codedefenders.singleplayer;
 
 import org.codedefenders.*;
+import org.codedefenders.singleplayer.automated.attacker.AiAttacker;
+import org.codedefenders.singleplayer.automated.attacker.MajorMaker;
+import org.codedefenders.singleplayer.automated.defender.AiDefender;
+import org.codedefenders.singleplayer.automated.defender.EvoSuiteMaker;
 
 import java.util.ArrayList;
 
@@ -11,12 +15,10 @@ public class PrepareAI {
 	}
 
 	public static void createTestsAndMutants(int classId) {
-		Game dummyGame = new Game(classId, 1, 3, Role.ATTACKER, Game.Level.EASY);
+		AIDummyGame dummyGame = new AIDummyGame(classId);
 		dummyGame.insert();
-		dummyGame.setDefenderId(1);
-		dummyGame.setState(Game.State.ACTIVE);
-		dummyGame.update();
-
+		dummyGame.addPlayer(AiAttacker.ID, Role.ATTACKER);
+		dummyGame.addPlayer(AiDefender.ID, Role.DEFENDER);
 
 		EvoSuiteMaker esMake = new EvoSuiteMaker(classId, dummyGame);
 		esMake.makeSuite();
