@@ -1,3 +1,4 @@
+<%@ page import="org.codedefenders.*" %>
 <% String pageTitle="Open Games"; %>
 <%@ include file="/jsp/header.jsp" %>
 <div class="full-width">
@@ -26,9 +27,14 @@
 			atkName = null;
 			defName = null;
 
+			// Single or UTesting games cannot be joined
+			if (g.getMode().equals(AbstractGame.Mode.SINGLE) ||
+					g.getMode().equals(AbstractGame.Mode.UTESTING)) {continue;}
+
 			atkId = g.getAttackerId();
 			defId = g.getDefenderId();
 
+			// User is already playing this game
 			if ((atkId == uid)||(defId == uid)) {continue;}
 
 			if (atkId != 0) {atkName = DatabaseAccess.getUserForKey("User_ID", atkId).username;}
@@ -86,8 +92,8 @@
 			<td class="col-sm-2"><%= g.getPrice() %></td>
 			<td class="col-sm-2"><%= g.getLevel().name() %></td>
 			<td class="col-sm-2">
-				<a href="multiplayer/games?attacker=1&id=<%= g.getId() %>">Attack</a>
-				<a href="multiplayer/games?defender=1&id=<%= g.getId() %>">Defend</a>
+				<a href="multiplayer/games?attacker=1&id=<%= g.getId() %>">Join as Attacker</a><br>
+				<a href="multiplayer/games?defender=1&id=<%= g.getId() %>">Join as Defender</a>
 			</td>
 		</tr>
 		<%
