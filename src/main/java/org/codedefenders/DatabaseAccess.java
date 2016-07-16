@@ -200,7 +200,7 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			if (rs.next()) {
-				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"));
+				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"));
 
 				stmt.close();
 				conn.close();
@@ -245,7 +245,7 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			if (rs.next()) {
-				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"));
+				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"));
 
 				stmt.close();
 				conn.close();
@@ -290,7 +290,7 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			if (rs.next()) {
-				User newUser = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"));
+				User newUser = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"));
 				stmt.close();
 				conn.close();
 				return newUser;

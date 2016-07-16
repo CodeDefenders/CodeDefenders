@@ -16,14 +16,20 @@ public class User {
 	public int id;
 	public String username;
 	public String password;
+	public String email;
 
 	public User(String username, String password) {
 		this.username = username;
 		this.password = password;
 	}
 
-	public User(int id, String username, String password) {
+	public User(String username, String password, String email) {
 		this(username, password);
+		this.email = email;
+	}
+
+	public User(int id, String username, String password, String email) {
+		this(username, password, email);
 		this.id = id;
 	}
 
@@ -42,9 +48,9 @@ public class User {
 			String safePassword = passwordEncoder.encode(password);
 
 			if (id <= 0)
-				sql = String.format("INSERT INTO users (Username, Password) VALUES ('%s', '%s');", username, safePassword);
+				sql = String.format("INSERT INTO users (Username, Password, Email) VALUES ('%s', '%s', '%s');", username, safePassword, email);
 			else
-				sql = String.format("INSERT INTO users (User_ID, Username, Password) VALUES (%d, '%s', '%s');", id, username, safePassword);
+				sql = String.format("INSERT INTO users (User_ID, Username, Password, Email) VALUES (%d, '%s', '%s', '%s');", id, username, safePassword, email);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 

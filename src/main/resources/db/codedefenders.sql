@@ -215,6 +215,7 @@ CREATE TABLE `users` (
   `User_ID` int(11) NOT NULL AUTO_INCREMENT,
   `Username` varchar(20) NOT NULL,
   `Password` char(60) NOT NULL,
+  `Email` varchar(320) NOT NULL,
   PRIMARY KEY (`User_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;

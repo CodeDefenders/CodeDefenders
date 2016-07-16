@@ -27,6 +27,7 @@ public class LoginManager extends HttpServlet {
 
 		String username = (String) request.getParameter("username");
 		String password = (String) request.getParameter("password");
+		String email = (String) request.getParameter("email");
 		String formType = (String) request.getParameter("formType");
 		int uid;
 
@@ -34,7 +35,7 @@ public class LoginManager extends HttpServlet {
 			String confirm = (String) request.getParameter("confirm");
 			if (password.equals(confirm)) {
 				if (DatabaseAccess.getUserForName(username) == null) {
-					User newUser = new User(username, password);
+					User newUser = new User(username, password, email);
 					if (newUser.insert()) {
 						HttpSession session = request.getSession();
 						session.setAttribute("uid", newUser.id);
