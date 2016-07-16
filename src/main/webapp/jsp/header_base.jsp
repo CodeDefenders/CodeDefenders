@@ -50,7 +50,6 @@
     <link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="js/game_highlighting.js"></script>
 
-
     <script>
         $(document).ready(function() {
             $('.single-item').slick({
@@ -59,7 +58,6 @@
                 speed: 300,
                 draggable:false
             });
-            $('#messages-div').delay(10000).fadeOut();
         });
     </script>
 </head>

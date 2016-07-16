@@ -1,3 +1,4 @@
+<%@ page import="org.apache.commons.lang.ArrayUtils" %>
 <%@ include file="/jsp/header_base.jsp" %>
 <div class="menu-top bg-light-blue .minus-2 text-white" style="padding: 5px;">
     <div class="full-width" style="padding-top: 3px;">
@@ -36,8 +37,21 @@
 	if (messages != null && ! messages.isEmpty()) {
 %>
 <div class="alert alert-info" id="messages-div">
-    <% for (String m : messages) { %>
+    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><br />
+    <%
+        boolean fadeOut = true;
+        for (String m : messages) { %>
     <pre><strong><%=m%></strong></pre>
+    <%
+            if (m.equals(Constants.MUTANT_UNCOMPILABLE_MESSAGE)
+                    || m.equals(Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE)
+                    || m.equals(Constants.TEST_DID_NOT_COMPILE_MESSAGE)) {
+                fadeOut = false;
+            }
+        }
+        if (fadeOut) {
+    %>
+    <script> $('#messages-div').delay(10000).fadeOut(); </script>
     <% } %>
 </div>
 <%	} %>
