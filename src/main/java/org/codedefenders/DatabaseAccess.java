@@ -66,19 +66,7 @@ public class DatabaseAccess {
 			System.out.println(e);
 		} // Handle errors for Class.forName
 		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			cleanup(conn, stmt);
 		}
 		return numMutants;
 	}
@@ -120,19 +108,7 @@ public class DatabaseAccess {
 			System.out.println(e);
 			//Handle errors for Class.forName
 		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				System.out.println(se);
-			}//end finally try
+			cleanup(conn, stmt);
 		} //end try
 		return null;
 	}
@@ -167,19 +143,7 @@ public class DatabaseAccess {
 			//Handle errors for Class.forName
 			e.printStackTrace();
 		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}//end finally try
+			cleanup(conn, stmt);
 		} //end try
 
 		return classList;
@@ -214,19 +178,7 @@ public class DatabaseAccess {
 			System.out.println(e);
 			//Handle errors for Class.forName
 		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				System.out.println(se);
-			}//end finally try
+			cleanup(conn, stmt);
 		} //end try
 
 		return null;
@@ -259,19 +211,7 @@ public class DatabaseAccess {
 			System.out.println(e);
 			//Handle errors for Class.forName
 		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				System.out.println(se);
-			}//end finally try
+			cleanup(conn, stmt);
 		} //end try
 
 		return null;
@@ -307,19 +247,7 @@ public class DatabaseAccess {
 			System.out.println(e);
 			//Handle errors for Class.forName
 		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				System.out.println(se);
-			}//end finally try
+			cleanup(conn, stmt);
 		} //end try
 
 		return null;
@@ -369,19 +297,7 @@ public class DatabaseAccess {
 			System.out.println(e);
 		} // Handle errors for Class.forName
 		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			cleanup(conn, stmt);
 		}
 		return null;
 	}
@@ -465,19 +381,7 @@ public class DatabaseAccess {
 			//Handle errors for Class.forName
 			e.printStackTrace();
 		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}//end finally try
+			cleanup(conn, stmt);
 		} //end try
 
 		return role;
@@ -548,19 +452,7 @@ public class DatabaseAccess {
 			//Handle errors for Class.forName
 			e.printStackTrace();
 		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}//end finally try
+			cleanup(conn, stmt);
 		} //end try
 
 		return gameList;
@@ -609,19 +501,7 @@ public class DatabaseAccess {
 			//Handle errors for Class.forName
 			e.printStackTrace();
 		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}//end finally try
+			cleanup(conn, stmt);
 		} //end try
 
 		return gameList;
@@ -663,19 +543,7 @@ public class DatabaseAccess {
 			System.out.println(e);
 		} // Handle errors for Class.forName
 		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			cleanup(conn, stmt);
 		}
 
 		return mutList;
@@ -715,19 +583,7 @@ public class DatabaseAccess {
 			System.out.println(e);
 		} // Handle errors for Class.forName
 		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			cleanup(conn, stmt);
 		}
 
 		return mutList;
@@ -762,19 +618,7 @@ public class DatabaseAccess {
 			System.out.println(e);
 		} // Handle errors for Class.forName
 		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			cleanup(conn, stmt);
 		}
 
 		return newMutant;
@@ -808,19 +652,7 @@ public class DatabaseAccess {
 			System.out.println(e);
 		} // Handle errors for Class.forName
 		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			cleanup(conn, stmt);
 		}
 
 		return newMutant;
@@ -1138,19 +970,7 @@ public class DatabaseAccess {
 			System.out.println(e);
 		} // Handle errors for Class.forName
 		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			cleanup(conn, stmt);
 		}
 		return attackers;
 	}
@@ -1210,19 +1030,7 @@ public class DatabaseAccess {
 			e.printStackTrace();
 		} // Handle errors for Class.forName
 		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			cleanup(conn, stmt);
 		}
 
 		return testList;
@@ -1260,19 +1068,7 @@ public class DatabaseAccess {
 			System.out.println(e);
 		} // Handle errors for Class.forName
 		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			cleanup(conn, stmt);
 		}
 
 		return executionList;
@@ -1323,20 +1119,36 @@ public class DatabaseAccess {
 			System.out.println(e);
 		} // Handle errors for Class.forName
 		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			cleanup(conn, stmt);
 		}
 		return null;
+	}
+
+	public static void logSession(int uid, String ipAddress) {
+		Connection conn =  null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			String sql = String.format("INSERT INTO sessions (User_ID, IP_Address) VALUES ('%d', '%s');", uid, ipAddress);
+
+			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+
+			ResultSet rs = stmt.getGeneratedKeys();
+
+			if (rs.next()) {
+				stmt.close();
+				conn.close();
+			}
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(conn, stmt);
+		}
 	}
 }

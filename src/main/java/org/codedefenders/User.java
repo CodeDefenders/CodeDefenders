@@ -85,4 +85,8 @@ public class User {
 		}
 		return false;
 	}
+
+	public void logSession(String ipAddress) {
+		DatabaseAccess.logSession(id, ipAddress);
+	}
 }

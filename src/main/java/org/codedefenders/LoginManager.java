@@ -69,6 +69,7 @@ public class LoginManager extends HttpServlet {
 				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 				if (passwordEncoder.matches(password, dbPassword)) {
 					HttpSession session = request.getSession();
+					DatabaseAccess.logSession(activeUser.id, getClientIpAddress(request));
 					session.setAttribute("uid", activeUser.id);
 					session.setAttribute("username", username);
 					Object from = session.getAttribute("loginFrom");
@@ -85,5 +86,36 @@ public class LoginManager extends HttpServlet {
 				}
 			}
 		}
+	}
+
+	public String getClientIpAddress(HttpServletRequest request) {
+		String ip = request.getHeader("X-Forwarded-For");
+		System.out.println("X-Forwarded-For: " + ip);
+		if (invalidIP(ip)) {
+			ip = request.getHeader("Proxy-Client-IP");
+			System.out.println("Proxy-Client-IP: " + ip);
+		}
+		if (invalidIP(ip)) {
+			ip = request.getHeader("WL-Proxy-Client-IP");
+			System.out.println("WL-Proxy-Client-IP: " + ip);
+		}
+		if (invalidIP(ip)) {
+			ip = request.getHeader("HTTP_CLIENT_IP");
+			System.out.println("HTTP_CLIENT_IP: " + ip);
+		}
+		if (invalidIP(ip)) {
+			ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+			System.out.println("HTTP_X_FORWARDED_FOR: " + ip);
+		}
+		if (invalidIP(ip)) {
+			ip = request.getRemoteAddr();
+			System.out.println("getRemoteAddr(): " + ip);
+		}
+		return ip;
+	}
+
+	private boolean invalidIP(String ip) {
+		return (ip == null) || (ip.length() == 0) ||
+				("unknown".equalsIgnoreCase(ip)) || ("0:0:0:0:0:0:0:1".equals(ip));
 	}
 }

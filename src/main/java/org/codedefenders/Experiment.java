@@ -42,7 +42,7 @@ public class Experiment extends HttpServlet {
 			for (int id=minUserID; id<=maxUserID; id++) {
 				String username = "hs"+id;
 				String password = randomString.nextString();
-				User newUser = new User(id, username, password);
+				User newUser = new User(id, username, password, "user@experiment");
 				if (newUser.insert()) {
 					userList.add("<tr><td>" + id + "</td><td>" + username + "</td><td>" + password + "</td></tr>");
 				} else {
