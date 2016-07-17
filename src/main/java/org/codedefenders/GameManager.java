@@ -299,7 +299,7 @@ public class GameManager extends HttpServlet {
 	}
 
 	// Writes text as a Mutant to the appropriate place in the file system.
-	public Mutant createMutant(int gid, int cid, String mutantText, int ownerId, String subDirectory) throws IOException {
+	public Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
 
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 		String classMutatedBaseName = classMutated.getBaseName();
@@ -307,18 +307,8 @@ public class GameManager extends HttpServlet {
 		File sourceFile = new File(classMutated.getJavaFile());
 		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
-		// Runs diff match patch between the two Strings to see if there are any differences.
-		DiffMatchPatch dmp = new DiffMatchPatch();
-		LinkedList<DiffMatchPatch.Diff> changes = dmp.diffMain(sourceCode.trim().replace("\n", "").replace("\r", ""), mutantText.trim().replace("\n", "").replace("\r", ""), true);
-		boolean noChange = true;
-		for (DiffMatchPatch.Diff d : changes) {
-			if (d.operation != DiffMatchPatch.Operation.EQUAL) {
-				noChange = false;
-			}
-		}
-
 		// If there were no differences, return, as the mutant is the same as original.
-		if (noChange)
+		if (! validMutant(sourceCode, mutatedCode))
 			return null;
 
 		// Setup folder the files will go in
@@ -332,13 +322,25 @@ public class GameManager extends HttpServlet {
 		File mutantFile = new File(mutantFileName);
 		FileWriter fw = new FileWriter(mutantFile);
 		BufferedWriter bw = new BufferedWriter(fw);
-		bw.write(mutantText);
+		bw.write(mutatedCode);
 		bw.close();
 
 		// Compile the mutant - if you can, add it to the MultiplayerGame State, otherwise, delete these files created.
 		return AntRunner.compileMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
 	}
 
+	private boolean validMutant(String originalCode, String mutatedCode) {
+		// Runs diff match patch between the two Strings to see if there are any differences.
+		DiffMatchPatch dmp = new DiffMatchPatch();
+		LinkedList<DiffMatchPatch.Diff> changes = dmp.diffMain(originalCode.trim().replace("\n", "").replace("\r", ""), mutatedCode.trim().replace("\n", "").replace("\r", ""), true);
+		boolean change = false;
+		for (DiffMatchPatch.Diff d : changes) {
+			if (d.operation != DiffMatchPatch.Operation.EQUAL) {
+				change = true;
+			}
+		}
+		return change;
+	}
 
 	/**
 	 *
