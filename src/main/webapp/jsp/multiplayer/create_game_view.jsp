@@ -44,6 +44,52 @@
 				<td>Attackers</td> <td class="crow fly"><input type="number" value="2" name="minAttackers" />-<input type="number" value="4" name="attackerLimit" /></td>
 			</tr>
 			<tr>
+				<td>Start Time</td> <td>
+				<input type="hidden" id="startTime" name="startTime" />
+				<input name="start_dateTime" id="start_dateTime" value="Select Date"/>
+				<div class="crow fly">
+					<input class="ws-5" type="text" name="start_hours" id="start_hours" value="00" />
+					<span class="wd-2">:</span>
+					<input class="wd-5" type="text" name="start_minutes" id="start_minutes" value="00" />
+				</div>
+				<script>
+					voidFunct = function(){};
+					updateStartTimestamp = function(){
+						var timestamp = new Date($("#start_dateTime").val()).valueOf();
+						timestamp += parseInt($("#start_hours").val()) * 60 * 60 * 1000;
+						timestamp += parseInt($("#start_minutes").val()) * 60 * 1000;
+						var now = new Date().getTime();
+						if (timestamp < now){
+							//invalid timestamp, set it to now
+							timestamp = now;
+						}
+						$("#startTime").val(timestamp);
+					}
+					$("#start_hours").on( "change", function(){
+						var hours = $("#start_hours").val();
+						if (hours < 0 || hours > 59){
+							$("#start_hours").val(0);
+						}
+						updateStartTimestamp();
+					})
+					$("#start_minutes").on( "change", function(){
+						var mins = $("#start_minutes").val();
+						if (mins < 0 || mins > 59){
+							$("#start_minutes").val(0);
+						}
+						updateStartTimestamp();
+					})
+					var dataPicker = $("#start_dateTime").datepicker({
+						onSelect: function (selectedDate, dp) {
+							$(".ui-datepicker a").attr("href", "javascript:voidFunct();");
+							//var date = $.datepicker.formatDate("@", dp);
+							//alert(date);
+							updateStartTimestamp();
+						}
+					});
+				</script>
+				</td>
+			<tr>
 				<td>Finish Time</td> <td>
 				<input type="hidden" id="finishTime" name="finishTime" /><input name="dateTime" id="dateTime" value="Select Date"/>
 				<div class="crow fly">

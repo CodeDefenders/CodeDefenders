@@ -88,9 +88,16 @@
 	<hr />
 
 	<h2>Battlegrounds</h2>
-	<table class="table table-hover table-responsive table-paragraphs"><tr><th>Game ID</th><th>Owner</th><th>
-		Price
-	</th><th>Level</th><th>Actions</th></tr>
+	<table class="table table-hover table-responsive table-paragraphs">
+		<tr>
+			<th>Game ID</th>
+			<th>Owner</th>
+			<th>Price</th>
+			<th>Level</th>
+			<th>Start Date</th>
+			<th>Finish Date</th>
+			<th>Actions</th>
+		</tr>
 <%
 	ArrayList<MultiplayerGame> mgames = DatabaseAccess.getMultiplayerGamesForUser(uid);
 	if (mgames.isEmpty()) {
@@ -106,8 +113,10 @@
 	<tr>
 		<td class="col-sm-2"><%= g.getId() %></td>
 		<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
-		<td class="col-sm-2"><%= g.getPrice() %></td>
-		<td class="col-sm-2"><%= g.getLevel().name() %></td>
+		<td class="col-sm-1"><%= g.getPrice() %></td>
+		<td class="col-sm-1"><%= g.getLevel().name() %></td>
+		<td class="col-sm-2"><%= g.getStartDateTime()%></td>
+		<td class="col-sm-2"><%= g.getFinishDateTime()%></td>
 		<td class="col-sm-2"><%
 			switch(role){
 				case ATTACKER:

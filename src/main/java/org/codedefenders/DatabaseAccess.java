@@ -9,10 +9,7 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class DatabaseAccess {
@@ -485,8 +482,8 @@ public class DatabaseAccess {
 						Game.Level.valueOf(rs.getString("Level")), (float)rs.getDouble("Coverage_Goal"),
 						(float)rs.getDouble("Mutant_Goal"), rs.getInt("Price"), rs.getInt("Defender_Value"),
 						rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
-						rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getLong("Finish_Time"),
-								rs.getString("State"));
+						rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),
+						rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"));
 				mg.setId(rs.getInt("ID"));
 				gameList.add(mg);
 			}

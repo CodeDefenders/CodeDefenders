@@ -3,11 +3,11 @@ package org.codedefenders.multiplayer;
 import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.*;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 
 import static org.codedefenders.Mutant.Equivalence.*;
@@ -23,12 +23,13 @@ public class MultiplayerGame extends AbstractGame {
 	private int defenderLimit;
 	private int minAttackers;
 	private int minDefenders;
-	private long finishTime;
+	private long startDateTime;
+	private long finishDateTime;
 
 
 	public void setId(int id) {
 		this.id = id;
-		if (this.state != State.FINISHED && finishTime < System.currentTimeMillis()){
+		if (this.state != State.FINISHED && finishDateTime < System.currentTimeMillis()){
 			this.state = State.FINISHED;
 			update();
 		}
@@ -74,11 +75,23 @@ public class MultiplayerGame extends AbstractGame {
 		this.price = price;
 	}
 
-	public MultiplayerGame(int classId, int creatorId, Game.Level level,
-						   float lineCoverage, float mutantCoverage, float price,
-						   int defenderValue, int attackerValue, int defenderLimit,
-						   int attackerLimit, int minDefenders, int minAttackers,
-						   long finishTime, String status) {
+	public String getStartDateTime() {
+		Date date = new Date(startDateTime);
+		Format format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return format.format(date);
+	}
+
+	public String getFinishDateTime() {
+		Date date = new Date(finishDateTime);
+		Format format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		return format.format(date);
+	}
+
+	public MultiplayerGame(int classId, int creatorId, Level level,
+	                       float lineCoverage, float mutantCoverage, float price,
+	                       int defenderValue, int attackerValue, int defenderLimit,
+	                       int attackerLimit, int minDefenders, int minAttackers,
+	                       long startDateTime, long finishDateTime, String status) {
 		this.classId = classId;
 		this.creatorId = creatorId;
 		this.level = level;
@@ -93,7 +106,8 @@ public class MultiplayerGame extends AbstractGame {
 		this.minDefenders = minDefenders;
 		this.minAttackers = minAttackers;
 		this.state = State.valueOf(status);
-		this.finishTime = finishTime;
+		this.startDateTime = startDateTime;
+		this.finishDateTime = finishDateTime;
 	}
 
 	public ArrayList<MultiplayerMutant> getMutants() {
@@ -195,11 +209,11 @@ public class MultiplayerGame extends AbstractGame {
 			stmt = conn.createStatement();
 			sql = String.format("INSERT INTO games " +
 					"(Class_ID, Level, Price, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " +
-					"Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Finish_Time, State, Mode) VALUES " +
+					"Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Start_Time, Finish_Time, State, Mode) VALUES " +
 					"('%s', 	'%s', '%f', 	'%d',			'%d',			'%f',			'%f',		'%d'," +
-					"'%d',				'%d',				'%d',			'%d',			'%d',		'%s', 'PARTY');",
+					"'%d',				'%d',				'%d',			'%d',			'%s', '%s',		'%s', 'PARTY');",
 					classId, level.name(), price, defenderValue, attackerValue, lineCoverage, mutantCoverage, creatorId,
-					minAttackers, minDefenders, attackerLimit, defenderLimit, finishTime, state.name());
+					minAttackers, minDefenders, attackerLimit, defenderLimit, new Timestamp(startDateTime), new Timestamp(finishDateTime), state.name());
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
