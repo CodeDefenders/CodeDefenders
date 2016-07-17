@@ -251,3 +251,13 @@ CREATE TABLE `sessions` (
 
 INSERT INTO `users` VALUES (1, 'Mutator', 'AI_ATTACKER_INACCESSIBLE');
 INSERT INTO `users` VALUES (2, 'TestGen', 'AI_DEFENDER_INACCESSIBLE');
+
+-- Event to activate multiplayer game
+SET @@global.event_scheduler = 1;
+DROP EVENT IF EXISTS start_mp_games;
+CREATE EVENT IF NOT EXISTS start_mp_games
+  ON SCHEDULE EVERY 1 MINUTE
+  ON COMPLETION PRESERVE
+DO
+  UPDATE games SET State='ACTIVE'
+  WHERE Mode='PARTY' AND State='CREATED' AND Start_Time<=CURRENT_TIMESTAMP;
