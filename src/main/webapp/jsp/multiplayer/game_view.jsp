@@ -38,20 +38,20 @@
         messages = new ArrayList<String>();
     }
 
-    ArrayList<MultiplayerMutant> mutantsAlive = mg.getAliveMutants();
+    ArrayList<Mutant> mutantsAlive = mg.getAliveMutants();
 
-    ArrayList<MultiplayerMutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();
+    ArrayList<Mutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();
 
-    HashMap<Integer, ArrayList<MultiplayerMutant>> mutantLines = new HashMap<Integer, ArrayList<MultiplayerMutant>>();
+    HashMap<Integer, ArrayList<Mutant>> mutantLines = new HashMap<Integer, ArrayList<Mutant>>();
 
-    HashMap<Integer, ArrayList<MultiplayerMutant>> mutantKilledLines = new HashMap<Integer, ArrayList<MultiplayerMutant>>();
+    HashMap<Integer, ArrayList<Mutant>> mutantKilledLines = new HashMap<Integer, ArrayList<Mutant>>();
 
     if (role.equals(Role.DEFENDER) && request.getParameter("equivLine") != null){
         try {
             int equivLine = Integer.parseInt(request.getParameter("equivLine"));
 
             int equivCounter = 0;
-            for (MultiplayerMutant m : mutantsAlive) {
+            for (Mutant m : mutantsAlive) {
                 for (int line : m.getLines()){
                     if (line == equivLine){
                         m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
@@ -71,9 +71,9 @@
 
             int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
 
-            MultiplayerMutant equiv = null;
+            Mutant equiv = null;
 
-            for (MultiplayerMutant m : mutantsEquiv){
+            for (Mutant m : mutantsEquiv){
                 if (m.getPlayerId() == playerId &&  m.getId() == mutId){
                     m.setScore(0);
                     m.setEquivalent(Mutant.Equivalence.DECLARED_YES);
@@ -85,10 +85,10 @@
         } catch (NumberFormatException e){}
     }
 
-    for (MultiplayerMutant m : mutantsAlive) {
+    for (Mutant m : mutantsAlive) {
         for (int line : m.getLines()){
             if (!mutantLines.containsKey(line)){
-                mutantLines.put(line, new ArrayList<MultiplayerMutant>());
+                mutantLines.put(line, new ArrayList<Mutant>());
             }
 
             mutantLines.get(line).add(m);
@@ -97,12 +97,12 @@
     }
 
 
-    ArrayList<MultiplayerMutant> mutantsKilled = mg.getKilledMutants();
+    ArrayList<Mutant> mutantsKilled = mg.getKilledMutants();
 
-    for (MultiplayerMutant m : mutantsKilled) {
+    for (Mutant m : mutantsKilled) {
         for (int line : m.getLines()){
             if (!mutantKilledLines.containsKey(line)){
-                mutantKilledLines.put(line, new ArrayList<MultiplayerMutant>());
+                mutantKilledLines.put(line, new ArrayList<Mutant>());
             }
 
             mutantKilledLines.get(line).add(m);

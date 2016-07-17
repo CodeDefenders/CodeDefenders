@@ -1,9 +1,5 @@
 package org.codedefenders;
 
-import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.Mutant.Equivalence.DECLARED_YES;
-import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
-
 import difflib.Chunk;
 import difflib.Delta;
 import difflib.DiffUtils;
@@ -48,6 +44,10 @@ public class Mutant {
 
 	private int killedByAITests = 0; //How many times this mutant is killed by an AI test.
 
+	private int score; // multiplayer
+
+	private int[] lines = null; // multiplayer
+
 	/**
 	 * Creates a mutant
 	 * @param gameId
@@ -84,6 +84,8 @@ public class Mutant {
 		this.equivalent = equiv;
 		this.roundCreated = rCreated;
 		this.roundKilled = rKilled;
+
+		score = 0;
 	}
 
 	public int getId() {
@@ -130,6 +132,13 @@ public class Mutant {
 		return playerId;
 	}
 
+	public int getScore() {
+		return score;
+	}
+
+	public void setScore(int score) {
+		this.score += score;
+	}
 	public void kill() {
 		alive = false;
 		roundKilled = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
@@ -146,11 +155,11 @@ public class Mutant {
 		} else {
 			if (classFile == null || classFile.equals("null")) // non-compilable
 				return 0;
-			if (equivalent.equals(DECLARED_YES)) // accepted equivalent
+			if (equivalent.equals(Equivalence.DECLARED_YES)) // accepted equivalent
 				return 0;
-			if (equivalent.equals(ASSUMED_YES)) // claimed, rejected, test did not kill it
+			if (equivalent.equals(Equivalence.ASSUMED_YES)) // claimed, rejected, test did not kill it
 				return 0;
-			if (equivalent.equals(PROVEN_NO)) { // claimed, rejected, test killed it
+			if (equivalent.equals(Equivalence.PROVEN_NO)) { // claimed, rejected, test killed it
 				logger.info("Claimed/rejected/killed mutant " + getId() + " contributes 2 attacker points");
 				return 2;
 			}
@@ -164,11 +173,11 @@ public class Mutant {
 		if (! alive) {
 			if (classFile == null) // non-compilable
 				return 0;
-			if (equivalent.equals(DECLARED_YES)) // accepted equivalent
+			if (equivalent.equals(Equivalence.DECLARED_YES)) // accepted equivalent
 				return 1;
-			if (equivalent.equals(ASSUMED_YES)) // claimed, rejected, test did not kill it
+			if (equivalent.equals(Equivalence.ASSUMED_YES)) // claimed, rejected, test did not kill it
 				return 2;
-			if (equivalent.equals(PROVEN_NO)) // claimed, rejected, test killed it
+			if (equivalent.equals(Equivalence.PROVEN_NO)) // claimed, rejected, test killed it
 				return 0;
 			return 0;
 		}
@@ -266,8 +275,8 @@ public class Mutant {
 			stmt = conn.createStatement();
 			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
 			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
-			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID)" +
-					" VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), playerId);
+			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points)" +
+					" VALUES (%s, %s, %d, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), playerId, score);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 
@@ -321,7 +330,8 @@ public class Mutant {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			String sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', RoundKilled='%d', NumberAiKillingTests='%d' WHERE Mutant_ID='%d';", equivalent.name(), sqlAlive(), roundKilled, killedByAITests, id);
+			String sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', RoundKilled='%d', NumberAiKillingTests='%d', Points=%d WHERE Mutant_ID='%d';",
+					equivalent.name(), sqlAlive(), roundKilled, killedByAITests, score, id);
 			stmt.execute(sql);
 
 			conn.close();
@@ -365,5 +375,27 @@ public class Mutant {
 	}
 	public void incrementTimesKilledAi() {
 		killedByAITests ++;
+	}
+
+	public int[] getLines() {
+		if (lines != null){
+			return lines;
+		}
+		try {
+			List<String> ls = getHTMLReadout();
+			lines = new int[ls.size()];
+			for (int i = 0; i < ls.size(); i++) {
+				String l = ls.get(i);
+				lines[i] = Integer.parseInt(l.split(":")[1].trim());
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (lines == null){
+			lines = new int[0];
+		}
+
+		return lines;
 	}
 }

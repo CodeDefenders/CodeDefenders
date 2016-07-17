@@ -5,9 +5,9 @@
 if (role == Role.ATTACKER && true){
     int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
 
-    MultiplayerMutant equiv = null;
+    Mutant equiv = null;
 
-    for (MultiplayerMutant m : mutantsEquiv){
+    for (Mutant m : mutantsEquiv){
         if (m.getPlayerId() == playerId &&  m.getEquivalent() == Mutant.Equivalence.PENDING_TEST){
             renderMutants = false;
             equiv = m;
@@ -92,7 +92,7 @@ if (role == Role.ATTACKER && true){
 					<table class="table table-hover table-responsive table-paragraphs bg-white">
 						<%
 						if (! mutantsAlive.isEmpty()) {
-							for (MultiplayerMutant m : mutantsAlive) {
+							for (Mutant m : mutantsAlive) {
 						%>
 						<tr>
 							<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4>
@@ -138,7 +138,7 @@ if (role == Role.ATTACKER && true){
 					<table class="table table-hover table-responsive table-paragraphs bg-white">
 						<%
 						if (! mutantsKilled.isEmpty()) {
-							for (MultiplayerMutant m : mutantsKilled) {
+							for (Mutant m : mutantsKilled) {
 						%>
 						<tr>
 							<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4>
@@ -180,7 +180,7 @@ if (role == Role.ATTACKER && true){
 					<table class="table table-hover table-responsive table-paragraphs bg-white">
 						<%
 						if (! mutantsEquiv.isEmpty()) {
-							for (MultiplayerMutant m : mutantsEquiv) {
+							for (Mutant m : mutantsEquiv) {
 						%>
 						<tr>
 							<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4>

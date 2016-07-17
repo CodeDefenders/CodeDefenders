@@ -2,7 +2,7 @@ package org.codedefenders.scoring;
 
 import org.codedefenders.Test;
 import org.codedefenders.multiplayer.MultiplayerGame;
-import org.codedefenders.multiplayer.MultiplayerMutant;
+import org.codedefenders.Mutant;
 
 import java.util.ArrayList;
 
@@ -14,22 +14,22 @@ public abstract class Scorer {
     private static class SizeScorer extends Scorer {
 
         @Override
-        protected int scoreTest(MultiplayerGame g, Test t, ArrayList<MultiplayerMutant> killed) {
+        protected int scoreTest(MultiplayerGame g, Test t, ArrayList<Mutant> killed) {
             return killed.size();
         }
 
         @Override
-        protected int scoreMutant(MultiplayerGame g, MultiplayerMutant m, ArrayList<Test> passed) {
+        protected int scoreMutant(MultiplayerGame g, Mutant m, ArrayList<Test> passed) {
             return passed.size();
         }
     }
 
     private static Scorer scorer = new CoverageScorer();
 
-    protected abstract int scoreTest(MultiplayerGame g, Test t, ArrayList<MultiplayerMutant> killed);
-    protected abstract int scoreMutant(MultiplayerGame g, MultiplayerMutant m, ArrayList<Test> passed);
+    protected abstract int scoreTest(MultiplayerGame g, Test t, ArrayList<Mutant> killed);
+    protected abstract int scoreMutant(MultiplayerGame g, Mutant m, ArrayList<Test> passed);
 
-    public static int score(MultiplayerGame g, Test t, ArrayList<MultiplayerMutant> killed){
+    public static int score(MultiplayerGame g, Test t, ArrayList<Mutant> killed){
         return scorer.scoreTest(g, t, killed);
     }
 
@@ -37,7 +37,7 @@ public abstract class Scorer {
         scorer = s;
     }
 
-    public static int score(MultiplayerGame g, MultiplayerMutant m, ArrayList<Test> passed){
+    public static int score(MultiplayerGame g, Mutant m, ArrayList<Test> passed){
         return scorer.scoreMutant(g, m, passed);
     }
 }

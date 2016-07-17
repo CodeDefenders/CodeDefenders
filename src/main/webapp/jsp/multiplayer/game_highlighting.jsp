@@ -12,7 +12,7 @@ mutantLine([
 %>
 [<%= line %>,
 <%= mutantLines.get(line).size() %>, [
-<% for(MultiplayerMutant mm : mutantLines.get(line)){%>
+<% for(Mutant mm : mutantLines.get(line)){%>
 <%= mm.getId() %>,
 <%}%>
 ]],
@@ -27,7 +27,7 @@ mutantKilledLine([
 %>
 [<%= line %>,
 <%= mutantKilledLines.get(line).size() %>, [
-<% for(MultiplayerMutant mm : mutantKilledLines.get(line)){%>
+<% for(Mutant mm : mutantKilledLines.get(line)){%>
 <%= mm.getId() %>,
 <%}%>
 ]],

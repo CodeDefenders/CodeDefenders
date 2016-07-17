@@ -1,5 +1,6 @@
 package org.codedefenders.multiplayer;
 
+import org.codedefenders.Mutant;
 import org.codedefenders.Test;
 import org.codedefenders.scoring.Scorer;
 
@@ -10,12 +11,12 @@ import java.util.ArrayList;
  */
 public class CoverageScorer extends Scorer {
     @Override
-    protected int scoreTest(MultiplayerGame g, Test t, ArrayList<MultiplayerMutant> killed) {
+    protected int scoreTest(MultiplayerGame g, Test t, ArrayList<Mutant> killed) {
         return (g.getDefenderValue() + killed.size()) * t.getLineCoverage().getLinesCovered().length;
     }
 
     @Override
-    protected int scoreMutant(MultiplayerGame g, MultiplayerMutant m, ArrayList<Test> passed) {
+    protected int scoreMutant(MultiplayerGame g, Mutant m, ArrayList<Test> passed) {
         return (g.getAttackerValue() + passed.size());
     }
 }

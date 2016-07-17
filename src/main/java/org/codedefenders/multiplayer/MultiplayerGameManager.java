@@ -48,7 +48,7 @@ public class MultiplayerGameManager extends HttpServlet {
 				logger.debug("Executing Action resolveEquivalence");
 				System.out.println("MultiplayerGame Manager Executing Action resolveEquivalence");
 				int currentEquivMutantID = Integer.parseInt(request.getParameter("currentEquivMutant"));
-				MultiplayerMutant mutant = activeGame.getMutantByID(currentEquivMutantID);
+				Mutant mutant = activeGame.getMutantByID(currentEquivMutantID);
 				System.out.println("CurrentEquivMutant ID = " + currentEquivMutantID);
 
 				// Check type of equivalence response.
@@ -79,7 +79,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 							MutationTester.runEquivalenceTest(newTest, mutant);
 							activeGame.update();
-							MultiplayerMutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
+							Mutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
 							if (mutantAfterTest.getEquivalent().equals(ASSUMED_YES)) {
 								logger.info("Test failed to kill the mutant, hence assumed equivalent");
 								messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
@@ -87,7 +87,7 @@ public class MultiplayerGameManager extends HttpServlet {
 								logger.info("Mutant was killed, hence tagged not equivalent");
 								messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
 
-								ArrayList<MultiplayerMutant> mm = new ArrayList<MultiplayerMutant>();
+								ArrayList<Mutant> mm = new ArrayList<Mutant>();
 								mm.add(mutantAfterTest);
 								newTest.setScore(Scorer.score(activeGame, newTest, mm));
 								newTest.update();
@@ -127,9 +127,9 @@ public class MultiplayerGameManager extends HttpServlet {
 
 				int attackerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
 
-				MultiplayerMutant newMutant = createMultiplayerMutant(activeGame.getId(), activeGame.getClassId(), mutantText, attackerId, "mp");
+				Mutant newMutant = createMultiplayerMutant(activeGame.getId(), activeGame.getClassId(), mutantText, attackerId, "mp");
 				if (newMutant != null) {
-					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMultiplayerMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
+					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 					if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
 						messages.add(MUTANT_COMPILED_MESSAGE);
 						MutationTester.runAllTestsOnMultiplayerMutant(activeGame, newMutant, messages);
@@ -186,7 +186,7 @@ public class MultiplayerGameManager extends HttpServlet {
 		response.sendRedirect("play");//doGet(request, response);
 	}
 
-	public MultiplayerMutant createMultiplayerMutant(int gid, int cid, String mutantText, int ownerId, String subDirectory) throws IOException {
+	public Mutant createMultiplayerMutant(int gid, int cid, String mutantText, int ownerId, String subDirectory) throws IOException {
 
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 		String classMutatedBaseName = classMutated.getBaseName();

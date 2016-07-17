@@ -1,13 +1,11 @@
 package org.codedefenders.scoring;
 
+import org.codedefenders.Mutant;
 import org.codedefenders.Test;
 import org.codedefenders.multiplayer.MultiplayerGame;
-import org.codedefenders.multiplayer.MultiplayerMutant;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Created by thoma on 07/07/2016.
@@ -15,7 +13,7 @@ import java.util.List;
 public class CoverageScorer extends Scorer {
 
     @Override
-    protected int scoreTest(MultiplayerGame g, Test t, ArrayList<MultiplayerMutant> killed) {
+    protected int scoreTest(MultiplayerGame g, Test t, ArrayList<Mutant> killed) {
         int totalLines = t.getLineCoverage().getLinesCovered().length + t.getLineCoverage().getLinesUncovered().length;
 
         float percentCovered = t.getLineCoverage().getLinesCovered().length/(float)totalLines;
@@ -24,18 +22,18 @@ public class CoverageScorer extends Scorer {
     }
 
     @Override
-    protected int scoreMutant(MultiplayerGame g, MultiplayerMutant mm, ArrayList<Test> passed) {
-        ArrayList<MultiplayerMutant> mutants = g.getMutants();
+    protected int scoreMutant(MultiplayerGame g, Mutant mm, ArrayList<Test> passed) {
+        ArrayList<Mutant> mutants = g.getMutants();
 
-        HashMap<Integer, ArrayList<MultiplayerMutant>> mutantLines = new HashMap<Integer, ArrayList<MultiplayerMutant>>();
+        HashMap<Integer, ArrayList<Mutant>> mutantLines = new HashMap<Integer, ArrayList<Mutant>>();
 
-        for (MultiplayerMutant m : mutants) {
+        for (Mutant m : mutants) {
             if (mm.getId() ==m.getId()){
                 continue;
             }
             for (int line : m.getLines()){
                 if (!mutantLines.containsKey(line)){
-                    mutantLines.put(line, new ArrayList<MultiplayerMutant>());
+                    mutantLines.put(line, new ArrayList<Mutant>());
                 }
 
                 mutantLines.get(line).add(m);

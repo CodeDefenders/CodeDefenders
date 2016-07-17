@@ -3,10 +3,8 @@ package org.codedefenders;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.codedefenders.multiplayer.CoverageGenerator;
 import org.codedefenders.multiplayer.LineCoverage;
-import org.codedefenders.multiplayer.MultiplayerMutant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,8 +17,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.FileHandler;
 
 import static org.codedefenders.Constants.*;
 
@@ -79,94 +75,6 @@ public class AntRunner {
 		return newExec;
 	}
 
-	/**
-	 * Executes a test against a mutant
-	 * @param t A {@link Test} object
-	 * @param c A {@link GameClass} object
-	 * @return A {@link TargetExecution} object
-	 */
-	public static LineCoverage getLinesCovered(Test t, GameClass c) {
-		logger.debug("Running test {} on class {}", t.getId(), c.getName());
-		String[] resultArray = runAntTarget("test-original", null, t.getFolder(), c, t.getFullyQualifiedClassName());
-
-
-		//String[] results2 = processJacoco(context,  t.getFolder());
-
-		for (String s :resultArray){
-			System.out.println(s);
-		}
-
-//		for (String s : results2){
-//			System.out.println(s);
-//		}
-
-		CoverageGenerator cg = new CoverageGenerator(
-				new File(t.getFolder()),
-				new File(Constants.CUTS_DIR + F_SEP + c.getAlias()));
-
-		try {
-			cg.create(c.getName());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		ArrayList<Integer> linesCovered = cg.getLinesCovered();
-
-		Integer[] r = new Integer[linesCovered.size()];
-
-		linesCovered.toArray(r);
-
-		LineCoverage lc = new LineCoverage();
-
-		lc.setLinesCovered(r);
-
-		ArrayList<Integer> linesUncovered = cg.getLinesUncovered();
-
-		r = new Integer[linesUncovered.size()];
-
-		linesUncovered.toArray(r);
-
-		lc.setLinesUncovered(r);
-
-		System.out.println(lc.toString());
-
-		return lc;
-	}
-
-	/**
-	 * Executes a test against a mutant
-	 * @param m A {@link MultiplayerMutant} object
-	 * @param t A {@link Test} object
-	 * @return A {@link TargetExecution} object
-	 */
-	public static TargetExecution testMutant(MultiplayerMutant m, Test t) {
-		logger.debug("Running test {} on mutant {}", t.getId(), m.getId());
-		System.out.println("Running test " + t.getId() + " on mutant " + m.getId());
-		GameClass cut = DatabaseAccess.getMultiplayerGame(m.getGameId()).getCUT();
-		String className = cut.getName();
-		String[] resultArray = runAntTarget("test-mutant", m.getFolder(), t.getFolder(), cut, t.getFullyQualifiedClassName());
-
-		TargetExecution newExec = null;
-//<<<<<<< HEAD
-		if (resultArray[0].toLowerCase().contains("failures: 0")) {
-			// If the test doesn't return failure
-			if (resultArray[0].toLowerCase().contains("errors: 0")) {
-				// The test succeeded and a Target Execution for the mutant/test pairing is recorded. This means the test failed to detect the mutant
-				newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "SUCCESS", null);
-			} else {
-				// New target execution recording failed test against mutant due to error
-				// Not sure on what circumstances cause a junit error, return all streams
-				String message = resultArray[0] + " " + resultArray[1] + " " + resultArray[2];
-				newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "ERROR", message);
-			}
-		} else {
-			// The test failed and a Target Execution for the mutant/test pairing is recorded. The test detected the mutant.
-			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "FAIL", null);
-		}
-		newExec.insert();
-		return newExec;
-		}
-//=======
 	public static boolean potentialEquivalent(Mutant m) {
 		System.out.println("Checking if mutant " + m.getId() + " is potentially equivalent.");
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
@@ -309,7 +217,7 @@ public class AntRunner {
 	 * @param classMutated
 	 * @return A {@link Mutant} object
 	 */
-	public static MultiplayerMutant compileMultiplayerMutant(File dir, String jFile, int gameID, GameClass classMutated, int ownerId) {
+	public static Mutant compileMultiplayerMutant(File dir, String jFile, int gameID, GameClass classMutated, int ownerId) {
 		//public static int compileMutant(ServletContext context, Mutant m2) {
 
 		// Gets the classname for the mutant from the game it is in
@@ -317,7 +225,7 @@ public class AntRunner {
 		System.out.println("Compilation result:");
 		System.out.println(Arrays.toString(resultArray));
 
-		MultiplayerMutant newMutant = null;
+		Mutant newMutant = null;
 		// If the input stream returned a 'successful build' message, the mutant compiled correctly
 		if (resultArray[0].toLowerCase().contains("build successful")) {
 			// Create and insert a new target execution recording successful compile, with no message to report, and return its ID
@@ -326,7 +234,7 @@ public class AntRunner {
 			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
 			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
 			String cFile = matchingFiles.get(0).getAbsolutePath();
-			newMutant = new MultiplayerMutant(-1, gameID, jFile, cFile, "ASSUMED_NO", true, ownerId);
+			newMutant = new Mutant(-1, gameID, jFile, cFile, true, Mutant.Equivalence.ASSUMED_NO, -1, -1, ownerId);
 			newMutant.insert();
 			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "SUCCESS", null);
 			newExec.insert();
@@ -334,7 +242,7 @@ public class AntRunner {
 			// The mutant failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
 			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(Constants.DATA_DIR, "");
-			newMutant = new MultiplayerMutant(-1, gameID, jFile, null, "ASSUMED_NO", false, ownerId);
+			newMutant = new Mutant(-1, gameID, jFile, null, false, Mutant.Equivalence.ASSUMED_NO, -1, -1, ownerId);
 			newMutant.insert();
 			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "FAIL", message);
 			newExec.insert();
@@ -491,6 +399,60 @@ public class AntRunner {
 		System.out.println("lg :" + debug);
 
 		return resultArray;
+	}
+
+	/**
+	 * Executes a test against a mutant
+	 * @param t A {@link Test} object
+	 * @param c A {@link GameClass} object
+	 * @return A {@link TargetExecution} object
+	 */
+	public static LineCoverage getLinesCovered(Test t, GameClass c) {
+		logger.debug("Running test {} on class {}", t.getId(), c.getName());
+		String[] resultArray = runAntTarget("test-original", null, t.getFolder(), c, t.getFullyQualifiedClassName());
+
+
+		//String[] results2 = processJacoco(context,  t.getFolder());
+
+		for (String s :resultArray){
+			System.out.println(s);
+		}
+
+//		for (String s : results2){
+//			System.out.println(s);
+//		}
+
+		CoverageGenerator cg = new CoverageGenerator(
+				new File(t.getFolder()),
+				new File(Constants.CUTS_DIR + F_SEP + c.getAlias()));
+
+		try {
+			cg.create(c.getName());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		ArrayList<Integer> linesCovered = cg.getLinesCovered();
+
+		Integer[] r = new Integer[linesCovered.size()];
+
+		linesCovered.toArray(r);
+
+		LineCoverage lc = new LineCoverage();
+
+		lc.setLinesCovered(r);
+
+		ArrayList<Integer> linesUncovered = cg.getLinesUncovered();
+
+		r = new Integer[linesUncovered.size()];
+
+		linesUncovered.toArray(r);
+
+		lc.setLinesUncovered(r);
+
+		System.out.println(lc.toString());
+
+		return lc;
 	}
 
 	private static String[] processJacoco(ServletContext context, String testFile) {

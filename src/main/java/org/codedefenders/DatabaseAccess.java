@@ -2,7 +2,6 @@ package org.codedefenders;
 
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
-import org.codedefenders.multiplayer.MultiplayerMutant;
 import org.codedefenders.singleplayer.SinglePlayerGame;
 
 import javax.naming.Context;
@@ -504,9 +503,9 @@ public class DatabaseAccess {
 		return gameList;
 	}
 
-	public static ArrayList<MultiplayerMutant> getMutantsForAttackers(int[] attackers) {
+	public static ArrayList<Mutant> getMutantsForAttackers(int[] attackers) {
 
-		ArrayList<MultiplayerMutant> mutList = new ArrayList<>();
+		ArrayList<Mutant> mutList = new ArrayList<>();
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -523,9 +522,10 @@ public class DatabaseAccess {
 				ResultSet rs = stmt.executeQuery(sql);
 
 				while (rs.next()) {
-					MultiplayerMutant newMutant = new MultiplayerMutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
-							rs.getString("JavaFile"), rs.getString("ClassFile"), rs.getString("Equivalent"),
-							rs.getBoolean("Alive"), rs.getInt("Player_ID"));
+					Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
+							rs.getString("JavaFile"), rs.getString("ClassFile"),
+							rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
+							rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
 					newMutant.setScore(rs.getInt("Points"));
 					mutList.add(newMutant);
 				}
@@ -621,9 +621,14 @@ public class DatabaseAccess {
 		return newMutant;
 	}
 
-	public static MultiplayerMutant getMultiplayerMutant(int mutantID) {
+	/**
+	 * Multiplayer method
+	 * @param mutantID
+	 * @return
+	 */
+	public static Mutant getMultiplayerMutant(int mutantID) {
 
-		MultiplayerMutant newMutant = null;
+		Mutant newMutant = null;
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -635,9 +640,10 @@ public class DatabaseAccess {
 			String sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d';", mutantID);
 			ResultSet rs = stmt.executeQuery(sql);
 			if (rs.next()) {
-				newMutant = new MultiplayerMutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
-						rs.getString("JavaFile"), rs.getString("ClassFile"), rs.getString("Equivalent"),
-						rs.getBoolean("Alive"), rs.getInt("Attacker_ID"));
+				newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
+						rs.getString("JavaFile"), rs.getString("ClassFile"),
+						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
+						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Attacker_ID"));
 			}
 
 			stmt.close();
@@ -1082,11 +1088,6 @@ public class DatabaseAccess {
 	}
 
 	public static TargetExecution getTargetExecutionForMutant(Mutant mutant, TargetExecution.Target target) {
-		String sql = String.format("SELECT * FROM targetexecutions WHERE Mutant_ID='%d' AND Target='%s';", mutant.getId(), target.name());
-		return getTargetExecutionSQL(sql);
-	}
-
-	public static TargetExecution getTargetExecutionForMultiplayerMutant(MultiplayerMutant mutant, TargetExecution.Target target) {
 		String sql = String.format("SELECT * FROM targetexecutions WHERE Mutant_ID='%d' AND Target='%s';", mutant.getId(), target.name());
 		return getTargetExecutionSQL(sql);
 	}

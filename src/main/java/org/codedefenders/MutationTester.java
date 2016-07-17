@@ -3,7 +3,6 @@ package org.codedefenders;
 import com.sun.org.apache.xpath.internal.operations.Mult;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
-import org.codedefenders.multiplayer.MultiplayerMutant;
 import org.codedefenders.scoring.Scorer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,10 +54,10 @@ public class MutationTester {
 
 	public static void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages) {
 		int killed = 0;
-		ArrayList<MultiplayerMutant> mutants = game.getAliveMutants();
+		ArrayList<Mutant> mutants = game.getAliveMutants();
 		mutants.addAll(game.getMutantsMarkedEquivalent());
-		ArrayList<MultiplayerMutant> killedMutants = new ArrayList<MultiplayerMutant>();
-		for (MultiplayerMutant mutant : mutants) {
+		ArrayList<Mutant> killedMutants = new ArrayList<Mutant>();
+		for (Mutant mutant : mutants) {
 			boolean k = testVsMultiplayerMutant(game, test, mutant);
 			if (k){
 				killed++;
@@ -69,7 +68,7 @@ public class MutationTester {
 		ArrayList<Test> tests = new ArrayList<Test>();
 		tests.add(test);
 
-		for (MultiplayerMutant mm : mutants){
+		for (Mutant mm : mutants){
 			if (mm.isAlive()){
 				mm.setScore(Scorer.score(game, mm, tests));
 
@@ -119,13 +118,13 @@ public class MutationTester {
 			messages.add(String.format(MUTANT_ALIVE_N_MESSAGE,tests.size()));
 	}
 
-	public static void runAllTestsOnMultiplayerMutant(MultiplayerGame game, MultiplayerMutant mutant, ArrayList<String> messages) {
+	public static void runAllTestsOnMultiplayerMutant(MultiplayerGame game, Mutant mutant, ArrayList<String> messages) {
 		ArrayList<Test> tests = game.getExecutableTests();
 		for (Test test : tests) {
 			// If this mutant/test pairing hasnt been run before and the test might kill the mutant
 			if (testVsMultiplayerMutant(game, test, mutant)) {
 				messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
-				ArrayList<MultiplayerMutant> mlist = new ArrayList<MultiplayerMutant>();
+				ArrayList<Mutant> mlist = new ArrayList<Mutant>();
 				mlist.add(mutant);
 				test.setScore(Scorer.score(game, test, mlist));
 				return;
@@ -180,7 +179,7 @@ public class MutationTester {
 		return false;
 	}
 
-	private static boolean testVsMultiplayerMutant(MultiplayerGame g, Test test, MultiplayerMutant mutant) {
+	private static boolean testVsMultiplayerMutant(MultiplayerGame g, Test test, Mutant mutant) {
 		if (DatabaseAccess.getTargetExecutionForPair(test.getId(), mutant.getId()) == null) {
 			// Run the test against the mutant and get the result
 			TargetExecution executedTarget = AntRunner.testMutant(mutant, test);
@@ -189,7 +188,7 @@ public class MutationTester {
 			if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
 				System.out.println(String.format("Test %d kills Mutant %d", test.getId(), mutant.getId()));
 				mutant.kill();
-				ArrayList<MultiplayerMutant> mlist = new ArrayList<MultiplayerMutant>();
+				ArrayList<Mutant> mlist = new ArrayList<Mutant>();
 
 				mlist.add(mutant);
 				test.killMutant();
@@ -218,27 +217,10 @@ public class MutationTester {
 		} else {
 			// If the test DID pass, the mutant went undetected and it is assumed to be equivalent.
 			mutant.setEquivalent(ASSUMED_YES);
-		}
-		// Kill the mutant if it was killed by the test or if it's marked equivalent
-		mutant.kill();
-	}
-
-	public static void runEquivalenceTest(Test test, MultiplayerMutant mutant) {
-		logger.info("Running equivalence test.");
-		// The test created is new and was made by the attacker (there is no need to check if the mutant/test pairing has been run already)
-
-		// As a result of this test, either the test the attacker has written kills the mutant or doesnt.
-		TargetExecution executedTarget = AntRunner.testMutant(mutant, test);
-
-		if (executedTarget.status.equals("ERROR") || executedTarget.status.equals("FAIL")) {
-			// If the test did NOT pass, the mutant was detected and is proven to be non-equivalent
-			mutant.setEquivalent(PROVEN_NO);
-		} else {
-			// If the test DID pass, the mutant went undetected and it is assumed to be equivalent.
-			mutant.setEquivalent(ASSUMED_YES);
 			mutant.setScore(0);
 		}
 		// Kill the mutant if it was killed by the test or if it's marked equivalent
 		mutant.kill();
 	}
+
 }
