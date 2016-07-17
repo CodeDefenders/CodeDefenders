@@ -4,11 +4,11 @@ MYSQL_PASSWORD=\*\*\*REMOVED\*\*\*
 EMAIL_PASSWORD=\*\*\*REMOVED\*\*\*
 
 default:
-	mvn -DskipTests clean compile package install war:war tomcat7:redeploy
+	mvn clean compile package install war:war tomcat7:redeploy
 
 # deploying for the first time
 first:
-	mvn -DskipTests clean compile package install war:war tomcat7:deploy
+	mvn clean compile package install war:war tomcat7:deploy
 
 # write passwords where needed
 passwords:
