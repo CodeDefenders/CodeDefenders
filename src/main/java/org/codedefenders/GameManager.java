@@ -6,12 +6,9 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.DoStmt;
-import com.github.javaparser.ast.stmt.ForStmt;
-import com.github.javaparser.ast.stmt.ForeachStmt;
-import com.github.javaparser.ast.stmt.IfStmt;
-import com.github.javaparser.ast.stmt.WhileStmt;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.stmt.*;
+import org.apache.commons.lang.ArrayUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.singleplayer.SinglePlayerGame;
 import org.slf4j.Logger;
@@ -29,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -400,6 +398,7 @@ public class GameManager extends HttpServlet {
 				return false;
 			}
 
+			int assertionCount = 0;
 			for (Node node : testBody.getChildrenNodes()) {
 				if (node instanceof ForeachStmt
 						|| node instanceof IfStmt
@@ -408,6 +407,11 @@ public class GameManager extends HttpServlet {
 						|| node instanceof DoStmt) {
 					System.out.println("Invalid test contains " + node.getClass().getSimpleName() + " statement");
 					return false;
+				}
+				if (isAssertion(node)) {
+					assertionCount++;
+					if (assertionCount > 2)
+						return false;
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -418,5 +422,19 @@ public class GameManager extends HttpServlet {
 			in.close();
 		}
 		return true;
+	}
+
+	private boolean isAssertion(Node node) {
+		if (node instanceof AssertStmt)
+			return true;
+		if (node instanceof ExpressionStmt) {
+			ExpressionStmt exprStmt = (ExpressionStmt) node;
+			if ((exprStmt.getExpression() instanceof MethodCallExpr)) {
+				MethodCallExpr call = (MethodCallExpr)exprStmt.getExpression();
+				if (ArrayUtils.contains(new String[]{"assertEquals", "assertTrue", "assertFalse", "assertNull", "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals"}, call.getName()))
+					return true;
+			}
+		}
+		return false;
 	}
 }
