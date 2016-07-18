@@ -3,17 +3,17 @@
 <%@ page import="org.codedefenders.*" %>
 <%
     // Get their user id from the session.
-    int uid = (Integer) session.getAttribute("uid");
+    int uid = ((Integer) session.getAttribute("uid")).intValue();
     int gameId = 0;
     try {
-        gameId = Integer.parseInt(request.getParameter("id"));
-        session.setAttribute("mpGameId", gameId);
-    } catch (NumberFormatException e){
         try {
-            gameId = (Integer) session.getAttribute("mpGameId");
-        } catch (NullPointerException e2){
-            response.sendRedirect("multiplayer/games/user");
+            gameId = Integer.parseInt(request.getParameter("id"));
+            session.setAttribute("mpGameId", new Integer(gameId));
+        } catch (NumberFormatException e) {
+            gameId = ((Integer) session.getAttribute("mpGameId")).intValue();
         }
+    } catch (Exception e2){
+        response.sendRedirect("multiplayer/games/user");
     }
     boolean isTests = false;
     boolean renderMutants = true;
