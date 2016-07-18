@@ -141,8 +141,22 @@
 		<div class="slider single-item">
 			<%
 				boolean isTests = false;
-				for (Test t : game.getExecutableTests()) {
+
+				String codeDivName = "newmut-div";
+				HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<Integer, ArrayList<Test>>();
+				List<Test> tests = game.getExecutableTests();
+
+				for (Test t : tests) {
 					isTests = true;
+
+					for (Integer lc : t.getLineCoverage().getLinesCovered()){
+						if (!linesCovered.containsKey(lc)){
+							linesCovered.put(lc, new ArrayList<Test>());
+						}
+
+						linesCovered.get(lc).add(t);
+					}
+
 					String tc = "";
 					for (String line : t.getHTMLReadout()) { tc += line + "\n"; }
 			%>
@@ -186,6 +200,15 @@
 		mode: "text/x-java"
 	});
 	editor.setSize("100%", 500);
+
+	highlightCoverage = function(){
+		highlightLine([<% for (Integer i : linesCovered.keySet()){%>
+			[<%=i%>, <%=((float)linesCovered.get(i).size() / (float) tests.size())%>],
+			<% } %>], COVERED_COLOR, "<%="#" + codeDivName%>");
+	};
+	$(document).ready(function(){
+		highlightCoverage();
+	});
 
 	var x = document.getElementsByClassName("utest");
 	var i;
