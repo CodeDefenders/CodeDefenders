@@ -352,9 +352,7 @@ public class MultiplayerGame extends AbstractGame {
 		allMutants.addAll(getAliveMutants());
 		allMutants.addAll(getKilledMutants());
 		for (Mutant mm : getMutantsMarkedEquivalent()){
-			if (!mm.getEquivalent().equals(Mutant.Equivalence.DECLARED_YES) && !mm.getEquivalent().equals(Mutant.Equivalence.ASSUMED_YES)){
-				allMutants.add(mm);
-			}
+			allMutants.add(mm);
 		}
 
 
