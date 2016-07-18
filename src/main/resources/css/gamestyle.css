@@ -9,6 +9,14 @@ body {
 	background-color: #fafafa;
 }
 
+h2 {
+	font-size: 32px;
+}
+
+h3 {
+	font-size: 25px;
+}
+
 #site-logo:hover {
 	color: #CCCCCC;
 }

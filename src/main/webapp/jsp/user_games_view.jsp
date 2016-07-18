@@ -9,7 +9,7 @@
 	int uid = (Integer)request.getSession().getAttribute("uid");
 	ArrayList<Game> games = DatabaseAccess.getGamesForUser(uid); %>
 <div class="w-100">
-	<h2>Duels</h2>
+	<h3>Duels</h3>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
 		<th class="col-sm-2">Game ID</th>
@@ -22,7 +22,7 @@
 	<%
 	if (games.isEmpty()) {
 %>
-	<tr><td colspan="7"> You are not currently in any games.</td></tr>
+	<tr><td colspan="100%"> You are not currently playing any duel game. </td></tr>
 <%
 	} else {
 		%>
@@ -85,7 +85,7 @@
 
 	<hr />
 
-	<h2>Battlegrounds</h2>
+	<h3>Battlegrounds</h3>
 	<table class="table table-hover table-responsive table-paragraphs games-table">
 		<tr>
 			<th>Game ID</th>
@@ -102,7 +102,7 @@
 	ArrayList<MultiplayerGame> mgames = DatabaseAccess.getMultiplayerGamesForUser(uid);
 	if (mgames.isEmpty()) {
 %>
-<tr><td colspan="5"> You are not currently in any games. </td></tr>
+<tr><td colspan="100%"> You are not currently playing any multiplayer game. </td></tr>
 <%
 } else {
 %>

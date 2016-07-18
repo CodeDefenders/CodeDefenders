@@ -2,15 +2,15 @@
 <% String pageTitle="Game History"; %>
 <%@ include file="/jsp/header.jsp" %>
 <div>
-<h2> View Past Games </h2>
+<h3> Duels </h3>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
-		<td class="col-sm-2">Game No.</td>
-		<td class="col-sm-2">Class</td>
-		<td class="col-sm-2">Attacker</td>
-		<td class="col-sm-2">Defender</td>
-		<td class="col-sm-2">Level</td>
-		<td class="col-sm-2"></td>
+		<th>Game ID</th>
+		<th>Class</th>
+		<th>Attacker</th>
+		<th>Defender</th>
+		<th>Level</th>
+		<th></th>
 	</tr>
 
 
@@ -48,12 +48,12 @@
 	<%
 		}
 		if (!isGames) {%>
-	<p> There are currently no games in your history </p>
+	<tr><td colspan="100%"> Empty duels history. </td></tr>
 	<%}
 	%>
 </table>
 	<hr />
-	<h2>Battlegrounds</h2>
+	<h3>Battlegrounds</h3>
 	<table class="table table-hover table-responsive table-paragraphs games-table">
 		<tr>
 			<th>Game ID</th>
@@ -67,7 +67,7 @@
 			ArrayList<MultiplayerGame> mgames = DatabaseAccess.getFinishedMultiplayerGamesForUser(uid);
 			if (mgames.isEmpty()) {
 		%>
-		<tr><td colspan="5"> You have complete no games. </td></tr>
+		<tr><td colspan="100%"> Empty multi-player games history. </td></tr>
 		<%
 		} else {
 		%>

@@ -2,7 +2,7 @@
 <% String pageTitle="Open Games"; %>
 <%@ include file="/jsp/header.jsp" %>
 <div class="full-width">
-	<h2>Duels</h2>
+	<h3>Duels</h3>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
 		<th class="col-sm-1">Game ID</th>
@@ -63,13 +63,13 @@
 	<%
 		}
 		if (!isGames) {%>
-	<tr><td colspan="8"> There are currently no open games </td></tr>
+	<tr><td colspan="100%"> There are currently no open duels. </td></tr>
 	<%}
 	%>
 </table>
 	<a href="/games/create">Create Duel</a>
 	<hr />
-	<h2>Battlegrounds</h2>
+	<h3>Battlegrounds</h3>
 	<table class="table table-hover table-responsive table-paragraphs games-table">
 		<tr>
 			<th>Game ID</th>
@@ -87,7 +87,7 @@
 		ArrayList<MultiplayerGame> mgames = DatabaseAccess.getMultiplayerGamesExcludingUser(uid);
 		if (mgames.isEmpty()) {
 	%>
-		<tr><td colspan="5"> There are currently no open games. </td></tr>
+		<tr><td colspan="100%"> There are currently no open multiplayer games. </td></tr>
 	<%
 	} else {
 	%>
