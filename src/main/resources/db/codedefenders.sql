@@ -249,8 +249,8 @@ CREATE TABLE `sessions` (
 
 -- Dump completed on 2016-07-13 11:18:20
 
-INSERT INTO `users` VALUES (1, 'Mutator', 'AI_ATTACKER_INACCESSIBLE');
-INSERT INTO `users` VALUES (2, 'TestGen', 'AI_DEFENDER_INACCESSIBLE');
+INSERT INTO `users` (`Username`, `Password`, `Email`) VALUES ('Mutator', 'AI_ATTACKER_INACCESSIBLE', 'codedef_mutator@sheffield.ac.uk');
+INSERT INTO `users` (`Username`, `Password`, `Email`) VALUES ('TestGen', 'AI_DEFENDER_INACCESSIBLE', 'codedef_testgen@sheffield.ac.uk');
 
 -- Event to activate multiplayer game
 SET @@global.event_scheduler = 1;
