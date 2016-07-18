@@ -61,32 +61,17 @@
 		<h2> JUnit tests </h2>
 		<div class="slider single-item">
 			<%
-				boolean isTests = false;
-
 				Role role = game.getRole(uid);
 
 				String codeDivName = "cut-div";
 				HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<Integer, ArrayList<Test>>();
-				ArrayList<Integer> linesUncovered = new ArrayList<Integer>();
 				List<Test> tests = game.getExecutableTests();
 
 				for (Test t : tests) {
-					isTests = true;
-
-					for (Integer luc : t.getLineCoverage().getLinesUncovered()){
-						if (!linesUncovered.contains(luc) && !linesCovered.containsKey(luc)){
-							linesUncovered.add(luc);
-						}
-					}
-
 
 					for (Integer lc : t.getLineCoverage().getLinesCovered()){
 						if (!linesCovered.containsKey(lc)){
 							linesCovered.put(lc, new ArrayList<Test>());
-						}
-
-						if (linesUncovered.contains(lc)){
-							linesUncovered.remove(lc);
 						}
 
 						linesCovered.get(lc).add(t);
@@ -98,7 +83,7 @@
 			<div><h4>Test <%= t.getId() %></h4><pre class="readonly-pre"><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
 			<%
 				}
-				if (!isTests) {%>
+				if (tests.isEmpty()) {%>
 			<div><h2></h2><p> There are currently no tests </p></div>
 			<%}
 			%>
