@@ -11,7 +11,7 @@
 	} else {
 		%>
 <table><tr><th>Game ID</th><th>Owner</th><th>Coverage Goal</th><th>Mutant Coverage Goal</th><th>
-	Price
+	Prize
 </th><th>Level</th></tr>
 	<%
 		for (MultiplayerGame g : games) {
@@ -22,7 +22,7 @@
 		<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
 		<td class="col-sm-2"><%= g.getLineCoverage() %></td>
 		<td class="col-sm-2"><%= g.getMutantCoverage() %></td>
-		<td class="col-sm-2"><%= g.getPrice() %></td>
+		<td class="col-sm-2"><%= g.getPrize() %></td>
 		<td class="col-sm-2"><%= g.getLevel().name() %></td>
 	</tr>
 <%
