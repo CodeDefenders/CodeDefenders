@@ -25,7 +25,8 @@
     String codeDivName = "cut-div";
 
     MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
-    if (mg.getState().equals(AbstractGame.State.FINISHED)) {
+
+    if (! mg.getState().equals(AbstractGame.State.ACTIVE)) {
         response.sendRedirect("/games/user");
     }
     Role role = mg.getRole(uid);
