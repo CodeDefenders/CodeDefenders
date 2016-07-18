@@ -15,12 +15,9 @@
     } catch (Exception e2){
         response.sendRedirect("multiplayer/games/user");
     }
-    boolean isTests = false;
     boolean renderMutants = true;
 
     HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<Integer, ArrayList<Test>>();
-
-    ArrayList<Integer> linesUncovered = new ArrayList<Integer>();
 
     String codeDivName = "cut-div";
 
@@ -32,6 +29,17 @@
     Role role = mg.getRole(uid);
 
     List<Test> tests = mg.getExecutableTests();
+
+    // compute line coverage information
+    for (Test t : tests) {
+        for (Integer lc : t.getLineCoverage().getLinesCovered()) {
+            if (!linesCovered.containsKey(lc)) {
+                linesCovered.put(lc, new ArrayList<Test>());
+            }
+            linesCovered.get(lc).add(t);
+        }
+    }
+
 %>
 <%@ include file="/jsp/multiplayer/header_game.jsp" %>
 <%

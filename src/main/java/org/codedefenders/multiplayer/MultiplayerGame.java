@@ -15,6 +15,23 @@ import static org.codedefenders.Mutant.Equivalence.*;
 public class MultiplayerGame extends AbstractGame {
 
 	private int defenderValue;
+
+	public int getAttackerLimit() {
+		return attackerLimit;
+	}
+
+	public int getDefenderLimit() {
+		return defenderLimit;
+	}
+
+	public int getMinAttackers() {
+		return minAttackers;
+	}
+
+	public int getMinDefenders() {
+		return minDefenders;
+	}
+
 	private int attackerValue;
 	private float lineCoverage;
 	private float mutantCoverage;
@@ -352,9 +369,7 @@ public class MultiplayerGame extends AbstractGame {
 		allMutants.addAll(getAliveMutants());
 		allMutants.addAll(getKilledMutants());
 		for (Mutant mm : getMutantsMarkedEquivalent()){
-			if (!mm.getEquivalent().equals(Mutant.Equivalence.DECLARED_YES) && !mm.getEquivalent().equals(Mutant.Equivalence.ASSUMED_YES)){
-				allMutants.add(mm);
-			}
+			allMutants.add(mm);
 		}
 
 

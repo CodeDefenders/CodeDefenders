@@ -68,9 +68,27 @@ public class MutationTester {
 		ArrayList<Test> tests = new ArrayList<Test>();
 		tests.add(test);
 
+
+
 		for (Mutant mm : mutants){
 			if (mm.isAlive()){
-				mm.setScore(Scorer.score(game, mm, tests));
+				ArrayList<Test> missedTests = new ArrayList<Test>();
+
+				for (Test t : tests){
+					for (int lm : mm.getLines()){
+						boolean found = false;
+						for (int lc : t.getLineCoverage().getLinesCovered()){
+							if (lc == lm){
+								found = true;
+								missedTests.add(t);
+							}
+						}
+						if (found){
+							break;
+						}
+					}
+				}
+				mm.setScore(Scorer.score(game, mm, missedTests));
 
 				mm.update();
 			}
