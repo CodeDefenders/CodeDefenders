@@ -24,7 +24,7 @@ public abstract class Scorer {
         }
     }
 
-    private static Scorer scorer = new CoverageScorer();
+    private static Scorer scorer = new SizeScorer();
 
     protected abstract int scoreTest(MultiplayerGame g, Test t, ArrayList<Mutant> killed);
     protected abstract int scoreMutant(MultiplayerGame g, Mutant m, ArrayList<Test> passed);
