@@ -176,6 +176,12 @@ th, td {
 	text-align: left;
 }
 
+.games-table td, .games-table th
+{
+	padding: 5px;
+	text-align:center;
+}
+
 .form-upload {
 	padding: 15px;
 	margin: 0 auto;
