@@ -51,7 +51,7 @@ var mutantLine = function (lineQuant, superDiv, defender){
 
         const mutantsOnLine = mol;
 
-        var content = '<span style="background-color: #f00; color: #fff; padding-left: 25px;" id="mutationPopup"> ' + quant + ' mutants on line ' + lineNum + ' (Mutants: ' + mutantsOnLine + ')';
+        var content = '<span style="background-color: #f00; color: #fff; padding-left: 25px; position: absolute;" id="mutationPopup"> ' + quant + ' mutants on line ' + lineNum + ' (Mutants: ' + mutantsOnLine + ')';
         if (defender) {
             content += '<a href="multiplayer/play?equivLine=' + lineQuant[l][0] + '" style="color: #FEFCFC"> Mark Line Equivalent </a>';
         }
@@ -103,7 +103,7 @@ var mutantKilledLine = function (lineQuant, superDiv){
 
         const mutantsOnLine = mol;
 
-        var content = '<span style="background-color: #090; color: #fff;" id="mutationPopup"> ' + quant + ' killed mutants on line ' + lineNum;
+        var content = '<span style="background-color: #090; color: #fff; position: absolute;" id="mutationPopup"> ' + quant + ' killed mutants on line ' + lineNum;
         content += '</span>'
 
         killedLineContent[lineNum] = content;
