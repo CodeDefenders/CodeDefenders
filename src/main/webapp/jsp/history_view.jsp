@@ -55,7 +55,7 @@
 	<hr />
 	<h2>Battlegrounds</h2>
 	<table class="table table-hover table-responsive table-paragraphs"><tr><th>Game ID</th><th>Owner</th><th>
-		Price
+		Prize
 	</th><th>Level</th><th>Actions</th></tr>
 		<%
 			ArrayList<MultiplayerGame> mgames = DatabaseAccess.getFinishedMultiplayerGamesForUser(uid);
@@ -72,7 +72,7 @@
 		<tr>
 			<td class="col-sm-2"><%= g.getId() %></td>
 			<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
-			<td class="col-sm-2"><%= g.getPrice() %></td>
+			<td class="col-sm-2"><%= g.getPrize() %></td>
 			<td class="col-sm-2"><%= g.getLevel().name() %></td>
 			<td class="col-sm-2"><%
 				switch(role){

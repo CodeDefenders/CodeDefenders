@@ -45,7 +45,7 @@ CREATE TABLE `games` (
   `Level` enum('EASY','MEDIUM','HARD') DEFAULT NULL,
   `Timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `Creator_ID` int(11) DEFAULT NULL,
-  `Price` int(11) DEFAULT NULL,
+  `Prize` int(11) DEFAULT NULL,
   `Defender_Value` int(11) DEFAULT '100',
   `Attacker_Value` int(11) DEFAULT '100',
   `Coverage_Goal` float DEFAULT NULL,

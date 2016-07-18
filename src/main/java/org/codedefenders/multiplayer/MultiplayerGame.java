@@ -35,7 +35,7 @@ public class MultiplayerGame extends AbstractGame {
 	private int attackerValue;
 	private float lineCoverage;
 	private float mutantCoverage;
-	private float price;
+	private float prize;
 	private int attackerLimit;
 	private int defenderLimit;
 	private int minAttackers;
@@ -84,12 +84,12 @@ public class MultiplayerGame extends AbstractGame {
 		this.mutantCoverage = mutantCoverage;
 	}
 
-	public float getPrice() {
-		return price;
+	public float getPrize() {
+		return prize;
 	}
 
-	public void setPrice(float price) {
-		this.price = price;
+	public void setPrize(float prize) {
+		this.prize = prize;
 	}
 
 	public String getStartDateTime() {
@@ -105,7 +105,7 @@ public class MultiplayerGame extends AbstractGame {
 	}
 
 	public MultiplayerGame(int classId, int creatorId, Level level,
-	                       float lineCoverage, float mutantCoverage, float price,
+	                       float lineCoverage, float mutantCoverage, float prize,
 	                       int defenderValue, int attackerValue, int defenderLimit,
 	                       int attackerLimit, int minDefenders, int minAttackers,
 	                       long startDateTime, long finishDateTime, String status) {
@@ -115,7 +115,7 @@ public class MultiplayerGame extends AbstractGame {
 		this.mode = Mode.PARTY;
 		this.lineCoverage = lineCoverage;
 		this.mutantCoverage = mutantCoverage;
-		this.price = price;
+		this.prize = prize;
 		this.defenderValue = defenderValue;
 		this.attackerValue = attackerValue;
 		this.defenderLimit = defenderLimit;
@@ -225,11 +225,11 @@ public class MultiplayerGame extends AbstractGame {
 
 			stmt = conn.createStatement();
 			sql = String.format("INSERT INTO games " +
-					"(Class_ID, Level, Price, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " +
+					"(Class_ID, Level, Prize, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " +
 					"Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Start_Time, Finish_Time, State, Mode) VALUES " +
 					"('%s', 	'%s', '%f', 	'%d',			'%d',			'%f',			'%f',		'%d'," +
 					"'%d',				'%d',				'%d',			'%d',			'%s', '%s',		'%s', 'PARTY');",
-					classId, level.name(), price, defenderValue, attackerValue, lineCoverage, mutantCoverage, creatorId,
+					classId, level.name(), prize, defenderValue, attackerValue, lineCoverage, mutantCoverage, creatorId,
 					minAttackers, minDefenders, attackerLimit, defenderLimit, new Timestamp(startDateTime), new Timestamp(finishDateTime), state.name());
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
@@ -280,9 +280,9 @@ public class MultiplayerGame extends AbstractGame {
 			// Get all rows from the database which have the chosen username
 			stmt = conn.createStatement();
 				sql = String.format("UPDATE games SET " +
-						"Class_ID = '%s', Level = '%s', Price = %f, Defender_Value=%d, Attacker_Value=%d, Coverage_Goal=%f" +
+						"Class_ID = '%s', Level = '%s', Prize = %f, Defender_Value=%d, Attacker_Value=%d, Coverage_Goal=%f" +
 						", Mutant_Goal=%f, State='%s' WHERE ID='%d'",
-						classId, level.name(), price, defenderValue, attackerValue, lineCoverage, mutantCoverage, state.name(), id);
+						classId, level.name(), prize, defenderValue, attackerValue, lineCoverage, mutantCoverage, state.name(), id);
 			stmt.execute(sql);
 			return true;
 
