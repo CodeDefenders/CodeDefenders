@@ -70,7 +70,7 @@ public class UploadManager extends HttpServlet {
 		}
 
 		//Not a java file
-		if (!fileName.contains(".java")) {
+		if (!fileName.endsWith(".java")) {
 			messages.add("The class under test must be a .java file.");
 			response.sendRedirect(request.getHeader("referer"));
 			return;
