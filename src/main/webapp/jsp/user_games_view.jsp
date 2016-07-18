@@ -93,6 +93,8 @@
 			<th>Game ID</th>
 			<th>Owner</th>
 			<th>Price</th>
+			<th>Attackers</th>
+			<th>Defenders</th>
 			<th>Level</th>
 			<th>Start Date</th>
 			<th>Finish Date</th>
@@ -114,6 +116,8 @@
 		<td class="col-sm-2"><%= g.getId() %></td>
 		<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
 		<td class="col-sm-1"><%= g.getPrice() %></td>
+		<td class="col-sm-1"><%= g.getAttackerIds().length %></td>
+		<td class="col-sm-1"><%= g.getDefenderIds().length %></td>
 		<td class="col-sm-1"><%= g.getLevel().name() %></td>
 		<td class="col-sm-2"><%= g.getStartDateTime()%></td>
 		<td class="col-sm-2"><%= g.getFinishDateTime()%></td>
