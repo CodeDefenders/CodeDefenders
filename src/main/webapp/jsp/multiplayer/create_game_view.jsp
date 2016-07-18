@@ -1,12 +1,11 @@
 <% String pageTitle = "Create Battleground"; %>
 <%@ include file="/jsp/header.jsp"%>
 <div id="creategame" class="container">
-	<form id="create" action="multiplayer/games" method="post" class="form-creategame">
-		<h2>Create Game</h2>
+	<form id="create" action="multiplayer/games" method="post" class="form-creategame-mp">
 		<input type="hidden" name="formType" value="createGame">
 		<table class="tableform">
 			<tr>
-				<td>Java Class</td>
+				<td width="25%">Java Class</td>
 				<td>
 					<select name="class" class="form-control selectpicker" data-size="large" >
 						<% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
@@ -14,18 +13,21 @@
 						<%}%>
 					</select>
 				</td>
-				<td>
+				<td width="17%">
 					<a href="games/upload" class="text-center new-account">Upload Class</a>
 				</td>
 			</tr>
 			<tr>
-				<td>Line Coverage Goal</td><td><input type="text" value="0.8" name="line_cov" /></td>
+				<td>Line Coverage Goal</td><td><input class="ws-2" type="number" value="0.8" min="0.1" max="1.0" step="0.1" name="line_cov" style="text-align: center"/></td>
 			</tr>
 			<tr>
-				<td>Mutation Goal</td><td><input type="text" value="0.5" name="mutant_cov"></td>
+				<td>Mutation Goal</td><td><input class="ws-2" type="number" value="0.5" min="0.1" max="1.0" step="0.1" name="mutant_cov" style="text-align: center"></td>
 			</tr>
 			<tr>
-				<td>Level</td> <td><input type="checkbox" id="level" name="level" class="form-control" data-size="large" data-toggle="toggle" data-on="Easy" data-off="Hard" data-onstyle="info" data-offstyle="warning">
+				<td>Level</td>
+				<td>
+					<input type="checkbox" id="level" name="level" class="form-control" data-size="large" data-toggle="toggle" data-on="Easy" data-off="Hard" data-onstyle="info" data-offstyle="warning">
+				</td>
 			</tr>
 			<% /*
 				Integer.parseInt(request.getParameter("defenderLimit")),
@@ -38,21 +40,36 @@
                 */
 			%>
 			<tr>
-				<td>Defenders</td> <td class="crow fly"><input type="number" name="minDefenders" value="2" />-<input type="number" value="4" name="defenderLimit" /></td>
+				<td>Defenders</td>
+				<td class="crow fly">
+					<label style="font-weight: normal;" for="minDefenders">Min</label>
+					<input type="number" name="minDefenders" id="minDefenders" value="2" />
+					<label style="font-weight: normal;" for="defenderLimit">Max</label>
+					<input type="number" value="4" id="defenderLimit" name="defenderLimit" />
+				</td>
 			</tr>
 			<tr>
-				<td>Attackers</td> <td class="crow fly"><input type="number" value="2" name="minAttackers" />-<input type="number" value="4" name="attackerLimit" /></td>
+				<td>Attackers</td>
+				<td class="crow fly">
+					<label style="font-weight: normal;" for="minAttackers">Min</label>
+					<input type="number" value="2" name="minAttackers" id="minAttackers" />
+					<label style="font-weight: normal;" for="attackerLimit">Max</label>
+					<input type="number" value="4" name="attackerLimit" id="attackerLimit" />
+				</td>
 			</tr>
 			<tr>
-				<td>Start Time</td> <td>
-				<input type="hidden" id="startTime" name="startTime" />
-				<input name="start_dateTime" id="start_dateTime" value="Select Date"/>
-				<div class="crow fly">
-					<input class="ws-5" type="text" name="start_hours" id="start_hours" value="00" />
-					<span class="wd-2">:</span>
-					<input class="wd-5" type="text" name="start_minutes" id="start_minutes" value="00" />
-				</div>
-				<script>
+				<td>Start Time</td>
+				<td>
+					<div class="crow">
+						<input type="hidden" id="startTime" name="startTime" />
+						<input class="ws-5" name="start_dateTime" id="start_dateTime" value="Select Date"/>
+						<div class="ws-7 nest">
+							<input class="ws-1" type="text" name="start_hours" id="start_hours" value="00" style="text-align: center"/>
+							<span>:</span>
+							<input class="ws-1" type="text" name="start_minutes" id="start_minutes" value="00"  style="text-align: center"/>
+						</div>
+					</div>
+					<script>
 					voidFunct = function(){};
 					updateStartTimestamp = function(){
 						var timestamp = new Date($("#start_dateTime").val()).valueOf();
@@ -87,16 +104,20 @@
 							updateStartTimestamp();
 						}
 					});
-				</script>
+					</script>
 				</td>
 			<tr>
-				<td>Finish Time</td> <td>
-				<input type="hidden" id="finishTime" name="finishTime" /><input name="dateTime" id="dateTime" value="Select Date"/>
-				<div class="crow fly">
-					<input class="ws-5" type="text" name="hours" id="hours" value="00" />
-					<span class="wd-2">:</span>
-					<input class="wd-5" type="text" name="minutes" id="minutes" value="00" />
-				</div>
+				<td>Finish Time</td>
+				<td>
+					<div class="crow">
+						<input type="hidden" id="finishTime" name="finishTime" />
+						<input class="ws-5" name="dateTime" id="dateTime" value="Select Date"/>
+						<div class="ws-7 nest">
+							<input class="ws-1" type="text" name="hours" id="hours" value="00" style="text-align: center"/>
+							<span>:</span>
+							<input class="ws-1" type="text" name="minutes" id="minutes" value="00" style="text-align: center"/>
+						</div>
+					</div>
 					<script>
 					voidFunct = function(){};
 					updateTimestamp = function(){
@@ -132,11 +153,11 @@
 							updateTimestamp();
 						}
 					});
-				</script>
+					</script>
 				</td>
 			</tr>
+			<tr><td /><td><button class="btn btn-lg btn-primary btn-block" type="submit" value="Create">Create</button></td><td /></tr>
 		</table>
-		<button class="btn btn-lg btn-primary btn-block" type="submit" value="Create">Create</button>
 	</form>
 </div>
 <%@ include file="/jsp/footer.jsp" %>

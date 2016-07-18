@@ -200,6 +200,12 @@ th, td {
 	max-width: 550px;
 }
 
+.form-creategame-mp {
+	padding: 15px;
+	margin: 0 auto;
+	max-width: 750px;
+}
+
 .form-signin {
 	padding: 15px;
 	margin: 0 auto;
