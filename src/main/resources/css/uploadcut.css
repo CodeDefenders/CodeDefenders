@@ -1,0 +1,22 @@
+@import 'https://fonts.googleapis.com/css?family=Open+Sans|Ubuntu';
+
+#formUpload #file-select {
+    display: inline-block;
+    margin: 0px;
+}
+.file-loading {
+
+}
+
+.file-loading input {
+}
+
+#formUpload #submit-button {
+    display: inline-block;
+    float: right;
+    margin: 0px;
+}
+
+.fileinput-upload-button {
+    float: right;
+}

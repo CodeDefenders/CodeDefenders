@@ -1,31 +1,10 @@
 <% if (role.equals(Role.DEFENDER) || role.equals(Role.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){
 %>
-<div class="ws-6">
+<div class="ws-12">
     <h2> JUnit tests </h2>
     <div class="slider single-item">
         <%
-            isTests = false;
             for (Test t : tests) {
-                for (Integer luc : t.getLineCoverage().getLinesUncovered()){
-                    if (!linesUncovered.contains(luc) && !linesCovered.containsKey(luc)){
-                        linesUncovered.add(luc);
-                    }
-                }
-
-
-                for (Integer lc : t.getLineCoverage().getLinesCovered()){
-                    if (!linesCovered.containsKey(lc)){
-                        linesCovered.put(lc, new ArrayList<Test>());
-                    }
-
-                    if (linesUncovered.contains(lc)){
-                        linesUncovered.remove(lc);
-                    }
-
-                    linesCovered.get(lc).add(t);
-                }
-
-                isTests = true;
                 String tc = "";
                 for (String l : t.getHTMLReadout()) { tc += l + "\n"; }
         %>
@@ -34,7 +13,7 @@
         </textarea></pre></div>
         <%
             }
-            if (!isTests) {%>
+            if (tests.isEmpty()) {%>
         <div><h2></h2><p> There are currently no tests </p></div>
         <%}
         %>

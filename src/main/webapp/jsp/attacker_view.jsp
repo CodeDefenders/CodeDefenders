@@ -147,7 +147,6 @@
 				List<Test> tests = game.getExecutableTests();
 
 				for (Test t : tests) {
-					isTests = true;
 
 					for (Integer lc : t.getLineCoverage().getLinesCovered()){
 						if (!linesCovered.containsKey(lc)){
@@ -163,7 +162,7 @@
 			<div><h4>Test <%=t.getId()%></h4><pre class="readonly-pre"><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
 			<%
 				}
-				if (!isTests) {%>
+				if (tests.isEmpty()) {%>
 			<div><h2></h2><p> There are currently no tests </p></div>
 			<%}
 			%>

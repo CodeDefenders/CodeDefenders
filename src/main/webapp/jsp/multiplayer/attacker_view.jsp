@@ -1,6 +1,10 @@
 <% codeDivName = "newmut-div"; %>
-<%@include file="/jsp/multiplayer/game_mutants.jsp"%>
-	<div class="ws-12" id="newmut-div">
+<div class="crow">
+	<div class="w-45 up">
+	<%@include file="/jsp/multiplayer/game_mutants.jsp"%>
+	<%@include file="/jsp/multiplayer/game_unit_tests.jsp"%>
+	</div>
+	<div class="w-55" id="newmut-div">
 		<form id="atk" action="/multiplayer/move" method="post">
 			<h2>Create a mutant here
 				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk">Attack!</button>
@@ -56,5 +60,4 @@
 			$('#finishedModal').modal('show');
 		</script>
 	</div> <!-- col-md6 newmut -->
-
-<%@include file="/jsp/multiplayer/game_unit_tests.jsp"%>
+</div>

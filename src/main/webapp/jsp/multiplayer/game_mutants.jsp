@@ -1,6 +1,6 @@
 <%@ page import="org.codedefenders.Game" %>
 <%@ page import="org.codedefenders.Role" %>
-<div class="ws-12" id="mutants-div">
+<div class="ws-12 up" id="mutants-div">
 <%
 if (role == Role.ATTACKER && true){
     int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
