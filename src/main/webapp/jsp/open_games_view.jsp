@@ -74,7 +74,7 @@
 	<h2>Battlegrounds</h2>
 	<table class="table table-hover table-responsive table-paragraphs"><tr><th>Game ID</th><th>Owner</th><th>
 		Price
-	</th><th>Level</th><th>Actions</th></tr>
+	</th><th>Attackers</th><th>Defenders</th><th>Level</th><th>Actions</th></tr>
 	<%
 		ArrayList<MultiplayerGame> mgames = DatabaseAccess.getMultiplayerGamesExcludingUser(uid);
 		if (mgames.isEmpty()) {
@@ -90,6 +90,14 @@
 			<td class="col-sm-2"><%= g.getId() %></td>
 			<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
 			<td class="col-sm-2"><%= g.getPrice() %></td>
+			<td class="col-sm-2"><%int attackers = g.getAttackerIds().length; %><%=attackers %> of <%=g.getAttackerLimit()%>
+				<% if (attackers < g.getMinAttackers()){%>
+				(at least <%=g.getMinAttackers()%> required)
+				<% } %></td>
+			<td class="col-sm-2"><%int defenders = g.getAttackerIds().length; %><%=defenders %> of <%=g.getDefenderLimit()%>
+				<% if (defenders < g.getMinDefenders()){%>
+				(at least <%=g.getMinDefenders()%> required)
+				<% } %></td>
 			<td class="col-sm-2"><%= g.getLevel().name() %></td>
 			<td class="col-sm-2">
 				<a href="multiplayer/games?attacker=1&id=<%= g.getId() %>">Join as Attacker</a><br>

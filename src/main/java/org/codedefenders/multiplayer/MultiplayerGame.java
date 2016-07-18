@@ -15,6 +15,23 @@ import static org.codedefenders.Mutant.Equivalence.*;
 public class MultiplayerGame extends AbstractGame {
 
 	private int defenderValue;
+
+	public int getAttackerLimit() {
+		return attackerLimit;
+	}
+
+	public int getDefenderLimit() {
+		return defenderLimit;
+	}
+
+	public int getMinAttackers() {
+		return minAttackers;
+	}
+
+	public int getMinDefenders() {
+		return minDefenders;
+	}
+
 	private int attackerValue;
 	private float lineCoverage;
 	private float mutantCoverage;
