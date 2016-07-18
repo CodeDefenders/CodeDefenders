@@ -69,6 +69,13 @@ public class UploadManager extends HttpServlet {
 			throw new ServletException("Cannot parse multipart request.", e);
 		}
 
+		//Not a java file
+		if (!fileName.contains(".java")) {
+			messages.add("The class under test must be a .java file.");
+			response.sendRedirect(request.getHeader("referer"));
+			return;
+		}
+
 		// two arguments processed?
 		if (classAlias == null || fileContent == null) {
 			messages.add("Please provide unique identifier and a .java file.");
@@ -108,8 +115,9 @@ public class UploadManager extends HttpServlet {
 			newSUT.setClassFile(classFileNameDB);
 			newSUT.insert();
 
+			//TODO: CHECK SINGLEPLAYER PREPARATION CHECKBOX
 			//Prepare AI classes, by generating tests and mutants.
-			PrepareAI.createTestsAndMutants(newSUT.getId());
+			//PrepareAI.createTestsAndMutants(newSUT.getId());
 
 			response.sendRedirect("games/user");
 

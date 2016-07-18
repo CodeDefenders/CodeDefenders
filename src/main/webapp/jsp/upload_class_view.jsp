@@ -4,8 +4,12 @@
 <div id="divUpload" class="container">
 	<form id="formUpload" action="upload" class="form-upload" method="post" enctype="multipart/form-data">
 		<input id="classAlias" name="classAlias" type="text" class="form-control" placeholder="Unique class identifier" required autofocus><br>
-		<input id="fileUpload" name="fileUpload" type="file" class="file-loading" data-allowed-file-extensions='["java"]' data-show-preview="false" data-placeholder="No file" data-show-upload="true" data-show-remove="false" data-show-caption="true" data-buttonText="Find CUT">
-		<input type="submit" text="Upoad" />
+		<span id="file-select">
+			<input id="fileUpload" name="fileUpload" type="file" class="file-loading" accept=".java" />
+		</span>
+		<span id="submit-button">
+			<input type="submit" text="Upload" class="fileinput-upload-button" value="Upload" />
+		</span>
 	</form>
 	</div>
 <%@ include file="/jsp/footer.jsp" %>

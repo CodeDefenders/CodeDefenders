@@ -20,6 +20,13 @@
     <link href="css/slick_1.5.9.css" rel="stylesheet" type="text/css" />
     <script src="js/slick_1.5.9.min.js" type="text/javascript" ></script>
 
+    <!-- File Input -->
+    <!--
+    <script src="js/fileinput.min.js" type="text/javascript"></script>
+    -->
+    <!--
+    <link href="css/fileinput.min.css" rel="stylesheet" type="text/css" />
+    -->
 
     <!-- Bootstrap -->
     <script src="js/bootstrap.min.js" type="text/javascript" ></script>
@@ -49,6 +56,9 @@
     <!-- MultiplayerGame -->
     <link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="js/game_highlighting.js"></script>
+
+    <!-- Upload page -->
+    <link href="css/uploadcut.css" rel="stylesheet" type="text/css" />
 
     <script>
         $(document).ready(function() {
