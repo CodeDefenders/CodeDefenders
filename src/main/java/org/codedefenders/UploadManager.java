@@ -42,10 +42,13 @@ public class UploadManager extends HttpServlet {
 		InputStream fileContent = null;
 		GameClass newSUT = null;
 
+		boolean shouldPrepareAI = false;
+
 		// Get actual parameters, because of the upload component, I can't do request.getParameter before fetching the file
 		try {
 			List<FileItem> items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
 			for (FileItem item : items) {
+
 				if (item.isFormField()) {
 					// Process class alias
 					String fieldName = item.getFieldName();
@@ -53,6 +56,8 @@ public class UploadManager extends HttpServlet {
 					System.out.println("Upload parameter {" + fieldName + ":" + fieldValue + "}");
 					if (fieldName.equals("classAlias"))
 						classAlias = fieldValue;
+					else if (fieldName.equals("prepareForSingle"))
+						shouldPrepareAI = true;
 					else
 						System.out.println("Unrecognized parameter");
 				} else {
@@ -115,9 +120,10 @@ public class UploadManager extends HttpServlet {
 			newSUT.setClassFile(classFileNameDB);
 			newSUT.insert();
 
-			//TODO: CHECK SINGLEPLAYER PREPARATION CHECKBOX
-			//Prepare AI classes, by generating tests and mutants.
-			//PrepareAI.createTestsAndMutants(newSUT.getId());
+			if(shouldPrepareAI) {
+				//Prepare AI classes, by generating tests and mutants.
+				PrepareAI.createTestsAndMutants(newSUT.getId());
+			}
 
 			response.sendRedirect("games/user");
 

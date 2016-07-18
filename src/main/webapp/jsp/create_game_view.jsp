@@ -24,9 +24,8 @@
 				<td>Mode</td>
 				<td>
 					<select name="mode" class="form-control selectpicker" data-size="large">
-						<option value="sing">Singleplayer</option>
 						<option value="duel">Duel</option>
-						<option value="prty">Party</option>
+						<option value="sing">Singleplayer</option>
 						<option value="utst">Unit Testing</option>
 					</select>
 				</td>

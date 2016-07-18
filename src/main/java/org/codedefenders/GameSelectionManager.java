@@ -1,5 +1,6 @@
 package org.codedefenders;
 
+import org.codedefenders.singleplayer.PrepareAI;
 import org.codedefenders.singleplayer.SinglePlayerGame;
 import org.codedefenders.singleplayer.automated.attacker.AiAttacker;
 import org.codedefenders.singleplayer.automated.defender.AiDefender;
@@ -62,6 +63,13 @@ public class GameSelectionManager extends HttpServlet {
 
 					if(mode.equals(Game.Mode.SINGLE)) {
 						//Create singleplayer game.
+
+						//Need to check if a dummy game has been created - ie if the generated files exist.
+						//If this is not the case, run prepareAI on the class.
+						if(!DatabaseAccess.gameWithUserExistsForClass(1, classId)) {
+							PrepareAI.createTestsAndMutants(classId);
+						}
+
 						SinglePlayerGame nGame = new SinglePlayerGame(classId, uid, rounds, role, level);
 						nGame.insert();
 						if (role.equals(Role.ATTACKER)) {

@@ -35,6 +35,16 @@ public class DatabaseAccess {
 		return getInt(sql, "NumberAiKillingTests");
 	}
 
+	public static boolean gameWithUserExistsForClass(int uId, int cId) {
+		ArrayList<Game> games = getGamesForUser(uId);
+		for (Game g : games) {
+			if(g.getClassId() == cId) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static int getInt(String sql, String att) {
 		Connection conn = null;
 		Statement stmt = null;
