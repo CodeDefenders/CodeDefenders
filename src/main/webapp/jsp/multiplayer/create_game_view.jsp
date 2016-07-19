@@ -70,6 +70,10 @@
 						</div>
 					</div>
 					<script>
+						$(document).ready(function(){
+							$("#startTime").val(new Date().getTime());
+							$("#start_dateTime").val($.datepicker.formatDate('mm/DD/yyyy', new Date(timeStamp)));
+						});
 					voidFunct = function(){};
 					updateStartTimestamp = function(){
 						var timestamp = new Date($("#start_dateTime").val()).valueOf();
@@ -119,6 +123,11 @@
 						</div>
 					</div>
 					<script>
+						$(document).ready(function(){
+							var timeStamp = new Date().getTime() + (1000*60*60*24*7);
+							$("#finishtTime").val(timeStamp);
+							$("#dateTime").val($.datepicker.formatDate('mm/DD/yyyy', new Date(timeStamp)));
+						});
 					voidFunct = function(){};
 					updateTimestamp = function(){
 						var timestamp = new Date($("#dateTime").val()).valueOf();
@@ -151,7 +160,7 @@
 							//var date = $.datepicker.formatDate("@", dp);
 							//alert(date);
 							updateTimestamp();
-						}
+						},
 					});
 					</script>
 				</td>

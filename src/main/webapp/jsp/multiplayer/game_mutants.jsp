@@ -43,7 +43,7 @@ if (role == Role.ATTACKER && true){
 					</textarea></pre>
 					<div class="crow fly">
 						<div>
-							<a href="multiplayer/play?acceptEquiv=<%= equiv.getId() %>">Accept Equivalence</a>
+							<a class="btn btn-primary" href="multiplayer/play?acceptEquiv=<%= equiv.getId() %>">Accept Equivalence</a>
 						</div>
 						<div>
 							<div class="btn-right">
