@@ -3,7 +3,6 @@ package org.codedefenders;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
 import com.github.javaparser.ast.CompilationUnit;
-import com.sun.org.apache.xml.internal.serializer.utils.Utils;
 import javassist.ClassPool;
 import javassist.CtClass;
 import org.apache.commons.fileupload.FileItem;
