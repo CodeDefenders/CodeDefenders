@@ -72,7 +72,7 @@
 	<a href="/games/create">Create Duel</a>
 	<hr />
 	<h2>Battlegrounds</h2>
-	<table class="table table-hover table-responsive table-paragraphs"><tr><th>Game ID</th><th>Owner</th><th>
+	<table class="table table-hover table-responsive table-paragraphs"><tr><th>Game ID</th><th>Owner</th><th>Class</th><th>
 		Price
 	</th><th>Attackers</th><th>Defenders</th><th>Level</th><th>Actions</th></tr>
 	<%
@@ -87,9 +87,31 @@
 			for (MultiplayerGame g : mgames) {
 		%>
 		<tr>
-			<td class="col-sm-2"><%= g.getId() %></td>
-			<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
-			<td class="col-sm-2"><%= g.getPrice() %></td>
+			<td class="col-sm-1"><%= g.getId() %></td>
+			<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
+			<td class="col-sm-1">
+				<a href="#" id="btnMut<%=g.getId()%>" data-toggle="modal" data-target="#modalMut<%=g.getId()%>">
+					<%=g.getCUT().getName()%>
+				</a>
+				<div id="modalMut<%=g.getId()%>" class="modal fade" role="dialog">
+					<div class="modal-dialog">
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title"><%=g.getCUT().getName()%></h4>
+							</div>
+							<div class="modal-body">
+							<pre class="readonly-pre"><textarea class="readonly-textarea classPreview" id="sut<%=g.getId()%>" name="cut<%=g.getId()%>" cols="80" rows="30"><%=g.getCUT().getAsString()%>
+							</textarea></pre>
+							</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							</div>
+						</div>
+					</div>
+				</div></td>
+			<td class="col-sm-1"><%= g.getPrice() %></td>
 			<td class="col-sm-2"><%int attackers = g.getAttackerIds().length; %><%=attackers %> of <%=g.getAttackerLimit()%>
 				<% if (attackers < g.getMinAttackers()){%>
 				(at least <%=g.getMinAttackers()%> required)
@@ -111,6 +133,23 @@
 	</table>
 
 	<a href="/multiplayer/games/create">Create Battleground</a>
+	<script>
+		$('.modal').on('shown.bs.modal', function() {
+			var codeMirrorContainer = $(this).find(".classPreview")[0];
+			if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+				codeMirrorContainer.CodeMirror.refresh();
+			} else {
+				var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
+					lineNumbers: false,
+					mode: "diff",
+					readOnly: true,
+					mode: "text/x-java"
+				});
+				editorDiff.setSize("100%", 500);
+			}
+		});
+	</script>
+
 
 </div>
 <%@ include file="/jsp/footer.jsp" %>
