@@ -35,6 +35,16 @@ public class DatabaseAccess {
 		return getInt(sql, "NumberAiKillingTests");
 	}
 
+	public static boolean gameWithUserExistsForClass(int uId, int cId) {
+		ArrayList<Game> games = getGamesForUser(uId);
+		for (Game g : games) {
+			if(g.getClassId() == cId) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static int getInt(String sql, String att) {
 		Connection conn = null;
 		Statement stmt = null;
@@ -311,7 +321,7 @@ public class DatabaseAccess {
 				"FROM games as g\n" +
 				"LEFT JOIN players as att ON g.ID=att.Game_ID  AND att.Role='ATTACKER'\n" +
 				"LEFT JOIN players AS def ON g.ID=def.Game_ID AND def.Role='DEFENDER'\n" +
-				"WHERE g.Mode != 'PARTY' AND (g.Creator_ID=%d OR IFNULL(att.User_ID,0)=%d OR IFNULL(def.User_ID,0)=%d);\n", userId, userId, userId);
+				"WHERE g.Mode != 'PARTY' AND g.State!='FINISHED' AND (g.Creator_ID=%d OR IFNULL(att.User_ID,0)=%d OR IFNULL(def.User_ID,0)=%d);\n", userId, userId, userId);
 
 		return getGames(sql);
 	}
@@ -389,12 +399,14 @@ public class DatabaseAccess {
 	 * @return
 	 */
 	public static ArrayList<Game> getHistoryForUser(int userId) {
-		String sql = String.format("SELECT * FROM games WHERE (Attacker_ID=%d OR Defender_ID=%d) AND State='FINISHED';", userId, userId);
-		return getGames(sql);
-	}
+		String sql = String.format("SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," +
+				"g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" +
+				"IFNULL(att.User_ID,0) AS Attacker_ID, IFNULL(def.User_ID,0) AS Defender_ID\n" +
+				"FROM games as g\n" +
+				"LEFT JOIN players as att ON g.ID=att.Game_ID  AND att.Role='ATTACKER'\n" +
+				"LEFT JOIN players AS def ON g.ID=def.Game_ID AND def.Role='DEFENDER'\n" +
+				"WHERE g.Mode != 'PARTY' AND g.State='FINISHED' AND (g.Creator_ID=%d OR IFNULL(att.User_ID,0)=%d OR IFNULL(def.User_ID,0)=%d);\n", userId, userId, userId);
 
-	public static ArrayList<Game> getAllGames() {
-		String sql = "SELECT * FROM games;";
 		return getGames(sql);
 	}
 
@@ -479,7 +491,7 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				MultiplayerGame mg = new MultiplayerGame(rs.getInt("Class_ID"), rs.getInt("Creator_ID"),
 						Game.Level.valueOf(rs.getString("Level")), (float)rs.getDouble("Coverage_Goal"),
-						(float)rs.getDouble("Mutant_Goal"), rs.getInt("Price"), rs.getInt("Defender_Value"),
+						(float)rs.getDouble("Mutant_Goal"), rs.getInt("Prize"), rs.getInt("Defender_Value"),
 						rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
 						rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),
 						rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"));

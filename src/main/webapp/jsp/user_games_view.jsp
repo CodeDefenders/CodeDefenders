@@ -9,21 +9,20 @@
 	int uid = (Integer)request.getSession().getAttribute("uid");
 	ArrayList<Game> games = DatabaseAccess.getGamesForUser(uid); %>
 <div class="w-100">
-	<h2>Duels</h2>
-<table class="table table-hover table-responsive table-paragraphs">
+	<h3>Duels</h3>
+<table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
-		<th class="col-sm-2">Game No.</th>
+		<th class="col-sm-2">Game ID</th>
+		<th class="col-sm-2">Class</th>
 		<th class="col-sm-2">Attacker</th>
 		<th class="col-sm-2">Defender</th>
-		<th class="col-sm-2">Game State</th>
-		<th class="col-sm-2">Class Under Test</th>
 		<th class="col-sm-2">Level</th>
-		<th class="col-sm-2"></th>
+		<th class="col-sm-2">Action</th>
 	</tr>
 	<%
 	if (games.isEmpty()) {
 %>
-	<tr><td colspan="7"> You are not currently in any games.</td></tr>
+	<tr><td colspan="100%"> You are not currently playing any duel game. </td></tr>
 <%
 	} else {
 		%>
@@ -50,10 +49,9 @@
 %>
 	<tr>
 		<td class="col-sm-2"><%= g.getId() %></td>
+		<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
 		<td class="col-sm-2"><%= atkName %></td>
 		<td class="col-sm-2"><%= defName %></td>
-		<td class="col-sm-2"><%= g.getState() %></td>
-		<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
 		<td class="col-sm-2"><%= g.getLevel().name() %></td>
 		<td class="col-sm-2">
 <%
@@ -87,24 +85,24 @@
 
 	<hr />
 
-	<h2>Battlegrounds</h2>
-	<table class="table table-hover table-responsive table-paragraphs">
+	<h3>Battlegrounds</h3>
+	<table class="table table-hover table-responsive table-paragraphs games-table">
 		<tr>
 			<th>Game ID</th>
 			<th>Owner</th>
-			<th>Price</th>
+			<th>Prize</th>
 			<th>Attackers</th>
 			<th>Defenders</th>
 			<th>Level</th>
-			<th>Start Date</th>
-			<th>Finish Date</th>
+			<th>Starting</th>
+			<th>Finishing</th>
 			<th>Actions</th>
 		</tr>
 <%
 	ArrayList<MultiplayerGame> mgames = DatabaseAccess.getMultiplayerGamesForUser(uid);
 	if (mgames.isEmpty()) {
 %>
-<tr><td colspan="5"> You are not currently in any games. </td></tr>
+<tr><td colspan="100%"> You are not currently playing any multiplayer game. </td></tr>
 <%
 } else {
 %>
@@ -115,12 +113,12 @@
 	<tr>
 		<td class="col-sm-2"><%= g.getId() %></td>
 		<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
-		<td class="col-sm-1"><%= g.getPrice() %></td>
+		<td class="col-sm-1"><%= g.getPrize() %></td>
 		<td class="col-sm-1"><%= g.getAttackerIds().length %></td>
 		<td class="col-sm-1"><%= g.getDefenderIds().length %></td>
 		<td class="col-sm-1"><%= g.getLevel().name() %></td>
-		<td class="col-sm-2"><%= g.getStartDateTime()%></td>
-		<td class="col-sm-2"><%= g.getFinishDateTime()%></td>
+		<td class="col-sm-1"><%= g.getStartDateTime()%></td>
+		<td class="col-sm-1"><%= g.getFinishDateTime()%></td>
 		<td class="col-sm-2"><%
 			switch(role){
 				case ATTACKER:

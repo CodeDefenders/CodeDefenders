@@ -2,16 +2,15 @@
 <% String pageTitle="Open Games"; %>
 <%@ include file="/jsp/header.jsp" %>
 <div class="full-width">
-	<h2>Duels</h2>
-<table class="table table-hover table-responsive table-paragraphs">
+	<h3>Duels</h3>
+<table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
-		<th class="col-sm-2">Game No.</th>
+		<th class="col-sm-1">Game ID</th>
+		<th class="col-sm-2">Class</th>
 		<th class="col-sm-2">Attacker</th>
 		<th class="col-sm-2">Defender</th>
-		<th class="col-sm-2">Game State</th>
-		<th class="col-sm-2">Class Under Test</th>
-		<th class="col-sm-2">Level</th>
-		<th class="col-sm-2"></th>
+		<th class="col-sm-1">Level</th>
+		<th class="col-sm-2">Action</th>
 	</tr>
 
 
@@ -47,12 +46,11 @@
 	%>
 
 	<tr>
-		<td class="col-sm-2"><%= g.getId() %></td>
+		<td class="col-sm-1"><%= g.getId() %></td>
+		<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
 		<td class="col-sm-2"><%= atkName %></td>
 		<td class="col-sm-2"><%= defName %></td>
-		<td class="col-sm-2"><%= g.getState() %></td>
-		<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
-		<td class="col-sm-2"><%= g.getLevel().name() %></td>
+		<td class="col-sm-1"><%= g.getLevel().name() %></td>
 		<td class="col-sm-2">
 			<form id="view" action="games" method="post">
 				<input type="hidden" name="formType" value="joinGame">
@@ -65,21 +63,31 @@
 	<%
 		}
 		if (!isGames) {%>
-	<tr><td colspan="8"> There are currently no open games </td></tr>
+	<tr><td colspan="100%"> There are currently no open duels. </td></tr>
 	<%}
 	%>
 </table>
 	<a href="/games/create">Create Duel</a>
 	<hr />
-	<h2>Battlegrounds</h2>
-	<table class="table table-hover table-responsive table-paragraphs"><tr><th>Game ID</th><th>Owner</th><th>Class</th><th>
-		Price
-	</th><th>Attackers</th><th>Defenders</th><th>Level</th><th>Actions</th></tr>
+	<h3>Battlegrounds</h3>
+	<table class="table table-hover table-responsive table-paragraphs games-table">
+		<tr>
+			<th>Game ID</th>
+			<th>Class</th>
+			<th>Owner</th>
+			<th>Prize</th>
+			<th>Attackers</th>
+			<th>Defenders</th>
+			<th>Level</th>
+			<th>Starting</th>
+			<th>Finishing</th>
+			<th>Actions</th>
+		</tr>
 	<%
 		ArrayList<MultiplayerGame> mgames = DatabaseAccess.getMultiplayerGamesExcludingUser(uid);
 		if (mgames.isEmpty()) {
 	%>
-	<tr><td colspan="5"> There are currently no open games. </td></tr>
+		<tr><td colspan="100%"> There are currently no open multiplayer games. </td></tr>
 	<%
 	} else {
 	%>
@@ -88,7 +96,6 @@
 		%>
 		<tr>
 			<td class="col-sm-1"><%= g.getId() %></td>
-			<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
 			<td class="col-sm-1">
 				<a href="#" id="btnMut<%=g.getId()%>" data-toggle="modal" data-target="#modalMut<%=g.getId()%>">
 					<%=g.getCUT().getName()%>
@@ -111,16 +118,13 @@
 						</div>
 					</div>
 				</div></td>
-			<td class="col-sm-1"><%= g.getPrice() %></td>
-			<td class="col-sm-2"><%int attackers = g.getAttackerIds().length; %><%=attackers %> of <%=g.getAttackerLimit()%>
-				<% if (attackers < g.getMinAttackers()){%>
-				(at least <%=g.getMinAttackers()%> required)
-				<% } %></td>
-			<td class="col-sm-2"><%int defenders = g.getAttackerIds().length; %><%=defenders %> of <%=g.getDefenderLimit()%>
-				<% if (defenders < g.getMinDefenders()){%>
-				(at least <%=g.getMinDefenders()%> required)
-				<% } %></td>
-			<td class="col-sm-2"><%= g.getLevel().name() %></td>
+			<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
+			<td class="col-sm-1"><%= g.getPrize() %></td>
+			<td class="col-sm-1"><%int attackers = g.getAttackerIds().length; %><%=attackers %> of <%=g.getMinAttackers()%>&ndash;<%=g.getAttackerLimit()%></td>
+			<td class="col-sm-1"><%int defenders = g.getAttackerIds().length; %><%=defenders %> of <%=g.getMinDefenders()%>&ndash;<%=g.getDefenderLimit()%></td>
+			<td class="col-sm-1"><%= g.getLevel().name() %></td>
+			<td class="col-sm-1"><%= g.getStartDateTime() %></td>
+			<td class="col-sm-1"><%= g.getFinishDateTime() %></td>
 			<td class="col-sm-2">
 				<a href="multiplayer/games?attacker=1&id=<%= g.getId() %>">Join as Attacker</a><br>
 				<a href="multiplayer/games?defender=1&id=<%= g.getId() %>">Join as Defender</a>

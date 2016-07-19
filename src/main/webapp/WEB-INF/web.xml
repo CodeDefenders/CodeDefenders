@@ -50,15 +50,6 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>updateClasses</servlet-name>
-		<servlet-class>org.codedefenders.UpdateAvailableClasses</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>updateClasses</servlet-name>
-		<url-pattern>/updateclasses</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
 		<servlet-name>intro</servlet-name>
 		<jsp-file>/jsp/index.jsp</jsp-file>
 	</servlet>

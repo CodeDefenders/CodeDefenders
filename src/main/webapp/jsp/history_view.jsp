@@ -2,15 +2,15 @@
 <% String pageTitle="Game History"; %>
 <%@ include file="/jsp/header.jsp" %>
 <div>
-<h2> View Past Games </h2>
-<table class="table table-hover table-responsive table-paragraphs">
+<h3> Duels </h3>
+<table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
-		<td class="col-sm-2">Game No.</td>
-		<td class="col-sm-2">Attacker</td>
-		<td class="col-sm-2">Defender</td>
-		<td class="col-sm-2">Class Under Test</td>
-		<td class="col-sm-2">Level</td>
-		<td class="col-sm-2"></td>
+		<th>Game ID</th>
+		<th>Class</th>
+		<th>Attacker</th>
+		<th>Defender</th>
+		<th>Level</th>
+		<th></th>
 	</tr>
 
 
@@ -32,9 +32,9 @@
 
 	<tr>
 		<td class="col-sm-2"><%= g.getId() %></td>
+		<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
 		<td class="col-sm-2"><%= atkName %></td>
 		<td class="col-sm-2"><%= defName %></td>
-		<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
 		<td class="col-sm-2"><%= g.getLevel().name() %></td>
 		<td class="col-sm-2">
 			<form id="view" action="games" method="post">
@@ -48,20 +48,26 @@
 	<%
 		}
 		if (!isGames) {%>
-	<p> There are currently no games in your history </p>
+	<tr><td colspan="100%"> Empty duels history. </td></tr>
 	<%}
 	%>
 </table>
 	<hr />
-	<h2>Battlegrounds</h2>
-	<table class="table table-hover table-responsive table-paragraphs"><tr><th>Game ID</th><th>Owner</th><th>
-		Price
-	</th><th>Level</th><th>Actions</th></tr>
+	<h3>Battlegrounds</h3>
+	<table class="table table-hover table-responsive table-paragraphs games-table">
+		<tr>
+			<th>Game ID</th>
+			<th>Class</th>
+			<th>Owner</th>
+			<th>Prize</th>
+			<th>Level</th>
+			<th>Actions</th>
+		</tr>
 		<%
 			ArrayList<MultiplayerGame> mgames = DatabaseAccess.getFinishedMultiplayerGamesForUser(uid);
 			if (mgames.isEmpty()) {
 		%>
-		<tr><td colspan="5"> You have complete no games. </td></tr>
+		<tr><td colspan="100%"> Empty multi-player games history. </td></tr>
 		<%
 		} else {
 		%>
@@ -71,8 +77,9 @@
 		%>
 		<tr>
 			<td class="col-sm-2"><%= g.getId() %></td>
+			<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
 			<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
-			<td class="col-sm-2"><%= g.getPrice() %></td>
+			<td class="col-sm-2"><%= g.getPrize() %></td>
 			<td class="col-sm-2"><%= g.getLevel().name() %></td>
 			<td class="col-sm-2"><%
 				switch(role){

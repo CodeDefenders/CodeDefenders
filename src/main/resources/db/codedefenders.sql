@@ -15,6 +15,8 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+USE codedefenders;
+
 --
 -- Table structure for table `classes`
 --
@@ -30,6 +32,7 @@ CREATE TABLE `classes` (
   `Alias` varchar(50) NOT NULL,
   PRIMARY KEY (`Class_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=221 DEFAULT CHARSET=utf8;
+CREATE UNIQUE INDEX classes_Alias_uindex ON classes (Alias);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,14 +48,14 @@ CREATE TABLE `games` (
   `Level` enum('EASY','MEDIUM','HARD') DEFAULT NULL,
   `Timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `Creator_ID` int(11) DEFAULT NULL,
-  `Price` int(11) DEFAULT NULL,
+  `Prize` int(11) DEFAULT NULL,
   `Defender_Value` int(11) DEFAULT '100',
   `Attacker_Value` int(11) DEFAULT '100',
   `Coverage_Goal` float DEFAULT NULL,
   `Mutant_Goal` float DEFAULT NULL,
   `Attackers_Needed` int(11) DEFAULT '0',
   `Defenders_Needed` int(11) DEFAULT '0',
-  `Start_Time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `Start_Time` TIMESTAMP DEFAULT 0,
   `Finish_Time` TIMESTAMP DEFAULT 0,
   `Attackers_Limit` int(11) DEFAULT '0',
   `Defenders_Limit` int(11) DEFAULT '0',
@@ -261,3 +264,11 @@ CREATE EVENT IF NOT EXISTS start_mp_games
 DO
   UPDATE games SET State='ACTIVE'
   WHERE Mode='PARTY' AND State='CREATED' AND Start_Time<=CURRENT_TIMESTAMP;
+
+DROP EVENT IF EXISTS close_mp_games;
+CREATE EVENT IF NOT EXISTS close_mp_games
+  ON SCHEDULE EVERY 1 MINUTE
+  ON COMPLETION PRESERVE
+DO
+  UPDATE games SET State='FINISHED'
+  WHERE Mode='PARTY' AND State='ACTIVE' AND Finish_Time<=CURRENT_TIMESTAMP;

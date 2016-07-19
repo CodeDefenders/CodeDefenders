@@ -1,8 +1,10 @@
 package org.codedefenders;
 
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -62,7 +64,7 @@ public class GameClass {
 	}
 
 	public void setAlias(String alias) {
-		alias = alias;
+		this.alias = alias;
 	}
 
 	public String getAsString() {
@@ -97,13 +99,9 @@ public class GameClass {
 		// Attempt to insert game info into database
 		try {
 			conn = DatabaseAccess.getConnection();
-
 			stmt = conn.createStatement();
-
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
-
 			ResultSet rs = stmt.getGeneratedKeys();
-
 			if (rs.next()) {
 				this.id = rs.getInt(1);
 				System.out.println("Inserted CUT with ID: " + this.id);
@@ -111,7 +109,6 @@ public class GameClass {
 				conn.close();
 				return true;
 			}
-
 		} catch (SQLException se) {
 			System.out.println(se);
 			//Handle errors for JDBC
@@ -119,36 +116,28 @@ public class GameClass {
 			System.out.println(e);
 			//Handle errors for Class.forName
 		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				System.out.println(se);
-			}//end finally try
+			DatabaseAccess.cleanup(conn, stmt);
 		} //end try
 
 		return false;
 	}
 
-	public static void clear() {
+	public boolean update() {
+
+		logger.debug("Updating class (Name={}, Alias={}, JavaFile={}, ClassFile={})", name, alias, javaFile, classFile);
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = "DELETE FROM classes;";
 
+		String sql = String.format("UPDATE classes SET Name='%s', Alias='%s', JavaFile='%s', ClassFile='%s' WHERE Class_ID='%d';", name, alias, javaFile, classFile, id);
+
+		// Attempt to update game info into database
 		try {
-			System.out.println("Clear classes table");
 			conn = DatabaseAccess.getConnection();
 			stmt = conn.createStatement();
 			stmt.execute(sql);
 			stmt.close();
 			conn.close();
+			return true;
 		} catch (SQLException se) {
 			System.out.println(se);
 			//Handle errors for JDBC
@@ -156,20 +145,9 @@ public class GameClass {
 			System.out.println(e);
 			//Handle errors for Class.forName
 		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				System.out.println(se);
-			}//end finally try
+			DatabaseAccess.cleanup(conn, stmt);
 		} //end try
+		return false;
 	}
 
 	public String getTestTemplate() {
@@ -188,42 +166,6 @@ public class GameClass {
 		sb.append(String.format("%c}%n",'\t'));
 		sb.append(String.format("}"));
 		return sb.toString();
-	}
-
-	public static boolean existUniqueClassID(String classID) {
-		Connection conn = null;
-		Statement stmt = null;
-		String sql = String.format("SELECT * FROM classes WHERE Name = '%s';", classID);
-		try {
-			conn = DatabaseAccess.getConnection();
-			stmt = conn.createStatement();
-			stmt.execute(sql);
-			boolean exist = stmt.getResultSet().next();
-			stmt.close();
-			conn.close();
-			return exist;
-		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				System.out.println(se);
-			}//end finally try
-		} //end try
-		return false;
 	}
 
 	public String getJavaFile() {

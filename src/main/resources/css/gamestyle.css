@@ -9,6 +9,14 @@ body {
 	background-color: #fafafa;
 }
 
+h2 {
+	font-size: 32px;
+}
+
+h3 {
+	font-size: 25px;
+}
+
 #site-logo:hover {
 	color: #CCCCCC;
 }
@@ -176,10 +184,17 @@ th, td {
 	text-align: left;
 }
 
+.games-table td, .games-table th
+{
+	padding: 5px;
+	text-align:center;
+}
+
 .form-upload {
 	padding: 15px;
 	margin: 0 auto;
 	max-width: 550px;
+	line-height: 50px;
 }
 
 .form-contact {
@@ -192,6 +207,12 @@ th, td {
 	padding: 15px;
 	margin: 0 auto;
 	max-width: 550px;
+}
+
+.form-creategame-mp {
+	padding: 15px;
+	margin: 0 auto;
+	max-width: 750px;
 }
 
 .form-signin {
