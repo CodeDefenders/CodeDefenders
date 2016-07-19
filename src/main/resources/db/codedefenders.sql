@@ -15,6 +15,8 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+USE codedefenders;
+
 --
 -- Table structure for table `classes`
 --
@@ -30,6 +32,7 @@ CREATE TABLE `classes` (
   `Alias` varchar(50) NOT NULL,
   PRIMARY KEY (`Class_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=221 DEFAULT CHARSET=utf8;
+CREATE UNIQUE INDEX classes_Alias_uindex ON classes (Alias);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -52,7 +55,7 @@ CREATE TABLE `games` (
   `Mutant_Goal` float DEFAULT NULL,
   `Attackers_Needed` int(11) DEFAULT '0',
   `Defenders_Needed` int(11) DEFAULT '0',
-  `Start_Time` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `Start_Time` TIMESTAMP DEFAULT 0,
   `Finish_Time` TIMESTAMP DEFAULT 0,
   `Attackers_Limit` int(11) DEFAULT '0',
   `Defenders_Limit` int(11) DEFAULT '0',
