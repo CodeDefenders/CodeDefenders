@@ -28,6 +28,10 @@ public class Test {
 
 	private int playerId;
 
+	public int getMutantsKilled() {
+		return mutantsKilled;
+	}
+
 	private LineCoverage lineCoverage = LineCoverage.NONE;
 
 	private int score;
