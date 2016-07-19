@@ -9,7 +9,7 @@
 				<td>
 					<select name="class" class="form-control selectpicker" data-size="large" >
 						<% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
-						<option value="<%=c.getId()%>"><%=c.getName()%></option>
+						<option value="<%=c.getId()%>"><%=c.getAlias()%></option>
 						<%}%>
 					</select>
 				</td>
