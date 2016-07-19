@@ -123,7 +123,9 @@
 			switch(role){
 				case ATTACKER:
 					%>
-			<a href="multiplayer/games?id=<%= g.getId() %>">Attack</a>
+			<% if(g.getState().equals(ACTIVE)) { %>
+				<a href="multiplayer/games?id=<%= g.getId() %>">Attack</a>
+			<% } else { %> <p>Game Not Ready</p> <% } %>
 			<%
 					break;
 				case CREATOR:
@@ -134,7 +136,9 @@
 					break;
 				case DEFENDER:
 			%>
-			<a href="multiplayer/games?id=<%= g.getId() %>">Defend</a>
+			<% if(g.getState().equals(ACTIVE)) { %>
+				<a href="multiplayer/games?id=<%= g.getId() %>">Defend</a>
+			<% } else { %> <p>Game Not Ready</p> <% } %>
 			<%
 
 					break;
