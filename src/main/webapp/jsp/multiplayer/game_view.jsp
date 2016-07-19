@@ -22,11 +22,11 @@
     String codeDivName = "cut-div";
 
     MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
+    Role role = mg.getRole(uid);
 
-    if (! mg.getState().equals(AbstractGame.State.ACTIVE)) {
+    if ((! mg.getState().equals(AbstractGame.State.ACTIVE)) && (!role.equals(Role.CREATOR))) {
         response.sendRedirect("/games/user");
     }
-    Role role = mg.getRole(uid);
 
     List<Test> tests = mg.getExecutableTests();
 
