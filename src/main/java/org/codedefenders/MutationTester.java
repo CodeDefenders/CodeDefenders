@@ -145,6 +145,7 @@ public class MutationTester {
 				ArrayList<Mutant> mlist = new ArrayList<Mutant>();
 				mlist.add(mutant);
 				test.setScore(Scorer.score(game, test, mlist));
+				test.update();
 				return;
 			}
 		}
@@ -171,9 +172,6 @@ public class MutationTester {
 			}
 		}
 		mutant.setScore(Scorer.score(game, mutant, missedTests));
-
-		//increase mutant score by one as it is a fresh mutant
-		mutant.setScore(1);
 		mutant.update();
 	}
 

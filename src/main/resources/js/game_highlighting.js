@@ -39,7 +39,7 @@ var mutantLine = function (lineQuant, superDiv, defender){
         const lineNum = lineQuant[l][0];
         const quant = lineQuant[l][1];
         const id = "line" + lineQuant[l][0];
-        $(allLines[lineQuant[l][0]]).before('<div id="'+id+'" style="width: 20px; height: 20px; margin-left: 5px; float: left; margin-right: -25px; position: relative; z-index:100000;"><img src="images/mutant.png" alt="' + lineQuant[l][1] + ' mutants on line ' + lineQuant[l][0] + '" width="20" /></div>');
+        $(allLines[lineQuant[l][0]]).before('<div id="'+id+'" style="width: 20px; height: 20px; margin-left: 5px; float: left; margin-right: -25px; position: relative; z-index:2000;"><img src="images/mutant.png" alt="' + lineQuant[l][1] + ' mutants on line ' + lineQuant[l][0] + '" width="20" /></div>');
         const divId = "#" + id;
         var mol = "";
 
@@ -93,7 +93,7 @@ var mutantKilledLine = function (lineQuant, superDiv){
         const lineNum = lineQuant[l][0];
         const quant = lineQuant[l][1];
         const id = "kline" + lineQuant[l][0];
-        $(allLines[lineQuant[l][0]]).before('<div id="'+id+'" style="width: 20px; height: 20px; margin-left: 25px; float: left; margin-right: -25px; position: relative; z-index:100000;"><img src="images/mutantKilled.png" alt="' + lineQuant[l][1] + ' mutants on line ' + lineQuant[l][0] + '" width="20" /></div>');
+        $(allLines[lineQuant[l][0]]).before('<div id="'+id+'" style="width: 20px; height: 20px; margin-left: 25px; float: left; margin-right: -25px; position: relative; z-index:2000;"><img src="images/mutantKilled.png" alt="' + lineQuant[l][1] + ' mutants on line ' + lineQuant[l][0] + '" width="20" /></div>');
         const divId = "#" + id;
         var mol = "";
 
