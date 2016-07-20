@@ -95,7 +95,6 @@ public class AiAttacker extends AiPlayer {
 				//Note mutants with low killcount are more likely to be equivalent.
 				n = PrepareAI.biasedSelection(origMutants.size(), 1.7);
 			}
-			//TODO: Other generation strategies
 
 			if(n >= 0) {
 				Mutant origM = origMutants.get(n);
