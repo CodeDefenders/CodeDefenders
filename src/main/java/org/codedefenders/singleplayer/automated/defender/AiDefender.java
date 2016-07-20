@@ -27,7 +27,7 @@ public class AiDefender extends AiPlayer {
 	}
 	public boolean turnHard() {
 		//Choose test which kills a high number of generated mutants.
-		return runTurn(GenerationMethod.KILLCOUNT);
+		return runTurn(GenerationMethod.COVERAGE);
 	}
 
 	public boolean turnEasy() {
@@ -73,8 +73,9 @@ public class AiDefender extends AiPlayer {
 			origTests.add(DatabaseAccess.getTestForId(tId));
 		}
 
+		Test covTest = null;
+		int bestCoverage = 0;
 		if (strategy.equals(GenerationMethod.COVERAGE)) {
-			Test covTest = null;
 			//Choose a test which covers the most lines of alive mutants.
 			//Get all alive mutated line numbers.
 
@@ -90,7 +91,6 @@ public class AiDefender extends AiPlayer {
 				System.out.println();
 			}
 
-			int bestCoverage = 0;
 			for (Test tst : origTests) {
 				//Test must not be used yet.
 				if(!usedTests.contains(tst)) {
@@ -119,14 +119,17 @@ public class AiDefender extends AiPlayer {
 			if (covTest != null) {
 				//Just use the found test if using line coverage method.
 				return covTest.getId();
+			} else {
+				System.out.println("No test covers an alive mutated line, using killcount instead.");
+				strategy = GenerationMethod.KILLCOUNT;
 			}
-		} else {
+		}
+		//If not line coverage, or no lines are covered.
+		if (bestCoverage == 0) {
 			//Repeat multiple times for non-deterministic strategies.
 			for (int i = 0; i <= 3; i++) {
 				//Try to get test by default strategy.
 				int n = -1;
-
-				Test covTest = null; //Test for line coverage.
 
 				if (strategy.equals(GenerationMethod.RANDOM)) {
 					n = (int) Math.floor(Math.random() * totalTests);
