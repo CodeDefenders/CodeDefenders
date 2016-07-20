@@ -1,6 +1,7 @@
 package org.codedefenders.singleplayer.automated.defender;
 
 import org.codedefenders.*;
+import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.singleplayer.AiPlayer;
 import org.codedefenders.singleplayer.PrepareAI;
 import org.codedefenders.singleplayer.automated.defender.TestComparator;
@@ -72,36 +73,90 @@ public class AiDefender extends AiPlayer {
 			origTests.add(DatabaseAccess.getTestForId(tId));
 		}
 
-		for (int i = 0; i <= 3; i++) {
-			//Try to get test by default strategy.
-			int n = -1;
-			if (strategy.equals(GenerationMethod.RANDOM)) {
-				n = (int) Math.floor(Math.random() * totalTests);
-				//0 -> totalTests - 1.
+		if (strategy.equals(GenerationMethod.COVERAGE)) {
+			Test covTest = null;
+			//Choose a test which covers the most lines of alive mutants.
+			//Get all alive mutated line numbers.
+
+			ArrayList<Mutant> muts = game.getAliveMutants();
+			ArrayList<Integer> linesModified = new ArrayList<Integer>();
+			for (Mutant m : muts) {
+				int[] lines = m.getLines();
+				System.out.print("Alive mutated lines:");
+				for (int l : lines) {
+					linesModified.add(l);
+					System.out.print(l + ", ");
+				}
+				System.out.println();
 			}
-			else if (strategy.equals(GenerationMethod.KILLCOUNT)) {
-				//Sort tests in order of killcount.
-				Collections.sort(origTests, new TestComparator());
 
-				//Get an index, using a random number biased towards later index.
-				//More extreme than attacker due to smaller sample size.
-				n = PrepareAI.biasedSelection(origTests.size(), 0.6);
-			}
-			//TODO: Other strategies.
-
-			//Check that an id has been retrieved.
-			if(n >= 0) {
-				//Get original test from dummy game's list of tests.
-				Test origT = origTests.get(n);
-				t = origT.getId();
-
-				if ((!usedTests.contains(t)) && (t != -1)) {
-					//Strategy found an unused test.
-					return t;
+			int bestCoverage = 0;
+			for (Test tst : origTests) {
+				//Test must not be used yet.
+				if(!usedTests.contains(tst)) {
+					tst.setLineCoverage(AntRunner.getLinesCovered(tst, game.getCUT()));
+					LineCoverage lc = tst.getLineCoverage();
+					Integer[] coveredByTest = lc.getLinesCovered();
+					int coverage = 0;
+					System.out.print("Test covers lines: ");
+					for (int l : coveredByTest) {
+						System.out.print(l);
+						if(linesModified.contains(l)) {
+							System.out.print("[HIT]");
+							//Test covers this mutated line.
+							coverage ++;
+						}
+						System.out.print(", ");
+					}
+					System.out.println();
+					if (coverage > bestCoverage) {
+						//Test is the best unused test found.
+						covTest = tst;
+						bestCoverage = coverage;
+					}
 				}
 			}
+			if (covTest != null) {
+				//Just use the found test if using line coverage method.
+				return covTest.getId();
+			}
+		} else {
+			//Repeat multiple times for non-deterministic strategies.
+			for (int i = 0; i <= 3; i++) {
+				//Try to get test by default strategy.
+				int n = -1;
 
+				Test covTest = null; //Test for line coverage.
+
+				if (strategy.equals(GenerationMethod.RANDOM)) {
+					n = (int) Math.floor(Math.random() * totalTests);
+					//0 -> totalTests - 1.
+				}
+				else if (strategy.equals(GenerationMethod.KILLCOUNT)) {
+					//Sort tests in order of killcount.
+					Collections.sort(origTests, new TestComparator());
+
+					//Get an index, using a random number biased towards later index.
+					//More extreme than attacker due to smaller sample size.
+					n = PrepareAI.biasedSelection(origTests.size(), 0.6);
+				}
+
+				//Check that an id has been retrieved.
+				if(n >= 0) {
+					//Get original test from dummy game's list of tests.
+					Test origT = origTests.get(n);
+					t = origT.getId();
+
+					if ((!usedTests.contains(t)) && (t != -1)) {
+						//Strategy found an unused test.
+						return t;
+					}
+				}
+
+			}
 		}
+
+
 
 		//If standard strategy fails, choose first non-selected test.
 		for (int x = 0; x < totalTests; x++) {
