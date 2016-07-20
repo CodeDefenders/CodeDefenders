@@ -450,9 +450,9 @@ public class MultiplayerGame extends AbstractGame {
 			ts.increaseQuantity();
 			ts.increaseTotalScore(tt.getScore());
 
-			mutantsKilled.put(tt.getPlayerId(), mutantsKilled.get(tt.getPlayerId())+1);
+			mutantsKilled.put(tt.getPlayerId(), mutantsKilled.get(tt.getPlayerId()) + tt.getMutantsKilled());
 
-			mutantsKilled.put(totalIndex, mutantsKilled.get(totalIndex)+1);
+			mutantsKilled.put(totalIndex, mutantsKilled.get(totalIndex)+tt.getMutantsKilled());
 
 		}
 

@@ -105,7 +105,7 @@
                                 if (mutantScores.containsKey(-1) && mutantScores.get(-1) != null){%>
                             <%= ((MultiplayerGame.PlayerScore)mutantScores.get(-1)).getAdditionalInformation() %>
                             <% } else { %>
-                            0, 0, 0
+                            0 / 0 / 0
                             <% } %>
                         </td>
                         <td>

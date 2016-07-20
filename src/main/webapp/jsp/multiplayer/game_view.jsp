@@ -84,7 +84,6 @@
 
             for (Mutant m : mutantsEquiv){
                 if (m.getPlayerId() == playerId &&  m.getId() == mutId){
-                    m.setScore(0);
                     m.setEquivalent(Mutant.Equivalence.DECLARED_YES);
                     m.update();
 

@@ -102,6 +102,9 @@ public class Mutant {
 
 	public void setEquivalent(Equivalence e) {
 		equivalent = e;
+		if (e.equals(Equivalence.DECLARED_YES) || e.equals(Equivalence.ASSUMED_YES)) {
+			score = 0;
+		}
 	}
 
 	public String getSourceFile() {
