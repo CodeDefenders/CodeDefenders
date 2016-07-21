@@ -1,3 +1,9 @@
+<%@ page import="java.text.SimpleDateFormat" %>
+<%@ page import="java.text.DateFormat" %>
+
+<%@ page import="org.joda.time.format.DateTimeFormat" %>
+<%@ page import="org.joda.time.format.DateTimeFormatter" %>
+<%@ page import="org.joda.time.DateTime" %>
 <% String pageTitle = "Create Battleground"; %>
 <%@ include file="/jsp/header.jsp"%>
 <div id="creategame" class="container">
@@ -58,110 +64,116 @@
 				</td>
 			</tr>
 			<tr>
+				<%
+					DateTime startDate = DateTime.now();
+					DateTime finishDate = startDate.plusDays(3);
+					DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
+				%>
 				<td>Start Time</td>
 				<td>
 					<div class="crow">
-						<input type="hidden" id="startTime" name="startTime" />
-						<input class="ws-5" name="start_dateTime" id="start_dateTime" value="Select Date"/>
+						<input type="hidden" id="startTime" name="startTime" value="<%=startDate.getMillis()%>" />
+						<input class="ws-5" name="start_dateTime" id="start_dateTime" value="<%=fmt.print(startDate)%>" />
 						<div class="ws-7 nest">
-							<input class="ws-1" type="text" name="start_hours" id="start_hours" value="00" style="text-align: center"/>
+							<input class="ws-1" type="text" name="start_hours" id="start_hours" value="<%=startDate.getHourOfDay()%>"  style="text-align: center;" />
 							<span>:</span>
-							<input class="ws-1" type="text" name="start_minutes" id="start_minutes" value="00"  style="text-align: center"/>
+							<input class="ws-1" type="text" name="start_minutes" id="start_minutes" value="<%=finishDate.getMinuteOfHour()%>"  style="text-align: center;" />
 						</div>
 					</div>
 					<script>
 						$(document).ready(function(){
 							$("#startTime").val(new Date().getTime());
 							$("#start_dateTime").val($.datepicker.formatDate('mm/DD/yyyy', new Date(timeStamp)));
-						});
-					voidFunct = function(){};
-					updateStartTimestamp = function(){
-						var timestamp = new Date($("#start_dateTime").val()).valueOf();
-						timestamp += parseInt($("#start_hours").val()) * 60 * 60 * 1000;
-						timestamp += parseInt($("#start_minutes").val()) * 60 * 1000;
-						var now = new Date().getTime();
-						if (timestamp < now){
-							//invalid timestamp, set it to now
-							timestamp = now;
-						}
-						$("#startTime").val(timestamp);
-					}
-					$("#start_hours").on( "change", function(){
-						var hours = $("#start_hours").val();
-						if (hours < 0 || hours > 59){
-							$("#start_hours").val(0);
-						}
-						updateStartTimestamp();
-					})
-					$("#start_minutes").on( "change", function(){
-						var mins = $("#start_minutes").val();
-						if (mins < 0 || mins > 59){
-							$("#start_minutes").val(0);
-						}
-						updateStartTimestamp();
-					})
-					var dataPicker = $("#start_dateTime").datepicker({
-						onSelect: function (selectedDate, dp) {
-							$(".ui-datepicker a").attr("href", "javascript:voidFunct();");
-							//var date = $.datepicker.formatDate("@", dp);
-							//alert(date);
 							updateStartTimestamp();
+						});
+						var voidFunct = function(){};
+						var updateStartTimestamp = function(){
+							var timestamp = new Date($("#start_dateTime").val()).valueOf();
+							timestamp += parseInt($("#start_hours").val()) * 60 * 60 * 1000;
+							timestamp += parseInt($("#start_minutes").val()) * 60 * 1000;
+							var now = new Date().getTime();
+							if (timestamp < now){
+								//invalid timestamp, set it to now
+								timestamp = now;
+							}
+							$("#startTime").val(timestamp);
 						}
-					});
+						$("#start_hours").on( "change", function(){
+							var hours = $("#start_hours").val();
+							if (hours < 0 || hours > 59){
+								$("#start_hours").val(0);
+							}
+							updateStartTimestamp();
+						})
+						$("#start_minutes").on( "change", function(){
+							var mins = $("#start_minutes").val();
+							if (mins < 0 || mins > 59){
+								$("#start_minutes").val(0);
+							}
+							updateStartTimestamp();
+						})
+						var dataPicker = $("#start_dateTime").datepicker({
+							onSelect: function (selectedDate, dp) {
+								$(".ui-datepicker a").attr("href", "javascript:voidFunct();");
+								//var date = $.datepicker.formatDate("@", dp);
+								//alert(date);
+								updateStartTimestamp();
+							}
+						});
 					</script>
 				</td>
 			<tr>
 				<td>Finish Time</td>
 				<td>
 					<div class="crow">
-						<input type="hidden" id="finishTime" name="finishTime" />
-						<input class="ws-5" name="dateTime" id="dateTime" value="Select Date"/>
+						<input type="hidden" id="finishTime" name="finishTime" value="<%=finishDate.getMillis()%>" />
+						<input class="ws-5" name="finish_dateTime" id="finish_dateTime" value="<%=fmt.print(finishDate)%>" />
 						<div class="ws-7 nest">
-							<input class="ws-1" type="text" name="hours" id="hours" value="00" style="text-align: center"/>
+							<input class="ws-1" type="text" name="finish_hours" id="finish_hours" value="<%=finishDate.getHourOfDay()%>" style="text-align: center;"/>
 							<span>:</span>
-							<input class="ws-1" type="text" name="minutes" id="minutes" value="00" style="text-align: center"/>
+							<input class="ws-1" type="text" name="finish_minutes" id="finish_minutes" value="<%=finishDate.getMinuteOfHour()%>" style="text-align: center;"/>
 						</div>
 					</div>
 					<script>
 						$(document).ready(function(){
 							var timeStamp = new Date().getTime() + (1000*60*60*24*7);
 							$("#finishtTime").val(timeStamp);
-							$("#dateTime").val($.datepicker.formatDate('mm/DD/yyyy', new Date(timeStamp)));
+							$("#finish_dateTime").val($.datepicker.formatDate('mm/DD/yyyy', new Date(timeStamp)));
+							updateFinishTimestamp();
 						});
-					voidFunct = function(){};
-					updateTimestamp = function(){
-						var timestamp = new Date($("#dateTime").val()).valueOf();
-						timestamp += parseInt($("#hours").val()) * 60 * 60 * 1000;
-						timestamp += parseInt($("#minutes").val()) * 60 * 1000;
-						var now = new Date().getTime();
-						if (timestamp < now){
-							//invalid timestamp, set it to now+5 days
-							timestamp = now + (5*24*60*60*1000);
+						var updateFinishTimestamp = function(){
+							var timestamp = new Date($("#finish_dateTime").val()).valueOf();
+							timestamp += parseInt($("#finish_hours").val()) * 60 * 60 * 1000;
+							timestamp += parseInt($("#finish_minutes").val()) * 60 * 1000;
+							var now = new Date().getTime();
+							if (timestamp < now){
+								//invalid timestamp, set it to now+5 days
+								timestamp = now + (3*24*60*60*1000);
+							}
+							$("#finishTime").val(timestamp);
 						}
-						$("#finishTime").val(timestamp);
-					}
-					$("#hours").on( "change", function(){
-						var hours = $("#hours").val();
-						if (hours < 0 || hours > 59){
-							$("#hours").val(0);
-						}
-						updateTimestamp();
-					})
-					$("#minutes").on( "change", function(){
-						var mins = $("#minutes").val();
-						if (mins < 0 || mins > 59){
-							$("#minutes").val(0);
-						}
-						updateTimestamp();
-					})
-					var dataPicker = $("#dateTime").datepicker({
-						onSelect: function (selectedDate, dp) {
-							$(".ui-datepicker a").attr("href", "javascript:voidFunct();");
-							//var date = $.datepicker.formatDate("@", dp);
-							//alert(date);
-							updateTimestamp();
-						},
-					});
+						$("#finish_hours").on( "change", function(){
+							var hours = $("#finish_hours").val();
+							if (hours < 0 || hours > 59){
+								$("#finish_hours").val(0);
+							}
+							updateFinishTimestamp();
+						})
+						$("#finish_minutes").on( "change", function(){
+							var mins = $("#finish_minutes").val();
+							if (mins < 0 || mins > 59){
+								$("#finish_minutes").val(0);
+							}
+							updateFinishTimestamp();
+						})
+						var dataPicker = $("#finish_dateTime").datepicker({
+							onSelect: function (selectedDate, dp) {
+								$(".ui-datepicker a").attr("href", "javascript:voidFunct();");
+								//var date = $.datepicker.formatDate("@", dp);
+								//alert(date);
+								updateFinishTimestamp();
+							},
+						});
 					</script>
 				</td>
 			</tr>
