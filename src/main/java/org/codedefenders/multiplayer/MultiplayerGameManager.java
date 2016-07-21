@@ -44,6 +44,13 @@ public class MultiplayerGameManager extends HttpServlet {
 
 		switch (request.getParameter("formType")) {
 
+			case "endGame": {
+				System.out.println("Ending party game " + activeGame.getId());
+				activeGame.setState(AbstractGame.State.FINISHED);
+				activeGame.update();
+				response.sendRedirect("games");
+				return;
+			}
 			case "resolveEquivalence": {
 				logger.debug("Executing Action resolveEquivalence");
 				System.out.println("MultiplayerGame Manager Executing Action resolveEquivalence");

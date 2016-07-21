@@ -12,6 +12,16 @@
 		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30">
 			<%=mg.getCUT().getAsString()%>
 		</textarea></pre>
+
+        <div>
+            <form id="end" action="/multiplayer/move" method="post">
+                <h2>Admin
+                <button type="submit" class="btn btn-primary btn-game btn-right" form="end">End Game</button>
+                </h2>
+                <input type="hidden" name="formType" value="endGame">
+                <input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
+            </form>
+        </div>
     </div>
     <div>
         <script>
