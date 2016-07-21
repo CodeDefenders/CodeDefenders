@@ -319,6 +319,10 @@ public class MultiplayerGame extends AbstractGame {
 		private int quantity;
 		private String additionalInformation;
 
+		public String toString(){
+			return playerId + ": " + totalScore + ", " + quantity + "," + additionalInformation;
+		}
+
 		public String getAdditionalInformation() {
 			return additionalInformation;
 		}
@@ -454,6 +458,25 @@ public class MultiplayerGame extends AbstractGame {
 
 			mutantsKilled.put(totalIndex, mutantsKilled.get(totalIndex)+tt.getMutantsKilled());
 
+		}
+
+		for (int i : mutantsKilled.keySet()){
+			if (i < 0){
+				continue;
+			}
+			int totalIndex = -1;
+			for (int j : attackers){
+				if (j == i){
+					totalIndex = -2;
+					break;
+				}
+			}
+			PlayerScore ps = testScores.get(i);
+			int playerScore = DatabaseAccess.getPlayerPoints(i);
+			ps.increaseTotalScore(playerScore);
+
+			PlayerScore ts = testScores.get(totalIndex);
+			ts.increaseTotalScore(playerScore);
 		}
 
 		for (int i : mutantsKilled.keySet()){

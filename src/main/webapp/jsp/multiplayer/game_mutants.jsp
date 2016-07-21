@@ -3,8 +3,6 @@
 <div class="ws-12 up" id="mutants-div">
 <%
 if (role == Role.ATTACKER && true){
-    int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
-
     Mutant equiv = null;
 
     for (Mutant m : mutantsEquiv){
@@ -50,6 +48,9 @@ if (role == Role.ATTACKER && true){
 								<input class="btn btn-primary" name="rejectEquivalent" type="submit" value="Submit Killing Test">
 							</div>
 						</div>
+					</div>
+					<div>
+						<p>Note: If the game finishes with this equivalence unsolved, you will lose points!</p>
 					</div>
 
 				</form>

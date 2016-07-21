@@ -703,6 +703,125 @@ public class DatabaseAccess {
 		return testList;
 	}
 
+	public static void increasePlayerPoints(int points, int player){
+		Connection conn =  null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			String sql = String.format(
+					"UPDATE players SET Points=Points+%d WHERE ID=%d",
+					points, player
+			);
+
+			stmt.execute(sql);
+			stmt.close();
+			conn.close();
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(conn, stmt);
+		}
+	}
+
+	public static int getEquivalentDefenderId(Mutant m){
+
+		Connection conn =  null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			String sql = String.format("SELECT * FROM equivalences WHERE Mutant_ID='%d';", m.getId());
+			ResultSet rs = stmt.executeQuery(sql);
+			int id = -1;
+			while (rs.next()) {
+				id = rs.getInt("Defender_ID");
+			}
+			stmt.close();
+			conn.close();
+
+			return id;
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(conn, stmt);
+		}
+		return -1;
+	}
+
+	public static int getPlayerPoints(int playerId){
+
+		Connection conn =  null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			String sql = String.format("SELECT * FROM players WHERE ID='%d';", playerId);
+			ResultSet rs = stmt.executeQuery(sql);
+			int points = 0;
+			while (rs.next()) {
+				points = rs.getInt("Points");
+			}
+			stmt.close();
+			conn.close();
+
+			return points;
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(conn, stmt);
+		}
+		return 0;
+	}
+
+	public static boolean insertEquivalence(Mutant mutant, int defender) {
+		Connection conn =  null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			String sql = String.format("INSERT INTO equivalences " +
+					"(Mutant_ID, Defender_ID, Mutant_Points) VALUES " +
+					"('%d', '%d', '%d')",
+					mutant.getId(), defender, mutant.getScore());
+
+			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+
+			ResultSet rs = stmt.getGeneratedKeys();
+
+			if (rs.next()) {
+				stmt.close();
+				conn.close();
+				return true;
+			}
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(conn, stmt);
+		}
+		return false;
+	}
+
 	public static boolean setAiTestAsUsed(int testNumber, Game g) {
 		Connection conn =  null;
 		Statement stmt = null;

@@ -1,6 +1,7 @@
 <% String pageTitle="In Game"; %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.*" %>
+<%@ page import="javafx.scene.chart.PieChart" %>
 <%
     // Get their user id from the session.
     int uid = ((Integer) session.getAttribute("uid")).intValue();
@@ -47,6 +48,7 @@
         messages = new ArrayList<String>();
     }
 
+    int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
     ArrayList<Mutant> mutantsAlive = mg.getAliveMutants();
 
     ArrayList<Mutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();
@@ -65,6 +67,7 @@
                     if (line == equivLine){
                         m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                         m.update();
+                        DatabaseAccess.insertEquivalence(m, playerId);
                         equivCounter++;
                     }
 
@@ -78,15 +81,13 @@
         try {
             int mutId = Integer.parseInt(request.getParameter("acceptEquiv"));
 
-            int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
-
             Mutant equiv = null;
 
             for (Mutant m : mutantsEquiv){
                 if (m.getPlayerId() == playerId &&  m.getId() == mutId){
                     m.setEquivalent(Mutant.Equivalence.DECLARED_YES);
                     m.update();
-
+                    DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
                     break;
                 }
             }
