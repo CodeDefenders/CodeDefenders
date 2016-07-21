@@ -68,6 +68,9 @@ public class MutationTester {
 		ArrayList<Test> tests = new ArrayList<Test>();
 		tests.add(test);
 
+		LineCoverage lineCov = AntRunner.getLinesCovered(test, game.getCUT());
+		test.setLineCoverage(lineCov);
+
 
 
 		for (Mutant mm : mutants){
@@ -93,9 +96,6 @@ public class MutationTester {
 				mm.update();
 			}
 		}
-
-		LineCoverage lc = AntRunner.getLinesCovered(test, game.getCUT());
-		test.setLineCoverage(lc);
 
 		test.setScore(Scorer.score(game, test, killedMutants));
 

@@ -15,7 +15,18 @@ public abstract class Scorer {
 
         @Override
         protected int scoreTest(MultiplayerGame g, Test t, ArrayList<Mutant> killed) {
-            return killed.size();
+
+            int points = 0;
+
+            for (Mutant m : killed){
+                if (m.getScore() == 0){
+                    points++;
+                } else {
+                    points += m.getScore();
+                }
+            }
+
+            return points;
         }
 
         @Override
