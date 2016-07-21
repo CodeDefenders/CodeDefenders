@@ -67,15 +67,13 @@
                                     if (mutantScores.containsKey(i) && mutantScores.get(i) != null){%>
                                 <%= ((MultiplayerGame.PlayerScore)mutantScores.get(i)).getAdditionalInformation() %>
                                 <% } else { %>
-                                    0, 0, 0
+                                    0 / 0 / 0
                                 <% } %>
                             </td>
                             <td>
                                 <%
                                 if (mutantScores.containsKey(i) && mutantScores.get(i) != null){
                                     total += ((MultiplayerGame.PlayerScore)mutantScores.get(i)).getTotalScore(); %>
-                            <% } else { %>
-                                  0
                             <% }
                                 if (testScores.containsKey(i) && testScores.get(i) != null){
                                     total += ((MultiplayerGame.PlayerScore)testScores.get(i)).getTotalScore(); %>
