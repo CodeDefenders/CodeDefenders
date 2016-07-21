@@ -95,7 +95,8 @@ if (role == Role.ATTACKER && true){
 							for (Mutant m : mutantsAlive) {
 						%>
 						<tr>
-							<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4>
+							<% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
+							<td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.username %> [UID: <%= creator.id %>]</h4>
 								<% for (String change : m.getHTMLReadout()) { %>
 								<p><%=change%><p>
 								<% } %></td>
@@ -147,7 +148,8 @@ if (role == Role.ATTACKER && true){
 							for (Mutant m : mutantsKilled) {
 						%>
 						<tr>
-							<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4>
+							<% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
+							<td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.username %> [UID: <%= creator.id %>]</h4>
 								<% for (String change : m.getHTMLReadout()) { %>
 								<p><%=change%><p>
 								<% } %></td>
@@ -189,7 +191,8 @@ if (role == Role.ATTACKER && true){
 							for (Mutant m : mutantsEquiv) {
 						%>
 						<tr>
-							<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4>
+							<% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
+							<td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.username %> [UID: <%= creator.id %>]</h4>
 								<% for (String change : m.getHTMLReadout()) { %>
 								<p><%=change%><p>
 								<% } %></td>
