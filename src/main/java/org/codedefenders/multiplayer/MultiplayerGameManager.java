@@ -43,9 +43,14 @@ public class MultiplayerGameManager extends HttpServlet {
 		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(gameId);
 
 		switch (request.getParameter("formType")) {
-
+			case "startGame": {
+				System.out.println("Starting party game " + activeGame.getId() + " (Setting state to ACTIVE)");
+				activeGame.setState(AbstractGame.State.ACTIVE);
+				activeGame.update();
+				break;
+			}
 			case "endGame": {
-				System.out.println("Ending party game " + activeGame.getId());
+				System.out.println("Ending party game " + activeGame.getId() + " (Setting state to FINISHED)");
 				activeGame.setState(AbstractGame.State.FINISHED);
 				activeGame.update();
 				response.sendRedirect("games");

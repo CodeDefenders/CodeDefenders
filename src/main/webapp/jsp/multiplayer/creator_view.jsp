@@ -14,11 +14,15 @@
 		</textarea></pre>
 
         <div>
-            <form id="end" action="/multiplayer/move" method="post">
-                <h2>Admin
-                <button type="submit" class="btn btn-primary btn-game btn-right" form="end">End Game</button>
-                </h2>
-                <input type="hidden" name="formType" value="endGame">
+            <h2>Admin</h2>
+            <form id="adminBtn" action="/multiplayer/move" method="post">
+                <% if (mg.getState().equals(AbstractGame.State.ACTIVE)) { %>
+                    <button type="submit" class="btn btn-primary btn-game btn-right" form="adminBtn">End Game</button>
+                    <input type="hidden" name="formType" value="endGame">
+                <% } else if (mg.getState().equals(AbstractGame.State.CREATED)) { %>
+                    <button type="submit" class="btn btn-primary btn-game btn-right" form="adminBtn">Start Game</button>
+                    <input type="hidden" name="formType" value="startGame">
+                <% } %>
                 <input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
             </form>
         </div>
