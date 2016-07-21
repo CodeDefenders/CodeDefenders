@@ -317,6 +317,11 @@ th, td {
 
 .readonly-pre .CodeMirror-lines {
     cursor : default; /* default pointer */
+	text-align: left;
+}
+
+.CodeMirror-sizer {
+	text-align: left;
 }
 
 .readonly-pre .CodeMirror {
