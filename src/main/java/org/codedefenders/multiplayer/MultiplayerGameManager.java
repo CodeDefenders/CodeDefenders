@@ -43,7 +43,25 @@ public class MultiplayerGameManager extends HttpServlet {
 		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(gameId);
 
 		switch (request.getParameter("formType")) {
-
+			case "startGame": {
+				if(activeGame.getState().equals(AbstractGame.State.CREATED)) {
+					System.out.println("Starting party game " + activeGame.getId() + " (Setting state to ACTIVE)");
+					activeGame.setState(AbstractGame.State.ACTIVE);
+					activeGame.update();
+				}
+				break;
+			}
+			case "endGame": {
+				if(activeGame.getState().equals(AbstractGame.State.ACTIVE)) {
+					System.out.println("Ending party game " + activeGame.getId() + " (Setting state to FINISHED)");
+					activeGame.setState(AbstractGame.State.FINISHED);
+					activeGame.update();
+					response.sendRedirect("games");
+					return;
+				} else {
+					break;
+				}
+			}
 			case "resolveEquivalence": {
 				logger.debug("Executing Action resolveEquivalence");
 				System.out.println("MultiplayerGame Manager Executing Action resolveEquivalence");
