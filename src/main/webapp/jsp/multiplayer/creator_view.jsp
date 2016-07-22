@@ -13,17 +13,24 @@
 			<%=mg.getCUT().getAsString()%>
 		</textarea></pre>
 
-        <div>
+        <div class="admin-panel">
             <h2>Admin</h2>
-            <form id="adminBtn" action="/multiplayer/move" method="post">
-                <% if (mg.getState().equals(AbstractGame.State.ACTIVE)) { %>
-                    <button type="submit" class="btn btn-primary btn-game btn-right" form="adminBtn">End Game</button>
+            <form id="adminEndBtn" action="/multiplayer/move" method="post">
+
+                    <button type="submit" class="btn btn-primary btn-game btn-right" form="adminEndBtn"
+                            <% if (!mg.getState().equals(AbstractGame.State.ACTIVE)) { %> disabled <% } %>>
+                        End Game
+                    </button>
                     <input type="hidden" name="formType" value="endGame">
-                <% } else if (mg.getState().equals(AbstractGame.State.CREATED)) { %>
-                    <button type="submit" class="btn btn-primary btn-game btn-right" form="adminBtn">Start Game</button>
+                    <input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
+            </form>
+            <form id="adminStartBtn" action="/multiplayer/move" method="post">
+                    <button type="submit" class="btn btn-primary btn-game btn-right" form="adminStartBtn"
+                            <% if (!mg.getState().equals(AbstractGame.State.CREATED)) { %> disabled <% } %>>
+                        Start Game
+                    </button>
                     <input type="hidden" name="formType" value="startGame">
-                <% } %>
-                <input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
+                    <input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
             </form>
         </div>
     </div>
