@@ -1,7 +1,6 @@
 <% String pageTitle="In Game"; %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.*" %>
-<%@ page import="javafx.scene.chart.PieChart" %>
 <%
     // Get their user id from the session.
     int uid = ((Integer) session.getAttribute("uid")).intValue();
@@ -25,7 +24,7 @@
     MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
     Role role = mg.getRole(uid);
 
-    if ((! mg.getState().equals(AbstractGame.State.ACTIVE)) && (!role.equals(Role.CREATOR))) {
+    if ((mg.getState().equals(AbstractGame.State.CREATED) || mg.getState().equals(AbstractGame.State.FINISHED)) && (!role.equals(Role.CREATOR))) {
         response.sendRedirect("/games/user");
     }
 

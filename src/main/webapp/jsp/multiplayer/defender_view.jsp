@@ -11,7 +11,7 @@
 	<div class="col-md-6" id="utest-div" style="float: right; min-width: 480px">
 		<h2> Write a new JUnit test here
 			<button type="submit" class="btn btn-primary btn-game btn-right" form="def"
-					<% if (!game.getState().equals(AbstractGame.State.ACTIVE)) { %> disabled <% } %>>
+					<% if (!mg.getState().equals(AbstractGame.State.ACTIVE)) { %> disabled <% } %>>
 				Defend!
 			</button>
 		</h2>
