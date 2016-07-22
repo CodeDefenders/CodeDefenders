@@ -126,7 +126,7 @@ public abstract class AbstractGame {
 		return false;
 	}
 
-	public enum State { CREATED, ACTIVE, FINISHED }
+	public enum State { CREATED, ACTIVE, FINISHED, GRACE_ONE, GRACE_TWO }
 
 	public enum Level { EASY, MEDIUM, HARD }
 

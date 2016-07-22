@@ -250,6 +250,20 @@ CREATE TABLE `sessions` (
 ) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+DROP TABLE IF EXISTS `equivalences`;
+CREATE TABLE `equivalences` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Mutant_ID` int(11) DEFAULT NULL,
+  `Defender_ID` int(11) DEFAULT NULL,
+  `Mutant_Points` int(11) DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
+  KEY `fk_equiv_def_idx` (`Defender_ID`),
+  KEY `fk_equiv_mutant_idx` (`Mutant_ID`),
+  CONSTRAINT `fk_equiv_def` FOREIGN KEY (`Defender_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_equiv_mutant` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+
 -- Dump completed on 2016-07-13 11:18:20
 
 INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`) VALUES (1, 'Mutator', 'AI_ATTACKER_INACCESSIBLE', 'codedef_mutator@sheffield.ac.uk');
@@ -265,10 +279,61 @@ DO
   UPDATE games SET State='ACTIVE'
   WHERE Mode='PARTY' AND State='CREATED' AND Start_Time<=CURRENT_TIMESTAMP;
 
+DROP EVENT IF EXISTS grace_mp_games;
+CREATE EVENT IF NOT EXISTS grace_mp_games
+  ON SCHEDULE EVERY 1 MINUTE
+  ON COMPLETION PRESERVE
+DO
+  UPDATE games SET State='GRACE_ONE'
+  WHERE Mode='PARTY' AND State='ACTIVE' AND Finish_Time<=DATE_ADD(NOW(), INTERVAL 1 HOUR);
+
+DROP EVENT IF EXISTS grace_two_mp_games;
+CREATE EVENT IF NOT EXISTS close_two_mp_games
+  ON SCHEDULE EVERY 1 MINUTE
+  ON COMPLETION PRESERVE
+DO
+  UPDATE games SET State='GRACE_TWO'
+  WHERE Mode='PARTY' AND State='GRACE_ONE' AND Finish_Time<=DATE_ADD(NOW(), INTERVAL 45 MIN);
+
 DROP EVENT IF EXISTS close_mp_games;
 CREATE EVENT IF NOT EXISTS close_mp_games
   ON SCHEDULE EVERY 1 MINUTE
   ON COMPLETION PRESERVE
 DO
-  UPDATE games SET State='FINISHED'
-  WHERE Mode='PARTY' AND State='ACTIVE' AND Finish_Time<=CURRENT_TIMESTAMP;
+  UPDATE games SET State='GRACE_TWO'
+  WHERE Mode='PARTY' AND State='ACTIVE' AND Finish_Time<=NOW();
+
+
+DROP EVENT IF EXISTS award_equivalences;
+
+CREATE EVENT IF NOT EXISTS award_equivalences
+  ON SCHEDULE EVERY 1 MINUTE
+  ON COMPLETION PRESERVE
+DO
+ UPDATE players AS p
+ RIGHT JOIN equivalences AS ee ON ee.Defender_ID = p.ID
+ RIGHT JOIN mutants AS mm ON mm.Mutant_ID = ee.Mutant_ID
+ SET ee.Expired = 1, p.Points = p.Points + (SELECT COUNT(ee.ID)
+         FROM equivalences AS e
+         LEFT JOIN mutants AS m ON m.Mutant_ID = e.Mutant_ID
+        WHERE ee.Defender_ID = e.Defender_ID AND mm.Equivalent = 'PENDING_TEST'
+        GROUP BY ee.Defender_ID
+       )
+  WHERE mm.Equivalent = 'PENDING_TEST';
+
+DROP EVENT IF EXISTS update_equivalences;
+
+CREATE EVENT IF NOT EXISTS update_equivalences
+  ON SCHEDULE EVERY 1 MINUTE
+  ON COMPLETION PRESERVE
+DO
+ UPDATE players AS p
+ RIGHT JOIN equivalences AS ee ON ee.Defender_ID = p.ID
+ RIGHT JOIN mutants AS mm ON mm.Mutant_ID = ee.Mutant_ID
+ SET p.Points = p.Points + (SELECT COUNT(ee.ID)
+         FROM equivalences AS e
+         LEFT JOIN mutants AS m ON m.Mutant_ID = e.Mutant_ID
+        WHERE ee.Defender_ID = e.Defender_ID AND mm.Equivalent = 'PENDING_TEST'
+        GROUP BY ee.Defender_ID
+       )
+  WHERE mm.Equivalent = 'PENDING_TEST';

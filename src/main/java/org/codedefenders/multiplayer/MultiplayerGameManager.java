@@ -122,64 +122,72 @@ public class MultiplayerGameManager extends HttpServlet {
 
 			case "createMutant":
 
-				// Get the text submitted by the user.
-				String mutantText = request.getParameter("mutant");
+				if (activeGame.getState().equals(AbstractGame.State.ACTIVE)) {
 
-				int attackerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
+					// Get the text submitted by the user.
+					String mutantText = request.getParameter("mutant");
 
-				Mutant newMutant = createMultiplayerMutant(activeGame.getId(), activeGame.getClassId(), mutantText, attackerId, "mp");
-				if (newMutant != null) {
-					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
-					if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
-						messages.add(MUTANT_COMPILED_MESSAGE);
-						MutationTester.runAllTestsOnMultiplayerMutant(activeGame, newMutant, messages);
-						activeGame.update();
+					int attackerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
+
+					Mutant newMutant = createMultiplayerMutant(activeGame.getId(), activeGame.getClassId(), mutantText, attackerId, "mp");
+					if (newMutant != null) {
+						TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
+						if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
+							messages.add(MUTANT_COMPILED_MESSAGE);
+							MutationTester.runAllTestsOnMultiplayerMutant(activeGame, newMutant, messages);
+							activeGame.update();
+						} else {
+							messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
+							if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty())
+								messages.add(compileMutantTarget.message);
+							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+						}
 					} else {
-						messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
-						if (compileMutantTarget != null && compileMutantTarget.message != null && ! compileMutantTarget.message.isEmpty())
-							messages.add(compileMutantTarget.message);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+						// Create Mutant failed because there were no differences between mutant and original, returning -1
+						messages.add(MUTANT_IDENTICAL_MESSAGE);
 					}
 				} else {
-					// Create Mutant failed because there were no differences between mutant and original, returning -1
-					messages.add(MUTANT_IDENTICAL_MESSAGE);
+					messages.add(GRACE_PERIOD_MESSAGE);
 				}
 				break;
 
 			case "createTest":
+				if (activeGame.getState().equals(AbstractGame.State.ACTIVE)) {
+					// Get the text submitted by the user.
+					String testText = request.getParameter("test");
 
-				// Get the text submitted by the user.
-				String testText = request.getParameter("test");
+					// If it can be written to file and compiled, end turn. Otherwise, dont.
+					Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
+					logger.info("New Test " + newTest.getId() + " by user " + uid);
 
-				// If it can be written to file and compiled, end turn. Otherwise, dont.
-				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
-				logger.info("New Test " + newTest.getId() + " by user " + uid);
+					if (newTest == null) {
+						messages.add(TEST_INVALID_MESSAGE);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						response.sendRedirect("play");
+						return;
+					}
 
-				if (newTest == null) {
-					messages.add(TEST_INVALID_MESSAGE);
-					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect("play");
-					return;
-				}
+					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
-
-				if (compileTestTarget.status.equals("SUCCESS")) {
-					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
-					if (testOriginalTarget.status.equals("SUCCESS")) {
-						messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-						MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
-						activeGame.update();
+					if (compileTestTarget.status.equals("SUCCESS")) {
+						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+						if (testOriginalTarget.status.equals("SUCCESS")) {
+							messages.add(TEST_PASSED_ON_CUT_MESSAGE);
+							MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
+							activeGame.update();
+						} else {
+							// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
+							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
+							messages.add(testOriginalTarget.message);
+							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						}
 					} else {
-						// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
-						messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
-						messages.add(testOriginalTarget.message);
+						messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+						messages.add(compileTestTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					}
 				} else {
-					messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
-					messages.add(compileTestTarget.message);
-					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+					messages.add(GRACE_PERIOD_MESSAGE);
 				}
 				break;
 		}

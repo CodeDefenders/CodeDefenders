@@ -57,7 +57,8 @@
 
     HashMap<Integer, ArrayList<Mutant>> mutantKilledLines = new HashMap<Integer, ArrayList<Mutant>>();
 
-    if (role.equals(Role.DEFENDER) && request.getParameter("equivLine") != null){
+    if (role.equals(Role.DEFENDER) && request.getParameter("equivLine") != null &&
+            (mg.getState().equals(AbstractGame.State.ACTIVE) || mg.getState().equals(AbstractGame.State.GRACE_ONE))){
         try {
             int equivLine = Integer.parseInt(request.getParameter("equivLine"));
 
