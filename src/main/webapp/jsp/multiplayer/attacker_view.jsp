@@ -7,7 +7,10 @@
 	<div class="w-55" id="newmut-div">
 		<form id="atk" action="/multiplayer/move" method="post">
 			<h2>Create a mutant here
-				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk">Attack!</button>
+				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk"
+						<% if (!game.getState().equals(AbstractGame.State.ACTIVE)) { %> disabled <% } %>>
+					Attack!
+				</button>
 			</h2>
 			<input type="hidden" name="formType" value="createMutant">
 			<input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
