@@ -123,7 +123,7 @@
 			switch(role){
 				case ATTACKER:
 					%>
-			<% if(g.getState().equals(ACTIVE)) { %>
+			<% if(!g.getState().equals(AbstractGame.State.CREATED)) { %>
 				<a href="multiplayer/games?id=<%= g.getId() %>">Attack</a>
 			<% } else { %> <p>Game Not Ready</p> <% } %>
 			<%
@@ -136,7 +136,7 @@
 					break;
 				case DEFENDER:
 			%>
-			<% if(g.getState().equals(ACTIVE)) { %>
+			<% if(!g.getState().equals(AbstractGame.State.CREATED)) { %>
 				<a href="multiplayer/games?id=<%= g.getId() %>">Defend</a>
 			<% } else { %> <p>Game Not Ready</p> <% } %>
 			<%

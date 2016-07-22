@@ -25,7 +25,7 @@
     MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
     Role role = mg.getRole(uid);
 
-    if ((! mg.getState().equals(AbstractGame.State.ACTIVE)) && (!role.equals(Role.CREATOR))) {
+    if ((mg.getState().equals(AbstractGame.State.CREATED) || mg.getState().equals(AbstractGame.State.FINISHED)) && (!role.equals(Role.CREATOR))) {
         response.sendRedirect("/games/user");
     }
 

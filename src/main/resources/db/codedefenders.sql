@@ -271,38 +271,22 @@ INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`) VALUES (2, 'Tes
 
 -- Event to activate multiplayer game
 SET @@global.event_scheduler = 1;
-DROP EVENT IF EXISTS start_mp_games;
-CREATE EVENT IF NOT EXISTS start_mp_games
-  ON SCHEDULE EVERY 1 MINUTE
-  ON COMPLETION PRESERVE
-DO
+-- HANDLING OF EQUIVALENCES AFTER TIME EXPIRATION
+
+DROP PROCEDURE IF EXISTS proc_multiplayer_task;
+
+DELIMITER //
+CREATE PROCEDURE proc_multiplayer_task()
+BEGIN
   UPDATE games SET State='ACTIVE'
   WHERE Mode='PARTY' AND State='CREATED' AND Start_Time<=CURRENT_TIMESTAMP;
 
-DROP EVENT IF EXISTS grace_mp_games;
-CREATE EVENT IF NOT EXISTS grace_mp_games
-  ON SCHEDULE EVERY 1 MINUTE
-  ON COMPLETION PRESERVE
-DO
   UPDATE games SET State='GRACE_ONE'
   WHERE Mode='PARTY' AND State='ACTIVE' AND Finish_Time<=DATE_ADD(NOW(), INTERVAL 1 HOUR);
 
-DROP EVENT IF EXISTS grace_two_mp_games;
-CREATE EVENT IF NOT EXISTS close_two_mp_games
-  ON SCHEDULE EVERY 1 MINUTE
-  ON COMPLETION PRESERVE
-DO
   UPDATE games SET State='GRACE_TWO'
   WHERE Mode='PARTY' AND State='GRACE_ONE' AND Finish_Time<=DATE_ADD(NOW(), INTERVAL 45 MINUTE);
 
-
--- HANDLING OF EQUIVALENCES AFTER TIME EXPIRATION
-
-DROP PROCEDURE IF EXISTS proc_award_points;
-
-DELIMITER //
-CREATE PROCEDURE proc_award_points()
-BEGIN
   UPDATE games AS g
   LEFT JOIN mutants AS m ON m.Game_ID = g.ID
   LEFT JOIN equivalences AS e ON e.Mutant_ID = m.Mutant_ID
@@ -324,9 +308,9 @@ BEGIN
 END //
 DELIMITER ;
 
-DROP EVENT IF EXISTS close_mp_games;
-CREATE EVENT IF NOT EXISTS close_mp_games
+DROP EVENT IF EXISTS event_mp_task;
+CREATE EVENT IF NOT EXISTS event_mp_task
   ON SCHEDULE EVERY 1 MINUTE
   ON COMPLETION PRESERVE
 DO
-  CALL proc_award_points();
+  CALL proc_multiplayer_task();
