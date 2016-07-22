@@ -59,7 +59,7 @@ CREATE TABLE `games` (
   `Finish_Time` TIMESTAMP DEFAULT 0,
   `Attackers_Limit` int(11) DEFAULT '0',
   `Defenders_Limit` int(11) DEFAULT '0',
-  `State` enum('CREATED','ACTIVE','FINISHED') DEFAULT 'CREATED',
+  `State` enum('CREATED','ACTIVE','FINISHED','GRACE_ONE','GRACE_TWO') DEFAULT 'CREATED',
   `CurrentRound` tinyint(4) NOT NULL DEFAULT '1',
   `FinalRound` tinyint(4) NOT NULL DEFAULT '5',
   `ActiveRole` enum('ATTACKER','DEFENDER') NOT NULL DEFAULT 'ATTACKER',
@@ -293,47 +293,40 @@ CREATE EVENT IF NOT EXISTS close_two_mp_games
   ON COMPLETION PRESERVE
 DO
   UPDATE games SET State='GRACE_TWO'
-  WHERE Mode='PARTY' AND State='GRACE_ONE' AND Finish_Time<=DATE_ADD(NOW(), INTERVAL 45 MIN);
+  WHERE Mode='PARTY' AND State='GRACE_ONE' AND Finish_Time<=DATE_ADD(NOW(), INTERVAL 45 MINUTE);
+
+
+-- HANDLING OF EQUIVALENCES AFTER TIME EXPIRATION
+
+DROP PROCEDURE IF EXISTS proc_award_points;
+
+DELIMITER //
+CREATE PROCEDURE proc_award_points()
+BEGIN
+  UPDATE games AS g
+  LEFT JOIN mutants AS m ON m.Game_ID = g.ID
+  LEFT JOIN equivalences AS e ON e.Mutant_ID = m.Mutant_ID
+  SET State='FINISHED', e.Expired = 1
+  WHERE Mode='PARTY' AND State='GRACE_TWO' AND Finish_Time<=NOW();
+
+   UPDATE players AS p
+ RIGHT JOIN equivalences AS ee ON ee.Defender_ID = p.ID
+ SET p.Points = p.Points + (SELECT COUNT(e.ID)
+         FROM equivalences AS e
+        WHERE ee.Defender_ID = e.Defender_ID AND
+        e.Expired = 1
+        GROUP BY ee.Defender_ID
+       )
+  WHERE ee.Expired = 1;
+
+  UPDATE equivalences SET Expired = 0
+  WHERE Expired = 1;
+END //
+DELIMITER ;
 
 DROP EVENT IF EXISTS close_mp_games;
 CREATE EVENT IF NOT EXISTS close_mp_games
   ON SCHEDULE EVERY 1 MINUTE
   ON COMPLETION PRESERVE
 DO
-  UPDATE games SET State='GRACE_TWO'
-  WHERE Mode='PARTY' AND State='ACTIVE' AND Finish_Time<=NOW();
-
-
-DROP EVENT IF EXISTS award_equivalences;
-
-CREATE EVENT IF NOT EXISTS award_equivalences
-  ON SCHEDULE EVERY 1 MINUTE
-  ON COMPLETION PRESERVE
-DO
- UPDATE players AS p
- RIGHT JOIN equivalences AS ee ON ee.Defender_ID = p.ID
- RIGHT JOIN mutants AS mm ON mm.Mutant_ID = ee.Mutant_ID
- SET ee.Expired = 1, p.Points = p.Points + (SELECT COUNT(ee.ID)
-         FROM equivalences AS e
-         LEFT JOIN mutants AS m ON m.Mutant_ID = e.Mutant_ID
-        WHERE ee.Defender_ID = e.Defender_ID AND mm.Equivalent = 'PENDING_TEST'
-        GROUP BY ee.Defender_ID
-       )
-  WHERE mm.Equivalent = 'PENDING_TEST';
-
-DROP EVENT IF EXISTS update_equivalences;
-
-CREATE EVENT IF NOT EXISTS update_equivalences
-  ON SCHEDULE EVERY 1 MINUTE
-  ON COMPLETION PRESERVE
-DO
- UPDATE players AS p
- RIGHT JOIN equivalences AS ee ON ee.Defender_ID = p.ID
- RIGHT JOIN mutants AS mm ON mm.Mutant_ID = ee.Mutant_ID
- SET p.Points = p.Points + (SELECT COUNT(ee.ID)
-         FROM equivalences AS e
-         LEFT JOIN mutants AS m ON m.Mutant_ID = e.Mutant_ID
-        WHERE ee.Defender_ID = e.Defender_ID AND mm.Equivalent = 'PENDING_TEST'
-        GROUP BY ee.Defender_ID
-       )
-  WHERE mm.Equivalent = 'PENDING_TEST';
+  CALL proc_award_points();

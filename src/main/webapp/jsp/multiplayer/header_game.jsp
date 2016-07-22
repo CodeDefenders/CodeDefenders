@@ -15,7 +15,7 @@ pageTitle = null;
 <nav class="nest" style="width: 80%; margin-left: auto; margin-right: auto;">
     <div class="crow fly">
         <div style="text-align: left">
-            <h3><%= role %>::<%= activeGame.getState().toString() %></h3>
+            <h3><%= role %>::<%= mg.getState().toString() %></h3>
         </div>
         <div style="text-align: center"><h1><%= mg.getCUT().getName() %></h1></div>
         <div>
