@@ -222,6 +222,7 @@ CREATE TABLE `users` (
   `Email` varchar(320) NOT NULL,
   PRIMARY KEY (`User_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+CREATE UNIQUE INDEX users_email_index ON users (Email);
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -256,6 +257,7 @@ CREATE TABLE `equivalences` (
   `Mutant_ID` int(11) DEFAULT NULL,
   `Defender_ID` int(11) DEFAULT NULL,
   `Mutant_Points` int(11) DEFAULT '0',
+  `Expired` TINYINT(4) DEFAULT '0' NOT NULL,
   PRIMARY KEY (`ID`),
   UNIQUE KEY `ID_UNIQUE` (`ID`),
   KEY `fk_equiv_def_idx` (`Defender_ID`),
