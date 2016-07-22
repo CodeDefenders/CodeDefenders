@@ -1,3 +1,4 @@
+<%@ page import="org.codedefenders.singleplayer.PrepareAI" %>
 <% String pageTitle=null; %>
 <%@ include file="/jsp/header.jsp" %>
 <div>
@@ -38,7 +39,16 @@
 							<td><%= c.getId() %></td>
 							<td><%= c.getAlias() %></td>
 							<td><%= c.getBaseName() %></td>
-							<td></td>
+							<td>
+								<form id="aiPrepButton" action="ai_preparer" method="post" >
+									<button type="submit" class="btn btn-primary btn-game btn-right" form="aiPrepButton"
+											<% if (PrepareAI.isPrepared(c)) { %> disabled <% } %>>
+										Prepare AI
+									</button>
+									<input type="hidden" name="formType" value="runPrepareAi" />
+									<input type="hidden" name="cutID" value="<%= c.getId() %>" />
+								</form>
+							</td>
 						</tr>
 					<% } %>
 				<% } %>

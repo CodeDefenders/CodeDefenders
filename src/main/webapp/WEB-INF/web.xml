@@ -39,6 +39,15 @@
 		<servlet-name>uploadManager</servlet-name>
 		<url-pattern>/upload</url-pattern>
 	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>aiPreparer</servlet-name>
+		<servlet-class>org.codedefenders.singleplayer.AiPreparer</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>aiPreparer</servlet-name>
+		<url-pattern>/ai_preparer</url-pattern>
+	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>gameManager</servlet-name>
