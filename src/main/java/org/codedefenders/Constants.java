@@ -19,6 +19,8 @@ public class Constants {
 	public static final String JAVA_CLASS_EXT = ".class";
 	public static final String TEST_INFO_EXT = ".xml";
 
+	public static final String GRACE_PERIOD_MESSAGE = "Game is now in grace period.";
+
 	public static final String LOGIN_VIEW_JSP           = "jsp" + F_SEP + "login_view.jsp";
 	public static final String RESOLVE_EQUIVALENCE_JSP  = "jsp" + F_SEP + "resolve_equivalence.jsp";
 	public static final String ATTACKER_VIEW_JSP        = "jsp" + F_SEP + "attacker_view.jsp";
