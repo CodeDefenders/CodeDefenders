@@ -1,7 +1,6 @@
 <% String pageTitle="In Game"; %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.*" %>
-<%@ page import="javafx.scene.chart.PieChart" %>
 <%
     // Get their user id from the session.
     int uid = ((Integer) session.getAttribute("uid")).intValue();
