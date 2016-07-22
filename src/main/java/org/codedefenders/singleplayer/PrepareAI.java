@@ -69,4 +69,12 @@ public class PrepareAI {
 
 		return (int) Math.floor(r * length);
 	}
+
+	public static boolean isPrepared(GameClass cut) {
+		//TODO: Use cleaner check for prepared class.
+		if(DatabaseAccess.gameWithUserExistsForClass(1, cut.getId())) {
+			return true;
+		}
+		return false;
+	}
 }
