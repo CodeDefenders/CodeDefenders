@@ -107,7 +107,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 								ArrayList<Mutant> mm = new ArrayList<Mutant>();
 								mm.add(mutantAfterTest);
-								newTest.setScore(1);
+								newTest.setScore(2);
 								newTest.update();
 							}
 
