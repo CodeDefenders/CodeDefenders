@@ -145,6 +145,7 @@ public class Mutant {
 	public void kill() {
 		alive = false;
 		roundKilled = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
+		equivalent = Equivalence.PROVEN_NO;
 		update();
 	}
 

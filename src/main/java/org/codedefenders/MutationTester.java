@@ -236,7 +236,6 @@ public class MutationTester {
 		} else {
 			// If the test DID pass, the mutant went undetected and it is assumed to be equivalent.
 			mutant.setEquivalent(ASSUMED_YES);
-			mutant.setScore(0);
 		}
 		// Kill the mutant if it was killed by the test or if it's marked equivalent
 		mutant.kill();
