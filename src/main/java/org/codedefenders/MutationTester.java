@@ -171,7 +171,7 @@ public class MutationTester {
 				}
 			}
 		}
-		mutant.setScore(Scorer.score(game, mutant, missedTests));
+		mutant.setScore(1 + Scorer.score(game, mutant, missedTests));
 		mutant.update();
 	}
 

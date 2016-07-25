@@ -19,11 +19,7 @@ public abstract class Scorer {
             int points = 0;
 
             for (Mutant m : killed){
-                if (m.getScore() == 0){
-                    points++;
-                } else {
-                    points += m.getScore();
-                }
+                points += m.getScore() + 1;
             }
 
             return points;
