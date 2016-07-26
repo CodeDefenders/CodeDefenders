@@ -1,16 +1,6 @@
 package org.codedefenders;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseException;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.stmt.*;
-import org.apache.commons.lang.ArrayUtils;
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-import org.codedefenders.singleplayer.SinglePlayerGame;
+import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,14 +12,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import static org.codedefenders.Constants.*;
 import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
@@ -308,7 +294,7 @@ public class GameManager extends HttpServlet {
 		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
 		// If there were no differences, return, as the mutant is the same as original.
-		if (! validMutant(sourceCode, mutatedCode))
+		if (! CodeValidator.validMutant(sourceCode, mutatedCode))
 			return null;
 
 		// Setup folder the files will go in
@@ -329,19 +315,6 @@ public class GameManager extends HttpServlet {
 		return AntRunner.compileMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
 	}
 
-	private boolean validMutant(String originalCode, String mutatedCode) {
-		// Runs diff match patch between the two Strings to see if there are any differences.
-		DiffMatchPatch dmp = new DiffMatchPatch();
-		LinkedList<DiffMatchPatch.Diff> changes = dmp.diffMain(originalCode.trim().replace("\n", "").replace("\r", ""), mutatedCode.trim().replace("\n", "").replace("\r", ""), true);
-		boolean change = false;
-		for (DiffMatchPatch.Diff d : changes) {
-			if (d.operation != DiffMatchPatch.Operation.EQUAL) {
-				change = true;
-			}
-		}
-		return change;
-	}
-
 	/**
 	 *
 	 * @param gid
@@ -360,7 +333,7 @@ public class GameManager extends HttpServlet {
 
 		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
-		if (! validTestCode(javaFile)) {
+		if (!CodeValidator.validTestCode(javaFile)) {
 			return null;
 		}
 
@@ -374,69 +347,4 @@ public class GameManager extends HttpServlet {
 		return newTest;
 	}
 
-
-	private boolean validTestCode(String javaFile) throws IOException {
-
-		CompilationUnit cu;
-		FileInputStream in = null;
-		try {
-			in = new FileInputStream(javaFile);
-			// parse the file
-			cu = JavaParser.parse(in);
-			// prints the resulting compilation unit to default system output
-			if (cu.getTypes().size() != 1) {
-				System.out.println("Invalid test suite contains more than one type declaration.");
-				return false;
-			}
-			TypeDeclaration clazz = cu.getTypes().get(0);
-			if (clazz.getMembers().size() != 1) {
-				System.out.println("Invalid test suite contains more than one method.");
-				return false;
-			}
-			MethodDeclaration test = (MethodDeclaration)clazz.getMembers().get(0);
-			BlockStmt testBody = test.getBody();
-			if (testBody.getStmts().isEmpty()) {
-				System.out.println("Empty test (no statement).");
-				return false;
-			}
-
-			int assertionCount = 0;
-			for (Node node : testBody.getChildrenNodes()) {
-				if (node instanceof ForeachStmt
-						|| node instanceof IfStmt
-						|| node instanceof ForStmt
-						|| node instanceof WhileStmt
-						|| node instanceof DoStmt) {
-					System.out.println("Invalid test contains " + node.getClass().getSimpleName() + " statement");
-					return false;
-				}
-				if (isAssertion(node)) {
-					assertionCount++;
-					if (assertionCount > 2)
-						return false;
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} finally {
-			in.close();
-		}
-		return true;
-	}
-
-	private boolean isAssertion(Node node) {
-		if (node instanceof AssertStmt)
-			return true;
-		if (node instanceof ExpressionStmt) {
-			ExpressionStmt exprStmt = (ExpressionStmt) node;
-			if ((exprStmt.getExpression() instanceof MethodCallExpr)) {
-				MethodCallExpr call = (MethodCallExpr)exprStmt.getExpression();
-				if (ArrayUtils.contains(new String[]{"assertEquals", "assertTrue", "assertFalse", "assertNull", "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals"}, call.getName()))
-					return true;
-			}
-		}
-		return false;
-	}
 }
