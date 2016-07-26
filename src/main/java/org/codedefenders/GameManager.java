@@ -10,15 +10,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 
 import static org.codedefenders.Constants.*;
 import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.validation.CodeValidator.getMD5;
 
 public class GameManager extends HttpServlet {
 
@@ -231,7 +229,7 @@ public class GameManager extends HttpServlet {
 					}
 				} else {
 					// Create Mutant failed because there were no differences between mutant and original, returning -1
-					messages.add(MUTANT_IDENTICAL_MESSAGE);
+					messages.add(MUTANT_INVALID_MESSAGE);
 				}
 				break;
 
@@ -297,11 +295,22 @@ public class GameManager extends HttpServlet {
 		if (! CodeValidator.validMutant(sourceCode, mutatedCode))
 			return null;
 
+		// If another mutant with same md5 exists
+		String md5CUT = CodeValidator.getMD5(sourceCode);
+		String md5Mutant = CodeValidator.getMD5(mutatedCode);
+		assert (! md5CUT.equals(md5Mutant));
+
+		// The insertion of a mutant will check (game_id,md5) unique later after compilation,
+		// however I am assuming querying the DB now (before compiling) is cheaper
+		Mutant mutantWithSameMD5 = DatabaseAccess.getMutant(gid, md5Mutant);
+		if (mutantWithSameMD5 == null)
+			return null; // a mutant with same MD5 already exists in the game
+
 		// Setup folder the files will go in
 		File newMutantDir = FileManager.getNextSubDir(Constants.MUTANTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
 
-		System.out.println("NewMutantDir: " + newMutantDir.getAbsolutePath());
-		System.out.println("Class Mutated: " + classMutated.getName() + "(basename: " + classMutatedBaseName +")");
+		logger.info("NewMutantDir: {}", newMutantDir.getAbsolutePath());
+		logger.info("Class Mutated: {} (basename: {})", classMutated.getName(), classMutatedBaseName);
 
 		// Write the Mutant String into a java file
 		String mutantFileName = newMutantDir + F_SEP + classMutatedBaseName + JAVA_SOURCE_EXT;
@@ -310,6 +319,10 @@ public class GameManager extends HttpServlet {
 		BufferedWriter bw = new BufferedWriter(fw);
 		bw.write(mutatedCode);
 		bw.close();
+
+		String md5FromMutantFile = CodeValidator.getMD5FromFile(mutantFileName);
+		logger.info("md5CUT: {}\nmd5Mutant:{}\nmd5FromMutantFile: {}", md5CUT, md5Mutant, md5FromMutantFile);
+		assert (md5Mutant.equals(md5FromMutantFile)); // sanity check
 
 		// Compile the mutant - if you can, add it to the MultiplayerGame State, otherwise, delete these files created.
 		return AntRunner.compileMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);

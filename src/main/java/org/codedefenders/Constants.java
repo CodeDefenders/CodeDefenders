@@ -48,7 +48,7 @@ public class Constants {
 	public static final String MUTANT_COMPILED_MESSAGE = "Your mutant was compiled successfully.";
 	public static final String MUTANT_ACCEPTED_EQUIVALENT_MESSAGE = "The mutant was marked equivalent.";
 	public static final String MUTANT_UNCOMPILABLE_MESSAGE = "Your mutant failed to compile. Try again.";
-	public static final String MUTANT_IDENTICAL_MESSAGE = "Your mutant is not quite a mutant, it's identical to the class under test!";
+	public static final String MUTANT_INVALID_MESSAGE = "Sorry, your mutant is invalid: it either is identical to the original class (or an existing mutant) or contains invalid code.";
 	public static final String MUTANT_CLAIMED_EQUIVALENT_MESSAGE = "Mutant claimed as equivalent, waiting for attacker to respond.";
 	public static final String MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE = "Something went wrong claiming equivalent mutant"; // TODO: How?
 	public static final String MUTANT_KILLED_BY_TEST_MESSAGE = "Test %d killed your mutant. Better luck in your next turn!"; // test

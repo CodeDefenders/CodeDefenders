@@ -7,9 +7,8 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.stmt.*;
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.*;
-import org.codedefenders.scoring.Scorer;
+import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +20,6 @@ import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
 
 import static org.codedefenders.Constants.*;
 import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
@@ -145,9 +142,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					// Get the text submitted by the user.
 					String mutantText = request.getParameter("mutant");
 
-					int attackerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
-
-					Mutant newMutant = createMultiplayerMutant(activeGame.getId(), activeGame.getClassId(), mutantText, attackerId, "mp");
+					Mutant newMutant = createMultiplayerMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "mp");
 					if (newMutant != null) {
 						TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 						if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
@@ -162,7 +157,7 @@ public class MultiplayerGameManager extends HttpServlet {
 						}
 					} else {
 						// Create Mutant failed because there were no differences between mutant and original, returning -1
-						messages.add(MUTANT_IDENTICAL_MESSAGE);
+						messages.add(MUTANT_INVALID_MESSAGE);
 					}
 				} else {
 					messages.add(GRACE_PERIOD_MESSAGE);
@@ -212,7 +207,7 @@ public class MultiplayerGameManager extends HttpServlet {
 		response.sendRedirect("play");//doGet(request, response);
 	}
 
-	public Mutant createMultiplayerMutant(int gid, int cid, String mutantText, int ownerId, String subDirectory) throws IOException {
+	public Mutant createMultiplayerMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
 
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 		String classMutatedBaseName = classMutated.getBaseName();
@@ -220,36 +215,40 @@ public class MultiplayerGameManager extends HttpServlet {
 		File sourceFile = new File(classMutated.getJavaFile());
 		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
-		// Runs diff match patch between the two Strings to see if there are any differences.
-		DiffMatchPatch dmp = new DiffMatchPatch();
-		LinkedList<DiffMatchPatch.Diff> changes = dmp.diffMain(sourceCode.trim().replace("\n", "").replace("\r", ""), mutantText.trim().replace("\n", "").replace("\r", ""), true);
-		boolean noChange = true;
-		for (DiffMatchPatch.Diff d : changes) {
-			if (d.operation != DiffMatchPatch.Operation.EQUAL) {
-				noChange = false;
-			}
-		}
-
 		// If there were no differences, return, as the mutant is the same as original.
-		if (noChange)
+		if (! CodeValidator.validMutant(sourceCode, mutatedCode))
 			return null;
+
+		// If another mutant with same md5 exists
+		String md5CUT = CodeValidator.getMD5(sourceCode);
+		String md5Mutant = CodeValidator.getMD5(mutatedCode);
+		if (md5CUT.equals(md5Mutant))
+			return null;
+
+		Mutant mutantWithSameMD5 = DatabaseAccess.getMutant(gid, md5Mutant);
+		if (mutantWithSameMD5 != null)
+			return null; // a mutant with same MD5 already exists in the game
 
 		// Setup folder the files will go in
 		File newMutantDir = FileManager.getNextSubDir(Constants.MUTANTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
 
-		System.out.println("NewMutantDir: " + newMutantDir.getAbsolutePath());
-		System.out.println("Class Mutated: " + classMutated.getName() + "(basename: " + classMutatedBaseName +")");
+		logger.info("NewMutantDir: {}", newMutantDir.getAbsolutePath());
+		logger.info("Class Mutated: {} (basename: {})", classMutated.getName(), classMutatedBaseName);
 
 		// Write the Mutant String into a java file
 		String mutantFileName = newMutantDir + F_SEP + classMutatedBaseName + JAVA_SOURCE_EXT;
 		File mutantFile = new File(mutantFileName);
 		FileWriter fw = new FileWriter(mutantFile);
 		BufferedWriter bw = new BufferedWriter(fw);
-		bw.write(mutantText);
+		bw.write(mutatedCode);
 		bw.close();
 
+		String md5FromMutantFile = CodeValidator.getMD5FromFile(mutantFileName);
+		logger.info("md5CUT: {}\nmd5Mutant:{}\nmd5FromMutantFile: {}", md5CUT, md5Mutant, md5FromMutantFile);
+		assert (md5Mutant.equals(md5FromMutantFile)); // sanity check
+
 		// Compile the mutant - if you can, add it to the MultiplayerGame State, otherwise, delete these files created.
-		return AntRunner.compileMultiplayerMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
+		return AntRunner.compileMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
 	}
 
 	public static boolean isParsable(String input){

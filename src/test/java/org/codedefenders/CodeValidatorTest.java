@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.regex.Pattern;
 
 import static org.codedefenders.validation.CodeValidator.validMutant;
 import static org.codedefenders.validation.CodeValidator.validTestCode;
@@ -76,8 +77,6 @@ public class CodeValidatorTest {
 	public void testValidMutant1() {
 		String orig = "int x = x + 0;";
 		String mutant = "int x = x + 1;";
-
-		
 		assertTrue(validMutant(orig, mutant));
 	}
 
@@ -112,17 +111,20 @@ public class CodeValidatorTest {
 	public void testInvalidMutant2() {
 		String orig = "int x = 0;";
 		String mutant = "int x = 0; while (x>0) {return false;}";
-
-		
 		assertFalse(validMutant(orig, mutant));
 	}
 
 	@Test
-	public void testInvalidMutant3() {
-		String orig = "int x = 0;";
-		String mutant = "System.getCurrentMillis(); int x = 0;";
+	public void testInvalidMutantContainsIf() {
+		String orig = "if (x >= 0) return 1; else return -x;";
+		String mutant = "if (x >= 0) if (x >= 0) { return 1; } else return -x;";
+		assertFalse(validMutant(orig, mutant));
+	}
 
-		
+	@Test
+	public void testInvalidMutantContainsSystemCall() {
+		String orig = "if (x >= 0) return 1; else return -x;";
+		String mutant = "if (x >= 0) { System.currentTimeMillis(); return x; } else return -x;";
 		assertFalse(validMutant(orig, mutant));
 	}
 }
