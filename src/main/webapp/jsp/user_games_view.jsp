@@ -12,7 +12,7 @@
 	<h3>Duels</h3>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
-		<th class="col-sm-2">Game ID</th>
+		<th class="col-sm-1">Game ID</th>
 		<th class="col-sm-2">Class</th>
 		<th class="col-sm-2">Attacker</th>
 		<th class="col-sm-2">Defender</th>
@@ -48,8 +48,8 @@
 
 %>
 	<tr>
-		<td class="col-sm-2"><%= g.getId() %></td>
-		<td class="col-sm-1">
+		<td class="col-sm-1"><%= g.getId() %></td>
+		<td class="col-sm-2">
 			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
 				<%=g.getCUT().getAlias()%>
 			</a>
@@ -132,8 +132,8 @@
 			Role role = g.getRole(uid);
 	%>
 	<tr>
-		<td class="col-sm-2"><%= g.getId() %></td>
-		<td class="col-sm-1">
+		<td class="col-sm-1"><%= g.getId() %></td>
+		<td class="col-sm-2">
 			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
 				<%=g.getCUT().getAlias()%>
 			</a>
