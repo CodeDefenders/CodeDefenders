@@ -74,7 +74,7 @@ public class MultiplayerGameManager extends HttpServlet {
 				String testText = request.getParameter("test");
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
-				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
+				Test newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
 
 				if (newTest == null) {
 					messages.add(TEST_INVALID_MESSAGE);
@@ -142,7 +142,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					// Get the text submitted by the user.
 					String mutantText = request.getParameter("mutant");
 
-					Mutant newMutant = createMultiplayerMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "mp");
+					Mutant newMutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "mp");
 					if (newMutant != null) {
 						TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 						if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
@@ -170,16 +170,14 @@ public class MultiplayerGameManager extends HttpServlet {
 					String testText = request.getParameter("test");
 
 					// If it can be written to file and compiled, end turn. Otherwise, dont.
-					Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
-					logger.info("New Test " + newTest.getId() + " by user " + uid);
-
+					Test newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
 					if (newTest == null) {
 						messages.add(TEST_INVALID_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						response.sendRedirect("play");
 						return;
 					}
-
+					logger.info("New Test " + newTest.getId() + " by user " + uid);
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 					if (compileTestTarget.status.equals("SUCCESS")) {
@@ -207,144 +205,4 @@ public class MultiplayerGameManager extends HttpServlet {
 		response.sendRedirect("play");//doGet(request, response);
 	}
 
-	public Mutant createMultiplayerMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
-
-		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
-		String classMutatedBaseName = classMutated.getBaseName();
-
-		File sourceFile = new File(classMutated.getJavaFile());
-		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
-
-		// If there were no differences, return, as the mutant is the same as original.
-		if (! CodeValidator.validMutant(sourceCode, mutatedCode))
-			return null;
-
-		// If another mutant with same md5 exists
-		String md5CUT = CodeValidator.getMD5(sourceCode);
-		String md5Mutant = CodeValidator.getMD5(mutatedCode);
-		if (md5CUT.equals(md5Mutant))
-			return null;
-
-		Mutant mutantWithSameMD5 = DatabaseAccess.getMutant(gid, md5Mutant);
-		if (mutantWithSameMD5 != null)
-			return null; // a mutant with same MD5 already exists in the game
-
-		// Setup folder the files will go in
-		File newMutantDir = FileManager.getNextSubDir(Constants.MUTANTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
-
-		logger.info("NewMutantDir: {}", newMutantDir.getAbsolutePath());
-		logger.info("Class Mutated: {} (basename: {})", classMutated.getName(), classMutatedBaseName);
-
-		// Write the Mutant String into a java file
-		String mutantFileName = newMutantDir + F_SEP + classMutatedBaseName + JAVA_SOURCE_EXT;
-		File mutantFile = new File(mutantFileName);
-		FileWriter fw = new FileWriter(mutantFile);
-		BufferedWriter bw = new BufferedWriter(fw);
-		bw.write(mutatedCode);
-		bw.close();
-
-		String md5FromMutantFile = CodeValidator.getMD5FromFile(mutantFileName);
-		logger.info("md5CUT: {}\nmd5Mutant:{}\nmd5FromMutantFile: {}", md5CUT, md5Mutant, md5FromMutantFile);
-		assert (md5Mutant.equals(md5FromMutantFile)); // sanity check
-
-		// Compile the mutant - if you can, add it to the MultiplayerGame State, otherwise, delete these files created.
-		return AntRunner.compileMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
-	}
-
-	public static boolean isParsable(String input){
-		boolean parsable = true;
-		try{
-			Integer.parseInt(input);
-		}catch(NumberFormatException e){
-			parsable = false;
-		}
-		return parsable;
-	}
-
-	/**
-	 *
-	 * @param gid
-	 * @param cid
-	 * @param testText
-	 * @param ownerId
-	 * @param subDirectory - Directory inside data for test to go
-	 * @return {@code null} if test is not valid
-	 * @throws IOException
-	 */
-	public Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
-
-		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
-
-		File newTestDir = FileManager.getNextSubDir(TESTS_DIR+ F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
-
-		String javaFile = createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
-
-		if (! validTestCode(javaFile)) {
-			return null;
-		}
-
-		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
-		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
-
-		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-			AntRunner.testOriginal(newTestDir, newTest);
-		}
-		return newTest;
-	}
-
-	private String createJavaFile(File dir, String classBaseName, String testCode) throws IOException {
-		String javaFile = dir.getAbsolutePath() + F_SEP + TEST_PREFIX + classBaseName + JAVA_SOURCE_EXT;
-		File testFile = new File(javaFile);
-		FileWriter testWriter = new FileWriter(testFile);
-		BufferedWriter bufferedTestWriter = new BufferedWriter(testWriter);
-		bufferedTestWriter.write(testCode);
-		bufferedTestWriter.close();
-		return javaFile;
-	}
-
-	private boolean validTestCode(String javaFile) throws IOException {
-
-		CompilationUnit cu;
-		FileInputStream in = null;
-		try {
-			in = new FileInputStream(javaFile);
-			// parse the file
-			cu = JavaParser.parse(in);
-			// prints the resulting compilation unit to default system output
-			if (cu.getTypes().size() != 1) {
-				System.out.println("Invalid test suite contains more than one type declaration.");
-				return false;
-			}
-			TypeDeclaration clazz = cu.getTypes().get(0);
-			if (clazz.getMembers().size() != 1) {
-				System.out.println("Invalid test suite contains more than one method.");
-				return false;
-			}
-			MethodDeclaration test = (MethodDeclaration)clazz.getMembers().get(0);
-			BlockStmt testBody = test.getBody();
-			if (testBody.getStmts().isEmpty()) {
-				System.out.println("Empty test (no statement).");
-				return false;
-			}
-
-			for (Node node : testBody.getChildrenNodes()) {
-				if (node instanceof ForeachStmt
-						|| node instanceof IfStmt
-						|| node instanceof ForStmt
-						|| node instanceof WhileStmt
-						|| node instanceof DoStmt) {
-					System.out.println("Invalid test contains " + node.getClass().getSimpleName() + " statement");
-					return false;
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} finally {
-			in.close();
-		}
-		return true;
-	}
 }

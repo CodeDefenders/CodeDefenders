@@ -282,8 +282,7 @@ public class GameManager extends HttpServlet {
 		response.sendRedirect("play");//doGet(request, response);
 	}
 
-	// Writes text as a Mutant to the appropriate place in the file system.
-	public Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
+	public static Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
 
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 		String classMutatedBaseName = classMutated.getBaseName();
@@ -298,12 +297,13 @@ public class GameManager extends HttpServlet {
 		// If another mutant with same md5 exists
 		String md5CUT = CodeValidator.getMD5(sourceCode);
 		String md5Mutant = CodeValidator.getMD5(mutatedCode);
-		assert (! md5CUT.equals(md5Mutant));
+		if (md5CUT.equals(md5Mutant))
+			return null;
 
 		// The insertion of a mutant will check (game_id,md5) unique later after compilation,
 		// however I am assuming querying the DB now (before compiling) is cheaper
 		Mutant mutantWithSameMD5 = DatabaseAccess.getMutant(gid, md5Mutant);
-		if (mutantWithSameMD5 == null)
+		if (mutantWithSameMD5 != null)
 			return null; // a mutant with same MD5 already exists in the game
 
 		// Setup folder the files will go in
@@ -338,7 +338,7 @@ public class GameManager extends HttpServlet {
 	 * @return {@code null} if test is not valid
 	 * @throws IOException
 	 */
-	public Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
+	public static Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
