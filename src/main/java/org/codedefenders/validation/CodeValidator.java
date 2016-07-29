@@ -63,6 +63,8 @@ public class CodeValidator {
 
 	public static boolean validTestCode(String javaFile) throws IOException {
 		CompilationUnit cu = getCompilationUnit(javaFile);
+		if (cu == null)
+			return false;
 		TestCodeVisitor visitor = new TestCodeVisitor();
 		visitor.visit(cu, null);
 		return visitor.isValid();
