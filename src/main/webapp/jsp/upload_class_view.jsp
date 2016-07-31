@@ -40,8 +40,8 @@
 							<td><%= c.getAlias() %></td>
 							<td><%= c.getBaseName() %></td>
 							<td>
-								<form id="aiPrepButton" action="ai_preparer" method="post" >
-									<button type="submit" class="btn btn-primary btn-game btn-right" form="aiPrepButton"
+								<form id="aiPrepButton<%= c.getId() %>" action="ai_preparer" method="post" >
+									<button type="submit" class="btn btn-primary btn-game btn-right" form="aiPrepButton<%= c.getId() %>"
 											<% if (PrepareAI.isPrepared(c)) { %> disabled <% } %>>
 										Prepare AI
 									</button>
