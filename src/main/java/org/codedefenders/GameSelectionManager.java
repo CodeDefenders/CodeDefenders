@@ -63,17 +63,23 @@ public class GameSelectionManager extends HttpServlet {
 
 					if(mode.equals(Game.Mode.SINGLE)) {
 						//Create singleplayer game.
-
-						SinglePlayerGame nGame = new SinglePlayerGame(classId, uid, rounds, role, level);
-						nGame.insert();
-						if (role.equals(Role.ATTACKER)) {
-							nGame.addPlayer(uid, Role.ATTACKER);
-							nGame.addPlayer(AiDefender.ID, Role.DEFENDER);
+						if(PrepareAI.isPrepared(DatabaseAccess.getClassForKey("Class_ID", classId))) {
+							SinglePlayerGame nGame = new SinglePlayerGame(classId, uid, rounds, role, level);
+							nGame.insert();
+							if (role.equals(Role.ATTACKER)) {
+								nGame.addPlayer(uid, Role.ATTACKER);
+								nGame.addPlayer(AiDefender.ID, Role.DEFENDER);
+							} else {
+								nGame.addPlayer(uid, Role.DEFENDER);
+								nGame.addPlayer(AiAttacker.ID, Role.ATTACKER);
+							}
+							nGame.tryFirstTurn();
 						} else {
-							nGame.addPlayer(uid, Role.DEFENDER);
-							nGame.addPlayer(AiAttacker.ID, Role.ATTACKER);
+							//Not prepared, show a message and redirect.
+							messages.add("AI has not been prepared for class. Please select PREPARE AI on the classes page.");
+							response.sendRedirect(request.getHeader("referer"));
+							return;
 						}
-						nGame.tryFirstTurn();
 					} else {
 						// Create the game with supplied parameters and insert it in the database.
 						Game nGame = new Game(classId, uid, rounds, role, level);
