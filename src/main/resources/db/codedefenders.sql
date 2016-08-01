@@ -116,12 +116,14 @@ CREATE TABLE `players` (
   `Game_ID` int(11) NOT NULL,
   `Points` int(11) NOT NULL,
   `Role` enum('ATTACKER','DEFENDER') NOT NULL,
+  `Active` TINYINT(1) DEFAULT '1' NOT NULL,
   PRIMARY KEY (`ID`),
   KEY `fk_userId_players_idx` (`User_ID`),
   KEY `fk_gameId_players_idx` (`Game_ID`),
   CONSTRAINT `fk_gameId_players` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_userId_players` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
+CREATE UNIQUE INDEX players_User_ID_Game_ID_uindex ON codedefenders.players (User_ID, Game_ID);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

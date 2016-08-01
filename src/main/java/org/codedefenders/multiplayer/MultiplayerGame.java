@@ -185,11 +185,11 @@ public class MultiplayerGame extends AbstractGame {
 	}
 
 	public int[] getDefenderIds(){
-		return DatabaseAccess.getDefendersForMultiplayerGame(getId());
+		return DatabaseAccess.getPlayersForMultiplayerGame(getId(), Role.DEFENDER);
 	}
 
 	public int[] getAttackerIds(){
-		return DatabaseAccess.getAttackersForMultiplayerGame(getId());
+		return DatabaseAccess.getPlayersForMultiplayerGame(getId(), Role.ATTACKER);
 	}
 
 	public int[] getPlayerIds() { return ArrayUtils.addAll(getDefenderIds(), getAttackerIds());}
@@ -197,10 +197,20 @@ public class MultiplayerGame extends AbstractGame {
 	public boolean addPlayer(int userId, Role role) {
 		if (state != State.FINISHED && canJoinGame(role)) {
 			String sql = String.format("INSERT INTO players " +
-							"(Game_ID, User_ID, Points, Role) VALUES " +
-							"(%d, %d, 0, '%s');",
+							"(Game_ID, User_ID, Points, Role) " +
+							"VALUES (%d, %d, 0, '%s') " +
+							"ON DUPLICATE KEY UPDATE Role='%3$s', Active=TRUE;",
 					id, userId, role);
+			return runStatement(sql);
+		}
+		return false;
+	}
 
+	public boolean removePlayer(int userId) {
+		if (state == State.CREATED) {
+			String sql = String.format("UPDATE players " +
+							"SET Active=FALSE WHERE Game_ID=%d AND User_ID=%d;",
+					id, userId);
 			return runStatement(sql);
 		}
 		return false;
