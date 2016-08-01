@@ -9,9 +9,9 @@
                 for (String l : t.getHTMLReadout()) { tc += l + "\n"; }
                 User creator = DatabaseAccess.getUserFromPlayer(t.getPlayerId());
         %>
-        <div><h4>Test <%= t.getId() %> | Creator: <%= creator.username %> [UID: <%= creator.id %>]</h4><pre class="readonly-pre"><textarea class="utest" cols="20" rows="10">
-                <%=tc%>
-        </textarea></pre></div>
+        <div><h4>Test <%= t.getId() %> | Creator: <%= creator.username %> [UID: <%= creator.id %>]</h4>
+            <pre class="readonly-pre"><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre>
+        </div>
         <%
             }
             if (tests.isEmpty()) {%>
