@@ -197,6 +197,14 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>multiplayerHistoryGame</servlet-name>
+		<jsp-file>/jsp/multiplayer/history_game_view.jsp</jsp-file>	</servlet>
+	<servlet-mapping>
+		<servlet-name>multiplayerHistoryGame</servlet-name>
+		<url-pattern>/multiplayer/history</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>multiplayerGameView</servlet-name>
 		<jsp-file>/jsp/multiplayer/create_game_view.jsp</jsp-file>
 	</servlet>
