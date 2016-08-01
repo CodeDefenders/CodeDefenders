@@ -117,7 +117,7 @@
 		%>
 		<tr>
 			<td class="col-sm-1"><%= g.getId() %></td>
-			<td class="col-sm-1">
+			<td class="col-sm-2">
 				<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
 					<%=g.getCUT().getAlias()%>
 				</a>

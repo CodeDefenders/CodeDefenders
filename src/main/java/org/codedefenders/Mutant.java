@@ -4,6 +4,7 @@ import difflib.Chunk;
 import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
+import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,7 @@ public class Mutant {
 	private int gameId;
 
 	private String javaFile;
+	private String md5;
 	private String classFile;
 
 	private boolean alive = true;
@@ -64,6 +66,7 @@ public class Mutant {
 		this.alive = alive;
 		this.equivalent = Equivalence.ASSUMED_NO;
 		this.playerId = playerId;
+		this.md5 = CodeValidator.getMD5FromFile(jFile);
 	}
 
 	/**
@@ -279,8 +282,8 @@ public class Mutant {
 			stmt = conn.createStatement();
 			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
 			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
-			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points)" +
-					" VALUES (%s, %s, %d, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), playerId, score);
+			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5)" +
+					" VALUES (%s, %s, %d, %d, %d, %d, %d, '%s');", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), playerId, score, md5);
 
 			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
 

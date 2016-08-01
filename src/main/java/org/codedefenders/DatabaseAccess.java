@@ -598,7 +598,7 @@ public class DatabaseAccess {
 		return mutList;
 	}
 
-	public static Mutant getMutant(Game game, int mutantID) {
+	public static Mutant getMutantFromDB(String sql) {
 
 		Mutant newMutant = null;
 
@@ -609,7 +609,6 @@ public class DatabaseAccess {
 			conn = getConnection();
 
 			stmt = conn.createStatement();
-			String sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d' AND Game_ID='%d' AND RoundCreated >= 0;", mutantID, game.getId());
 			ResultSet rs = stmt.executeQuery(sql);
 			if (rs.next()) {
 				newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
@@ -633,44 +632,14 @@ public class DatabaseAccess {
 		return newMutant;
 	}
 
-	/**
-	 * Multiplayer method
-	 * @param mutantID
-	 * @return
-	 */
-	public static Mutant getMultiplayerMutant(int mutantID) {
+	public static Mutant getMutant(Game game, int mutantID) {
+		String sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d' AND Game_ID='%d';", mutantID, game.getId());
+		return getMutantFromDB(sql);
+	}
 
-		Mutant newMutant = null;
-
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-			conn = getConnection();
-
-			stmt = conn.createStatement();
-			String sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d';", mutantID);
-			ResultSet rs = stmt.executeQuery(sql);
-			if (rs.next()) {
-				newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
-						rs.getString("JavaFile"), rs.getString("ClassFile"),
-						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
-						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Attacker_ID"));
-			}
-
-			stmt.close();
-			conn.close();
-		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
-			cleanup(conn, stmt);
-		}
-
-		return newMutant;
+	public static Mutant getMutant(int gameId, String md5) {
+		String sql = String.format("SELECT * FROM mutants WHERE Game_ID='%d' AND MD5='%s';", gameId, md5);
+		return getMutantFromDB(sql);
 	}
 
 	public static ArrayList<Integer> getUsedAiTestsForGame(Game g) {
@@ -1168,44 +1137,6 @@ public class DatabaseAccess {
 		}
 
 		return testList;
-	}
-
-	public static ArrayList<TargetExecution> getTargetExecutionsForKey(String keyname, int id) {
-		ArrayList<TargetExecution> executionList = new ArrayList<TargetExecution>();
-
-		Connection conn = null;
-		Statement stmt = null;
-		String sql = null;
-
-		try {
-
-			// Load the MultiplayerGame Data with the provided ID.
-			conn = getConnection();
-
-			stmt = conn.createStatement();
-			sql = String.format("SELECT * FROM targetexecutions WHERE %s='%d';", keyname, id);
-			ResultSet rs = stmt.executeQuery(sql);
-
-			while (rs.next()) {
-				TargetExecution newExecution = new TargetExecution(rs.getInt("TargetExecution_ID"), rs.getInt("Test_ID"),
-						rs.getInt("Mutant_ID"), TargetExecution.Target.valueOf(rs.getString("Target")),
-						rs.getString("State"), rs.getString("Message"), rs.getString("Timestamp"));
-				executionList.add(newExecution);
-			}
-
-			stmt.close();
-			conn.close();
-		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
-			cleanup(conn, stmt);
-		}
-
-		return executionList;
 	}
 
 	public static TargetExecution getTargetExecutionForPair(int tid, int mid) {

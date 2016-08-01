@@ -191,7 +191,8 @@ public class UploadManager extends HttpServlet {
 			FileUtils.writeStringToFile(tmpFile, fileContent);
 			FileInputStream in = new FileInputStream(tmpFile);
 			CompilationUnit cu = JavaParser.parse(in);
-			return cu.getPackage().getName() + "." + FilenameUtils.getBaseName(fileName);
+			if (null != cu && null != cu.getPackage() && ! cu.getPackage().getName().getName().isEmpty())
+				return cu.getPackage().getName() + "." + FilenameUtils.getBaseName(fileName);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ParseException e) {

@@ -210,47 +210,6 @@ public class AntRunner {
 	}
 
 	/**
-	 * Compiles mutant
-	 * @param dir
-	 * @param jFile
-	 * @param gameID
-	 * @param classMutated
-	 * @return A {@link Mutant} object
-	 */
-	public static Mutant compileMultiplayerMutant(File dir, String jFile, int gameID, GameClass classMutated, int ownerId) {
-		//public static int compileMutant(ServletContext context, Mutant m2) {
-
-		// Gets the classname for the mutant from the game it is in
-		String[] resultArray = runAntTarget("compile-mutant", dir.getAbsolutePath(), null, classMutated, null);
-		System.out.println("Compilation result:");
-		System.out.println(Arrays.toString(resultArray));
-
-		Mutant newMutant = null;
-		// If the input stream returned a 'successful build' message, the mutant compiled correctly
-		if (resultArray[0].toLowerCase().contains("build successful")) {
-			// Create and insert a new target execution recording successful compile, with no message to report, and return its ID
-			// Locate .class file
-			final String compiledClassName = classMutated.getBaseName() + JAVA_CLASS_EXT;
-			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
-			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
-			String cFile = matchingFiles.get(0).getAbsolutePath();
-			newMutant = new Mutant(-1, gameID, jFile, cFile, true, Mutant.Equivalence.ASSUMED_NO, -1, -1, ownerId);
-			newMutant.insert();
-			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "SUCCESS", null);
-			newExec.insert();
-		} else {
-			// The mutant failed to compile
-			// New target execution recording failed compile, providing the return messages from the ant javac task
-			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(Constants.DATA_DIR, "");
-			newMutant = new Mutant(-1, gameID, jFile, null, false, Mutant.Equivalence.ASSUMED_NO, -1, -1, ownerId);
-			newMutant.insert();
-			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "FAIL", message);
-			newExec.insert();
-		}
-		return newMutant;
-	}
-
-	/**
 	 * Compiles test
 	 * @param dir
 	 * @param jFile

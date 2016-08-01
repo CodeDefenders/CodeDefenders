@@ -4,9 +4,7 @@
 <div class="ws-12">
 	<div class="col-md-6" id="cut-div">
 		<h2>Class Under Test</h2>
-		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30">
-			<%=mg.getCUT().getAsString()%>
-		</textarea></pre>
+		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30"><%=mg.getCUT().getAsString()%></textarea></pre>
 	</div> <!-- col-md6 left -->
 	<div class="col-md-6" id="utest-div" style="float: right; min-width: 480px">
 		<h2> Write a new JUnit test here

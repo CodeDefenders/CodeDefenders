@@ -1,16 +1,6 @@
 package org.codedefenders;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseException;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.stmt.*;
-import org.apache.commons.lang.ArrayUtils;
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-import org.codedefenders.singleplayer.SinglePlayerGame;
+import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,19 +10,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Method;
+import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.LinkedList;
 
 import static org.codedefenders.Constants.*;
 import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.validation.CodeValidator.getMD5;
 
 public class GameManager extends HttpServlet {
 
@@ -245,7 +229,7 @@ public class GameManager extends HttpServlet {
 					}
 				} else {
 					// Create Mutant failed because there were no differences between mutant and original, returning -1
-					messages.add(MUTANT_IDENTICAL_MESSAGE);
+					messages.add(MUTANT_INVALID_MESSAGE);
 				}
 				break;
 
@@ -298,8 +282,7 @@ public class GameManager extends HttpServlet {
 		response.sendRedirect("play");//doGet(request, response);
 	}
 
-	// Writes text as a Mutant to the appropriate place in the file system.
-	public Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
+	public static Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
 
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 		String classMutatedBaseName = classMutated.getBaseName();
@@ -308,14 +291,26 @@ public class GameManager extends HttpServlet {
 		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
 		// If there were no differences, return, as the mutant is the same as original.
-		if (! validMutant(sourceCode, mutatedCode))
+		if (! CodeValidator.validMutant(sourceCode, mutatedCode))
 			return null;
+
+		// If another mutant with same md5 exists
+		String md5CUT = CodeValidator.getMD5(sourceCode);
+		String md5Mutant = CodeValidator.getMD5(mutatedCode);
+		if (md5CUT.equals(md5Mutant))
+			return null;
+
+		// The insertion of a mutant will check (game_id,md5) unique later after compilation,
+		// however I am assuming querying the DB now (before compiling) is cheaper
+		Mutant mutantWithSameMD5 = DatabaseAccess.getMutant(gid, md5Mutant);
+		if (mutantWithSameMD5 != null)
+			return null; // a mutant with same MD5 already exists in the game
 
 		// Setup folder the files will go in
 		File newMutantDir = FileManager.getNextSubDir(Constants.MUTANTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
 
-		System.out.println("NewMutantDir: " + newMutantDir.getAbsolutePath());
-		System.out.println("Class Mutated: " + classMutated.getName() + "(basename: " + classMutatedBaseName +")");
+		logger.info("NewMutantDir: {}", newMutantDir.getAbsolutePath());
+		logger.info("Class Mutated: {} (basename: {})", classMutated.getName(), classMutatedBaseName);
 
 		// Write the Mutant String into a java file
 		String mutantFileName = newMutantDir + F_SEP + classMutatedBaseName + JAVA_SOURCE_EXT;
@@ -325,21 +320,12 @@ public class GameManager extends HttpServlet {
 		bw.write(mutatedCode);
 		bw.close();
 
+		String md5FromMutantFile = CodeValidator.getMD5FromFile(mutantFileName);
+		logger.info("md5CUT: {}\nmd5Mutant:{}\nmd5FromMutantFile: {}", md5CUT, md5Mutant, md5FromMutantFile);
+		assert (md5Mutant.equals(md5FromMutantFile)); // sanity check
+
 		// Compile the mutant - if you can, add it to the MultiplayerGame State, otherwise, delete these files created.
 		return AntRunner.compileMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
-	}
-
-	private boolean validMutant(String originalCode, String mutatedCode) {
-		// Runs diff match patch between the two Strings to see if there are any differences.
-		DiffMatchPatch dmp = new DiffMatchPatch();
-		LinkedList<DiffMatchPatch.Diff> changes = dmp.diffMain(originalCode.trim().replace("\n", "").replace("\r", ""), mutatedCode.trim().replace("\n", "").replace("\r", ""), true);
-		boolean change = false;
-		for (DiffMatchPatch.Diff d : changes) {
-			if (d.operation != DiffMatchPatch.Operation.EQUAL) {
-				change = true;
-			}
-		}
-		return change;
 	}
 
 	/**
@@ -352,7 +338,7 @@ public class GameManager extends HttpServlet {
 	 * @return {@code null} if test is not valid
 	 * @throws IOException
 	 */
-	public Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
+	public static Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
@@ -360,7 +346,7 @@ public class GameManager extends HttpServlet {
 
 		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
-		if (! validTestCode(javaFile)) {
+		if (!CodeValidator.validTestCode(javaFile)) {
 			return null;
 		}
 
@@ -374,69 +360,4 @@ public class GameManager extends HttpServlet {
 		return newTest;
 	}
 
-
-	private boolean validTestCode(String javaFile) throws IOException {
-
-		CompilationUnit cu;
-		FileInputStream in = null;
-		try {
-			in = new FileInputStream(javaFile);
-			// parse the file
-			cu = JavaParser.parse(in);
-			// prints the resulting compilation unit to default system output
-			if (cu.getTypes().size() != 1) {
-				System.out.println("Invalid test suite contains more than one type declaration.");
-				return false;
-			}
-			TypeDeclaration clazz = cu.getTypes().get(0);
-			if (clazz.getMembers().size() != 1) {
-				System.out.println("Invalid test suite contains more than one method.");
-				return false;
-			}
-			MethodDeclaration test = (MethodDeclaration)clazz.getMembers().get(0);
-			BlockStmt testBody = test.getBody();
-			if (testBody.getStmts().isEmpty()) {
-				System.out.println("Empty test (no statement).");
-				return false;
-			}
-
-			int assertionCount = 0;
-			for (Node node : testBody.getChildrenNodes()) {
-				if (node instanceof ForeachStmt
-						|| node instanceof IfStmt
-						|| node instanceof ForStmt
-						|| node instanceof WhileStmt
-						|| node instanceof DoStmt) {
-					System.out.println("Invalid test contains " + node.getClass().getSimpleName() + " statement");
-					return false;
-				}
-				if (isAssertion(node)) {
-					assertionCount++;
-					if (assertionCount > 2)
-						return false;
-				}
-			}
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} finally {
-			in.close();
-		}
-		return true;
-	}
-
-	private boolean isAssertion(Node node) {
-		if (node instanceof AssertStmt)
-			return true;
-		if (node instanceof ExpressionStmt) {
-			ExpressionStmt exprStmt = (ExpressionStmt) node;
-			if ((exprStmt.getExpression() instanceof MethodCallExpr)) {
-				MethodCallExpr call = (MethodCallExpr)exprStmt.getExpression();
-				if (ArrayUtils.contains(new String[]{"assertEquals", "assertTrue", "assertFalse", "assertNull", "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals"}, call.getName()))
-					return true;
-			}
-		}
-		return false;
-	}
 }

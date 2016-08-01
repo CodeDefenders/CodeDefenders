@@ -83,6 +83,7 @@ DROP TABLE IF EXISTS `mutants`;
 CREATE TABLE `mutants` (
   `Mutant_ID` int(11) NOT NULL AUTO_INCREMENT,
   `JavaFile` varchar(255) NOT NULL,
+  `MD5` CHAR(32) NOT NULL,
   `ClassFile` varchar(255) DEFAULT NULL,
   `Alive` tinyint(1) NOT NULL DEFAULT '1',
   `Game_ID` int(11) NOT NULL,
@@ -99,6 +100,7 @@ CREATE TABLE `mutants` (
   CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
+CREATE UNIQUE INDEX mutants_Game_ID_MD5_index ON mutants (Game_ID, MD5);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -219,7 +221,7 @@ CREATE TABLE `users` (
   `User_ID` int(11) NOT NULL AUTO_INCREMENT,
   `Username` varchar(20) NOT NULL,
   `Password` char(60) NOT NULL,
-  `Email` varchar(320) NOT NULL,
+  `Email` varchar(254) NOT NULL,
   PRIMARY KEY (`User_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX users_email_index ON users (Email);

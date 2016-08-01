@@ -12,7 +12,7 @@
 	<h3>Duels</h3>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
-		<th class="col-sm-2">Game ID</th>
+		<th class="col-sm-1">Game ID</th>
 		<th class="col-sm-2">Class</th>
 		<th class="col-sm-2">Attacker</th>
 		<th class="col-sm-2">Defender</th>
@@ -48,8 +48,29 @@
 
 %>
 	<tr>
-		<td class="col-sm-2"><%= g.getId() %></td>
-		<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
+		<td class="col-sm-1"><%= g.getId() %></td>
+		<td class="col-sm-2">
+			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
+				<%=g.getCUT().getAlias()%>
+			</a>
+			<div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;" >
+				<div class="modal-dialog">
+					<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
+						</div>
+						<div class="modal-body">
+							<pre class="readonly-pre"><textarea class=	"readonly-textarea classPreview" id="sut<%=g.getId()%>" name="cut<%=g.getId()%>" cols="80" rows="30"><%=g.getCUT().getAsString()%></textarea></pre>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</td>
 		<td class="col-sm-2"><%= atkName %></td>
 		<td class="col-sm-2"><%= defName %></td>
 		<td class="col-sm-2"><%= g.getLevel().name() %></td>
@@ -89,7 +110,7 @@
 	<table class="table table-hover table-responsive table-paragraphs games-table">
 		<tr>
 			<th>Game ID</th>
-			<th>Owner</th>
+			<th>Class</th>
 			<th>Prize</th>
 			<th>Attackers</th>
 			<th>Defenders</th>
@@ -111,8 +132,29 @@
 			Role role = g.getRole(uid);
 	%>
 	<tr>
-		<td class="col-sm-2"><%= g.getId() %></td>
-		<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
+		<td class="col-sm-1"><%= g.getId() %></td>
+		<td class="col-sm-2">
+			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
+				<%=g.getCUT().getAlias()%>
+			</a>
+			<div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;" >
+				<div class="modal-dialog">
+					<!-- Modal content-->
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal">&times;</button>
+							<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
+						</div>
+						<div class="modal-body">
+							<pre class="readonly-pre"><textarea class=	"readonly-textarea classPreview" id="sut<%=g.getId()%>" name="cut<%=g.getId()%>" cols="80" rows="30"><%=g.getCUT().getAsString()%></textarea></pre>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</td>
 		<td class="col-sm-1"><%= g.getPrize() %></td>
 		<td class="col-sm-1"><%= g.getAttackerIds().length %></td>
 		<td class="col-sm-1"><%= g.getDefenderIds().length %></td>
@@ -156,5 +198,20 @@
 </table>
 	<a href="/multiplayer/games/create">Create Battleground</a>
 
+	<script>
+		$('.modal').on('shown.bs.modal', function() {
+			var codeMirrorContainer = $(this).find(".CodeMirror")[0];
+			if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+				codeMirrorContainer.CodeMirror.refresh();
+			} else {
+				var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
+					lineNumbers: false,
+					readOnly: true,
+					mode: "text/x-java"
+				});
+				editorDiff.setSize("100%", 500);
+			}
+		});
+	</script>
 </div>
 <%@ include file="/jsp/footer.jsp" %>
