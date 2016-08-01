@@ -295,8 +295,16 @@ BEGIN
   SET State='FINISHED', e.Expired = 1
   WHERE Mode='PARTY' AND State='GRACE_TWO' AND Finish_Time<=NOW();
 
+  UPDATE equivalences AS e
+  LEFT JOIN mutants AS m ON e.Mutant_ID = m.Mutant_ID
+  SET e.Expired = 0 WHERE e.Expired = 1 AND m.Equivalent != 'PENDING_TEST';
+
+  UPDATE mutants AS m
+  LEFT JOIN equivalences AS e ON e.Mutant_ID = m.Mutant_ID
+  SET m.Points = 0, m.Equivalent = 'ASSUMED_YES' WHERE e.Expired = 1;
+
    UPDATE players AS p
- RIGHT JOIN equivalences AS ee ON ee.Defender_ID = p.ID
+ LEFT JOIN equivalences AS ee ON ee.Defender_ID = p.ID
  SET p.Points = p.Points + (SELECT COUNT(e.ID)
          FROM equivalences AS e
         WHERE ee.Defender_ID = e.Defender_ID AND

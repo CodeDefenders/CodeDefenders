@@ -110,7 +110,8 @@ if (role == Role.ATTACKER && true){
 								<% } %>
 								<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){ %>
 									<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
-								<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
+								<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
+									 style="z-index: 10000; position: absolute;">
 									<div class="modal-dialog">
 										<!-- Modal content-->
 										<div class="modal-content">
@@ -156,7 +157,8 @@ if (role == Role.ATTACKER && true){
 								<% } %></td>
 							<td class="col-sm-1">
 								<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
-								<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
+								<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
+									 style="z-index: 10000; position: absolute;">
 									<div class="modal-dialog">
 										<!-- Modal content-->
 										<div class="modal-content">
@@ -199,7 +201,8 @@ if (role == Role.ATTACKER && true){
 								<% } %></td>
 							<td class="col-sm-1">
 								<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
-								<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
+								<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
+									 style="z-index: 10000; position: absolute;">
 									<div class="modal-dialog">
 										<!-- Modal content-->
 										<div class="modal-content">

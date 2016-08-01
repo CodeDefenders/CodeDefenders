@@ -136,12 +136,14 @@
                             if (testScores.containsKey(i) && testScores.get(i) != null){ %>
                                 <%= ((MultiplayerGame.PlayerScore)testScores.get(i)).getQuantity() %>
 
-                            <% } %></td>
+                            <% } else { %>
+                                0 <% } %></td>
                         <td><%
                             if (testScores.containsKey(i) && testScores.get(i) != null){
                                     total += ((MultiplayerGame.PlayerScore)testScores.get(i)).getTotalScore(); %>
                             <%= ((MultiplayerGame.PlayerScore)testScores.get(i)).getAdditionalInformation()%>
-                            <% } %></td>
+                            <% } else { %>
+                            0 <% } %></td>
                         <td>
                             <%= total %>
                         </td>
@@ -161,12 +163,14 @@
                             if (testScores.containsKey(-1) && testScores.get(-1) != null){ %>
                             <%= ((MultiplayerGame.PlayerScore)testScores.get(-1)).getQuantity() %>
 
-                            <% } %></td>
+                            <% } else { %>
+                            0 <% } %></td>
                         <td><%
                             if (testScores.containsKey(-1) && testScores.get(-1) != null){
                                 total += ((MultiplayerGame.PlayerScore)testScores.get(-1)).getTotalScore(); %>
                             <%= ((MultiplayerGame.PlayerScore)testScores.get(-1)).getAdditionalInformation()%>
-                            <% } %></td>
+                            <% } else { %>
+                            0 <% } %></td>
                         <td>
                             <%= total %>
                         </td>
