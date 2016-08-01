@@ -83,24 +83,14 @@ public abstract class AbstractGame {
 		Connection conn = null;
 		Statement stmt = null;
 
-		System.out.println(sql);
+		logger.info(sql);
 
 		// Attempt to insert game info into database
 		try {
 			conn = DatabaseAccess.getConnection();
 
 			stmt = conn.createStatement();
-			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
-
-			ResultSet rs = stmt.getGeneratedKeys();
-
-			if (rs.next()) {
-				rs.getInt(1);
-				stmt.close();
-				conn.close();
-				return true;
-			}
-
+			return stmt.executeUpdate(sql) > 0;
 		} catch (SQLException se) {
 			System.out.println(se);
 			//Handle errors for JDBC
