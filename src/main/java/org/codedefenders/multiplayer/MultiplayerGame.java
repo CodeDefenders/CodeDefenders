@@ -441,6 +441,14 @@ public class MultiplayerGame extends AbstractGame {
 		testScores.put(-2, new PlayerScore(-2));
 		mutantsKilled.put(-1, 0);
 		mutantsKilled.put(-2, 0);
+
+		for (int i : getDefenderIds()){
+			if (!testScores.containsKey(i)){
+				testScores.put(i, new PlayerScore(i));
+				mutantsKilled.put(i, 0);
+			}
+		}
+
 		int[] attackers = getAttackerIds();
 		for (Test tt : getTests()){
 			if (!testScores.containsKey(tt.getPlayerId())){

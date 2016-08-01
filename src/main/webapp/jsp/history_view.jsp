@@ -81,31 +81,9 @@
 			<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
 			<td class="col-sm-2"><%= g.getPrize() %></td>
 			<td class="col-sm-2"><%= g.getLevel().name() %></td>
-			<td class="col-sm-2"><%
-				switch(role){
-					case ATTACKER:
-			%>
-				<a href="multiplayer/games?id=<%= g.getId() %>">Attack</a>
-				<%
-						break;
-					case CREATOR:
-				%>
-				<a href="multiplayer/games?id=<%= g.getId() %>">Observe</a>
-				<%
-
-						break;
-					case DEFENDER:
-				%>
-				<a href="multiplayer/games?id=<%= g.getId() %>">Defend</a>
-				<%
-
-							break;
-						default:
-
-							break;
-					}
-
-				%></td>
+			<td class="col-sm-2">
+				<a href="multiplayer/history?id=<%= g.getId() %>">View Results</a>
+			</td>
 		</tr>
 		<%
 				} // for (MultiplayerGame g : games)
