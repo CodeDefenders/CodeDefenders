@@ -284,8 +284,14 @@ DROP PROCEDURE IF EXISTS proc_multiplayer_task;
 DELIMITER //
 CREATE PROCEDURE proc_multiplayer_task()
 BEGIN
-  UPDATE games SET State='ACTIVE'
-  WHERE Mode='PARTY' AND State='CREATED' AND Start_Time<=CURRENT_TIMESTAMP;
+  -- Activate games when its start time has passed and there are sufficient players
+  UPDATE games as g
+    INNER JOIN (SELECT gatt.ID, sum(case when Role = 'ATTACKER' then 1 else 0 end) nAttackers, sum(case when Role = 'DEFENDER' then 1 else 0 end) nDefenders
+                FROM games as gatt LEFT JOIN players ON gatt.ID=players.Game_ID AND players.Active=TRUE GROUP BY gatt.ID) as nplayers
+    ON g.ID=nplayers.ID
+  SET g.State='ACTIVE'
+  WHERE g.Mode='PARTY' AND g.State='CREATED' AND g.Start_Time<=CURRENT_TIMESTAMP
+        AND g.Attackers_Needed <= nplayers.nAttackers AND g.Defenders_Needed <= nplayers.nDefenders;
 
   UPDATE games SET State='GRACE_ONE'
   WHERE Mode='PARTY' AND State='ACTIVE' AND Finish_Time<=DATE_ADD(NOW(), INTERVAL 1 HOUR);
