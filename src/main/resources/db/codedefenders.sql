@@ -214,6 +214,19 @@ CREATE TABLE `usedaitests` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `registeredEmails`
+--
+DROP TABLE IF EXISTS `registeredEmails`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `registeredEmails` (
+  email VARCHAR(254) PRIMARY KEY NOT NULL
+);
+CREATE UNIQUE INDEX validatedEmails_email_uindex ON registeredEmails (email);
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+--
 -- Table structure for table `users`
 --
 
@@ -229,6 +242,14 @@ CREATE TABLE `users` (
   PRIMARY KEY (`User_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX users_email_index ON users (Email);
+DELIMITER $$
+CREATE TRIGGER ins_users
+BEFORE INSERT ON `users`
+FOR EACH ROW BEGIN
+  IF (NEW.Email IN (SELECT * FROM registeredEmails)) THEN
+    SET NEW.Validated = TRUE;
+  END IF;
+END$$
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
