@@ -250,6 +250,7 @@ FOR EACH ROW BEGIN
     SET NEW.Validated = TRUE;
   END IF;
 END$$
+DELIMITER ;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
