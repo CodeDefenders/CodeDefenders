@@ -42,7 +42,7 @@ public class GameManager extends HttpServlet {
 
             Game activeGame = DatabaseAccess.getGameForKey("ID", gid);
             session.setAttribute("game", activeGame);
-            // If the game is finished, redirect to the score page.
+
             if (activeGame.getAttackerId() == uid) {
                 ArrayList<Mutant> equivMutants = activeGame.getMutantsMarkedEquivalent();
                 if (equivMutants.isEmpty()) {
@@ -83,7 +83,6 @@ public class GameManager extends HttpServlet {
             Game activeGame = (Game) session.getAttribute("game");
 
             switch (request.getParameter("formType")) {
-
                 case "resolveEquivalence":
                     logger.info("Executing Action resolveEquivalence");
                     int currentEquivMutantID = Integer.parseInt(request.getParameter("currentEquivMutant"));
@@ -97,7 +96,6 @@ public class GameManager extends HttpServlet {
 
                         // Get the text submitted by the user.
                         String testText = request.getParameter("test");
-
                         // If it can be written to file and compiled, end turn. Otherwise, dont.
                         Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
                         if (newTest == null) {
@@ -108,6 +106,7 @@ public class GameManager extends HttpServlet {
                         }
 
                         TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+
                         if (compileTestTarget.status.equals("SUCCESS")) {
                             TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
                             if (testOriginalTarget.status.equals("SUCCESS")) {
@@ -128,7 +127,6 @@ public class GameManager extends HttpServlet {
                                         return;
                                     }
                                 } else {
-                                    //  (testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
                                     //  (testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
                                     logger.debug("testOriginalTarget: " + testOriginalTarget);
                                     messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
@@ -152,9 +150,9 @@ public class GameManager extends HttpServlet {
                                 response.sendRedirect("play");
                                 return;
                             }
+                            break;
                         }
                     }
-                    break;
                 case "claimEquivalent":
                     if (request.getParameter("mutantId") != null) {
                         int mutantId = Integer.parseInt(request.getParameter("mutantId"));
@@ -232,7 +230,6 @@ public class GameManager extends HttpServlet {
 
                     // Get the text submitted by the user.
                     String testText = request.getParameter("test");
-
                     // If it can be written to file and compiled, end turn. Otherwise, dont.
                     Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
                     if (newTest == null) {
@@ -256,6 +253,7 @@ public class GameManager extends HttpServlet {
                             messages.add(compileTestTarget.message);
                             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
                         }
+
                         break;
                     }
                     if (activeGame.getMode().equals(Game.Mode.SINGLE)) {
@@ -272,6 +270,7 @@ public class GameManager extends HttpServlet {
         } catch (Exception e) {
             messages.add("An error has occurred.");
             response.sendRedirect("games");
+            e.printStackTrace();
             return;
         }
         response.sendRedirect("play");//doGet(request, response);
