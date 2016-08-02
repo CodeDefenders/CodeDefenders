@@ -253,7 +253,7 @@ public class MultiplayerGame extends AbstractGame {
 					"(Class_ID, Level, Prize, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " +
 					"Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Start_Time, Finish_Time, State, Mode) VALUES " +
 					"('%s', 	'%s', '%f', 	'%d',			'%d',			'%f',			'%f',		'%d'," +
-					"'%d',				'%d',				'%d',			'%d',			'%s', '%s',		'%s', 'PARTY', FALSE);",
+					"'%d',				'%d',				'%d',			'%d',			'%s', '%s',		'%s', 'PARTY');",
 					classId, level.name(), prize, defenderValue, attackerValue, lineCoverage, mutantCoverage, creatorId,
 					minAttackers, minDefenders, attackerLimit, defenderLimit, new Timestamp(startDateTime), new Timestamp(finishDateTime), state.name());
 
