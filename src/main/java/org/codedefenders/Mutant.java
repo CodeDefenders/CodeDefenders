@@ -145,10 +145,15 @@ public class Mutant {
 	public void setScore(int score) {
 		this.score += score;
 	}
+
 	public void kill() {
+		kill(Equivalence.PROVEN_NO);
+	}
+
+	public void kill(Equivalence equivalent) {
 		alive = false;
 		roundKilled = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
-		equivalent = Equivalence.PROVEN_NO;
+		this.equivalent = equivalent;
 		update();
 	}
 

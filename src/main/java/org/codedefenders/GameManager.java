@@ -36,7 +36,7 @@ public class GameManager extends HttpServlet {
 
 		int gid = (Integer) ogid;
 
-		System.out.println("Getting game " + gid + " for " + uid);
+		logger.debug("Getting game " + gid + " for " + uid);
 
 		Game activeGame = DatabaseAccess.getGameForKey("ID", gid);
 		session.setAttribute("game", activeGame);
@@ -45,10 +45,10 @@ public class GameManager extends HttpServlet {
 		if (activeGame.getAttackerId() == uid) {
 			ArrayList<Mutant> equivMutants = activeGame.getMutantsMarkedEquivalent();
 			if (equivMutants.isEmpty()) {
-				System.out.println("Redirecting to attacker page");
+				logger.info("Redirecting to attacker page");
 				ArrayList<Mutant> aliveMutants = activeGame.getAliveMutants();
 				if (aliveMutants.isEmpty()) {
-					System.out.println("No Mutants Alive, only attacker can play.");
+					logger.info("No Mutants Alive, only attacker can play.");
 					activeGame.setActiveRole(Role.ATTACKER);
 					activeGame.update();
 				}
@@ -81,16 +81,14 @@ public class GameManager extends HttpServlet {
 		switch (request.getParameter("formType")) {
 
 			case "resolveEquivalence":
-				logger.debug("Executing Action resolveEquivalence");
-				System.out.println("MultiplayerGame Manager Executing Action resolveEquivalence");
+				logger.info("Executing Action resolveEquivalence");
 				int currentEquivMutantID = Integer.parseInt(request.getParameter("currentEquivMutant"));
 				Mutant mutant = activeGame.getMutantByID(currentEquivMutantID);
-				System.out.println("CurrentEquivMutant ID = " + currentEquivMutantID);
+				logger.debug("CurrentEquivMutant ID = " + currentEquivMutantID);
 
 				// Check type of equivalence response.
 				if (request.getParameter("rejectEquivalent") != null) { // If user wanted to supply a test
-					logger.debug("Equivalence rejected, going to process killing test form mutant " + currentEquivMutantID);
-					System.out.println("Equivalence rejected, going to process killing test for mutant " + currentEquivMutantID);
+					logger.info("Equivalence rejected, going to process killing test form mutant " + currentEquivMutantID);
 
 					// Get the text submitted by the user.
 					String testText = request.getParameter("test");
@@ -109,7 +107,7 @@ public class GameManager extends HttpServlet {
 					if (compileTestTarget.status.equals("SUCCESS")) {
 						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 						if (testOriginalTarget.status.equals("SUCCESS")) {
-							System.out.println(TEST_PASSED_ON_CUT_MESSAGE);
+							logger.info(TEST_PASSED_ON_CUT_MESSAGE);
 							if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
 								// Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
 								MutationTester.runEquivalenceTest(newTest, mutant);
@@ -134,23 +132,21 @@ public class GameManager extends HttpServlet {
 							}
 						} else {
 							//  (testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
-							System.out.println("testOriginalTarget: " + testOriginalTarget);
+							logger.debug("testOriginalTarget: " + testOriginalTarget);
 							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 							messages.add(testOriginalTarget.message);
 							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						}
 					} else {
-						System.out.println("compileTestTarget: " + compileTestTarget);
+						logger.debug("compileTestTarget: " + compileTestTarget);
 						messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
 						messages.add(compileTestTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					}
 				} else if (request.getParameter("acceptEquivalent") != null) { // If the user didnt want to supply a test
-					logger.debug("Equivalence accepted");
-					System.out.println("Equivalence accepted");
+					logger.info("Equivalence accepted");
 					if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
-						mutant.setEquivalent(Mutant.Equivalence.DECLARED_YES);
-						mutant.kill();
+						mutant.kill(Mutant.Equivalence.DECLARED_YES);
 
 						messages.add(MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 						activeGame.endRound();
@@ -246,7 +242,7 @@ public class GameManager extends HttpServlet {
 					response.sendRedirect("play");
 					return;
 				}
-				System.out.println("New Test " + newTest.getId());
+				logger.debug("New Test " + newTest.getId());
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 				if (compileTestTarget.status.equals("SUCCESS")) {
