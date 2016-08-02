@@ -315,10 +315,11 @@ public class DatabaseAccess {
 		return getMultiplayerGames(sql);
 	}
 
-	public static ArrayList<MultiplayerGame> getMultiplayerGamesExcludingUser(int userId) {
-		String sql = String.format("SELECT * FROM games AS m " +
-				"WHERE m.Mode='PARTY' AND m.Creator_ID!=%d AND NOT EXISTS " +
-				"(SELECT * FROM players AS p WHERE p.User_ID=%d AND p.Game_ID=m.ID  AND p.Active=TRUE);", userId, userId, userId);
+	public static ArrayList<MultiplayerGame> getOpenMultiplayerGamesForUser(int userId) {
+		String sql = String.format("SELECT * FROM games AS m\n" +
+				"WHERE m.Mode='PARTY' AND m.Creator_ID!=%1$d \n" +
+				"AND NOT EXISTS (SELECT * FROM players AS p WHERE p.User_ID=%1$d AND p.Game_ID=m.ID  AND p.Active=TRUE) \n" +
+				"AND (m.RequiresValidation=FALSE OR (%1$d IN (SELECT User_ID from users where Validated=TRUE)));", userId);
 		return getMultiplayerGames(sql);
 	}
 
