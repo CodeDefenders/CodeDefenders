@@ -32,11 +32,11 @@
 			defName = null;
 
 			if (g.getAttackerId() != 0) {
-				atkName = DatabaseAccess.getUserForKey("User_ID", g.getAttackerId()).username;
+				atkName = DatabaseAccess.getUserForKey("User_ID", g.getAttackerId()).getUsername();
 			}
 
 			if (g.getDefenderId() != 0) {
-				defName = DatabaseAccess.getUserForKey("User_ID", g.getDefenderId()).username;
+				defName = DatabaseAccess.getUserForKey("User_ID", g.getDefenderId()).getUsername();
 			}
 
 			int turnId = g.getAttackerId();

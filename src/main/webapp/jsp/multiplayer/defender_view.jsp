@@ -8,7 +8,7 @@
 	</div> <!-- col-md6 left -->
 	<div class="col-md-6" id="utest-div" style="float: right; min-width: 480px">
 		<h2> Write a new JUnit test here
-			<button type="submit" class="btn btn-primary btn-game btn-right" form="def"
+			<button type="submit" class="btn btn-primary btn-game btn-right" form="def" onClick="this.form.submit(); this.disabled=true; this.value='Defending...';"
 					<% if (!mg.getState().equals(AbstractGame.State.ACTIVE)) { %> disabled <% } %>>
 				Defend!
 			</button>

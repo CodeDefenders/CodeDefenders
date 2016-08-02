@@ -19,7 +19,7 @@
 %>
 	<tr>
 		<td class="col-sm-2"><%= g.getId() %></td>
-		<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
+		<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
 		<td class="col-sm-2"><%= g.getLineCoverage() %></td>
 		<td class="col-sm-2"><%= g.getMutantCoverage() %></td>
 		<td class="col-sm-2"><%= g.getPrize() %></td>

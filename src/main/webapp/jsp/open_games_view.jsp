@@ -36,8 +36,8 @@
 			// User is already playing this game
 			if ((atkId == uid)||(defId == uid)) {continue;}
 
-			if (atkId != 0) {atkName = DatabaseAccess.getUserForKey("User_ID", atkId).username;}
-			if (defId != 0) {defName = DatabaseAccess.getUserForKey("User_ID", defId).username;}
+			if (atkId != 0) {atkName = DatabaseAccess.getUserForKey("User_ID", atkId).getUsername();}
+			if (defId != 0) {defName = DatabaseAccess.getUserForKey("User_ID", defId).getUsername();}
 
 			if ((atkName != null)&&(defName != null)) {continue;}
 
@@ -105,7 +105,7 @@
 			<th>Actions</th>
 		</tr>
 	<%
-		ArrayList<MultiplayerGame> mgames = DatabaseAccess.getMultiplayerGamesExcludingUser(uid);
+		ArrayList<MultiplayerGame> mgames = DatabaseAccess.getOpenMultiplayerGamesForUser(uid);
 		if (mgames.isEmpty()) {
 	%>
 		<tr><td colspan="100%"> There are currently no open multiplayer games. </td></tr>
@@ -139,7 +139,7 @@
 					</div>
 				</div>
 			</td>
-			<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
+			<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
 			<td class="col-sm-1"><%= g.getPrize() %></td>
 			<td class="col-sm-1"><%int attackers = g.getAttackerIds().length; %><%=attackers %> of <%=g.getMinAttackers()%>&ndash;<%=g.getAttackerLimit()%></td>
 			<td class="col-sm-1"><%int defenders = g.getAttackerIds().length; %><%=defenders %> of <%=g.getMinDefenders()%>&ndash;<%=g.getDefenderLimit()%></td>

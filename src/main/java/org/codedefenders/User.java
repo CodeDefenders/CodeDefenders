@@ -13,10 +13,11 @@ public class User {
 
 	private static final Logger logger = LoggerFactory.getLogger(User.class);
 
-	public int id;
-	public String username;
-	public String password;
-	public String email;
+	private int id;
+	private String username;
+	private String password;
+	private String email;
+	private boolean validated;
 
 	public User(String username, String password) {
 		this.username = username;
@@ -69,24 +70,49 @@ public class User {
 			System.out.println(e);
 		} // Handle errors for Class.forName
 		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			DatabaseAccess.cleanup(conn, stmt);
 		}
 		return false;
+	}
+
+	public boolean isValidated() {
+		return validated;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public void logSession(String ipAddress) {
 		DatabaseAccess.logSession(id, ipAddress);
 	}
+
 }

@@ -45,6 +45,7 @@ public class LoginFilter implements Filter {
 		String context = request.getContextPath().toString();
 		if ((path.endsWith(context + "/"))
 				|| (path.endsWith(context + "/login"))
+				|| (path.endsWith(context + "/help"))
 				|| (path.contains(context + "/papers"))
 				|| (path.endsWith(context + "/sendEmail"))
 				|| (path.endsWith(context + "/index.jsp")))

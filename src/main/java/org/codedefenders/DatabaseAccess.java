@@ -155,19 +155,23 @@ public class DatabaseAccess {
 		return classList;
 	}
 
+	public static User getUser(int uid) {
+		return getUserForKey("User_ID", uid);
+	}
+
 	public static User getUserFromPlayer(int playerId) {
 		String sql = String.format("SELECT * FROM users AS u " +
 				"LEFT JOIN players AS p ON p.User_ID=u.User_ID " +
 				"WHERE p.ID='%d';", playerId);
-		return getUser(sql);
+		return getUserFromDB(sql);
 	}
 
 	public static User getUserForKey(String keyName, int id) {
 		String sql = String.format("SELECT * FROM users WHERE %s=%d;", keyName, id);
-		return getUser(sql);
+		return getUserFromDB(sql);
 	}
 
-	private static User getUser(String sql) {
+	private static User getUserFromDB(String sql) {
 		Connection conn = null;
 		Statement stmt = null;
 
@@ -315,10 +319,11 @@ public class DatabaseAccess {
 		return getMultiplayerGames(sql);
 	}
 
-	public static ArrayList<MultiplayerGame> getMultiplayerGamesExcludingUser(int userId) {
-		String sql = String.format("SELECT * FROM games AS m " +
-				"WHERE m.Mode='PARTY' AND m.Creator_ID!=%d AND NOT EXISTS " +
-				"(SELECT * FROM players AS p WHERE p.User_ID=%d AND p.Game_ID=m.ID  AND p.Active=TRUE);", userId, userId, userId);
+	public static ArrayList<MultiplayerGame> getOpenMultiplayerGamesForUser(int userId) {
+		String sql = String.format("SELECT * FROM games AS m\n" +
+				"WHERE m.Mode='PARTY' AND m.Creator_ID!=%1$d \n" +
+				"AND NOT EXISTS (SELECT * FROM players AS p WHERE p.User_ID=%1$d AND p.Game_ID=m.ID  AND p.Active=TRUE) \n" +
+				"AND (m.RequiresValidation=FALSE OR (%1$d IN (SELECT User_ID from users where Validated=TRUE)));", userId);
 		return getMultiplayerGames(sql);
 	}
 
@@ -467,7 +472,7 @@ public class DatabaseAccess {
 						(float)rs.getDouble("Mutant_Goal"), rs.getInt("Prize"), rs.getInt("Defender_Value"),
 						rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
 						rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),
-						rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"));
+						rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"));
 				mg.setId(rs.getInt("ID"));
 				gameList.add(mg);
 			}

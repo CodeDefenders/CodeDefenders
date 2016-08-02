@@ -38,8 +38,8 @@ public class LoginManager extends HttpServlet {
 					User newUser = new User(username, password, email);
 					if (newUser.insert()) {
 						HttpSession session = request.getSession();
-						session.setAttribute("uid", newUser.id);
-						session.setAttribute("username", newUser.username);
+						session.setAttribute("uid", newUser.getId());
+						session.setAttribute("username", newUser.getUsername());
 						session.setAttribute("messages", messages);
 
 						response.sendRedirect("games");
@@ -65,12 +65,12 @@ public class LoginManager extends HttpServlet {
 				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 				dispatcher.forward(request, response);
 			} else {
-				String dbPassword = activeUser.password;
+				String dbPassword = activeUser.getPassword();
 				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 				if (passwordEncoder.matches(password, dbPassword)) {
 					HttpSession session = request.getSession();
-					DatabaseAccess.logSession(activeUser.id, getClientIpAddress(request));
-					session.setAttribute("uid", activeUser.id);
+					DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
+					session.setAttribute("uid", activeUser.getId());
 					session.setAttribute("username", username);
 					Object from = session.getAttribute("loginFrom");
 					if (from != null && ! ((String) from).endsWith(".ico")
