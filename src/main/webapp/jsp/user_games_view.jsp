@@ -161,35 +161,44 @@
 		<td class="col-sm-1"><%= g.getLevel().name() %></td>
 		<td class="col-sm-1"><%= g.getStartDateTime()%></td>
 		<td class="col-sm-1"><%= g.getFinishDateTime()%></td>
-		<td class="col-sm-2"><%
-			switch(role){
-				case ATTACKER:
-					%>
-			<% if(!g.getState().equals(AbstractGame.State.CREATED)) { %>
-				<a href="multiplayer/games?id=<%= g.getId() %>">Attack</a>
-			<% } else { %> <p>Game Not Ready</p> <% } %>
+		<td class="col-sm-2">
 			<%
-					break;
+			switch(role){
 				case CREATOR:
 			%>
 			<a href="multiplayer/games?id=<%= g.getId() %>">Observe</a>
 			<%
-
+					break;
+				case ATTACKER:
+					if(!g.getState().equals(AbstractGame.State.CREATED)) {
+			%>
+			<a href="multiplayer/games?id=<%= g.getId() %>">Attack</a>
+			<%		} else { %>
+			<p>Joined as Attacker</p>
+			<form id="attLeave" action="multiplayer/games" method="post">
+				<input type="hidden" name="formType" value="leaveGame">
+				<input type="hidden" name="game" value="<%=g.getId()%>">
+				<input type="submit" form="attLeave" value="Leave">
+			</form>
+			<% }
 					break;
 				case DEFENDER:
-			%>
-			<% if(!g.getState().equals(AbstractGame.State.CREATED)) { %>
+					if(!g.getState().equals(AbstractGame.State.CREATED)) { %>
 				<a href="multiplayer/games?id=<%= g.getId() %>">Defend</a>
-			<% } else { %> <p>Game Not Ready</p> <% } %>
-			<%
-
+			<% 		} else { %>
+			<p>Joined as Defender</p>
+			<form id="defLeave" action="multiplayer/games" method="post">
+				<input type="hidden" name="formType" value="leaveGame">
+				<input type="hidden" name="game" value="<%=g.getId()%>">
+				<input type="submit" form="defLeave" class="leave-button" value="Leave">
+			</form>
+			<% }
 					break;
 				default:
-
 					break;
 			}
-
-		%></td>
+			%>
+		</td>
 	</tr>
 	<%
 			} // for (MultiplayerGame g : games)

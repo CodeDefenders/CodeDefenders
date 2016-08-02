@@ -69,6 +69,16 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>help</servlet-name>
+		<jsp-file>/jsp/help.jsp</jsp-file>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>help</servlet-name>
+		<url-pattern>/help</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>index</servlet-name>
 		<jsp-file>/jsp/index.jsp</jsp-file>
 	</servlet>
