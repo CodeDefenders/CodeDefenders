@@ -159,6 +159,11 @@ public class DatabaseAccess {
 		return getUserForKey("User_ID", uid);
 	}
 
+	public static User getUserForName(String username) {
+		String sql = String.format("SELECT * FROM users WHERE Username='%s';", username);
+		return getUserFromDB(sql);
+	}
+
 	public static User getUserFromPlayer(int playerId) {
 		String sql = String.format("SELECT * FROM users AS u " +
 				"LEFT JOIN players AS p ON p.User_ID=u.User_ID " +
@@ -181,46 +186,10 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			if (rs.next()) {
-				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"));
+				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"));
 				stmt.close();
 				conn.close();
 				return userRecord;
-			}
-
-		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-		} finally {
-			cleanup(conn, stmt);
-		} //end try
-
-		return null;
-	}
-
-	public static User getUserForName(String username) {
-
-		Connection conn = null;
-		Statement stmt = null;
-		String sql = null;
-
-		try {
-			conn = getConnection();
-			stmt = conn.createStatement();
-			sql = String.format("SELECT * FROM users WHERE Username='%s';", username);
-			ResultSet rs = stmt.executeQuery(sql);
-
-			if (rs.next()) {
-				User newUser = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"));
-				stmt.close();
-				conn.close();
-				return newUser;
-			} else {
-				stmt.close();
-				conn.close();
-				return null;
 			}
 
 		} catch (SQLException se) {
