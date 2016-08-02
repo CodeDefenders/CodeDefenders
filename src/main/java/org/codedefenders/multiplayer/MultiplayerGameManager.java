@@ -65,6 +65,10 @@ public class MultiplayerGameManager extends HttpServlet {
 				Mutant mutant = activeGame.getMutantByID(currentEquivMutantID);
 				logger.debug("CurrentEquivMutant ID = " + currentEquivMutantID);
 
+				if (activeGame.getState().equals(AbstractGame.State.FINISHED)){
+					response.sendRedirect("games");
+				}
+
 				// Check type of equivalence response.
 				//logger.debug("Equivalence rejected, going to process killing test form mutant " + currentEquivMutantID);
 				//System.out.println("Equivalence rejected, going to process killing test for mutant " + currentEquivMutantID);

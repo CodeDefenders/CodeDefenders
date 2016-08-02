@@ -64,6 +64,7 @@ CREATE TABLE `games` (
   `FinalRound` tinyint(4) NOT NULL DEFAULT '5',
   `ActiveRole` enum('ATTACKER','DEFENDER') NOT NULL DEFAULT 'ATTACKER',
   `Mode` enum('SINGLE','DUEL','PARTY','UTESTING') NOT NULL DEFAULT 'DUEL',
+  `RequiresValidation` TINYINT(1) DEFAULT '0' NOT NULL,
   PRIMARY KEY (`ID`),
   KEY `fk_creatorId_idx` (`Creator_ID`),
   KEY `fk_className_idx` (`Class_ID`),
@@ -224,6 +225,7 @@ CREATE TABLE `users` (
   `Username` varchar(20) NOT NULL,
   `Password` char(60) NOT NULL,
   `Email` varchar(254) NOT NULL,
+  `Validated` TINYINT(1) DEFAULT '0' NOT NULL,
   PRIMARY KEY (`User_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX users_email_index ON users (Email);

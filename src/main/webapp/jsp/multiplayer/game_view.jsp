@@ -13,7 +13,7 @@
             gameId = ((Integer) session.getAttribute("mpGameId")).intValue();
         }
     } catch (Exception e2){
-        response.sendRedirect("multiplayer/games/user");
+        response.sendRedirect("games/user");
     }
     boolean renderMutants = true;
 
@@ -76,6 +76,8 @@
             messages.add("Flagged " + equivCounter + " mutants as equivalent");
             mutantsAlive = mg.getAliveMutants();
 
+            response.sendRedirect("multiplayer/play");
+
         } catch (NumberFormatException e){}
     } else if (role.equals(Role.ATTACKER) && request.getParameter("acceptEquiv") != null){
         try {
@@ -84,7 +86,8 @@
             Mutant equiv = null;
 
             for (Mutant m : mutantsEquiv){
-                if (m.getPlayerId() == playerId &&  m.getId() == mutId){
+                if (m.getPlayerId() == playerId &&  m.getId() == mutId
+                        && m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){
                     m.setEquivalent(Mutant.Equivalence.DECLARED_YES);
                     m.update();
                     DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
