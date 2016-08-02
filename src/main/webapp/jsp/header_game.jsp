@@ -23,8 +23,8 @@ pageTitle = null;
                 }
             }
             String loggedName = (String) request.getSession().getAttribute("username");
-            String atkName = DatabaseAccess.getUserForKey("User_ID", game.getAttackerId()).username;
-            String defName = DatabaseAccess.getUserForKey("User_ID", game.getDefenderId()).username;
+            String atkName = DatabaseAccess.getUserForKey("User_ID", game.getAttackerId()).getUsername();
+            String defName = DatabaseAccess.getUserForKey("User_ID", game.getDefenderId()).getUsername();
             if (atkName.equals(loggedName))
                 atkName = "you";
             else

@@ -26,8 +26,8 @@
 			defId = g.getDefenderId();
 			User attacker = DatabaseAccess.getUserForKey("User_ID", atkId);
 			User defender = DatabaseAccess.getUserForKey("User_ID", defId);
-			atkName = attacker == null ? "-" : attacker.username;
-			defName = defender == null ? "-" : defender.username;
+			atkName = attacker == null ? "-" : attacker.getUsername();
+			defName = defender == null ? "-" : defender.getUsername();
 	%>
 
 	<tr>
@@ -78,7 +78,7 @@
 		<tr>
 			<td class="col-sm-2"><%= g.getId() %></td>
 			<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
-			<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).username %></td>
+			<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
 			<td class="col-sm-2"><%= g.getPrize() %></td>
 			<td class="col-sm-2"><%= g.getLevel().name() %></td>
 			<td class="col-sm-2">

@@ -54,7 +54,7 @@
                         int counter = 0;
                         %>
                         <tr class="attacker"><td>
-                                <%=aUser.username%>
+                                <%=aUser.getUsername()%>
                             </td>
                             <td><%
                                 if (mutantScores.containsKey(i) && mutantScores.get(i) != null){ %>
@@ -130,7 +130,7 @@
                             total = 0;
                     %>
                     <tr class="defender"><td>
-                        <%=dUser.username%>
+                        <%=dUser.getUsername()%>
                     </td>
                         <td><%
                             if (testScores.containsKey(i) && testScores.get(i) != null){ %>

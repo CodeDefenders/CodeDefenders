@@ -42,7 +42,7 @@ public class MultiplayerGame extends AbstractGame {
 	private int minDefenders;
 	private long startDateTime;
 	private long finishDateTime;
-
+	private boolean requiresValidation;
 
 	public void setId(int id) {
 		this.id = id;
@@ -109,6 +109,15 @@ public class MultiplayerGame extends AbstractGame {
 	                       int defenderValue, int attackerValue, int defenderLimit,
 	                       int attackerLimit, int minDefenders, int minAttackers,
 	                       long startDateTime, long finishDateTime, String status) {
+		this(classId, creatorId, level, lineCoverage, mutantCoverage, prize, defenderValue, attackerValue, defenderLimit, attackerLimit,
+				minDefenders, minAttackers, startDateTime, finishDateTime, status, false);
+	}
+
+	public MultiplayerGame(int classId, int creatorId, Level level,
+	                       float lineCoverage, float mutantCoverage, float prize,
+	                       int defenderValue, int attackerValue, int defenderLimit,
+	                       int attackerLimit, int minDefenders, int minAttackers,
+	                       long startDateTime, long finishDateTime, String status, boolean requiresValidation) {
 		this.classId = classId;
 		this.creatorId = creatorId;
 		this.level = level;
@@ -125,6 +134,7 @@ public class MultiplayerGame extends AbstractGame {
 		this.state = State.valueOf(status);
 		this.startDateTime = startDateTime;
 		this.finishDateTime = finishDateTime;
+		this.requiresValidation = requiresValidation;
 	}
 
 	public ArrayList<Mutant> getMutants() {
@@ -195,7 +205,7 @@ public class MultiplayerGame extends AbstractGame {
 	public int[] getPlayerIds() { return ArrayUtils.addAll(getDefenderIds(), getAttackerIds());}
 
 	public boolean addPlayer(int userId, Role role) {
-		if (state != State.FINISHED && canJoinGame(role)) {
+		if (state != State.FINISHED && canJoinGame(userId, role)) {
 			String sql = String.format("INSERT INTO players " +
 							"(Game_ID, User_ID, Points, Role) " +
 							"VALUES (%d, %d, 0, '%s') " +
@@ -216,12 +226,17 @@ public class MultiplayerGame extends AbstractGame {
 		return false;
 	}
 
-	private boolean canJoinGame(Role role) {
-		if (role.equals(Role.ATTACKER))
-			return (attackerLimit == 0 || getAttackerIds().length < attackerLimit);
-		else
-			return (defenderLimit == 0 || getDefenderIds().length < defenderLimit);
+	private boolean canJoinGame(int userId, Role role) {
+		if (!requiresValidation || DatabaseAccess.getUserForKey("User_ID", userId).isValidated()) {
+			if (role.equals(Role.ATTACKER))
+				return (attackerLimit == 0 || getAttackerIds().length < attackerLimit);
+			else
+				return (defenderLimit == 0 || getDefenderIds().length < defenderLimit);
+		} else
+			return false;
 	}
+
+
 
 	public boolean insert() {
 
@@ -238,7 +253,7 @@ public class MultiplayerGame extends AbstractGame {
 					"(Class_ID, Level, Prize, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " +
 					"Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Start_Time, Finish_Time, State, Mode) VALUES " +
 					"('%s', 	'%s', '%f', 	'%d',			'%d',			'%f',			'%f',		'%d'," +
-					"'%d',				'%d',				'%d',			'%d',			'%s', '%s',		'%s', 'PARTY');",
+					"'%d',				'%d',				'%d',			'%d',			'%s', '%s',		'%s', 'PARTY', FALSE);",
 					classId, level.name(), prize, defenderValue, attackerValue, lineCoverage, mutantCoverage, creatorId,
 					minAttackers, minDefenders, attackerLimit, defenderLimit, new Timestamp(startDateTime), new Timestamp(finishDateTime), state.name());
 
@@ -260,19 +275,7 @@ public class MultiplayerGame extends AbstractGame {
 			System.out.println(e);
 			//Handle errors for Class.forName
 		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				System.out.println(se);
-			}//end finally try
+			DatabaseAccess.cleanup(conn, stmt);
 		} //end try
 
 		return false;
@@ -305,19 +308,7 @@ public class MultiplayerGame extends AbstractGame {
 			//Handle errors for Class.forName
 			e.printStackTrace();
 		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}//end finally try
+			DatabaseAccess.cleanup(conn, stmt);
 		} //end try
 
 		return false;
