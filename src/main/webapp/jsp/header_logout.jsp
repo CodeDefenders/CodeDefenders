@@ -21,6 +21,7 @@
                     <div class="inline crow fly">
                         <a class="text-white button tab-link bg-minus-1" href="#research">Research</a>
                         <a class="text-white button tab-link bg-minus-1" href="#contact">Contact</a>
+                        <a class="text-white button tab-link bg-minus-1" href="help">Help</a>
                     </div>
                 </div>
             </div>

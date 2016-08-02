@@ -1,7 +1,9 @@
 <% String pageTitle = "Help"; %>
 
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_base.jsp" %>
 
+<div style="padding: 0px 16px 0px 16px">
+	<h2>Help</h2>
 	<div style="padding: 0px 16px 0px 16px">
 		<p>Code Defenders pits two teams against each other on a Java class. Attackers must create mutants in the code, whilst Defenders write unit tests to catch (kill) these changes to the code.</p>
 
@@ -67,4 +69,4 @@
 
 
 	</div>
-<%@ include file="/jsp/footer.jsp" %>
+</div>
