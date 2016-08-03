@@ -55,6 +55,11 @@ public class CodeValidator {
 			logger.warn("Swallowing ParseException");
 			// remove whitespaces
 			String diff2 = diff.replaceAll("\\s+","");
+			// forbid adding disjunctions, if || or | appear on their own, that's an operator replacement, so fine
+			if (diff2.contains("|") && ! ("|".equals(diff2) || "||".equals(diff2))) {
+				return false;
+			}
+			// forbid if, while, for, and system calls
 			String regex = "(?:(?:if|while|for)\\s*\\(.*|[\\s\\;\\{\\(\\)]System\\.|^System\\.)";
 			Pattern p = Pattern.compile(regex);
 			return ! p.matcher(diff2).find();
