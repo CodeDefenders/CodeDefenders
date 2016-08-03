@@ -159,8 +159,8 @@ public class DatabaseAccess {
 		return getUserForKey("User_ID", uid);
 	}
 
-	public static User getUserForName(String username) {
-		String sql = String.format("SELECT * FROM users WHERE Username='%s';", username);
+	public static User getUserForNameOrEmail(String usernameOrEmail) {
+		String sql = String.format("SELECT * FROM users WHERE Username='%1$s' OR Email='%1$s';", usernameOrEmail);
 		return getUserFromDB(sql);
 	}
 

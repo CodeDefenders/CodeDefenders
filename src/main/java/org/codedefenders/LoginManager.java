@@ -1,5 +1,7 @@
 package org.codedefenders;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.servlet.RequestDispatcher;
@@ -12,6 +14,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class LoginManager extends HttpServlet {
+
+	private static final Logger logger = LoggerFactory.getLogger(LoginManager.class);
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -34,7 +38,7 @@ public class LoginManager extends HttpServlet {
 		if (formType.equals("create")) {
 			String confirm = (String) request.getParameter("confirm");
 			if (password.equals(confirm)) {
-				if (DatabaseAccess.getUserForName(username) == null) {
+				if (DatabaseAccess.getUserForNameOrEmail(username) == null) {
 					User newUser = new User(username, password, email);
 					if (newUser.insert()) {
 						HttpSession session = request.getSession();
@@ -49,7 +53,7 @@ public class LoginManager extends HttpServlet {
 						dispatcher.forward(request, response);
 					}
 				} else {
-					messages.add("Username Is Already Taken");
+					messages.add("Username is already taken or Email has already been used");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
 				}
@@ -59,7 +63,7 @@ public class LoginManager extends HttpServlet {
 				dispatcher.forward(request, response);
 			}
 		} else if (formType.equals("login")) {
-			User activeUser = DatabaseAccess.getUserForName(username);
+			User activeUser = DatabaseAccess.getUserForNameOrEmail(username);
 			if (activeUser == null) {
 				messages.add("User could not be retrieved from DB");
 				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
@@ -71,7 +75,7 @@ public class LoginManager extends HttpServlet {
 					HttpSession session = request.getSession();
 					DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
 					session.setAttribute("uid", activeUser.getId());
-					session.setAttribute("username", username);
+					session.setAttribute("username", activeUser.getUsername());
 					Object from = session.getAttribute("loginFrom");
 					if (from != null && ! ((String) from).endsWith(".ico")
 							&& ! ((String) from).endsWith(".css")
@@ -90,26 +94,26 @@ public class LoginManager extends HttpServlet {
 
 	public String getClientIpAddress(HttpServletRequest request) {
 		String ip = request.getHeader("X-Forwarded-For");
-		System.out.println("X-Forwarded-For: " + ip);
+		logger.debug("X-Forwarded-For: " + ip);
 		if (invalidIP(ip)) {
 			ip = request.getHeader("Proxy-Client-IP");
-			System.out.println("Proxy-Client-IP: " + ip);
+			logger.debug("Proxy-Client-IP: " + ip);
 		}
 		if (invalidIP(ip)) {
 			ip = request.getHeader("WL-Proxy-Client-IP");
-			System.out.println("WL-Proxy-Client-IP: " + ip);
+			logger.debug("WL-Proxy-Client-IP: " + ip);
 		}
 		if (invalidIP(ip)) {
 			ip = request.getHeader("HTTP_CLIENT_IP");
-			System.out.println("HTTP_CLIENT_IP: " + ip);
+			logger.debug("HTTP_CLIENT_IP: " + ip);
 		}
 		if (invalidIP(ip)) {
 			ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-			System.out.println("HTTP_X_FORWARDED_FOR: " + ip);
+			logger.debug("HTTP_X_FORWARDED_FOR: " + ip);
 		}
 		if (invalidIP(ip)) {
 			ip = request.getRemoteAddr();
-			System.out.println("getRemoteAddr(): " + ip);
+			logger.debug("getRemoteAddr(): " + ip);
 		}
 		return ip;
 	}
