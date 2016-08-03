@@ -30,8 +30,15 @@ public class User {
 	}
 
 	public User(int id, String username, String password, String email) {
-		this(username, password, email);
+		this(id, username, password, email, false);
+	}
+
+	public User(int id, String username, String password, String email, boolean validated) {
 		this.id = id;
+		this.username = username;
+		this.password = password;
+		this.email = email;
+		this.validated = validated;
 	}
 
 	public boolean insert() {
