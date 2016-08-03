@@ -82,7 +82,7 @@ public class MultiplayerGameManager extends HttpServlet {
 				if (newTest == null) {
 					messages.add(TEST_INVALID_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect("multiplayer/play");
+					response.sendRedirect("play");
 					return;
 				}
 
