@@ -4,6 +4,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.ConditionalExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.stmt.*;
@@ -84,6 +85,15 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 	{
 		super.visit(stmt,args);
 		logger.info("Invalid test contains an IfStmt statement");
+		isValid = false;
+		return stmt;
+	}
+
+	@Override
+	public Node visit (ConditionalExpr stmt, Object args)
+	{
+		super.visit(stmt,args);
+		logger.info("Invalid test contains a conditional statement: " + stmt.toString());
 		isValid = false;
 		return stmt;
 	}
