@@ -76,7 +76,7 @@
             messages.add("Flagged " + equivCounter + " mutants as equivalent");
             mutantsAlive = mg.getAliveMutants();
 
-            response.sendRedirect("multiplayer/play");
+            response.sendRedirect("play");
 
         } catch (NumberFormatException e){}
     } else if (role.equals(Role.ATTACKER) && request.getParameter("acceptEquiv") != null){
