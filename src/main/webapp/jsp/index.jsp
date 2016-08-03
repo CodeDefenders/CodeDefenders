@@ -9,7 +9,7 @@
 		<p><img style="margin-top:20px" src="images/schema.jpeg" class="img-responsive displayed"/></p>
 		<p class="text-muted" style="font-size:small;">
 			Developed at The University of Sheffield <br />Supported by the <a href="https://www.sheffield.ac.uk/sure">SURE (Sheffield Undergraduate Research Experience)</a> scheme <br />
-			<b>Important note:</b> Internet Explorer not currently supported.
+			<b>Important note:</b> Internet Explorer and Safari are not currently supported.
 		</p>
 	</div>
 <%@ include file="/jsp/footer_logout.jsp" %>
