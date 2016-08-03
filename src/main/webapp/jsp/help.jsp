@@ -4,9 +4,8 @@
 
 <div style="padding: 0px 16px 0px 16px">
 	<h1>Help</h1>
-	<div style="padding: 0px 16px 0px 16px">
-		<p>Code Defenders pits two teams against each other on a Java class. Attackers must create mutants in the code, whilst Defenders write unit tests to catch (kill) these changes to the code.</p>
-
+	<p style="margin-left: 16px">Code Defenders pits two teams against each other on a Java class. Attackers must create mutants in the code, whilst Defenders write unit tests to catch (kill) these changes to the code.</p>
+	<div style="padding: 0px 16px 0px 16px" class="help-main-div">
 		<h2>Defenders</h2>
 		<p>At the top of the page, there are two panels. On the left is the original Class Under Test (CUT), and on the right there is a panel to write a new test, along with a &#34;Defend!&#34; button which submits the test.</p>
 		<p><img style="margin-top:16px" src="images/help/defend_01.png" class="img-responsive"/></p>
