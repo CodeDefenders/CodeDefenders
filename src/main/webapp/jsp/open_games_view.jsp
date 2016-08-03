@@ -142,7 +142,7 @@
 			<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
 			<td class="col-sm-1"><%= g.getPrize() %></td>
 			<td class="col-sm-1"><%int attackers = g.getAttackerIds().length; %><%=attackers %> of <%=g.getMinAttackers()%>&ndash;<%=g.getAttackerLimit()%></td>
-			<td class="col-sm-1"><%int defenders = g.getAttackerIds().length; %><%=defenders %> of <%=g.getMinDefenders()%>&ndash;<%=g.getDefenderLimit()%></td>
+			<td class="col-sm-1"><%int defenders = g.getDefenderIds().length; %><%=defenders %> of <%=g.getMinDefenders()%>&ndash;<%=g.getDefenderLimit()%></td>
 			<td class="col-sm-1"><%= g.getLevel().name() %></td>
 			<td class="col-sm-1"><%= g.getStartDateTime() %></td>
 			<td class="col-sm-1"><%= g.getFinishDateTime() %></td>
