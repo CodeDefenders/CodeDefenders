@@ -56,6 +56,8 @@
 
     HashMap<Integer, ArrayList<Mutant>> mutantKilledLines = new HashMap<Integer, ArrayList<Mutant>>();
 
+    ArrayList<Mutant> mutantsPending = new ArrayList<Mutant>(); // assume no pending tasks
+
     if (role.equals(Role.DEFENDER) && request.getParameter("equivLine") != null &&
             (mg.getState().equals(AbstractGame.State.ACTIVE) || mg.getState().equals(AbstractGame.State.GRACE_ONE))){
         try {
