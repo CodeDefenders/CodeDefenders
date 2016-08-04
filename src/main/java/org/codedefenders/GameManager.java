@@ -163,9 +163,8 @@ public class GameManager extends HttpServlet {
 					if(activeGame.getMode().equals(Game.Mode.SINGLE)) {
 						//Singleplayer - use automatic system.
 						if(AntRunner.potentialEquivalent(mutantClaimed)) {
-							//Is potentially equiv - mark as equivalent and update.
-							mutantClaimed.setEquivalent(Mutant.Equivalence.DECLARED_YES);
-							mutantClaimed.kill();
+							//Is potentially equiv - accept as equivalent
+							mutantClaimed.kill(Mutant.Equivalence.DECLARED_YES);
 						} else {
 							mutantClaimed.setEquivalent(Mutant.Equivalence.PROVEN_NO);
 							mutantClaimed.update();

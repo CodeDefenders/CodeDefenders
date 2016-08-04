@@ -147,7 +147,7 @@ public class Mutant {
 	}
 
 	public void kill() {
-		kill(Equivalence.PROVEN_NO);
+		kill(equivalent);
 	}
 
 	public void kill(Equivalence equivalent) {
@@ -182,17 +182,18 @@ public class Mutant {
 	}
 
 	public int getDefenderPoints() {
-		if (! alive) {
-			if (classFile == null) // non-compilable
+		if (! alive && classFile != null) {
+			if (equivalent.equals(Equivalence.ASSUMED_NO) || equivalent.equals(Equivalence.DECLARED_YES)) {
+				return 1; // accepted equivalent
+			} else if (equivalent.equals(Equivalence.ASSUMED_YES)) {
+				return 2; // claimed, rejected, test did not kill it
+			} else {
+				// claimed, rejected, test killed it
 				return 0;
-			if (equivalent.equals(Equivalence.DECLARED_YES)) // accepted equivalent
-				return 1;
-			if (equivalent.equals(Equivalence.ASSUMED_YES)) // claimed, rejected, test did not kill it
-				return 2;
-			if (equivalent.equals(Equivalence.PROVEN_NO)) // claimed, rejected, test killed it
-				return 0;
-			return 0;
+			}
+
 		}
+		logger.info("Mutant " + getId() + " contributes 0 defender points (alive or non-compilable)");
 		return 0;
 	}
 
