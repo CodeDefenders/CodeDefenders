@@ -61,7 +61,7 @@ public class CodeValidator {
 				return false;
 			}
 			// forbid if, while, for, and system calls, and ?: operator
-			String regex = "(?:(?:if|while|for)\\s*\\(.*|[\\s\\;\\{\\(\\)]System\\.|^System\\.|\\\\?.*\\\\:)";
+			String regex = "(?:(?:if|while|for)\\s*\\(.*|[\\s\\;\\{\\(\\)]System\\.|^System\\.|\\?.*\\:)";
 			Pattern p = Pattern.compile(regex);
 			return ! p.matcher(diff2).find();
 		}
