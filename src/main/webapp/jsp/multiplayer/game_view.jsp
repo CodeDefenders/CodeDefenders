@@ -52,6 +52,8 @@
 
     ArrayList<Mutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();
 
+    ArrayList<Mutant> mutantsPending = mg.getMutantsMarkedEquivalentPending();
+
     HashMap<Integer, ArrayList<Mutant>> mutantLines = new HashMap<Integer, ArrayList<Mutant>>();
 
     HashMap<Integer, ArrayList<Mutant>> mutantKilledLines = new HashMap<Integer, ArrayList<Mutant>>();
@@ -85,7 +87,7 @@
 
             Mutant equiv = null;
 
-            for (Mutant m : mutantsEquiv){
+            for (Mutant m : mutantsPending){
                 if (m.getPlayerId() == playerId &&  m.getId() == mutId
                         && m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){
                     m.setEquivalent(Mutant.Equivalence.DECLARED_YES);
@@ -108,7 +110,7 @@
         }
     }
 
-    for (Mutant m : mg.getMutantsMarkedEquivalentPending()){
+    for (Mutant m : mutantsPending){
         mutantsAlive.add(m);
     }
 

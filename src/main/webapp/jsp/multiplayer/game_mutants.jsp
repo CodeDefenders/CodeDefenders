@@ -6,7 +6,7 @@
 if (role == Role.ATTACKER && true){
     Mutant equiv = null;
 
-    for (Mutant m : mutantsEquiv){
+    for (Mutant m : mutantsPending){
         if (m.getPlayerId() == playerId &&  m.getEquivalent() == Mutant.Equivalence.PENDING_TEST){
             renderMutants = false;
             equiv = m;
