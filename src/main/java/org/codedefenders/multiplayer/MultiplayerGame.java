@@ -165,7 +165,18 @@ public class MultiplayerGame extends AbstractGame {
 	public ArrayList<Mutant> getMutantsMarkedEquivalent() {
 		ArrayList<Mutant> equivMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
-			if (!m.getEquivalent().equals(ASSUMED_NO) && !m.getEquivalent().equals(PROVEN_NO)) {
+			if (!m.getEquivalent().equals(ASSUMED_NO) && !m.getEquivalent().equals(PROVEN_NO)
+					&& !m.getEquivalent().equals(PENDING_TEST)) {
+				equivMutants.add(m);
+			}
+		}
+		return equivMutants;
+	}
+
+	public ArrayList<Mutant> getMutantsMarkedEquivalentPending() {
+		ArrayList<Mutant> equivMutants = new ArrayList<>();
+		for (Mutant m : getMutants()) {
+			if (m.getEquivalent().equals(PENDING_TEST)) {
 				equivMutants.add(m);
 			}
 		}
@@ -377,6 +388,10 @@ public class MultiplayerGame extends AbstractGame {
 			allMutants.add(mm);
 		}
 
+		for (Mutant mm : getMutantsMarkedEquivalentPending()){
+			allMutants.add(mm);
+		}
+
 
 		if (!mutantScores.containsKey(-1)){
 			mutantScores.put(-1, new PlayerScore(-1));
@@ -386,7 +401,6 @@ public class MultiplayerGame extends AbstractGame {
 		}
 
 		for (Mutant mm : allMutants){
-
 
 			if (!mutantScores.containsKey(mm.getPlayerId())){
 				mutantScores.put(mm.getPlayerId(), new PlayerScore(mm.getPlayerId()));
@@ -408,6 +422,7 @@ public class MultiplayerGame extends AbstractGame {
 				mutantsEquiv.put(mm.getPlayerId(), mutantsEquiv.get(mm.getPlayerId())+1);
 				mutantsEquiv.put(-1, mutantsEquiv.get(-1)+1);
 			} else if (mm.isAlive()){
+				//This includes mutants marked equivalent
 				mutantsAlive.put(mm.getPlayerId(), mutantsAlive.get(mm.getPlayerId())+1);
 				mutantsAlive.put(-1, mutantsAlive.get(-1)+1);
 			} else {

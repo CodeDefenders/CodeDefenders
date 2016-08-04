@@ -1,5 +1,6 @@
 <%@ page import="org.codedefenders.Game" %>
 <%@ page import="org.codedefenders.Role" %>
+<%@ page import="org.codedefenders.Mutant" %>
 <div class="ws-12 up" id="mutants-div">
 <%
 if (role == Role.ATTACKER && true){
@@ -102,12 +103,15 @@ if (role == Role.ATTACKER && true){
 								<p><%=change%><p>
 								<% } %></td>
 							<td class="col-sm-1">
-								<% if (role.equals(Role.DEFENDER)){ %>
+								<% if (role.equals(Role.DEFENDER) && m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)){ %>
 									<a href="multiplayer/play?equivLine=<%=m.getLines()[0]%>"
 									 class="btn btn-default btn-diff"
 								     onclick="return confirm('This will mark all mutants on line <%=m.getLines()[0]%> as equivalent. Are you sure?');">
 										Claim Equivalent</a>
-								<% } %>
+								<% }
+								if (m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){
+									%><span>Flagged Equivalent</span><%
+								}%>
 								<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){ %>
 									<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 								<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"

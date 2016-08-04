@@ -108,6 +108,10 @@
         }
     }
 
+    for (Mutant m : mg.getMutantsMarkedEquivalentPending()){
+        mutantsAlive.add(m);
+    }
+
 
     ArrayList<Mutant> mutantsKilled = mg.getKilledMutants();
 
