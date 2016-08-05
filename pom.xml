@@ -58,6 +58,7 @@
 					<password>***REMOVED***</password>
 					<path>/</path>
 					<ignorePackaging>true</ignorePackaging>
+					<contextReloadable>true</contextReloadable>
 				</configuration>
 			</plugin>
 		</plugins>
