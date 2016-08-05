@@ -51,7 +51,20 @@
     <script src="codemirror/lib/codemirror.js" type="text/javascript" ></script>
     <script src="codemirror/mode/clike/clike.js" type="text/javascript" ></script>
     <script src="codemirror/mode/diff/diff.js" type="text/javascript" ></script>
+    <script src="codemirror/addon/dialog/dialog.js" type="text/javascript" ></script>
+    <script src="codemirror/addon/search/searchcursor.js" type="text/javascript" ></script>
+    <script src="codemirror/addon/search/search.js" type="text/javascript" ></script>
+    <script src="codemirror/addon/scroll/annotatescrollbar.js" type="text/javascript" ></script>
+    <script src="codemirror/addon/search/matchesonscrollbar.js" type="text/javascript" ></script>
+    <script src="codemirror/addon/search/jump-to-line.js" type="text/javascript" ></script>
+
     <link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
+    <!-- <link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" > -->
+    <link href="codemirror/addon/dialog/dialog.css" rel="stylesheet" type="text/css" >
+    <link href="codemirror/addon/search/matchesonscrollbar.css" rel="stylesheet" type="text/css" >
+
+
+
 
     <!-- MultiplayerGame -->
     <link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
