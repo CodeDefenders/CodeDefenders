@@ -1,5 +1,6 @@
 package org.codedefenders;
 
+import org.codedefenders.singleplayer.SinglePlayerGame;
 import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -211,6 +212,10 @@ public class GameManager extends HttpServlet {
 								activeGame.update();
 							} else {
 								activeGame.endTurn();
+								SinglePlayerGame g = (SinglePlayerGame) activeGame;
+								if (g.getAi().makeTurn()) {
+									messages.add("The AI has created a test!");
+								}
 							}
 						} else {
 							activeGame.endTurn();
@@ -251,6 +256,12 @@ public class GameManager extends HttpServlet {
 						MutationTester.runTestOnAllMutants(activeGame, newTest, messages);
 						activeGame.endTurn();
 						activeGame.update();
+						if(activeGame.getMode().equals(AbstractGame.Mode.SINGLE)) {
+							SinglePlayerGame g = (SinglePlayerGame) activeGame;
+							if (g.getAi().makeTurn()) {
+								messages.add("The AI has created a mutant!");
+							}
+						}
 					} else {
 						// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
 						messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
@@ -264,16 +275,7 @@ public class GameManager extends HttpServlet {
 				}
 				break;
 		}
-		if(activeGame.getMode().equals(Game.Mode.SINGLE)) {
-			//Singleplayer game, show messages depending on state.
-			if(activeGame.getAttackerId() == uid) {
-				//Player attacker
-				messages.add("The AI has created a test!");
-			} else {
-				//Player defender
-				messages.add("The AI has created a mutant!");
-			}
-		}
+
 		response.sendRedirect("play");//doGet(request, response);
 	}
 

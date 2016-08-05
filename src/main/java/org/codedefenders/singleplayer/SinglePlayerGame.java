@@ -31,6 +31,10 @@ public class SinglePlayerGame extends Game {
 		setState(State.ACTIVE);
 	}
 
+	public AiPlayer getAi() {
+		return ai;
+	}
+
 	public SinglePlayerGame(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, State state, Level level, Mode mode) {
 		super(id, attackerId, defenderId, classId, currentRound, finalRound, activeRole, state, level, mode);
 		//Set ai's role
@@ -61,7 +65,7 @@ public class SinglePlayerGame extends Game {
 		}
 
 		//Make the ai's turn
-		ai.makeTurn();
+		//ai.makeTurn();
 		update();
 	}
 }
