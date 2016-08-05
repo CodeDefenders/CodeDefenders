@@ -28,6 +28,7 @@ public class AiDefender extends AiPlayer {
 	public boolean turnHard() {
 		//Choose test which kills a high number of generated mutants.
 		return runTurn(GenerationMethod.COVERAGE);
+		//return runTurn(GenerationMethod.KILLCOUNT);
 	}
 
 	public boolean turnEasy() {
