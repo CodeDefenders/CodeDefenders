@@ -127,4 +127,12 @@ public class CodeValidatorTest {
 		String mutant = "if (x >= 0) { System.currentTimeMillis(); return x; } else return -x;";
 		assertFalse(validMutant(orig, mutant));
 	}
+
+	@Test
+	public void testValidWithString() {
+		String orig = "if (!isHierachic(path))";
+		String mutant = "if (!isHierachic(\"test.value\"))"; // raises com.github.javaparser.TokenMgrException
+		assertTrue(validMutant(orig, mutant));
+	}
+
 }

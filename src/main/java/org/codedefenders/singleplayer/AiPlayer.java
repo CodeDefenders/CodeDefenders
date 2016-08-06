@@ -26,13 +26,15 @@ public class AiPlayer {
 	/**
 	 * Make the AI's turn if it is its turn.
 	 */
-	public void makeTurn() {
+	public boolean makeTurn() {
+		boolean success = false;
 		if (game.getActiveRole().equals(role)) {
 			for (int i = 0; i < 3; i++) {
-				if (tryTurn()) { break; }
+				if (tryTurn()) { success = true; break; }
 			}
 			game.endTurn();
 		}
+		return success;
 	}
 
 	public boolean tryTurn() {

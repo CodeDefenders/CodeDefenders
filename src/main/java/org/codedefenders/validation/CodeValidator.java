@@ -2,6 +2,7 @@ package org.codedefenders.validation;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
+import com.github.javaparser.TokenMgrError;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import org.apache.commons.io.FileUtils;
@@ -49,10 +50,10 @@ public class CodeValidator {
 			MutationVisitor visitor = new MutationVisitor();
 			visitor.visit(blockStmt, null);
 			return visitor.isValid();
-		} catch (ParseException e) {
+		} catch (ParseException|TokenMgrError e) {
 			// diff did not compile as a block, let's try some regex
 			// TODO: there must be a better way of doing this
-			logger.warn("Swallowing ParseException");
+			logger.warn("Swallowing ParseException|TokenMgrError");
 			// remove whitespaces
 			String diff2 = diff.replaceAll("\\s+","");
 			// forbid logical operators unless they appear on their own (LOR)
@@ -61,7 +62,7 @@ public class CodeValidator {
 				return false;
 			}
 			// forbid if, while, for, and system calls, and ?: operator
-			String regex = "(?:(?:if|while|for)\\s*\\(.*|[\\s\\;\\{\\(\\)]System\\.|^System\\.|\\\\?.*\\\\:)";
+			String regex = "(?:(?:if|while|for)\\s*\\(.*|[\\s\\;\\{\\(\\)]System\\.|^System\\.|\\?.*\\:)";
 			Pattern p = Pattern.compile(regex);
 			return ! p.matcher(diff2).find();
 		}

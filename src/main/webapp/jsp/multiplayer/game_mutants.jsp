@@ -33,11 +33,12 @@ if (role == Role.ATTACKER && true){
 									request.getSession().removeAttribute("previousTest");
 									if (mutPreviousTestCode != null) {
 										mutTestCode = mutPreviousTestCode;
-									} else
-										mutTestCode = mg.getCUT().getTestTemplate();
-										%>
+									} else {
+										String equivText = "/**\n * " + equiv.getPatchString().replace("\n", "\n * ").trim() + "\n */\n";
+										mutTestCode = equivText + mg.getCUT().getTestTemplate();
+									}
+					%>
 					<pre><textarea id="mutantSut" name="test" cols="80" rows="30">
-<%= "/**\n * " + equiv.getPatchString().replace("\n", "\n * ").trim() + "\n */\n"%>
 <%= mutTestCode %>
 					</textarea></pre>
 					<div class="crow fly">
