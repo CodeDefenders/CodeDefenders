@@ -10,7 +10,7 @@
 
         <h2>Class Under Test</h2>
 		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30">
-			<%=mg.getCUT().getAsString()%>
+<%=mg.getCUT().getAsString()%>
 		</textarea></pre>
 
         <div class="admin-panel">
