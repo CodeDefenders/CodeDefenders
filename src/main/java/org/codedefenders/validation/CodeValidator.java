@@ -68,7 +68,7 @@ public class CodeValidator {
 		}
 	}
 
-	public static boolean validTestCode(String javaFile) throws IOException {
+	public static boolean validTestCode(String javaFile) {
 		CompilationUnit cu = getCompilationUnit(javaFile);
 		if (cu == null)
 			return false;
