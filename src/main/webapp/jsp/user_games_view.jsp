@@ -111,7 +111,7 @@
 		<tr>
 			<th>Game ID</th>
 			<th>Class</th>
-			<th>Prize</th>
+			<!--<th>Prize</th>-->
 			<th>Attackers</th>
 			<th>Defenders</th>
 			<th>Level</th>
@@ -155,7 +155,7 @@
 				</div>
 			</div>
 		</td>
-		<td class="col-sm-1"><%= g.getPrize() %></td>
+		<!--<td class="col-sm-1"><%/*= g.getPrize() */%></td>-->
 		<td class="col-sm-1"><%= g.getAttackerIds().length %></td>
 		<td class="col-sm-1"><%= g.getDefenderIds().length %></td>
 		<td class="col-sm-1"><%= g.getLevel().name() %></td>

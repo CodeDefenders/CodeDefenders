@@ -1,6 +1,3 @@
-<%@ page import="java.text.SimpleDateFormat" %>
-<%@ page import="java.text.DateFormat" %>
-
 <%@ page import="org.joda.time.format.DateTimeFormat" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="org.joda.time.DateTime" %>
