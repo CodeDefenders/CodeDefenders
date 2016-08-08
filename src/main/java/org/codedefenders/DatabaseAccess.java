@@ -980,21 +980,19 @@ public class DatabaseAccess {
 				String lcs = rs.getString("Lines_Covered");
 				String lucs = rs.getString("Lines_Uncovered");
 				if (lcs != null && lucs != null && lcs.length() > 0 && lucs.length() > 0) {
-					String[] covered = lcs.split(",");
-					String[] uncovered = lucs.split(",");
-					Integer[] cov = new Integer[covered.length];
-					Integer[] uncov = new Integer[uncovered.length];
-					for (int i = 0; i < covered.length; i++) {
-						cov[i] = Integer.parseInt(covered[i]);
+					ArrayList<Integer> covered = new ArrayList<>();
+					ArrayList<Integer> uncovered = new ArrayList<>();
+					for (String s : lcs.split(",")) {
+						covered.add(Integer.parseInt(s));
 					}
-					for (int i = 0; i < uncovered.length; i++) {
-						uncov[i] = Integer.parseInt(uncovered[i]);
+					for (String s : lucs.split(",")) {
+						uncovered.add(Integer.parseInt(s));
 					}
 
 					LineCoverage lc = new LineCoverage();
 
-					lc.setLinesUncovered(uncov);
-					lc.setLinesCovered(cov);
+					lc.setLinesUncovered(uncovered);
+					lc.setLinesCovered(covered);
 
 					newTest.setLineCoverage(lc);
 

@@ -13,7 +13,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Map;
@@ -105,6 +104,10 @@ public class AntRunner {
 		//TODO: Maybe getBaseName() not getName()
 		String className = cut.getName();
 		String[] resultArray = runAntTarget("test-original", null, dir.getAbsolutePath(), cut, t.getFullyQualifiedClassName());
+
+		// add coverage information
+		t.setLineCoverage(getLinesCovered(t, cut));
+		t.update();
 
 		// If the test doesn't return failure
 		if (resultArray[0].toLowerCase().contains("failures: 0")) {
@@ -368,21 +371,7 @@ public class AntRunner {
 	 * @param c A {@link GameClass} object
 	 * @return A {@link TargetExecution} object
 	 */
-	public static LineCoverage getLinesCovered(Test t, GameClass c) {
-		logger.debug("Running test {} on class {}", t.getId(), c.getName());
-		String[] resultArray = runAntTarget("test-original", null, t.getFolder(), c, t.getFullyQualifiedClassName());
-
-
-		//String[] results2 = processJacoco(context,  t.getFolder());
-
-		for (String s :resultArray){
-			System.out.println(s);
-		}
-
-//		for (String s : results2){
-//			System.out.println(s);
-//		}
-
+	private static LineCoverage getLinesCovered(Test t, GameClass c) {
 		CoverageGenerator cg = new CoverageGenerator(
 				new File(t.getFolder()),
 				new File(Constants.CUTS_DIR + F_SEP + c.getAlias()));
@@ -393,26 +382,9 @@ public class AntRunner {
 			e.printStackTrace();
 		}
 
-		ArrayList<Integer> linesCovered = cg.getLinesCovered();
-
-		Integer[] r = new Integer[linesCovered.size()];
-
-		linesCovered.toArray(r);
-
 		LineCoverage lc = new LineCoverage();
-
-		lc.setLinesCovered(r);
-
-		ArrayList<Integer> linesUncovered = cg.getLinesUncovered();
-
-		r = new Integer[linesUncovered.size()];
-
-		linesUncovered.toArray(r);
-
-		lc.setLinesUncovered(r);
-
-		System.out.println(lc.toString());
-
+		lc.setLinesCovered(cg.getLinesCovered());
+		lc.setLinesUncovered(cg.getLinesUncovered());
 		return lc;
 	}
 

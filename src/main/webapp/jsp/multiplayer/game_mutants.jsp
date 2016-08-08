@@ -105,9 +105,9 @@ if (role == Role.ATTACKER && true){
 								<% } %></td>
 							<td class="col-sm-1">
 								<% if (role.equals(Role.DEFENDER) && m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)){ %>
-									<a href="multiplayer/play?equivLine=<%=m.getLines()[0]%>"
+									<a href="multiplayer/play?equivLine=<%=m.getLines().get(0)%>"
 									 class="btn btn-default btn-diff"
-								     onclick="return confirm('This will mark all mutants on line <%=m.getLines()[0]%> as equivalent. Are you sure?');">
+								     onclick="return confirm('This will mark all mutants on line <%=m.getLines().get(0)%> as equivalent. Are you sure?');">
 										Claim Equivalent</a>
 								<% }
 								if (m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){

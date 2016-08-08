@@ -1,13 +1,10 @@
 package org.codedefenders;
 
-import com.sun.org.apache.xpath.internal.operations.Mult;
-import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.scoring.Scorer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.ServletContext;
 import java.util.ArrayList;
 
 import static org.codedefenders.Constants.*;
@@ -46,10 +43,6 @@ public class MutationTester {
 			}
 
 		}
-		// coverage information
-		LineCoverage lc = AntRunner.getLinesCovered(test, game.getCUT());
-		test.setLineCoverage(lc);
-		test.update();
 	}
 
 	public static void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages) {
@@ -58,42 +51,32 @@ public class MutationTester {
 		mutants.addAll(game.getMutantsMarkedEquivalentPending());
 		ArrayList<Mutant> killedMutants = new ArrayList<Mutant>();
 		for (Mutant mutant : mutants) {
-			boolean k = testVsMultiplayerMutant(game, test, mutant);
-			if (k){
+			if (testVsMutant(test, mutant)){
 				killed++;
 				killedMutants.add(mutant);
 			}
 		}
 
-		ArrayList<Test> tests = new ArrayList<Test>();
-		tests.add(test);
-
-		LineCoverage lineCov = AntRunner.getLinesCovered(test, game.getCUT());
-		test.setLineCoverage(lineCov);
-
-
-
-		for (Mutant mm : mutants){
-			if (mm.isAlive()){
+		for (Mutant mutant : mutants){
+			if (mutant.isAlive()){
 				ArrayList<Test> missedTests = new ArrayList<Test>();
 
-				for (Test t : tests){
-					for (int lm : mm.getLines()){
-						boolean found = false;
-						for (int lc : t.getLineCoverage().getLinesCovered()){
-							if (lc == lm){
-								found = true;
-								missedTests.add(t);
-							}
-						}
-						if (found){
-							break;
+				for (int lm : mutant.getLines()){
+					boolean found = false;
+					for (int lc : test.getLineCoverage().getLinesCovered()){
+						if (lc == lm){
+							found = true;
+							missedTests.add(test);
 						}
 					}
+					if (found){
+						break;
+					}
 				}
-				mm.setScore(Scorer.score(game, mm, missedTests));
 
-				mm.update();
+				mutant.setScore(Scorer.score(game, mutant, missedTests));
+
+				mutant.update();
 			}
 		}
 
@@ -140,7 +123,7 @@ public class MutationTester {
 		ArrayList<Test> tests = game.getExecutableTests();
 		for (Test test : tests) {
 			// If this mutant/test pairing hasnt been run before and the test might kill the mutant
-			if (testVsMultiplayerMutant(game, test, mutant)) {
+			if (testVsMutant(test, mutant)) {
 				messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
 				ArrayList<Mutant> mlist = new ArrayList<Mutant>();
 				mlist.add(mutant);
@@ -198,33 +181,13 @@ public class MutationTester {
 		return false;
 	}
 
-	private static boolean testVsMultiplayerMutant(MultiplayerGame g, Test test, Mutant mutant) {
-		if (DatabaseAccess.getTargetExecutionForPair(test.getId(), mutant.getId()) == null) {
-			// Run the test against the mutant and get the result
-			TargetExecution executedTarget = AntRunner.testMutant(mutant, test);
-
-			// If the test did NOT pass, the mutant was detected and should be killed.
-			if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
-				System.out.println(String.format("Test %d kills Mutant %d", test.getId(), mutant.getId()));
-				mutant.kill();
-				ArrayList<Mutant> mlist = new ArrayList<Mutant>();
-
-				mlist.add(mutant);
-				test.killMutant();
-				return true;
-			}
-		} else
-			System.err.println(String.format("No execution result found for (m: %d,t: %d)", mutant.getId(), test.getId()));
-		return false;
-	}
-
 	// RUN EQUIVALENCE TEST: Runs an equivalence test using an attacker supplied test and a mutant thought to be equivalent
 
 	// Inputs: Attacker created test and a mutant to run it on
 	// Outputs: None
 
 	public static void runEquivalenceTest(Test test, Mutant mutant) {
-		logger.info("Running equivalence test.");
+		logger.info("Running equivalence test for test {} and mutant {}.", test.getId(), mutant.getId());
 		// The test created is new and was made by the attacker (there is no need to check if the mutant/test pairing has been run already)
 
 		// As a result of this test, either the test the attacker has written kills the mutant or doesnt.

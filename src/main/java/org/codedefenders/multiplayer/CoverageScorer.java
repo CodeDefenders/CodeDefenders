@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class CoverageScorer extends Scorer {
     @Override
     protected int scoreTest(MultiplayerGame g, Test t, ArrayList<Mutant> killed) {
-        return (g.getDefenderValue() + killed.size()) * t.getLineCoverage().getLinesCovered().length;
+        return (g.getDefenderValue() + killed.size()) * t.getLineCoverage().getLinesCovered().size();
     }
 
     @Override

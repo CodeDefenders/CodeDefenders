@@ -14,9 +14,9 @@ public class CoverageScorer extends Scorer {
 
     @Override
     protected int scoreTest(MultiplayerGame g, Test t, ArrayList<Mutant> killed) {
-        int totalLines = t.getLineCoverage().getLinesCovered().length + t.getLineCoverage().getLinesUncovered().length;
+        int totalLines = t.getLineCoverage().getLinesCovered().size() + t.getLineCoverage().getLinesUncovered().size();
 
-        float percentCovered = t.getLineCoverage().getLinesCovered().length/(float)totalLines;
+        float percentCovered = t.getLineCoverage().getLinesCovered().size()/(float)totalLines;
 
         return killed.size() + (int)(g.getDefenderValue() * percentCovered);
     }

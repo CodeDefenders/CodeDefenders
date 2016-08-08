@@ -1,30 +1,30 @@
 package org.codedefenders.multiplayer;
 
-import javax.sound.sampled.Line;
+import java.util.ArrayList;
 
 /**
  * Created by thoma on 16/06/2016.
  */
 public class LineCoverage {
     public static LineCoverage NONE = new LineCoverage();
-    private Integer[] linesCovered = new Integer[0];
-    private Integer[] linesUncovered = new Integer[0];
+    private ArrayList<Integer> linesCovered = new ArrayList<>();
+    private ArrayList<Integer> linesUncovered = new ArrayList<>();
 
-    public void setLinesCovered (Integer[] lines){ linesCovered = lines; }
+    public void setLinesCovered (ArrayList<Integer> lines){ linesCovered = lines; }
 
-    public Integer[] getLinesCovered(){
+    public ArrayList<Integer> getLinesCovered(){
         return linesCovered;
     }
 
-    public Integer[] getLinesUncovered(){
+    public ArrayList<Integer> getLinesUncovered(){
         return linesUncovered;
     }
 
-    public void setLinesUncovered (Integer[] lines){
+    public void setLinesUncovered (ArrayList<Integer> lines){
         linesUncovered = lines;
     }
 
     public String toString(){
-        return "Covered: " + linesCovered.length + ", Uncovered: " + linesUncovered.length;
+        return "Covered: " + linesCovered.size() + ", Uncovered: " + linesUncovered.size();
     }
 }

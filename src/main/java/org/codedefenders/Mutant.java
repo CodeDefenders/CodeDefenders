@@ -48,7 +48,7 @@ public class Mutant {
 
 	private int score; // multiplayer
 
-	private int[] lines = null; // multiplayer
+	private ArrayList<Integer> lines = null; // multiplayer
 
 	/**
 	 * Creates a mutant
@@ -390,23 +390,23 @@ public class Mutant {
 		killedByAITests ++;
 	}
 
-	public int[] getLines() {
+	public ArrayList<Integer> getLines() {
 		if (lines != null){
 			return lines;
 		}
 		try {
 			List<String> ls = getHTMLReadout();
-			lines = new int[ls.size()];
+			lines = new ArrayList<>();
 			for (int i = 0; i < ls.size(); i++) {
 				String l = ls.get(i);
-				lines[i] = Integer.parseInt(l.split(":")[1].trim());
+				lines.add(Integer.parseInt(l.split(":")[1].trim()));
 			}
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		if (lines == null){
-			lines = new int[0];
+			lines = new ArrayList<>();
 		}
 
 		return lines;
