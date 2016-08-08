@@ -2,7 +2,9 @@ package org.codedefenders.singleplayer.automated.defender;
 
 import org.codedefenders.*;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +26,7 @@ public class EvoSuiteMaker {
 
 	public boolean makeSuite() {
 		AntRunner.generateTestsFromCUT(cut);
-		AntRunner.compileGenTestSuite(cut);
+		//AntRunner.compileGenTestSuite(cut);
 		//Need a dummy game to add test to.
 
 		ArrayList<String> testStrings = getTestStrings();
@@ -84,6 +86,45 @@ public class EvoSuiteMaker {
 
 		try {
 			FileManager.createIndexXML(dir, "TestsIndex", xml);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 *
+	 * @param time
+	 * @return
+     */
+	public boolean addTimeoutsToSuite(int time) {
+		List<String> orig = getTestSuiteLines();
+		String buf = "";
+
+		for(String l : orig) {
+			if(l.endsWith("@Test")) {
+				buf += "\t@Test(timeout = " + time + ")\n";
+			}
+			else {
+				buf += l + "\n";
+			}
+		}
+
+		String packageDir = cut.getPackage().replace(".", Constants.F_SEP);
+		String loc = AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias() +
+				F_SEP + packageDir + F_SEP + cut.getBaseName();
+		try {
+			FileWriter fw = new FileWriter(loc + "NewSuite");
+			fw.write(buf);
+			fw.close();
+
+			File oldfile = new File(loc + Constants.SUITE_EXT + Constants.JAVA_SOURCE_EXT);
+			File backupfile = new File(loc + "OldSuite");
+			File newfile = new File(loc + "NewSuite");
+
+			oldfile.renameTo(backupfile);
+			newfile.renameTo(oldfile);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;

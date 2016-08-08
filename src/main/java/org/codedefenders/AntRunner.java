@@ -80,15 +80,15 @@ public class AntRunner {
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
 		String suiteDir = AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias();
 
-		String[] resultArray = runAntTarget("test-mutant", m.getFolder(), suiteDir, cut, cut.getName() + "EvoSuiteTest");
+		String[] resultArray = runAntTarget("test-mutant", m.getFolder(), suiteDir, cut, cut.getName() + Constants.SUITE_EXT);
 		if (resultArray[0].toLowerCase().contains("failures: 0")) {
 		// If the test doesn't return failure
 			if (resultArray[0].toLowerCase().contains("errors: 0")) {
 			// If the test doesn't return any errors
-					// Test succeeded, so could be equivalent.
-					return true;
-				}
+				// Test succeeded, so could be equivalent.
+				return true;
 			}
+		}
 
 		return false;
 	}
@@ -272,8 +272,10 @@ public class AntRunner {
 	 * Compiles generated test suite
 	 * @param cut
 	 */
-	public static void compileGenTestSuite(final GameClass cut) {
-		String[] resultArray = runAntTarget("compile-gen-tests", null, null, cut, null);
+	public static boolean compileGenTestSuite(final GameClass cut) {
+		//TODO: Add check for failure
+		String[] resultArray = runAntTarget("compile-gen-tests", null, null, cut, cut.getName() + Constants.SUITE_EXT);
+		return true;
 	}
 
 	/**
