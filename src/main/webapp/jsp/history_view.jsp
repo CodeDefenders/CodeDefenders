@@ -59,7 +59,8 @@
 			<th>Game ID</th>
 			<th>Class</th>
 			<th>Owner</th>
-			<th>Prize</th>
+			<th>Attackers</th>
+			<th>Defenders</th>
 			<th>Level</th>
 			<th>Actions</th>
 		</tr>
@@ -79,7 +80,8 @@
 			<td class="col-sm-2"><%= g.getId() %></td>
 			<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
 			<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
-			<td class="col-sm-2"><%= g.getPrize() %></td>
+			<td class="col-sm-1"><%= g.getAttackerIds().length %></td>
+			<td class="col-sm-1"><%= g.getDefenderIds().length %></td>
 			<td class="col-sm-2"><%= g.getLevel().name() %></td>
 			<td class="col-sm-2">
 				<a href="multiplayer/history?id=<%= g.getId() %>">View Results</a>

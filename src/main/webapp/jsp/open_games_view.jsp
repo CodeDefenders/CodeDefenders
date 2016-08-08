@@ -96,7 +96,7 @@
 			<th>Game ID</th>
 			<th>Class</th>
 			<th>Owner</th>
-			<th>Prize</th>
+			<!--<th>Prize</th>-->
 			<th>Attackers</th>
 			<th>Defenders</th>
 			<th>Level</th>
@@ -140,7 +140,7 @@
 				</div>
 			</td>
 			<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
-			<td class="col-sm-1"><%= g.getPrize() %></td>
+			<!--<td class="col-sm-1"><%/*= g.getPrize() */%></td>-->
 			<td class="col-sm-1"><%int attackers = g.getAttackerIds().length; %><%=attackers %> of <%=g.getMinAttackers()%>&ndash;<%=g.getAttackerLimit()%></td>
 			<td class="col-sm-1"><%int defenders = g.getDefenderIds().length; %><%=defenders %> of <%=g.getMinDefenders()%>&ndash;<%=g.getDefenderLimit()%></td>
 			<td class="col-sm-1"><%= g.getLevel().name() %></td>
