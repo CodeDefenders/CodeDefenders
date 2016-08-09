@@ -38,9 +38,7 @@ if (role == Role.ATTACKER && true){
 										mutTestCode = equivText + mg.getCUT().getTestTemplate();
 									}
 					%>
-					<pre><textarea id="mutantSut" name="test" cols="80" rows="30">
-<%= mutTestCode %>
-					</textarea></pre>
+					<pre><textarea id="mutantSut" name="test" cols="80" rows="30"><%= mutTestCode %></textarea></pre>
 					<div class="crow fly">
 						<div>
 							<a class="btn btn-primary" href="multiplayer/play?acceptEquiv=<%= equiv.getId() %>">Accept Equivalence</a>
@@ -130,9 +128,7 @@ if (role == Role.ATTACKER && true){
 													<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
 												</div>
 												<div class="modal-body">
-													<pre class="readonly-pre"><textarea class="mutdiff" id="diff<%=m.getId()%>">
-															%><%=m.getPatchString()%>
-														</textarea></pre>
+													<pre class="readonly-pre"><textarea class="mutdiff" id="diff<%=m.getId()%>"><%=m.getPatchString()%></textarea></pre>
 												</div>
 												<div class="modal-footer">
 													<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
