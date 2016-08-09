@@ -1017,6 +1017,12 @@ public class DatabaseAccess {
 		return testList;
 	}
 
+	public static int getKillingTestIdForMut(int mid) {
+		String sql = String.format("SELECT * FROM targetexecutions WHERE Target='TEST_MUTANT' AND Status='FAIL' AND Mutant_ID='%d';", mid);
+		TargetExecution targ = getTargetExecutionSQL(sql);
+		return targ.testId;
+	}
+
 	public static TargetExecution getTargetExecutionForPair(int tid, int mid) {
 		String sql = String.format("SELECT * FROM targetexecutions WHERE Test_ID='%d' AND Mutant_ID='%d';", tid, mid);
 		return getTargetExecutionSQL(sql);
