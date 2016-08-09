@@ -94,13 +94,12 @@ if (role == Role.ATTACKER && true){
 				<div class="tab-pane fade active in" id="mutalivetab">
 					<table id="alive-mutants" class="mutant-table display dataTable table table-hover table-responsive table-paragraphs bg-white">
 						<% if (! mutantsAlive.isEmpty()) { %>
-						<thead>
+						<thead>  <!-- needed for datatable apparently -->
 						<tr>
-							<th>Mutant</th>
-							<th>Option</th>
+							<th></th>
+							<th></th>
 						</tr>
 						</thead>
-
 						<tbody>
 						<% for (Mutant m : mutantsAlive) { %>
 							<tr>
@@ -122,7 +121,7 @@ if (role == Role.ATTACKER && true){
 									<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){ %>
 										<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 									<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
-										 style="z-index: 10000; position: absolute;">
+										 style="z-index: 10000;">
 										<div class="modal-dialog">
 											<!-- Modal content-->
 											<div class="modal-content">
@@ -157,10 +156,10 @@ if (role == Role.ATTACKER && true){
 				<div class="tab-pane fade  bg-grey" id="mutkilledtab">
 					<table id="killed-mutants" class="mutant-table display dataTable table table-hover table-responsive table-paragraphs bg-white">
 						<% if (! mutantsKilled.isEmpty()) { %>
-						<thead>
+						<thead>  <!-- needed for datatable apparently -->
 						<tr>
-							<th>Mutant</th>
-							<th>Option</th>
+							<th></th>
+							<th></th>
 						</tr>
 						</thead>
 
@@ -175,7 +174,7 @@ if (role == Role.ATTACKER && true){
 							<td class="col-sm-1">
 								<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 								<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
-									 style="z-index: 10000; position: absolute;">
+									 style="z-index: 10000;">
 									<div class="modal-dialog">
 										<!-- Modal content-->
 										<div class="modal-content">
@@ -208,10 +207,10 @@ if (role == Role.ATTACKER && true){
 				<div class="tab-pane fade  bg-grey" id="mutequivtab">
 					<table id="equiv-mutants" class="mutant-table display dataTable table table-hover table-responsive table-paragraphs bg-white">
 						<% if (! mutantsEquiv.isEmpty()) { %>
-						<thead>
+						<thead>  <!-- needed for datatable apparently -->
 						<tr>
-							<th>Mutant</th>
-							<th>Option</th>
+							<th></th>
+							<th></th>
 						</tr>
 						</thead>
 
@@ -226,7 +225,7 @@ if (role == Role.ATTACKER && true){
 							<td class="col-sm-1">
 								<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 								<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
-									 style="z-index: 10000; position: absolute;">
+									 style="z-index: 10000;">
 									<div class="modal-dialog">
 										<!-- Modal content-->
 										<div class="modal-content">
