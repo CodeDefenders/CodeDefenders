@@ -12,7 +12,7 @@
 	<h3>Duels</h3>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
-		<th class="col-sm-1">Game ID</th>
+		<th class="col-sm-1">ID</th>
 		<th class="col-sm-2">Class</th>
 		<th class="col-sm-2">Attacker</th>
 		<th class="col-sm-2">Defender</th>
@@ -107,22 +107,26 @@
 	<hr />
 
 	<h3>Battlegrounds</h3>
-	<table class="table table-hover table-responsive table-paragraphs games-table">
-		<tr>
-			<th>Game ID</th>
-			<th>Class</th>
-			<!--<th>Prize</th>-->
-			<th>Attackers</th>
-			<th>Defenders</th>
-			<th>Level</th>
-			<th>Starting</th>
-			<th>Finishing</th>
-			<th>Actions</th>
-		</tr>
+	<table id="tableMPGames" class="table table-hover table-responsive table-paragraphs games-table">
+
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Class</th>
+				<!--<th>Prize</th>-->
+				<th>Attackers</th>
+				<th>Defenders</th>
+				<th>Level</th>
+				<th>Starting</th>
+				<th>Finishing</th>
+				<th>Actions</th>
+			</tr>
+		</thead>
 <%
 	ArrayList<MultiplayerGame> mgames = DatabaseAccess.getMultiplayerGamesForUser(uid);
 	if (mgames.isEmpty()) {
 %>
+	<tbody>
 <tr><td colspan="100%"> You are not currently playing any multiplayer game. </td></tr>
 <%
 } else {
@@ -204,10 +208,20 @@
 			} // for (MultiplayerGame g : games)
 		} // if (games.isEmpty())
 	%>
+	</tbody>
 </table>
 	<a href="/multiplayer/games/create">Create Battleground</a>
 
 	<script>
+		$(document).ready(function() {
+			$.fn.dataTable.moment( 'DD/MM/YY HH:mm' );
+			$('#tableMPGames').DataTable( {
+				"paging":   false,
+				"searching": false,
+				"order": [[ 5, "asc" ]]
+			} );
+		} );
+
 		$('.modal').on('shown.bs.modal', function() {
 			var codeMirrorContainer = $(this).find(".CodeMirror")[0];
 			if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {

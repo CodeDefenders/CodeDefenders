@@ -63,6 +63,11 @@
     <link href="codemirror/addon/dialog/dialog.css" rel="stylesheet" type="text/css" >
     <link href="codemirror/addon/search/matchesonscrollbar.css" rel="stylesheet" type="text/css" >
 
+    <!-- Table sorter -->
+    <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="js/moment.min.js"></script> <!-- must come before datetime-moment -->
+    <script type="text/javascript" src="js/datetime-moment.js"></script> <!-- must come after moment -->
+    <link href="css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
 
 
 
