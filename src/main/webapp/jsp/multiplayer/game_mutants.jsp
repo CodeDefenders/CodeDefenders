@@ -34,7 +34,7 @@ if (role == Role.ATTACKER && true){
 									if (mutPreviousTestCode != null) {
 										mutTestCode = mutPreviousTestCode;
 									} else {
-										String equivText = "/**\n * " + equiv.getPatchString().replace("\n", "\n * ").trim() + "\n */\n";
+										String equivText = "// " + equiv.getPatchString().replace("\n", "\n// ").trim() + "\n";
 										mutTestCode = equivText + mg.getCUT().getTestTemplate();
 									}
 					%>
