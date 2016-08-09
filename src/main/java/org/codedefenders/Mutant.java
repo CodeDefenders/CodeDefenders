@@ -225,6 +225,8 @@ public class Mutant {
 		List<String> unifiedPatches = DiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
 		StringBuilder unifiedPatch = new StringBuilder();
 		for (String s : unifiedPatches) {
+			if ("--- null".equals(s) || "+++ null".equals(s))
+				continue;
 			unifiedPatch.append(s + System.getProperty("line.separator"));
 		}
 		return unifiedPatch.toString();
