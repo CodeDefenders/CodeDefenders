@@ -92,68 +92,80 @@ if (role == Role.ATTACKER && true){
 			</div>
 			<div class="tab-content bg-grey">
 				<div class="tab-pane fade active in" id="mutalivetab">
-					<table class="table table-hover table-responsive table-paragraphs bg-white">
-						<%
-						if (! mutantsAlive.isEmpty()) {
-							for (Mutant m : mutantsAlive) {
-						%>
+					<table id="alive-mutants" class="display dataTable table table-hover table-responsive table-paragraphs bg-white">
+						<% if (! mutantsAlive.isEmpty()) { %>
+						<thead>
 						<tr>
-							<% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
-							<td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> [UID: <%= creator.getId() %>]</h4>
-								<% for (String change : m.getHTMLReadout()) { %>
-								<p><%=change%><p>
-								<% } %></td>
-							<td class="col-sm-1">
-								<% if (role.equals(Role.DEFENDER) && m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)){ %>
-									<a href="multiplayer/play?equivLine=<%=m.getLines().get(0)%>"
-									 class="btn btn-default btn-diff"
-								     onclick="return confirm('This will mark all mutants on line <%=m.getLines().get(0)%> as equivalent. Are you sure?');">
-										Claim Equivalent</a>
-								<% }
-								if (m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){
-									%><span>Flagged Equivalent</span><%
-								}%>
-								<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){ %>
-									<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
-								<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
-									 style="z-index: 10000; position: absolute;">
-									<div class="modal-dialog">
-										<!-- Modal content-->
-										<div class="modal-content">
-											<div class="modal-header">
-												<button type="button" class="close" data-dismiss="modal">&times;</button>
-												<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
-											</div>
-											<div class="modal-body">
-												<pre class="readonly-pre"><textarea class="mutdiff" id="diff<%=m.getId()%>">
-														%><%=m.getPatchString()%>
-													</textarea></pre>
-											</div>
-											<div class="modal-footer">
-												<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+							<th>Mutant</th>
+							<th>Option</th>
+						</tr>
+						</thead>
+
+						<tbody>
+						<% for (Mutant m : mutantsAlive) { %>
+							<tr>
+								<% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
+								<td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> [UID: <%= creator.getId() %>]</h4>
+									<% for (String change : m.getHTMLReadout()) { %>
+									<p><%=change%><p>
+									<% } %></td>
+								<td class="col-sm-1">
+									<% if (role.equals(Role.DEFENDER) && m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)){ %>
+										<a href="multiplayer/play?equivLine=<%=m.getLines().get(0)%>"
+										 class="btn btn-default btn-diff"
+										 onclick="return confirm('This will mark all mutants on line <%=m.getLines().get(0)%> as equivalent. Are you sure?');">
+											Claim Equivalent</a>
+									<% }
+									if (m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){
+										%><span>Flagged Equivalent</span><%
+									}%>
+									<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){ %>
+										<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
+									<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
+										 style="z-index: 10000; position: absolute;">
+										<div class="modal-dialog">
+											<!-- Modal content-->
+											<div class="modal-content">
+												<div class="modal-header">
+													<button type="button" class="close" data-dismiss="modal">&times;</button>
+													<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
+												</div>
+												<div class="modal-body">
+													<pre class="readonly-pre"><textarea class="mutdiff" id="diff<%=m.getId()%>">
+															%><%=m.getPatchString()%>
+														</textarea></pre>
+												</div>
+												<div class="modal-footer">
+													<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+												</div>
 											</div>
 										</div>
 									</div>
-								</div>
-								<% } %>
-							</td>
-						</tr>
-						<%
-							}
-						} else {%>
+									<% } %>
+								</td>
+							</tr>
+						<% } %>
+						</tbody>
+						<% } else {%>
 						<tr>
 							<td class="col-sm-1" colspan="2">No mutants alive.</td>
 						</tr>
-						<%}
-						%>
+						<% } %>
 					</table>
+
 				</div>
 				<div class="tab-pane fade  bg-grey" id="mutkilledtab">
-					<table class="table table-hover table-responsive table-paragraphs bg-white">
-						<%
-						if (! mutantsKilled.isEmpty()) {
-							for (Mutant m : mutantsKilled) {
-						%>
+					<table id="killed-mutants" class="display dataTable table table-hover table-responsive table-paragraphs bg-white">
+						<% if (! mutantsKilled.isEmpty()) { %>
+						<thead>
+						<tr>
+							<th>Mutant</th>
+							<th>Option</th>
+						</tr>
+						</thead>
+
+						<tbody>
+						<%	for (Mutant m : mutantsKilled) { %>
 						<tr>
 							<% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
 							<td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> [UID: <%= creator.getId() %>]</h4>
@@ -182,9 +194,9 @@ if (role == Role.ATTACKER && true){
 								</div>
 							</td>
 						</tr>
-						<%
-							}
-						} else {%>
+						<% } %>
+						</tbody>
+						<% } else {%>
 						<tr>
 							<td  class="col-sm-1" colspan="2">No mutants killed.</td>
 						</tr>
@@ -193,11 +205,17 @@ if (role == Role.ATTACKER && true){
 					</table>
 				</div>
 				<div class="tab-pane fade  bg-grey" id="mutequivtab">
-					<table class="table table-hover table-responsive table-paragraphs bg-white">
-						<%
-						if (! mutantsEquiv.isEmpty()) {
-							for (Mutant m : mutantsEquiv) {
-						%>
+					<table id="equiv-mutants" class="display dataTable table table-hover table-responsive table-paragraphs bg-white">
+						<% if (! mutantsEquiv.isEmpty()) { %>
+						<thead>
+						<tr>
+							<th>Mutant</th>
+							<th>Option</th>
+						</tr>
+						</thead>
+
+						<tbody>
+						<%	for (Mutant m : mutantsEquiv) { %>
 						<tr>
 							<% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
 							<td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> [UID: <%= creator.getId() %>]</h4>
@@ -226,9 +244,9 @@ if (role == Role.ATTACKER && true){
 								</div>
 							</td>
 						</tr>
-						<%
-							}
-						} else {%>
+						<% } %>
+						</tbody>
+						<% } else {%>
 						<tr>
 							<td class="col-sm-1">No mutants equivalent.</td>
 						</tr>
