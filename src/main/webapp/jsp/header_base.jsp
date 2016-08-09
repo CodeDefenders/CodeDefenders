@@ -68,6 +68,7 @@
     <script type="text/javascript" src="js/moment.min.js"></script> <!-- must come before datetime-moment -->
     <script type="text/javascript" src="js/datetime-moment.js"></script> <!-- must come after moment -->
     <link href="css/jquery.dataTables.min.css" rel="stylesheet" type="text/css" />
+    <link href="css/datatables-override.css" rel="stylesheet" type="text/css" />
 
 
 

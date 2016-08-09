@@ -1,0 +1,10 @@
+.dataTables_wrapper {
+    background-color: #ffffff;
+}
+.dataTables_info {
+    padding-left: 8px;
+    padding-bottom: 8px;
+}
+.dataTables_paginate {
+    margin-bottom: 6px;
+}
