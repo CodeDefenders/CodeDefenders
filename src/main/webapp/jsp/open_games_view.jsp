@@ -168,7 +168,10 @@
 			$('#tableMPGames').DataTable( {
 				"paging":   false,
 				"searching": false,
-				"order": [[ 6, "asc" ]]
+				"order": [[ 6, "asc" ]],
+				"language": {
+					"info": ""
+				}
 			} );
 		} );
 		$('.modal').on('shown.bs.modal', function() {

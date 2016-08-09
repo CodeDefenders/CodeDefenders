@@ -218,7 +218,10 @@
 			$('#tableMPGames').DataTable( {
 				"paging":   false,
 				"searching": false,
-				"order": [[ 5, "asc" ]]
+				"order": [[ 5, "asc" ]],
+				"language": {
+					"info": ""
+				}
 			} );
 		} );
 
