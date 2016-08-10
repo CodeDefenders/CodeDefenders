@@ -4,6 +4,8 @@ import difflib.Chunk;
 import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -342,7 +344,7 @@ public class Mutant {
 	// These values update when Mutants are suspected of being equivalent, go through an equivalence test, or are killed.
 	public boolean update() {
 
-		logger.info("Updating Mutant");
+		logger.info("Updating Mutant {}", getId());
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -418,5 +420,35 @@ public class Mutant {
 		}
 
 		return lines;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Mutant mutant = (Mutant) o;
+
+		return new EqualsBuilder()
+				.append(id, mutant.id)
+				.append(gameId, mutant.gameId)
+				.append(playerId, mutant.playerId)
+				.append(javaFile, mutant.javaFile)
+				.append(md5, mutant.md5)
+				.append(classFile, mutant.classFile)
+				.isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(17, 37)
+				.append(id)
+				.append(gameId)
+				.append(playerId)
+				.append(javaFile)
+				.append(md5)
+				.append(classFile)
+				.toHashCode();
 	}
 }
