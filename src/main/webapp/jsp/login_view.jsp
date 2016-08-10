@@ -69,4 +69,3 @@
         }
   });
 </script>
-<%@ include file="/jsp/footer_logout.jsp" %>
