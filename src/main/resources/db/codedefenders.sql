@@ -90,7 +90,7 @@ CREATE TABLE `mutants` (
   `Game_ID` int(11) NOT NULL,
   `RoundCreated` int(11) NOT NULL,
   `RoundKilled` int(11) DEFAULT NULL,
-  `Equivalent` enum('ASSUMED_NO','PENDING_TEST','DECLARED_YES','ASSUMED_YES','PROVEN_NO') NOT NULL,
+  `Equivalent` enum('ASSUMED_NO','PENDING_TEST','DECLARED_YES','ASSUMED_YES','PROVEN_NO') DEFAULT 'ASSUMED_NO' NOT NULL,
   `Player_ID` int(11) DEFAULT NULL,
   `NumberAiKillingTests` int(11) DEFAULT '0',
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
