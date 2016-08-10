@@ -5,7 +5,7 @@
 <h3> Duels </h3>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
-		<th>Game ID</th>
+		<th>ID</th>
 		<th>Class</th>
 		<th>Attacker</th>
 		<th>Defender</th>
@@ -56,7 +56,7 @@
 	<h3>Battlegrounds</h3>
 	<table class="table table-hover table-responsive table-paragraphs games-table">
 		<tr>
-			<th>Game ID</th>
+			<th>ID</th>
 			<th>Class</th>
 			<th>Owner</th>
 			<th>Attackers</th>
