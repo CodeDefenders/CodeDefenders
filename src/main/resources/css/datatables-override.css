@@ -1,5 +1,5 @@
 .dataTables_wrapper {
-    background: #ffffff;
+    background: #fafafa;
 }
 .dataTables_info {
     padding-left: 8px;
@@ -7,4 +7,12 @@
 }
 .dataTables_paginate {
     margin-bottom: 2px;
+}
+
+.dataTables_wrapper table.mutant-table thead {
+    display:none;
+}
+
+.dataTables_wrapper table.mutant-table {
+    height: 405px;
 }

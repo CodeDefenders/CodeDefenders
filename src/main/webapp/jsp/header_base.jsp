@@ -94,11 +94,17 @@
         $(document).ready(function() {
             $('table.mutant-table').DataTable( {
                 "pagingType": "full_numbers",
-                "searching": false,
+                "searching": true,
                 "lengthChange": false,
                 "ordering": false,
                 "pageLength": 4,
-                "dom": '<"top"p>rt<"bottom"ifl><"clear">'
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search...",
+                    info: "",
+                    sInfoEmpty: "",
+                    sInfoFiltered: ""
+                }
             } );
         } );
     </script>

@@ -91,7 +91,7 @@
 	<a href="/games/create">Create Duel</a>
 	<hr />
 	<h3>Battlegrounds</h3>
-	<table id="tableMPGames" class="table table-hover table-responsive table-paragraphs games-table">
+	<table id="tableMPGames" class="table table-hover table-responsive table-paragraphs games-table dataTable display">
 		<thead>
 			<tr>
 				<th>ID</th>
