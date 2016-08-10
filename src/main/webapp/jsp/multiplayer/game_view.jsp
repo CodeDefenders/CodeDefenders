@@ -73,7 +73,6 @@
                 }
             }
             messages.add("Flagged " + equivCounter + " mutants as equivalent");
-            mutantsAlive = mg.getAliveMutants();
 
             response.sendRedirect("play");
 
