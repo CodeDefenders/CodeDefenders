@@ -101,8 +101,6 @@ public class AntRunner {
 	public static int testOriginal(File dir, Test t) {
 		GameClass cut = DatabaseAccess.getClassForGame(t.getGameId());
 
-		//TODO: Maybe getBaseName() not getName()
-		String className = cut.getName();
 		String[] resultArray = runAntTarget("test-original", null, dir.getAbsolutePath(), cut, t.getFullyQualifiedClassName());
 
 		// add coverage information
