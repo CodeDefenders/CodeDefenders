@@ -58,44 +58,6 @@
 
     ArrayList<Mutant> mutantsPending = new ArrayList<Mutant>(); // assume no pending tasks
 
-    if (role.equals(Role.DEFENDER) && request.getParameter("equivLine") != null &&
-            (mg.getState().equals(AbstractGame.State.ACTIVE) || mg.getState().equals(AbstractGame.State.GRACE_ONE))){
-        try {
-            int equivLine = Integer.parseInt(request.getParameter("equivLine"));
-
-            int equivCounter = 0;
-            for (Mutant m : mutantsAlive) {
-                for (int line : m.getLines()){
-                    if (line == equivLine){
-                        m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-                        m.update();
-                        DatabaseAccess.insertEquivalence(m, playerId);
-                        equivCounter++;
-                    }
-
-                }
-            }
-            messages.add("Flagged " + equivCounter + " mutants as equivalent");
-            mutantsAlive = mg.getAliveMutants();
-
-        } catch (NumberFormatException e){}
-    } else if (role.equals(Role.ATTACKER) && request.getParameter("acceptEquiv") != null){
-        try {
-            int mutId = Integer.parseInt(request.getParameter("acceptEquiv"));
-
-            Mutant equiv = null;
-
-            for (Mutant m : mutantsEquiv){
-                if (m.getPlayerId() == playerId &&  m.getId() == mutId){
-                    m.setEquivalent(Mutant.Equivalence.DECLARED_YES);
-                    m.update();
-                    DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
-                    break;
-                }
-            }
-        } catch (NumberFormatException e){}
-    }
-
     for (Mutant m : mutantsAlive) {
         for (int line : m.getLines()){
             if (!mutantLines.containsKey(line)){
