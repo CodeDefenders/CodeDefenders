@@ -116,7 +116,7 @@ span.defenderTotal {
 	z-index:15;
 	margin: auto;
 	text-align:center;
-	background-color: #fff;
+	background-color: #fafafa;
 }
 
 #research {
@@ -126,7 +126,7 @@ span.defenderTotal {
 	z-index:15;
 	margin: auto;
 	text-align:center;
-	background-color: #fff;
+	background-color: #fafafa;
 }
 
 #contact {
@@ -136,7 +136,7 @@ span.defenderTotal {
 	z-index:15;
 	margin: auto;
 	text-align:center;
-	background-color: #fff;
+	background-color: #fafafa;
 }
 
 textarea {
@@ -453,48 +453,40 @@ nav li a {
 
 /* Papercite */
 
-.papercite_errors:before {
-	content: "Papercite errors";
+.paper-list {
+	width: 500px;
+	margin: 10px
 }
 
-.papercite_errors {
-	border: 1px solid red;
-	background: #eee;
-	padding: 5px;
+.papercite_bibliography {
+	color: #ccc;
+	list-style-type: none;
 }
 
-.papercite_errors > div {
-	display: list-item;
+.papercite_bibliography li {
+	font: 14px/1.5 Helvetica, sans-serif;
+	padding-left: 60px;
+	color: #555;
+	margin-bottom: 20px;
 }
 
-.papercite_bibtex {
+.bibtex_hide {
 	display: none;
 }
 
-.papercite_bibtex pre {
-	white-space: pre-wrap;
+.bibtex_show {
+	text-align: left;
 }
 
-.papercite_toggle:link, .papercite_toggle:visited {
-	color: gray;
-	text-decoration: none;
+.tex {
+	margin: 0 auto;
+	width:40%;
 }
 
-
-.papercite_link, .papercite_link:link, .papercite_link:visited {
-	color: #222;
-	font-weight: bold;
-	text-decoration: none;
-	cursor: pointer;
-}
-.papercite_info {
-	color: #555;
-}
-
-.papercite_highlight {
+.paper_title {
 	font-weight: bold;
 }
 
-.bibtex {
-	text-align:center;
+.paper_venue {
+	font-style: italic;
 }
