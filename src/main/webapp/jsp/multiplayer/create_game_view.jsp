@@ -72,9 +72,9 @@
 						<input type="hidden" id="startTime" name="startTime" value="<%=startDate.getMillis()%>" />
 						<input class="ws-5" name="start_dateTime" id="start_dateTime" value="<%=fmt.print(startDate)%>" />
 						<div class="ws-7 nest">
-							<input class="ws-1" type="text" name="start_hours" id="start_hours" value="<%=startDate.getHourOfDay()%>"  style="text-align: center;" />
+							<input class="ws-1" type="text" name="start_hours" id="start_hours" value="<%=String.format("%1$02d",startDate.getHourOfDay())%>"  style="text-align: center;" />
 							<span>:</span>
-							<input class="ws-1" type="text" name="start_minutes" id="start_minutes" value="<%=finishDate.getMinuteOfHour()%>"  style="text-align: center;" />
+							<input class="ws-1" type="text" name="start_minutes" id="start_minutes" value="<%=String.format("%1$02d",startDate.getMinuteOfHour())%>"  style="text-align: center;" />
 						</div>
 					</div>
 					<script>
@@ -126,9 +126,9 @@
 						<input type="hidden" id="finishTime" name="finishTime" value="<%=finishDate.getMillis()%>" />
 						<input class="ws-5" name="finish_dateTime" id="finish_dateTime" value="<%=fmt.print(finishDate)%>" />
 						<div class="ws-7 nest">
-							<input class="ws-1" type="text" name="finish_hours" id="finish_hours" value="<%=finishDate.getHourOfDay()%>" style="text-align: center;"/>
+							<input class="ws-1" type="text" name="finish_hours" id="finish_hours" value="<%=String.format("%1$02d",finishDate.getHourOfDay())%>" style="text-align: center;"/>
 							<span>:</span>
-							<input class="ws-1" type="text" name="finish_minutes" id="finish_minutes" value="<%=finishDate.getMinuteOfHour()%>" style="text-align: center;"/>
+							<input class="ws-1" type="text" name="finish_minutes" id="finish_minutes" value="<%=String.format("%1$02d",finishDate.getMinuteOfHour())%>" style="text-align: center;"/>
 						</div>
 					</div>
 					<script>
