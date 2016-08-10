@@ -179,7 +179,7 @@ if (role == Role.ATTACKER && true){
 												<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
 											</div>
 											<div class="modal-body">
-												<p>Killed by Test <%= DatabaseAccess.getKillingTestIdForMut(m.getId()) %></p>
+												<p>Killed by Test <%= DatabaseAccess.getKillingTestIdForMutant(m.getId()) %></p>
 												<pre class="readonly-pre"><textarea class="mutdiff" id="diff<%=m.getId()%>"><%=m.getPatchString()%></textarea></pre>
 											</div>
 											<div class="modal-footer">

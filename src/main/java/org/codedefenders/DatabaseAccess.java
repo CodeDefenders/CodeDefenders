@@ -1017,10 +1017,10 @@ public class DatabaseAccess {
 		return testList;
 	}
 
-	public static int getKillingTestIdForMut(int mid) {
-		String sql = String.format("SELECT * FROM targetexecutions WHERE Target='TEST_MUTANT' AND Status='FAIL' AND Mutant_ID='%d';", mid);
+	public static int getKillingTestIdForMutant(int mid) {
+		String sql = String.format("SELECT * FROM targetexecutions WHERE Target='TEST_MUTANT' AND Status!='SUCCESS' AND Mutant_ID='%d';", mid);
 		TargetExecution targ = getTargetExecutionSQL(sql);
-		return targ.testId;
+		return (targ != null) ? targ.testId : -1; // TODO: We shouldn't give away that we don't know which test killed the mutant?
 	}
 
 	public static TargetExecution getTargetExecutionForPair(int tid, int mid) {
