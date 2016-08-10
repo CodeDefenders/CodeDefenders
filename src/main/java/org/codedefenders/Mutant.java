@@ -157,6 +157,9 @@ public class Mutant {
 		update();
 	}
 
+	/**
+	 * @return attacker points for this mutant in DUEL MODE
+	 */
 	public int getAttackerPoints() {
 		if (alive) {
 			// if mutant is alive, as many points as rounds it has survived
@@ -181,6 +184,9 @@ public class Mutant {
 		}
 	}
 
+	/**
+	 * @return defender points for this mutant in DUEL MODE
+	 */
 	public int getDefenderPoints() {
 		if (! alive && classFile != null) {
 			if (equivalent.equals(Equivalence.ASSUMED_NO) || equivalent.equals(Equivalence.DECLARED_YES)) {
