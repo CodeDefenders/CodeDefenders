@@ -85,11 +85,10 @@ public class GameManager extends HttpServlet {
 				logger.info("Executing Action resolveEquivalence");
 				int currentEquivMutantID = Integer.parseInt(request.getParameter("currentEquivMutant"));
 				Mutant mutant = activeGame.getMutantByID(currentEquivMutantID);
-				logger.debug("CurrentEquivMutant ID = " + currentEquivMutantID);
 
 				// Check type of equivalence response.
 				if (request.getParameter("rejectEquivalent") != null) { // If user wanted to supply a test
-					logger.info("Equivalence rejected, going to process killing test form mutant " + currentEquivMutantID);
+					logger.info("Equivalence rejected for mutant {}, processing killing test", currentEquivMutantID);
 
 					// Get the text submitted by the user.
 					String testText = request.getParameter("test");
@@ -145,7 +144,7 @@ public class GameManager extends HttpServlet {
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					}
 				} else if (request.getParameter("acceptEquivalent") != null) { // If the user didnt want to supply a test
-					logger.info("Equivalence accepted");
+					logger.info("Equivalence accepted for mutant {}", mutant.getId());
 					if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
 						mutant.kill(Mutant.Equivalence.DECLARED_YES);
 
