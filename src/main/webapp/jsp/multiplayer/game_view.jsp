@@ -65,14 +65,11 @@
 
             int equivCounter = 0;
             for (Mutant m : mutantsAlive) {
-                for (int line : m.getLines()){
-                    if (line == equivLine){
-                        m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-                        m.update();
-                        DatabaseAccess.insertEquivalence(m, playerId);
-                        equivCounter++;
-                    }
-
+                if (m.getLines().contains(equivLine)) {
+                    m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+                    m.update();
+                    DatabaseAccess.insertEquivalence(m, playerId);
+                    equivCounter++;
                 }
             }
             messages.add("Flagged " + equivCounter + " mutants as equivalent");
