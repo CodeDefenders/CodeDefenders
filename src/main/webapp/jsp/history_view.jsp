@@ -88,8 +88,8 @@
 			</td>
 		</tr>
 		<%
-				} // for (MultiplayerGame g : games)
-			} // if (games.isEmpty())
+			}
+		}
 		%>
 	</table>
 
