@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import static org.codedefenders.Constants.*;
 import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 import static org.codedefenders.validation.CodeValidator.getMD5;
 
 public class GameManager extends HttpServlet {
@@ -109,17 +110,21 @@ public class GameManager extends HttpServlet {
 						if (testOriginalTarget.status.equals("SUCCESS")) {
 							logger.info(TEST_PASSED_ON_CUT_MESSAGE);
 							if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
-								// Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
+								// TODO: Allow multiple trials?
+								// TODO: Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
 								MutationTester.runEquivalenceTest(newTest, mutant);
 								activeGame.endRound();
 								activeGame.update();
 								Mutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
-								if (mutantAfterTest.getEquivalent().equals(ASSUMED_YES)) {
-									logger.info("Test failed to kill the mutant, hence assumed equivalent");
-									messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
-								} else { // PROVEN_NO
-									logger.info("Mutant was killed, hence tagged not equivalent");
+								if (mutantAfterTest.getEquivalent().equals(PROVEN_NO)) {
+									logger.info("Test {} killed mutant {}, hence NOT equivalent", newTest.getId(), mutant.getId());
 									messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
+								} else {
+									// test did not kill the mutant, lost duel, kill mutant
+									mutantAfterTest.kill(ASSUMED_YES);
+
+									logger.info("Test {} failed to kill mutant {}", newTest.getId(), mutant.getId());
+									messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
 								}
 								response.sendRedirect("play");
 								return;
@@ -166,7 +171,7 @@ public class GameManager extends HttpServlet {
 							//Is potentially equiv - accept as equivalent
 							mutantClaimed.kill(Mutant.Equivalence.DECLARED_YES);
 						} else {
-							mutantClaimed.setEquivalent(Mutant.Equivalence.PROVEN_NO);
+							mutantClaimed.setEquivalent(PROVEN_NO);
 							mutantClaimed.update();
 						}
 						activeGame.endTurn();

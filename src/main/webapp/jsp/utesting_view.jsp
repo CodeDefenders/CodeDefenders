@@ -143,7 +143,7 @@
 		<div class="slider single-item">
 			<%
 				boolean isTests = false;
-				for (Test t : uTestingSession.getExecutableTests()) {
+				for (Test t : uTestingSession.getTests()) {
 					isTests = true;
 					String tc = "";
 					for (String l : t.getHTMLReadout()) { tc += l + "\n"; }

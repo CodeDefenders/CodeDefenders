@@ -7,6 +7,7 @@ import java.sql.*;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -138,8 +139,7 @@ public class MultiplayerGame extends AbstractGame {
 	}
 
 	public ArrayList<Mutant> getMutants() {
-		int[] attackers = getPlayerIds();
-		return DatabaseAccess.getMutantsForAttackers(attackers);
+		return DatabaseAccess.getMutantsForGame(id);
 	}
 
 	public ArrayList<Mutant> getAliveMutants() {
@@ -155,7 +155,7 @@ public class MultiplayerGame extends AbstractGame {
 	public ArrayList<Mutant> getKilledMutants() {
 		ArrayList<Mutant> killedMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
-			if (!m.isAlive() && (m.getClassFile() != null)) {
+			if (!m.isAlive() && (m.getEquivalent().equals(ASSUMED_NO) ||  m.getEquivalent().equals(PROVEN_NO)) && (m.getClassFile() != null)) {
 				killedMutants.add(m);
 			}
 		}
@@ -165,8 +165,7 @@ public class MultiplayerGame extends AbstractGame {
 	public ArrayList<Mutant> getMutantsMarkedEquivalent() {
 		ArrayList<Mutant> equivMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
-			if (!m.getEquivalent().equals(ASSUMED_NO) && !m.getEquivalent().equals(PROVEN_NO)
-					&& !m.getEquivalent().equals(PENDING_TEST)) {
+			if (m.getEquivalent().equals(ASSUMED_YES) || m.getEquivalent().equals(DECLARED_YES)) {
 				equivMutants.add(m);
 			}
 		}
@@ -189,20 +188,6 @@ public class MultiplayerGame extends AbstractGame {
 				return m;
 		}
 		return null;
-	}
-
-	public ArrayList<Test> getTests() {
-		return getExecutableTests();
-	}
-
-	public ArrayList<Test> getExecutableTests() {
-		ArrayList<Test> allTests = new ArrayList<>();
-		int[] defenders = getPlayerIds();
-		for (int i = 0; i < defenders.length; i++){
-			ArrayList<Test> tests = DatabaseAccess.getExecutableTestsForMultiplayerGame(defenders[i]);
-			allTests.addAll(tests);
-		}
-		return allTests;
 	}
 
 	public int[] getDefenderIds(){
@@ -381,16 +366,10 @@ public class MultiplayerGame extends AbstractGame {
 		HashMap<Integer, Integer> mutantsKilled = new HashMap<Integer, Integer>();
 		HashMap<Integer, Integer> mutantsEquiv = new HashMap<Integer, Integer>();
 
-		ArrayList<Mutant> allMutants = new ArrayList<Mutant>();
-		allMutants.addAll(getAliveMutants());
+		ArrayList<Mutant> allMutants = getAliveMutants();
 		allMutants.addAll(getKilledMutants());
-		for (Mutant mm : getMutantsMarkedEquivalent()){
-			allMutants.add(mm);
-		}
-
-		for (Mutant mm : getMutantsMarkedEquivalentPending()){
-			allMutants.add(mm);
-		}
+		allMutants.addAll(getMutantsMarkedEquivalent());
+		allMutants.addAll(getMutantsMarkedEquivalentPending());
 
 
 		if (!mutantScores.containsKey(-1)){
@@ -443,63 +422,55 @@ public class MultiplayerGame extends AbstractGame {
 	public HashMap<Integer, PlayerScore> getTestScores(){
 		HashMap<Integer, PlayerScore> testScores = new HashMap<Integer, PlayerScore>();
 		HashMap<Integer, Integer> mutantsKilled = new HashMap<Integer, Integer>();
-		testScores.put(-1, new PlayerScore(-1));
-		testScores.put(-2, new PlayerScore(-2));
-		mutantsKilled.put(-1, 0);
-		mutantsKilled.put(-2, 0);
+		int defendersTeamId = -1;
+		int attackersTeamId = -2;
+		testScores.put(defendersTeamId, new PlayerScore(defendersTeamId));
+		testScores.put(attackersTeamId, new PlayerScore(attackersTeamId));
+		mutantsKilled.put(defendersTeamId, 0);
+		mutantsKilled.put(attackersTeamId, 0);
 
-		for (int i : getDefenderIds()){
-			if (!testScores.containsKey(i)){
-				testScores.put(i, new PlayerScore(i));
-				mutantsKilled.put(i, 0);
-			}
+		for (int defenderId : getDefenderIds()){
+			testScores.put(defenderId, new PlayerScore(defenderId));
+			mutantsKilled.put(defenderId, 0);
 		}
 
 		int[] attackers = getAttackerIds();
-		for (Test tt : getTests()){
-			if (!testScores.containsKey(tt.getPlayerId())){
-				testScores.put(tt.getPlayerId(), new PlayerScore(tt.getPlayerId()));
-				mutantsKilled.put(tt.getPlayerId(), 0);
+		for (Test test : getTests()){
+			if (!testScores.containsKey(test.getPlayerId())){
+				testScores.put(test.getPlayerId(), new PlayerScore(test.getPlayerId()));
+				mutantsKilled.put(test.getPlayerId(), 0);
 			}
-			PlayerScore ps = testScores.get(tt.getPlayerId());
+			PlayerScore ps = testScores.get(test.getPlayerId());
 			ps.increaseQuantity();
-			ps.increaseTotalScore(tt.getScore());
+			ps.increaseTotalScore(test.getScore());
 
-			int totalIndex = -1;
+			int teamKey = defendersTeamId;
+			if (ArrayUtils.contains(attackers, test.getPlayerId()))
+				teamKey = attackersTeamId;
 
-			for (int i : attackers){
-				if (i == tt.getPlayerId()){
-					totalIndex = -2;
-					break;
-				}
-			}
-
-			PlayerScore ts = testScores.get(totalIndex);
+			PlayerScore ts = testScores.get(teamKey);
 			ts.increaseQuantity();
-			ts.increaseTotalScore(tt.getScore());
+			ts.increaseTotalScore(test.getScore());
 
-			mutantsKilled.put(tt.getPlayerId(), mutantsKilled.get(tt.getPlayerId()) + tt.getMutantsKilled());
+			mutantsKilled.put(test.getPlayerId(), mutantsKilled.get(test.getPlayerId()) + test.getMutantsKilled());
 
-			mutantsKilled.put(totalIndex, mutantsKilled.get(totalIndex)+tt.getMutantsKilled());
+			mutantsKilled.put(teamKey, mutantsKilled.get(teamKey)+test.getMutantsKilled());
 
 		}
 
-		for (int i : mutantsKilled.keySet()){
-			if (i < 0){
+		for (int playerId : mutantsKilled.keySet()){
+			if (playerId < 0)
 				continue;
-			}
-			int totalIndex = -1;
-			for (int j : attackers){
-				if (j == i){
-					totalIndex = -2;
-					break;
-				}
-			}
-			PlayerScore ps = testScores.get(i);
-			int playerScore = DatabaseAccess.getPlayerPoints(i);
+
+			int teamKey = defendersTeamId;
+			if (ArrayUtils.contains(attackers, playerId))
+				teamKey = attackersTeamId;
+
+			PlayerScore ps = testScores.get(playerId);
+			int playerScore = DatabaseAccess.getPlayerPoints(playerId);
 			ps.increaseTotalScore(playerScore);
 
-			PlayerScore ts = testScores.get(totalIndex);
+			PlayerScore ts = testScores.get(teamKey);
 			ts.increaseTotalScore(playerScore);
 		}
 
@@ -523,7 +494,7 @@ public class MultiplayerGame extends AbstractGame {
 	public int getDefenderTeamScore() {
 		int totalScore = 0;
 
-		for (Test t : getTests())
+		for (Test t : getTests(true))
 			totalScore += t.getDefenderPoints();
 
 		for (Mutant m : getMutants())

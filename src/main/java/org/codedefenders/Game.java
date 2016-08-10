@@ -137,15 +137,6 @@ public class Game extends AbstractGame {
 		return null;
 	}
 
-	@Override
-	public ArrayList<Test> getTests() {
-		return DatabaseAccess.getTestsForGame(id);
-	}
-
-	public ArrayList<Test> getExecutableTests() {
-		return DatabaseAccess.getExecutableTestsForGame(id);
-	}
-
 	public int getAttackerScore() {
 		int totalScore = 0;
 

@@ -28,7 +28,7 @@
         response.sendRedirect("/games/user");
     }
 
-    List<Test> tests = mg.getExecutableTests();
+    List<Test> tests = mg.getTests(true); // get executable defenders' tests
 
     // compute line coverage information
     for (Test t : tests) {
@@ -43,40 +43,34 @@
 %>
 <%@ include file="/jsp/multiplayer/header_game.jsp" %>
 <%
-    if (messages == null){
-        messages = new ArrayList<String>();
-    }
+    messages = new ArrayList<String>();
+    session.setAttribute("messages", messages);
 
     int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
     ArrayList<Mutant> mutantsAlive = mg.getAliveMutants();
 
-    ArrayList<Mutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();
-
     ArrayList<Mutant> mutantsPending = mg.getMutantsMarkedEquivalentPending();
-
-    HashMap<Integer, ArrayList<Mutant>> mutantLines = new HashMap<Integer, ArrayList<Mutant>>();
-
-    HashMap<Integer, ArrayList<Mutant>> mutantKilledLines = new HashMap<Integer, ArrayList<Mutant>>();
 
     if (role.equals(Role.DEFENDER) && request.getParameter("equivLine") != null &&
             (mg.getState().equals(AbstractGame.State.ACTIVE) || mg.getState().equals(AbstractGame.State.GRACE_ONE))){
         try {
             int equivLine = Integer.parseInt(request.getParameter("equivLine"));
 
-            int equivCounter = 0;
+            int nClaimed = 0;
             for (Mutant m : mutantsAlive) {
                 if (m.getLines().contains(equivLine)) {
                     m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                     m.update();
                     DatabaseAccess.insertEquivalence(m, playerId);
-                    equivCounter++;
+                    nClaimed++;
                 }
             }
-            messages.add("Flagged " + equivCounter + " mutants as equivalent");
+            messages.add(String.format("Flagged %d mutant%s as equivalent", nClaimed, (nClaimed == 1 ? "" : 's')));
 
             response.sendRedirect("play");
 
         } catch (NumberFormatException e){}
+
     } else if (role.equals(Role.ATTACKER) && request.getParameter("acceptEquiv") != null){
         try {
             int mutId = Integer.parseInt(request.getParameter("acceptEquiv"));
@@ -84,16 +78,20 @@
             Mutant equiv = null;
 
             for (Mutant m : mutantsPending){
-                if (m.getPlayerId() == playerId &&  m.getId() == mutId
-                        && m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){
-                    m.setEquivalent(Mutant.Equivalence.DECLARED_YES);
-                    m.update();
+                if (m.getPlayerId() == playerId &&  m.getId() == mutId){
+                    m.kill(Mutant.Equivalence.DECLARED_YES);
                     DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
-                    break;
+                    messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
+
+                    response.sendRedirect("play");
                 }
             }
         } catch (NumberFormatException e){}
     }
+
+    ArrayList<Mutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();
+    HashMap<Integer, ArrayList<Mutant>> mutantLines = new HashMap<Integer, ArrayList<Mutant>>();
+    HashMap<Integer, ArrayList<Mutant>> mutantKilledLines = new HashMap<Integer, ArrayList<Mutant>>();
 
     for (Mutant m : mutantsAlive) {
         for (int line : m.getLines()){

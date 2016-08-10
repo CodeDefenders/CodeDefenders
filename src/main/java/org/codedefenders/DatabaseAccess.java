@@ -462,64 +462,17 @@ public class DatabaseAccess {
 		return gameList;
 	}
 
-	public static ArrayList<Mutant> getMutantsForAttackers(int[] attackers) {
-
-		ArrayList<Mutant> mutList = new ArrayList<>();
-
-		Connection conn = null;
-		Statement stmt = null;
-		String sql = null;
-
-		try {
-
-			// Load the MultiplayerGame Data with the provided ID.
-			conn = getConnection();
-
-			stmt = conn.createStatement();
-			for (int i : attackers) {
-				sql = String.format("SELECT * FROM mutants WHERE Player_ID=%d;", i);
-				ResultSet rs = stmt.executeQuery(sql);
-
-				while (rs.next()) {
-					Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
-							rs.getString("JavaFile"), rs.getString("ClassFile"),
-							rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
-							rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
-					newMutant.setScore(rs.getInt("Points"));
-					mutList.add(newMutant);
-				}
-			}
-
-			stmt.close();
-			conn.close();
-		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
-			cleanup(conn, stmt);
-		}
-
-		return mutList;
-	}
-
 	public static ArrayList<Mutant> getMutantsForGame(int gid) {
 
 		ArrayList<Mutant> mutList = new ArrayList<>();
-
 		Connection conn = null;
 		Statement stmt = null;
 		String sql = null;
 
 		try {
-
-			// Load the MultiplayerGame Data with the provided ID.
 			conn = getConnection();
-
 			stmt = conn.createStatement();
-			sql = String.format("SELECT * FROM mutants WHERE Game_ID='%d' AND RoundCreated >= 0;", gid);
+			sql = String.format("SELECT * FROM mutants WHERE Game_ID='%d' AND ClassFile IS NOT NULL;", gid);
 			ResultSet rs = stmt.executeQuery(sql);
 
 			while (rs.next()) {
@@ -527,9 +480,9 @@ public class DatabaseAccess {
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
 						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
 						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
+				newMutant.setScore(rs.getInt("Points"));
 				mutList.add(newMutant);
 			}
-
 			stmt.close();
 			conn.close();
 		} catch (SQLException se) {
@@ -541,7 +494,6 @@ public class DatabaseAccess {
 		finally {
 			cleanup(conn, stmt);
 		}
-
 		return mutList;
 	}
 
@@ -861,25 +813,21 @@ public class DatabaseAccess {
 		return getTests(sql).get(0);
 	}
 
-	public static ArrayList<Test> getExecutableTestsForGame(int gid) {
-		String stmt = "SELECT tests.* FROM tests "
-				+ "INNER JOIN targetexecutions ex on tests.Test_ID = ex.Test_ID "
-				+ "WHERE tests.Game_ID='%d' AND tests.ClassFile IS NOT NULL " // only compilable tests
-				+ "AND ex.Target='TEST_ORIGINAL' AND ex.Status='SUCCESS';"; // that pass on original CUT
+	/**
+	 *
+	 * @param gameId
+	 * @param defendersOnly
+	 * @return Tests submitted by defenders which compiled and passed on CUT
+	 */
+	public static ArrayList<Test> getExecutableTests(int gameId, boolean defendersOnly) {
+		String stmt = "SELECT tests.* FROM tests\n"
+				+ "INNER JOIN targetexecutions ex on tests.Test_ID = ex.Test_ID\n"
+				+ (defendersOnly ? "INNER JOIN players pl on tests.Player_ID = pl.ID\n" : "")
+				+ "WHERE tests.Game_ID='%d' AND tests.ClassFile IS NOT NULL\n"  // only compilable tests for a game
+				+ (defendersOnly ? "AND pl.Role='DEFENDER'\n" : "")             // [optional] submitted by defenders only
+				+ "AND ex.Target='TEST_ORIGINAL' AND ex.Status='SUCCESS';";     // that pass on original CUT
 
-		//String sql = String.format("SELECT * FROM tests WHERE Game_ID='%d' AND ClassFile IS NOT NULL;", gid);
-		String sql = String.format(stmt, gid);
-		return getTests(sql);
-	}
-
-	public static ArrayList<Test> getExecutableTestsForMultiplayerGame(int defenderId) {
-		String stmt = "SELECT tests.* FROM tests "
-				+ "INNER JOIN targetexecutions ex on tests.Test_ID = ex.Test_ID "
-				+ "WHERE tests.Player_ID='%d' AND tests.ClassFile IS NOT NULL " // only compilable tests
-				+ "AND ex.Target='TEST_ORIGINAL' AND ex.Status='SUCCESS';"; // that pass on original CUT
-
-		//String sql = String.format("SELECT * FROM tests WHERE Game_ID='%d' AND ClassFile IS NOT NULL;", gid);
-		String sql = String.format(stmt, defenderId);
+		String sql = String.format(stmt, gameId);
 		return getTests(sql);
 	}
 

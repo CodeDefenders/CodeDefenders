@@ -28,7 +28,7 @@
         response.sendRedirect("/games/user");
     }
 
-    List<Test> tests = mg.getExecutableTests();
+    List<Test> tests = mg.getTests(); // get all executable tests
 
     // compute line coverage information
     for (Test t : tests) {

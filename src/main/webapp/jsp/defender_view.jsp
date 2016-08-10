@@ -65,7 +65,7 @@
 
 				String codeDivName = "cut-div";
 				HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<Integer, ArrayList<Test>>();
-				List<Test> tests = game.getExecutableTests();
+				List<Test> tests = game.getTests();
 
 				for (Test t : tests) {
 
