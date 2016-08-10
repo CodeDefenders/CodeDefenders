@@ -47,7 +47,6 @@ public class AntRunner {
 	 */
 	public static TargetExecution testMutant(Mutant m, Test t) {
 		logger.debug("Running test {} on mutant {}", t.getId(), m.getId());
-		System.out.println("Running test " + t.getId() + " on mutant " + m.getId());
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
 
 		String[] resultArray = runAntTarget("test-mutant", m.getFolder(), t.getFolder(), cut, t.getFullyQualifiedClassName());
@@ -75,7 +74,7 @@ public class AntRunner {
 	}
 
 	public static boolean potentialEquivalent(Mutant m) {
-		System.out.println("Checking if mutant " + m.getId() + " is potentially equivalent.");
+		logger.debug("Checking if mutant " + m.getId() + " is potentially equivalent.");
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
 		String suiteDir = AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias();
 
