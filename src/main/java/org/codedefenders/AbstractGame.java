@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -66,7 +65,13 @@ public abstract class AbstractGame {
 	// TODO:
 	// public abstract ArrayList<Mutant> getMutants();
 
-	public abstract ArrayList<Test> getTests();
+	public ArrayList<Test> getTests() {
+		return getTests(false);
+	}
+
+	public ArrayList<Test> getTests(boolean defendersOnly) {
+		return DatabaseAccess.getExecutableTests(this.id, defendersOnly);
+	}
 
 	public abstract boolean addPlayer(int userId, Role role);
 
