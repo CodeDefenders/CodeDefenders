@@ -342,10 +342,13 @@ public class DatabaseAccess {
 	}
 
 	public static ArrayList<MultiplayerGame> getOpenMultiplayerGamesForUser(int userId) {
-		String sql = String.format("SELECT * FROM games AS m\n" +
-				"WHERE m.Mode='PARTY' AND m.Creator_ID!=%1$d \n" +
-				"AND NOT EXISTS (SELECT * FROM players AS p WHERE p.User_ID=%1$d AND p.Game_ID=m.ID  AND p.Active=TRUE) \n" +
-				"AND (m.RequiresValidation=FALSE OR (%1$d IN (SELECT User_ID from users where Validated=TRUE)));", userId);
+		String sql = String.format("SELECT * from games as g\n" +
+				"INNER JOIN (SELECT gatt.ID, sum(case when Role = 'ATTACKER' then 1 else 0 end) nAttackers, sum(case when Role = 'DEFENDER' then 1 else 0 end) nDefenders\n" +
+				"              FROM games as gatt LEFT JOIN players ON gatt.ID=players.Game_ID AND players.Active=TRUE GROUP BY gatt.ID) as nplayers\n" +
+				"ON g.ID=nplayers.ID\n" +
+				"WHERE g.Mode='PARTY' AND g.Creator_ID!=%1$d AND (g.State='CREATED' OR g.State='ACTIVE')\n" +
+				"\tAND (g.RequiresValidation=FALSE OR (%1$d IN (SELECT User_ID from users where Validated=TRUE)))\n" +
+				"\tAND nplayers.nAttackers < g.Attackers_Limit AND nplayers.nDefenders < g.Defenders_Limit;\n", userId);
 		return getMultiplayerGames(sql);
 	}
 
