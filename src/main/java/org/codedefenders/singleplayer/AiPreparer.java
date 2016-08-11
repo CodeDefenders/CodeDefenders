@@ -28,7 +28,9 @@ public class AiPreparer extends HttpServlet {
             case "runPrepareAi":
                 int cutId = Integer.parseInt(request.getParameter("cutID"));
                 System.out.println("Running PrepareAI on class " + cutId);
-                PrepareAI.createTestsAndMutants(cutId);
+                if(!PrepareAI.createTestsAndMutants(cutId)) {
+                    messages.add("Preparation of AI for the class failed, please prepare the class again, or try a different class.");
+                }
                 break;
             default:
                 break;

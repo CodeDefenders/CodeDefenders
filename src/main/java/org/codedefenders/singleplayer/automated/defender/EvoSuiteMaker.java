@@ -24,7 +24,11 @@ public class EvoSuiteMaker {
 		dGame = dummyGame;
 	}
 
-	public boolean makeSuite() {
+	public ArrayList<Test> getValidTests() {
+		return validTests;
+	}
+
+	public boolean makeSuite() throws Exception{
 		AntRunner.generateTestsFromCUT(cut);
 		//AntRunner.compileGenTestSuite(cut);
 		//Need a dummy game to add test to.
@@ -48,6 +52,12 @@ public class EvoSuiteMaker {
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
+		}
+
+		if(validTests.isEmpty()) {
+			//No valid tests.
+			NoTestsException e = new NoTestsException();
+			throw e;
 		}
 
 		return true; //Success

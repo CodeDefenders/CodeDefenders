@@ -31,7 +31,11 @@ public class MajorMaker {
 		dGame = dummyGame;
 	}
 
-	public boolean createMutants() {
+	public ArrayList<Mutant> getValidMutants() {
+		return validMutants;
+	}
+
+	public void createMutants() throws NoMutantsException {
 		AntRunner.generateMutantsFromCUT(cut);
 
 		File cutFile = new File(cut.getJavaFile());
@@ -52,12 +56,17 @@ public class MajorMaker {
 			}
 			Mutant m = createMutant(mText);
 			if (m != null) {
-				//Successfully created and compiled(?) mutant.
-				validMutants.add(m);
+				//Successfully created mutant.
+				if(m.getClassFile() != null) {
+					validMutants.add(m);
+				}
 			}
 		}
-
-		return true;
+		if (validMutants.isEmpty()) {
+			//No valid mutants exist.
+			NoMutantsException e = new NoMutantsException();
+			throw e;
+		}
 	}
 
 	public boolean createMutantIndex() {
@@ -143,13 +152,14 @@ public class MajorMaker {
 			// Setup folder the files will go in
 			File newMutantDir = FileManager.getNextSubDir(AI_DIR + F_SEP + "mutants" + F_SEP + cut.getAlias());
 
-			// Write the Mutant String into a java file
+			// 1 the Mutant String into a java file
 			String mutantFileName = newMutantDir + F_SEP + cut.getBaseName() + JAVA_SOURCE_EXT;
 			File mutantFile = new File(mutantFileName);
 			FileWriter fw = new FileWriter(mutantFile);
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write(mutantText);
 			bw.close();
+			fw.close();
 
 			// Compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
 			return AntRunner.compileMutant(newMutantDir, mutantFileName, dGame.getId(), cut, AiAttacker.ID);

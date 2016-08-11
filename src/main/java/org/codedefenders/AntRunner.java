@@ -273,9 +273,11 @@ public class AntRunner {
 	 * @param cut
 	 */
 	public static boolean compileGenTestSuite(final GameClass cut) {
-		//TODO: Add check for failure
 		String[] resultArray = runAntTarget("compile-gen-tests", null, null, cut, cut.getName() + Constants.SUITE_EXT);
-		return true;
+		if (resultArray[0].toLowerCase().contains("build successful")) {
+			return true;
+		}
+		return false;
 	}
 
 	/**

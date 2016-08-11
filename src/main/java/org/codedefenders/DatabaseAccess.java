@@ -87,6 +87,59 @@ public class DatabaseAccess {
 		return getClass(sql);
 	}
 
+	public static boolean isAiPrepared(GameClass c) {
+		boolean prepared = false;
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = String.format("SELECT * from classes WHERE AiPrepared = 1 AND Class_ID = %d", c.getId());
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				//Class is prepared
+				prepared = true;
+			}
+
+			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			System.out.println(se);
+			//Handle errors for JDBC
+		} catch (Exception e) {
+			System.out.println(e);
+			//Handle errors for Class.forName
+		} finally {
+			cleanup(conn, stmt);
+		} //end try
+
+		return prepared;
+	}
+
+	public static void setAiPrepared(GameClass c) {
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = String.format("UPDATE classes SET AiPrepared = 1 WHERE Class_ID = %d;", c.getId());
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			stmt.executeUpdate(sql);
+
+			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			System.out.println(se);
+			//Handle errors for JDBC
+		} catch (Exception e) {
+			System.out.println(e);
+			//Handle errors for Class.forName
+		} finally {
+			cleanup(conn, stmt);
+		} //end try
+	}
+
 	private static GameClass getClass(String sql) {
 		Connection conn = null;
 		Statement stmt = null;

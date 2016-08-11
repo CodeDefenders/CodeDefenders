@@ -1,12 +1,18 @@
 package org.codedefenders.singleplayer;
 
+import org.apache.commons.io.FileUtils;
 import org.codedefenders.*;
 import org.codedefenders.singleplayer.automated.attacker.AiAttacker;
 import org.codedefenders.singleplayer.automated.attacker.MajorMaker;
 import org.codedefenders.singleplayer.automated.defender.AiDefender;
 import org.codedefenders.singleplayer.automated.defender.EvoSuiteMaker;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+
+import static org.codedefenders.Constants.AI_DIR;
+import static org.codedefenders.Constants.F_SEP;
 
 public class PrepareAI {
 
@@ -23,25 +29,41 @@ public class PrepareAI {
 
 		GameClass cut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
+		//Generate tests.
 		EvoSuiteMaker esMake = new EvoSuiteMaker(classId, dummyGame);
-		esMake.makeSuite();
+		try {
+			esMake.makeSuite();
+		} catch (Exception e) {
+			e.printStackTrace();
+			killAi(cut);
+			return false;
+		}
+
+		//Make the suite include timeouts, to prevent infinite looping
+		//when checking equivalence against a player's mutants.
 		if (esMake.addTimeoutsToSuite(4000)) {
 			//Compile the modified suite.
-			//TODO: Correct return value for compiling suite.
 			if (!AntRunner.compileGenTestSuite(cut)) {
+				killAi(cut);
 				return false; //Failed
 			}
 		} else {
+			killAi(cut);
 			return false; //Failed
 		}
 
-		//TODO: Add correct check that everything succeeds.
-
+		//Generate mutants.
 		MajorMaker mMake = new MajorMaker(classId, dummyGame);
-		mMake.createMutants();
+		try {
+			mMake.createMutants();
+		} catch (Exception e) {
+			e.printStackTrace();
+			killAi(cut);
+			return false;
+		}
 
-		ArrayList<Test> tests = dummyGame.getTests();
-		ArrayList<Mutant> mutants = dummyGame.getMutants();
+		ArrayList<Test> tests = esMake.getValidTests();
+		ArrayList<Mutant> mutants = mMake.getValidMutants();
 
 		for (Test t : tests) {
 			for (Mutant m : mutants) {
@@ -65,7 +87,36 @@ public class PrepareAI {
 		esMake.createTestIndex();
 		mMake.createMutantIndex();
 
+		DatabaseAccess.setAiPrepared(cut);
+
+		if(!isPrepared(cut)) {
+			//SQL has not been updated correctly, should discard everything and fail.
+			killAi(cut);
+			return false;
+		}
 		return true; //Succeeded
+	}
+
+	/**
+	 * Delete all generated AI files for a CUT.
+	 * Should be used if generation fails.
+	 * Mutants and tests are deleted separately, as one can be created without the other.
+	 */
+	private static void killAi(GameClass c) {
+		try {
+			File tDir = new File(AI_DIR + F_SEP + "tests" + F_SEP + c.getAlias());
+			FileUtils.deleteDirectory(tDir);
+		} catch (IOException e) {
+			//Deleting mutants failed.
+			e.printStackTrace();
+		}
+		try {
+			File mDir = new File(AI_DIR + F_SEP + "mutants" + F_SEP + c.getAlias());
+			FileUtils.deleteDirectory(mDir);
+		} catch (IOException e) {
+			//Deleting mutants failed.
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -83,8 +134,7 @@ public class PrepareAI {
 	}
 
 	public static boolean isPrepared(GameClass cut) {
-		//TODO: Use cleaner check for prepared class.
-		if(DatabaseAccess.gameWithUserExistsForClass(1, cut.getId())) {
+		if(DatabaseAccess.isAiPrepared(cut)) {
 			return true;
 		}
 		return false;

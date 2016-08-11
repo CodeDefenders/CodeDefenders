@@ -170,7 +170,9 @@ public class UploadManager extends HttpServlet {
 
 			if(shouldPrepareAI) {
 				//Prepare AI classes, by generating tests and mutants.
-				PrepareAI.createTestsAndMutants(cut.getId());
+				if(!PrepareAI.createTestsAndMutants(cut.getId())) {
+					messages.add("Preparation of AI for the class failed, please prepare the class again, or try a different class.");
+				}
 			}
 			messages.add("Class uploaded successfully. It will be referred to as: " + cut.getAlias());
 			response.sendRedirect("games/user");
