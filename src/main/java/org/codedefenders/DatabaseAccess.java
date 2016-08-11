@@ -348,7 +348,8 @@ public class DatabaseAccess {
 				"ON g.ID=nplayers.ID\n" +
 				"WHERE g.Mode='PARTY' AND g.Creator_ID!=%1$d AND (g.State='CREATED' OR g.State='ACTIVE')\n" +
 				"\tAND (g.RequiresValidation=FALSE OR (%1$d IN (SELECT User_ID from users where Validated=TRUE)))\n" +
-				"\tAND nplayers.nAttackers < g.Attackers_Limit AND nplayers.nDefenders < g.Defenders_Limit;\n", userId);
+				"\tAND AND g.ID NOT IN (SELECT g.ID from games g INNER JOIN players p ON g.ID=p.Game_ID WHERE p.User_ID=%1$d AND p.Active=TRUE)\n" +
+				"\tAND nplayers.nAttackers < g.Attackers_Limit AND nplayers.nDefenders < g.Defenders_Limit;", userId);
 		return getMultiplayerGames(sql);
 	}
 
