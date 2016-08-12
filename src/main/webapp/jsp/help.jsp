@@ -76,6 +76,17 @@
 		<p>If an Attacker proves a mutant is not equivalent, they keep the mutant&#39;s points and gain an additional point.</p>
 		<p>If the Attacker accepts the mutant is equivalent, or the game expires, they lose the points of that mutant, and the Defender who claimed that it is equivalent gains a point.</p>
 
-
+		<h2>Code Editor</h2>
+		<p>The code editor has functionality to search the code, and to move to a line, implemented using CodeMirror.</p>
+		<p>These are the keyboard shortcuts for particular functions:</p>
+		<ul>
+			<li>Start Searching - Ctrl+F / Cmd+F</li>
+			<li>Find Next - Ctrl+G / Cmd+G</li>
+			<li>Find Previous - Shift+Ctrl+G / Shift+Cmd+G</li>
+			<li>Replace - Shift+Ctrl+F / Cmd+Option+F</li>
+			<li>Replace All - Shift+Ctrl+R / Shift+Cmd+Option+F</li>
+			<li>Persistent Search (dialog doesn't close, Enter to find next, Shift+Enter to find prev.) - Alt+F</li>
+			<li>Jump to Line - Alt+G</li>
+		</ul>
 	</div>
 </div>
