@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -12,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class LoginManager extends HttpServlet {
 
@@ -26,7 +29,7 @@ public class LoginManager extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
 		ArrayList<String> messages = new ArrayList<String>();
-		request.setAttribute("messages", messages);
+		request.getSession().setAttribute("messages", messages);
 
 
 		String username = (String) request.getParameter("username");
@@ -37,7 +40,13 @@ public class LoginManager extends HttpServlet {
 
 		if (formType.equals("create")) {
 			String confirm = (String) request.getParameter("confirm");
-			if (password.equals(confirm)) {
+			if (! (validUsername(username)
+					&& validEmailAddress(email)
+					&& validPassword(password))) {
+				messages.add("User not created. Make sure username, password and email are valid.");
+				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+				dispatcher.forward(request, response);
+			} else if (password.equals(confirm)) {
 				if (DatabaseAccess.getUserForNameOrEmail(username) == null) {
 					User newUser = new User(username, password, email);
 					if (newUser.insert()) {
@@ -84,7 +93,7 @@ public class LoginManager extends HttpServlet {
 					} else
 						response.sendRedirect("games");
 				} else {
-					messages.add("Username Does Not Exist Or Your Password Was Incorrect");
+					messages.add("Username does not exist or your password ws incorrect.");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
 				}
@@ -94,32 +103,61 @@ public class LoginManager extends HttpServlet {
 
 	public String getClientIpAddress(HttpServletRequest request) {
 		String ip = request.getHeader("X-Forwarded-For");
-		logger.debug("X-Forwarded-For: " + ip);
 		if (invalidIP(ip)) {
 			ip = request.getHeader("Proxy-Client-IP");
-			logger.debug("Proxy-Client-IP: " + ip);
 		}
 		if (invalidIP(ip)) {
 			ip = request.getHeader("WL-Proxy-Client-IP");
-			logger.debug("WL-Proxy-Client-IP: " + ip);
 		}
 		if (invalidIP(ip)) {
 			ip = request.getHeader("HTTP_CLIENT_IP");
-			logger.debug("HTTP_CLIENT_IP: " + ip);
 		}
 		if (invalidIP(ip)) {
 			ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-			logger.debug("HTTP_X_FORWARDED_FOR: " + ip);
 		}
 		if (invalidIP(ip)) {
 			ip = request.getRemoteAddr();
-			logger.debug("getRemoteAddr(): " + ip);
 		}
+		logger.debug("Client IP: " + ip);
 		return ip;
 	}
 
 	private boolean invalidIP(String ip) {
 		return (ip == null) || (ip.length() == 0) ||
 				("unknown".equalsIgnoreCase(ip)) || ("0:0:0:0:0:0:0:1".equals(ip));
+	}
+
+	/**
+	 * Username must contain 3 to 20 alphanumeric characters,
+	 * start with an alphabetic character, and have no whitespace or special character.
+	 * @param username
+	 * @return true iff valid username
+	 */
+
+	public static boolean validUsername(String username) {
+		String pattern = "^[a-zA-Z][a-zA-Z0-9]{2,19}$";
+		return username != null && username.matches(pattern);
+	}
+
+	public static boolean validEmailAddress(String email) {
+		if (email == null) return false;
+		boolean result = true;
+		try {
+			InternetAddress emailAddr = new InternetAddress(email);
+			emailAddr.validate();
+		} catch (AddressException ex) {
+			result = false;
+		}
+		return result;
+	}
+
+	/**
+	 * Password must contain 3 to 20 alphanumeric characters,
+	 * with no whitespace or special character.
+	*/
+	public static boolean validPassword(String password) {
+		// 3-10 alphanumeric characters (a-z, A-Z, 0-9) (no whitespaces)
+		String pattern = "^[a-zA-Z0-9]{3,10}$";
+		return password != null && password.matches(pattern);
 	}
 }

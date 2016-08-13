@@ -37,8 +37,8 @@
                   <h4 class="modal-title">Create new account</h4>
               </div>
               <div class="modal-body">
-	        <div id="create">
-                  <form  action="login" method="post" class="form-signin">
+	            <div id="create">
+                    <form  action="login" method="post" class="form-signin">
                       <input type="hidden" name="formType" value="create">
                       <label for="inputUsername" class="sr-only">Username</label>
                       <input type="text" id="inputUsernameCreate" name="username" class="form-control" placeholder="Username" required autofocus>
@@ -49,7 +49,8 @@
                       <label for="inputPassword" class="sr-only">Password</label>
                       <input type="password" id="inputConfirmPassword" name="confirm" class="form-control" placeholder="Confirm Password" required>
                       <button class="btn btn-lg btn-primary btn-block" type="submit">Create Account</button>
-                   </form>
+                    </form>
+                    <span style="margin-right:5px; font-size:small;">Valid username: 3-20 alphanumerics starting with a letter (a-z), no space or special character.<br>Valid password: 3-20 alphanumeric characters, no whitespace or special character.</span>
                 </div>
               </div>
               <div class="modal-footer">

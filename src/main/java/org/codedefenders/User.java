@@ -20,13 +20,11 @@ public class User {
 	private boolean validated;
 
 	public User(String username, String password) {
-		this.username = username;
-		this.password = password;
+		this(username, password, "");
 	}
 
 	public User(String username, String password, String email) {
-		this(username, password);
-		this.email = email;
+		this(0, username, password, email);
 	}
 
 	public User(int id, String username, String password, String email) {
@@ -37,7 +35,7 @@ public class User {
 		this.id = id;
 		this.username = username;
 		this.password = password;
-		this.email = email;
+		this.email = email.toLowerCase();
 		this.validated = validated;
 	}
 

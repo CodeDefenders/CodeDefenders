@@ -38,5 +38,6 @@
     <% for (String m : messages) { %>
     <pre><strong><%=m%></strong></pre>
     <% } %>
+    <script> $('#messages-div').delay(10000).fadeOut(); </script>
 </div>
 <%	} %>
