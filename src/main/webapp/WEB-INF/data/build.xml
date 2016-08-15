@@ -12,6 +12,7 @@
 	<property name="evosuite.home" value="${codedef.home}/lib/evosuite"/>
 	<property name="ai.tests.dir" value="${codedef.home}/ai/tests"/>
 	<property name="ai.mutants.dir" value="${codedef.home}/ai/mutants"/>
+	<property name="ai.cuts.dir" value="${codedef.home}/ai/cuts"/>
 
 	<path id="nocut.cp">
 		<pathelement path="${codedef.home}/lib/junit-4.12.jar"/>
@@ -92,14 +93,32 @@
 			<jvmarg value="-Djava.security.policy==${policyfile}" />
 		</junit>
 	</target>
+	<target name="jacoco-report">
+		<jacoco:report>
+			<executiondata>
+				<file file="jacoco.exec"/>
+			</executiondata>
+
+			<structure name="Example Project">
+				<classfiles>
+					<fileset dir="/var/lib/codedefenders/sources/Inflection"/>
+				</classfiles>
+				<sourcefiles encoding="UTF-8">
+					<fileset dir="/var/lib/codedefenders/sources/Inflection"/>
+				</sourcefiles>
+			</structure>
+		<html destdir="report"/>
+		</jacoco:report>
+	</target>
 
 	<target name="mutant-gen-cut" description="generate mutants using major">
-		<exec executable="${major.home}/bin/javac">
-			<arg value="-XMutator${mutOp}"/>
+		<mkdir dir="${ai.cuts.dir}/${classalias}"/>
+		<javac fork="yes" executable="${major.home}/bin/javac" sourcepath="" srcdir="${cut.dir}" destdir="${ai.cuts.dir}/${classalias}">
+			<compilerarg value="-XMutator${mutOp}"/>
 			<!--<arg value="-J-Dmajor.export.mutants=true"/>-->
-			<arg value="-J-Dmajor.export.directory=${ai.mutants.dir}/${classalias}"/>
-			<arg value="${cut.dir}/${classbasename}.java"/>
-		</exec>
+			<compilerarg value="-J-Dmajor.export.directory=${ai.mutants.dir}/${classalias}"/>
+			<include name="**/${classbasename}.java"/>
+		</javac>
 		<!--Move the generated log file to the correct location-->
 		<move file="${codedef.home}/mutants.log" tofile="${ai.mutants.dir}/${classalias}.log"/>
 	</target>
