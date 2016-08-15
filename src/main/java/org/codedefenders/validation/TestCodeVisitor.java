@@ -177,4 +177,14 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 		return stmt;
 	}
 
+	@Override
+	public Node visit(final AssignExpr expr, Object arg) {
+		if (expr.getOperator() != null &&
+				( expr.getOperator().equals(AssignExpr.Operator.and)
+						|| expr.getOperator().equals(AssignExpr.Operator.or)
+						|| expr.getOperator().equals(AssignExpr.Operator.xor)))
+			isValid = false;
+		return expr;
+	}
+
 }
