@@ -984,6 +984,7 @@ public class DatabaseAccess {
 						rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"), rs.getInt("Player_ID"));
 				String lcs = rs.getString("Lines_Covered");
 				String lucs = rs.getString("Lines_Uncovered");
+				LineCoverage lc = new LineCoverage();
 				if (lcs != null && lucs != null && lcs.length() > 0 && lucs.length() > 0) {
 					ArrayList<Integer> covered = new ArrayList<>();
 					ArrayList<Integer> uncovered = new ArrayList<>();
@@ -993,17 +994,11 @@ public class DatabaseAccess {
 					for (String s : lucs.split(",")) {
 						uncovered.add(Integer.parseInt(s));
 					}
-
-					LineCoverage lc = new LineCoverage();
-
 					lc.setLinesUncovered(uncovered);
 					lc.setLinesCovered(covered);
-
-					newTest.setLineCoverage(lc);
-
-					newTest.setScore(rs.getInt("Points"));
 				}
-
+				newTest.setLineCoverage(lc);
+				newTest.setScore(rs.getInt("Points"));
 				testList.add(newTest);
 			}
 
