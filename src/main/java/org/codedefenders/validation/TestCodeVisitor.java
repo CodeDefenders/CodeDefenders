@@ -4,9 +4,7 @@ import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.expr.ConditionalExpr;
-import com.github.javaparser.ast.expr.MethodCallExpr;
-import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.expr.*;
 import com.github.javaparser.ast.stmt.*;
 import com.github.javaparser.ast.visitor.ModifierVisitorAdapter;
 import org.apache.commons.lang.ArrayUtils;
@@ -168,6 +166,14 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 			logger.info("There is a variable declaration using System.*");
 			isValid = false;
 		}
+		return stmt;
+	}
+
+	@Override
+	public Node visit(final BinaryExpr stmt, Object arg) {
+		if (stmt.getOperator().equals(BinaryExpr.Operator.and) ||
+				stmt.getOperator().equals(BinaryExpr.Operator.or))
+			isValid = false;
 		return stmt;
 	}
 
