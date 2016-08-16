@@ -93,6 +93,22 @@ public class MultiplayerGame extends AbstractGame {
 		this.prize = prize;
 	}
 
+	/**
+	 * Get winning team. Return NONE if a draw.
+	 * @return Winning team.
+     */
+	public Role getWinningTeam() {
+		Role victor = Role.NONE;
+		int scoreAtt = getAttackerTeamScore();
+		int scoreDef = getDefenderTeamScore();
+		if(scoreAtt > scoreDef) {
+			victor = Role.ATTACKER;
+		} else if (scoreAtt < scoreDef) {
+			victor = Role.DEFENDER;
+		}
+		return victor;
+	}
+
 	public String getStartDateTime() {
 		Date date = new Date(startDateTime);
 		Format format = new SimpleDateFormat("dd/MM/yy HH:mm");

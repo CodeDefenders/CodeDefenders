@@ -224,8 +224,6 @@ public class DatabaseAccess {
 
 			while (rs.next()) {
 				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"));
-				stmt.close();
-				conn.close();
 				uList.add(userRecord);
 			}
 			stmt.close();
@@ -567,6 +565,41 @@ public class DatabaseAccess {
 			conn = getConnection();
 			stmt = conn.createStatement();
 			sql = String.format("SELECT * FROM mutants WHERE Game_ID='%d' AND ClassFile IS NOT NULL;", gid);
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
+						rs.getString("JavaFile"), rs.getString("ClassFile"),
+						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
+						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
+				newMutant.setScore(rs.getInt("Points"));
+				mutList.add(newMutant);
+			}
+			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			System.out.println(se);
+		} // Handle errors for JDBC
+		catch (Exception e) {
+			System.out.println(e);
+		} // Handle errors for Class.forName
+		finally {
+			cleanup(conn, stmt);
+		}
+		return mutList;
+	}
+
+	public static ArrayList<Mutant> getMutantsForPlayer(int pid) {
+
+		ArrayList<Mutant> mutList = new ArrayList<>();
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			sql = String.format("SELECT * FROM mutants WHERE Player_ID='%d' AND ClassFile IS NOT NULL;", pid);
 			ResultSet rs = stmt.executeQuery(sql);
 
 			while (rs.next()) {

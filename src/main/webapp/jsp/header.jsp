@@ -16,6 +16,7 @@
                         <a class="text-white button tab-link bg-minus-1" href="games/open">Open Games</a>
                         <a class="text-white button tab-link bg-minus-1" href="games/upload">Upload Class</a>
                         <a class="text-white button tab-link bg-minus-1" href="games/history">History</a>
+                        <a class="text-white button tab-link bg-minus-1" href="leaderboards">Leaderboards</a>
                         <a class="text-white button tab-link bg-minus-1" href="help">Help</a>
                         <a href="/logout" class="text-white button tab-link bg-plus-2">
                                 <span class="glyphicon glyphicon-user" aria-hidden="true"></span>

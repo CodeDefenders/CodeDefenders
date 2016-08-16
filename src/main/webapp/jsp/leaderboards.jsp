@@ -22,19 +22,31 @@
 		<tbody>
 		<%
 			for (User u : users) {
+				int totalScore = 0;
 				int numTests = 0;
 				int numMutants = 0;
 				int winsDef = 0;
 				int winsAtt = 0;
-				int totalScore = 0;
 
 				ArrayList<MultiplayerGame> mGames = DatabaseAccess.getMultiplayerGamesForUser(u.getId());
 				for (MultiplayerGame mg : mGames) {
-					int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(u.getId(), game.getId());
-
-					numTests += DatabaseAccess.getNumTestsForPlayer(playerId);
+					int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(u.getId(), mg.getId());
+					Role r = DatabaseAccess.getRole(u.getId(), mg.getId());
 
 					totalScore += DatabaseAccess.getPlayerPoints(playerId);
+					numTests += DatabaseAccess.getNumTestsForPlayer(playerId);
+					numMutants += DatabaseAccess.getMutantsForPlayer(playerId).size();
+
+					if(mg.getState().equals(AbstractGame.State.FINISHED))
+					{
+						if(r.equals(Role.DEFENDER) && r.equals(mg.getWinningTeam())) {
+							winsDef ++;
+						}
+						if(r.equals(Role.ATTACKER) && r.equals(mg.getWinningTeam())) {
+							winsAtt ++;
+						}
+					}
+
 				}
 		%>
 		<tr>
@@ -42,15 +54,14 @@
 			<td><%=totalScore%></td>
 			<td><%=numTests%></td>
 			<td><%=numMutants%></td>
-			<td></td>
-			<td></td>
+			<td><%=winsDef%></td>
+			<td><%=winsAtt%></td>
 		</tr>
 		<% } %>
 
 		</tbody>
 	</table>
 
-	<!--
 	<script>
 		$(document).ready(function() {
 			$.fn.dataTable.moment( 'DD/MM/YY HH:mm' );
@@ -77,6 +88,7 @@
 				editorDiff.setSize("100%", 500);
 			}
 		});
-	</script> -->
+	</script>
+
 </div>
 <%@ include file="/jsp/footer.jsp" %>
