@@ -40,10 +40,10 @@
 
 					if(mg.getState().equals(AbstractGame.State.FINISHED))
 					{
-						if(r.equals(Role.DEFENDER) && r.equals(mg.getWinningTeam())) {
+						if(r.equals(Role.DEFENDER) && mg.getWinningTeam().equals(Role.DEFENDER)) {
 							winsDef ++;
 						}
-						if(r.equals(Role.ATTACKER) && r.equals(mg.getWinningTeam())) {
+						if(r.equals(Role.ATTACKER) && mg.getWinningTeam().equals(Role.ATTACKER)) {
 							winsAtt ++;
 						}
 					}
