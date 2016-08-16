@@ -16,6 +16,18 @@ WHERE
   g.Mode = 'PARTY'
 ;
 
+CREATE OR REPLACE VIEW `vw_mp_num_tests`(User_ID, TestCount)
+AS
+SELECT
+  User_ID,
+  COUNT(*)
+
+FROM
+  vw_mp_tests
+
+GROUP BY User_ID
+;
+
 CREATE OR REPLACE VIEW `vw_mp_tests_kill_mutants`
 AS
 SELECT

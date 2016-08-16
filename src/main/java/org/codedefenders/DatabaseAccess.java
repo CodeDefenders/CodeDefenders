@@ -49,7 +49,7 @@ public class DatabaseAccess {
 		Connection conn = null;
 		Statement stmt = null;
 
-		int numMutants = 0;
+		int n = 0;
 
 		try {
 
@@ -60,7 +60,7 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			if (rs.next()) {
-				numMutants = rs.getInt(att);
+				n = rs.getInt(att);
 			}
 
 			stmt.close();
@@ -74,7 +74,7 @@ public class DatabaseAccess {
 		finally {
 			cleanup(conn, stmt);
 		}
-		return numMutants;
+		return n;
 	}
 
 	public static GameClass getClassForGame(int gameId) {
@@ -1100,6 +1100,16 @@ public class DatabaseAccess {
 		}
 
 		return testList;
+	}
+
+	public static ArrayList<Test> getPartyTestsForUser(int uid) {
+		String sql = String.format("SELECT * FROM vw_mp_tests WHERE User_ID='%d';", uid);
+		return getTests(sql);
+	}
+
+	public static int getNumPartyTestsForUser(int uid) {
+		String sql = String.format("SELECT * FROM vw_mp_num_tests WHERE User_ID='%d';", uid);
+		return getInt(sql, "TestCount");
 	}
 
 	public static int getKillingTestIdForMutant(int mid) {
