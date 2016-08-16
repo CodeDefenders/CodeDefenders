@@ -208,6 +208,43 @@ public class DatabaseAccess {
 		return classList;
 	}
 
+	public static ArrayList<User> getAllUsers() {
+		String sql = String.format("SELECT * FROM users");
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		ArrayList<User> uList = new ArrayList<User>();
+
+		try {
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"));
+				stmt.close();
+				conn.close();
+				uList.add(userRecord);
+			}
+			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			System.out.println(se);
+			//Handle errors for JDBC
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			//Handle errors for Class.forName
+			e.printStackTrace();
+		} finally {
+			cleanup(conn, stmt);
+		} //end try
+
+		return uList;
+	}
+
 	public static User getUser(int uid) {
 		return getUserForKey("User_ID", uid);
 	}
@@ -961,6 +998,13 @@ public class DatabaseAccess {
 			cleanup(conn, stmt);
 		}
 		return players;
+	}
+
+	public static int getNumTestsForPlayer(int pid) {
+		int n = 0;
+		String sql = String.format("SELECT * FROM tests WHERE Player_ID = '%d'", pid);
+		n += getTests(sql).size();
+		return n;
 	}
 
 	private static ArrayList<Test> getTests(String sql) {

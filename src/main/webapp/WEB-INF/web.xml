@@ -79,6 +79,16 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>leaderboards</servlet-name>
+		<jsp-file>/jsp/leaderboards.jsp</jsp-file>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>leaderboards</servlet-name>
+		<url-pattern>/leaderboards</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>index</servlet-name>
 		<jsp-file>/jsp/index.jsp</jsp-file>
 	</servlet>
