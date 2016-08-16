@@ -10,7 +10,7 @@
                 <a href="papers/Mutation16_CodeDefenders.pdf" title='Download PDF'>
                     <img src='images/pdf.png' alt="[PDF]"/>
                 </a>
-                Jos&eacute; Miguel Rojas and G. Fraser.
+                Jos&eacute; Miguel Rojas and Gordon Fraser.
                 <span class="paper_title">&#8220;Code Defenders: A Mutation Testing Game,&#8221;</span>
                 In <span class="paper_venue">Proc. of The 11th International Workshop on Mutation Analysis</span>,  2016.
                 <a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('mutation16_bibtex'));">[Bibtex]</a>
@@ -29,7 +29,7 @@
                 <a href="papers/ECSEE16_MutationEducation.pdf" title='Download PDF'>
                     <img src='images/pdf.png' alt="[PDF]"/>
                 </a>
-                Jos&eacute; Miguel Rojas and G. Fraser.
+                Jos&eacute; Miguel Rojas and Gordon Fraser.
                 <span class="paper_title">&#8220;Teaching Mutation Testing using Gamification,&#8221;</span>
                 In <span class="paper_venue">Proc. of The European Conference of Software Engineering Education</span>,  2016.
                 <a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('ecsee16_bibtex'));">[Bibtex]</a>
@@ -50,7 +50,7 @@
                 <a href="papers/PPIG16_TeachingTesting.pdf" title='Download PDF'>
                     <img src='images/pdf.png' alt="[PDF]"/>
                 </a>
-                Jos&eacute; Miguel Rojas and G. Fraser.
+                Jos&eacute; Miguel Rojas and Gordon Fraser.
                 <span class="paper_title">&#8220;Teaching Software Testing with a Mutation Testing Game,&#8221;</span>
                 In <span class="paper_venue">Proc. of the Annual Workshop of the Psychology of Programming Interest Group</span>,  2016.
                 <a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('ppig16_bibtex'));">[Bibtex]</a>
