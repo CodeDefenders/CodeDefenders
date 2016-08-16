@@ -111,9 +111,7 @@
 						HashMap<Integer, ArrayList<Mutant>> mutantLines = new HashMap<Integer, ArrayList<Mutant>>();
 
 						for (Mutant m : mutantsAlive) {
-							List<String> lines = m.getHTMLReadout();
-							for (String l : lines){
-								int line = Integer.parseInt(l.split(":")[1].trim());
+							for (int line : m.getLines()){
 								if (!mutantLines.containsKey(line)){
 									mutantLines.put(line, new ArrayList<Mutant>());
 								}
