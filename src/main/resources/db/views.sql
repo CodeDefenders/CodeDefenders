@@ -16,16 +16,6 @@ WHERE
   g.Mode = 'PARTY'
 ;
 
-CREATE OR REPLACE VIEW `vw_mp_num_tests`(User_ID, TestCount)
-AS
-SELECT
-  User_ID,
-  COUNT(*)
-FROM
-  vw_mp_tests
-GROUP BY User_ID
-;
-
 CREATE OR REPLACE VIEW `vw_mp_tests_kill_mutants`
 AS
 SELECT
@@ -66,6 +56,17 @@ WHERE
   g.Mode = 'PARTY'
 ;
 
+
+CREATE OR REPLACE VIEW `vw_mp_num_tests`(User_ID, TestCount)
+AS
+SELECT
+  User_ID,
+  COUNT(*)
+FROM
+  vw_mp_tests
+GROUP BY User_ID
+;
+
 CREATE OR REPLACE VIEW `vw_mp_num_mutants`(User_ID, MutantCount)
 AS
 SELECT
@@ -73,5 +74,15 @@ SELECT
   COUNT(*)
 FROM
   vw_mp_mutants
+GROUP BY User_ID
+;
+
+CREATE OR REPLACE VIEW `vw_mp_num_tests_kill`(User_ID, TestKillCount)
+AS
+SELECT
+  User_ID,
+  COUNT(*)
+FROM
+  vw_mp_tests_kill_mutants
 GROUP BY User_ID
 ;

@@ -13,8 +13,9 @@
 			<tr>
 				<th class="col-sm-2">User</th>
 				<th class="col-sm-2">Total Score</th>
-				<th class="col-sm-2">Tests</th>
-				<th class="col-sm-2">Mutants</th>
+				<th class="col-sm-1">Mutants</th>
+				<th class="col-sm-1">Tests</th>
+				<th class="col-sm-2">Mutant Kills</th>
 				<th class="col-sm-2">Defender Wins</th>
 				<th class="col-sm-2">Attacker Wins</th>
 			</tr>
@@ -49,8 +50,9 @@
 		<tr>
 			<td><%=u.getUsername()%></td>
 			<td><%=totalScore%></td>
-			<td><%=DatabaseAccess.getNumPartyTestsForUser(u.getId())%></td>
 			<td><%=DatabaseAccess.getNumPartyMutantsForUser(u.getId())%></td>
+			<td><%=DatabaseAccess.getNumPartyTestsForUser(u.getId())%></td>
+			<td><%=DatabaseAccess.getNumPartyTestKillsForUser(u.getId())%></td>
 			<td><%=winsDef%></td>
 			<td><%=winsAtt%></td>
 		</tr>

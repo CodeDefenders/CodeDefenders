@@ -1112,6 +1112,11 @@ public class DatabaseAccess {
 		return getInt(sql, "TestCount");
 	}
 
+	public static int getNumPartyTestKillsForUser(int uid) {
+		String sql = String.format("SELECT * FROM vw_mp_num_tests_kill WHERE User_ID='%d';", uid);
+		return getInt(sql, "TestKillCount");
+	}
+
 	public static int getNumPartyMutantsForUser(int uid) {
 		String sql = String.format("SELECT * FROM vw_mp_num_mutants WHERE User_ID='%d';", uid);
 		return getInt(sql, "MutantCount");
