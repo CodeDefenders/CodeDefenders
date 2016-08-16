@@ -8,7 +8,7 @@
 	%>
 <div class="w-100">
 	<h3>Battlegrounds</h3>
-	<table class="table table-hover table-responsive table-paragraphs games-table">
+	<table id="tableMPLeaderboard" class="table table-hover table-responsive table-paragraphs games-table dataTable display">
 		<thead>
 			<tr>
 				<th class="col-sm-2">User</th>
@@ -28,7 +28,8 @@
 				int winsDef = 0;
 				int winsAtt = 0;
 
-				ArrayList<MultiplayerGame> mGames = DatabaseAccess.getMultiplayerGamesForUser(u.getId());
+				ArrayList<MultiplayerGame> mGames = DatabaseAccess.getJoinedMultiplayerGamesForUser(u.getId());
+
 				for (MultiplayerGame mg : mGames) {
 					int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(u.getId(), mg.getId());
 					Role r = DatabaseAccess.getRole(u.getId(), mg.getId());
@@ -65,7 +66,7 @@
 	<script>
 		$(document).ready(function() {
 			$.fn.dataTable.moment( 'DD/MM/YY HH:mm' );
-			$('#tableMPGames').DataTable( {
+			$('#tableMPLeaderboard').DataTable( {
 				"paging":   false,
 				"searching": false,
 				"order": [[ 5, "asc" ]],

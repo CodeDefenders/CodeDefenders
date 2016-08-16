@@ -360,6 +360,14 @@ public class DatabaseAccess {
 		return getGames(sql);
 	}
 
+	public static ArrayList<MultiplayerGame> getJoinedMultiplayerGamesForUser(int userId) {
+		String sql = String.format("SELECT * FROM games AS m " +
+				"LEFT JOIN players as p ON p.Game_ID=m.ID \n" +
+				"WHERE m.Mode = 'PARTY' AND (p.User_ID=%d)" +
+				"GROUP BY m.ID;", userId);
+		return getMultiplayerGames(sql);
+	}
+
 	public static ArrayList<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
 		String sql = String.format("SELECT * FROM games AS m " +
 				"LEFT JOIN players as p ON p.Game_ID=m.ID  AND p.Active=TRUE \n" +
