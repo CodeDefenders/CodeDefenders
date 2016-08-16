@@ -1112,6 +1112,11 @@ public class DatabaseAccess {
 		return getInt(sql, "TestCount");
 	}
 
+	public static int getNumPartyMutantsForUser(int uid) {
+		String sql = String.format("SELECT * FROM vw_mp_num_mutants WHERE User_ID='%d';", uid);
+		return getInt(sql, "MutantCount");
+	}
+
 	public static int getKillingTestIdForMutant(int mid) {
 		String sql = String.format("SELECT * FROM targetexecutions WHERE Target='TEST_MUTANT' AND Status!='SUCCESS' AND Mutant_ID='%d';", mid);
 		TargetExecution targ = getTargetExecutionSQL(sql);

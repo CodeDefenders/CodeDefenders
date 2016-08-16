@@ -21,10 +21,8 @@ AS
 SELECT
   User_ID,
   COUNT(*)
-
 FROM
   vw_mp_tests
-
 GROUP BY User_ID
 ;
 
@@ -66,4 +64,14 @@ FROM users u
 
 WHERE
   g.Mode = 'PARTY'
+;
+
+CREATE OR REPLACE VIEW `vw_mp_num_mutants`(User_ID, MutantCount)
+AS
+SELECT
+  User_ID,
+  COUNT(*)
+FROM
+  vw_mp_mutants
+GROUP BY User_ID
 ;

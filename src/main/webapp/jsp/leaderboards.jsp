@@ -23,7 +23,6 @@
 		<%
 			for (User u : users) {
 				int totalScore = 0;
-				int numMutants = 0;
 				int winsDef = 0;
 				int winsAtt = 0;
 
@@ -34,7 +33,6 @@
 					Role r = DatabaseAccess.getRole(u.getId(), mg.getId());
 
 					totalScore += DatabaseAccess.getPlayerPoints(playerId);
-					numMutants += DatabaseAccess.getMutantsForPlayer(playerId).size();
 
 					if(mg.getState().equals(AbstractGame.State.FINISHED))
 					{
@@ -52,7 +50,7 @@
 			<td><%=u.getUsername()%></td>
 			<td><%=totalScore%></td>
 			<td><%=DatabaseAccess.getNumPartyTestsForUser(u.getId())%></td>
-			<td><%=numMutants%></td>
+			<td><%=DatabaseAccess.getNumPartyMutantsForUser(u.getId())%></td>
 			<td><%=winsDef%></td>
 			<td><%=winsAtt%></td>
 		</tr>
