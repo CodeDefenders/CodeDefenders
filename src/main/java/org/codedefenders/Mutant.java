@@ -20,7 +20,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class Mutant {
@@ -50,7 +49,8 @@ public class Mutant {
 
 	private int score; // multiplayer
 
-	private ArrayList<Integer> lines = null; // multiplayer
+	private ArrayList<Integer> lines = null;
+	private ArrayList<String> description = null;
 
 	/**
 	 * Creates a mutant
@@ -254,33 +254,6 @@ public class Mutant {
 		}
 	}
 
-	public List<String> getHTMLReadout() throws IOException {
-
-		Patch p = getDifferences();
-		Chunk c;
-		Delta.TYPE t;
-		int pos;
-
-		List<String> htmlMessages = new LinkedList<String>();
-
-		for (Delta d : p.getDeltas()) {
-			c = d.getOriginal();
-			t = d.getType();
-			// position starts at 0 but code readout starts at 1
-			pos = c.getPosition() + 1;
-			if (t == Delta.TYPE.CHANGE) {
-				htmlMessages.add("Made a change to Line: " + pos + "\n");
-			} else if (t == Delta.TYPE.DELETE) {
-				htmlMessages.add("Removed Line: " + pos + "\n");
-			} else {
-				htmlMessages.add("Added Line: " + pos + "\n");
-			}
-
-		}
-
-		return htmlMessages;
-	}
-
 	// insert will run once after mutant creation.
 	// Stores values of JavaFile, ClassFile, GameID, RoundCreated in DB. These will not change once input.
 	// Default values for Equivalent (ASSUMED_NO), Alive(1), RoundKilled(NULL) are assigned.
@@ -404,22 +377,47 @@ public class Mutant {
 		if (lines != null){
 			return lines;
 		}
-		try {
-			List<String> ls = getHTMLReadout();
-			lines = new ArrayList<>();
-			for (int i = 0; i < ls.size(); i++) {
-				String l = ls.get(i);
-				lines.add(Integer.parseInt(l.split(":")[1].trim()));
+		lines = new ArrayList<>();
+		description = new ArrayList<>();
+
+		Patch p = getDifferences();
+		for (Delta d : p.getDeltas()) {
+			Chunk c = d.getOriginal();
+			Delta.TYPE t = d.getType();
+			// position starts at 0 but code readout starts at 1
+			int firstLine = c.getPosition() + 1;
+			String desc = "line " + firstLine;
+			// was it one single line or several?
+			lines.add(firstLine);
+			int endLine = firstLine + c.getLines().size() - 1;
+			if (endLine > firstLine) {
+				// if more than one line, report range of lines;
+				// may not be 100% accurate, but is all we have in the delta chunk
+				for (int l = firstLine + 1 ; l <= endLine; l++) {
+					lines.add(l);
+				}
+				desc = String.format("lines %d-%d", firstLine, endLine);
 			}
-
-		} catch (IOException e) {
-			e.printStackTrace();
+			// update mutant description
+			if (t == Delta.TYPE.CHANGE) {
+				description.add("Modified " + desc + "\n");
+			} else if (t == Delta.TYPE.DELETE) {
+				description.add("Removed " + desc + "\n");
+			} else {
+				description.add("Added " + desc + "\n");
+			}
 		}
-		if (lines == null){
-			lines = new ArrayList<>();
-		}
-
 		return lines;
+	}
+
+	public List<String> getHTMLReadout() throws IOException {
+		if (description != null){
+			return description;
+		}
+		// for efficiency, getLines actually create the list of messages
+		getLines();
+
+		return description;
 	}
 
 	@Override
