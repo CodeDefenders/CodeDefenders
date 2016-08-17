@@ -155,7 +155,8 @@ public class Mutant {
 	public void kill(Equivalence equivalent) {
 		alive = false;
 		roundKilled = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
-		this.equivalent = equivalent;
+		setEquivalent(equivalent);
+
 		update();
 	}
 
