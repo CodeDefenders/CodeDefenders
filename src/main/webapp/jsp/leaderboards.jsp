@@ -13,48 +13,29 @@
 			<tr>
 				<th class="col-sm-2">User</th>
 				<th class="col-sm-2">Total Score</th>
-				<th class="col-sm-1">Mutants</th>
-				<th class="col-sm-1">Tests</th>
+				<th class="col-sm-2">Mutants | Points</th>
+				<th class="col-sm-2">Tests | Points</th>
 				<th class="col-sm-2">Mutant Kills</th>
+				<!--
 				<th class="col-sm-2">Defender Wins</th>
 				<th class="col-sm-2">Attacker Wins</th>
+				-->
 			</tr>
 		</thead>
 		<tbody>
 		<%
 			for (User u : users) {
-				int totalScore = 0;
-				int winsDef = 0;
-				int winsAtt = 0;
-
-				ArrayList<MultiplayerGame> mGames = DatabaseAccess.getJoinedMultiplayerGamesForUser(u.getId());
-
-				for (MultiplayerGame mg : mGames) {
-					int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(u.getId(), mg.getId());
-					Role r = DatabaseAccess.getRole(u.getId(), mg.getId());
-
-					totalScore += DatabaseAccess.getPlayerPoints(playerId);
-
-					if(mg.getState().equals(AbstractGame.State.FINISHED))
-					{
-						if(r.equals(Role.DEFENDER) && mg.getWinningTeam().equals(Role.DEFENDER)) {
-							winsDef ++;
-						}
-						if(r.equals(Role.ATTACKER) && mg.getWinningTeam().equals(Role.ATTACKER)) {
-							winsAtt ++;
-						}
-					}
-
-				}
 		%>
 		<tr>
 			<td><%=u.getUsername()%></td>
-			<td><%=totalScore%></td>
-			<td><%=DatabaseAccess.getNumPartyMutantsForUser(u.getId())%></td>
-			<td><%=DatabaseAccess.getNumPartyTestsForUser(u.getId())%></td>
+			<td><%=DatabaseAccess.getUserPartyPointsTotal(u.getId())%></td>
+			<td><%=DatabaseAccess.getNumPartyMutantsForUser(u.getId())%> | <%=DatabaseAccess.getUserPartyPointsMutants(u.getId())%></td>
+			<td><%=DatabaseAccess.getNumPartyTestsForUser(u.getId())%> | <%=DatabaseAccess.getUserPartyPointsTests(u.getId())%></td>
 			<td><%=DatabaseAccess.getNumPartyTestKillsForUser(u.getId())%></td>
-			<td><%=winsDef%></td>
-			<td><%=winsAtt%></td>
+			<!--
+			<td></td>
+			<td></td>
+			-->
 		</tr>
 		<% } %>
 

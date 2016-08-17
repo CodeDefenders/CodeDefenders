@@ -1122,6 +1122,19 @@ public class DatabaseAccess {
 		return getInt(sql, "MutantCount");
 	}
 
+	public static int getUserPartyPointsMutants(int uid) {
+		String sql = String.format("SELECT * FROM vw_mp_user_points WHERE User_ID='%d';", uid);
+		return getInt(sql, "MutantPoints");
+	}
+	public static int getUserPartyPointsTests(int uid) {
+		String sql = String.format("SELECT * FROM vw_mp_user_points WHERE User_ID='%d';", uid);
+		return getInt(sql, "TestPoints");
+	}
+	public static int getUserPartyPointsTotal(int uid) {
+		String sql = String.format("SELECT * FROM vw_mp_user_points WHERE User_ID='%d';", uid);
+		return getInt(sql, "TotalPoints");
+	}
+
 	public static int getKillingTestIdForMutant(int mid) {
 		String sql = String.format("SELECT * FROM targetexecutions WHERE Target='TEST_MUTANT' AND Status!='SUCCESS' AND Mutant_ID='%d';", mid);
 		TargetExecution targ = getTargetExecutionSQL(sql);
