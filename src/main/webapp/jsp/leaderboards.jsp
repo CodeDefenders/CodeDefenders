@@ -30,11 +30,11 @@
 		%>
 		<tr>
 			<td><%=u.getUsername()%></td>
-			<td><%=DatabaseAccess.getUserPartyPointsTotal(u.getId())%></td>
 			<td><%=DatabaseAccess.getNumPartyMutantsForUser(u.getId())%></td>
 			<td><%=DatabaseAccess.getUserPartyPointsMutants(u.getId())%></td>
 			<td><%=DatabaseAccess.getNumPartyTestsForUser(u.getId())%></td>
 			<td><%=DatabaseAccess.getUserPartyPointsTests(u.getId())%></td>
+			<td><%=DatabaseAccess.getUserPartyPointsTotal(u.getId())%></td>
 			<td><%=DatabaseAccess.getNumPartyTestKillsForUser(u.getId())%></td>
 			<!--
 			<td></td>
