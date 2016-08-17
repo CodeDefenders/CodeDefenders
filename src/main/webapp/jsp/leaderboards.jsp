@@ -12,11 +12,11 @@
 		<thead>
 			<tr>
 				<th class="col-sm-2">User</th>
-				<th class="col-sm-2">Total Score</th>
 				<th class="col-sm-1">Mutants</th>
-				<th class="col-sm-2">Points as Attacker</th>
+				<th class="col-sm-2">Attacker Score</th>
 				<th class="col-sm-1">Tests</th>
-				<th class="col-sm-2">Points as Defender</th>
+				<th class="col-sm-2">Defender Score</th>
+				<th class="col-sm-2">Total Score</th>
 				<th class="col-sm-2">Mutants Killed</th>
 				<!--
 				<th class="col-sm-2">Defender Wins</th>
@@ -52,7 +52,7 @@
 			$('#tableMPLeaderboard').DataTable( {
 				"paging":   false,
 				"searching": false,
-				"order": [[ 1, "desc" ]],
+				"order": [[ 6, "desc" ]],
 				"language": {
 					"info": ""
 				}
