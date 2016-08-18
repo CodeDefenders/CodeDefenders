@@ -12,12 +12,12 @@
 		<thead>
 			<tr>
 				<th class="col-sm-2">User</th>
+				<th class="col-sm-1">Mutants</th>
+				<th class="col-sm-2">Attacker Score</th>
+				<th class="col-sm-1">Tests</th>
+				<th class="col-sm-2">Defender Score</th>
+				<th class="col-sm-2">Mutants Killed</th>
 				<th class="col-sm-2">Total Score</th>
-				<th class="col-sm-1">Mutant Points</th>
-				<th class="col-sm-1">Test Points</th>
-				<th class="col-sm-1">No. Mutants</th>
-				<th class="col-sm-1">No. Tests</th>
-				<th class="col-sm-2">Mutant Kills</th>
 				<!--
 				<th class="col-sm-2">Defender Wins</th>
 				<th class="col-sm-2">Attacker Wins</th>
@@ -31,12 +31,12 @@
 		%>
 		<tr>
 			<td><%=u.getUsername()%></td>
-			<td><%=DatabaseAccess.getUserPartyPointsTotal(u.getId())%></td>
-			<td><%=DatabaseAccess.getUserPartyPointsMutants(u.getId())%></td>
-			<td><%=DatabaseAccess.getUserPartyPointsTests(u.getId())%></td>
 			<td><%=DatabaseAccess.getNumPartyMutantsForUser(u.getId())%></td>
+			<td><%=DatabaseAccess.getUserPartyPointsMutants(u.getId())%></td>
 			<td><%=DatabaseAccess.getNumPartyTestsForUser(u.getId())%></td>
+			<td><%=DatabaseAccess.getUserPartyPointsTests(u.getId())%></td>
 			<td><%=DatabaseAccess.getNumPartyTestKillsForUser(u.getId())%></td>
+			<td><%=DatabaseAccess.getUserPartyPointsTotal(u.getId())%></td>
 			<!--
 			<td></td>
 			<td></td>
@@ -53,7 +53,7 @@
 			$('#tableMPLeaderboard').DataTable( {
 				"paging":   false,
 				"searching": false,
-				"order": [[ 5, "asc" ]],
+				"order": [[ 6, "desc" ]],
 				"language": {
 					"info": ""
 				}
