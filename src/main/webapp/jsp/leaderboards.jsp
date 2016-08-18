@@ -13,13 +13,16 @@
 			<tr>
 				<th class="col-sm-2">User</th>
 				<th class="col-sm-2">Total Score</th>
-				<th class="col-sm-2">Mutants | Points</th>
-				<th class="col-sm-2">Tests | Points</th>
+				<th class="col-sm-1">Mutant Points</th>
+				<th class="col-sm-1">Test Points</th>
+				<th class="col-sm-1">No. Mutants</th>
+				<th class="col-sm-1">No. Tests</th>
 				<th class="col-sm-2">Mutant Kills</th>
 				<!--
 				<th class="col-sm-2">Defender Wins</th>
 				<th class="col-sm-2">Attacker Wins</th>
 				-->
+				
 			</tr>
 		</thead>
 		<tbody>
@@ -29,8 +32,10 @@
 		<tr>
 			<td><%=u.getUsername()%></td>
 			<td><%=DatabaseAccess.getUserPartyPointsTotal(u.getId())%></td>
-			<td><%=DatabaseAccess.getNumPartyMutantsForUser(u.getId())%> | <%=DatabaseAccess.getUserPartyPointsMutants(u.getId())%></td>
-			<td><%=DatabaseAccess.getNumPartyTestsForUser(u.getId())%> | <%=DatabaseAccess.getUserPartyPointsTests(u.getId())%></td>
+			<td><%=DatabaseAccess.getUserPartyPointsMutants(u.getId())%></td>
+			<td><%=DatabaseAccess.getUserPartyPointsTests(u.getId())%></td>
+			<td><%=DatabaseAccess.getNumPartyMutantsForUser(u.getId())%></td>
+			<td><%=DatabaseAccess.getNumPartyTestsForUser(u.getId())%></td>
 			<td><%=DatabaseAccess.getNumPartyTestKillsForUser(u.getId())%></td>
 			<!--
 			<td></td>
