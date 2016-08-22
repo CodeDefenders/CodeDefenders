@@ -439,11 +439,8 @@ public class MultiplayerGame extends AbstractGame {
 		HashMap<Integer, PlayerScore> testScores = new HashMap<Integer, PlayerScore>();
 		HashMap<Integer, Integer> mutantsKilled = new HashMap<Integer, Integer>();
 		int defendersTeamId = -1;
-		int attackersTeamId = -2;
 		testScores.put(defendersTeamId, new PlayerScore(defendersTeamId));
-		testScores.put(attackersTeamId, new PlayerScore(attackersTeamId));
 		mutantsKilled.put(defendersTeamId, 0);
-		mutantsKilled.put(attackersTeamId, 0);
 
 		for (int defenderId : getDefenderIds()){
 			testScores.put(defenderId, new PlayerScore(defenderId));
@@ -452,6 +449,8 @@ public class MultiplayerGame extends AbstractGame {
 
 		int[] attackers = getAttackerIds();
 		for (Test test : getTests()){
+			if (ArrayUtils.contains(attackers, test.getPlayerId()))
+				continue;
 			if (!testScores.containsKey(test.getPlayerId())){
 				testScores.put(test.getPlayerId(), new PlayerScore(test.getPlayerId()));
 				mutantsKilled.put(test.getPlayerId(), 0);
@@ -461,8 +460,6 @@ public class MultiplayerGame extends AbstractGame {
 			ps.increaseTotalScore(test.getScore());
 
 			int teamKey = defendersTeamId;
-			if (ArrayUtils.contains(attackers, test.getPlayerId()))
-				teamKey = attackersTeamId;
 
 			PlayerScore ts = testScores.get(teamKey);
 			ts.increaseQuantity();
@@ -475,12 +472,10 @@ public class MultiplayerGame extends AbstractGame {
 		}
 
 		for (int playerId : mutantsKilled.keySet()){
-			if (playerId < 0)
+			if (playerId < 0 || ArrayUtils.contains(attackers, playerId))
 				continue;
 
 			int teamKey = defendersTeamId;
-			if (ArrayUtils.contains(attackers, playerId))
-				teamKey = attackersTeamId;
 
 			PlayerScore ps = testScores.get(playerId);
 			int playerScore = DatabaseAccess.getPlayerPoints(playerId);

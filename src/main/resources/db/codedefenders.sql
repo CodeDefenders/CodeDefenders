@@ -473,7 +473,7 @@ BEGIN
   LEFT JOIN mutants AS m ON m.Game_ID = g.ID
   LEFT JOIN equivalences AS e ON e.Mutant_ID = m.Mutant_ID
   SET State='FINISHED', e.Expired = 1
-  WHERE Mode='PARTY' AND State='GRACE_TWO' AND Finish_Time<=NOW();
+  WHERE Mode='PARTY' AND (State='GRACE_TWO' OR (State='FINISHED' AND m.Equivalent='PENDING_TEST')) AND Finish_Time<=NOW();
 
   UPDATE equivalences AS e
   LEFT JOIN mutants AS m ON e.Mutant_ID = m.Mutant_ID
