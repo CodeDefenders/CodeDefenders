@@ -39,16 +39,9 @@ if (role == Role.ATTACKER && true){
 									}
 					%>
 					<pre><textarea id="mutantSut" name="test" cols="80" rows="30"><%= mutTestCode %></textarea></pre>
-					<div class="crow fly">
-						<div>
-							<a class="btn btn-primary" href="multiplayer/play?acceptEquiv=<%= equiv.getId() %>">Accept Equivalence</a>
-						</div>
-						<div>
-							<div class="btn-right">
-								<input class="btn btn-primary" name="rejectEquivalent" type="submit" value="Submit Killing Test">
-							</div>
-						</div>
-					</div>
+							<!--btn-danger-->
+							<a onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');" href="multiplayer/play?acceptEquiv=<%= equiv.getId() %>"><button type="button" class="btn btn-danger btn-left">Accept Equivalence</button></a>
+							<button form="equivalenceForm" class="btn btn-primary btn-game btn-right" name="rejectEquivalent" type="submit">Submit Killing Test</button>
 					<div>
 						<p>Note: If the game finishes with this equivalence unsolved, you will lose points!</p>
 					</div>

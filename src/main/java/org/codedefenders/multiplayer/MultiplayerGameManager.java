@@ -98,7 +98,7 @@ public class MultiplayerGameManager extends HttpServlet {
 							MutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
 							if (mPending.getEquivalent().equals(PROVEN_NO)) {
 								logger.info("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
-								newTest.setScore(2); // score 2 points for proving a mutant non-equivalent
+								newTest.setScore(0); // score 2 points for proving a mutant non-equivalent
 								if (mPending.getId() == currentEquivMutantID)
 									killedClaimed = true;
 								else
