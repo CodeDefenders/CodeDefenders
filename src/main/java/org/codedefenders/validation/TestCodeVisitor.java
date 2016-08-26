@@ -62,8 +62,8 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 	public Node visit (NameExpr stmt, Object args)
 	{
 		super.visit(stmt,args);
-		if (stmt.getName().equals("System")) {
-			logger.info("Invalid test contains System uses");
+		if (stmt.getName().equals("System") || stmt.getName().equals("Random") ) {
+			logger.info("Invalid test contains System/Random uses");
 			isValid = false;
 		}
 		return stmt;
@@ -146,8 +146,8 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 	{
 		super.visit(stmt,args);
 		stmtCount++;
-		if (stmt.toString().startsWith("System.")) {
-			logger.info("There is a call to System.*");
+		if (stmt.toString().startsWith("System.") || stmt.toString().startsWith("Random.")) {
+			logger.info("There is a call to System/Random.*");
 			isValid = false;
 		}
 
@@ -162,8 +162,8 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 	public Node visit (VariableDeclarator stmt, Object args)
 	{
 		super.visit(stmt,args);
-		if (stmt.getInit() != null && stmt.getInit().toString().startsWith("System.*")) {
-			logger.info("There is a variable declaration using System.*");
+		if (stmt.getInit() != null && (stmt.getInit().toString().startsWith("System.*") || stmt.getInit().toString().startsWith("Random.*"))) {
+			logger.info("There is a variable declaration using System/Random.*");
 			isValid = false;
 		}
 		return stmt;
