@@ -166,9 +166,20 @@
 		<servlet-name>contact.jsp</servlet-name>
 		<jsp-file>/jsp/contact.jsp</jsp-file>
 	</servlet>
+
 	<servlet-mapping>
 		<servlet-name>contact.jsp</servlet-name>
 		<url-pattern>/contact</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>study</servlet-name>
+		<jsp-file>/jsp/study.jsp</jsp-file>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>study</servlet-name>
+		<url-pattern>/study</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
