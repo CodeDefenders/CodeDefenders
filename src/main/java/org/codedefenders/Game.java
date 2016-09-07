@@ -2,10 +2,6 @@ package org.codedefenders;
 
 import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 
-import org.codedefenders.singleplayer.automated.attacker.AiAttacker;
-import org.codedefenders.singleplayer.automated.defender.AiDefender;
-import org.codedefenders.singleplayer.AiPlayer;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;

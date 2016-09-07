@@ -264,7 +264,9 @@ public class GameManager extends HttpServlet {
 						MutationTester.runTestOnAllMutants(activeGame, newTest, messages);
 						activeGame.endTurn();
 						activeGame.update();
-						if(activeGame.getMode().equals(AbstractGame.Mode.SINGLE)) {
+						// if single-player game is not finished, make a move
+						if (! activeGame.getState().equals(AbstractGame.State.FINISHED)
+								&& activeGame.getMode().equals(AbstractGame.Mode.SINGLE)) {
 							SinglePlayerGame g = (SinglePlayerGame) activeGame;
 							if (g.getAi().makeTurn()) {
 								messages.addAll(g.getAi().getMessagesLastTurn());
