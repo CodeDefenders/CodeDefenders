@@ -178,6 +178,7 @@ public class UploadManager extends HttpServlet {
 			response.sendRedirect("games/user");
 
 		} else {
+			cut.delete();
 			messages.add("We were unable to compile your class, please try with a simpler one (no dependencies)");
 			response.sendRedirect(request.getHeader("referer"));
 			return;

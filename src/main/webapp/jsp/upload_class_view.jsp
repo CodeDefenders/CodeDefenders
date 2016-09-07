@@ -39,7 +39,7 @@
 							<td><%= c.getId() %></td>
 							<td>
 								<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=c.getId()%>">
-									<%=c.getBaseName()%>
+									<%=c.getBaseName()%> <%=c.getBaseName().equals(c.getAlias()) ? "" : "(alias "+c.getAlias()+")"%>
 								</a>
 								<div id="modalCUTFor<%=c.getId()%>" class="modal fade" role="dialog" style="text-align: left;" tabindex="-1">
 									<div class="modal-dialog">
@@ -47,7 +47,7 @@
 										<div class="modal-content">
 											<div class="modal-header">
 												<button type="button" class="close" data-dismiss="modal">&times;</button>
-												<h4 class="modal-title"><%=c.getBaseName()%> (alias <%=c.getAlias()%>)</h4>
+												<h4 class="modal-title"><%=c.getBaseName()%></h4>
 											</div>
 											<div class="modal-body">
 												<pre class="readonly-pre"><textarea class=	"readonly-textarea classPreview" id="sut<%=c.getId()%>" name="cut<%=c.getId()%>" cols="80" rows="30"><%=c.getAsString()%></textarea></pre>

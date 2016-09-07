@@ -1,10 +1,8 @@
 package org.codedefenders;
 
-import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -182,5 +180,32 @@ public class GameClass {
 
 	public void setClassFile(String classFile) {
 		this.classFile = classFile;
+	}
+
+	public boolean delete() {
+		logger.debug("Deleting class (ID={})", id);
+		Connection conn = null;
+		Statement stmt = null;
+
+		String sql = String.format("DELETE FROM classes WHERE Class_ID='%d';", id);
+
+		// Attempt to update game info into database
+		try {
+			conn = DatabaseAccess.getConnection();
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			stmt.close();
+			conn.close();
+			return true;
+		} catch (SQLException se) {
+			System.out.println(se);
+			//Handle errors for JDBC
+		} catch (Exception e) {
+			System.out.println(e);
+			//Handle errors for Class.forName
+		} finally {
+			DatabaseAccess.cleanup(conn, stmt);
+		} //end try
+		return false;
 	}
 }
