@@ -8,22 +8,38 @@
                     class="navbar-toggle tex-white buton tab-link bg-minus-1" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                 Menu <span class="glyphicon glyphicon-plus"></span>
             </button>
-            <ul class="navbar navbar-nav collapse navbar-collapse"
+            <ul
+                    class="crow fly no-gutter navbar navbar-nav collapse navbar-collapse"
                id="bs-example-navbar-collapse-1"
                  style="z-index: 1000; text-align: center; list-style:none;
-                 width: 100%;">
-                <li><a class="text-white button tab-link bg-minus-1"
-                    href="games/user" style="width:100%;">My Games</a></li>
-                <li><a class="text-white button tab-link bg-minus-1"
-                       href="games/open" style="width:100%;">Open Games</a></li>
-                <li><a class="text-white button tab-link bg-minus-1" href="games/upload" style="width:100%;">Upload Class</a></li>
-                <li><a class="text-white button tab-link bg-minus-1" href="games/history" style="width:100%;">History</a></li>
-                <li><a class="text-white button tab-link bg-minus-1" href="leaderboards" style="width: 100%;>Leaderboards</a></li>
-                <li><a class="text-white button tab-link bg-minus-1" href="help" style="width:100%;">Help</a></li>
-                <li><a href="/logout" class="text-white button tab-link bg-plus-2" style="width:100%;">
-                        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                        <%=request.getSession().getAttribute("username")%> [Logout]
-                </a></li>
+                 width: 80%; float: none; margin: 0 auto;">
+                <li style="float: none" class="dropdown"><a
+                            class="text-white button tab-link bg-minus-1 dropdown-toggle"
+                            href="games/user"
+                            style="width:100%;" data-toggle="dropdown" href="#">Games <span class="glyphicon glyphicon-menu-hamburger" style="float: right;"></span></a>
+                        <ul class="dropdown-menu" style="background-color:
+                        #FFFFFF; border: 1px solid #000000;">
+                            <li><a
+                                   href="games/user" style="width:100%;">My Games</a></li>
+                            <li><a
+                                   href="games/open" style="width:100%;">Open
+                                Games</a></li>
+                            <li><a href="games/history" style="width:100%;">History</a></li>
+                </ul></li>
+                <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="games/upload" style="width:100%;">Upload Class</a></li>
+                <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="leaderboards" style="width: 100%;">Leaderboard</a></li>
+                <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="help" style="width:100%;">Help</a></li>
+                <li style="float: none" class="dropdown"><a
+                        class="text-white button tab-link bg-minus-1 dropdown-toggle"
+                        href="games/user"
+                        style="width:100%;" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+                    <%=request.getSession().getAttribute("username")%> <span class="glyphicon glyphicon-menu-hamburger" style="float: right;"></span></a>
+                    <ul class="dropdown-menu" style="background-color:
+                        #FFFFFF; border: 1px solid #000000;">
+                        <li><a
+                               href="/logout" style="width:100%;">Logout
+                        </a></li>
+                    </ul></li>
                 </ul>
         </div>
     </div>

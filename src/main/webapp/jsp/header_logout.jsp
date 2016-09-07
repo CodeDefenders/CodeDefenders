@@ -21,15 +21,16 @@
                     class="navbar-toggle tex-white buton tab-link bg-minus-1" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                 Menu <span class="glyphicon glyphicon-plus"></span>
             </button>
-            <ul class="navbar navbar-nav collapse navbar-collapse"
+            <ul class="crow fly navbar navbar-nav collapse navbar-collapse"
                 id="bs-example-navbar-collapse-1"
                 style="z-index: 1000; text-align: center; list-style:none;
-                 width: 100%;">
-                <li><a class="text-white button tab-link bg-minus-1"
+                width: 80%; float: none; margin: 0 auto;">
+                <li style="float: none"><a
+                        class="text-white button tab-link bg-minus-1"
                        href="#research" style="width:100%;">Research</a></li>
-                <li><a class="text-white button tab-link bg-minus-1"
+                <li style="float: none"><a class="text-white button tab-link bg-minus-1"
                        href="#contact" style="width:100%;">Contact</a></li>
-                <li><a class="text-white button tab-link bg-minus-1"
+                <li style="float: none"><a class="text-white button tab-link bg-minus-1"
                        href="help" style="width:100%;">Help</a></li>
             </ul>
         </div>
