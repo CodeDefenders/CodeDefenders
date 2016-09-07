@@ -167,13 +167,15 @@ public class GameManager extends HttpServlet {
 						if(AntRunner.potentialEquivalent(mutantClaimed)) {
 							//Is potentially equiv - accept as equivalent
 							mutantClaimed.kill(Mutant.Equivalence.DECLARED_YES);
+							messages.add("The AI has accepted the mutant as equivalent.");
 						} else {
 							mutantClaimed.kill(Mutant.Equivalence.PROVEN_NO);
+							messages.add("The AI has submitted a test that kills the mutant and proves it non-equivalent!");
 						}
 						activeGame.endTurn();
 						SinglePlayerGame spg = (SinglePlayerGame) activeGame;
 						if (spg.getAi().makeTurn()) {
-							messages.add("The AI has created a test!");
+							messages.addAll(spg.getAi().getMessagesLastTurn());
 						}
 
 					} else {
@@ -212,6 +214,7 @@ public class GameManager extends HttpServlet {
 							//Singleplayer - check for potential equivalent.
 							if(AntRunner.potentialEquivalent(newMutant)) {
 								//Is potentially equiv - mark as equivalent and update.
+								messages.add("The AI has started an equivalence challenge on your last mutant.");
 								newMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
 								newMutant.update();
 								activeGame.update();
@@ -219,7 +222,7 @@ public class GameManager extends HttpServlet {
 								activeGame.endTurn();
 								SinglePlayerGame g = (SinglePlayerGame) activeGame;
 								if (g.getAi().makeTurn()) {
-									messages.add("The AI has created a test!");
+									messages.addAll(g.getAi().getMessagesLastTurn());
 								}
 							}
 						} else {
@@ -264,7 +267,7 @@ public class GameManager extends HttpServlet {
 						if(activeGame.getMode().equals(AbstractGame.Mode.SINGLE)) {
 							SinglePlayerGame g = (SinglePlayerGame) activeGame;
 							if (g.getAi().makeTurn()) {
-								messages.add("The AI has created a mutant!");
+								messages.addAll(g.getAi().getMessagesLastTurn());
 							}
 						}
 					} else {

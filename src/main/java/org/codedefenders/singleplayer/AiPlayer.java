@@ -3,6 +3,8 @@ package org.codedefenders.singleplayer;
 import org.codedefenders.Game;
 import org.codedefenders.Role;
 
+import java.util.ArrayList;
+
 /**
  * @author Ben Clegg
  * Base class for AI players.
@@ -18,9 +20,11 @@ public class AiPlayer {
 
 	protected Game game;
 	protected Role role;
+	protected ArrayList<String> messages;
 
 	public AiPlayer(Game g) {
 		game = g;
+		messages = new ArrayList<String>();
 	}
 
 	/**
@@ -28,6 +32,7 @@ public class AiPlayer {
 	 */
 	public boolean makeTurn() {
 		boolean success = false;
+		messages.clear();
 		if (game.getActiveRole().equals(role)) {
 			for (int i = 0; i < 3; i++) {
 				if (tryTurn()) { success = true; break; }
@@ -59,5 +64,10 @@ public class AiPlayer {
 	protected boolean runTurn(GenerationMethod strat) {
 		//Override
 		return true;
+	}
+
+	public ArrayList<String> getMessagesLastTurn() {
+		//Override
+		return messages;
 	}
 }

@@ -1,6 +1,13 @@
 package org.codedefenders.singleplayer.automated.defender;
 
-import org.codedefenders.*;
+import org.codedefenders.AntRunner;
+import org.codedefenders.DatabaseAccess;
+import org.codedefenders.Game;
+import org.codedefenders.Mutant;
+import org.codedefenders.MutationTester;
+import org.codedefenders.Role;
+import org.codedefenders.TargetExecution;
+import org.codedefenders.Test;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.singleplayer.AiPlayer;
 import org.codedefenders.singleplayer.PrepareAI;
@@ -196,7 +203,6 @@ public class AiDefender extends AiPlayer {
 			t.update();
 			TargetExecution newExec = new TargetExecution(t.getId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);
 			newExec.insert();
-			ArrayList<String> messages = new ArrayList<String>();
 			MutationTester.runTestOnAllMutants(game, t, messages);
 			DatabaseAccess.setAiTestAsUsed(origTestNum, game);
 			File dir = new File(origT.getFolder());
@@ -205,5 +211,21 @@ public class AiDefender extends AiPlayer {
 		}
 	}
 
+	@Override
+	public ArrayList<String> getMessagesLastTurn() {
+		boolean killed = false;
+		for (String s : messages) {
+			if (s.contains("test killed")) {
+				killed = true;
+				break;
+			}
+		}
+		messages.clear();
+		if (killed)
+			messages.add("The AI submitted a new test, which killed at least one mutant.");
+		else
+			messages.add("The AI submitted a new test, which did not kill any mutant.");
+		return messages;
+	}
 }
 
