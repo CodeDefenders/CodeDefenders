@@ -16,9 +16,6 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 
 import static org.codedefenders.Constants.*;
-import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
-import static org.codedefenders.validation.CodeValidator.getMD5;
 
 public class GameManager extends HttpServlet {
 
@@ -116,12 +113,12 @@ public class GameManager extends HttpServlet {
 								activeGame.endRound();
 								activeGame.update();
 								Mutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
-								if (mutantAfterTest.getEquivalent().equals(PROVEN_NO)) {
+								if (mutantAfterTest.getEquivalent().equals(Mutant.Equivalence.PROVEN_NO)) {
 									logger.info("Test {} killed mutant {}, hence NOT equivalent", newTest.getId(), mutant.getId());
 									messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
 								} else {
 									// test did not kill the mutant, lost duel, kill mutant
-									mutantAfterTest.kill(ASSUMED_YES);
+									mutantAfterTest.kill(Mutant.Equivalence.ASSUMED_YES);
 
 									logger.info("Test {} failed to kill mutant {}", newTest.getId(), mutant.getId());
 									messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
@@ -171,10 +168,14 @@ public class GameManager extends HttpServlet {
 							//Is potentially equiv - accept as equivalent
 							mutantClaimed.kill(Mutant.Equivalence.DECLARED_YES);
 						} else {
-							mutantClaimed.setEquivalent(PROVEN_NO);
-							mutantClaimed.update();
+							mutantClaimed.kill(Mutant.Equivalence.PROVEN_NO);
 						}
 						activeGame.endTurn();
+						SinglePlayerGame spg = (SinglePlayerGame) activeGame;
+						if (spg.getAi().makeTurn()) {
+							messages.add("The AI has created a test!");
+						}
+
 					} else {
 						mutantClaimed.setEquivalent(Mutant.Equivalence.PENDING_TEST);
 						mutantClaimed.update();
