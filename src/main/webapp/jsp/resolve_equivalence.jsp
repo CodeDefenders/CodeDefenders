@@ -2,7 +2,7 @@
 <%@ include file="/jsp/header_game.jsp" %>
 
 <div class="row-fluid">
-	<div class="col-md-6">
+	<div class="col-md-6" id="new-test">
 		<h2> Class Under Test </h2>
 		<input type="hidden" name="formType" value="createMutant">
 		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" cols="80" rows="50"><%= game.getCUT().getAsString() %></textarea></pre>
@@ -30,8 +30,15 @@
 
 			<%
 				ArrayList<Mutant> equivMutants = game.getMutantsMarkedEquivalent();
+				HashMap<Integer, ArrayList<Mutant>> mutantLines = new HashMap<Integer, ArrayList<Mutant>>();
 				if (! equivMutants.isEmpty()) {
 					Mutant m = equivMutants.get(0);
+					for (int line : m.getLines()){
+						if (!mutantLines.containsKey(line)){
+							mutantLines.put(line, new ArrayList<Mutant>());
+						}
+						mutantLines.get(line).add(m);
+					}
 			%>
 			<tr>
 				<td>
@@ -124,6 +131,28 @@
 		readOnly: true
 	});
 	editorSUT.setSize("100%", 500);
+
+	showMutant = function(){
+		mutantLine([
+			<% for (Integer line : mutantLines.keySet()) {
+            %>
+			[<%= line %>,
+				<%= mutantLines.get(line).size() %>, [
+				<% for(Mutant mm : mutantLines.get(line)){%>
+				<%= mm.getId() %>,
+				<%}%>
+			]],
+			<%
+                } %>
+		],"#new-test", false );
+	};
+	editorSUT.on("viewportChange", function(){
+		showMutant();
+	});
+	$(document).ready(function(){
+		showMutant();
+	});
+
 	var x = document.getElementsByClassName("utest");
 	var i;
 	for (i = 0; i < x.length; i++) {

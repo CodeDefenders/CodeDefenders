@@ -232,7 +232,7 @@
 			]],
 			<%
                 } %>
-		],"<%="#" + codeDivName%>", "false" );
+		],"<%="#" + codeDivName%>", false );
 	};
 	showKilledMutants = function(){
 		mutantKilledLine([

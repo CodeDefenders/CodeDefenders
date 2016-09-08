@@ -278,7 +278,7 @@
 			]],
 			<%
                 } %>
-		],"<%="#" + codeDivName%>", <%= role.equals(Role.DEFENDER)? "true" : "false" %>);
+		],"<%="#" + codeDivName%>", false);
 	};
 	showKilledMutants = function(){
 		mutantKilledLine([
