@@ -127,7 +127,7 @@
 							<h4>Mutant <%= m.getId() %></h4>
 						</td>
 						<td>
-							<% if (game.getLevel().equals(Game.Level.EASY)) { %>
+							<% if (game.getLevel().equals(Game.Level.EASY) || game.getState().equals(Game.State.FINISHED)) { %>
 							<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 							<% } %>
 							<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
