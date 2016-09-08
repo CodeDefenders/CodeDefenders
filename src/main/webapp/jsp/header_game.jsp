@@ -4,10 +4,9 @@ pageTitle = null;
 <%@ include file="/jsp/header.jsp" %>
 </div></div></div></div></div>
 <%@ page import="java.util.*" %>
-<%@ page import="org.codedefenders.Game" %>
-<%@ page import="org.codedefenders.GameClass" %>
-<%@ page import="static org.codedefenders.AbstractGame.State.ACTIVE" %>
 <%@ page import="org.codedefenders.*" %>
+<%@ page import="static org.codedefenders.AbstractGame.State.ACTIVE" %>
+<%@ page import="static org.codedefenders.AbstractGame.State.FINISHED" %>
 <div class="game-container"><h2 class="full-width page-title" style="text-align: center"><%= pTitle %></h2>
 <nav>
     <div class="container-fluid">
@@ -21,6 +20,8 @@ pageTitle = null;
                     turnMsg = "Your turn";
                     labelType = "label-primary";
                 }
+            } else if (game.getState().equals(FINISHED)) {
+                turnMsg = "Finished";
             }
             String loggedName = (String) request.getSession().getAttribute("username");
             String atkName = DatabaseAccess.getUserForKey("User_ID", game.getAttackerId()).getUsername();
