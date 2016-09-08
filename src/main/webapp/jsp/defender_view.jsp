@@ -179,8 +179,15 @@
 				<table class="table table-hover table-responsive table-paragraphs">
 					<%
 					ArrayList<Mutant> mutantsKilled = game.getKilledMutants();
+					HashMap<Integer, ArrayList<Mutant>> mutantKilledLines = new HashMap<Integer, ArrayList<Mutant>>();
 					if (! mutantsKilled.isEmpty()) {
 						for (Mutant m : mutantsKilled) {
+							for (int line : m.getLines()){
+								if (!mutantKilledLines.containsKey(line)){
+									mutantKilledLines.put(line, new ArrayList<Mutant>());
+								}
+								mutantKilledLines.get(line).add(m);
+							}
 					%>
 					<tr>
 						<td><h4>Mutant <%= m.getId() %></h4></td>
@@ -273,12 +280,28 @@
                 } %>
 		],"<%="#" + codeDivName%>", <%= role.equals(Role.DEFENDER)? "true" : "false" %>);
 	};
+	showKilledMutants = function(){
+		mutantKilledLine([
+			<% for (Integer line : mutantKilledLines.keySet()) {
+			%>
+			[<%= line %>,
+				<%= mutantKilledLines.get(line).size() %>, [
+				<% for(Mutant mm : mutantKilledLines.get(line)){%>
+				<%= mm.getId() %>,
+				<%}%>
+			]],
+			<%
+				} %>
+		],"<%="#" + codeDivName%>");
+	};
 	editorSUT.on("viewportChange", function(){
 		showMutants();
+		showKilledMutants();
 		highlightCoverage();
 	});
 	$(document).ready(function(){
 		showMutants();
+		showKilledMutants();
 		highlightCoverage();
 	});
 

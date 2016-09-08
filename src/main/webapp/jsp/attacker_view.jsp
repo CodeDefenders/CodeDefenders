@@ -46,8 +46,15 @@
 				<table class="table table-hover table-responsive table-paragraphs">
 					<%
 					ArrayList<Mutant> mutantsAlive = game.getAliveMutants();
+					HashMap<Integer, ArrayList<Mutant>> mutantLines = new HashMap<Integer, ArrayList<Mutant>>();
 					if (! mutantsAlive.isEmpty()) {
 						for (Mutant m : mutantsAlive) {
+							for (int line : m.getLines()){
+								if (!mutantLines.containsKey(line)){
+									mutantLines.put(line, new ArrayList<Mutant>());
+								}
+								mutantLines.get(line).add(m);
+							}
 					%>
 					<tr>
 						<td><h4>Mutant <%= m.getId() %></h4></td>
@@ -93,8 +100,15 @@
 				<table class="table table-hover table-responsive table-paragraphs">
 					<%
 					ArrayList<Mutant> mutantsKilled = game.getKilledMutants();
+					HashMap<Integer, ArrayList<Mutant>> mutantKilledLines = new HashMap<Integer, ArrayList<Mutant>>();
 					if (! mutantsKilled.isEmpty()) {
 						for (Mutant m : mutantsKilled) {
+							for (int line : m.getLines()){
+								if (!mutantKilledLines.containsKey(line)){
+									mutantKilledLines.put(line, new ArrayList<Mutant>());
+								}
+								mutantKilledLines.get(line).add(m);
+							}
 					%>
 					<tr>
 						<td class="col-sm-1"><h4>Mutant <%= m.getId() %></h4></td>
@@ -206,7 +220,42 @@
 			[<%=i%>, <%=((float)linesCovered.get(i).size() / (float) tests.size())%>],
 			<% } %>], COVERED_COLOR, "<%="#" + codeDivName%>");
 	};
+	showMutants = function(){
+		mutantLine([
+			<% for (Integer line : mutantLines.keySet()) {
+            %>
+			[<%= line %>,
+				<%= mutantLines.get(line).size() %>, [
+				<% for(Mutant mm : mutantLines.get(line)){%>
+				<%= mm.getId() %>,
+				<%}%>
+			]],
+			<%
+                } %>
+		],"<%="#" + codeDivName%>", "false" );
+	};
+	showKilledMutants = function(){
+		mutantKilledLine([
+			<% for (Integer line : mutantKilledLines.keySet()) {
+			%>
+			[<%= line %>,
+				<%= mutantKilledLines.get(line).size() %>, [
+				<% for(Mutant mm : mutantKilledLines.get(line)){%>
+				<%= mm.getId() %>,
+				<%}%>
+			]],
+			<%
+				} %>
+		],"<%="#" + codeDivName%>");
+	};
+	editor.on("viewportChange", function(){
+		showMutants();
+		showKilledMutants();
+		highlightCoverage();
+	});
 	$(document).ready(function(){
+		showMutants();
+		showKilledMutants();
 		highlightCoverage();
 	});
 
