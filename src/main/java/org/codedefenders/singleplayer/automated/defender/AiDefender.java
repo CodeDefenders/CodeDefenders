@@ -66,8 +66,8 @@ public class AiDefender extends AiPlayer {
 
 		//Get all available tests from dummy game
 		ArrayList<Test> origTests = new ArrayList<Test>();
-		for (Test t : dummyGame.getTests()) {
-			origTests.add(t);
+		for (Test tst : dummyGame.getTests()) {
+			origTests.add(tst);
 		}
 
 		int totalTests = origTests.size();
@@ -79,11 +79,10 @@ public class AiDefender extends AiPlayer {
 		}
 		int t = -1;
 
-
 		//Discard useless tests in origtests (ie tests with killcount of zero
-		for (Test tA : origTests) {
-			if(tA.getAiMutantsKilled() == 0) {
-				origTests.remove(origTests.indexOf(tA));
+		for (Test tst : origTests) {
+			if(tst.getAiMutantsKilled() == 0) {
+				origTests.remove(origTests.indexOf(tst));
 			}
 		}
 
