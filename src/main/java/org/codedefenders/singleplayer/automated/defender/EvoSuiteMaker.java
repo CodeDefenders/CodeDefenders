@@ -63,46 +63,6 @@ public class EvoSuiteMaker {
 		return true; //Success
 	}
 
-	public boolean createTestIndex() {
-		File dir = new File(AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias());
-
-		int goodTests = 0;
-
-		String xml = "";
-		xml += "<?xml version=\"1.0\"?> \n";
-		xml += "<testindex> \n";
-
-		//Original test ids.
-		xml += "\t<tests> \n";
-		for (Test t : validTests) {
-			int mKilled = t.getAiMutantsKilled();
-			//If the test kills at least one mutant, use it in the future.
-			if(mKilled > 0) {
-				xml += "\t\t<test ";
-				xml += "id=\"" + t.getId() + "\" ";
-				xml += "kills=\"" + mKilled + "\" ";
-				xml += "/>\n";
-				goodTests ++;
-			}
-		}
-		xml += "\t</tests> \n";
-
-		//Number of tests.
-		xml += "\t<quantity>" + goodTests + "</quantity> \n";
-		//ID of dummy game.
-		xml += "\t<dummygame>" + dGame.getId() + "</dummygame> \n";
-
-		xml += "</testindex> \n";
-
-		try {
-			FileManager.createIndexXML(dir, "TestsIndex", xml);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
-	}
-
 	/**
 	 *
 	 * @param time

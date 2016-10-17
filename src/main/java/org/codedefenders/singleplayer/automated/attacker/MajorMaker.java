@@ -69,33 +69,6 @@ public class MajorMaker {
 		}
 	}
 
-	public boolean createMutantIndex() {
-		File dir = new File(AI_DIR + F_SEP + "mutants" + F_SEP + cut.getAlias());
-
-		String xml = "<?xml version=\"1.0\"?>\n";
-		xml += "<mutantindex>\n";
-		xml += "\t<mutants>\n";
-		for(Mutant m : validMutants) {
-			xml += "\t\t<mutant ";
-			xml += "id=\"" + m.getId() + "\" ";
-			xml += "killed=\"" + m.getTimesKilledAi() + "\" ";
-			xml += "/>\n";
-		}
-		xml += "\t</mutants>\n";
-		xml += "\t<quantity>" + validMutants.size() + "</quantity>\n";
-		xml += "\t<dummygame>" + dGame.getId() + "</dummygame> \n";
-
-		xml += "</mutantindex>\n";
-
-		try {
-			FileManager.createIndexXML(dir, "MutantsIndex", xml);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return false;
-		}
-		return true;
-	}
-
 	/**
 	 * Modify a list of strings from a class to have a mutant.
 	 * @param lines original class's lines.
