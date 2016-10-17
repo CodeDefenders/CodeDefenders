@@ -182,6 +182,11 @@ public class GameClass {
 		this.classFile = classFile;
 	}
 
+	public Game getDummyGame() throws Exception {
+		Game dg = DatabaseAccess.getAiDummyGameForClass(this.getId());
+		return dg;
+	}
+
 	public boolean delete() {
 		logger.debug("Deleting class (ID={})", id);
 		Connection conn = null;

@@ -21,6 +21,47 @@ public class DatabaseAccess {
 		return dataSource.getConnection();
 	}
 
+	/**
+	 * Execute an update statement.
+	 * @param sql Statement to be executed
+     */
+	private static void executeUpdate(String sql) {
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			stmt.executeUpdate(sql);
+
+			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			System.out.println(se);
+			//Handle errors for JDBC
+		} catch (Exception e) {
+			System.out.println(e);
+			//Handle errors for Class.forName
+		} finally {
+			cleanup(conn, stmt);
+		} //end try
+	}
+
+	public static void setGameAsAIDummy(int gId) {
+		String sql = String.format("UPDATE games SET IsAIDummyGame = 1 WHERE ID = %d;", gId);
+		executeUpdate(sql);
+	}
+
+	public static Game getAiDummyGameForClass(int cId) throws Exception {
+		String sql = String.format("SELECT * FROM games WHERE Class_ID='%d' AND IsAIDummyGame=1", cId);
+		int gID = getInt(sql, "ID");
+		if (gID == 0) {
+			Exception e = new Exception("No dummy game found.");
+			throw e;
+		}
+		return getGameForKey("ID", gID);
+	}
+
 	public static String addSlashes(String s) {
 		return s.replaceAll("\\\\", "\\\\\\\\");
 	}
@@ -122,22 +163,7 @@ public class DatabaseAccess {
 		Statement stmt = null;
 		String sql = String.format("UPDATE classes SET AiPrepared = 1 WHERE Class_ID = %d;", c.getId());
 
-		try {
-			conn = getConnection();
-			stmt = conn.createStatement();
-			stmt.executeUpdate(sql);
-
-			stmt.close();
-			conn.close();
-		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-		} finally {
-			cleanup(conn, stmt);
-		} //end try
+		executeUpdate(sql);
 	}
 
 	private static GameClass getClass(String sql) {
