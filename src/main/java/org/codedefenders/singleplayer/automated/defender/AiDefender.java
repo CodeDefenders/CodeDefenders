@@ -40,11 +40,9 @@ public class AiDefender extends AiPlayer {
 
 	protected boolean runTurn(GenerationMethod strat) {
 		try {
-			TestsIndexContents ind = new TestsIndexContents(game.getCUT());
-
 			int tNum = selectTest(strat);
 			try {
-				useTestFromSuite(tNum, ind);
+				useTestFromSuite(tNum);
 			} catch (IOException e) {
 				e.printStackTrace();
 				return false;
@@ -184,8 +182,9 @@ public class AiDefender extends AiPlayer {
 		throw e;
 	}
 
-	private void useTestFromSuite(int origTestNum, TestsIndexContents indexCon) throws IOException {
-		Game dummyGame = DatabaseAccess.getGameForKey("ID", indexCon.getDummyGameId());
+	private void useTestFromSuite(int origTestNum) throws IOException, Exception {
+		GameClass cut = game.getCUT();
+		Game dummyGame = cut.getDummyGame();
 		ArrayList<Test> origTests = dummyGame.getTests();
 
 		Test origT = null;
