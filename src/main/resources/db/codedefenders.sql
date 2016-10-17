@@ -93,7 +93,7 @@ CREATE TABLE `mutants` (
   `RoundKilled` int(11) DEFAULT NULL,
   `Equivalent` enum('ASSUMED_NO','PENDING_TEST','DECLARED_YES','ASSUMED_YES','PROVEN_NO') DEFAULT 'ASSUMED_NO' NOT NULL,
   `Player_ID` int(11) DEFAULT NULL,
-  `NumberAiKillingTests` int(11) DEFAULT '0',
+  `NumberAiKillingTests` int(11) DEFAULT '0', /* If an original ai mutant, killcount. Number of killing tests in game otherwise. */
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Points` int(11) DEFAULT '0',
   PRIMARY KEY (`Mutant_ID`),
@@ -166,7 +166,7 @@ CREATE TABLE `tests` (
   `RoundCreated` int(11) NOT NULL,
   `MutantsKilled` int(11) DEFAULT '0',
   `Player_ID` int(11) NOT NULL,
-  `NumberAiMutantsKilled` int(11) DEFAULT '0',
+  `NumberAiMutantsKilled` int(11) DEFAULT '0', /* If an original ai test, killcount. Number of kills in game otherwise. */
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Lines_Covered` longtext,
   `Lines_Uncovered` longtext,
@@ -183,7 +183,6 @@ CREATE TABLE `tests` (
 --
 -- Table structure for table `usedaimutants`
 --
-
 DROP TABLE IF EXISTS `usedaimutants`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
