@@ -45,32 +45,32 @@ public class AiAttacker extends AiPlayer {
 
 	protected boolean runTurn(GenerationMethod strat) {
 		try {
-			MutantsIndexContents ind = new MutantsIndexContents(game.getCUT());
-			int mNum = selectMutant(strat, ind);
-			useMutantFromSuite(mNum, ind);
+			int mNum = selectMutant(strat);
+			useMutantFromSuite(mNum);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
 		} catch (Exception e) {
 			//Assume no more unused mutants remain, do nothing.
-			logger.info("something went wrong; skiping turn");
+			logger.info("something went wrong; skipping turn");
 		}
 
 		return true;
 	}
 
-	private int selectMutant(GenerationMethod strategy, MutantsIndexContents indexCon) throws Exception {
+	private int selectMutant(GenerationMethod strategy) throws Exception {
 		ArrayList<Integer> usedMutants = DatabaseAccess.getUsedAiMutantsForGame(game);
-		Exception e = new Exception("No unused mutants remain.");
-		int totalMutants = indexCon.getNumMutants();
+		GameClass cut = game.getCUT();
+		Game dummyGame = cut.getDummyGame();
+		ArrayList<Mutant> origMutants = dummyGame.getMutants();
 
+		int totalMutants = origMutants.size();
+
+		Exception e = new Exception("No unused mutants remain.");
 		if(usedMutants.size() == totalMutants) {
 			throw e;
 		}
 		int m = -1;
-
-		Game dummyGame = DatabaseAccess.getGameForKey("ID", indexCon.getDummyGameId());
-		ArrayList<Mutant> origMutants = dummyGame.getMutants();
 
 		for (int i = 0; i < 10; i++) {
 			//Try standard strategy to select a mutant.
@@ -116,8 +116,9 @@ public class AiAttacker extends AiPlayer {
 		throw e;
 	}
 
-	private void useMutantFromSuite(int origMutNum, MutantsIndexContents indexCon) throws IOException {
-		Game dummyGame = DatabaseAccess.getGameForKey("ID", indexCon.getDummyGameId());
+	private void useMutantFromSuite(int origMutNum) throws IOException, Exception {
+		GameClass cut = game.getCUT();
+		Game dummyGame = cut.getDummyGame();
 		ArrayList<Mutant> origMutants = dummyGame.getMutants();
 
 		Mutant origM = null;

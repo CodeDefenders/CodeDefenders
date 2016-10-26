@@ -83,11 +83,9 @@ public class PrepareAI {
 			m.update();
 		}
 
-		//Create XML files.
-		esMake.createTestIndex();
-		mMake.createMutantIndex();
-
-		DatabaseAccess.setAiPrepared(cut);
+		DatabaseAccess.setAiPrepared(cut); //Mark class as being AI prepared.
+		dummyGame.update();
+		DatabaseAccess.setGameAsAIDummy(dummyGame.getId()); //Mark dummy game as a dummy game.
 
 		if(!isPrepared(cut)) {
 			//SQL has not been updated correctly, should discard everything and fail.

@@ -1,13 +1,6 @@
 package org.codedefenders.singleplayer.automated.defender;
 
-import org.codedefenders.AntRunner;
-import org.codedefenders.DatabaseAccess;
-import org.codedefenders.Game;
-import org.codedefenders.Mutant;
-import org.codedefenders.MutationTester;
-import org.codedefenders.Role;
-import org.codedefenders.TargetExecution;
-import org.codedefenders.Test;
+import org.codedefenders.*;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.singleplayer.AiPlayer;
 import org.codedefenders.singleplayer.PrepareAI;
@@ -47,11 +40,9 @@ public class AiDefender extends AiPlayer {
 
 	protected boolean runTurn(GenerationMethod strat) {
 		try {
-			TestsIndexContents ind = new TestsIndexContents(game.getCUT());
-
-			int tNum = selectTest(strat, ind);
+			int tNum = selectTest(strat);
 			try {
-				useTestFromSuite(tNum, ind);
+				useTestFromSuite(tNum);
 			} catch (IOException e) {
 				e.printStackTrace();
 				return false;
@@ -65,22 +56,32 @@ public class AiDefender extends AiPlayer {
 		return true;
 	}
 
-	private int selectTest(GenerationMethod strategy, TestsIndexContents indexCon) throws Exception {
+	private int selectTest(GenerationMethod strategy) throws Exception {
 
 		ArrayList<Integer> usedTests = DatabaseAccess.getUsedAiTestsForGame(game);
-		int totalTests = indexCon.getNumTests();
-		Exception e = new Exception("No choices remain.");
+		GameClass cut = game.getCUT();
+		Game dummyGame = cut.getDummyGame();
 
+		//Get all available tests from dummy game
+		ArrayList<Test> origTests = new ArrayList<Test>();
+		for (Test tst : dummyGame.getTests()) {
+			origTests.add(tst);
+		}
+
+		int totalTests = origTests.size();
+
+		//Throw an exception if all tests used
+		Exception e = new Exception("No choices remain.");
 		if(usedTests.size() == totalTests) {
 			throw e;
 		}
 		int t = -1;
 
-		//Get available tests, only ones in the xml file
-		//Prevents usage of useless tests
-		ArrayList<Test> origTests = new ArrayList<Test>();
-		for (int tId : indexCon.getTestIds()) {
-			origTests.add(DatabaseAccess.getTestForId(tId));
+		//Discard useless tests in origtests (ie tests with killcount of zero
+		for (Test tst : origTests) {
+			if(tst.getAiMutantsKilled() == 0) {
+				origTests.remove(origTests.indexOf(tst));
+			}
 		}
 
 		Test covTest = null;
@@ -181,8 +182,9 @@ public class AiDefender extends AiPlayer {
 		throw e;
 	}
 
-	private void useTestFromSuite(int origTestNum, TestsIndexContents indexCon) throws IOException {
-		Game dummyGame = DatabaseAccess.getGameForKey("ID", indexCon.getDummyGameId());
+	private void useTestFromSuite(int origTestNum) throws IOException, Exception {
+		GameClass cut = game.getCUT();
+		Game dummyGame = cut.getDummyGame();
 		ArrayList<Test> origTests = dummyGame.getTests();
 
 		Test origT = null;
