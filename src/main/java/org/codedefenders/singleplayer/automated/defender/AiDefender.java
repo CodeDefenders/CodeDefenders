@@ -77,11 +77,11 @@ public class AiDefender extends AiPlayer {
 		}
 		int t = -1;
 
-		ArrayList<Integer> toRemove = new ArrayList<>(); //Store tests to remove
+		ArrayList<Test> toRemove = new ArrayList<>(); //Store tests to remove
 		//Discard useless tests in origtests (ie tests with killcount of zero)
 		for (Test tst : origTests) {
 			if(tst.getAiMutantsKilled() == 0) {
-				toRemove.add(origTests.indexOf(tst));
+				toRemove.add(tst);
 			}
 		}
 		origTests.removeAll(toRemove);
