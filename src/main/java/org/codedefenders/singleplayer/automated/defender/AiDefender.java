@@ -77,12 +77,14 @@ public class AiDefender extends AiPlayer {
 		}
 		int t = -1;
 
-		//Discard useless tests in origtests (ie tests with killcount of zero
+		ArrayList<Integer> toRemove = new ArrayList<>(); //Store tests to remove
+		//Discard useless tests in origtests (ie tests with killcount of zero)
 		for (Test tst : origTests) {
 			if(tst.getAiMutantsKilled() == 0) {
-				origTests.remove(origTests.indexOf(tst));
+				toRemove.add(origTests.indexOf(tst));
 			}
 		}
+		origTests.removeAll(toRemove);
 
 		Test covTest = null;
 		int bestCoverage = 0;
