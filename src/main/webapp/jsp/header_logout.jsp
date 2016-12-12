@@ -29,8 +29,6 @@
                         class="text-white button tab-link bg-minus-1"
                        href="#research" style="width:100%;">Research</a></li>
                 <li style="float: none"><a class="text-white button tab-link bg-minus-1"
-                       href="#contact" style="width:100%;">Contact</a></li>
-                <li style="float: none"><a class="text-white button tab-link bg-minus-1"
                        href="help" style="width:100%;">Help</a></li>
             </ul>
         </div>
