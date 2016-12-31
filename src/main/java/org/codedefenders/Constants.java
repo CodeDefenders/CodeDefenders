@@ -1,5 +1,7 @@
 package org.codedefenders;
 
+import java.util.Map;
+
 /**
  * @author Jose Rojas
  */
@@ -7,7 +9,21 @@ public class Constants {
 
 	public static final String F_SEP = System.getProperty("file.separator");
 
-	public static String DATA_DIR = "/var/lib/codedefenders";
+	public static String DATA_DIR;
+
+	static {
+
+		ProcessBuilder pb = new ProcessBuilder();
+		Map env = pb.environment();
+
+		String dataHome = (String) env.get("CODEDEFENDERS_DATA");
+		if (dataHome == null) {
+			dataHome = System.getProperty("codedefenders.data", "/var/lib/codedefenders");
+		}
+
+		DATA_DIR = dataHome;
+	}
+
 	//public static String DATA_DIR    = F_SEP + "WEB-INF" + F_SEP + "data";
 	public static String CUTS_DIR    = DATA_DIR + F_SEP + "sources";
 	public static String MUTANTS_DIR = DATA_DIR + F_SEP + "mutants";
