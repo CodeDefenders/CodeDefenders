@@ -16,7 +16,7 @@
 		        In <span class="paper_venue">Proc. of the International Conference on Software Engineering Companion (ICSE)</span>,  2017. To appear.
 		        <a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('icse17_edu_bibtex'));">[Bibtex]</a>
 		        <div id="icse17_edu_bibtex" class="bibtex_hide" >
-<pre class="tex"><code>@inproceedings{ICSE2017_Education,
+<pre class="tex"><code>@inproceedings{ICSE_SEET2017_CodeDefenders,
 	author = {Benjamin Clegg, Jos{\'e} Miguel Rojas and Gordon Fraser},
 	title = {Teaching Software Testing Concepts Using a Mutation Testing Game},
 	booktitle = {Proc. of the International Conference on Software Engineering Companion (ICSE) 2017},
@@ -32,11 +32,11 @@
 			        <img src='images/pdf.png' alt="[PDF]"/>
 		        </a>
 		        Jos&eacute; Miguel Rojas, Thomas White, Benjamin Clegg and Gordon Fraser.
-		        <span class="paper_title">&#8220;Teaching Software Testing Concepts Using a Mutation Testing Game,&#8221;</span>
+		        <span class="paper_title">&#8220;Code Defenders: Crowdsourcing Effective Tests and Subtle Mutants with a Mutation Testing Game,&#8221;</span>
 		        In <span class="paper_venue">Proc. of the International Conference on Software Engineering (ICSE)</span>,  2017. To appear.
 		        <a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('icse17_bibtex'));">[Bibtex]</a>
 		        <div id="icse17_bibtex" class="bibtex_hide" >
-<pre class="tex"><code>@inproceedings{ICSE2016_CodeDefenders,
+<pre class="tex"><code>@inproceedings{ICSE2017_CodeDefenders,
 	author = {Jos{\'e} Miguel Rojas, Thomas White, Benjamin Clegg and Gordon Fraser},
 	title = {{C}ode {D}efenders: Crowdsourcing Effective Tests and Subtle Mutants with a Mutation Testing Game},
 	booktitle = {Proc. of the International Conference on Software Engineering (ICSE) 2017},
