@@ -64,9 +64,11 @@ make
 - Configure Artifact (as Web Application: Exploded), it must include:
   - WEB-INF/classes/[module compile output]
   - WEB-INF/lib/[all maven dependencies]
-  - ``resources`` directory contents
-  - ``webapps`` directory contents
-	
+  - \`resources\` directory contents
+  - \`webapps\` directory contents
+- Add Run/Debug Configuration
+  - Run -> Edit Configurations... -> Add New Tomcat Server configuration -> Add \`Build artifact\` in \`Before launch\` panel and check On Update action: Redeploy. -> OK
+
 ## Public URL
 
 <http://code-defenders.org>
