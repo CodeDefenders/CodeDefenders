@@ -20,7 +20,6 @@ target/
 .DS_Store
 
 ### IntelliJ ###
-*.iml
 .idea/deployment.xml
 .idea/workspace.xml
 .idea/tasks.xml
