@@ -25,3 +25,4 @@ target/
 .idea/tasks.xml
 .idea/libraries/
 .idea/dataSources.local.xml
+out/
