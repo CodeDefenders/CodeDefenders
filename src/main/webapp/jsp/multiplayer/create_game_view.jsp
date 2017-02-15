@@ -1,6 +1,6 @@
+<%@ page import="org.joda.time.DateTime" %>
 <%@ page import="org.joda.time.format.DateTimeFormat" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
-<%@ page import="org.joda.time.DateTime" %>
 <% String pageTitle = "Create Battleground"; %>
 <%@ include file="/jsp/header.jsp"%>
 <div id="creategame" class="container">
@@ -20,12 +20,14 @@
 					<a href="games/upload" class="text-center new-account">Upload Class</a>
 				</td>
 			</tr>
+			<!--
 			<tr>
 				<td>Line Coverage Goal</td><td><input class="ws-2" type="number" value="0.8" min="0.1" max="1.0" step="0.1" name="line_cov" style="text-align: center"/></td>
 			</tr>
 			<tr>
 				<td>Mutation Goal</td><td><input class="ws-2" type="number" value="0.5" min="0.1" max="1.0" step="0.1" name="mutant_cov" style="text-align: center"></td>
 			</tr>
+			-->
 			<tr>
 				<td>Level</td>
 				<td>
