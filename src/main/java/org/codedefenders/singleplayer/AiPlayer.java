@@ -9,7 +9,7 @@ import java.util.ArrayList;
  * @author Ben Clegg
  * Base class for AI players.
  */
-public class AiPlayer {
+public abstract class AiPlayer {
 
 	public enum GenerationMethod {
 		RANDOM, //Randomly select mutant.
@@ -43,31 +43,18 @@ public class AiPlayer {
 	}
 
 	public boolean tryTurn() {
-		boolean b = false;
 		switch (game.getLevel()) {
-			case EASY: b = turnEasy(); break;
-			case HARD: b = turnHard(); break;
-			default: b = turnHard(); break;
+			case EASY: return turnEasy();
+			case HARD: return turnHard();
+			default: return turnHard();
 		}
-		return b;
 	}
 
-	public boolean turnEasy() {
-		//Override
-		return true;
-	}
-	public boolean turnHard() {
-		//Override
-		return true;
-	}
+	public abstract boolean turnEasy();
 
-	protected boolean runTurn(GenerationMethod strat) {
-		//Override
-		return true;
-	}
+	public abstract boolean turnHard();
 
-	public ArrayList<String> getMessagesLastTurn() {
-		//Override
-		return messages;
-	}
+	protected abstract boolean runTurn(GenerationMethod strat);
+
+	public abstract ArrayList<String> getMessagesLastTurn();
 }
