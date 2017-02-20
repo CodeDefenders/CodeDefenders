@@ -56,8 +56,10 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 case "createGame":
                     // Get the identifying information required to create a game from the submitted form.
                     int classId = Integer.parseInt(request.getParameter("class"));
-                    double lineCoverage = Double.parseDouble(request.getParameter("line_cov"));
-                    double mutantCoverage = Double.parseDouble(request.getParameter("mutant_cov"));
+                    String lineCovGoal = request.getParameter("line_cov");
+                    String mutCovGoal = request.getParameter("mutant_cov");
+                    double lineCoverage = lineCovGoal == null ? 1.1 : Double.parseDouble(lineCovGoal);
+                    double mutantCoverage = mutCovGoal == null ? 1.1 : Double.parseDouble(mutCovGoal);
                     Game.Level level = request.getParameter("level") == null ? Game.Level.HARD : Game.Level.EASY;
 
                     // Create the game with supplied parameters and insert it in the database.
