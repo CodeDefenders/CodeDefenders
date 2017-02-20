@@ -1,16 +1,12 @@
 package org.codedefenders;
 
-import org.slf4j.LoggerFactory;
-
 import java.io.*;
-import java.nio.Buffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
 
 import static org.codedefenders.Constants.*;
 
