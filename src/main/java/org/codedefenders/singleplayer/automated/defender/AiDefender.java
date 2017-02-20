@@ -9,9 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Ben Clegg
@@ -62,126 +61,95 @@ public class AiDefender extends AiPlayer {
 		GameClass cut = game.getCUT();
 		Game dummyGame = cut.getDummyGame();
 
-		//Get all available tests from dummy game
-		ArrayList<Test> origTests = new ArrayList<Test>();
-		for (Test tst : dummyGame.getTests()) {
-			origTests.add(tst);
-		}
-
-		int totalTests = origTests.size();
+		//TODO: Discarding useless tests in origtests would be a sideeffect
+		List<Test> candidateTests = dummyGame.getTests().stream().filter(test -> !usedTests.contains(test.getId()) && test.getAiMutantsKilled() > 0).collect(Collectors.toList());
 
 		//Throw an exception if all tests used
-		Exception e = new Exception("No choices remain.");
-		if(usedTests.size() == totalTests) {
-			throw e;
+		if(candidateTests.isEmpty()) {
+			// TODO: It would be better to use a specific exception type
+			throw new Exception("No choices remain.");
 		}
-		int t = -1;
 
-		ArrayList<Test> toRemove = new ArrayList<>(); //Store tests to remove
-		//Discard useless tests in origtests (ie tests with killcount of zero)
-		for (Test tst : origTests) {
-			if(tst.getAiMutantsKilled() == 0) {
-				toRemove.add(tst);
-			}
-		}
-		origTests.removeAll(toRemove);
-
-		Test covTest = null;
-		int bestCoverage = 0;
-		if (strategy.equals(GenerationMethod.COVERAGE)) {
-			//Choose a test which covers the most lines of alive mutants.
-			//Get all alive mutated line numbers.
-
-			ArrayList<Mutant> muts = game.getAliveMutants();
+		if(strategy.equals(GenerationMethod.COVERAGE)) {
 			HashSet<Integer> linesModified = new HashSet<Integer>();
-			for (Mutant m : muts) {
+			for (Mutant m : game.getAliveMutants()) {
 				linesModified.addAll(m.getLines());
 			}
 			logger.debug("Alive mutated lines: {}", linesModified.toString());
 
-			for (Test tst : origTests) {
-				//Test must not be used yet.
-				if(!usedTests.contains(tst)) {
-					LineCoverage lc = tst.getLineCoverage(); // test already has line coverage information here
-					ArrayList<Integer> coveredByTest = lc.getLinesCovered();
-					int coverage = 0;
-					System.out.print("Test covers lines: ");
-					for (int l : coveredByTest) {
-						System.out.print(l);
-						if(linesModified.contains(l)) {
-							System.out.print("[HIT]");
-							//Test covers this mutated line.
-							coverage ++;
-						}
-						System.out.print(", ");
+			Test covTest = null;
+			int bestCoverage = 0;
+			for (Test tst : candidateTests) {
+				LineCoverage lc = tst.getLineCoverage(); // test already has line coverage information here
+				ArrayList<Integer> coveredByTest = lc.getLinesCovered();
+				int coverage = 0;
+				// TODO: Use logger, not stdout
+				System.out.print("Test covers lines: ");
+				for (int l : coveredByTest) {
+					System.out.print(l);
+					if(linesModified.contains(l)) {
+						System.out.print("[HIT]");
+						//Test covers this mutated line.
+						coverage ++;
 					}
-					System.out.println();
-					if (coverage > bestCoverage) {
-						//Test is the best unused test found.
-						covTest = tst;
-						bestCoverage = coverage;
-					}
+					System.out.print(", ");
+				}
+				System.out.println();
+				if (coverage > bestCoverage) {
+					//Test is the best unused test found.
+					covTest = tst;
+					bestCoverage = coverage;
 				}
 			}
 			if (covTest != null) {
 				//Just use the found test if using line coverage method.
 				return covTest.getId();
 			} else {
-				System.out.println("No test covers an alive mutated line, using killcount instead.");
+				logger.debug("No test covers an alive mutated line, using killcount instead.");
 				strategy = GenerationMethod.KILLCOUNT;
 			}
-		}
-		//If not line coverage, or no lines are covered.
-		if (bestCoverage == 0) {
-			//Repeat multiple times for non-deterministic strategies.
-			for (int i = 0; i <= 3; i++) {
-				//Try to get test by default strategy.
-				int n = -1;
 
-				if (strategy.equals(GenerationMethod.RANDOM)) {
-					n = (int) Math.floor(Math.random() * totalTests);
-					//0 -> totalTests - 1.
-				}
-				else if (strategy.equals(GenerationMethod.KILLCOUNT)) {
-					//Sort tests in order of killcount.
-					Collections.sort(origTests, new TestComparator());
-
-					//Get an index, using a random number biased towards later index.
-					//More extreme than attacker due to smaller sample size.
-					n = PrepareAI.biasedSelection(origTests.size(), 0.6);
-				}
-
-				//Check that an id has been retrieved.
-				if(n >= 0) {
-					//Get original test from dummy game's list of tests.
-					Test origT = origTests.get(n);
-					t = origT.getId();
-
-					if ((!usedTests.contains(t)) && (t != -1)) {
-						//Strategy found an unused test.
-						return t;
-					}
-				}
-
-			}
 		}
 
+		switch(strategy) {
+			// case COVERAGE:
+			// Already handled
+			//
+			case RANDOM:
+				Random r = new Random();
+				Test selected = candidateTests.get(r.nextInt(candidateTests.size()));
+				return selected.getId();
+			case KILLCOUNT:
+				//Sort tests in order of killcount.
+				Collections.sort(candidateTests, new TestComparator());
 
+				//Get an index, using a random number biased towards later index.
+				//More extreme than attacker due to smaller sample size.
+				int n = PrepareAI.biasedSelection(candidateTests.size(), 0.6);
+				return candidateTests.get(n).getId();
 
+			case FIRST:
+			default:
+				// TODO: Why do we have these strategies if we don't use them?
+				throw new UnsupportedOperationException("Not implemented");
+
+		}
+
+		// TODO: Unreachable code:
 		//If standard strategy fails, choose first non-selected test.
-		for (int x = 0; x < totalTests; x++) {
-
-			Test origT = origTests.get(x);
-			t = origT.getId();
-
-			if(!usedTests.contains(t)) {
-				//Unused test found.
-				return t;
-			}
-		}
-
-		//Something went wrong.
-		throw e;
+//		for (int x = 0; x < totalTests; x++) {
+//
+//			Test origT = origTests.get(x);
+//			t = origT.getId();
+//
+//			if(!usedTests.contains(t)) {
+//				//Unused test found.
+//				return t;
+//			}
+//		}
+//
+//		//Something went wrong.
+//		throw e;
 	}
 
 	private void useTestFromSuite(int origTestNum) throws IOException, Exception {
