@@ -43,7 +43,7 @@
                       <label for="inputUsername" class="sr-only">Username</label>
                       <input type="text" id="inputUsernameCreate" name="username" class="form-control" placeholder="Username" required autofocus>
                       <label for="inputEmail" class="sr-only">Email</label>
-                      <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email" required autofocus>
+                      <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email" required>
                       <label for="inputPassword" class="sr-only">Password</label>
                       <input type="password" id="inputPasswordCreate" name="password" class="form-control" placeholder="Password" required>
                       <label for="inputPassword" class="sr-only">Password</label>
