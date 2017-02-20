@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * @author Ben Clegg
@@ -61,59 +63,36 @@ public class AiAttacker extends AiPlayer {
 	private int selectMutant(GenerationMethod strategy) throws Exception {
 		ArrayList<Integer> usedMutants = DatabaseAccess.getUsedAiMutantsForGame(game);
 		GameClass cut = game.getCUT();
+
+		// TODO: This isn't actually an AIDummyGame
 		Game dummyGame = cut.getDummyGame();
 		ArrayList<Mutant> origMutants = dummyGame.getMutants();
 
-		int totalMutants = origMutants.size();
-
-		Exception e = new Exception("No unused mutants remain.");
-		if(usedMutants.size() == totalMutants) {
-			throw e;
+		List<Mutant> candidateMutants = origMutants.stream().filter(mutant -> !usedMutants.contains(mutant.getId())).collect(Collectors.toList());
+		if(candidateMutants.isEmpty()) {
+			// TODO: It would be better to use a specific exception type
+			throw new Exception("No unused mutants remain.");
 		}
-		int m = -1;
 
-		for (int i = 0; i < 10; i++) {
-			//Try standard strategy to select a mutant.
-			int n = -1;
-			if(strategy.equals(GenerationMethod.RANDOM)) {
-				n = (int) Math.floor(Math.random() * totalMutants);
-				//0 -> totalMutants - 1.
-			}
-			else if(strategy.equals(GenerationMethod.KILLCOUNT)) {
-				//Sort tests in order of killcount.
-				Collections.sort(origMutants, new MutantComparator());
+		switch(strategy) {
+			case RANDOM:
+				Random r = new Random();
+				Mutant selected = candidateMutants.get(r.nextInt(candidateMutants.size()));
+				return selected.getId();
+			case KILLCOUNT:
+				candidateMutants.sort(new MutantComparator());
 
 				//Get an index, using a random number biased towards earlier index.
 				//Note mutants with low killcount are more likely to be equivalent.
-				n = PrepareAI.biasedSelection(origMutants.size(), 1.7);
-			}
+				int n = PrepareAI.biasedSelection(candidateMutants.size(), 1.7);
+				return candidateMutants.get(n).getId();
 
-			if(n >= 0) {
-				Mutant origM = origMutants.get(n);
-				m = origM.getId();
-
-				if ((!usedMutants.contains(m)) && (m != -1)) {
-					//Found an unused mutant.
-					return m;
-				}
-			}
-
+			case COVERAGE:
+			case FIRST:
+			default:
+				// TODO: Why do we have these strategies if we don't use them?
+				throw new UnsupportedOperationException("Not implemented");
 		}
-
-		//If standard strategy fails, make a choice linearly.
-		for (int x = 0; x < totalMutants; x++) {
-
-			Mutant origM = origMutants.get(x);
-			m = origM.getId();
-
-			if(!usedMutants.contains(m)) {
-				//Found an unused mutant.
-				return m;
-			}
-		}
-
-		//Something went wrong.
-		throw e;
 	}
 
 	private void useMutantFromSuite(int origMutNum) throws IOException, Exception {
@@ -130,6 +109,7 @@ public class AiAttacker extends AiPlayer {
 			}
 		}
 
+		// TODO: Shouldn't we rather throw an IllegalArgumentException if origMutNum doesn't exist?
 		if(origM != null) {
 			String jFile = origM.getSourceFile();
 			String cFile = origM.getClassFile();
@@ -155,7 +135,7 @@ public class AiAttacker extends AiPlayer {
 		}
 		messages.clear();
 		if (killed)
-			messages.add("The AI submitted a new mutant, but one of your tests killed it inmediately!");
+			messages.add("The AI submitted a new mutant, but one of your tests killed it immediately!");
 		else
 			messages.add("The AI submitted a new mutant.");
 		return messages;
