@@ -7,7 +7,6 @@ import java.sql.*;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -324,55 +323,6 @@ public class MultiplayerGame extends AbstractGame {
 		} //end try
 
 		return false;
-	}
-
-	public class PlayerScore {
-		private int playerId;
-		private int totalScore;
-		private int quantity;
-		private String additionalInformation;
-
-		public String toString(){
-			return playerId + ": " + totalScore + ", " + quantity + "," + additionalInformation;
-		}
-
-		public String getAdditionalInformation() {
-			return additionalInformation;
-		}
-
-		public void setAdditionalInformation(String additionalInformation) {
-			this.additionalInformation = additionalInformation;
-		}
-
-		public PlayerScore(int playerId) {
-			this.playerId = playerId;
-			this.totalScore = 0;
-			this.quantity = 0;
-		}
-
-		public int getPlayerId() {
-			return playerId;
-		}
-
-		public int getTotalScore() {
-			return totalScore;
-		}
-
-		public int getQuantity() {
-			return quantity;
-		}
-
-		public void setPlayerId(int playerId) {
-			this.playerId = playerId;
-		}
-
-		public void increaseTotalScore(int score) {
-			this.totalScore += score;
-		}
-
-		public void increaseQuantity() {
-			quantity++;
-		}
 	}
 
 	public HashMap<Integer, PlayerScore> getMutantScores(){
