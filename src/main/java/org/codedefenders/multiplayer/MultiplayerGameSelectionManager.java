@@ -1,8 +1,8 @@
 package org.codedefenders.multiplayer;
 
-import org.codedefenders.AbstractGame;
 import org.codedefenders.DatabaseAccess;
-import org.codedefenders.duel.DuelGame;
+import org.codedefenders.GameLevel;
+import org.codedefenders.GameState;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -60,14 +60,14 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     String mutCovGoal = request.getParameter("mutant_cov");
                     double lineCoverage = lineCovGoal == null ? 1.1 : Double.parseDouble(lineCovGoal);
                     double mutantCoverage = mutCovGoal == null ? 1.1 : Double.parseDouble(mutCovGoal);
-                    DuelGame.Level level = request.getParameter("level") == null ? DuelGame.Level.HARD : DuelGame.Level.EASY;
+                    GameLevel level = request.getParameter("level") == null ? GameLevel.HARD : GameLevel.EASY;
 
                     // Create the game with supplied parameters and insert it in the database.
                     MultiplayerGame nGame = new MultiplayerGame(classId, uid, level, (float) lineCoverage,
                             (float) mutantCoverage, 1f, 100, 100,
                             Integer.parseInt(request.getParameter("defenderLimit")), Integer.parseInt(request.getParameter("attackerLimit")),
                             Integer.parseInt(request.getParameter("minDefenders")), Integer.parseInt(request.getParameter("minAttackers")),
-                            Long.parseLong(request.getParameter("startTime")), Long.parseLong(request.getParameter("finishTime")), AbstractGame.State.CREATED.name());
+                            Long.parseLong(request.getParameter("startTime")), Long.parseLong(request.getParameter("finishTime")), GameState.CREATED.name());
                     nGame.insert();
 
                     //rs.getInt("Defender_Limit"), rs.getInt("Attacker_Limit"),

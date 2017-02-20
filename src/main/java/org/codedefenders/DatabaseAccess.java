@@ -344,14 +344,14 @@ public class DatabaseAccess {
 
 			if (rs.next()) {
 				DuelGame gameRecord;
-				if (rs.getString("Mode").equals(DuelGame.Mode.SINGLE.name()))
+				if (rs.getString("Mode").equals(GameMode.SINGLE.name()))
 					gameRecord = new SinglePlayerGame(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
-							rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), AbstractGame.State.valueOf(rs.getString("State")),
-							DuelGame.Level.valueOf(rs.getString("Level")), DuelGame.Mode.valueOf(rs.getString("Mode")));
+							rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), GameState.valueOf(rs.getString("State")),
+							GameLevel.valueOf(rs.getString("Level")), GameMode.valueOf(rs.getString("Mode")));
 				else
 					gameRecord = new DuelGame(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
-							rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), AbstractGame.State.valueOf(rs.getString("State")),
-							DuelGame.Level.valueOf(rs.getString("Level")), DuelGame.Mode.valueOf(rs.getString("Mode")));
+							rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), GameState.valueOf(rs.getString("State")),
+							GameLevel.valueOf(rs.getString("Level")), GameMode.valueOf(rs.getString("Mode")));
 
 				stmt.close();
 				conn.close();
@@ -520,8 +520,8 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				gameList.add(new DuelGame(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
 						rs.getInt("Class_ID"), rs.getInt("CurrentRound"), rs.getInt("FinalRound"),
-						Role.valueOf(rs.getString("ActiveRole")), AbstractGame.State.valueOf(rs.getString("State")),
-						DuelGame.Level.valueOf(rs.getString("Level")), DuelGame.Mode.valueOf(rs.getString("Mode"))));
+						Role.valueOf(rs.getString("ActiveRole")), GameState.valueOf(rs.getString("State")),
+						GameLevel.valueOf(rs.getString("Level")), GameMode.valueOf(rs.getString("Mode"))));
 			}
 			stmt.close();
 			conn.close();
@@ -564,7 +564,7 @@ public class DatabaseAccess {
 
 			while (rs.next()) {
 				MultiplayerGame mg = new MultiplayerGame(rs.getInt("Class_ID"), rs.getInt("Creator_ID"),
-						DuelGame.Level.valueOf(rs.getString("Level")), (float)rs.getDouble("Coverage_Goal"),
+						GameLevel.valueOf(rs.getString("Level")), (float)rs.getDouble("Coverage_Goal"),
 						(float)rs.getDouble("Mutant_Goal"), rs.getInt("Prize"), rs.getInt("Defender_Value"),
 						rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
 						rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),

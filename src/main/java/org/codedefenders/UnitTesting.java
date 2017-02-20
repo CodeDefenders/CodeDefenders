@@ -92,7 +92,7 @@ public class UnitTesting extends HttpServlet {
 				messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 				activeGame.endRound();
 				activeGame.update();
-				if (activeGame.getState().equals(AbstractGame.State.FINISHED))
+				if (activeGame.getState().equals(GameState.FINISHED))
 					messages.add("Great! Unit testing goal achieved. Session finished.");
 			} else {
 				// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")

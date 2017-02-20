@@ -120,7 +120,7 @@
 <%@ page import="org.codedefenders.Constants" %>
 <%@ page import="org.codedefenders.DatabaseAccess" %>
 <%@ page import="org.codedefenders.Role" %>
-<%@ page import="static org.codedefenders.AbstractGame.State.ACTIVE" %>
+<%@ page import="static org.codedefenders.GameState.ACTIVE" %>
 <%@ page import="org.codedefenders.GameClass" %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
 <%@ page import="java.util.ArrayList" %>

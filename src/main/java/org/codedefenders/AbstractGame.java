@@ -16,9 +16,9 @@ public abstract class AbstractGame {
 	protected int id;
 	protected int classId;
 	protected int creatorId;
-	protected State state;
-	protected Level level;
-	protected Mode mode;
+	protected GameState state;
+	protected GameLevel level;
+	protected GameMode mode;
 
 	public int getId() {
 		return id;
@@ -40,27 +40,27 @@ public abstract class AbstractGame {
 		return creatorId;
 	}
 
-	public State getState() {
+	public GameState getState() {
 		return state;
 	}
 
-	public void setState(State s) {
+	public void setState(GameState s) {
 		state = s;
 	}
 
-	public Level getLevel() {
+	public GameLevel getLevel() {
 		return this.level;
 	}
 
-	public void setLevel(Level level) {
+	public void setLevel(GameLevel level) {
 		this.level = level;
 	}
 
-	public Mode getMode() {
+	public GameMode getMode() {
 		return this.mode;
 	}
 
-	protected void setMode(Mode newMode) { this.mode = newMode; }
+	protected void setMode(GameMode newMode) { this.mode = newMode; }
 
 	// TODO:
 	// public abstract ArrayList<Mutant> getMutants();
@@ -121,9 +121,4 @@ public abstract class AbstractGame {
 		return false;
 	}
 
-	public enum State { CREATED, ACTIVE, FINISHED, GRACE_ONE, GRACE_TWO }
-
-	public enum Level { EASY, MEDIUM, HARD }
-
-	public enum Mode { SINGLE, DUEL, PARTY, UTESTING }
 }

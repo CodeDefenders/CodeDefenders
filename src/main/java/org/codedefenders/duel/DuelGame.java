@@ -20,7 +20,7 @@ public class DuelGame extends AbstractGame {
 
 	private Role activeRole;
 
-	public DuelGame(int classId, int userId, int maxRounds, Role role, Level level) {
+	public DuelGame(int classId, int userId, int maxRounds, Role role, GameLevel level) {
 		this.classId = classId;
 
 		if (role.equals(Role.ATTACKER)) {
@@ -33,13 +33,13 @@ public class DuelGame extends AbstractGame {
 		this.finalRound = maxRounds;
 
 		this.activeRole = Role.ATTACKER;
-		this.state = State.CREATED;
+		this.state = GameState.CREATED;
 
 		this.level = level;
-		this.mode = Mode.DUEL;
+		this.mode = GameMode.DUEL;
 	}
 
-	public DuelGame(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, State state, Level level, Mode mode) {
+	public DuelGame(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, GameState state, GameLevel level, GameMode mode) {
 		this.id = id;
 		this.attackerId = attackerId;
 		this.defenderId = defenderId;
@@ -176,8 +176,8 @@ public class DuelGame extends AbstractGame {
 	public void endRound() {
 		if (currentRound < finalRound) {
 			currentRound++;
-		} else if ((currentRound == finalRound) && (state.equals(State.ACTIVE))) {
-			state = State.FINISHED;
+		} else if ((currentRound == finalRound) && (state.equals(GameState.ACTIVE))) {
+			state = GameState.FINISHED;
 		}
 	}
 
@@ -257,7 +257,7 @@ public class DuelGame extends AbstractGame {
 
 			// Get all rows from the database which have the chosen username
 			stmt = conn.createStatement();
-			if (this.mode.equals(Mode.UTESTING))
+			if (this.mode.equals(GameMode.UTESTING))
 				sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', State='%s' WHERE ID='%d'",
 						currentRound, finalRound, state.name(), id);
 			else

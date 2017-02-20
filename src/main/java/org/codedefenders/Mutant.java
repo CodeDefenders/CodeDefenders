@@ -170,7 +170,7 @@ public class Mutant {
 			// TODO: as many points as tests it has survived?
 			DuelGame g = DatabaseAccess.getGameForKey("ID", gameId);
 			int points = g.getCurrentRound() - roundCreated; // rounds survived
-			if (g.getState().equals(AbstractGame.State.FINISHED))
+			if (g.getState().equals(GameState.FINISHED))
 				points++; // add a point for the last round if the game has finished
 			logger.info("Alive mutant " + getId() + " contributes " + points + " attacker points");
 			return points;

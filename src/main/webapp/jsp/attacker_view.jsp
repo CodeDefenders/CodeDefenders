@@ -1,10 +1,10 @@
 <%@ page import="org.codedefenders.*" %>
-<%@ page import="static org.codedefenders.AbstractGame.State.ACTIVE" %>
+<%@ page import="static org.codedefenders.GameState.ACTIVE" %>
 <% String pageTitle="Attacking Class"; %>
 <%@ include file="/jsp/header_game.jsp" %>
 
 <%
-	if (game.getState().equals(AbstractGame.State.FINISHED)) {
+	if (game.getState().equals(GameState.FINISHED)) {
 		String message = Constants.DRAW_MESSAGE;
 		if (game.getAttackerScore() > game.getDefenderScore())
 			message = Constants.WINNER_MESSAGE;

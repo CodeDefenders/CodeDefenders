@@ -24,7 +24,7 @@
     MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
     Role role = mg.getRole(uid);
 
-    if ((mg.getState().equals(AbstractGame.State.CREATED) || mg.getState().equals(AbstractGame.State.FINISHED)) && (!role.equals(Role.CREATOR))) {
+    if ((mg.getState().equals(GameState.CREATED) || mg.getState().equals(GameState.FINISHED)) && (!role.equals(Role.CREATOR))) {
         response.sendRedirect("/games/user");
     }
 
@@ -52,7 +52,7 @@
     ArrayList<Mutant> mutantsPending = mg.getMutantsMarkedEquivalentPending();
 
     if (role.equals(Role.DEFENDER) && request.getParameter("equivLine") != null &&
-            (mg.getState().equals(AbstractGame.State.ACTIVE) || mg.getState().equals(AbstractGame.State.GRACE_ONE))){
+            (mg.getState().equals(GameState.ACTIVE) || mg.getState().equals(GameState.GRACE_ONE))){
         try {
             int equivLine = Integer.parseInt(request.getParameter("equivLine"));
 

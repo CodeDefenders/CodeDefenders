@@ -5,8 +5,8 @@ pageTitle = null;
 </div></div></div></div></div>
 <%@ page import="java.util.*" %>
 <%@ page import="org.codedefenders.*" %>
-<%@ page import="static org.codedefenders.AbstractGame.State.ACTIVE" %>
-<%@ page import="static org.codedefenders.AbstractGame.State.FINISHED" %>
+<%@ page import="static org.codedefenders.GameState.ACTIVE" %>
+<%@ page import="static org.codedefenders.GameState.FINISHED" %>
 <div class="game-container"><h2 class="full-width page-title" style="text-align: center"><%= pTitle %></h2>
 <nav>
     <div class="container-fluid">

@@ -1,5 +1,8 @@
 package org.codedefenders.singleplayer;
 
+import org.codedefenders.GameLevel;
+import org.codedefenders.GameMode;
+import org.codedefenders.GameState;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.Role;
 import org.codedefenders.singleplayer.automated.attacker.AiAttacker;
@@ -15,7 +18,7 @@ public class SinglePlayerGame extends DuelGame {
 
 	protected AiPlayer ai = null;
 
-	public SinglePlayerGame(int classId, int userId, int maxRounds, Role role, Level level) {
+	public SinglePlayerGame(int classId, int userId, int maxRounds, Role role, GameLevel level) {
 		super(classId, userId, maxRounds, role, level);
 
 		//Set ai's role
@@ -26,15 +29,15 @@ public class SinglePlayerGame extends DuelGame {
 			setAttackerId(AiAttacker.ID);
 			ai = new AiAttacker(this);
 		}
-		setMode(Mode.SINGLE); //Set singleplayer mode.
-		setState(State.ACTIVE);
+		setMode(GameMode.SINGLE); //Set singleplayer mode.
+		setState(GameState.ACTIVE);
 	}
 
 	public AiPlayer getAi() {
 		return ai;
 	}
 
-	public SinglePlayerGame(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, State state, Level level, Mode mode) {
+	public SinglePlayerGame(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, GameState state, GameLevel level, GameMode mode) {
 		super(id, attackerId, defenderId, classId, currentRound, finalRound, activeRole, state, level, mode);
 		//Set ai's role
 		if(defenderId == AiDefender.ID) {

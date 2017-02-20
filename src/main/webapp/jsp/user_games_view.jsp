@@ -77,9 +77,9 @@
 		<td class="col-sm-2"><%= g.getLevel().name() %></td>
 		<td class="col-sm-2">
 <%
-			if (g.getState().equals(AbstractGame.State.ACTIVE)) { // Can enter only if game is in progress.
+			if (g.getState().equals(GameState.ACTIVE)) { // Can enter only if game is in progress.
 				String btnLabel = "Your Turn";
-				if (g.getMode().equals(DuelGame.Mode.UTESTING)) {
+				if (g.getMode().equals(GameMode.UTESTING)) {
 					btnLabel = "Enter";
 				}
 %>
@@ -175,7 +175,7 @@
 			<%
 					break;
 				case ATTACKER:
-					if(!g.getState().equals(AbstractGame.State.CREATED)) {
+					if(!g.getState().equals(GameState.CREATED)) {
 			%>
 			<a href="multiplayer/games?id=<%= g.getId() %>">Attack</a>
 			<%		} else { %>
@@ -188,7 +188,7 @@
 			<% }
 					break;
 				case DEFENDER:
-					if(!g.getState().equals(AbstractGame.State.CREATED)) { %>
+					if(!g.getState().equals(GameState.CREATED)) { %>
 				<a href="multiplayer/games?id=<%= g.getId() %>">Defend</a>
 			<% 		} else { %>
 			<p>Joined as Defender</p>

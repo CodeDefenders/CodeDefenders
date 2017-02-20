@@ -51,8 +51,8 @@
 <%@ page import="org.codedefenders.Test" %>
 <%@ page import="org.codedefenders.duel.DuelGame" %>
 <%@ page import="org.codedefenders.Constants" %>
-<%@ page import="static org.codedefenders.AbstractGame.State.ACTIVE" %>
-<%@ page import="static org.codedefenders.AbstractGame.State.FINISHED" %>
+<%@ page import="static org.codedefenders.GameState.ACTIVE" %>
+<%@ page import="static org.codedefenders.GameState.FINISHED" %>
 <% DuelGame uTestingSession = (DuelGame) session.getAttribute("game"); %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">

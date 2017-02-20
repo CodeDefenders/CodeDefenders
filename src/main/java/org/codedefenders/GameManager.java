@@ -163,7 +163,7 @@ public class GameManager extends HttpServlet {
 				if (request.getParameter("mutantId") != null) {
 					int mutantId = Integer.parseInt(request.getParameter("mutantId"));
 					Mutant mutantClaimed = DatabaseAccess.getMutant(activeGame, mutantId);
-					if(activeGame.getMode().equals(AbstractGame.Mode.SINGLE)) {
+					if(activeGame.getMode().equals(GameMode.SINGLE)) {
 						//Singleplayer - use automatic system.
 						if(AntRunner.potentialEquivalent(mutantClaimed)) {
 							//Is potentially equiv - accept as equivalent
@@ -211,7 +211,7 @@ public class GameManager extends HttpServlet {
 						messages.add(MUTANT_COMPILED_MESSAGE);
 						MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
 
-						if(activeGame.getMode().equals(AbstractGame.Mode.SINGLE)) {
+						if(activeGame.getMode().equals(GameMode.SINGLE)) {
 							//Singleplayer - check for potential equivalent.
 							if(AntRunner.potentialEquivalent(newMutant)) {
 								//Is potentially equiv - mark as equivalent and update.
@@ -266,8 +266,8 @@ public class GameManager extends HttpServlet {
 						activeGame.endTurn();
 						activeGame.update();
 						// if single-player game is not finished, make a move
-						if (! activeGame.getState().equals(AbstractGame.State.FINISHED)
-								&& activeGame.getMode().equals(AbstractGame.Mode.SINGLE)) {
+						if (! activeGame.getState().equals(GameState.FINISHED)
+								&& activeGame.getMode().equals(GameMode.SINGLE)) {
 							SinglePlayerGame g = (SinglePlayerGame) activeGame;
 							if (g.getAi().makeTurn()) {
 								messages.addAll(g.getAi().getMessagesLastTurn());

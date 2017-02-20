@@ -10,7 +10,7 @@ pageTitle = null;
 <%@ page import="org.codedefenders.Constants" %>
 <%@ page import="org.codedefenders.DatabaseAccess" %>
 <%@ page import="org.codedefenders.GameClass" %>
-<%@ page import="static org.codedefenders.AbstractGame.State.ACTIVE" %>
+<%@ page import="static org.codedefenders.GameState.ACTIVE" %>
 <div class="game-container">
 <nav class="nest" style="width: 80%; margin-left: auto; margin-right: auto;">
     <div class="crow fly">

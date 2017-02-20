@@ -28,7 +28,7 @@ public class MultiplayerGame extends AbstractGame {
 	private long finishDateTime;
 	private boolean requiresValidation;
 
-	public MultiplayerGame(int classId, int creatorId, Level level,
+	public MultiplayerGame(int classId, int creatorId, GameLevel level,
 	                       float lineCoverage, float mutantCoverage, float prize,
 	                       int defenderValue, int attackerValue, int defenderLimit,
 	                       int attackerLimit, int minDefenders, int minAttackers,
@@ -37,7 +37,7 @@ public class MultiplayerGame extends AbstractGame {
 				minDefenders, minAttackers, startDateTime, finishDateTime, status, false);
 	}
 
-	public MultiplayerGame(int classId, int creatorId, Level level,
+	public MultiplayerGame(int classId, int creatorId, GameLevel level,
 	                       float lineCoverage, float mutantCoverage, float prize,
 	                       int defenderValue, int attackerValue, int defenderLimit,
 	                       int attackerLimit, int minDefenders, int minAttackers,
@@ -45,7 +45,7 @@ public class MultiplayerGame extends AbstractGame {
 		this.classId = classId;
 		this.creatorId = creatorId;
 		this.level = level;
-		this.mode = Mode.PARTY;
+		this.mode = GameMode.PARTY;
 		this.lineCoverage = lineCoverage;
 		this.mutantCoverage = mutantCoverage;
 		this.prize = prize;
@@ -55,7 +55,7 @@ public class MultiplayerGame extends AbstractGame {
 		this.attackerLimit = attackerLimit;
 		this.minDefenders = minDefenders;
 		this.minAttackers = minAttackers;
-		this.state = State.valueOf(status);
+		this.state = GameState.valueOf(status);
 		this.startDateTime = startDateTime;
 		this.finishDateTime = finishDateTime;
 		this.requiresValidation = requiresValidation;
@@ -79,8 +79,8 @@ public class MultiplayerGame extends AbstractGame {
 
 	public void setId(int id) {
 		this.id = id;
-		if (this.state != State.FINISHED && finishDateTime < System.currentTimeMillis()){
-			this.state = State.FINISHED;
+		if (this.state != GameState.FINISHED && finishDateTime < System.currentTimeMillis()){
+			this.state = GameState.FINISHED;
 			update();
 		}
 	}
@@ -197,7 +197,7 @@ public class MultiplayerGame extends AbstractGame {
 	public int[] getPlayerIds() { return ArrayUtils.addAll(getDefenderIds(), getAttackerIds());}
 
 	public boolean addPlayer(int userId, Role role) {
-		if (state != State.FINISHED && canJoinGame(userId, role)) {
+		if (state != GameState.FINISHED && canJoinGame(userId, role)) {
 			String sql = String.format("INSERT INTO players " +
 							"(Game_ID, User_ID, Points, Role) " +
 							"VALUES (%d, %d, 0, '%s') " +
@@ -209,7 +209,7 @@ public class MultiplayerGame extends AbstractGame {
 	}
 
 	public boolean removePlayer(int userId) {
-		if (state == State.CREATED) {
+		if (state == GameState.CREATED) {
 			String sql = String.format("UPDATE players " +
 							"SET Active=FALSE WHERE Game_ID=%d AND User_ID=%d;",
 					id, userId);

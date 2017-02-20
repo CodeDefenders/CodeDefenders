@@ -28,8 +28,8 @@
 			defName = null;
 
 			// Single or UTesting games cannot be joined
-			if (g.getMode().equals(AbstractGame.Mode.SINGLE) ||
-					g.getMode().equals(AbstractGame.Mode.UTESTING)) {continue;}
+			if (g.getMode().equals(GameMode.SINGLE) ||
+					g.getMode().equals(GameMode.UTESTING)) {continue;}
 
 			atkId = g.getAttackerId();
 			defId = g.getDefenderId();

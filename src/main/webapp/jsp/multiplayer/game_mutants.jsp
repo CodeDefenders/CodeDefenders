@@ -1,6 +1,7 @@
 <%@ page import="org.codedefenders.duel.DuelGame" %>
 <%@ page import="org.codedefenders.Role" %>
 <%@ page import="org.codedefenders.Mutant" %>
+<%@ page import="org.codedefenders.GameLevel" %>
 <div class="ws-12 up" id="mutants-div">
 	<%
 if (role == Role.ATTACKER && true){
@@ -109,7 +110,7 @@ if (role == Role.ATTACKER && true){
 									if (m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){
 										%><span>Flagged Equivalent</span><%
 									}%>
-									<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(DuelGame.Level.EASY)){ %>
+									<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(GameLevel.EASY)){ %>
 										<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 									<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
 										 style="z-index: 10000;">

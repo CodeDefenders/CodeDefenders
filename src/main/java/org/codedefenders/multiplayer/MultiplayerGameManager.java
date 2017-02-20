@@ -1,14 +1,6 @@
 package org.codedefenders.multiplayer;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseException;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.stmt.*;
 import org.codedefenders.*;
-import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.nio.file.Files;
 import java.util.ArrayList;
 
 import static org.codedefenders.Constants.*;
@@ -42,17 +33,17 @@ public class MultiplayerGameManager extends HttpServlet {
 
 		switch (request.getParameter("formType")) {
 			case "startGame": {
-				if(activeGame.getState().equals(AbstractGame.State.CREATED)) {
+				if(activeGame.getState().equals(GameState.CREATED)) {
 					logger.info("Starting multiplayer game {} (Setting state to ACTIVE)", activeGame.getId());
-					activeGame.setState(AbstractGame.State.ACTIVE);
+					activeGame.setState(GameState.ACTIVE);
 					activeGame.update();
 				}
 				break;
 			}
 			case "endGame": {
-				if(activeGame.getState().equals(AbstractGame.State.ACTIVE)) {
+				if(activeGame.getState().equals(GameState.ACTIVE)) {
 					logger.info("Ending multiplayer game {} (Setting state to FINISHED)", activeGame.getId());
-					activeGame.setState(AbstractGame.State.FINISHED);
+					activeGame.setState(GameState.FINISHED);
 					activeGame.update();
 					response.sendRedirect("games");
 					return;
@@ -63,7 +54,7 @@ public class MultiplayerGameManager extends HttpServlet {
 			case "resolveEquivalence": {
 				int currentEquivMutantID = Integer.parseInt(request.getParameter("currentEquivMutant"));
 
-				if (activeGame.getState().equals(AbstractGame.State.FINISHED)){
+				if (activeGame.getState().equals(GameState.FINISHED)){
 					messages.add(String.format("Game %d has finished.", activeGame.getId()));
 					response.sendRedirect("games");
 				}
@@ -146,7 +137,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 			case "createMutant":
 
-				if (activeGame.getState().equals(AbstractGame.State.ACTIVE)) {
+				if (activeGame.getState().equals(GameState.ACTIVE)) {
 
 					// Get the text submitted by the user.
 					String mutantText = request.getParameter("mutant");
@@ -174,7 +165,7 @@ public class MultiplayerGameManager extends HttpServlet {
 				break;
 
 			case "createTest":
-				if (activeGame.getState().equals(AbstractGame.State.ACTIVE)) {
+				if (activeGame.getState().equals(GameState.ACTIVE)) {
 					// Get the text submitted by the user.
 					String testText = request.getParameter("test");
 
