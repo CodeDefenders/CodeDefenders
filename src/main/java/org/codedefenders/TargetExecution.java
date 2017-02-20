@@ -104,19 +104,7 @@ public class TargetExecution {
 			System.out.println(e);
 		} // Handle errors for Class.forName
 		finally {
-			try {
-				if (pstmt != null) {
-					pstmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			DatabaseAccess.cleanup(conn, pstmt);
 		}
 		return false;
 	}
