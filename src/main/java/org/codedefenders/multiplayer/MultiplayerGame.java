@@ -6,15 +6,60 @@ import org.codedefenders.*;
 import java.sql.*;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.codedefenders.Mutant.Equivalence.*;
 
 public class MultiplayerGame extends AbstractGame {
 
 	private int defenderValue;
+	private int attackerValue;
+	private float lineCoverage;
+	private float mutantCoverage;
+	private float prize;
+	private int attackerLimit;
+	private int defenderLimit;
+	private int minAttackers;
+	private int minDefenders;
+	private long startDateTime;
+	private long finishDateTime;
+	private boolean requiresValidation;
+
+	public MultiplayerGame(int classId, int creatorId, Level level,
+	                       float lineCoverage, float mutantCoverage, float prize,
+	                       int defenderValue, int attackerValue, int defenderLimit,
+	                       int attackerLimit, int minDefenders, int minAttackers,
+	                       long startDateTime, long finishDateTime, String status) {
+		this(classId, creatorId, level, lineCoverage, mutantCoverage, prize, defenderValue, attackerValue, defenderLimit, attackerLimit,
+				minDefenders, minAttackers, startDateTime, finishDateTime, status, false);
+	}
+	
+	public MultiplayerGame(int classId, int creatorId, Level level,
+	                       float lineCoverage, float mutantCoverage, float prize,
+	                       int defenderValue, int attackerValue, int defenderLimit,
+	                       int attackerLimit, int minDefenders, int minAttackers,
+	                       long startDateTime, long finishDateTime, String status, boolean requiresValidation) {
+		this.classId = classId;
+		this.creatorId = creatorId;
+		this.level = level;
+		this.mode = Mode.PARTY;
+		this.lineCoverage = lineCoverage;
+		this.mutantCoverage = mutantCoverage;
+		this.prize = prize;
+		this.defenderValue = defenderValue;
+		this.attackerValue = attackerValue;
+		this.defenderLimit = defenderLimit;
+		this.attackerLimit = attackerLimit;
+		this.minDefenders = minDefenders;
+		this.minAttackers = minAttackers;
+		this.state = State.valueOf(status);
+		this.startDateTime = startDateTime;
+		this.finishDateTime = finishDateTime;
+		this.requiresValidation = requiresValidation;
+	}
 
 	public int getAttackerLimit() {
 		return attackerLimit;
@@ -31,18 +76,6 @@ public class MultiplayerGame extends AbstractGame {
 	public int getMinDefenders() {
 		return minDefenders;
 	}
-
-	private int attackerValue;
-	private float lineCoverage;
-	private float mutantCoverage;
-	private float prize;
-	private int attackerLimit;
-	private int defenderLimit;
-	private int minAttackers;
-	private int minDefenders;
-	private long startDateTime;
-	private long finishDateTime;
-	private boolean requiresValidation;
 
 	public void setId(int id) {
 		this.id = id;
@@ -120,81 +153,29 @@ public class MultiplayerGame extends AbstractGame {
 		return format.format(date);
 	}
 
-	public MultiplayerGame(int classId, int creatorId, Level level,
-	                       float lineCoverage, float mutantCoverage, float prize,
-	                       int defenderValue, int attackerValue, int defenderLimit,
-	                       int attackerLimit, int minDefenders, int minAttackers,
-	                       long startDateTime, long finishDateTime, String status) {
-		this(classId, creatorId, level, lineCoverage, mutantCoverage, prize, defenderValue, attackerValue, defenderLimit, attackerLimit,
-				minDefenders, minAttackers, startDateTime, finishDateTime, status, false);
-	}
-
-	public MultiplayerGame(int classId, int creatorId, Level level,
-	                       float lineCoverage, float mutantCoverage, float prize,
-	                       int defenderValue, int attackerValue, int defenderLimit,
-	                       int attackerLimit, int minDefenders, int minAttackers,
-	                       long startDateTime, long finishDateTime, String status, boolean requiresValidation) {
-		this.classId = classId;
-		this.creatorId = creatorId;
-		this.level = level;
-		this.mode = Mode.PARTY;
-		this.lineCoverage = lineCoverage;
-		this.mutantCoverage = mutantCoverage;
-		this.prize = prize;
-		this.defenderValue = defenderValue;
-		this.attackerValue = attackerValue;
-		this.defenderLimit = defenderLimit;
-		this.attackerLimit = attackerLimit;
-		this.minDefenders = minDefenders;
-		this.minAttackers = minAttackers;
-		this.state = State.valueOf(status);
-		this.startDateTime = startDateTime;
-		this.finishDateTime = finishDateTime;
-		this.requiresValidation = requiresValidation;
-	}
-
-	public ArrayList<Mutant> getMutants() {
+	public List<Mutant> getMutants() {
 		return DatabaseAccess.getMutantsForGame(id);
 	}
 
-	public ArrayList<Mutant> getAliveMutants() {
-		ArrayList<Mutant> aliveMutants = new ArrayList<>();
-		for (Mutant m : getMutants()) {
-			if (m.isAlive() && m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO) && (m.getClassFile() != null)) {
-				aliveMutants.add(m);
-			}
-		}
-		return aliveMutants;
+	public List<Mutant> getAliveMutants() {
+		return getMutants().stream().filter(mutant -> mutant.isAlive() &&
+									 		mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO) &&
+				                     		mutant.getClassFile() != null).collect(Collectors.toList());
 	}
 
-	public ArrayList<Mutant> getKilledMutants() {
-		ArrayList<Mutant> killedMutants = new ArrayList<>();
-		for (Mutant m : getMutants()) {
-			if (!m.isAlive() && (m.getEquivalent().equals(ASSUMED_NO) ||  m.getEquivalent().equals(PROVEN_NO)) && (m.getClassFile() != null)) {
-				killedMutants.add(m);
-			}
-		}
-		return killedMutants;
+	public List<Mutant> getKilledMutants() {
+		return getMutants().stream().filter(mutant -> !mutant.isAlive() &&
+				                           (mutant.getEquivalent().equals(ASSUMED_NO) || mutant.getEquivalent().equals(PROVEN_NO)) &&
+				                           (mutant.getClassFile() != null)).collect(Collectors.toList());
 	}
 
-	public ArrayList<Mutant> getMutantsMarkedEquivalent() {
-		ArrayList<Mutant> equivMutants = new ArrayList<>();
-		for (Mutant m : getMutants()) {
-			if (m.getEquivalent().equals(ASSUMED_YES) || m.getEquivalent().equals(DECLARED_YES)) {
-				equivMutants.add(m);
-			}
-		}
-		return equivMutants;
+	public List<Mutant> getMutantsMarkedEquivalent() {
+		return getMutants().stream().filter(mutant -> mutant.getEquivalent().equals(ASSUMED_YES) ||
+				                            mutant.getEquivalent().equals(DECLARED_YES)).collect(Collectors.toList());
 	}
 
-	public ArrayList<Mutant> getMutantsMarkedEquivalentPending() {
-		ArrayList<Mutant> equivMutants = new ArrayList<>();
-		for (Mutant m : getMutants()) {
-			if (m.getEquivalent().equals(PENDING_TEST)) {
-				equivMutants.add(m);
-			}
-		}
-		return equivMutants;
+	public List<Mutant> getMutantsMarkedEquivalentPending() {
+		return getMutants().stream().filter(mutant -> mutant.getEquivalent().equals(PENDING_TEST)).collect(Collectors.toList());
 	}
 
 	public Mutant getMutantByID(int mutantID) {
@@ -332,7 +313,7 @@ public class MultiplayerGame extends AbstractGame {
 		HashMap<Integer, Integer> mutantsKilled = new HashMap<Integer, Integer>();
 		HashMap<Integer, Integer> mutantsEquiv = new HashMap<Integer, Integer>();
 
-		ArrayList<Mutant> allMutants = getAliveMutants();
+		List<Mutant> allMutants = getAliveMutants();
 		allMutants.addAll(getKilledMutants());
 		allMutants.addAll(getMutantsMarkedEquivalent());
 		allMutants.addAll(getMutantsMarkedEquivalentPending());
