@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.codedefenders.Constants.*;
 import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
@@ -81,7 +82,7 @@ public class MultiplayerGameManager extends HttpServlet {
 						logger.info("Test {} passed on the CUT", newTest.getId());
 
 						// Instead of running equivalence on only one mutant, let's try with all mutants pending resolution
-						ArrayList<Mutant> mutantsPendingTests = activeGame.getMutantsMarkedEquivalentPending();
+						List<Mutant> mutantsPendingTests = activeGame.getMutantsMarkedEquivalentPending();
 						boolean killedClaimed = false;
 						int killedOthers = 0;
 						for (Mutant mPending : mutantsPendingTests) {
