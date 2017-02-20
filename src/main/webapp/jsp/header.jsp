@@ -24,6 +24,7 @@
                             <li><a
                                    href="games/open" style="width:100%;">Open
                                 Games</a></li>
+                            <li><a href="games/tutorial" style="width:100%;">Tutorial</a></li>
                             <li><a href="games/history" style="width:100%;">History</a></li>
                 </ul></li>
                 <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="games/upload" style="width:100%;">Upload Class</a></li>

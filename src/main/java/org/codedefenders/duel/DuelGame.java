@@ -1,4 +1,6 @@
-package org.codedefenders;
+package org.codedefenders.duel;
+
+import org.codedefenders.*;
 
 import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 
@@ -8,7 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-public class Game extends AbstractGame {
+public class DuelGame extends AbstractGame {
 
 	private int attackerId;
 	private int defenderId;
@@ -18,7 +20,7 @@ public class Game extends AbstractGame {
 
 	private Role activeRole;
 
-	public Game(int classId, int userId, int maxRounds, Role role, Level level) {
+	public DuelGame(int classId, int userId, int maxRounds, Role role, Level level) {
 		this.classId = classId;
 
 		if (role.equals(Role.ATTACKER)) {
@@ -37,7 +39,7 @@ public class Game extends AbstractGame {
 		this.mode = Mode.DUEL;
 	}
 
-	public Game(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, State state, Level level, Mode mode) {
+	public DuelGame(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, State state, Level level, Mode mode) {
 		this.id = id;
 		this.attackerId = attackerId;
 		this.defenderId = defenderId;

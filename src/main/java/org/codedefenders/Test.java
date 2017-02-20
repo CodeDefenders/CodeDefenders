@@ -2,6 +2,7 @@ package org.codedefenders;
 
 import javassist.ClassPool;
 import javassist.CtClass;
+import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.LineCoverage;
 
 import java.io.BufferedReader;
@@ -67,7 +68,7 @@ public class Test {
 	public Test(int gameId, String jFile, String cFile, int playerId) {
 		this.gameId = gameId;
 		try {
-			Game g = DatabaseAccess.getGameForKey("ID", gameId);
+			DuelGame g = DatabaseAccess.getGameForKey("ID", gameId);
 			if (g != null)
 				this.roundCreated = g.getCurrentRound();
 		} catch (NullPointerException e) {

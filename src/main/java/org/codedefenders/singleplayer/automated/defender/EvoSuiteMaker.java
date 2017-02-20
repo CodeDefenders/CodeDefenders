@@ -1,8 +1,8 @@
 package org.codedefenders.singleplayer.automated.defender;
 
 import org.codedefenders.*;
+import org.codedefenders.duel.DuelGame;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -15,10 +15,10 @@ public class EvoSuiteMaker {
 
 	private int cId;
 	private GameClass cut;
-	private Game dGame;
+	private DuelGame dGame;
 	private ArrayList<Test> validTests;
 
-	public EvoSuiteMaker(int classId, Game dummyGame) {
+	public EvoSuiteMaker(int classId, DuelGame dummyGame) {
 		cId = classId;
 		cut = DatabaseAccess.getClassForKey("Class_ID", cId);
 		dGame = dummyGame;

@@ -2,7 +2,7 @@ package org.codedefenders.multiplayer;
 
 import org.codedefenders.AbstractGame;
 import org.codedefenders.DatabaseAccess;
-import org.codedefenders.Game;
+import org.codedefenders.duel.DuelGame;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -60,7 +60,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     String mutCovGoal = request.getParameter("mutant_cov");
                     double lineCoverage = lineCovGoal == null ? 1.1 : Double.parseDouble(lineCovGoal);
                     double mutantCoverage = mutCovGoal == null ? 1.1 : Double.parseDouble(mutCovGoal);
-                    Game.Level level = request.getParameter("level") == null ? Game.Level.HARD : Game.Level.EASY;
+                    DuelGame.Level level = request.getParameter("level") == null ? DuelGame.Level.HARD : DuelGame.Level.EASY;
 
                     // Create the game with supplied parameters and insert it in the database.
                     MultiplayerGame nGame = new MultiplayerGame(classId, uid, level, (float) lineCoverage,

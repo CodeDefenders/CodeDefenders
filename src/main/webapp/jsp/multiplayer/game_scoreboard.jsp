@@ -2,6 +2,7 @@
 <%@ page import="org.codedefenders.DatabaseAccess" %>
 <%@ page import="org.codedefenders.User" %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.multiplayer.PlayerScore" %>
 <%
 
     HashMap mutantScores = mg.getMutantScores();
@@ -26,16 +27,16 @@
                     <span class="attackerTotal"><%
                         int ts = 0;
                         if (mutantScores.containsKey(-1) && mutantScores.get(-1) != null){
-                            ts += ((MultiplayerGame.PlayerScore)mutantScores.get(-1)).getTotalScore();
+                            ts += ((PlayerScore)mutantScores.get(-1)).getTotalScore();
                         }
                         if (testScores.containsKey(-2) && testScores.get(-2) != null){
-                            ts += ((MultiplayerGame.PlayerScore)testScores.get(-2)).getTotalScore();
+                            ts += ((PlayerScore)testScores.get(-2)).getTotalScore();
                         } %>
                         <%= ts %>
                     </span><img class="logo" href="/" src="images/logo.png"/><span class="defenderTotal">
                     <% ts = 0;
                         if (testScores.containsKey(-1) && testScores.get(-1) != null){
-                                ts += ((MultiplayerGame.PlayerScore)testScores.get(-1)).getTotalScore(); %>
+                                ts += ((PlayerScore)testScores.get(-1)).getTotalScore(); %>
                         <% } %>
                         <%= ts %>
                 </span>
@@ -58,14 +59,14 @@
                             </td>
                             <td><%
                                 if (mutantScores.containsKey(i) && mutantScores.get(i) != null){ %>
-                                <%= ((MultiplayerGame.PlayerScore)mutantScores.get(i)).getQuantity() %>
+                                <%= ((PlayerScore)mutantScores.get(i)).getQuantity() %>
                                 <% } else { %>
                                 0
                                 <% } %></td>
                             <td>
                                 <%
                                     if (mutantScores.containsKey(i) && mutantScores.get(i) != null){%>
-                                <%= ((MultiplayerGame.PlayerScore)mutantScores.get(i)).getAdditionalInformation() %>
+                                <%= ((PlayerScore)mutantScores.get(i)).getAdditionalInformation() %>
                                 <% } else { %>
                                     0 / 0 / 0
                                 <% } %>
@@ -73,10 +74,10 @@
                             <td>
                                 <%
                                 if (mutantScores.containsKey(i) && mutantScores.get(i) != null){
-                                    total += ((MultiplayerGame.PlayerScore)mutantScores.get(i)).getTotalScore(); %>
+                                    total += ((PlayerScore)mutantScores.get(i)).getTotalScore(); %>
                             <% }
                                 if (testScores.containsKey(i) && testScores.get(i) != null){
-                                    total += ((MultiplayerGame.PlayerScore)testScores.get(i)).getTotalScore(); %>
+                                    total += ((PlayerScore)testScores.get(i)).getTotalScore(); %>
                             <% } %>
                                 <%= total %>
                             </td>
@@ -94,14 +95,14 @@
                     </td>
                         <td><%
                             if (mutantScores.containsKey(-1) && mutantScores.get(-1) != null){ %>
-                            <%= ((MultiplayerGame.PlayerScore)mutantScores.get(-1)).getQuantity() %>
+                            <%= ((PlayerScore)mutantScores.get(-1)).getQuantity() %>
                             <% } else { %>
                             0
                             <% } %></td>
                         <td>
                             <%
                                 if (mutantScores.containsKey(-1) && mutantScores.get(-1) != null){%>
-                            <%= ((MultiplayerGame.PlayerScore)mutantScores.get(-1)).getAdditionalInformation() %>
+                            <%= ((PlayerScore)mutantScores.get(-1)).getAdditionalInformation() %>
                             <% } else { %>
                             0 / 0 / 0
                             <% } %>
@@ -109,12 +110,12 @@
                         <td>
                             <%
                                 if (mutantScores.containsKey(-1) && mutantScores.get(-1) != null){
-                                    total += ((MultiplayerGame.PlayerScore)mutantScores.get(-1)).getTotalScore(); %>
+                                    total += ((PlayerScore)mutantScores.get(-1)).getTotalScore(); %>
                             <% } else { %>
                             0
                             <% }
                                 if (testScores.containsKey(-2) && testScores.get(-2) != null){
-                                    total += ((MultiplayerGame.PlayerScore)testScores.get(-2)).getTotalScore(); %>
+                                    total += ((PlayerScore)testScores.get(-2)).getTotalScore(); %>
                             <% } %>
                             <%= total %>
                         </td>
@@ -134,14 +135,14 @@
                     </td>
                         <td><%
                             if (testScores.containsKey(i) && testScores.get(i) != null){ %>
-                                <%= ((MultiplayerGame.PlayerScore)testScores.get(i)).getQuantity() %>
+                                <%= ((PlayerScore)testScores.get(i)).getQuantity() %>
 
                             <% } else { %>
                                 0 <% } %></td>
                         <td><%
                             if (testScores.containsKey(i) && testScores.get(i) != null){
-                                    total += ((MultiplayerGame.PlayerScore)testScores.get(i)).getTotalScore(); %>
-                            <%= ((MultiplayerGame.PlayerScore)testScores.get(i)).getAdditionalInformation()%>
+                                    total += ((PlayerScore)testScores.get(i)).getTotalScore(); %>
+                            <%= ((PlayerScore)testScores.get(i)).getAdditionalInformation()%>
                             <% } else { %>
                             0 <% } %></td>
                         <td>
@@ -161,14 +162,14 @@
                     </td>
                         <td><%
                             if (testScores.containsKey(-1) && testScores.get(-1) != null){ %>
-                            <%= ((MultiplayerGame.PlayerScore)testScores.get(-1)).getQuantity() %>
+                            <%= ((PlayerScore)testScores.get(-1)).getQuantity() %>
 
                             <% } else { %>
                             0 <% } %></td>
                         <td><%
                             if (testScores.containsKey(-1) && testScores.get(-1) != null){
-                                total += ((MultiplayerGame.PlayerScore)testScores.get(-1)).getTotalScore(); %>
-                            <%= ((MultiplayerGame.PlayerScore)testScores.get(-1)).getAdditionalInformation()%>
+                                total += ((PlayerScore)testScores.get(-1)).getTotalScore(); %>
+                            <%= ((PlayerScore)testScores.get(-1)).getAdditionalInformation()%>
                             <% } else { %>
                             0 <% } %></td>
                         <td>

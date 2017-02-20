@@ -6,6 +6,7 @@ import difflib.DiffUtils;
 import difflib.Patch;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.codedefenders.duel.DuelGame;
 import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -167,7 +168,7 @@ public class Mutant {
 		if (alive) {
 			// if mutant is alive, as many points as rounds it has survived
 			// TODO: as many points as tests it has survived?
-			Game g = DatabaseAccess.getGameForKey("ID", gameId);
+			DuelGame g = DatabaseAccess.getGameForKey("ID", gameId);
 			int points = g.getCurrentRound() - roundCreated; // rounds survived
 			if (g.getState().equals(AbstractGame.State.FINISHED))
 				points++; // add a point for the last round if the game has finished

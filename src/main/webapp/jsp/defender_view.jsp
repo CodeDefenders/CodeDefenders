@@ -1,10 +1,11 @@
 <%@ page import="static org.codedefenders.AbstractGame.State.ACTIVE" %>
 <%@ page import="org.codedefenders.*" %>
+<%@ page import="org.codedefenders.duel.DuelGame" %>
 <% String pageTitle="Defending Class"; %>
 <%@ include file="/jsp/header_game.jsp" %>
 
 <%
-	if (game.getState().equals(Game.State.FINISHED)) {
+	if (game.getState().equals(DuelGame.State.FINISHED)) {
 		String message = Constants.DRAW_MESSAGE;
 		if (game.getAttackerScore() > game.getDefenderScore())
 			message = Constants.LOSER_MESSAGE;
@@ -127,7 +128,7 @@
 							<h4>Mutant <%= m.getId() %></h4>
 						</td>
 						<td>
-							<% if (game.getLevel().equals(Game.Level.EASY) || game.getState().equals(Game.State.FINISHED)) { %>
+							<% if (game.getLevel().equals(DuelGame.Level.EASY) || game.getState().equals(DuelGame.State.FINISHED)) { %>
 							<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 							<% } %>
 							<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">

@@ -2,7 +2,7 @@ package org.codedefenders.singleplayer.automated.attacker;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.*;
-import org.codedefenders.singleplayer.automated.defender.AiDefender;
+import org.codedefenders.duel.DuelGame;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -22,10 +22,10 @@ public class MajorMaker {
 
 	private int cId;
 	private GameClass cut;
-	private Game dGame;
+	private DuelGame dGame;
 	private ArrayList<Mutant> validMutants;
 
-	public MajorMaker(int classId, Game dummyGame) {
+	public MajorMaker(int classId, DuelGame dummyGame) {
 		cId = classId;
 		cut = DatabaseAccess.getClassForKey("Class_ID", cId);
 		dGame = dummyGame;

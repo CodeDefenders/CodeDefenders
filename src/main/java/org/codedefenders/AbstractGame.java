@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * Created by jmr on 13/07/2016.
  */
 public abstract class AbstractGame {
-	protected static final Logger logger = LoggerFactory.getLogger(Game.class);
+	protected static final Logger logger = LoggerFactory.getLogger(AbstractGame.class);
 	protected int id;
 	protected int classId;
 	protected int creatorId;

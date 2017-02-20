@@ -1,7 +1,6 @@
 package org.codedefenders.singleplayer;
 
-import org.codedefenders.AbstractGame;
-import org.codedefenders.Game;
+import org.codedefenders.duel.DuelGame;
 import org.codedefenders.Role;
 import org.codedefenders.singleplayer.automated.attacker.AiAttacker;
 import org.codedefenders.singleplayer.automated.defender.AiDefender;
@@ -9,10 +8,10 @@ import org.codedefenders.singleplayer.automated.defender.AiDefender;
 /**
  * @author Ben Clegg
  * Set up a singleplayer game.
- * Logic still handled by Game class.
+ * Logic still handled by DuelGame class.
  */
 
-public class SinglePlayerGame extends Game {
+public class SinglePlayerGame extends DuelGame {
 
 	protected AiPlayer ai = null;
 

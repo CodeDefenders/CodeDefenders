@@ -1,5 +1,6 @@
 package org.codedefenders;
 
+import org.codedefenders.duel.DuelGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -182,8 +183,8 @@ public class GameClass {
 		this.classFile = classFile;
 	}
 
-	public Game getDummyGame() throws Exception {
-		Game dg = DatabaseAccess.getAiDummyGameForClass(this.getId());
+	public DuelGame getDummyGame() throws Exception {
+		DuelGame dg = DatabaseAccess.getAiDummyGameForClass(this.getId());
 		return dg;
 	}
 

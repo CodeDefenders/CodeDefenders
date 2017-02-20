@@ -1,6 +1,7 @@
 package org.codedefenders;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.scoring.Scorer;
 import org.slf4j.Logger;
@@ -23,7 +24,7 @@ public class MutationTester {
 	// Inputs: The ID of the game to run mutation tests for
 	// Outputs: None
 
-	public static void runTestOnAllMutants(Game game, Test test, ArrayList<String> messages) {
+	public static void runTestOnAllMutants(DuelGame game, Test test, ArrayList<String> messages) {
 		int killed = 0;
 		ArrayList<Mutant> mutants = game.getAliveMutants();
 		for (Mutant mutant : mutants) {

@@ -1,6 +1,7 @@
 package org.codedefenders.singleplayer.automated.defender;
 
 import org.codedefenders.*;
+import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.singleplayer.AiPlayer;
 import org.codedefenders.singleplayer.PrepareAI;
@@ -22,7 +23,7 @@ public class AiDefender extends AiPlayer {
 
 	public static final int ID = 2;
 
-	public AiDefender(Game g) {
+	public AiDefender(DuelGame g) {
 		super(g);
 		role = Role.DEFENDER;
 	}
@@ -59,7 +60,7 @@ public class AiDefender extends AiPlayer {
 
 		ArrayList<Integer> usedTests = DatabaseAccess.getUsedAiTestsForGame(game);
 		GameClass cut = game.getCUT();
-		Game dummyGame = cut.getDummyGame();
+		DuelGame dummyGame = cut.getDummyGame();
 
 		//TODO: Discarding useless tests in origtests would be a sideeffect
 		List<Test> candidateTests = dummyGame.getTests().stream().filter(test -> !usedTests.contains(test.getId()) && test.getAiMutantsKilled() > 0).collect(Collectors.toList());
@@ -154,7 +155,7 @@ public class AiDefender extends AiPlayer {
 
 	private void useTestFromSuite(int origTestNum) throws IOException, Exception {
 		GameClass cut = game.getCUT();
-		Game dummyGame = cut.getDummyGame();
+		DuelGame dummyGame = cut.getDummyGame();
 		ArrayList<Test> origTests = dummyGame.getTests();
 
 		Test origT = null;

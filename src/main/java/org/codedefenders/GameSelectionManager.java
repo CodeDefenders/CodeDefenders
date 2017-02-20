@@ -1,5 +1,6 @@
 package org.codedefenders;
 
+import org.codedefenders.duel.DuelGame;
 import org.codedefenders.singleplayer.PrepareAI;
 import org.codedefenders.singleplayer.SinglePlayerGame;
 import org.codedefenders.singleplayer.automated.attacker.AiAttacker;
@@ -43,8 +44,8 @@ public class GameSelectionManager extends HttpServlet {
 
                     String modeName = request.getParameter("mode");
                     Role role = request.getParameter("role") == null ? Role.DEFENDER : Role.ATTACKER;
-                    Game.Level level = request.getParameter("level") == null ? Game.Level.HARD : Game.Level.EASY;
-                    Game.Mode mode = null;
+                    AbstractGame.Level level = request.getParameter("level") == null ? AbstractGame.Level.HARD : AbstractGame.Level.EASY;
+                    AbstractGame.Mode mode = null;
 
                     if (rounds < 1 || rounds > 10) {
                         messages.add("Invalid rounds amount");
@@ -54,25 +55,25 @@ public class GameSelectionManager extends HttpServlet {
 
                     switch (modeName) {
                         case "sing":
-                            mode = Game.Mode.SINGLE;
+                            mode = AbstractGame.Mode.SINGLE;
                             break;
                         case "duel":
-                            mode = Game.Mode.DUEL;
+                            mode = AbstractGame.Mode.DUEL;
                             break;
                         case "prty":
-                            mode = Game.Mode.PARTY;
+                            mode = AbstractGame.Mode.PARTY;
                             break;
                         case "utst":
-                            mode = Game.Mode.UTESTING;
+                            mode = AbstractGame.Mode.UTESTING;
                             break;
                         default:
-                            mode = Game.Mode.SINGLE;
+                            mode = AbstractGame.Mode.SINGLE;
                     }
 
                     if (classId != 0 && DatabaseAccess.getClassForKey("Class_ID", classId) != null) {
                         //Valid class selected.
 
-                        if (mode.equals(Game.Mode.SINGLE)) {
+                        if (mode.equals(AbstractGame.Mode.SINGLE)) {
                             //Create singleplayer game.
                             if (PrepareAI.isPrepared(DatabaseAccess.getClassForKey("Class_ID", classId))) {
                                 SinglePlayerGame nGame = new SinglePlayerGame(classId, uid, rounds, role, level);
@@ -93,7 +94,7 @@ public class GameSelectionManager extends HttpServlet {
                             }
                         } else {
                             // Create the game with supplied parameters and insert it in the database.
-                            Game nGame = new Game(classId, uid, rounds, role, level);
+                            DuelGame nGame = new DuelGame(classId, uid, rounds, role, level);
                             nGame.insert();
                             if (nGame.getAttackerId() != 0)
                                 nGame.addPlayer(uid, Role.ATTACKER);
@@ -119,7 +120,7 @@ public class GameSelectionManager extends HttpServlet {
                 try {
                     gameId = Integer.parseInt(request.getParameter("game"));
 
-                    Game jGame = DatabaseAccess.getGameForKey("ID", gameId);
+                    DuelGame jGame = DatabaseAccess.getGameForKey("ID", gameId);
 
                     if ((jGame.getAttackerId() == uid) || (jGame.getDefenderId() == uid)) {
                         // uid is already in the game
@@ -138,12 +139,12 @@ public class GameSelectionManager extends HttpServlet {
                             messages.add("Joined game as a defender.");
                             jGame.addPlayer(uid, Role.DEFENDER);
                         } else {
-                            messages.add("Game is no longer open.");
+                            messages.add("DuelGame is no longer open.");
                             response.sendRedirect(request.getHeader("referer"));
                             break;
                         }
                         // user joined, update game
-                        jGame.setState(Game.State.ACTIVE);
+                        jGame.setState(AbstractGame.State.ACTIVE);
                         jGame.setActiveRole(Role.ATTACKER);
                         jGame.update();
                         // go to play view
@@ -161,11 +162,11 @@ public class GameSelectionManager extends HttpServlet {
 
                 try {
                     gameId = Integer.parseInt(request.getParameter("game"));
-                    Game eGame = DatabaseAccess.getGameForKey("ID", gameId);
+                    DuelGame eGame = DatabaseAccess.getGameForKey("ID", gameId);
 
                     if (eGame.isUserInGame(uid)) {
                         session.setAttribute("gid", gameId);
-                        if (eGame.getMode().equals(Game.Mode.UTESTING))
+                        if (eGame.getMode().equals(AbstractGame.Mode.UTESTING))
                             response.sendRedirect("utesting");
                         else
                             response.sendRedirect("play");

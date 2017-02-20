@@ -1,13 +1,14 @@
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.Role" %>
 <%@ page import="org.codedefenders.*" %>
+<%@ page import="org.codedefenders.duel.DuelGame" %>
 <% String pageTitle="My Games"; %>
 <%@ include file="/jsp/header.jsp" %>
 	<%
 	String atkName;
 	String defName;
 	int uid = (Integer)request.getSession().getAttribute("uid");
-	ArrayList<Game> games = DatabaseAccess.getGamesForUser(uid); %>
+	ArrayList<DuelGame> games = DatabaseAccess.getGamesForUser(uid); %>
 <div class="w-100">
 	<h3>Duels</h3>
 <table class="table table-hover table-responsive table-paragraphs games-table">
@@ -27,7 +28,7 @@
 	} else {
 		%>
 	<%
-		for (Game g : games) {
+		for (DuelGame g : games) {
 			atkName = null;
 			defName = null;
 
@@ -78,7 +79,7 @@
 <%
 			if (g.getState().equals(AbstractGame.State.ACTIVE)) { // Can enter only if game is in progress.
 				String btnLabel = "Your Turn";
-				if (g.getMode().equals(Game.Mode.UTESTING)) {
+				if (g.getMode().equals(DuelGame.Mode.UTESTING)) {
 					btnLabel = "Enter";
 				}
 %>

@@ -1,5 +1,6 @@
 <%@ page import="org.codedefenders.*" %>
-<% String pageTitle="Game History"; %>
+<%@ page import="org.codedefenders.duel.DuelGame" %>
+<% String pageTitle="DuelGame History"; %>
 <%@ include file="/jsp/header.jsp" %>
 <div>
 <h3> Duels </h3>
@@ -21,7 +22,7 @@
 		int uid = (Integer)request.getSession().getAttribute("uid");
 		int atkId;
 		int defId;
-		for (Game g : DatabaseAccess.getHistoryForUser(uid)) {
+		for (DuelGame g : DatabaseAccess.getHistoryForUser(uid)) {
 			atkId = g.getAttackerId();
 			defId = g.getDefenderId();
 			User attacker = DatabaseAccess.getUserForKey("User_ID", atkId);

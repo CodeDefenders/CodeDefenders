@@ -1,5 +1,6 @@
 package org.codedefenders;
 
+import org.codedefenders.duel.DuelGame;
 import org.codedefenders.singleplayer.SinglePlayerGame;
 import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class GameManager extends HttpServlet {
 
 		logger.debug("Getting game " + gid + " for " + uid);
 
-		Game activeGame = DatabaseAccess.getGameForKey("ID", gid);
+		DuelGame activeGame = DatabaseAccess.getGameForKey("ID", gid);
 		session.setAttribute("game", activeGame);
 
 		// If the game is finished, redirect to the score page.
@@ -75,7 +76,7 @@ public class GameManager extends HttpServlet {
 
 		session.setAttribute("messages", messages);
 
-		Game activeGame = (Game) session.getAttribute("game");
+		DuelGame activeGame = (DuelGame) session.getAttribute("game");
 
 		switch (request.getParameter("formType")) {
 
@@ -162,7 +163,7 @@ public class GameManager extends HttpServlet {
 				if (request.getParameter("mutantId") != null) {
 					int mutantId = Integer.parseInt(request.getParameter("mutantId"));
 					Mutant mutantClaimed = DatabaseAccess.getMutant(activeGame, mutantId);
-					if(activeGame.getMode().equals(Game.Mode.SINGLE)) {
+					if(activeGame.getMode().equals(AbstractGame.Mode.SINGLE)) {
 						//Singleplayer - use automatic system.
 						if(AntRunner.potentialEquivalent(mutantClaimed)) {
 							//Is potentially equiv - accept as equivalent
@@ -210,7 +211,7 @@ public class GameManager extends HttpServlet {
 						messages.add(MUTANT_COMPILED_MESSAGE);
 						MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
 
-						if(activeGame.getMode().equals(Game.Mode.SINGLE)) {
+						if(activeGame.getMode().equals(AbstractGame.Mode.SINGLE)) {
 							//Singleplayer - check for potential equivalent.
 							if(AntRunner.potentialEquivalent(newMutant)) {
 								//Is potentially equiv - mark as equivalent and update.

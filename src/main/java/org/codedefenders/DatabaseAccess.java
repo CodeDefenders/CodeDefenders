@@ -1,5 +1,6 @@
 package org.codedefenders;
 
+import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.singleplayer.SinglePlayerGame;
@@ -52,7 +53,7 @@ public class DatabaseAccess {
 		executeUpdate(sql);
 	}
 
-	public static Game getAiDummyGameForClass(int cId) throws Exception {
+	public static DuelGame getAiDummyGameForClass(int cId) throws Exception {
 		String sql = String.format("SELECT * FROM games WHERE Class_ID='%d' AND IsAIDummyGame=1", cId);
 		int gID = getInt(sql, "ID");
 		if (gID == 0) {
@@ -77,8 +78,8 @@ public class DatabaseAccess {
 	}
 
 	public static boolean gameWithUserExistsForClass(int uId, int cId) {
-		ArrayList<Game> games = getGamesForUser(uId);
-		for (Game g : games) {
+		ArrayList<DuelGame> games = getGamesForUser(uId);
+		for (DuelGame g : games) {
 			if(g.getClassId() == cId) {
 				return true;
 			}
@@ -94,7 +95,7 @@ public class DatabaseAccess {
 
 		try {
 
-			// Load the Game Data with the provided ID.
+			// Load the DuelGame Data with the provided ID.
 			conn = getConnection();
 
 			stmt = conn.createStatement();
@@ -319,7 +320,7 @@ public class DatabaseAccess {
 		return null;
 	}
 
-	public static Game getGameForKey(String keyName, int id) {
+	public static DuelGame getGameForKey(String keyName, int id) {
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -342,15 +343,15 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			if (rs.next()) {
-				Game gameRecord;
-				if (rs.getString("Mode").equals(Game.Mode.SINGLE.name()))
+				DuelGame gameRecord;
+				if (rs.getString("Mode").equals(DuelGame.Mode.SINGLE.name()))
 					gameRecord = new SinglePlayerGame(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
 							rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), AbstractGame.State.valueOf(rs.getString("State")),
-							Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode")));
+							DuelGame.Level.valueOf(rs.getString("Level")), DuelGame.Mode.valueOf(rs.getString("Mode")));
 				else
-					gameRecord = new Game(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
+					gameRecord = new DuelGame(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
 							rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), AbstractGame.State.valueOf(rs.getString("State")),
-							Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode")));
+							DuelGame.Level.valueOf(rs.getString("Level")), DuelGame.Mode.valueOf(rs.getString("Mode")));
 
 				stmt.close();
 				conn.close();
@@ -373,7 +374,7 @@ public class DatabaseAccess {
 	 * @param userId
 	 * @return
 	 */
-	public static ArrayList<Game> getGamesForUser(int userId) {
+	public static ArrayList<DuelGame> getGamesForUser(int userId) {
 
 		String sql = String.format("SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," +
 				"g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" +
@@ -471,7 +472,7 @@ public class DatabaseAccess {
 	 * @param userId
 	 * @return
 	 */
-	public static ArrayList<Game> getHistoryForUser(int userId) {
+	public static ArrayList<DuelGame> getHistoryForUser(int userId) {
 		String sql = String.format("SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," +
 				"g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" +
 				"IFNULL(att.User_ID,0) AS Attacker_ID, IFNULL(def.User_ID,0) AS Defender_ID\n" +
@@ -483,7 +484,7 @@ public class DatabaseAccess {
 		return getGames(sql);
 	}
 
-	public static ArrayList<Game> getOpenGames() {
+	public static ArrayList<DuelGame> getOpenGames() {
 
 		String sql = String.format("SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," +
 				"g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" +
@@ -496,19 +497,19 @@ public class DatabaseAccess {
 		return getGames(sql);
 	}
 
-	public static Game getActiveUnitTestingSession(int userId) {
+	public static DuelGame getActiveUnitTestingSession(int userId) {
 		String sql = String.format("SELECT * FROM games WHERE Defender_ID='%d' AND Mode='UTESTING' AND State='ACTIVE';", userId);
-		ArrayList<Game> games = getGames(sql);
+		ArrayList<DuelGame> games = getGames(sql);
 		if (games.isEmpty())
 			return null;
 		else
 			return games.get(0);
 	}
 
-	public static ArrayList<Game> getGames(String sql) {
+	public static ArrayList<DuelGame> getGames(String sql) {
 		Connection conn = null;
 		Statement stmt = null;
-		ArrayList<Game> gameList = new ArrayList<>();
+		ArrayList<DuelGame> gameList = new ArrayList<>();
 
 		try {
 			conn = getConnection();
@@ -517,10 +518,10 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql);
 
 			while (rs.next()) {
-				gameList.add(new Game(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
+				gameList.add(new DuelGame(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
 						rs.getInt("Class_ID"), rs.getInt("CurrentRound"), rs.getInt("FinalRound"),
 						Role.valueOf(rs.getString("ActiveRole")), AbstractGame.State.valueOf(rs.getString("State")),
-						Game.Level.valueOf(rs.getString("Level")), Game.Mode.valueOf(rs.getString("Mode"))));
+						DuelGame.Level.valueOf(rs.getString("Level")), DuelGame.Mode.valueOf(rs.getString("Mode"))));
 			}
 			stmt.close();
 			conn.close();
@@ -563,7 +564,7 @@ public class DatabaseAccess {
 
 			while (rs.next()) {
 				MultiplayerGame mg = new MultiplayerGame(rs.getInt("Class_ID"), rs.getInt("Creator_ID"),
-						Game.Level.valueOf(rs.getString("Level")), (float)rs.getDouble("Coverage_Goal"),
+						DuelGame.Level.valueOf(rs.getString("Level")), (float)rs.getDouble("Coverage_Goal"),
 						(float)rs.getDouble("Mutant_Goal"), rs.getInt("Prize"), rs.getInt("Defender_Value"),
 						rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
 						rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),
@@ -692,7 +693,7 @@ public class DatabaseAccess {
 		return newMutant;
 	}
 
-	public static Mutant getMutant(Game game, int mutantID) {
+	public static Mutant getMutant(DuelGame game, int mutantID) {
 		String sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d' AND Game_ID='%d';", mutantID, game.getId());
 		return getMutantFromDB(sql);
 	}
@@ -702,7 +703,7 @@ public class DatabaseAccess {
 		return getMutantFromDB(sql);
 	}
 
-	public static ArrayList<Integer> getUsedAiTestsForGame(Game g) {
+	public static ArrayList<Integer> getUsedAiTestsForGame(DuelGame g) {
 		ArrayList<Integer> testList = new ArrayList<Integer>();
 
 		Connection conn =  null;
@@ -851,7 +852,7 @@ public class DatabaseAccess {
 		return false;
 	}
 
-	public static boolean setAiTestAsUsed(int testNumber, Game g) {
+	public static boolean setAiTestAsUsed(int testNumber, DuelGame g) {
 		Connection conn =  null;
 		Statement stmt = null;
 
@@ -881,7 +882,7 @@ public class DatabaseAccess {
 		return false;
 	}
 
-	public static ArrayList<Integer> getUsedAiMutantsForGame(Game g) {
+	public static ArrayList<Integer> getUsedAiMutantsForGame(DuelGame g) {
 		ArrayList<Integer> mutantList = new ArrayList<Integer>();
 
 		Connection conn =  null;
@@ -917,7 +918,7 @@ public class DatabaseAccess {
 	 * @param g the game the mutant belongs to
 	 * @return
 	 */
-	public static boolean setAiMutantAsUsed(int mutantNumber, Game g) {
+	public static boolean setAiMutantAsUsed(int mutantNumber, DuelGame g) {
 		Connection conn =  null;
 		Statement stmt = null;
 

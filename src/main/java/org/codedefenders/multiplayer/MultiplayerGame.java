@@ -36,7 +36,7 @@ public class MultiplayerGame extends AbstractGame {
 		this(classId, creatorId, level, lineCoverage, mutantCoverage, prize, defenderValue, attackerValue, defenderLimit, attackerLimit,
 				minDefenders, minAttackers, startDateTime, finishDateTime, status, false);
 	}
-	
+
 	public MultiplayerGame(int classId, int creatorId, Level level,
 	                       float lineCoverage, float mutantCoverage, float prize,
 	                       int defenderValue, int attackerValue, int defenderLimit,

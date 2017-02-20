@@ -49,11 +49,11 @@
 <body>
 <%@ page import="java.util.*" %>
 <%@ page import="org.codedefenders.Test" %>
-<%@ page import="org.codedefenders.Game" %>
+<%@ page import="org.codedefenders.duel.DuelGame" %>
 <%@ page import="org.codedefenders.Constants" %>
 <%@ page import="static org.codedefenders.AbstractGame.State.ACTIVE" %>
 <%@ page import="static org.codedefenders.AbstractGame.State.FINISHED" %>
-<% Game uTestingSession = (Game) session.getAttribute("game"); %>
+<% DuelGame uTestingSession = (DuelGame) session.getAttribute("game"); %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
 	<div class="container-fluid">

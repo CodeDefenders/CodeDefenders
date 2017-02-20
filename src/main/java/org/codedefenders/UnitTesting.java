@@ -12,6 +12,7 @@ import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
+import org.codedefenders.duel.DuelGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,18 +22,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.codedefenders.Constants.F_SEP;
-import static org.codedefenders.Constants.JAVA_SOURCE_EXT;
 import static org.codedefenders.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
 import static org.codedefenders.Constants.TESTS_DIR;
 import static org.codedefenders.Constants.DATA_DIR;
@@ -40,7 +36,6 @@ import static org.codedefenders.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.Constants.TEST_INVALID_MESSAGE;
 import static org.codedefenders.Constants.TEST_PASSED_ON_CUT_MESSAGE;
-import static org.codedefenders.Constants.TEST_PREFIX;
 
 public class UnitTesting extends HttpServlet {
 
@@ -53,7 +48,7 @@ public class UnitTesting extends HttpServlet {
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
 		Object ogid = session.getAttribute("gid");
-		Game activeGame;
+		DuelGame activeGame;
 		if (ogid == null) {
 			System.out.println("Getting active unit testing session for user " + uid);
 			activeGame = DatabaseAccess.getActiveUnitTestingSession(uid);
@@ -74,7 +69,7 @@ public class UnitTesting extends HttpServlet {
 		ArrayList<String> messages = new ArrayList<>();
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
-		Game activeGame = (Game) session.getAttribute("game");
+		DuelGame activeGame = (DuelGame) session.getAttribute("game");
 		session.setAttribute("messages", messages);
 
 		// Get the text submitted by the user.
@@ -97,7 +92,7 @@ public class UnitTesting extends HttpServlet {
 				messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 				activeGame.endRound();
 				activeGame.update();
-				if (activeGame.getState().equals(Game.State.FINISHED))
+				if (activeGame.getState().equals(AbstractGame.State.FINISHED))
 					messages.add("Great! Unit testing goal achieved. Session finished.");
 			} else {
 				// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")

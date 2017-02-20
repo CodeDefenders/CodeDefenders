@@ -1,4 +1,5 @@
 <%@ page import="org.codedefenders.*" %>
+<%@ page import="org.codedefenders.duel.DuelGame" %>
 <% String pageTitle="Open Games"; %>
 <%@ include file="/jsp/header.jsp" %>
 <div class="full-width">
@@ -21,7 +22,7 @@
 		int uid = (Integer)request.getSession().getAttribute("uid");
 		int atkId;
 		int defId;
-		for (Game g : DatabaseAccess.getOpenGames()) {
+		for (DuelGame g : DatabaseAccess.getOpenGames()) {
 			isGames = true;
 			atkName = null;
 			defName = null;

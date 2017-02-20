@@ -116,7 +116,7 @@
 <%@ page import="org.codedefenders.Test" %>
 <%@ page import="org.codedefenders.User" %>
 <%@ page import="org.codedefenders.Mutant" %>
-<%@ page import="org.codedefenders.Game" %>
+<%@ page import="org.codedefenders.duel.DuelGame" %>
 <%@ page import="org.codedefenders.Constants" %>
 <%@ page import="org.codedefenders.DatabaseAccess" %>
 <%@ page import="org.codedefenders.Role" %>
@@ -124,7 +124,7 @@
 <%@ page import="org.codedefenders.GameClass" %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
 <%@ page import="java.util.ArrayList" %>
-    <% Game game = (Game) session.getAttribute("game"); %>
+    <% DuelGame game = (DuelGame) session.getAttribute("game"); %>
 <div class="menu-top bg-grey bg-plus-4 text-white" style="padding-bottom:0px;">
     <div class="full-width">
         <div class="nest">

@@ -1,6 +1,7 @@
 package org.codedefenders.singleplayer.automated.attacker;
 
 import org.codedefenders.*;
+import org.codedefenders.duel.DuelGame;
 import org.codedefenders.singleplayer.AiPlayer;
 import org.codedefenders.singleplayer.PrepareAI;
 import org.slf4j.Logger;
@@ -22,7 +23,7 @@ public class AiAttacker extends AiPlayer {
 
 	public static final int ID = 1;
 
-	public AiAttacker(Game g) {
+	public AiAttacker(DuelGame g) {
 		super(g);
 		role = Role.ATTACKER;
 	}
@@ -65,7 +66,7 @@ public class AiAttacker extends AiPlayer {
 		GameClass cut = game.getCUT();
 
 		// TODO: This isn't actually an AIDummyGame
-		Game dummyGame = cut.getDummyGame();
+		DuelGame dummyGame = cut.getDummyGame();
 		ArrayList<Mutant> origMutants = dummyGame.getMutants();
 
 		List<Mutant> candidateMutants = origMutants.stream().filter(mutant -> !usedMutants.contains(mutant.getId())).collect(Collectors.toList());
@@ -97,7 +98,7 @@ public class AiAttacker extends AiPlayer {
 
 	private void useMutantFromSuite(int origMutNum) throws IOException, Exception {
 		GameClass cut = game.getCUT();
-		Game dummyGame = cut.getDummyGame();
+		DuelGame dummyGame = cut.getDummyGame();
 		ArrayList<Mutant> origMutants = dummyGame.getMutants();
 
 		Mutant origM = null;

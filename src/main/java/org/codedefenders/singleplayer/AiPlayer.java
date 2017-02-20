@@ -1,6 +1,6 @@
 package org.codedefenders.singleplayer;
 
-import org.codedefenders.Game;
+import org.codedefenders.duel.DuelGame;
 import org.codedefenders.Role;
 
 import java.util.ArrayList;
@@ -18,11 +18,11 @@ public abstract class AiPlayer {
 		FIRST //Choose the first mutant, for debugging.
 	}
 
-	protected Game game;
+	protected DuelGame game;
 	protected Role role;
 	protected ArrayList<String> messages;
 
-	public AiPlayer(Game g) {
+	public AiPlayer(DuelGame g) {
 		game = g;
 		messages = new ArrayList<String>();
 	}
