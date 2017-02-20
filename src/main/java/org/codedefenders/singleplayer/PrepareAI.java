@@ -6,6 +6,7 @@ import org.codedefenders.singleplayer.automated.attacker.AiAttacker;
 import org.codedefenders.singleplayer.automated.attacker.MajorMaker;
 import org.codedefenders.singleplayer.automated.defender.AiDefender;
 import org.codedefenders.singleplayer.automated.defender.EvoSuiteMaker;
+import org.codedefenders.util.DatabaseAccess;
 
 import java.io.File;
 import java.io.IOException;

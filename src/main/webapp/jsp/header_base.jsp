@@ -118,7 +118,7 @@
 <%@ page import="org.codedefenders.Mutant" %>
 <%@ page import="org.codedefenders.duel.DuelGame" %>
 <%@ page import="org.codedefenders.Constants" %>
-<%@ page import="org.codedefenders.DatabaseAccess" %>
+<%@ page import="org.codedefenders.util.DatabaseAccess" %>
 <%@ page import="org.codedefenders.Role" %>
 <%@ page import="static org.codedefenders.GameState.ACTIVE" %>
 <%@ page import="org.codedefenders.GameClass" %>

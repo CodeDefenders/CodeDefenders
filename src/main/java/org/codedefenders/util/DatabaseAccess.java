@@ -1,5 +1,6 @@
-package org.codedefenders;
+package org.codedefenders.util;
 
+import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;

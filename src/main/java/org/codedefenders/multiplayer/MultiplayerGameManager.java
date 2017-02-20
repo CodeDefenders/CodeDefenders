@@ -1,6 +1,7 @@
 package org.codedefenders.multiplayer;
 
 import org.codedefenders.*;
+import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

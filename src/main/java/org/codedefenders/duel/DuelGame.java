@@ -1,6 +1,7 @@
 package org.codedefenders.duel;
 
 import org.codedefenders.*;
+import org.codedefenders.util.DatabaseAccess;
 
 import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 

@@ -4,6 +4,7 @@ import javassist.ClassPool;
 import javassist.CtClass;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.LineCoverage;
+import org.codedefenders.util.DatabaseAccess;
 
 import java.io.BufferedReader;
 import java.io.File;

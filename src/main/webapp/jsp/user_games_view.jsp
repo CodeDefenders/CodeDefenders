@@ -2,6 +2,7 @@
 <%@ page import="org.codedefenders.Role" %>
 <%@ page import="org.codedefenders.*" %>
 <%@ page import="org.codedefenders.duel.DuelGame" %>
+<%@ page import="org.codedefenders.util.DatabaseAccess" %>
 <% String pageTitle="My Games"; %>
 <%@ include file="/jsp/header.jsp" %>
 	<%

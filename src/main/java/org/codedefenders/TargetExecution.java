@@ -1,5 +1,7 @@
 package org.codedefenders;
 
+import org.codedefenders.util.DatabaseAccess;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

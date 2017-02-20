@@ -1,6 +1,7 @@
 <%@ page import="static org.codedefenders.GameState.ACTIVE" %>
 <%@ page import="org.codedefenders.*" %>
 <%@ page import="org.codedefenders.duel.DuelGame" %>
+<%@ page import="org.codedefenders.util.DatabaseAccess" %>
 <% String pageTitle="Defending Class"; %>
 <%@ include file="/jsp/header_game.jsp" %>
 

@@ -4,6 +4,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.scoring.Scorer;
+import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

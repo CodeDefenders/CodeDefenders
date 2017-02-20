@@ -4,6 +4,7 @@ import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.singleplayer.AiPlayer;
 import org.codedefenders.singleplayer.PrepareAI;
+import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

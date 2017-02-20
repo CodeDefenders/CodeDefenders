@@ -1,6 +1,7 @@
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.Role" %>
 <%@ page import="org.codedefenders.*" %>
+<%@ page import="org.codedefenders.util.DatabaseAccess" %>
 <% String pageTitle="Leaderboards"; %>
 <%@ include file="/jsp/header.jsp" %>
 	<%

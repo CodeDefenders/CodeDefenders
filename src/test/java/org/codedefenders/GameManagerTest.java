@@ -1,6 +1,7 @@
 package org.codedefenders;
 
 import org.apache.commons.io.FileUtils;
+import org.codedefenders.util.FileManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -10,11 +11,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
-import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.file.FileStore;
-import java.nio.file.FileSystem;
 
 import static org.codedefenders.Constants.MUTANTS_DIR;
 import static org.junit.Assert.assertEquals;

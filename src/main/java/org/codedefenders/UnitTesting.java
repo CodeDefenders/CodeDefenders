@@ -13,6 +13,8 @@ import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import org.codedefenders.duel.DuelGame;
+import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.FileManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

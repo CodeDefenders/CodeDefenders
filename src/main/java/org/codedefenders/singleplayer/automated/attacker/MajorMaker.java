@@ -3,6 +3,8 @@ package org.codedefenders.singleplayer.automated.attacker;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
+import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.FileManager;
 
 import java.io.BufferedWriter;
 import java.io.File;

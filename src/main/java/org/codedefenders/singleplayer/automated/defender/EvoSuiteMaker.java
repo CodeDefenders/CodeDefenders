@@ -2,6 +2,8 @@ package org.codedefenders.singleplayer.automated.defender;
 
 import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
+import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.FileManager;
 
 import java.io.File;
 import java.io.FileWriter;

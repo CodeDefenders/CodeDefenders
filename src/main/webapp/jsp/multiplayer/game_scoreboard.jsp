@@ -1,5 +1,5 @@
 <%@ page import="java.util.HashMap" %>
-<%@ page import="org.codedefenders.DatabaseAccess" %>
+<%@ page import="org.codedefenders.util.DatabaseAccess" %>
 <%@ page import="org.codedefenders.User" %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.multiplayer.PlayerScore" %>

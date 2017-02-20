@@ -1,6 +1,6 @@
 package org.codedefenders.multiplayer;
 
-import org.codedefenders.DatabaseAccess;
+import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.GameLevel;
 import org.codedefenders.GameState;
 

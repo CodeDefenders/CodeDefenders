@@ -1,4 +1,4 @@
-package org.codedefenders;
+package org.codedefenders.util;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

@@ -5,6 +5,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.codedefenders.multiplayer.CoverageGenerator;
 import org.codedefenders.multiplayer.LineCoverage;
+import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

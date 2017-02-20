@@ -7,6 +7,7 @@ import difflib.Patch;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.duel.DuelGame;
+import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

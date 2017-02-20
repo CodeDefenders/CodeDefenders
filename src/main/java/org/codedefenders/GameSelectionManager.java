@@ -5,6 +5,7 @@ import org.codedefenders.singleplayer.PrepareAI;
 import org.codedefenders.singleplayer.SinglePlayerGame;
 import org.codedefenders.singleplayer.automated.attacker.AiAttacker;
 import org.codedefenders.singleplayer.automated.defender.AiDefender;
+import org.codedefenders.util.DatabaseAccess;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
