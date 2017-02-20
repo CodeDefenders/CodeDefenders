@@ -10,6 +10,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DuelGame extends AbstractGame {
 
@@ -101,6 +103,8 @@ public class DuelGame extends AbstractGame {
 	public ArrayList<Mutant> getAliveMutants() {
 		ArrayList<Mutant> aliveMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
+			// TODO: Why does MultiPlayerGame also check for mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)?
+			// Should this really be in AbstractGame?
 			if (m.isAlive() && (m.getClassFile() != null)) {
 				aliveMutants.add(m);
 			}
@@ -111,6 +115,8 @@ public class DuelGame extends AbstractGame {
 	public ArrayList<Mutant> getKilledMutants() {
 		ArrayList<Mutant> killedMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
+			// TODO: Why does MultiPlayerGame also check for mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)?
+			// Should this really be in AbstractGame?
 			if (!m.isAlive() && (m.getClassFile() != null)) {
 				killedMutants.add(m);
 			}
@@ -118,6 +124,7 @@ public class DuelGame extends AbstractGame {
 		return killedMutants;
 	}
 
+	// TODO: Why is this different in the MultiplayerGame?
 	public ArrayList<Mutant> getMutantsMarkedEquivalent() {
 		ArrayList<Mutant> equivMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
