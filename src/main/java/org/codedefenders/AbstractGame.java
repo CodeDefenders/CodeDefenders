@@ -103,19 +103,7 @@ public abstract class AbstractGame {
 			System.out.println(e);
 			//Handle errors for Class.forName
 		} finally {
-			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				System.out.println(se);
-			}//end finally try
+			DatabaseAccess.cleanup(conn, stmt);
 		} //end try
 
 		return false;
