@@ -4,39 +4,20 @@ import org.codedefenders.Test;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.Mutant;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by thoma on 23/06/2016.
  */
 public abstract class Scorer {
 
-    private static class SizeScorer extends Scorer {
-
-        @Override
-        protected int scoreTest(MultiplayerGame g, Test t, ArrayList<Mutant> killed) {
-
-            int points = 0;
-
-            for (Mutant m : killed){
-                points += m.getScore() + 1;
-            }
-
-            return points;
-        }
-
-        @Override
-        protected int scoreMutant(MultiplayerGame g, Mutant m, ArrayList<Test> passed) {
-            return passed.size();
-        }
-    }
-
     private static Scorer scorer = new SizeScorer();
 
-    protected abstract int scoreTest(MultiplayerGame g, Test t, ArrayList<Mutant> killed);
-    protected abstract int scoreMutant(MultiplayerGame g, Mutant m, ArrayList<Test> passed);
+    protected abstract int scoreTest(MultiplayerGame g, Test t, List<Mutant> killed);
 
-    public static int score(MultiplayerGame g, Test t, ArrayList<Mutant> killed){
+    protected abstract int scoreMutant(MultiplayerGame g, Mutant m, List<Test> passed);
+
+    public static int score(MultiplayerGame g, Test t, List<Mutant> killed){
         return scorer.scoreTest(g, t, killed);
     }
 
@@ -44,7 +25,7 @@ public abstract class Scorer {
         scorer = s;
     }
 
-    public static int score(MultiplayerGame g, Mutant m, ArrayList<Test> passed){
+    public static int score(MultiplayerGame g, Mutant m, List<Test> passed){
         return scorer.scoreMutant(g, m, passed);
     }
 }

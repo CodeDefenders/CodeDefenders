@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.codedefenders.Constants.*;
 import static org.codedefenders.Mutant.Equivalence.ASSUMED_NO;
@@ -48,9 +49,9 @@ public class MutationTester {
 
 	public static void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages) {
 		int killed = 0;
-		ArrayList<Mutant> mutants = game.getAliveMutants();
+		List<Mutant> mutants = game.getAliveMutants();
 		mutants.addAll(game.getMutantsMarkedEquivalentPending());
-		ArrayList<Mutant> killedMutants = new ArrayList<Mutant>();
+		List<Mutant> killedMutants = new ArrayList<Mutant>();
 		for (Mutant mutant : mutants) {
 			if (testVsMutant(test, mutant)){
 				killed++;
