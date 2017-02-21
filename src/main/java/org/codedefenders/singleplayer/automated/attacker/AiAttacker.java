@@ -90,7 +90,6 @@ public class AiAttacker extends AiPlayer {
 				return candidateMutants.get(n).getId();
 
 			case COVERAGE:
-			case FIRST:
 			default:
 				// TODO: Why do we have these strategies if we don't use them?
 				throw new UnsupportedOperationException("Not implemented");

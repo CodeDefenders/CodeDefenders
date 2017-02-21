@@ -31,7 +31,6 @@ public class AiDefender extends AiPlayer {
 	public boolean turnHard() {
 		//Choose test which kills a high number of generated mutants.
 		return runTurn(GenerationMethod.COVERAGE);
-		//return runTurn(GenerationMethod.KILLCOUNT);
 	}
 
 	public boolean turnEasy() {
@@ -66,74 +65,22 @@ public class AiDefender extends AiPlayer {
 		//TODO: Discarding useless tests in origtests would be a sideeffect
 		List<Test> candidateTests = dummyGame.getTests().stream().filter(test -> !usedTests.contains(test.getId()) && test.getAiMutantsKilled() > 0).collect(Collectors.toList());
 
-		//Throw an exception if all tests used
 		if(candidateTests.isEmpty()) {
-			// TODO: It would be better to use a specific exception type
-			throw new Exception("No choices remain.");
-		}
-
-		if(strategy.equals(GenerationMethod.COVERAGE)) {
-			HashSet<Integer> linesModified = new HashSet<Integer>();
-			for (Mutant m : game.getAliveMutants()) {
-				linesModified.addAll(m.getLines());
-			}
-			logger.debug("Alive mutated lines: {}", linesModified.toString());
-
-			Test covTest = null;
-			int bestCoverage = 0;
-			for (Test tst : candidateTests) {
-				LineCoverage lc = tst.getLineCoverage(); // test already has line coverage information here
-				ArrayList<Integer> coveredByTest = lc.getLinesCovered();
-				int coverage = 0;
-				// TODO: Use logger, not stdout
-				System.out.print("Test covers lines: ");
-				for (int l : coveredByTest) {
-					System.out.print(l);
-					if(linesModified.contains(l)) {
-						System.out.print("[HIT]");
-						//Test covers this mutated line.
-						coverage ++;
-					}
-					System.out.print(", ");
-				}
-				System.out.println();
-				if (coverage > bestCoverage) {
-					//Test is the best unused test found.
-					covTest = tst;
-					bestCoverage = coverage;
-				}
-			}
-			if (covTest != null) {
-				//Just use the found test if using line coverage method.
-				return covTest.getId();
-			} else {
-				logger.debug("No test covers an alive mutated line, using killcount instead.");
-				strategy = GenerationMethod.KILLCOUNT;
-			}
-
+			throw new NoTestsException("All generated tests have already been used.");
 		}
 
 		switch(strategy) {
-			// case COVERAGE:
-			// Already handled
-			//
+			case COVERAGE:
+				return getTestIdByCoverage(candidateTests);
+
 			case RANDOM:
-				Random r = new Random();
-				Test selected = candidateTests.get(r.nextInt(candidateTests.size()));
-				return selected.getId();
+				return getTestIdByRandom(candidateTests);
+
 			case KILLCOUNT:
-				//Sort tests in order of killcount.
-				Collections.sort(candidateTests, new TestComparator());
+				return getTestIdByKillcount(candidateTests);
 
-				//Get an index, using a random number biased towards later index.
-				//More extreme than attacker due to smaller sample size.
-				int n = PrepareAI.biasedSelection(candidateTests.size(), 0.6);
-				return candidateTests.get(n).getId();
-
-			case FIRST:
 			default:
-				// TODO: Why do we have these strategies if we don't use them?
-				throw new UnsupportedOperationException("Not implemented");
+				throw new UnsupportedOperationException("Invalid strategy for AI defender");
 
 		}
 
@@ -152,6 +99,62 @@ public class AiDefender extends AiPlayer {
 //
 //		//Something went wrong.
 //		throw e;
+	}
+
+	private int getTestIdByCoverage(List<Test> possibleTests) {
+		HashSet<Integer> linesModified = new HashSet<Integer>();
+		for (Mutant m : game.getAliveMutants()) {
+			linesModified.addAll(m.getLines());
+		}
+		logger.debug("Alive mutated lines: {}", linesModified.toString());
+
+		Test covTest = null;
+		int bestCoverage = 0;
+		for (Test tst : possibleTests) {
+			LineCoverage lc = tst.getLineCoverage(); // test already has line coverage information here
+			ArrayList<Integer> coveredByTest = lc.getLinesCovered();
+			int coverage = 0;
+			// TODO: Use logger, not stdout
+			System.out.print("Test covers lines: ");
+			for (int l : coveredByTest) {
+				System.out.print(l);
+				if(linesModified.contains(l)) {
+					System.out.print("[HIT]");
+					//Test covers this mutated line.
+					coverage ++;
+				}
+				System.out.print(", ");
+			}
+			System.out.println();
+			if (coverage > bestCoverage) {
+				//Test is the best unused test found.
+				covTest = tst;
+				bestCoverage = coverage;
+			}
+		}
+		if (covTest != null) {
+			//Just use the found test if using line coverage method.
+			return covTest.getId();
+		} else {
+			logger.debug("No test covers an alive mutated line, using killcount instead.");
+			return getTestIdByKillcount(possibleTests);
+		}
+	}
+
+	private int getTestIdByKillcount(List<Test> possibleTests) {
+		//Sort tests in order of killcount.
+		Collections.sort(possibleTests, new TestComparator());
+
+		//Get an index, using a random number biased towards later index.
+		//More extreme than attacker due to smaller sample size.
+		int n = PrepareAI.biasedSelection(possibleTests.size(), 0.6);
+		return possibleTests.get(n).getId();
+	}
+
+	private int getTestIdByRandom(List<Test> possibleTests) {
+		Random r = new Random();
+		Test selected = possibleTests.get(r.nextInt(possibleTests.size()));
+		return selected.getId();
 	}
 
 	private void useTestFromSuite(int origTestNum) throws IOException, Exception {
