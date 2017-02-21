@@ -114,18 +114,19 @@ public class AiDefender extends AiPlayer {
 			LineCoverage lc = tst.getLineCoverage(); // test already has line coverage information here
 			ArrayList<Integer> coveredByTest = lc.getLinesCovered();
 			int coverage = 0;
-			// TODO: Use logger, not stdout
-			System.out.print("Test covers lines: ");
+
+			StringBuilder logOutput = new StringBuilder();
+			logOutput.append("String covers lines: ");
 			for (int l : coveredByTest) {
-				System.out.print(l);
+				logOutput.append(l);
 				if(linesModified.contains(l)) {
-					System.out.print("[HIT]");
+					logOutput.append("[HIT]");
 					//Test covers this mutated line.
 					coverage ++;
 				}
-				System.out.print(", ");
+				logOutput.append(", ");
 			}
-			System.out.println();
+			logger.info(logOutput.toString());
 			if (coverage > bestCoverage) {
 				//Test is the best unused test found.
 				covTest = tst;
