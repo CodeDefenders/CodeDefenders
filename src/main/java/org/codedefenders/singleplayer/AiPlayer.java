@@ -14,7 +14,7 @@ public abstract class AiPlayer {
 	public enum GenerationMethod {
 		RANDOM, //Randomly select mutant.
 		COVERAGE, //Select random mutant by least covered lines.
-		KILLCOUNT, //Number of mutants a test kills, or number of tests that kill mutant.
+		KILLCOUNT //Number of mutants a test kills, or number of tests that kill mutant.
 	}
 
 	protected DuelGame game;

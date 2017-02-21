@@ -71,9 +71,9 @@ public class AiAttacker extends AiPlayer {
 		ArrayList<Mutant> origMutants = dummyGame.getMutants();
 
 		List<Mutant> candidateMutants = origMutants.stream().filter(mutant -> !usedMutants.contains(mutant.getId())).collect(Collectors.toList());
+
 		if(candidateMutants.isEmpty()) {
-			// TODO: It would be better to use a specific exception type
-			throw new Exception("No unused mutants remain.");
+			throw new NoMutantsException("No unused generated mutants remain.");
 		}
 
 		switch(strategy) {
@@ -110,19 +110,20 @@ public class AiAttacker extends AiPlayer {
 			}
 		}
 
-		// TODO: Shouldn't we rather throw an IllegalArgumentException if origMutNum doesn't exist?
-		if(origM != null) {
-			String jFile = origM.getSourceFile();
-			String cFile = origM.getClassFile();
-			int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ID, game.getId());
-			Mutant m = new Mutant(game.getId(), jFile, cFile, true, playerId);
-			m.insert();
-			m.update();
-
-			MutationTester.runAllTestsOnMutant(game, m, messages);
-			DatabaseAccess.setAiMutantAsUsed(origMutNum, game);
-			game.update();
+		if(origM == null) {
+			throw new NoMutantsException("No mutant exists for ID: " + origMutNum);
 		}
+
+		String jFile = origM.getSourceFile();
+		String cFile = origM.getClassFile();
+		int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ID, game.getId());
+		Mutant m = new Mutant(game.getId(), jFile, cFile, true, playerId);
+		m.insert();
+		m.update();
+
+		MutationTester.runAllTestsOnMutant(game, m, messages);
+		DatabaseAccess.setAiMutantAsUsed(origMutNum, game);
+		game.update();
 	}
 
 	@Override
