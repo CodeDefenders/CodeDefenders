@@ -154,22 +154,6 @@ public class MultiplayerGame extends AbstractGame {
 		return format.format(date);
 	}
 
-	public List<Mutant> getMutants() {
-		return DatabaseAccess.getMutantsForGame(id);
-	}
-
-	public List<Mutant> getAliveMutants() {
-		return getMutants().stream().filter(mutant -> mutant.isAlive() &&
-									 		mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO) &&
-				                     		mutant.getClassFile() != null).collect(Collectors.toList());
-	}
-
-	public List<Mutant> getKilledMutants() {
-		return getMutants().stream().filter(mutant -> !mutant.isAlive() &&
-				                           (mutant.getEquivalent().equals(ASSUMED_NO) || mutant.getEquivalent().equals(PROVEN_NO)) &&
-				                           (mutant.getClassFile() != null)).collect(Collectors.toList());
-	}
-
 	public List<Mutant> getMutantsMarkedEquivalent() {
 		return getMutants().stream().filter(mutant -> mutant.getEquivalent().equals(ASSUMED_YES) ||
 				                            mutant.getEquivalent().equals(DECLARED_YES)).collect(Collectors.toList());
@@ -177,14 +161,6 @@ public class MultiplayerGame extends AbstractGame {
 
 	public List<Mutant> getMutantsMarkedEquivalentPending() {
 		return getMutants().stream().filter(mutant -> mutant.getEquivalent().equals(PENDING_TEST)).collect(Collectors.toList());
-	}
-
-	public Mutant getMutantByID(int mutantID) {
-		for (Mutant m : getMutants()) {
-			if (m.getId() == mutantID)
-				return m;
-		}
-		return null;
 	}
 
 	public int[] getDefenderIds(){

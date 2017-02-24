@@ -8,6 +8,11 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.codedefenders.Mutant.Equivalence.ASSUMED_NO;
+import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 
 /**
  * Created by jmr on 13/07/2016.
@@ -73,6 +78,31 @@ public abstract class AbstractGame {
 	public ArrayList<Test> getTests(boolean defendersOnly) {
 		return DatabaseAccess.getExecutableTests(this.id, defendersOnly);
 	}
+
+	public List<Mutant> getMutants() {
+		return DatabaseAccess.getMutantsForGame(id);
+	}
+
+	public List<Mutant> getAliveMutants() {
+		return getMutants().stream().filter(mutant -> mutant.isAlive() &&
+				mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO) &&
+				mutant.getClassFile() != null).collect(Collectors.toList());
+	}
+
+	public List<Mutant> getKilledMutants() {
+		return getMutants().stream().filter(mutant -> !mutant.isAlive() &&
+				(mutant.getEquivalent().equals(ASSUMED_NO) || mutant.getEquivalent().equals(PROVEN_NO)) &&
+				(mutant.getClassFile() != null)).collect(Collectors.toList());
+	}
+
+	public Mutant getMutantByID(int mutantID) {
+		for (Mutant m : getMutants()) {
+			if (m.getId() == mutantID)
+				return m;
+		}
+		return null;
+	}
+
 
 	public abstract boolean addPlayer(int userId, Role role);
 

@@ -96,34 +96,6 @@ public class DuelGame extends AbstractGame {
 		activeRole = role;
 	}
 
-	public ArrayList<Mutant> getMutants() {
-		return DatabaseAccess.getMutantsForGame(id);
-	}
-
-	public ArrayList<Mutant> getAliveMutants() {
-		ArrayList<Mutant> aliveMutants = new ArrayList<>();
-		for (Mutant m : getMutants()) {
-			// TODO: Why does MultiPlayerGame also check for mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)?
-			// Should this really be in AbstractGame?
-			if (m.isAlive() && (m.getClassFile() != null)) {
-				aliveMutants.add(m);
-			}
-		}
-		return aliveMutants;
-	}
-
-	public ArrayList<Mutant> getKilledMutants() {
-		ArrayList<Mutant> killedMutants = new ArrayList<>();
-		for (Mutant m : getMutants()) {
-			// TODO: Why does MultiPlayerGame also check for mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)?
-			// Should this really be in AbstractGame?
-			if (!m.isAlive() && (m.getClassFile() != null)) {
-				killedMutants.add(m);
-			}
-		}
-		return killedMutants;
-	}
-
 	// TODO: Why is this different in the MultiplayerGame?
 	public ArrayList<Mutant> getMutantsMarkedEquivalent() {
 		ArrayList<Mutant> equivMutants = new ArrayList<>();
@@ -135,13 +107,6 @@ public class DuelGame extends AbstractGame {
 		return equivMutants;
 	}
 
-	public Mutant getMutantByID(int mutantID) {
-		for (Mutant m : getMutants()) {
-			if (m.getId() == mutantID)
-				return m;
-		}
-		return null;
-	}
 
 	public int getAttackerScore() {
 		int totalScore = 0;
