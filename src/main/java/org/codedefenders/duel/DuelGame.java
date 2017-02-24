@@ -10,8 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class DuelGame extends AbstractGame {
 
@@ -201,18 +199,7 @@ public class DuelGame extends AbstractGame {
 			//Handle errors for Class.forName
 		} finally {
 			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				System.out.println(se);
-			}//end finally try
+			DatabaseAccess.cleanup(conn, stmt);
 		} //end try
 
 		return false;
@@ -249,18 +236,7 @@ public class DuelGame extends AbstractGame {
 			e.printStackTrace();
 		} finally {
 			//finally block used to close resources
-			try {
-				if (stmt != null)
-					stmt.close();
-			} catch (SQLException se2) {
-			}// nothing we can do
-
-			try {
-				if (conn != null)
-					conn.close();
-			} catch (SQLException se) {
-				se.printStackTrace();
-			}//end finally try
+			DatabaseAccess.cleanup(conn, stmt);
 		} //end try
 
 		return false;
