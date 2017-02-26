@@ -8,7 +8,7 @@
 		<form id="atk" action="/multiplayer/move" method="post">
 			<h2>Create a mutant here
 				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk" onClick="this.form.submit(); this.disabled=true; this.value='Attacking...';"
-						<% if (!mg.getState().equals(AbstractGame.State.ACTIVE)) { %> disabled <% } %>>
+						<% if (!mg.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>
 					Attack!
 				</button>
 			</h2>

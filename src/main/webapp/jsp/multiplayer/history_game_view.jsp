@@ -49,15 +49,15 @@
     }
 
     int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
-    ArrayList<Mutant> mutantsAlive = mg.getAliveMutants();
+    List<Mutant> mutantsAlive = mg.getAliveMutants();
 
-    ArrayList<Mutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();
+    List<Mutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();
 
-    HashMap<Integer, ArrayList<Mutant>> mutantLines = new HashMap<Integer, ArrayList<Mutant>>();
+    Map<Integer, List<Mutant>> mutantLines = new HashMap<>();
 
-    HashMap<Integer, ArrayList<Mutant>> mutantKilledLines = new HashMap<Integer, ArrayList<Mutant>>();
+    Map<Integer, List<Mutant>> mutantKilledLines = new HashMap<>();
 
-    ArrayList<Mutant> mutantsPending = new ArrayList<Mutant>(); // assume no pending tasks
+    List<Mutant> mutantsPending = new ArrayList<>(); // assume no pending tasks
 
     for (Mutant m : mutantsAlive) {
         for (int line : m.getLines()){
@@ -71,7 +71,7 @@
     }
 
 
-    ArrayList<Mutant> mutantsKilled = mg.getKilledMutants();
+    List<Mutant> mutantsKilled = mg.getKilledMutants();
 
     for (Mutant m : mutantsKilled) {
         for (int line : m.getLines()){

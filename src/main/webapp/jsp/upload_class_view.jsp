@@ -22,7 +22,7 @@
 		<span>Preparing classes for the single player mode (action 'Prepare AI') may take a long time.</span>
 		<div id="classList" >
 			<%
-				ArrayList<GameClass> gameClasses = DatabaseAccess.getAllClasses();
+				List<GameClass> gameClasses = DatabaseAccess.getAllClasses();
 			%>
 			<table class="table table-hover table-responsive table-paragraphs games-table">
 				<tr>

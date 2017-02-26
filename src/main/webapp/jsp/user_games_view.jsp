@@ -9,7 +9,7 @@
 	String atkName;
 	String defName;
 	int uid = (Integer)request.getSession().getAttribute("uid");
-	ArrayList<DuelGame> games = DatabaseAccess.getGamesForUser(uid); %>
+	List<DuelGame> games = DatabaseAccess.getGamesForUser(uid); %>
 <div class="w-100">
 	<h3>Duels</h3>
 <table class="table table-hover table-responsive table-paragraphs games-table">
@@ -125,7 +125,7 @@
 			</tr>
 		</thead>
 <%
-	ArrayList<MultiplayerGame> mgames = DatabaseAccess.getMultiplayerGamesForUser(uid);
+	List<MultiplayerGame> mgames = DatabaseAccess.getMultiplayerGamesForUser(uid);
 	if (mgames.isEmpty()) {
 %>
 	<tbody>

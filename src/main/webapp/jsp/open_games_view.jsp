@@ -110,7 +110,7 @@
 		</thead>
 		<tbody>
 	<%
-		ArrayList<MultiplayerGame> mgames = DatabaseAccess.getOpenMultiplayerGamesForUser(uid);
+		List<MultiplayerGame> mgames = DatabaseAccess.getOpenMultiplayerGamesForUser(uid);
 		if (mgames.isEmpty()) {
 	%>
 		<tr><td colspan="100%"> There are currently no open multiplayer games. </td></tr>

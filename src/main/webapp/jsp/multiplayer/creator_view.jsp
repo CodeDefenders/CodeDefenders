@@ -18,7 +18,7 @@
             <form id="adminEndBtn" action="/multiplayer/move" method="post">
 
                     <button type="submit" class="btn btn-primary btn-game btn-right" form="adminEndBtn"
-                            <% if (!mg.getState().equals(AbstractGame.State.ACTIVE)) { %> disabled <% } %>>
+                            <% if (!mg.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>
                         End Game
                     </button>
                     <input type="hidden" name="formType" value="endGame">
@@ -26,7 +26,7 @@
             </form>
             <form id="adminStartBtn" action="/multiplayer/move" method="post">
                     <button type="submit" class="btn btn-primary btn-game btn-right" form="adminStartBtn"
-                            <% if (!mg.getState().equals(AbstractGame.State.CREATED)) { %> disabled <% } %>>
+                            <% if (!mg.getState().equals(GameState.CREATED)) { %> disabled <% } %>>
                         Start Game
                     </button>
                     <input type="hidden" name="formType" value="startGame">

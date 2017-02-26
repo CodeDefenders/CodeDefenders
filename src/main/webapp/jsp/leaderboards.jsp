@@ -5,7 +5,7 @@
 <% String pageTitle="Leaderboards"; %>
 <%@ include file="/jsp/header.jsp" %>
 	<%
-		ArrayList<User> users = DatabaseAccess.getAllUsers();
+		List<User> users = DatabaseAccess.getAllUsers();
 	%>
 <div class="w-100">
 	<h3>Battlegrounds</h3>

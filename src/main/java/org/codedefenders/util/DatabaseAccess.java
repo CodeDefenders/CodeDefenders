@@ -12,10 +12,11 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseAccess {
 
-	public static Connection getConnection() throws ClassNotFoundException, SQLException, NamingException {
+	public static Connection getConnection() throws SQLException, NamingException {
 		Context initialContext = new InitialContext();
 		Context environmentContext = (Context) initialContext.lookup("java:comp/env");
 		String dataResourceName = "jdbc/codedefenders";
@@ -23,21 +24,20 @@ public class DatabaseAccess {
 		return dataSource.getConnection();
 	}
 
+
 	/**
 	 * Execute an update statement.
 	 * @param sql Statement to be executed
      */
-	private static void executeUpdate(String sql) {
+	public static boolean executeUpdate(String sql) {
 		Connection conn = null;
 		Statement stmt = null;
 
 		try {
 			conn = getConnection();
 			stmt = conn.createStatement();
-			stmt.executeUpdate(sql);
 
-			stmt.close();
-			conn.close();
+			return stmt.executeUpdate(sql) > 0;
 		} catch (SQLException se) {
 			System.out.println(se);
 			//Handle errors for JDBC
@@ -47,7 +47,74 @@ public class DatabaseAccess {
 		} finally {
 			cleanup(conn, stmt);
 		} //end try
+		return false;
 	}
+
+
+	public static boolean execute(String sql){
+		Connection conn =  null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			stmt.execute(sql);
+			return true;
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(conn, stmt);
+		}
+		return false;
+	}
+
+	public static int getInt(String sql, String att) {
+		Connection conn = null;
+		Statement stmt = null;
+
+		int n = 0;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				n = rs.getInt(att);
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+		} // Handle errors for JDBC
+		catch (Exception e) {
+			System.out.println(e);
+		} // Handle errors for Class.forName
+		finally {
+			cleanup(conn, stmt);
+		}
+		return n;
+	}
+
+	public static void cleanup(Connection c, Statement s) {
+		try {
+			if (s != null) {
+				s.close();
+			}
+		} catch (SQLException se2) {
+			se2.printStackTrace();
+		}
+		try {
+			if (c != null) {
+				c.close();
+			}
+		} catch (SQLException se3) {
+			se3.printStackTrace();
+		}
+	}
+
+
 
 	public static void setGameAsAIDummy(int gId) {
 		String sql = String.format("UPDATE games SET IsAIDummyGame = 1 WHERE ID = %d;", gId);
@@ -79,45 +146,13 @@ public class DatabaseAccess {
 	}
 
 	public static boolean gameWithUserExistsForClass(int uId, int cId) {
-		ArrayList<DuelGame> games = getGamesForUser(uId);
+		List<DuelGame> games = getGamesForUser(uId);
 		for (DuelGame g : games) {
 			if(g.getClassId() == cId) {
 				return true;
 			}
 		}
 		return false;
-	}
-
-	public static int getInt(String sql, String att) {
-		Connection conn = null;
-		Statement stmt = null;
-
-		int n = 0;
-
-		try {
-
-			// Load the DuelGame Data with the provided ID.
-			conn = getConnection();
-
-			stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(sql);
-
-			if (rs.next()) {
-				n = rs.getInt(att);
-			}
-
-			stmt.close();
-			conn.close();
-		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
-			cleanup(conn, stmt);
-		}
-		return n;
 	}
 
 	public static GameClass getClassForGame(int gameId) {
@@ -132,6 +167,7 @@ public class DatabaseAccess {
 
 	public static boolean isAiPrepared(GameClass c) {
 		boolean prepared = false;
+
 		Connection conn = null;
 		Statement stmt = null;
 		String sql = String.format("SELECT * from classes WHERE AiPrepared = 1 AND Class_ID = %d", c.getId());
@@ -144,9 +180,6 @@ public class DatabaseAccess {
 				//Class is prepared
 				prepared = true;
 			}
-
-			stmt.close();
-			conn.close();
 		} catch (SQLException se) {
 			System.out.println(se);
 			//Handle errors for JDBC
@@ -161,10 +194,7 @@ public class DatabaseAccess {
 	}
 
 	public static void setAiPrepared(GameClass c) {
-		Connection conn = null;
-		Statement stmt = null;
 		String sql = String.format("UPDATE classes SET AiPrepared = 1 WHERE Class_ID = %d;", c.getId());
-
 		executeUpdate(sql);
 	}
 
@@ -179,15 +209,8 @@ public class DatabaseAccess {
 
 			if (rs.next()) {
 				GameClass classRecord = new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile"));
-				stmt.close();
-				conn.close();
 				return classRecord;
 			}
-
-			stmt.close();
-			conn.close();
-
-
 		} catch (SQLException se) {
 			System.out.println(se);
 			//Handle errors for JDBC
@@ -200,26 +223,20 @@ public class DatabaseAccess {
 		return null;
 	}
 
-	public static ArrayList<GameClass> getAllClasses() {
+	public static List<GameClass> getAllClasses() {
+		List<GameClass> classList = new ArrayList<>();
+
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = null;
-		ArrayList<GameClass> classList = new ArrayList<GameClass>();
 
 		try {
 			conn = getConnection();
 
 			stmt = conn.createStatement();
-			sql = "SELECT * FROM classes;";
-			ResultSet rs = stmt.executeQuery(sql);
-
+			ResultSet rs = stmt.executeQuery("SELECT * FROM classes;");
 			while (rs.next()) {
 				classList.add(new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile")));
 			}
-
-			stmt.close();
-			conn.close();
-
 
 		} catch (SQLException se) {
 			System.out.println(se);
@@ -236,13 +253,13 @@ public class DatabaseAccess {
 		return classList;
 	}
 
-	public static ArrayList<User> getAllUsers() {
+	public static List<User> getAllUsers() {
 		String sql = String.format("SELECT * FROM users");
 
 		Connection conn = null;
 		Statement stmt = null;
 
-		ArrayList<User> uList = new ArrayList<User>();
+		List<User> uList = new ArrayList<>();
 
 		try {
 			conn = getConnection();
@@ -254,8 +271,6 @@ public class DatabaseAccess {
 				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"));
 				uList.add(userRecord);
 			}
-			stmt.close();
-			conn.close();
 		} catch (SQLException se) {
 			System.out.println(se);
 			//Handle errors for JDBC
@@ -303,8 +318,6 @@ public class DatabaseAccess {
 
 			if (rs.next()) {
 				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"));
-				stmt.close();
-				conn.close();
 				return userRecord;
 			}
 
@@ -375,7 +388,7 @@ public class DatabaseAccess {
 	 * @param userId
 	 * @return
 	 */
-	public static ArrayList<DuelGame> getGamesForUser(int userId) {
+	public static List<DuelGame> getGamesForUser(int userId) {
 
 		String sql = String.format("SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," +
 				"g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" +
@@ -388,7 +401,7 @@ public class DatabaseAccess {
 		return getGames(sql);
 	}
 
-	public static ArrayList<MultiplayerGame> getJoinedMultiplayerGamesForUser(int userId) {
+	public static List<MultiplayerGame> getJoinedMultiplayerGamesForUser(int userId) {
 		String sql = String.format("SELECT * FROM games AS m " +
 				"LEFT JOIN players as p ON p.Game_ID=m.ID \n" +
 				"WHERE m.Mode = 'PARTY' AND (p.User_ID=%d)" +
@@ -396,7 +409,7 @@ public class DatabaseAccess {
 		return getMultiplayerGames(sql);
 	}
 
-	public static ArrayList<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
+	public static List<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
 		String sql = String.format("SELECT * FROM games AS m " +
 				"LEFT JOIN players as p ON p.Game_ID=m.ID  AND p.Active=TRUE \n" +
 				"WHERE m.Mode = 'PARTY' AND (p.User_ID=%d OR m.Creator_ID=%d) AND m.State != 'FINISHED' " +
@@ -404,7 +417,7 @@ public class DatabaseAccess {
 		return getMultiplayerGames(sql);
 	}
 
-	public static ArrayList<MultiplayerGame> getFinishedMultiplayerGamesForUser(int userId) {
+	public static List<MultiplayerGame> getFinishedMultiplayerGamesForUser(int userId) {
 		String sql = String.format("SELECT * FROM games AS m " +
 				"LEFT JOIN players as p ON p.Game_ID=m.ID  AND p.Active=TRUE \n" +
 				"WHERE (p.User_ID=%d OR m.Creator_ID=%d) AND m.State = 'FINISHED' AND m.Mode='PARTY'" +
@@ -412,7 +425,7 @@ public class DatabaseAccess {
 		return getMultiplayerGames(sql);
 	}
 
-	public static ArrayList<MultiplayerGame> getOpenMultiplayerGamesForUser(int userId) {
+	public static List<MultiplayerGame> getOpenMultiplayerGamesForUser(int userId) {
 		String sql = String.format("SELECT * from games as g\n" +
 				"INNER JOIN (SELECT gatt.ID, sum(case when Role = 'ATTACKER' then 1 else 0 end) nAttackers, sum(case when Role = 'DEFENDER' then 1 else 0 end) nDefenders\n" +
 				"              FROM games as gatt LEFT JOIN players ON gatt.ID=players.Game_ID AND players.Active=TRUE GROUP BY gatt.ID) as nplayers\n" +
@@ -451,8 +464,6 @@ public class DatabaseAccess {
 				}
 
 			}
-			stmt.close();
-			conn.close();
 		} catch (SQLException se) {
 			System.out.println(se);
 			//Handle errors for JDBC
@@ -473,7 +484,7 @@ public class DatabaseAccess {
 	 * @param userId
 	 * @return
 	 */
-	public static ArrayList<DuelGame> getHistoryForUser(int userId) {
+	public static List<DuelGame> getHistoryForUser(int userId) {
 		String sql = String.format("SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," +
 				"g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" +
 				"IFNULL(att.User_ID,0) AS Attacker_ID, IFNULL(def.User_ID,0) AS Defender_ID\n" +
@@ -485,7 +496,7 @@ public class DatabaseAccess {
 		return getGames(sql);
 	}
 
-	public static ArrayList<DuelGame> getOpenGames() {
+	public static List<DuelGame> getOpenGames() {
 
 		String sql = String.format("SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," +
 				"g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" +
@@ -500,17 +511,17 @@ public class DatabaseAccess {
 
 	public static DuelGame getActiveUnitTestingSession(int userId) {
 		String sql = String.format("SELECT * FROM games WHERE Defender_ID='%d' AND Mode='UTESTING' AND State='ACTIVE';", userId);
-		ArrayList<DuelGame> games = getGames(sql);
+		List<DuelGame> games = getGames(sql);
 		if (games.isEmpty())
 			return null;
 		else
 			return games.get(0);
 	}
 
-	public static ArrayList<DuelGame> getGames(String sql) {
+	public static List<DuelGame> getGames(String sql) {
 		Connection conn = null;
 		Statement stmt = null;
-		ArrayList<DuelGame> gameList = new ArrayList<>();
+		List<DuelGame> gameList = new ArrayList<>();
 
 		try {
 			conn = getConnection();
@@ -524,8 +535,6 @@ public class DatabaseAccess {
 						Role.valueOf(rs.getString("ActiveRole")), GameState.valueOf(rs.getString("State")),
 						GameLevel.valueOf(rs.getString("Level")), GameMode.valueOf(rs.getString("Mode"))));
 			}
-			stmt.close();
-			conn.close();
 		} catch (SQLException se) {
 			System.out.println(se);
 			//Handle errors for JDBC
@@ -545,24 +554,23 @@ public class DatabaseAccess {
 		String sql = String.format("SELECT * FROM games AS m " +
 				"WHERE ID=%d AND m.Mode='PARTY'", id);
 
-		ArrayList<MultiplayerGame> mgs = getMultiplayerGames(sql);
+		List<MultiplayerGame> mgs = getMultiplayerGames(sql);
 		if (mgs.size() > 0){
 			return mgs.get(0);
 		}
 		return null;
 	}
 
-	public static ArrayList<MultiplayerGame> getMultiplayerGames(String sql) {
+	public static List<MultiplayerGame> getMultiplayerGames(String sql) {
+		List<MultiplayerGame> gameList = new ArrayList<>();
 		Connection conn = null;
 		Statement stmt = null;
-		ArrayList<MultiplayerGame> gameList = new ArrayList<>();
 
 		try {
 			conn = getConnection();
 
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
-
 			while (rs.next()) {
 				MultiplayerGame mg = new MultiplayerGame(rs.getInt("Class_ID"), rs.getInt("Creator_ID"),
 						GameLevel.valueOf(rs.getString("Level")), (float)rs.getDouble("Coverage_Goal"),
@@ -573,8 +581,6 @@ public class DatabaseAccess {
 				mg.setId(rs.getInt("ID"));
 				gameList.add(mg);
 			}
-			stmt.close();
-			conn.close();
 		} catch (SQLException se) {
 			System.out.println(se);
 			//Handle errors for JDBC
@@ -587,12 +593,13 @@ public class DatabaseAccess {
 			cleanup(conn, stmt);
 		} //end try
 
+
 		return gameList;
 	}
 
-	public static ArrayList<Mutant> getMutantsForGame(int gid) {
+	public static List<Mutant> getMutantsForGame(int gid) {
 
-		ArrayList<Mutant> mutList = new ArrayList<>();
+		List<Mutant> mutList = new ArrayList<>();
 		Connection conn = null;
 		Statement stmt = null;
 		String sql = null;
@@ -611,8 +618,6 @@ public class DatabaseAccess {
 				newMutant.setScore(rs.getInt("Points"));
 				mutList.add(newMutant);
 			}
-			stmt.close();
-			conn.close();
 		} catch (SQLException se) {
 			System.out.println(se);
 		} // Handle errors for JDBC
@@ -625,9 +630,9 @@ public class DatabaseAccess {
 		return mutList;
 	}
 
-	public static ArrayList<Mutant> getMutantsForPlayer(int pid) {
+	public static List<Mutant> getMutantsForPlayer(int pid) {
 
-		ArrayList<Mutant> mutList = new ArrayList<>();
+		List<Mutant> mutList = new ArrayList<>();
 		Connection conn = null;
 		Statement stmt = null;
 		String sql = null;
@@ -646,8 +651,6 @@ public class DatabaseAccess {
 				newMutant.setScore(rs.getInt("Points"));
 				mutList.add(newMutant);
 			}
-			stmt.close();
-			conn.close();
 		} catch (SQLException se) {
 			System.out.println(se);
 		} // Handle errors for JDBC
@@ -678,9 +681,6 @@ public class DatabaseAccess {
 						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
 						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
 			}
-
-			stmt.close();
-			conn.close();
 		} catch (SQLException se) {
 			System.out.println(se);
 		} // Handle errors for JDBC
@@ -704,8 +704,8 @@ public class DatabaseAccess {
 		return getMutantFromDB(sql);
 	}
 
-	public static ArrayList<Integer> getUsedAiTestsForGame(DuelGame g) {
-		ArrayList<Integer> testList = new ArrayList<Integer>();
+	public static List<Integer> getUsedAiTestsForGame(DuelGame g) {
+		List<Integer> testList = new ArrayList<>();
 
 		Connection conn =  null;
 		Statement stmt = null;
@@ -719,8 +719,6 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				testList.add(rs.getInt("Value"));
 			}
-			stmt.close();
-			conn.close();
 
 		} catch (SQLException se) {
 			se.printStackTrace();
@@ -735,29 +733,11 @@ public class DatabaseAccess {
 	}
 
 	public static void increasePlayerPoints(int points, int player){
-		Connection conn =  null;
-		Statement stmt = null;
-
-		try {
-			conn = getConnection();
-			stmt = conn.createStatement();
-			String sql = String.format(
-					"UPDATE players SET Points=Points+%d WHERE ID=%d",
-					points, player
-			);
-
-			stmt.execute(sql);
-			stmt.close();
-			conn.close();
-
-		} catch (SQLException se) {
-			se.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
-			cleanup(conn, stmt);
-		}
+		String sql = String.format(
+				"UPDATE players SET Points=Points+%d WHERE ID=%d",
+				points, player
+		);
+		execute(sql);
 	}
 
 	public static int getEquivalentDefenderId(Mutant m){
@@ -774,9 +754,6 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				id = rs.getInt("Defender_ID");
 			}
-			stmt.close();
-			conn.close();
-
 			return id;
 
 		} catch (SQLException se) {
@@ -804,8 +781,6 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				points = rs.getInt("Points");
 			}
-			stmt.close();
-			conn.close();
 
 			return points;
 
@@ -883,8 +858,8 @@ public class DatabaseAccess {
 		return false;
 	}
 
-	public static ArrayList<Integer> getUsedAiMutantsForGame(DuelGame g) {
-		ArrayList<Integer> mutantList = new ArrayList<Integer>();
+	public static List<Integer> getUsedAiMutantsForGame(DuelGame g) {
+		List<Integer> mutantList = new ArrayList<>();
 
 		Connection conn =  null;
 		Statement stmt = null;
@@ -933,8 +908,6 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.getGeneratedKeys();
 
 			if (rs.next()) {
-				stmt.close();
-				conn.close();
 				return true;
 			}
 
@@ -949,24 +922,7 @@ public class DatabaseAccess {
 		return false;
 	}
 
-	public static void cleanup(Connection c, Statement s) {
-		try {
-			if (s != null) {
-				s.close();
-			}
-		} catch (SQLException se2) {
-			se2.printStackTrace();
-		}
-		try {
-			if (c != null) {
-				c.close();
-			}
-		} catch (SQLException se3) {
-			se3.printStackTrace();
-		}
-	}
-
-	public static ArrayList<Test> getTestsForGame(int gid) {
+	public static List<Test> getTestsForGame(int gid) {
 		String sql = String.format("SELECT * FROM tests WHERE Game_ID='%d';", gid);
 		return getTests(sql);
 	}
@@ -982,7 +938,7 @@ public class DatabaseAccess {
 	 * @param defendersOnly
 	 * @return Tests submitted by defenders which compiled and passed on CUT
 	 */
-	public static ArrayList<Test> getExecutableTests(int gameId, boolean defendersOnly) {
+	public static List<Test> getExecutableTests(int gameId, boolean defendersOnly) {
 		String stmt = "SELECT tests.* FROM tests\n"
 				+ "INNER JOIN targetexecutions ex on tests.Test_ID = ex.Test_ID\n"
 				+ (defendersOnly ? "INNER JOIN players pl on tests.Player_ID = pl.ID\n" : "")
@@ -998,32 +954,7 @@ public class DatabaseAccess {
 		String sql = String.format("SELECT * FROM players AS p " +
 				"WHERE p.User_ID = %d AND p.Game_ID = %d", userId, gameId); // that pass on original CUT
 
-		Connection conn = null;
-		Statement stmt = null;
-		try {
-
-			// Load the MultiplayerGame Data with the provided ID.
-			conn = getConnection();
-
-			stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(sql);
-
-			if (rs.next()) {
-				return rs.getInt("ID");
-			}
-
-			stmt.close();
-			conn.close();
-		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
-			cleanup(conn, stmt);
-		}
-		return 0;
+		return getInt(sql, "ID");
 	}
 
 	public static int[] getPlayersForMultiplayerGame(int gameId, Role role) {
@@ -1043,7 +974,7 @@ public class DatabaseAccess {
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 
-			ArrayList<Integer> atks = new ArrayList<>();
+			List<Integer> atks = new ArrayList<>();
 
 			while (rs.next()) {
 				atks.add(rs.getInt("ID"));
@@ -1054,9 +985,6 @@ public class DatabaseAccess {
 			for (int i = 0; i < atks.size(); i++){
 				players[i] = atks.get(i);
 			}
-
-			stmt.close();
-			conn.close();
 		} catch (SQLException se) {
 			System.out.println(se);
 		} // Handle errors for JDBC
@@ -1076,9 +1004,9 @@ public class DatabaseAccess {
 		return n;
 	}
 
-	private static ArrayList<Test> getTests(String sql) {
+	private static List<Test> getTests(String sql) {
 
-		ArrayList<Test> testList = new ArrayList<>();
+		List<Test> testList = new ArrayList<>();
 
 		Connection conn = null;
 		Statement stmt = null;
@@ -1130,7 +1058,7 @@ public class DatabaseAccess {
 		return testList;
 	}
 
-	public static ArrayList<Test> getPartyTestsForUser(int uid) {
+	public static List<Test> getPartyTestsForUser(int uid) {
 		String sql = String.format("SELECT * FROM vw_mp_tests WHERE User_ID='%d';", uid);
 		return getTests(sql);
 	}
@@ -1197,8 +1125,6 @@ public class DatabaseAccess {
 				TargetExecution targetExecution = new TargetExecution(rs.getInt("TargetExecution_ID"), rs.getInt("Test_ID"),
 						rs.getInt("Mutant_ID"), TargetExecution.Target.valueOf(rs.getString("Target")),
 						rs.getString("Status"), rs.getString("Message"), rs.getString("Timestamp"));
-				stmt.close();
-				conn.close();
 				return targetExecution;
 			}
 

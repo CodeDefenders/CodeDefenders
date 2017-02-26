@@ -106,11 +106,11 @@
 			<div class="tab-pane fade active in" id="mutalivetab">
 				<table class="table table-hover table-responsive table-paragraphs">
 					<%
-						ArrayList<Mutant> mutantsAlive = game.getAliveMutants();
+						List<Mutant> mutantsAlive = game.getAliveMutants();
 
-						ArrayList<Mutant> mutantsEquiv =  game.getMutantsMarkedEquivalent();
+						List<Mutant> mutantsEquiv =  game.getMutantsMarkedEquivalent();
 
-						HashMap<Integer, ArrayList<Mutant>> mutantLines = new HashMap<Integer, ArrayList<Mutant>>();
+						Map<Integer, List<Mutant>> mutantLines = new HashMap<Integer, List<Mutant>>();
 
 						for (Mutant m : mutantsAlive) {
 							for (int line : m.getLines()){
@@ -180,13 +180,13 @@
 			<div class="tab-pane fade" id="mutkilledtab">
 				<table class="table table-hover table-responsive table-paragraphs">
 					<%
-					ArrayList<Mutant> mutantsKilled = game.getKilledMutants();
-					HashMap<Integer, ArrayList<Mutant>> mutantKilledLines = new HashMap<Integer, ArrayList<Mutant>>();
+					List<Mutant> mutantsKilled = game.getKilledMutants();
+					Map<Integer, List<Mutant>> mutantKilledLines = new HashMap<>();
 					if (! mutantsKilled.isEmpty()) {
 						for (Mutant m : mutantsKilled) {
 							for (int line : m.getLines()){
 								if (!mutantKilledLines.containsKey(line)){
-									mutantKilledLines.put(line, new ArrayList<Mutant>());
+									mutantKilledLines.put(line, new ArrayList<>());
 								}
 								mutantKilledLines.get(line).add(m);
 							}

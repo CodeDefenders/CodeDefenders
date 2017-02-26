@@ -1,13 +1,16 @@
 package org.codedefenders.multiplayer;
 
-/**
- * Created by gordon on 20/02/2017.
- */
 public class PlayerScore {
     private int playerId;
     private int totalScore;
     private int quantity;
     private String additionalInformation;
+
+    public PlayerScore(int playerId) {
+        this.playerId = playerId;
+        this.totalScore = 0;
+        this.quantity = 0;
+    }
 
     public String toString() {
         return playerId + ": " + totalScore + ", " + quantity + "," + additionalInformation;
@@ -21,14 +24,12 @@ public class PlayerScore {
         this.additionalInformation = additionalInformation;
     }
 
-    public PlayerScore(int playerId) {
-        this.playerId = playerId;
-        this.totalScore = 0;
-        this.quantity = 0;
-    }
-
     public int getPlayerId() {
         return playerId;
+    }
+
+    public void setPlayerId(int playerId) {
+        this.playerId = playerId;
     }
 
     public int getTotalScore() {
@@ -37,10 +38,6 @@ public class PlayerScore {
 
     public int getQuantity() {
         return quantity;
-    }
-
-    public void setPlayerId(int playerId) {
-        this.playerId = playerId;
     }
 
     public void increaseTotalScore(int score) {

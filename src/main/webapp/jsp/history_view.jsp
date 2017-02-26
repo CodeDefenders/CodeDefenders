@@ -67,7 +67,7 @@
 			<th>Actions</th>
 		</tr>
 		<%
-			ArrayList<MultiplayerGame> mgames = DatabaseAccess.getFinishedMultiplayerGamesForUser(uid);
+			List<MultiplayerGame> mgames = DatabaseAccess.getFinishedMultiplayerGamesForUser(uid);
 			if (mgames.isEmpty()) {
 		%>
 		<tr><td colspan="100%"> Empty multi-player games history. </td></tr>

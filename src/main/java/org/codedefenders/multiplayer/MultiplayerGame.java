@@ -180,7 +180,7 @@ public class MultiplayerGame extends AbstractGame {
 							"VALUES (%d, %d, 0, '%s') " +
 							"ON DUPLICATE KEY UPDATE Role='%3$s', Active=TRUE;",
 					id, userId, role);
-			return runStatement(sql);
+			return DatabaseAccess.executeUpdate(sql);
 		}
 		return false;
 	}
@@ -190,7 +190,7 @@ public class MultiplayerGame extends AbstractGame {
 			String sql = String.format("UPDATE players " +
 							"SET Active=FALSE WHERE Game_ID=%d AND User_ID=%d;",
 					id, userId);
-			return runStatement(sql);
+			return DatabaseAccess.executeUpdate(sql);
 		}
 		return false;
 	}
@@ -201,8 +201,9 @@ public class MultiplayerGame extends AbstractGame {
 				return (attackerLimit == 0 || getAttackerIds().length < attackerLimit);
 			else
 				return (defenderLimit == 0 || getDefenderIds().length < defenderLimit);
-		} else
+		} else {
 			return false;
+		}
 	}
 
 

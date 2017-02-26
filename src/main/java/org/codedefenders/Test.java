@@ -34,7 +34,7 @@ public class Test {
 		return mutantsKilled;
 	}
 
-	private LineCoverage lineCoverage = LineCoverage.NONE;
+	private LineCoverage lineCoverage = new LineCoverage();
 
 	private int score;
 

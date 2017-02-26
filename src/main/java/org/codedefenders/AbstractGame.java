@@ -4,9 +4,6 @@ import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -68,9 +65,6 @@ public abstract class AbstractGame {
 
 	protected void setMode(GameMode newMode) { this.mode = newMode; }
 
-	// TODO:
-	// public abstract ArrayList<Mutant> getMutants();
-
 	public ArrayList<Test> getTests() {
 		return getTests(false);
 	}
@@ -114,30 +108,5 @@ public abstract class AbstractGame {
 
 	public abstract boolean update();
 
-	public boolean runStatement(String sql) {
-
-		Connection conn = null;
-		Statement stmt = null;
-
-		logger.info(sql);
-
-		// Attempt to insert game info into database
-		try {
-			conn = DatabaseAccess.getConnection();
-
-			stmt = conn.createStatement();
-			return stmt.executeUpdate(sql) > 0;
-		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
-		} //end try
-
-		return false;
-	}
 
 }

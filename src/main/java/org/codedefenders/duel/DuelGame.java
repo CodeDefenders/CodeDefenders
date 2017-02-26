@@ -156,7 +156,7 @@ public class DuelGame extends AbstractGame {
 
 		String sql = String.format("INSERT INTO players (Game_ID, User_ID, Points, Role) " +
 				"VALUES (%d, %d, 0, '%s');", id, userId, role);
-		if (runStatement(sql)) {
+		if (DatabaseAccess.executeUpdate(sql)) {
 			if (role.equals(Role.ATTACKER))
 				attackerId = userId;
 			else
@@ -186,8 +186,6 @@ public class DuelGame extends AbstractGame {
 
 			if (rs.next()) {
 				id = rs.getInt(1);
-				stmt.close();
-				conn.close();
 				return true;
 			}
 
@@ -207,38 +205,11 @@ public class DuelGame extends AbstractGame {
 
 	@Override
 	public boolean update() {
-
-		Connection conn = null;
-		Statement stmt = null;
-		String sql = null;
-
-		try {
-			conn = DatabaseAccess.getConnection();
-
-			// Get all rows from the database which have the chosen username
-			stmt = conn.createStatement();
-			if (this.mode.equals(GameMode.UTESTING))
-				sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', State='%s' WHERE ID='%d'",
-						currentRound, finalRound, state.name(), id);
-			else
-				sql = String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s' WHERE ID='%d'",
-						currentRound, finalRound, activeRole, state.name(), id);
-			stmt.execute(sql);
-			return true;
-
-		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-			se.printStackTrace();
-		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-			e.printStackTrace();
-		} finally {
-			//finally block used to close resources
-			DatabaseAccess.cleanup(conn, stmt);
-		} //end try
-
-		return false;
+		if (this.mode.equals(GameMode.UTESTING))
+			return DatabaseAccess.execute(String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', State='%s' WHERE ID='%d'",
+					currentRound, finalRound, state.name(), id));
+		else
+			return DatabaseAccess.execute(String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s' WHERE ID='%d'",
+					currentRound, finalRound, activeRole, state.name(), id));
 	}
 }

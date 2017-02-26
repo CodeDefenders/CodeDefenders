@@ -1,27 +1,33 @@
 package org.codedefenders.multiplayer;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by thoma on 16/06/2016.
  */
 public class LineCoverage {
-    public static LineCoverage NONE = new LineCoverage();
-    private ArrayList<Integer> linesCovered = new ArrayList<>();
-    private ArrayList<Integer> linesUncovered = new ArrayList<>();
 
-    public void setLinesCovered (ArrayList<Integer> lines){ linesCovered = lines; }
+    private List<Integer> linesCovered = new ArrayList<>();
 
-    public ArrayList<Integer> getLinesCovered(){
+    private List<Integer> linesUncovered = new ArrayList<>();
+
+    public void setLinesCovered (List<Integer> lines) {
+        linesCovered.clear();
+        linesCovered.addAll(lines);
+    }
+
+    public List<Integer> getLinesCovered(){
         return linesCovered;
     }
 
-    public ArrayList<Integer> getLinesUncovered(){
+    public List<Integer> getLinesUncovered(){
         return linesUncovered;
     }
 
-    public void setLinesUncovered (ArrayList<Integer> lines){
-        linesUncovered = lines;
+    public void setLinesUncovered (List<Integer> lines){
+        linesUncovered.clear();
+        linesUncovered.addAll(lines);
     }
 
     public String toString(){
