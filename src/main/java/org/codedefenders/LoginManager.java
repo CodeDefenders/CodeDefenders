@@ -32,14 +32,14 @@ public class LoginManager extends HttpServlet {
 		request.getSession().setAttribute("messages", messages);
 
 
-		String username = (String) request.getParameter("username");
-		String password = (String) request.getParameter("password");
-		String email = (String) request.getParameter("email");
-		String formType = (String) request.getParameter("formType");
+		String username = request.getParameter("username");
+		String password = request.getParameter("password");
+		String email    = request.getParameter("email");
+		String formType = request.getParameter("formType");
 		int uid;
 
 		if (formType.equals("create")) {
-			String confirm = (String) request.getParameter("confirm");
+			String confirm = request.getParameter("confirm");
 			if (! (validUsername(username)
 					&& validEmailAddress(email)
 					&& validPassword(password))) {
@@ -57,6 +57,7 @@ public class LoginManager extends HttpServlet {
 
 						response.sendRedirect("games");
 					} else {
+						// TODO: How about some error handling?
 						messages.add("Could not create a user for you, sorry!");
 						RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 						dispatcher.forward(request, response);
@@ -93,7 +94,8 @@ public class LoginManager extends HttpServlet {
 					} else
 						response.sendRedirect("games");
 				} else {
-					messages.add("Username does not exist or your password ws incorrect.");
+					// TODO: Shouldn't the user exist if we can retrieve it from the DB?
+					messages.add("Username does not exist or your password was incorrect.");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
 				}
