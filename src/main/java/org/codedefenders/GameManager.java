@@ -17,6 +17,7 @@ import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.codedefenders.Constants.*;
 
@@ -45,10 +46,10 @@ public class GameManager extends HttpServlet {
 
 		// If the game is finished, redirect to the score page.
 		if (activeGame.getAttackerId() == uid) {
-			ArrayList<Mutant> equivMutants = activeGame.getMutantsMarkedEquivalent();
+			List<Mutant> equivMutants = activeGame.getMutantsMarkedEquivalent();
 			if (equivMutants.isEmpty()) {
 				logger.info("Redirecting to attacker page");
-				ArrayList<Mutant> aliveMutants = activeGame.getAliveMutants();
+				List<Mutant> aliveMutants = activeGame.getAliveMutants();
 				if (aliveMutants.isEmpty()) {
 					logger.info("No Mutants Alive, only attacker can play.");
 					activeGame.setActiveRole(Role.ATTACKER);
@@ -166,6 +167,7 @@ public class GameManager extends HttpServlet {
 					int mutantId = Integer.parseInt(request.getParameter("mutantId"));
 					Mutant mutantClaimed = DatabaseAccess.getMutant(activeGame, mutantId);
 					if(activeGame.getMode().equals(GameMode.SINGLE)) {
+						// TODO: Why is this not handled in the single player game but here?
 						//Singleplayer - use automatic system.
 						if(AntRunner.potentialEquivalent(mutantClaimed)) {
 							//Is potentially equiv - accept as equivalent
@@ -213,6 +215,7 @@ public class GameManager extends HttpServlet {
 						messages.add(MUTANT_COMPILED_MESSAGE);
 						MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
 
+						// TODO: Why doesnt that happen in SinglePlayerGame.endTurn()?
 						if(activeGame.getMode().equals(GameMode.SINGLE)) {
 							//Singleplayer - check for potential equivalent.
 							if(AntRunner.potentialEquivalent(newMutant)) {
@@ -267,6 +270,7 @@ public class GameManager extends HttpServlet {
 						MutationTester.runTestOnAllMutants(activeGame, newTest, messages);
 						activeGame.endTurn();
 						activeGame.update();
+						// TODO: Why doesn't that simply happen in SinglePlayerGame.endTurn?
 						// if single-player game is not finished, make a move
 						if (! activeGame.getState().equals(GameState.FINISHED)
 								&& activeGame.getMode().equals(GameMode.SINGLE)) {

@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DuelGame extends AbstractGame {
 
@@ -95,8 +96,8 @@ public class DuelGame extends AbstractGame {
 	}
 
 	// TODO: Why is this different in the MultiplayerGame?
-	public ArrayList<Mutant> getMutantsMarkedEquivalent() {
-		ArrayList<Mutant> equivMutants = new ArrayList<>();
+	public List<Mutant> getMutantsMarkedEquivalent() {
+		List<Mutant> equivMutants = new ArrayList<>();
 		for (Mutant m : getMutants()) {
 			if (m.isAlive() && m.getEquivalent().equals(PENDING_TEST)) {
 				equivMutants.add(m);
