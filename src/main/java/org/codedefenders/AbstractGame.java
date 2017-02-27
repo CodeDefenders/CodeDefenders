@@ -65,11 +65,11 @@ public abstract class AbstractGame {
 
 	protected void setMode(GameMode newMode) { this.mode = newMode; }
 
-	public ArrayList<Test> getTests() {
+	public List<Test> getTests() {
 		return getTests(false);
 	}
 
-	public ArrayList<Test> getTests(boolean defendersOnly) {
+	public List<Test> getTests(boolean defendersOnly) {
 		return DatabaseAccess.getExecutableTests(this.id, defendersOnly);
 	}
 

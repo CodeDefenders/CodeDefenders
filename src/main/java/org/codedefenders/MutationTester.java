@@ -27,7 +27,7 @@ public class MutationTester {
 
 	public static void runTestOnAllMutants(DuelGame game, Test test, ArrayList<String> messages) {
 		int killed = 0;
-		ArrayList<Mutant> mutants = game.getAliveMutants();
+		List<Mutant> mutants = game.getAliveMutants();
 		for (Mutant mutant : mutants) {
 			killed += testVsMutant(test, mutant) ? 1 : 0;
 		}
@@ -107,7 +107,7 @@ public class MutationTester {
 	}
 
 	public static void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages) {
-		ArrayList<Test> tests = game.getTests(true); // executable tests submitted by defenders
+		List<Test> tests = game.getTests(true); // executable tests submitted by defenders
 		for (Test test : tests) {
 			// If this mutant/test pairing hasnt been run before and the test might kill the mutant
 			if (testVsMutant(test, mutant)) {

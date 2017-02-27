@@ -58,7 +58,7 @@ public class AiDefender extends AiPlayer {
 
 	private int selectTest(GenerationMethod strategy) throws Exception {
 
-		ArrayList<Integer> usedTests = DatabaseAccess.getUsedAiTestsForGame(game);
+		List<Integer> usedTests = DatabaseAccess.getUsedAiTestsForGame(game);
 		GameClass cut = game.getCUT();
 		DuelGame dummyGame = cut.getDummyGame();
 
@@ -112,7 +112,7 @@ public class AiDefender extends AiPlayer {
 		int bestCoverage = 0;
 		for (Test tst : possibleTests) {
 			LineCoverage lc = tst.getLineCoverage(); // test already has line coverage information here
-			ArrayList<Integer> coveredByTest = lc.getLinesCovered();
+			List<Integer> coveredByTest = lc.getLinesCovered();
 			int coverage = 0;
 
 			StringBuilder logOutput = new StringBuilder();
@@ -161,7 +161,7 @@ public class AiDefender extends AiPlayer {
 	private void useTestFromSuite(int origTestNum) throws IOException, Exception {
 		GameClass cut = game.getCUT();
 		DuelGame dummyGame = cut.getDummyGame();
-		ArrayList<Test> origTests = dummyGame.getTests();
+		List<Test> origTests = dummyGame.getTests();
 
 		Test origT = null;
 

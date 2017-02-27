@@ -63,12 +63,12 @@ public class AiAttacker extends AiPlayer {
 	}
 
 	private int selectMutant(GenerationMethod strategy) throws Exception {
-		ArrayList<Integer> usedMutants = DatabaseAccess.getUsedAiMutantsForGame(game);
+		List<Integer> usedMutants = DatabaseAccess.getUsedAiMutantsForGame(game);
 		GameClass cut = game.getCUT();
 
 		// TODO: This isn't actually an AIDummyGame
 		DuelGame dummyGame = cut.getDummyGame();
-		ArrayList<Mutant> origMutants = dummyGame.getMutants();
+		List<Mutant> origMutants = dummyGame.getMutants();
 
 		List<Mutant> candidateMutants = origMutants.stream().filter(mutant -> !usedMutants.contains(mutant.getId())).collect(Collectors.toList());
 
@@ -99,7 +99,7 @@ public class AiAttacker extends AiPlayer {
 	private void useMutantFromSuite(int origMutNum) throws IOException, Exception {
 		GameClass cut = game.getCUT();
 		DuelGame dummyGame = cut.getDummyGame();
-		ArrayList<Mutant> origMutants = dummyGame.getMutants();
+		List<Mutant> origMutants = dummyGame.getMutants();
 
 		Mutant origM = null;
 
