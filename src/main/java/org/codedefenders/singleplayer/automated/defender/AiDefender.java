@@ -4,6 +4,7 @@ import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.singleplayer.AiPlayer;
+import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.singleplayer.PrepareAI;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
@@ -41,22 +42,19 @@ public class AiDefender extends AiPlayer {
 	protected boolean runTurn(GenerationMethod strat) {
 		try {
 			int tNum = selectTest(strat);
-			try {
-				useTestFromSuite(tNum);
-			} catch (IOException e) {
-				e.printStackTrace();
-				return false;
-			}
+			useTestFromSuite(tNum);
+		} catch (NoTestsException e) {
+			//No more choices remain - do nothing
 		} catch (Exception e) {
+			//Something's gone wrong
 			e.printStackTrace();
-			//Assume no more choices remain.
-			//Do nothing.
+			return false;
 		}
 
 		return true;
 	}
 
-	private int selectTest(GenerationMethod strategy) throws Exception {
+	private int selectTest(GenerationMethod strategy) throws NoTestsException, NoDummyGameException {
 
 		List<Integer> usedTests = DatabaseAccess.getUsedAiTestsForGame(game);
 		GameClass cut = game.getCUT();
@@ -141,7 +139,7 @@ public class AiDefender extends AiPlayer {
 		return selected.getId();
 	}
 
-	private void useTestFromSuite(int origTestNum) throws IOException, Exception {
+	private void useTestFromSuite(int origTestNum) throws NoDummyGameException{
 		GameClass cut = game.getCUT();
 		DuelGame dummyGame = cut.getDummyGame();
 		List<Test> origTests = dummyGame.getTests();

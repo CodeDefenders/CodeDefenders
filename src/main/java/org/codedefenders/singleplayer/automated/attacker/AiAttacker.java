@@ -5,6 +5,7 @@ import org.codedefenders.duel.DuelGame;
 import org.codedefenders.singleplayer.AiPlayer;
 import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.singleplayer.PrepareAI;
+import org.codedefenders.singleplayer.automated.defender.NoTestsException;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,7 @@ public class AiAttacker extends AiPlayer {
 		return true;
 	}
 
-	private int selectMutant(GenerationMethod strategy) throws Exception {
+	private int selectMutant(GenerationMethod strategy) throws NoMutantsException, NoDummyGameException {
 		List<Integer> usedMutants = DatabaseAccess.getUsedAiMutantsForGame(game);
 		GameClass cut = game.getCUT();
 
