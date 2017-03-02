@@ -3,6 +3,7 @@ package org.codedefenders.singleplayer.automated.attacker;
 import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.singleplayer.AiPlayer;
+import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.singleplayer.PrepareAI;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
@@ -51,12 +52,12 @@ public class AiAttacker extends AiPlayer {
 		try {
 			int mNum = selectMutant(strat);
 			useMutantFromSuite(mNum);
-		} catch (IOException e) {
+		} catch (NoMutantsException e) {
+			//No more unused mutants remain, do nothing.
+		} catch (Exception e) {
+			//Something's gone wrong
 			e.printStackTrace();
 			return false;
-		} catch (Exception e) {
-			//Assume no more unused mutants remain, do nothing.
-			logger.info("something went wrong; skipping turn");
 		}
 
 		return true;
@@ -96,7 +97,7 @@ public class AiAttacker extends AiPlayer {
 		}
 	}
 
-	private void useMutantFromSuite(int origMutNum) throws IOException, Exception {
+	private void useMutantFromSuite(int origMutNum) throws NoMutantsException, NoDummyGameException {
 		GameClass cut = game.getCUT();
 		DuelGame dummyGame = cut.getDummyGame();
 		List<Mutant> origMutants = dummyGame.getMutants();

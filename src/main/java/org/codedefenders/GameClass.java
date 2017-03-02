@@ -1,6 +1,7 @@
 package org.codedefenders;
 
 import org.codedefenders.duel.DuelGame;
+import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -184,7 +185,7 @@ public class GameClass {
 		this.classFile = classFile;
 	}
 
-	public DuelGame getDummyGame() throws Exception {
+	public DuelGame getDummyGame() throws NoDummyGameException {
 		DuelGame dg = DatabaseAccess.getAiDummyGameForClass(this.getId());
 		return dg;
 	}

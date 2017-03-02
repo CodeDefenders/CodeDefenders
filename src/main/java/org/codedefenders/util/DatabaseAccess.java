@@ -4,6 +4,7 @@ import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
+import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.singleplayer.SinglePlayerGame;
 
 import javax.naming.Context;
@@ -121,11 +122,11 @@ public class DatabaseAccess {
 		executeUpdate(sql);
 	}
 
-	public static DuelGame getAiDummyGameForClass(int cId) throws Exception {
+	public static DuelGame getAiDummyGameForClass(int cId) throws NoDummyGameException {
 		String sql = String.format("SELECT * FROM games WHERE Class_ID='%d' AND IsAIDummyGame=1", cId);
 		int gID = getInt(sql, "ID");
 		if (gID == 0) {
-			Exception e = new Exception("No dummy game found.");
+			NoDummyGameException e = new NoDummyGameException("No dummy game found.");
 			throw e;
 		}
 		return getGameForKey("ID", gID);
