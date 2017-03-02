@@ -81,24 +81,7 @@ public class AiDefender extends AiPlayer {
 
 			default:
 				throw new UnsupportedOperationException("Invalid strategy for AI defender");
-
 		}
-
-		// TODO: Unreachable code:
-		//If standard strategy fails, choose first non-selected test.
-//		for (int x = 0; x < totalTests; x++) {
-//
-//			Test origT = origTests.get(x);
-//			t = origT.getId();
-//
-//			if(!usedTests.contains(t)) {
-//				//Unused test found.
-//				return t;
-//			}
-//		}
-//
-//		//Something went wrong.
-//		throw e;
 	}
 
 	private int getTestIdByCoverage(List<Test> possibleTests) {
