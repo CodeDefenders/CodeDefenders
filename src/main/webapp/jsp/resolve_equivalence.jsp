@@ -29,8 +29,8 @@
 		<table class="table table-hover table-responsive table-paragraphs">
 
 			<%
-				ArrayList<Mutant> equivMutants = game.getMutantsMarkedEquivalent();
-				HashMap<Integer, ArrayList<Mutant>> mutantLines = new HashMap<Integer, ArrayList<Mutant>>();
+				List<Mutant> equivMutants = game.getMutantsMarkedEquivalent();
+				HashMap<Integer, List<Mutant>> mutantLines = new HashMap<Integer, List<Mutant>>();
 				if (! equivMutants.isEmpty()) {
 					Mutant m = equivMutants.get(0);
 					for (int line : m.getLines()){
