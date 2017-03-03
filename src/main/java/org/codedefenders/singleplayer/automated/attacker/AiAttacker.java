@@ -49,12 +49,18 @@ public class AiAttacker extends AiPlayer {
 		return runTurn(GenerationMethod.RANDOM);
 	}
 
+	/**
+	 * Attempts to submit a mutant, according to a strategy
+	 * @param strat Generation strategy to use
+	 * @return true if mutant submitted, false otherwise
+	 */
 	protected boolean runTurn(GenerationMethod strat) {
 		try {
 			int mNum = selectMutant(strat);
 			useMutantFromSuite(mNum);
 		} catch (NoMutantsException e) {
-			//No more unused mutants remain, do nothing.
+			//No more unused mutants remain,
+			return false;
 		} catch (Exception e) {
 			//Something's gone wrong
 			e.printStackTrace();

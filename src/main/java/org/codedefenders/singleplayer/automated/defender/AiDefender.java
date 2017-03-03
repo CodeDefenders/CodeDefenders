@@ -39,12 +39,18 @@ public class AiDefender extends AiPlayer {
 		return runTurn(GenerationMethod.RANDOM);
 	}
 
+	/**
+	 * Attempts to submit a test, according to a strategy
+	 * @param strat Generation strategy to use
+	 * @return true if test submitted, false otherwise
+	 */
 	protected boolean runTurn(GenerationMethod strat) {
 		try {
 			int tNum = selectTest(strat);
 			useTestFromSuite(tNum);
 		} catch (NoTestsException e) {
 			//No more choices remain - do nothing
+			return false;
 		} catch (Exception e) {
 			//Something's gone wrong
 			e.printStackTrace();
