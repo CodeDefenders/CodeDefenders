@@ -178,9 +178,12 @@ public class GameManager extends HttpServlet {
 							messages.add("The AI has submitted a test that kills the mutant and proves it non-equivalent!");
 						}
 						activeGame.endTurn();
-						SinglePlayerGame spg = (SinglePlayerGame) activeGame;
-						if (spg.getAi().makeTurn()) {
-							messages.addAll(spg.getAi().getMessagesLastTurn());
+						if(!activeGame.getState().equals(GameState.FINISHED)) {
+							//The ai should make another move if the game isn't over
+							SinglePlayerGame spg = (SinglePlayerGame) activeGame;
+							if (spg.getAi().makeTurn()) {
+								messages.addAll(spg.getAi().getMessagesLastTurn());
+							}
 						}
 
 					} else {
