@@ -34,7 +34,7 @@ public class Constants {
 	public static final String JAVA_SOURCE_EXT = ".java";
 	public static final String JAVA_CLASS_EXT = ".class";
 	public static final String TEST_INFO_EXT = ".xml";
-	public static final String SUITE_EXT = "EvoSuiteTest";
+	public static final String SUITE_EXT = "_ESTest";
 
 	public static final String GRACE_PERIOD_MESSAGE = "Game is now in grace period.";
 

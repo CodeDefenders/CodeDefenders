@@ -111,7 +111,7 @@ public class EvoSuiteMaker {
 	private List<String> getTestSuiteLines() {
 		String packageDir = cut.getPackage().replace(".", Constants.F_SEP);
 		String loc = AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias() +
-				F_SEP + packageDir + F_SEP + cut.getBaseName() + "EvoSuiteTest.java";
+				F_SEP + packageDir + F_SEP + cut.getBaseName() + "_ESTest.java";
 		File f = new File(loc);
 		return FileManager.readLines(f.toPath());
 	}
