@@ -67,7 +67,7 @@ public class AiDefender extends AiPlayer {
 		DuelGame dummyGame = cut.getDummyGame();
 
 		//TODO: Discarding useless tests in origtests would be a sideeffect
-		List<Test> candidateTests = dummyGame.getTests().stream().filter(test -> !usedTests.contains(test.getId()) && test.getAiMutantsKilled() > 0).collect(Collectors.toList());
+		List<Test> candidateTests = dummyGame.getTests().stream().filter(test -> !usedTests.contains(test.getId())).collect(Collectors.toList());
 
 		if(candidateTests.isEmpty()) {
 			throw new NoTestsException("All generated tests have already been used.");
