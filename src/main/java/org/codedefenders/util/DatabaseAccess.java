@@ -2,6 +2,8 @@ package org.codedefenders.util;
 
 import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
+import org.codedefenders.events.Event;
+import org.codedefenders.events.EventStatus;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.singleplayer.NoDummyGameException;
@@ -116,6 +118,50 @@ public class DatabaseAccess {
 	}
 
 
+	public static ArrayList<Event> getEventsForGame(int gameId) {
+		String sql = String.format("SELECT * FROM events WHERE Game_ID='%d' " +
+						"AND Event_Status='%s'",
+				gameId, EventStatus.GAME);
+		return getEvents(sql);
+	}
+
+	public static void removePlayerEventsForGame(int gameId, int
+			playerId) {
+		String sql = String.format("SELECT * FROM events WHERE Game_ID=%d " +
+						"AND Player_ID=%d",
+				gameId, EventStatus.GAME);
+		for (Event e : getEvents(sql)){
+			e.setStatus(EventStatus.DELETED);
+			e.update();
+		}
+	}
+
+	public static ArrayList<Event> getNewEventsForGame(int gameId, long time) {
+		String sql = String.format("SELECT * FROM events WHERE Game_ID='%d' " +
+						"AND Event_Status='%s' " +
+						"AND Timestamp >= FROM_UNIXTIME(%d)",
+				gameId, EventStatus.GAME, time);
+		return getEvents(sql);
+	}
+
+	public static ArrayList<Event> getEventsForUser(int userId) {
+		String sql = String.format("SELECT * FROM events WHERE " +
+						"Event_Status!='DELETED' " +
+						"AND Player_ID='%d';",
+				userId);
+		return getEvents(sql);
+	}
+
+	public static ArrayList<Event> getNewEventsForUser(int userId, long time) {
+		String sql = String.format("SELECT * FROM events WHERE Player_ID='%d'" +
+						" " +
+						"AND Event_Status<>'%s' " +
+						"AND Event_Status<>'%s' " +
+						"AND Timestamp >= FROM_UNIXTIME(%d)",
+				userId, EventStatus.DELETED, EventStatus.GAME, time);
+		return getEvents(sql);
+	}
+
 
 	public static void setGameAsAIDummy(int gId) {
 		String sql = String.format("UPDATE games SET IsAIDummyGame = 1 WHERE ID = %d;", gId);
@@ -197,6 +243,40 @@ public class DatabaseAccess {
 	public static void setAiPrepared(GameClass c) {
 		String sql = String.format("UPDATE classes SET AiPrepared = 1 WHERE Class_ID = %d;", c.getId());
 		executeUpdate(sql);
+	}
+
+	private static ArrayList<Event> getEvents(String sql) {
+		Connection conn = null;
+		Statement stmt = null;
+
+		ArrayList<Event> events = new ArrayList<Event>();
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql + " ORDER BY Timestamp ASC");
+
+			while (rs.next()) {
+				Event event = new Event(rs.getInt("Event_ID"),
+						rs.getInt("Game_ID"),
+						rs.getInt("Player_ID"),
+						rs.getString("Event_Message"),
+						rs.getString("Event_Type"),
+						rs.getString("Event_Status"),
+						rs.getTimestamp("Timestamp"));
+
+				events.add(event);
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+			//Handle errors for JDBC
+		} catch (Exception e) {
+			System.out.println(e);
+			//Handle errors for Class.forName
+		} finally {
+			cleanup(conn, stmt);
+		} //end try
+		return events;
 	}
 
 	private static GameClass getClass(String sql) {

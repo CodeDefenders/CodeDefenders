@@ -2,6 +2,10 @@
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.*" %>
 <%@ page import="org.codedefenders.util.DatabaseAccess" %>
+<%@ page import="org.codedefenders.events.Event" %>
+<%@ page import="org.codedefenders.events.EventType" %>
+<%@ page import="org.codedefenders.events.EventStatus" %>
+<%@ page import="java.sql.Timestamp" %>
 <%
     // Get their user id from the session.
     int uid = ((Integer) session.getAttribute("uid")).intValue();
@@ -16,13 +20,16 @@
     } catch (Exception e2){
         response.sendRedirect("games/user");
     }
+    MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
+    if (mg == null){
+        response.sendRedirect("games/user");
+    }
     boolean renderMutants = true;
 
     HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<Integer, ArrayList<Test>>();
 
     String codeDivName = "cut-div";
 
-    MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
     Role role = mg.getRole(uid);
 
     if ((mg.getState().equals(GameState.CREATED) || mg.getState().equals(GameState.FINISHED)) && (!role.equals(Role.CREATOR))) {
@@ -62,10 +69,33 @@
                 if (m.getLines().contains(equivLine)) {
                     m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                     m.update();
+
+                    User mutantOwner = DatabaseAccess.getUserFromPlayer(m.getPlayerId());
+
+                    Event notifEquivFlag = new Event(-1, mg.getId(),
+                            mutantOwner.getId(),
+                            "One or more of your mutants is flagged equivalent.",
+                            EventType.DEFENDER_MUTANT_EQUIVALENT,
+                            EventStatus.NEW,
+                            new Timestamp(System.currentTimeMillis()));
+                    notifEquivFlag.insert();
+
                     DatabaseAccess.insertEquivalence(m, playerId);
                     nClaimed++;
                 }
             }
+
+            Event notifMutant = new Event(-1, mg.getId(),
+                    uid,
+                    DatabaseAccess.getUser(uid)
+                            .getUsername() + " flagged " + nClaimed +
+                            " mutant" + (nClaimed == 1? "" : "s") +
+                            " as equivalent.",
+                    EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
+                    new Timestamp(System.currentTimeMillis()));
+
+            notifMutant.insert();
+
             messages.add(String.format("Flagged %d mutant%s as equivalent", nClaimed, (nClaimed == 1 ? "" : 's')));
 
             response.sendRedirect("play");
@@ -83,6 +113,16 @@
                     m.kill(Mutant.Equivalence.DECLARED_YES);
                     DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
                     messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
+
+                    User eventUser = DatabaseAccess.getUser(uid);
+
+                    Event notifEquiv = new Event(-1, mg.getId(),
+                            uid,
+                            eventUser.getUsername() +
+                                    " accepts that their mutant is equivalent.",
+                            EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
+                            new Timestamp(System.currentTimeMillis()));
+                    notifEquiv.insert();
 
                     response.sendRedirect("play");
                 }
@@ -157,4 +197,5 @@
 <script>
 <%@ include file="/jsp/multiplayer/game_highlighting.jsp" %>
 </script>
+<%@ include file="/jsp/game_notifications.jsp"%>
 <%@ include file="/jsp/multiplayer/footer_game.jsp" %>

@@ -249,15 +249,17 @@
   };
 
   init = function() {
-    imagesLoaded($('body')[0]).on('always', function() {
-      makeSquare(elements);
-      return alignChildren(rows);
-    });
-    checkResize();
-    activateLists();
-    initSlider();
-    initWaves();
-    return initFlip();
+      try {
+          imagesLoaded($('body')[0]).on('always', function () {
+              makeSquare(elements);
+              return alignChildren(rows);
+          });
+        checkResize();
+        activateLists();
+        initSlider();
+        initWaves();
+        return initFlip();
+      } catch (e){}
   };
 
   init();

@@ -92,20 +92,24 @@
 
     <script>
         $(document).ready(function() {
-            $('table.mutant-table').DataTable( {
-                "pagingType": "full_numbers",
-                "searching": true,
-                "lengthChange": false,
-                "ordering": false,
-                "pageLength": 4,
-                language: {
-                    search: "_INPUT_",
-                    searchPlaceholder: "Search...",
-                    info: "",
-                    sInfoEmpty: "",
-                    sInfoFiltered: ""
-                }
-            } );
+            try {
+                $('table.mutant-table').DataTable( {
+                    "pagingType": "full_numbers",
+                    "searching": true,
+                    "lengthChange": false,
+                    "ordering": false,
+                    "pageLength": 4,
+                    language: {
+                        search: "_INPUT_",
+                        searchPlaceholder: "Search...",
+                        info: "",
+                        sInfoEmpty: "",
+                        sInfoFiltered: ""
+                    }
+                } );
+            } catch (e) {
+                // statements to handle TypeError exceptions
+            }
         } );
     </script>
 

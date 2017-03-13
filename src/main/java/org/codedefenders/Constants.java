@@ -18,7 +18,13 @@ public class Constants {
 
 		String dataHome = (String) env.get("CODEDEFENDERS_DATA");
 		if (dataHome == null) {
-			dataHome = System.getProperty("codedefenders.data", "/var/lib/codedefenders");
+			if (System.getProperty("os.name").toLowerCase().contains("windows")){
+				dataHome = System.getProperty("codedefenders.data",
+						"C:/codedefenders-data");
+			} else {
+				dataHome = System.getProperty("codedefenders.data",
+						"/var/lib/codedefenders");
+			}
 		}
 
 		DATA_DIR = dataHome;

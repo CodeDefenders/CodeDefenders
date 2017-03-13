@@ -2,6 +2,60 @@
 <%@ page import="org.codedefenders.Constants" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ include file="/jsp/header_base.jsp" %>
+
+<script>
+    //If the user is logged in, start receiving notifications
+    var updateUserNotifications = function(url) {
+        $.get(url, function (r) {
+
+            var notificationCount = 0;
+
+            $(r).each(function (index) {
+                $("#userDropDown li:first-child").after(
+                    "<li><a " +
+                    "href=\"/multiplayer/games?id=" + r[index].gameId +
+                    "\" style=\"width:100%;\">" +
+                    r[index].message +
+                    "</a></li>"
+                )
+
+                if (r[index].eventStatus == "NEW"){
+                    notificationCount += 1;
+                }
+            });
+
+            var lastNotifCount = parseInt($("#notificationCount").html());
+
+            var notifCount =  notificationCount;
+
+            if (lastNotifCount != null && !isNaN(lastNotifCount)){
+                notifCount += lastNotifCount;
+            }
+
+            $("#notificationCount").html(notifCount);
+        });
+    }
+
+    $(document).ready(function() {
+            if ($("#userDropDown").length) {
+                //notifications written here:
+                // refreshed every 5 seconds
+                var interval = 5000;
+                setInterval(function () {
+                    var url = "/game_notifications?userId=" + <%=request.getSession().getAttribute("uid")%> +"&timestamp=" + (new Date().getTime() - interval);
+
+                    updateUserNotifications(url);
+
+                }, interval)
+
+                var url = "/game_notifications?userId=" + <%=request.getSession().getAttribute("uid")%> +"&timestamp=" + 0;
+
+                updateUserNotifications(url);
+            }
+        }
+        );
+</script>
+
 <div class="menu-top bg-light-blue .minus-2 text-white" style="padding: 5px;">
     <div class="full-width" style="padding-top: 3px;">
         <div class="ws-12 container" style="text-align: right; clear:
@@ -36,8 +90,11 @@
                         class="text-white button tab-link bg-minus-1 dropdown-toggle"
                         href="games/user"
                         style="width:100%;" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                    <%=request.getSession().getAttribute("username")%> <span class="glyphicon glyphicon-menu-hamburger" style="float: right;"></span></a>
-                    <ul class="dropdown-menu" style="background-color:
+                    <%=request.getSession().getAttribute("username")%>
+                    (<span id="notificationCount"></span>)
+                    <span class="glyphicon glyphicon-menu-hamburger" style="float: right;"></span></a>
+                    <ul id="userDropDown" class="dropdown-menu"
+                    style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
                         <li><a
                                href="/logout" style="width:100%;">Logout

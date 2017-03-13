@@ -254,6 +254,19 @@
 	</servlet-mapping>
 	<!-- end multiplayer servlets -->
 
+	<!-- Notification JSON Servlets -->
+
+	<servlet>
+		<servlet-name>game_notification</servlet-name>
+		<servlet-class>org.codedefenders.events.EventManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>game_notification</servlet-name>
+		<url-pattern>/game_notifications</url-pattern>
+	</servlet-mapping>
+
+	<!-- End Notification JSON Servlets -->
+
 	<resource-ref>
 		<res-ref-name>jdbc/codedefenders</res-ref-name>
 		<res-type>javax.sql.DataSource</res-type>
