@@ -24,7 +24,31 @@
                 $("#game-notifications").html(oldNotifications);
             });
         });
-    }
+    };
+
+    var toggleNotificationTimer = function(show){
+        //TODO: Show/Hide loading animation
+    };
+
+    var updateGameMutants = function(url) {
+        $.get(url, function (r) {
+            var mutLines = [];
+            $(r).each(function (index) {
+                var mut = r[index];
+
+                for (line in mut.lines){
+                    if (!mutLines[line]){
+                        mutLines[line] = [];
+                    }
+
+                    mutLines.push(mut);
+                }
+            });
+
+            mutantLine(mutLines, "cut-div");
+
+        });
+    };
 
     $(document).ready(function() {
             var interval = 5000;
@@ -35,7 +59,7 @@
                 updateGameNotifications(url);
             }, interval)
         }
-        );
+    );
 </script>
 <h1 style="text-align: center;">Game Log</h1>
 <div class="ws-12" id="game-notifications">

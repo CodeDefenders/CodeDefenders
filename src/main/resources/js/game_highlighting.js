@@ -26,7 +26,7 @@ lineContent = [];
 
 timeoutFunction = null;
 
-var mutantLine = function (lineQuant, superDiv, defender){
+var mutantLine = function (lineQuant, superDiv){
     if (!superDiv){
         superDiv = "#cut-div";
     }
@@ -35,11 +35,14 @@ var mutantLine = function (lineQuant, superDiv, defender){
         var line = parseInt(e.innerHTML);
         allLines[line] = $(e).parent("div").parent("div")[0];
     });
+
+    $(".codedef-line-mutant").remove();
+
     for (var l in lineQuant){
         const lineNum = lineQuant[l][0];
         const quant = lineQuant[l][1];
         const id = "line" + lineQuant[l][0];
-        $(allLines[lineQuant[l][0]]).before('<div id="'+id+'" style="width: 20px; height: 20px; margin-left: 5px; float: left; margin-right: -25px; position: relative; z-index:2000;"><img src="images/mutant.png" alt="' + lineQuant[l][1] + ' mutants on line ' + lineQuant[l][0] + '" width="20" /></div>');
+        $(allLines[lineQuant[l][0]]).before('<div id="'+id+'" style="width: 20px; height: 20px; margin-left: 5px; float: left; margin-right: -25px; position: relative; z-index:2000;" class="codedef-line-mutant"><img src="images/mutant.png" alt="' + lineQuant[l][1] + ' mutants on line ' + lineQuant[l][0] + '" width="20" /></div>');
         const divId = "#" + id;
         var mol = "";
 
@@ -52,10 +55,10 @@ var mutantLine = function (lineQuant, superDiv, defender){
         const mutantsOnLine = mol;
 
         var content = '<span style="background-color: #f00; color: #fff; padding-left: 25px; position: absolute;" id="mutationPopup"> ' + quant + ' mutants on line ' + lineNum + ' (Mutants: ' + mutantsOnLine + ')';
-        if (defender) {
-            content += '<a href="multiplayer/play?equivLine=' + lineQuant[l][0] + '" style="color: #FEFCFC"> Mark Line Equivalent </a>';
-        }
-        content += '</span>'
+            if (lineQuant[l].difference.deltas.length>0) {
+                content += '<a href="multiplayer/play?equivLine=' + lineQuant[l][0] + '" style="color: #FEFCFC"> Mark Line Equivalent </a>';
+                content += '</span>';
+            }
 
         lineContent[lineNum] = content;
 

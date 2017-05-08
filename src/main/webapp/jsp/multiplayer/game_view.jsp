@@ -134,6 +134,10 @@
     Map<Integer, List<Mutant>> mutantLines = new HashMap<>();
     Map<Integer, List<Mutant>> mutantKilledLines = new HashMap<>();
 
+
+    // Ensure that mutants marked equivalent are drawn to display
+    mutantsAlive.addAll(mutantsEquiv);
+
     for (Mutant m : mutantsAlive) {
         for (int line : m.getLines()){
             if (!mutantLines.containsKey(line)){

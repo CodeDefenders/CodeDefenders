@@ -78,7 +78,7 @@ public class DatabaseAccess {
 		Connection conn = null;
 		Statement stmt = null;
 
-		int n = 0;
+		int n = -1;
 
 		try {
 			conn = getConnection();
