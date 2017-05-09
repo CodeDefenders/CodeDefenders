@@ -9,47 +9,6 @@ body {
 	background-color: #fafafa;
 }
 
-#game-notifications {
-	border: 1px solid #000;
-	background-color: #ffffff;
-	height: 200px;
-	overflow-y: scroll;
-	width: 25%;
-	min-width: 480px;
-	margin: 10px auto;
-}
-
-#game-notifications span {
-	border-radius: 3px;
-	padding: 5px;
-	margin: 0px;
-	clear: both;
-}
-
-#game-notifications p {
-	clear: both;
-	float: left;
-	width: 100%;
-	text-align: center
-}
-
-#game-notifications span.gameEvent {
-	background-color: #DEDEDE;
-	margin-left: auto;
-	margin-right: auto;
-
-}
-
-#game-notifications span.attackerEvent {
-	background-color: #FF4444;
-	float: left;
-}
-
-#game-notifications span.defenderEvent {
-	background-color: #66d1ff;
-	float: right;
-}
-
 h2 {
 	font-size: 32px;
 }

@@ -6,22 +6,54 @@
             var notificationCount = 0;
 
             $(r).each(function (index) {
-                var oldNotifications = $("#game-notifications").html();
 
-                var eventClass = "gameEvent"
+                var eventClass = "#game-notifications-game"
 
                  if (r[index].eventType.includes("DEFENDER")){
-                    eventClass = "defenderEvent"
+                    eventClass = "#game-notifications-defenders"
                  } else if (r[index].eventType.includes("ATTACKER")){
-                    eventClass = "attackerEvent"
+                    eventClass = "#game-notifications-attackers"
                 }
 
+                var lastCount = $(eventClass).find(".notif-count");
+
+                var total = parseInt(lastCount.html()) + 1;
+
+                if (isNaN(total)){
+                    total = 1;
+                }
+
+                if (total > 0){
+                    lastCount.parent().show();
+                    lastCount.parent().removeClass("hidden");
+                } else {
+                    lastCount.parent().hide();
+                }
+
+                lastCount.html(total);
+
+                $(eventClass).addClass("notif-alert");
+
+                eventClass += " .events";
+
+                var oldNotifications = $(eventClass).html();
+
                 oldNotifications =
-                    "<p><span class='" + eventClass + "'>" +
+                    "<p><span class=\"event\">" +
                     r[index].message +
                     "</span></p>" + oldNotifications;
 
-                $("#game-notifications").html(oldNotifications);
+                $(eventClass).html(oldNotifications);
+
+                var lastTotalCount = $("#notif-game-total-count");
+
+                var totalCount = parseInt(lastTotalCount.html()) + 1;
+
+                if (isNaN(total)){
+                    total = 1;
+                }
+
+                lastTotalCount.html(totalCount);
             });
         });
     };
@@ -61,7 +93,33 @@
         }
     );
 </script>
-<h1 style="text-align: center;">Game Log</h1>
-<div class="ws-12" id="game-notifications">
+<div id="game-notification-bar" class="min">
+<a id="notification-show-bar"><span>(<span
+id="notif-game-total-count">0</span>)</span>
+</a>
+    <div class="game-notifications min" id="game-notifications-attackers"
+    style="right: 20px;">
+        <a>Attackers<span class="hidden">(<span class="notif-count"></span>)</span></a>
+            <div class="events">
 
-</div> <!-- col-md-6 left bottom -->
+    &nbsp;
+            </div>
+    </div>
+
+     <div class="game-notifications min" id="game-notifications-defenders"
+     style="right: 220px;">
+        <a>Defenders<span class="hidden">(<span class="notif-count"></span>)</span></a>
+            <div class="events">
+
+            &nbsp;
+            </div>
+     </div>
+
+     <div class="game-notifications min" id="game-notifications-game"
+     style="right: 420px;">
+        <a>Game<span class="hidden">(<span class="notif-count"></span>)</span></a>
+            <div class="events">
+    &nbsp;
+        </div>
+     </div><!-- col-md-6 left bottom -->
+</div>

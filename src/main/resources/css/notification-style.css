@@ -1,0 +1,128 @@
+.game-notifications, .game-notifications.min {
+    border: 1px solid #000;
+    border-radius: 1px;
+    position: fixed;
+    top: 100%;
+    padding: 0px;
+
+    width: 200px;
+
+    z-index: 100000;
+
+    padding: 5px;
+
+    margin: 0px;
+
+    margin-top: -28px;
+    height: 28px;
+}
+
+#game-notifications-defenders {
+    background-color: #66d1ff;
+    color: white;
+}
+
+#game-notifications-attackers {
+    background-color: #FF4444;
+    color: white;
+}
+
+#game-notifications-game {
+    background-color: #DEDEDE;
+    color: black;
+}
+
+#game-notification-bar .game-notifications a {
+    font-size: 14px;
+    width: 100%;
+    height: 24px;
+    padding: 0px;
+    min-width: 200px;
+    margin: 0px;
+    color: #000;
+    margin: 5px;
+}
+
+#game-notification-bar .game-notifications a:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.game-notifications.expand {
+    height: 256px;
+    width: 200px;
+    margin-top: -256px;
+    z-index: 11000000;
+    padding: 0px;
+}
+
+.game-notifications .events {
+    width: 100%;
+    height: 190px;
+    overflow-y: scroll;
+    background-color: #FFFFFF;
+    border: 1px solid #000;
+    margin: 0px;
+    padding: 0px;
+    color: #000000;
+}
+
+.game-notifications .events p {
+    line-height: 16px;
+    text-align: left;
+    text-indent: 0px;
+    padding: 5px 5px;
+}
+
+.game-notifications.notif-alert a {
+    font-weight: bolder;
+}
+
+#game-notification-bar {
+    margin: 0px;
+    padding: 0px;
+    position: fixed;
+    z-index: 100000;
+    float: left;
+    left: 100%;
+    top:100%;
+    font-size: 14px;
+    margin-top: -28px;
+    height: 38px;
+}
+
+#game-notification-bar.min {
+    margin-left: -36px;
+
+    width: 36px;
+}
+
+#game-notification-bar.expand {
+    margin-left: -657px;
+    width: 657px;
+}
+
+#notification-show-bar {
+    width: 34px;
+    height: 38px;
+    color: #fff;
+    background-color: #fff;
+    border: 1px solid black;
+    font-size: 18px;
+    margin: 0px;
+    padding: 6px 3px;
+}
+
+#notification-show-bar span:first-child {
+    color: black;
+    margin-top: 12px;
+    background-color: #DEDEDE;
+    border: 1px solid #CCCCCC;
+    font-size: 14px;
+    padding: 6px 3px;
+    height: 36px;
+}
+
+#game-notification-bar a:hover{
+    cursor: pointer;
+}
