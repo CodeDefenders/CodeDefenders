@@ -1,6 +1,21 @@
 /**
  * Created by thomas on 09/05/2017.
  */
+
+var sendMessage = function(elem){
+    var ele = $(elem);
+    if (ele.attr("target") && ele.attr("gameId")) {
+        var url = "/messages/send?message=" + encodeURI($(ele.parent().find("input")).val()) + "&target=" + ele.attr("target") + "&gameId=" + ele.attr("gameId");
+        $.get(url, function (r) {
+            if (r.status != "Success"){
+                window.alert("Could not send message: " + r.status);
+            } else {
+                //TODO: Put newly sent message here.
+            }
+        });
+    }
+};
+
 $(document).ready(function() {
         $(".game-notifications a").click(function (e) {
             var parent = $(e.target).parent();
@@ -40,5 +55,10 @@ $(document).ready(function() {
         $("#game-notification-bar").removeClass("expand");
         $("#game-notification-bar").addClass("min");
         $(".game-notifications").hide();
+        $(".send-message button").click(function(e){
+            alert("message")
+            sendMessage(e.target);
+        });
+
     }
 );

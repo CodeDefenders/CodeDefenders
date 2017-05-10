@@ -4,12 +4,13 @@
     position: fixed;
     top: 100%;
     padding: 0px;
+    background-color: white;
 
     width: 200px;
 
     z-index: 100000;
 
-    padding: 5px;
+    padding: 0px;
 
     margin: 0px;
 
@@ -17,30 +18,30 @@
     height: 28px;
 }
 
-#game-notifications-defenders {
+#game-notifications-defenders a {
     background-color: #66d1ff;
     color: white;
 }
 
-#game-notifications-attackers {
+#game-notifications-attackers a {
     background-color: #FF4444;
     color: white;
 }
 
-#game-notifications-game {
+#game-notifications-game a {
     background-color: #DEDEDE;
     color: black;
 }
 
 #game-notification-bar .game-notifications a {
     font-size: 14px;
-    width: 100%;
     height: 24px;
     padding: 0px;
-    min-width: 200px;
-    margin: 0px;
+    width: 200px;
     color: #000;
-    margin: 5px;
+    padding: 5px;
+    margin: 0px;
+    float: left;
 }
 
 #game-notification-bar .game-notifications a:hover {
@@ -53,12 +54,13 @@
     width: 200px;
     margin-top: -256px;
     z-index: 11000000;
+    background-color: white;
     padding: 0px;
 }
 
 .game-notifications .events {
     width: 100%;
-    height: 190px;
+    height: 200px;
     overflow-y: scroll;
     background-color: #FFFFFF;
     border: 1px solid #000;
@@ -67,6 +69,26 @@
     color: #000000;
 }
 
+.game-notifications input {
+    background-color: #FFFFFF;
+    border: 1px solid #000;
+    margin: 0px;
+    padding: 0px;
+    color: #000000;
+    width: 180px;
+    float: left;
+    height: 31px;
+    padding: 2px;
+}
+
+.game-notifications button {
+    float:right;
+    border: none;
+    background-color: white;
+    width: 18px;
+    height: 35px;
+    border-left: 1px solid black;
+}
 .game-notifications .events p {
     line-height: 16px;
     text-align: left;
@@ -93,7 +115,6 @@
 
 #game-notification-bar.min {
     margin-left: -36px;
-
     width: 36px;
 }
 

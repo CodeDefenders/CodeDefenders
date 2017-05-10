@@ -117,6 +117,34 @@ public class DatabaseAccess {
 		}
 	}
 
+	public static void insertMessage(int uid, String ipAddress) {
+		Connection conn =  null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			String sql = String.format("INSERT INTO events (User_ID, IP_Address) VALUES ('%d', '%s');", uid, ipAddress);
+
+			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+
+			ResultSet rs = stmt.getGeneratedKeys();
+
+			if (rs.next()) {
+				stmt.close();
+				conn.close();
+			}
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(conn, stmt);
+		}
+	}
+
 
 	public static ArrayList<Event> getEventsForGame(int gameId) {
 		String sql = String.format("SELECT * FROM events WHERE Game_ID='%d' " +

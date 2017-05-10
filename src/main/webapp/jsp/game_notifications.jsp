@@ -104,6 +104,11 @@ id="notif-game-total-count">0</span>)</span>
 
     &nbsp;
             </div>
+            <div class="send-message">
+                <input type="text" placeholder="send message" />
+                <button gameId="<%=gameId%>" target="ATTACKER_MESSAGE">&gt;
+                </button>
+            </div>
     </div>
 
      <div class="game-notifications min" id="game-notifications-defenders"
@@ -113,6 +118,11 @@ id="notif-game-total-count">0</span>)</span>
 
             &nbsp;
             </div>
+            <div class="send-message">
+                <input type="text" placeholder="send message" />
+                <button gameId="<%=gameId%>" target="DEFENDER_MESSAGE">&gt;
+                </button>
+            </div>
      </div>
 
      <div class="game-notifications min" id="game-notifications-game"
@@ -120,6 +130,11 @@ id="notif-game-total-count">0</span>)</span>
         <a>Game<span class="hidden">(<span class="notif-count"></span>)</span></a>
             <div class="events">
     &nbsp;
+        </div>
+        <div class="send-message">
+            <input disabled="true" type="text"
+            placeholder="Cannot send game messages" />
+            <button>&gt;</button>
         </div>
      </div><!-- col-md-6 left bottom -->
 </div>
