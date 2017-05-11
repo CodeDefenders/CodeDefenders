@@ -2,6 +2,7 @@ package org.codedefenders;
 
 import org.codedefenders.util.DatabaseAccess;
 
+import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -39,6 +40,77 @@ public class TargetExecution {
 		this(tid, mid, target, status, message);
 		this.id = id;
 		this.timestamp = Timestamp.valueOf(timestamp);
+	}
+
+	public boolean insertStory() {
+
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		String sql = null;
+
+		try {
+
+			System.out.println("Inserting " + toString());
+
+			conn = DatabaseAccess.getConnection();
+
+			if (testId == 0) {
+				System.out.println("- No Test ID");
+				if (mutantId == 0) {
+					System.out.println("- No Mutant ID");
+					pstmt = conn.prepareStatement("INSERT INTO storytargetexecutions (Target, Status, Message) VALUES (?, ?, ?);", new String[]{"TargetExecution_ID"});
+					pstmt.setString(1, target.name());
+					pstmt.setString(2, status);
+					pstmt.setString(3, message == null ? "" : message.length() <= 2000 ? message : message.substring(0,1999));
+				} else {
+					pstmt = conn.prepareStatement("INSERT INTO storytargetexecutions (Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
+					pstmt.setInt(1, mutantId);
+					pstmt.setString(2, target.name());
+					pstmt.setString(3, status);
+					pstmt.setString(4, message == null ? "" : message.length() <= 2000 ? message : message.substring(0,1999));
+				}
+			} else {
+				if (mutantId == 0) {
+					System.out.println("- No Mutant ID");
+					pstmt = conn.prepareStatement("INSERT INTO storytargetexecutions (Test_ID, Target, Status, Message) VALUES (?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
+					pstmt.setInt(1, testId);
+					pstmt.setString(2, target.name());
+					pstmt.setString(3, status);
+					pstmt.setString(4, message == null ? "" : message.length() <= 2000 ? message : message.substring(0,1999));
+				} else {
+					pstmt = conn.prepareStatement("INSERT INTO storytargetexecutions (Test_ID, Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
+					pstmt.setInt(1, testId);
+					pstmt.setInt(2, mutantId);
+					pstmt.setString(3, target.name());
+					pstmt.setString(4, status);
+					pstmt.setString(5, message == null ? "" : message.length() <= 2000 ? message : message.substring(0,1999));
+				}
+			}
+
+			pstmt.execute();
+			System.out.println("SQL Statement executed");
+
+			ResultSet rs = pstmt.getGeneratedKeys();
+
+			if (rs.next()) {
+				System.out.println("Retrieving execution keys for ID");
+				this.id = rs.getInt(1);
+				System.out.println(this.id);
+				pstmt.close();
+				conn.close();
+				return true;
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			DatabaseAccess.cleanup(conn, pstmt);
+		}
+
+		return false;
+
 	}
 
 	public boolean insert() {

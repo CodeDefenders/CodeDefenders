@@ -83,7 +83,6 @@ public class Test {
 
 	public Test(int tid, int gid, String jFile, String cFile, int roundCreated, int mutantsKilled, int playerId) {
 		this(gid, jFile, cFile, playerId);
-
 		this.id = tid;
 		this.roundCreated = roundCreated;
 		this.mutantsKilled = mutantsKilled;

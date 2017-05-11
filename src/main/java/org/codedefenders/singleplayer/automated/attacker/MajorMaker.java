@@ -81,10 +81,7 @@ public class MajorMaker {
 		//Copy contents of original lines.
 		List<String> newLines = new ArrayList<String>(lines);
 		String l = newLines.get(patch.getLineNum() - 1);
-		String pOrig = patch.getOriginal();
-		//TODO: Check the validity of the escape char fixing in the replacement below (ie replace QE ...)
-		String pRepl = patch.getReplacement().replace("QE","");
-		String newLine = l.replaceFirst(Pattern.quote(pOrig), pRepl);
+		String newLine = l.replaceFirst(patch.getOriginal(), patch.getReplacement().replace("QE", ""));
 		newLines.set(patch.getLineNum() - 1, newLine);
 		return newLines;
 	}

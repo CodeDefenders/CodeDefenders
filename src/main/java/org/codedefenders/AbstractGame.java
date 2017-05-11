@@ -1,10 +1,10 @@
 package org.codedefenders;
 
-import org.codedefenders.events.Event;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.crypto.Data;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,7 +24,19 @@ public abstract class AbstractGame {
 	protected GameLevel level;
 	protected GameMode mode;
 
-	protected ArrayList<Event> events = null;
+	protected int levelNum;
+	protected int puzzleId;
+	protected int levelId;
+	protected int puzzle;
+	protected int points;
+	protected String puzzleName;
+	protected String storyName;
+	protected String alias;
+	protected String hint;
+	protected String desc;
+	protected boolean canModify;
+	protected StoryState storyState;
+	protected PuzzleMode storyMode;
 
 	public int getId() {
 		return id;
@@ -38,17 +50,17 @@ public abstract class AbstractGame {
 		return DatabaseAccess.getClassForKey("Class_ID", classId).getName();
 	}
 
-	public ArrayList<Event> getEvents(){
-		if (events == null){
-			events = DatabaseAccess.getEventsForGame(getId());
-		}
-
-		return events;
-	}
-
 	public GameClass getCUT() {
 		return DatabaseAccess.getClassForKey("Class_ID", classId);
 	}
+
+	public StoryClass getPCUT() { return DatabaseAccess.getStoryForKey(classId); }
+
+	public StoryClass getPTest() { return DatabaseAccess.getTestForPuzzleId(puzzleId); }
+
+	public StoryClass getUserPuzzleTest() { return DatabaseAccess.getUserPuzzleTest(puzzleId, id); }
+
+	public StoryClass getUserPuzzleMutant() { return DatabaseAccess.getUserPuzzleMutant(puzzleId, id); }
 
 	public int getCreatorId() {
 		return creatorId;
@@ -75,6 +87,39 @@ public abstract class AbstractGame {
 	}
 
 	protected void setMode(GameMode newMode) { this.mode = newMode; }
+
+	//story
+	public int getLevelNum() { return levelNum; }
+
+	public int getPuzzleId() { return puzzleId; }
+
+	public int getLevelId() { return levelId; }
+
+	public int getPuzzle() { return puzzle; }
+
+	public int getPoints() { return points; }
+
+	public void setPoints(int p) { this.points = p; }
+
+	public String getPuzzleName() { return puzzleName; }
+
+	public StoryState getStoryState() { return this.storyState; }
+
+	public void setStoryState(StoryState s) { this.storyState = s; }
+
+	public PuzzleMode getStoryMode() { return this.storyMode; }
+
+	protected void setStoryMode(PuzzleMode newSMode) { this.storyMode = newSMode; }
+
+	public String getStoryName() { return storyName; }
+
+	public String getAlias() { return alias; }
+
+	public String getHint() { return hint; }
+
+	public String getDesc() { return desc; }
+
+	//end
 
 	public List<Test> getTests() {
 		return getTests(false);
@@ -108,6 +153,45 @@ public abstract class AbstractGame {
 		return null;
 	}
 
+	public List<PuzzleTest> getPTests() {
+
+		return getPTests(false);
+
+	}
+
+	public List<PuzzleTest> getPTests(boolean defendersOnly) {
+
+		return DatabaseAccess.getExecutablePTests(this.puzzleId,defendersOnly);
+
+	}
+
+	public List<PuzzleMutant> getPMutants() { return DatabaseAccess.getMutantsforPuzzle(puzzleId); }
+
+	public List<PuzzleMutant> getAlivePMutants() {
+
+		return getPMutants().stream().filter(puzzleMutant -> puzzleMutant.isAlive() &&
+				puzzleMutant.getEquivalent().equals(PuzzleMutant.Equivalence.ASSUMED_NO) &&
+				puzzleMutant.getClassFile() != null).collect(Collectors.toList());
+
+	}
+
+	public List<PuzzleMutant> getKilledPMutants() {
+
+		return getPMutants().stream().filter(puzzleMutant -> !puzzleMutant.isAlive() &&
+				(puzzleMutant.getEquivalent().equals(ASSUMED_NO) || puzzleMutant.getEquivalent().equals(PROVEN_NO)) &&
+				(puzzleMutant.getClassFile() != null)).collect(Collectors.toList());
+	}
+
+	public PuzzleMutant getPMutantByID(int mid) {
+
+		for (PuzzleMutant m : getPMutants()) {
+			if (m.getMutantId() == mid)
+				return m;
+		}
+
+		return null;
+
+	}
 
 	public abstract boolean addPlayer(int userId, Role role);
 

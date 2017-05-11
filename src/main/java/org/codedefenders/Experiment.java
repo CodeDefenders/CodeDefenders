@@ -1,5 +1,8 @@
 package org.codedefenders;
 
+import org.codedefenders.story.StoryGame;
+import org.codedefenders.util.DatabaseAccess;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -9,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**

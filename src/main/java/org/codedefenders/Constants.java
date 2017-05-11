@@ -18,13 +18,7 @@ public class Constants {
 
 		String dataHome = (String) env.get("CODEDEFENDERS_DATA");
 		if (dataHome == null) {
-			if (System.getProperty("os.name").toLowerCase().contains("windows")){
-				dataHome = System.getProperty("codedefenders.data",
-						"C:/codedefenders-data");
-			} else {
-				dataHome = System.getProperty("codedefenders.data",
-						"/var/lib/codedefenders");
-			}
+			dataHome = System.getProperty("codedefenders.data", "/var/lib/codedefenders");
 		}
 
 		DATA_DIR = dataHome;
@@ -35,12 +29,14 @@ public class Constants {
 	public static String MUTANTS_DIR = DATA_DIR + F_SEP + "mutants";
 	public static String TESTS_DIR   = DATA_DIR + F_SEP + "tests";
 	public static String AI_DIR      = DATA_DIR + F_SEP + "ai";
+	public static String PUZZLE_MUTANTS_DIR = DATA_DIR + F_SEP + "puzzles" + F_SEP + "mutants";
+	public static String PUZZLE_TESTS_DIR = DATA_DIR + F_SEP + "puzzles" + F_SEP + "tests";
 
 	public static final String TEST_PREFIX = "Test";
 	public static final String JAVA_SOURCE_EXT = ".java";
 	public static final String JAVA_CLASS_EXT = ".class";
 	public static final String TEST_INFO_EXT = ".xml";
-	public static final String SUITE_EXT = "_ESTest";
+	public static final String SUITE_EXT = "EvoSuiteTest";
 
 	public static final String GRACE_PERIOD_MESSAGE = "Game is now in grace period.";
 
@@ -50,6 +46,10 @@ public class Constants {
 	public static final String DEFENDER_VIEW_JSP        = "jsp" + F_SEP + "defender_view.jsp";
 	public static final String SCORE_VIEW_JSP           = "jsp" + F_SEP + "score_view.jsp";
 	public static final String UTESTING_VIEW_JSP        = "jsp" + F_SEP + "utesting_view.jsp";
+	public static final String STORY_ATT_VIEW_JSP 		= "jsp" + F_SEP + "story" + F_SEP + "attacker_view.jsp";
+	public static final String STORY_DEF_VIEW_JSP 		= "jsp" + F_SEP + "story" + F_SEP + "defender_view.jsp";
+	public static final String STORY_ATT_RES_VIEW_JSP	= "jsp" + F_SEP + "story" + F_SEP + "attacker_results_view.jsp";
+	public static final String STORY_DEF_RES_VIEW_JSP 	= "jsp" + F_SEP + "story" + F_SEP + "defender_results_view.jsp";
 
 	// Messages
 	public static final String WINNER_MESSAGE = "You won!";
@@ -78,6 +78,14 @@ public class Constants {
 	public static final String MUTANT_SUBMITTED_MESSAGE = "Mutant submitted, may the force be with it.";
 	public static final String MUTANT_ALIVE_1_MESSAGE = "Cool, your mutant is alive.";
 	public static final String MUTANT_ALIVE_N_MESSAGE = "Awesome, your mutant survived %d existing tests!"; // number of tests
+
+	public static final String PUZZLE_MUTANT_DEAD_MESSAGE = "The test killed your mutant. Better luck next time!";
+	public static final String PUZZLE_MUTANT_HALF_MESSAGE = "The test killed some of your mutants! Nearly there!";
+	public static final String PUZZLE_MUTANT_ALIVE_MESSAGE = "Your mutant survived! Congratulations!";
+	public static final String PUZZLE_TEST_FAIL_MESSAGE = "The mutant survived your test. Better luck next time!";
+	public static final String PUZZLE_TEST_HALF_MESSAGE = "Not all mutants were killed! Nearly there!";
+	public static final String PUZZLE_TEST_SUCCESS_MESSAGE = "Your tests killed all the mutants! Congratulations!";
+
 	// JSP
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_TEST = "previousTest";
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_MUTANT = "previousMutant";

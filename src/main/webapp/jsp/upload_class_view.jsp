@@ -89,6 +89,7 @@
 				editorDiff.setSize("100%", 500);
 			}
 		});
+
 	</script>
 </div>
 <%@ include file="/jsp/footer.jsp" %>

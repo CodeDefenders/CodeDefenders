@@ -4,7 +4,6 @@ import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.singleplayer.AiPlayer;
-import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.singleplayer.PrepareAI;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
@@ -39,35 +38,32 @@ public class AiDefender extends AiPlayer {
 		return runTurn(GenerationMethod.RANDOM);
 	}
 
-	/**
-	 * Attempts to submit a test, according to a strategy
-	 * @param strat Generation strategy to use
-	 * @return true if test submitted, false otherwise
-	 */
 	protected boolean runTurn(GenerationMethod strat) {
 		try {
 			int tNum = selectTest(strat);
-			useTestFromSuite(tNum);
-		} catch (NoTestsException e) {
-			//No more choices remain - do nothing
-			return false;
+			try {
+				useTestFromSuite(tNum);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			}
 		} catch (Exception e) {
-			//Something's gone wrong
 			e.printStackTrace();
-			return false;
+			//Assume no more choices remain.
+			//Do nothing.
 		}
 
 		return true;
 	}
 
-	private int selectTest(GenerationMethod strategy) throws NoTestsException, NoDummyGameException {
+	private int selectTest(GenerationMethod strategy) throws Exception {
 
 		List<Integer> usedTests = DatabaseAccess.getUsedAiTestsForGame(game);
 		GameClass cut = game.getCUT();
 		DuelGame dummyGame = cut.getDummyGame();
 
 		//TODO: Discarding useless tests in origtests would be a sideeffect
-		List<Test> candidateTests = dummyGame.getTests().stream().filter(test -> !usedTests.contains(test.getId())).collect(Collectors.toList());
+		List<Test> candidateTests = dummyGame.getTests().stream().filter(test -> !usedTests.contains(test.getId()) && test.getAiMutantsKilled() > 0).collect(Collectors.toList());
 
 		if(candidateTests.isEmpty()) {
 			throw new NoTestsException("All generated tests have already been used.");
@@ -85,7 +81,24 @@ public class AiDefender extends AiPlayer {
 
 			default:
 				throw new UnsupportedOperationException("Invalid strategy for AI defender");
+
 		}
+
+		// TODO: Unreachable code:
+		//If standard strategy fails, choose first non-selected test.
+//		for (int x = 0; x < totalTests; x++) {
+//
+//			Test origT = origTests.get(x);
+//			t = origT.getId();
+//
+//			if(!usedTests.contains(t)) {
+//				//Unused test found.
+//				return t;
+//			}
+//		}
+//
+//		//Something went wrong.
+//		throw e;
 	}
 
 	private int getTestIdByCoverage(List<Test> possibleTests) {
@@ -145,7 +158,7 @@ public class AiDefender extends AiPlayer {
 		return selected.getId();
 	}
 
-	private void useTestFromSuite(int origTestNum) throws NoDummyGameException{
+	private void useTestFromSuite(int origTestNum) throws IOException, Exception {
 		GameClass cut = game.getCUT();
 		DuelGame dummyGame = cut.getDummyGame();
 		List<Test> origTests = dummyGame.getTests();

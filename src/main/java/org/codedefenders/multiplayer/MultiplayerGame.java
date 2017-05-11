@@ -2,16 +2,11 @@ package org.codedefenders.multiplayer;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.*;
-import org.codedefenders.events.Event;
-import org.codedefenders.events.EventStatus;
-import org.codedefenders.events.EventType;
 import org.codedefenders.util.DatabaseAccess;
 
-import java.awt.image.DataBuffer;
 import java.sql.*;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -185,29 +180,7 @@ public class MultiplayerGame extends AbstractGame {
 							"VALUES (%d, %d, 0, '%s') " +
 							"ON DUPLICATE KEY UPDATE Role='%3$s', Active=TRUE;",
 					id, userId, role);
-
-			if (DatabaseAccess.executeUpdate(sql)){
-
-				User u = DatabaseAccess.getUser(userId);
-
-				EventType et = role.equals(Role.ATTACKER) ?
-						EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
-				Event e = new Event(-1, id, userId, u.getUsername() + " joined the game as " +
-						"" + role,
-						et, EventStatus.GAME,
-						new Timestamp(System.currentTimeMillis()));
-				e.insert();
-
-				EventType notifType = role.equals(Role.ATTACKER) ?
-						EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
-				Event notif = new Event(-1, id, userId, "You joined a game " +
-						"as " +
-						"" + role,
-						notifType, EventStatus.NEW,
-						new Timestamp(System.currentTimeMillis()));
-				notif.insert();
-				return true;
-			}
+			return DatabaseAccess.executeUpdate(sql);
 		}
 		return false;
 	}
@@ -448,111 +421,5 @@ public class MultiplayerGame extends AbstractGame {
 			totalScore += m.getDefenderPoints();
 		logger.debug("Defender Score: " + totalScore);
 		return totalScore;
-	}
-
-	public void notifyPlayers(){
-		ArrayList<Event> events = getEvents();
-
-		EventType e = null;
-
-		switch (state){
-			case ACTIVE:
-				if (!listContainsEvent(events, EventType.GAME_STARTED)){
-					EventType et = EventType.GAME_STARTED;
-					notifyAttackers("Game has started. Attack now!",
-							et);
-					notifyDefenders("Game has started. Defend now!",
-							et);
-					notifyCreator("Your game as started!", et);
-					notifyGame("The game has started!", et);
-				}
-				break;
-			case GRACE_ONE:
-				if (!listContainsEvent(events, EventType.GAME_GRACE_ONE)){
-					EventType et = EventType.GAME_GRACE_ONE;
-					notifyAttackers("A game has entered Grace One.",
-							et);
-					notifyDefenders("A game has entered Grace One.",
-							et);
-					notifyCreator("Your game has entered Grace One", et);
-					notifyGame("The game as entered Grace Period One", et);
-				}
-				break;
-			case GRACE_TWO:
-				if (!listContainsEvent(events, EventType.GAME_GRACE_TWO)){
-					EventType et = EventType.GAME_GRACE_TWO;
-					notifyAttackers("A game has entered Grace Two.",
-							et);
-					notifyDefenders("A game has entered Grace Two.",
-							et);
-					notifyCreator("Your game has entered Grace Two", et);
-					notifyGame("The game as entered Grace Period Two", et);
-				}
-				break;
-			case FINISHED:
-				if (!listContainsEvent(events, EventType.GAME_FINISHED)){
-					EventType et = EventType.GAME_FINISHED;
-					notifyAttackers("A game has finised.",
-							et);
-					notifyDefenders("A game has finished.",
-							et);
-					notifyCreator("Your game has finished.", et);
-					notifyGame("The game has ended.", et);
-				}
-				break;
-		}
-	}
-
-	private boolean listContainsEvent(List<Event> events, EventType et){
-		for (Event e : events){
-			if (e.getEventType().equals(et)){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public void notifyAttackers(String message, EventType et){
-
-		for (int attacker : getAttackerIds()){
-			Event notif = new Event(-1, id,
-					DatabaseAccess.getUserFromPlayer(attacker).getId(),
-					message,
-					et, EventStatus.NEW,
-					new Timestamp(System.currentTimeMillis()));
-			notif.insert();
-		}
-	}
-
-	public void notifyDefenders(String message, EventType et){
-		for (int defender : getDefenderIds()){
-			Event notif = new Event(-1, id,
-					DatabaseAccess.getUserFromPlayer(defender).getId(),
-					message,
-					et, EventStatus.NEW,
-					new Timestamp(System.currentTimeMillis()));
-			notif.insert();
-		}
-	}
-
-	public void notifyCreator(String message, EventType et){
-		//Event for game log: started
-		Event notif = new Event(-1, id,
-				getCreatorId(),
-				message,
-				et, EventStatus.NEW,
-				new Timestamp(System.currentTimeMillis()));
-		notif.insert();
-	}
-
-	public void notifyGame(String message, EventType et){
-
-		//Event for game log: started
-		Event notif = new Event(-1, id,
-				getCreatorId(),
-				message,
-				et, EventStatus.GAME,
-				new Timestamp(System.currentTimeMillis()));
-		notif.insert();
 	}
 }

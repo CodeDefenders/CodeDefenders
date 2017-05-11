@@ -1,9 +1,6 @@
 package org.codedefenders.multiplayer;
 
 import org.codedefenders.*;
-import org.codedefenders.events.Event;
-import org.codedefenders.events.EventStatus;
-import org.codedefenders.events.EventType;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +39,6 @@ public class MultiplayerGameManager extends HttpServlet {
 					logger.info("Starting multiplayer game {} (Setting state to ACTIVE)", activeGame.getId());
 					activeGame.setState(GameState.ACTIVE);
 					activeGame.update();
-
 				}
 				break;
 			}
@@ -52,7 +47,6 @@ public class MultiplayerGameManager extends HttpServlet {
 					logger.info("Ending multiplayer game {} (Setting state to FINISHED)", activeGame.getId());
 					activeGame.setState(GameState.FINISHED);
 					activeGame.update();
-
 					response.sendRedirect("games");
 					return;
 				} else {
@@ -98,15 +92,6 @@ public class MultiplayerGameManager extends HttpServlet {
 							if (mPending.getEquivalent().equals(PROVEN_NO)) {
 								logger.info("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
 								newTest.setScore(0); // score 2 points for proving a mutant non-equivalent
-								Event notif = new Event(-1, activeGame.getId(),
-										uid,
-										DatabaseAccess.getUser(uid)
-												.getUsername() +
-										" killed a mutant in an equivalence " +
-												"duel.",
-										EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
-										new Timestamp(System.currentTimeMillis()));
-								notif.insert();
 								if (mPending.getId() == currentEquivMutantID)
 									killedClaimed = true;
 								else
@@ -115,16 +100,6 @@ public class MultiplayerGameManager extends HttpServlet {
 								if (mPending.getId() == currentEquivMutantID) {
 									// only kill the one mutant that was claimed
 									mPending.kill(ASSUMED_YES);
-									Event notif = new Event(-1, activeGame.getId(),
-											uid,
-											DatabaseAccess.getUser(uid)
-													.getUsername() + " lost " +
-													"an equivalence duel. " +
-													"Mutant is assumed " +
-													"equivalent.",
-											EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
-											new Timestamp(System.currentTimeMillis()));
-									notif.insert();
 								}
 								logger.info("Test {} failed to kill mutant {}, hence mutant is assumed equivalent", newTest.getId(), mPending.getId());
 							}
@@ -173,15 +148,6 @@ public class MultiplayerGameManager extends HttpServlet {
 					if (newMutant != null) {
 						TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 						if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
-							Event notif = new Event(-1, activeGame.getId(),
-									uid,
-									DatabaseAccess.getUser(uid)
-											.getUsername() + " created a " +
-											"mutant.",
-									EventType.ATTACKER_MUTANT_CREATED, EventStatus
-									.GAME,
-									new Timestamp(System.currentTimeMillis()));
-							notif.insert();
 							messages.add(MUTANT_COMPILED_MESSAGE);
 							MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
 							activeGame.update();
@@ -220,18 +186,8 @@ public class MultiplayerGameManager extends HttpServlet {
 						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 						if (testOriginalTarget.status.equals("SUCCESS")) {
 							messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-
-							Event notif = new Event(-1, activeGame.getId(),
-									uid,
-									DatabaseAccess.getUser(uid)
-											.getUsername() + " created a test",
-									EventType.DEFENDER_TEST_CREATED, EventStatus.GAME,
-									new Timestamp(System.currentTimeMillis()));
-							notif.insert();
-
 							MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
 							activeGame.update();
-
 						} else {
 							// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
 							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
@@ -248,7 +204,6 @@ public class MultiplayerGameManager extends HttpServlet {
 				}
 				break;
 		}
-
 		response.sendRedirect("play");//doGet(request, response);
 	}
 

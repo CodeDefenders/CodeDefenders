@@ -1,5 +1,5 @@
-TOMCAT_PASSWORD=
-MYSQL_PASSWORD=
+TOMCAT_PASSWORD=password
+MYSQL_PASSWORD=password
 
 default:
 # After it has been deployed a first time

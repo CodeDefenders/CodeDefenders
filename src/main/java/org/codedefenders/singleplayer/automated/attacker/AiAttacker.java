@@ -3,9 +3,7 @@ package org.codedefenders.singleplayer.automated.attacker;
 import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.singleplayer.AiPlayer;
-import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.singleplayer.PrepareAI;
-import org.codedefenders.singleplayer.automated.defender.NoTestsException;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,28 +47,22 @@ public class AiAttacker extends AiPlayer {
 		return runTurn(GenerationMethod.RANDOM);
 	}
 
-	/**
-	 * Attempts to submit a mutant, according to a strategy
-	 * @param strat Generation strategy to use
-	 * @return true if mutant submitted, false otherwise
-	 */
 	protected boolean runTurn(GenerationMethod strat) {
 		try {
 			int mNum = selectMutant(strat);
 			useMutantFromSuite(mNum);
-		} catch (NoMutantsException e) {
-			//No more unused mutants remain,
-			return false;
-		} catch (Exception e) {
-			//Something's gone wrong
+		} catch (IOException e) {
 			e.printStackTrace();
 			return false;
+		} catch (Exception e) {
+			//Assume no more unused mutants remain, do nothing.
+			logger.info("something went wrong; skipping turn");
 		}
 
 		return true;
 	}
 
-	private int selectMutant(GenerationMethod strategy) throws NoMutantsException, NoDummyGameException {
+	private int selectMutant(GenerationMethod strategy) throws Exception {
 		List<Integer> usedMutants = DatabaseAccess.getUsedAiMutantsForGame(game);
 		GameClass cut = game.getCUT();
 
@@ -104,7 +96,7 @@ public class AiAttacker extends AiPlayer {
 		}
 	}
 
-	private void useMutantFromSuite(int origMutNum) throws NoMutantsException, NoDummyGameException {
+	private void useMutantFromSuite(int origMutNum) throws IOException, Exception {
 		GameClass cut = game.getCUT();
 		DuelGame dummyGame = cut.getDummyGame();
 		List<Mutant> origMutants = dummyGame.getMutants();

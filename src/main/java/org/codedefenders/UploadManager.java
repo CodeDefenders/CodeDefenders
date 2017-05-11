@@ -43,6 +43,9 @@ public class UploadManager extends HttpServlet {
 		HttpSession session = request.getSession();
 		ArrayList<String> messages = new ArrayList<>();
 		session.setAttribute("messages", messages);
+		HttpServletRequest httpReq = (HttpServletRequest) request;
+		HttpSession userSession = httpReq.getSession();
+		Integer uid = (Integer) userSession.getAttribute("uid");
 
 		System.out.println("Uploading CUT");
 
@@ -104,7 +107,7 @@ public class UploadManager extends HttpServlet {
 		if (classAlias != null && !classAlias.isEmpty()) {
 			// check if basename exists as CUT dir
 			logger.info("Checking if alias {0} is a good directory to store the class", classAlias);
-			GameClass cut = new GameClass("", classAlias, "", "");
+			GameClass cut = new GameClass("", classAlias, "", "", uid);
 			if (cut.insert()) {
 				storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI);
 				return;
@@ -115,7 +118,7 @@ public class UploadManager extends HttpServlet {
 		// try with basename as alias
 		String baseName = FilenameUtils.getBaseName(fileName);
 		logger.info("Checking if base name {0} is a good directory to store the class", baseName);
-		GameClass cut = new GameClass("", baseName, "", "");
+		GameClass cut = new GameClass("", baseName, "", "", uid);
 		if (cut.insert()) {
 			storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI);
 			return;
@@ -124,7 +127,7 @@ public class UploadManager extends HttpServlet {
 
 		// now try fully qualified name
 		String fullName = getFullyQualifiedName(fileName, fileContent);
-		cut = new GameClass("", fullName, "", "");
+		cut = new GameClass("", fullName, "", "", uid);
 		logger.info("Checking if full name {0} is a good directory to store the class", fullName);
 		if (cut.insert()) {
 			storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI);
@@ -132,7 +135,7 @@ public class UploadManager extends HttpServlet {
 		} else {
 			// Neither alias nor basename or fullname are good, make up a name using a suffix
 			int index = 2;
-			cut = new GameClass("", baseName + index, "", "");
+			cut = new GameClass("", baseName + index, "", "", uid);
 			while (! cut.insert()) {
 				index++;
 				cut.setAlias(baseName + index);
@@ -147,6 +150,7 @@ public class UploadManager extends HttpServlet {
 
 		String cutDir = Constants.CUTS_DIR + Constants.F_SEP + cut.getAlias();
 		File targetFile = new File(cutDir + Constants.F_SEP + fileName);
+
 		assert (! targetFile.exists());
 
 		FileUtils.writeStringToFile(targetFile, fileContent);
@@ -176,6 +180,7 @@ public class UploadManager extends HttpServlet {
 				}
 			}
 			messages.add("Class uploaded successfully. It will be referred to as: " + cut.getAlias());
+			messages.add("If you uploaded a file for Story Mode, go to 'Level Editor' to edit your file further");
 			response.sendRedirect("games/user");
 
 		} else {

@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContext;
+import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +39,19 @@ public class AntRunner {
 			return false;
 		}
 		return true;
+	}
+
+	public static boolean testKillsMutantStory(PuzzleMutant m, PuzzleTest t) {
+
+		StoryClass cut = DatabaseAccess.getClassForPuzzle(m.getPuzzleId());
+
+		String[] resultArray = runAntTargetStory("test-mutant", m.getFolder(), t.getFolder(), cut, "Test" + cut.getClassName());
+		if (resultArray[0].toLowerCase().contains("failures: 0")) {
+			return false;
+		}
+
+		return true;
+
 	}
 
 	/**
@@ -74,6 +88,30 @@ public class AntRunner {
 		return newExec;
 	}
 
+	public static TargetExecution testPMutant(PuzzleMutant m, PuzzleTest t) {
+
+		logger.debug("Running test{} on mutant{}", t.getTestId(), m.getMutantId());
+		StoryClass cut = DatabaseAccess.getClassForPuzzle(m.getPuzzleId());
+
+		String[] resultArray = runAntTargetStory("test-mutant", Constants.PUZZLE_MUTANTS_DIR, Constants.PUZZLE_TESTS_DIR, cut, "Test" + cut.getClassName());
+
+		TargetExecution newExec = null;
+
+		if (resultArray[0].toLowerCase().contains("failures: 0")) {
+			if (resultArray[0].toLowerCase().contains("errors: 0")) {
+				newExec = new TargetExecution(t.getTestId(), m.getMutantId(), TargetExecution.Target.TEST_MUTANT, "SUCCESS", null);
+			} else {
+				String message = resultArray[0] + " " + resultArray[1] + " " + resultArray[2];
+				newExec = new TargetExecution(t.getTestId(), m.getMutantId(), TargetExecution.Target.TEST_MUTANT, "ERROR", message);
+			}
+		} else {
+			newExec = new TargetExecution(t.getTestId(), m.getMutantId(), TargetExecution.Target.TEST_MUTANT, "FAIL", null);
+		}
+		newExec.insert();
+		return newExec;
+
+	}
+
 	public static boolean potentialEquivalent(Mutant m) {
 		logger.debug("Checking if mutant " + m.getId() + " is potentially equivalent.");
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
@@ -90,6 +128,23 @@ public class AntRunner {
 		}
 
 		return false;
+	}
+
+	public static boolean potentialEquivalentP(PuzzleMutant m) {
+
+		logger.debug("Cheking if mutant " + m.getMutantId() + " is potentially equivalent");
+		StoryClass cut = DatabaseAccess.getClassForPuzzle(m.getPuzzleId());
+		String suiteDir = AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias();
+
+		String[] resultArray = runAntTargetStory("test-mutant", m.getFolder(), suiteDir, cut, cut.getClassName() + Constants.SUITE_EXT);
+		if (resultArray[0].toLowerCase().contains("failures: 0")) {
+			if (resultArray[0].toLowerCase().contains("errors: 0")) {
+				return true;
+			}
+		}
+
+		return false;
+
 	}
 
 	/**
@@ -132,6 +187,42 @@ public class AntRunner {
 		}
 	}
 
+	public static int testOriginalStory(File dir, PuzzleTest t) {
+
+		StoryClass cut = DatabaseAccess.getClassForPuzzle(t.getPuzzleId());
+
+		String[] resultArray = runAntTargetStory("test-original", null, dir.getAbsolutePath(), cut, cut.getClassName());
+
+		t.setLineCoverage(getLinesCoveredStory(t, cut));
+		t.update();
+
+		if (resultArray[0].toLowerCase().contains("failures: 0")) {
+
+			if (resultArray[0].toLowerCase().contains("errors: 0")) {
+
+				TargetExecution newExec = new TargetExecution(t.getTestId(), 0, TargetExecution.Target.TEST_ORIGINAL, "SUCCESS", null);
+				newExec.insertStory();
+				return newExec.id;
+
+			} else {
+
+				String message = resultArray[0] + " " + resultArray[1] + " " + resultArray[2];
+				TargetExecution newExec = new TargetExecution(t.getTestId(), 0, TargetExecution.Target.TEST_ORIGINAL, "FAIL", message);
+				newExec.insertStory();
+				return newExec.id;
+
+			}
+		} else {
+
+			String message = resultArray[0].substring(resultArray[0].indexOf("[junit]"));
+			TargetExecution newExec = new TargetExecution(t.getTestId(), 0, TargetExecution.Target.TEST_ORIGINAL, "FAIL", message);
+			newExec.insert();
+			return newExec.id;
+
+		}
+
+	}
+
 	/**
 	 * Compiles CUT
 	 *
@@ -166,6 +257,35 @@ public class AntRunner {
 		return pathCompiledClassName;
 	}
 
+	public static String compilePCUT(StoryClass cut) {
+
+		String[] resultArray = runAntTargetStory("compile-cut", null, null, cut, null);
+		System.out.println("Compile New CUT, Compilation result:");
+		System.out.println(Arrays.toString(resultArray));
+
+		String pathCompiledClassName = null;
+		if (resultArray[0].toLowerCase().contains("build successful")) {
+			// If the input stream returned a 'successful build' message, the CUT compiled correctly
+			System.out.println("Compiled uploaded CUT successfully");
+			File f = new File(CUTS_DIR + Constants.F_SEP + cut.getAlias());
+			System.out.println(f.getAbsolutePath());
+			final String compiledClassName = FilenameUtils.getBaseName(cut.getJavaFile()) + Constants.JAVA_CLASS_EXT;
+			System.out.println(compiledClassName);
+			LinkedList<File> matchingFiles = (LinkedList)FileUtils.listFiles(f, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
+			if (! matchingFiles.isEmpty())
+				pathCompiledClassName = matchingFiles.get(0).getAbsolutePath();
+		} else {
+			// Otherwise the CUT failed to compile
+			System.err.println("Failed to compile uploaded CUT");
+			int index = resultArray[0].indexOf("javac");
+			String message = resultArray[0];
+			if (index >= 0){
+				message = message.substring(message.indexOf("javac"));
+			}
+			System.err.println(message);
+		}
+		return pathCompiledClassName;
+	}
 
 	/**
 	 * Compiles mutant
@@ -210,6 +330,35 @@ public class AntRunner {
 		return newMutant;
 	}
 
+	// same method as compileMutant but for puzzle objects
+	public static PuzzleMutant compilePMutant(File mutantDir, String jFile, int puzzleID, StoryClass cut, int creatorId) {
+
+		String[] resultArray = runAntTargetStory("compile-mutant", mutantDir.getAbsolutePath(), null, cut, "Test" + cut.getBaseName());
+		System.out.println(Arrays.toString(resultArray));
+
+		PuzzleMutant newMutant = null;
+
+		if (resultArray[0].toLowerCase().contains("build successful")) {
+			final String compiledClassName = FilenameUtils.getBaseName(jFile) + JAVA_CLASS_EXT;
+			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(mutantDir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
+			assert (!matchingFiles.isEmpty());
+			String cFile = matchingFiles.get(0).getAbsolutePath();
+			newMutant = new PuzzleMutant(puzzleID, jFile, cFile, true, creatorId);
+			newMutant.insert();
+			TargetExecution newExec = new TargetExecution(0, newMutant.getMutantId(), TargetExecution.Target.COMPILE_MUTANT, "SUCCESS", null);
+			newExec.insertStory();
+		} else {
+			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(Constants.DATA_DIR, "");
+			newMutant = new PuzzleMutant(puzzleID, jFile, null, false, creatorId);
+			newMutant.insert();
+			TargetExecution newExec = new TargetExecution(0, newMutant.getMutantId(), TargetExecution.Target.COMPILE_MUTANT, "FAIL", message);
+			newExec.insertStory();
+		}
+
+		return newMutant;
+
+	}
+
 	/**
 	 * Compiles test
 	 * @param dir
@@ -250,6 +399,37 @@ public class AntRunner {
 			newExec.insert();
 			return newTest;
 		}
+
+	}
+
+	// same as compileTest but for puzzle objects
+	public static PuzzleTest compilePTest(File dir, String jFile, int puzzleId, StoryClass cut, int creatorId) {
+
+		String[] resultArray = runAntTargetStory("compile-test", null, dir.getAbsolutePath(), cut, null);
+
+		if (resultArray[0].toLowerCase().contains("build successful")) {
+
+			final String compiledClassName = FilenameUtils.getBaseName(jFile) + JAVA_CLASS_EXT;
+			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
+			assert (! matchingFiles.isEmpty());
+			String cFile = matchingFiles.get(0).getAbsolutePath();
+			PuzzleTest newTest = new PuzzleTest(puzzleId, jFile, cFile, creatorId);
+			newTest.insert();
+			TargetExecution newExec = new TargetExecution(newTest.getTestId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);
+			newExec.insertStory();
+			return newTest;
+
+		} else {
+
+			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(Constants.DATA_DIR, "");
+			PuzzleTest newTest = new PuzzleTest(puzzleId, jFile, null, creatorId);
+			newTest.insert();
+			TargetExecution newExec = new TargetExecution(newTest.getTestId(), 0, TargetExecution.Target.COMPILE_TEST, "FAIL", message);
+			newExec.insertStory();
+			return newTest;
+
+		}
+
 	}
 
 	/**
@@ -261,12 +441,29 @@ public class AntRunner {
 		String[] resultArray = runAntTarget("mutant-gen-cut", null, null, cut, null);
 	}
 
+	public static void generatePMutantsFromCUT(final StoryClass cut, int pid) {
+
+		String[] resultArray = runAntTargetStory("mutant-gen-cut", Constants.PUZZLE_MUTANTS_DIR, null, cut, null);
+
+	}
+
 	/**
 	 * Generates tests using EvoSuite
 	 * @param cut CUT filename
 	 */
 	public static void generateTestsFromCUT(final GameClass cut) {
 		String[] resultArray = runAntTarget("test-gen-cut", null, null, cut, null);
+	}
+
+	/**
+	 * Compiles and takes tests from file using TestMaker
+	 * @param cut CUT filename
+	 * @param pid puzzleID
+	 */
+	public static void generatePTestsFromCUT(final StoryClass cut, int pid) {
+
+		String[] resultArray = runAntTargetStory("test-gen-cut", null, Constants.PUZZLE_TESTS_DIR, cut, "Test" + DatabaseAccess.getClassForPuzzle(pid).getClassName());
+
 	}
 
 	/**
@@ -304,8 +501,6 @@ public class AntRunner {
 
 		ProcessBuilder pb = new ProcessBuilder();
 		Map env = pb.environment();
-
-
 
 		String antHome = (String) env.get("ANT_HOME");
 		if (antHome == null) {
@@ -366,6 +561,92 @@ public class AntRunner {
 	}
 
 	/**
+	 * Runs a specific Ant target in the build.xml file (For story mode)
+	 *
+	 * @param target An Ant target
+	 * @param mutantFile is provided (should be /var/lib/codedefenders/puzzles/mutants)
+	 * @param testDir is provided (should be /var/lib/codedefenders/puzzles/tests)
+	 * @param cut Class
+	 * @param testClassName - provided is the class name assuming the classname will be the same as the test class name
+	 * @return String Array of length 4
+	 * [0] : Input Stream for the process
+	 * [1] : Error Stream for the process
+	 * [2] : Any exceptions from running the process
+	 * [3] : Message indicating which target was run, and with which files
+	 */
+
+	// same as runAntTarget but for puzzle objects
+	private static String[] runAntTargetStory(String target, String mutantFile, String testDir, StoryClass cut, String testClassName) {
+		String[] resultArray = new String[4];
+		String isLog = "";
+		String esLog = "";
+		String exLog = "";
+		String debug = "Running Ant Target: " + target + " with mFile: " + mutantFile + " and tFile: " + testDir;
+
+		ProcessBuilder pb = new ProcessBuilder();
+		Map env = pb.environment();
+
+
+
+		String antHome = (String) env.get("ANT_HOME");
+		if (antHome == null) {
+			System.err.println("ANT_HOME undefined.");
+			antHome = System.getProperty("ant.home", "/usr/local");
+		}
+
+		String command = antHome + "/bin/ant";
+
+		if (System.getProperty("os.name").toLowerCase().contains("windows")){
+			command += ".bat";
+			command = command.replace("/", "\\").replace("\\", "\\\\");
+		}
+
+		pb.command(command, target, // "-v", "-d", for verbose, debug
+				"-Dmutant.file=" + mutantFile,
+				"-Dtest.file=" + testDir,
+				"-Dcut.dir=" + CUTS_DIR + F_SEP + cut.getAlias(),
+				"-Dclassalias=" + cut.getAlias(),
+				"-Dclassbasename=" + cut.getBaseName(),
+				"-Dclassname=" + cut.getClassName(),
+				"-DtestClassname=" + testClassName);
+
+		String buildFileDir = Constants.DATA_DIR;
+		pb.directory(new File(buildFileDir));
+		pb.redirectErrorStream(true);
+
+		System.out.println("Executing Ant Command (Story): " + pb.command().toString());
+		System.out.println("Executing from directory: " + buildFileDir);
+		try {
+			Process p = pb.start();
+			String line;
+
+			BufferedReader is = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			while ((line = is.readLine()) != null) {
+				isLog += line + "\n";
+			}
+
+			BufferedReader es = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+			while ((line = es.readLine()) != null) {
+				esLog += line + "\n";
+			}
+
+		} catch (Exception ex) {
+			exLog += "Exception: " + ex.toString() + "\n";
+		}
+
+		resultArray[0] = isLog;
+		resultArray[1] = esLog;
+		resultArray[2] = exLog;
+		resultArray[3] = debug;
+		System.out.println("is: " + isLog);
+		System.out.println("es: " + esLog);
+		System.out.println("ex: " + exLog);
+		System.out.println("lg :" + debug);
+
+		return resultArray;
+	}
+
+	/**
 	 * Executes a test against a mutant
 	 * @param t A {@link Test} object
 	 * @param c A {@link GameClass} object
@@ -386,6 +667,25 @@ public class AntRunner {
 		lc.setLinesCovered(cg.getLinesCovered());
 		lc.setLinesUncovered(cg.getLinesUncovered());
 		return lc;
+	}
+
+	private static LineCoverage getLinesCoveredStory(PuzzleTest t, StoryClass s) {
+
+		CoverageGenerator cg = new CoverageGenerator(
+				new File(Constants.PUZZLE_TESTS_DIR),
+				new File(Constants.CUTS_DIR + F_SEP + s.getClassName()));
+
+		try {
+			cg.create(s.getClassName());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		LineCoverage lc = new LineCoverage();
+		lc.setLinesCovered(cg.getLinesCovered());
+		lc.setLinesUncovered(cg.getLinesUncovered());
+		return lc;
+
 	}
 
 	private static String[] processJacoco(ServletContext context, String testFile) {

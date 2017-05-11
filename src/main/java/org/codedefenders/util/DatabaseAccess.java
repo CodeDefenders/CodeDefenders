@@ -1,12 +1,14 @@
 package org.codedefenders.util;
 
+import com.mysql.jdbc.exceptions.MySQLDataException;
 import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
+import org.codedefenders.story.StoryGame;
+import org.codedefenders.story.StoryPuzzle;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
-import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.singleplayer.SinglePlayerGame;
 
 import javax.naming.Context;
@@ -162,17 +164,16 @@ public class DatabaseAccess {
 		return getEvents(sql);
 	}
 
-
 	public static void setGameAsAIDummy(int gId) {
 		String sql = String.format("UPDATE games SET IsAIDummyGame = 1 WHERE ID = %d;", gId);
 		executeUpdate(sql);
 	}
 
-	public static DuelGame getAiDummyGameForClass(int cId) throws NoDummyGameException {
+	public static DuelGame getAiDummyGameForClass(int cId) throws Exception {
 		String sql = String.format("SELECT * FROM games WHERE Class_ID='%d' AND IsAIDummyGame=1", cId);
 		int gID = getInt(sql, "ID");
 		if (gID == 0) {
-			NoDummyGameException e = new NoDummyGameException("No dummy game found.");
+			Exception e = new Exception("No dummy game found.");
 			throw e;
 		}
 		return getGameForKey("ID", gID);
@@ -187,8 +188,18 @@ public class DatabaseAccess {
 		return getInt(sql, "NumberAiMutantsKilled");
 	}
 
+	public static int getNumAiMutantsKilledByPuzzleTest(int tid) {
+		String sql = String.format("SELECT * FROM puzzleTests WHERE Test_ID='%d';", tid);
+		return getInt(sql, "NumberAiMutantsKilled");
+	}
+
 	public static int getNumTestsKillMutant(int mId) {
 		String sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d';", mId);
+		return getInt(sql, "NumberAiKillingTests");
+	}
+
+	public static int getNumTestsKillPuzzleMutant(int mid) {
+		String sql = String.format("SELECT * FROM puzzleMutants WHERE Mutant_ID='%d';", mid);
 		return getInt(sql, "NumberAiKillingTests");
 	}
 
@@ -205,6 +216,66 @@ public class DatabaseAccess {
 	public static GameClass getClassForGame(int gameId) {
 		String sql = String.format("SELECT classes.* from classes INNER JOIN games ON classes.Class_ID = games.Class_ID WHERE games.ID=%d;", gameId);
 		return getClass(sql);
+	}
+
+	public static StoryClass getClassForPuzzle(int pid) {
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		String sql = String.format("SELECT classes.* from classes INNER JOIN puzzles ON classes.Class_ID = puzzles.Class_ID WHERE puzzles.Puzzle_ID=%d", pid);
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				StoryClass classRecord = new StoryClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile"));
+				return classRecord;
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+			//Handle errors for JDBC
+		} catch (Exception e) {
+			System.out.println(e);
+			//Handle errors for Class.forName
+		} finally {
+			cleanup(conn, stmt);
+		} //end try
+		return null;
+
+	}
+
+	public static List<PuzzleClass> getDetailsForPuzzle(int puzzleId) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		List<PuzzleClass> puzzleDetails = new ArrayList<PuzzleClass>();
+
+		String sql = String.format("SELECT * FROM puzzles AS p " +
+				"INNER JOIN classes AS c ON p.Class_ID=c.Class_ID " +
+				"WHERE Puzzle_ID=%d", puzzleId);
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				puzzleDetails.add(new PuzzleClass(rs.getInt("Class_ID"),
+						rs.getString("Hint"), rs.getString("Description")));
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cleanup(conn,stmt);
+		}
+
+		return puzzleDetails;
+
 	}
 
 	public static GameClass getClassForKey(String keyName, int id) {
@@ -302,6 +373,131 @@ public class DatabaseAccess {
 			cleanup(conn, stmt);
 		} //end try
 		return null;
+	}
+
+	// getClassForKey equivalent
+	public static StoryClass getStoryForKey(int classId) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = String.format("SELECT * FROM classes AS c " +
+				"INNER JOIN puzzles AS p ON c.Class_ID=p.Class_ID " +
+				"WHERE c.Class_ID=%d", classId);
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				StoryClass classRecord = new StoryClass(rs.getInt("Puzzle_ID"), rs.getInt("Class_ID"), rs.getInt("Creator_ID"), rs.getString("Name"),
+						rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile"));
+				return classRecord;
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return null;
+
+	}
+
+	public static StoryClass getTestForPuzzleId(int puzzleId) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = String.format("SELECT * FROM puzzleTests WHERE Puzzle_ID = '%d'", puzzleId);
+
+		try {
+
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				StoryClass result = new StoryClass(rs.getString("JavaFile"));
+				return result;
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return null;
+
+	}
+
+	// gets user submitted test
+	public static StoryClass getUserPuzzleTest(int pid, int uid) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = String.format("SELECT * FROM puzzleTests " +
+				"WHERE User_ID=%d AND Puzzle_ID=%d " +
+				"ORDER BY Timestamp DESC " +
+				"LIMIT 1", uid, pid); // get the latest record the user has submitted
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				StoryClass sc = new StoryClass(rs.getString("JavaFile"));
+				return sc;
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return null;
+
+	}
+
+	// get user-submitted mutants
+	public static StoryClass getUserPuzzleMutant(int pid, int uid) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = String.format("SELECT * FROM puzzleMutants " +
+				"WHERE User_ID=%d AND Puzzle_ID=%d " +
+				"ORDER BY Timestamp DESC " +
+				"LIMIT 1", uid, pid);
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				StoryClass sc = new StoryClass(rs.getString("JavaFile"));
+				return sc;
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return null;
+
 	}
 
 	public static List<GameClass> getAllClasses() {
@@ -462,6 +658,48 @@ public class DatabaseAccess {
 			cleanup(conn, stmt);
 		}
 		return null;
+	}
+
+	// getGameForKey equivalent for puzzles
+	public static StoryGame getPuzzleForUser(int puzzleId) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = null;
+
+		try {
+
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			sql = String.format("SELECT * FROM puzzles AS p " +
+					"INNER JOIN levels AS l ON p.Level_ID = l.Level_ID " +
+					"INNER JOIN story AS s ON p.Puzzle_ID = s.Puzzle_ID " +
+					"WHERE p.Puzzle_ID=%d", puzzleId);
+
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				StoryGame puzzleRecord = new StoryGame(rs.getInt("User_ID"), rs.getInt("Puzzle_ID"), rs.getInt("LevelNumber"),
+						rs.getInt("Puzzle"), rs.getInt("Class_ID"), rs.getString("PuzzleName"), rs.getString("Hint"),
+						rs.getString("Description"), PuzzleMode.valueOf(rs.getString("Mode")), rs.getInt("Points"), StoryState.valueOf(rs.getString("State")));
+
+				stmt.close();
+				conn.close();
+				return puzzleRecord;
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn,stmt);
+		}
+
+		return null;
+
 	}
 
 	/**
@@ -631,6 +869,616 @@ public class DatabaseAccess {
 		return gameList;
 	}
 
+	public static List<Achievements> getAchievements() {
+
+		Connection conn = null;
+		Statement stmt = null;
+		List<Achievements> achv = new ArrayList<Achievements>();
+		String sql = String.format("SELECT * FROM achievements AS a " +
+				"LEFT JOIN user_achievements AS ua ON a.Achievement_ID = ua.Achievement_ID");
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				achv.add(new Achievements(rs.getInt("User_ID"), rs.getInt("Achievement_ID"), rs.getInt("Achieved"),
+						rs.getString("Achievement_Name"), rs.getString("Achievement_Desc")));
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return achv;
+
+	}
+
+	public static List<StoryGame> getStoryClassesForUser(int userId) {
+
+		String sql = String.format("SELECT c.Class_ID, c.Name, c.Alias, p.PuzzleName, p.Description, p.Level_ID, p.Puzzle FROM classes AS c " +
+				"INNER JOIN puzzles AS p ON c.Class_ID = p.Class_ID " +
+				"WHERE c.Creator_ID=%d " +
+				"ORDER BY Level_ID, Puzzle", userId);
+
+		return getStoryClasses(sql);
+
+	}
+
+	public static boolean checkPuzzle(int levelNum, int puzzleNum) {
+
+		boolean check = false; // available is false
+
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = String.format("SELECT * FROM puzzles AS p " +
+				"INNER JOIN levels AS l ON p.Level_ID = l.Level_ID " +
+				"WHERE l.Level_ID = %s AND Puzzle = %d",levelNum, puzzleNum);
+
+		try {
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				check = true; // taken is true
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn,stmt);
+		}
+
+		return check;
+
+	}
+
+	// setAttribute("puzzle")
+	public static StoryGame getActivePuzzle(int puzzleId) {
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		String sql = String.format("SELECT * FROM puzzles AS p " +
+				"INNER JOIN classes AS c ON p.Class_ID = c.Class_ID " +
+				"INNER JOIN levels AS l ON p.Level_ID = l.Level_ID " +
+				"INNER JOIN story AS s ON p.Puzzle_ID = s.Puzzle_ID " +
+				"WHERE p.Puzzle_ID=%s", puzzleId);
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				StoryGame puzzles;
+				puzzles = new StoryGame(rs.getInt("User_ID"), rs.getInt("Puzzle_ID"), rs.getInt("LevelNumber"),
+						rs.getInt("Puzzle"), rs.getInt("Class_ID"), rs.getString("PuzzleName"),
+						rs.getString("Hint"), rs.getString("Description"), PuzzleMode.valueOf(rs.getString("Mode")),
+						rs.getInt("Points"), StoryState.valueOf(rs.getString("State")));
+				return puzzles;
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return null;
+
+	}
+
+	public static List<StoryGame> getCurrentLevel(int userId) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		List<StoryGame> levels = new ArrayList<StoryGame>();
+
+		String sql = String.format("SELECT * FROM puzzles AS p " +
+				"INNER JOIN levels AS l ON p.Level_ID = l.Level_ID " +
+				"INNER JOIN story AS s ON p.Puzzle_ID = s.Puzzle_ID " +
+				"WHERE s.User_ID = %d " +
+				"ORDER BY LevelNumber, Puzzle ", userId);
+
+		try {
+
+			conn = getConnection();
+			stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while(rs.next()) {
+				levels.add(new StoryGame(rs.getInt("LevelNumber"), rs.getInt("Puzzle"),
+						rs.getString("PuzzleName"), StoryState.valueOf(rs.getString("State"))));
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return levels;
+
+	}
+
+	public static int getAllPuzzleCount(int userId) {
+
+		String sql = String.format("SELECT * FROM puzzles " +
+				"WHERE Puzzle IS NOT NULL AND PuzzleName IS NOT NULL");
+		return getStoryProgress(sql, userId);
+
+	}
+
+	public static int getCompletedPuzzleCount(int userId) {
+
+		String sql = String.format("SELECT * FROM puzzles AS p " +
+				"INNER JOIN story AS s ON p.Puzzle_ID = s.Puzzle_ID " +
+				"WHERE s.User_ID = %d AND s.State='COMPLETED'", userId);
+		return getStoryProgress(sql, userId);
+
+	}
+
+	public static int getStoryProgress(String sql, int userId) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		List<StoryPuzzle> list = new ArrayList<StoryPuzzle>();
+
+		try {
+
+			conn = getConnection();
+			stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				list.add(new StoryPuzzle(rs.getInt("Puzzle_ID")));
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return list.size();
+
+	}
+
+	public static List<PuzzleClass> getTakenPuzzles(int levelNum) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		List<PuzzleClass> takenPuzzles = new ArrayList<PuzzleClass>();
+
+		String sql = String.format("SELECT Puzzle, l.LevelNumber FROM puzzles AS p " +
+				"INNER JOIN levels AS l ON p.Level_ID = l.Level_ID " +
+				"WHERE l.Level_ID=%s",levelNum);
+
+		try {
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				takenPuzzles.add(new PuzzleClass(rs.getInt("LevelNumber"), rs.getInt("Puzzle")));
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn,stmt);
+		}
+
+		return takenPuzzles;
+
+	}
+
+	public static List<StoryGame> getStoryClasses(String sql) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		List<StoryGame> classesList = new ArrayList<>();
+
+		try {
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while(rs.next()) {
+				classesList.add(new StoryGame(rs.getInt("Class_ID"), rs.getString("Name"),
+						rs.getString("Alias"), rs.getString("PuzzleName"), rs.getString("Description"),
+						rs.getInt("Level_ID"), rs.getInt("Puzzle")));
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return classesList;
+
+	}
+
+	public static StoryPuzzle getPuzzleId(int classId) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = String.format("SELECT p.Puzzle_ID FROM puzzles AS p " +
+				"WHERE p.Class_ID=%d", classId);
+
+		try {
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				StoryPuzzle pid;
+				pid = new StoryPuzzle(rs.getInt("Puzzle_ID"));
+				return pid;
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return null;
+
+	}
+
+	public static List<StoryGame> getPuzzles() {
+
+		Connection conn = null;
+		Statement stmt = null;
+		List<StoryGame> puzzleList = new ArrayList<>();
+
+		String sql = String.format("SELECT * FROM puzzles AS p " +
+				"INNER JOIN story AS s ON p.Puzzle_ID = s.Puzzle_ID " +
+				"INNER JOIN levels AS l ON p.Level_ID = l.Level_ID " +
+				"ORDER BY LevelNumber, Puzzle");
+
+		try {
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				puzzleList.add(new StoryGame(rs.getInt("User_ID"), rs.getInt("Puzzle"), rs.getInt("LevelNumber"),
+						rs.getInt("Points"), rs.getInt("Puzzle_ID"), StoryState.valueOf(rs.getString("State")),
+						rs.getString("PuzzleName"), rs.getString("Description"), PuzzleMode.valueOf(rs.getString("Mode"))));
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return puzzleList;
+
+	}
+
+	public static List<StoryGame> getAllPuzzles() {
+
+		Connection conn = null;
+		Statement stmt = null;
+		List<StoryGame> puzzleList = new ArrayList<>();
+
+		String sql = String.format("SELECT * FROM puzzles");
+
+		try {
+
+			conn = getConnection();
+			stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				puzzleList.add(new StoryGame(rs.getInt("Puzzle_ID")));
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return puzzleList;
+
+	}
+
+	public static List<PuzzleClass> getLevels() {
+
+		Connection conn = null;
+		Statement stmt = null;
+		List<PuzzleClass> levelList = new ArrayList<>();
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+
+			String sql = String.format("SELECT DISTINCT LevelNumber from levels");
+
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				levelList.add(new PuzzleClass(rs.getInt("LevelNumber")));
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return levelList;
+
+	}
+
+	public static StoryPuzzle getLevelDetails(int classId) {
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+
+			String sql = String.format("SELECT * FROM puzzles AS p " +
+					"INNER JOIN levels AS l ON p.Level_ID = l.Level_ID " +
+					"WHERE p.Class_ID = %d", classId);
+
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				StoryPuzzle details;
+				details = new StoryPuzzle(rs.getInt("LevelNumber"), rs.getInt("Puzzle"),
+						rs.getString("PuzzleName"), rs.getString("Hint"), rs.getString("Description"),
+						PuzzleMode.valueOf(rs.getString("Mode")));
+				return details;
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return null;
+
+	}
+
+	public static Achievements getAchvNameById(int aid) {
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		String sql = String.format("SELECT * FROM achievements " +
+				"WHERE Achievement_ID = %d", aid);
+
+		try {
+
+			conn = getConnection();
+			stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				Achievements achv;
+				achv = new Achievements(rs.getString("Achievement_Name"));
+				return achv;
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return null;
+
+	}
+
+	public static List<Achievements> firstLevelAchv(int userId) {
+
+		String sql = String.format("SELECT * FROM user_achievements AS ua " +
+				"INNER JOIN achievements AS a ON ua.Achievement_ID = a.Achievement_ID " +
+				"WHERE ua.User_ID = %d AND ua.Achievement_ID = 1", userId);
+		return checkAchievements(sql);
+
+	}
+
+	public static List<Achievements> fullLevelAchv(int userId, int aid) {
+
+		String sql = String.format("SELECT * FROM user_achivements AS ua " +
+				"INNER JOIN achievements AS a ON ua.Achievement_ID = a.Achivement_ID " +
+				"INNER JOIN puzzles AS p ON " +
+				"WHERE ua.User_ID = %d AND ua.Achievement_ID = %d", userId, aid);
+		return checkAchievements(sql);
+
+	}
+
+	public static List<Achievements> checkAchievements(String sql) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		List<Achievements> achv = new ArrayList<Achievements>();
+
+		try {
+
+			conn = getConnection();
+			stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				achv.add(new Achievements(rs.getInt("User_ID"), rs.getInt("Achievement_ID"),
+						rs.getInt("Achieved"), rs.getString("Achievement_Name")));
+
+				return achv;
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return null;
+
+	}
+
+	public static boolean alreadyAchieved(int uid, int aid) {
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		String sql = String.format("SELECT * FROM user_achievements " +
+				"WHERE User_ID = %d AND Achievement_ID = %d", uid, aid);
+
+		try {
+
+			conn = getConnection();
+			stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				return true;
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return false;
+
+	}
+
+	public static List<StoryGame> getPuzzlesForLevel(int lid) {
+
+		Connection conn = null;
+		Statement stmt = null;
+		List<StoryGame> list = new ArrayList<StoryGame>();
+
+		String sql = String.format("SELECT * FROM puzzles AS p " +
+				"INNER JOIN story AS s ON p.Puzzle_ID = s.Puzzle_ID " +
+				"WHERE p.Level_ID = %d", lid);
+
+		try {
+
+			conn = getConnection();
+			stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				list.add(new StoryGame(rs.getInt("Level_ID"), StoryState.valueOf(rs.getString("State")),
+						rs.getInt("Puzzle")));
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return list;
+
+	}
+
+	public static int getOverallPoints(int userId) {
+
+		String sql = String.format("SELECT * FROM story WHERE User_ID = %d", userId);
+
+		Connection conn = null;
+		Statement stmt = null;
+		int points = 0;
+
+		try {
+
+			conn = getConnection();
+			stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				points += rs.getInt("Points");
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return points;
+
+	}
+
 	public static MultiplayerGame getMultiplayerGame(int id){
 		String sql = String.format("SELECT * FROM games AS m " +
 				"WHERE ID=%d AND m.Mode='PARTY'", id);
@@ -711,6 +1559,41 @@ public class DatabaseAccess {
 		return mutList;
 	}
 
+	public static List<PuzzleMutant> getMutantsforPuzzle(int pid) {
+
+		List<PuzzleMutant> mutList = new ArrayList<>();
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = null;
+
+		try {
+
+			conn = getConnection();
+			stmt = conn.createStatement();
+			sql = String.format("SELECT * FROM puzzleMutants WHERE Puzzle_ID='%d' AND ClassFile IS NOT NULL;", pid);
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while (rs.next()) {
+				PuzzleMutant newMutant = new PuzzleMutant(rs.getInt("Mutant_ID"), rs.getInt("Puzzle_ID"),
+						rs.getString("JavaFile"), rs.getString("ClassFile"),
+						rs.getBoolean("Alive"), PuzzleMutant.Equivalence.valueOf(rs.getString("Equivalent")),
+						rs.getInt("User_ID"));
+				newMutant.setScore(rs.getInt("Points"));
+				mutList.add(newMutant);
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return mutList;
+
+	}
+
 	public static List<Mutant> getMutantsForPlayer(int pid) {
 
 		List<Mutant> mutList = new ArrayList<>();
@@ -775,6 +1658,38 @@ public class DatabaseAccess {
 		return newMutant;
 	}
 
+	public static PuzzleMutant getPMutantFromDB(String sql) {
+
+		PuzzleMutant newMutant = null;
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			if (rs.next()) {
+				newMutant = new PuzzleMutant(rs.getInt("Mutant_ID"), rs.getInt("Puzzle_ID"),
+						rs.getString("JavaFile"), rs.getString("ClassFile"),
+						rs.getBoolean("Alive"), PuzzleMutant.Equivalence.valueOf(rs.getString("Equivalent")),
+						rs.getInt("User_ID"));
+			}
+		} catch (SQLException se) {
+			System.out.println(se);
+			se.printStackTrace();
+		} catch (Exception e) {
+			System.out.println(e);
+			e.printStackTrace();
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return newMutant;
+
+	}
+
 	public static Mutant getMutant(DuelGame game, int mutantID) {
 		String sql = String.format("SELECT * FROM mutants WHERE Mutant_ID='%d' AND Game_ID='%d';", mutantID, game.getId());
 		return getMutantFromDB(sql);
@@ -784,6 +1699,15 @@ public class DatabaseAccess {
 		String sql = String.format("SELECT * FROM mutants WHERE Game_ID='%d' AND MD5='%s';", gameId, md5);
 		return getMutantFromDB(sql);
 	}
+
+	public static PuzzleMutant getPMutant(int puzzleId, String md5) {
+
+		String sql = String.format("SELECT * FROM puzzleMutants WHERE Puzzle_ID='%d' AND MD5='%s';", puzzleId, md5);
+		return getPMutantFromDB(sql);
+
+	}
+
+
 
 	public static List<Integer> getUsedAiTestsForGame(DuelGame g) {
 		List<Integer> testList = new ArrayList<>();
@@ -1031,9 +1955,44 @@ public class DatabaseAccess {
 		return getTests(sql);
 	}
 
+	public static List<PuzzleTest> getTestsforPuzzle(int pid) {
+
+		String sql = String.format("SELECT * FROM puzzleTests WHERE Puzzle_ID='%d' AND ClassFile IS NOT NULL;", pid);
+		return getPuzzleTests(sql);
+
+	}
+
+	public static PuzzleTest getPTestForId(int tid) {
+
+		String sql = String.format("SELECT * FROM puzzleTests WHERE Test_ID='%d'", tid);
+		return getPuzzleTests(sql).get(0);
+
+	}
+
+	public static List<PuzzleTest> getExecutablePTests(int pid, boolean dOnly) {
+
+		String stmt = "SELECT puzzleTests.* FROM puzzleTests\n"
+				+ "INNER JOIN storytargetexecutions ex ON puzzleTests.Test_ID = ex.Test_ID\n"
+				+ (dOnly ? "INNER JOIN story s ON puzzleTests.User_ID = s.ID\n"
+				+ "INNER JOIN puzzles p ON puzzleTests.Puzzle_ID = p.Puzzle_ID\n" : "")
+				+ "WHERE puzzleTests.Puzzle_ID='%d' AND puzzleTests.ClassFile IS NOT NULL\n"
+				+ (dOnly ? "AND p.Mode='DEFENDER'\n" : "")
+				+ "AND ex.Target='TEST_ORIGINAL' AND ex.Status='SUCCESS';";
+		String sql = String.format(stmt, pid);
+		return getPuzzleTests(sql);
+	}
+
 	public static int getPlayerIdForMultiplayerGame(int userId, int gameId) {
 		String sql = String.format("SELECT * FROM players AS p " +
 				"WHERE p.User_ID = %d AND p.Game_ID = %d", userId, gameId); // that pass on original CUT
+
+		return getInt(sql, "ID");
+	}
+
+	public static int getPlayerForStory(int userId, int puzzleId) {
+
+		String sql = String.format("SELECT * FROM story AS s " +
+				"WHERE s.User_ID = %d AND s.Puzzle_ID = %d", userId, puzzleId);
 
 		return getInt(sql, "ID");
 	}
@@ -1085,18 +2044,24 @@ public class DatabaseAccess {
 		return n;
 	}
 
+	public static int getNumPuzzleTestsForUser(int pid) {
+
+		int n = 0;
+		String sql = String.format("SELECT * FROM puzzleTests WHERE User_ID = '%d'", pid);
+		n += getPuzzleTests(sql).size();
+		return n;
+
+	}
+
 	private static List<Test> getTests(String sql) {
 
 		List<Test> testList = new ArrayList<>();
 
 		Connection conn = null;
 		Statement stmt = null;
-
 		try {
-
 			// Load the MultiplayerGame Data with the provided ID.
 			conn = getConnection();
-
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(sql);
 
@@ -1123,7 +2088,6 @@ public class DatabaseAccess {
 				newTest.setScore(rs.getInt("Points"));
 				testList.add(newTest);
 			}
-
 			stmt.close();
 			conn.close();
 		} catch (SQLException se) {
@@ -1137,6 +2101,118 @@ public class DatabaseAccess {
 		}
 
 		return testList;
+	}
+
+	private static List<PuzzleTest> getPuzzleTests(String sql) {
+
+		List<PuzzleTest> testList = new ArrayList<>();
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery(sql);
+
+			while(rs.next()) {
+				PuzzleTest newTest = new PuzzleTest(rs.getInt("Test_ID"), rs.getInt("Puzzle_ID"),
+						rs.getString("JavaFile"), rs.getString("ClassFile"),
+						rs.getInt("MutantsKilled"), rs.getInt("User_ID"));
+				String lcs = rs.getString("Lines_Covered");
+				String lucs = rs.getString("Lines_Uncovered");
+				LineCoverage lc = new LineCoverage();
+				if (lcs != null && lucs != null && lcs.length() > 0 && lucs.length() > 0) {
+					ArrayList<Integer> covered = new ArrayList<>();
+					ArrayList<Integer> uncovered = new ArrayList<>();
+					for (String s : lcs.split(",")) {
+						covered.add(Integer.parseInt(s));
+					}
+					for (String s : lucs.split(",")) {
+						uncovered.add(Integer.parseInt(s));
+					}
+					lc.setLinesCovered(covered);
+					lc.setLinesUncovered(uncovered);
+				}
+				newTest.setLineCoverage(lc);
+				newTest.setScore(rs.getInt("Points"));
+				testList.add(newTest);
+			}
+			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return testList;
+
+	}
+
+	public static PuzzleTest getTestIdByPuzzle(int pid) {
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		String sql = String.format("SELECT Test_ID, JavaFile FROM puzzleTests WHERE Puzzle_ID = '%d'", pid);
+
+		try {
+
+			conn = getConnection();
+			stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				PuzzleTest pt = new PuzzleTest(rs.getInt("Test_ID"), rs.getString("JavaFile"));
+				return pt;
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return null;
+
+	}
+
+	public static PuzzleMutant getMutantIdByPuzzle(int pid) {
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		String sql = String.format("SELECT Mutant_ID, JavaFile FROM puzzleMutants WHERE Puzzle_ID = '%d'", pid);
+
+		try {
+
+			conn = getConnection();
+			stmt = conn.createStatement();
+
+			ResultSet rs = stmt.executeQuery(sql);
+
+			if (rs.next()) {
+				PuzzleMutant pm = new PuzzleMutant(rs.getInt("Mutant_ID"), rs.getString("JavaFile"));
+				return pm;
+			}
+
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+
+		return null;
+
 	}
 
 	public static List<Test> getPartyTestsForUser(int uid) {
@@ -1183,13 +2259,28 @@ public class DatabaseAccess {
 		return getTargetExecutionSQL(sql);
 	}
 
+	public static TargetExecution getTargetExecutionForStoryPair(int tid, int mid) {
+		String sql = String.format("SELECT * FROM storytargetexecutions WHERE Test_ID='%d' AND Mutant_ID='%d';", tid, mid);
+		return getTargetExecutionSQL(sql);
+	}
+
 	public static TargetExecution getTargetExecutionForTest(Test test, TargetExecution.Target target) {
 		String sql = String.format("SELECT * FROM targetexecutions WHERE Test_ID='%d' AND Target='%s';", test.getId(), target.name());
 		return getTargetExecutionSQL(sql);
 	}
 
+	public static TargetExecution getTargetExecutionForPTest(PuzzleTest test, TargetExecution.Target target) {
+		String sql = String.format("SELECT * FROM storytargetexecutions WHERE Test_ID='%d' AND Target='%s';", test.getTestId(), target.name());
+		return getTargetExecutionSQL(sql);
+	}
+
 	public static TargetExecution getTargetExecutionForMutant(Mutant mutant, TargetExecution.Target target) {
 		String sql = String.format("SELECT * FROM targetexecutions WHERE Mutant_ID='%d' AND Target='%s';", mutant.getId(), target.name());
+		return getTargetExecutionSQL(sql);
+	}
+
+	public static TargetExecution getTargetExecutionForPMutant(PuzzleMutant mutant, TargetExecution.Target target) {
+		String sql = String.format("SELECT * FROM storytargetexecutions WHERE Mutant_ID='%d' AND Target='%s';", mutant.getMutantId(), target.name());
 		return getTargetExecutionSQL(sql);
 	}
 

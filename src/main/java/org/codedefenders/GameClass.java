@@ -1,11 +1,13 @@
 package org.codedefenders;
 
+import com.sun.corba.se.impl.orb.DataCollectorBase;
 import org.codedefenders.duel.DuelGame;
-import org.codedefenders.singleplayer.NoDummyGameException;
+import org.codedefenders.story.StoryPuzzle;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.image.DataBuffer;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -22,6 +24,7 @@ public class GameClass {
 	private static final Logger logger = LoggerFactory.getLogger(GameClass.class);
 
 	private int id;
+	private int creatorId;
 	private String name; // fully qualified name
 	private String alias;
 	private String javaFile;
@@ -39,9 +42,16 @@ public class GameClass {
 		this.id = id;
 	}
 
+	public GameClass(String name, String alias, String jFile, String cFile, int creatorId) {
+		this(name, alias, jFile, cFile);
+		this.creatorId = creatorId;
+	}
+
 	public int getId() {
 		return id;
 	}
+
+	public int getCreatorId() { return creatorId; }
 
 	public String getName() {
 		return name;
@@ -92,11 +102,11 @@ public class GameClass {
 
 	public boolean insert() {
 
-		logger.debug("Inserting class (Name={}, Alias={}, JavaFile={}, ClassFile={})", name, alias, javaFile, classFile);
+		logger.debug("Inserting class (Name={}, Alias={}, JavaFile={}, ClassFile={}, Creator_ID{})", name, alias, javaFile, classFile, creatorId);
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = String.format("INSERT INTO classes (Name, Alias, JavaFile, ClassFile) VALUES ('%s', '%s', '%s', '%s');", name, alias, javaFile, classFile);
 
+		String sql = String.format("INSERT INTO classes (Name, Alias, JavaFile, ClassFile, Creator_ID) VALUES ('%s', '%s', '%s', '%s', '%s');", name, alias, javaFile, classFile, creatorId);
 		// Attempt to insert game info into database
 		try {
 			conn = DatabaseAccess.getConnection();
@@ -130,12 +140,17 @@ public class GameClass {
 		Statement stmt = null;
 
 		String sql = String.format("UPDATE classes SET Name='%s', Alias='%s', JavaFile='%s', ClassFile='%s' WHERE Class_ID='%d';", name, alias, javaFile, classFile, id);
-
+		String sql2 = String.format("INSERT INTO puzzles (Class_ID, Level_ID) VALUES ('%d', '%d');", id, 1);
 		// Attempt to update game info into database
 		try {
 			conn = DatabaseAccess.getConnection();
 			stmt = conn.createStatement();
 			stmt.execute(sql);
+			stmt.execute(sql2);
+			String sql3 = String.format("INSERT INTO story (User_ID, Puzzle_ID) VALUES ('%d','%d');", creatorId, DatabaseAccess.getPuzzleId(id).getPuzzleId());
+			String sql4 = String.format("UPDATE puzzles SET Class_ID='%d' WHERE Puzzle_ID='%d'", id, DatabaseAccess.getPuzzleId(id).getPuzzleId());
+			stmt.execute(sql3);
+			stmt.execute(sql4);
 			stmt.close();
 			conn.close();
 			return true;
@@ -185,23 +200,28 @@ public class GameClass {
 		this.classFile = classFile;
 	}
 
-	public DuelGame getDummyGame() throws NoDummyGameException {
+	public DuelGame getDummyGame() throws Exception {
 		DuelGame dg = DatabaseAccess.getAiDummyGameForClass(this.getId());
 		return dg;
 	}
 
 	public boolean delete() {
 		logger.debug("Deleting class (ID={})", id);
+		logger.debug("Deleting story and class (Puzzle_ID={}", DatabaseAccess.getPuzzleId(id).getPuzzleId());
 		Connection conn = null;
 		Statement stmt = null;
 
 		String sql = String.format("DELETE FROM classes WHERE Class_ID='%d';", id);
+		String sql2 = String.format("DELETE FROM story WHERE Puzzle_ID='%d';", DatabaseAccess.getPuzzleId(id).getPuzzleId());
+		String sql3 = String.format("DELETE FROM puzzles WHERE Puzzle_ID='%d';", DatabaseAccess.getPuzzleId(id).getPuzzleId());
 
 		// Attempt to update game info into database
 		try {
 			conn = DatabaseAccess.getConnection();
 			stmt = conn.createStatement();
 			stmt.execute(sql);
+			stmt.execute(sql2);
+			stmt.execute(sql3);
 			stmt.close();
 			conn.close();
 			return true;

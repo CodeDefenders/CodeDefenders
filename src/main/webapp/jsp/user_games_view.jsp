@@ -2,15 +2,58 @@
 <%@ page import="org.codedefenders.Role" %>
 <%@ page import="org.codedefenders.*" %>
 <%@ page import="org.codedefenders.duel.DuelGame" %>
+<%@ page import="org.codedefenders.story.StoryPuzzle" %>
 <%@ page import="org.codedefenders.util.DatabaseAccess" %>
+<%@ page import="javax.xml.crypto.Data" %>
 <% String pageTitle="My Games"; %>
 <%@ include file="/jsp/header.jsp" %>
-	<%
+<%
 	String atkName;
 	String defName;
 	int uid = (Integer)request.getSession().getAttribute("uid");
-	List<DuelGame> games = DatabaseAccess.getGamesForUser(uid); %>
+	List<DuelGame> games = DatabaseAccess.getGamesForUser(uid);
+	List<StoryGame> currentLevel = DatabaseAccess.getCurrentLevel(uid);
+	int allPuzzles = DatabaseAccess.getAllPuzzleCount(uid);
+	int allCompleted = DatabaseAccess.getCompletedPuzzleCount(uid);
+	int progress = (allCompleted*100)/allPuzzles;
+%>
 <div class="w-100">
+	<h3>Story Mode</h3>
+<table class="table table-hover table-responsive table-paragraphs games-table">
+	<tr>
+		<th class="col-sm-4">Current level</th>
+		<th class="col-sm-4">Progress</th>
+		<th class="col-sm-4">Action</th>
+	</tr>
+	<%
+
+	%>
+	<tr>
+		<%
+			int count = 0;
+			for (StoryGame s : currentLevel) {
+			    count++;
+			    if (currentLevel.isEmpty()) { %>
+		<td colspan="100%">No puzzles have been added yet!</td>
+		<%
+				} else if (!s.getStoryState().equals(StoryState.COMPLETED) && s.getPuzzleName() != null) {
+		%>
+		<td>(<%=s.getLevelNum()%> - <%=s.getPuzzle()%>) <%=s.getPuzzleName()%></td>
+		<td><%= progress %>% (<%=allCompleted%>/<%=allPuzzles%>)</td>
+		<td><a href="/story/view" class="btn btn-primary">Go!</a></td>
+		<%
+					break;
+				} else if (count == currentLevel.size()){
+		%>
+			<td>Finished!</td>
+			<td><%= progress %>% (<%=allCompleted%>/<%=allPuzzles%>)</td>
+			<td><a href="/story/view" class="btn btn-primary">Go!</a></td>
+		<%
+				}
+			}
+		%>
+	</tr>
+</table>
 	<h3>Duels</h3>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>

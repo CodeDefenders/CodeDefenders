@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
-         version="3.1">
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+		 version="3.1">
 
 	<description>
 		Code Defenders: A Mutation Testing Game
@@ -39,7 +39,7 @@
 		<servlet-name>uploadManager</servlet-name>
 		<url-pattern>/upload</url-pattern>
 	</servlet-mapping>
-	
+
 	<servlet>
 		<servlet-name>aiPreparer</servlet-name>
 		<servlet-class>org.codedefenders.singleplayer.AiPreparer</servlet-class>
@@ -253,6 +253,118 @@
 		<url-pattern>/multiplayer/move</url-pattern>
 	</servlet-mapping>
 	<!-- end multiplayer servlets -->
+
+	<!-- start storymode servlets -->
+	
+	<servlet>
+		<servlet-name>storyLevelView</servlet-name>
+		<jsp-file>/jsp/story/level_view.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>storyLevelView</servlet-name>
+		<url-pattern>/story/view</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>storyPuzzleEditor</servlet-name>
+		<jsp-file>/jsp/story/puzzle_editor.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>storyPuzzleEditor</servlet-name>
+		<url-pattern>/story/mypuzzles</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>storyEditPuzzle</servlet-name>
+		<jsp-file>/jsp/story/edit_puzzle.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>storyEditPuzzle</servlet-name>
+		<url-pattern>/puzzle/edit</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>storyAchievements</servlet-name>
+		<jsp-file>/jsp/story/achievements.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>storyAchievements</servlet-name>
+		<url-pattern>/story/achievements</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>uploadStory</servlet-name>
+		<jsp-file>/jsp/story/upload_puzzle_view.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>uploadStory</servlet-name>
+		<url-pattern>/puzzle/upload</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>uploadMutant</servlet-name>
+		<jsp-file>/jsp/story/upload_mutant_view.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>uploadMutant</servlet-name>
+		<url-pattern>/puzzle/mutant/upload</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>uploadTest</servlet-name>
+		<jsp-file>/jsp/story/upload_test_view.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>uploadTest</servlet-name>
+		<url-pattern>/puzzle/test/upload</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>PuzzleEditor</servlet-name>
+		<servlet-class>org.codedefenders.PuzzleEditor</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>PuzzleEditor</servlet-name>
+		<url-pattern>/editpuzzles</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>PuzzleManager</servlet-name>
+		<servlet-class>org.codedefenders.PuzzleManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>PuzzleManager</servlet-name>
+		<url-pattern>/puzzles</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>StoryUploadManager</servlet-name>
+		<servlet-class>org.codedefenders.StoryUploadManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>StoryUploadManager</servlet-name>
+		<url-pattern>/puzzle/uploader</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>PuzzleSelectionManager</servlet-name>
+		<servlet-class>org.codedefenders.PuzzleSelectionManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>PuzzleSelectionManager</servlet-name>
+		<url-pattern>/puzzle</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>ResultManager</servlet-name>
+		<servlet-class>org.codedefenders.ResultManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ResultManager</servlet-name>
+		<url-pattern>/results</url-pattern>
+	</servlet-mapping>
+
+	<!-- end storymode servlets -->
 
 	<!-- Notification JSON Servlets -->
 

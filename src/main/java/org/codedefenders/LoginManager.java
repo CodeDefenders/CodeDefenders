@@ -1,5 +1,6 @@
 package org.codedefenders;
 
+import org.codedefenders.story.StoryGame;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class LoginManager extends HttpServlet {
 
@@ -31,6 +33,7 @@ public class LoginManager extends HttpServlet {
 		ArrayList<String> messages = new ArrayList<String>();
 		request.getSession().setAttribute("messages", messages);
 
+		List<StoryGame> puzzleList = DatabaseAccess.getAllPuzzles();
 
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
@@ -54,6 +57,7 @@ public class LoginManager extends HttpServlet {
 						session.setAttribute("uid", newUser.getId());
 						session.setAttribute("username", newUser.getUsername());
 						session.setAttribute("messages", messages);
+						newUser.insertStory(puzzleList);
 
 						response.sendRedirect("games");
 					} else {
@@ -159,7 +163,7 @@ public class LoginManager extends HttpServlet {
 	*/
 	public static boolean validPassword(String password) {
 		// 3-10 alphanumeric characters (a-z, A-Z, 0-9) (no whitespaces)
-		String pattern = "^[a-zA-Z0-9]{3,20}$";
+		String pattern = "^[a-zA-Z0-9]{3,10}$";
 		return password != null && password.matches(pattern);
 	}
 }

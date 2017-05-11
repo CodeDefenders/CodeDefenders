@@ -1,14 +1,18 @@
 package org.codedefenders;
 
+import org.codedefenders.story.StoryGame;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import javax.xml.crypto.Data;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
+import java.util.ArrayList;
 
 public class User {
 
@@ -79,6 +83,39 @@ public class User {
 			DatabaseAccess.cleanup(conn, stmt);
 		}
 		return false;
+	}
+
+	// when new user is made, add progress to all created puzzles
+	public boolean insertStory(List<StoryGame> puzzles) {
+
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+
+			conn = DatabaseAccess.getConnection();
+
+			stmt = conn.createStatement();
+			logger.debug("Insert into story mode for new user" + id);
+
+			// for every puzzle, add into story table
+			for (StoryGame puzzle: puzzles) {
+				int pid = puzzle.getPuzzleId();
+				String sql = String.format("INSERT INTO story (User_ID, Puzzle_ID) VALUES (%d, %d);", id, pid);
+
+				stmt.execute(sql);
+			}
+			return true;
+		} catch (SQLException se) {
+			System.out.println(se);
+		} catch (Exception e) {
+			System.out.println(e);
+		} finally {
+			DatabaseAccess.cleanup(conn, stmt);
+		}
+
+		return false;
+
 	}
 
 	public boolean isValidated() {

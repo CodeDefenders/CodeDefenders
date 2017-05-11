@@ -2,16 +2,13 @@ package org.codedefenders;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.duel.DuelGame;
-import org.codedefenders.events.Event;
-import org.codedefenders.events.EventStatus;
-import org.codedefenders.events.EventType;
+import org.codedefenders.story.StoryGame;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.scoring.Scorer;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,14 +50,38 @@ public class MutationTester {
 		}
 	}
 
+	public static void runTestOnAllPMutants(StoryGame story, PuzzleTest test, ArrayList<String> messages) {
+
+		int killed = 0;
+		List<PuzzleMutant> mutants = story.getAlivePMutants();
+		for (PuzzleMutant mutant : mutants) {
+			killed += testVsPMutant(test, mutant) ? 1 : 0;
+		}
+		if (killed == 0) {
+			if (mutants.size() == 0) {
+				messages.add(TEST_SUBMITTED_MESSAGE);
+			} else {
+				messages.add(TEST_KILLED_ZERO_MESSAGE);
+			}
+		} else {
+			if (killed == 1) {
+				if (mutants.size() == 1) {
+					messages.add(TEST_KILLED_LAST_MESSAGE);
+				} else {
+					messages.add(TEST_KILLED_ONE_MESSAGE);
+				}
+			} else {
+				messages.add(String.format(TEST_KILLED_N_MESSAGE, killed));
+			}
+		}
+
+	}
+
 	public static void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages) {
 		int killed = 0;
 		List<Mutant> mutants = game.getAliveMutants();
 		mutants.addAll(game.getMutantsMarkedEquivalentPending());
 		List<Mutant> killedMutants = new ArrayList<Mutant>();
-
-		User u = DatabaseAccess.getUserFromPlayer(test.getPlayerId());
-
 		for (Mutant mutant : mutants) {
 			if (testVsMutant(test, mutant)){
 				killed++;
@@ -101,13 +122,6 @@ public class MutationTester {
 			else
 				messages.add(TEST_KILLED_ZERO_MESSAGE);
 		else {
-			Event notif = new Event(-1, game.getId(),
-					u.getId(),
-					u.getUsername() + "&#39;s test kills " + killed + " " +
-							"mutants.",
-					EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME,
-					new Timestamp(System.currentTimeMillis()));
-			notif.insert();
 			if (killed == 1) {
 				if (mutants.size() == 1)
 					messages.add(TEST_KILLED_LAST_MESSAGE);
@@ -122,8 +136,6 @@ public class MutationTester {
 
 	public static void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages) {
 		List<Test> tests = game.getTests(true); // executable tests submitted by defenders
-		User u = DatabaseAccess.getUserFromPlayer(mutant.getPlayerId());
-
 		for (Test test : tests) {
 			// If this mutant/test pairing hasnt been run before and the test might kill the mutant
 			if (testVsMutant(test, mutant)) {
@@ -135,15 +147,6 @@ public class MutationTester {
 					test.setScore(Scorer.score((MultiplayerGame) game, test, mlist));
 					test.update();
 				}
-
-				Event notif = new Event(-1, game.getId(),
-						u.getId(),
-						u.getUsername() + "&#39;s mutant is killed by " +
-						DatabaseAccess.getUserFromPlayer(test.getPlayerId()).getUsername() + "&#39;s test.",
-						EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME,
-						new Timestamp(System.currentTimeMillis()));
-				notif.insert();
-
 				return; // return as soon as a test kills the mutant
 			}
 		}
@@ -154,12 +157,6 @@ public class MutationTester {
 			messages.add(MUTANT_ALIVE_1_MESSAGE);
 		else
 			messages.add(String.format(MUTANT_ALIVE_N_MESSAGE,tests.size()));
-		Event notif = new Event(-1, game.getId(),
-				u.getId(),
-				u.getUsername() + "&#39;s mutant survives the test suite.",
-				EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME,
-				new Timestamp(System.currentTimeMillis()));
-		notif.insert();
 
 		if (game instanceof MultiplayerGame) {
 			ArrayList<Test> missedTests = new ArrayList<Test>();
@@ -169,6 +166,20 @@ public class MutationTester {
 			}
 			mutant.setScore(1 + Scorer.score((MultiplayerGame) game, mutant, missedTests));
 			mutant.update();
+		}
+	}
+
+	public static void runAllTestsOnPMutant(AbstractGame story, PuzzleMutant mutant, ArrayList<String> messages) {
+
+		List<PuzzleTest> tests = story.getPTests(true);
+		for(PuzzleTest test : tests) {
+			logger.info("Checking Puzzle Test vs Puzzle Mutant");
+			if(testVsPMutant(test,mutant)) {
+				logger.info("Test {} kills mutant {}", test.getTestId(), mutant.getMutantId());
+				messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getTestId()));
+
+				return;
+			}
 		}
 	}
 
@@ -193,6 +204,27 @@ public class MutationTester {
 		} else
 			System.err.println(String.format("No execution result found for (m: %d,t: %d)", mutant.getId(), test.getId()));
 		return false;
+	}
+
+	private static boolean testVsPMutant(PuzzleTest test, PuzzleMutant mutant) {
+
+		if (DatabaseAccess.getTargetExecutionForStoryPair(test.getTestId(), mutant.getMutantId()) == null) {
+			// Run test against mutant and get result
+			TargetExecution executedTarget = AntRunner.testPMutant(mutant, test);
+
+			if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
+				System.out.println(String.format("Test %d kills Mutant %d", test.getTestId(), mutant.getMutantId()));
+				mutant.kill(PuzzleMutant.Equivalence.ASSUMED_NO);
+				test.killMutant();
+				return true;
+			}
+
+		} else {
+			System.err.println(String.format("No execution result found for (m: %d, t: %d)", mutant.getMutantId(), test.getTestId()));
+		}
+
+		return false;
+
 	}
 
 	/**

@@ -92,24 +92,20 @@
 
     <script>
         $(document).ready(function() {
-            try {
-                $('table.mutant-table').DataTable( {
-                    "pagingType": "full_numbers",
-                    "searching": true,
-                    "lengthChange": false,
-                    "ordering": false,
-                    "pageLength": 4,
-                    language: {
-                        search: "_INPUT_",
-                        searchPlaceholder: "Search...",
-                        info: "",
-                        sInfoEmpty: "",
-                        sInfoFiltered: ""
-                    }
-                } );
-            } catch (e) {
-                // statements to handle TypeError exceptions
-            }
+            $('table.mutant-table').DataTable( {
+                "pagingType": "full_numbers",
+                "searching": true,
+                "lengthChange": false,
+                "ordering": false,
+                "pageLength": 4,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search...",
+                    info: "",
+                    sInfoEmpty: "",
+                    sInfoFiltered: ""
+                }
+            } );
         } );
     </script>
 
@@ -121,6 +117,7 @@
 <%@ page import="org.codedefenders.User" %>
 <%@ page import="org.codedefenders.Mutant" %>
 <%@ page import="org.codedefenders.duel.DuelGame" %>
+<%@ page import="org.codedefenders.story.StoryGame" %>
 <%@ page import="org.codedefenders.Constants" %>
 <%@ page import="org.codedefenders.util.DatabaseAccess" %>
 <%@ page import="org.codedefenders.Role" %>
@@ -129,6 +126,7 @@
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
 <%@ page import="java.util.ArrayList" %>
     <% DuelGame game = (DuelGame) session.getAttribute("game"); %>
+    <% StoryGame puzzle = (StoryGame) session.getAttribute("puzzle"); %>
 <div class="menu-top bg-grey bg-plus-4 text-white" style="padding-bottom:0px;">
     <div class="full-width">
         <div class="nest">

@@ -1,4 +1,4 @@
-<% if (role.equals(Role.DEFENDER) || role.equals(Role.CREATOR) || mg.getLevel().equals(GameLevel.EASY)){
+<% if (role.equals(Role.DEFENDER) || role.equals(Role.CREATOR) || mg.getLevel().equals(Game.Level.EASY)){
 %>
 <div class="ws-12">
     <h2> JUnit tests </h2>

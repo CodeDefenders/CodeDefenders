@@ -28,13 +28,14 @@ public abstract class AiPlayer {
 
 	/**
 	 * Make the AI's turn if it is its turn.
-	 * @return true if turn successfully made, false otherwise - can be used to show notifications
 	 */
 	public boolean makeTurn() {
 		boolean success = false;
 		messages.clear();
 		if (game.getActiveRole().equals(role)) {
-			if (tryTurn()) { success = true; }
+			for (int i = 0; i < 3; i++) {
+				if (tryTurn()) { success = true; break; }
+			}
 			game.endTurn();
 		}
 		return success;
