@@ -1,6 +1,7 @@
 package org.codedefenders.events;
 
 import com.google.gson.Gson;
+import org.codedefenders.Role;
 import org.codedefenders.User;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
@@ -33,11 +34,16 @@ public class MessageManager extends HttpServlet {
 						Integer.parseInt(request.getParameter("gameId"));
 				int userId = (int) request.getSession().getAttribute("uid");
 
+				Role role = DatabaseAccess.getRole(userId, gameId);
+
 				EventType eventType = EventType.valueOf(request.getParameter
 						("target"));
 
-				if (eventType == EventType.ATTACKER_MESSAGE ||
-						eventType == EventType.DEFENDER_MESSAGE) {
+				if ((eventType == EventType.ATTACKER_MESSAGE && role.equals
+						(Role.ATTACKER)) ||
+						(eventType == EventType.DEFENDER_MESSAGE && role
+								.equals(Role.DEFENDER))
+						|| eventType == EventType.GAME_MESSAGE) {
 
 					EventStatus es = EventStatus.GAME;
 

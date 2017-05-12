@@ -5,7 +5,11 @@
 var sendMessage = function(elem){
     var ele = $(elem);
     if (ele.attr("target") && ele.attr("gameId")) {
-        var url = "/messages/send?message=" + encodeURI($(ele.parent().find("input")).val()) + "&target=" + ele.attr("target") + "&gameId=" + ele.attr("gameId");
+        var inp = $(ele.parent().find("input"));
+        var url = "/messages/send?message=" + encodeURI(inp.val()) + "&target=" + ele.attr("target") + "&gameId=" + ele.attr("gameId");
+
+        $('.send-message input').val('');
+
         $.get(url, function (r) {
             if (r.status != "Success"){
                 window.alert("Could not send message: " + r.status);
@@ -56,8 +60,14 @@ $(document).ready(function() {
         $("#game-notification-bar").addClass("min");
         $(".game-notifications").hide();
         $(".send-message button").click(function(e){
-            alert("message")
             sendMessage(e.target);
+        });
+
+
+        $(".send-message input").keyup(function(e){
+            if(e.keyCode == 13){ // 13 is enter
+                $(e.target).parent().find("button").click();
+            }
         });
 
     }

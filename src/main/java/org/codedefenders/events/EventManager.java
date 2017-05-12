@@ -41,7 +41,8 @@ public class EventManager extends HttpServlet {
 					int gameId =
 							Integer.parseInt(request.getParameter("gameId"));
 					events = DatabaseAccess.getNewEventsForGame(
-							gameId, timestamp
+							gameId, timestamp, DatabaseAccess.getRole((int)
+									request.getSession().getAttribute("uid"), gameId)
 					);
 				} else {
 					int userId =

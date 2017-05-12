@@ -4,6 +4,7 @@ import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
+import org.codedefenders.events.EventType;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.singleplayer.NoDummyGameException;
@@ -164,11 +165,18 @@ public class DatabaseAccess {
 		}
 	}
 
-	public static ArrayList<Event> getNewEventsForGame(int gameId, long time) {
+	public static ArrayList<Event> getNewEventsForGame(int gameId, long time,
+													   Role role) {
 		String sql = String.format("SELECT * FROM events WHERE Game_ID='%d' " +
 						"AND Event_Status='%s' " +
 						"AND Timestamp >= FROM_UNIXTIME(%d)",
 				gameId, EventStatus.GAME, time);
+
+		if (role.equals(Role.ATTACKER)){
+			sql += " AND Event_Type!='DEFENDER_MESSAGE'";
+		} else if (role.equals(Role.DEFENDER)){
+			sql += " AND Event_Type!='ATTACKER_MESSAGE'";
+		}
 		return getEvents(sql);
 	}
 

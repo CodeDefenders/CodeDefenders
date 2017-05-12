@@ -119,6 +119,11 @@
 }
 
 #game-notification-bar.expand {
+    margin-left: -457px;
+    width: 457px;
+}
+
+#game-notification-bar.expand.creator {
     margin-left: -657px;
     width: 657px;
 }

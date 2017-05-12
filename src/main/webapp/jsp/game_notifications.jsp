@@ -9,9 +9,9 @@
 
                 var eventClass = "#game-notifications-game"
 
-                 if (r[index].eventType.includes("DEFENDER")){
+                 if (r[index].eventType == "DEFENDER_MESSAGE"){
                     eventClass = "#game-notifications-defenders"
-                 } else if (r[index].eventType.includes("ATTACKER")){
+                 } else if (r[index].eventType == "ATTACKER_MESSAGE"){
                     eventClass = "#game-notifications-attackers"
                 }
 
@@ -93,12 +93,18 @@
         }
     );
 </script>
-<div id="game-notification-bar" class="min">
+<div id="game-notification-bar" class="min<%
+if (role.equals(Role.CREATOR)) { %> creator<% } %>">
 <a id="notification-show-bar"><span>(<span
 id="notif-game-total-count">0</span>)</span>
 </a>
+
+     <%
+     int rightPosition = 20;
+     if (!role.equals(Role.DEFENDER)){
+    %>
     <div class="game-notifications min" id="game-notifications-attackers"
-    style="right: 20px;">
+    style="right: <%= rightPosition %>px;">
         <a>Attackers<span class="hidden">(<span class="notif-count"></span>)</span></a>
             <div class="events">
 
@@ -111,8 +117,12 @@ id="notif-game-total-count">0</span>)</span>
             </div>
     </div>
 
+    <%
+    rightPosition += 200;
+
+    } if (!role.equals(Role.ATTACKER)){ %>
      <div class="game-notifications min" id="game-notifications-defenders"
-     style="right: 220px;">
+     style="right: <%= rightPosition %>px">
         <a>Defenders<span class="hidden">(<span class="notif-count"></span>)</span></a>
             <div class="events">
 
@@ -125,16 +135,20 @@ id="notif-game-total-count">0</span>)</span>
             </div>
      </div>
 
+     <%
+      rightPosition += 200;
+      } %>
+
      <div class="game-notifications min" id="game-notifications-game"
-     style="right: 420px;">
+     style="right: <%= rightPosition %>px;">
         <a>Game<span class="hidden">(<span class="notif-count"></span>)</span></a>
             <div class="events">
     &nbsp;
         </div>
-        <div class="send-message">
-            <input disabled="true" type="text"
-            placeholder="Cannot send game messages" />
-            <button>&gt;</button>
-        </div>
+            <div class="send-message">
+                <input type="text" placeholder="send message" />
+                <button gameId="<%=gameId%>" target="GAME_MESSAGE">&gt;
+                </button>
+            </div>
      </div><!-- col-md-6 left bottom -->
 </div>
