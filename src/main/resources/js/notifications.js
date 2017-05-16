@@ -37,6 +37,8 @@ $(document).ready(function() {
                 parent.focus();
                 var lastCount = $(parent).find(".notif-count");
                 lastCount.parent().hide();
+
+                lastCount.html("0");
             }
         });
 

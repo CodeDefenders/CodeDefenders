@@ -114,18 +114,18 @@
 }
 
 #game-notification-bar.min {
-    margin-left: -36px;
-    width: 36px;
+    margin-left: -50px;
+    width: 50px;
 }
 
 #game-notification-bar.expand {
-    margin-left: -457px;
-    width: 457px;
+    margin-left: -471px;
+    width: 471px;
 }
 
 #game-notification-bar.expand.creator {
-    margin-left: -657px;
-    width: 657px;
+    margin-left: -671px;
+    width: 671px;
 }
 
 #notification-show-bar {
