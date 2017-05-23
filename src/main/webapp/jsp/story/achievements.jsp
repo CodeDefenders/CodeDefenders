@@ -53,20 +53,21 @@
                     if (a.getUserId() == uid && a.getAchieved() == 1) {
             %>
                     <tr>
-                        <td class="col-lg-4"><%= a.getAchvName() %></td>
-                        <td class="col-lg-6"><%= a.getAchvDesc() %></td>
+                        <td class="col-lg-4" style="color:#0099ff"><%= a.getAchvName() %></td>
+                        <td class="col-lg-6" style="color:#0099ff"><%= a.getAchvDesc() %></td>
                         <td class="col=lg-2"><img style="height:15%;width:15%;"src="images/achieved.png"></td>
                     </tr>
             <%
-                    } else {
+                    } else if (a.getUserId() == 0) {
             %>
-                    <tr>
-                        <td class="col-lg-4" style="color:#666666;"><%= a.getAchvName() %></td>
-                        <td class="col-lg-6" style="color:#666666;"><%= a.getAchvDesc() %></td>
-                        <td class="col-lg-2"></td>
-                    </tr>
+                        <tr>
+                            <td class="col-lg-4" style="color:#666666;"><%= a.getAchvName() %></td>
+                            <td class="col-lg-6" style="color:#666666;"><%= a.getAchvDesc() %></td>
+                            <td class="col-lg-2"></td>
+                        </tr>
 
         <%
+
                     }
                 }
             }
