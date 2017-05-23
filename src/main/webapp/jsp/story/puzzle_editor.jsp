@@ -34,7 +34,7 @@
         <% } else { %>
             <td class="col-sm-1"><%= c.getLevelId() %> - <%= c.getPuzzle() %></td>
         <% } %>
-        <td class="col-sm-5"><%= c.getClassName() %> (<%= c.getAlias() %>)</td>
+        <td class="col-sm-5"><%= c.getClassName() %> (<%= c.getPuzzleName() %>)</td>
         <%
             if (c.getPuzzleName() == null || c.getDesc() == null) {
         %>
@@ -46,7 +46,7 @@
             <form id="view" action="editpuzzles" method="post">
                 <input type="hidden" name="formType" value="reqEdit">
                 <input type="hidden" name="editClassId" value="<%= c.getClassId() %>">
-                <input type="hidden" name="classAlias" value="<%= c.getAlias() %>">
+                <input type="hidden" name="classAlias" value="<%= c.getPuzzleName() %>">
                 <input class="btn btn-primary" type="submit" value="Edit">
             </form>
         </td>

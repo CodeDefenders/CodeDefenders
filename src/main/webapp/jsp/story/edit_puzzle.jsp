@@ -1,6 +1,8 @@
 <%@ page import="org.codedefenders.PuzzleMode" %>
 <%@ page import="org.codedefenders.story.StoryPuzzle" %>
 <%@ page import="org.codedefenders.PuzzleClass" %>
+<%@ page import="org.codedefenders.StoryClass" %>
+%>
 <%@ page import="org.codedefenders.util.DatabaseAccess" %>
 <%@ page import="javax.xml.crypto.Data" %>
 <% String pageTitle = null; %>
@@ -9,17 +11,19 @@
 <%
     int cid = (Integer) request.getAttribute("editClassId");
     StoryPuzzle details = DatabaseAccess.getLevelDetails(cid); // get list of levels
+    List<String> unavailable = DatabaseAccess.getUnavailablePuzzles();
+    StoryClass editCut = DatabaseAccess.getStoryForKey(cid);
 %>
 
 <div class="container-fluid">
-    <h2>Edit ${classAlias}</h2>
+    <h2>Editing '${classAlias}'</h2>
     <form id="formEdit" action="editpuzzles" class="form-upload form-horizontal" method="post">
         <input type="hidden" name="formType" value="sendEdit">
         <input type="hidden" name="editClassId" value="${editClassId}">
         <div class="form-group">
             <label class="control-label" for="levelNumber">Level:</label>
             <span>
-                <select id="levelNumber" name="levelNumber">
+                <select id="levelNumber" name="levelNumber" class="form-control" style="width:50px;">
                     <%
                         List<PuzzleClass> levels = DatabaseAccess.getLevels();
                         if (levels.isEmpty()) {
@@ -50,8 +54,32 @@
                         puzzleNum = "";
                     }
                 %>
-                <input id="puzzleNumber" name="puzzleNumber" type="text" class="form-control" placeholder="<%= puzzleNum %>", value="<%= puzzleNum %>">
-                <!--<a href="#" class="btn btn-primary btn-right" id="btnPuzzles" data-toggle="modal" data-target="#puzzleModal">Check Puzzle</a>-->
+                <input id="puzzleNumber" name="puzzleNumber" type="text" style="width:50px;" class="form-control" placeholder="<%= puzzleNum %>", value="<%= puzzleNum %>">
+                <a href="#" class="btn btn-primary" id="btnPuzzles" data-toggle="modal" data-target="#puzzleModal">Check Unavailable Puzzle Numbers</a>
+                <div id="puzzleModal" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+                                <h4 class="modal-title">Unavailable puzzle numbers</h4>
+                            </div>
+                            <div class="modal-body">
+                                <p>
+                                    <%
+                                        for (String s : unavailable) {
+                                    %>
+                                            <%=s%>
+                                    <%
+                                        }
+                                    %>
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- End Unavailable puzzle modal -->
             </span>
             <input type="hidden" name="pNum" value="<%= details.getPuzzleNum() %>">
         </div>
@@ -105,7 +133,7 @@
         <div class="form-group">
             <label class="control-label" for="pMode">Puzzle mode:</label>
             <span>
-                <select id="pMode" name="pMode">
+                <select id="pMode" name="pMode" class="form-control" style="width:150px;">
                     <%
                         if (details.getMode().equals(PuzzleMode.ATTACKER)) {
                     %>
@@ -127,6 +155,7 @@
             <input class="btn btn-primary" type="submit" value="Submit changes" onClick="getPuzzleMode()">
             <input type="hidden" id="puzzleMode" name="puzzleMode" value="">
         </div>
+        <input type="hidden" id="puzzleId" name="puzzleId" value="<%=details.getPuzzleId()%>">
     </form>
 
     <script>

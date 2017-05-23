@@ -16,8 +16,9 @@ public class StoryPuzzle {
     private String desc;
     private PuzzleMode mode;
 
-    public StoryPuzzle (int levelNum, int puzzleNum, String puzzleName, String hint, String desc, PuzzleMode mode) {
+    public StoryPuzzle (int puzzleId, int levelNum, int puzzleNum, String puzzleName, String hint, String desc, PuzzleMode mode) {
 
+        this.puzzleId = puzzleId;
         this.levelNum = levelNum;
         this.puzzleNum = puzzleNum;
         this.puzzleName = puzzleName;

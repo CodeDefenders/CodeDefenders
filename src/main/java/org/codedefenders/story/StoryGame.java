@@ -93,11 +93,12 @@ public class StoryGame extends AbstractGame {
 
     }
 
-    public StoryGame (int levelId, StoryState state, int puzzleNum) {
+    public StoryGame (int levelId, StoryState state, int puzzleNum, int puzzleId) {
 
         this.levelId = levelId;
         this.storyState = state;
         this.puzzle = puzzleNum;
+        this.puzzleId = puzzleId;
     }
 
     public StoryGame (int levelNum, int puzzleNum, String name, StoryState state) {

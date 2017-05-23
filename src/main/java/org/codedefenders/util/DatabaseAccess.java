@@ -1282,7 +1282,7 @@ public class DatabaseAccess {
 
 			if (rs.next()) {
 				StoryPuzzle details;
-				details = new StoryPuzzle(rs.getInt("LevelNumber"), rs.getInt("Puzzle"),
+				details = new StoryPuzzle(rs.getInt("Puzzle_ID"), rs.getInt("LevelNumber"), rs.getInt("Puzzle"),
 						rs.getString("PuzzleName"), rs.getString("Hint"), rs.getString("Description"),
 						PuzzleMode.valueOf(rs.getString("Mode")));
 				return details;
@@ -1298,6 +1298,57 @@ public class DatabaseAccess {
 		}
 
 		return null;
+
+	}
+
+	public static List<String> getUnavailablePuzzles() {
+
+		Connection conn = null;
+		Statement stmt = null;
+		List<String> list = new ArrayList<String>();
+
+		List<PuzzleClass> levels = DatabaseAccess.getLevels();
+
+		for (PuzzleClass l : levels) {
+			String sql = String.format("SELECT Puzzle FROM puzzles " +
+					"WHERE Level_ID=%d " +
+					"ORDER BY Puzzle ASC",l.getLevelNum());
+
+			try {
+
+				conn = getConnection();
+				stmt = conn.createStatement();
+
+				ResultSet rs = stmt.executeQuery(sql);
+
+				list.add("Level " + l.getLevelNum() + ": ");
+
+				int temp = 0;
+				while(rs.next()) {
+					// Don't add comma since it's the first value
+					if (temp == 0) {
+						list.add(String.valueOf(rs.getInt("Puzzle")));
+					} else {
+						// add a comma to any recurring values
+						list.add(", ");
+						list.add(String.valueOf(rs.getInt("Puzzle")));
+					}
+					temp++;
+				}
+
+				list.add("<br>");
+
+			} catch (SQLException se) {
+				System.out.println(se);
+			} catch (Exception e) {
+				System.out.println(e);
+			} finally {
+				cleanup(conn, stmt);
+			}
+
+		}
+
+		return list;
 
 	}
 
@@ -1434,7 +1485,7 @@ public class DatabaseAccess {
 
 			while (rs.next()) {
 				list.add(new StoryGame(rs.getInt("Level_ID"), StoryState.valueOf(rs.getString("State")),
-						rs.getInt("Puzzle")));
+						rs.getInt("Puzzle"), rs.getInt("Puzzle_ID")));
 			}
 
 		} catch (SQLException se) {

@@ -37,6 +37,7 @@ public class PuzzleEditor extends HttpServlet {
         int levelNumber;
         int classId;
         int uid;
+        int puzzleId;
         String puzzleName, puzzleHint, puzzleDesc, puzzleMode;
         String formType = req.getParameter("formType");
 
@@ -57,17 +58,48 @@ public class PuzzleEditor extends HttpServlet {
         } else if (formType.equals("sendEdit")) {
 
             levelNumber = Integer.parseInt(req.getParameter("levelNumber"));
-            int puzzleNumber = Integer.parseInt(req.getParameter("puzzleNumber"));
+            String tempNum = req.getParameter("puzzleNumber");
             classId = Integer.parseInt(req.getParameter("editClassId"));
             puzzleName = req.getParameter("classAlias");
             puzzleHint = req.getParameter("puzzleHint");
             puzzleDesc = req.getParameter("puzzleDesc");
             puzzleMode = req.getParameter("puzzleMode");
+            puzzleId = Integer.parseInt(req.getParameter("puzzleId"));
 
-            if (puzzleDesc == null || puzzleName == null) {
+            int puzzleNumber = 0;
+
+            try { // see if input can be converted to valid type: int
+                puzzleNumber = Integer.parseInt(tempNum);
+            } catch (Exception e) {
+                e.printStackTrace();
+                messages.add("Please enter a valid puzzle number");
+                req.setAttribute("editClassId", classId);
+                req.setAttribute("classAlias", puzzleName);
+                RequestDispatcher view = getServletContext().getRequestDispatcher("/puzzle/edit");
+                view.forward(req, res);
+                return;
+            }
+
+            List<StoryGame> levelList = DatabaseAccess.getPuzzlesForLevel(levelNumber);
+
+            for (StoryGame l : levelList) {
+                if (l.getPuzzle() == puzzleNumber && puzzleId != l.getPuzzleId()) {
+                    messages.add(levelNumber + "-" + puzzleNumber + " has already been taken. Please try another one.");
+                    req.setAttribute("editClassId", classId);
+                    req.setAttribute("classAlias", puzzleName);
+                    RequestDispatcher view = getServletContext().getRequestDispatcher("/puzzle/edit");
+                    view.forward(req, res);
+                    return;
+                }
+            }
+
+            if (puzzleDesc == null || puzzleName == null || puzzleDesc == "" || puzzleName == "") {
 
                 messages.add("Please enter a puzzle name and/or a description");
-                res.sendRedirect(req.getHeader("referer"));
+                req.setAttribute("editClassId", classId);
+                req.setAttribute("classAlias", puzzleName);
+                RequestDispatcher view = getServletContext().getRequestDispatcher("/puzzle/edit");
+                view.forward(req, res);
 
             } else {
 
