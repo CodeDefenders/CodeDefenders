@@ -89,6 +89,8 @@ public class Event {
                         "Event_Status) " +
                         "VALUES (%d, %d, '%s', '%s', '%s') ",
                 gameId, playerId, message, eventType, eventStatus);
+
+        sql = sql.replaceAll("\\<[^>]*>","");
         return DatabaseAccess.executeUpdate(sql);
     }
 
