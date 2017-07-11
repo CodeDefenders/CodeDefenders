@@ -1,5 +1,4 @@
-<% String pTitle = pageTitle;
-pageTitle = null;
+<% pageTitle = "Game " + mg.getId();
 %>
 <%@ include file="/jsp/header.jsp" %>
 </div></div></div></div></div>
