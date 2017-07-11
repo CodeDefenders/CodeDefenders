@@ -7,7 +7,9 @@
 		<div id="divUpload" >
 			<form id="formUpload" action="upload" class="form-upload" method="post" enctype="multipart/form-data">
 				<input id="classAlias" name="classAlias" type="text" class="form-control" placeholder="Optional class alias" >
+				<!--
 				<input type="checkbox" name="prepareForSingle" value="prepare" style="margin-right:5px;">Generate mutants and tests for single-player mode? (It may take a while...)</input>
+				-->
 				<span id="file-select">
 					<input id="fileUpload" name="fileUpload" type="file" class="file-loading" accept=".java" />
 				</span>
@@ -59,6 +61,7 @@
 									</div>
 								</div>
 							</td>
+							<!--
 							<td>
 								<form id="aiPrepButton<%= c.getId() %>" action="ai_preparer" method="post" >
 									<button type="submit" class="btn btn-primary btn-game btn-right" form="aiPrepButton<%= c.getId() %>" onClick="this.form.submit(); this.disabled=true; this.value='Preparing...';"
@@ -69,6 +72,7 @@
 									<input type="hidden" name="cutID" value="<%= c.getId() %>" />
 								</form>
 							</td>
+							-->
 						</tr>
 					<% } %>
 				<% } %>
