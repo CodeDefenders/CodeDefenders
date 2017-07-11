@@ -20,6 +20,20 @@ import java.util.List;
 
 public class DatabaseAccess {
 
+	/**
+	 * Sanitises user input. If a whole SQL query is entered, syntax
+	 * errors may occur.
+	 * @param s user input String
+	 * @return sanitised String s
+	 */
+	public static String sanitise(String s){
+		s = s.replaceAll("\\<","&lt;");
+		s = s.replaceAll("\\>", "&gt;");
+		s = s.replaceAll("\\\"", "&quot;");
+		s = s.replaceAll("\\'", "&apos;");
+		return s;
+	}
+
 	public static Connection getConnection() throws SQLException, NamingException {
 		Context initialContext = new InitialContext();
 		Context environmentContext = (Context) initialContext.lookup("java:comp/env");
