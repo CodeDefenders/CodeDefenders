@@ -4,6 +4,7 @@ import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
+import org.codedefenders.leaderboard.Entry;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.singleplayer.NoDummyGameException;
@@ -1078,13 +1079,6 @@ public class DatabaseAccess {
 		return players;
 	}
 
-	public static int getNumTestsForPlayer(int pid) {
-		int n = 0;
-		String sql = String.format("SELECT * FROM tests WHERE Player_ID = '%d'", pid);
-		n += getTests(sql).size();
-		return n;
-	}
-
 	private static List<Test> getTests(String sql) {
 
 		List<Test> testList = new ArrayList<>();
@@ -1139,37 +1133,45 @@ public class DatabaseAccess {
 		return testList;
 	}
 
-	public static List<Test> getPartyTestsForUser(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_tests WHERE User_ID='%d';", uid);
-		return getTests(sql);
-	}
-
-	public static int getNumPartyTestsForUser(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_num_tests WHERE User_ID='%d';", uid);
-		return getInt(sql, "TestCount");
-	}
-
-	public static int getNumPartyTestKillsForUser(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_num_tests_kill WHERE User_ID='%d';", uid);
-		return getInt(sql, "TestKillCount");
-	}
-
-	public static int getNumPartyMutantsForUser(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_num_mutants WHERE User_ID='%d';", uid);
-		return getInt(sql, "MutantCount");
-	}
-
-	public static int getUserPartyPointsMutants(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_user_points WHERE User_ID='%d';", uid);
-		return getInt(sql, "MutantPoints");
-	}
-	public static int getUserPartyPointsTests(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_user_points WHERE User_ID='%d';", uid);
-		return getInt(sql, "TestPoints");
-	}
-	public static int getUserPartyPointsTotal(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_user_points WHERE User_ID='%d';", uid);
-		return getInt(sql, "TotalPoints");
+	public static List<Entry> getLeaderboard() {
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = "SELECT U.username AS username, IFNULL(NMutants,0) AS NMutants, IFNULL(AScore,0) AS AScore, IFNULL(NTests,0) AS NTests, IFNULL(DScore,0) AS DScore, IFNULL(NKilled,0) AS NKilled, IFNULL(AScore,0)+IFNULL(DScore,0) AS TotalScore\n" +
+				"FROM users U LEFT JOIN\n" +
+				"  (SELECT PA.user_id, count(M.Mutant_ID) as NMutants, sum(M.Points) as AScore FROM players PA LEFT JOIN mutants M on PA.id = M.Player_ID GROUP BY PA.user_id)\n" +
+				"    AS Attacker ON U.user_id = Attacker.user_id\n" +
+				"  LEFT JOIN\n" +
+				"  (SELECT PD.user_id, count(T.Test_ID) as NTests, sum(T.Points) as DScore, sum(T.MutantsKilled) as NKilled FROM players PD LEFT JOIN tests T on PD.id = T.Player_ID GROUP BY PD.user_id)\n" +
+				"    AS Defender on U.user_id = Defender.user_id\n" +
+				"WHERE U.user_id > 2;";
+		List<Entry> leaderboard = new ArrayList<>();
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				Entry p = new Entry();
+				p.setUsername(rs.getString("username"));
+				p.setMutantsSubmitted(rs.getInt("NMutants"));
+				p.setAttackerScore(rs.getInt("AScore"));
+				p.setTestsSubmitted(rs.getInt("NTests"));
+				p.setDefenderScore(rs.getInt("DScore"));
+				p.setMutantsKilled(rs.getInt("NKilled"));
+				p.setTotalPoints(rs.getInt("TotalScore"));
+				leaderboard.add(p);
+			}
+			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			System.out.println(se);
+		} // Handle errors for JDBC
+		catch (Exception e) {
+			e.printStackTrace();
+		} // Handle errors for Class.forName
+		finally {
+			cleanup(conn, stmt);
+		}
+		return leaderboard;
 	}
 
 	public static int getKillingTestIdForMutant(int mid) {

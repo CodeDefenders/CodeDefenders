@@ -1,12 +1,7 @@
-<%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
-<%@ page import="org.codedefenders.Role" %>
-<%@ page import="org.codedefenders.*" %>
-<%@ page import="org.codedefenders.util.DatabaseAccess" %>
-<% String pageTitle="Leaderboards"; %>
+<%@ page import="org.codedefenders.leaderboard.Leaderboard" %>
+<%@ page import="org.codedefenders.leaderboard.Entry" %>
+<% String pageTitle="Leaderboard"; %>
 <%@ include file="/jsp/header.jsp" %>
-	<%
-		List<User> users = DatabaseAccess.getAllUsers();
-	%>
 <div class="w-100">
 	<h3>Battlegrounds</h3>
 	<table id="tableMPLeaderboard" class="table table-hover table-responsive table-paragraphs games-table dataTable display">
@@ -19,29 +14,20 @@
 				<th class="col-sm-2">Defender Score</th>
 				<th class="col-sm-2">Mutants Killed</th>
 				<th class="col-sm-2">Total Score</th>
-				<!--
-				<th class="col-sm-2">Defender Wins</th>
-				<th class="col-sm-2">Attacker Wins</th>
-				-->
-				
 			</tr>
 		</thead>
 		<tbody>
 		<%
-			for (User u : users) {
+			for (Entry p : Leaderboard.getAll()) {
 		%>
 		<tr>
-			<td><%=u.getUsername()%></td>
-			<td><%=DatabaseAccess.getNumPartyMutantsForUser(u.getId())%></td>
-			<td><%=DatabaseAccess.getUserPartyPointsMutants(u.getId())%></td>
-			<td><%=DatabaseAccess.getNumPartyTestsForUser(u.getId())%></td>
-			<td><%=DatabaseAccess.getUserPartyPointsTests(u.getId())%></td>
-			<td><%=DatabaseAccess.getNumPartyTestKillsForUser(u.getId())%></td>
-			<td><%=DatabaseAccess.getUserPartyPointsTotal(u.getId())%></td>
-			<!--
-			<td></td>
-			<td></td>
-			-->
+			<td><%=p.getUsername()%></td>
+			<td><%=p.getMutantsSubmitted()%></td>
+			<td><%=p.getAttackerScore()%></td>
+			<td><%=p.getTestsSubmitted()%></td>
+			<td><%=p.getDefenderScore()%></td>
+			<td><%=p.getMutantsKilled()%></td>
+			<td><%=p.getTotalPoints()%></td>
 		</tr>
 		<% } %>
 
