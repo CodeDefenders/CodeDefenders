@@ -40,7 +40,7 @@
 
                 oldNotifications =
                     "<p><span class=\"event\">" +
-                    r[index].message +
+                    r[index].parsedMessage +
                     "</span></p>" + oldNotifications;
 
                 $(eventClass).html(oldNotifications);

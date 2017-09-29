@@ -45,16 +45,25 @@ public class MessageManager extends HttpServlet {
 								.equals(Role.DEFENDER))
 						|| eventType == EventType.GAME_MESSAGE) {
 
+					if (eventType == EventType.GAME_MESSAGE){
+						if (role.equals(Role.DEFENDER)){
+							eventType = EventType.GAME_MESSAGE_DEFENDER;
+						} else if (role.equals(Role.ATTACKER)){
+							eventType = EventType.GAME_MESSAGE_ATTACKER;
+						}
+					}
+
 					EventStatus es = EventStatus.GAME;
 
 					User u = DatabaseAccess.getUser(userId);
 
 					String message = request.getParameter("message");
 
-					Event e = new Event(0, gameId, DatabaseAccess
-							.getPlayerIdForMultiplayerGame(userId, gameId),
+					Event e = new Event(0, gameId, userId,
 							u.getUsername() + ": " + message,
 							eventType, es, new Timestamp(System.currentTimeMillis()));
+
+					e.setChatMessage(DatabaseAccess.sanitise(message));
 
 					if (e.insert()){
 						result = "{'status':'Success'}";

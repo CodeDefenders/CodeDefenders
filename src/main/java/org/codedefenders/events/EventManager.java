@@ -52,6 +52,10 @@ public class EventManager extends HttpServlet {
 					);
 				}
 
+				for (Event e : events){
+					e.parse();
+				}
+
 				out.print(gson.toJson(events));
 				out.flush();
 			}
