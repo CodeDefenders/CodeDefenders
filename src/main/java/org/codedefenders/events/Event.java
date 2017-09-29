@@ -80,7 +80,8 @@ public class Event {
         chatMessage = message;
     }
 
-    public String parse(HashMap<String, String> replacements, String message){
+    public String parse(HashMap<String, String> replacements, String message,
+                        boolean emphasise){
 
         String procMessage = message;
 
@@ -98,6 +99,10 @@ public class Event {
         if (procMessage.contains("@chat_message")){
             procMessage = procMessage.replace("@chat_message",
                     getChatMessage());
+        } else if (emphasise){
+            procMessage = "<span style='font-style: italic; font-weight: " +
+                    "bold;'>" + procMessage +
+                    "</span>";
         }
         return procMessage;
     }
@@ -108,14 +113,14 @@ public class Event {
         }
         if (parsedChatMessage == null){
             parsedChatMessage = parse(new HashMap<String, String>(),
-                    chatMessage);
+                    chatMessage, false);
         }
         return parsedChatMessage;
     }
 
     public void parse(HashMap<String, String> replacements){
 
-        this.parsedMessage = parse(replacements, message);
+        this.parsedMessage = parse(replacements, message, true);
     }
 
     public void parse(){
