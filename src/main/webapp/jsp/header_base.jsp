@@ -73,7 +73,9 @@
 
     <!-- MultiplayerGame -->
     <link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
+    <link href="css/notification-style.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="js/game_highlighting.js"></script>
+    <script type="text/javascript" src="js/notifications.js"></script>
 
     <!-- Upload page -->
     <link href="css/uploadcut.css" rel="stylesheet" type="text/css" />

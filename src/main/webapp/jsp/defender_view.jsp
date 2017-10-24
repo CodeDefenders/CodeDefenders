@@ -186,7 +186,8 @@
 						for (Mutant m : mutantsKilled) {
 							for (int line : m.getLines()){
 								if (!mutantKilledLines.containsKey(line)){
-									mutantKilledLines.put(line, new ArrayList<>());
+									mutantKilledLines.put(line, new
+											ArrayList<Mutant>());
 								}
 								mutantKilledLines.get(line).add(m);
 							}

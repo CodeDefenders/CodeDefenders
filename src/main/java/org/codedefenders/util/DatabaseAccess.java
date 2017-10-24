@@ -20,6 +20,20 @@ import java.util.List;
 
 public class DatabaseAccess {
 
+	/**
+	 * Sanitises user input. If a whole SQL query is entered, syntax
+	 * errors may occur.
+	 * @param s user input String
+	 * @return sanitised String s
+	 */
+	public static String sanitise(String s){
+		s = s.replaceAll("\\<","&lt;");
+		s = s.replaceAll("\\>", "&gt;");
+		s = s.replaceAll("\\\"", "&quot;");
+		s = s.replaceAll("\\'", "&apos;");
+		return s;
+	}
+
 	public static Connection getConnection() throws SQLException, NamingException {
 		Context initialContext = new InitialContext();
 		Context environmentContext = (Context) initialContext.lookup("java:comp/env");
@@ -118,6 +132,34 @@ public class DatabaseAccess {
 		}
 	}
 
+	public static void insertMessage(int uid, String ipAddress) {
+		Connection conn =  null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			String sql = String.format("INSERT INTO events (User_ID, IP_Address) VALUES ('%d', '%s');", uid, ipAddress);
+
+			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+
+			ResultSet rs = stmt.getGeneratedKeys();
+
+			if (rs.next()) {
+				stmt.close();
+				conn.close();
+			}
+
+		} catch (SQLException se) {
+			se.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		finally {
+			cleanup(conn, stmt);
+		}
+	}
+
 
 	public static ArrayList<Event> getEventsForGame(int gameId) {
 		String sql = String.format("SELECT * FROM events WHERE Game_ID='%d' " +
@@ -137,11 +179,18 @@ public class DatabaseAccess {
 		}
 	}
 
-	public static ArrayList<Event> getNewEventsForGame(int gameId, long time) {
+	public static ArrayList<Event> getNewEventsForGame(int gameId, long time,
+													   Role role) {
 		String sql = String.format("SELECT * FROM events WHERE Game_ID='%d' " +
 						"AND Event_Status='%s' " +
 						"AND Timestamp >= FROM_UNIXTIME(%d)",
 				gameId, EventStatus.GAME, time);
+
+		if (role.equals(Role.ATTACKER)){
+			sql += " AND Event_Type!='DEFENDER_MESSAGE'";
+		} else if (role.equals(Role.DEFENDER)){
+			sql += " AND Event_Type!='ATTACKER_MESSAGE'";
+		}
 		return getEvents(sql);
 	}
 

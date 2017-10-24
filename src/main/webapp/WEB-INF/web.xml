@@ -265,6 +265,15 @@
 		<url-pattern>/game_notifications</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>game_message</servlet-name>
+		<servlet-class>org.codedefenders.events.MessageManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>game_message</servlet-name>
+		<url-pattern>/messages/send</url-pattern>
+	</servlet-mapping>
+
 
 	<servlet>
 		<servlet-name>mutants</servlet-name>

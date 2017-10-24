@@ -88,9 +88,14 @@ public class Event {
                         "(Game_ID, Player_ID, Event_Message, Event_Type, " +
                         "Event_Status) " +
                         "VALUES (%d, %d, '%s', '%s', '%s') ",
-                gameId, playerId, message, eventType, eventStatus);
+                gameId, playerId, DatabaseAccess.sanitise(message),
+                eventType,
+                eventStatus);
+
         return DatabaseAccess.executeUpdate(sql);
     }
+
+
 
 
     public boolean update(){
@@ -102,7 +107,9 @@ public class Event {
                         "Event_Status='%s', " +
                         "Timestamp=FROM_UNIXTIME(%d) WHERE " +
                         "Event_ID=%d",
-                gameId, playerId, message, eventType, eventStatus, time.getTime
+                gameId, playerId, DatabaseAccess.sanitise(message), eventType,
+                eventStatus, time
+                        .getTime
                         (), eventId);
         return DatabaseAccess.executeUpdate(sql);
     }
