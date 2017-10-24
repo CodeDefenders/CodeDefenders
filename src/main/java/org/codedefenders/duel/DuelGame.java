@@ -189,17 +189,13 @@ public class DuelGame extends AbstractGame {
 				id = rs.getInt(1);
 				return true;
 			}
-
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
+			logger.error("Exception caught", e);
 		} finally {
-			//finally block used to close resources
 			DatabaseAccess.cleanup(conn, stmt);
-		} //end try
+		}
 
 		return false;
 	}

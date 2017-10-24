@@ -299,28 +299,11 @@ public class Mutant implements Serializable {
 				return true;
 			}
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			logger.error(e.getMessage());
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				logger.error(se.getMessage());
-				System.out.println(se);
-			}
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DatabaseAccess.cleanup(conn, stmt);
 		}
 		return false;
 	}
@@ -347,27 +330,11 @@ public class Mutant implements Serializable {
 			stmt.close();
 			return true;
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			logger.error(e.getMessage());
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DatabaseAccess.cleanup(conn, stmt);
 		}
 		return false;
 	}

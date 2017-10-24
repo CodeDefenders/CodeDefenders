@@ -1,6 +1,5 @@
 package org.codedefenders.events;
 
-import com.google.gson.Gson;
 import org.codedefenders.Role;
 import org.codedefenders.User;
 import org.codedefenders.util.DatabaseAccess;
@@ -66,8 +65,10 @@ public class MessageManager extends HttpServlet {
 					e.setChatMessage(DatabaseAccess.sanitise(message));
 
 					if (e.insert()){
+						logger.info(String.format("Event %s saved in game %d.", eventType.toString(), gameId));
 						result = "{'status':'Success'}";
-					}
+					} else
+						logger.error(String.format("Problem saving event %s in game %d", eventType.toString(), gameId));
 				}
 
 			}

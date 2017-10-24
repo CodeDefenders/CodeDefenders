@@ -61,14 +61,12 @@ public class DatabaseAccess {
 
 			return stmt.executeUpdate(sql) > 0;
 		} catch (SQLException se) {
-			//Handle errors for JDBC
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			//Handle errors for Class.forName
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 		return false;
 	}
 
@@ -91,14 +89,12 @@ public class DatabaseAccess {
 				return rs.getInt(1);
 			}
 		} catch (SQLException se) {
-			//Handle errors for JDBC
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			//Handle errors for Class.forName
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 		return -1;
 	}
 
@@ -113,9 +109,9 @@ public class DatabaseAccess {
 			stmt.execute(sql);
 			return true;
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -137,9 +133,9 @@ public class DatabaseAccess {
 			}
 
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -152,14 +148,14 @@ public class DatabaseAccess {
 				s.close();
 			}
 		} catch (SQLException se2) {
-			logger.error(se2.getMessage());
+			logger.error("SQL exception caught", se2);
 		}
 		try {
 			if (c != null) {
 				c.close();
 			}
 		} catch (SQLException se3) {
-			logger.error(se3.getMessage());
+			logger.error("SQL exception caught", se3);
 		}
 	}
 
@@ -182,9 +178,9 @@ public class DatabaseAccess {
 			}
 
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -322,14 +318,12 @@ public class DatabaseAccess {
 				prepared = true;
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 
 		return prepared;
 	}
@@ -362,18 +356,16 @@ public class DatabaseAccess {
 				try {
 					String chatMessage = rs.getString("ec.Message");
 					event.setChatMessage(chatMessage);
-				} catch (SQLException sqle){// chat message does not exist
-					logger.error(sqle.getMessage());
+				} catch (SQLException sqle){
+					logger.error("Chat message does not seem to exist", sqle);
 				}
 
 				events.add(event);
 			}
 		} catch (SQLException se) {
-			//Handle errors for JDBC
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			//Handle errors for Class.forName
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -394,11 +386,9 @@ public class DatabaseAccess {
 				return classRecord;
 			}
 		} catch (SQLException se) {
-			//Handle errors for JDBC
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			//Handle errors for Class.forName
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -419,13 +409,10 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				classList.add(new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile")));
 			}
-
 		} catch (SQLException se) {
-			//Handle errors for JDBC
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			//Handle errors for Class.forName
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -452,11 +439,9 @@ public class DatabaseAccess {
 				uList.add(userRecord);
 			}
 		} catch (SQLException se) {
-			//Handle errors for JDBC
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			//Handle errors for Class.forName
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -498,11 +483,10 @@ public class DatabaseAccess {
 				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"));
 				return userRecord;
 			}
-
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -548,9 +532,9 @@ public class DatabaseAccess {
 				return gameRecord;
 			}
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -639,11 +623,9 @@ public class DatabaseAccess {
 
 			}
 		} catch (SQLException se) {
-			//Handle errors for JDBC
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			//Handle errors for Class.forName
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -708,9 +690,9 @@ public class DatabaseAccess {
 						GameLevel.valueOf(rs.getString("Level")), GameMode.valueOf(rs.getString("Mode"))));
 			}
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -750,14 +732,12 @@ public class DatabaseAccess {
 				gameList.add(mg);
 			}
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
-
-
 		return gameList;
 	}
 
@@ -783,9 +763,9 @@ public class DatabaseAccess {
 				mutList.add(newMutant);
 			}
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -814,9 +794,9 @@ public class DatabaseAccess {
 				mutList.add(newMutant);
 			}
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -842,9 +822,9 @@ public class DatabaseAccess {
 						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
 			}
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -877,11 +857,10 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				testList.add(rs.getInt("Value"));
 			}
-
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -912,11 +891,10 @@ public class DatabaseAccess {
 				id = rs.getInt("Defender_ID");
 			}
 			return id;
-
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -939,11 +917,10 @@ public class DatabaseAccess {
 			}
 
 			return points;
-
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -971,11 +948,10 @@ public class DatabaseAccess {
 				conn.close();
 				return true;
 			}
-
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -1000,11 +976,10 @@ public class DatabaseAccess {
 				conn.close();
 				return true;
 			}
-
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -1028,11 +1003,10 @@ public class DatabaseAccess {
 			}
 			stmt.close();
 			conn.close();
-
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -1062,11 +1036,10 @@ public class DatabaseAccess {
 			if (rs.next()) {
 				return true;
 			}
-
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -1137,9 +1110,9 @@ public class DatabaseAccess {
 				players[i] = atks.get(i);
 			}
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -1188,13 +1161,12 @@ public class DatabaseAccess {
 			stmt.close();
 			conn.close();
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
-
 		return testList;
 	}
 
@@ -1228,9 +1200,9 @@ public class DatabaseAccess {
 			stmt.close();
 			conn.close();
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -1273,11 +1245,10 @@ public class DatabaseAccess {
 						rs.getString("Status"), rs.getString("Message"), rs.getString("Timestamp"));
 				return targetExecution;
 			}
-
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}
@@ -1301,11 +1272,10 @@ public class DatabaseAccess {
 				stmt.close();
 				conn.close();
 			}
-
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
 		}

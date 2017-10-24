@@ -6,22 +6,27 @@
 <%@ page import="org.codedefenders.events.EventType" %>
 <%@ page import="org.codedefenders.events.EventStatus" %>
 <%@ page import="java.sql.Timestamp" %>
+<%@ page import="org.slf4j.Logger" %>
+<%@ page import="org.slf4j.LoggerFactory" %>
 <%
+    final Logger logger = LoggerFactory.getLogger("game_view.jsp");
+
     // Get their user id from the session.
     int uid = ((Integer) session.getAttribute("uid")).intValue();
     int gameId = 0;
     try {
-        try {
-            gameId = Integer.parseInt(request.getParameter("id"));
-            session.setAttribute("mpGameId", new Integer(gameId));
-        } catch (NumberFormatException e) {
-            gameId = ((Integer) session.getAttribute("mpGameId")).intValue();
-        }
+        gameId = Integer.parseInt(request.getParameter("id"));
+        session.setAttribute("mpGameId", new Integer(gameId));
+    } catch (NumberFormatException e) {
+        logger.error("NumberFormatException caught", e);
+        gameId = ((Integer) session.getAttribute("mpGameId")).intValue();
     } catch (Exception e2){
+        logger.error("Exception caught", e2);
         response.sendRedirect("games/user");
     }
     MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
     if (mg == null){
+        logger.error(String.format("Could not find multiplayer game %d", gameId));
         response.sendRedirect("games/user");
     }
     boolean renderMutants = true;

@@ -105,20 +105,18 @@ public class GameClass {
 			ResultSet rs = stmt.getGeneratedKeys();
 			if (rs.next()) {
 				this.id = rs.getInt(1);
-				System.out.println("Inserted CUT with ID: " + this.id);
+				logger.debug("Inserted CUT with ID: " + this.id);
 				stmt.close();
 				conn.close();
 				return true;
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
+			logger.error("Exception caught", e);
 		} finally {
 			DatabaseAccess.cleanup(conn, stmt);
-		} //end try
+		}
 
 		return false;
 	}
@@ -140,14 +138,12 @@ public class GameClass {
 			conn.close();
 			return true;
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
+			logger.error("Exception caught", e);
 		} finally {
 			DatabaseAccess.cleanup(conn, stmt);
-		} //end try
+		}
 		return false;
 	}
 
@@ -206,14 +202,12 @@ public class GameClass {
 			conn.close();
 			return true;
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
+			logger.error("Exception caught", e);
 		} finally {
 			DatabaseAccess.cleanup(conn, stmt);
-		} //end try
+		}
 		return false;
 	}
 }

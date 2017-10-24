@@ -70,12 +70,10 @@ public class User {
 				return true;
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
 			DatabaseAccess.cleanup(conn, stmt);
 		}
 		return false;

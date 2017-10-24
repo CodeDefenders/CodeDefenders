@@ -5,6 +5,8 @@ import javassist.CtClass;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.util.DatabaseAccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -19,6 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Test {
+
+	private static final Logger logger = LoggerFactory.getLogger(Test.class);
 
 	private int id;
 	private int gameId;
@@ -74,6 +78,7 @@ public class Test {
 				this.roundCreated = g.getCurrentRound();
 		} catch (NullPointerException e) {
 			//multiplayer game
+			logger.error("Could not fetch game", e);
 		}
 		this.javaFile = jFile;
 		this.classFile = cFile;
@@ -134,7 +139,7 @@ public class Test {
 				testLines.add(line);
 			}
 		} catch (IOException e) {
-			System.err.println(e.getLocalizedMessage());
+			logger.error(String.format("Failed to read test class: %s", e.getLocalizedMessage()), e);
 		}
 
 		return testLines;
@@ -167,32 +172,18 @@ public class Test {
 				return true;
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DatabaseAccess.cleanup(conn, stmt);
 		}
 		return false;
 	}
 
 	public boolean update() {
 
-		System.out.println("Updating Test");
+		logger.debug("Updating Test");
 		Connection conn = null;
 		Statement stmt = null;
 		String sql = null;
@@ -237,25 +228,11 @@ public class Test {
 			stmt.close();
 			return true;
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DatabaseAccess.cleanup(conn, stmt);
 		}
 		return false;
 	}
@@ -269,7 +246,7 @@ public class Test {
 		try {
 			cc = classPool.makeClass(new FileInputStream(new File(classFile)));
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("IO exception caught", e);
 		}
 		return cc == null ? null : cc.getName();
 	}

@@ -1,21 +1,14 @@
 package org.codedefenders.events;
 
 import com.google.gson.Gson;
-import org.codedefenders.Constants;
-import org.codedefenders.User;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -27,9 +20,10 @@ public class EventManager extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		try {
 			if (!canAccess(request)) {
+				logger.debug("Access denied");
 				response.sendRedirect("/games/user");
 			} else {
-
+				logger.debug("Access granted");
 				response.setContentType("text/json");
 
 				PrintWriter out = response.getWriter();
@@ -60,6 +54,7 @@ public class EventManager extends HttpServlet {
 				out.flush();
 			}
 		} catch (Exception e){
+			logger.error("Exception caught", e);
 			response.sendRedirect("/games/user");
 		}
 	}

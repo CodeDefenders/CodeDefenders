@@ -184,13 +184,13 @@ public class MutationTester {
 
 			// If the test did NOT pass, the mutant was detected and should be killed.
 			if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
-				System.out.println(String.format("Test %d kills Mutant %d", test.getId(), mutant.getId()));
+				logger.info(String.format("Test %d kills Mutant %d", test.getId(), mutant.getId()));
 				mutant.kill(ASSUMED_NO);
 				test.killMutant();
 				return true;
 			}
 		} else
-			System.err.println(String.format("No execution result found for (m: %d,t: %d)", mutant.getId(), test.getId()));
+			logger.error(String.format("No execution result found for (m: %d,t: %d)", mutant.getId(), test.getId()));
 		return false;
 	}
 
