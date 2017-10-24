@@ -121,4 +121,9 @@ public class User {
 		DatabaseAccess.logSession(id, ipAddress);
 	}
 
+	public String printFriendly(String color){
+		return "<span style='color: " + color + "'>@" + getUsername() +
+		"</span>";
+	}
+
 }

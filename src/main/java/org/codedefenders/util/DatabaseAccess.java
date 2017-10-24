@@ -9,6 +9,8 @@ import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.singleplayer.SinglePlayerGame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -19,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseAccess {
+
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseAccess.class);
 
 	/**
 	 * Sanitises user input. If a whole SQL query is entered, syntax
@@ -46,7 +50,7 @@ public class DatabaseAccess {
 	/**
 	 * Execute an update statement.
 	 * @param sql Statement to be executed
-     */
+	 */
 	public static boolean executeUpdate(String sql) {
 		Connection conn = null;
 		Statement stmt = null;
@@ -57,15 +61,45 @@ public class DatabaseAccess {
 
 			return stmt.executeUpdate(sql) > 0;
 		} catch (SQLException se) {
-			System.out.println(se);
 			//Handle errors for JDBC
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			System.out.println(e);
 			//Handle errors for Class.forName
+			logger.error(e.getMessage());
 		} finally {
 			cleanup(conn, stmt);
 		} //end try
 		return false;
+	}
+
+
+	/**
+	 * Execute an insert statement and returns primary key.
+	 * @param sql Statement to be executed
+	 */
+	public static int executeInsert(String sql) {
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+			ResultSet rs = stmt.getGeneratedKeys();
+
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+		} catch (SQLException se) {
+			//Handle errors for JDBC
+			logger.error(se.getMessage());
+		} catch (Exception e) {
+			//Handle errors for Class.forName
+			logger.error(e.getMessage());
+		} finally {
+			cleanup(conn, stmt);
+		} //end try
+		return -1;
 	}
 
 
@@ -79,11 +113,10 @@ public class DatabaseAccess {
 			stmt.execute(sql);
 			return true;
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return false;
@@ -104,12 +137,10 @@ public class DatabaseAccess {
 			}
 
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error(se.getMessage());
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return n;
@@ -121,14 +152,14 @@ public class DatabaseAccess {
 				s.close();
 			}
 		} catch (SQLException se2) {
-			se2.printStackTrace();
+			logger.error(se2.getMessage());
 		}
 		try {
 			if (c != null) {
 				c.close();
 			}
 		} catch (SQLException se3) {
-			se3.printStackTrace();
+			logger.error(se3.getMessage());
 		}
 	}
 
@@ -151,19 +182,22 @@ public class DatabaseAccess {
 			}
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 	}
 
 
 	public static ArrayList<Event> getEventsForGame(int gameId) {
-		String sql = String.format("SELECT * FROM events WHERE Game_ID='%d' " +
-						"AND Event_Status='%s'",
+		String sql = String.format("SELECT * FROM events " +
+			"LEFT JOIN event_messages AS em ON events.Event_Type = em" +
+						".Event_Type " +
+			"LEFT JOIN event_chat AS ec ON events.Event_Id = ec.Event_Id " +
+			"WHERE Game_ID='%d' " +
+			"AND Event_Status='%s'",
 				gameId, EventStatus.GAME);
 		return getEvents(sql);
 	}
@@ -181,21 +215,28 @@ public class DatabaseAccess {
 
 	public static ArrayList<Event> getNewEventsForGame(int gameId, long time,
 													   Role role) {
-		String sql = String.format("SELECT * FROM events WHERE Game_ID='%d' " +
+		String sql = String.format("SELECT * FROM events " +
+						"LEFT JOIN event_messages AS em ON events.Event_Type = em.Event_Type " +
+						"LEFT JOIN event_chat AS ec ON events.Event_Id = ec" +
+						".Event_Id " +
+						"WHERE Game_ID='%d' " +
 						"AND Event_Status='%s' " +
 						"AND Timestamp >= FROM_UNIXTIME(%d)",
 				gameId, EventStatus.GAME, time);
 
 		if (role.equals(Role.ATTACKER)){
-			sql += " AND Event_Type!='DEFENDER_MESSAGE'";
+			sql += " AND events.Event_Type!='DEFENDER_MESSAGE'";
 		} else if (role.equals(Role.DEFENDER)){
-			sql += " AND Event_Type!='ATTACKER_MESSAGE'";
+			sql += " AND events.Event_Type!='ATTACKER_MESSAGE'";
 		}
 		return getEvents(sql);
 	}
 
 	public static ArrayList<Event> getEventsForUser(int userId) {
-		String sql = String.format("SELECT * FROM events WHERE " +
+		String sql = String.format("SELECT * FROM events " +
+						"LEFT JOIN event_messages AS em ON events.Event_Type = em.Event_Type " +
+						"LEFT JOIN event_chat AS ec ON events.Event_Id = ec.Event_Id " +
+						"WHERE " +
 						"Event_Status!='DELETED' " +
 						"AND Player_ID='%d';",
 				userId);
@@ -203,7 +244,10 @@ public class DatabaseAccess {
 	}
 
 	public static ArrayList<Event> getNewEventsForUser(int userId, long time) {
-		String sql = String.format("SELECT * FROM events WHERE Player_ID='%d'" +
+		String sql = String.format("SELECT * FROM events " +
+						"LEFT JOIN event_messages AS em ON events.Event_Type = em.Event_Type " +
+						"LEFT JOIN event_chat AS ec ON events.Event_Id = ec.Event_Id " +
+						"WHERE Player_ID='%d'" +
 						" " +
 						"AND Event_Status<>'%s' " +
 						"AND Event_Status<>'%s' " +
@@ -307,25 +351,32 @@ public class DatabaseAccess {
 			ResultSet rs = stmt.executeQuery(sql + " ORDER BY Timestamp ASC");
 
 			while (rs.next()) {
-				Event event = new Event(rs.getInt("Event_ID"),
+				Event event = new Event(rs.getInt("events.Event_ID"),
 						rs.getInt("Game_ID"),
 						rs.getInt("Player_ID"),
-						rs.getString("Event_Message"),
-						rs.getString("Event_Type"),
+						rs.getString("em.Message"),
+						rs.getString("events.Event_Type"),
 						rs.getString("Event_Status"),
 						rs.getTimestamp("Timestamp"));
+
+				try {
+					String chatMessage = rs.getString("ec.Message");
+					event.setChatMessage(chatMessage);
+				} catch (SQLException sqle){// chat message does not exist
+					logger.error(sqle.getMessage());
+				}
 
 				events.add(event);
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
 			//Handle errors for JDBC
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			System.out.println(e);
 			//Handle errors for Class.forName
+			logger.error(e.getMessage());
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 		return events;
 	}
 
@@ -343,14 +394,14 @@ public class DatabaseAccess {
 				return classRecord;
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
 			//Handle errors for JDBC
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			System.out.println(e);
 			//Handle errors for Class.forName
+			logger.error(e.getMessage());
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 		return null;
 	}
 
@@ -370,16 +421,14 @@ public class DatabaseAccess {
 			}
 
 		} catch (SQLException se) {
-			System.out.println(se);
 			//Handle errors for JDBC
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			System.out.println(e);
 			//Handle errors for Class.forName
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 
 		return classList;
 	}
@@ -403,16 +452,14 @@ public class DatabaseAccess {
 				uList.add(userRecord);
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
 			//Handle errors for JDBC
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			System.out.println(e);
 			//Handle errors for Class.forName
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 
 		return uList;
 	}
@@ -453,14 +500,12 @@ public class DatabaseAccess {
 			}
 
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
+			logger.error(e.getMessage());
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 
 		return null;
 	}
@@ -503,12 +548,10 @@ public class DatabaseAccess {
 				return gameRecord;
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error(se.getMessage());
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return null;
@@ -596,16 +639,14 @@ public class DatabaseAccess {
 
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
 			//Handle errors for JDBC
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			System.out.println(e);
 			//Handle errors for Class.forName
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 
 		return role;
 	}
@@ -667,16 +708,12 @@ public class DatabaseAccess {
 						GameLevel.valueOf(rs.getString("Level")), GameMode.valueOf(rs.getString("Mode"))));
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 
 		return gameList;
 	}
@@ -713,16 +750,12 @@ public class DatabaseAccess {
 				gameList.add(mg);
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 
 
 		return gameList;
@@ -750,12 +783,10 @@ public class DatabaseAccess {
 				mutList.add(newMutant);
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error(se.getMessage());
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return mutList;
@@ -783,12 +814,10 @@ public class DatabaseAccess {
 				mutList.add(newMutant);
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error(se.getMessage());
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return mutList;
@@ -813,12 +842,10 @@ public class DatabaseAccess {
 						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error(se.getMessage());
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 
@@ -852,11 +879,10 @@ public class DatabaseAccess {
 			}
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 
@@ -888,11 +914,10 @@ public class DatabaseAccess {
 			return id;
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return -1;
@@ -916,11 +941,10 @@ public class DatabaseAccess {
 			return points;
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return 0;
@@ -949,11 +973,10 @@ public class DatabaseAccess {
 			}
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return false;
@@ -979,11 +1002,10 @@ public class DatabaseAccess {
 			}
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return false;
@@ -1008,11 +1030,10 @@ public class DatabaseAccess {
 			conn.close();
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 
@@ -1043,11 +1064,10 @@ public class DatabaseAccess {
 			}
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return false;
@@ -1117,12 +1137,10 @@ public class DatabaseAccess {
 				players[i] = atks.get(i);
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error(se.getMessage());
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return players;
@@ -1170,12 +1188,10 @@ public class DatabaseAccess {
 			stmt.close();
 			conn.close();
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			e.printStackTrace();
-		} // Handle errors for Class.forName
-		finally {
+			logger.error(se.getMessage());
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 
@@ -1212,12 +1228,10 @@ public class DatabaseAccess {
 			stmt.close();
 			conn.close();
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			e.printStackTrace();
-		} // Handle errors for Class.forName
-		finally {
+			logger.error(se.getMessage());
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return leaderboard;
@@ -1261,12 +1275,10 @@ public class DatabaseAccess {
 			}
 
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error(se.getMessage());
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return null;
@@ -1291,11 +1303,10 @@ public class DatabaseAccess {
 			}
 
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error(se.getMessage());
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error(e.getMessage());
+		} finally {
 			cleanup(conn, stmt);
 		}
 	}

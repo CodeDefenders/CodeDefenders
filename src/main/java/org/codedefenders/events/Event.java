@@ -1,25 +1,39 @@
 package org.codedefenders.events;
 
+import org.codedefenders.Role;
 import org.codedefenders.User;
 import org.codedefenders.util.DatabaseAccess;
 
 import java.sql.Timestamp;
-import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by thomas on 06/03/2017.
  */
 public class Event {
 
+    private static final HashMap<Role, String> ROLE_COLORS =
+            new HashMap<>();
+
+    static {
+        ROLE_COLORS.put(Role.ATTACKER, "#FF0000");
+        ROLE_COLORS.put(Role.DEFENDER, "#0000FF");
+        ROLE_COLORS.put(Role.CREATOR, "#00FF00");
+    }
+
     private int eventId;
 
-    private int playerId = 0;
+    private int userId = 0;
 
     private int gameId = 0;
 
-    private User user = null;
+    private transient User user = null;
 
     private String message = null;
+
+    private String chatMessage = null;
+
+    private String parsedChatMessage = null;
 
     private String parsedMessage = null;
 
@@ -28,6 +42,8 @@ public class Event {
     private EventStatus eventStatus = null;
 
     private Timestamp time;
+
+    private Role role;
 
     public Event(int eventId, int gameId, int playerId, String message, String
             eventType,
@@ -42,7 +58,16 @@ public class Event {
             eventType,
                  EventStatus
             eventStatus, Timestamp timestamp){
-        this.playerId = playerId;
+        String eString = eventType.toString();
+        if (eString.contains("ATTACKER")){
+            role = Role.ATTACKER;
+        } else if (eString.contains("DEFENDER")){
+            role = Role.DEFENDER;
+        } else {
+            role = Role.CREATOR;
+        }
+
+        this.userId = playerId;
         this.message = message;
         this.eventType = eventType;
         this.eventStatus = eventStatus;
@@ -51,12 +76,55 @@ public class Event {
         this.eventId = eventId;
     }
 
-    public void parse(){
-        //TODO: This is a placeholder method and in future
-        // will handle complex tokens in a message (e.g. [user:101] will be
-        // replaced with the name of user 101).
+    public void setChatMessage(String message){
+        chatMessage = message;
+    }
 
-        this.parsedMessage = getUser().getUsername() + ": " + message;
+    public String parse(HashMap<String, String> replacements, String message,
+                        boolean emphasise){
+
+        String procMessage = message;
+
+        for (String s : replacements.keySet()){
+            procMessage = procMessage.replace(s, replacements.get(s));
+        }
+
+        if (procMessage.contains("@event_user")) {
+            User user = getUser();
+            procMessage = procMessage.replace("@event_user",
+                    user != null ? user.printFriendly(ROLE_COLORS.get(role)) :
+            "<span style='color:#000000'>@Unknown</span>");
+        }
+
+        if (procMessage.contains("@chat_message")){
+            procMessage = procMessage.replace("@chat_message",
+                    getChatMessage());
+        } else if (emphasise){
+            procMessage = "<span style='font-style: italic; font-weight: " +
+                    "bold;'>" + procMessage +
+                    "</span>";
+        }
+        return procMessage;
+    }
+
+    public String getChatMessage(){
+        if (chatMessage == null){
+            return "";
+        }
+        if (parsedChatMessage == null){
+            parsedChatMessage = parse(new HashMap<String, String>(),
+                    chatMessage, false);
+        }
+        return parsedChatMessage;
+    }
+
+    public void parse(HashMap<String, String> replacements){
+
+        this.parsedMessage = parse(replacements, message, true);
+    }
+
+    public void parse(){
+        parse(new HashMap<String, String>());
     }
 
     public String getParsedMessage(){
@@ -69,7 +137,7 @@ public class Event {
 
     public User getUser(){
         if (user == null){
-            user = DatabaseAccess.getUser(playerId);
+            user = DatabaseAccess.getUser(userId);
         }
 
         return user;
@@ -85,14 +153,26 @@ public class Event {
 
     public boolean insert(){
         String sql = String.format("INSERT INTO events " +
-                        "(Game_ID, Player_ID, Event_Message, Event_Type, " +
+                        "(Game_ID, Player_ID, Event_Type, " +
                         "Event_Status) " +
-                        "VALUES (%d, %d, '%s', '%s', '%s') ",
-                gameId, playerId, DatabaseAccess.sanitise(message),
+                        "VALUES (%d, %d, '%s', '%s') ",
+                gameId, userId,
                 eventType,
                 eventStatus);
 
-        return DatabaseAccess.executeUpdate(sql);
+        eventId = DatabaseAccess.executeInsert(sql);
+
+        if (chatMessage != null && eventId >= 0) {
+            String sqlMessage = String.format("INSERT INTO event_chat " +
+                            "(Event_Id, Message) " +
+                            "VALUES (%d, '%s') ",
+                    eventId,
+                    chatMessage);
+
+            DatabaseAccess.executeInsert(sqlMessage);
+
+        }
+        return eventId >= 0;
     }
 
 
@@ -102,15 +182,14 @@ public class Event {
         String sql = String.format("UPDATE events SET " +
                         "Game_ID=%d, " +
                         "Player_ID=%d', " +
-                        "Event_Message='%s', " +
                         "Event_Type='%s', " +
                         "Event_Status='%s', " +
                         "Timestamp=FROM_UNIXTIME(%d) WHERE " +
                         "Event_ID=%d",
-                gameId, playerId, DatabaseAccess.sanitise(message), eventType,
+                gameId, userId, eventType,
                 eventStatus, time
                         .getTime
-                        (), eventId);
+                                (), eventId);
         return DatabaseAccess.executeUpdate(sql);
     }
 

@@ -81,10 +81,10 @@ public class GameClass {
 
 		} catch (FileNotFoundException e) {
 			result = "[File Not Found]";
-			e.printStackTrace();
+			logger.error("Could not find file " + javaFile);
 		} catch (IOException e) {
 			result = "[File Not Readable]";
-			e.printStackTrace();
+			logger.error("Could not read file " + javaFile);
 		}
 		return result;
 

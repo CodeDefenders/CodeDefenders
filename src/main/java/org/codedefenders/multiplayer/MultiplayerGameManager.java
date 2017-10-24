@@ -180,7 +180,8 @@ public class MultiplayerGameManager extends HttpServlet {
 											"mutant.",
 									EventType.ATTACKER_MUTANT_CREATED, EventStatus
 									.GAME,
-									new Timestamp(System.currentTimeMillis()));
+									new Timestamp(System.currentTimeMillis()
+											- 1000));
 							notif.insert();
 							messages.add(MUTANT_COMPILED_MESSAGE);
 							MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);

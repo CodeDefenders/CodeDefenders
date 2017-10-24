@@ -137,9 +137,8 @@ public class MutationTester {
 				}
 
 				Event notif = new Event(-1, game.getId(),
-						u.getId(),
-						u.getUsername() + "&#39;s mutant is killed by " +
-						DatabaseAccess.getUserFromPlayer(test.getPlayerId()).getUsername() + "&#39;s test.",
+						DatabaseAccess.getUserFromPlayer(test.getPlayerId()).getId(),
+						u.getUsername() + "&#39;s mutant is killed",
 						EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME,
 						new Timestamp(System.currentTimeMillis()));
 				notif.insert();

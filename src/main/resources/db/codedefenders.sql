@@ -317,6 +317,45 @@ CREATE TABLE `events` (
 ) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8;
 
 --
+-- Table structure for table `event_chat`
+--
+
+DROP TABLE IF EXISTS `event_chat`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `event_chat` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Event_Id` int(11) DEFAULT NULL,
+  `Message` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `event_messages`
+--
+
+DROP TABLE IF EXISTS `event_messages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `event_messages` (
+  `Event_Type` varchar(45) NOT NULL,
+  `Message` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`Event_Type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `event_messages`
+--
+
+LOCK TABLES `event_messages` WRITE;
+/*!40000 ALTER TABLE `event_messages` DISABLE KEYS */;
+INSERT INTO `event_messages` VALUES ('ATTACKER_JOINED','@event_user is joining the attackers'),('ATTACKER_MESSAGE','@event_user: @chat_message'),('ATTACKER_MUTANT_CREATED','@event_user created a mutant'),('ATTACKER_MUTANT_ERROR','@event_user\'s mutant failed'),('ATTACKER_MUTANT_KILLED_EQUIVALENT','@event_user proved a mutant non-equivalent'),('ATTACKER_MUTANT_SURVIVED','@event_user\'s mutant survived'),('DEFENDER_JOINED','@event_user is joining the defenders!'),('DEFENDER_KILLED_MUTANT','@event_user killed a mutant'),('DEFENDER_MESSAGE','@event_user: @chat_message'),('DEFENDER_MUTANT_CLAIMED_EQUIVALENT','@event_user claimed a mutant equivalent'),('DEFENDER_MUTANT_EQUIVALENT','@event_user caught an equivalence'),('DEFENDER_TEST_CREATED','@event_user created a test'),('DEFENDER_TEST_ERROR','@event_user\'s test failed'),('DEFENDER_TEST_READY','@event_user test ready'),('GAME_CREATED','Game created'),('GAME_FINISHED','Game Over!'),('GAME_GRACE_ONE','The game is entering grace period one.'),('GAME_GRACE_TWO','The game is entering grace period two.'),('GAME_MESSAGE','@event_user: @chat_message'),('GAME_MESSAGE_ATTACKER','@event_user: @chat_message'),('GAME_MESSAGE_DEFENDER','@event_user: @chat_message'),('GAME_PLAYER_LEFT','@event_user left the game'),('GAME_STARTED','The game has started!');
+/*!40000 ALTER TABLE `event_messages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Leaderboard View
 --
 
