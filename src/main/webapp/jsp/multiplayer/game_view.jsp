@@ -1,3 +1,37 @@
+<%
+    final Logger logger = LoggerFactory.getLogger("game_view.jsp");
+    boolean redirectToGames = false;
+    // Get their user id from the session.
+    int uid = ((Integer) session.getAttribute("uid")).intValue();
+    int gameId = 0;
+    try {
+        gameId = Integer.parseInt(request.getParameter("id"));
+        session.setAttribute("mpGameId", new Integer(gameId));
+    } catch (NumberFormatException e) {
+        logger.error("NumberFormatException caught. Restoring game " +
+                "from session.", e);
+        if (session.getAttribute("mpGameId") != null) {
+            gameId = ((Integer)session.getAttribute("mpGameId")).intValue();
+        } else {
+            redirectToGames = true;
+        }
+    } catch (Exception e2){
+        logger.error("Exception caught", e2);
+        gameId = 0;
+        redirectToGames = true;
+    }
+    MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
+    if (mg == null){
+        logger.error(String.format("Could not find multiplayer game %d", gameId));
+        redirectToGames = true;
+    }
+
+    if (redirectToGames){
+        response.sendRedirect("/games/user");
+        return;
+    }
+%>
+
 <% String pageTitle="In Game"; %>
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.*" %>
@@ -9,28 +43,9 @@
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
 <%
-    final Logger logger = LoggerFactory.getLogger("game_view.jsp");
-
-    // Get their user id from the session.
-    int uid = ((Integer) session.getAttribute("uid")).intValue();
-    int gameId = 0;
-    try {
-        gameId = Integer.parseInt(request.getParameter("id"));
-        session.setAttribute("mpGameId", new Integer(gameId));
-    } catch (NumberFormatException e) {
-        logger.error("NumberFormatException caught", e);
-        gameId = ((Integer) session.getAttribute("mpGameId")).intValue();
-        response.sendRedirect("games/user");
-    } catch (Exception e2){
-        logger.error("Exception caught", e2);
-        response.sendRedirect("games/user");
-    }
-    MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
-    if (mg == null){
-        logger.error(String.format("Could not find multiplayer game %d", gameId));
-        response.sendRedirect("games/user");
-    }
     boolean renderMutants = true;
+
+    boolean redirect = false;
 
     HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<Integer, ArrayList<Test>>();
 
