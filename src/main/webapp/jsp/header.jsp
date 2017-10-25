@@ -97,7 +97,9 @@
                     style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
                         <li><a
-                               href="/logout" style="width:100%;">Logout
+                               href="/logout"
+                               style="width:100%;border-bottom:1px solid
+                               black">Logout
                         </a></li>
                     </ul></li>
                 </ul>

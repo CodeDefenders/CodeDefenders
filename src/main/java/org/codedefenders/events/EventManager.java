@@ -31,23 +31,30 @@ public class EventManager extends HttpServlet {
 				long timestamp = Long.parseLong(request.getParameter
 						("timestamp"));
 				ArrayList<Event> events = null;
+
+				int userId =
+						(int) request.getSession().getAttribute("uid");
+
 				if (request.getParameter("gameId") != null) {
 					int gameId =
 							Integer.parseInt(request.getParameter("gameId"));
 					events = DatabaseAccess.getNewEventsForGame(
-							gameId, timestamp, DatabaseAccess.getRole((int)
-									request.getSession().getAttribute("uid"), gameId)
+							gameId, timestamp, DatabaseAccess.getRole(userId,
+									gameId)
 					);
 				} else {
-					int userId =
-							Integer.parseInt(request.getParameter("userId"));
 					events = DatabaseAccess.getNewEventsForUser(userId,
 							timestamp
 					);
 				}
 
 				for (Event e : events){
-					e.parse();
+					e.setCurrentUserName("@" + DatabaseAccess.getUser(userId).getUsername());
+					if (e.getEventStatus().equals(EventStatus.GAME)) {
+						e.parse(true);
+					} else {
+						e.parse(false);
+					}
 				}
 
 				out.print(gson.toJson(events));

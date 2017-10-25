@@ -25,6 +25,16 @@ public class Event {
 
     private int userId = 0;
 
+    private String currentUserName = "";
+
+    public String getCurrentUserName() {
+        return currentUserName;
+    }
+
+    public void setCurrentUserName(String currentUserName) {
+        this.currentUserName = currentUserName;
+    }
+
     private int gameId = 0;
 
     private transient User user = null;
@@ -104,6 +114,12 @@ public class Event {
                     "bold;'>" + procMessage +
                     "</span>";
         }
+
+        if (currentUserName.length() > 0 && procMessage.contains
+                (currentUserName)){
+            procMessage = procMessage.replace(currentUserName, "@You");
+        }
+
         return procMessage;
     }
 
@@ -118,18 +134,18 @@ public class Event {
         return parsedChatMessage;
     }
 
-    public void parse(HashMap<String, String> replacements){
+    public void parse(HashMap<String, String> replacements, boolean emphasise){
 
-        this.parsedMessage = parse(replacements, message, true);
+        this.parsedMessage = parse(replacements, message, emphasise);
     }
 
-    public void parse(){
-        parse(new HashMap<String, String>());
+    public void parse(boolean emphasise){
+        parse(new HashMap<String, String>(), emphasise);
     }
 
     public String getParsedMessage(){
         if (parsedMessage == null){
-            parse();
+            parse(true);
         }
 
         return parsedMessage;
@@ -141,6 +157,10 @@ public class Event {
         }
 
         return user;
+    }
+
+    public EventStatus getEventStatus() {
+        return eventStatus;
     }
 
     public EventType getEventType(){

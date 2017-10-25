@@ -120,6 +120,8 @@ public class User {
 	}
 
 	public String printFriendly(String color){
+		String username = getUsername();
+
 		return "<span style='color: " + color + "'>@" + getUsername() +
 		"</span>";
 	}
