@@ -15,7 +15,7 @@
                     "<li><a " +
                     "href=\"/multiplayer/games?id=" + r[index].gameId +
                     "\" style=\"width:100%;\">" +
-                    r[index].message +
+                    r[index].parsedMessage +
                     "</a></li>"
                 )
 
