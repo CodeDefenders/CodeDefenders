@@ -20,6 +20,7 @@
     } catch (NumberFormatException e) {
         logger.error("NumberFormatException caught", e);
         gameId = ((Integer) session.getAttribute("mpGameId")).intValue();
+        response.sendRedirect("games/user");
     } catch (Exception e2){
         logger.error("Exception caught", e2);
         response.sendRedirect("games/user");
