@@ -40,6 +40,7 @@
 	title = {{C}ode {D}efenders: Crowdsourcing Effective Tests and Subtle Mutants with a Mutation Testing Game},
 	booktitle = {Proc. of the International Conference on Software Engineering (ICSE) 2017},
 	pages = {677--688},
+	publisher = {IEEE},
 	year = {2017}
 }</code></pre>
 		        </div>
