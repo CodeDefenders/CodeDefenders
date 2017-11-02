@@ -124,11 +124,7 @@ public class UnitTesting extends HttpServlet {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-//<<<<<<< HEAD
 		File newTestDir = FileManager.getNextSubDir(getServletContext().getRealPath(DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + TESTS_DIR + F_SEP + ownerId));
-//=======
-//		File newTestDir = FileManager.getNextSubDir(getServletContext().getRealPath(TESTS_DIR + F_SEP + gid));
-//>>>>>>> origin
 
 		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
