@@ -8,11 +8,11 @@
         gameId = Integer.parseInt(request.getParameter("id"));
         session.setAttribute("mpGameId", new Integer(gameId));
     } catch (NumberFormatException e) {
-        logger.error("NumberFormatException caught. Restoring game " +
-                "from session.", e);
+        logger.info("Game ID was not passed in the  Restoring from session.");
         if (session.getAttribute("mpGameId") != null) {
             gameId = ((Integer)session.getAttribute("mpGameId")).intValue();
         } else {
+            logger.info("Don't know what game was open...");
             redirectToGames = true;
         }
     } catch (Exception e2){
