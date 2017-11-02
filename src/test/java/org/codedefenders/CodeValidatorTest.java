@@ -129,6 +129,20 @@ public class CodeValidatorTest {
 	}
 
 	@Test
+	public void testInvalidMutantWithTernaryOperator1() {
+		String orig = "x = 1;";
+		String mutant = "x = x == 0 ? 1 : 0;";
+		assertFalse(validMutant(orig, mutant));
+	}
+
+	@Test
+	public void testInvalidMutantWithTernaryOperator2() {
+		String orig = "currentFloor--;";
+		String mutant = "currentFloor = currentFloor + currentFloor % 8 == 0 ? (-1) : 0;";
+		assertFalse(validMutant(orig, mutant));
+	}
+
+	@Test
 	public void testValidWithString() {
 		String orig = "if (!isHierachic(path))";
 		String mutant = "if (!isHierachic(\"test.value\"))"; // raises com.github.javaparser.TokenMgrException
