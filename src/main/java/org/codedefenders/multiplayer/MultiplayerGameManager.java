@@ -169,6 +169,24 @@ public class MultiplayerGameManager extends HttpServlet {
 					// Get the text submitted by the user.
 					String mutantText = request.getParameter("mutant");
 
+					if (! GameManager.isMutantValid(activeGame.getClassId(), mutantText)) {
+						// Mutant is either the same as the CUT or it contains invalid code
+						// Do not restore mutated code
+						messages.add(MUTANT_INVALID_MESSAGE);
+						break;
+					}
+					Mutant existingMutant = GameManager.existingMutant(activeGame.getId(), mutantText);
+					if (existingMutant != null) {
+						messages.add(MUTANT_DUPLICATED_MESSAGE);
+						TargetExecution existingMutantTarget = DatabaseAccess.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
+						if (existingMutantTarget != null
+								&& !existingMutantTarget.status.equals("SUCCESS")
+								&& existingMutantTarget.message != null && !existingMutantTarget .message.isEmpty()) {
+							messages.add(existingMutantTarget.message);
+						}
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+						break;
+					}
 					Mutant newMutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "mp");
 					if (newMutant != null) {
 						TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
@@ -193,8 +211,9 @@ public class MultiplayerGameManager extends HttpServlet {
 							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
 						}
 					} else {
-						// Create Mutant failed because there were no differences between mutant and original, returning -1
-						messages.add(MUTANT_INVALID_MESSAGE);
+						messages.add(MUTANT_CREATION_ERROR_MESSAGE);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+						logger.error("Error creating mutant. Game: {}, Class: {}, User: {}", activeGame.getId(), activeGame.getClassId(), uid, mutantText);
 					}
 				} else {
 					messages.add(GRACE_PERIOD_MESSAGE);
