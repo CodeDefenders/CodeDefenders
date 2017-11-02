@@ -188,7 +188,7 @@ public class AntRunner {
 			// Locate .class file
 			final String compiledClassName = cut.getBaseName() + JAVA_CLASS_EXT;
 			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
-			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
+			assert (! matchingFiles.isEmpty()): "if compilation was successful, .class file must exist";
 			String cFile = matchingFiles.get(0).getAbsolutePath();
 			int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gameID);
 			newMutant = new Mutant(gameID, jFile, cFile, true, playerId);
