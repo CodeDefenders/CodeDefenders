@@ -110,7 +110,7 @@ if (role == Role.ATTACKER && true){
 									if (m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){
 										%><span>Flagged Equivalent</span><%
 									}%>
-									<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(GameLevel.EASY)){ %>
+									<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(GameLevel.EASY) || mg.getState() == GameState.FINISHED){ %>
 										<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 									<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
 										 style="z-index: 10000;">
