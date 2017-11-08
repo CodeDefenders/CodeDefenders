@@ -260,6 +260,14 @@ function create_random_game(){
 	
 	# Create Game Folder
 	local gameFolder="${SYSTEM_TESTS_HOME}/${gameId}"
+	#
+	while [ -e ${gameFolder} ]; do
+		
+		(>&2 echo "${gameFolder} exists. Try next one")
+		
+		gameId=$((${gameId}+1));
+		gameFolder="${SYSTEM_TESTS_HOME}/${gameId}";
+	done
 	mkdir ${gameFolder}
 	
 	local cutId=$(__private_query_db "SELECT Class_ID FROM classes WHERE Alias='${classAlias}';")

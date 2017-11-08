@@ -44,5 +44,10 @@
 		name="parallelize"
 		type="java.lang.String"
 		value="${parallelize}" />
+		
+	<Environment
+		name="forceLocalExecution"
+		type="java.lang.String"
+		value="${forceLocalExecution}" />
 
 </Context>
