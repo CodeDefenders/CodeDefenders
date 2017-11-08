@@ -135,8 +135,10 @@ public class MutationTester {
 			//
 			Map<Mutant, FutureTask<Boolean>> tasks = new HashMap<Mutant, FutureTask<Boolean>>();
 			for (final Mutant mutant : mutants) {
-				if (useMutantCoverage && !test.isMutantCovered(mutant))
+				if (useMutantCoverage && !test.isMutantCovered(mutant)) {
+					System.out.println("Skipping non-covered mutant "+mutant.getId()+", test "+test.getId());
 					continue;
+				}
 
 				FutureTask<Boolean> task = new FutureTask<Boolean>(
 						new Callable<Boolean>() {
@@ -220,8 +222,10 @@ public class MutationTester {
 
 		} else {
 			for (Mutant mutant : mutants) {
-				if (useMutantCoverage && !test.isMutantCovered(mutant))
+				if (useMutantCoverage && !test.isMutantCovered(mutant)) {
+					System.out.println("Skipping non-covered mutant "+mutant.getId()+", test "+test.getId());
 					continue;
+				}
 
 				if (testVsMutant(test, mutant)) {
 					killed++;
@@ -292,8 +296,10 @@ public class MutationTester {
 		User u = DatabaseAccess.getUserFromPlayer(mutant.getPlayerId());
 
 		for (Test test : tests) {
-			if (useMutantCoverage && !test.isMutantCovered(mutant))
+			if (useMutantCoverage && !test.isMutantCovered(mutant)) {
+				System.out.println("Skipping non-covered mutant "+mutant.getId()+", test "+test.getId());
 				continue;
+			}
 
 			// If this mutant/test pairing hasnt been run before and the test
 			// might kill the mutant
