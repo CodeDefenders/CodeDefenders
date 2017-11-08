@@ -90,7 +90,13 @@
 	<%}
 	%>
 </table>
+
+	<!-- Alessio disabled this to avoid students creating stuff. Then it should be enough to set visibility to null  -->
+	<!-- 
 	<a href="/games/create">Create Duel</a>
+	-->
+	
+	
 	<hr />
 	<h3>Battlegrounds</h3>
 	<table id="tableMPGames" class="table table-hover table-responsive table-paragraphs games-table dataTable display">
@@ -163,7 +169,11 @@
 		</tbody>
 	</table>
 
+	<!-- Alessio disabled this -->
+	<!-- 
 	<a href="/multiplayer/games/create">Create Battleground</a>
+	-->
+
 	<script>
 		$(document).ready(function() {
 			$.fn.dataTable.moment( 'DD/MM/YY HH:mm' );
