@@ -112,7 +112,6 @@ Removes Comments (of both varieties) and Whitespaces from java source code.
  */
 	private static String getCodeWithoutComments(String code) {
 		String filtered = code.replaceAll("((['\"])(?:(?!\\2|\\\\).|\\\\.)*\\2)|\\/\\/[^\\n]*|\\/\\*(?:[^*]|\\*(?!\\/))*\\*\\/", "");
-		System.out.println(filtered.replaceAll("\\s+", ""));
 		return filtered.replaceAll("\\s+", "");
 	}
 }
