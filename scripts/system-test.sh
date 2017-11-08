@@ -163,20 +163,24 @@ while read -r timestamp <&3 && read -r codeFile <&4; do
 	
 	if [ ${role} == "ATTACKER" ]; then
 		
+		echo "At " $(date) " -- In game ${gameId} ${userId} attacks using ${codeFile}" | tee -a ${logFile}
+		
 		local totTime=$(__private_do_attack \
 			${gameId} \
 			${codeFile} \
 			${folder}/cookie.txt)
 			
-		echo "At " $(date) " -- In game ${gameId} ${userId} attacks using ${codeFile} took ${totTime} secs" | tee -a ${logFile}
+		echo "At " $(date) " -- In game ${gameId} ${userId} attack using ${codeFile} ends. It took ${totTime} secs" | tee -a ${logFile}
 		
 	else
+		echo "At " $(date) " -- In game ${gameId} ${userId} defends using ${codeFile}" | tee -a ${logFile}
+		
 		local totTime=$(__private_do_defend \
 			${gameId} \
 			${codeFile} \
 			${folder}/cookie.txt)
 			
-		echo "At " $(date) " -- In game ${gameId} ${userId} defends using ${codeFile} took ${totTime} secs" | tee -a ${logFile}	
+		echo "At " $(date) " -- In game ${gameId} ${userId} defense using ${codeFile} ends.It took ${totTime} secs" | tee -a ${logFile}	
 	fi 
 	
 done 3<${folder}/timeline 4< <(find ${folder} -iname "*.java" | sort)
@@ -374,6 +378,7 @@ function replay_game(){
 
 function __private_setup(){
 	# TODO: Remove all the Tests/Mutants from the test bed which by default is?
+	
 	mkdir -p ${SYSTEM_TESTS_HOME}
 	mkdir -p ${SYSTEM_TESTS_HOME}/tests
 	mkdir -p ${SYSTEM_TESTS_HOME}/mutants
@@ -430,6 +435,63 @@ function benchmark(){
 	
 		# Collect logs - TODO
 		mv -v "${SYSTEM_TESTS_HOME}/${gameId}/game.log" "${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log"
+		
+		# Output some Stats
+		echo "----- Stats ----- "
+		echo "Total "`grep took ${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log | awk '{ num = num + 1; total = total + $17 } END { print num, "m", total/num, "s"}'`
+		echo "  Attack "`grep took ${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log | grep attacks | awk '{ num = num + 1; total = total + $17 } END { print num, "m", total/num, "s"}'`
+		echo "  Defense "`grep took ${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log | grep defends | awk '{ num = num + 1; total = total + $17 } END { print num, "m", total/num, "s"}'`
+
+	done
+}
+
+
+
+function multi_benchmark(){
+	local nGames=$1
+	local gameSize=$2
+	local classAlias=$3
+	local nUserEvents=$4
+	local configurationFiles=${@:5:$#}
+	
+	# Create ${nGames} random games
+	local gameIds=""
+	for i in $(seq 1 ${nGames}); do
+		gameIds+=" $(create_random_game ${gameSize} ${classAlias} ${nUserEvents})"
+	done
+	
+	for gameId in "${gameIds}"; do
+		echo "${gameId}"
+	done
+	
+	for cFile in ${configurationFiles}; do
+		# FIXME Clean up and restore. On defender this might require to ssh defender@defender ? 
+		echo "> Clean up" 
+		__private_setup
+	
+		echo "> Redeploy CD using ${cFile}"
+		cd ..
+			mvn clean compile package install war:war tomcat7:redeploy -Dconfig.properties=${cFile} -DskipTests
+		cd ${HERE}
+		
+		for gameId in ${gameIds}; do
+			# Run the game in background
+			replay_game ${gameId} &
+		done
+		
+		wait
+	
+		# Collect logs
+		for gameId in ${gameIds}; do
+			mv -v "${SYSTEM_TESTS_HOME}/${gameId}/game.log" "${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log"
+		done
+		
+		# Output some Stats
+		#echo "----- Stats ----- "
+		#echo "Total "`grep took ${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log | awk '{ num = num + 1; total = total + $17 } END { print num, "m", total/num, "s"}'`
+		#echo "  Attack "`grep took ${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log | grep attacks | awk '{ num = num + 1; total = total + $17 } END { print num, "m", total/num, "s"}'`
+		#echo "  Defense "`grep took ${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log | grep defends | awk '{ num = num + 1; total = total + $17 } END { print num, "m", total/num, "s"}'`
+
 	done
 }
 
