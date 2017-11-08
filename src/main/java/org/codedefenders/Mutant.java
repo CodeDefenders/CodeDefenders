@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,16 +25,16 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Mutant {
+public class Mutant implements Serializable {
 
 	private static final Logger logger = LoggerFactory.getLogger(Mutant.class);
 
 	private int id;
 	private int gameId;
 
-	private String javaFile;
-	private String md5;
-	private String classFile;
+	private transient String javaFile;
+	private transient String md5;
+	private transient String classFile;
 
 	private boolean alive = true;
 
@@ -47,12 +48,14 @@ public class Mutant {
 
 	private int playerId;
 
-	private int killedByAITests = 0; //How many times this mutant is killed by an AI test.
+	private transient int killedByAITests = 0; //How many times this mutant is killed
+	// by an AI test.
 
 	private int score; // multiplayer
 
 	private ArrayList<Integer> lines = null;
 	private ArrayList<String> description = null;
+	private Patch difference = null;
 
 	/**
 	 * Creates a mutant
@@ -212,17 +215,21 @@ public class Mutant {
 	}
 
 	public Patch getDifferences() {
+		if (difference == null) {
+			int classId =
+					DatabaseAccess.getGameForKey("ID", gameId).getClassId();
+			GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
-		int classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
-		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+			File sourceFile = new File(sut.getJavaFile());
+			File mutantFile = new File(javaFile);
 
-		File sourceFile = new File(sut.getJavaFile());
-		File mutantFile = new File(javaFile);
+			List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());
+			List<String> mutantLines =
+					readLinesIfFileExist(mutantFile.toPath());
 
-		List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());
-		List<String> mutantLines = readLinesIfFileExist(mutantFile.toPath());
-
-		return DiffUtils.diff(sutLines, mutantLines);
+			difference = DiffUtils.diff(sutLines, mutantLines);
+		}
+		return difference;
 	}
 
 	public String getPatchString() {
@@ -292,28 +299,11 @@ public class Mutant {
 				return true;
 			}
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			logger.error(e.getMessage());
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				logger.error(se.getMessage());
-				System.out.println(se);
-			}
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DatabaseAccess.cleanup(conn, stmt);
 		}
 		return false;
 	}
@@ -340,27 +330,11 @@ public class Mutant {
 			stmt.close();
 			return true;
 		} catch (SQLException se) {
-			logger.error(se.getMessage());
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			logger.error(e.getMessage());
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException se2) {
-			} // Nothing we can do
-			try {
-				if (conn != null) {
-					conn.close();
-				}
-			} catch (SQLException se) {
-				System.out.println(se);
-			}
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DatabaseAccess.cleanup(conn, stmt);
 		}
 		return false;
 	}
@@ -454,5 +428,18 @@ public class Mutant {
 				.append(md5)
 				.append(classFile)
 				.toHashCode();
+	}
+
+	public void prepareForSerialise(boolean showDifferences){
+		try {
+			getHTMLReadout();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		getLines();
+		if (showDifferences)
+			getDifferences();
+		else
+			difference = new Patch();
 	}
 }

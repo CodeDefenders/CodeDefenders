@@ -2,8 +2,7 @@
 <html>
 
 <head>
-    <title>Code Defenders - <% if (pageTitle != null) { %><%= pageTitle %>
-        <% } %></title>
+    <title>Code Defenders<%= pageTitle != null ? " - " + pageTitle : "" %></title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -74,7 +73,9 @@
 
     <!-- MultiplayerGame -->
     <link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
+    <link href="css/notification-style.css" rel="stylesheet" type="text/css" />
     <script type="text/javascript" src="js/game_highlighting.js"></script>
+    <script type="text/javascript" src="js/notifications.js"></script>
 
     <!-- Upload page -->
     <link href="css/uploadcut.css" rel="stylesheet" type="text/css" />
@@ -92,20 +93,24 @@
 
     <script>
         $(document).ready(function() {
-            $('table.mutant-table').DataTable( {
-                "pagingType": "full_numbers",
-                "searching": true,
-                "lengthChange": false,
-                "ordering": false,
-                "pageLength": 4,
-                language: {
-                    search: "_INPUT_",
-                    searchPlaceholder: "Search...",
-                    info: "",
-                    sInfoEmpty: "",
-                    sInfoFiltered: ""
-                }
-            } );
+            try {
+                $('table.mutant-table').DataTable( {
+                    "pagingType": "full_numbers",
+                    "searching": true,
+                    "lengthChange": false,
+                    "ordering": false,
+                    "pageLength": 4,
+                    language: {
+                        search: "_INPUT_",
+                        searchPlaceholder: "Search...",
+                        info: "",
+                        sInfoEmpty: "",
+                        sInfoFiltered: ""
+                    }
+                } );
+            } catch (e) {
+                // statements to handle TypeError exceptions
+            }
         } );
     </script>
 

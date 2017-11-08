@@ -18,7 +18,13 @@ public class Constants {
 
 		String dataHome = (String) env.get("CODEDEFENDERS_DATA");
 		if (dataHome == null) {
-			dataHome = System.getProperty("codedefenders.data", "/var/lib/codedefenders");
+			if (System.getProperty("os.name").toLowerCase().contains("windows")){
+				dataHome = System.getProperty("codedefenders.data",
+						"C:/codedefenders-data");
+			} else {
+				dataHome = System.getProperty("codedefenders.data",
+						"/var/lib/codedefenders");
+			}
 		}
 
 		DATA_DIR = dataHome;
@@ -34,7 +40,7 @@ public class Constants {
 	public static final String JAVA_SOURCE_EXT = ".java";
 	public static final String JAVA_CLASS_EXT = ".class";
 	public static final String TEST_INFO_EXT = ".xml";
-	public static final String SUITE_EXT = "EvoSuiteTest";
+	public static final String SUITE_EXT = "_ESTest";
 
 	public static final String GRACE_PERIOD_MESSAGE = "Game is now in grace period.";
 
@@ -65,7 +71,9 @@ public class Constants {
 	public static final String MUTANT_COMPILED_MESSAGE = "Your mutant was compiled successfully.";
 	public static final String MUTANT_ACCEPTED_EQUIVALENT_MESSAGE = "The mutant was accepted as equivalent.";
 	public static final String MUTANT_UNCOMPILABLE_MESSAGE = "Your mutant failed to compile. Try again.";
-	public static final String MUTANT_INVALID_MESSAGE = "Sorry, your mutant is invalid: it is identical to the CUT or another mutant, or it contains invalid code (ifs, loops, or new logical ops.)";
+	public static final String MUTANT_INVALID_MESSAGE = "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)";
+	public static final String MUTANT_CREATION_ERROR_MESSAGE = "Oops! Something went wrong and the mutant was not created.";
+	public static final String MUTANT_DUPLICATED_MESSAGE = "Sorry, your mutant already exists in this game!";
 	public static final String MUTANT_CLAIMED_EQUIVALENT_MESSAGE = "Mutant claimed as equivalent, waiting for attacker to respond.";
 	public static final String MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE = "Something went wrong claiming equivalent mutant"; // TODO: How?
 	public static final String MUTANT_KILLED_BY_TEST_MESSAGE = "Test %d killed your mutant. Better luck with the next one!"; // test

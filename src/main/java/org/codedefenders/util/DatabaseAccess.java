@@ -2,9 +2,15 @@ package org.codedefenders.util;
 
 import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
+import org.codedefenders.events.Event;
+import org.codedefenders.events.EventStatus;
+import org.codedefenders.leaderboard.Entry;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
+import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.singleplayer.SinglePlayerGame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -15,6 +21,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseAccess {
+
+	private static final Logger logger = LoggerFactory.getLogger(DatabaseAccess.class);
+
+	/**
+	 * Sanitises user input. If a whole SQL query is entered, syntax
+	 * errors may occur.
+	 * @param s user input String
+	 * @return sanitised String s
+	 */
+	public static String sanitise(String s){
+		s = s.replaceAll("\\<","&lt;");
+		s = s.replaceAll("\\>", "&gt;");
+		s = s.replaceAll("\\\"", "&quot;");
+		s = s.replaceAll("\\'", "&apos;");
+		return s;
+	}
 
 	public static Connection getConnection() throws SQLException, NamingException {
 		Context initialContext = new InitialContext();
@@ -28,7 +50,7 @@ public class DatabaseAccess {
 	/**
 	 * Execute an update statement.
 	 * @param sql Statement to be executed
-     */
+	 */
 	public static boolean executeUpdate(String sql) {
 		Connection conn = null;
 		Statement stmt = null;
@@ -39,15 +61,41 @@ public class DatabaseAccess {
 
 			return stmt.executeUpdate(sql) > 0;
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 		return false;
+	}
+
+
+	/**
+	 * Execute an insert statement and returns primary key.
+	 * @param sql Statement to be executed
+	 */
+	public static int executeInsert(String sql) {
+		Connection conn = null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+			ResultSet rs = stmt.getGeneratedKeys();
+
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+		return -1;
 	}
 
 
@@ -61,11 +109,10 @@ public class DatabaseAccess {
 			stmt.execute(sql);
 			return true;
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return false;
@@ -75,7 +122,7 @@ public class DatabaseAccess {
 		Connection conn = null;
 		Statement stmt = null;
 
-		int n = 0;
+		int n = -1;
 
 		try {
 			conn = getConnection();
@@ -86,12 +133,10 @@ public class DatabaseAccess {
 			}
 
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return n;
@@ -103,17 +148,109 @@ public class DatabaseAccess {
 				s.close();
 			}
 		} catch (SQLException se2) {
-			se2.printStackTrace();
+			logger.error("SQL exception caught", se2);
 		}
 		try {
 			if (c != null) {
 				c.close();
 			}
 		} catch (SQLException se3) {
-			se3.printStackTrace();
+			logger.error("SQL exception caught", se3);
 		}
 	}
 
+	public static void insertMessage(int uid, String ipAddress) {
+		Connection conn =  null;
+		Statement stmt = null;
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			String sql = String.format("INSERT INTO events (User_ID, IP_Address) VALUES ('%d', '%s');", uid, ipAddress);
+
+			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+
+			ResultSet rs = stmt.getGeneratedKeys();
+
+			if (rs.next()) {
+				stmt.close();
+				conn.close();
+			}
+
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+	}
+
+
+	public static ArrayList<Event> getEventsForGame(int gameId) {
+		String sql = String.format("SELECT * FROM events " +
+			"LEFT JOIN event_messages AS em ON events.Event_Type = em" +
+						".Event_Type " +
+			"LEFT JOIN event_chat AS ec ON events.Event_Id = ec.Event_Id " +
+			"WHERE Game_ID='%d' " +
+			"AND Event_Status='%s'",
+				gameId, EventStatus.GAME);
+		return getEvents(sql);
+	}
+
+	public static void removePlayerEventsForGame(int gameId, int
+			playerId) {
+		String sql = String.format("SELECT * FROM events WHERE Game_ID=%d " +
+						"AND Player_ID=%d",
+				gameId, EventStatus.GAME);
+		for (Event e : getEvents(sql)){
+			e.setStatus(EventStatus.DELETED);
+			e.update();
+		}
+	}
+
+	public static ArrayList<Event> getNewEventsForGame(int gameId, long time,
+													   Role role) {
+		String sql = String.format("SELECT * FROM events " +
+						"LEFT JOIN event_messages AS em ON events.Event_Type = em.Event_Type " +
+						"LEFT JOIN event_chat AS ec ON events.Event_Id = ec" +
+						".Event_Id " +
+						"WHERE Game_ID='%d' " +
+						"AND Event_Status='%s' " +
+						"AND Timestamp >= FROM_UNIXTIME(%d)",
+				gameId, EventStatus.GAME, time);
+
+		if (role.equals(Role.ATTACKER)){
+			sql += " AND events.Event_Type!='DEFENDER_MESSAGE'";
+		} else if (role.equals(Role.DEFENDER)){
+			sql += " AND events.Event_Type!='ATTACKER_MESSAGE'";
+		}
+		return getEvents(sql);
+	}
+
+	public static ArrayList<Event> getEventsForUser(int userId) {
+		String sql = String.format("SELECT * FROM events " +
+						"LEFT JOIN event_messages AS em ON events.Event_Type = em.Event_Type " +
+						"LEFT JOIN event_chat AS ec ON events.Event_Id = ec.Event_Id " +
+						"WHERE " +
+						"Event_Status!='DELETED' " +
+						"AND Player_ID='%d';",
+				userId);
+		return getEvents(sql);
+	}
+
+	public static ArrayList<Event> getNewEventsForUser(int userId, long time) {
+		String sql = String.format("SELECT * FROM events " +
+						"LEFT JOIN event_messages AS em ON events.Event_Type = em.Event_Type " +
+						"LEFT JOIN event_chat AS ec ON events.Event_Id = ec.Event_Id " +
+						"WHERE Player_ID='%d'" +
+						" " +
+						"AND Event_Status<>'%s' " +
+						"AND Event_Status<>'%s' " +
+						"AND Timestamp >= FROM_UNIXTIME(%d)",
+				userId, EventStatus.DELETED, EventStatus.GAME, time);
+		return getEvents(sql);
+	}
 
 
 	public static void setGameAsAIDummy(int gId) {
@@ -121,11 +258,11 @@ public class DatabaseAccess {
 		executeUpdate(sql);
 	}
 
-	public static DuelGame getAiDummyGameForClass(int cId) throws Exception {
+	public static DuelGame getAiDummyGameForClass(int cId) throws NoDummyGameException {
 		String sql = String.format("SELECT * FROM games WHERE Class_ID='%d' AND IsAIDummyGame=1", cId);
 		int gID = getInt(sql, "ID");
 		if (gID == 0) {
-			Exception e = new Exception("No dummy game found.");
+			NoDummyGameException e = new NoDummyGameException("No dummy game found.");
 			throw e;
 		}
 		return getGameForKey("ID", gID);
@@ -181,14 +318,12 @@ public class DatabaseAccess {
 				prepared = true;
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 
 		return prepared;
 	}
@@ -196,6 +331,45 @@ public class DatabaseAccess {
 	public static void setAiPrepared(GameClass c) {
 		String sql = String.format("UPDATE classes SET AiPrepared = 1 WHERE Class_ID = %d;", c.getId());
 		executeUpdate(sql);
+	}
+
+	private static ArrayList<Event> getEvents(String sql) {
+		Connection conn = null;
+		Statement stmt = null;
+
+		ArrayList<Event> events = new ArrayList<Event>();
+
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql + " ORDER BY Timestamp ASC");
+
+			while (rs.next()) {
+				Event event = new Event(rs.getInt("events.Event_ID"),
+						rs.getInt("Game_ID"),
+						rs.getInt("Player_ID"),
+						rs.getString("em.Message"),
+						rs.getString("events.Event_Type"),
+						rs.getString("Event_Status"),
+						rs.getTimestamp("Timestamp"));
+
+				try {
+					String chatMessage = rs.getString("ec.Message");
+					event.setChatMessage(chatMessage);
+				} catch (SQLException sqle){
+					logger.error("Chat message does not seem to exist", sqle);
+				}
+
+				events.add(event);
+			}
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+		return events;
 	}
 
 	private static GameClass getClass(String sql) {
@@ -212,14 +386,12 @@ public class DatabaseAccess {
 				return classRecord;
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 		return null;
 	}
 
@@ -237,18 +409,13 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				classList.add(new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile")));
 			}
-
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-			e.printStackTrace();
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 
 		return classList;
 	}
@@ -272,16 +439,12 @@ public class DatabaseAccess {
 				uList.add(userRecord);
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-			e.printStackTrace();
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 
 		return uList;
 	}
@@ -320,16 +483,13 @@ public class DatabaseAccess {
 				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"));
 				return userRecord;
 			}
-
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 
 		return null;
 	}
@@ -372,12 +532,10 @@ public class DatabaseAccess {
 				return gameRecord;
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return null;
@@ -465,16 +623,12 @@ public class DatabaseAccess {
 
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-			e.printStackTrace();
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 
 		return role;
 	}
@@ -536,16 +690,12 @@ public class DatabaseAccess {
 						GameLevel.valueOf(rs.getString("Level")), GameMode.valueOf(rs.getString("Mode"))));
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-			e.printStackTrace();
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
+		}
 
 		return gameList;
 	}
@@ -582,18 +732,12 @@ public class DatabaseAccess {
 				gameList.add(mg);
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
-			e.printStackTrace();
+			logger.error("Exception caught", e);
 		} finally {
 			cleanup(conn, stmt);
-		} //end try
-
-
+		}
 		return gameList;
 	}
 
@@ -619,12 +763,10 @@ public class DatabaseAccess {
 				mutList.add(newMutant);
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return mutList;
@@ -652,12 +794,10 @@ public class DatabaseAccess {
 				mutList.add(newMutant);
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return mutList;
@@ -682,12 +822,10 @@ public class DatabaseAccess {
 						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 
@@ -719,13 +857,11 @@ public class DatabaseAccess {
 			while (rs.next()) {
 				testList.add(rs.getInt("Value"));
 			}
-
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 
@@ -755,13 +891,11 @@ public class DatabaseAccess {
 				id = rs.getInt("Defender_ID");
 			}
 			return id;
-
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return -1;
@@ -783,13 +917,11 @@ public class DatabaseAccess {
 			}
 
 			return points;
-
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return 0;
@@ -816,13 +948,11 @@ public class DatabaseAccess {
 				conn.close();
 				return true;
 			}
-
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return false;
@@ -846,13 +976,11 @@ public class DatabaseAccess {
 				conn.close();
 				return true;
 			}
-
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return false;
@@ -875,13 +1003,11 @@ public class DatabaseAccess {
 			}
 			stmt.close();
 			conn.close();
-
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 
@@ -910,13 +1036,11 @@ public class DatabaseAccess {
 			if (rs.next()) {
 				return true;
 			}
-
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return false;
@@ -986,22 +1110,13 @@ public class DatabaseAccess {
 				players[i] = atks.get(i);
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return players;
-	}
-
-	public static int getNumTestsForPlayer(int pid) {
-		int n = 0;
-		String sql = String.format("SELECT * FROM tests WHERE Player_ID = '%d'", pid);
-		n += getTests(sql).size();
-		return n;
 	}
 
 	private static List<Test> getTests(String sql) {
@@ -1046,49 +1161,52 @@ public class DatabaseAccess {
 			stmt.close();
 			conn.close();
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			e.printStackTrace();
-		} // Handle errors for Class.forName
-		finally {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
-
 		return testList;
 	}
 
-	public static List<Test> getPartyTestsForUser(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_tests WHERE User_ID='%d';", uid);
-		return getTests(sql);
-	}
-
-	public static int getNumPartyTestsForUser(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_num_tests WHERE User_ID='%d';", uid);
-		return getInt(sql, "TestCount");
-	}
-
-	public static int getNumPartyTestKillsForUser(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_num_tests_kill WHERE User_ID='%d';", uid);
-		return getInt(sql, "TestKillCount");
-	}
-
-	public static int getNumPartyMutantsForUser(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_num_mutants WHERE User_ID='%d';", uid);
-		return getInt(sql, "MutantCount");
-	}
-
-	public static int getUserPartyPointsMutants(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_user_points WHERE User_ID='%d';", uid);
-		return getInt(sql, "MutantPoints");
-	}
-	public static int getUserPartyPointsTests(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_user_points WHERE User_ID='%d';", uid);
-		return getInt(sql, "TestPoints");
-	}
-	public static int getUserPartyPointsTotal(int uid) {
-		String sql = String.format("SELECT * FROM vw_mp_user_points WHERE User_ID='%d';", uid);
-		return getInt(sql, "TotalPoints");
+	public static List<Entry> getLeaderboard() {
+		Connection conn = null;
+		Statement stmt = null;
+		String sql = "SELECT U.username AS username, IFNULL(NMutants,0) AS NMutants, IFNULL(AScore,0) AS AScore, IFNULL(NTests,0) AS NTests, IFNULL(DScore,0) AS DScore, IFNULL(NKilled,0) AS NKilled, IFNULL(AScore,0)+IFNULL(DScore,0) AS TotalScore\n" +
+				"FROM users U LEFT JOIN\n" +
+				"  (SELECT PA.user_id, count(M.Mutant_ID) as NMutants, sum(M.Points) as AScore FROM players PA LEFT JOIN mutants M on PA.id = M.Player_ID GROUP BY PA.user_id)\n" +
+				"    AS Attacker ON U.user_id = Attacker.user_id\n" +
+				"  LEFT JOIN\n" +
+				"  (SELECT PD.user_id, count(T.Test_ID) as NTests, sum(T.Points) as DScore, sum(T.MutantsKilled) as NKilled FROM players PD LEFT JOIN tests T on PD.id = T.Player_ID GROUP BY PD.user_id)\n" +
+				"    AS Defender on U.user_id = Defender.user_id\n" +
+				"WHERE U.user_id > 2;";
+		List<Entry> leaderboard = new ArrayList<>();
+		try {
+			conn = getConnection();
+			stmt = conn.createStatement();
+			ResultSet rs = stmt.executeQuery(sql);
+			while (rs.next()) {
+				Entry p = new Entry();
+				p.setUsername(rs.getString("username"));
+				p.setMutantsSubmitted(rs.getInt("NMutants"));
+				p.setAttackerScore(rs.getInt("AScore"));
+				p.setTestsSubmitted(rs.getInt("NTests"));
+				p.setDefenderScore(rs.getInt("DScore"));
+				p.setMutantsKilled(rs.getInt("NKilled"));
+				p.setTotalPoints(rs.getInt("TotalScore"));
+				leaderboard.add(p);
+			}
+			stmt.close();
+			conn.close();
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			cleanup(conn, stmt);
+		}
+		return leaderboard;
 	}
 
 	public static int getKillingTestIdForMutant(int mid) {
@@ -1127,14 +1245,11 @@ public class DatabaseAccess {
 						rs.getString("Status"), rs.getString("Message"), rs.getString("Timestamp"));
 				return targetExecution;
 			}
-
 		} catch (SQLException se) {
-			System.out.println(se);
-		} // Handle errors for JDBC
-		catch (Exception e) {
-			System.out.println(e);
-		} // Handle errors for Class.forName
-		finally {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 		return null;
@@ -1157,13 +1272,11 @@ public class DatabaseAccess {
 				stmt.close();
 				conn.close();
 			}
-
 		} catch (SQLException se) {
-			se.printStackTrace();
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		finally {
+			logger.error("Exception caught", e);
+		} finally {
 			cleanup(conn, stmt);
 		}
 	}

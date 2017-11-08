@@ -298,152 +298,98 @@ CREATE TABLE `equivalences` (
   CONSTRAINT `fk_equiv_mutant` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
--- Dump completed on 2016-07-13 11:18:20
+--
+-- Table structure for table `events`
+--
 
--- Views
-CREATE OR REPLACE VIEW `vw_mp_tests`
+DROP TABLE IF EXISTS `events`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `events` (
+  `Event_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Game_ID` int(11) DEFAULT NULL,
+  `Player_ID` int(11) DEFAULT NULL,
+  `Event_Message` varchar(255) DEFAULT NULL,
+  `Event_Type` varchar(45) DEFAULT NULL,
+  `Event_Status` varchar(45) DEFAULT NULL,
+  `Timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`Event_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=117 DEFAULT CHARSET=utf8;
+
+--
+-- Table structure for table `event_chat`
+--
+
+DROP TABLE IF EXISTS `event_chat`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `event_chat` (
+  `Id` int(11) NOT NULL AUTO_INCREMENT,
+  `Event_Id` int(11) DEFAULT NULL,
+  `Message` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`Id`)
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `event_messages`
+--
+
+DROP TABLE IF EXISTS `event_messages`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `event_messages` (
+  `Event_Type` varchar(45) NOT NULL,
+  `Message` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`Event_Type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `event_messages`
+--
+
+LOCK TABLES `event_messages` WRITE;
+/*!40000 ALTER TABLE `event_messages` DISABLE KEYS */;
+INSERT INTO `event_messages` VALUES ('ATTACKER_JOINED','@event_user joined the attackers'),('ATTACKER_MESSAGE','@event_user: @chat_message'),('ATTACKER_MUTANT_CREATED','@event_user created a mutant'),('ATTACKER_MUTANT_ERROR','@event_user created a mutant that errored'),('ATTACKER_MUTANT_KILLED_EQUIVALENT','@event_user proved a mutant non-equivalent'),('ATTACKER_MUTANT_SURVIVED','@event_user created a mutant that survived'),('DEFENDER_JOINED','@event_user joined the defenders!'),('DEFENDER_KILLED_MUTANT','@event_user killed a mutant'),('DEFENDER_MESSAGE','@event_user: @chat_message'),('DEFENDER_MUTANT_CLAIMED_EQUIVALENT','@event_user claimed a mutant equivalent'),('DEFENDER_MUTANT_EQUIVALENT','@event_user caught an equivalence'),('DEFENDER_TEST_CREATED','@event_user created a test'),('DEFENDER_TEST_ERROR','@event_user created a test that errored'),('DEFENDER_TEST_READY','Test by @event_user is ready'),('GAME_CREATED','Game created'),('GAME_FINISHED','Game Over!'),('GAME_GRACE_ONE','The game is entering grace period one.'),('GAME_GRACE_TWO','The game is entering grace period two.'),('GAME_MESSAGE','@event_user: @chat_message'),('GAME_MESSAGE_ATTACKER','@event_user: @chat_message'),('GAME_MESSAGE_DEFENDER','@event_user: @chat_message'),('GAME_PLAYER_LEFT','@event_user left the game'),('GAME_STARTED','The game has started!');
+/*!40000 ALTER TABLE `event_messages` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Leaderboard View
+--
+
+CREATE OR REPLACE VIEW `view_leaderboard`
 AS
-SELECT
-  u.User_ID,
-  t.Test_ID
+  SELECT
+    U.username                            AS username,
+    IFNULL(NMutants, 0)                   AS NMutants,
+    IFNULL(AScore, 0)                     AS AScore,
+    IFNULL(NTests, 0)                     AS NTests,
+    IFNULL(DScore, 0)                     AS DScore,
+    IFNULL(NKilled, 0)                    AS NKilled,
+    IFNULL(AScore, 0) + IFNULL(DScore, 0) AS TotalScore
+  FROM users U LEFT JOIN
+    (SELECT
+       PA.user_id,
+       count(M.Mutant_ID) AS NMutants,
+       sum(M.Points)      AS AScore
+     FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID
+     GROUP BY PA.user_id) AS Attacker ON U.user_id = Attacker.user_id
+    LEFT JOIN
+    (SELECT
+       PD.user_id,
+       count(T.Test_ID)     AS NTests,
+       sum(T.Points)        AS DScore,
+       sum(T.MutantsKilled) AS NKilled
+     FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID
+     GROUP BY PD.user_id)
+      AS Defender ON U.user_id = Defender.user_id
+  WHERE U.user_id > 2; -- Ignore automated players
 
-FROM users u
-  JOIN players p
-    ON u.User_ID = p.User_ID
-  JOIN tests t
-    ON p.ID = t.Player_ID
-  JOIN games g
-    ON t.Game_ID = g.ID
-
-WHERE
-  g.Mode = 'PARTY'
-;
-
-CREATE OR REPLACE VIEW `vw_mp_tests_kill_mutants`
-AS
-SELECT
-  u.User_ID,
-  t.Test_ID
-
-FROM users u
-  JOIN players p
-    ON u.User_ID = p.User_ID
-  JOIN tests t
-    ON p.ID = t.Player_ID
-  JOIN games g
-    ON t.Game_ID = g.ID
-  JOIN targetexecutions trg
-    ON t.Test_ID = trg.Test_ID
-
-WHERE
-  g.Mode = 'PARTY' AND
-  trg.Target = 'TEST_MUTANT' AND
-  (trg.Status = 'FAIL' OR trg.Status = 'ERROR')
-;
-
-CREATE OR REPLACE VIEW `vw_mp_mutants`
-AS
-SELECT
-  u.User_ID,
-  m.Mutant_ID
-
-FROM users u
-  JOIN players p
-    ON u.User_ID = p.User_ID
-  JOIN mutants m
-    ON p.ID = m.Player_ID
-  JOIN games g
-    ON m.Game_ID = g.ID
-
-WHERE
-  g.Mode = 'PARTY'
-;
-
-
-CREATE OR REPLACE VIEW `vw_mp_num_tests`(User_ID, TestCount)
-AS
-SELECT
-  User_ID,
-  COUNT(*)
-FROM
-  vw_mp_tests
-GROUP BY User_ID
-;
-
-CREATE OR REPLACE VIEW `vw_mp_num_mutants`(User_ID, MutantCount)
-AS
-SELECT
-  User_ID,
-  COUNT(*)
-FROM
-  vw_mp_mutants
-GROUP BY User_ID
-;
-
-CREATE OR REPLACE VIEW `vw_mp_num_tests_kill`(User_ID, TestKillCount)
-AS
-SELECT
-  User_ID,
-  COUNT(*)
-FROM
-  vw_mp_tests_kill_mutants
-GROUP BY User_ID
-;
-
-CREATE OR REPLACE VIEW `vw_mp_user_points_mutants`(User_ID, MutantPoints)
-AS
-SELECT
-  u.User_ID,
-  SUM(m.Points)
-FROM users u
-  JOIN players p
-    ON u.User_ID = p.User_ID
-  JOIN mutants m
-    ON p.ID = m.Player_ID
-  JOIN games g
-    ON m.Game_ID = g.ID
-WHERE g.Mode = 'PARTY'
-GROUP BY u.User_ID
-;
-
-CREATE OR REPLACE VIEW `vw_mp_user_points_tests`(User_ID, TestPoints)
-AS
-SELECT
-  u.User_ID,
-  SUM(t.Points)
-FROM users u
-  JOIN players p
-    ON u.User_ID = p.User_ID
-  JOIN tests t
-    ON p.ID = t.Player_ID
-  JOIN games g
-    ON t.Game_ID = g.ID
-WHERE g.Mode = 'PARTY'
-GROUP BY u.User_ID
-;
-
-CREATE OR REPLACE VIEW `vw_mp_user_points`(User_ID, MutantPoints, TestPoints, TotalPoints)
-AS
-SELECT
-  u.User_ID,
-  IFNULL(mset.MutantPoints, 0),
-  IFNULL(tset.TestPoints, 0),
-  IFNULL(mset.MutantPoints, 0) + IFNULL(tset.TestPoints, 0)
-FROM users u
-  LEFT JOIN
-  (
-    SELECT *
-    FROM vw_mp_user_points_mutants
-  ) mset ON u.User_ID = mset.User_ID
-  LEFT JOIN
-  (
-    SELECT *
-    FROM vw_mp_user_points_tests
-  ) tset ON u.User_ID = tset.User_ID
-GROUP BY u.User_ID
-;
--- End Views
-
+--
+-- Automated attacker and defender
+--
 
 INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`) VALUES (1, 'Mutator', 'AI_ATTACKER_INACCESSIBLE', 'codedef_mutator@sheffield.ac.uk');
 INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`) VALUES (2, 'TestGen', 'AI_DEFENDER_INACCESSIBLE', 'codedef_testgen@sheffield.ac.uk');

@@ -141,13 +141,13 @@ public class AntRunner {
 	public static String compileCUT(GameClass cut) {
 
 		String[] resultArray = runAntTarget("compile-cut", null, null, cut, null);
-		System.out.println("Compile New CUT, Compilation result:");
-		System.out.println(Arrays.toString(resultArray));
+		logger.info(String.format("Compile New CUT, Compilation result: %s", Arrays.toString(resultArray)));
+
 
 		String pathCompiledClassName = null;
 		if (resultArray[0].toLowerCase().contains("build successful")) {
 			// If the input stream returned a 'successful build' message, the CUT compiled correctly
-			System.out.println("Compiled uploaded CUT successfully");
+			logger.info("Compiled uploaded CUT successfully");
 			File f = new File(CUTS_DIR + Constants.F_SEP + cut.getAlias());
 			final String compiledClassName = FilenameUtils.getBaseName(cut.getJavaFile()) + Constants.JAVA_CLASS_EXT;
 			LinkedList<File> matchingFiles = (LinkedList)FileUtils.listFiles(f, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
@@ -155,13 +155,12 @@ public class AntRunner {
 				pathCompiledClassName = matchingFiles.get(0).getAbsolutePath();
 		} else {
 			// Otherwise the CUT failed to compile
-			System.err.println("Failed to compile uploaded CUT");
 			int index = resultArray[0].indexOf("javac");
 			String message = resultArray[0];
 			if (index >= 0){
 				message = message.substring(message.indexOf("javac"));
 			}
-			System.err.println(message);
+			logger.error(String.format("Failed to compile uploaded CUT: %s", message));
 		}
 		return pathCompiledClassName;
 	}
@@ -180,8 +179,7 @@ public class AntRunner {
 
 		// Gets the classname for the mutant from the game it is in
 		String[] resultArray = runAntTarget("compile-mutant", dir.getAbsolutePath(), null, cut, null);
-		System.out.println("Compilation result:");
-		System.out.println(Arrays.toString(resultArray));
+		logger.info(String.format("Compilation result: %s", Arrays.toString(resultArray)));
 
 		Mutant newMutant = null;
 		// If the input stream returned a 'successful build' message, the mutant compiled correctly
@@ -190,7 +188,7 @@ public class AntRunner {
 			// Locate .class file
 			final String compiledClassName = cut.getBaseName() + JAVA_CLASS_EXT;
 			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
-			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
+			assert (! matchingFiles.isEmpty()): "if compilation was successful, .class file must exist";
 			String cFile = matchingFiles.get(0).getAbsolutePath();
 			int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gameID);
 			newMutant = new Mutant(gameID, jFile, cFile, true, playerId);
@@ -201,6 +199,7 @@ public class AntRunner {
 			// The mutant failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
 			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(Constants.DATA_DIR, "");
+			logger.error(String.format("Failed to compile mutant %s: %s", jFile, message));
 			int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gameID);
 			newMutant = new Mutant(gameID, jFile, null, false, playerId);
 			newMutant.insert();
@@ -234,7 +233,7 @@ public class AntRunner {
 			LinkedList<File> matchingFiles = (LinkedList) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
 			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
 			String cFile = matchingFiles.get(0).getAbsolutePath();
-
+			logger.error(String.format("Compiled test %s", compiledClassName));
 			Test newTest = new Test(gameID, jFile, cFile, playerId);
 			newTest.insert();
 			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);
@@ -244,6 +243,7 @@ public class AntRunner {
 			// The test failed to compile
 			// New target execution recording failed compile, providing the return messages from the ant javac task
 			String message = resultArray[0].substring(resultArray[0].indexOf("[javac]")).replaceAll(Constants.DATA_DIR, "");
+			logger.error(String.format("Failed to compile test %s: %s", jFile, message));
 			Test newTest = new Test(gameID, jFile, null, playerId);
 			newTest.insert();
 			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "FAIL", message);
@@ -309,7 +309,7 @@ public class AntRunner {
 
 		String antHome = (String) env.get("ANT_HOME");
 		if (antHome == null) {
-			System.err.println("ANT_HOME undefined.");
+			logger.error("ANT_HOME undefined.");
 			antHome = System.getProperty("ant.home", "/usr/local");
 		}
 
@@ -333,8 +333,8 @@ public class AntRunner {
 		pb.directory(new File(buildFileDir));
 		pb.redirectErrorStream(true);
 
-		System.out.println("Executing Ant Command: " + pb.command().toString());
-		System.out.println("Executing from directory: " + buildFileDir);
+		logger.debug("Executing Ant Command: " + pb.command().toString());
+		logger.debug("Executing from directory: " + buildFileDir);
 		try {
 			Process p = pb.start();
 			String line;
@@ -357,10 +357,10 @@ public class AntRunner {
 		resultArray[1] = esLog;
 		resultArray[2] = exLog;
 		resultArray[3] = debug;
-		System.out.println("is: " + isLog);
-		System.out.println("es: " + esLog);
-		System.out.println("ex: " + exLog);
-		System.out.println("lg :" + debug);
+		logger.debug("is: " + isLog);
+		logger.debug("es: " + esLog);
+		logger.debug("ex: " + exLog);
+		logger.debug("lg :" + debug);
 
 		return resultArray;
 	}
@@ -420,8 +420,8 @@ public class AntRunner {
 		pb.directory(new File(buildFileDir));
 		pb. redirectErrorStream(true);
 
-		System.out.println("Executing Ant Command: " + pb.command().toString());
-		System.out.println("Executing from directory: " + buildFileDir);
+		logger.debug("Executing Ant Command: " + pb.command().toString());
+		logger.debug("Executing from directory: " + buildFileDir);
 		try {
 			Process p = pb.start();
 			String line;
@@ -443,9 +443,9 @@ public class AntRunner {
 		resultArray[0] = isLog;
 		resultArray[1] = esLog;
 		resultArray[2] = exLog;
-		System.out.println("is: " + isLog);
-		System.out.println("es: " + esLog);
-		System.out.println("ex: " + exLog);
+		logger.debug("is: " + isLog);
+		logger.debug("es: " + esLog);
+		logger.debug("ex: " + exLog);
 
 		return resultArray;
 	}

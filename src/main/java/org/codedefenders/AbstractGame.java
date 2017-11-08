@@ -1,5 +1,6 @@
 package org.codedefenders;
 
+import org.codedefenders.events.Event;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +24,8 @@ public abstract class AbstractGame {
 	protected GameLevel level;
 	protected GameMode mode;
 
+	protected ArrayList<Event> events = null;
+
 	public int getId() {
 		return id;
 	}
@@ -33,6 +36,14 @@ public abstract class AbstractGame {
 
 	public String getClassName() {
 		return DatabaseAccess.getClassForKey("Class_ID", classId).getName();
+	}
+
+	public ArrayList<Event> getEvents(){
+		if (events == null){
+			events = DatabaseAccess.getEventsForGame(getId());
+		}
+
+		return events;
 	}
 
 	public GameClass getCUT() {

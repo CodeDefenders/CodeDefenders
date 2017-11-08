@@ -254,6 +254,38 @@
 	</servlet-mapping>
 	<!-- end multiplayer servlets -->
 
+	<!-- Notification JSON Servlets -->
+
+	<servlet>
+		<servlet-name>game_notification</servlet-name>
+		<servlet-class>org.codedefenders.events.EventManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>game_notification</servlet-name>
+		<url-pattern>/game_notifications</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>game_message</servlet-name>
+		<servlet-class>org.codedefenders.events.MessageManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>game_message</servlet-name>
+		<url-pattern>/messages/send</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet>
+		<servlet-name>mutants</servlet-name>
+		<servlet-class>org.codedefenders.json.MutantManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>mutants</servlet-name>
+		<url-pattern>/game_mutants</url-pattern>
+	</servlet-mapping>
+
+	<!-- End Notification JSON Servlets -->
+
 	<resource-ref>
 		<res-ref-name>jdbc/codedefenders</res-ref-name>
 		<res-type>javax.sql.DataSource</res-type>

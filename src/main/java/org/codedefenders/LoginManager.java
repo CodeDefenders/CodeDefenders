@@ -159,7 +159,7 @@ public class LoginManager extends HttpServlet {
 	*/
 	public static boolean validPassword(String password) {
 		// 3-10 alphanumeric characters (a-z, A-Z, 0-9) (no whitespaces)
-		String pattern = "^[a-zA-Z0-9]{3,10}$";
+		String pattern = "^[a-zA-Z0-9]{3,20}$";
 		return password != null && password.matches(pattern);
 	}
 }

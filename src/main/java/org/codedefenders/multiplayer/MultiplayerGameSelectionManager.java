@@ -1,5 +1,8 @@
 package org.codedefenders.multiplayer;
 
+import org.codedefenders.events.Event;
+import org.codedefenders.events.EventStatus;
+import org.codedefenders.events.EventType;
 import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.GameLevel;
 import org.codedefenders.GameState;
@@ -10,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class MultiplayerGameSelectionManager extends HttpServlet {
@@ -24,6 +28,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
 
             if (mg != null) {
+                mg.notifyPlayers();
                 String redirect = "/multiplayer/play?id=" + gameId;
                 if (request.getParameter("attacker") != null) {
                     redirect += "&attacker=1";
@@ -68,7 +73,13 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                             Integer.parseInt(request.getParameter("defenderLimit")), Integer.parseInt(request.getParameter("attackerLimit")),
                             Integer.parseInt(request.getParameter("minDefenders")), Integer.parseInt(request.getParameter("minAttackers")),
                             Long.parseLong(request.getParameter("startTime")), Long.parseLong(request.getParameter("finishTime")), GameState.CREATED.name());
-                    nGame.insert();
+                    if (nGame.insert()){
+                        Event event = new Event(-1, nGame.getId(), uid, "Game" +
+                                " Created",
+                                EventType.GAME_CREATED, EventStatus.GAME, new
+                                Timestamp(System.currentTimeMillis()));
+                        event.insert();
+                    }
 
                     //rs.getInt("Defender_Limit"), rs.getInt("Attacker_Limit"),
                     //rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getLong("Finish_Time"),
@@ -80,11 +91,21 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 case "leaveGame":
                     int gameId = Integer.parseInt(request.getParameter("game"));
                     MultiplayerGame game = DatabaseAccess.getMultiplayerGame(gameId);
-                    if (game.removePlayer(uid))
+                    if (game.removePlayer(uid)) {
                         messages.add("Game " + gameId + " left");
-                    else
-                        messages.add("An error occured while leaving game " + gameId);
-                    // Redirect to the game selection menu.
+                        DatabaseAccess.removePlayerEventsForGame(gameId,
+                                uid);
+                        EventType notifType = EventType.GAME_PLAYER_LEFT;
+                        Event notif = new Event(-1, gameId, uid,
+                                "You successfully left" +
+                                " the game.",
+                                notifType, EventStatus.NEW,
+                                new Timestamp(System.currentTimeMillis()));
+                        notif.insert();
+                    } else {
+                        messages.add("An error occured while leaving game " +
+                                gameId);
+                    }// Redirect to the game selection menu.
                     response.sendRedirect("games");
                     break;
                 default:

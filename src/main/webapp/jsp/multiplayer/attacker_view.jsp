@@ -47,17 +47,19 @@
 			}
 			/* Mutants diffs */
 			$('.modal').on('shown.bs.modal', function() {
-				var codeMirrorContainer = $(this).find(".CodeMirror")[0];
-				if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-					codeMirrorContainer.CodeMirror.refresh();
-				} else {
-					var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
-						lineNumbers: false,
-						mode: "diff",
-						readOnly: true /* onCursorActivity: null */
-					});
-					editorDiff.setSize("100%", 500);
-				}
+			    try {
+                    var codeMirrorContainer = $(this).find(".CodeMirror")[0];
+                    if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+                        codeMirrorContainer.CodeMirror.refresh();
+                    } else {
+                        var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
+                            lineNumbers: false,
+                            mode: "diff",
+                            readOnly: true /* onCursorActivity: null */
+                        });
+                        editorDiff.setSize("100%", 500);
+                    }
+                } catch (e){}
 			});
 
 			$('#finishedModal').modal('show');

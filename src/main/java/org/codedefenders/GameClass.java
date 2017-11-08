@@ -1,6 +1,7 @@
 package org.codedefenders;
 
 import org.codedefenders.duel.DuelGame;
+import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,10 +81,10 @@ public class GameClass {
 
 		} catch (FileNotFoundException e) {
 			result = "[File Not Found]";
-			e.printStackTrace();
+			logger.error("Could not find file " + javaFile);
 		} catch (IOException e) {
 			result = "[File Not Readable]";
-			e.printStackTrace();
+			logger.error("Could not read file " + javaFile);
 		}
 		return result;
 
@@ -104,20 +105,18 @@ public class GameClass {
 			ResultSet rs = stmt.getGeneratedKeys();
 			if (rs.next()) {
 				this.id = rs.getInt(1);
-				System.out.println("Inserted CUT with ID: " + this.id);
+				logger.debug("Inserted CUT with ID: " + this.id);
 				stmt.close();
 				conn.close();
 				return true;
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
+			logger.error("Exception caught", e);
 		} finally {
 			DatabaseAccess.cleanup(conn, stmt);
-		} //end try
+		}
 
 		return false;
 	}
@@ -139,14 +138,12 @@ public class GameClass {
 			conn.close();
 			return true;
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
+			logger.error("Exception caught", e);
 		} finally {
 			DatabaseAccess.cleanup(conn, stmt);
-		} //end try
+		}
 		return false;
 	}
 
@@ -184,7 +181,7 @@ public class GameClass {
 		this.classFile = classFile;
 	}
 
-	public DuelGame getDummyGame() throws Exception {
+	public DuelGame getDummyGame() throws NoDummyGameException {
 		DuelGame dg = DatabaseAccess.getAiDummyGameForClass(this.getId());
 		return dg;
 	}
@@ -205,14 +202,12 @@ public class GameClass {
 			conn.close();
 			return true;
 		} catch (SQLException se) {
-			System.out.println(se);
-			//Handle errors for JDBC
+			logger.error("SQL exception caught", se);
 		} catch (Exception e) {
-			System.out.println(e);
-			//Handle errors for Class.forName
+			logger.error("Exception caught", e);
 		} finally {
 			DatabaseAccess.cleanup(conn, stmt);
-		} //end try
+		}
 		return false;
 	}
 }
