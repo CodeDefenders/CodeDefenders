@@ -80,6 +80,14 @@ grant {
   permission java.awt.AWTPermission "*";
   permission java.io.FilePermission "<<ALL FILES>>", "read";
   permission java.io.FilePermission "/var/lib/codedefenders/-", "write";
+  
+  permission java.io.FilePermission "/tmp/var/lib/codedefenders/-", "write";
+  permission java.io.FilePermission "/tmp/codedefender/-", "read,write";
+  permission java.io.FilePermission "/tmp/defender/-", "read,write";
+  permission java.io.FilePermission "/private/tmp/defender/-", "read,write";
+  
+  permission java.io.FilePermission "/scratch/defender/-", "read,write";
+  
   permission java.util.PropertyPermission "*", "read,write";
 
 };
