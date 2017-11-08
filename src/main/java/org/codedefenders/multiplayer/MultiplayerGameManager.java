@@ -32,7 +32,20 @@ public class MultiplayerGameManager extends HttpServlet {
 		ArrayList<String> messages = new ArrayList<String>();
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
-		int gameId = (Integer) session.getAttribute("mpGameId");
+		// This raises exception when playing around with curl, not sure it's a feature.
+//		int gameId = (Integer) session.getAttribute("mpGameId");
+		 // Why this must be set with the session from game_view.jsp ?
+		int gameId = -1;
+		if (session.getAttribute("mpGameId") != null) {
+			gameId = (Integer) session.getAttribute("mpGameId");
+		} else if (request.getAttribute("mpGameID") != null) {
+			gameId = (Integer) request.getAttribute("mpGameID");
+		} else {
+			logger.error("Problem setting gameID !");
+			response.setStatus(500);
+			return;
+		}
+
 		session.setAttribute("messages", messages);
 
 		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(gameId);

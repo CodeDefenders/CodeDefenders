@@ -86,7 +86,7 @@ public class UploadManager extends HttpServlet {
 			throw new ServletException("Cannot parse multipart request.", e);
 		}
 
-		//Not a java file
+		// Not a java file
 		if (!fileName.endsWith(".java")) {
 			messages.add("The class under test must be a .java file.");
 			response.sendRedirect(request.getHeader("referer"));
@@ -103,7 +103,7 @@ public class UploadManager extends HttpServlet {
 		// alias provided
 		if (classAlias != null && !classAlias.isEmpty()) {
 			// check if basename exists as CUT dir
-			logger.info("Checking if alias {0} is a good directory to store the class", classAlias);
+			logger.info("Checking if alias {} is a good directory to store the class", classAlias);
 			GameClass cut = new GameClass("", classAlias, "", "");
 			if (cut.insert()) {
 				storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI);
@@ -114,7 +114,7 @@ public class UploadManager extends HttpServlet {
 
 		// try with basename as alias
 		String baseName = FilenameUtils.getBaseName(fileName);
-		logger.info("Checking if base name {0} is a good directory to store the class", baseName);
+		logger.info("Checking if base name {} is a good directory to store the class", baseName);
 		GameClass cut = new GameClass("", baseName, "", "");
 		if (cut.insert()) {
 			storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI);
@@ -125,7 +125,7 @@ public class UploadManager extends HttpServlet {
 		// now try fully qualified name
 		String fullName = getFullyQualifiedName(fileName, fileContent);
 		cut = new GameClass("", fullName, "", "");
-		logger.info("Checking if full name {0} is a good directory to store the class", fullName);
+		logger.info("Checking if full name {} is a good directory to store the class", fullName);
 		if (cut.insert()) {
 			storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI);
 			return;
@@ -153,7 +153,7 @@ public class UploadManager extends HttpServlet {
 		String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
 		// Create CUT, temporarily using file name as class name for compilation
 		cut.setJavaFile(javaFileNameDB);
-		//Compile original class, using alias as directory name
+		// Compile original class, using alias as directory name
 		String classFileName = AntRunner.compileCUT(cut);
 
 		if (classFileName != null) {
@@ -195,7 +195,7 @@ public class UploadManager extends HttpServlet {
 			FileUtils.writeStringToFile(tmpFile, fileContent);
 			FileInputStream in = new FileInputStream(tmpFile);
 			CompilationUnit cu = JavaParser.parse(in);
-			if (null != cu && null != cu.getPackage() && ! cu.getPackage().getName().getName().isEmpty())
+			if (null != cu && null != cu.getPackage() && !cu.getPackage().getName().getName().isEmpty())
 				return cu.getPackage().getName() + "." + FilenameUtils.getBaseName(fileName);
 		} catch (IOException e) {
 			e.printStackTrace();

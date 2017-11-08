@@ -1,5 +1,34 @@
 package org.codedefenders;
 
+import static org.codedefenders.Constants.MUTANT_ALIVE_1_MESSAGE;
+import static org.codedefenders.Constants.MUTANT_ALIVE_N_MESSAGE;
+import static org.codedefenders.Constants.MUTANT_KILLED_BY_TEST_MESSAGE;
+import static org.codedefenders.Constants.MUTANT_SUBMITTED_MESSAGE;
+import static org.codedefenders.Constants.TEST_KILLED_LAST_MESSAGE;
+import static org.codedefenders.Constants.TEST_KILLED_N_MESSAGE;
+import static org.codedefenders.Constants.TEST_KILLED_ONE_MESSAGE;
+import static org.codedefenders.Constants.TEST_KILLED_ZERO_MESSAGE;
+import static org.codedefenders.Constants.TEST_SUBMITTED_MESSAGE;
+import static org.codedefenders.Mutant.Equivalence.ASSUMED_NO;
+import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
+
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.events.Event;
@@ -11,18 +40,37 @@ import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.codedefenders.Constants.*;
-import static org.codedefenders.Mutant.Equivalence.ASSUMED_NO;
-import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
-
 // Class that handles compilation and testing by creating a Process with the relevant ant target
 public class MutationTester {
-
 	private static final Logger logger = LoggerFactory.getLogger(MutationTester.class);
+
+	private static boolean parallelize = false;
+
+	// DO NOT REALLY LIKE THOSE...
+	static {
+		// First check the Web abb context
+		InitialContext initialContext;
+		try {
+			initialContext = new InitialContext();
+			NamingEnumeration<NameClassPair> list = initialContext.list("java:/comp/env");
+			Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
+
+			// Looking up a name which is not there causes an exception
+			// Some are unsafe !
+			while (list.hasMore()) {
+				String name = list.next().getName();
+				switch (name) {
+				case "parallelize":
+					parallelize = "enabled".equalsIgnoreCase((String) environmentContext.lookup(name));
+					break;
+				}
+				System.out.println("MutationTester Setting Env " + name);
+			}
+
+		} catch (NamingException e) {
+			e.printStackTrace();
+		}
+	}
 
 	// RUN MUTATION TESTS: Runs all the mutation tests for a particular game, using all the alive mutants and all tests
 
@@ -61,28 +109,110 @@ public class MutationTester {
 
 		User u = DatabaseAccess.getUserFromPlayer(test.getPlayerId());
 
-		for (Mutant mutant : mutants) {
-			if(!test.isMutantCovered(mutant))
-				continue;
-			if (testVsMutant(test, mutant)){
-				killed++;
-				killedMutants.add(mutant);
+		/// PARALLELIZE THIS
+		if (parallelize) {
+
+			System.out.println("\n\n MutationTester.runTestOnAllMultiplayerMutants()  START PARALLEL EXECUTION \n\n");
+
+			// Fork and Join parallelization
+			// TODO THe alternative is to use the count-down-latch, but I am not
+			// sure how to handle timeouts and such !
+			ExecutorService executor = Executors.newFixedThreadPool(10);
+			//
+			Map<Mutant, FutureTask<Boolean>> tasks = new HashMap<Mutant, FutureTask<Boolean>>();
+			for (final Mutant mutant : mutants) {
+				FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
+
+					@Override
+					public Boolean call() throws Exception {
+						return testVsMutant(test, mutant);
+					}
+				});
+				// This is for checking later
+				tasks.put(mutant, task);
+				//
+				System.out.println("MutationTester.runTestOnAllMultiplayerMutants() Scheduling Task testVsMutant "
+						+ test + " vs " + mutant);
+				executor.execute(task);
+			}
+
+			// TODO Mayse use some timeout ?!
+			for (final Mutant mutant : mutants) {
+				// checks if task done
+				System.out.println("Is mutant done? " + tasks.get(mutant).isDone());
+				// checks if task canceled
+				System.out.println("Is mutant cancelled? " + tasks.get(mutant).isCancelled());
+				// fetches result and waits if not ready
+
+				// THIS IS BLOCKING !!!
+				try {
+					if (tasks.get(mutant).get()) {
+						killed++;
+						killedMutants.add(mutant);
+					}
+				} catch (InterruptedException | ExecutionException e) {
+					System.out.println(
+							"MutationTester.runTestOnAllMultiplayerMutants() ERROR While waiting results for mutant "
+									+ mutant);
+					e.printStackTrace();
+				}
+			}
+
+			// Get rid of the executor pool
+			// Shutdown but not wait ?
+			System.out.println("MutationTester.runTestOnAllMultiplayerMutants() DEBUG: shutting down executor service");
+			executor.shutdown();
+			System.out.println("MutationTester.runTestOnAllMultiplayerMutants() DEBUG: done");
+			tasks.clear();
+
+			/*
+			 * if (testVsMutant(test, mutant)) { }
+			 */
+			// TODO 10 is cluster size but this can be anynumber
+
+			/*
+			 * while (true) { try { if(futureTask1.isDone() &&
+			 * futureTask2.isDone()){ System.out.println("Done"); //shut down
+			 * executor service executor.shutdown(); return; }
+			 * 
+			 * if(!futureTask1.isDone()){ //wait indefinitely for future task to
+			 * complete
+			 * System.out.println("FutureTask1 output="+futureTask1.get()); }
+			 * 
+			 * System.out.println("Waiting for FutureTask2 to complete"); String
+			 * s = futureTask2.get(200L, TimeUnit.MILLISECONDS); if(s !=null){
+			 * System.out.println("FutureTask2 output="+s); } } catch
+			 * (InterruptedException | ExecutionException e) {
+			 * e.printStackTrace(); }catch(TimeoutException e){ //do nothing } }
+			 * 
+			 * }
+			 * 
+			 * }
+			 */
+
+		} else {
+			for (Mutant mutant : mutants) {
+				if (testVsMutant(test, mutant)) {
+					killed++;
+					killedMutants.add(mutant);
+				}
 			}
 		}
+		////
 
-		for (Mutant mutant : mutants){
-			if (mutant.isAlive()){
+		for (Mutant mutant : mutants) {
+			if (mutant.isAlive()) {
 				ArrayList<Test> missedTests = new ArrayList<Test>();
 
-				for (int lm : mutant.getLines()){
+				for (int lm : mutant.getLines()) {
 					boolean found = false;
-					for (int lc : test.getLineCoverage().getLinesCovered()){
-						if (lc == lm){
+					for (int lc : test.getLineCoverage().getLinesCovered()) {
+						if (lc == lm) {
 							found = true;
 							missedTests.add(test);
 						}
 					}
-					if (found){
+					if (found) {
 						break;
 					}
 				}
@@ -122,6 +252,8 @@ public class MutationTester {
 		}
 	}
 
+	// TODO Do not parallelize for the moment. Pay attention to the return statement.
+	//
 	public static void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages) {
 		List<Test> tests = game.getTests(true); // executable tests submitted by defenders
 		User u = DatabaseAccess.getUserFromPlayer(mutant.getPlayerId());
