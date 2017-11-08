@@ -46,6 +46,8 @@ public class MutationTester {
 
 	private static boolean parallelize = false;
 
+	private static boolean useMutantCoverage = true;
+
 	// DO NOT REALLY LIKE THOSE...
 	static {
 		// First check the Web abb context
@@ -62,6 +64,9 @@ public class MutationTester {
 				switch (name) {
 				case "parallelize":
 					parallelize = "enabled".equalsIgnoreCase((String) environmentContext.lookup(name));
+					break;
+				case "mutant.coverage":
+					useMutantCoverage = "enabled".equalsIgnoreCase((String) environmentContext.lookup(name));
 					break;
 				}
 				System.out.println("MutationTester Setting Env " + name);
@@ -121,6 +126,9 @@ public class MutationTester {
 			//
 			Map<Mutant, FutureTask<Boolean>> tasks = new HashMap<Mutant, FutureTask<Boolean>>();
 			for (final Mutant mutant : mutants) {
+				if(useMutantCoverage && !test.isMutantCovered(mutant))
+					continue;
+
 				FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
 
 					@Override
@@ -138,6 +146,9 @@ public class MutationTester {
 
 			// TODO Mayse use some timeout ?!
 			for (final Mutant mutant : mutants) {
+				if(useMutantCoverage && !test.isMutantCovered(mutant))
+					continue;
+
 				// checks if task done
 				System.out.println("Is mutant done? " + tasks.get(mutant).isDone());
 				// checks if task canceled
@@ -192,6 +203,9 @@ public class MutationTester {
 
 		} else {
 			for (Mutant mutant : mutants) {
+				if(useMutantCoverage && !test.isMutantCovered(mutant))
+					continue;
+
 				if (testVsMutant(test, mutant)) {
 					killed++;
 					killedMutants.add(mutant);
@@ -259,7 +273,7 @@ public class MutationTester {
 		User u = DatabaseAccess.getUserFromPlayer(mutant.getPlayerId());
 
 		for (Test test : tests) {
-			if(!test.isMutantCovered(mutant))
+			if(useMutantCoverage && !test.isMutantCovered(mutant))
 				continue;
 
 			// If this mutant/test pairing hasnt been run before and the test might kill the mutant

@@ -50,4 +50,9 @@
 		type="java.lang.String"
 		value="${forceLocalExecution}" />
 
+	<Environment
+			name="mutant.coverage"
+			type="java.lang.String"
+			value="${mutant.coverage}" />
+
 </Context>
