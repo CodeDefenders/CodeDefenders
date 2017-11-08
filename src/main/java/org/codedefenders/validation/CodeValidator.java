@@ -6,19 +6,13 @@ import com.github.javaparser.TokenMgrError;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.regex.Pattern;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Jose Rojas
@@ -117,23 +111,8 @@ public class CodeValidator {
 Removes Comments (of both varieties) and Whitespaces from java source code.
  */
 	private static String getCodeWithoutComments(String code) {
-		List<String> tokens = new ArrayList<>();
-		StreamTokenizer st = new StreamTokenizer(new StringReader(code));
-		st.slashSlashComments(true);
-		st.slashStarComments(true);
-		try {
-			while (st.nextToken() != StreamTokenizer.TT_EOF) {
-				if (st.ttype == StreamTokenizer.TT_NUMBER) {
-					tokens.add(String.valueOf(st.nval));
-				} else {
-					tokens.add(st.sval);
-				}
-			}
-		} catch (IOException e) {
-			// st.nextToken can throw an IOException if the stream ends
-			// As we have already parsed the code at this point it should
-			// be safe to assume this cannot happen (?)
-		}
-		return tokens.toString().replaceAll("\\s+", "");
+		String filtered = code.replaceAll("((['\"])(?:(?!\\2|\\\\).|\\\\.)*\\2)|\\/\\/[^\\n]*|\\/\\*(?:[^*]|\\*(?!\\/))*\\*\\/", "");
+		System.out.println(filtered.replaceAll("\\s+", ""));
+		return filtered.replaceAll("\\s+", "");
 	}
 }
