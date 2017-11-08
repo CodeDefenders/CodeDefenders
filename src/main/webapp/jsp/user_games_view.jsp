@@ -104,10 +104,7 @@
 	} // if (games.isEmpty())
 %>
 </table>
-<!-- Alessio disabled this -->
-<!-- 
 	<a href="/games/create">Create Duel</a>
- -->
 
 	<hr />
 
@@ -215,10 +212,7 @@
 	%>
 	</tbody>
 </table>
-<!-- Alessio disabled this -->
-	<!-- 
 	<a href="/multiplayer/games/create">Create Battleground</a>
- -->
 
 	<script>
 		$(document).ready(function() {

@@ -82,9 +82,7 @@
                                 Games</a></li>
                             <li><a href="games/history" style="width:100%;">History</a></li>
                 </ul></li>
-                <!-- Alessio: Disabled this -->
-                <!-- <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="games/upload" style="width:100%;">Upload Class</a></li> -->
-                
+                <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="games/upload" style="width:100%;">Upload Class</a></li>
                 <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="leaderboards" style="width: 100%;">Leaderboard</a></li>
                 <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="help" style="width:100%;">Help</a></li>
                 <li style="float: none" class="dropdown"><a

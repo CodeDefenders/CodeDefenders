@@ -22,13 +22,7 @@
               <input type="checkbox" id="consentOK" style="margin-right:5px;" checked>I understand and consent that the mutants and tests I create in the game will be used for research purposes.
           </div>
           <button class="btn btn-lg btn-primary btn-block" id="signInButton" type="submit">Sign in</button>
-          
-          <!--  Alessio disable this to avoid students creating additional users. Ideally this should be configure at build time -->
-          <!-- 
           <a href="#" class="text-center new-account" data-toggle="modal" data-target="#myModal">Create an account</a>
-           -->
-          
-          
       </form>
   </div>
 
