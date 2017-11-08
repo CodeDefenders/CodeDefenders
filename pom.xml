@@ -67,6 +67,34 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<!-- Print the properties -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<echo>Displaying properties value</echo>
+								<!-- <echo>[build.profile.id] ${build.profile.id}</echo> -->
+								<echo>[data.dir] ${data.dir}</echo>
+								<echo>[db.url]${db.url}</echo>
+								<echo>[tomcat.url] ${tomcat.url}</echo>
+								<echo>[cluster.mode] ${cluster.mode}</echo>
+								<echo>[cluster.reservation.name] ${cluster.reservation.name}</echo>
+								<echo>[parallelize] ${parallelize}</echo>
+								<echo>[forceLocalExecution] ${forceLocalExecution}</echo>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
@@ -90,6 +118,13 @@
 								<include>**/*.sh</include>
 								<include>**/*.svg</include>
 							</includes>
+						</resource>
+						<!-- Enable reading props from config.file and setting all the files 
+							in META-INF -->
+						<resource>
+							<directory>src/main/webapp/META-INF</directory>
+							<filtering>true</filtering>
+							<targetPath>META-INF</targetPath>
 						</resource>
 					</webResources>
 					<packagingExcludes>**/empty.tmp</packagingExcludes>
