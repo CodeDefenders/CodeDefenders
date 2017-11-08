@@ -21,6 +21,9 @@ if [ ! -f credentials.cfg-system-tests ]; then echo "Missing credentials.cfg-sys
 #
 : ${CODE_DEFENDER_URL:?Missing}
 
+# users.list contains usernames and password of the syntethic clients
+if [ ! -f users.list ]; then echo "Missing users.list file !;" exit 1; fi
+
 shopt -s expand_aliases
 
 # Under MAC some utilities have different name. This requires that utils is installed on Mac. Use brew.
