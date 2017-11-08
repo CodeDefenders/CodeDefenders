@@ -55,6 +55,8 @@ public class MutationTester {
 		mutants.addAll(game.getMutantsMarkedEquivalentPending());
 		List<Mutant> killedMutants = new ArrayList<Mutant>();
 		for (Mutant mutant : mutants) {
+			if(!test.isMutantCovered(mutant))
+				continue;
 			if (testVsMutant(test, mutant)){
 				killed++;
 				killedMutants.add(mutant);
@@ -109,6 +111,9 @@ public class MutationTester {
 	public static void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages) {
 		List<Test> tests = game.getTests(true); // executable tests submitted by defenders
 		for (Test test : tests) {
+			if(!test.isMutantCovered(mutant))
+				continue;
+
 			// If this mutant/test pairing hasnt been run before and the test might kill the mutant
 			if (testVsMutant(test, mutant)) {
 				logger.info("Test {} kills mutant {}", test.getId(), mutant.getId());

@@ -2,6 +2,7 @@ package org.codedefenders;
 
 import javassist.ClassPool;
 import javassist.CtClass;
+import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.util.DatabaseAccess;
@@ -119,6 +120,10 @@ public class Test {
 	public void killMutant() {
 		mutantsKilled++;
 		update();
+	}
+
+	public boolean isMutantCovered(Mutant mutant) {
+		return CollectionUtils.containsAny(lineCoverage.getLinesCovered(), mutant.getLines());
 	}
 
 	public List<String> getHTMLReadout() throws IOException {
