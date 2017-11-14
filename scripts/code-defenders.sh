@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# TODO pay attention to empty lines when dealing with mysql. E.g., create balanced games
+# TODO add a function to join a running game (maybe leaving it also?) given the id
+
 # General Setting
 
 if [ ! -f credentials.cfg ]; then echo "Missing credentials.cfg file!"; exit 1; fi
@@ -22,11 +26,13 @@ if uname -a | grep -c Darwin > /dev/null; then
  date_timestamp='date +"%Y-%m-%d %H:%M:%S"'
  date_timestamp_start='date -v-1d +"%Y-%m-%d %H:%M:%S"'
  date_timestamp_end='date -v+1d +"%Y-%m-%d %H:%M:%S"'
+ alias remove_empty_lines="sed -i \".original\" '/^[[:space:]]*$/d'"
 else
  DICTIONARY="/usr/share/dict/american-english"
  date_timestamp='date +"%Y-%m-%d %H:%M:%S"'
  date_timestamp_start='date +"%Y-%m-%d %H:%M:%S" -d "-1days"'
  date_timestamp_end='date +"%Y-%m-%d %H:%M:%S" -d "+1days"'
+ alias remove_empty_lines="sed -i .original '/^[[:space:]]*$/d"
 fi
 
 function __private_generate_password(){
@@ -108,12 +114,30 @@ function get_cut_for(){
   echo $(__private_query_db "select Class_ID from classes where Alias='$1';")
 }
 
+# Can we make the game creation parametric on the "Last ID of the game"?
+#
 # Create a set of game scripts based on user ranking and last role
-### MAYBE HAVING A CREATE GAME SCRITP GIVEN THE USERS THAT DOES MOST OF THIS COMPUTATIONS USING MYSQL WOULD BE SMARTER
-# chose students, create a game by querying the DB directly while creating the game. At that point, we can also create the finish game file !
+# chose students, create a game by querying the DB directly while creating the game and create the script to finish the game !
 function create_balanced_game_scripts(){
  	if [ $# -lt 1 ]; then echo "Provide a list of code-defenders usernames"; return 1; fi
 	  local participants=$1
+	  
+	  # remove empty lines and backup the original version to
+	  # This create a ${participants}.original file
+	  remove_empty_lines ${participants}
+	  
+	  mv ${participants} ${participants}.sanitized
+	  mv ${participants}.original ${participants} # Switch back the original version of the file !
+	  
+	  # use the sanitized version now on
+	  participants=${participants}.sanitized
+	  
+# Check that the file is valid
+	  if [ $(awk '{print NF}' %{participants} | sort -nu | tail -n 1) -gt 1 ]; then
+	  		echo "File ${participants} is invalid. The file must have only one column, which contains user ID only!"
+	  		return 1;
+		fi
+	  
 	if [ $# -lt 2 ]; then echo "Provide Size of Game. 4 for a 2 vs 2, 6 for a 3 vs 3"; return 1; fi
 	  local gameSize=$2
 	if [ $# -lt 3 ]; then echo "Provide CUT ALIAS Name for the Games. eg. Lift"; return 1; fi
@@ -129,7 +153,7 @@ function create_balanced_game_scripts(){
 
 	# Get bot ID or register bot user
 	if [ $(__private_query_db "select count(*) from users where Username='bot';") -eq 0 ]; then
-		 $(register_student "bot" "bot") 2>&1 > /dev/null
+		 $(register_student "bot" "iRobot") 2>&1 > /dev/null
     fi
     
 	# Creator ID 
@@ -143,7 +167,7 @@ function create_balanced_game_scripts(){
 	END_TIMESTAMP=$(eval ${date_timestamp_end})
 
 # SELECT ALL THE GAMES FOR AN USER, i.e., "settik01"
-#SELECT Username, U.User_ID, GP.Role, GP.Start_Time from users U left join (select P.User_ID as User_ID, G.Start_Time as Start_Time, P.Role as Role from games G left join players P on G.ID=P.Game_ID ) GP on U.User_ID=GP.User_ID WHERE U.Username='settik01';
+# SELECT Username, U.User_ID, GP.Role, GP.Start_Time from users U left join (select P.User_ID as User_ID, G.Start_Time as Start_Time, P.Role as Role from games G left join players P on G.ID=P.Game_ID ) GP on U.User_ID=GP.User_ID WHERE U.Username='settik01';
 
 # Last Role Played
 
