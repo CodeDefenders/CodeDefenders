@@ -71,8 +71,8 @@ var mutantLine = function (lineQuant, superDiv) {
                 drawMutants(lineNum, this);
             }, function () {
                 timeoutFunction = setTimeout(function () {
-                    $('#mutationPopup').fadeOut(500);
-                }, 5000);
+                    $('#mutationPopup').fadeOut(50);
+                }, 500);
             }
         );
     }
@@ -122,8 +122,8 @@ var mutantKilledLine = function (lineQuant, superDiv) {
                 drawKilledMutants(lineNum, this);
             }, function () {
                 timeoutFunction = setTimeout(function () {
-                    $('#mutationPopup').fadeOut(500);
-                }, 5000);
+                    $('#mutationPopup').fadeOut(50);
+                }, 500);
             }
         );
     }
