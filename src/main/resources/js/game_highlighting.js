@@ -79,11 +79,9 @@ var mutantLine = function (lineQuant, superDiv) {
 };
 
 var drawMutants = function (lineNum, ele) {
-    if (!$.contains(ele, $('#mutationPopup')[0])) {
-        $('#mutationPopup').remove();
-        var content = lineContent[lineNum];
-        $(ele).append(content);
-    }
+    $('#mutationPopup').remove();
+    var content = lineContent[lineNum];
+    $(ele).append(content);
 };
 
 killedLineContent = [];
