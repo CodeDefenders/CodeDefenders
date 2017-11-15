@@ -12,10 +12,7 @@ import org.codedefenders.singleplayer.SinglePlayerGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +36,7 @@ public class DatabaseAccess {
 	}
 
 	public static Connection getConnection() throws SQLException, NamingException {
-		Context initialContext = new InitialContext();
-		Context environmentContext = (Context) initialContext.lookup("java:comp/env");
-		String dataResourceName = "jdbc/codedefenders";
-		DataSource dataSource = (DataSource) environmentContext.lookup(dataResourceName);
-		return dataSource.getConnection();
+		return DatabaseConnection.getConnection();
 	}
 
 
