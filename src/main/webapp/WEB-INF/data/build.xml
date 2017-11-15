@@ -68,8 +68,7 @@
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="test-original" depends="echo-path" description="run test on original code to ensure it passes">
-		<jacoco:coverage enabled="true" destFile="${test.file}/jacoco.exec"  dumponexit="true"
-						 classdumpdir="">
+		<jacoco:coverage enabled="true" destFile="${test.file}/jacoco.exec"  dumponexit="true" >
 			<junit printsummary="true" haltonfailure="false"  includeantruntime="true" fork="true" clonevm="true">
 				<classpath refid="test.cp" />
 				<classpath location="${test.file}"/>
