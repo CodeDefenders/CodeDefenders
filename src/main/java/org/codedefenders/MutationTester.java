@@ -123,20 +123,23 @@ public class MutationTester {
 		mutants.addAll(game.getMutantsMarkedEquivalentPending());
 		List<Mutant> killedMutants = new ArrayList<Mutant>();
 
+		// Acquire and release the connection
 		User u = DatabaseAccess.getUserFromPlayer(test.getPlayerId());
 
 		/// PARALLELIZE THIS
 		if (parallelize) {
 
-			System.out.println(
-					"\n\n MutationTester.runTestOnAllMultiplayerMutants()  START PARALLEL EXECUTION \n\n");
+			// System.out.println(
+			// "\n\n MutationTester.runTestOnAllMultiplayerMutants() START
+			// PARALLEL EXECUTION \n\n");
 
 			// Fork and Join parallelization
 			//
 			Map<Mutant, FutureTask<Boolean>> tasks = new HashMap<Mutant, FutureTask<Boolean>>();
 			for (final Mutant mutant : mutants) {
 				if (useMutantCoverage && !test.isMutantCovered(mutant)) {
-					System.out.println("Skipping non-covered mutant "+mutant.getId()+", test "+test.getId());
+					// System.out.println("Skipping non-covered mutant "
+					// + mutant.getId() + ", test " + test.getId());
 					continue;
 				}
 
@@ -152,9 +155,10 @@ public class MutationTester {
 				// This is for checking later
 				tasks.put(mutant, task);
 				//
-				System.out.println(
-						"MutationTester.runTestOnAllMultiplayerMutants() Scheduling Task testVsMutant "
-								+ test + " vs " + mutant);
+				// System.out.println(
+				// "MutationTester.runTestOnAllMultiplayerMutants() Scheduling
+				// Task testVsMutant "
+				// + test + " vs " + mutant);
 				sharedExecutorService.execute(task);
 			}
 
@@ -164,11 +168,11 @@ public class MutationTester {
 					continue;
 
 				// checks if task done
-				System.out.println(
-						"Is mutant done? " + tasks.get(mutant).isDone());
+				// System.out.println(
+				// "Is mutant done? " + tasks.get(mutant).isDone());
 				// checks if task canceled
-				System.out.println("Is mutant cancelled? "
-						+ tasks.get(mutant).isCancelled());
+				// System.out.println("Is mutant cancelled? "
+				// + tasks.get(mutant).isCancelled());
 				// fetches result and waits if not ready
 
 				// THIS IS BLOCKING !!!
@@ -185,45 +189,16 @@ public class MutationTester {
 				}
 			}
 
-			// Get rid of the executor pool
-			// Shutdown but not wait ?
-			// FIXME The executor service must be shut down at the end !
-			// System.out.println("MutationTester.runTestOnAllMultiplayerMutants()
-			// DEBUG: shutting down executor service");
-			// executor.shutdown();
-			System.out.println(
-					"MutationTester.runTestOnAllMultiplayerMutants() DEBUG: done");
+			// System.out.println(
+			// "MutationTester.runTestOnAllMultiplayerMutants() DEBUG: done");
 			tasks.clear();
 
-			/*
-			 * if (testVsMutant(test, mutant)) { }
-			 */
-			// TODO 10 is cluster size but this can be anynumber
-
-			/*
-			 * while (true) { try { if(futureTask1.isDone() &&
-			 * futureTask2.isDone()){ System.out.println("Done"); //shut down
-			 * executor service executor.shutdown(); return; }
-			 * 
-			 * if(!futureTask1.isDone()){ //wait indefinitely for future task to
-			 * complete
-			 * System.out.println("FutureTask1 output="+futureTask1.get()); }
-			 * 
-			 * System.out.println("Waiting for FutureTask2 to complete"); String
-			 * s = futureTask2.get(200L, TimeUnit.MILLISECONDS); if(s !=null){
-			 * System.out.println("FutureTask2 output="+s); } } catch
-			 * (InterruptedException | ExecutionException e) {
-			 * e.printStackTrace(); }catch(TimeoutException e){ //do nothing } }
-			 * 
-			 * }
-			 * 
-			 * }
-			 */
-
 		} else {
+			// Normal execution
 			for (Mutant mutant : mutants) {
 				if (useMutantCoverage && !test.isMutantCovered(mutant)) {
-					System.out.println("Skipping non-covered mutant "+mutant.getId()+", test "+test.getId());
+					// System.out.println("Skipping non-covered mutant "
+					// + mutant.getId() + ", test " + test.getId());
 					continue;
 				}
 
@@ -297,11 +272,13 @@ public class MutationTester {
 
 		for (Test test : tests) {
 			if (useMutantCoverage && !test.isMutantCovered(mutant)) {
-				System.out.println("Skipping non-covered mutant "+mutant.getId()+", test "+test.getId());
+				System.out.println("Skipping non-covered mutant "
+						+ mutant.getId() + ", test " + test.getId());
 				continue;
 			}
 
-			// If this mutant/test pairing hasnt been run before and the test
+			// If this mutant/test pairing hasnt been run before and the
+			// test
 			// might kill the mutant
 			if (testVsMutant(test, mutant)) {
 				logger.info("Test {} kills mutant {}", test.getId(),
@@ -362,6 +339,8 @@ public class MutationTester {
 	 * @return
 	 */
 	private static boolean testVsMutant(Test test, Mutant mutant) {
+
+		// Acquire and release the connection...
 		if (DatabaseAccess.getTargetExecutionForPair(test.getId(),
 				mutant.getId()) == null) {
 			// Run the test against the mutant and get the result

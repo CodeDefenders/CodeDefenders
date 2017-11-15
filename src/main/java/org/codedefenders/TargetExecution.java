@@ -95,8 +95,9 @@ public class TargetExecution {
 				System.out.println("Retrieving execution keys for ID");
 				this.id = rs.getInt(1);
 				System.out.println(this.id);
-				pstmt.close();
-				conn.close();
+				// Rely on finally to properly close those  
+//				pstmt.close();
+//				conn.close();
 				return true;
 			}
 		} catch (SQLException se) {

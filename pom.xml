@@ -15,6 +15,7 @@
 
 		<plugins>
 			<!-- Fails if the ${config.properties} file does not exists -->
+			<!-- Note that does not check that properties are there -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>

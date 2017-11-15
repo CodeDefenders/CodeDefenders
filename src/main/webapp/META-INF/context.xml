@@ -2,9 +2,10 @@
 <Context>
 	<Resource
 		name="jdbc/codedefenders" type="javax.sql.DataSource"
-		maxActive="200"
-		maxIdle="50"
-		maxWait="10000"
+		
+		maxTotal="200"
+		maxWaitMillis="1000"
+		
 		driverClassName="com.mysql.jdbc.Driver"
 		url="${db.url}"
 		username="${db.username}"
