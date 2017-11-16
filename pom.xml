@@ -6,6 +6,12 @@
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
 	<version>1.0-SNAPSHOT-Passau</version>
+
+	<!-- By default we use the following config.properties file -->
+	<properties>
+		<config.properties>config.properties</config.properties>
+	</properties>
+
 	<build>
 		<filters>
 			<!-- This enables to read properties from this file and automagically 
@@ -15,6 +21,7 @@
 
 		<plugins>
 			<!-- Fails if the ${config.properties} file does not exists -->
+			<!-- Note that does not check that properties are there -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
@@ -67,7 +74,7 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<!-- Print the properties -->
+			<!-- Print the properties. Maybe is enough to attach this to deploy instead -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
@@ -149,9 +156,77 @@
 
 				</configuration>
 			</plugin>
+
 		</plugins>
 		<finalName>${artifactId}</finalName>
 	</build>
+
+	<profiles>
+		<!-- Solution inspired by: Taken from : https://stackoverflow.com/questions/2606572/junit-splitting-integration-test-and-unit-tests/10381662#10381662 -->
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>2.20.1</version>
+						<!-- This forces to use the proper junit runner. Old versions do not 
+							support categories -->
+						<dependencies>
+							<dependency>
+								<groupId>org.apache.maven.surefire</groupId>
+								<artifactId>surefire-junit47</artifactId>
+								<version>2.20.1</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+							<includes>
+								<include>**/*.class</include>
+							</includes>
+							<excludedGroups>org.codedefenders.itests.IntegrationTest</excludedGroups>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>IT</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>2.20.1</version>
+						<!-- This forces to use the proper junit runner. Old versions do not 
+							support categories -->
+						<dependencies>
+							<dependency>
+								<groupId>org.apache.maven.surefire</groupId>
+								<artifactId>surefire-junit47</artifactId>
+								<version>2.20.1</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+							<!-- From : http://maven.apache.org/surefire/maven-surefire-plugin/examples/fork-options-and-parallel-execution.html 
+								forkCount=1/reuseForks=false executes each test class in its own JVM process, 
+								one after another. It creates the highest level of separation for the test 
+								execution, but it would probably also give you the longest execution time 
+								of all the available options. Consider it as a last resort. -->
+							<!-- Do not parallelize, just fork -->
+							<forkCount>1</forkCount>
+							<!-- Do not reuse the jvm -->
+							<reuseForks>false</reuseForks>
+							<groups>org.codedefenders.itests.IntegrationTest</groups>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 	<dependencies>
 		<dependency>

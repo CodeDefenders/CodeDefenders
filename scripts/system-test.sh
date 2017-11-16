@@ -155,8 +155,11 @@ function __private_run_user_on_game(){
 		${folder}/cookie.txt
 
 # Do invocations on game X. Notw that n events and n mutants/tests must be the same
+local i=0;
+local tot=$(cat ${folder}/timeline | wc -l)
+
 while read -r timestamp <&3 && read -r codeFile <&4; do
-	
+	((i++))
 	# Start with the sleep so we do not have a hit of requests at the very beginning
 	echo "At " $(date) " -- In game ${gameId} ${userId} thinks for ${timestamp} sec"
 	sleep ${timestamp}
@@ -170,7 +173,7 @@ while read -r timestamp <&3 && read -r codeFile <&4; do
 			${codeFile} \
 			${folder}/cookie.txt)
 			
-		echo "At " $(date) " -- In game ${gameId} ${userId} attack using ${codeFile} ends. It took ${totTime} secs" | tee -a ${logFile}
+		echo "At " $(date) " -- In game ${gameId} ${userId} attack ${i}/${tot} using ${codeFile} ends. It took ${totTime} secs" | tee -a ${logFile}
 		
 	else
 		echo "At " $(date) " -- In game ${gameId} ${userId} defends using ${codeFile}" | tee -a ${logFile}
@@ -180,7 +183,7 @@ while read -r timestamp <&3 && read -r codeFile <&4; do
 			${codeFile} \
 			${folder}/cookie.txt)
 			
-		echo "At " $(date) " -- In game ${gameId} ${userId} defense using ${codeFile} ends.It took ${totTime} secs" | tee -a ${logFile}	
+		echo "At " $(date) " -- In game ${gameId} ${userId} defense ${i}/${tot} using ${codeFile} ends.It took ${totTime} secs" | tee -a ${logFile}	
 	fi 
 	
 done 3<${folder}/timeline 4< <(find ${folder} -iname "*.java" | sort)
@@ -465,13 +468,24 @@ function multi_benchmark(){
 	done
 	
 	for cFile in ${configurationFiles}; do
+		
+		# Automatically make ${configurationFiles} an absolute path
+		if [ "${cFile}" == "$(basename ${cFile})" ];
+		then 
+			cFile=$(pwd)/${cFile}
+		fi
+	
+		
 		# FIXME Clean up and restore. On defender this might require to ssh defender@defender ? 
 		echo "> Clean up" 
 		__private_setup
 	
 		echo "> Redeploy CD using ${cFile}"
 		cd ..
+		# Stop on error
+		set -e
 			mvn clean compile package install war:war tomcat7:redeploy -Dconfig.properties=${cFile} -DskipTests
+		set +e
 		cd ${HERE}
 		
 		for gameId in ${gameIds}; do
@@ -484,17 +498,21 @@ function multi_benchmark(){
 		# Collect logs
 		for gameId in ${gameIds}; do
 			mv -v "${SYSTEM_TESTS_HOME}/${gameId}/game.log" "${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log"
+			# Output some Stats for each game, not overall
+			__private_stats_on_game ${gameId} ${cFile}
 		done
-		
-		# Output some Stats
-		#echo "----- Stats ----- "
-		#echo "Total "`grep took ${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log | awk '{ num = num + 1; total = total + $17 } END { print num, "m", total/num, "s"}'`
-		#echo "  Attack "`grep took ${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log | grep attacks | awk '{ num = num + 1; total = total + $17 } END { print num, "m", total/num, "s"}'`
-		#echo "  Defense "`grep took ${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log | grep defends | awk '{ num = num + 1; total = total + $17 } END { print num, "m", total/num, "s"}'`
 
 	done
 }
 
+function __private_stats_on_game(){
+	local gameId=$1
+	local cFile=$2
+	echo "----- Stats ----- "
+        echo "Total "`grep took ${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log | awk '{ num = num + 1; total = total + $19 } END { print num, "m", total/num, "s"}'`
+        echo "  Attack "`grep took ${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log | grep "\battack\b" | awk '{ num = num + 1; total = total + $20 } END { print num, "m", total/num, "s"}'`
+        echo "  Defense "`grep took ${SYSTEM_TESTS_HOME}/${gameId}/game-$(basename ${cFile}).log | grep defense | awk '{ num = num + 1; total = total + $19 } END { print num, "m", total/num, "s"}'`
+}
 
 function help(){
 	echo "COMMANDS"

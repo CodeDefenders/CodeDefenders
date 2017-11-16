@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# TODO pay attention to empty lines when dealing with mysql. E.g., create balanced games
 # TODO add a function to join a running game (maybe leaving it also?) given the id
+# TODO Check the "LAST" role query: why that returns the wrong results ?
 
 # General Setting
 
@@ -32,7 +32,7 @@ else
  date_timestamp='date +"%Y-%m-%d %H:%M:%S"'
  date_timestamp_start='date +"%Y-%m-%d %H:%M:%S" -d "-1days"'
  date_timestamp_end='date +"%Y-%m-%d %H:%M:%S" -d "+1days"'
- alias remove_empty_lines="sed -i .original '/^[[:space:]]*$/d"
+ alias remove_empty_lines="sed -i'.original' '/^[[:space:]]*$/d'"
 fi
 
 function __private_generate_password(){
@@ -121,7 +121,8 @@ function get_cut_for(){
 function create_balanced_game_scripts(){
  	if [ $# -lt 1 ]; then echo "Provide a list of code-defenders usernames"; return 1; fi
 	  local participants=$1
-	  
+          echo "Got $(cat ${participants} | wc -l)"
+
 	  # remove empty lines and backup the original version to
 	  # This create a ${participants}.original file
 	  remove_empty_lines ${participants}
@@ -131,9 +132,9 @@ function create_balanced_game_scripts(){
 	  
 	  # use the sanitized version now on
 	  participants=${participants}.sanitized
-	  
+	  echo "Got $(cat ${participants} | wc -l)" 
 # Check that the file is valid
-	  if [ $(awk '{print NF}' %{participants} | sort -nu | tail -n 1) -gt 1 ]; then
+	  if [ $(awk '{print NF}' ${participants} | sort -nu | tail -n 1) -gt 1 ]; then
 	  		echo "File ${participants} is invalid. The file must have only one column, which contains user ID only!"
 	  		return 1;
 		fi
@@ -232,8 +233,8 @@ split -l${SPLIT} sorted_defenders defend -da 2
 
 # Shuffle per category and append to file
 set +e
-mv -v sorted_attackers sorted_attackers.debug
-mv -v sorted_defenders sorted_defenders.debug
+mv sorted_attackers sorted_attackers.debug
+mv sorted_defenders sorted_defenders.debug
 set -e
 
 find . -iname "attack*" -exec basename {} \; | sort | \
@@ -256,7 +257,7 @@ paste -d"\n" sorted_attackers sorted_defenders | sed '/^$/d' > participants.tmp
 ID=$(__private_query_db 'select Max(ID) from games;')
 if [ "${ID}" == "NULL" ]; then ID=0; fi
 
-echo "DEBUG: Last GAME ID is: ${ID}"
+# echo "DEBUG: Last GAME ID is: ${ID}"
 	
 lineNumber=0
 
