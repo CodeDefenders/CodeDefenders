@@ -491,8 +491,7 @@ public class DatabaseAccess {
 
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = null;
-
+		String sql;
 		try {
 
 			// Load the MultiplayerGame Data with the provided ID.
@@ -519,9 +518,6 @@ public class DatabaseAccess {
 					gameRecord = new DuelGame(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
 							rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), GameState.valueOf(rs.getString("State")),
 							GameLevel.valueOf(rs.getString("Level")), GameMode.valueOf(rs.getString("Mode")));
-
-				stmt.close();
-				conn.close();
 				return gameRecord;
 			}
 		} catch (SQLException se) {
