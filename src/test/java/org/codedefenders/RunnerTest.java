@@ -3,10 +3,12 @@ package org.codedefenders;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import org.codedefenders.itests.IntegrationTest;
 import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.util.DatabaseConnection;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -21,6 +23,7 @@ import java.sql.SQLException;
 /**
  * @author Jose Rojas
  */
+@Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(DatabaseConnection.class)
 public class RunnerTest {
@@ -31,10 +34,12 @@ public class RunnerTest {
 	@Test
 	public void testInsertClasses() throws Exception {
 		PowerMockito.mockStatic(DatabaseConnection.class);
-		PowerMockito.when(DatabaseConnection.getConnection()).
-				thenAnswer(new Answer<Connection>() {
-					public Connection answer(InvocationOnMock invocation) throws SQLException{
-						return DriverManager.getConnection(db.config.getURL(db.DBNAME), "root", "");
+		PowerMockito.when(DatabaseConnection.getConnection())
+				.thenAnswer(new Answer<Connection>() {
+					public Connection answer(InvocationOnMock invocation)
+							throws SQLException {
+						return DriverManager.getConnection(
+								db.config.getURL(db.DBNAME), "root", "");
 					}
 				});
 		assertEquals(0, DatabaseAccess.getAllClasses().size());
