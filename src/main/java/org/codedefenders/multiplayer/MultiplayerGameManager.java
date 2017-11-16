@@ -240,7 +240,7 @@ public class MultiplayerGameManager extends HttpServlet {
 							return;
 						}
 						// the test is valid, but does it pass on the original class?
-						TargetExecution testOriginalTarget = AntRunner.testOriginal(new File(newTest.getFolder()), newTest);
+						TargetExecution testOriginalTarget = AntRunner.testOriginal(new File(newTest.getDirectory()), newTest);
 						if (testOriginalTarget.status.equals("SUCCESS")) {
 							messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 

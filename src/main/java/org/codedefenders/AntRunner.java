@@ -28,7 +28,7 @@ public class AntRunner {
 	public static boolean testKillsMutant(Mutant m, Test t) {
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
 
-		AntProcessResult result = runAntTarget("test-mutant", m.getFolder(), t.getFolder(), cut, t.getFullyQualifiedClassName());
+		AntProcessResult result = runAntTarget("test-mutant", m.getDirectory(), t.getDirectory(), cut, t.getFullyQualifiedClassName());
 
 		// Return true iff test failed
 		return result.hasFailure();
@@ -44,7 +44,7 @@ public class AntRunner {
 		logger.debug("Running test {} on mutant {}", t.getId(), m.getId());
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
 
-		AntProcessResult result = runAntTarget("test-mutant", m.getFolder(), t.getFolder(), cut, t.getFullyQualifiedClassName());
+		AntProcessResult result = runAntTarget("test-mutant", m.getDirectory(), t.getDirectory(), cut, t.getFullyQualifiedClassName());
 
 		TargetExecution newExec;
 
@@ -69,7 +69,7 @@ public class AntRunner {
 		String suiteDir = AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias();
 
 		// TODO: is this actually executing a whole test suite?
-		AntProcessResult result = runAntTarget("test-mutant", m.getFolder(), suiteDir, cut, cut.getName() + Constants.SUITE_EXT);
+		AntProcessResult result = runAntTarget("test-mutant", m.getDirectory(), suiteDir, cut, cut.getName() + Constants.SUITE_EXT);
 
 		// return true if tests pass without failures or errors
 		return !(result.hasError() || result.hasFailure());
@@ -307,7 +307,7 @@ public class AntRunner {
 	 */
 	private static LineCoverage getLinesCovered(Test t, GameClass c) {
 		CoverageGenerator cg = new CoverageGenerator(
-				new File(t.getFolder()),
+				new File(t.getDirectory()),
 				new File(Constants.CUTS_DIR + F_SEP + c.getAlias()));
 
 		try {
