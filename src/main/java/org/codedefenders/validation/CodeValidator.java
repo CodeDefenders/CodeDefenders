@@ -78,7 +78,7 @@ public class CodeValidator {
 		return visitor.isValid();
 	}
 
-	public static CompilationUnit getCompilationUnit(String javaFile) {
+	private static CompilationUnit getCompilationUnit(String javaFile) {
 		FileInputStream in;
 		try {
 			in = new FileInputStream(javaFile);
