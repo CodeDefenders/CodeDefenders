@@ -6,17 +6,15 @@ import com.github.javaparser.TokenMgrError;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Jose Rojas
@@ -61,7 +59,7 @@ public class CodeValidator {
 				return false;
 			}
 			// forbid if, while, for, and system calls, and ?: operator
-			String regex = "(?:(?:if|while|for)\\s*\\(.*|[\\s\\;\\{\\(\\)]System\\.|[\\s\\;\\{\\(\\)]Random\\.|^System\\.|^Random\\.|\\?.*\\:)";
+			String regex = "(?:(?:if|while|for)\\s*\\(.*|[\\s;{()]System\\.|[\\s;{()]Random\\.|^System\\.|^Random\\.|\\?.*:)";
 			Pattern p = Pattern.compile(regex);
 			if (p.matcher(diff2).find())
 				return false;
@@ -81,7 +79,7 @@ public class CodeValidator {
 	}
 
 	public static CompilationUnit getCompilationUnit(String javaFile) {
-		FileInputStream in = null;
+		FileInputStream in;
 		try {
 			in = new FileInputStream(javaFile);
 			CompilationUnit cu;
