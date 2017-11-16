@@ -5,6 +5,7 @@ import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
 import org.codedefenders.events.EventType;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -227,17 +228,19 @@ public class MultiplayerGameManager extends HttpServlet {
 
 					// If it can be written to file and compiled, end turn. Otherwise, dont.
 					Test newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
-					if (newTest == null) {
-						messages.add(TEST_INVALID_MESSAGE);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect("play");
-						return;
-					}
+
 					logger.info("New Test " + newTest.getId() + " by user " + uid);
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-					if (compileTestTarget.status.equals("SUCCESS")) {
-						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+					if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
+						if (! CodeValidator.validTestCode(newTest.getJavaFile())) {
+							messages.add(TEST_INVALID_MESSAGE);
+							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+							response.sendRedirect("play");
+							return;
+						}
+						// the test is valid, but does it pass on the original class?
+						TargetExecution testOriginalTarget = AntRunner.testOriginal(new File(newTest.getFolder()), newTest);
 						if (testOriginalTarget.status.equals("SUCCESS")) {
 							messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 

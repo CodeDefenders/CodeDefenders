@@ -42,6 +42,10 @@ public class GameManager extends HttpServlet {
 		logger.debug("Getting game " + gid + " for " + uid);
 
 		DuelGame activeGame = DatabaseAccess.getGameForKey("ID", gid);
+		if (activeGame == null) {
+			response.sendRedirect("games/user");
+			return;
+		}
 		session.setAttribute("game", activeGame);
 
 		// If the game is finished, redirect to the score page.
@@ -276,17 +280,19 @@ public class GameManager extends HttpServlet {
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
 				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
-				if (newTest == null) {
-					messages.add(TEST_INVALID_MESSAGE);
-					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect("play");
-					return;
-				}
+
 				logger.debug("New Test " + newTest.getId());
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-				if (compileTestTarget.status.equals("SUCCESS")) {
-					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+				if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
+					if (! CodeValidator.validTestCode(newTest.getJavaFile())) {
+						messages.add(TEST_INVALID_MESSAGE);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						response.sendRedirect("play");
+						return;
+					}
+					// the test is valid, but does it pass on the original class?
+					TargetExecution testOriginalTarget = AntRunner.testOriginal(new File(newTest.getFolder()), newTest);
 					if (testOriginalTarget.status.equals("SUCCESS")) {
 						messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 						MutationTester.runTestOnAllMutants(activeGame, newTest, messages);
@@ -386,18 +392,7 @@ public class GameManager extends HttpServlet {
 
 		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
-		if (!CodeValidator.validTestCode(javaFile)) {
-			return null;
-		}
-
-		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
-		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
-
-		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-			AntRunner.testOriginal(newTestDir, newTest);
-		}
-		return newTest;
+		return AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
 	}
 
 }
