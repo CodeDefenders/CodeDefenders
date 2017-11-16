@@ -6,6 +6,12 @@
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
 	<version>1.0-SNAPSHOT-Passau</version>
+
+	<!-- By default we use the following config.properties file -->
+	<properties>
+		<config.properties>config.properties</config.properties>
+	</properties>
+
 	<build>
 		<filters>
 			<!-- This enables to read properties from this file and automagically 
@@ -68,7 +74,7 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<!-- Print the properties -->
+			<!-- Print the properties. Maybe is enough to attach this to deploy instead -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
