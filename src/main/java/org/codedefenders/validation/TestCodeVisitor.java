@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Jose Rojas
  */
-class TestCodeVisitor extends ModifierVisitorAdapter {
+class TestCodeVisitor extends ModifierVisitorAdapter<Object> {
 
 	private static final Logger logger = LoggerFactory.getLogger(TestCodeVisitor.class);
 
