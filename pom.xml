@@ -57,7 +57,7 @@
 					<url>http://localhost:8080/manager/text</url>
 					<server>TomcatServer</server>
 					<username>adminscript</username>
-					<password>adm3b5eM3JG</password>
+					<password>***REMOVED***</password>
 					<path>/</path>
 					<ignorePackaging>true</ignorePackaging>
 					<contextReloadable>true</contextReloadable>
