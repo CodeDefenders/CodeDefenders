@@ -30,6 +30,19 @@ The tomcat user (and possibly the user running Code Defenders) must have full pe
 
 Major and Evosuite must be stored in their respective folders within this directory (codedefenders/major and codedefenders/evosuite).
 
+## Build
+Building codedefenders now requires a config.properties file to be in the root of the project. This file contains all the properties that are required to deploy and run codedefenders.
+
+Maven enforces this rule, so if the config.properties is not there, the build will fail.
+
+Therefore, create a config.properties file using the provided config.properties.template. Properties name are self-explanatory.
+
+During the build, maven will output the value of those variables for you to check if they have the correct value.
+
+Since the config.properties contains also your passwords, please **do not commit** it to the repo.
+
+In case you want to provide a file with a different name (let's say config.test), you can add the following option to your maven command: `-Dconfig.properties=config.test` 
+
 ## Deployment
 
 ### Tomcat admin user
