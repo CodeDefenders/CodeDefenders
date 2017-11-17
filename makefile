@@ -1,23 +1,22 @@
-TOMCAT_PASSWORD=
-MYSQL_PASSWORD=
-
+PROPERTIES=db.url db.username db.password tomcat.username tomcat.password tomcat.url
 default:
 # After it has been deployed a first time
 	mvn clean compile package install war:war tomcat7:redeploy
 
-first:	passwords
+first:	check-properties
 # Deploying for the first time
 	mvn clean compile package install war:war tomcat7:deploy
 
-passwords:	cleanup
-# Write passwords where needed
-	@test $(TOMCAT_PASSWORD) || echo "ERROR: missing TOMCAT_PASSWORD=..."
-	@test $(MYSQL_PASSWORD) || echo "ERROR: missing MYSQL_PASSWORD=..."
-	sed -i.orig 's/\*\*\*REMOVED\*\*\*/${TOMCAT_PASSWORD}/g' pom.xml
-	sed -i.orig 's/\*\*\*REMOVED\*\*\*/${MYSQL_PASSWORD}/g' src/main/webapp/META-INF/context.xml
+check-properties:
+# TODO Somehow this does not fail the build
+# Check if the requires properties are specified inside config.properties
+	$(foreach p,${PROPERTIES}, \
+		test ! -z $$(cat config.properties | grep $p | grep "$p" | sed -e 's|^.*=\(.*\)|\1|') || echo "Missing $p" \
+	)
+		
 
-cleanup:
+#cleanup:
 # Revert changes in repository
-	git checkout pom.xml src/main/webapp/META-INF/context.xml
+#	git checkout pom.xml src/main/webapp/META-INF/context.xml
 
 .PHONY : default
