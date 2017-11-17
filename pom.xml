@@ -5,12 +5,65 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<powermock.version>1.6.1</powermock.version>
+		<config.properties>config.properties</config.properties>
 	</properties>
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0-SNAPSHOT-Passau</version>
+
 	<build>
+		<filters>
+			<!-- This enables to read properties from this file and automagically 
+				put their values in other files. For example, we use that to update: context.xml -->
+			<filter>${config.properties}</filter>
+		</filters>
+
 		<plugins>
+			<!-- Fails if the ${config.properties} file does not exists -->
+			<!-- NOTE: it does not check that properties have values -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.0.0-M1</version>
+				<executions>
+					<execution>
+						<id>enforce-files-exist</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireFilesExist>
+									<files>
+										<file>${config.properties}</file>
+									</files>
+								</requireFilesExist>
+							</rules>
+							<fail>true</fail>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Reads all the properties from ${config.properties} -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>${config.properties}</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -20,6 +73,29 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<!-- Print the properties. Maybe is enough to attach this to deploy instead -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<echo>Displaying properties value</echo>
+								<echo>[data.dir] ${data.dir}</echo>
+								<echo>[db.url]${db.url}</echo>
+								<echo>[tomcat.url] ${tomcat.url}</echo>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
@@ -44,20 +120,30 @@
 								<include>**/*.svg</include>
 							</includes>
 						</resource>
+						<!-- Enable reading props from config.file and setting all the files 
+							in META-INF -->
+						<resource>
+							<directory>src/main/webapp/META-INF</directory>
+							<filtering>true</filtering>
+							<targetPath>META-INF</targetPath>
+						</resource>
 					</webResources>
 					<packagingExcludes>**/empty.tmp</packagingExcludes>
 					<excludes>src/main/resources/db/**</excludes>
 				</configuration>
 			</plugin>
+			<!-- Deploys on tomcat reading the properties from ${configuration.properties} -->
+			<!-- FIXME Check that all the mandatory properties are there -->
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
-					<url>http://localhost:8080/manager/text</url>
 					<server>TomcatServer</server>
-					<username>adminscript</username>
-					<password>***REMOVED***</password>
+					<url>${tomcat.url}</url>
+					<username>${tomcat.username}</username>
+					<password>${tomcat.password}</password>
+					<!-- FIXME So far CodeDefenders must be deployed in Tomcat's root -->
 					<path>/</path>
 					<ignorePackaging>true</ignorePackaging>
 					<contextReloadable>true</contextReloadable>
@@ -66,7 +152,6 @@
 		</plugins>
 		<finalName>${project.artifactId}</finalName>
 	</build>
-
 
 	<profiles>
 		<!-- Solution inspired by: Taken from : https://stackoverflow.com/questions/2606572/junit-splitting-integration-test-and-unit-tests/10381662#10381662 -->

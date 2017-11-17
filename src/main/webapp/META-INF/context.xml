@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
-	<Resource
-			name="jdbc/codedefenders" type="javax.sql.DataSource"
-			maxActive="100" maxIdle="30" maxWait="10000"
-			url="jdbc:mysql://localhost:3306/codedefenders"
-			driverClassName="com.mysql.jdbc.Driver"
-			username="root" password="***REMOVED***"
-	/>
+	<!-- The values in this file are filled with the values from the config.properties 
+		file -->
+
+	<Resource name="jdbc/codedefenders" type="javax.sql.DataSource"
+		maxTotal="200" maxWaitMillis="1000" driverClassName="com.mysql.jdbc.Driver"
+		url="${db.url}" username="${db.username}" password="${db.password}" />
+
+	<Environment name="data.dir" type="java.lang.String" value="${data.dir}" />
+
+	<Environment name="ant.home" type="java.lang.String" value="${ant.home}" />
+
+	<Environment name="mutant.coverage" type="java.lang.String"
+		value="${mutant.coverage}" />
+
 </Context>
