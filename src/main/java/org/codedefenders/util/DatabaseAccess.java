@@ -12,11 +12,7 @@ import org.codedefenders.singleplayer.SinglePlayerGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.sql.DataSource;
-import java.lang.reflect.Method;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,13 +38,9 @@ public class DatabaseAccess {
         return s;
     }
 
-    public static Connection getConnection() throws SQLException, NamingException {
-        Context initialContext = new InitialContext();
-        Context environmentContext = (Context) initialContext.lookup("java:comp/env");
-        String dataResourceName = "jdbc/codedefenders";
-        DataSource dataSource = (DataSource) environmentContext.lookup(dataResourceName);
-        return dataSource.getConnection();
-    }
+	public static Connection getConnection() throws SQLException, NamingException {
+		return DatabaseConnection.getConnection();
+	}
 
 
     /**
@@ -136,10 +128,6 @@ public class DatabaseAccess {
             stmt.setString(2, ipAddress);
             stmt.executeUpdate();
             ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                stmt.close();
-                conn.close();
-            }
         } catch (SQLException se) {
             logger.error("SQL exception caught", se);
             cleanup(conn, stmt);
@@ -619,7 +607,7 @@ public class DatabaseAccess {
         Connection conn = null;
         try {
             conn = getConnection();
-            stmt = conn.prepareStatement("SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," + "g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" + "IFNULL(att.User_ID,0) AS Attacker_ID, IFNULL(def.User_ID,0) AS Defender_ID\n" + "FROM games AS g\n" + "LEFT JOIN players AS att ON g.ID=att.Game_ID  AND att.Role='ATTACKER' AND att.Active=TRUE\n" + "LEFT JOIN players AS def ON g.ID=def.Game_ID AND def.Role='DEFENDER' AND def.Active=TRUE\n" + "WHERE g.Mode != 'PARTY' AND g.State!='FINISHED' AND (g.Creator_ID=? OR IFNULL(att.User_ID,0)=? OR IFNULL(def.User_ID,0)=?);\n");
+            stmt = conn.prepareStatement("SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State, g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" + "IFNULL(att.User_ID,0) AS Attacker_ID, IFNULL(def.User_ID,0) AS Defender_ID FROM games AS g LEFT JOIN players AS att ON g.ID=att.Game_ID  AND att.Role='ATTACKER' AND att.Active=TRUE\n" + "LEFT JOIN players AS def ON g.ID=def.Game_ID AND def.Role='DEFENDER' AND def.Active=TRUE WHERE g.Mode != 'PARTY' AND g.State!='FINISHED' AND (g.Creator_ID=? OR IFNULL(att.User_ID,0)=? OR IFNULL(def.User_ID,0)=?);");
             stmt.setInt(1, userId);
             stmt.setInt(2, userId);
             stmt.setInt(3, userId);
@@ -653,7 +641,8 @@ public class DatabaseAccess {
         Connection conn = null;
         try {
             conn = getConnection();
-            stmt = conn.prepareStatement("SELECT * FROM games AS m " + "LEFT JOIN players AS p ON p.Game_ID=m.ID  AND p.Active=TRUE \n" + "WHERE m.Mode = 'PARTY' AND (p.User_ID=? OR m.Creator_ID=?) AND m.State != 'FINISHED' " + "GROUP BY m.ID;");
+            stmt = conn.prepareStatement("SELECT * FROM games AS m LEFT JOIN players AS p ON p.Game_ID=m.ID  AND p.Active=TRUE" +
+                    " WHERE m.Mode = 'PARTY' AND (p.User_ID=? OR m.Creator_ID=?) AND m.State != 'FINISHED' GROUP BY m.ID;");
             stmt.setInt(1, userId);
             stmt.setInt(2, userId);
         } catch (SQLException se) {
@@ -1065,7 +1054,8 @@ public class DatabaseAccess {
         PreparedStatement stmt = null;
         try {
             conn = getConnection();
-            stmt = conn.prepareStatement("INSERT INTO equivalences " + "(Mutant_ID, Defender_ID, Mutant_Points) VALUES " + "(?, ?, ?)");
+            stmt = conn.prepareStatement("INSERT INTO equivalences " + "(Mutant_ID, Defender_ID, Mutant_Points) VALUES " + "(?, ?, ?)",
+                    Statement.RETURN_GENERATED_KEYS);
             stmt.setInt(1, mutant.getId());
             stmt.setInt(2, defender);
             stmt.setInt(3, mutant.getScore());
