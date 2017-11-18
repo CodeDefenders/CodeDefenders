@@ -2,15 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
-	<groupId>codedefenders</groupId>
-	<artifactId>codedefenders</artifactId>
-	<version>1.0-SNAPSHOT-Passau</version>
-
-	<!-- By default we use the following config.properties file -->
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<powermock.version>1.6.1</powermock.version>
 		<config.properties>config.properties</config.properties>
 	</properties>
+	<groupId>codedefenders</groupId>
+	<artifactId>codedefenders</artifactId>
+	<version>1.0-SNAPSHOT</version>
 
 	<build>
 		<filters>
@@ -21,7 +20,7 @@
 
 		<plugins>
 			<!-- Fails if the ${config.properties} file does not exists -->
-			<!-- Note that does not check that properties are there -->
+			<!-- NOTE: it does not check that properties have values -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
@@ -88,14 +87,9 @@
 						<configuration>
 							<tasks>
 								<echo>Displaying properties value</echo>
-								<!-- <echo>[build.profile.id] ${build.profile.id}</echo> -->
 								<echo>[data.dir] ${data.dir}</echo>
 								<echo>[db.url]${db.url}</echo>
 								<echo>[tomcat.url] ${tomcat.url}</echo>
-								<echo>[cluster.mode] ${cluster.mode}</echo>
-								<echo>[cluster.reservation.name] ${cluster.reservation.name}</echo>
-								<echo>[parallelize] ${parallelize}</echo>
-								<echo>[forceLocalExecution] ${forceLocalExecution}</echo>
 							</tasks>
 						</configuration>
 					</execution>
@@ -153,12 +147,10 @@
 					<path>/</path>
 					<ignorePackaging>true</ignorePackaging>
 					<contextReloadable>true</contextReloadable>
-
 				</configuration>
 			</plugin>
-
 		</plugins>
-		<finalName>${artifactId}</finalName>
+		<finalName>${project.artifactId}</finalName>
 	</build>
 
 	<profiles>
@@ -227,6 +219,9 @@
 			</build>
 		</profile>
 	</profiles>
+
+
+
 
 	<dependencies>
 		<dependency>
@@ -341,6 +336,29 @@
 			<artifactId>gson</artifactId>
 			<version>2.3.1</version>
 		</dependency>
+		<dependency>
+			<groupId>ch.vorburger.mariaDB4j</groupId>
+			<artifactId>mariaDB4j</artifactId>
+			<version>2.2.3</version>
+		</dependency>
 
+		<dependency>
+			<groupId>commons-dbutils</groupId>
+			<artifactId>commons-dbutils</artifactId>
+			<version>1.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+			<version>${powermock.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito</artifactId>
+			<version>${powermock.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
