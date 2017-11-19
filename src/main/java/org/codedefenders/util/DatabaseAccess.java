@@ -1054,18 +1054,12 @@ public class DatabaseAccess {
         PreparedStatement stmt = null;
         try {
             conn = getConnection();
-            stmt = conn.prepareStatement("INSERT INTO equivalences " + "(Mutant_ID, Defender_ID, Mutant_Points) VALUES " + "(?, ?, ?)",
-                    Statement.RETURN_GENERATED_KEYS);
+            stmt = conn.prepareStatement("INSERT INTO equivalences " +
+                            "(Mutant_ID, Defender_ID, Mutant_Points) VALUES " + "(?, ?, ?)");
             stmt.setInt(1, mutant.getId());
             stmt.setInt(2, defender);
             stmt.setInt(3, mutant.getScore());
-            stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                stmt.close();
-                conn.close();
-                return true;
-            }
+            return stmt.executeUpdate() > 0;
         } catch (SQLException se) {
             logger.error("SQL exception caught", se);
             cleanup(conn, stmt);
