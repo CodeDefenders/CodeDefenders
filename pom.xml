@@ -153,12 +153,10 @@
 					<path>/</path>
 					<ignorePackaging>true</ignorePackaging>
 					<contextReloadable>true</contextReloadable>
-
 				</configuration>
 			</plugin>
-
 		</plugins>
-		<finalName>${artifactId}</finalName>
+		<finalName>${project.artifactId}</finalName>
 	</build>
 
 	<profiles>
