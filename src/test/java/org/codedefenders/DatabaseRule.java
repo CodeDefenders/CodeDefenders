@@ -1,6 +1,9 @@
 package org.codedefenders;
 
 import java.awt.dnd.DnDConstants;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import org.junit.rules.ExternalResource;
 
@@ -53,5 +56,8 @@ public class DatabaseRule extends ExternalResource {
 		} catch (ManagedProcessException e) {
 			// quiet
 		}
+	}
+	public Connection getConnection() throws SQLException {
+		return DriverManager.getConnection(config.getURL(dbName), username, password);
 	}
 }

@@ -23,8 +23,8 @@ public class DatabaseTest {
 
 	@Test
 	public void testCleanDB() throws Exception {
-		// Look funny
-		Connection conn = DriverManager.getConnection(db.config.getURL(db.getDbName()), "root", "");
+		// Get a new connection from the rule 
+		Connection conn = db.getConnection();
 
 		try {
 			QueryRunner qr = new QueryRunner();
