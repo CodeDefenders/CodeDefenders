@@ -1,7 +1,15 @@
 package org.codedefenders;
 
-import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.handlers.ColumnListHandler;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Arrays;
+
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
 import org.codedefenders.events.EventType;
@@ -11,27 +19,17 @@ import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.util.DatabaseConnection;
 import org.codedefenders.validation.CodeValidator;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
-
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import javax.xml.crypto.Data;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Jose Rojas
@@ -55,8 +53,9 @@ public class RunnerTest {
     }
 
 
+    // This will re-create the same DB from scratch every time... is this really necessary ?!
     @Rule
-    DatabaseRule db = new DatabaseRule();
+    DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
 
     @Before
     public void mockDBConnections() throws Exception {
@@ -65,8 +64,8 @@ public class RunnerTest {
                 .thenAnswer(new Answer<Connection>() {
                     public Connection answer(InvocationOnMock invocation)
                             throws SQLException {
-                        return DriverManager.getConnection(
-                                db.config.getURL(DatabaseRule.DBNAME), "root", "");
+                    	// Return a new connection from the rule instead 
+                    	return db.getConnection();
                     }
                 });
     }
