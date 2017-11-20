@@ -270,7 +270,11 @@ public class MultiplayerGame extends AbstractGame {
         try {
             conn = DatabaseAccess.getConnection();
 
-            stmt = conn.prepareStatement("INSERT INTO games " + "(Class_ID, Level, Prize, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " + "Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Start_Time, Finish_Time, State, Mode) VALUES " + "(?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, 'PARTY');");
+            stmt = conn.prepareStatement("INSERT INTO games " +
+                    "(Class_ID, Level, Prize, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " +
+                    "Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Start_Time, Finish_Time, State, Mode) VALUES " +
+                    "(?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, 'PARTY');",
+                    Statement.RETURN_GENERATED_KEYS);
             stmt.setInt(1, classId);
             stmt.setString(2, level.name());
             stmt.setFloat(3, prize);
@@ -286,7 +290,14 @@ public class MultiplayerGame extends AbstractGame {
             stmt.setTimestamp(13, new Timestamp(startDateTime));
             stmt.setTimestamp(14,  new Timestamp(finishDateTime));
             stmt.setString(15, state.name());
-            return stmt.executeUpdate() > 0;
+            stmt.executeUpdate();
+
+            ResultSet rs = stmt.getGeneratedKeys();
+
+            if (rs.next()) {
+                id = rs.getInt(1);
+                return true;
+            }
 
         } catch (SQLException se) {
             logger.error("SQL exception caught", se);
