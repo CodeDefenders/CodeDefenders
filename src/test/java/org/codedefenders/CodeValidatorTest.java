@@ -1,5 +1,7 @@
 package org.codedefenders;
 
+import com.sun.org.apache.bcel.internal.classfile.Code;
+import org.codedefenders.validation.CodeValidator;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -170,6 +172,29 @@ public class CodeValidatorTest {
 		assertFalse(validMutant("final class Rational  {", "class Rational  {"));
 
 	}
+	@org.junit.Test
+	public void testLiterals() throws Exception {
+		assertTrue(validMutant("format(\"first\", \"second\", \"third\");", "format(\"\", \"sec\", \"third\");"));
+		assertTrue(validMutant("String s = \"\";", "String s = \" \";"));
+		assertTrue(validMutant("String s = \"stringval\";", "String s = \"stringval \";"));
+		for (String p : CodeValidator.PROHIBITED_OPERATORS) {
+			assertTrue(p+" in a String should be valid", validMutant("String s = \"\";",
+					"String s = \""+p+"\";"));
+		}
+		assertTrue(validMutant("String s = \"\";", "String s = \";?{} <<\";"));
+		assertTrue(validMutant("String s = \"\";", "String s = \"public final protected\";"));
+		assertTrue(validMutant("Char c = \'c\';", "Char c = \';\';"));
+	}
 
+	@org.junit.Test
+	public void testComments() throws Exception {
+		assertFalse(validMutant("String s = \"\";", "String s = \"\";// added comment"));
+		assertFalse(validMutant("String s = \" \";", "String s = \"\";// added comment"));
+		assertFalse(validMutant("if(x > 0) \n\t return x;", "if(x > 1) \n\t return x; // comment"));
+		assertFalse(validMutant("if(x > 0) \n\t return x; //x is positive", "if(x > 1) \n\t return x; //x is gt 1"));
+		assertTrue(validMutant("String s = \"old\";// comment", "String s = \"new\";// comment"));
+		assertFalse(validMutant("String s = \"\";", "String s = \"\"; /*added comment*/"));
+
+	}
 
 }
