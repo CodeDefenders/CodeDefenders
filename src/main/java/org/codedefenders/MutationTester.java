@@ -17,7 +17,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -260,13 +262,6 @@ public class MutationTester {
 		User u = DatabaseAccess.getUserFromPlayer(mutant.getPlayerId());
 
 		if (parallelize) {
-			// Start all the test in parallel, but skip the ones already covered
-			// Keep checking if a test killed a mutant, by iterating over the
-			// completed
-			// tasks. As soon as you find one, discard all the other results
-			// (basically do not wait for them to complete
-			// before
-
 			// Book kepping running tasks
 			final Map<Test, FutureTask<Boolean>> tasks = new HashMap<Test, FutureTask<Boolean>>();
 			// Assumption: submitting tasks is faster than processing tasks...
@@ -276,23 +271,27 @@ public class MutationTester {
 					continue;
 				}
 
-				// Shall I need a reference to myself in order not to cancel
-				// myself?
 				FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
+
 					@Override
 					public Boolean call() throws Exception {
+
 						if (testVsMutant(test, mutant)) {
 							logger.info("Test {} kills mutant {}", test.getId(), mutant.getId());
 
-							// Notify the other threads that we already killed
-							// the mutant
-							// TODO This is unsafe, might raise concurrent
-							// modification exception !
-							// see the assumption above. Alternatively we can
-							// first schedule all of them, then start them, but
-							// that's cumbersome
+							// Notify the *other* tasks we already killed
+							// the mutant. Note, we cannot call t.cancel on this
+							// and then get its result...
 							System.out.println("MutationTester Cancelling running tasks");
-							for (Future<Boolean> t : tasks.values()) {
+							for (Entry<Test, FutureTask<Boolean>> e : tasks.entrySet()) {
+
+								if (e.getKey().equals(test)) {
+									System.out.println("MutationTester.worker: skipping myself ");
+									continue;
+								}
+
+								FutureTask<Boolean> t = e.getValue();
+
 								if (!(t.isDone() || t.isCancelled())) {
 									System.out.println("MutationTester Cancel task " + t);
 									/*
@@ -316,32 +315,34 @@ public class MutationTester {
 
 				// This is for checking later which test killed which mutant
 				tasks.put(test, task);
-				//
-				System.out.println("MutationTester.runAllTestsOnMutant() : Scheduling Task " + test);
-				sharedExecutorService.execute(task);
+			}
+
+			// Start all
+			for (Test test : tests) {
+				if (tasks.containsKey(test)) {
+					System.out.println("MutationTester.runAllTestsOnMutant() : Scheduling Task " + test);
+					sharedExecutorService.execute(tasks.get(test));
+				}
 			}
 
 			// Wait for the result
-
-			// TODO Will this raise some concurrent modification exception if we
-			// just read it ?
-			boolean killed = false;
 			for (Test test : tests) {
 				Future<Boolean> task = tasks.get(test);
-				// At some point, either all the tests finish or they are
-				// cancelled.
-				// We just check them in order of submission
 				System.out.println("MutationTester.runAllTestsOnMutant() Checking task " + task + ". Done: "
 						+ task.isDone() + ". Cancelled: " + task.isCancelled());
 				try {
-					// This is blocking, but guarantee that we check tests in a
-					// fixed order
-					
-					if( task.isCancelled() ){
-						System.out.println("MutationTester.runAllTestsOnMutant() Task is already cancelled ");
-						continue;
+
+					boolean hasTestkilledTheMutant = false;
+
+					// Since we might cancel a task at anytime but we need to get their result, this might raise an exception
+					try {
+						hasTestkilledTheMutant = task.get();
+					} catch (CancellationException ce) {
+						//
+						logger.info("Swallowed exception " + ce );
 					}
-					if (tasks.get(test).get() && !killed) {
+
+					if ( hasTestkilledTheMutant ) {
 						// This test killede the mutant...
 						logger.info(">> Double Check. Test {} kills mutant {}", test.getId(), mutant.getId());
 						messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
@@ -358,8 +359,8 @@ public class MutationTester {
 								EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
 						notif.insert();
 
-						//
-						killed = true;
+						// Early return. Just forget about the other running (yet cancelled) tasks
+						return;
 
 					}
 				} catch (InterruptedException | ExecutionException e) {
@@ -369,11 +370,6 @@ public class MutationTester {
 				}
 			}
 
-			// To keep the original semantic if the mutant was killed we exit
-			// here
-			if (killed) {
-				return;
-			}
 
 		} else {
 
@@ -437,7 +433,8 @@ public class MutationTester {
 	 * @return
 	 */
 	private static boolean testVsMutant(Test test, Mutant mutant) {
-
+		// TODO: the issue in parallelizing this call is that a task which is cancelled will still update the DB
+		// at least the targetExecution table
 		// Acquire and release the connection...
 		if (DatabaseAccess.getTargetExecutionForPair(test.getId(), mutant.getId()) == null) {
 			// Run the test against the mutant and get the result
