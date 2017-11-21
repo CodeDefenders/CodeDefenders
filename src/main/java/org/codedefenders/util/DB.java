@@ -3,16 +3,19 @@ package org.codedefenders.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.naming.NamingException;
 import java.sql.*;
 
 public class DB {
 
     private static final Logger logger = LoggerFactory.getLogger(DB.class);
 
-    public static Connection getConnection() throws SQLException, NamingException {
-        return DatabaseConnection.getConnection();
+    public static Connection getConnection() {
+        try {
+            return DatabaseConnection.getConnection();
+        } catch (Exception e) {
+            logger.error("Database not available", e);
+        }
+        return null;
     }
 
     public static void cleanup(Connection c, Statement s) {
@@ -32,7 +35,7 @@ public class DB {
         }
     }
 
-    static PreparedStatement createPreparedStatement(Connection conn, String query, DatabaseValue value) {
+    public static PreparedStatement createPreparedStatement(Connection conn, String query, DatabaseValue value) {
         DatabaseValue[] databaseValues = {value};
         return createPreparedStatement(conn, query, databaseValues);
     }
@@ -40,7 +43,6 @@ public class DB {
     public static PreparedStatement createPreparedStatement(Connection conn, String query, DatabaseValue[] values) {
         PreparedStatement stmt = null;
         try {
-            conn = DB.getConnection();
             stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             int count = 1;
             for (DatabaseValue val : values) {
@@ -54,6 +56,12 @@ public class DB {
                     case LONG:
                         stmt.setLong(count++, val.getLongVal());
                         break;
+                    case FLOAT:
+                        stmt.setFloat(count++, val.getFloatVal());
+                        break;
+                    case TIMESTAMP:
+                        stmt.setTimestamp(count++, val.getTimestampVal());
+                        break;
                     default:
                         return null;
                 }
@@ -61,8 +69,6 @@ public class DB {
         } catch (SQLException se) {
             logger.error("SQLException while creating Prepared Statement for query\n\t" + query, se);
             DB.cleanup(conn, stmt);
-        } catch (NamingException e) {
-            logger.error("Database not available", e);
         }
         return stmt;
     }
@@ -75,8 +81,6 @@ public class DB {
         } catch (SQLException se) {
             logger.error("SQLException while creating Statement for query\n\t" + query, se);
             DB.cleanup(conn, stmt);
-        } catch (NamingException e) {
-            logger.error("Database not available", e);
         }
         return stmt;
     }
@@ -139,6 +143,17 @@ public class DB {
     }
 
     public static DatabaseValue getDBV(int v) {
+        return new DatabaseValue(v);
+    }
+
+    /*
+    * Caution: Explicitly cast to Long or value will be converted to float
+    */
+    public static DatabaseValue getDBV(float v) {
+        return new DatabaseValue(v);
+    }
+
+    public static DatabaseValue getDBV(Timestamp v) {
         return new DatabaseValue(v);
     }
 
