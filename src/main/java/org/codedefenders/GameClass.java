@@ -12,10 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class GameClass {
 
@@ -94,20 +91,21 @@ public class GameClass {
 
 		logger.debug("Inserting class (Name={}, Alias={}, JavaFile={}, ClassFile={})", name, alias, javaFile, classFile);
 		Connection conn = null;
-		Statement stmt = null;
-		String sql = String.format("INSERT INTO classes (Name, Alias, JavaFile, ClassFile) VALUES ('%s', '%s', '%s', '%s');", name, alias, javaFile, classFile);
-
+		PreparedStatement stmt = null;
 		// Attempt to insert game info into database
 		try {
 			conn = DatabaseAccess.getConnection();
-			stmt = conn.createStatement();
-			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+			stmt=conn.prepareStatement("INSERT INTO classes (Name, Alias, JavaFile, ClassFile) VALUES (?, ?, ?, ?);",
+					Statement.RETURN_GENERATED_KEYS);
+			stmt.setString(1, name);
+			stmt.setString(2, alias);
+			stmt.setString(3, javaFile);
+			stmt.setString(4, classFile);
+			stmt.executeUpdate();
 			ResultSet rs = stmt.getGeneratedKeys();
 			if (rs.next()) {
 				this.id = rs.getInt(1);
 				logger.debug("Inserted CUT with ID: " + this.id);
-				stmt.close();
-				conn.close();
 				return true;
 			}
 		} catch (SQLException se) {
@@ -125,15 +123,18 @@ public class GameClass {
 
 		logger.debug("Updating class (Name={}, Alias={}, JavaFile={}, ClassFile={})", name, alias, javaFile, classFile);
 		Connection conn = null;
-		Statement stmt = null;
-
-		String sql = String.format("UPDATE classes SET Name='%s', Alias='%s', JavaFile='%s', ClassFile='%s' WHERE Class_ID='%d';", name, alias, javaFile, classFile, id);
+		PreparedStatement stmt = null;
 
 		// Attempt to update game info into database
 		try {
 			conn = DatabaseAccess.getConnection();
-			stmt = conn.createStatement();
-			stmt.execute(sql);
+			stmt=conn.prepareStatement("UPDATE classes SET Name=?, Alias=?, JavaFile=?, ClassFile=? WHERE Class_ID=?;");
+			stmt.setString(1, name);
+			stmt.setString(2, alias);
+			stmt.setString(3, javaFile);
+			stmt.setString(4, classFile);
+			stmt.setInt(5, id);
+			stmt.executeUpdate();
 			stmt.close();
 			conn.close();
 			return true;
@@ -189,15 +190,14 @@ public class GameClass {
 	public boolean delete() {
 		logger.debug("Deleting class (ID={})", id);
 		Connection conn = null;
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 
-		String sql = String.format("DELETE FROM classes WHERE Class_ID='%d';", id);
-
-		// Attempt to update game info into database
 		try {
+			// Attempt to update game info into database
 			conn = DatabaseAccess.getConnection();
-			stmt = conn.createStatement();
-			stmt.execute(sql);
+			stmt=conn.prepareStatement("DELETE FROM classes WHERE Class_ID=?;");
+			stmt.setInt(1, id);
+			stmt.executeUpdate();
 			stmt.close();
 			conn.close();
 			return true;
