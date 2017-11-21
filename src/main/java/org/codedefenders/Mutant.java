@@ -7,7 +7,9 @@ import difflib.Patch;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.duel.DuelGame;
+import org.codedefenders.util.DB;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.DatabaseValue;
 import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -275,37 +277,26 @@ public class Mutant implements Serializable {
     // Default values for Equivalent (ASSUMED_NO), Alive(1), RoundKilled(NULL) are assigned.
     // Currently Mutant ID isnt set yet after insertion, if Mutant needs to be used straight away it needs a similar insert method to MultiplayerGame.
     public boolean insert() {
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        try {
-            logger.info("Inserting mutant");
-            conn = DatabaseAccess.getConnection();
-            String jFileDB = DatabaseAccess.addSlashes(javaFile);
-            String cFileDB = classFile == null ? null :DatabaseAccess.addSlashes(classFile);
-            stmt = conn.prepareStatement("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5)" + " VALUES (?, ?, ?, ?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
-            stmt.setString(1, jFileDB);
-            stmt.setString(2, cFileDB);
-            stmt.setInt(3, gameId);
-            stmt.setInt(4, roundCreated);
-            stmt.setInt(5, sqlAlive());
-            stmt.setInt(6, playerId);
-            stmt.setInt(7, score);
-            stmt.setString(8, md5);
-            stmt.executeUpdate();
-            ResultSet rs = stmt.getGeneratedKeys();
-            if (rs.next()) {
-                this.id = rs.getInt(1);
-                System.out.println("setting mutant ID to: " + this.id);
-                stmt.close();
-                conn.close();
-                return true;
-            }
-        } catch (SQLException se) {
-            logger.error("SQL exception caught", se);
-        } catch (Exception e) {
-            logger.error("Exception caught", e);
-        } finally {
-            DatabaseAccess.cleanup(conn, stmt);
+        logger.info("Inserting mutant");
+        Connection conn = DB.getConnection();
+        String jFileDB = DatabaseAccess.addSlashes(javaFile);
+        String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
+        String query = "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5)" +
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(jFileDB),
+                DB.getDBV(cFileDB),
+                DB.getDBV(gameId),
+                DB.getDBV(roundCreated),
+                DB.getDBV(sqlAlive()),
+                DB.getDBV(playerId),
+                DB.getDBV(score),
+                DB.getDBV(md5)};
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        int res = DB.executeUpdateGetKeys(stmt, conn);
+        if (res > -1) {
+            this.id = res;
+            System.out.println("setting mutant ID to: " + this.id);
+            return true;
         }
         return false;
     }
@@ -315,29 +306,16 @@ public class Mutant implements Serializable {
     // These values update when Mutants are suspected of being equivalent, go through an equivalence test, or are killed.
     public boolean update() {
         logger.info("Updating Mutant {}", getId());
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        try {
-            conn = DatabaseAccess.getConnection();
-            stmt = conn.prepareStatement("UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, NumberAiKillingTests=?, Points=? WHERE Mutant_ID=?;");
-            stmt.setString(1, equivalent.name());
-            stmt.setInt(2, sqlAlive());
-            stmt.setInt(3, roundKilled);
-            stmt.setInt(4, killedByAITests);
-            stmt.setInt(5, score);
-            stmt.setInt(6, id);
-            stmt.executeUpdate();
-            conn.close();
-            stmt.close();
-            return true;
-        } catch (SQLException se) {
-            logger.error("SQL exception caught", se);
-        } catch (Exception e) {
-            logger.error("Exception caught", e);
-        } finally {
-            DatabaseAccess.cleanup(conn, stmt);
-        }
-        return false;
+        Connection conn = DB.getConnection();
+        String query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, NumberAiKillingTests=?, Points=? WHERE Mutant_ID=?;";
+        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(equivalent.name()),
+                DB.getDBV(sqlAlive()),
+                DB.getDBV(roundKilled),
+                DB.getDBV(killedByAITests),
+                DB.getDBV(score),
+                DB.getDBV(id)};
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        return DB.executeUpdate(stmt, conn);
     }
 
     public void setTimesKilledAi(int count) {
