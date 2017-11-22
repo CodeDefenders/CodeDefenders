@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<!-- By default we use the following config.properties file -->
@@ -8,7 +8,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<powermock.version>1.6.1</powermock.version>
-		<config.properties>/home/wendling/workspace/HIWI_SE_2/DBRefactor/CodeDefenders/configuration.properties_own</config.properties>
+		<config.properties>config.properties</config.properties>
 	</properties>
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
@@ -16,7 +16,7 @@
 
 	<build>
 		<filters>
-			<!-- This enables to read properties from this file and automagically
+			<!-- This enables to read properties from this file and automagically 
 				put their values in other files. For example, we use that to update: context.xml -->
 			<filter>${config.properties}</filter>
 		</filters>
@@ -127,7 +127,7 @@
 								<include>**/*.svg</include>
 							</includes>
 						</resource>
-						<!-- Enable reading props from config.file and setting all the files
+						<!-- Enable reading props from config.file and setting all the files 
 							in META-INF -->
 						<resource>
 							<directory>src/main/webapp/META-INF</directory>
@@ -174,7 +174,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<version>2.20.1</version>
-						<!-- This forces to use the proper junit runner. Old versions do not
+						<!-- This forces to use the proper junit runner. Old versions do not 
 							support categories -->
 						<dependencies>
 							<dependency>
@@ -188,6 +188,9 @@
 								<include>**/*.class</include>
 							</includes>
 							<excludedGroups>org.codedefenders.itests.IntegrationTest</excludedGroups>
+							<excludes>
+								<exclude>itests/**/*.*</exclude>
+							</excludes>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -201,7 +204,7 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
 						<version>2.20.1</version>
-						<!-- This forces to use the proper junit runner. Old versions do not
+						<!-- This forces to use the proper junit runner. Old versions do not 
 							support categories -->
 						<dependencies>
 							<dependency>
@@ -211,10 +214,10 @@
 							</dependency>
 						</dependencies>
 						<configuration>
-							<!-- From : http://maven.apache.org/surefire/maven-surefire-plugin/examples/fork-options-and-parallel-execution.html
-								forkCount=1/reuseForks=false executes each test class in its own JVM process,
-								one after another. It creates the highest level of separation for the test
-								execution, but it would probably also give you the longest execution time
+							<!-- From : http://maven.apache.org/surefire/maven-surefire-plugin/examples/fork-options-and-parallel-execution.html 
+								forkCount=1/reuseForks=false executes each test class in its own JVM process, 
+								one after another. It creates the highest level of separation for the test 
+								execution, but it would probably also give you the longest execution time 
 								of all the available options. Consider it as a last resort. -->
 							<!-- Do not parallelize, just fork -->
 							<forkCount>1</forkCount>

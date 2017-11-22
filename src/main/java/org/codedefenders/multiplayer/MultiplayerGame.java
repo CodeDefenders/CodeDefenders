@@ -5,8 +5,11 @@ import org.codedefenders.*;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
 import org.codedefenders.events.EventType;
+import org.codedefenders.util.DB;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.DatabaseValue;
 
+import javax.xml.crypto.Data;
 import java.awt.image.DataBuffer;
 import java.sql.*;
 import java.text.Format;
@@ -183,27 +186,11 @@ public class MultiplayerGame extends AbstractGame {
 
     public boolean addPlayer(int userId, Role role) {
         if (state != GameState.FINISHED && canJoinGame(userId, role)) {
-            PreparedStatement stmt = null;
-            Connection conn = null;
-            int res = -1;
-            try {
-                conn = DatabaseAccess.getConnection();
-                stmt = conn.prepareStatement("INSERT INTO players " + "(Game_ID, User_ID, Points, Role) " + "VALUES (?, ?, 0, ?) " + "ON DUPLICATE KEY UPDATE Role=?, Active=TRUE;");
-                stmt.setInt(1, id);
-                stmt.setInt(2, userId);
-                stmt.setString(3, role.toString());
-                stmt.setString(4, role.toString());
-
-                res = stmt.executeUpdate();
-            } catch (SQLException se) {
-                logger.error("SQL exception caught", se);
-            } catch (Exception e) {
-                logger.error("Exception caught", e);
-            } finally {
-                DatabaseAccess.cleanup(conn, stmt);
-            }
-
-            if (res > 0) {
+            Connection conn = DB.getConnection();
+            String query = "INSERT INTO players (Game_ID, User_ID, Points, Role) VALUES (?, ?, 0, ?) ON DUPLICATE KEY UPDATE Role=?, Active=TRUE;";
+            DatabaseValue[] valueList = {DB.getDBV(id), DB.getDBV(userId), DB.getDBV(role.toString()), DB.getDBV(role.toString())};
+            PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+            if (DB.executeUpdate(stmt, conn)) {
                 User u = DatabaseAccess.getUser(userId);
                 EventType et = role.equals(Role.ATTACKER) ?
                         EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
@@ -229,21 +216,11 @@ public class MultiplayerGame extends AbstractGame {
 
     public boolean removePlayer(int userId) {
         if (state == GameState.CREATED) {
-            PreparedStatement stmt = null;
-            Connection conn = null;
-            try {
-                conn = DatabaseAccess.getConnection();
-                stmt = conn.prepareStatement("UPDATE players " + "SET Active=FALSE WHERE Game_ID=? AND User_ID=?;");
-                stmt.setInt(1, id);
-                stmt.setInt(2, userId);
-                return stmt.executeUpdate() > 0;
-            } catch (SQLException se) {
-                logger.error("SQL exception caught", se);
-            } catch (Exception e) {
-                logger.error("Exception caught", e);
-            } finally {
-                DatabaseAccess.cleanup(conn, stmt);
-            }
+            Connection conn = DB.getConnection();
+            String query = "UPDATE players " + "SET Active=FALSE WHERE Game_ID=? AND User_ID=?;";
+            DatabaseValue[] valueList = {DB.getDBV(id), DB.getDBV(userId)};
+            PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+            return DB.executeUpdate(stmt, conn);
         }
         return false;
     }
@@ -261,92 +238,38 @@ public class MultiplayerGame extends AbstractGame {
 
 
     public boolean insert() {
-
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        String sql = null;
-
         // Attempt to insert game info into database
-        try {
-            conn = DatabaseAccess.getConnection();
-
-            stmt = conn.prepareStatement("INSERT INTO games " +
-                    "(Class_ID, Level, Prize, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " +
-                    "Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Start_Time, Finish_Time, State, Mode) VALUES " +
-                    "(?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, 'PARTY');",
-                    Statement.RETURN_GENERATED_KEYS);
-            stmt.setInt(1, classId);
-            stmt.setString(2, level.name());
-            stmt.setFloat(3, prize);
-            stmt.setInt(4, defenderValue);
-            stmt.setInt(5, attackerValue);
-            stmt.setFloat(6, lineCoverage);
-            stmt.setFloat(7, mutantCoverage);
-            stmt.setInt(8, creatorId);
-            stmt.setInt(9, minAttackers);
-            stmt.setInt(10, minDefenders);
-            stmt.setInt(11, attackerLimit);
-            stmt.setInt(12, defenderLimit);
-            stmt.setTimestamp(13, new Timestamp(startDateTime));
-            stmt.setTimestamp(14,  new Timestamp(finishDateTime));
-            stmt.setString(15, state.name());
-            stmt.executeUpdate();
-
-            ResultSet rs = stmt.getGeneratedKeys();
-
-            if (rs.next()) {
-                id = rs.getInt(1);
-                return true;
-            }
-
-        } catch (SQLException se) {
-            logger.error("SQL exception caught", se);
-            //Handle errors for JDBC
-        } catch (Exception e) {
-            System.out.println(e);
-            //Handle errors for Class.forName
-        } finally {
-            DatabaseAccess.cleanup(conn, stmt);
-        } //end try
+        String query = "INSERT INTO games " +
+                "(Class_ID, Level, Prize, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " +
+                "Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Start_Time, Finish_Time, State, Mode) VALUES " +
+                "(?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, 'PARTY');";
+        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId), DB.getDBV(level.name()),
+                DB.getDBV(prize), DB.getDBV(defenderValue), DB.getDBV(attackerValue),
+                DB.getDBV(lineCoverage), DB.getDBV(mutantCoverage), DB.getDBV(creatorId),
+                DB.getDBV(minAttackers), DB.getDBV(minDefenders), DB.getDBV(attackerLimit),
+                DB.getDBV(defenderLimit), DB.getDBV(new Timestamp(startDateTime)),
+                DB.getDBV(new Timestamp(finishDateTime)), DB.getDBV(state.name())};
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        System.out.println("Game insert Statement is: " + stmt);
+        int res = DB.executeUpdateGetKeys(stmt, conn);
+        if (res > -1) {
+            id = res;
+            return true;
+        }
         return false;
     }
 
     public boolean update() {
-
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        String sql = null;
-
-        try {
-            conn = DatabaseAccess.getConnection();
-
-            // Get all rows from the database which have the chosen username
-            stmt = conn.prepareStatement("UPDATE games SET " + "Class_ID = ?, Level = ?, Prize = ?, Defender_Value=?, Attacker_Value=?, Coverage_Goal=?" + ", Mutant_Goal=?, State=? WHERE ID=?");
-            stmt.setInt(1, classId);
-            stmt.setString(2, level.name());
-            stmt.setFloat(3, prize);
-            stmt.setInt(4, defenderValue);
-            stmt.setInt(5, attackerValue);
-            stmt.setFloat(6, lineCoverage);
-            stmt.setFloat(7, mutantCoverage);
-            stmt.setString(8, state.name());
-            stmt.setInt(9, id);
-            stmt.executeUpdate();
-            return true;
-
-        } catch (SQLException se) {
-            System.out.println(se);
-            //Handle errors for JDBC
-            se.printStackTrace();
-        } catch (Exception e) {
-            System.out.println(e);
-            //Handle errors for Class.forName
-            e.printStackTrace();
-        } finally {
-            DatabaseAccess.cleanup(conn, stmt);
-        } //end try
-
-        return false;
+        Connection conn = DB.getConnection();
+        // Get all rows from the database which have the chosen username
+        String query = "UPDATE games SET Class_ID = ?, Level = ?, Prize = ?, Defender_Value=?, Attacker_Value=?,"+
+                " Coverage_Goal=?, Mutant_Goal=?, State=? WHERE ID=?";
+        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId), DB.getDBV(level.name()),
+                DB.getDBV(prize), DB.getDBV(defenderValue), DB.getDBV(attackerValue),
+                DB.getDBV(lineCoverage), DB.getDBV(mutantCoverage), DB.getDBV(state.name()), DB.getDBV(id)};
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        return DB.executeUpdate(stmt, conn);
     }
 
     public HashMap<Integer, PlayerScore> getMutantScores() {
