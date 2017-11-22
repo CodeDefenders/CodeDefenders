@@ -15,45 +15,45 @@ import java.util.regex.Pattern;
 // Implements Filter class
 public class LoginFilter implements Filter {
 
-	public void init(FilterConfig config) throws ServletException {
-	}
+    public void init(FilterConfig config) throws ServletException {
+    }
 
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws java.io.IOException, ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws java.io.IOException, ServletException {
 
-		HttpServletRequest httpReq = (HttpServletRequest) request;
+        HttpServletRequest httpReq = (HttpServletRequest) request;
 
-		if (shouldAllow(httpReq))
-			chain.doFilter(request, response);
-		else {
-			HttpSession session = httpReq.getSession();
-			Integer uid = (Integer) session.getAttribute("uid");
-			if (uid != null) {
-				chain.doFilter(request, response);
-			} else {
-				HttpServletResponse httpResp = (HttpServletResponse) response;
-				session.setAttribute("loginFrom", httpReq.getRequestURI());
-				httpResp.sendRedirect("/login");
-			}
-		}
-	}
+        if (shouldAllow(httpReq))
+            chain.doFilter(request, response);
+        else {
+            HttpSession session = httpReq.getSession();
+            Integer uid = (Integer) session.getAttribute("uid");
+            if (uid != null) {
+                chain.doFilter(request, response);
+            } else {
+                HttpServletResponse httpResp = (HttpServletResponse) response;
+                session.setAttribute("loginFrom", httpReq.getRequestURI());
+                httpResp.sendRedirect("/login");
+            }
+        }
+    }
 
-	public void destroy() {
-	}
+    public void destroy() {
+    }
 
-	private boolean shouldAllow(HttpServletRequest request) {
-		String path = request.getRequestURI().toString();
-		String context = request.getContextPath().toString();
-		if ((path.endsWith(context + "/"))
-				|| (path.endsWith(context + "/login"))
-				|| (path.endsWith(context + "/help"))
-				|| (path.endsWith(context + "/video")) || (path.endsWith(context + "/video.mp4"))
-				|| (path.contains(context + "/papers"))
-				|| (path.endsWith(context + "/sendEmail"))
-				|| (path.endsWith(context + "/index.jsp")))
-			return true;
+    private boolean shouldAllow(HttpServletRequest request) {
+        String path = request.getRequestURI().toString();
+        String context = request.getContextPath().toString();
+        if ((path.endsWith(context + "/"))
+                || (path.endsWith(context + "/login"))
+                || (path.endsWith(context + "/help"))
+                || (path.endsWith(context + "/video")) || (path.endsWith(context + "/video.mp4"))
+                || (path.contains(context + "/papers"))
+                || (path.endsWith(context + "/sendEmail"))
+                || (path.endsWith(context + "/index.jsp")))
+            return true;
 
-		Pattern excludeUrls = Pattern.compile("^.*/(css|js|images)/.*$", Pattern.CASE_INSENSITIVE);
-		Matcher m = excludeUrls.matcher(path);
-		return m.matches();
-	}
+        Pattern excludeUrls = Pattern.compile("^.*/(css|js|images)/.*$", Pattern.CASE_INSENSITIVE);
+        Matcher m = excludeUrls.matcher(path);
+        return m.matches();
+    }
 }

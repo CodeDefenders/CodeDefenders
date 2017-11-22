@@ -129,7 +129,7 @@ public class Mutant implements Serializable {
         return classFile;
     }
 
-//    public String getFolder() {
+    //    public String getFolder() {
 //        int lio = javaFile.lastIndexOf("/");
 //        if (lio == -1) {
 //            lio = javaFile.lastIndexOf("\\");
@@ -137,9 +137,9 @@ public class Mutant implements Serializable {
 //        return javaFile.substring(0, lio);
 //    }
     public String getDirectory() {
-		File file = new File(javaFile);
-		return file.getAbsoluteFile().getParent();
-	}
+        File file = new File(javaFile);
+        return file.getAbsoluteFile().getParent();
+    }
 
     public boolean isAlive() {
         return alive;

@@ -54,7 +54,7 @@ public class MutantManager extends HttpServlet {
                         .equals(Role.DEFENDER) || game.getLevel().equals(
                         GameLevel.EASY);
 
-                for (Mutant m : mutants){
+                for (Mutant m : mutants) {
                     m.prepareForSerialise(showDiff);
                 }
 
@@ -70,7 +70,7 @@ public class MutantManager extends HttpServlet {
         //TODO: Implement heavy load/DDOS handling
         if (request.getParameter("gameId") != null) {
             int pId = DatabaseAccess.getPlayerIdForMultiplayerGame(
-                    (int)request.getSession().getAttribute("uid"),
+                    (int) request.getSession().getAttribute("uid"),
                     Integer.parseInt(request.getParameter("gameId"))
             );
             return pId >= 0;

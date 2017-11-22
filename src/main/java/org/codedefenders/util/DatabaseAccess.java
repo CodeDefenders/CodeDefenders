@@ -32,19 +32,20 @@ public class DatabaseAccess {
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseAccess.class);
 
-	/**
-	 * Sanitises user input. If a whole SQL query is entered, syntax
-	 * errors may occur.
-	 * @param s user input String
-	 * @return sanitised String s
-	 */
-	public static String sanitise(String s){
-		s = s.replaceAll("\\<","&lt;");
-		s = s.replaceAll("\\>", "&gt;");
-		s = s.replaceAll("\\\"", "&quot;");
-		s = s.replaceAll("\\'", "&apos;");
-		return s;
-	}
+    /**
+     * Sanitises user input. If a whole SQL query is entered, syntax
+     * errors may occur.
+     *
+     * @param s user input String
+     * @return sanitised String s
+     */
+    public static String sanitise(String s) {
+        s = s.replaceAll("\\<", "&lt;");
+        s = s.replaceAll("\\>", "&gt;");
+        s = s.replaceAll("\\\"", "&quot;");
+        s = s.replaceAll("\\'", "&apos;");
+        return s;
+    }
 
 
     public static int getInt(PreparedStatement stmt, String att, Connection conn) {

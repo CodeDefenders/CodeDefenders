@@ -50,26 +50,27 @@ public class CoverageGenerator {
 
         analyzer.analyzeAll(classesDirectory);
 
-        for (IClassCoverage cc : coverageBuilder.getClasses()){
-            String fullyQualifiedName = cc.getName().replace("/",".");
+        for (IClassCoverage cc : coverageBuilder.getClasses()) {
+            String fullyQualifiedName = cc.getName().replace("/", ".");
             if (fullyQualifiedName != null && fullyQualifiedName.startsWith(clazz)) {
                 for (int i = cc.getFirstLine(); i <= cc.getLastLine(); i++) {
                     ILine line = cc.getLine(i);
                     if (line.getInstructionCounter().getStatus() == ICounter.FULLY_COVERED ||
                             line.getInstructionCounter().getStatus() == ICounter.PARTLY_COVERED) {
                         linesCovered.add(i);
-                    } else if (line.getInstructionCounter().getStatus() == ICounter.NOT_COVERED){
+                    } else if (line.getInstructionCounter().getStatus() == ICounter.NOT_COVERED) {
                         linesUncovered.add(i);
                     }
                 }
             }
         }
     }
-    public ArrayList<Integer> getLinesCovered(){
+
+    public ArrayList<Integer> getLinesCovered() {
         return linesCovered;
     }
 
-    public ArrayList<Integer> getLinesUncovered(){
+    public ArrayList<Integer> getLinesUncovered() {
         return linesUncovered;
     }
 

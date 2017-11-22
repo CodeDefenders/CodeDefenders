@@ -17,77 +17,77 @@ import java.util.ArrayList;
 
 public class MessageManager extends HttpServlet {
 
-	private static final Logger logger = LoggerFactory.getLogger(MessageManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(MessageManager.class);
 
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		String result = "{'status':'Error'}";
-		response.setContentType("text/json");
-		PrintWriter out = response.getWriter();
-		try {
-			if (canAccess(request)) {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String result = "{'status':'Error'}";
+        response.setContentType("text/json");
+        PrintWriter out = response.getWriter();
+        try {
+            if (canAccess(request)) {
 
 
-				ArrayList<Event> events = null;
+                ArrayList<Event> events = null;
 
-				int gameId =
-						Integer.parseInt(request.getParameter("gameId"));
-				int userId = (int) request.getSession().getAttribute("uid");
+                int gameId =
+                        Integer.parseInt(request.getParameter("gameId"));
+                int userId = (int) request.getSession().getAttribute("uid");
 
-				Role role = DatabaseAccess.getRole(userId, gameId);
+                Role role = DatabaseAccess.getRole(userId, gameId);
 
-				EventType eventType = EventType.valueOf(request.getParameter
-						("target"));
+                EventType eventType = EventType.valueOf(request.getParameter
+                        ("target"));
 
-				if ((eventType == EventType.ATTACKER_MESSAGE && role.equals
-						(Role.ATTACKER)) ||
-						(eventType == EventType.DEFENDER_MESSAGE && role
-								.equals(Role.DEFENDER))
-						|| eventType == EventType.GAME_MESSAGE) {
+                if ((eventType == EventType.ATTACKER_MESSAGE && role.equals
+                        (Role.ATTACKER)) ||
+                        (eventType == EventType.DEFENDER_MESSAGE && role
+                                .equals(Role.DEFENDER))
+                        || eventType == EventType.GAME_MESSAGE) {
 
-					if (eventType == EventType.GAME_MESSAGE){
-						if (role.equals(Role.DEFENDER)){
-							eventType = EventType.GAME_MESSAGE_DEFENDER;
-						} else if (role.equals(Role.ATTACKER)){
-							eventType = EventType.GAME_MESSAGE_ATTACKER;
-						}
-					}
+                    if (eventType == EventType.GAME_MESSAGE) {
+                        if (role.equals(Role.DEFENDER)) {
+                            eventType = EventType.GAME_MESSAGE_DEFENDER;
+                        } else if (role.equals(Role.ATTACKER)) {
+                            eventType = EventType.GAME_MESSAGE_ATTACKER;
+                        }
+                    }
 
-					EventStatus es = EventStatus.GAME;
+                    EventStatus es = EventStatus.GAME;
 
-					User u = DatabaseAccess.getUser(userId);
+                    User u = DatabaseAccess.getUser(userId);
 
-					String message = request.getParameter("message");
+                    String message = request.getParameter("message");
 
-					Event e = new Event(0, gameId, userId,
-							u.getUsername() + ": " + message,
-							eventType, es, new Timestamp(System.currentTimeMillis()));
+                    Event e = new Event(0, gameId, userId,
+                            u.getUsername() + ": " + message,
+                            eventType, es, new Timestamp(System.currentTimeMillis()));
 
-					e.setChatMessage(DatabaseAccess.sanitise(message));
+                    e.setChatMessage(DatabaseAccess.sanitise(message));
 
-					if (e.insert()){
-						logger.info(String.format("Event %s saved in game %d.", eventType.toString(), gameId));
-						result = "{'status':'Success'}";
-					} else
-						logger.error(String.format("Problem saving event %s in game %d", eventType.toString(), gameId));
-				}
+                    if (e.insert()) {
+                        logger.info(String.format("Event %s saved in game %d.", eventType.toString(), gameId));
+                        result = "{'status':'Success'}";
+                    } else
+                        logger.error(String.format("Problem saving event %s in game %d", eventType.toString(), gameId));
+                }
 
-			}
-		} catch (Exception e){
-			e.printStackTrace();
-		}
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-		out.print(result);
-		out.flush();
-	}
+        out.print(result);
+        out.flush();
+    }
 
-	public boolean canAccess(HttpServletRequest request){
-		//TODO: Implement heavy load/DDOS handling
-		if (request.getParameter("gameId") != null
-				&& request.getParameter("message") != null
-				&& request.getParameter("target") != null) {
-			return true;
-		}
-		return false;
-	}
+    public boolean canAccess(HttpServletRequest request) {
+        //TODO: Implement heavy load/DDOS handling
+        if (request.getParameter("gameId") != null
+                && request.getParameter("message") != null
+                && request.getParameter("target") != null) {
+            return true;
+        }
+        return false;
+    }
 
 }

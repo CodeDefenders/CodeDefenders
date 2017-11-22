@@ -18,9 +18,9 @@ public class CoverageScorer extends Scorer {
     protected int scoreTest(MultiplayerGame g, Test t, List<Mutant> killed) {
         int totalLines = t.getLineCoverage().getLinesCovered().size() + t.getLineCoverage().getLinesUncovered().size();
 
-        float percentCovered = t.getLineCoverage().getLinesCovered().size()/(float)totalLines;
+        float percentCovered = t.getLineCoverage().getLinesCovered().size() / (float) totalLines;
 
-        return killed.size() + (int)(g.getDefenderValue() * percentCovered);
+        return killed.size() + (int) (g.getDefenderValue() * percentCovered);
     }
 
     @Override
@@ -30,11 +30,11 @@ public class CoverageScorer extends Scorer {
         Map<Integer, List<Mutant>> mutantLines = new HashMap<>();
 
         for (Mutant m : mutants) {
-            if (mm.getId() ==m.getId()){
+            if (mm.getId() == m.getId()) {
                 continue;
             }
-            for (int line : m.getLines()){
-                if (!mutantLines.containsKey(line)){
+            for (int line : m.getLines()) {
+                if (!mutantLines.containsKey(line)) {
                     mutantLines.put(line, new ArrayList<>());
                 }
 
@@ -45,10 +45,10 @@ public class CoverageScorer extends Scorer {
         }
 
         int lineScore = g.getAttackerValue();
-        for (int line : mm.getLines()){
-            if (mutantLines.containsKey(line)){
-                float percent = mutants.size() == 0 ? 1f : 1f - (mutantLines.get(line).size() / (float)mutants.size());
-                lineScore = (int)(lineScore * percent);
+        for (int line : mm.getLines()) {
+            if (mutantLines.containsKey(line)) {
+                float percent = mutants.size() == 0 ? 1f : 1f - (mutantLines.get(line).size() / (float) mutants.size());
+                lineScore = (int) (lineScore * percent);
             }
 
         }

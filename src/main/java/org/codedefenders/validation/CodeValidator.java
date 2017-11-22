@@ -132,7 +132,7 @@ public class CodeValidator {
     private static String removeQuoted(String s, String quotationMark) {
         while (s.contains(quotationMark)) {
             int index_first_occ = s.indexOf(quotationMark);
-            int index_second_occ = index_first_occ + s.substring(index_first_occ+1).indexOf(quotationMark);
+            int index_second_occ = index_first_occ + s.substring(index_first_occ + 1).indexOf(quotationMark);
             s = s.substring(0, index_first_occ - 1) + s.substring(index_second_occ + 2);
         }
         return s;

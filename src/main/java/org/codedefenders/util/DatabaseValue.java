@@ -8,7 +8,7 @@ public class DatabaseValue {
     private String stringVal;
     private Type type;
     private float floatVal;
-     private Timestamp timestampVal;
+    private Timestamp timestampVal;
 
     public enum Type {
         LONG, INT, STRING, FLOAT, TIMESTAMP
@@ -40,7 +40,6 @@ public class DatabaseValue {
     }
 
 
-
     public Type getType() {
         return this.type;
     }
@@ -57,7 +56,11 @@ public class DatabaseValue {
         return this.longVal;
     }
 
-    Float getFloatVal() {return this.floatVal;}
+    Float getFloatVal() {
+        return this.floatVal;
+    }
 
-    Timestamp getTimestampVal() {return this.timestampVal;}
+    Timestamp getTimestampVal() {
+        return this.timestampVal;
+    }
 }

@@ -12,25 +12,25 @@ public class LineCoverage {
 
     private List<Integer> linesUncovered = new ArrayList<>();
 
-    public void setLinesCovered (List<Integer> lines) {
+    public void setLinesCovered(List<Integer> lines) {
         linesCovered.clear();
         linesCovered.addAll(lines);
     }
 
-    public List<Integer> getLinesCovered(){
+    public List<Integer> getLinesCovered() {
         return linesCovered;
     }
 
-    public List<Integer> getLinesUncovered(){
+    public List<Integer> getLinesUncovered() {
         return linesUncovered;
     }
 
-    public void setLinesUncovered (List<Integer> lines){
+    public void setLinesUncovered(List<Integer> lines) {
         linesUncovered.clear();
         linesUncovered.addAll(lines);
     }
 
-    public String toString(){
+    public String toString() {
         return "Covered: " + linesCovered.size() + ", Uncovered: " + linesUncovered.size();
     }
 }

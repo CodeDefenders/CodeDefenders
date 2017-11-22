@@ -73,7 +73,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                             Integer.parseInt(request.getParameter("defenderLimit")), Integer.parseInt(request.getParameter("attackerLimit")),
                             Integer.parseInt(request.getParameter("minDefenders")), Integer.parseInt(request.getParameter("minAttackers")),
                             Long.parseLong(request.getParameter("startTime")), Long.parseLong(request.getParameter("finishTime")), GameState.CREATED.name());
-                    if (nGame.insert()){
+                    if (nGame.insert()) {
                         Event event = new Event(-1, nGame.getId(), uid, "Game" +
                                 " Created",
                                 EventType.GAME_CREATED, EventStatus.GAME, new
@@ -98,7 +98,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                         EventType notifType = EventType.GAME_PLAYER_LEFT;
                         Event notif = new Event(-1, gameId, uid,
                                 "You successfully left" +
-                                " the game.",
+                                        " the game.",
                                 notifType, EventStatus.NEW,
                                 new Timestamp(System.currentTimeMillis()));
                         notif.insert();

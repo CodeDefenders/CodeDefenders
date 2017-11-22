@@ -114,7 +114,7 @@ public class Test {
             return 0;
     }
 
-//    public String getFolder() {
+    //    public String getFolder() {
 //        int lio = javaFile.lastIndexOf("/");
 //        if (lio == -1) {
 //            lio = javaFile.lastIndexOf("\\");
@@ -122,9 +122,9 @@ public class Test {
 //        return javaFile.substring(0, lio);
 //    }
     public String getDirectory() {
-		File file = new File(javaFile);
-		return file.getAbsoluteFile().getParent();
-	}
+        File file = new File(javaFile);
+        return file.getAbsoluteFile().getParent();
+    }
 
     public void killMutant() {
         mutantsKilled++;

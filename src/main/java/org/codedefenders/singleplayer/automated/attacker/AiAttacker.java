@@ -22,132 +22,135 @@ import java.util.stream.Collectors;
  */
 public class AiAttacker extends AiPlayer {
 
-	private static final Logger logger = LoggerFactory.getLogger(AiAttacker.class);
+    private static final Logger logger = LoggerFactory.getLogger(AiAttacker.class);
 
-	public static final int ID = 1;
+    public static final int ID = 1;
 
-	public AiAttacker(DuelGame g) {
-		super(g);
-		role = Role.ATTACKER;
-	}
+    public AiAttacker(DuelGame g) {
+        super(g);
+        role = Role.ATTACKER;
+    }
 
-	/**
-	 * Hard difficulty attacker turn.
-	 * @return true if mutant generation succeeds, or if no non-existing mutants have been found to prevent infinite loop.
-	 */
-	public boolean turnHard() {
-		//Choose a mutant which is killed by few generated tests.
-		return runTurn(GenerationMethod.KILLCOUNT);
-	}
+    /**
+     * Hard difficulty attacker turn.
+     *
+     * @return true if mutant generation succeeds, or if no non-existing mutants have been found to prevent infinite loop.
+     */
+    public boolean turnHard() {
+        //Choose a mutant which is killed by few generated tests.
+        return runTurn(GenerationMethod.KILLCOUNT);
+    }
 
-	/**
-	 * Easy difficulty attacker turn.
-	 * @return true if mutant generation succeeds, or if no non-existing mutants have been found to prevent infinite loop.
-	 */
-	public boolean turnEasy() {
-		//Choose a random mutant.
-		return runTurn(GenerationMethod.RANDOM);
-	}
+    /**
+     * Easy difficulty attacker turn.
+     *
+     * @return true if mutant generation succeeds, or if no non-existing mutants have been found to prevent infinite loop.
+     */
+    public boolean turnEasy() {
+        //Choose a random mutant.
+        return runTurn(GenerationMethod.RANDOM);
+    }
 
-	/**
-	 * Attempts to submit a mutant, according to a strategy
-	 * @param strat Generation strategy to use
-	 * @return true if mutant submitted, false otherwise
-	 */
-	protected boolean runTurn(GenerationMethod strat) {
-		try {
-			int mNum = selectMutant(strat);
-			useMutantFromSuite(mNum);
-		} catch (NoMutantsException e) {
-			//No more unused mutants remain,
-			return false;
-		} catch (Exception e) {
-			//Something's gone wrong
-			e.printStackTrace();
-			return false;
-		}
+    /**
+     * Attempts to submit a mutant, according to a strategy
+     *
+     * @param strat Generation strategy to use
+     * @return true if mutant submitted, false otherwise
+     */
+    protected boolean runTurn(GenerationMethod strat) {
+        try {
+            int mNum = selectMutant(strat);
+            useMutantFromSuite(mNum);
+        } catch (NoMutantsException e) {
+            //No more unused mutants remain,
+            return false;
+        } catch (Exception e) {
+            //Something's gone wrong
+            e.printStackTrace();
+            return false;
+        }
 
-		return true;
-	}
+        return true;
+    }
 
-	private int selectMutant(GenerationMethod strategy) throws NoMutantsException, NoDummyGameException {
-		List<Integer> usedMutants = DatabaseAccess.getUsedAiMutantsForGame(game);
-		GameClass cut = game.getCUT();
+    private int selectMutant(GenerationMethod strategy) throws NoMutantsException, NoDummyGameException {
+        List<Integer> usedMutants = DatabaseAccess.getUsedAiMutantsForGame(game);
+        GameClass cut = game.getCUT();
 
-		// TODO: This isn't actually an AIDummyGame
-		DuelGame dummyGame = cut.getDummyGame();
-		List<Mutant> origMutants = dummyGame.getMutants();
+        // TODO: This isn't actually an AIDummyGame
+        DuelGame dummyGame = cut.getDummyGame();
+        List<Mutant> origMutants = dummyGame.getMutants();
 
-		List<Mutant> candidateMutants = origMutants.stream().filter(mutant -> !usedMutants.contains(mutant.getId())).collect(Collectors.toList());
+        List<Mutant> candidateMutants = origMutants.stream().filter(mutant -> !usedMutants.contains(mutant.getId())).collect(Collectors.toList());
 
-		if(candidateMutants.isEmpty()) {
-			throw new NoMutantsException("No unused generated mutants remain.");
-		}
+        if (candidateMutants.isEmpty()) {
+            throw new NoMutantsException("No unused generated mutants remain.");
+        }
 
-		switch(strategy) {
-			case RANDOM:
-				Random r = new Random();
-				Mutant selected = candidateMutants.get(r.nextInt(candidateMutants.size()));
-				return selected.getId();
-			case KILLCOUNT:
-				candidateMutants.sort(new MutantComparator());
+        switch (strategy) {
+            case RANDOM:
+                Random r = new Random();
+                Mutant selected = candidateMutants.get(r.nextInt(candidateMutants.size()));
+                return selected.getId();
+            case KILLCOUNT:
+                candidateMutants.sort(new MutantComparator());
 
-				//Get an index, using a random number biased towards earlier index.
-				//Note mutants with low killcount are more likely to be equivalent.
-				int n = PrepareAI.biasedSelection(candidateMutants.size(), 1.7);
-				return candidateMutants.get(n).getId();
+                //Get an index, using a random number biased towards earlier index.
+                //Note mutants with low killcount are more likely to be equivalent.
+                int n = PrepareAI.biasedSelection(candidateMutants.size(), 1.7);
+                return candidateMutants.get(n).getId();
 
-			case COVERAGE:
-			default:
-				// TODO: Why do we have these strategies if we don't use them?
-				throw new UnsupportedOperationException("Not implemented");
-		}
-	}
+            case COVERAGE:
+            default:
+                // TODO: Why do we have these strategies if we don't use them?
+                throw new UnsupportedOperationException("Not implemented");
+        }
+    }
 
-	private void useMutantFromSuite(int origMutNum) throws NoMutantsException, NoDummyGameException {
-		GameClass cut = game.getCUT();
-		DuelGame dummyGame = cut.getDummyGame();
-		List<Mutant> origMutants = dummyGame.getMutants();
+    private void useMutantFromSuite(int origMutNum) throws NoMutantsException, NoDummyGameException {
+        GameClass cut = game.getCUT();
+        DuelGame dummyGame = cut.getDummyGame();
+        List<Mutant> origMutants = dummyGame.getMutants();
 
-		Mutant origM = null;
+        Mutant origM = null;
 
-		for (Mutant m : origMutants) {
-			if(m.getId() == origMutNum) {
-				origM = m;
-				break;
-			}
-		}
+        for (Mutant m : origMutants) {
+            if (m.getId() == origMutNum) {
+                origM = m;
+                break;
+            }
+        }
 
-		if(origM == null) {
-			throw new NoMutantsException("No mutant exists for ID: " + origMutNum);
-		}
+        if (origM == null) {
+            throw new NoMutantsException("No mutant exists for ID: " + origMutNum);
+        }
 
-		String jFile = origM.getSourceFile();
-		String cFile = origM.getClassFile();
-		int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ID, game.getId());
-		Mutant m = new Mutant(game.getId(), jFile, cFile, true, playerId);
-		m.insert();
-		m.update();
+        String jFile = origM.getSourceFile();
+        String cFile = origM.getClassFile();
+        int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ID, game.getId());
+        Mutant m = new Mutant(game.getId(), jFile, cFile, true, playerId);
+        m.insert();
+        m.update();
 
-		MutationTester.runAllTestsOnMutant(game, m, messages);
-		DatabaseAccess.setAiMutantAsUsed(origMutNum, game);
-		game.update();
-	}
+        MutationTester.runAllTestsOnMutant(game, m, messages);
+        DatabaseAccess.setAiMutantAsUsed(origMutNum, game);
+        game.update();
+    }
 
-	@Override
-	public ArrayList<String> getMessagesLastTurn() {
-		boolean killed = false;
-		for (String s : messages) {
-			if (s.contains("killed your mutant")) {
-				killed = true;
-				break;
-			}
-		}
-		messages.clear();
-		if (killed)
-			messages.add("The AI submitted a new mutant, but one of your tests killed it immediately!");
-		else
-			messages.add("The AI submitted a new mutant.");
-		return messages;
-	}
+    @Override
+    public ArrayList<String> getMessagesLastTurn() {
+        boolean killed = false;
+        for (String s : messages) {
+            if (s.contains("killed your mutant")) {
+                killed = true;
+                break;
+            }
+        }
+        messages.clear();
+        if (killed)
+            messages.add("The AI submitted a new mutant, but one of your tests killed it immediately!");
+        else
+            messages.add("The AI submitted a new mutant.");
+        return messages;
+    }
 }

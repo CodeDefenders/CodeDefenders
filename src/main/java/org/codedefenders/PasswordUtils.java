@@ -13,10 +13,10 @@ public class PasswordUtils {
 
     public static final long padding = 172636374748392l;
 
-    public static String getReference(){
+    public static String getReference() {
         SecureRandom r = new SecureRandom();
 
-        long identifier = ((long)(r.nextLong() * (1f - (padding/ (float)Long
+        long identifier = ((long) (r.nextLong() * (1f - (padding / (float) Long
                 .MAX_VALUE))) + padding);
 
         MessageDigest md = null;
@@ -29,7 +29,7 @@ public class PasswordUtils {
 
         try {
             md.update(text.getBytes("UTF-8")); // Change this to "UTF-16" if
-                // needed
+            // needed
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

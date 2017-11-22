@@ -17,15 +17,15 @@ public abstract class Scorer {
 
     protected abstract int scoreMutant(MultiplayerGame g, Mutant m, List<Test> passed);
 
-    public static int score(MultiplayerGame g, Test t, List<Mutant> killed){
+    public static int score(MultiplayerGame g, Test t, List<Mutant> killed) {
         return scorer.scoreTest(g, t, killed);
     }
 
-    public static void setScorer(Scorer s){
+    public static void setScorer(Scorer s) {
         scorer = s;
     }
 
-    public static int score(MultiplayerGame g, Mutant m, List<Test> passed){
+    public static int score(MultiplayerGame g, Mutant m, List<Test> passed) {
         return scorer.scoreMutant(g, m, passed);
     }
 }

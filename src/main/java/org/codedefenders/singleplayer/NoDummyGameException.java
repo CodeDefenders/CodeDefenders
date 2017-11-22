@@ -7,5 +7,8 @@ public class NoDummyGameException extends Exception {
     public NoDummyGameException() {
         super();
     }
-    public NoDummyGameException(String msg) {super(msg);}
+
+    public NoDummyGameException(String msg) {
+        super(msg);
+    }
 }

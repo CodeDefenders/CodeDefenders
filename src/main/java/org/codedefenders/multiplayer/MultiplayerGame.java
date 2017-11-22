@@ -262,7 +262,7 @@ public class MultiplayerGame extends AbstractGame {
     public boolean update() {
         Connection conn = DB.getConnection();
         // Get all rows from the database which have the chosen username
-        String query = "UPDATE games SET Class_ID = ?, Level = ?, Prize = ?, Defender_Value=?, Attacker_Value=?,"+
+        String query = "UPDATE games SET Class_ID = ?, Level = ?, Prize = ?, Defender_Value=?, Attacker_Value=?," +
                 " Coverage_Goal=?, Mutant_Goal=?, State=? WHERE ID=?";
         DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId), DB.getDBV(level.name()),
                 DB.getDBV(prize), DB.getDBV(defenderValue), DB.getDBV(attackerValue),
