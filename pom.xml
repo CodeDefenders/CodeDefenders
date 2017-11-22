@@ -12,7 +12,7 @@
 	</properties>
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
-	<version>1.0-SNAPSHOT-Passau</version>
+	<version>1.0-SNAPSHOT</version>
 
 	<build>
 		<filters>
