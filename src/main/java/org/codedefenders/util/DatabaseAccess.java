@@ -1,6 +1,24 @@
 package org.codedefenders.util;
 
-import org.codedefenders.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.naming.NamingException;
+
+import org.codedefenders.GameClass;
+import org.codedefenders.GameLevel;
+import org.codedefenders.GameMode;
+import org.codedefenders.GameState;
+import org.codedefenders.Mutant;
+import org.codedefenders.Role;
+import org.codedefenders.TargetExecution;
+import org.codedefenders.Test;
+import org.codedefenders.User;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
@@ -12,31 +30,23 @@ import org.codedefenders.singleplayer.SinglePlayerGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.NamingException;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-
-@SuppressWarnings("ALL")
 public class DatabaseAccess {
-
 
     private static final Logger logger = LoggerFactory.getLogger(DatabaseAccess.class);
 
-    /**
-     * Sanitises user input. If a whole SQL query is entered, syntax
-     * errors may occur.
-     *
-     * @param s user input String
-     * @return sanitised String s
-     */
-    public static String sanitise(String s) {
-        s = s.replaceAll("\\<", "&lt;");
-        s = s.replaceAll("\\>", "&gt;");
-        s = s.replaceAll("\\\"", "&quot;");
-        s = s.replaceAll("\\'", "&apos;");
-        return s;
-    }
+	/**
+	 * Sanitises user input. If a whole SQL query is entered, syntax
+	 * errors may occur.
+	 * @param s user input String
+	 * @return sanitised String s
+	 */
+	public static String sanitise(String s){
+		s = s.replaceAll("\\<","&lt;");
+		s = s.replaceAll("\\>", "&gt;");
+		s = s.replaceAll("\\\"", "&quot;");
+		s = s.replaceAll("\\'", "&apos;");
+		return s;
+	}
 
 	public static Connection getConnection() throws SQLException, NamingException {
 		return DatabaseConnection.getConnection();

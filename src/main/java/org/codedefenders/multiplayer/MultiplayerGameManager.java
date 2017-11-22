@@ -5,6 +5,7 @@ import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
 import org.codedefenders.events.EventType;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,15 +33,16 @@ public class MultiplayerGameManager extends HttpServlet {
 		ArrayList<String> messages = new ArrayList<String>();
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
-		// This raises exception when playing around with curl, not sure it's a feature.
-//		int gameId = (Integer) session.getAttribute("mpGameId");
-		 // Why this must be set with the session from game_view.jsp ?
+		// The following raises exception when playing around with curl, not sure it's a feature.
+		//		int gameId = (Integer) session.getAttribute("mpGameId");
+		// Why this must be set with the session from game_view.jsp ?
 		int gameId = -1;
 		if (session.getAttribute("mpGameId") != null) {
 			gameId = (Integer) session.getAttribute("mpGameId");
 		} else if (request.getAttribute("mpGameID") != null) {
 			gameId = (Integer) request.getAttribute("mpGameID");
 		} else {
+			// TODO Not sure this is 100% right
 			logger.error("Problem setting gameID !");
 			response.setStatus(500);
 			return;

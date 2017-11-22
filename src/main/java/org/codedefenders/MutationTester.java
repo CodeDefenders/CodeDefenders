@@ -45,19 +45,18 @@ import org.slf4j.LoggerFactory;
 
 // Class that handles compilation and testing by creating a Process with the relevant ant target
 public class MutationTester {
+
 	private static final Logger logger = LoggerFactory.getLogger(MutationTester.class);
 
 	private static boolean parallelize = false;
+	private static ExecutorService sharedExecutorService = Executors.newFixedThreadPool(30);
 
 	private static boolean useMutantCoverage = true;
-	// Use a shared executor pool, prevents thread explosion.
-	// TODO How to close this when application is redeployed/restarted ?
-	// TODO Do we need to cap the amount of parallel tasks per use request ?
-	private static ExecutorService sharedExecutorService = Executors.newFixedThreadPool(30);
 
 	// DO NOT REALLY LIKE THOSE...
 	static {
-		// First check the Web abb context
+		// TODO Does this break integratino tests? Shall we declare initial
+		// context as static field instead?
 		InitialContext initialContext;
 		try {
 			initialContext = new InitialContext();
@@ -121,23 +120,13 @@ public class MutationTester {
 		mutants.addAll(game.getMutantsMarkedEquivalentPending());
 		List<Mutant> killedMutants = new ArrayList<Mutant>();
 
-		// Acquire and release the connection
 		User u = DatabaseAccess.getUserFromPlayer(test.getPlayerId());
 
-		/// PARALLELIZE THIS
 		if (parallelize) {
-
-			// System.out.println(
-			// "\n\n MutationTester.runTestOnAllMultiplayerMutants() START
-			// PARALLEL EXECUTION \n\n");
-
 			// Fork and Join parallelization
-			//
 			Map<Mutant, FutureTask<Boolean>> tasks = new HashMap<Mutant, FutureTask<Boolean>>();
 			for (final Mutant mutant : mutants) {
 				if (useMutantCoverage && !test.isMutantCovered(mutant)) {
-					// System.out.println("Skipping non-covered mutant "
-					// + mutant.getId() + ", test " + test.getId());
 					continue;
 				}
 
@@ -148,46 +137,26 @@ public class MutationTester {
 						return testVsMutant(test, mutant);
 					}
 				});
-
-				// This is for checking later
+				// Book keeping
 				tasks.put(mutant, task);
-				//
-				// System.out.println(
-				// "MutationTester.runTestOnAllMultiplayerMutants() Scheduling
-				// Task testVsMutant "
-				// + test + " vs " + mutant);
+				// Schedule the task for the execution
 				sharedExecutorService.execute(task);
 			}
 
-			// TODO Mayse use some timeout ?!
 			for (final Mutant mutant : mutants) {
-				if (useMutantCoverage && !test.isMutantCovered(mutant))
+				if (useMutantCoverage && !test.isMutantCovered(mutant)) {
 					continue;
-
-				// checks if task done
-				// System.out.println(
-				// "Is mutant done? " + tasks.get(mutant).isDone());
-				// checks if task canceled
-				// System.out.println("Is mutant cancelled? "
-				// + tasks.get(mutant).isCancelled());
-				// fetches result and waits if not ready
-
-				// THIS IS BLOCKING !!!
+				}
+				// Note that .get() is a blocking call
 				try {
 					if (tasks.get(mutant).get()) {
 						killed++;
 						killedMutants.add(mutant);
 					}
-				} catch (InterruptedException | ExecutionException e) {
-					System.out.println(
-							"MutationTester.runTestOnAllMultiplayerMutants() ERROR While waiting results for mutant "
-									+ mutant);
-					e.printStackTrace();
+				} catch (InterruptedException | ExecutionException | CancellationException e) {
+					logger.error("While waiting results for mutant " + mutant, e);
 				}
 			}
-
-			// System.out.println(
-			// "MutationTester.runTestOnAllMultiplayerMutants() DEBUG: done");
 			tasks.clear();
 
 		} else {
@@ -205,7 +174,6 @@ public class MutationTester {
 				}
 			}
 		}
-		////
 
 		for (Mutant mutant : mutants) {
 			if (mutant.isAlive()) {
@@ -334,15 +302,16 @@ public class MutationTester {
 
 					boolean hasTestkilledTheMutant = false;
 
-					// Since we might cancel a task at anytime but we need to get their result, this might raise an exception
+					// Since we might cancel a task at anytime but we need to
+					// get their result, this might raise an exception
 					try {
 						hasTestkilledTheMutant = task.get();
 					} catch (CancellationException ce) {
 						//
-						logger.info("Swallowed exception " + ce );
+						logger.info("Swallowed exception " + ce);
 					}
 
-					if ( hasTestkilledTheMutant ) {
+					if (hasTestkilledTheMutant) {
 						// This test killede the mutant...
 						logger.info(">> Double Check. Test {} kills mutant {}", test.getId(), mutant.getId());
 						messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
@@ -359,7 +328,8 @@ public class MutationTester {
 								EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
 						notif.insert();
 
-						// Early return. Just forget about the other running (yet cancelled) tasks
+						// Early return. Just forget about the other running
+						// (yet cancelled) tasks
 						return;
 
 					}
@@ -369,7 +339,6 @@ public class MutationTester {
 					e.printStackTrace();
 				}
 			}
-
 
 		} else {
 
@@ -433,9 +402,6 @@ public class MutationTester {
 	 * @return
 	 */
 	private static boolean testVsMutant(Test test, Mutant mutant) {
-		// TODO: the issue in parallelizing this call is that a task which is cancelled will still update the DB
-		// at least the targetExecution table
-		// Acquire and release the connection...
 		if (DatabaseAccess.getTargetExecutionForPair(test.getId(), mutant.getId()) == null) {
 			// Run the test against the mutant and get the result
 			TargetExecution executedTarget = AntRunner.testMutant(mutant, test);

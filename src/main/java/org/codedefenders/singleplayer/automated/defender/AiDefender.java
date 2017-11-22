@@ -170,7 +170,7 @@ public class AiDefender extends AiPlayer {
 			newExec.insert();
 			MutationTester.runTestOnAllMutants(game, t, messages);
 			DatabaseAccess.setAiTestAsUsed(origTestNum, game);
-			File dir = new File(origT.getFolder());
+			File dir = new File(origT.getDirectory());
 			AntRunner.testOriginal(dir, t);
 			game.update();
 		}

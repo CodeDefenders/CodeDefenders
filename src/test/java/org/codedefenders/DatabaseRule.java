@@ -12,7 +12,7 @@ import ch.vorburger.mariadb4j.DB;
 import ch.vorburger.mariadb4j.DBConfigurationBuilder;
 
 /**
- * @author Jose Rojas
+ * @author Jose Rojas, Alessio Gambi
  */
 public class DatabaseRule extends ExternalResource {
 

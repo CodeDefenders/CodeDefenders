@@ -1,26 +1,29 @@
 package org.codedefenders;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-import javassist.ClassPool;
-import javassist.CtClass;
-import org.apache.commons.collections.CollectionUtils;
-import org.codedefenders.duel.DuelGame;
-import org.codedefenders.multiplayer.LineCoverage;
-import org.codedefenders.util.DB;
-import org.codedefenders.util.DatabaseAccess;
-import org.codedefenders.util.DatabaseValue;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.codedefenders.duel.DuelGame;
+import org.codedefenders.multiplayer.LineCoverage;
+import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.DatabaseValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.vorburger.mariadb4j.DB;
+import javassist.ClassPool;
+import javassist.CtClass;
 
 public class Test {
 
@@ -114,13 +117,17 @@ public class Test {
             return 0;
     }
 
-    public String getFolder() {
-        int lio = javaFile.lastIndexOf("/");
-        if (lio == -1) {
-            lio = javaFile.lastIndexOf("\\");
-        }
-        return javaFile.substring(0, lio);
-    }
+//    public String getFolder() {
+//        int lio = javaFile.lastIndexOf("/");
+//        if (lio == -1) {
+//            lio = javaFile.lastIndexOf("\\");
+//        }
+//        return javaFile.substring(0, lio);
+//    }
+    public String getDirectory() {
+		File file = new File(javaFile);
+		return file.getAbsoluteFile().getParent();
+	}
 
     public void killMutant() {
         mutantsKilled++;
