@@ -21,6 +21,22 @@ mutantLine([
 ],"<%="#" + codeDivName%>", <%= role.equals(Role.DEFENDER)? "true" : "false" %>);
 };
 
+
+showMutantsEquiv = function(){
+mutantEquivLine([
+<% for (Integer line : mutantEquivPending.keySet()) {
+%>
+[<%= line %>,
+<%= mutantEquivPending.get(line).size() %>, [
+<% for(Mutant mm : mutantEquivPending.get(line)){%>
+<%= mm.getId() %>,
+<%}%>
+]],
+<%
+    } %>
+],"<%="#" + codeDivName%>", <%= role.equals(Role.DEFENDER)? "true" : "false" %>);
+};
+
 showKilledMutants = function(){
 mutantKilledLine([
 <% for (Integer line : mutantKilledLines.keySet()) {
@@ -37,11 +53,13 @@ mutantKilledLine([
 };
 editorSUT.on("viewportChange", function(){
     showMutants();
+    showMutantsEquiv();
     showKilledMutants();
     highlightCoverage();
 });
 $(document).ready(function(){
     showMutants();
+    showMutantsEquiv();
     showKilledMutants();
     highlightCoverage();
 });
