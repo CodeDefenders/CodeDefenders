@@ -1,14 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<powermock.version>1.6.1</powermock.version>
+		<config.properties>config.properties</config.properties>
+	</properties>
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
 	<version>1.0-SNAPSHOT</version>
+
 	<build>
+		<filters>
+			<!-- This enables to read properties from this file and automagically 
+				put their values in other files. For example, we use that to update: context.xml -->
+			<filter>${config.properties}</filter>
+		</filters>
+
 		<plugins>
+			<!-- Fails if the ${config.properties} file does not exists -->
+			<!-- NOTE: it does not check that properties have values -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.0.0-M1</version>
+				<executions>
+					<execution>
+						<id>enforce-files-exist</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireFilesExist>
+									<files>
+										<file>${config.properties}</file>
+									</files>
+								</requireFilesExist>
+							</rules>
+							<fail>true</fail>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Reads all the properties from ${config.properties} -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>${config.properties}</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -18,6 +73,29 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
+			<!-- Print the properties. Maybe is enough to attach this to deploy instead -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.1</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<echo>Displaying properties value</echo>
+								<echo>[data.dir] ${data.dir}</echo>
+								<echo>[db.url]${db.url}</echo>
+								<echo>[tomcat.url] ${tomcat.url}</echo>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
@@ -42,28 +120,108 @@
 								<include>**/*.svg</include>
 							</includes>
 						</resource>
+						<!-- Enable reading props from config.file and setting all the files 
+							in META-INF -->
+						<resource>
+							<directory>src/main/webapp/META-INF</directory>
+							<filtering>true</filtering>
+							<targetPath>META-INF</targetPath>
+						</resource>
 					</webResources>
 					<packagingExcludes>**/empty.tmp</packagingExcludes>
 					<excludes>src/main/resources/db/**</excludes>
 				</configuration>
 			</plugin>
+			<!-- Deploys on tomcat reading the properties from ${configuration.properties} -->
+			<!-- FIXME Check that all the mandatory properties are there -->
 			<plugin>
 				<groupId>org.apache.tomcat.maven</groupId>
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
-					<url>http://localhost:8080/manager/text</url>
 					<server>TomcatServer</server>
-					<username>adminscript</username>
-					<password>***REMOVED***</password>
+					<url>${tomcat.url}</url>
+					<username>${tomcat.username}</username>
+					<password>${tomcat.password}</password>
+					<!-- FIXME So far CodeDefenders must be deployed in Tomcat's root -->
 					<path>/</path>
 					<ignorePackaging>true</ignorePackaging>
 					<contextReloadable>true</contextReloadable>
 				</configuration>
 			</plugin>
 		</plugins>
-		<finalName>${artifactId}</finalName>
+		<finalName>${project.artifactId}</finalName>
 	</build>
+
+	<profiles>
+		<!-- Solution inspired by: Taken from : https://stackoverflow.com/questions/2606572/junit-splitting-integration-test-and-unit-tests/10381662#10381662 -->
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>2.20.1</version>
+						<!-- This forces to use the proper junit runner. Old versions do not 
+							support categories -->
+						<dependencies>
+							<dependency>
+								<groupId>org.apache.maven.surefire</groupId>
+								<artifactId>surefire-junit47</artifactId>
+								<version>2.20.1</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+							<includes>
+								<include>**/*.class</include>
+							</includes>
+							<excludedGroups>org.codedefenders.itests.IntegrationTest</excludedGroups>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>IT</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>2.20.1</version>
+						<!-- This forces to use the proper junit runner. Old versions do not 
+							support categories -->
+						<dependencies>
+							<dependency>
+								<groupId>org.apache.maven.surefire</groupId>
+								<artifactId>surefire-junit47</artifactId>
+								<version>2.20.1</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+							<!-- From : http://maven.apache.org/surefire/maven-surefire-plugin/examples/fork-options-and-parallel-execution.html 
+								forkCount=1/reuseForks=false executes each test class in its own JVM process, 
+								one after another. It creates the highest level of separation for the test 
+								execution, but it would probably also give you the longest execution time 
+								of all the available options. Consider it as a last resort. -->
+							<!-- Do not parallelize, just fork -->
+							<forkCount>1</forkCount>
+							<!-- Do not reuse the jvm -->
+							<reuseForks>false</reuseForks>
+							<groups>org.codedefenders.itests.IntegrationTest</groups>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+
+
 
 	<dependencies>
 		<dependency>
@@ -173,11 +331,34 @@
 			<artifactId>joda-time</artifactId>
 			<version>2.8.1</version>
 		</dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.3.1</version>
-        </dependency>
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>2.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.vorburger.mariaDB4j</groupId>
+			<artifactId>mariaDB4j</artifactId>
+			<version>2.2.3</version>
+		</dependency>
 
+		<dependency>
+			<groupId>commons-dbutils</groupId>
+			<artifactId>commons-dbutils</artifactId>
+			<version>1.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-module-junit4</artifactId>
+			<version>${powermock.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.powermock</groupId>
+			<artifactId>powermock-api-mockito</artifactId>
+			<version>${powermock.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>

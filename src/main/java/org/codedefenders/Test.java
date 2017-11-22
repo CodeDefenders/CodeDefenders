@@ -2,6 +2,7 @@ package org.codedefenders;
 
 import javassist.ClassPool;
 import javassist.CtClass;
+import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.util.DatabaseAccess;
@@ -113,17 +114,18 @@ public class Test {
 			return 0;
 	}
 
-	public String getFolder() {
-		int lio = javaFile.lastIndexOf("/");
-		if (lio == -1) {
-			lio = javaFile.lastIndexOf("\\");
-		}
-		return javaFile.substring(0, lio);
+	public String getDirectory() {
+		File file = new File(javaFile);
+		return file.getAbsoluteFile().getParent();
 	}
 
 	public void killMutant() {
 		mutantsKilled++;
 		update();
+	}
+
+	public boolean isMutantCovered(Mutant mutant) {
+		return CollectionUtils.containsAny(lineCoverage.getLinesCovered(), mutant.getLines());
 	}
 
 	public List<String> getHTMLReadout() throws IOException {

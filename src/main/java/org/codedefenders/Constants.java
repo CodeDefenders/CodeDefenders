@@ -71,9 +71,12 @@ public class Constants {
 	public static final String MUTANT_COMPILED_MESSAGE = "Your mutant was compiled successfully.";
 	public static final String MUTANT_ACCEPTED_EQUIVALENT_MESSAGE = "The mutant was accepted as equivalent.";
 	public static final String MUTANT_UNCOMPILABLE_MESSAGE = "Your mutant failed to compile. Try again.";
-	public static final String MUTANT_INVALID_MESSAGE = "Sorry, your mutant is invalid: it is identical to the CUT or another mutant, or it contains invalid code (ifs, loops, or new logical ops.)";
+	public static final String MUTANT_INVALID_MESSAGE = "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)";
+	public static final String MUTANT_CREATION_ERROR_MESSAGE = "Oops! Something went wrong and the mutant was not created.";
+	public static final String MUTANT_DUPLICATED_MESSAGE = "Sorry, your mutant already exists in this game!";
 	public static final String MUTANT_CLAIMED_EQUIVALENT_MESSAGE = "Mutant claimed as equivalent, waiting for attacker to respond.";
 	public static final String MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE = "Something went wrong claiming equivalent mutant"; // TODO: How?
+	public static final String MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE = "Cheeky! You cannot claim equivalence on untested lines!";
 	public static final String MUTANT_KILLED_BY_TEST_MESSAGE = "Test %d killed your mutant. Better luck with the next one!"; // test
 	public static final String MUTANT_SUBMITTED_MESSAGE = "Mutant submitted, may the force be with it.";
 	public static final String MUTANT_ALIVE_1_MESSAGE = "Cool, your mutant is alive.";

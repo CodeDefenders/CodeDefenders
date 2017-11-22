@@ -351,13 +351,54 @@ CREATE TABLE `event_messages` (
 
 LOCK TABLES `event_messages` WRITE;
 /*!40000 ALTER TABLE `event_messages` DISABLE KEYS */;
-INSERT INTO `event_messages` VALUES ('ATTACKER_JOINED','@event_user joined the attackers'),('ATTACKER_MESSAGE','@event_user: @chat_message'),('ATTACKER_MUTANT_CREATED','@event_user created a mutant'),('ATTACKER_MUTANT_ERROR','@event_user created a mutant that errored'),('ATTACKER_MUTANT_KILLED_EQUIVALENT','@event_user proved a mutant non-equivalent'),('ATTACKER_MUTANT_SURVIVED','@event_user created a mutant that survived'),('DEFENDER_JOINED','@event_user joined the defenders!'),('DEFENDER_KILLED_MUTANT','@event_user killed a mutant'),('DEFENDER_MESSAGE','@event_user: @chat_message'),('DEFENDER_MUTANT_CLAIMED_EQUIVALENT','@event_user claimed a mutant equivalent'),('DEFENDER_MUTANT_EQUIVALENT','@event_user caught an equivalence'),('DEFENDER_TEST_CREATED','@event_user created a test'),('DEFENDER_TEST_ERROR','@event_user created a test that errored'),('DEFENDER_TEST_READY','Test by @event_user is ready'),('GAME_CREATED','Game created'),('GAME_FINISHED','Game Over!'),('GAME_GRACE_ONE','The game is entering grace period one.'),('GAME_GRACE_TWO','The game is entering grace period two.'),('GAME_MESSAGE','@event_user: @chat_message'),('GAME_MESSAGE_ATTACKER','@event_user: @chat_message'),('GAME_MESSAGE_DEFENDER','@event_user: @chat_message'),('GAME_PLAYER_LEFT','@event_user left the game'),('GAME_STARTED','The game has started!');
+INSERT INTO `event_messages`
+VALUES
+  ('ATTACKER_JOINED','@event_user joined the attackers'),
+  ('ATTACKER_MESSAGE','@event_user: @chat_message'),
+  ('ATTACKER_MUTANT_CREATED','@event_user created a mutant'),
+  ('ATTACKER_MUTANT_ERROR','@event_user created a mutant that errored'),
+  ('ATTACKER_MUTANT_KILLED_EQUIVALENT','@event_user proved a mutant non-equivalent'),
+  ('ATTACKER_MUTANT_SURVIVED','@event_user created a mutant that survived'),
+  ('DEFENDER_JOINED','@event_user joined the defenders!'),
+  ('DEFENDER_KILLED_MUTANT','@event_user killed a mutant'),
+  ('DEFENDER_MESSAGE','@event_user: @chat_message'),
+  ('DEFENDER_MUTANT_CLAIMED_EQUIVALENT','@event_user claimed a mutant equivalent'),
+  ('DEFENDER_MUTANT_EQUIVALENT','@event_user caught an equivalence'),
+  ('DEFENDER_TEST_CREATED','@event_user created a test'),
+  ('DEFENDER_TEST_ERROR','@event_user created a test that errored'),
+  ('DEFENDER_TEST_READY','Test by @event_user is ready'),
+  ('GAME_CREATED','Game created'),('GAME_FINISHED','Game Over!'),
+  ('GAME_GRACE_ONE','The game is entering grace period one.'),
+  ('GAME_GRACE_TWO','The game is entering grace period two.'),
+  ('GAME_MESSAGE','@event_user: @chat_message'),
+  ('GAME_MESSAGE_ATTACKER','@event_user: @chat_message'),
+  ('GAME_MESSAGE_DEFENDER','@event_user: @chat_message'),
+  ('GAME_PLAYER_LEFT','@event_user left the game'),
+  ('GAME_STARTED','The game has started!');
 /*!40000 ALTER TABLE `event_messages` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
 -- Leaderboard View
 --
+CREATE OR REPLACE VIEW `view_attackers`
+  AS
+    SELECT
+      PA.user_id,
+      count(M.Mutant_ID) AS NMutants,
+      sum(M.Points)      AS AScore
+    FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID
+    GROUP BY PA.user_id;
+
+CREATE OR REPLACE VIEW `view_defenders`
+  AS
+    SELECT
+      PD.user_id,
+      count(T.Test_ID)     AS NTests,
+      sum(T.Points)        AS DScore,
+      sum(T.MutantsKilled) AS NKilled
+    FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID
+    GROUP BY PD.user_id;
 
 CREATE OR REPLACE VIEW `view_leaderboard`
 AS
@@ -369,22 +410,9 @@ AS
     IFNULL(DScore, 0)                     AS DScore,
     IFNULL(NKilled, 0)                    AS NKilled,
     IFNULL(AScore, 0) + IFNULL(DScore, 0) AS TotalScore
-  FROM users U LEFT JOIN
-    (SELECT
-       PA.user_id,
-       count(M.Mutant_ID) AS NMutants,
-       sum(M.Points)      AS AScore
-     FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID
-     GROUP BY PA.user_id) AS Attacker ON U.user_id = Attacker.user_id
-    LEFT JOIN
-    (SELECT
-       PD.user_id,
-       count(T.Test_ID)     AS NTests,
-       sum(T.Points)        AS DScore,
-       sum(T.MutantsKilled) AS NKilled
-     FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID
-     GROUP BY PD.user_id)
-      AS Defender ON U.user_id = Defender.user_id
+  FROM users U
+    LEFT JOIN view_attackers ON U.user_id = view_attackers.user_id
+    LEFT JOIN view_defenders ON U.user_id = view_defenders.user_id
   WHERE U.user_id > 2; -- Ignore automated players
 
 --
@@ -396,8 +424,10 @@ INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`) VALUES (2, 'Tes
 
 -- Event to activate multiplayer game
 SET @@global.event_scheduler = 1;
--- HANDLING OF EQUIVALENCES AFTER TIME EXPIRATION
 
+--
+-- Handling equivalences after time expiration
+--
 DROP PROCEDURE IF EXISTS proc_multiplayer_task;
 
 DELIMITER //

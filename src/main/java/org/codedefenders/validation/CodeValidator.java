@@ -6,17 +6,15 @@ import com.github.javaparser.TokenMgrError;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.ArrayUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.LinkedList;
 import java.util.regex.Pattern;
-
-import static org.junit.Assert.assertTrue;
 
 /**
  * @author Jose Rojas
@@ -44,7 +42,6 @@ public class CodeValidator {
 	}
 
 	private static boolean validInsertion(String diff) {
-		InputStream is = new ByteArrayInputStream(diff.getBytes(StandardCharsets.UTF_8));
 		try {
 			BlockStmt blockStmt = JavaParser.parseBlock("{ " + diff + " }");
 			MutationVisitor visitor = new MutationVisitor();
@@ -53,7 +50,7 @@ public class CodeValidator {
 		} catch (ParseException|TokenMgrError e) {
 			// diff did not compile as a block, let's try some regex
 			// TODO: there must be a better way of doing this
-			logger.warn("Swallowing ParseException|TokenMgrError");
+			logger.warn("Swallowing exception. Could not parse diff \"{}\" as a block.", diff);
 			// remove whitespaces
 			String diff2 = diff.replaceAll("\\s+","");
 			// forbid logical operators unless they appear on their own (LOR)
@@ -62,9 +59,13 @@ public class CodeValidator {
 				return false;
 			}
 			// forbid if, while, for, and system calls, and ?: operator
-			String regex = "(?:(?:if|while|for)\\s*\\(.*|[\\s\\;\\{\\(\\)]System\\.|[\\s\\;\\{\\(\\)]Random\\.|^System\\.|^Random\\.|\\?.*\\:)";
+			String regex = "(?:(?:if|while|for)\\s*\\(.*|[\\s;{()]System\\.|[\\s;{()]Random\\.|^System\\.|^Random\\.|\\?.*:)";
 			Pattern p = Pattern.compile(regex);
-			return ! p.matcher(diff2).find();
+			if (p.matcher(diff2).find())
+				return false;
+
+			// Ternary operator is a pain. If "?" exists, assume diff is invalid.
+			return ! diff2.contains("?"); // TODO: Is there a better way to handle this?
 		}
 	}
 
@@ -77,8 +78,8 @@ public class CodeValidator {
 		return visitor.isValid();
 	}
 
-	public static CompilationUnit getCompilationUnit(String javaFile) {
-		FileInputStream in = null;
+	private static CompilationUnit getCompilationUnit(String javaFile) {
+		FileInputStream in;
 		try {
 			in = new FileInputStream(javaFile);
 			CompilationUnit cu;

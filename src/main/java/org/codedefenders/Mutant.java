@@ -4,6 +4,7 @@ import difflib.Chunk;
 import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.duel.DuelGame;
@@ -23,7 +24,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class Mutant implements Serializable {
 
@@ -125,12 +128,9 @@ public class Mutant implements Serializable {
 		return classFile;
 	}
 
-	public String getFolder() {
-		int lio = javaFile.lastIndexOf("/");
-		if (lio == -1) {
-			lio = javaFile.lastIndexOf("\\");
-		}
-		return javaFile.substring(0, lio);
+	public String getDirectory() {
+		File file = new File(javaFile);
+		return file.getAbsoluteFile().getParent();
 	}
 
 	public boolean isAlive() {
@@ -163,6 +163,15 @@ public class Mutant implements Serializable {
 		setEquivalent(equivalent);
 
 		update();
+	}
+
+	public boolean isCovered() {
+		List<Test> tests = DatabaseAccess.getExecutableTests(gameId,true);
+		for (Test t : tests) {
+			if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), getLines()))
+				return true;
+		}
+		return false;
 	}
 
 	/**

@@ -12,10 +12,7 @@ import org.codedefenders.singleplayer.SinglePlayerGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
-import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,11 +36,7 @@ public class DatabaseAccess {
 	}
 
 	public static Connection getConnection() throws SQLException, NamingException {
-		Context initialContext = new InitialContext();
-		Context environmentContext = (Context) initialContext.lookup("java:comp/env");
-		String dataResourceName = "jdbc/codedefenders";
-		DataSource dataSource = (DataSource) environmentContext.lookup(dataResourceName);
-		return dataSource.getConnection();
+		return DatabaseConnection.getConnection();
 	}
 
 
@@ -498,8 +491,7 @@ public class DatabaseAccess {
 
 		Connection conn = null;
 		Statement stmt = null;
-		String sql = null;
-
+		String sql;
 		try {
 
 			// Load the MultiplayerGame Data with the provided ID.
@@ -526,9 +518,6 @@ public class DatabaseAccess {
 					gameRecord = new DuelGame(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
 							rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), GameState.valueOf(rs.getString("State")),
 							GameLevel.valueOf(rs.getString("Level")), GameMode.valueOf(rs.getString("Mode")));
-
-				stmt.close();
-				conn.close();
 				return gameRecord;
 			}
 		} catch (SQLException se) {

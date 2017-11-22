@@ -42,6 +42,10 @@ public class GameManager extends HttpServlet {
 		logger.debug("Getting game " + gid + " for " + uid);
 
 		DuelGame activeGame = DatabaseAccess.getGameForKey("ID", gid);
+		if (activeGame == null) {
+			response.sendRedirect("games/user");
+			return;
+		}
 		session.setAttribute("game", activeGame);
 
 		// If the game is finished, redirect to the score page.
@@ -211,6 +215,24 @@ public class GameManager extends HttpServlet {
 				// Get the text submitted by the user.
 				String mutantText = request.getParameter("mutant");
 
+				if (! isMutantValid(activeGame.getClassId(), mutantText)) {
+					// Mutant is either the same as the CUT or it contains invalid code
+					// Do not restore mutated code
+					messages.add(MUTANT_INVALID_MESSAGE);
+					break;
+				}
+				Mutant existingMutant = existingMutant(activeGame.getId(), mutantText);
+				if (existingMutant != null) {
+					messages.add(MUTANT_DUPLICATED_MESSAGE);
+					TargetExecution existingMutantTarget = DatabaseAccess.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
+					if (existingMutantTarget != null
+							&& !existingMutantTarget.status.equals("SUCCESS")
+							&& existingMutantTarget.message != null && !existingMutantTarget .message.isEmpty()) {
+						messages.add(existingMutantTarget.message);
+					}
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+					break;
+				}
 				Mutant newMutant = createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "sp");
 				if (newMutant != null) {
 					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
@@ -245,8 +267,9 @@ public class GameManager extends HttpServlet {
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
 					}
 				} else {
-					// Create Mutant failed because there were no differences between mutant and original, returning -1
-					messages.add(MUTANT_INVALID_MESSAGE);
+					messages.add(MUTANT_CREATION_ERROR_MESSAGE);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+					logger.error("Error creating mutant. Game: {}, Class: {}, User: {}", activeGame.getId(), activeGame.getClassId(), uid, mutantText);
 				}
 				break;
 
@@ -257,17 +280,19 @@ public class GameManager extends HttpServlet {
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
 				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
-				if (newTest == null) {
-					messages.add(TEST_INVALID_MESSAGE);
-					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect("play");
-					return;
-				}
+
 				logger.debug("New Test " + newTest.getId());
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-				if (compileTestTarget.status.equals("SUCCESS")) {
-					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+				if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
+					if (! CodeValidator.validTestCode(newTest.getJavaFile())) {
+						messages.add(TEST_INVALID_MESSAGE);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						response.sendRedirect("play");
+						return;
+					}
+					// the test is valid, but does it pass on the original class?
+					TargetExecution testOriginalTarget = AntRunner.testOriginal(new File(newTest.getDirectory()), newTest);
 					if (testOriginalTarget.status.equals("SUCCESS")) {
 						messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 						MutationTester.runTestOnAllMutants(activeGame, newTest, messages);
@@ -299,29 +324,32 @@ public class GameManager extends HttpServlet {
 		response.sendRedirect("play");//doGet(request, response);
 	}
 
-	public static Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
-
+	public static boolean isMutantValid(int cid, String mutatedCode) throws IOException {
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
-		String classMutatedBaseName = classMutated.getBaseName();
 
 		File sourceFile = new File(classMutated.getJavaFile());
 		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
-		// If there were no differences, return, as the mutant is the same as original.
-		if (! CodeValidator.validMutant(sourceCode, mutatedCode))
-			return null;
-
-		// If another mutant with same md5 exists
+		// is it an actual mutation?
 		String md5CUT = CodeValidator.getMD5(sourceCode);
 		String md5Mutant = CodeValidator.getMD5(mutatedCode);
-		if (md5CUT.equals(md5Mutant))
-			return null;
 
-		// The insertion of a mutant will check (game_id,md5) unique later after compilation,
-		// however I am assuming querying the DB now (before compiling) is cheaper
-		Mutant mutantWithSameMD5 = DatabaseAccess.getMutant(gid, md5Mutant);
-		if (mutantWithSameMD5 != null)
-			return null; // a mutant with same MD5 already exists in the game
+		// mutant is valid only if it differs from CUT and does not contain forbidden constructs
+		return (! md5CUT.equals(md5Mutant)) && CodeValidator.validMutant(sourceCode, mutatedCode);
+	}
+
+	public static Mutant existingMutant(int gid, String mutatedCode) throws IOException {
+		String md5Mutant = CodeValidator.getMD5(mutatedCode);
+
+		// return the mutant in the game with same MD5 if it exists; return null otherwise
+		return DatabaseAccess.getMutant(gid, md5Mutant);
+	}
+
+	public static Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
+		// Mutant is assumed valid here
+
+		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
+		String classMutatedBaseName = classMutated.getBaseName();
 
 		// Setup folder the files will go in
 		File newMutantDir = FileManager.getNextSubDir(Constants.MUTANTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
@@ -337,11 +365,12 @@ public class GameManager extends HttpServlet {
 		bw.write(mutatedCode);
 		bw.close();
 
+		// sanity check
+		String md5Mutant = CodeValidator.getMD5(mutatedCode);
 		String md5FromMutantFile = CodeValidator.getMD5FromFile(mutantFileName);
-		logger.info("md5CUT: {}\nmd5Mutant:{}\nmd5FromMutantFile: {}", md5CUT, md5Mutant, md5FromMutantFile);
-		assert (md5Mutant.equals(md5FromMutantFile)); // sanity check
+		assert md5Mutant.equals(md5FromMutantFile) : "MD5 hashes differ between code as text and code from new file";
 
-		// Compile the mutant - if you can, add it to the MultiplayerGame State, otherwise, delete these files created.
+		// Compile the mutant and add it to the game if possible; otherwise, TODO: delete these files created?
 		return AntRunner.compileMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
 	}
 
@@ -363,18 +392,7 @@ public class GameManager extends HttpServlet {
 
 		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
-		if (!CodeValidator.validTestCode(javaFile)) {
-			return null;
-		}
-
-		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
-		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
-
-		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-			AntRunner.testOriginal(newTestDir, newTest);
-		}
-		return newTest;
+		return AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
 	}
 
 }

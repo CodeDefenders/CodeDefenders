@@ -101,7 +101,10 @@ if (role == Role.ATTACKER && true){
 									<p><%=change%><p>
 									<% } %></td>
 								<td class="col-sm-1">
-									<% if (role.equals(Role.DEFENDER) && m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO) && !mg.getState().equals(GameState.FINISHED)){ %>
+									<% if (role.equals(Role.DEFENDER)
+											&& m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
+											&& !mg.getState().equals(GameState.FINISHED)
+											&& m.isCovered()){ %>
 										<a href="multiplayer/play?equivLine=<%=m.getLines().get(0)%>"
 										 class="btn btn-default btn-diff"
 										 onclick="return confirm('This will mark all mutants on line <%=m.getLines().get(0)%> as equivalent. Are you sure?');">
@@ -110,7 +113,7 @@ if (role == Role.ATTACKER && true){
 									if (m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){
 										%><span>Flagged Equivalent</span><%
 									}%>
-									<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(GameLevel.EASY)){ %>
+									<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(GameLevel.EASY) || mg.getState() == GameState.FINISHED){ %>
 										<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 									<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
 										 style="z-index: 10000;">

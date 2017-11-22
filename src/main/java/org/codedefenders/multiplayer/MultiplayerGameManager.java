@@ -5,6 +5,7 @@ import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
 import org.codedefenders.events.EventType;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,6 +170,24 @@ public class MultiplayerGameManager extends HttpServlet {
 					// Get the text submitted by the user.
 					String mutantText = request.getParameter("mutant");
 
+					if (! GameManager.isMutantValid(activeGame.getClassId(), mutantText)) {
+						// Mutant is either the same as the CUT or it contains invalid code
+						// Do not restore mutated code
+						messages.add(MUTANT_INVALID_MESSAGE);
+						break;
+					}
+					Mutant existingMutant = GameManager.existingMutant(activeGame.getId(), mutantText);
+					if (existingMutant != null) {
+						messages.add(MUTANT_DUPLICATED_MESSAGE);
+						TargetExecution existingMutantTarget = DatabaseAccess.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
+						if (existingMutantTarget != null
+								&& !existingMutantTarget.status.equals("SUCCESS")
+								&& existingMutantTarget.message != null && !existingMutantTarget .message.isEmpty()) {
+							messages.add(existingMutantTarget.message);
+						}
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+						break;
+					}
 					Mutant newMutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "mp");
 					if (newMutant != null) {
 						TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
@@ -193,8 +212,9 @@ public class MultiplayerGameManager extends HttpServlet {
 							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
 						}
 					} else {
-						// Create Mutant failed because there were no differences between mutant and original, returning -1
-						messages.add(MUTANT_INVALID_MESSAGE);
+						messages.add(MUTANT_CREATION_ERROR_MESSAGE);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+						logger.error("Error creating mutant. Game: {}, Class: {}, User: {}", activeGame.getId(), activeGame.getClassId(), uid, mutantText);
 					}
 				} else {
 					messages.add(GRACE_PERIOD_MESSAGE);
@@ -208,17 +228,19 @@ public class MultiplayerGameManager extends HttpServlet {
 
 					// If it can be written to file and compiled, end turn. Otherwise, dont.
 					Test newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
-					if (newTest == null) {
-						messages.add(TEST_INVALID_MESSAGE);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect("play");
-						return;
-					}
+
 					logger.info("New Test " + newTest.getId() + " by user " + uid);
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-					if (compileTestTarget.status.equals("SUCCESS")) {
-						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+					if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
+						if (! CodeValidator.validTestCode(newTest.getJavaFile())) {
+							messages.add(TEST_INVALID_MESSAGE);
+							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+							response.sendRedirect("play");
+							return;
+						}
+						// the test is valid, but does it pass on the original class?
+						TargetExecution testOriginalTarget = AntRunner.testOriginal(new File(newTest.getDirectory()), newTest);
 						if (testOriginalTarget.status.equals("SUCCESS")) {
 							messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 

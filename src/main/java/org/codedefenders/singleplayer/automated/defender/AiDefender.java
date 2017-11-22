@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -170,7 +169,7 @@ public class AiDefender extends AiPlayer {
 			newExec.insert();
 			MutationTester.runTestOnAllMutants(game, t, messages);
 			DatabaseAccess.setAiTestAsUsed(origTestNum, game);
-			File dir = new File(origT.getFolder());
+			File dir = new File(origT.getDirectory());
 			AntRunner.testOriginal(dir, t);
 			game.update();
 		}

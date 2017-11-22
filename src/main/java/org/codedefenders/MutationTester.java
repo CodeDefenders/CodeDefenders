@@ -62,6 +62,8 @@ public class MutationTester {
 		User u = DatabaseAccess.getUserFromPlayer(test.getPlayerId());
 
 		for (Mutant mutant : mutants) {
+			if(!test.isMutantCovered(mutant))
+				continue;
 			if (testVsMutant(test, mutant)){
 				killed++;
 				killedMutants.add(mutant);
@@ -125,6 +127,9 @@ public class MutationTester {
 		User u = DatabaseAccess.getUserFromPlayer(mutant.getPlayerId());
 
 		for (Test test : tests) {
+			if(!test.isMutantCovered(mutant))
+				continue;
+
 			// If this mutant/test pairing hasnt been run before and the test might kill the mutant
 			if (testVsMutant(test, mutant)) {
 				logger.info("Test {} kills mutant {}", test.getId(), mutant.getId());

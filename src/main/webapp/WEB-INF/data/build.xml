@@ -61,15 +61,9 @@
 		<javac srcdir="${test.file}" destdir="${test.file}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false"/>
 	</target>
 
-	<target name="echo-path" description="Echo test path">
-		<pathconvert targetos="unix" property="test.path.unix" refid="test.cp"/>
-		<echo message="Test path: ${test.path.unix}"/>
-	</target>
-
 	<!-- requires test to compile, and the classname of the file you are testing -->
-	<target name="test-original" depends="echo-path" description="run test on original code to ensure it passes">
-		<jacoco:coverage enabled="true" destFile="${test.file}/jacoco.exec"  dumponexit="true"
-						 classdumpdir="">
+	<target name="test-original" description="run test on original code to ensure it passes">
+		<jacoco:coverage enabled="true" destFile="${test.file}/jacoco.exec"  dumponexit="true" >
 			<junit printsummary="true" haltonfailure="false"  includeantruntime="true" fork="true" clonevm="true">
 				<classpath refid="test.cp" />
 				<classpath location="${test.file}"/>
@@ -95,23 +89,6 @@
 			<jvmarg value="-Djava.security.manager" />
 			<jvmarg value="-Djava.security.policy==${policyfile}" />
 		</junit>
-	</target>
-	<target name="jacoco-report">
-		<jacoco:report>
-			<executiondata>
-				<file file="jacoco.exec"/>
-			</executiondata>
-
-			<structure name="Example Project">
-				<classfiles>
-					<fileset dir="/var/lib/codedefenders/sources/Inflection"/>
-				</classfiles>
-				<sourcefiles encoding="UTF-8">
-					<fileset dir="/var/lib/codedefenders/sources/Inflection"/>
-				</sourcefiles>
-			</structure>
-		<html destdir="report"/>
-		</jacoco:report>
 	</target>
 
 	<target name="mutant-gen-cut" description="generate mutants using major">
