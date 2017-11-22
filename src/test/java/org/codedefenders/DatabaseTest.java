@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
+import org.codedefenders.rules.DatabaseRule;
 import org.junit.Rule;
 import org.junit.Test;
 

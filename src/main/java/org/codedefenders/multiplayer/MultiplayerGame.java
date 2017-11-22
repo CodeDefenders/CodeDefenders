@@ -251,7 +251,6 @@ public class MultiplayerGame extends AbstractGame {
                 DB.getDBV(new Timestamp(finishDateTime)), DB.getDBV(state.name())};
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-        System.out.println("Game insert Statement is: " + stmt);
         int res = DB.executeUpdateGetKeys(stmt, conn);
         if (res > -1) {
             id = res;
