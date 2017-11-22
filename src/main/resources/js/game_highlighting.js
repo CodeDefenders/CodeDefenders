@@ -54,7 +54,7 @@ var mutantLine = function (lineQuant, superDiv) {
 
         const mutantsOnLine = mol;
 
-        var content = '<span style="background-color: #f00; color: #fff; padding-left: 25px; position: absolute;" id="mutationPopup"> ' + quant + ' mutants on line ' + lineNum + ' (Mutants: ' + mutantsOnLine + ')';
+        var content = '<span style="background-color: #f00; color: #fff; padding-left: 50px; position: absolute; z-index:20000;" id="mutationPopup"> ' + quant + ' mutants on line ' + lineNum + ' (Mutants: ' + mutantsOnLine + ')';
         // Do we have access to line differences (not if defender)
         if (lineQuant.difference &&
             lineQuant.difference.deltas &&
@@ -111,7 +111,9 @@ var mutantKilledLine = function (lineQuant, superDiv) {
 
         const mutantsOnLine = mol;
 
-        var content = '<span style="background-color: #090; color: #fff; position: absolute;" id="mutationPopup"> ' + quant + ' killed mutants on line ' + lineNum;
+        var content = '<span style="background-color: #090; color: #fff; position: absolute; z-index:20000;" id="mutationPopup"> ' + quant + ' killed' +
+            ' mutants' +
+            ' on line ' + lineNum;
         content += '</span>'
 
         killedLineContent[lineNum] = content;
@@ -133,6 +135,62 @@ var drawKilledMutants = function (lineNum, ele) {
     if (!$.contains(ele, $('#mutationPopup')[0])) {
         $('#mutationPopup').remove();
         var content = killedLineContent[lineNum];
+        $(ele).append(content);
+    }
+};
+
+
+equivLineContent = [];
+
+var mutantEquivLine = function (lineQuant, superDiv) {
+    if (!superDiv) {
+        superDiv = "#cut-div";
+    }
+    var allLines = [];
+    $(superDiv + ' .CodeMirror-linenumber').each(function (i, e) {
+        var line = parseInt(e.innerHTML);
+        allLines[line] = $(e).parent("div").parent("div")[0];
+    });
+    for (var l in lineQuant) {
+        const lineNum = lineQuant[l][0];
+        const quant = lineQuant[l][1];
+        const id = "eline" + lineQuant[l][0];
+        $(allLines[lineQuant[l][0]]).before('<div id="' + id + '" style="width: 20px; height: 20px; margin-left: 25px; float: left; margin-right: -25px; position: relative; z-index:2000;"><img src="images/mutantEquiv.png" alt="' + lineQuant[l][1] + ' mutants on line ' + lineQuant[l][0] + '" width="20" /></div>');
+        const divId = "#" + id;
+        var mol = "";
+
+        for (var ml in lineQuant[l][2]) {
+            mol = mol + lineQuant[l][2][ml] + ",";
+        }
+
+        const mutantsOnLine = mol;
+
+        var content = '<span style="background-color: #c841dd; color: #fff; position: absolute; z-index:20000; padding-left: 25px;" id="mutationPopup"> ' + quant + ' mutants' +
+            ' marked' +
+            ' equivalent on' +
+            ' line' +
+            ' ' + lineNum;
+        content += '</span>'
+
+        equivLineContent[lineNum] = content;
+
+        $(divId).hover(
+            function () {
+                clearTimeout(timeoutFunction);
+                drawEquivMutants(lineNum, this);
+            }, function () {
+                timeoutFunction = setTimeout(function () {
+                    $('#mutationPopup').fadeOut(500);
+                }, 5000);
+            }
+        );
+    }
+};
+
+var drawEquivMutants = function (lineNum, ele) {
+    if (!$.contains(ele, $('#mutationPopup')[0])) {
+        $('#mutationPopup').remove();
+        var content = equivLineContent[lineNum];
         $(ele).append(content);
     }
 };

@@ -153,11 +153,12 @@
 
     List<Mutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();
     Map<Integer, List<Mutant>> mutantLines = new HashMap<>();
+    Map<Integer, List<Mutant>> mutantEquivPending = new HashMap<>();
     Map<Integer, List<Mutant>> mutantKilledLines = new HashMap<>();
 
 
     // Ensure that mutants marked equivalent are drawn to display
-    mutantsAlive.addAll(mutantsEquiv);
+    //mutantsAlive.addAll(mutantsEquiv);
 
     for (Mutant m : mutantsAlive) {
         for (int line : m.getLines()){
@@ -170,9 +171,18 @@
         }
     }
 
-    for (Mutant m : mutantsPending){
-        mutantsAlive.add(m);
+    for (Mutant m : mutantsPending) {
+        for (int line : m.getLines()){
+            if (!mutantEquivPending.containsKey(line)){
+                mutantEquivPending.put(line, new ArrayList<Mutant>());
+            }
+            mutantEquivPending.get(line).add(m);
+        }
     }
+
+//    for (Mutant m : mutantsPending){
+//        mutantsAlive.add(m);
+//    }
 
 
     List<Mutant> mutantsKilled = mg.getKilledMutants();
