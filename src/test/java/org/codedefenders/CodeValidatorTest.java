@@ -4,7 +4,6 @@ import org.junit.Test;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.regex.Pattern;
 
 import static org.codedefenders.validation.CodeValidator.validMutant;
 import static org.codedefenders.validation.CodeValidator.validTestCode;
@@ -90,12 +89,11 @@ public class CodeValidatorTest {
 	}
 
 	@Test
-	public void testValidMutant3() {
+	public void testInValidMutant3() {
 		String orig = "int x = 0;";
 		String mutant = "int x = 0; x++;";
 
-		
-		assertTrue(validMutant(orig, mutant));
+		assertFalse("Should be invalid as mutant has multiple statements per line", validMutant(orig, mutant));
 	}
 
 	@Test
@@ -103,7 +101,7 @@ public class CodeValidatorTest {
 		String orig = "int x = 0;";
 		String mutant = "int x = 0; if (x>0) {return false;}";
 
-		
+
 		assertFalse(validMutant(orig, mutant));
 	}
 
@@ -148,5 +146,30 @@ public class CodeValidatorTest {
 		String mutant = "if (!isHierachic(\"test.value\"))"; // raises com.github.javaparser.TokenMgrException
 		assertTrue(validMutant(orig, mutant));
 	}
+
+
+	@org.junit.Test
+	public void testMultipleStatements() throws Exception {
+		assertFalse(validMutant("mul();", "mul(); add();"));
+		assertFalse(validMutant("for (int i = 0; i <= 10; i ++) {", "mul(); for (int i = 0; i <= 10; i ++) {"));
+	}
+
+	@org.junit.Test
+	public void testBitshifts() throws Exception {
+		assertFalse(validMutant("r.num = r.num;", "r.num = r.num | ((r.num & (1 << 29)) << 1);"));
+		assertFalse(validMutant("r.num = r.num;", "r.num = r.num << 1+344;"));
+	}
+
+	@org.junit.Test
+	public void testSignatureChange() throws Exception {
+		assertFalse(validMutant("public class Rational  {", "public final class Rational  {"));
+		assertFalse(validMutant("class Rational  {", "public class Rational  {"));
+		assertFalse(validMutant("class Rational  {", "final class Rational  {"));
+		assertFalse(validMutant("public class Rational  {", "class Rational  {"));
+		assertFalse(validMutant("public class Rational  {", "protected class Rational  {"));
+		assertFalse(validMutant("final class Rational  {", "class Rational  {"));
+
+	}
+
 
 }
