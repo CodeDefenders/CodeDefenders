@@ -14,4 +14,9 @@
 	<Environment name="mutant.coverage" type="java.lang.String"
 		value="${mutant.coverage}" />
 
+	<Environment
+			name="mutant.coverage"
+			type="java.lang.String"
+			value="${mutant.coverage}" />
+
 </Context>

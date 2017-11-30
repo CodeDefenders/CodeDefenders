@@ -20,7 +20,6 @@
 
 		<plugins>
 			<!-- Fails if the ${config.properties} file does not exists -->
-			<!-- NOTE: it does not check that properties have values -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
@@ -149,6 +148,7 @@
 					<contextReloadable>true</contextReloadable>
 				</configuration>
 			</plugin>
+
 		</plugins>
 		<finalName>${project.artifactId}</finalName>
 	</build>
@@ -219,9 +219,6 @@
 			</build>
 		</profile>
 	</profiles>
-
-
-
 
 	<dependencies>
 		<dependency>
