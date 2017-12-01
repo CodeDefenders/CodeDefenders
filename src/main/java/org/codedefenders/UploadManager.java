@@ -78,7 +78,7 @@ public class UploadManager extends HttpServlet {
 					if (fieldName.equals("fileUpload") && !fileName.isEmpty()) {
 						StringWriter writer = new StringWriter();
 						IOUtils.copy(item.getInputStream(), writer, "UTF-8");
-						fileContent = writer.toString();
+						fileContent = writer.toString().trim();
 					}
 				}
 			}
@@ -86,7 +86,7 @@ public class UploadManager extends HttpServlet {
 			throw new ServletException("Cannot parse multipart request.", e);
 		}
 
-		//Not a java file
+		// Not a java file
 		if (!fileName.endsWith(".java")) {
 			messages.add("The class under test must be a .java file.");
 			response.sendRedirect(request.getHeader("referer"));
@@ -103,7 +103,7 @@ public class UploadManager extends HttpServlet {
 		// alias provided
 		if (classAlias != null && !classAlias.isEmpty()) {
 			// check if basename exists as CUT dir
-			logger.info("Checking if alias {0} is a good directory to store the class", classAlias);
+			logger.info("Checking if alias {} is a good directory to store the class", classAlias);
 			GameClass cut = new GameClass("", classAlias, "", "");
 			if (cut.insert()) {
 				storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI);
@@ -114,7 +114,7 @@ public class UploadManager extends HttpServlet {
 
 		// try with basename as alias
 		String baseName = FilenameUtils.getBaseName(fileName);
-		logger.info("Checking if base name {0} is a good directory to store the class", baseName);
+		logger.info("Checking if base name {} is a good directory to store the class", baseName);
 		GameClass cut = new GameClass("", baseName, "", "");
 		if (cut.insert()) {
 			storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI);
@@ -125,7 +125,7 @@ public class UploadManager extends HttpServlet {
 		// now try fully qualified name
 		String fullName = getFullyQualifiedName(fileName, fileContent);
 		cut = new GameClass("", fullName, "", "");
-		logger.info("Checking if full name {0} is a good directory to store the class", fullName);
+		logger.info("Checking if full name {} is a good directory to store the class", fullName);
 		if (cut.insert()) {
 			storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI);
 			return;
@@ -133,7 +133,7 @@ public class UploadManager extends HttpServlet {
 			// Neither alias nor basename or fullname are good, make up a name using a suffix
 			int index = 2;
 			cut = new GameClass("", baseName + index, "", "");
-			while (! cut.insert()) {
+			while (!cut.insert()) {
 				index++;
 				cut.setAlias(baseName + index);
 			}
@@ -147,13 +147,13 @@ public class UploadManager extends HttpServlet {
 
 		String cutDir = Constants.CUTS_DIR + Constants.F_SEP + cut.getAlias();
 		File targetFile = new File(cutDir + Constants.F_SEP + fileName);
-		assert (! targetFile.exists());
+		assert (!targetFile.exists());
 
 		FileUtils.writeStringToFile(targetFile, fileContent);
 		String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
 		// Create CUT, temporarily using file name as class name for compilation
 		cut.setJavaFile(javaFileNameDB);
-		//Compile original class, using alias as directory name
+		// Compile original class, using alias as directory name
 		String classFileName = AntRunner.compileCUT(cut);
 
 		if (classFileName != null) {
@@ -169,9 +169,9 @@ public class UploadManager extends HttpServlet {
 			cut.setClassFile(classFileNameDB);
 			cut.update();
 
-			if(shouldPrepareAI) {
+			if (shouldPrepareAI) {
 				//Prepare AI classes, by generating tests and mutants.
-				if(!PrepareAI.createTestsAndMutants(cut.getId())) {
+				if (!PrepareAI.createTestsAndMutants(cut.getId())) {
 					messages.add("Preparation of AI for the class failed, please prepare the class again, or try a different class.");
 				}
 			}
@@ -195,7 +195,7 @@ public class UploadManager extends HttpServlet {
 			FileUtils.writeStringToFile(tmpFile, fileContent);
 			FileInputStream in = new FileInputStream(tmpFile);
 			CompilationUnit cu = JavaParser.parse(in);
-			if (null != cu && null != cu.getPackage() && ! cu.getPackage().getName().getName().isEmpty())
+			if (null != cu && null != cu.getPackage() && !cu.getPackage().getName().getName().isEmpty())
 				return cu.getPackage().getName() + "." + FilenameUtils.getBaseName(fileName);
 		} catch (IOException e) {
 			e.printStackTrace();
