@@ -54,7 +54,7 @@
     List<Mutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();
 
     Map<Integer, List<Mutant>> mutantLines = new HashMap<>();
-
+    Map<Integer, List<Mutant>> mutantEquivPending = new HashMap<>();
     Map<Integer, List<Mutant>> mutantKilledLines = new HashMap<>();
 
     List<Mutant> mutantsPending = new ArrayList<>(); // assume no pending tasks
@@ -70,6 +70,19 @@
         }
     }
 
+    for (Mutant m : mutantsPending) {
+        for (int line : m.getLines()){
+            if (!mutantEquivPending.containsKey(line)){
+                mutantEquivPending.put(line, new ArrayList<Mutant>());
+            }
+            mutantEquivPending.get(line).add(m);
+        }
+    }
+
+//    for (Mutant m : mutantsPending){
+//        mutantsAlive.add(m);
+//    }
+	mutantsAlive.addAll(mutantsPending);
 
     List<Mutant> mutantsKilled = mg.getKilledMutants();
 
@@ -78,9 +91,7 @@
             if (!mutantKilledLines.containsKey(line)){
                 mutantKilledLines.put(line, new ArrayList<Mutant>());
             }
-
             mutantKilledLines.get(line).add(m);
-
         }
     }
     //ArrayList<String> messages = new ArrayList<String>();
