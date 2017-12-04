@@ -1,14 +1,14 @@
 package org.codedefenders;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
+import org.codedefenders.util.DB;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.DatabaseValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 public class User {
 
@@ -41,42 +41,27 @@ public class User {
 	}
 
 	public boolean insert() {
+		DatabaseValue[] valueList;
+		String query;
+		Connection conn = DB.getConnection();
+		logger.debug("Calling BCryptPasswordEncoder.encode");
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		String safePassword = passwordEncoder.encode(password);
 
-		Connection conn = null;
-		Statement stmt = null;
-		String sql = null;
-
-		try {
-			conn = DatabaseAccess.getConnection();
-
-			stmt = conn.createStatement();
-			logger.debug("Calling BCryptPasswordEncoder.encode");
-			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-			String safePassword = passwordEncoder.encode(password);
-
-			if (id <= 0)
-				sql = String.format("INSERT INTO users (Username, Password, Email) VALUES ('%s', '%s', '%s');", username, safePassword, email);
-			else
-				sql = String.format("INSERT INTO users (User_ID, Username, Password, Email) VALUES (%d, '%s', '%s', '%s');", id, username, safePassword, email);
-
-			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
-
-			ResultSet rs = stmt.getGeneratedKeys();
-
-			if (rs.next()) {
-				id = rs.getInt(1);
-				stmt.close();
-				conn.close();
-				return true;
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
+		if (id <= 0) {
+			query = "INSERT INTO users (Username, Password, Email) VALUES (?, ?, ?);";
+			valueList = new DatabaseValue[]{DB.getDBV(username),
+					DB.getDBV(safePassword),
+					DB.getDBV(email)};
+		} else {
+			query = "INSERT INTO users (User_ID, Username, Password, Email) VALUES (?, ?, ?, ?);";
+			valueList = new DatabaseValue[]{DB.getDBV(id),
+					DB.getDBV(username),
+					DB.getDBV(safePassword),
+					DB.getDBV(email)};
 		}
-		return false;
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return DB.executeUpdate(stmt, conn);
 	}
 
 	public boolean isValidated() {
@@ -119,11 +104,11 @@ public class User {
 		DatabaseAccess.logSession(id, ipAddress);
 	}
 
-	public String printFriendly(String color){
+	public String printFriendly(String color) {
 		String username = getUsername();
 
 		return "<span style='color: " + color + "'>@" + getUsername() +
-		"</span>";
+				"</span>";
 	}
 
 }
