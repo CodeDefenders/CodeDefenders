@@ -1,6 +1,41 @@
 package org.codedefenders.multiplayer;
 
-import org.codedefenders.*;
+import static org.codedefenders.Constants.GRACE_PERIOD_MESSAGE;
+import static org.codedefenders.Constants.MUTANT_COMPILED_MESSAGE;
+import static org.codedefenders.Constants.MUTANT_CREATION_ERROR_MESSAGE;
+import static org.codedefenders.Constants.MUTANT_DUPLICATED_MESSAGE;
+import static org.codedefenders.Constants.MUTANT_INVALID_MESSAGE;
+import static org.codedefenders.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
+import static org.codedefenders.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
+import static org.codedefenders.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
+import static org.codedefenders.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
+import static org.codedefenders.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
+import static org.codedefenders.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
+import static org.codedefenders.Constants.TEST_INVALID_MESSAGE;
+import static org.codedefenders.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
+import static org.codedefenders.Constants.TEST_PASSED_ON_CUT_MESSAGE;
+import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.codedefenders.AntRunner;
+import org.codedefenders.GameManager;
+import org.codedefenders.GameState;
+import org.codedefenders.Mutant;
+import org.codedefenders.MutationTester;
+import org.codedefenders.TargetExecution;
+import org.codedefenders.Test;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
 import org.codedefenders.events.EventType;
@@ -8,20 +43,6 @@ import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import java.io.*;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.codedefenders.Constants.*;
-import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 
 public class MultiplayerGameManager extends HttpServlet {
 
@@ -33,7 +54,20 @@ public class MultiplayerGameManager extends HttpServlet {
 		ArrayList<String> messages = new ArrayList<String>();
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
-		int gameId = (Integer) session.getAttribute("mpGameId");
+		// The following raises exception when playing around with curl, not sure it's a feature.
+		//		int gameId = (Integer) session.getAttribute("mpGameId");
+		// Why this must be set with the session from game_view.jsp ?
+		int gameId = -1;
+		if (session.getAttribute("mpGameId") != null) {
+			gameId = (Integer) session.getAttribute("mpGameId");
+		} else if (request.getAttribute("mpGameID") != null) {
+			gameId = (Integer) request.getAttribute("mpGameID");
+		} else {
+			// TODO Not sure this is 100% right
+			logger.error("Problem setting gameID !");
+			response.setStatus(500);
+			return;
+		}
 		session.setAttribute("messages", messages);
 
 		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(gameId);
