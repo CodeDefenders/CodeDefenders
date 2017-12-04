@@ -283,23 +283,23 @@ public class Mutant implements Serializable {
 	public boolean insert() {
 
 		Connection conn = null;
-		Statement stmt = null;
-
+		PreparedStatement stmt = null;
 		try {
 			logger.info("Inserting mutant");
-
 			conn = DatabaseAccess.getConnection();
-
-			stmt = conn.createStatement();
-			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
-			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
-			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5)" +
-					" VALUES (%s, %s, %d, %d, %d, %d, %d, '%s');", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), playerId, score, md5);
-
-			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
-
+			String jFileDB = DatabaseAccess.addSlashes(javaFile);
+			String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
+			stmt = conn.prepareStatement("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5)" + " VALUES (?, ?, ?, ?, ?, ?, ?, ?);", Statement.RETURN_GENERATED_KEYS);
+			stmt.setString(1, jFileDB);
+			stmt.setString(2, cFileDB);
+			stmt.setInt(3, gameId);
+			stmt.setInt(4, roundCreated);
+			stmt.setInt(5, sqlAlive());
+			stmt.setInt(6, playerId);
+			stmt.setInt(7, score);
+			stmt.setString(8, md5);
+			stmt.executeUpdate();
 			ResultSet rs = stmt.getGeneratedKeys();
-
 			if (rs.next()) {
 				this.id = rs.getInt(1);
 				System.out.println("setting mutant ID to: " + this.id);
@@ -321,20 +321,19 @@ public class Mutant implements Serializable {
 	// Updates values of Equivalent, Alive, RoundKilled.
 	// These values update when Mutants are suspected of being equivalent, go through an equivalence test, or are killed.
 	public boolean update() {
-
 		logger.info("Updating Mutant {}", getId());
-
 		Connection conn = null;
-		Statement stmt = null;
-
+		PreparedStatement stmt = null;
 		try {
 			conn = DatabaseAccess.getConnection();
-
-			stmt = conn.createStatement();
-			String sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', RoundKilled='%d', NumberAiKillingTests='%d', Points=%d WHERE Mutant_ID='%d';",
-					equivalent.name(), sqlAlive(), roundKilled, killedByAITests, score, id);
-			stmt.execute(sql);
-
+			stmt = conn.prepareStatement("UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, NumberAiKillingTests=?, Points=? WHERE Mutant_ID=?;");
+			stmt.setString(1, equivalent.name());
+			stmt.setInt(2, sqlAlive());
+			stmt.setInt(3, roundKilled);
+			stmt.setInt(4, killedByAITests);
+			stmt.setInt(5, score);
+			stmt.setInt(6, id);
+			stmt.executeUpdate();
 			conn.close();
 			stmt.close();
 			return true;
@@ -351,6 +350,7 @@ public class Mutant implements Serializable {
 	public void setTimesKilledAi(int count) {
 		killedByAITests = count;
 	}
+
 	public int getTimesKilledAi() {
 		if(killedByAITests == 0) {
 			//Retrieve from DB.
@@ -358,12 +358,13 @@ public class Mutant implements Serializable {
 		}
 		return killedByAITests;
 	}
+
 	public void incrementTimesKilledAi() {
 		killedByAITests ++;
 	}
 
 	public ArrayList<Integer> getLines() {
-		if (lines != null){
+		if (lines != null) {
 			return lines;
 		}
 		lines = new ArrayList<>();

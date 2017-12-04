@@ -5,10 +5,7 @@ import org.codedefenders.util.DatabaseAccess;
 
 import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -154,10 +151,26 @@ public class DuelGame extends AbstractGame {
 	}
 
 	public boolean addPlayer(int userId, Role role) {
+		PreparedStatement stmt = null;
+		Connection conn = null;
+		boolean was_success = false;
 
-		String sql = String.format("INSERT INTO players (Game_ID, User_ID, Points, Role) " +
-				"VALUES (%d, %d, 0, '%s');", id, userId, role);
-		if (DatabaseAccess.executeUpdate(sql)) {
+		try {
+			conn = DatabaseAccess.getConnection();
+			stmt = conn.prepareStatement("INSERT INTO players (Game_ID, User_ID, Points, Role) " + "VALUES (?, ?, 0, ?);");
+			stmt.setInt(1, id);
+			stmt.setInt(2, userId);
+			stmt.setString(3, role.toString());
+			was_success = stmt.executeUpdate() >= 0;
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DatabaseAccess.cleanup(conn, stmt);
+		}
+
+		if (was_success) {
 			if (role.equals(Role.ATTACKER))
 				attackerId = userId;
 			else
@@ -171,17 +184,23 @@ public class DuelGame extends AbstractGame {
 	public boolean insert() {
 
 		Connection conn = null;
-		Statement stmt = null;
-		String sql = String.format("INSERT INTO games (Class_ID, Creator_ID, FinalRound, Level, Mode, State) VALUES ('%d', '%d', '%d', '%s', '%s', '%s');", classId, (attackerId != 0) ? attackerId : defenderId, finalRound, level.name(), mode.name(), state.name());
-		logger.info(sql);
+		PreparedStatement stmt = null;
 
 		// Attempt to insert game info into database
 		try {
 			conn = DatabaseAccess.getConnection();
 
-			stmt = conn.createStatement();
 
-			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
+			stmt = conn.prepareStatement("INSERT INTO games (Class_ID, Creator_ID, FinalRound, Level, Mode, State) VALUES (?, ?, ?, ?, ?, ?);");
+			stmt.setInt(1, classId);
+			stmt.setInt(2, (attackerId != 0) ? attackerId : defenderId);
+			stmt.setInt(3, finalRound);
+			stmt.setString(4, level.name());
+			stmt.setString(5, mode.name());
+			stmt.setString(6, state.name());
+
+			logger.info(stmt.toString());
+			stmt.execute();
 
 			ResultSet rs = stmt.getGeneratedKeys();
 

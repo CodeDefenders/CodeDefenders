@@ -5,10 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
 public class User {
 
@@ -43,40 +40,39 @@ public class User {
 	public boolean insert() {
 
 		Connection conn = null;
-		Statement stmt = null;
-		String sql = null;
+		PreparedStatement stmt = null;
+		int res = -1;
 
 		try {
 			conn = DatabaseAccess.getConnection();
 
-			stmt = conn.createStatement();
 			logger.debug("Calling BCryptPasswordEncoder.encode");
 			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 			String safePassword = passwordEncoder.encode(password);
 
-			if (id <= 0)
-				sql = String.format("INSERT INTO users (Username, Password, Email) VALUES ('%s', '%s', '%s');", username, safePassword, email);
-			else
-				sql = String.format("INSERT INTO users (User_ID, Username, Password, Email) VALUES (%d, '%s', '%s', '%s');", id, username, safePassword, email);
-
-			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
-
-			ResultSet rs = stmt.getGeneratedKeys();
-
-			if (rs.next()) {
-				id = rs.getInt(1);
-				stmt.close();
-				conn.close();
-				return true;
+			if (id <= 0) {
+				stmt = conn.prepareStatement("INSERT INTO users (Username, Password, Email) VALUES (?, ?, ?);");
+				stmt.setString(1, username);
+				stmt.setString(2, safePassword);
+				stmt.setString(3, email);
+			} else {
+				stmt = conn.prepareStatement("INSERT INTO users (User_ID, Username, Password, Email) VALUES (?, ?, ?, ?);");
+				stmt.setInt(1, id);
+				stmt.setString(2, username);
+				stmt.setString(3, safePassword);
+				stmt.setString(4, email);
 			}
+
+			return stmt.executeUpdate() > 0;
 		} catch (SQLException se) {
 			logger.error("SQL exception caught", se);
+			return false;
 		} catch (Exception e) {
 			logger.error("Exception caught", e);
+			return false;
 		} finally {
 			DatabaseAccess.cleanup(conn, stmt);
 		}
-		return false;
 	}
 
 	public boolean isValidated() {
