@@ -1,6 +1,21 @@
 package org.codedefenders.util;
 
-import org.codedefenders.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.codedefenders.GameClass;
+import org.codedefenders.GameLevel;
+import org.codedefenders.GameMode;
+import org.codedefenders.GameState;
+import org.codedefenders.Mutant;
+import org.codedefenders.Role;
+import org.codedefenders.TargetExecution;
+import org.codedefenders.Test;
+import org.codedefenders.User;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
@@ -12,9 +27,6 @@ import org.codedefenders.singleplayer.SinglePlayerGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings("ALL")
 public class DatabaseAccess {
@@ -182,7 +194,20 @@ public class DatabaseAccess {
 		String query = "SELECT * FROM classes WHERE AiPrepared = 1 AND Class_ID = ?";
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(c.getId()));
-		return DB.executeUpdateGetKeys(stmt, conn) > -1;
+		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+		try {
+			if (rs.next()) {
+				return true;
+			}
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+			DB.cleanup(conn, stmt);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return false;
 	}
 
 	public static void setAiPrepared(GameClass c) {

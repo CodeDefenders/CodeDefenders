@@ -73,10 +73,9 @@ public class DB {
         return stmt;
     }
 
-    static PreparedStatement createPreparedStatement(Connection conn, String query) {
+    public static PreparedStatement createPreparedStatement(Connection conn, String query) {
         PreparedStatement stmt = null;
         try {
-            conn = DB.getConnection();
             stmt = conn.prepareStatement(query);
         } catch (SQLException se) {
             logger.error("SQLException while creating Statement for query\n\t" + query, se);
@@ -89,7 +88,7 @@ public class DB {
     /*
     * Does not clean up!
      */
-    static ResultSet executeQueryReturnRS(Connection conn, PreparedStatement stmt) {
+    public static ResultSet executeQueryReturnRS(Connection conn, PreparedStatement stmt) {
         try {
             stmt.executeQuery();
             return stmt.getResultSet();

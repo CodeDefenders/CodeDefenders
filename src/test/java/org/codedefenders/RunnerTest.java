@@ -5,9 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Timestamp;
+import java.sql.*;
 import java.util.Arrays;
 
 import org.codedefenders.events.Event;
@@ -16,9 +14,11 @@ import org.codedefenders.events.EventType;
 import org.codedefenders.itests.IntegrationTest;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
+import org.codedefenders.util.DB;
 import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.util.DatabaseConnection;
 import org.codedefenders.validation.CodeValidator;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -70,6 +70,32 @@ public class RunnerTest {
                 });
     }
 
+    @Before
+    public void getNumConnectionsBefore() throws SQLException{
+        numConnectionsBefore = getNumConnections();
+    }
+
+    @After
+    public void checkNumConnectionsAfter() throws SQLException{
+        assertEquals(numConnectionsBefore, getNumConnections());
+    }
+
+
+    private int getNumConnections() throws SQLException {
+        int numConnections = -1;
+
+        Connection conn = DB.getConnection();
+        String query = "SHOW STATUS WHERE Variable_name='threads_connected';";
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query);
+        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+        if (rs.next()) {
+            numConnections = rs.getInt(2);
+        }
+        DB.cleanup(conn, stmt);
+        return numConnections;
+    }
+
+    private User creator;
     private User user1;
     private User user2;
     private MultiplayerGame multiplayerGame;
@@ -77,6 +103,7 @@ public class RunnerTest {
     private GameClass cut2;
     private Mutant mutant1;
     private org.codedefenders.Test test;
+    private int numConnectionsBefore;
 
     @Test
     public void testInsertUser() throws Exception {
@@ -104,7 +131,6 @@ public class RunnerTest {
 
         assertTrue("Should have inserted class", cut2.insert());
         assertEquals(2, DatabaseAccess.getAllClasses().size());
-        PowerMockito.verifyStatic();
     }
 
     @Test
