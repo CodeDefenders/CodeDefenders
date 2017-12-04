@@ -61,7 +61,13 @@ public class User {
 					DB.getDBV(email)};
 		}
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		return DB.executeUpdate(stmt, conn);
+		int key = DB.executeUpdateGetKeys(stmt, conn);
+		if( key != -1 ){
+			this.id = key;
+			return true;
+		} else {
+			 return false;
+		}
 	}
 
 	public boolean isValidated() {

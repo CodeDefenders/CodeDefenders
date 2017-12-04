@@ -43,6 +43,30 @@ Since the config.properties contains also your passwords, please **do not commit
 
 In case you want to provide a file with a different name (let's say config.test), you can add the following option to your maven command: `-Dconfig.properties=config.test` 
 
+## Integration testing
+Before running integration tests, which are activated by using the maven IT profile (-PIT) you need to set up the test resources. Otherwise, the enforcer plugin will break your build.
+
+You can setup the resources by copying the required libraries inside the following folder:
+```
+src/test/resources/itests/lib/
+```
+
+The required libraries are listed inside the following file: ```src/test/resources/itests/lib/libraries.list```
+ 
+Otherwise, you can runn the following script (Mac/Linux and default maven installation) which looks for those libraries in your local maven repository and copies then in the right folder:
+
+```bash
+mvn -U clean compile test-compile
+cd src/test/resources/itests/lib
+for F in $(cat libraries.list); do
+  find ~/.m2 -iname "${F}" -exec cp {} . \;
+done
+cd -
+```
+Once these libraries are in place you can run the integration tests (note the war:war in the command):
+
+```mvn compile test-compile war:war test -PIT```
+
 ## Deployment
 
 ### Tomcat admin user

@@ -180,6 +180,10 @@
 								<include>**/*.class</include>
 							</includes>
 							<excludedGroups>org.codedefenders.itests.IntegrationTest</excludedGroups>
+							<!-- Exclude resources for integration tests. Note that those are actual java and class files for mutants and tests -->
+							<excludes>
+								<exclude>itests/**/*.*</exclude>
+							</excludes>
 						</configuration>
 					</plugin>
 				</plugins>
