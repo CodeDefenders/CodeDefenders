@@ -44,29 +44,28 @@ public class Test {
 
 	private int score;
 
-	public void setLineCoverage(LineCoverage lc){
+	public void setLineCoverage(LineCoverage lc) {
 		lineCoverage = lc;
 	}
 
-	public LineCoverage getLineCoverage(){
+	public LineCoverage getLineCoverage() {
 		return lineCoverage;
 	}
 
-	public void setPlayerId(int id){
+	public void setPlayerId(int id) {
 		playerId = id;
 	}
 
 
-
-	public int getPlayerId(){
+	public int getPlayerId() {
 		return playerId;
 	}
 
-	public int getScore(){
+	public int getScore() {
 		return score;
 	}
 
-	public void setScore(int s){
+	public void setScore(int s) {
 		score += s;
 	}
 
@@ -148,45 +147,12 @@ public class Test {
 		return testLines;
 	}
 
-	public boolean insert() {
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		String sql = null;
-		try {
-			conn = DatabaseAccess.getConnection();
-			String jFileDB = DatabaseAccess.addSlashes(javaFile);
-			// class file can be null
-			String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
-			stmt = conn.prepareStatement("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points) " + "VALUES (?, ?, ?, ?, ?, ?);",
-					Statement.RETURN_GENERATED_KEYS);
-			stmt.setString(1, jFileDB);
-			stmt.setString(2, cFileDB);
-			stmt.setInt(3, gameId);
-			stmt.setInt(4, roundCreated);
-			stmt.setInt(5, playerId);
-			stmt.setInt(6, score);
-			stmt.executeUpdate();
-			ResultSet rs = stmt.getGeneratedKeys();
-			if (rs.next()) {
-				this.id = rs.getInt(1);
-				return true;
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-			DatabaseAccess.cleanup(conn, stmt);
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
-		}
-		return false;
-	}
 
-	public boolean insertRefactored() {
+	public boolean insert() {
 		String jFileDB = DatabaseAccess.addSlashes(javaFile);
 		String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
 
-		Connection conn = null;
+		Connection conn = DB.getConnection();
 		String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points) VALUES (?, ?, ?, ?, ?, ?);";
 		DatabaseValue[] valueList = new DatabaseValue[]{
 				DB.getDBV(jFileDB),
@@ -204,47 +170,34 @@ public class Test {
 
 	public boolean update() {
 		logger.debug("Updating Test");
-		Connection conn = null;
-		PreparedStatement stmt = null;
 		String sql = null;
-		try {
-			conn = DatabaseAccess.getConnection();
-			String linesCoveredString = "";
-			String linesUncoveredString = "";
-			if (lineCoverage != null) {
-				for (int i : lineCoverage.getLinesCovered()) {
-					linesCoveredString += i + ",";
-				}
-				for (int i : lineCoverage.getLinesUncovered()) {
-					linesUncoveredString += i + ",";
-				}
-				if (linesCoveredString.length() > 0) {
-					linesCoveredString = linesCoveredString.substring(0, linesCoveredString.length() - 1);
-				}
-				if (linesUncoveredString.length() > 0) {
-					linesUncoveredString = linesUncoveredString.substring(0, linesUncoveredString.length() - 1);
-				}
+		Connection conn = DB.getConnection();
+		String linesCoveredString = "";
+		String linesUncoveredString = "";
+		if (lineCoverage != null) {
+			for (int i : lineCoverage.getLinesCovered()) {
+				linesCoveredString += i + ",";
 			}
-			//-1 for the left over comma
-			stmt = conn.prepareStatement("UPDATE tests SET mutantsKilled=?, " + "NumberAiMutantsKilled=?, " + "Lines_Covered=?, " + "Lines_Uncovered=?," + "Points = ? " + "WHERE Test_ID=?;");
-			stmt.setInt(1, mutantsKilled);
-			stmt.setInt(2, aiMutantsKilled);
-			stmt.setString(3, linesCoveredString);
-			stmt.setString(4, linesUncoveredString);
-			stmt.setInt(5, score);
-			stmt.setInt(6, id);
-			stmt.executeUpdate();
-			conn.close();
-			stmt.close();
-			return true;
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
+			for (int i : lineCoverage.getLinesUncovered()) {
+				linesUncoveredString += i + ",";
+			}
+			if (linesCoveredString.length() > 0) {
+				linesCoveredString = linesCoveredString.substring(0, linesCoveredString.length() - 1);
+			}
+			if (linesUncoveredString.length() > 0) {
+				linesUncoveredString = linesUncoveredString.substring(0, linesUncoveredString.length() - 1);
+			}
 		}
-		return false;
+		//-1 for the left over comma
+		String query = "UPDATE tests SET mutantsKilled=?, NumberAiMutantsKilled=?, Lines_Covered=?, Lines_Uncovered=?, Points = ? WHERE Test_ID=?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantsKilled),
+				DB.getDBV(aiMutantsKilled),
+				DB.getDBV(linesCoveredString),
+				DB.getDBV(linesUncoveredString),
+				DB.getDBV(score),
+				DB.getDBV(id)};
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return DB.executeUpdate(stmt, conn);
 	}
 
 	public String getFullyQualifiedClassName() {
@@ -270,15 +223,17 @@ public class Test {
 	}
 
 	public int getAiMutantsKilled() {
-		if(aiMutantsKilled == 0) {
+		if (aiMutantsKilled == 0) {
 			//Retrieve from DB.
 			aiMutantsKilled = DatabaseAccess.getNumAiMutantsKilledByTest(getId());
 		}
 		return aiMutantsKilled;
 	}
+
 	public void incrementAiMutantsKilled() {
 		aiMutantsKilled++;
 	}
+
 	public String getJavaFile() {
 		return javaFile;
 	}

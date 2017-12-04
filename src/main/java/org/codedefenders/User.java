@@ -1,11 +1,14 @@
 package org.codedefenders;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
+import org.codedefenders.util.DB;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.DatabaseValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
-import java.sql.*;
 
 public class User {
 
@@ -38,41 +41,27 @@ public class User {
 	}
 
 	public boolean insert() {
+		DatabaseValue[] valueList;
+		String query;
+		Connection conn = DB.getConnection();
+		logger.debug("Calling BCryptPasswordEncoder.encode");
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		String safePassword = passwordEncoder.encode(password);
 
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		int res = -1;
-
-		try {
-			conn = DatabaseAccess.getConnection();
-
-			logger.debug("Calling BCryptPasswordEncoder.encode");
-			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-			String safePassword = passwordEncoder.encode(password);
-
-			if (id <= 0) {
-				stmt = conn.prepareStatement("INSERT INTO users (Username, Password, Email) VALUES (?, ?, ?);");
-				stmt.setString(1, username);
-				stmt.setString(2, safePassword);
-				stmt.setString(3, email);
-			} else {
-				stmt = conn.prepareStatement("INSERT INTO users (User_ID, Username, Password, Email) VALUES (?, ?, ?, ?);");
-				stmt.setInt(1, id);
-				stmt.setString(2, username);
-				stmt.setString(3, safePassword);
-				stmt.setString(4, email);
-			}
-
-			return stmt.executeUpdate() > 0;
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-			return false;
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-			return false;
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
+		if (id <= 0) {
+			query = "INSERT INTO users (Username, Password, Email) VALUES (?, ?, ?);";
+			valueList = new DatabaseValue[]{DB.getDBV(username),
+					DB.getDBV(safePassword),
+					DB.getDBV(email)};
+		} else {
+			query = "INSERT INTO users (User_ID, Username, Password, Email) VALUES (?, ?, ?, ?);";
+			valueList = new DatabaseValue[]{DB.getDBV(id),
+					DB.getDBV(username),
+					DB.getDBV(safePassword),
+					DB.getDBV(email)};
 		}
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return DB.executeUpdate(stmt, conn);
 	}
 
 	public boolean isValidated() {
@@ -115,11 +104,11 @@ public class User {
 		DatabaseAccess.logSession(id, ipAddress);
 	}
 
-	public String printFriendly(String color){
+	public String printFriendly(String color) {
 		String username = getUsername();
 
 		return "<span style='color: " + color + "'>@" + getUsername() +
-		"</span>";
+				"</span>";
 	}
 
 }

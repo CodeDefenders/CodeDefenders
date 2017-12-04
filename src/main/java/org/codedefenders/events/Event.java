@@ -1,17 +1,17 @@
 package org.codedefenders.events;
 
-import org.codedefenders.Role;
-import org.codedefenders.User;
-import org.codedefenders.util.DatabaseAccess;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.awt.image.DataBuffer;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
+
+import org.codedefenders.Role;
+import org.codedefenders.User;
+import org.codedefenders.util.DB;
+import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.DatabaseValue;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Created by thomas on 06/03/2017.
@@ -180,60 +180,40 @@ public class Event {
 	}
 
 	public boolean insert() {
-		Connection conn = null;
-		PreparedStatement stmt = null;
-		try {
-			conn = DatabaseAccess.getConnection();
-			stmt = conn.prepareStatement("INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status) VALUES (?, ?, ?, ?);");
-			stmt.setInt(1, gameId);
-			stmt.setInt(2, userId);
-			stmt.setString(3, eventType.toString());
-			stmt.setString(4, eventStatus.toString());
-			if (stmt.executeUpdate() > 0) {
-				eventId = gameId;
-				if (chatMessage != null) {
-					stmt = conn.prepareStatement("INSERT INTO event_chat " + "(Event_Id, Message) VALUES (?, ?);");
-					stmt.setInt(1, eventId);
-					stmt.setString(2, chatMessage);
-					stmt.executeUpdate();
-				}
-			} else {
-				eventId = -1;
+		Connection conn = DB.getConnection();
+		String query = "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status) VALUES (?, ?, ?, ?);";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(gameId),
+				DB.getDBV(userId),
+				DB.getDBV(eventType.toString()),
+				DB.getDBV(eventStatus.toString())};
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		if (DB.executeUpdate(stmt, conn)) {
+			eventId = gameId;
+			if (chatMessage != null) {
+				query = "INSERT INTO event_chat (Event_Id, Message) VALUES (?, ?);";
+				valueList = new DatabaseValue[]{DB.getDBV(eventId),
+						DB.getDBV(chatMessage)};
+				stmt = DB.createPreparedStatement(conn, query, valueList);
+				DB.executeUpdate(stmt, conn);
 			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
+		} else {
+			eventId = -1;
 		}
 		return eventId >= 0;
 	}
 
 
 	public boolean update() {
-		PreparedStatement stmt = null;
-		Connection conn = null;
-		int res = -1;
-		try {
-			conn = DatabaseAccess.getConnection();
-			stmt = conn.prepareStatement("UPDATE events SET " + "Game_ID=?, " + "Player_ID=?, " + "Event_Type=?, " + "Event_Status=?, " + "Timestamp=FROM_UNIXTIME(?) WHERE " + "Event_ID=?");
-			stmt.setInt(1, gameId);
-			stmt.setInt(2, userId);
-			stmt.setString(3, eventType.toString());
-			stmt.setString(4, eventStatus.toString());
-			stmt.setLong(5, time.getTime());
-			stmt.setInt(6, eventId);
-			return stmt.executeUpdate() > 0;
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-			return false;
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-			return false;
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
-		}
+		Connection conn = DB.getConnection();
+		String query = "UPDATE events SET Game_ID=?, Player_ID=?, Event_Type=?, Event_Status=?, Timestamp=FROM_UNIXTIME(?) WHERE Event_ID=?";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(gameId),
+				DB.getDBV(userId),
+				DB.getDBV(eventType.toString()),
+				DB.getDBV(eventStatus.toString()),
+				DB.getDBV((Long) time.getTime()),
+				DB.getDBV(eventId)};
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return DB.executeUpdate(stmt, conn);
 	}
 
 }

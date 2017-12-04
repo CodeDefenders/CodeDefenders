@@ -1,13 +1,21 @@
 package org.codedefenders.duel;
 
-import org.codedefenders.*;
-import org.codedefenders.util.DatabaseAccess;
-
 import static org.codedefenders.Mutant.Equivalence.PENDING_TEST;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.codedefenders.AbstractGame;
+import org.codedefenders.GameLevel;
+import org.codedefenders.GameMode;
+import org.codedefenders.GameState;
+import org.codedefenders.Mutant;
+import org.codedefenders.Role;
+import org.codedefenders.Test;
+import org.codedefenders.util.DB;
+import org.codedefenders.util.DatabaseValue;
 
 public class DuelGame extends AbstractGame {
 
@@ -151,81 +159,59 @@ public class DuelGame extends AbstractGame {
 	}
 
 	public boolean addPlayer(int userId, Role role) {
-		PreparedStatement stmt = null;
-		Connection conn = null;
 		boolean was_success = false;
-
-		try {
-			conn = DatabaseAccess.getConnection();
-			stmt = conn.prepareStatement("INSERT INTO players (Game_ID, User_ID, Points, Role) " + "VALUES (?, ?, 0, ?);");
-			stmt.setInt(1, id);
-			stmt.setInt(2, userId);
-			stmt.setString(3, role.toString());
-			was_success = stmt.executeUpdate() >= 0;
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
-		}
-
-		if (was_success) {
+		Connection conn = DB.getConnection();
+		String query = "INSERT INTO players (Game_ID, User_ID, Points, Role) VALUES (?, ?, 0, ?);";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(id),
+				DB.getDBV(userId),
+				DB.getDBV(role.toString())};
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		if (DB.executeUpdate(stmt, conn)) {
 			if (role.equals(Role.ATTACKER))
 				attackerId = userId;
 			else
 				defenderId = userId;
 			return true;
-		};
+		}
 		return false;
 	}
 
 	@Override
 	public boolean insert() {
-
-		Connection conn = null;
-		PreparedStatement stmt = null;
-
 		// Attempt to insert game info into database
-		try {
-			conn = DatabaseAccess.getConnection();
-
-
-			stmt = conn.prepareStatement("INSERT INTO games (Class_ID, Creator_ID, FinalRound, Level, Mode, State) VALUES (?, ?, ?, ?, ?, ?);");
-			stmt.setInt(1, classId);
-			stmt.setInt(2, (attackerId != 0) ? attackerId : defenderId);
-			stmt.setInt(3, finalRound);
-			stmt.setString(4, level.name());
-			stmt.setString(5, mode.name());
-			stmt.setString(6, state.name());
-
-			logger.info(stmt.toString());
-			stmt.execute();
-
-			ResultSet rs = stmt.getGeneratedKeys();
-
-			if (rs.next()) {
-				id = rs.getInt(1);
-				return true;
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
+		Connection conn = DB.getConnection();
+		String query = "INSERT INTO games (Class_ID, Creator_ID, FinalRound, Level, Mode, State) VALUES (?, ?, ?, ?, ?, ?);";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId),
+				DB.getDBV((attackerId != 0) ? attackerId : defenderId),
+				DB.getDBV(finalRound),
+				DB.getDBV(level.name()),
+				DB.getDBV(mode.name()),
+				DB.getDBV(state.name())};
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		logger.info(stmt.toString());
+		int res = DB.executeUpdateGetKeys(stmt, conn);
+		if (res > -1) {
+			id = res;
+			return true;
 		}
-
 		return false;
 	}
 
 	@Override
 	public boolean update() {
-		if (this.mode.equals(GameMode.UTESTING))
-			return DatabaseAccess.execute(String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', State='%s' WHERE ID='%d'",
-					currentRound, finalRound, state.name(), id));
-		else
-			return DatabaseAccess.execute(String.format("UPDATE games SET CurrentRound='%d', FinalRound='%d', ActiveRole='%s', State='%s' WHERE ID='%d'",
-					currentRound, finalRound, activeRole, state.name(), id));
+		Connection conn = DB.getConnection();
+		String query = null;
+		DatabaseValue[] valueList = null;
+		if (this.mode.equals(GameMode.UTESTING)) {
+			query = "UPDATE games SET CurrentRound=?, FinalRound=?, State=? WHERE ID=?";
+			valueList = new DatabaseValue[]{
+					DB.getDBV(currentRound), DB.getDBV(finalRound), DB.getDBV(state.name()), DB.getDBV(id)};
+		} else {
+			query = "UPDATE games SET CurrentRound=?, FinalRound=?, ActiveRole=?, State=? WHERE ID=?";
+			valueList = new DatabaseValue[]{
+					DB.getDBV(currentRound), DB.getDBV(finalRound), DB.getDBV(activeRole.toString()), DB.getDBV(state.name()), DB.getDBV(id)};
+		}
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return DB.executeUpdate(stmt, conn);
 	}
 }

@@ -2,7 +2,9 @@ package org.codedefenders;
 
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.singleplayer.NoDummyGameException;
+import org.codedefenders.util.DB;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.DatabaseValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +52,7 @@ public class GameClass {
 
 	public String getBaseName() {
 		String[] tokens = name.split("\\.");
-		return tokens[tokens.length-1];
+		return tokens[tokens.length - 1];
 	}
 
 	public String getPackage() {
@@ -88,64 +90,34 @@ public class GameClass {
 	}
 
 	public boolean insert() {
-
 		logger.debug("Inserting class (Name={}, Alias={}, JavaFile={}, ClassFile={})", name, alias, javaFile, classFile);
-		Connection conn = null;
-		PreparedStatement stmt = null;
 		// Attempt to insert game info into database
-		try {
-			conn = DatabaseAccess.getConnection();
-			stmt = conn.prepareStatement("INSERT INTO classes (Name, Alias, JavaFile, ClassFile) VALUES (?, ?, ?, ?);",
-					Statement.RETURN_GENERATED_KEYS);
-			stmt.setString(1, name);
-			stmt.setString(2, alias);
-			stmt.setString(3, javaFile);
-			stmt.setString(4, classFile);
-			stmt.executeUpdate();
-			ResultSet rs = stmt.getGeneratedKeys();
-			if (rs.next()) {
-				this.id = rs.getInt(1);
-				logger.debug("Inserted CUT with ID: " + this.id);
-				return true;
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
+		Connection conn = DB.getConnection();
+		String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile) VALUES (?, ?, ?, ?);";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(name), DB.getDBV(alias),
+				DB.getDBV(javaFile), DB.getDBV(classFile)};
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		int res = DB.executeUpdateGetKeys(stmt, conn);
+		if (res > -1) {
+			this.id = res;
+			logger.debug("Inserted CUT with ID: " + this.id);
+			return true;
 		}
-
 		return false;
 	}
 
 	public boolean update() {
-
 		logger.debug("Updating class (Name={}, Alias={}, JavaFile={}, ClassFile={})", name, alias, javaFile, classFile);
-		Connection conn = null;
-		PreparedStatement stmt = null;
-
 		// Attempt to update game info into database
-		try {
-			conn = DatabaseAccess.getConnection();
-			stmt = conn.prepareStatement("UPDATE classes SET Name=?, Alias=?, JavaFile=?, ClassFile=? WHERE Class_ID=?;");
-			stmt.setString(1, name);
-			stmt.setString(2, alias);
-			stmt.setString(3, javaFile);
-			stmt.setString(4, classFile);
-			stmt.setInt(5, id);
-			stmt.executeUpdate();
-			stmt.close();
-			conn.close();
-			return true;
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
-		}
-		return false;
+		Connection conn = DB.getConnection();
+		String query = "UPDATE classes SET Name=?, Alias=?, JavaFile=?, ClassFile=? WHERE Class_ID=?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(name),
+				DB.getDBV(alias),
+				DB.getDBV(javaFile),
+				DB.getDBV(classFile),
+				DB.getDBV(id)};
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return DB.executeUpdate(stmt, conn);
 	}
 
 	public String getTestTemplate() {
@@ -189,25 +161,10 @@ public class GameClass {
 
 	public boolean delete() {
 		logger.debug("Deleting class (ID={})", id);
-		Connection conn = null;
-		PreparedStatement stmt = null;
-
-		try {
-			// Attempt to update game info into database
-			conn = DatabaseAccess.getConnection();
-			stmt = conn.prepareStatement("DELETE FROM classes WHERE Class_ID=?;");
-			stmt.setInt(1, id);
-			stmt.executeUpdate();
-			stmt.close();
-			conn.close();
-			return true;
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
-		}
-		return false;
+		// Attempt to update game info into database
+		Connection conn = DB.getConnection();
+		String query = "DELETE FROM classes WHERE Class_ID=?;";
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
+		return DB.executeUpdate(stmt, conn);
 	}
 }
