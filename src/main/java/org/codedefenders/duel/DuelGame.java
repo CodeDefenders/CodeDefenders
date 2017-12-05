@@ -159,7 +159,6 @@ public class DuelGame extends AbstractGame {
 	}
 
 	public boolean addPlayer(int userId, Role role) {
-		boolean was_success = false;
 		Connection conn = DB.getConnection();
 		String query = "INSERT INTO players (Game_ID, User_ID, Points, Role) VALUES (?, ?, 0, ?);";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(id),
