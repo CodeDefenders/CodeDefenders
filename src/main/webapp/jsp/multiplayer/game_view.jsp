@@ -60,7 +60,7 @@
     for (Test t : tests) {
         for (Integer lc : t.getLineCoverage().getLinesCovered()) {
             if (!linesCovered.containsKey(lc)) {
-                linesCovered.put(lc, new ArrayList<>());
+                linesCovered.put(lc, new ArrayList<Test>());
             }
             linesCovered.get(lc).add(t);
         }
@@ -164,7 +164,7 @@
     for (Mutant m : mutantsAlive) {
         for (int line : m.getLines()){
             if (!mutantLines.containsKey(line)){
-                mutantLines.put(line, new ArrayList<>());
+                mutantLines.put(line, new ArrayList<Mutant>());
             }
 
             mutantLines.get(line).add(m);
@@ -188,7 +188,7 @@
     for (Mutant m : mutantsKilled) {
         for (int line : m.getLines()){
             if (!mutantKilledLines.containsKey(line)){
-                mutantKilledLines.put(line, new ArrayList<>());
+                mutantKilledLines.put(line, new ArrayList<Mutant>());
             }
 
             mutantKilledLines.get(line).add(m);
