@@ -2,30 +2,46 @@ package org.codedefenders;
 
 import java.util.Map;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 /**
  * @author Jose Rojas
  */
 public class Constants {
 
-	public static final String F_SEP = System.getProperty("file.separator");
+    public static final String F_SEP = System.getProperty("file.separator");
 
-	public static String DATA_DIR;
+    public static String DATA_DIR;
 
-	static {
+    static {
+        // First check the Web abb context
+        InitialContext initialContext;
+        String dataHome = null;
+        try {
+            initialContext = new InitialContext();
+            Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
+            dataHome = (String) environmentContext.lookup("data.dir");
 
-		ProcessBuilder pb = new ProcessBuilder();
-		Map env = pb.environment();
+        } catch (NamingException e) {
+            // e.printStackTrace();
+        }
 
-		String dataHome = (String) env.get("CODEDEFENDERS_DATA");
-		if (dataHome == null) {
-			if (System.getProperty("os.name").toLowerCase().contains("windows")){
-				dataHome = System.getProperty("codedefenders.data",
-						"C:/codedefenders-data");
-			} else {
-				dataHome = System.getProperty("codedefenders.data",
-						"/var/lib/codedefenders");
-			}
-		}
+        // Check Env
+        if (dataHome == null) {
+            ProcessBuilder pb = new ProcessBuilder();
+            Map env = pb.environment();
+            dataHome = (String) env.get("CODEDEFENDERS_DATA");
+        }
+        // Check System properties
+        if (dataHome == null) {
+            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+                dataHome = System.getProperty("codedefenders.data", "C:/codedefenders-data");
+            } else {
+                dataHome = System.getProperty("codedefenders.data", "/var/lib/codedefenders");
+            }
+        }
 
 		DATA_DIR = dataHome;
 	}
@@ -56,6 +72,8 @@ public class Constants {
 	public static final String LOSER_MESSAGE = "You lost!";
 	public static final String DRAW_MESSAGE = "It was a draw!";
 
+	public static final String TEST_GENERIC_ERROR_MESSAGE = "Sorry ! An error on the server prevented the compilation of your test.";
+
 	public static final String TEST_DID_NOT_COMPILE_MESSAGE = "Your test did not compile. Try again, but with compilable code.";
 	public static final String TEST_INVALID_MESSAGE = "Your test is not valid. Remember the rules: Only one non-empty test, at most two assertions per test, no conditionals and no loops!";
 	public static final String TEST_PASSED_ON_CUT_MESSAGE = "Great! Your test compiled and passed on the original class under test.";
@@ -71,6 +89,16 @@ public class Constants {
 	public static final String MUTANT_COMPILED_MESSAGE = "Your mutant was compiled successfully.";
 	public static final String MUTANT_ACCEPTED_EQUIVALENT_MESSAGE = "The mutant was accepted as equivalent.";
 	public static final String MUTANT_UNCOMPILABLE_MESSAGE = "Your mutant failed to compile. Try again.";
+
+	public static final String MUTANT_VALIDATION_SUCCESS_MESSAGE = "Your mutant complies with our rules.";
+	public static final String MUTANT_VALIDATION_LINES_MESSAGE = "Invalid mutant, sorry! Removing or adding lines is not allowed.";
+	public static final String MUTANT_VALIDATION_MODIFIER_MESSAGE = "Invalid mutant, sorry! Changing modifiers such as 'static' or 'public' is not allowed.";
+	public static final String MUTANT_VALIDATION_COMMENT_MESSAGE = "Invalid mutant, sorry! Adding or modifying comments is not allowed.";
+	public static final String MUTANT_VALIDATION_LOGIC_MESSAGE = "Invalid mutant, sorry! Your mutant contains new logical operations";
+	public static final String MUTANT_VALIDATION_OPERATORS_MESSAGE = "Invalid mutant, sorry! Your mutant contains prohibited operations such as bitshifts, ternary operators or multiple statments per line.";
+	public static final String MUTANT_VALIDATION_CALLS_MESSAGE = "Your mutant contains calls to System.*, Random.* or new control structures.\n\nShame on you!";
+	public static final String MUTANT_VALIDATION_IDENTICAL_MESSAGE = "Invalid mutant, sorry! Your mutant is identical to the CUT";
+
 	public static final String MUTANT_INVALID_MESSAGE = "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)";
 	public static final String MUTANT_CREATION_ERROR_MESSAGE = "Oops! Something went wrong and the mutant was not created.";
 	public static final String MUTANT_DUPLICATED_MESSAGE = "Sorry, your mutant already exists in this game!";
