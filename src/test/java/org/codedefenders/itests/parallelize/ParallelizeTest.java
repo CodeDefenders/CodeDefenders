@@ -22,7 +22,6 @@ import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 
 import org.codedefenders.Constants;
-import org.codedefenders.DatabaseRule;
 import org.codedefenders.GameClass;
 import org.codedefenders.GameLevel;
 import org.codedefenders.GameManager;
@@ -33,6 +32,7 @@ import org.codedefenders.Role;
 import org.codedefenders.User;
 import org.codedefenders.itests.IntegrationTest;
 import org.codedefenders.multiplayer.MultiplayerGame;
+import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.util.DatabaseConnection;
 import org.junit.After;

@@ -212,11 +212,13 @@
 								one after another. It creates the highest level of separation for the test 
 								execution, but it would probably also give you the longest execution time 
 								of all the available options. Consider it as a last resort. -->
-							<!-- Do not parallelize, just fork -->
+							<!-- Do not parallelize, but just fork a new JVM each time -->
 							<forkCount>1</forkCount>
-							<!-- Do not reuse the jvm -->
 							<reuseForks>false</reuseForks>
+							<!-- Only consider tests marked as IntegrationTest -->
 							<groups>org.codedefenders.itests.IntegrationTest</groups>
+							<!-- Do not clog the console but write to output files -->
+							<redirectTestOutputToFile>true</redirectTestOutputToFile>
 						</configuration>
 					</plugin>
 				</plugins>
