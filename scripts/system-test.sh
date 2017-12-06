@@ -165,9 +165,7 @@ while read -r timestamp <&3 && read -r codeFile <&4; do
 	sleep ${timestamp}
 	
 	if [ ${role} == "ATTACKER" ]; then
-		
 		echo "At " $(date) " -- In game ${gameId} ${userId} attacks using ${codeFile}" | tee -a ${logFile}
-		
 		local totTime=$(__private_do_attack \
 			${gameId} \
 			${codeFile} \
@@ -381,7 +379,7 @@ function replay_game(){
 
 function __private_setup(){
 	# TODO: Remove all the Tests/Mutants from the test bed which by default is?
-	
+
 	mkdir -p ${SYSTEM_TESTS_HOME}
 	mkdir -p ${SYSTEM_TESTS_HOME}/tests
 	mkdir -p ${SYSTEM_TESTS_HOME}/mutants
@@ -447,7 +445,6 @@ function benchmark(){
 
 	done
 }
-
 
 
 function multi_benchmark(){
