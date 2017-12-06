@@ -47,7 +47,6 @@ public class MultiplayerGameManager extends HttpServlet {
 			response.setStatus(500);
 			return;
 		}
-
 		session.setAttribute("messages", messages);
 
 		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(gameId);
@@ -193,6 +192,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 					// Get the text submitted by the user.
 					String mutantText = request.getParameter("mutant");
+
 					String validityMessage = GameManager.getMutantValidityMessage(activeGame.getClassId(), mutantText);
 					if (!validityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE)) {
 						// Mutant is either the same as the CUT or it contains invalid code

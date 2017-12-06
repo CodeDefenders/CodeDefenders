@@ -254,13 +254,12 @@ public class CodeValidator {
 	}
 
 	/*
-		Removes Comments (of both varieties) and Whitespaces from java source code.
-		 */
+        Removes Comments (of both varieties) and Whitespaces from java source code.
+         */
 	private static String getCodeWithoutComments(String code) {
 		StreamTokenizer st = new StreamTokenizer(new StringReader(code));
 		st.slashSlashComments(true);
 		st.slashStarComments(true);
 		return getTokens(st).toString().replaceAll("\\s+", "");
 	}
-
 }

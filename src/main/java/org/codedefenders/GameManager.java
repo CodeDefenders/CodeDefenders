@@ -56,8 +56,7 @@ public class GameManager extends HttpServlet {
 					activeGame.setActiveRole(Role.ATTACKER);
 					activeGame.update();
 				}
-				// If no mutants needed to be proved non-equivalent, direct to
-				// the Attacker Page.
+				// If no mutants needed to be proved non-equivalent, direct to the Attacker Page.
 				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.ATTACKER_VIEW_JSP);
 				dispatcher.forward(request, response);
 			} else {
@@ -68,7 +67,7 @@ public class GameManager extends HttpServlet {
 			// Direct to the Defender Page.
 			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.DEFENDER_VIEW_JSP);
 			dispatcher.forward(request, response);
-		} // else
+		}// else
 		// response.sendRedirect(request.getHeader("referer"));
 	}
 
@@ -91,17 +90,13 @@ public class GameManager extends HttpServlet {
 				Mutant mutant = activeGame.getMutantByID(currentEquivMutantID);
 
 				// Check type of equivalence response.
-				if (request.getParameter("rejectEquivalent") != null) { // If user
-					// wanted to
-					// supply a
-					// test
+				if (request.getParameter("rejectEquivalent") != null) { // If user wanted to supply a test
 					logger.info("Equivalence rejected for mutant {}, processing killing test", currentEquivMutantID);
 
 					// Get the text submitted by the user.
 					String testText = request.getParameter("test");
 
-					// If it can be written to file and compiled, end turn.
-					// Otherwise, dont.
+					// If it can be written to file and compiled, end turn. Otherwise, dont.
 
 					Test newTest = null;
 
@@ -121,30 +116,24 @@ public class GameManager extends HttpServlet {
 						return;
 					}
 
-					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest,
-							TargetExecution.Target.COMPILE_TEST);
+					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 					if (compileTestTarget.status.equals("SUCCESS")) {
-						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest,
-								TargetExecution.Target.TEST_ORIGINAL);
+						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 						if (testOriginalTarget.status.equals("SUCCESS")) {
 							logger.info(TEST_PASSED_ON_CUT_MESSAGE);
 							if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
 								// TODO: Allow multiple trials?
-								// TODO: Doesnt differentiate between failing
-								// because the test didnt run and failing because it
-								// detected the mutant
+								// TODO: Doesnt differentiate between failing because the test didnt run and failing because it detected the mutant
 								MutationTester.runEquivalenceTest(newTest, mutant);
 								activeGame.endRound();
 								activeGame.update();
 								Mutant mutantAfterTest = activeGame.getMutantByID(currentEquivMutantID);
 								if (mutantAfterTest.getEquivalent().equals(Mutant.Equivalence.PROVEN_NO)) {
-									logger.info("Test {} killed mutant {}, hence NOT equivalent", newTest.getId(),
-											mutant.getId());
+									logger.info("Test {} killed mutant {}, hence NOT equivalent", newTest.getId(), mutant.getId());
 									messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
 								} else {
-									// test did not kill the mutant, lost duel, kill
-									// mutant
+									// test did not kill the mutant, lost duel, kill mutant
 									mutantAfterTest.kill(Mutant.Equivalence.ASSUMED_YES);
 
 									logger.info("Test {} failed to kill mutant {}", newTest.getId(), mutant.getId());
@@ -160,8 +149,7 @@ public class GameManager extends HttpServlet {
 								return;
 							}
 						} else {
-							// (testOriginalTarget.state.equals("FAIL") ||
-							// testOriginalTarget.state.equals("ERROR")
+							//  (testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
 							logger.debug("testOriginalTarget: " + testOriginalTarget);
 							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 							messages.add(testOriginalTarget.message);
@@ -173,15 +161,7 @@ public class GameManager extends HttpServlet {
 						messages.add(compileTestTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					}
-				} else if (request.getParameter("acceptEquivalent") != null) { // If
-					// the
-					// user
-					// didnt
-					// want
-					// to
-					// supply
-					// a
-					// test
+				} else if (request.getParameter("acceptEquivalent") != null) { // If the user didnt want to supply a test
 					logger.info("Equivalence accepted for mutant {}", mutant.getId());
 					if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
 						mutant.kill(Mutant.Equivalence.DECLARED_YES);
@@ -199,11 +179,10 @@ public class GameManager extends HttpServlet {
 					int mutantId = Integer.parseInt(request.getParameter("mutantId"));
 					Mutant mutantClaimed = DatabaseAccess.getMutant(activeGame, mutantId);
 					if (activeGame.getMode().equals(GameMode.SINGLE)) {
-						// TODO: Why is this not handled in the single player game
-						// but here?
-						// Singleplayer - use automatic system.
+						// TODO: Why is this not handled in the single player game but here?
+						//Singleplayer - use automatic system.
 						if (AntRunner.potentialEquivalent(mutantClaimed)) {
-							// Is potentially equiv - accept as equivalent
+							//Is potentially equiv - accept as equivalent
 							mutantClaimed.kill(Mutant.Equivalence.DECLARED_YES);
 							messages.add("The AI has accepted the mutant as equivalent.");
 						} else {
@@ -212,8 +191,7 @@ public class GameManager extends HttpServlet {
 						}
 						activeGame.endTurn();
 						if (!activeGame.getState().equals(GameState.FINISHED)) {
-							// The ai should make another move if the game isn't
-							// over
+							//The ai should make another move if the game isn't over
 							SinglePlayerGame spg = (SinglePlayerGame) activeGame;
 							if (spg.getAi().makeTurn()) {
 								messages.addAll(spg.getAi().getMessagesLastTurn());
@@ -244,10 +222,10 @@ public class GameManager extends HttpServlet {
 
 				// Get the text submitted by the user.
 				String mutantText = request.getParameter("mutant");
+				
 				String validityMessage = getMutantValidityMessage(activeGame.getClassId(), mutantText);
 				if (!validityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE)) {
-					// Mutant is either the same as the CUT or it contains invalid
-					// code
+					// Mutant is either the same as the CUT or it contains invalid code
 					// Do not restore mutated code
 					messages.add(validityMessage);
 					break;
@@ -255,9 +233,9 @@ public class GameManager extends HttpServlet {
 				Mutant existingMutant = existingMutant(activeGame.getId(), mutantText);
 				if (existingMutant != null) {
 					messages.add(MUTANT_DUPLICATED_MESSAGE);
-					TargetExecution existingMutantTarget = DatabaseAccess.getTargetExecutionForMutant(existingMutant,
-							TargetExecution.Target.COMPILE_MUTANT);
-					if (existingMutantTarget != null && !existingMutantTarget.status.equals("SUCCESS")
+					TargetExecution existingMutantTarget = DatabaseAccess.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
+					if (existingMutantTarget != null
+							&& !existingMutantTarget.status.equals("SUCCESS")
 							&& existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
 						messages.add(existingMutantTarget.message);
 					}
@@ -266,19 +244,16 @@ public class GameManager extends HttpServlet {
 				}
 				Mutant newMutant = createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "sp");
 				if (newMutant != null) {
-					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant,
-							TargetExecution.Target.COMPILE_MUTANT);
+					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 					if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
 						messages.add(MUTANT_COMPILED_MESSAGE);
 						MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
 
-						// TODO: Why doesnt that happen in
-						// SinglePlayerGame.endTurn()?
+						// TODO: Why doesnt that happen in SinglePlayerGame.endTurn()?
 						if (activeGame.getMode().equals(GameMode.SINGLE)) {
-							// Singleplayer - check for potential equivalent.
+							//Singleplayer - check for potential equivalent.
 							if (AntRunner.potentialEquivalent(newMutant)) {
-								// Is potentially equiv - mark as equivalent and
-								// update.
+								//Is potentially equiv - mark as equivalent and update.
 								messages.add("The AI has started an equivalence challenge on your last mutant.");
 								newMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
 								newMutant.update();
@@ -296,16 +271,14 @@ public class GameManager extends HttpServlet {
 						activeGame.update();
 					} else {
 						messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
-						if (compileMutantTarget != null && compileMutantTarget.message != null
-								&& !compileMutantTarget.message.isEmpty())
+						if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty())
 							messages.add(compileMutantTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
 					}
 				} else {
 					messages.add(MUTANT_CREATION_ERROR_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
-					logger.error("Error creating mutant. Game: {}, Class: {}, User: {}", activeGame.getId(),
-							activeGame.getClassId(), uid, mutantText);
+					logger.error("Error creating mutant. Game: {}, Class: {}, User: {}", activeGame.getId(), activeGame.getClassId(), uid, mutantText);
 				}
 				break;
 
@@ -314,8 +287,7 @@ public class GameManager extends HttpServlet {
 				// Get the text submitted by the user.
 				String testText = request.getParameter("test");
 
-				// If it can be written to file and compiled, end turn. Otherwise,
-				// dont.
+				// If it can be written to file and compiled, end turn. Otherwise, dont.
 				Test newTest = null;
 
 				try {
@@ -336,19 +308,16 @@ public class GameManager extends HttpServlet {
 					return;
 				}
 				logger.debug("New Test " + newTest.getId());
-				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest,
-						TargetExecution.Target.COMPILE_TEST);
+				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 				if (compileTestTarget.status.equals("SUCCESS")) {
-					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest,
-							TargetExecution.Target.TEST_ORIGINAL);
+					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 					if (testOriginalTarget.status.equals("SUCCESS")) {
 						messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 						MutationTester.runTestOnAllMutants(activeGame, newTest, messages);
 						activeGame.endTurn();
 						activeGame.update();
-						// TODO: Why doesn't that simply happen in
-						// SinglePlayerGame.endTurn?
+						// TODO: Why doesn't that simply happen in SinglePlayerGame.endTurn?
 						// if single-player game is not finished, make a move
 						if (!activeGame.getState().equals(GameState.FINISHED)
 								&& activeGame.getMode().equals(GameMode.SINGLE)) {
@@ -358,8 +327,7 @@ public class GameManager extends HttpServlet {
 							}
 						}
 					} else {
-						// testOriginalTarget.state.equals("FAIL") ||
-						// testOriginalTarget.state.equals("ERROR")
+						// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
 						messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 						messages.add(testOriginalTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -372,7 +340,7 @@ public class GameManager extends HttpServlet {
 				break;
 		}
 
-		response.sendRedirect("play");// doGet(request, response);
+		response.sendRedirect("play");//doGet(request, response);
 	}
 
 	public static String getMutantValidityMessage(int cid, String mutatedCode) throws IOException {
@@ -385,8 +353,7 @@ public class GameManager extends HttpServlet {
 		String md5CUT = CodeValidator.getMD5(sourceCode);
 		String md5Mutant = CodeValidator.getMD5(mutatedCode);
 
-		// mutant is valid only if it differs from CUT and does not contain
-		// forbidden constructs
+		// mutant is valid only if it differs from CUT and does not contain forbidden constructs
 		if (md5CUT.equals(md5Mutant))
 			return Constants.MUTANT_VALIDATION_IDENTICAL_MESSAGE;
 
@@ -396,21 +363,18 @@ public class GameManager extends HttpServlet {
 	public static Mutant existingMutant(int gid, String mutatedCode) throws IOException {
 		String md5Mutant = CodeValidator.getMD5(mutatedCode);
 
-		// return the mutant in the game with same MD5 if it exists; return null
-		// otherwise
+		// return the mutant in the game with same MD5 if it exists; return null otherwise
 		return DatabaseAccess.getMutant(gid, md5Mutant);
 	}
 
-	public static Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory)
-			throws IOException {
+	public static Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
 		// Mutant is assumed valid here
 
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 		String classMutatedBaseName = classMutated.getBaseName();
 
 		// Setup folder the files will go in
-		File newMutantDir = FileManager
-				.getNextSubDir(Constants.MUTANTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
+		File newMutantDir = FileManager.getNextSubDir(Constants.MUTANTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
 
 		logger.info("NewMutantDir: {}", newMutantDir.getAbsolutePath());
 		logger.info("Class Mutated: {} (basename: {})", classMutated.getName(), classMutatedBaseName);
@@ -428,8 +392,7 @@ public class GameManager extends HttpServlet {
 		String md5FromMutantFile = CodeValidator.getMD5FromFile(mutantFileName);
 		assert md5Mutant.equals(md5FromMutantFile) : "MD5 hashes differ between code as text and code from new file";
 
-		// Compile the mutant and add it to the game if possible; otherwise,
-		// TODO: delete these files created?
+		// Compile the mutant and add it to the game if possible; otherwise, TODO: delete these files created?
 		return AntRunner.compileMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
 	}
 
@@ -443,8 +406,7 @@ public class GameManager extends HttpServlet {
 	 * @throws IOException
 	 * @throws CodeValidatorException
 	 */
-	public static Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory)
-			throws IOException, CodeValidatorException {
+	public static Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException, CodeValidatorException {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
