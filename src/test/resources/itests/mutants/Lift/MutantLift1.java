@@ -6,7 +6,7 @@ public class Lift {
 	private int numRiders = 0;    // default
 
 	public Lift(int highestFloor) {
-		topFloor = highestFloor++;
+		topFloor = highestFloor+1;
 	}
 
 	public Lift(int highestFloor, int maxRiders) {
