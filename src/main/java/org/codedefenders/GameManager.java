@@ -244,12 +244,12 @@ public class GameManager extends HttpServlet {
 
                 // Get the text submitted by the user.
                 String mutantText = request.getParameter("mutant");
-
-                if (!isMutantValid(activeGame.getClassId(), mutantText)) {
+                String validityMessage = getMutantValidityMessage(activeGame.getClassId(), mutantText);
+                if (!validityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE)) {
                     // Mutant is either the same as the CUT or it contains invalid
                     // code
                     // Do not restore mutated code
-                    messages.add(MUTANT_INVALID_MESSAGE);
+                    messages.add(validityMessage);
                     break;
                 }
                 Mutant existingMutant = existingMutant(activeGame.getId(), mutantText);
@@ -375,7 +375,7 @@ public class GameManager extends HttpServlet {
         response.sendRedirect("play");// doGet(request, response);
     }
 
-    public static boolean isMutantValid(int cid, String mutatedCode) throws IOException {
+    public static String getMutantValidityMessage(int cid, String mutatedCode) throws IOException {
         GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 
         File sourceFile = new File(classMutated.getJavaFile());
@@ -387,7 +387,10 @@ public class GameManager extends HttpServlet {
 
         // mutant is valid only if it differs from CUT and does not contain
         // forbidden constructs
-        return (!md5CUT.equals(md5Mutant)) && CodeValidator.validMutant(sourceCode, mutatedCode);
+        if (md5CUT.equals(md5Mutant))
+            return Constants.MUTANT_VALIDATION_IDENTICAL_MESSAGE;
+
+        return CodeValidator.getValidationMessage(sourceCode, mutatedCode);
     }
 
     public static Mutant existingMutant(int gid, String mutatedCode) throws IOException {

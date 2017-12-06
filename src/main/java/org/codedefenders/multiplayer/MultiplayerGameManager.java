@@ -1,26 +1,6 @@
 package org.codedefenders.multiplayer;
 
-import static org.codedefenders.Constants.*;
-import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.codedefenders.GameManager;
-import org.codedefenders.GameState;
-import org.codedefenders.Mutant;
-import org.codedefenders.MutationTester;
-import org.codedefenders.TargetExecution;
-import org.codedefenders.Test;
+import org.codedefenders.*;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
 import org.codedefenders.events.EventType;
@@ -28,6 +8,20 @@ import org.codedefenders.exceptions.CodeValidatorException;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.codedefenders.Constants.*;
+import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 
 public class MultiplayerGameManager extends HttpServlet {
 
@@ -199,11 +193,11 @@ public class MultiplayerGameManager extends HttpServlet {
 
                     // Get the text submitted by the user.
                     String mutantText = request.getParameter("mutant");
-
-                    if (!GameManager.isMutantValid(activeGame.getClassId(), mutantText)) {
+                    String validityMessage = GameManager.getMutantValidityMessage(activeGame.getClassId(), mutantText);
+                    if (!validityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE)) {
                         // Mutant is either the same as the CUT or it contains invalid code
                         // Do not restore mutated code
-                        messages.add(MUTANT_INVALID_MESSAGE);
+                        messages.add(validityMessage);
                         break;
                     }
                     Mutant existingMutant = GameManager.existingMutant(activeGame.getId(), mutantText);
