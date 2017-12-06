@@ -1,41 +1,70 @@
 package org.codedefenders.validation;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseException;
+import com.github.javaparser.TokenMgrError;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import org.apache.commons.io.FileUtils;
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+import org.codedefenders.Constants;
+import org.codedefenders.exceptions.CodeValidatorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.FileUtils;
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseException;
-import com.github.javaparser.TokenMgrError;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.stmt.BlockStmt;
-
 /**
  * @author Jose Rojas
  */
 public class CodeValidator {
 
-	private final static String[] PROHIBITED_OPERATORS = {"<<", ">>", ">>>", "?", ";"};
-	private final static String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private"};
+	//TODO check if removing ";" makes people take advantage of using multiple statements
+	public final static String[] PROHIBITED_OPERATORS = {"<<", ">>", ">>>", "?", "//", "/*"};
+	public final static String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
 	private static final Logger logger = LoggerFactory.getLogger(CodeValidator.class);
 
 	public static boolean validMutant(String originalCode, String mutatedCode) {
+		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE.equals(getValidationMessage(originalCode, mutatedCode));
+	}
+
+	public static String getValidationMessage(String originalCode, String mutatedCode) {
+
+		String originalLines[] = originalCode.split("\\r?\\n");
+		String mutatedLines[] = mutatedCode.split("\\r?\\n");
+
+		//TODO check if this is too restrictive
+		// if lines were added or removed, mutant is invalid
+        /*if (originalLines.length != mutatedLines.length)
+            return Constants.MUTANT_VALIDATION_LINES_MESSAGE;*/
+
+		// if only string literals were changed
+		if (onlyLiteralsChanged(originalCode, mutatedCode)) {
+			return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
+		}
+
+        /*for (int i = 0; i < originalLines.length; ++i) {
+            String originalLine = originalLines[i];
+            String mutatedLine = mutatedLines[i];
+            // rudimentary word-level matching as dmp works on character level
+            List<DiffMatchPatch.Diff> word_changes = tokenDiff(originalLine, mutatedLine);
+            if (containsProhibitedModifierChanges(word_changes))
+                return Constants.MUTANT_VALIDATION_MODIFIER_MESSAGE;
+
+            //if comments were changed in any way, mutant is invalid
+            if (containsModifiedComments(originalLine, mutatedLine))
+                return Constants.MUTANT_VALIDATION_COMMENT_MESSAGE;
+        }*/
+
 		// rudimentary word-level matching as dmp works on character level
-		List<DiffMatchPatch.Diff> word_changes = word_diff(originalCode, mutatedCode);
+		List<DiffMatchPatch.Diff> word_changes = tokenDiff(originalCode, mutatedCode);
 		if (containsProhibitedModifierChanges(word_changes))
-			return false;
+			return Constants.MUTANT_VALIDATION_MODIFIER_MESSAGE;
 
 		// Runs diff match patch between the two Strings to see if there are any differences.
 		DiffMatchPatch dmp = new DiffMatchPatch();
@@ -46,15 +75,19 @@ public class CodeValidator {
 			if (d.operation != DiffMatchPatch.Operation.EQUAL) {
 				hasChanges = true;
 				if (d.operation == DiffMatchPatch.Operation.INSERT) {
-					if (!validInsertion(d.text))
-						return false;
+					String insertionValidityMessage = validInsertion(d.text);
+					if (!insertionValidityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE))
+						return insertionValidityMessage;
 				}
 			}
 		}
-		return hasChanges;
+		if (!hasChanges)
+			return Constants.MUTANT_VALIDATION_IDENTICAL_MESSAGE;
+
+		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
 	}
 
-	private static List<DiffMatchPatch.Diff> word_diff(String orig, String mutated) {
+	private static List<DiffMatchPatch.Diff> tokenDiff(String orig, String mutated) {
 		List<DiffMatchPatch.Diff> diffs = new ArrayList<>();
 		List<String> tokensOrig = getTokens(new StreamTokenizer(new StringReader(orig)));
 		List<String> tokensMuta = getTokens(new StreamTokenizer(new StringReader(mutated)));
@@ -88,6 +121,7 @@ public class CodeValidator {
 				}
 			}
 		} catch (IOException e) {
+			logger.warn("Swallowing IOException", e);
 		}
 		return tokens;
 	}
@@ -104,63 +138,92 @@ public class CodeValidator {
 		return false;
 	}
 
+	private static Boolean containsModifiedComments(String orig, String muta) {
+		String[] commentTokens = {"//", "/*", "*/"};
+		for (String ct : commentTokens) {
+			if (muta.contains(ct) && !orig.contains(ct) || !muta.contains(ct) && orig.contains(ct))
+				return true;
+		}
+		if (orig.contains("//")) {
+			String commentTokensOrig = orig.substring(orig.indexOf("//"));
+			String commentTokensMuta = muta.substring(muta.indexOf("//"));
+			if (!commentTokensMuta.equals(commentTokensOrig))
+				return true;
+		}
+		if (orig.contains("/*")) {
+			int commentTokensOrigLimit = orig.contains("*/") ? orig.indexOf("*/") : orig.length();
+			int commentTokensMutaLimit = muta.contains("*/") ? muta.indexOf("*/") : muta.length();
 
-	private static boolean validInsertion(String diff) {
+			String commentTokensOrig = orig.substring(orig.indexOf("/*"), commentTokensOrigLimit);
+			String commentTokensMuta = orig.substring(muta.indexOf("/*"), commentTokensMutaLimit);
+			if (!commentTokensMuta.equals(commentTokensOrig))
+				return true;
+		}
+		return false;
+	}
+
+	private static String removeQuoted(String s, String quotationMark) {
+		while (s.contains(quotationMark)) {
+			int index_first_occ = s.indexOf(quotationMark);
+			int index_second_occ = index_first_occ + s.substring(index_first_occ + 1).indexOf(quotationMark);
+			s = s.substring(0, index_first_occ - 1) + s.substring(index_second_occ + 2);
+		}
+		return s;
+	}
+
+	private static Boolean onlyLiteralsChanged(String orig, String muta) { //FIXME this will not work if a string contains \"
+		String origWithoudStrings = removeQuoted(orig, "\"");
+		String mutaWithoutStrings = removeQuoted(muta, "\"");
+		return removeQuoted(origWithoudStrings, "\'").equals(removeQuoted(mutaWithoutStrings, "\'"));
+	}
+
+
+	private static String validInsertion(String diff) {
 		try {
 			BlockStmt blockStmt = JavaParser.parseBlock("{ " + diff + " }");
 			MutationVisitor visitor = new MutationVisitor();
 			visitor.visit(blockStmt, null);
-			return visitor.isValid();
-		} catch (ParseException | TokenMgrError e) {
-			// diff did not compile as a block, let's try some regex
-			// TODO: there must be a better way of doing this
-			logger.warn("Swallowing exception. Could not parse diff \"{}\" as a block.", diff);
-			// remove whitespaces
-			String diff2 = diff.replaceAll("\\s+", "");
-			// forbid logical operators unless they appear on their own (LOR)
-			if ((diff2.contains("|") && !("|".equals(diff2) || "||".equals(diff2)))
-					|| (diff2.contains("&") && !("&".equals(diff2) || "&&".equals(diff2)))) {
-				return false;
-			}
-			// forbid if, while, for, and system calls, and ?: operator
-			String regex = "(?:(?:if|while|for)\\s*\\(.*|[\\s;{()]System\\.|[\\s;{()]Random\\.|^System\\.|^Random\\.|\\?.*:)";
-			Pattern p = Pattern.compile(regex);
-			if (p.matcher(diff2).find())
-				return false;
+			if (!visitor.isValid())
+				return visitor.getMessage();
+		} catch (ParseException | TokenMgrError ignored) {
 		}
 		// remove whitespaces
 		String diff2 = diff.replaceAll("\\s+", "");
 		// forbid logical operators unless they appear on their own (LOR)
 		if ((diff2.contains("|") && !("|".equals(diff2) || "||".equals(diff2)))
 				|| (diff2.contains("&") && !("&".equals(diff2) || "&&".equals(diff2)))) {
-			return false;
+			return Constants.MUTANT_VALIDATION_LOGIC_MESSAGE;
 		}
 		// forbid if, while, for, and system calls, and ?: operator
 		String regex = "(?:(?:if|while|for)\\s*\\(.*|[\\s\\;\\{\\(\\)]System\\.|[\\s\\;\\{\\(\\)]Random\\.|^System\\.|^Random\\.|\\?.*\\:)";
 		Pattern p = Pattern.compile(regex);
 		if (p.matcher(diff2).find())
-			return false;
-
+			return Constants.MUTANT_VALIDATION_CALLS_MESSAGE;
 		// If bitshifts are used or diff contains "?" (hinting at a ternary operator)
 		for (String operator : PROHIBITED_OPERATORS) {
 			if (diff2.contains(operator))
-				return false; // TODO: Is there a better way to handle this for ternary operator?
+				return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE; // TODO: Is there a better way to handle this for ternary operator?
 		}
-		return true;
+		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
 
 	}
 
-	public static boolean validTestCode(String javaFile) {
-		CompilationUnit cu = getCompilationUnit(javaFile);
-		if (cu == null)
-			return false;
-		TestCodeVisitor visitor = new TestCodeVisitor();
-		visitor.visit(cu, null);
-		return visitor.isValid();
+	public static boolean validTestCode(String javaFile) throws CodeValidatorException {
+		try {
+			CompilationUnit cu = getCompilationUnit(javaFile);
+			if (cu == null)
+				return false;
+			TestCodeVisitor visitor = new TestCodeVisitor();
+			visitor.visit(cu, null);
+			return visitor.isValid();
+		} catch (Throwable e) {
+			logger.error("Problem in validating test code " + javaFile);
+			throw new CodeValidatorException("Problem in validating test code " + javaFile, e);
+		}
 	}
 
-	private static CompilationUnit getCompilationUnit(String javaFile) {
-		FileInputStream in;
+	public static CompilationUnit getCompilationUnit(String javaFile) {
+		FileInputStream in = null;
 		try {
 			in = new FileInputStream(javaFile);
 			CompilationUnit cu;

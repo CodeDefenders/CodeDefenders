@@ -1,6 +1,8 @@
 package org.codedefenders.itests.parallelize;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,7 +14,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.List;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -30,6 +31,7 @@ import org.codedefenders.Mutant;
 import org.codedefenders.MutationTester;
 import org.codedefenders.Role;
 import org.codedefenders.User;
+import org.codedefenders.exceptions.CodeValidatorException;
 import org.codedefenders.itests.IntegrationTest;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.rules.DatabaseRule;
@@ -164,7 +166,7 @@ public class ParallelizeTest {
 	}
 
 	@Test
-	public void testRunAllTestsOnMutant() throws IOException {
+	public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException {
 		User observer = new User("observer", "password", "demo@observer.com");
 		observer.insert();
 		//

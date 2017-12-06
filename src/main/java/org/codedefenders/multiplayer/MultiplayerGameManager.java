@@ -1,48 +1,27 @@
 package org.codedefenders.multiplayer;
 
-import static org.codedefenders.Constants.GRACE_PERIOD_MESSAGE;
-import static org.codedefenders.Constants.MUTANT_COMPILED_MESSAGE;
-import static org.codedefenders.Constants.MUTANT_CREATION_ERROR_MESSAGE;
-import static org.codedefenders.Constants.MUTANT_DUPLICATED_MESSAGE;
-import static org.codedefenders.Constants.MUTANT_INVALID_MESSAGE;
-import static org.codedefenders.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
-import static org.codedefenders.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
-import static org.codedefenders.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
-import static org.codedefenders.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
-import static org.codedefenders.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
-import static org.codedefenders.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
-import static org.codedefenders.Constants.TEST_INVALID_MESSAGE;
-import static org.codedefenders.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
-import static org.codedefenders.Constants.TEST_PASSED_ON_CUT_MESSAGE;
-import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
-
-import java.io.File;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
+import org.codedefenders.*;
+import org.codedefenders.events.Event;
+import org.codedefenders.events.EventStatus;
+import org.codedefenders.events.EventType;
+import org.codedefenders.exceptions.CodeValidatorException;
+import org.codedefenders.util.DatabaseAccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.codedefenders.AntRunner;
-import org.codedefenders.GameManager;
-import org.codedefenders.GameState;
-import org.codedefenders.Mutant;
-import org.codedefenders.MutationTester;
-import org.codedefenders.TargetExecution;
-import org.codedefenders.Test;
-import org.codedefenders.events.Event;
-import org.codedefenders.events.EventStatus;
-import org.codedefenders.events.EventType;
-import org.codedefenders.util.DatabaseAccess;
-import org.codedefenders.validation.CodeValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.codedefenders.Constants.*;
+import static org.codedefenders.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.Mutant.Equivalence.PROVEN_NO;
 
 public class MultiplayerGameManager extends HttpServlet {
 
@@ -106,7 +85,17 @@ public class MultiplayerGameManager extends HttpServlet {
 				String testText = request.getParameter("test");
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
-				Test newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
+
+				Test newTest = null;
+
+				try {
+					newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
+				} catch (CodeValidatorException cve) {
+					messages.add(TEST_GENERIC_ERROR_MESSAGE);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+					response.sendRedirect("play");
+					return;
+				}
 
 				if (newTest == null) {
 					messages.add(TEST_INVALID_MESSAGE);
@@ -204,10 +193,11 @@ public class MultiplayerGameManager extends HttpServlet {
 					// Get the text submitted by the user.
 					String mutantText = request.getParameter("mutant");
 
-					if (!GameManager.isMutantValid(activeGame.getClassId(), mutantText)) {
+					String validityMessage = GameManager.getMutantValidityMessage(activeGame.getClassId(), mutantText);
+					if (!validityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE)) {
 						// Mutant is either the same as the CUT or it contains invalid code
 						// Do not restore mutated code
-						messages.add(MUTANT_INVALID_MESSAGE);
+						messages.add(validityMessage);
 						break;
 					}
 					Mutant existingMutant = GameManager.existingMutant(activeGame.getId(), mutantText);
@@ -261,20 +251,28 @@ public class MultiplayerGameManager extends HttpServlet {
 					String testText = request.getParameter("test");
 
 					// If it can be written to file and compiled, end turn. Otherwise, dont.
-					Test newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
+					Test newTest = null;
 
+					try {
+						newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
+					} catch (CodeValidatorException cve) {
+						messages.add(TEST_GENERIC_ERROR_MESSAGE);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						response.sendRedirect("play");
+						return;
+					}
+
+					if (newTest == null) {
+						messages.add(TEST_INVALID_MESSAGE);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						response.sendRedirect("play");
+						return;
+					}
 					logger.info("New Test " + newTest.getId() + " by user " + uid);
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-					if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-						if (!CodeValidator.validTestCode(newTest.getJavaFile())) {
-							messages.add(TEST_INVALID_MESSAGE);
-							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-							response.sendRedirect("play");
-							return;
-						}
-						// the test is valid, but does it pass on the original class?
-						TargetExecution testOriginalTarget = AntRunner.testOriginal(new File(newTest.getDirectory()), newTest);
+					if (compileTestTarget.status.equals("SUCCESS")) {
+						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 						if (testOriginalTarget.status.equals("SUCCESS")) {
 							messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 

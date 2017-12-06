@@ -1,10 +1,9 @@
 package org.codedefenders;
 
-import java.util.Map;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import java.util.Map;
 
 /**
  * @author Jose Rojas
@@ -95,11 +94,10 @@ public class Constants {
 	public static final String MUTANT_VALIDATION_MODIFIER_MESSAGE = "Invalid mutant, sorry! Changing modifiers such as 'static' or 'public' is not allowed.";
 	public static final String MUTANT_VALIDATION_COMMENT_MESSAGE = "Invalid mutant, sorry! Adding or modifying comments is not allowed.";
 	public static final String MUTANT_VALIDATION_LOGIC_MESSAGE = "Invalid mutant, sorry! Your mutant contains new logical operations";
-	public static final String MUTANT_VALIDATION_OPERATORS_MESSAGE = "Invalid mutant, sorry! Your mutant contains prohibited operations such as bitshifts, ternary operators or multiple statments per line.";
+	public static final String MUTANT_VALIDATION_OPERATORS_MESSAGE = "Invalid mutant, sorry! Your mutant contains prohibited operations such as bitshifts, ternary operators, added comments or multiple statments per line.";
 	public static final String MUTANT_VALIDATION_CALLS_MESSAGE = "Your mutant contains calls to System.*, Random.* or new control structures.\n\nShame on you!";
 	public static final String MUTANT_VALIDATION_IDENTICAL_MESSAGE = "Invalid mutant, sorry! Your mutant is identical to the CUT";
 
-	public static final String MUTANT_INVALID_MESSAGE = "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)";
 	public static final String MUTANT_CREATION_ERROR_MESSAGE = "Oops! Something went wrong and the mutant was not created.";
 	public static final String MUTANT_DUPLICATED_MESSAGE = "Sorry, your mutant already exists in this game!";
 	public static final String MUTANT_CLAIMED_EQUIVALENT_MESSAGE = "Mutant claimed as equivalent, waiting for attacker to respond.";

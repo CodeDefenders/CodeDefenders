@@ -190,9 +190,7 @@
             if (!mutantKilledLines.containsKey(line)){
                 mutantKilledLines.put(line, new ArrayList<Mutant>());
             }
-
             mutantKilledLines.get(line).add(m);
-
         }
     }
     //ArrayList<String> messages = new ArrayList<String>();

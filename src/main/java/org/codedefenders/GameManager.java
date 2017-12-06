@@ -1,6 +1,7 @@
 package org.codedefenders;
 
 import org.codedefenders.duel.DuelGame;
+import org.codedefenders.exceptions.CodeValidatorException;
 import org.codedefenders.singleplayer.SinglePlayerGame;
 import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.util.FileManager;
@@ -42,10 +43,6 @@ public class GameManager extends HttpServlet {
 		logger.debug("Getting game " + gid + " for " + uid);
 
 		DuelGame activeGame = DatabaseAccess.getGameForKey("ID", gid);
-		if (activeGame == null) {
-			response.sendRedirect("games/user");
-			return;
-		}
 		session.setAttribute("game", activeGame);
 
 		// If the game is finished, redirect to the score page.
@@ -100,7 +97,18 @@ public class GameManager extends HttpServlet {
 					String testText = request.getParameter("test");
 
 					// If it can be written to file and compiled, end turn. Otherwise, dont.
-					Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
+
+					Test newTest = null;
+
+					try {
+						newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
+					} catch (CodeValidatorException e) {
+						logger.warn("Swallow Exception", e);
+						messages.add(TEST_GENERIC_ERROR_MESSAGE);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						response.sendRedirect("play");
+						return;
+					}
 					if (newTest == null) {
 						messages.add(TEST_INVALID_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -214,11 +222,12 @@ public class GameManager extends HttpServlet {
 
 				// Get the text submitted by the user.
 				String mutantText = request.getParameter("mutant");
-
-				if (!isMutantValid(activeGame.getClassId(), mutantText)) {
+				
+				String validityMessage = getMutantValidityMessage(activeGame.getClassId(), mutantText);
+				if (!validityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE)) {
 					// Mutant is either the same as the CUT or it contains invalid code
 					// Do not restore mutated code
-					messages.add(MUTANT_INVALID_MESSAGE);
+					messages.add(validityMessage);
 					break;
 				}
 				Mutant existingMutant = existingMutant(activeGame.getId(), mutantText);
@@ -279,20 +288,30 @@ public class GameManager extends HttpServlet {
 				String testText = request.getParameter("test");
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
-				Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
+				Test newTest = null;
 
+				try {
+					newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
+				} catch (CodeValidatorException e) {
+					logger.warn("Swallow Exception", e);
+					messages.add(TEST_GENERIC_ERROR_MESSAGE);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+					response.sendRedirect("play");
+					return;
+				}
+
+
+				if (newTest == null) {
+					messages.add(TEST_INVALID_MESSAGE);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+					response.sendRedirect("play");
+					return;
+				}
 				logger.debug("New Test " + newTest.getId());
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-				if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-					if (!CodeValidator.validTestCode(newTest.getJavaFile())) {
-						messages.add(TEST_INVALID_MESSAGE);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect("play");
-						return;
-					}
-					// the test is valid, but does it pass on the original class?
-					TargetExecution testOriginalTarget = AntRunner.testOriginal(new File(newTest.getDirectory()), newTest);
+				if (compileTestTarget.status.equals("SUCCESS")) {
+					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 					if (testOriginalTarget.status.equals("SUCCESS")) {
 						messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 						MutationTester.runTestOnAllMutants(activeGame, newTest, messages);
@@ -324,7 +343,7 @@ public class GameManager extends HttpServlet {
 		response.sendRedirect("play");//doGet(request, response);
 	}
 
-	public static boolean isMutantValid(int cid, String mutatedCode) throws IOException {
+	public static String getMutantValidityMessage(int cid, String mutatedCode) throws IOException {
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 
 		File sourceFile = new File(classMutated.getJavaFile());
@@ -335,7 +354,10 @@ public class GameManager extends HttpServlet {
 		String md5Mutant = CodeValidator.getMD5(mutatedCode);
 
 		// mutant is valid only if it differs from CUT and does not contain forbidden constructs
-		return (!md5CUT.equals(md5Mutant)) && CodeValidator.validMutant(sourceCode, mutatedCode);
+		if (md5CUT.equals(md5Mutant))
+			return Constants.MUTANT_VALIDATION_IDENTICAL_MESSAGE;
+
+		return CodeValidator.getValidationMessage(sourceCode, mutatedCode);
 	}
 
 	public static Mutant existingMutant(int gid, String mutatedCode) throws IOException {
@@ -382,8 +404,9 @@ public class GameManager extends HttpServlet {
 	 * @param subDirectory - Directory inside data for test to go
 	 * @return {@code null} if test is not valid
 	 * @throws IOException
+	 * @throws CodeValidatorException
 	 */
-	public static Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
+	public static Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException, CodeValidatorException {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
@@ -391,7 +414,19 @@ public class GameManager extends HttpServlet {
 
 		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
-		return AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
+		if (!CodeValidator.validTestCode(javaFile)) {
+			return null;
+		}
+
+		// Check the test actually passes when applied to the original code.
+		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
+		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest,
+				TargetExecution.Target.COMPILE_TEST);
+
+		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
+			AntRunner.testOriginal(newTestDir, newTest);
+		}
+		return newTest;
 	}
 
 }
