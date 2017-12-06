@@ -163,12 +163,9 @@ public class MutationTester {
 						killed++;
 						killedMutants.add(mutant);
 					}
-				} catch (InterruptedException | ExecutionException e) {
-					System.out.println(
-							"MutationTester.runTestOnAllMultiplayerMutants() ERROR While waiting results for mutant "
-									+ mutant);
-					e.printStackTrace();
-				}
+				} catch (InterruptedException | ExecutionException | CancellationException e) {
+                    logger.error("While waiting results for mutant " + mutant, e);
+                }
 			}
 
 			tasks.clear();
@@ -394,6 +391,8 @@ public class MutationTester {
             }
         }
 
+		// TODO In the original implementation (see commit 4fbdc78304374ee31a06d56f8ce67ca80309e24c for example)
+		// the first block and the second one are swapped. Why ?
         ArrayList<Test> missedTests = new ArrayList<Test>();
         if (game instanceof MultiplayerGame) {
             for (Test t : tests) {
