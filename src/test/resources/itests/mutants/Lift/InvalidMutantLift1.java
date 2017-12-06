@@ -6,7 +6,7 @@ public class Lift {
     private int numRiders = 0;    // default
 
     public Lift(int highestFloor) {
-        topFloor = highestFloor++;
+        topFloor = highestFloor;
     }
 
     public Lift(int highestFloor, int maxRiders) {
@@ -19,6 +19,7 @@ public class Lift {
     }
 
     public int getCurrentFloor() {
+        --topFloor;
         return currentFloor;
     }
 
