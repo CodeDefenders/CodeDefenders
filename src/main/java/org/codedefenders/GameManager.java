@@ -118,7 +118,7 @@ public class GameManager extends HttpServlet {
 
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-					if (compileTestTarget.status.equals("SUCCESS")) {
+					if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
 						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 						if (testOriginalTarget.status.equals("SUCCESS")) {
 							logger.info(TEST_PASSED_ON_CUT_MESSAGE);
@@ -310,7 +310,7 @@ public class GameManager extends HttpServlet {
 				logger.debug("New Test " + newTest.getId());
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-				if (compileTestTarget.status.equals("SUCCESS")) {
+				if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
 					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 					if (testOriginalTarget.status.equals("SUCCESS")) {
 						messages.add(TEST_PASSED_ON_CUT_MESSAGE);
@@ -414,16 +414,22 @@ public class GameManager extends HttpServlet {
 
 		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
-		if (!CodeValidator.validTestCode(javaFile)) {
-			return null;
-		}
-
-		// Check the test actually passes when applied to the original code.
 		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest,
 				TargetExecution.Target.COMPILE_TEST);
 
-		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
+		// If the test did not compile we short circuit here
+		if (compileTestTarget == null || ( compileTestTarget != null && ! compileTestTarget.status.equals("SUCCESS"))) {
+			return null;
+		}
+		
+		// Validate code or short circuit here
+		if (!CodeValidator.validTestCode(javaFile)) {
+			return null;
+		}
+
+		// Eventually check the test actually passes when applied to the original code.
+		if (compileTestTarget.status.equals("SUCCESS")) {
 			AntRunner.testOriginal(newTestDir, newTest);
 		}
 		return newTest;

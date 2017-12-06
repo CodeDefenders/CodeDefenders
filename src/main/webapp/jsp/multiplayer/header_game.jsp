@@ -18,6 +18,10 @@
         </div>
         <div style="text-align: center"><h1><%= mg.getCUT().getName() %></h1></div>
         <div>
+            <a href="#" class="btn btn-diff" id="btnScoringTooltip" data-toggle="modal" data-target="#scoringTooltip"
+               style="color: black; font-size: 18px; padding: 5px;">
+            <span class="glyphicon glyphicon-question-sign"></span>
+            </a>
             <a href="#" class="btn btn-default btn-diff" id="btnScoreboard" data-toggle="modal" data-target="#scoreboard">Show Scoreboard</a>
         </div>
     </div>

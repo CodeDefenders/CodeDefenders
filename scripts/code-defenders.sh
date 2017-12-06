@@ -178,7 +178,9 @@ __private_query_db "SELECT U.username AS username, IFNULL(AScore,0)+IFNULL(DScor
 grep -f ${participants} sorted-all-participants > sorted-participants
 
 # List ALL students with their last played role, if any
-__private_query_db "SELECT Username, GP.Role from users U left join (select P.User_ID as User_ID, MAX(G.Start_Time) as Start_Time, P.Role as Role from games G left join players P on G.ID=P.Game_ID GROUP BY P.User_ID) GP on U.User_ID=GP.User_ID WHERE U.User_ID>8;" > last-role-all-participants
+__private_query_db "SELECT Username, Role FROM users INNER JOIN players ON users.User_ID = players.User_ID INNER JOIN games ON players.Game_ID = games.ID INNER JOIN (SELECT players.User_ID, max(players.Game_ID) AS latestGame FROM players GROUP BY players.User_ID) AS lg ON lg.User_ID = players.User_ID AND lg.latestGame = games.ID;" > last-role-all-participants
+
+#__private_query_db "SELECT Username, GP.Role from users U left join (select P.User_ID as User_ID, MAX(G.Start_Time) as Start_Time, P.Role as Role from games G left join players P on G.ID=P.Game_ID GROUP BY P.User_ID) GP on U.User_ID=GP.User_ID WHERE U.User_ID>8;" > last-role-all-participants
 # Filter on students in class
 grep -f ${participants} last-role-all-participants > last-role-participants
 

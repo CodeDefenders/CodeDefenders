@@ -9,7 +9,7 @@ public class DB {
 
     private static final Logger logger = LoggerFactory.getLogger(DB.class);
 
-    public static Connection getConnection() {
+    public synchronized static Connection getConnection() {
         try {
             return DatabaseConnection.getConnection();
         } catch (Exception e) {

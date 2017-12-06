@@ -199,9 +199,6 @@ public class DatabaseAccess {
 			if (rs.next()) {
 				return true;
 			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-			DB.cleanup(conn, stmt);
 		} catch (Exception e) {
 			logger.error("Exception caught", e);
 		} finally {

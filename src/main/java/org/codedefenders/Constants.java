@@ -98,6 +98,7 @@ public class Constants {
 	public static final String MUTANT_VALIDATION_CALLS_MESSAGE = "Your mutant contains calls to System.*, Random.* or new control structures.\n\nShame on you!";
 	public static final String MUTANT_VALIDATION_IDENTICAL_MESSAGE = "Invalid mutant, sorry! Your mutant is identical to the CUT";
 
+	public static final String MUTANT_INVALID_MESSAGE = "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)";
 	public static final String MUTANT_CREATION_ERROR_MESSAGE = "Oops! Something went wrong and the mutant was not created.";
 	public static final String MUTANT_DUPLICATED_MESSAGE = "Sorry, your mutant already exists in this game!";
 	public static final String MUTANT_CLAIMED_EQUIVALENT_MESSAGE = "Mutant claimed as equivalent, waiting for attacker to respond.";
@@ -105,8 +106,8 @@ public class Constants {
 	public static final String MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE = "Cheeky! You cannot claim equivalence on untested lines!";
 	public static final String MUTANT_KILLED_BY_TEST_MESSAGE = "Test %d killed your mutant. Better luck with the next one!"; // test
 	public static final String MUTANT_SUBMITTED_MESSAGE = "Mutant submitted, may the force be with it.";
-	public static final String MUTANT_ALIVE_1_MESSAGE = "Cool, your mutant is alive.";
-	public static final String MUTANT_ALIVE_N_MESSAGE = "Awesome, your mutant survived %d existing tests!"; // number of tests
+	public static final String MUTANT_ALIVE_1_MESSAGE = "Cool, your mutant survived its first test.";
+	public static final String MUTANT_ALIVE_N_MESSAGE = "Awesome, your mutant survived %d tests!"; // number of tests that covered mutant
 	// JSP
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_TEST = "previousTest";
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_MUTANT = "previousMutant";
