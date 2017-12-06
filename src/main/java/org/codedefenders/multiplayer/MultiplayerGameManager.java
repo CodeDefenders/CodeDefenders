@@ -74,7 +74,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 		switch (request.getParameter("formType")) {
 			case "startGame": {
-				if(activeGame.getState().equals(GameState.CREATED)) {
+				if (activeGame.getState().equals(GameState.CREATED)) {
 					logger.info("Starting multiplayer game {} (Setting state to ACTIVE)", activeGame.getId());
 					activeGame.setState(GameState.ACTIVE);
 					activeGame.update();
@@ -83,7 +83,7 @@ public class MultiplayerGameManager extends HttpServlet {
 				break;
 			}
 			case "endGame": {
-				if(activeGame.getState().equals(GameState.ACTIVE)) {
+				if (activeGame.getState().equals(GameState.ACTIVE)) {
 					logger.info("Ending multiplayer game {} (Setting state to FINISHED)", activeGame.getId());
 					activeGame.setState(GameState.FINISHED);
 					activeGame.update();
@@ -97,7 +97,7 @@ public class MultiplayerGameManager extends HttpServlet {
 			case "resolveEquivalence": {
 				int currentEquivMutantID = Integer.parseInt(request.getParameter("currentEquivMutant"));
 
-				if (activeGame.getState().equals(GameState.FINISHED)){
+				if (activeGame.getState().equals(GameState.FINISHED)) {
 					messages.add(String.format("Game %d has finished.", activeGame.getId()));
 					response.sendRedirect("games");
 				}
@@ -137,7 +137,7 @@ public class MultiplayerGameManager extends HttpServlet {
 										uid,
 										DatabaseAccess.getUser(uid)
 												.getUsername() +
-										" killed a mutant in an equivalence " +
+												" killed a mutant in an equivalence " +
 												"duel.",
 										EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
 										new Timestamp(System.currentTimeMillis()));
@@ -166,15 +166,15 @@ public class MultiplayerGameManager extends HttpServlet {
 						}
 						if (killedClaimed) {
 							messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
-							if (killedOthers==1)
+							if (killedOthers == 1)
 								messages.add("...and it also killed another claimed mutant!");
-							else if (killedOthers>1)
+							else if (killedOthers > 1)
 								messages.add(String.format("...and it also killed other %d claimed mutants!", killedOthers));
 						} else {
 							messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
-							if (killedOthers==1)
+							if (killedOthers == 1)
 								messages.add("...however, your test did kill another claimed mutant!");
-							else if (killedOthers>1)
+							else if (killedOthers > 1)
 								messages.add(String.format("...however, your test killed other %d claimed mutants!", killedOthers));
 						}
 						newTest.update();
@@ -195,7 +195,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 				}
 			}
-				break;
+			break;
 
 			case "createMutant":
 
@@ -204,7 +204,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					// Get the text submitted by the user.
 					String mutantText = request.getParameter("mutant");
 
-					if (! GameManager.isMutantValid(activeGame.getClassId(), mutantText)) {
+					if (!GameManager.isMutantValid(activeGame.getClassId(), mutantText)) {
 						// Mutant is either the same as the CUT or it contains invalid code
 						// Do not restore mutated code
 						messages.add(MUTANT_INVALID_MESSAGE);
@@ -216,7 +216,7 @@ public class MultiplayerGameManager extends HttpServlet {
 						TargetExecution existingMutantTarget = DatabaseAccess.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
 						if (existingMutantTarget != null
 								&& !existingMutantTarget.status.equals("SUCCESS")
-								&& existingMutantTarget.message != null && !existingMutantTarget .message.isEmpty()) {
+								&& existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
 							messages.add(existingMutantTarget.message);
 						}
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
@@ -267,7 +267,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 					if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-						if (! CodeValidator.validTestCode(newTest.getJavaFile())) {
+						if (!CodeValidator.validTestCode(newTest.getJavaFile())) {
 							messages.add(TEST_INVALID_MESSAGE);
 							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 							response.sendRedirect("play");

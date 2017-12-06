@@ -18,42 +18,42 @@ public class CodeValidatorTest {
 
 	@Test
 	public void testInvalidSuiteWithTwoClasses() throws IOException {
-		
+
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TwoClasses.java");
 		assertFalse("Should be invalid; file contains a two classes", validTestCode(url.getPath()));
 	}
 
 	@Test
 	public void testInvalidEmptyTest() throws IOException {
-		
+
 		URL url = Thread.currentThread().getContextClassLoader().getResource("EmptyTest.java");
 		assertFalse(validTestCode(url.getPath()));
 	}
 
 	@Test
 	public void testInvalidTwoTests() throws IOException {
-		
+
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TwoTests.java");
 		assertFalse("Should be invalid; class contains two tests", validTestCode(url.getPath()));
 	}
 
 	@Test
 	public void testInvalidTestWithTooManyAssertions() throws IOException {
-		
+
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TestWithTooManyAssertions.java");
 		assertFalse("Should be invalid; test has too many assertions", validTestCode(url.getPath()));
 	}
 
 	@Test
 	public void testInvalidTestWithIf() throws IOException {
-		
+
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TestWithIf.java");
 		assertFalse("Should be invalid; test contains if statement", validTestCode(url.getPath()));
 	}
 
 	@Test
 	public void testInvalidTestWithSystemCalls() throws IOException {
-		
+
 		URL url = Thread.currentThread().getContextClassLoader().getResource("TestWithSystemCall.java");
 		assertFalse("Should be invalid; test contains system call", validTestCode(url.getPath()));
 
@@ -67,7 +67,7 @@ public class CodeValidatorTest {
 
 	@Test
 	public void testValidTest() throws IOException {
-		
+
 		URL url = Thread.currentThread().getContextClassLoader().getResource("ValidTest.java");
 		assertTrue("Should be valid", validTestCode(url.getPath()));
 	}
@@ -84,7 +84,7 @@ public class CodeValidatorTest {
 		String orig = "int x = x + 1;";
 		String mutant = "int x = x - 1;";
 
-		
+
 		assertTrue(validMutant(orig, mutant));
 	}
 

@@ -25,24 +25,24 @@ class MutationVisitor extends ModifierVisitorAdapter {
 	}
 
 	@Override
-	public Node visit (ClassOrInterfaceDeclaration stmt, Object args) {
-		super.visit(stmt,args);
+	public Node visit(ClassOrInterfaceDeclaration stmt, Object args) {
+		super.visit(stmt, args);
 		logger.info("Invalid mutation contains class declaration.");
 		isValid = false;
 		return stmt;
 	}
 
 	@Override
-	public Node visit (MethodDeclaration stmt, Object args) {
-		super.visit(stmt,args);
+	public Node visit(MethodDeclaration stmt, Object args) {
+		super.visit(stmt, args);
 		logger.info("Invalid mutation contains method declaration.");
 		isValid = false;
 		return stmt;
 	}
 
 	@Override
-	public Node visit (NameExpr stmt, Object args) {
-		super.visit(stmt,args);
+	public Node visit(NameExpr stmt, Object args) {
+		super.visit(stmt, args);
 		if (stmt.getName().equals("System")) {
 			logger.info("Invalid mutation contains System uses");
 			isValid = false;
@@ -51,56 +51,56 @@ class MutationVisitor extends ModifierVisitorAdapter {
 	}
 
 	@Override
-	public Node visit (ForeachStmt stmt, Object args) {
-		super.visit(stmt,args);
+	public Node visit(ForeachStmt stmt, Object args) {
+		super.visit(stmt, args);
 		logger.info("Invalid mutation contains a ForeachStmt statement");
 		isValid = false;
 		return stmt;
 	}
 
 	@Override
-	public Node visit (IfStmt stmt, Object args) {
-		super.visit(stmt,args);
+	public Node visit(IfStmt stmt, Object args) {
+		super.visit(stmt, args);
 		logger.info("Invalid mutation contains an IfStmt statement");
 		isValid = false;
 		return stmt;
 	}
 
 	@Override
-	public Node visit (ForStmt stmt, Object args) {
-		super.visit(stmt,args);
+	public Node visit(ForStmt stmt, Object args) {
+		super.visit(stmt, args);
 		logger.info("Invalid mutation contains a ForStmt statement");
 		isValid = false;
 		return stmt;
 	}
 
 	@Override
-	public Node visit (WhileStmt stmt, Object args) {
-		super.visit(stmt,args);
+	public Node visit(WhileStmt stmt, Object args) {
+		super.visit(stmt, args);
 		logger.info("Invalid mutation contains a WhileStmt statement");
 		isValid = false;
 		return stmt;
 	}
 
 	@Override
-	public Node visit (DoStmt stmt, Object args) {
-		super.visit(stmt,args);
+	public Node visit(DoStmt stmt, Object args) {
+		super.visit(stmt, args);
 		logger.info("Invalid mutation contains a DoStmt statement");
 		isValid = false;
 		return stmt;
 	}
 
 	@Override
-	public Node visit (SwitchStmt stmt, Object args) {
-		super.visit(stmt,args);
+	public Node visit(SwitchStmt stmt, Object args) {
+		super.visit(stmt, args);
 		logger.info("Invalid mutation contains a SwitchStmt statement");
 		isValid = false;
 		return stmt;
 	}
 
 	@Override
-	public Node visit (MethodCallExpr stmt, Object args) {
-		super.visit(stmt,args);
+	public Node visit(MethodCallExpr stmt, Object args) {
+		super.visit(stmt, args);
 		if (stmt.toString().startsWith("System.")) {
 			logger.info("Invalid mutation contains a call to System.*");
 			isValid = false;
@@ -109,8 +109,8 @@ class MutationVisitor extends ModifierVisitorAdapter {
 	}
 
 	@Override
-	public Node visit (VariableDeclarator stmt, Object args) {
-		super.visit(stmt,args);
+	public Node visit(VariableDeclarator stmt, Object args) {
+		super.visit(stmt, args);
 		if (stmt.getInit() != null && stmt.getInit().toString().startsWith("System.*")) {
 			logger.info("Invalid mutation contains variable declaration using System.*");
 			isValid = false;

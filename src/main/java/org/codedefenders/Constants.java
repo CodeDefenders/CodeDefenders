@@ -11,46 +11,46 @@ import javax.naming.NamingException;
  */
 public class Constants {
 
-    public static final String F_SEP = System.getProperty("file.separator");
+	public static final String F_SEP = System.getProperty("file.separator");
 
-    public static String DATA_DIR;
+	public static String DATA_DIR;
 
-    static {
-        // First check the Web abb context
-        InitialContext initialContext;
-        String dataHome = null;
-        try {
-            initialContext = new InitialContext();
-            Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
-            dataHome = (String) environmentContext.lookup("data.dir");
+	static {
+		// First check the Web abb context
+		InitialContext initialContext;
+		String dataHome = null;
+		try {
+			initialContext = new InitialContext();
+			Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
+			dataHome = (String) environmentContext.lookup("data.dir");
 
-        } catch (NamingException e) {
-            // e.printStackTrace();
-        }
+		} catch (NamingException e) {
+			// e.printStackTrace();
+		}
 
-        // Check Env
-        if (dataHome == null) {
-            ProcessBuilder pb = new ProcessBuilder();
-            Map env = pb.environment();
-            dataHome = (String) env.get("CODEDEFENDERS_DATA");
-        }
-        // Check System properties
-        if (dataHome == null) {
-            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-                dataHome = System.getProperty("codedefenders.data", "C:/codedefenders-data");
-            } else {
-                dataHome = System.getProperty("codedefenders.data", "/var/lib/codedefenders");
-            }
-        }
+		// Check Env
+		if (dataHome == null) {
+			ProcessBuilder pb = new ProcessBuilder();
+			Map env = pb.environment();
+			dataHome = (String) env.get("CODEDEFENDERS_DATA");
+		}
+		// Check System properties
+		if (dataHome == null) {
+			if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+				dataHome = System.getProperty("codedefenders.data", "C:/codedefenders-data");
+			} else {
+				dataHome = System.getProperty("codedefenders.data", "/var/lib/codedefenders");
+			}
+		}
 
 		DATA_DIR = dataHome;
 	}
 
 	//public static String DATA_DIR    = F_SEP + "WEB-INF" + F_SEP + "data";
-	public static String CUTS_DIR    = DATA_DIR + F_SEP + "sources";
+	public static String CUTS_DIR = DATA_DIR + F_SEP + "sources";
 	public static String MUTANTS_DIR = DATA_DIR + F_SEP + "mutants";
-	public static String TESTS_DIR   = DATA_DIR + F_SEP + "tests";
-	public static String AI_DIR      = DATA_DIR + F_SEP + "ai";
+	public static String TESTS_DIR = DATA_DIR + F_SEP + "tests";
+	public static String AI_DIR = DATA_DIR + F_SEP + "ai";
 
 	public static final String TEST_PREFIX = "Test";
 	public static final String JAVA_SOURCE_EXT = ".java";
@@ -60,12 +60,12 @@ public class Constants {
 
 	public static final String GRACE_PERIOD_MESSAGE = "Game is now in grace period.";
 
-	public static final String LOGIN_VIEW_JSP           = "jsp" + F_SEP + "login_view.jsp";
-	public static final String RESOLVE_EQUIVALENCE_JSP  = "jsp" + F_SEP + "resolve_equivalence.jsp";
-	public static final String ATTACKER_VIEW_JSP        = "jsp" + F_SEP + "attacker_view.jsp";
-	public static final String DEFENDER_VIEW_JSP        = "jsp" + F_SEP + "defender_view.jsp";
-	public static final String SCORE_VIEW_JSP           = "jsp" + F_SEP + "score_view.jsp";
-	public static final String UTESTING_VIEW_JSP        = "jsp" + F_SEP + "utesting_view.jsp";
+	public static final String LOGIN_VIEW_JSP = "jsp" + F_SEP + "login_view.jsp";
+	public static final String RESOLVE_EQUIVALENCE_JSP = "jsp" + F_SEP + "resolve_equivalence.jsp";
+	public static final String ATTACKER_VIEW_JSP = "jsp" + F_SEP + "attacker_view.jsp";
+	public static final String DEFENDER_VIEW_JSP = "jsp" + F_SEP + "defender_view.jsp";
+	public static final String SCORE_VIEW_JSP = "jsp" + F_SEP + "score_view.jsp";
+	public static final String UTESTING_VIEW_JSP = "jsp" + F_SEP + "utesting_view.jsp";
 
 	// Messages
 	public static final String WINNER_MESSAGE = "You won!";

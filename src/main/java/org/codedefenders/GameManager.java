@@ -71,7 +71,7 @@ public class GameManager extends HttpServlet {
 			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.DEFENDER_VIEW_JSP);
 			dispatcher.forward(request, response);
 		}// else
-			// response.sendRedirect(request.getHeader("referer"));
+		// response.sendRedirect(request.getHeader("referer"));
 	}
 
 	// Based on the data provided, update information for the game
@@ -170,10 +170,10 @@ public class GameManager extends HttpServlet {
 				if (request.getParameter("mutantId") != null) {
 					int mutantId = Integer.parseInt(request.getParameter("mutantId"));
 					Mutant mutantClaimed = DatabaseAccess.getMutant(activeGame, mutantId);
-					if(activeGame.getMode().equals(GameMode.SINGLE)) {
+					if (activeGame.getMode().equals(GameMode.SINGLE)) {
 						// TODO: Why is this not handled in the single player game but here?
 						//Singleplayer - use automatic system.
-						if(AntRunner.potentialEquivalent(mutantClaimed)) {
+						if (AntRunner.potentialEquivalent(mutantClaimed)) {
 							//Is potentially equiv - accept as equivalent
 							mutantClaimed.kill(Mutant.Equivalence.DECLARED_YES);
 							messages.add("The AI has accepted the mutant as equivalent.");
@@ -182,7 +182,7 @@ public class GameManager extends HttpServlet {
 							messages.add("The AI has submitted a test that kills the mutant and proves it non-equivalent!");
 						}
 						activeGame.endTurn();
-						if(!activeGame.getState().equals(GameState.FINISHED)) {
+						if (!activeGame.getState().equals(GameState.FINISHED)) {
 							//The ai should make another move if the game isn't over
 							SinglePlayerGame spg = (SinglePlayerGame) activeGame;
 							if (spg.getAi().makeTurn()) {
@@ -215,7 +215,7 @@ public class GameManager extends HttpServlet {
 				// Get the text submitted by the user.
 				String mutantText = request.getParameter("mutant");
 
-				if (! isMutantValid(activeGame.getClassId(), mutantText)) {
+				if (!isMutantValid(activeGame.getClassId(), mutantText)) {
 					// Mutant is either the same as the CUT or it contains invalid code
 					// Do not restore mutated code
 					messages.add(MUTANT_INVALID_MESSAGE);
@@ -227,7 +227,7 @@ public class GameManager extends HttpServlet {
 					TargetExecution existingMutantTarget = DatabaseAccess.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
 					if (existingMutantTarget != null
 							&& !existingMutantTarget.status.equals("SUCCESS")
-							&& existingMutantTarget.message != null && !existingMutantTarget .message.isEmpty()) {
+							&& existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
 						messages.add(existingMutantTarget.message);
 					}
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
@@ -241,9 +241,9 @@ public class GameManager extends HttpServlet {
 						MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
 
 						// TODO: Why doesnt that happen in SinglePlayerGame.endTurn()?
-						if(activeGame.getMode().equals(GameMode.SINGLE)) {
+						if (activeGame.getMode().equals(GameMode.SINGLE)) {
 							//Singleplayer - check for potential equivalent.
-							if(AntRunner.potentialEquivalent(newMutant)) {
+							if (AntRunner.potentialEquivalent(newMutant)) {
 								//Is potentially equiv - mark as equivalent and update.
 								messages.add("The AI has started an equivalence challenge on your last mutant.");
 								newMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
@@ -262,7 +262,7 @@ public class GameManager extends HttpServlet {
 						activeGame.update();
 					} else {
 						messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
-						if (compileMutantTarget != null && compileMutantTarget.message != null && ! compileMutantTarget.message.isEmpty())
+						if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty())
 							messages.add(compileMutantTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
 					}
@@ -285,7 +285,7 @@ public class GameManager extends HttpServlet {
 				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 				if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-					if (! CodeValidator.validTestCode(newTest.getJavaFile())) {
+					if (!CodeValidator.validTestCode(newTest.getJavaFile())) {
 						messages.add(TEST_INVALID_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						response.sendRedirect("play");
@@ -300,7 +300,7 @@ public class GameManager extends HttpServlet {
 						activeGame.update();
 						// TODO: Why doesn't that simply happen in SinglePlayerGame.endTurn?
 						// if single-player game is not finished, make a move
-						if (! activeGame.getState().equals(GameState.FINISHED)
+						if (!activeGame.getState().equals(GameState.FINISHED)
 								&& activeGame.getMode().equals(GameMode.SINGLE)) {
 							SinglePlayerGame g = (SinglePlayerGame) activeGame;
 							if (g.getAi().makeTurn()) {
@@ -335,7 +335,7 @@ public class GameManager extends HttpServlet {
 		String md5Mutant = CodeValidator.getMD5(mutatedCode);
 
 		// mutant is valid only if it differs from CUT and does not contain forbidden constructs
-		return (! md5CUT.equals(md5Mutant)) && CodeValidator.validMutant(sourceCode, mutatedCode);
+		return (!md5CUT.equals(md5Mutant)) && CodeValidator.validMutant(sourceCode, mutatedCode);
 	}
 
 	public static Mutant existingMutant(int gid, String mutatedCode) throws IOException {
@@ -375,7 +375,6 @@ public class GameManager extends HttpServlet {
 	}
 
 	/**
-	 *
 	 * @param gid
 	 * @param cid
 	 * @param testText

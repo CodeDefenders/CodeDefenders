@@ -52,7 +52,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DatabaseConnection.class }) // , MutationTester.class })
+@PrepareForTest({DatabaseConnection.class}) // , MutationTester.class })
 public class ParallelizeTest {
 
 	// PowerMock does not work with @ClassRule !!

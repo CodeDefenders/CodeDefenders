@@ -94,7 +94,7 @@ public class CodeValidator {
 
 
 	private static Boolean containsProhibitedModifierChanges(List<DiffMatchPatch.Diff> changes) {
-		for (DiffMatchPatch.Diff change : changes){
+		for (DiffMatchPatch.Diff change : changes) {
 			for (String operator : PROHIBITED_MODIFIER_CHANGES) {
 				if (change.text.contains(operator)) {
 					return true;
@@ -111,15 +111,15 @@ public class CodeValidator {
 			MutationVisitor visitor = new MutationVisitor();
 			visitor.visit(blockStmt, null);
 			return visitor.isValid();
-		} catch (ParseException|TokenMgrError e) {
+		} catch (ParseException | TokenMgrError e) {
 			// diff did not compile as a block, let's try some regex
 			// TODO: there must be a better way of doing this
 			logger.warn("Swallowing exception. Could not parse diff \"{}\" as a block.", diff);
 			// remove whitespaces
-			String diff2 = diff.replaceAll("\\s+","");
+			String diff2 = diff.replaceAll("\\s+", "");
 			// forbid logical operators unless they appear on their own (LOR)
-			if ((diff2.contains("|") && ! ("|".equals(diff2) || "||".equals(diff2)))
-					|| (diff2.contains("&") && ! ("&".equals(diff2) || "&&".equals(diff2)))) {
+			if ((diff2.contains("|") && !("|".equals(diff2) || "||".equals(diff2)))
+					|| (diff2.contains("&") && !("&".equals(diff2) || "&&".equals(diff2)))) {
 				return false;
 			}
 			// forbid if, while, for, and system calls, and ?: operator
