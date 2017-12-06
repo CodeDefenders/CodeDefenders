@@ -1,20 +1,32 @@
 package org.codedefenders.validation;
 
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.expr.*;
-import com.github.javaparser.ast.stmt.*;
-import com.github.javaparser.ast.visitor.ModifierVisitorAdapter;
 import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.expr.AssignExpr;
+import com.github.javaparser.ast.expr.BinaryExpr;
+import com.github.javaparser.ast.expr.ConditionalExpr;
+import com.github.javaparser.ast.expr.MethodCallExpr;
+import com.github.javaparser.ast.expr.NameExpr;
+import com.github.javaparser.ast.stmt.AssertStmt;
+import com.github.javaparser.ast.stmt.DoStmt;
+import com.github.javaparser.ast.stmt.ExpressionStmt;
+import com.github.javaparser.ast.stmt.ForStmt;
+import com.github.javaparser.ast.stmt.ForeachStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.SwitchStmt;
+import com.github.javaparser.ast.stmt.WhileStmt;
+import com.github.javaparser.ast.visitor.ModifierVisitorAdapter;
+
 /**
  * @author Jose Rojas
  */
-class TestCodeVisitor extends ModifierVisitorAdapter<Object> {
+class TestCodeVisitor extends ModifierVisitorAdapter {
 
 	private static final Logger logger = LoggerFactory.getLogger(TestCodeVisitor.class);
 
@@ -159,8 +171,7 @@ class TestCodeVisitor extends ModifierVisitorAdapter<Object> {
 	}
 
 	@Override
-	public Node visit (VariableDeclarator stmt, Object args)
-	{
+	public Node visit (VariableDeclarator stmt, Object args) {
 		super.visit(stmt,args);
 		if (stmt.getInit() != null && (stmt.getInit().toString().startsWith("System.*") || stmt.getInit().toString().startsWith("Random.*"))) {
 			logger.info("There is a variable declaration using System/Random.*");

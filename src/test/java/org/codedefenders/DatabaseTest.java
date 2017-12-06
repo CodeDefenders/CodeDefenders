@@ -44,18 +44,4 @@ public class DatabaseTest {
 		}
 	}
 
-	// @org.junit.Test
-	// public void loadResource() throws IOException {
-	// InputStream from =
-	// getClass().getClassLoader().getResourceAsStream("db/emptydb.sql");
-	// assertNotNull( "Resource is null", from );
-	// try (BufferedReader reader = new BufferedReader(new
-	// InputStreamReader(from));) {
-	// String str;
-	// while ((str = reader.readLine()) != null) {
-	// System.out.println("DatabaseTest.loadResource() " + str);
-	// }
-	//
-	// }
-	// }
 }
