@@ -394,19 +394,8 @@ public class MutationTester {
             }
         }
 
-        // Mutant survived
-        if (tests.size() == 0)
-            messages.add(MUTANT_SUBMITTED_MESSAGE);
-        else if (tests.size() <= 1)
-            messages.add(MUTANT_ALIVE_1_MESSAGE);
-        else
-            messages.add(String.format(MUTANT_ALIVE_N_MESSAGE, tests.size()));
-        Event notif = new Event(-1, game.getId(), u.getId(), u.getUsername() + "&#39;s mutant survives the test suite.",
-                EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-        notif.insert();
-
+        ArrayList<Test> missedTests = new ArrayList<Test>();
         if (game instanceof MultiplayerGame) {
-            ArrayList<Test> missedTests = new ArrayList<Test>();
             for (Test t : tests) {
                 if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), mutant.getLines()))
                     missedTests.add(t);
@@ -414,6 +403,18 @@ public class MutationTester {
             mutant.setScore(1 + Scorer.score((MultiplayerGame) game, mutant, missedTests));
             mutant.update();
         }
+
+        int nbRelevantTests = missedTests.size();
+        // Mutant survived
+        if (nbRelevantTests == 0)
+            messages.add(MUTANT_SUBMITTED_MESSAGE);
+        else if (nbRelevantTests <= 1)
+            messages.add(MUTANT_ALIVE_1_MESSAGE);
+        else
+            messages.add(String.format(MUTANT_ALIVE_N_MESSAGE, nbRelevantTests));
+        Event notif = new Event(-1, game.getId(), u.getId(), u.getUsername() + "&#39;s mutant survives the test suite.",
+                EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
+        notif.insert();
     }
 
     /**
