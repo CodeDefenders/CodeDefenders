@@ -5,7 +5,7 @@
 	<%@include file="/jsp/multiplayer/game_unit_tests.jsp"%>
 	</div>
 	<div class="w-55" id="newmut-div">
-		<form id="atk" action="/multiplayer/move" method="post">
+		<form id="atk" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
 			<h2>Create a mutant here
 				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk" onClick="this.form.submit(); this.disabled=true; this.value='Attacking...';"
 						<% if (!mg.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>

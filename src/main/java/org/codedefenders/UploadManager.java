@@ -145,6 +145,8 @@ public class UploadManager extends HttpServlet {
 
 	public void storeClass(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages, String fileName, String fileContent, GameClass cut, boolean shouldPrepareAI) throws IOException {
 
+		String contextPath = request.getContextPath();
+
 		String cutDir = Constants.CUTS_DIR + Constants.F_SEP + cut.getAlias();
 		File targetFile = new File(cutDir + Constants.F_SEP + fileName);
 		assert (!targetFile.exists());
@@ -176,7 +178,7 @@ public class UploadManager extends HttpServlet {
 				}
 			}
 			messages.add("Class uploaded successfully. It will be referred to as: " + cut.getAlias());
-			response.sendRedirect("games/user");
+			response.sendRedirect(contextPath+"/games/user");
 
 		} else {
 			cut.delete();

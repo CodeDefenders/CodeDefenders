@@ -86,7 +86,7 @@
             var interval = 5000;
             var lastTime = 0;
             setInterval(function () {
-                var url = "/game_notifications?gameId=" + <%=gameId%> +"&timestamp=" + lastTime;
+                var url = "<%= request.getContextPath()%>" + "/game_notifications?gameId=" + <%=gameId%> +"&timestamp=" + lastTime;
                 lastTime = Math.round(new Date().getTime()/1000);
                 updateGameNotifications(url);
             }, interval)

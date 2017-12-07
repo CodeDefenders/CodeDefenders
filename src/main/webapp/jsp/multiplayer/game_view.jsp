@@ -27,7 +27,7 @@
     }
 
     if (redirectToGames){
-        response.sendRedirect("/games/user");
+        response.sendRedirect(request.getContextPath()+"/games/user");
         return;
     }
 %>
@@ -51,7 +51,7 @@
 	HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<>();
 
     if ((mg.getState().equals(GameState.CREATED) || mg.getState().equals(GameState.FINISHED)) && (!role.equals(Role.CREATOR))) {
-        response.sendRedirect("/games/user");
+        response.sendRedirect(request.getContextPath()+"/games/user");
     }
 
     List<Test> tests = mg.getTests(true); // get executable defenders' tests
@@ -214,7 +214,7 @@
             } else if (request.getParameter("attacker") != null){
                 mg.addPlayer(uid, Role.ATTACKER);
             } else {
-                response.sendRedirect("multiplayer/games/user");
+                response.sendRedirect(request.getContextPath()+"multiplayer/games/user");
                 break;
             }
             %>

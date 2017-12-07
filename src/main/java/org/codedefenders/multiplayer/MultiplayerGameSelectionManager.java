@@ -19,6 +19,7 @@ import java.util.ArrayList;
 public class MultiplayerGameSelectionManager extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		String contextPath = request.getContextPath();
         try {
             HttpSession session = request.getSession();
             // Get their user id from the session.
@@ -29,7 +30,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
             if (mg != null) {
                 mg.notifyPlayers();
-                String redirect = "/multiplayer/play?id=" + gameId;
+                String redirect = contextPath + "/multiplayer/play?id=" + gameId;
                 if (request.getParameter("attacker") != null) {
                     redirect += "&attacker=1";
                 } else if (request.getParameter("defender") != null) {
@@ -37,17 +38,17 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 }
                 response.sendRedirect(redirect);
             } else {
-                response.sendRedirect("/games/user");
+                response.sendRedirect(contextPath+"/multiplayer/games/user");
             }
 
         } catch (NumberFormatException nfe) {
-            response.sendRedirect("/games/user");
+            response.sendRedirect(contextPath + "/multiplayer/games/user");
         }
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession();
-
+        String contextPath = request.getContextPath();
         ArrayList<String> messages = new ArrayList<String>();
         session.setAttribute("messages", messages);
         try {
@@ -86,7 +87,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     //        rs.getString("State")
 
                     // Redirect to the game selection menu.
-                    response.sendRedirect("games");
+                    response.sendRedirect(contextPath+"/multiplayer/games");
                     break;
                 case "leaveGame":
                     int gameId = Integer.parseInt(request.getParameter("game"));
@@ -106,7 +107,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                         messages.add("An error occured while leaving game " +
                                 gameId);
                     }// Redirect to the game selection menu.
-                    response.sendRedirect("games");
+                    response.sendRedirect(contextPath+"/multiplayer/games");
                     break;
                 default:
                     System.err.println("Action not recognised");

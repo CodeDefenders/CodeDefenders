@@ -6,7 +6,8 @@ var sendMessage = function(elem){
     var ele = $(elem);
     if (ele.attr("target") && ele.attr("gameId")) {
         var inp = $(ele.parent().find("input"));
-        var url = "/messages/send?message=" + encodeURI(inp.val()) + "&target=" + ele.attr("target") + "&gameId=" + ele.attr("gameId");
+        // TODO Not sure how we get the contextPath here so we use relative url
+        var url = "messages/send?message=" + encodeURI(inp.val()) + "&target=" + ele.attr("target") + "&gameId=" + ele.attr("gameId");
 
         $('.send-message input').val('');
 

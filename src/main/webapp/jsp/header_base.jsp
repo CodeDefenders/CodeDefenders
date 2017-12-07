@@ -137,10 +137,10 @@
                 <div>
                     <div>
                         <div class="tabs-blue-grey">
-                            <a href="${pageContext.request.contextPath}" class="main-title" id="site-logo">
+                            <a href="${pageContext.request.contextPath}/" class="main-title" id="site-logo">
                                 <div class="crow">
                                     <div class="ws-12" style="font-size: 36px; text-align: center;">
-                                        <span><img class="logo" href="${pageContext.request.contextPath}" src="images/logo.png"/></span>
+                                        <span><img class="logo" href="${pageContext.request.contextPath}/" src="images/logo.png"/></span>
                                         Code Defenders
                                     </div>
                                 </div>

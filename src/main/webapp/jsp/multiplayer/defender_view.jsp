@@ -13,7 +13,7 @@
 				Defend!
 			</button>
 		</h2>
-		<form id="def" action="/multiplayer/move" method="post">
+		<form id="def" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
 			<%
 				String testCode;
 				String previousTestCode = (String) request.getSession().getAttribute("previousTest");

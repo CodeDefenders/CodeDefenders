@@ -33,8 +33,10 @@ public class GameManager extends HttpServlet {
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
 		Object ogid = session.getAttribute("gid");
+		String contextPath = request.getContextPath();
+
 		if (ogid == null) {
-			response.sendRedirect("games/user");
+			response.sendRedirect(contextPath+"/games/user");
 			return;
 		}
 

@@ -17,13 +17,13 @@ import java.util.ArrayList;
 
 public class GameSelectionManager extends HttpServlet {
 
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
-        response.sendRedirect("games/user");
-    }
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		String contextPath = request.getContextPath();
+		response.sendRedirect(contextPath + "/games/user");
+	}
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
+        String contextPath = request.getContextPath();
         HttpSession session = request.getSession();
         // Get their user id from the session.
         int uid = (Integer) session.getAttribute("uid");
@@ -50,7 +50,7 @@ public class GameSelectionManager extends HttpServlet {
 
                     if (rounds < 1 || rounds > 10) {
                         messages.add("Invalid rounds amount");
-                        response.sendRedirect("games");
+                        response.sendRedirect(contextPath+"/games");
                         return;
                     }
 
@@ -110,7 +110,7 @@ public class GameSelectionManager extends HttpServlet {
                     messages.add("There was a problem with the form.");
                 }
 
-                response.sendRedirect("games");
+                response.sendRedirect(contextPath+"/games");
 
 
                 break;
@@ -150,7 +150,7 @@ public class GameSelectionManager extends HttpServlet {
                         jGame.update();
                         // go to play view
                         session.setAttribute("gid", gameId);
-                        response.sendRedirect("play");
+                        response.sendRedirect(contextPath+"/play");
                     }
                 } catch (Exception e) {
                     messages.add("There was a problem joining the game.");
@@ -168,9 +168,9 @@ public class GameSelectionManager extends HttpServlet {
                     if (eGame.isUserInGame(uid)) {
                         session.setAttribute("gid", gameId);
                         if (eGame.getMode().equals(GameMode.UTESTING))
-                            response.sendRedirect("utesting");
+                            response.sendRedirect(contextPath+"/utesting");
                         else
-                            response.sendRedirect("play");
+                            response.sendRedirect(contextPath+"/play");
                     } else {
                         response.sendRedirect(request.getHeader("referer"));
                     }

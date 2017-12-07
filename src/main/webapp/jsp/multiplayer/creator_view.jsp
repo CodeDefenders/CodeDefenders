@@ -15,7 +15,7 @@
 
         <div class="admin-panel">
             <h2>Admin</h2>
-            <form id="adminEndBtn" action="/multiplayer/move" method="post">
+            <form id="adminEndBtn" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
 
                     <button type="submit" class="btn btn-primary btn-game btn-right" form="adminEndBtn"
                             <% if (!mg.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>
@@ -24,7 +24,7 @@
                     <input type="hidden" name="formType" value="endGame">
                     <input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
             </form>
-            <form id="adminStartBtn" action="/multiplayer/move" method="post">
+            <form id="adminStartBtn" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
                     <button type="submit" class="btn btn-primary btn-game btn-right" form="adminStartBtn"
                             <% if (!mg.getState().equals(GameState.CREATED)) { %> disabled <% } %>>
                         Start Game
