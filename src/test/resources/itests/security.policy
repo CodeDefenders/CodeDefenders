@@ -1,0 +1,93 @@
+//Jacoco permissions
+//grant codeBase "file:lib/*" {
+//      permission java.security.AllPermission;
+//};
+
+//java.policyjava.policyinstall_root/java/jre/lib/security/java.policy
+
+// Standard extensions get all permissions by default
+grant codeBase "file:${java.home}/lib/ext/*" {
+      permission java.security.AllPermission;
+};
+
+// default permissions granted to all domains
+grant {
+// Allows any thread to stop itself using the java.lang.Thread.stop()
+// method that takes no argument.
+// Note that this permission is granted by default only to remain
+// backwards compatible.
+// It is strongly recommended that you either remove this permission
+// from this policy file or further restrict it to code sources
+// that you specify, because Thread.stop() is potentially unsafe.
+// See "http://java.sun.com/notes" for more information.
+// permission java.lang.RuntimePermission "stopThread";
+
+// "standard" properties that can be read by anyone
+
+
+// permission java.util.SocketPermission;
+// AuthPermission
+// WebServicePermission
+// SQLPermission
+// DelegationPermission
+// UnresolvedPermission
+// AllPermission
+
+  permission javax.management.MBeanPermission "*", "*";
+  permission javax.management.MBeanServerPermission "*";
+  permission javax.management.MBeanTrustPermission "*";
+  permission java.lang.management.ManagementPermission "monitor";
+  permission javax.management.remote.SubjectDelegationPermission "*";
+//  permission javax.security.auth.PrivateCredentialPermission "*", "read"; // need principal name?
+  permission javax.net.ssl.SSLPermission "getSSLSessionContext";
+  permission javax.security.auth.kerberos.ServicePermission "*", "initiate";
+  permission javax.security.auth.kerberos.ServicePermission "*", "accept";
+  permission javax.sound.sampled.AudioPermission "*";
+  permission java.io.SerializablePermission "*";
+  permission java.security.SecurityPermission "getDomainCombiner";
+  permission java.security.SecurityPermission "getPolicy";
+  permission java.security.SecurityPermission "printIdentity";
+  permission java.security.SecurityPermission "getSignerPrivateKey";
+  permission java.security.SecurityPermission "getProperty.*";
+  permission java.security.SecurityPermission "putProviderProperty.*";
+  permission java.lang.RuntimePermission "getClassLoader";
+  permission java.lang.RuntimePermission "createClassLoader";
+  permission java.lang.RuntimePermission "accessClassInPackage*";
+  permission java.lang.RuntimePermission "defineClassInPackage*";
+  permission java.lang.RuntimePermission "setContextClassLoader";
+  permission java.lang.RuntimePermission "accessDeclaredMembers";
+  permission java.lang.RuntimePermission "shutdownHooks";
+  permission java.lang.RuntimePermission "modifyThreadGroup";
+  permission java.lang.RuntimePermission "modifyThread";
+  permission java.lang.RuntimePermission "setFactory";
+  permission java.lang.RuntimePermission "setIO";
+  permission java.lang.RuntimePermission "reflectionFactoryAccess";
+  permission java.lang.RuntimePermission "modifyThread";
+  permission java.lang.RuntimePermission "stopThread";
+  permission java.lang.RuntimePermission "modifyThreadGroup";
+  permission java.lang.RuntimePermission "setDefaultUncaughtExceptionHandler";
+  permission java.lang.RuntimePermission "getenv.*";
+  permission java.lang.RuntimePermission "getProtectionDomain";
+  permission java.lang.RuntimePermission "readFileDescriptor";
+  permission java.lang.RuntimePermission "loadLibrary.*";
+  permission java.lang.RuntimePermission "getStackTrace";
+  permission java.lang.RuntimePermission "charsetProvider";
+  permission java.lang.RuntimePermission "selectorProvider";
+
+  permission java.net.NetPermission "*";
+  permission java.lang.reflect.ReflectPermission "*";
+  permission java.util.logging.LoggingPermission "control";
+  permission java.awt.AWTPermission "*";
+  permission java.io.FilePermission "<<ALL FILES>>", "read";
+  permission java.io.FilePermission "/var/lib/codedefenders/-", "write";
+  
+  permission java.io.FilePermission "/tmp/var/lib/codedefenders/-", "write";
+  permission java.io.FilePermission "/tmp/codedefender/-", "read,write";
+  permission java.io.FilePermission "/tmp/defender/-", "read,write";
+  permission java.io.FilePermission "/private/tmp/defender/-", "read,write";
+  
+  permission java.io.FilePermission "/scratch/defender/-", "read,write";
+  
+  permission java.util.PropertyPermission "*", "read,write";
+
+};
