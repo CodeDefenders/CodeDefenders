@@ -1,6 +1,10 @@
+src/test/resources/itests/lib/*.jar
+
+credentials*
+
+config.properties*
 config.properties
 config.properties.system-tests@localhost
-credentials.cfg
 
 ### Logs ###
 *.log
