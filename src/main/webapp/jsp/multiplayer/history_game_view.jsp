@@ -14,7 +14,8 @@
             gameId = ((Integer) session.getAttribute("mpGameId")).intValue();
         }
     } catch (Exception e2){
-        response.sendRedirect(request.getContextPath()+"/multiplayer/games/user");
+        // response.sendRedirect(request.getContextPath()+"/multiplayer/games/user");
+        response.sendRedirect(request.getContextPath()+"/games/user");
     }
     boolean renderMutants = true;
 

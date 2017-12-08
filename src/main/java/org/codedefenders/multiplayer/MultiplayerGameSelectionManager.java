@@ -38,11 +38,13 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 }
                 response.sendRedirect(redirect);
             } else {
-                response.sendRedirect(contextPath+"/multiplayer/games/user");
+                // response.sendRedirect(contextPath+"/multiplayer/games/user");
+                response.sendRedirect(contextPath+"/games/user");
             }
 
         } catch (NumberFormatException nfe) {
-            response.sendRedirect(contextPath + "/multiplayer/games/user");
+            // response.sendRedirect(contextPath + "/multiplayer/games/user");
+            response.sendRedirect(contextPath + "/games/user");
         }
     }
 

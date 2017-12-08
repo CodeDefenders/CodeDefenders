@@ -214,7 +214,8 @@
             } else if (request.getParameter("attacker") != null){
                 mg.addPlayer(uid, Role.ATTACKER);
             } else {
-                response.sendRedirect(request.getContextPath()+"/multiplayer/games/user");
+                // response.sendRedirect(request.getContextPath()+"/multiplayer/games/user");
+                response.sendRedirect(request.getContextPath()+"/games/user");
                 break;
             }
             %>
