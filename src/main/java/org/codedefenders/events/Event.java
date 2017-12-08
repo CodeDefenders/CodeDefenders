@@ -1,10 +1,5 @@
 package org.codedefenders.events;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Timestamp;
-import java.util.HashMap;
-
 import org.codedefenders.Role;
 import org.codedefenders.User;
 import org.codedefenders.util.DB;
@@ -12,6 +7,11 @@ import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.util.DatabaseValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.util.HashMap;
 
 /**
  * Created by thomas on 06/03/2017.
@@ -190,6 +190,7 @@ public class Event {
 		if (DB.executeUpdate(stmt, conn)) {
 			eventId = gameId;
 			if (chatMessage != null) {
+				conn = DB.getConnection();
 				query = "INSERT INTO event_chat (Event_Id, Message) VALUES (?, ?);";
 				valueList = new DatabaseValue[]{DB.getDBV(eventId),
 						DB.getDBV(chatMessage)};
