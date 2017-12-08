@@ -33,7 +33,7 @@
                             ts += ((PlayerScore)testScores.get(-2)).getTotalScore();
                         } %>
                         <%= ts %>
-                    </span><img class="logo" href="/" src="images/logo.png"/><span class="defenderTotal">
+                    </span><img class="logo" href="<%=request.getContextPath() %>/" src="images/logo.png"/><span class="defenderTotal">
                     <% ts = 0;
                         if (testScores.containsKey(-1) && testScores.get(-1) != null){
                                 ts += ((PlayerScore)testScores.get(-1)).getTotalScore(); %>

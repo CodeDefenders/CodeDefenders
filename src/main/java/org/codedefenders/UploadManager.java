@@ -35,7 +35,7 @@ public class UploadManager extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-		response.sendRedirect("games/upload");
+		response.sendRedirect(request.getContextPath()+"/games/upload");
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

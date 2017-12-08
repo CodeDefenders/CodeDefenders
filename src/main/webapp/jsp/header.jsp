@@ -109,7 +109,7 @@
     </div>
 </div>
 
-<form id="logout" action="login" method="post">
+<form id="logout" action="<%=request.getContextPath() %>/login" method="post">
     <input type="hidden" name="formType" value="logOut">
 </form>
 

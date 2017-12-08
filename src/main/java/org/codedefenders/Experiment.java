@@ -49,7 +49,7 @@ public class Experiment extends HttpServlet {
 					errors.add("<tr><td>" + id + "</td><td>" + username + "</td><td>ERROR!</td></tr>");
 				}
 			}
-			response.sendRedirect("experiment");
+			response.sendRedirect( request.getContextPath() + "/experiment");
 		}
 	}
 }

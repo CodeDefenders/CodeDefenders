@@ -117,11 +117,11 @@
 
                 messages.add(String.format("Flagged %d mutant%s as equivalent", nClaimed, (nClaimed == 1 ? "" : 's')));
 
-                response.sendRedirect("play");
+                response.sendRedirect(request.getContextPath()+"/play");
             } else {
             	// equivLine is not covered, possible iff passed directly as url argument
                 messages.add(MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
-                response.sendRedirect("play");
+                response.sendRedirect(request.getContextPath()+"/play");
                 return;
             }
         } catch (NumberFormatException e){}
@@ -146,7 +146,7 @@
                             new Timestamp(System.currentTimeMillis()));
                     notifEquiv.insert();
 
-                    response.sendRedirect("play");
+                    response.sendRedirect(request.getContextPath()+"/play");
                 }
             }
         } catch (NumberFormatException e){}
@@ -214,7 +214,7 @@
             } else if (request.getParameter("attacker") != null){
                 mg.addPlayer(uid, Role.ATTACKER);
             } else {
-                response.sendRedirect(request.getContextPath()+"multiplayer/games/user");
+                response.sendRedirect(request.getContextPath()+"/multiplayer/games/user");
                 break;
             }
             %>

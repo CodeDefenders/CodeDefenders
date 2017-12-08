@@ -39,7 +39,7 @@
 		<td class="col-sm-2"><%= defName %></td>
 		<td class="col-sm-2"><%= g.getLevel().name() %></td>
 		<td class="col-sm-2">
-			<form id="view" action="games" method="post">
+			<form id="view" action="<%=request.getContextPath() %>/games" method="post">
 				<input type="hidden" name="formType" value="enterGame">
 				<input type="hidden" name="game" value=<%=g.getId()%>>
 				<input type="submit" class="btn btn-default" value="View Scores">

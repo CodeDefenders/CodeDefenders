@@ -84,7 +84,7 @@
 					btnLabel = "Enter";
 				}
 %>
-			<form id="view" action="games" method="post">
+			<form id="view" action="<%= request.getContextPath() %>/games" method="post">
 				<input type="hidden" name="formType" value="enterGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
 				<% if (uid == turnId ) {%>

@@ -60,8 +60,8 @@
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
 			</button>
-			<a class="navbar-brand" href="/">
-				<span><img class="logo" href="/" src="images/logo.png"/></span>
+			<a class="navbar-brand" href="<%=request.getContextPath() %>/">
+				<span><img class="logo" href="<%=request.getContextPath()%>/" src="images/logo.png"/></span>
 				Code Defenders
 			</a>
 		</div>
@@ -85,7 +85,7 @@
 	</div>
 </nav>
 
-<form id="logout" action="login" method="post">
+<form id="logout" action="<%=request.getContextPath() %>/login" method="post">
 	<input type="hidden" name="formType" value="logOut">
 </form>
 
@@ -122,7 +122,7 @@
 			<button type="submit" class="btn btn-primary btn-game btn-right" form="def">Submit</button>
 			<%} %>
 		</h2>
-		<form id="def" action="utesting" method="post">
+		<form id="def" action="<%=request.getContextPath() %>/utesting" method="post">
 			<%
 				String testCode;
 				String previousTestCode = (String) request.getSession().getAttribute("previousTest");

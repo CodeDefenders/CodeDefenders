@@ -108,13 +108,13 @@ public class GameManager extends HttpServlet {
 						logger.warn("Swallow Exception", e);
 						messages.add(TEST_GENERIC_ERROR_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect("play");
+						response.sendRedirect(request.getContextPath()+"/play");
 						return;
 					}
 					if (newTest == null) {
 						messages.add(TEST_INVALID_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect("play");
+						response.sendRedirect(request.getContextPath()+"/play");
 						return;
 					}
 
@@ -141,13 +141,13 @@ public class GameManager extends HttpServlet {
 									logger.info("Test {} failed to kill mutant {}", newTest.getId(), mutant.getId());
 									messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
 								}
-								response.sendRedirect("play");
+								response.sendRedirect(request.getContextPath()+"/play");
 								return;
 							} else {
 								activeGame.endRound();
 								activeGame.update();
 								messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
-								response.sendRedirect("play");
+								response.sendRedirect(request.getContextPath()+"/play");
 								return;
 							}
 						} else {
@@ -171,7 +171,7 @@ public class GameManager extends HttpServlet {
 						messages.add(MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 						activeGame.endRound();
 						activeGame.update();
-						response.sendRedirect("play");
+						response.sendRedirect(request.getContextPath()+"/play");
 						return;
 					}
 				}
@@ -298,7 +298,7 @@ public class GameManager extends HttpServlet {
 					logger.warn("Swallow Exception", e);
 					messages.add(TEST_GENERIC_ERROR_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect("play");
+					response.sendRedirect(request.getContextPath()+"/play");
 					return;
 				}
 
@@ -306,7 +306,7 @@ public class GameManager extends HttpServlet {
 				if (newTest == null) {
 					messages.add(TEST_INVALID_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect("play");
+					response.sendRedirect(request.getContextPath()+"/play");
 					return;
 				}
 				logger.debug("New Test " + newTest.getId());
@@ -342,7 +342,7 @@ public class GameManager extends HttpServlet {
 				break;
 		}
 
-		response.sendRedirect("play");//doGet(request, response);
+		response.sendRedirect(request.getContextPath()+"/play");//doGet(request, response);
 	}
 
 	public static String getMutantValidityMessage(int cid, String mutatedCode) throws IOException {
