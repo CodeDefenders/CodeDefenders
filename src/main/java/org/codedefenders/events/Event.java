@@ -187,8 +187,8 @@ public class Event {
 				DB.getDBV(eventType.toString()),
 				DB.getDBV(eventStatus.toString())};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		eventId = DB.executeUpdateGetKeys(stmt, conn);
-		if (eventId >= 0) {
+		if (DB.executeUpdate(stmt, conn)) {
+			eventId = gameId;
 			if (chatMessage != null) {
 				conn = DB.getConnection();
 				query = "INSERT INTO event_chat (Event_Id, Message) VALUES (?, ?);";
@@ -197,6 +197,8 @@ public class Event {
 				stmt = DB.createPreparedStatement(conn, query, valueList);
 				DB.executeUpdate(stmt, conn);
 			}
+		} else {
+			eventId = -1;
 		}
 		return eventId >= 0;
 	}
