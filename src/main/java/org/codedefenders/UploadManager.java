@@ -89,14 +89,22 @@ public class UploadManager extends HttpServlet {
 		// Not a java file
 		if (!fileName.endsWith(".java")) {
 			messages.add("The class under test must be a .java file.");
-			response.sendRedirect(request.getHeader("referer"));
+			String redirect = (String) request.getHeader("referer");
+			if( ! redirect.startsWith(request.getContextPath())){
+				redirect = request.getContextPath()+"/" + redirect;
+			}
+			response.sendRedirect(redirect);
 			return;
 		}
 
 		// no file content?
 		if (fileContent == null || fileContent.isEmpty()) {
 			messages.add("File content could not be read. Please try again.");
-			response.sendRedirect(request.getHeader("referer"));
+			String redirect = (String) request.getHeader("referer");
+			if( ! redirect.startsWith(request.getContextPath())){
+				redirect = request.getContextPath()+"/" + redirect;
+			}
+			response.sendRedirect(redirect);
 			return;
 		}
 
@@ -183,7 +191,11 @@ public class UploadManager extends HttpServlet {
 		} else {
 			cut.delete();
 			messages.add("We were unable to compile your class, please try with a simpler one (no dependencies)");
-			response.sendRedirect(request.getHeader("referer"));
+			String redirect = (String) request.getHeader("referer");
+			if( ! redirect.startsWith(request.getContextPath())){
+				redirect = request.getContextPath()+"/" + redirect;
+			}
+			response.sendRedirect(redirect);
 			return;
 		}
 	}

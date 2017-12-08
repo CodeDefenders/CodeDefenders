@@ -111,12 +111,20 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     break;
                 default:
                     System.err.println("Action not recognised");
-                    response.sendRedirect(request.getHeader("referer"));
+                    String redirect = (String) request.getHeader("referer");
+                    if( ! redirect.startsWith(request.getContextPath())){
+                        redirect = request.getContextPath()+"/" + redirect;
+                    }
+                    response.sendRedirect(redirect);
                     break;
             }
         } catch (Exception e) {
             messages.add("An error occurred");
-            response.sendRedirect(request.getHeader("referer"));
+            String redirect = (String) request.getHeader("referer");
+			if( ! redirect.startsWith(request.getContextPath())){
+				redirect = request.getContextPath()+"/" + redirect;
+			}
+			response.sendRedirect(redirect);
         }
     }
 }

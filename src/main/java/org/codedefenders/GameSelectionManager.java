@@ -90,7 +90,11 @@ public class GameSelectionManager extends HttpServlet {
                             } else {
                                 //Not prepared, show a message and redirect.
                                 messages.add("AI has not been prepared for class. Please select PREPARE AI on the classes page.");
-                                response.sendRedirect(request.getHeader("referer"));
+                                String redirect = (String) request.getHeader("referer");
+                                if (!redirect.startsWith(request.getContextPath())) {
+                                    redirect = request.getContextPath() + "/" + redirect;
+                                }
+                                response.sendRedirect(redirect);
                                 return;
                             }
                         } else {
@@ -130,7 +134,11 @@ public class GameSelectionManager extends HttpServlet {
                         else
                             messages.add("Already an attacker in this game!");
                         // either way, reload list of open games
-                        response.sendRedirect(request.getHeader("referer"));
+                        String redirect = (String) request.getHeader("referer");
+                        if( ! redirect.startsWith(request.getContextPath())){
+                            redirect = request.getContextPath()+"/" + redirect;
+                        }
+                        response.sendRedirect(redirect);
                         break;
                     } else {
                         if (jGame.getAttackerId() == 0) {
@@ -141,7 +149,11 @@ public class GameSelectionManager extends HttpServlet {
                             jGame.addPlayer(uid, Role.DEFENDER);
                         } else {
                             messages.add("DuelGame is no longer open.");
-                            response.sendRedirect(request.getHeader("referer"));
+                            String redirect = (String) request.getHeader("referer");
+                            if( ! redirect.startsWith(request.getContextPath())){
+                                redirect = request.getContextPath()+"/" + redirect;
+                            }
+                            response.sendRedirect(redirect);
                             break;
                         }
                         // user joined, update game
@@ -154,7 +166,11 @@ public class GameSelectionManager extends HttpServlet {
                     }
                 } catch (Exception e) {
                     messages.add("There was a problem joining the game.");
-                    response.sendRedirect(request.getHeader("referer"));
+                    String redirect = (String) request.getHeader("referer");
+                    if( ! redirect.startsWith(request.getContextPath())){
+                        redirect = request.getContextPath()+"/" + redirect;
+                    }
+                    response.sendRedirect(redirect);
                 }
 
                 break;
@@ -172,17 +188,28 @@ public class GameSelectionManager extends HttpServlet {
                         else
                             response.sendRedirect(contextPath+"/play");
                     } else {
-                        response.sendRedirect(request.getHeader("referer"));
+                    	String redirect = (String) request.getHeader("referer");
+                    	if( ! redirect.startsWith(request.getContextPath())){
+                    		redirect = request.getContextPath()+"/" + redirect;
+                    	}
+                    	response.sendRedirect(redirect);
                     }
                 } catch (Exception e) {
                     messages.add("There was a problem entering the game");
-                    response.sendRedirect(request.getHeader("referer"));
-
+                    String redirect = (String) request.getHeader("referer");
+                    if( ! redirect.startsWith(request.getContextPath())){
+                        redirect = request.getContextPath()+"/" + redirect;
+                    }
+                    response.sendRedirect(redirect);
                 }
                 break;
             default:
                 System.err.println("Action not recognised");
-                response.sendRedirect(request.getHeader("referer"));
+                String redirect = (String) request.getHeader("referer");
+                if( ! redirect.startsWith(request.getContextPath())){
+                    redirect = request.getContextPath()+"/" + redirect;
+                }
+                response.sendRedirect(redirect);
                 break;
         }
     }

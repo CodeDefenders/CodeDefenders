@@ -70,7 +70,11 @@ public class GameManager extends HttpServlet {
 			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.DEFENDER_VIEW_JSP);
 			dispatcher.forward(request, response);
 		}// else
-		// response.sendRedirect(request.getHeader("referer"));
+//		String redirect = (String) request.getHeader("referer");
+//		if (!redirect.startsWith(request.getContextPath())) {
+//			redirect = request.getContextPath() + "/" + redirect;
+//		}
+//		response.sendRedirect(redirect);
 	}
 
 	// Based on the data provided, update information for the game
