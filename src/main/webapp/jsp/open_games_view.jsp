@@ -158,8 +158,8 @@
 			<td class="col-sm-1"><%= g.getStartDateTime() %></td>
 			<td class="col-sm-1"><%= g.getFinishDateTime() %></td>
 			<td class="col-sm-2">
-				<a href="multiplayer/games?attacker=1&id=<%= g.getId() %>">Join as Attacker</a><br>
-				<a href="multiplayer/games?defender=1&id=<%= g.getId() %>">Join as Defender</a>
+				<a href="<%=request.getContextPath()%>/multiplayer/games?attacker=1&id=<%= g.getId() %>">Join as Attacker</a><br>
+				<a href="<%=request.getContextPath()%>/multiplayer/games?defender=1&id=<%= g.getId() %>">Join as Defender</a>
 			</td>
 		</tr>
 		<%
