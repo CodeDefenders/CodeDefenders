@@ -211,8 +211,10 @@
         default:
             if (request.getParameter("defender") != null){
                 mg.addPlayer(uid, Role.DEFENDER);
+                %><meta http-equiv="refresh" content="1" /><%
             } else if (request.getParameter("attacker") != null){
                 mg.addPlayer(uid, Role.ATTACKER);
+                %><meta http-equiv="refresh" content="1" /><%
             } else {
                 response.sendRedirect("multiplayer/games/user");
                 break;
@@ -220,7 +222,6 @@
             %>
             <p>Joining Game...</p>
 <%
-            response.setIntHeader("Refresh", 1);
             break;
     }
 %>
