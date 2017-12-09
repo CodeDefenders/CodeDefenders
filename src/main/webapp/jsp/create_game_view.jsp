@@ -3,7 +3,7 @@
 
 
 <div id="creategame" class="container">
-	<form id="create" action="games" method="post" class="form-creategame">
+	<form id="create" action="<%=request.getContextPath() %>/games" method="post" class="form-creategame">
 		<h2>Create Game</h2>
 		<input type="hidden" name="formType" value="createGame">
 		<table class="tableform">

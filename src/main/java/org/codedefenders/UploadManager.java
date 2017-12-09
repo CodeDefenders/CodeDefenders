@@ -35,7 +35,7 @@ public class UploadManager extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-		response.sendRedirect("games/upload");
+		response.sendRedirect(request.getContextPath()+"/games/upload");
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -89,14 +89,22 @@ public class UploadManager extends HttpServlet {
 		// Not a java file
 		if (!fileName.endsWith(".java")) {
 			messages.add("The class under test must be a .java file.");
-			response.sendRedirect(request.getHeader("referer"));
+			String redirect = (String) request.getHeader("referer");
+			if( ! redirect.startsWith(request.getContextPath())){
+				redirect = request.getContextPath()+"/" + redirect;
+			}
+			response.sendRedirect(redirect);
 			return;
 		}
 
 		// no file content?
 		if (fileContent == null || fileContent.isEmpty()) {
 			messages.add("File content could not be read. Please try again.");
-			response.sendRedirect(request.getHeader("referer"));
+			String redirect = (String) request.getHeader("referer");
+			if( ! redirect.startsWith(request.getContextPath())){
+				redirect = request.getContextPath()+"/" + redirect;
+			}
+			response.sendRedirect(redirect);
 			return;
 		}
 
@@ -145,6 +153,8 @@ public class UploadManager extends HttpServlet {
 
 	public void storeClass(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages, String fileName, String fileContent, GameClass cut, boolean shouldPrepareAI) throws IOException {
 
+		String contextPath = request.getContextPath();
+
 		String cutDir = Constants.CUTS_DIR + Constants.F_SEP + cut.getAlias();
 		File targetFile = new File(cutDir + Constants.F_SEP + fileName);
 		assert (!targetFile.exists());
@@ -176,12 +186,16 @@ public class UploadManager extends HttpServlet {
 				}
 			}
 			messages.add("Class uploaded successfully. It will be referred to as: " + cut.getAlias());
-			response.sendRedirect("games/user");
+			response.sendRedirect(contextPath+"/games/user");
 
 		} else {
 			cut.delete();
 			messages.add("We were unable to compile your class, please try with a simpler one (no dependencies)");
-			response.sendRedirect(request.getHeader("referer"));
+			String redirect = (String) request.getHeader("referer");
+			if( ! redirect.startsWith(request.getContextPath())){
+				redirect = request.getContextPath()+"/" + redirect;
+			}
+			response.sendRedirect(redirect);
 			return;
 		}
 	}

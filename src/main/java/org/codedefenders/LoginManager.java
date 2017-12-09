@@ -55,7 +55,7 @@ public class LoginManager extends HttpServlet {
 						session.setAttribute("username", newUser.getUsername());
 						session.setAttribute("messages", messages);
 
-						response.sendRedirect("games");
+						response.sendRedirect(request.getContextPath()+"/games");
 					} else {
 						// TODO: How about some error handling?
 						messages.add("Could not create a user for you, sorry!");
@@ -90,9 +90,13 @@ public class LoginManager extends HttpServlet {
 					if (from != null && ! ((String) from).endsWith(".ico")
 							&& ! ((String) from).endsWith(".css")
 							&& ! ((String) from).endsWith(".js")) {
-						response.sendRedirect((String) from);
+						if (((String) from).startsWith(request.getContextPath())) {
+							response.sendRedirect((String) from);
+						} else {
+							response.sendRedirect(request.getContextPath() + "/" + (String) from);
+						}
 					} else
-						response.sendRedirect("games");
+						response.sendRedirect(request.getContextPath()+"/games");
 				} else {
 					// TODO: Shouldn't the user exist if we can retrieve it from the DB?
 					messages.add("Username does not exist or your password was incorrect.");

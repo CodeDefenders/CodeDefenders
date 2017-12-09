@@ -27,7 +27,7 @@
     }
 
     if (redirectToGames){
-        response.sendRedirect("/games/user");
+        response.sendRedirect(request.getContextPath()+"/games/user");
         return;
     }
 %>
@@ -51,7 +51,7 @@
 	HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<>();
 
     if ((mg.getState().equals(GameState.CREATED) || mg.getState().equals(GameState.FINISHED)) && (!role.equals(Role.CREATOR))) {
-        response.sendRedirect("/games/user");
+        response.sendRedirect(request.getContextPath()+"/games/user");
     }
 
     List<Test> tests = mg.getTests(true); // get executable defenders' tests
@@ -117,11 +117,11 @@
 
                 messages.add(String.format("Flagged %d mutant%s as equivalent", nClaimed, (nClaimed == 1 ? "" : 's')));
 
-                response.sendRedirect("play");
+                response.sendRedirect(request.getContextPath()+"/play");
             } else {
             	// equivLine is not covered, possible iff passed directly as url argument
                 messages.add(MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
-                response.sendRedirect("play");
+                response.sendRedirect(request.getContextPath()+"/play");
                 return;
             }
         } catch (NumberFormatException e){}
@@ -146,7 +146,7 @@
                             new Timestamp(System.currentTimeMillis()));
                     notifEquiv.insert();
 
-                    response.sendRedirect("play");
+                    response.sendRedirect(request.getContextPath()+"/play");
                 }
             }
         } catch (NumberFormatException e){}
@@ -216,7 +216,8 @@
                 mg.addPlayer(uid, Role.ATTACKER);
                 %><meta http-equiv="refresh" content="1" /><%
             } else {
-                response.sendRedirect("multiplayer/games/user");
+                // response.sendRedirect(request.getContextPath()+"/multiplayer/games/user");
+                response.sendRedirect(request.getContextPath()+"/games/user");
                 break;
             }
             %>

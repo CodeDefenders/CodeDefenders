@@ -14,7 +14,8 @@
             gameId = ((Integer) session.getAttribute("mpGameId")).intValue();
         }
     } catch (Exception e2){
-        response.sendRedirect("multiplayer/games/user");
+        // response.sendRedirect(request.getContextPath()+"/multiplayer/games/user");
+        response.sendRedirect(request.getContextPath()+"/games/user");
     }
     boolean renderMutants = true;
 
@@ -26,7 +27,7 @@
     Role role = mg.getRole(uid);
 
     if ((!mg.getState().equals(GameState.FINISHED))) {
-        response.sendRedirect("/games/user");
+        response.sendRedirect(request.getContextPath()+"/games/user");
     }
 
     List<Test> tests = mg.getTests(); // get all executable tests

@@ -33,8 +33,8 @@
 		<div class="navbar-header">
 			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
 			</button>
-			<a class="navbar-brand" href="/">
-				<span><img class="logo" href="/" src="images/logo.png"/></span>
+			<a class="navbar-brand" href="<%=request.getContextPath() %>/">
+				<span><img class="logo" href="<%=request.getContextPath() %>/" src="images/logo.png"/></span>
 				Code Defenders
 			</a>
 		</div>
@@ -53,7 +53,7 @@
 %>
 
 <div class="container">
-	<form  action="sendEmail" method="post" class="form-signin">
+	<form  action="<%=request.getContextPath() %>/sendEmail" method="post" class="form-signin">
 		<input type="hidden" name="formType" value="login">
 		<h2 class="form-signin-heading">Contact Us</h2>
 		<label for="inputName" class="sr-only">Name</label>

@@ -6,12 +6,12 @@
 	  Object uid = request.getSession().getAttribute("uid");
 	  Object username = request.getSession().getAttribute("username");
 	  if (uid != null && username != null)
-		  response.sendRedirect("games");
+		  response.sendRedirect(request.getContextPath()+"/games");
   %>
 
 
   <div id="login" class="container">
-      <form  action="login" method="post" class="form-signin">
+      <form  action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
           <input type="hidden" name="formType" value="login">
           <h2 class="form-signin-heading">Sign in</h2>
           <label for="inputUsername" class="sr-only">Username/Email</label>
@@ -44,7 +44,7 @@
               </div>
               <div class="modal-body">
 	            <div id="create">
-                    <form  action="login" method="post" class="form-signin">
+                    <form  action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
                       <input type="hidden" name="formType" value="create">
                       <label for="inputUsername" class="sr-only">Username</label>
                       <input type="text" id="inputUsernameCreate" name="username" class="form-control" placeholder="Username" required autofocus>

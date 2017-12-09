@@ -89,6 +89,7 @@
 								<!-- <echo>[build.profile.id] ${build.profile.id}</echo> -->
 								<echo>[data.dir] ${data.dir}</echo>
 								<echo>[db.url]${db.url}</echo>
+								<echo>[tomcat.path] ${tomcat.path}</echo>
 								<echo>[tomcat.url] ${tomcat.url}</echo>
 								<echo>[cluster.mode] ${cluster.mode}</echo>
 								<echo>[cluster.reservation.name] ${cluster.reservation.name}</echo>
@@ -148,7 +149,7 @@
 					<username>${tomcat.username}</username>
 					<password>${tomcat.password}</password>
 					<!-- FIXME So far CodeDefenders must be deployed in Tomcat's root -->
-					<path>/</path>
+					<path>${tomcat.path}</path>
 					<ignorePackaging>true</ignorePackaging>
 					<contextReloadable>true</contextReloadable>
 				</configuration>

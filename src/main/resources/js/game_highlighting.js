@@ -59,6 +59,7 @@ var mutantLine = function (lineQuant, superDiv) {
         if (lineQuant.difference &&
             lineQuant.difference.deltas &&
             lineQuant[l].difference.deltas.length > 0) {
+            // TODO How do we get the contextPath ? it might not be necessary if we use relative href
             content += '<a href="multiplayer/play?equivLine=' + lineQuant[l][0] + '" style="color: #FEFCFC"> Mark Line Equivalent </a>';
             content += '</span>';
         }

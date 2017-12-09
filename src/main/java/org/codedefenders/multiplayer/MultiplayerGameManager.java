@@ -49,6 +49,8 @@ public class MultiplayerGameManager extends HttpServlet {
 		}
 		session.setAttribute("messages", messages);
 
+		String contextPath = request.getContextPath();
+
 		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(gameId);
 
 		switch (request.getParameter("formType")) {
@@ -57,7 +59,6 @@ public class MultiplayerGameManager extends HttpServlet {
 					logger.info("Starting multiplayer game {} (Setting state to ACTIVE)", activeGame.getId());
 					activeGame.setState(GameState.ACTIVE);
 					activeGame.update();
-
 				}
 				break;
 			}
@@ -67,7 +68,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					activeGame.setState(GameState.FINISHED);
 					activeGame.update();
 
-					response.sendRedirect("games");
+					response.sendRedirect(contextPath+"/multiplayer/games");
 					return;
 				} else {
 					break;
@@ -78,7 +79,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 				if (activeGame.getState().equals(GameState.FINISHED)) {
 					messages.add(String.format("Game %d has finished.", activeGame.getId()));
-					response.sendRedirect("games");
+					response.sendRedirect(contextPath+"/multiplayer/games");
 				}
 
 				// Get the text submitted by the user.
@@ -93,14 +94,14 @@ public class MultiplayerGameManager extends HttpServlet {
 				} catch (CodeValidatorException cve) {
 					messages.add(TEST_GENERIC_ERROR_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect("play");
+					response.sendRedirect(contextPath+"/multiplayer/play");
 					return;
 				}
 
 				if (newTest == null) {
 					messages.add(TEST_INVALID_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect("play");
+					response.sendRedirect(contextPath+"/multiplayer/play");
 					return;
 				}
 
@@ -168,7 +169,7 @@ public class MultiplayerGameManager extends HttpServlet {
 						}
 						newTest.update();
 						activeGame.update();
-						response.sendRedirect("play");
+						response.sendRedirect(contextPath+"/multiplayer/play");
 						return;
 					} else {
 						//  (testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
@@ -258,14 +259,14 @@ public class MultiplayerGameManager extends HttpServlet {
 					} catch (CodeValidatorException cve) {
 						messages.add(TEST_GENERIC_ERROR_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect("play");
+						response.sendRedirect(contextPath+"/multiplayer/play");
 						return;
 					}
 
 					if (newTest == null) {
 						messages.add(TEST_INVALID_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect("play");
+						response.sendRedirect(contextPath+"/multiplayer/play");
 						return;
 					}
 					logger.info("New Test " + newTest.getId() + " by user " + uid);
@@ -304,7 +305,7 @@ public class MultiplayerGameManager extends HttpServlet {
 				break;
 		}
 
-		response.sendRedirect("play");//doGet(request, response);
+		response.sendRedirect(contextPath+"/multiplayer/play");//doGet(request, response);
 	}
 
 }

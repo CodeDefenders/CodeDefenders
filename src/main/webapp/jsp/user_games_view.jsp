@@ -84,7 +84,7 @@
 					btnLabel = "Enter";
 				}
 %>
-			<form id="view" action="games" method="post">
+			<form id="view" action="<%= request.getContextPath() %>/games" method="post">
 				<input type="hidden" name="formType" value="enterGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
 				<% if (uid == turnId ) {%>
@@ -105,9 +105,7 @@
 %>
 </table>
 <!-- Alessio disabled this -->
-<!-- 
-	<a href="/games/create">Create Duel</a>
- -->
+	<%-- <a href="<%= request.getContextPath() %>/games/create">Create Duel</a> --%>
 
 	<hr />
 
@@ -175,16 +173,16 @@
 			switch(role){
 				case CREATOR:
 			%>
-			<a href="multiplayer/games?id=<%= g.getId() %>">Observe</a>
+			<a href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Observe</a>
 			<%
 					break;
 				case ATTACKER:
 					if(!g.getState().equals(GameState.CREATED)) {
 			%>
-			<a href="multiplayer/games?id=<%= g.getId() %>">Attack</a>
+			<a href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Attack</a>
 			<%		} else { %>
 			<p>Joined as Attacker</p>
-			<form id="attLeave" action="multiplayer/games" method="post">
+			<form id="attLeave" action="<%= request.getContextPath() %>/multiplayer/games" method="post">
 				<input type="hidden" name="formType" value="leaveGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
 				<input type="submit" form="attLeave" value="Leave">
@@ -193,10 +191,10 @@
 					break;
 				case DEFENDER:
 					if(!g.getState().equals(GameState.CREATED)) { %>
-				<a href="multiplayer/games?id=<%= g.getId() %>">Defend</a>
+				<a href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Defend</a>
 			<% 		} else { %>
 			<p>Joined as Defender</p>
-			<form id="defLeave" action="multiplayer/games" method="post">
+			<form id="defLeave" action="<%= request.getContextPath() %>/multiplayer/games" method="post">
 				<input type="hidden" name="formType" value="leaveGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
 				<input type="submit" form="defLeave" class="leave-button" value="Leave">
@@ -215,10 +213,8 @@
 	%>
 	</tbody>
 </table>
-<!-- Alessio disabled this -->
-	<!-- 
-	<a href="/multiplayer/games/create">Create Battleground</a>
- -->
+	<!-- Alessio disabled this -->
+	<%-- <a href="<%= request.getContextPath() %>/multiplayer/games/create">Create Battleground</a> --%>
 
 	<script>
 		$(document).ready(function() {

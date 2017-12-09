@@ -1,5 +1,8 @@
 package org.codedefenders;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -9,8 +12,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 // Implements Filter class
 public class LoginFilter implements Filter {
@@ -32,7 +33,9 @@ public class LoginFilter implements Filter {
 			} else {
 				HttpServletResponse httpResp = (HttpServletResponse) response;
 				session.setAttribute("loginFrom", httpReq.getRequestURI());
-				httpResp.sendRedirect("/login");
+//				String path = request.getRequestURI().toString();
+				String context = httpReq.getContextPath().toString();
+				httpResp.sendRedirect(context+"/login");
 			}
 		}
 	}

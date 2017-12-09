@@ -13,7 +13,8 @@
             $(r).each(function (index) {
                 $("#userDropDown li:first-child").after(
                     "<li><a " +
-                    "href=\"/multiplayer/games?id=" + r[index].gameId +
+                    "href=\"" + "<%=request.getContextPath().toString()%>" +
+                    "/multiplayer/games?id=" + r[index].gameId +
                     "\" style=\"width:100%;\">" +
                     r[index].parsedMessage +
                     "</a></li>"
@@ -42,13 +43,13 @@
                 // refreshed every 5 seconds
                 var interval = 5000;
                 setInterval(function () {
-                    var url = "/game_notifications?userId=" + <%=request.getSession().getAttribute("uid")%> +"&timestamp=" + (new Date().getTime() - interval);
+                    var url = "<%=request.getContextPath()%>" + "/game_notifications?userId=" + <%=request.getSession().getAttribute("uid")%> +"&timestamp=" + (new Date().getTime() - interval);
 
                     updateUserNotifications(url);
 
                 }, interval)
 
-                var url = "/game_notifications?userId=" + <%=request.getSession().getAttribute("uid")%> +"&timestamp=" + 0;
+                var url = "<%=request.getContextPath()%>" + "/game_notifications?userId=" + <%=request.getSession().getAttribute("uid")%> +"&timestamp=" + 0;
 
                 updateUserNotifications(url);
             }
@@ -71,16 +72,16 @@
                  width: 80%; float: none; margin: 0 auto;">
                 <li style="float: none" class="dropdown"><a
                             class="text-white button tab-link bg-minus-1 dropdown-toggle"
-                            href="games/user"
+                            href="<%=request.getContextPath() %>/games/user"
                             style="width:100%;" data-toggle="dropdown" href="#">Games <span class="glyphicon glyphicon-menu-hamburger" style="float: right;"></span></a>
                         <ul class="dropdown-menu" style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
                             <li><a
-                                   href="games/user" style="width:100%;">My Games</a></li>
+                                   href="<%=request.getContextPath() %>/games/user" style="width:100%;">My Games</a></li>
                             <li><a
-                                   href="games/open" style="width:100%;">Open
+                                   href="<%=request.getContextPath() %>/games/open" style="width:100%;">Open
                                 Games</a></li>
-                            <li><a href="games/history" style="width:100%;">History</a></li>
+                            <li><a href="<%=request.getContextPath() %>/games/history" style="width:100%;">History</a></li>
                 </ul></li>
                 <!-- Alessio: Disabled this -->
                 <!-- <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="games/upload" style="width:100%;">Upload Class</a></li> -->
@@ -89,7 +90,7 @@
                 <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="help" style="width:100%;">Help</a></li>
                 <li style="float: none" class="dropdown"><a
                         class="text-white button tab-link bg-minus-1 dropdown-toggle"
-                        href="games/user"
+                        href="<%=request.getContextPath() %>/games/user"
                         style="width:100%;" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                     <%=request.getSession().getAttribute("username")%>
                     (<span id="notificationCount"></span>)
@@ -98,7 +99,7 @@
                     style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
                         <li><a
-                               href="/logout"
+                               href="<%=request.getContextPath().toString()%>/logout"
                                style="width:100%;border-bottom:1px solid
                                black">Logout
                         </a></li>
@@ -108,7 +109,7 @@
     </div>
 </div>
 
-<form id="logout" action="login" method="post">
+<form id="logout" action="<%=request.getContextPath() %>/login" method="post">
     <input type="hidden" name="formType" value="logOut">
 </form>
 

@@ -4,7 +4,7 @@
 <% String pageTitle = "Create Battleground"; %>
 <%@ include file="/jsp/header.jsp"%>
 <div id="creategame" class="container">
-	<form id="create" action="multiplayer/games" method="post" class="form-creategame-mp">
+	<form id="create" action="<%=request.getContextPath() %>/multiplayer/games" method="post" class="form-creategame-mp">
 		<input type="hidden" name="formType" value="createGame">
 		<table class="tableform">
 			<tr>

@@ -27,7 +27,7 @@ public class MutantManager extends HttpServlet {
 
     public void doGet(HttpServletRequest request, HttpServletResponse response)
             throws IOException, ServletException {
-
+        String contextPath = request.getContextPath();
         int gameId = Integer.parseInt(request.getParameter("gameId"));
 
         AbstractGame game = DatabaseAccess.getMultiplayerGame(gameId);
@@ -62,7 +62,7 @@ public class MutantManager extends HttpServlet {
                 out.flush();
             }
         } catch (Exception e) {
-            response.sendRedirect("/games/user");
+            response.sendRedirect(contextPath+"/games/user");
         }
     }
 

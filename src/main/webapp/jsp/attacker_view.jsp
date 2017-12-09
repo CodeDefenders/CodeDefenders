@@ -186,7 +186,7 @@
 	</div> <!-- col-md6 mutants -->
 
 	<div class="col-md-6" id="newmut-div">
-		<form id="atk" action="play" method="post">
+		<form id="atk" action="<%=request.getContextPath() %>/play" method="post">
 			<h2>Create a mutant here
 				<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Role.ATTACKER)) {%>
 				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk" onClick="this.form.submit(); this.disabled=true; this.value='Attacking...';">Attack!</button><%}%>
