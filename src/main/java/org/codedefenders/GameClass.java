@@ -1,5 +1,16 @@
 package org.codedefenders;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.util.DB;
@@ -8,13 +19,10 @@ import org.codedefenders.util.DatabaseValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.sql.*;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseException;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
 
 public class GameClass {
 
@@ -26,11 +34,20 @@ public class GameClass {
 	private String javaFile;
 	private String classFile;
 
+	private Set<String> additionalImports = new HashSet<String>();
+
 	public GameClass(String name, String alias, String jFile, String cFile) {
 		this.name = name;
 		this.alias = alias;
 		this.javaFile = jFile;
 		this.classFile = cFile;
+
+		/*
+		 * According to :https://stackoverflow.com/questions/22684264/how-get-the-fully-qualified-name-of-the-java-class
+		 * it is not easy to resolve the imports of the CUT automatically. So we follow a simple heuristic:
+		 * We take all the imports declared in the CUT.
+		 */
+		this.additionalImports.addAll(includeAdditionalImportsFromCUT());
 	}
 
 	public GameClass(int id, String name, String alias, String jFile, String cFile) {
@@ -127,8 +144,15 @@ public class GameClass {
 		else
 			sb.append(String.format("/* no package name */%n"));
 		sb.append(String.format("%n"));
-		sb.append(String.format("import org.junit.*;%n"));
 		sb.append(String.format("import static org.junit.Assert.*;%n%n"));
+
+		sb.append(String.format("import org.junit.*;%n"));
+
+		// Additional import are already in the form of 'import X.Y.Z;\n'
+		for (String additionalImport : this.additionalImports) {
+			sb.append(additionalImport);
+		}
+
 		sb.append(String.format("public class Test%s {%n", getBaseName()));
 		sb.append(String.format("%c@Test(timeout = 4000)%n", '\t'));
 		sb.append(String.format("%cpublic void test() throws Throwable {%n", '\t'));
@@ -136,6 +160,39 @@ public class GameClass {
 		sb.append(String.format("%c}%n", '\t'));
 		sb.append(String.format("}"));
 		return sb.toString();
+	}
+
+	/*
+	 * We list all the NON-primitive imports here. We do not perform any
+	 * merging.
+	 * 
+	 * (using *)
+	 */
+	private Set<String> includeAdditionalImportsFromCUT() {
+		Set<String> additionalImports = new HashSet<String>();
+		CompilationUnit cu;
+		try (FileInputStream in = new FileInputStream(javaFile)) {
+			// parse the file
+			cu = JavaParser.parse(in);
+
+			// This might be useful to automatically identify the need to Mocking (see issue #10)
+			if (cu.getTypes().size() != 1) {
+				logger.warn("CUT contains more than one type declaration.");
+			}
+
+			// Extract the import declarations from the CUT and add them to additionaImports 
+			for(ImportDeclaration declaredImport : cu.getImports()){
+				additionalImports.add( declaredImport.toStringWithoutComments() );
+			}
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (ParseException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return additionalImports;
 	}
 
 	public String getJavaFile() {
