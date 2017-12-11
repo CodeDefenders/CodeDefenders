@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.codedefenders.duel.DuelGame;
@@ -24,14 +23,6 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.ConstructorDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.ModifierSet;
-import com.github.javaparser.ast.body.Parameter;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.type.PrimitiveType;
-import com.github.javaparser.ast.type.Type;
 
 public class GameClass {
 
@@ -51,7 +42,12 @@ public class GameClass {
 		this.javaFile = jFile;
 		this.classFile = cFile;
 
-		this.additionalImports.addAll(computeAdditionalImports());
+		/*
+		 * According to :https://stackoverflow.com/questions/22684264/how-get-the-fully-qualified-name-of-the-java-class
+		 * it is not easy to resolve the imports of the CUT automatically. So we follow a simple heuristic:
+		 * We take all the imports declared in the CUT.
+		 */
+		this.additionalImports.addAll(includeAdditionalImportsFromCUT());
 	}
 
 	public GameClass(int id, String name, String alias, String jFile, String cFile) {
@@ -152,7 +148,7 @@ public class GameClass {
 
 		sb.append(String.format("import org.junit.*;%n"));
 
-		// Additional import are already in the form of import X.Y.Z;
+		// Additional import are already in the form of 'import X.Y.Z;\n'
 		for (String additionalImport : this.additionalImports) {
 			sb.append(additionalImport);
 		}
@@ -172,109 +168,31 @@ public class GameClass {
 	 * 
 	 * (using *)
 	 */
-	private Set<String> computeAdditionalImports() {
+	private Set<String> includeAdditionalImportsFromCUT() {
 		Set<String> additionalImports = new HashSet<String>();
 		CompilationUnit cu;
 		try (FileInputStream in = new FileInputStream(javaFile)) {
 			// parse the file
 			cu = JavaParser.parse(in);
 
+			// This might be useful to automatically identify the need to Mocking (see issue #10)
 			if (cu.getTypes().size() != 1) {
 				logger.warn("CUT contains more than one type declaration.");
 			}
-			// Extract the Class
-			// Not sure it works when we include private classes ...
-			TypeDeclaration clazz = null;
-			for (TypeDeclaration c : cu.getTypes()) {
-				if (this.name.equals(c.getName())) {
-					clazz = c;
-					break;
-				}
+
+			// Extract the import declarations from the CUT and add them to additionaImports 
+			for(ImportDeclaration declaredImport : cu.getImports()){
+				additionalImports.add( declaredImport.toStringWithoutComments() );
 			}
 
-			List<ImportDeclaration> declaredImports = cu.getImports();
-
-			for (BodyDeclaration b : clazz.getMembers()) {
-				if (b instanceof MethodDeclaration && ((MethodDeclaration) b).getModifiers() == ModifierSet.PUBLIC) {
-					additionalImports
-							.addAll(extractFromParameters(((MethodDeclaration) b).getParameters(), declaredImports));
-					additionalImports.addAll(extractFromReturnType(((MethodDeclaration) b).getType(), declaredImports));
-				} else if (b instanceof ConstructorDeclaration
-						&& ((ConstructorDeclaration) b).getModifiers() == ModifierSet.PUBLIC) {
-					additionalImports.addAll(
-							extractFromParameters(((ConstructorDeclaration) b).getParameters(), declaredImports));
-				}
-			}
-			// MethodDeclaration test = (MethodDeclaration) clazz.getMembers();
-			// cu.get
-			//
-			// BlockStmt testBody = test.getBody();
-			// for (Node node : testBody.getChildrenNodes()) {
-			// if (node instanceof ForeachStmt
-			// || node instanceof IfStmt
-			// || node instanceof ForStmt
-			// || node instanceof WhileStmt
-			// || node instanceof DoStmt) {
-			// System.out.println("Invalid test contains " +
-			// node.getClass().getSimpleName() + " statement");
-			// return false;
-			// }
-			// }
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (ParseException e) {
 			e.printStackTrace();
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
-		//
 		return additionalImports;
-	}
-
-	private Set<String> extractFromReturnType(Type type, List<ImportDeclaration> declaredImports) {
-		Set<String> importsFromParameters = new HashSet<String>();
-
-		if (type instanceof PrimitiveType) {
-			return importsFromParameters;
-		} else if ("String".equals(type.toString())) {
-			return importsFromParameters;
-		} else {
-			String cleanType = type.toString().replaceAll("<.*>", "");
-			for (ImportDeclaration importDeclaration : declaredImports) {
-				if (importDeclaration.getName().toStringWithoutComments().contains(cleanType)) {
-					importsFromParameters.add(importDeclaration.toString());
-				}
-			}
-		}
-		return importsFromParameters;
-	}
-
-	// TODO This is an heuristic !
-	// We might miss cases where parameters have FQN but can still be
-	// imported...
-	// But those are a minority IMHO
-	// FIXME This will not match imports that ends with *. For that we need to
-	// convert the import into a regular patter
-	private Set<String> extractFromParameters(List<Parameter> parameters, List<ImportDeclaration> declaredImports) {
-
-		Set<String> importsFromParameters = new HashSet<String>();
-
-		for (Parameter p : parameters) {
-			if (p.getType() instanceof PrimitiveType) {
-				continue;
-			} else if ("String".equals(p.getType().toString())) {
-				continue;
-			} else {
-				String cleanType = p.getType().toString().replaceAll("<.*>", "");
-				for (ImportDeclaration importDeclaration : declaredImports) {
-					if (importDeclaration.getName().toStringWithoutComments().contains(cleanType)) {
-						importsFromParameters.add(importDeclaration.toString());
-					}
-				}
-			}
-		}
-		return importsFromParameters;
 	}
 
 	public String getJavaFile() {
