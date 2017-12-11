@@ -15,12 +15,13 @@ public class AutomaticImportTest {
 		String testTemplate = gc.getTestTemplate();
 		assertThat(testTemplate,
 				allOf(
+						containsString("import static org.mockito.Mockito.*;"),
 						containsString("import static org.junit.Assert.*;"),
 						containsString("import org.junit.*;")
 					));
 		// We need -1 to get rid of the last token
 		int expectedImports = testTemplate.split("import").length - 1;
-		assertEquals( "The test template has the wrong number of imports", 2, expectedImports );
+		assertEquals( "The test template has the wrong number of imports", 3, expectedImports );
 	}
 
 	@org.junit.Test
@@ -33,6 +34,7 @@ public class AutomaticImportTest {
 
 		assertThat(testTemplate,
 				allOf(
+						containsString("import static org.mockito.Mockito.*;"),
 						containsString("import static org.junit.Assert.*;"),
 						containsString("import org.junit.*;"),
 						containsString("import java.util.Enumeration;"),
@@ -44,6 +46,6 @@ public class AutomaticImportTest {
 				);
 
 		int expectedImports = testTemplate.split("import").length - 1;
-		assertEquals( "The test template has the wrong number of imports", 7, expectedImports );
+		assertEquals( "The test template has the wrong number of imports", 8, expectedImports );
 	}
 }

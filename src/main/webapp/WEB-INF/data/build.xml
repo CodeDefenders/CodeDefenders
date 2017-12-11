@@ -29,6 +29,7 @@
 		<pathelement path="${codedef.home}/lib/org.jacoco.core-0.7.7.201606060606.jar"/>
 		<pathelement path="${codedef.home}/lib/org.jacoco.agent-0.7.7.201606060606.jar"/>
 		<pathelement path="${codedef.home}/lib/org.jacoco.report-0.7.7.201606060606.jar"/>
+		<pathelement path="${codedef.home}/lib/mockito-all-1.9.5.jar"/>
 		<pathelement path="${major.home}/config/config.jar"/>
 		<pathelement path="${cut.dir}"/>
 		<pathelement path="${cuts.deps}"/>

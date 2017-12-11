@@ -144,7 +144,8 @@ public class GameClass {
 		else
 			sb.append(String.format("/* no package name */%n"));
 		sb.append(String.format("%n"));
-		sb.append(String.format("import static org.junit.Assert.*;%n%n"));
+		sb.append(String.format("import static org.junit.Assert.*;%n"));
+		sb.append(String.format("import static org.mockito.Mockito.*;%n%n"));
 
 		sb.append(String.format("import org.junit.*;%n"));
 
@@ -175,22 +176,14 @@ public class GameClass {
 			// parse the file
 			cu = JavaParser.parse(in);
 
-			// This might be useful to automatically identify the need to Mocking (see issue #10)
-			if (cu.getTypes().size() != 1) {
-				logger.warn("CUT contains more than one type declaration.");
-			}
-
 			// Extract the import declarations from the CUT and add them to additionaImports 
 			for(ImportDeclaration declaredImport : cu.getImports()){
 				additionalImports.add( declaredImport.toStringWithoutComments() );
 			}
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (ParseException | IOException e) {
+			// If a java file is not provided, there's no import at all.
+			logger.warn("Swallow Exception" + e.getMessage() );
 		}
 		return additionalImports;
 	}
