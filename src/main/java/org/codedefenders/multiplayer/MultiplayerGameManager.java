@@ -102,7 +102,7 @@ public class MultiplayerGameManager extends HttpServlet {
 				}
 
 				if (newTest == null) {
-					messages.add(TEST_INVALID_MESSAGE);
+					messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					response.sendRedirect(contextPath+"/multiplayer/play");
 					return;
@@ -267,11 +267,12 @@ public class MultiplayerGameManager extends HttpServlet {
 					}
 
 					if (newTest == null) {
-						messages.add(TEST_INVALID_MESSAGE);
+						messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						response.sendRedirect(contextPath+"/multiplayer/play");
 						return;
 					}
+
 					logger.info("New Test " + newTest.getId() + " by user " + uid);
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
