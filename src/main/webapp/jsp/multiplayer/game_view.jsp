@@ -117,11 +117,11 @@
 
                 messages.add(String.format("Flagged %d mutant%s as equivalent", nClaimed, (nClaimed == 1 ? "" : 's')));
 
-                response.sendRedirect(request.getContextPath()+"/play");
+                response.sendRedirect(request.getContextPath()+"/multiplayer/play");
             } else {
             	// equivLine is not covered, possible iff passed directly as url argument
                 messages.add(MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
-                response.sendRedirect(request.getContextPath()+"/play");
+                response.sendRedirect(request.getContextPath()+"/multiplayer/play");
                 return;
             }
         } catch (NumberFormatException e){}
@@ -146,7 +146,7 @@
                             new Timestamp(System.currentTimeMillis()));
                     notifEquiv.insert();
 
-                    response.sendRedirect(request.getContextPath()+"/play");
+                    response.sendRedirect(request.getContextPath()+"/multiplayer/play");
                 }
             }
         } catch (NumberFormatException e){}
