@@ -8,7 +8,7 @@
         gameId = Integer.parseInt(request.getParameter("id"));
         session.setAttribute("mpGameId", gameId);
     } catch (NumberFormatException e) {
-        logger.info("Game ID was not passed in the  Restoring from session.");
+        logger.info("Game ID was not passed in the request " + request.getContextPath() + request.getRequestURI() +". Restoring from session.");
         if (session.getAttribute("mpGameId") != null) {
             gameId = (Integer) session.getAttribute("mpGameId");
         } else {

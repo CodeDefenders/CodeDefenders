@@ -39,8 +39,11 @@ public class MultiplayerGameManager extends HttpServlet {
 		int gameId = -1;
 		if (session.getAttribute("mpGameId") != null) {
 			gameId = (Integer) session.getAttribute("mpGameId");
-		} else if (request.getAttribute("mpGameID") != null) {
-			gameId = (Integer) request.getAttribute("mpGameID");
+        } else if (request.getParameter("mpGameID") != null) {
+        	// During integration tests the session value is empty, but we car read it from the url as parameter
+            gameId = Integer.parseInt(request.getParameter("mpGameID"));
+            // Set this value in the session
+            session.setAttribute("mpGameId", gameId);
 		} else {
 			// TODO Not sure this is 100% right
 			logger.error("Problem setting gameID !");
