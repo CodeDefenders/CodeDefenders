@@ -275,7 +275,7 @@ public class AntRunner {
 			LinkedList<File> matchingFiles = (LinkedList<File>) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
 			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
 			String cFile = matchingFiles.get(0).getAbsolutePath();
-			logger.error("Compiled test {}", compiledClassName);
+			logger.info("Compiled test {}", compiledClassName);
 			Test newTest = new Test(gameID, jFile, cFile, playerId);
 			newTest.insert();
 			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);
