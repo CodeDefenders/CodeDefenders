@@ -21,7 +21,7 @@
 
 LOCK TABLES `classes` WRITE;
 /*!40000 ALTER TABLE `classes` DISABLE KEYS */;
-INSERT INTO `classes` VALUES (221,'Lift','/tmp/defender/sources/Lift/Lift.java','/tmp/defender/sources/Lift/Lift.class','Lift',0),(225,'Complex','/tmp/defender/sources/Complex/Complex.java','/tmp/defender/sources/Complex/Complex.class','Complex',0),(226,'XmlElement','/tmp/defender/sources/XmlElement/XmlElement.java','/tmp/defender/sources/XmlElement/XmlElement.class','XmlElement',0),(227,'SparseIntArray','/tmp/defender/sources/SparseIntArray/SparseIntArray.java','/tmp/defender/sources/SparseIntArray/SparseIntArray.class','SparseIntArray',0);
+INSERT INTO `classes` VALUES (221,'Lift','/tmp/defender/sources/Lift/Lift.java','/tmp/defender/sources/Lift/Lift.class','Lift',0,0),(225,'Complex','/tmp/defender/sources/Complex/Complex.java','/tmp/defender/sources/Complex/Complex.class','Complex',0,0),(226,'XmlElement','/tmp/defender/sources/XmlElement/XmlElement.java','/tmp/defender/sources/XmlElement/XmlElement.class','XmlElement',0,1);
 /*!40000 ALTER TABLE `classes` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

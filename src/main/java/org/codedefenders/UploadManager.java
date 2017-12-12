@@ -49,8 +49,10 @@ public class UploadManager extends HttpServlet {
 		String classAlias = null;
 		String fileName = null;
 		String fileContent = null;
+
 		GameClass newSUT = null;
 
+		boolean isMockingEnabled = false;
 		boolean shouldPrepareAI = false;
 
 		// Get actual parameters, because of the upload component, I can't do request.getParameter before fetching the file
@@ -67,6 +69,9 @@ public class UploadManager extends HttpServlet {
 						classAlias = fieldValue;
 					else if (fieldName.equals("prepareForSingle"))
 						shouldPrepareAI = true;
+					else if (fieldName.equals("enableMocking")) {
+						isMockingEnabled = true;
+					}
 					else
 						System.out.println("Unrecognized parameter");
 				} else {
@@ -114,7 +119,7 @@ public class UploadManager extends HttpServlet {
 			logger.info("Checking if alias {} is a good directory to store the class", classAlias);
 			GameClass cut = new GameClass("", classAlias, "", "");
 			if (cut.insert()) {
-				storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI);
+				storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI, isMockingEnabled);
 				return;
 			} else
 				logger.info("Alias has already been used. Trying with class name as alias instead.");
@@ -125,7 +130,7 @@ public class UploadManager extends HttpServlet {
 		logger.info("Checking if base name {} is a good directory to store the class", baseName);
 		GameClass cut = new GameClass("", baseName, "", "");
 		if (cut.insert()) {
-			storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI);
+			storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI, isMockingEnabled);
 			return;
 		} else
 			logger.info("Class name has already been used as alias. Trying with fully qualified class name now.");
@@ -135,7 +140,7 @@ public class UploadManager extends HttpServlet {
 		cut = new GameClass("", fullName, "", "");
 		logger.info("Checking if full name {} is a good directory to store the class", fullName);
 		if (cut.insert()) {
-			storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI);
+			storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI, isMockingEnabled);
 			return;
 		} else {
 			// Neither alias nor basename or fullname are good, make up a name using a suffix
@@ -145,13 +150,13 @@ public class UploadManager extends HttpServlet {
 				index++;
 				cut.setAlias(baseName + index);
 			}
-			storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI);
+			storeClass(request, response, messages, fileName, fileContent, cut, shouldPrepareAI, isMockingEnabled);
 			return;
 		}
 	}
 
 
-	public void storeClass(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages, String fileName, String fileContent, GameClass cut, boolean shouldPrepareAI) throws IOException {
+	public void storeClass(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages, String fileName, String fileContent, GameClass cut, boolean shouldPrepareAI, boolean isMockingEnabled) throws IOException {
 
 		String contextPath = request.getContextPath();
 
@@ -175,6 +180,7 @@ public class UploadManager extends HttpServlet {
 			String classQualifiedName = cc.getName();
 
 			// db insert
+			cut.setMockingEnabled(isMockingEnabled);
 			cut.setName(classQualifiedName);
 			cut.setClassFile(classFileNameDB);
 			cut.update();

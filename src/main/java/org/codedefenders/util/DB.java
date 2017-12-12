@@ -145,6 +145,10 @@ public class DB {
         return new DatabaseValue(v);
     }
 
+    public static DatabaseValue getDBV(boolean v) {
+        return new DatabaseValue(v);
+    }
+
     /*
     * Caution: Explicitly cast to Long or value will be converted to float
     */
