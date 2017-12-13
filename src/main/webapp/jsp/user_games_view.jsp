@@ -35,15 +35,15 @@
 <h2 class="full-width page-title">My Games</h2>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
-		<th class="col-sm-1">ID</th>
-		<th class="col-sm-2">Type</th>
-		<th class="col-sm-2">Class</th>
-		<th class="col-sm-2">Attack</th>
-		<th class="col-sm-2">Defense</th>
-		<th class="col-sm-2">Level</th>
-		<th class="col-sm-2">Starting</th>
-		<th class="col-sm-2">Finishing</th>
-		<th class="col-sm-2">Action</th>
+		<th>ID</th>
+		<th>Type</th>
+		<th>Class</th>
+		<th>Attack</th>
+		<th>Defense</th>
+		<th>Level</th>
+		<th>Starting</th>
+		<th>Finishing</th>
+		<th>Action</th>
 	</tr>
 <%
 	if (games.isEmpty()) {
@@ -136,7 +136,7 @@
 %>
 	<tr>
 		<td class="col-sm-1"><%= g.getId() %></td>
-		<td class="col-sm-2">Battle</td>
+		<td class="col-sm-2">Multiplayer</td>
 		<td class="col-sm-2">
 			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>"><%=g.getCUT().getAlias()%></a>
 			<div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;" >
@@ -167,21 +167,24 @@
 				switch(role){
 					case CREATOR:
 %>
-			<a href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Observe</a>
+			<a class = "btn btn-sm btn-primary" href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Observe</a>
 <%
 					break;
 					case ATTACKER:
 						if(!g.getState().equals(GameState.CREATED)) {
 %>
-			<a href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Attack</a>
+			<a class = "btn btn-sm btn-primary"  style="background-color: #884466;border-color: #772233;"
+			   href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Attack</a>
 <%
 						} else {
 %>
-			<p>Joined as Attacker</p>
+			Joined as Attacker
 			<form id="attLeave" action="<%= request.getContextPath() %>/multiplayer/games" method="post">
-				<input type="hidden" name="formType" value="leaveGame">
+				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
-				<input type="submit" form="attLeave" value="Leave">
+				<button class = "btn btn-sm btn-danger" type="submit" form="attLeave" value="Leave">
+					Leave
+				</button>
 			</form>
 <%
 						}
@@ -189,15 +192,16 @@
 					case DEFENDER:
 						if(!g.getState().equals(GameState.CREATED)) {
 %>
-			<a href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Defend</a>
+			<a class = "btn btn-sm btn-primary" style="background-color: #446688;border-color: #225577"
+			   href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Defend</a>
 <%
 						} else {
 %>
-			<p>Joined as Defender</p>
+			Joined as Defender
 			<form id="defLeave" action="<%= request.getContextPath() %>/multiplayer/games" method="post">
-				<input type="hidden" name="formType" value="leaveGame">
+				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
-				<input type="submit" form="defLeave" class="leave-button" value="Leave">
+				<button class = "btn btn-sm btn-danger" type="submit" form="defLeave" value="Leave">Leave</button>
 			</form>
 <%
 						}
@@ -224,15 +228,15 @@
 <h2 class="full-width page-title">Open Games</h2>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
-		<th class="col-sm-1">ID</th>
-		<th class="col-sm-2">Type</th>
-		<th class="col-sm-2">Class</th>
-		<th class="col-sm-2">Attack</th>
-		<th class="col-sm-2">Defense</th>
-		<th class="col-sm-2">Level</th>
-		<th class="col-sm-2">Starting</th>
-		<th class="col-sm-2">Finishing</th>
-		<th class="col-sm-2">Action</th>
+		<th>ID</th>
+		<th>Type</th>
+		<th>Class</th>
+		<th>Attack</th>
+		<th>Defense</th>
+		<th>Level</th>
+		<th>Starting</th>
+		<th>Finishing</th>
+		<th>Action</th>
 
 	</tr>
 <%
@@ -312,7 +316,7 @@
 %>
 		<tr>
 			<td class="col-sm-1"><%= g.getId() %></td>
-			<td class="col-sm-2">Battle</td>
+			<td class="col-sm-2">Multiplayer</td>
 			<td class="col-sm-2">
 				<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
 					<%=g.getCUT().getAlias()%>
@@ -344,8 +348,10 @@
 			<td class="col-sm-1"><%= g.getStartDateTime() %></td>
 			<td class="col-sm-1"><%= g.getFinishDateTime() %></td>
 			<td class="col-sm-2">
-				<a href="<%=request.getContextPath()%>/multiplayer/games?attacker=1&id=<%= g.getId() %>">Join as Attacker</a><br>
-				<a href="<%=request.getContextPath()%>/multiplayer/games?defender=1&id=<%= g.getId() %>">Join as Defender</a>
+				<a class="btn btn-sm btn-primary" style="background-color: #884466;border-color: #772233;"
+				   href="<%=request.getContextPath()%>/multiplayer/games?attacker=1&id=<%= g.getId() %>">Attack</a>
+				<a class="btn btn-sm btn-primary" style="background-color: #446688;border-color: #225577"
+				   href="<%=request.getContextPath()%>/multiplayer/games?defender=1&id=<%= g.getId() %>">Defend</a>
 			</td>
 		</tr>
 <%
