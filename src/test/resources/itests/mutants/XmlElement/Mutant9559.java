@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Vector;
 
 /**
-* The XmlElement is a generic containment class for elements within an XML
-* file.
-*/
+ * The XmlElement is a generic containment class for elements within an XML
+ * file.
+ */
 public class XmlElement {
     private String name;
 
@@ -46,13 +46,10 @@ public class XmlElement {
 
     /**
      * Add attribute to this xml element.
-     * 
-     * @param name
-     *            name of key
-     * @param value
-     *            new attribute value
+     *
+     * @param name  name of key
+     * @param value new attribute value
      * @return old attribute value
-     *  
      */
     public Object addAttribute(String name, String value) {
         if ((value != null) && (name != null)) {
@@ -156,9 +153,9 @@ public class XmlElement {
      * Note: if one node has more than one elements
      * that have the same name, that is, if its subnodes
      * have the same path, only the first one is returned.
-     * 
-     * @return the first element qualified with the path
+     *
      * @param path the path string of the specified element
+     * @return the first element qualified with the path
      */
     public XmlElement getElement(String path) {
         int i = path.indexOf('.');
@@ -201,10 +198,9 @@ public class XmlElement {
     /**
      * Adds a sub element to this one. The path
      * is separated with dots(".").
-     * 
-     * @return the XmlElement added
+     *
      * @param path The subpath of the sub element to add
-     *  
+     * @return the XmlElement added
      */
     public XmlElement addSubElement(String path) {
         XmlElement parent = this;
@@ -238,11 +234,9 @@ public class XmlElement {
 
     /**
      * Adds a sub element to this one
-     * 
+     *
+     * @param element The XmlElement to add
      * @return XmlElement
-     * @param element
-     *            The XmlElement to add
-     *  
      */
     public XmlElement addSubElement(XmlElement e) {
         e.setParent(this);
@@ -253,12 +247,10 @@ public class XmlElement {
 
     /**
      * Adds a sub element to this one
-     * 
+     *
+     * @param Name The name of the sub element to add
+     * @param Data String Data for this element
      * @return XmlElement
-     * @param Name
-     *            The name of the sub element to add
-     * @param Data
-     *            String Data for this element
      */
     public XmlElement addSubElement(String name, String data) {
         XmlElement e = new XmlElement(name);
@@ -271,10 +263,8 @@ public class XmlElement {
 
     /**
      * Sets the parent element
-     * 
-     * @param Parent
-     *            The XmlElement that contains this one
-     *  
+     *
+     * @param Parent The XmlElement that contains this one
      */
     public void setParent(XmlElement parent) {
         this.parent = parent;
@@ -282,9 +272,8 @@ public class XmlElement {
 
     /**
      * Gives the XmlElement containing the current element
-     * 
+     *
      * @return XmlElement
-     *  
      */
     public XmlElement getParent() {
         return parent;
@@ -292,10 +281,8 @@ public class XmlElement {
 
     /**
      * Sets the data for this element
-     * 
-     * @param D
-     *            The String representation of the data
-     *  
+     *
+     * @param D The String representation of the data
      */
     public void setData(String d) {
         data = d;
@@ -303,9 +290,8 @@ public class XmlElement {
 
     /**
      * Returns the data associated with the current Xml element
-     * 
+     *
      * @return String
-     *  
      */
     public String getData() {
         return data;
@@ -313,9 +299,8 @@ public class XmlElement {
 
     /**
      * Returns the name of the current Xml element
-     * 
+     *
      * @return String
-     *  
      */
     public String getName() {
         return name;
@@ -329,13 +314,11 @@ public class XmlElement {
      * Returns true if the specified objects are equal. They are equal if they
      * are both null OR if the equals() method return true. (
      * obj1.equals(obj2)).
-     * 
-     * @param obj1
-     *            first object to compare with.
-     * @param obj2
-     *            second object to compare with.
+     *
+     * @param obj1 first object to compare with.
+     * @param obj2 second object to compare with.
      * @return true if they represent the same object; false if one of them is
-     *         null or the equals() method returns false.
+     * null or the equals() method returns false.
      */
     private boolean equals(Object obj1, Object obj2) {
         boolean equal = false;

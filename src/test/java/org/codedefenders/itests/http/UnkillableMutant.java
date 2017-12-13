@@ -1,5 +1,7 @@
 package org.codedefenders.itests.http;
 
+import static org.junit.Assert.*;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -10,10 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
@@ -39,7 +39,12 @@ import com.gargoylesoftware.htmlunit.WaitingRefreshHandler;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
+import com.gargoylesoftware.htmlunit.html.HtmlButton;
+import com.gargoylesoftware.htmlunit.html.HtmlFileInput;
+import com.gargoylesoftware.htmlunit.html.HtmlForm;
 import com.gargoylesoftware.htmlunit.html.HtmlPage;
+import com.gargoylesoftware.htmlunit.html.HtmlSubmitInput;
+import com.gargoylesoftware.htmlunit.html.HtmlTableDataCell;
 import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 
@@ -341,16 +346,60 @@ public class UnkillableMutant {
 
 		}
 
+		public int uploadClass(File file) throws FailingHttpStatusCodeException, MalformedURLException, IOException {
+			HtmlPage uploadPage = browser.getPage("http://localhost:8080/upload");
+
+			// Class IDs before
+			//
+			List<String> classIDs = new ArrayList<>();
+			for( Object l : uploadPage.getByXPath("//*[@id='classList']/table/tbody/.//td[1]")){
+				if( l instanceof HtmlTableDataCell){
+					HtmlTableDataCell td = (HtmlTableDataCell) l;
+					classIDs.add( td.getTextContent());
+				}
+			}
+
+			HtmlForm form = (HtmlForm) uploadPage.getElementById("formUpload");
+			form.setActionAttribute( "http://localhost:8080/upload" );
+			form.getInputByName("fileUpload").setValueAttribute(file.getAbsolutePath());
+			form.<HtmlFileInput>getInputByName("fileUpload").setContentType("image/png");//optional
+
+			((HtmlSubmitInput) uploadPage.getFirstByXPath("//*[@id='submit-button']/input")).click();
+
+			// Explicitlye reload the page
+			uploadPage = browser.getPage("http://localhost:8080/upload");
+
+			for( Object l : uploadPage.getByXPath("//*[@id='classList']/table/tbody/.//td[1]")){
+				if( l instanceof HtmlTableDataCell){
+					HtmlTableDataCell td = (HtmlTableDataCell) l;
+					if( classIDs.contains( td.getTextContent() ) )
+						continue;
+					else {
+						return Integer.parseInt( td.getTextContent());
+					}
+				}
+			}
+
+			fail("Cannot find the ID of the new class !");
+
+			return -1;
+		}
+
 	}
 
 	@Test
 	public void testUnkillableMutant() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-		// TODO This value is hardcoded in the test db ... maybe we should upload the class everytime ?
-		int classID = 226;
+		// // This test assumes an empty db !
 		User creatorUser = new User("creator", "test");
 		HelperUser creator = new HelperUser(creatorUser);
 		creator.doLogin();
 		System.out.println("Creator Login");
+
+		// Upload the class
+		int classID = creator.uploadClass(new File("src/test/resources/itests/sources/XmlElement/XmlElement.java"));
+
+		System.out.println("UnkillableMutant.testUnkillableMutant() Class ID = " + classID);
+
 		//
 		int newGameId = creator.createNewGame(classID);
 		System.out.println("Creator Create new Game: " + newGameId);
@@ -364,6 +413,13 @@ public class UnkillableMutant {
 		//
 		attacker.joinOpenGame(newGameId, true);
 		System.out.println("Attacker Join game " + newGameId);
+		// Submit the unkillable mutant
+		attacker.attack(newGameId,
+				new String(
+						Files.readAllBytes(
+								new File("src/test/resources/itests/mutants/XmlElement/Mutant9559.java").toPath()),
+						Charset.defaultCharset()));
+		System.out.println("Attacker attack in game " + newGameId);
 		//
 		User defenderUser = new User("demodefender", "test");
 		HelperUser defender = new HelperUser(defenderUser);
@@ -375,13 +431,6 @@ public class UnkillableMutant {
 		//
 		System.out.println("Defender Join game " + newGameId);
 		
-		// Submit the unkillable mutant
-		attacker.attack(newGameId,
-				new String(
-						Files.readAllBytes(
-								new File("src/test/resources/itests/mutants/XmlElement/Mutant9559.java").toPath()),
-						Charset.defaultCharset()));
-		System.out.println("Attacker attack in game " + newGameId);
 
 		// Submit all the compilable tests from the original game (182)
 		Collection<File> testFiles = FileUtils.listFiles(
