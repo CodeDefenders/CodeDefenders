@@ -101,8 +101,9 @@ public class MultiplayerGameManager extends HttpServlet {
 					return;
 				}
 
+				// If test is null, it compiled but codevalidator triggered
 				if (newTest == null) {
-					messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+					messages.add(TEST_INVALID_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					response.sendRedirect(contextPath+"/multiplayer/play");
 					return;
@@ -266,8 +267,9 @@ public class MultiplayerGameManager extends HttpServlet {
 						return;
 					}
 
+					// If test is null, then test did compile but codevalidator triggered
 					if (newTest == null) {
-						messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+						messages.add(TEST_INVALID_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						response.sendRedirect(contextPath+"/multiplayer/play");
 						return;
