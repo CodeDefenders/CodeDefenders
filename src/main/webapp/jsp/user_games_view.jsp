@@ -106,6 +106,8 @@
 		<td class="col-sm-2"><%= atkName %></td>
 		<td class="col-sm-2"><%= defName %></td>
 		<td class="col-sm-2"><%= g.getLevel().name() %></td>
+        <td class="col-sm-1"></td>
+        <td class="col-sm-1"></td>
 		<td class="col-sm-2">
 <%
 			if (g.getState().equals(GameState.ACTIVE)) { // Can enter only if game is in progress.
@@ -120,7 +122,7 @@
 				<% if (uid == turnId ) {%>
 				<input class="btn btn-primary" type="submit" value="<%=btnLabel%>">
 				<% } else {%>
-				<input  class="btn btn-default" type="submit" value="Enter Game">
+				<a  class="btn btn-default btn-sm" type="submit" value="Enter Game">Enter Game</a>
 				<% }%>
 			</form>
 
@@ -304,11 +306,13 @@
 			<td class="col-sm-2"><%= atkName %></td>
 			<td class="col-sm-2"><%= defName %></td>
 			<td class="col-sm-1"><%= g.getLevel().name() %></td>
+			<td class="col-sm-1"></td>
+			<td class="col-sm-1"></td>
 			<td class="col-sm-2">
-				<form id="view" action="<%=request.getContextPath() %>/games" method="post">
+			<form id="view" action="<%=request.getContextPath() %>/games" method="post">
 					<input type="hidden" name="formType" value="joinGame">
 					<input type="hidden" name="game" value=<%=g.getId()%>>
-					<input type="submit" class="btn btn-primary" value="Join Game">
+					<a type="submit" class="btn btn-primary btn-sm" value="Join Game">Join Game</a>
 				</form>
 			</td>
 		</tr>
