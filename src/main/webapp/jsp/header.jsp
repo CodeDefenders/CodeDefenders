@@ -77,10 +77,10 @@
                         <ul class="dropdown-menu" style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
                             <li><a
-                                   href="<%=request.getContextPath() %>/games/user" style="width:100%;">My Games</a></li>
-                            <li><a
+                                   href="<%=request.getContextPath() %>/games/user" style="width:100%;">Games</a></li>
+                            <%-- <li><a
                                    href="<%=request.getContextPath() %>/games/open" style="width:100%;">Open
-                                Games</a></li>
+                                Games</a></li> --%>
                             <li><a href="<%=request.getContextPath() %>/games/history" style="width:100%;">History</a></li>
                 </ul></li>
                 <!-- Alessio: Disabled this -->
