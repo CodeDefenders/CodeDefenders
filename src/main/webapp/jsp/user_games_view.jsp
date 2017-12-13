@@ -246,7 +246,7 @@
 
 	</tr>
 <%
-	if (games.isEmpty()) {
+	if (openGames.isEmpty()) {
 %>
 	<tr><td colspan="100%"> There are currently no open games. </td></tr>
 <%
