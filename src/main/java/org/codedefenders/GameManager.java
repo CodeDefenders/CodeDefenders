@@ -421,12 +421,13 @@ public class GameManager extends HttpServlet {
 		String javaFile = FileManager.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
 
 		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
+
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest,
 				TargetExecution.Target.COMPILE_TEST);
 
-		// If the test did not compile we short circuit here
+		// If the test did not compile we short circuit here. We shall not return null
 		if (compileTestTarget == null || ( compileTestTarget != null && ! compileTestTarget.status.equals("SUCCESS"))) {
-			return null;
+			return newTest;
 		}
 		
 		// Validate code or short circuit here
