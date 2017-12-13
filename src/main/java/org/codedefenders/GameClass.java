@@ -8,7 +8,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.codedefenders.duel.DuelGame;
@@ -23,6 +27,10 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 
 public class GameClass {
 
@@ -35,6 +43,8 @@ public class GameClass {
 	private String classFile;
 
 	private Set<String> additionalImports = new HashSet<String>();
+	// Store begin and end line which corresponds to uncoverable non-initializad fields
+	private List<Entry<Integer,Integer>> linesOfNonInitializedFields = new ArrayList<>();
 
 	public GameClass(String name, String alias, String jFile, String cFile) {
 		this.name = name;
@@ -48,7 +58,9 @@ public class GameClass {
 		 * We take all the imports declared in the CUT.
 		 */
 		this.additionalImports.addAll(includeAdditionalImportsFromCUT());
+		this.linesOfNonInitializedFields.addAll( findNonInitializedFields());
 	}
+
 
 	public GameClass(int id, String name, String alias, String jFile, String cFile) {
 		this(name, alias, jFile, cFile);
@@ -175,22 +187,13 @@ public class GameClass {
 			// parse the file
 			cu = JavaParser.parse(in);
 
-			// This might be useful to automatically identify the need to Mocking (see issue #10)
-			if (cu.getTypes().size() != 1) {
-				logger.warn("CUT contains more than one type declaration.");
-			}
-
 			// Extract the import declarations from the CUT and add them to additionaImports 
 			for(ImportDeclaration declaredImport : cu.getImports()){
 				additionalImports.add( declaredImport.toStringWithoutComments() );
 			}
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (ParseException | IOException e) {
+			logger.warn("Swallow exception", e);
 		}
 		return additionalImports;
 	}
@@ -214,6 +217,51 @@ public class GameClass {
 	public DuelGame getDummyGame() throws NoDummyGameException {
 		DuelGame dg = DatabaseAccess.getAiDummyGameForClass(this.getId());
 		return dg;
+	}
+
+	// TODO Probably this shall be refactor using some code visitor so we do not
+	// reanalyze everything from scratch each time
+	private List<Entry<Integer,Integer>> findNonInitializedFields() {
+		List<Entry<Integer,Integer>> nonInitializedFieldsLines = new ArrayList<>();
+		CompilationUnit cu;
+		try (FileInputStream in = new FileInputStream(javaFile)) {
+			// parse the file
+			cu = JavaParser.parse(in);
+
+			TypeDeclaration td = null;
+			for( TypeDeclaration t : cu.getTypes() ){
+				if( t.getName().equals( this.name ) ){
+					td = t;
+					break;
+				}
+			}
+
+			if( td == null ){
+				logger.warn("Missing type declaration for class " + this.name);
+				return nonInitializedFieldsLines;
+			}
+
+			// We look for FieldDeclaration whose init part is null
+			// and store their begin/end line, usually this is the same line.
+			for (BodyDeclaration bd : td.getMembers()) {
+				if (bd instanceof FieldDeclaration) {
+					FieldDeclaration f = (FieldDeclaration) bd;
+					for (VariableDeclarator v : f.getVariables()) {
+						if( v.getInit() == null ){
+							nonInitializedFieldsLines.add( new AbstractMap.SimpleEntry(v.getBeginLine(), v.getEndLine()));
+						}
+					}
+				}
+			}
+
+		} catch (ParseException | IOException e) {
+			logger.warn("Swallow exception", e);
+		}
+		return nonInitializedFieldsLines;
+	}
+
+	public List<Entry<Integer, Integer>> getLinesOfNonInitializedFields() {
+		return linesOfNonInitializedFields;
 	}
 
 	public boolean delete() {

@@ -420,7 +420,7 @@ public class AntRunner {
 				new File(Constants.CUTS_DIR + F_SEP + c.getAlias()));
 
 		try {
-			cg.create(c.getName());
+			cg.create( c );
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
