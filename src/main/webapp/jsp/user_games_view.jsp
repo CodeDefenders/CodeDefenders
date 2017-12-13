@@ -37,6 +37,7 @@
 	<tr>
 		<th>ID</th>
 		<th>Type</th>
+		<th>Creator</th>
 		<th>Class</th>
 		<th>Attack</th>
 		<th>Defense</th>
@@ -78,7 +79,8 @@
 %>
 	<tr>
 		<td class="col-sm-1"><%= g.getId() %></td>
-		<td class="col-sm-2">Duel</td>
+		<td class="col-sm-1">Duel</td>
+		<td class="col-sm-1"></td>
 		<td class="col-sm-2">
 			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
 				<%=g.getCUT().getAlias()%>
@@ -136,7 +138,8 @@
 %>
 	<tr>
 		<td class="col-sm-1"><%= g.getId() %></td>
-		<td class="col-sm-2">Multiplayer</td>
+		<td class="col-sm-1">Multiplayer</td>
+		<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
 		<td class="col-sm-2">
 			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>"><%=g.getCUT().getAlias()%></a>
 			<div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;" >
@@ -230,6 +233,7 @@
 	<tr>
 		<th>ID</th>
 		<th>Type</th>
+		<th>Creator</th>
 		<th>Class</th>
 		<th>Attack</th>
 		<th>Defense</th>
@@ -273,7 +277,8 @@
 
 		<tr>
 			<td class="col-sm-1"><%= g.getId() %></td>
-			<td class="col-sm-2">Duel</td>
+			<td class="col-sm-1">Duel</td>
+			<td class="col-sm-1"></td>
 			<td class="col-sm-2">
 				<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
 					<%=g.getCUT().getAlias()%>
@@ -316,7 +321,8 @@
 %>
 		<tr>
 			<td class="col-sm-1"><%= g.getId() %></td>
-			<td class="col-sm-2">Multiplayer</td>
+			<td class="col-sm-1">Multiplayer</td>
+			<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
 			<td class="col-sm-2">
 				<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
 					<%=g.getCUT().getAlias()%>
