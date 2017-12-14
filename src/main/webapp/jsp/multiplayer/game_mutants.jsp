@@ -2,6 +2,11 @@
 <%@ page import="org.codedefenders.Role" %>
 <%@ page import="org.codedefenders.Mutant" %>
 <%@ page import="org.codedefenders.GameLevel" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Comparator" %>
+<%@ page import="java.util.Collections" %>
+
 <div class="ws-12 up" id="mutants-div">
 	<%
 if (role == Role.ATTACKER && true){
@@ -93,7 +98,12 @@ if (role == Role.ATTACKER && true){
 						</tr>
 						</thead>
 						<tbody>
-						<% for (Mutant m : mutantsAlive) { %>
+<%
+						// Sorting mutants
+						List<Mutant> sortedMutants = new ArrayList<Mutant>( mutantsAlive );
+								Collections.sort( sortedMutants, Mutant.orderByIdDescending());
+%>
+						<% for (Mutant m : sortedMutants) { %>
 							<tr>
 								<% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
 								<td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> [UID: <%= creator.getId() %>]</h4>
