@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -430,5 +431,26 @@ public class Mutant implements Serializable {
 			getDifferences();
 		else
 			difference = new Patch();
+	}
+
+	// TODO Ideally this should have a timestamp ... we use the ID instead
+	// First created appears first
+	public static Comparator<Mutant> orderByIdAscending() {
+		return new Comparator<Mutant>() {
+			@Override
+			public int compare(Mutant o1, Mutant o2) {
+				return o1.id - o2.id;
+			}
+		};
+	}
+
+	// Last created appears first
+	public static Comparator<Mutant> orderByIdDescending() {
+		return new Comparator<Mutant>() {
+			@Override
+			public int compare(Mutant o1, Mutant o2) {
+				return o2.id - o1.id;
+			}
+		};
 	}
 }
