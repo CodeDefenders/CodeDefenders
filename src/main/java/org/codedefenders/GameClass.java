@@ -219,37 +219,42 @@ public class GameClass {
 		return dg;
 	}
 
+	private List<Entry<Integer, Integer>> findNonInitializedFieldsByType(TypeDeclaration type) {
+		List<Entry<Integer, Integer>> nonInitializedFieldsLines = new ArrayList<>();
+		for (BodyDeclaration bd : type.getMembers()) {
+			if (bd instanceof FieldDeclaration) {
+				FieldDeclaration f = (FieldDeclaration) bd;
+				for (VariableDeclarator v : f.getVariables()) {
+					if (v.getInit() == null) {
+						nonInitializedFieldsLines.add(new AbstractMap.SimpleEntry(v.getBeginLine(), v.getEndLine()));
+					}
+				}
+			}
+		}
+		return nonInitializedFieldsLines;
+	}
+
 	// TODO Probably this shall be refactor using some code visitor so we do not
 	// reanalyze everything from scratch each time
-	private List<Entry<Integer,Integer>> findNonInitializedFields() {
-		List<Entry<Integer,Integer>> nonInitializedFieldsLines = new ArrayList<>();
+	private List<Entry<Integer, Integer>> findNonInitializedFields() {
+		List<Entry<Integer, Integer>> nonInitializedFieldsLines = new ArrayList<>();
 		CompilationUnit cu;
 		try (FileInputStream in = new FileInputStream(javaFile)) {
 			// parse the file
 			cu = JavaParser.parse(in);
 
-			TypeDeclaration td = null;
-			for( TypeDeclaration t : cu.getTypes() ){
-				if( t.getName().equals( this.name ) ){
-					td = t;
-					break;
-				}
-			}
+			// We need to consider all the non initialized fields, even if they
+			// are in
+			// inner classes !
+			for (TypeDeclaration td : cu.getTypes()) {
+				// Add the fields for this class;
+				nonInitializedFieldsLines.addAll(findNonInitializedFieldsByType( td ));
 
-			if( td == null ){
-				logger.warn("Missing type declaration for class " + this.name);
-				return nonInitializedFieldsLines;
-			}
-
-			// We look for FieldDeclaration whose init part is null
-			// and store their begin/end line, usually this is the same line.
-			for (BodyDeclaration bd : td.getMembers()) {
-				if (bd instanceof FieldDeclaration) {
-					FieldDeclaration f = (FieldDeclaration) bd;
-					for (VariableDeclarator v : f.getVariables()) {
-						if( v.getInit() == null ){
-							nonInitializedFieldsLines.add( new AbstractMap.SimpleEntry(v.getBeginLine(), v.getEndLine()));
-						}
+				// We look for FieldDeclaration inside inner classes
+				for (BodyDeclaration bd : td.getMembers()) {
+					if (bd instanceof TypeDeclaration) {
+						nonInitializedFieldsLines.addAll(
+								findNonInitializedFieldsByType( (TypeDeclaration) bd ));
 					}
 				}
 			}
