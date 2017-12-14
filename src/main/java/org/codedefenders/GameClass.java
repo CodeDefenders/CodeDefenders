@@ -29,6 +29,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.ModifierSet;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 
@@ -234,6 +235,23 @@ public class GameClass {
 		return nonInitializedFieldsLines;
 	}
 
+	// Final and static considered here
+	private List<Entry<Integer, Integer>> findFinalStaticFieldsByType(TypeDeclaration type) {
+		List<Entry<Integer, Integer>> nonInitializedFieldsLines = new ArrayList<>();
+		for (BodyDeclaration bd : type.getMembers()) {
+			if (bd instanceof FieldDeclaration) {
+				FieldDeclaration f = (FieldDeclaration) bd;
+				if ((f.getModifiers() & ModifierSet.FINAL) != 0 && (f.getModifiers() & ModifierSet.STATIC) != 0) {
+					for (VariableDeclarator v : f.getVariables()) {
+						nonInitializedFieldsLines.add(new AbstractMap.SimpleEntry(v.getBeginLine(), v.getEndLine()));
+					}
+				}
+			}
+		}
+		return nonInitializedFieldsLines;
+
+	}
+
 	// TODO Probably this shall be refactor using some code visitor so we do not
 	// reanalyze everything from scratch each time
 	private List<Entry<Integer, Integer>> findNonInitializedFields() {
@@ -243,20 +261,24 @@ public class GameClass {
 			// parse the file
 			cu = JavaParser.parse(in);
 
-			// We need to consider all the non initialized fields, even if they
-			// are in
-			// inner classes !
 			for (TypeDeclaration td : cu.getTypes()) {
+				System.out.println("GameClass.findNonInitializedFields() " + td.getName());
 				// Add the fields for this class;
-				nonInitializedFieldsLines.addAll(findNonInitializedFieldsByType( td ));
+				nonInitializedFieldsLines.addAll(findNonInitializedFieldsByType(td));
+
+				// Static final or static final primitive in the class
+				nonInitializedFieldsLines.addAll(findFinalStaticFieldsByType(td));
 
 				// We look for FieldDeclaration inside inner classes
 				for (BodyDeclaration bd : td.getMembers()) {
 					if (bd instanceof TypeDeclaration) {
-						nonInitializedFieldsLines.addAll(
-								findNonInitializedFieldsByType( (TypeDeclaration) bd ));
+						System.out.println("GameClass.findNonInitializedFields() bd " + bd);
+						nonInitializedFieldsLines.addAll(findNonInitializedFieldsByType((TypeDeclaration) bd));
+						//
+						nonInitializedFieldsLines.addAll(findFinalStaticFieldsByType((TypeDeclaration) bd));
 					}
 				}
+
 			}
 
 		} catch (ParseException | IOException e) {
