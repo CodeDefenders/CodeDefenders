@@ -44,7 +44,7 @@
 		<th>Level</th>
 		<th>Starting</th>
 		<th>Finishing</th>
-		<th>Action</th>
+		<th></th>
 	</tr>
 <%
 	if (games.isEmpty()) {
@@ -81,7 +81,7 @@
 		<td class="col-sm-1"><%= g.getId() %></td>
 		<td class="col-sm-1">Duel</td>
 		<td class="col-sm-1"></td>
-		<td class="col-sm-2">
+		<td class="col-sm-1">
 			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
 				<%=g.getCUT().getAlias()%>
 			</a>
@@ -103,12 +103,12 @@
 				</div>
 			</div>
 		</td>
-		<td class="col-sm-2"><%= atkName %></td>
-		<td class="col-sm-2"><%= defName %></td>
-		<td class="col-sm-2"><%= g.getLevel().name() %></td>
+		<td class="col-sm-1"><%= atkName %></td>
+		<td class="col-sm-1"><%= defName %></td>
+		<td class="col-sm-1"><%= g.getLevel().name() %></td>
         <td class="col-sm-1"></td>
         <td class="col-sm-1"></td>
-		<td class="col-sm-2">
+		<td class="col-sm-3">
 <%
 			if (g.getState().equals(GameState.ACTIVE)) { // Can enter only if game is in progress.
 				String btnLabel = "Your Turn";
@@ -242,7 +242,7 @@
 		<th>Level</th>
 		<th>Starting</th>
 		<th>Finishing</th>
-		<th>Action</th>
+		<th></th>
 
 	</tr>
 <%
@@ -358,10 +358,10 @@
 			<td class="col-sm-1"><%= g.getStartDateTime() %></td>
 			<td class="col-sm-1"><%= g.getFinishDateTime() %></td>
 			<td class="col-sm-2">
-				<a class="btn btn-sm btn-primary" style="background-color: #884466;border-color: #772233;"
-				   href="<%=request.getContextPath()%>/multiplayer/games?attacker=1&id=<%= g.getId() %>">Attack</a>
+				<a class="btn btn-sm btn-primary" style="background-color: #884466;border-color: #772233; margin-bottom: 3px;"
+				   href="<%=request.getContextPath()%>/multiplayer/games?attacker=1&id=<%= g.getId() %>">Join as Attacker</a>
 				<a class="btn btn-sm btn-primary" style="background-color: #446688;border-color: #225577"
-				   href="<%=request.getContextPath()%>/multiplayer/games?defender=1&id=<%= g.getId() %>">Defend</a>
+				   href="<%=request.getContextPath()%>/multiplayer/games?defender=1&id=<%= g.getId() %>">Join as Defender</a>
 			</td>
 		</tr>
 <%
