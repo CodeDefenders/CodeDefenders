@@ -38,19 +38,19 @@ public class MultiplayerGame extends AbstractGame {
 	private boolean requiresValidation;
 
 	public MultiplayerGame(int classId, int creatorId, GameLevel level,
-	                       float lineCoverage, float mutantCoverage, float prize,
-	                       int defenderValue, int attackerValue, int defenderLimit,
-	                       int attackerLimit, int minDefenders, int minAttackers,
-	                       long startDateTime, long finishDateTime, String status) {
+						   float lineCoverage, float mutantCoverage, float prize,
+						   int defenderValue, int attackerValue, int defenderLimit,
+						   int attackerLimit, int minDefenders, int minAttackers,
+						   long startDateTime, long finishDateTime, String status) {
 		this(classId, creatorId, level, lineCoverage, mutantCoverage, prize, defenderValue, attackerValue, defenderLimit, attackerLimit,
 				minDefenders, minAttackers, startDateTime, finishDateTime, status, false);
 	}
 
 	public MultiplayerGame(int classId, int creatorId, GameLevel level,
-	                       float lineCoverage, float mutantCoverage, float prize,
-	                       int defenderValue, int attackerValue, int defenderLimit,
-	                       int attackerLimit, int minDefenders, int minAttackers,
-	                       long startDateTime, long finishDateTime, String status, boolean requiresValidation) {
+						   float lineCoverage, float mutantCoverage, float prize,
+						   int defenderValue, int attackerValue, int defenderLimit,
+						   int attackerLimit, int minDefenders, int minAttackers,
+						   long startDateTime, long finishDateTime, String status, boolean requiresValidation) {
 		this.classId = classId;
 		this.creatorId = creatorId;
 		this.level = level;
@@ -185,7 +185,11 @@ public class MultiplayerGame extends AbstractGame {
 	}
 
 	public boolean addPlayer(int userId, Role role) {
-		if (state != GameState.FINISHED && canJoinGame(userId, role)) {
+		return canJoinGame(userId, role) && addPlayerForce(userId, role);
+	}
+
+	public boolean addPlayerForce(int userId, Role role){
+		if (state != GameState.FINISHED) {
 			Connection conn = DB.getConnection();
 			String query = "INSERT INTO players (Game_ID, User_ID, Points, Role) VALUES (?, ?, 0, ?) ON DUPLICATE KEY UPDATE Role=?, Active=TRUE;";
 			DatabaseValue[] valueList = {DB.getDBV(id), DB.getDBV(userId), DB.getDBV(role.toString()), DB.getDBV(role.toString())};
