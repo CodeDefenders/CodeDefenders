@@ -48,12 +48,10 @@ public class CoverageGenerator {
     }
 
 	private void includeNonInitializedFields(GameClass clazz) {
-		for (Entry<Integer, Integer> nonInitializedField : clazz.getLinesOfNonInitializedFields()) {
-			for (int i = nonInitializedField.getKey(); i <= nonInitializedField.getValue(); i++) {
-				linesCovered.add(i);
-				if (linesUncovered.contains(i)) {
-					linesUncovered.remove(i);
-				}
+		for (Integer nonInitializedField : clazz.getLinesOfNonCoverableCode()) {
+			linesCovered.add(nonInitializedField);
+			if (linesUncovered.contains(nonInitializedField)) {
+				linesUncovered.remove(nonInitializedField);
 			}
 		}
 	}

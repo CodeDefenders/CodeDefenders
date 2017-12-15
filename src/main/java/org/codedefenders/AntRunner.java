@@ -23,6 +23,7 @@ import javax.naming.NamingException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.codedefenders.multiplayer.CoverageGenerator;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.util.DatabaseAccess;
@@ -111,10 +112,39 @@ public class AntRunner {
 	 * @return A {@link TargetExecution} object
 	 */
 	static TargetExecution testMutant(Mutant m, Test t) {
-		logger.debug("Running test {} on mutant {}", t.getId(), m.getId());
+		logger.info("Running test {} on mutant {}", t.getId(), m.getId());
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
 
-		AntProcessResult result = runAntTarget("test-mutant", m.getDirectory(), t.getDirectory(), cut, t.getFullyQualifiedClassName());
+		// Check if this mutant requires a test recompilation
+		AntProcessResult result = null;
+		if( m.doesRequireRecompilation() ){
+			result = runAntTarget("recompiled-test-mutant", m.getDirectory(), t.getDirectory(), cut, t.getFullyQualifiedClassName());
+		} else {
+			result = runAntTarget("test-mutant", m.getDirectory(), t.getDirectory(), cut, t.getFullyQualifiedClassName());
+		}
+
+		TargetExecution newExec;
+
+		if (result.hasFailure()) {
+			// The test failed, i.e., it detected the mutant
+			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "FAIL", null);
+		} else if (result.hasError()) {
+			// The test is in error, interpreted also as detecting the mutant
+			String message = result.getErrorMessage();
+			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "ERROR", message);
+		} else {
+			// The test passed, i.e., it did not detect the mutant
+			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "SUCCESS", null);
+		}
+		newExec.insert();
+		return newExec;
+	}
+
+	static TargetExecution recompileTestAndTestMutant(Mutant m, Test t) {
+		logger.info("Running test {} on mutant {}", t.getId(), m.getId());
+		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
+
+		AntProcessResult result = runAntTarget("recompile-test-mutant", m.getDirectory(), t.getDirectory(), cut, t.getFullyQualifiedClassName());
 
 		TargetExecution newExec;
 
@@ -134,7 +164,7 @@ public class AntRunner {
 	}
 
 	static boolean potentialEquivalent(Mutant m) {
-		logger.debug("Checking if mutant {} is potentially equivalent.", m.getId());
+		logger.info("Checking if mutant {} is potentially equivalent.", m.getId());
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
 		String suiteDir = AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias();
 
@@ -335,8 +365,8 @@ public class AntRunner {
 		return runAntTarget(target, mutantFile, testDir, cut, testClassName, false);
 	}
 	
-	private static AntProcessResult runAntTarget(String target, String mutantFile, String testDir, GameClass cut, String testClassName, boolean forcedLocally) {
-		logger.debug("Running Ant Target: {} with mFile: {} and tFile: {}", target, mutantFile, testDir);
+	private static AntProcessResult runAntTarget(String target, String mutantDir, String testDir, GameClass cut, String testClassName, boolean forcedLocally) {
+		logger.info("Running Ant Target: {} with mFile: {} and tFile: {}", target, mutantDir, testDir);
 
 		ProcessBuilder pb = new ProcessBuilder();
 		Map env = pb.environment();
@@ -349,7 +379,7 @@ public class AntRunner {
 		 */
 
 		if (clusterEnabled & !forcedLocally) {
-			logger.debug("Clustered Execution");
+			logger.info("Clustered Execution");
 			if (clusterJavaHome != null) {
 				env.put("JAVA_HOME", clusterJavaHome);
 			}
@@ -370,7 +400,7 @@ public class AntRunner {
 			//
 			command.add("ant");
 		} else {
-			logger.debug("Local Execution");
+			logger.info("Local Execution");
 			env.put("CLASSPATH", "lib/hamcrest-all-1.3.jar:lib/junit-4.12.jar");
 
 			String command_ = antHome + "/bin/ant";
@@ -388,14 +418,26 @@ public class AntRunner {
 		// This ensures that ant actually uses the data dir we setup
 		command.add("-Dcodedef.home=" + Constants.DATA_DIR);
 		///
-		command.add("-Dmutant.file=" + mutantFile);
+		command.add("-Dmutant.file=" + mutantDir);
 		command.add("-Dtest.file=" + testDir);
 		command.add("-Dcut.dir=" + CUTS_DIR + F_SEP + cut.getAlias());
 		command.add("-Dclassalias=" + cut.getAlias());
 		command.add("-Dclassbasename=" + cut.getBaseName());
 		command.add("-Dclassname=" + cut.getName());
 		command.add("-DtestClassname=" + testClassName);
-
+		//
+		if (mutantDir != null && testDir != null) {
+			String[] tokens = mutantDir.split(F_SEP);
+			String mutantFile = String.format("%s-%s", tokens[tokens.length - 2], tokens[tokens.length - 1]);
+			String testMutantFile = testDir.replace("original", mutantFile);
+			// TODO This might need refactoring
+			File testMutantFileDir = new File( testMutantFile  );
+			if( ! testMutantFileDir.exists() ){
+				testMutantFileDir.mkdirs();
+			}
+			//
+			command.add("-Dmutant.test.file=" + testMutantFile);
+		}
 		// Execute whichever command was build
 		pb.command(command);
 
@@ -403,7 +445,7 @@ public class AntRunner {
 		pb.directory(new File(buildFileDir));
 		pb.redirectErrorStream(true);
 
-		logger.debug("Executing Ant Command {} from directory {}", pb.command().toString(), buildFileDir);
+		logger.info("Executing Ant Command {} from directory {}", pb.command().toString(), buildFileDir);
 
 		return runAntProcess(pb);
 	}

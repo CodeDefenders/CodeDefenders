@@ -15,7 +15,7 @@ public class CodeCoverageTest {
 		// TODO We need to run the test
 		
 		// TODO We know that there are 5 non initialized fields from that class
-		assertEquals(5, gc.getLinesOfNonInitializedFields().size());
+		assertEquals(5, gc.getLinesOfNonCoverableCode().size());
 		// TODO add assertions that check line number corresponds
 
 	}
@@ -29,7 +29,7 @@ public class CodeCoverageTest {
 		// TODO We need to run the test
 
 		// TODO We know that there are 5 non initialized fields from that class
-		assertEquals(8, gc.getLinesOfNonInitializedFields().size());
+		assertEquals(8, gc.getLinesOfNonCoverableCode().size());
 		// TODO add assertions that check line number corresponds
 
 	}

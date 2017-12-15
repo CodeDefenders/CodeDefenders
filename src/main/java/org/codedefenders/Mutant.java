@@ -178,6 +178,11 @@ public class Mutant implements Serializable {
 		return false;
 	}
 
+	public boolean doesRequireRecompilation() {
+		GameClass cut = DatabaseAccess.getClassForGame(gameId);
+		return CollectionUtils.containsAny(cut.getLinesOfCompileTimeConstants(), getLines());
+	}
+
 	/**
 	 * @return attacker points for this mutant in DUEL MODE
 	 */
