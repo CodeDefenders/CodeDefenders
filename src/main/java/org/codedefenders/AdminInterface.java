@@ -61,11 +61,22 @@ public class AdminInterface extends HttpServlet {
 
             case "startStopGame":
                 String playerToRemoveIdGameIdString = request.getParameter("activeGameUserRemoveButton");
-                if (playerToRemoveIdGameIdString != null) { // admin is removing user from temp game
-                    int playerToRemoveId = Integer.parseInt(playerToRemoveIdGameIdString.split("-")[0]);
-                    int gameToRemoveFromId = Integer.parseInt(playerToRemoveIdGameIdString.split("-")[1]);
+                String playerToSwitchIdGameIdString = request.getParameter("activeGameUserSwitchButton");
+                boolean switchUser = playerToSwitchIdGameIdString != null;
+                if (playerToRemoveIdGameIdString != null || playerToSwitchIdGameIdString != null) { // admin is removing user from temp game
+                    int playerToRemoveId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[0]);
+                    int gameToRemoveFromId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[1]);
+                    int userId = DatabaseAccess.getUserFromPlayer(playerToRemoveId).getId();
                     if (!deletePlayer(playerToRemoveId, gameToRemoveFromId))
-                        messages.add("Deleting player " + playerToRemoveId + "failed! \n Please check the logs!");
+                        messages.add("Deleting player " + playerToRemoveId + " failed! \n Please check the logs!");
+                    else if (switchUser) {
+                        Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
+                                ? Role.DEFENDER : Role.ATTACKER;
+                        mg = DatabaseAccess.getMultiplayerGame(gameToRemoveFromId);
+                        if (!mg.addPlayerForce(userId, newRole))
+                            messages.add("Inserting user " + userId + " failed! \n Please check the logs!");
+                    }
+
                 } else { // admin is inserting or deleting selected temp games
                     int gameId = -1;
                     // Get the identifying information required to create a game from the submitted form.
@@ -454,6 +465,7 @@ public class AdminInterface extends HttpServlet {
             if (m.getPlayerId() == pid)
                 AdminDAO.deleteMutantTargetExecutions(m.getId());
         }
+        DatabaseAccess.removePlayerEventsForGame(gid, pid);
         AdminDAO.deletePlayerTest(pid);
         AdminDAO.deletePlayerMutants(pid);
         AdminDAO.deletePlayerEquivalences(pid);

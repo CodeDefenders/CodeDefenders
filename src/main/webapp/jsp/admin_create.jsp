@@ -125,12 +125,12 @@
                 <th></th>
                 <th></th>
                 <th></th>
-                <th></th>
                 <th style="border-bottom: 1px solid black">Name</th>
                 <th style="border-bottom: 1px solid black">Submissions</th>
                 <th style="border-bottom: 1px solid black">Last Action</th>
                 <th style="border-bottom: 1px solid black">Points</th>
                 <th style="border-bottom: 1px solid black">Total Score</th>
+                <th style="border-bottom: 1px solid black">Switch Role</th>
                 <th style="border-bottom: 1px solid black"></th>
             </tr>
             <%
@@ -144,6 +144,7 @@
                     //Timestamp ts = AdminDAO.getLastLogin(aid);
                     Entry score = AdminDAO.getScore(id);
                     int totalScore = score.getTotalPoints();
+                    Role role = attackerIds.contains(pid) ? Role.ATTACKER : Role.DEFENDER;
                     String color = attackerIds.contains(pid) ? "#edcece" : "#ced6ed";
                     int submissionsCount = AdminInterface.getSubmissionsCount(g, pid);
                     String lastActionTS = AdminInterface.getTimeSinceLastSubmission(pid);
@@ -151,7 +152,6 @@
             %>
             <tr style="height: 3px;" id="playersTableActive"></tr>
             <tr id="playersTableActive">
-                <td></td>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -165,6 +165,16 @@
                 <td style="background: <%= color %>"><%= gameScore %>
                 </td>
                 <td style="background: <%= color %>"><%= totalScore %>
+                </td>
+                <td style="background: <%= color %>">
+
+                    <button class="btn btn-sm btn-danger" value="<%=pid + "-" + g.getId() + "-" + role%>"
+                            onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
+                             'This will also delete ALL of his tests, mutants and claimed equivalences ' +
+                              'and might create inconsistencies in the Game.');"
+                            name="activeGameUserSwitchButton">
+                        <span class="glyphicon glyphicon-transfer"></span>
+                    </button>
                 </td>
                 <td style="background: <%= color %>; border-top-right-radius: 7px;border-bottom-right-radius: 7px;">
 
