@@ -307,10 +307,18 @@
                             </td>
                             <td class="col-sm-1"><%= totalScore %>
                             </td>
-                            <td class="col-sm-1">
+                            <td>
+                                <button class="btn btn-sm btn-primary"
+                                        value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
+                                        name="tempGameUserSwitchButton">
+                                    <span class = "glyphicon glyphicon-transfer"></span>
+                                </button>
+                            </td>
+                            <td>
                                 <button class="btn btn-sm btn-danger"
                                         value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
-                                        name="tempGameUserRemoveButton">Remove
+                                        name="tempGameUserRemoveButton">
+                                    <span class = "glyphicon glyphicon-trash"></span>
                                 </button>
                             </td>
                         </tr>

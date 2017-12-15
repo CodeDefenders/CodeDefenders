@@ -187,15 +187,25 @@ public class AdminInterface extends HttpServlet {
             case "insertGames":
                 attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.ATTACKER_LISTS_SESSION_ATTRIBUTE);
                 defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.DEFENDER_LISTS_SESSION_ATTRIBUTE);
-                String gameAndUserId = request.getParameter("tempGameUserRemoveButton");
-                if (gameAndUserId != null) { // admin is removing user from temp game
+                String gameAndUserRemoveId = request.getParameter("tempGameUserRemoveButton");
+                String gameAndUserSwitchId = request.getParameter("tempGameUserSwitchButton");
+                if (gameAndUserRemoveId != null || gameAndUserSwitchId != null) { // admin is removing user  from temp game or switching their role
+                    switchUser = gameAndUserSwitchId != null;
+                    String gameAndUserId = switchUser ? gameAndUserSwitchId : gameAndUserRemoveId;
                     int gameToRemoveFromId = Integer.parseInt(gameAndUserId.split("-")[0]);
                     Integer userToRemoveId = Integer.parseInt(gameAndUserId.split("-")[1]);
                     List<Integer> attackerIds = attackerIdsList.get(gameToRemoveFromId);
-                    if (attackerIds.contains(userToRemoveId))
+                    List<Integer> defenderIds = defenderIdsList.get(gameToRemoveFromId);
+                    if (attackerIds.contains(userToRemoveId)) {
                         attackerIds.remove(userToRemoveId);
-                    else
-                        defenderIdsList.get(gameToRemoveFromId).remove(userToRemoveId);
+                        if (switchUser)
+                            defenderIds.add(userToRemoveId);
+                    }
+                    else {
+                        defenderIds.remove(userToRemoveId);
+                        if (switchUser)
+                            attackerIds.add(userToRemoveId);
+                    }
 
                 } else { // admin is inserting or deleting selected temp games
                     String[] selectedGames;
