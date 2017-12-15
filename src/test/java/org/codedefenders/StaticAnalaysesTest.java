@@ -5,8 +5,6 @@ import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 
-import java.util.Map.Entry;
-
 public class StaticAnalaysesTest {
 
 	@org.junit.Test
@@ -15,12 +13,27 @@ public class StaticAnalaysesTest {
 				"src/test/resources/itests/sources/XmlElement/XmlElement.java",
 				"src/test/resources/itests/sources/XmlElement/XmlElement.class");
 
-		for (Entry<Integer, Integer> l : gc.getLinesOfNonInitializedFields()) {
-			System.out.println("StaticAnalaysesTest " + l.getKey() + "--" + l.getValue());
+		for (Integer line : gc.getLinesOfNonCoverableCode()) {
+			System.out.println("StaticAnalaysesTest " + line );
 		}
 
 		// We know that there are 5 non initialized fields from that class
-		assertEquals(5, gc.getLinesOfNonInitializedFields().size());
+		assertEquals(5, gc.getLinesOfNonCoverableCode().size());
+		// TODO add assertions that check line number corresponds
+	}
+
+	@org.junit.Test
+	public void testTestHasCompileTimeConstants() {
+		GameClass gc = new GameClass("Option", "Option",
+				"src/test/resources/itests/sources/Option/Option.java",
+				"src/test/resources/itests/sources/Option/Option.class");
+
+		for (Integer line : gc.getLinesOfCompileTimeConstants()) {
+			System.out.println("StaticAnalaysesTest " + line );
+		}
+
+		// We know that there are 5 non initialized fields from that class
+		assertEquals(2, gc.getLinesOfCompileTimeConstants().size());
 		// TODO add assertions that check line number corresponds
 	}
 	

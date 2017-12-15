@@ -8,11 +8,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.codedefenders.duel.DuelGame;
@@ -32,6 +30,7 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.ModifierSet;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.type.PrimitiveType;
 
 public class GameClass {
 
@@ -45,7 +44,8 @@ public class GameClass {
 
 	private Set<String> additionalImports = new HashSet<String>();
 	// Store begin and end line which corresponds to uncoverable non-initializad fields
-	private List<Entry<Integer,Integer>> linesOfNonInitializedFields = new ArrayList<>();
+	private List<Integer> linesOfNonCoverableCode = new ArrayList<>();
+	private List<Integer> linesOfCompileTimeConstants= new ArrayList<>();
 
 	public GameClass(String name, String alias, String jFile, String cFile) {
 		this.name = name;
@@ -59,7 +59,10 @@ public class GameClass {
 		 * We take all the imports declared in the CUT.
 		 */
 		this.additionalImports.addAll(includeAdditionalImportsFromCUT());
-		this.linesOfNonInitializedFields.addAll( findNonInitializedFields());
+		this.linesOfNonCoverableCode.addAll( findNonInitializedFields());
+		this.linesOfNonCoverableCode.addAll( findCompileTimeConstants());
+		//
+		this.linesOfCompileTimeConstants.addAll( findCompileTimeConstants());
 	}
 
 
@@ -220,14 +223,16 @@ public class GameClass {
 		return dg;
 	}
 
-	private List<Entry<Integer, Integer>> findNonInitializedFieldsByType(TypeDeclaration type) {
-		List<Entry<Integer, Integer>> nonInitializedFieldsLines = new ArrayList<>();
+	private List<Integer> findNonInitializedFieldsByType(TypeDeclaration type) {
+		List<Integer> nonInitializedFieldsLines = new ArrayList<>();
 		for (BodyDeclaration bd : type.getMembers()) {
 			if (bd instanceof FieldDeclaration) {
 				FieldDeclaration f = (FieldDeclaration) bd;
 				for (VariableDeclarator v : f.getVariables()) {
 					if (v.getInit() == null) {
-						nonInitializedFieldsLines.add(new AbstractMap.SimpleEntry(v.getBeginLine(), v.getEndLine()));
+						for( int line = v.getBeginLine(); line <= v.getEndLine(); line++){
+							nonInitializedFieldsLines.add( line );
+						}
 					}
 				}
 			}
@@ -235,47 +240,45 @@ public class GameClass {
 		return nonInitializedFieldsLines;
 	}
 
-	// Final and static considered here
-	private List<Entry<Integer, Integer>> findFinalStaticFieldsByType(TypeDeclaration type) {
-		List<Entry<Integer, Integer>> nonInitializedFieldsLines = new ArrayList<>();
+	// TODO The actual definition of compile-time constants is more complex, but
+	// for the moment primitive and string types declared as final are considered compile-time constants.
+	private List<Integer> findCompileTimeConstantsByType(TypeDeclaration type) {
+		List<Integer> compileTimeConstants = new ArrayList<>();
 		for (BodyDeclaration bd : type.getMembers()) {
 			if (bd instanceof FieldDeclaration) {
 				FieldDeclaration f = (FieldDeclaration) bd;
-				if ((f.getModifiers() & ModifierSet.FINAL) != 0 && (f.getModifiers() & ModifierSet.STATIC) != 0) {
-					for (VariableDeclarator v : f.getVariables()) {
-						nonInitializedFieldsLines.add(new AbstractMap.SimpleEntry(v.getBeginLine(), v.getEndLine()));
+				if ( ( f.getType() instanceof PrimitiveType ) || ("String".equals( f.getType().toString()))) {
+					if ((f.getModifiers() & ModifierSet.FINAL) != 0) {
+						for (VariableDeclarator v : f.getVariables()) {
+							logger.debug("Found compile-time constant " + v );
+							for( int line = v.getBeginLine(); line <= v.getEndLine(); line++ )
+							compileTimeConstants.add(line);
+						}
 					}
 				}
 			}
 		}
-		return nonInitializedFieldsLines;
+		return compileTimeConstants;
 
 	}
 
 	// TODO Probably this shall be refactor using some code visitor so we do not
 	// reanalyze everything from scratch each time
-	private List<Entry<Integer, Integer>> findNonInitializedFields() {
-		List<Entry<Integer, Integer>> nonInitializedFieldsLines = new ArrayList<>();
+	private List<Integer> findNonInitializedFields() {
+		List<Integer> nonInitializedFieldsLines = new ArrayList<>();
 		CompilationUnit cu;
 		try (FileInputStream in = new FileInputStream(javaFile)) {
 			// parse the file
 			cu = JavaParser.parse(in);
 
 			for (TypeDeclaration td : cu.getTypes()) {
-				System.out.println("GameClass.findNonInitializedFields() " + td.getName());
 				// Add the fields for this class;
 				nonInitializedFieldsLines.addAll(findNonInitializedFieldsByType(td));
-
-				// Static final or static final primitive in the class
-				nonInitializedFieldsLines.addAll(findFinalStaticFieldsByType(td));
 
 				// We look for FieldDeclaration inside inner classes
 				for (BodyDeclaration bd : td.getMembers()) {
 					if (bd instanceof TypeDeclaration) {
-						System.out.println("GameClass.findNonInitializedFields() bd " + bd);
 						nonInitializedFieldsLines.addAll(findNonInitializedFieldsByType((TypeDeclaration) bd));
-						//
-						nonInitializedFieldsLines.addAll(findFinalStaticFieldsByType((TypeDeclaration) bd));
 					}
 				}
 
@@ -287,8 +290,40 @@ public class GameClass {
 		return nonInitializedFieldsLines;
 	}
 
-	public List<Entry<Integer, Integer>> getLinesOfNonInitializedFields() {
-		return linesOfNonInitializedFields;
+	// TODO Probably this shall be refactor using some code visitor so we do not
+	// reanalyze everything from scratch each time
+	private List<Integer> findCompileTimeConstants(){
+		List<Integer> compileTimeConstantsLine = new ArrayList<>();
+		CompilationUnit cu;
+		try (FileInputStream in = new FileInputStream(javaFile)) {
+			// parse the file
+			cu = JavaParser.parse(in);
+
+			for (TypeDeclaration td : cu.getTypes()) {
+				// Static final or static final primitive in the class
+				compileTimeConstantsLine.addAll(findCompileTimeConstantsByType(td));
+
+				// We look for FieldDeclaration inside inner classes
+				for (BodyDeclaration bd : td.getMembers()) {
+					if (bd instanceof TypeDeclaration) {
+						compileTimeConstantsLine.addAll(findCompileTimeConstantsByType((TypeDeclaration) bd));
+					}
+				}
+
+			}
+
+		} catch (ParseException | IOException e) {
+			logger.warn("Swallow exception", e);
+		}
+		return compileTimeConstantsLine;
+	}
+
+	public List<Integer> getLinesOfNonCoverableCode() {
+		return linesOfNonCoverableCode;
+	}
+
+	public List<Integer> getLinesOfCompileTimeConstants() {
+		return linesOfCompileTimeConstants;
 	}
 
 	public boolean delete() {
