@@ -284,6 +284,16 @@
 		<url-pattern>/game_mutants</url-pattern>
 	</servlet-mapping>
 
+
+    <servlet>
+        <servlet-name>adminInterface</servlet-name>
+        <servlet-class>org.codedefenders.AdminInterface</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>adminInterface</servlet-name>
+        <url-pattern>/admin</url-pattern>
+    </servlet-mapping>
+
 	<!-- End Notification JSON Servlets -->
 
 	<resource-ref>
