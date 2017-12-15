@@ -57,5 +57,10 @@
 			name="mutant.coverage"
 			type="java.lang.String"
 			value="${mutant.coverage}" />
-			
+
+	<Environment
+			name="block.attacker"
+			type="java.lang.String"
+			value="${block.attacker}" />
+
 </Context>

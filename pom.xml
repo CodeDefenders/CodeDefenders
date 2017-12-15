@@ -95,6 +95,7 @@
 								<echo>[cluster.reservation.name] ${cluster.reservation.name}</echo>
 								<echo>[parallelize] ${parallelize}</echo>
 								<echo>[forceLocalExecution] ${forceLocalExecution}</echo>
+								<echo>[block.attacker] ${block.attacker}</echo>
 							</tasks>
 						</configuration>
 					</execution>

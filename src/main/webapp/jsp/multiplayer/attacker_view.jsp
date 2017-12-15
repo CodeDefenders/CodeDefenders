@@ -2,11 +2,15 @@
 <%@ page import="org.codedefenders.Role" %>
 <%@ page import="org.codedefenders.Mutant" %>
 <%@ page import="org.codedefenders.GameLevel" %>
+<%@ page import="org.codedefenders.Constants" %>
+
 <%
 // Not sure where those variables come from...
 boolean disableAttack = false;
 if (role == Role.ATTACKER && mutantsPending != null ){
-	disableAttack = mutantsPending.size() > 0;
+	disableAttack = ( mutantsPending.size() > 0 ) &&
+					( session.getAttribute( Constants.BLOCK_ATTACKER ) != null ) && // This should be superflous since we always set this session attribute
+					((Boolean) session.getAttribute( Constants.BLOCK_ATTACKER ) );
 }
 %>
 <% codeDivName = "newmut-div"; %>
