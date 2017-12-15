@@ -246,6 +246,7 @@ public class AdminInterface extends HttpServlet {
         if (roleAssignmentMethod.equals(RoleAssignmentMethod.OPPOSITE)) {
             attackerIDs = getUsersByLastRole(selectedUserIDs, Role.DEFENDER);
             defenderIDs = getUsersByLastRole(selectedUserIDs, Role.ATTACKER);
+            distributeRemainingUsers(selectedUserIDs, attackerIDs, defenderIDs);
             nbGames = getNumberOfGames(attackersPerGame, defendersPerGame, attackerIDs.size(), defenderIDs.size());
         } else {
             nbGames = getNumberOfGames(attackersPerGame, defendersPerGame, selectedUserIDs.size());
@@ -290,7 +291,8 @@ public class AdminInterface extends HttpServlet {
     private static List<Integer> getUsersByLastRole(List<Integer> userIDs, Role role) {
         List<Integer> userList = new ArrayList<>();
         for (int uid : userIDs) {
-            if (AdminDAO.getLastRole(uid).equals(role)) {
+            Role lastRole = AdminDAO.getLastRole(uid);
+            if (lastRole != null && lastRole.equals(role)) {
                 userList.add(uid);
             }
         }
@@ -457,5 +459,21 @@ public class AdminInterface extends HttpServlet {
         AdminDAO.deletePlayerEquivalences(pid);
         return AdminDAO.deletePlayer(pid);
     }
+
+	private static void distributeRemainingUsers(List<Integer> selectedUserIDs, List<Integer> attackerIDs,
+												 List<Integer> defenderIDs) {
+		List<Integer> remainingUsers = new ArrayList<>();
+		for (int uid : selectedUserIDs) {
+			if (!(attackerIDs.contains(uid) || defenderIDs.contains(uid))) {
+				remainingUsers.add(uid);
+			}
+		}
+		Collections.shuffle(remainingUsers);
+
+		int nbDefenders = remainingUsers.size() / 2;
+		for (int i = 0; i < remainingUsers.size(); ++i) {
+			(i < nbDefenders ? defenderIDs : attackerIDs).add(remainingUsers.get(i));
+		}
+	}
 
 }
