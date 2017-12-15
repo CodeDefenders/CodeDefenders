@@ -1,20 +1,24 @@
 package org.codedefenders;
 
-import org.codedefenders.util.DatabaseAccess;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.ArrayList;
+
+import org.codedefenders.util.DatabaseAccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class LoginManager extends HttpServlet {
 
@@ -86,6 +90,9 @@ public class LoginManager extends HttpServlet {
 					DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
 					session.setAttribute("uid", activeUser.getId());
 					session.setAttribute("username", activeUser.getUsername());
+					//
+					storeApplicationDataInSession(session);
+
 					Object from = session.getAttribute("loginFrom");
 					if (from != null && ! ((String) from).endsWith(".ico")
 							&& ! ((String) from).endsWith(".css")
@@ -105,6 +112,25 @@ public class LoginManager extends HttpServlet {
 				}
 			}
 		}
+	}
+
+	/*
+	 * This method collects all the app specific configurations and store them into the current user-session.
+	 * This avoids to access Context directly from the JSP code which is a bad practice, since JSP are meant only
+	 * for implementing rendering code.
+	 */
+	private void storeApplicationDataInSession(HttpSession session) {
+		// First check the Web abb context
+		Boolean isAttackerBlocked = Boolean.FALSE;
+		try {
+			InitialContext initialContext = new InitialContext();
+			Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
+			isAttackerBlocked = "enabled".equals( (String) environmentContext.lookup( Constants.BLOCK_ATTACKER ));
+		} catch (NamingException e) {
+			logger.warn("Swallow Exception " + e );
+			logger.info("Default " + Constants.BLOCK_ATTACKER + " to false");
+		}
+		session.setAttribute( Constants.BLOCK_ATTACKER , isAttackerBlocked);
 	}
 
 	public String getClientIpAddress(HttpServletRequest request) {
