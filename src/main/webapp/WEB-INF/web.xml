@@ -13,6 +13,29 @@
 		<session-timeout>0</session-timeout>
 	</session-config>
 
+	<!-- Security Configuration -->
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>SecuredBookSite</web-resource-name>
+			<url-pattern>/admin</url-pattern>
+			<http-method>GET</http-method>
+			<http-method>POST</http-method>
+		</web-resource-collection>
+
+		<auth-constraint>
+			<role-name>manager-gui</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<security-role>
+		<role-name>manager-gui</role-name>
+	</security-role>
+
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+
+
 	<servlet>
 		<servlet-name>loginManager</servlet-name>
 		<servlet-class>org.codedefenders.LoginManager</servlet-class>
