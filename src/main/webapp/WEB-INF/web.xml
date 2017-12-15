@@ -351,7 +351,12 @@
 
 	<error-page>
 		<error-code>404</error-code>
-		<location>/error_page.html</location>
+		<location>/error_page_404.html</location>
+	</error-page>
+
+	<error-page>
+		<error-code>500</error-code>
+		<location>/error_page_500.html</location>
 	</error-page>
 
 </web-app>
