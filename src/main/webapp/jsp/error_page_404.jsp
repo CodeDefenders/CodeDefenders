@@ -66,10 +66,9 @@
 </head>
 
 <body>
-
-
-<img href="/" src="/images/logo.png">
-
+	<a href="<%=request.getContextPath()%>"> <img
+		src="<%=request.getContextPath()%>/images/logo.png">
+	</a>
 <h1>
     404
 </h1>
