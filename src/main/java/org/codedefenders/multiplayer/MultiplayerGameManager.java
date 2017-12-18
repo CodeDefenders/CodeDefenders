@@ -78,6 +78,10 @@ public class MultiplayerGameManager extends HttpServlet {
 				}
 			}
 			case "resolveEquivalence": {
+				if(!activeGame.getRole(uid).equals(Role.ATTACKER)) {
+					messages.add("Can only resolve equivalence duels if you are an Attacker!");
+					break;
+				}
 				int currentEquivMutantID = Integer.parseInt(request.getParameter("currentEquivMutant"));
 
 				if (activeGame.getState().equals(GameState.FINISHED)) {
@@ -192,6 +196,10 @@ public class MultiplayerGameManager extends HttpServlet {
 			break;
 
 			case "createMutant":
+				if(!activeGame.getRole(uid).equals(Role.ATTACKER)) {
+					messages.add("Can only submit mutants if you are an Attacker!");
+					break;
+				}
 
 				if (activeGame.getState().equals(GameState.ACTIVE)) {
 
@@ -251,6 +259,10 @@ public class MultiplayerGameManager extends HttpServlet {
 				break;
 
 			case "createTest":
+				if(!activeGame.getRole(uid).equals(Role.DEFENDER)) {
+					messages.add("Can only submit tests if you are an Defender!");
+					break;
+				}
 				if (activeGame.getState().equals(GameState.ACTIVE)) {
 					// Get the text submitted by the user.
 					String testText = request.getParameter("test");
