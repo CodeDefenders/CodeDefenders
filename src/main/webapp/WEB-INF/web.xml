@@ -13,6 +13,29 @@
 		<session-timeout>0</session-timeout>
 	</session-config>
 
+	<!-- Security Configuration -->
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>SecuredBookSite</web-resource-name>
+			<url-pattern>/admin</url-pattern>
+			<http-method>GET</http-method>
+			<http-method>POST</http-method>
+		</web-resource-collection>
+
+		<auth-constraint>
+			<role-name>manager-gui</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<security-role>
+		<role-name>manager-gui</role-name>
+	</security-role>
+
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+
+
 	<servlet>
 		<servlet-name>loginManager</servlet-name>
 		<servlet-class>org.codedefenders.LoginManager</servlet-class>
@@ -284,6 +307,16 @@
 		<url-pattern>/game_mutants</url-pattern>
 	</servlet-mapping>
 
+
+    <servlet>
+        <servlet-name>adminInterface</servlet-name>
+        <servlet-class>org.codedefenders.AdminInterface</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>adminInterface</servlet-name>
+        <url-pattern>/admin</url-pattern>
+    </servlet-mapping>
+
 	<!-- End Notification JSON Servlets -->
 
 	<resource-ref>
@@ -315,4 +348,15 @@
 	<!--<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>-->
+
+	<error-page>
+		<error-code>404</error-code>
+		<location>/jsp/error_page_404.jsp</location>
+	</error-page>
+
+	<error-page>
+		<error-code>500</error-code>
+		<location>/jsp/error_page_500.jsp</location>
+	</error-page>
+
 </web-app>

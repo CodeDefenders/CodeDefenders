@@ -1,15 +1,16 @@
 package org.codedefenders;
 
-import org.codedefenders.util.DatabaseAccess;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-public class TargetExecution {
+import org.codedefenders.util.DB;
+import org.slf4j.LoggerFactory;
 
+public class TargetExecution {
+	private static final org.slf4j.Logger logger = LoggerFactory.getLogger(TargetExecution.class);
 	public int id;
 	public int testId;
 	public int mutantId;
@@ -18,7 +19,7 @@ public class TargetExecution {
 	public String message;
 	public Timestamp timestamp;
 
-	public enum Target { COMPILE_MUTANT, COMPILE_TEST, TEST_ORIGINAL, TEST_MUTANT, TEST_EQUIVALENCE }
+	public enum Target {COMPILE_MUTANT, COMPILE_TEST, TEST_ORIGINAL, TEST_MUTANT, TEST_EQUIVALENCE}
 
 	// Constructors for inital creation of TargetExecution
 
@@ -42,30 +43,25 @@ public class TargetExecution {
 	}
 
 	public boolean insert() {
-
 		Connection conn = null;
 		PreparedStatement pstmt = null;
-		String sql = null;
-
 		try {
-			System.out.println("Inserting " + toString());
-
-			conn = DatabaseAccess.getConnection();
-
+			logger.debug("Inserting " + toString());
+			conn = DB.getConnection();
 			if (testId == 0) {
-				System.out.println("- No testId");
+				logger.warn("- No testId");
 				if (mutantId == 0) {
 					System.out.println("- No mutantId");
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Target, Status, Message) VALUES (?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setString(1, target.name());
 					pstmt.setString(2, status);
-					pstmt.setString(3, message == null ? "" : message.length() <= 2000 ? message : message.substring(0,1999));
+					pstmt.setString(3, message == null ? "" : message.length() <= 2000 ? message : message.substring(0, 1999));
 				} else {
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setInt(1, mutantId);
 					pstmt.setString(2, target.name());
 					pstmt.setString(3, status);
-					pstmt.setString(4, message == null ? "" : message.length() <= 2000 ? message : message.substring(0,1999));
+					pstmt.setString(4, message == null ? "" : message.length() <= 2000 ? message : message.substring(0, 1999));
 				}
 			} else {
 				if (mutantId == 0) {
@@ -74,39 +70,31 @@ public class TargetExecution {
 					pstmt.setInt(1, testId);
 					pstmt.setString(2, target.name());
 					pstmt.setString(3, status);
-					pstmt.setString(4, message == null ? "" : message.length() <= 2000 ? message : message.substring(0,1999));
+					pstmt.setString(4, message == null ? "" : message.length() <= 2000 ? message : message.substring(0, 1999));
 				} else {
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Test_ID, Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setInt(1, testId);
 					pstmt.setInt(2, mutantId);
 					pstmt.setString(3, target.name());
 					pstmt.setString(4, status);
-					pstmt.setString(5, message == null ? "" : message.length() <= 2000 ? message : message.substring(0,1999));
+					pstmt.setString(5, message == null ? "" : message.length() <= 2000 ? message : message.substring(0, 1999));
 				}
 			}
-
 			pstmt.execute();
-			System.out.println("SQL statement executed");
-
 			ResultSet rs = pstmt.getGeneratedKeys();
 
-
 			if (rs.next()) {
-				System.out.println("Retrieving execution keys for ID");
 				this.id = rs.getInt(1);
-				System.out.println(this.id);
-				pstmt.close();
-				conn.close();
 				return true;
 			}
 		} catch (SQLException se) {
-			System.out.println(se);
+			logger.error("Caught SQLException", se);
 		} // Handle errors for JDBC
 		catch (Exception e) {
-			System.out.println(e);
+			logger.error("Caught Exception", e);
 		} // Handle errors for Class.forName
 		finally {
-			DatabaseAccess.cleanup(conn, pstmt);
+			DB.cleanup(conn, pstmt);
 		}
 		return false;
 	}

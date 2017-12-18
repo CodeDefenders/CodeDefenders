@@ -6,7 +6,7 @@
 	  Object uid = request.getSession().getAttribute("uid");
 	  Object username = request.getSession().getAttribute("username");
 	  if (uid != null && username != null)
-		  response.sendRedirect("games");
+		  response.sendRedirect(request.getContextPath()+"/games");
 
 	  String email = request.getParameter("email");
 	  String reference = request.getParameter("reference");
@@ -16,7 +16,7 @@
   <div id="login" class="container">
       <div class="modal-body">
           <div id="create">
-              <form  action="login" method="post" class="form-signin">
+              <form  action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
                   <input type="hidden" name="formType" value="resetPassword">
                   <input type="hidden" name="reference"
                          value="<%= reference %>">

@@ -2,6 +2,11 @@
 <%@ page import="org.codedefenders.Role" %>
 <%@ page import="org.codedefenders.Mutant" %>
 <%@ page import="org.codedefenders.GameLevel" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Comparator" %>
+<%@ page import="java.util.Collections" %>
+
 <div class="ws-12 up" id="mutants-div">
 	<%
 if (role == Role.ATTACKER && true){
@@ -25,7 +30,7 @@ if (role == Role.ATTACKER && true){
         %><div>
 			<h2>Equivalent Mutant Claimed</h2>
 			<div class="nest crow fly" style="border: 5px dashed #f00; border-radius: 10px; width: 100%;">
-				<form id="equivalenceForm" action="multiplayer/move" method="post">
+				<form id="equivalenceForm" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
 					<input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= equiv.getId() %>">
 					<input type="hidden" name="formType" value="resolveEquivalence">
 					<%
@@ -41,7 +46,7 @@ if (role == Role.ATTACKER && true){
 					%>
 					<pre><textarea id="mutantSut" name="test" cols="80" rows="30"><%= mutTestCode %></textarea></pre>
 							<!--btn-danger-->
-							<a onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');" href="multiplayer/play?acceptEquiv=<%= equiv.getId() %>"><button type="button" class="btn btn-danger btn-left">Accept Equivalence</button></a>
+							<a onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');" href="<%=request.getContextPath() %>/multiplayer/play?acceptEquiv=<%= equiv.getId() %>"><button type="button" class="btn btn-danger btn-left">Accept Equivalence</button></a>
 							<button form="equivalenceForm" class="btn btn-primary btn-game btn-right" name="rejectEquivalent" type="submit">Submit Killing Test</button>
 					<div>
 						<p>Note: If the game finishes with this equivalence unsolved, you will lose points!</p>
@@ -93,7 +98,12 @@ if (role == Role.ATTACKER && true){
 						</tr>
 						</thead>
 						<tbody>
-						<% for (Mutant m : mutantsAlive) { %>
+<%
+						// Sorting mutants
+						List<Mutant> sortedMutants = new ArrayList<Mutant>( mutantsAlive );
+								Collections.sort( sortedMutants, Mutant.orderByIdDescending());
+%>
+						<% for (Mutant m : sortedMutants) { %>
 							<tr>
 								<% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
 								<td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> [UID: <%= creator.getId() %>]</h4>
@@ -105,7 +115,7 @@ if (role == Role.ATTACKER && true){
 											&& m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
 											&& !mg.getState().equals(GameState.FINISHED)
 											&& m.isCovered()){ %>
-										<a href="multiplayer/play?equivLine=<%=m.getLines().get(0)%>"
+										<a href="<%=request.getContextPath() %>/multiplayer/play?equivLine=<%=m.getLines().get(0)%>"
 										 class="btn btn-default btn-diff"
 										 onclick="return confirm('This will mark all mutants on line <%=m.getLines().get(0)%> as equivalent. Are you sure?');">
 											Claim Equivalent</a>

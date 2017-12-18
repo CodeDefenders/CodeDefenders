@@ -42,7 +42,7 @@
 			<button type="submit" class="btn btn-primary btn-game btn-right" form="def" onClick="this.form.submit(); this.disabled=true; this.value='Defending...';">Defend!</button>
 			<%}%>
 		</h2>
-		<form id="def" action="play" method="post">
+		<form id="def" action="<%=request.getContextPath() %>/play" method="post">
 			<%
 				String testCode;
 				String previousTestCode = (String) request.getSession().getAttribute("previousTest");
@@ -152,7 +152,7 @@
 						</td>
 						<td >
 							<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Role.DEFENDER)) {%>
-							<form id="equiv" action="play" method="post">
+							<form id="equiv" action="<%=request.getContextPath() %>/play" method="post">
 								<input type="hidden" name="formType" value="claimEquivalent">
 								<input type="hidden" name="mutantId" value="<%=m.getId()%>">
 								<button type="submit" class="btn btn-default btn-right">Claim Equivalent</button>

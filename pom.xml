@@ -20,7 +20,6 @@
 
 		<plugins>
 			<!-- Fails if the ${config.properties} file does not exists -->
-			<!-- NOTE: it does not check that properties have values -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
@@ -87,9 +86,16 @@
 						<configuration>
 							<tasks>
 								<echo>Displaying properties value</echo>
+								<!-- <echo>[build.profile.id] ${build.profile.id}</echo> -->
 								<echo>[data.dir] ${data.dir}</echo>
 								<echo>[db.url]${db.url}</echo>
+								<echo>[tomcat.path] ${tomcat.path}</echo>
 								<echo>[tomcat.url] ${tomcat.url}</echo>
+								<echo>[cluster.mode] ${cluster.mode}</echo>
+								<echo>[cluster.reservation.name] ${cluster.reservation.name}</echo>
+								<echo>[parallelize] ${parallelize}</echo>
+								<echo>[forceLocalExecution] ${forceLocalExecution}</echo>
+								<echo>[block.attacker] ${block.attacker}</echo>
 							</tasks>
 						</configuration>
 					</execution>
@@ -144,11 +150,12 @@
 					<username>${tomcat.username}</username>
 					<password>${tomcat.password}</password>
 					<!-- FIXME So far CodeDefenders must be deployed in Tomcat's root -->
-					<path>/</path>
+					<path>${tomcat.path}</path>
 					<ignorePackaging>true</ignorePackaging>
 					<contextReloadable>true</contextReloadable>
 				</configuration>
 			</plugin>
+
 		</plugins>
 		<finalName>${project.artifactId}</finalName>
 	</build>
@@ -180,6 +187,10 @@
 								<include>**/*.class</include>
 							</includes>
 							<excludedGroups>org.codedefenders.itests.IntegrationTest</excludedGroups>
+							<!-- Exclude resources for integration tests. Note that those are actual java and class files for mutants and tests -->
+							<excludes>
+								<exclude>itests/**/*.*</exclude>
+							</excludes>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -189,6 +200,39 @@
 			<id>IT</id>
 			<build>
 				<plugins>
+					<!-- Running integration tests require the lib folder to contains all 
+						the libs -->
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-enforcer-plugin</artifactId>
+						<version>3.0.0-M1</version>
+						<executions>
+							<execution>
+								<id>enforce-libs-exist</id>
+								<phase>validate</phase>
+								<goals>
+									<goal>enforce</goal>
+								</goals>
+								<configuration>
+									<rules>
+										<requireFilesExist>
+											<files>
+												<file>src/test/resources/itests/lib/hamcrest-all-1.3.jar</file>
+												<file>src/test/resources/itests/lib/junit-4.12.jar</file>
+												<file>src/test/resources/itests/lib/org.jacoco.agent-0.7.7.201606060606.jar</file>
+												<file>src/test/resources/itests/lib/org.jacoco.ant-0.7.7.201606060606.jar</file>
+												<file>src/test/resources/itests/lib/org.jacoco.core-0.7.7.201606060606.jar</file>
+												<file>src/test/resources/itests/lib/org.jacoco.report-0.7.7.201606060606.jar</file>
+											</files>
+										</requireFilesExist>
+									</rules>
+									<fail>true</fail>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-surefire-plugin</artifactId>
@@ -208,11 +252,13 @@
 								one after another. It creates the highest level of separation for the test 
 								execution, but it would probably also give you the longest execution time 
 								of all the available options. Consider it as a last resort. -->
-							<!-- Do not parallelize, just fork -->
+							<!-- Do not parallelize, but just fork a new JVM each time -->
 							<forkCount>1</forkCount>
-							<!-- Do not reuse the jvm -->
 							<reuseForks>false</reuseForks>
+							<!-- Only consider tests marked as IntegrationTest -->
 							<groups>org.codedefenders.itests.IntegrationTest</groups>
+							<!-- Do not clog the console but write to output files -->
+							<redirectTestOutputToFile>true</redirectTestOutputToFile>
 						</configuration>
 					</plugin>
 				</plugins>
@@ -220,14 +266,12 @@
 		</profile>
 	</profiles>
 
-
-
-
 	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -358,6 +402,14 @@
 			<groupId>org.powermock</groupId>
 			<artifactId>powermock-api-mockito</artifactId>
 			<version>${powermock.version}</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- HTML Client -->
+		<dependency>
+			<groupId>net.sourceforge.htmlunit</groupId>
+			<artifactId>htmlunit</artifactId>
+			<version>2.18</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

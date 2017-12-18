@@ -1,11 +1,14 @@
 package org.codedefenders;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 import javassist.ClassPool;
 import javassist.CtClass;
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.LineCoverage;
+import org.codedefenders.util.DB;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.DatabaseValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,10 +17,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,29 +44,28 @@ public class Test {
 
 	private int score;
 
-	public void setLineCoverage(LineCoverage lc){
+	public void setLineCoverage(LineCoverage lc) {
 		lineCoverage = lc;
 	}
 
-	public LineCoverage getLineCoverage(){
+	public LineCoverage getLineCoverage() {
 		return lineCoverage;
 	}
 
-	public void setPlayerId(int id){
+	public void setPlayerId(int id) {
 		playerId = id;
 	}
 
 
-
-	public int getPlayerId(){
+	public int getPlayerId() {
 		return playerId;
 	}
 
-	public int getScore(){
+	public int getScore() {
 		return score;
 	}
 
-	public void setScore(int s){
+	public void setScore(int s) {
 		score += s;
 	}
 
@@ -147,96 +147,57 @@ public class Test {
 		return testLines;
 	}
 
+
 	public boolean insert() {
+		String jFileDB = DatabaseAccess.addSlashes(javaFile);
+		String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
 
-		Connection conn = null;
-		Statement stmt = null;
-		String sql = null;
+		Connection conn = DB.getConnection();
+		String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points) VALUES (?, ?, ?, ?, ?, ?);";
+		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(jFileDB),
+				DB.getDBV(cFileDB),
+				DB.getDBV(gameId),
+				DB.getDBV(roundCreated),
+				DB.getDBV(playerId),
+				DB.getDBV(score)
+		};
 
-		try {
-			conn = DatabaseAccess.getConnection();
-
-			stmt = conn.createStatement();
-			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
-			// class file can be null
-			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
-			sql = String.format("INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points) " +
-						"VALUES (%s, %s, %d, %d, %d, %d);", jFileDB, cFileDB, gameId, roundCreated, playerId, score);
-
-			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
-
-			ResultSet rs = stmt.getGeneratedKeys();
-
-			if (rs.next()) {
-				this.id = rs.getInt(1);
-				stmt.close();
-				conn.close();
-				return true;
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
-		}
-		return false;
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		this.id = DB.executeUpdateGetKeys(stmt, conn);
+		return this.id > 0;
 	}
 
 	public boolean update() {
-
 		logger.debug("Updating Test");
-		Connection conn = null;
-		Statement stmt = null;
 		String sql = null;
-
-		try {
-			conn = DatabaseAccess.getConnection();
-
-			stmt = conn.createStatement();
-
-			String linesCoveredString = "";
-			String linesUncoveredString = "";
-			if (lineCoverage != null) {
-				for (int i : lineCoverage.getLinesCovered()) {
-					linesCoveredString += i + ",";
-				}
-
-				for (int i : lineCoverage.getLinesUncovered()) {
-					linesUncoveredString += i + ",";
-				}
-				if (linesCoveredString.length() > 0) {
-					linesCoveredString = linesCoveredString.substring(0, linesCoveredString.length() - 1);
-				}
-
-				if (linesUncoveredString.length() > 0) {
-					linesUncoveredString = linesUncoveredString.substring(0, linesUncoveredString.length() - 1);
-				}
+		Connection conn = DB.getConnection();
+		String linesCoveredString = "";
+		String linesUncoveredString = "";
+		if (lineCoverage != null) {
+			for (int i : lineCoverage.getLinesCovered()) {
+				linesCoveredString += i + ",";
 			}
-
-			//-1 for the left over comma
-
-
-			sql = String.format("UPDATE tests SET mutantsKilled='%d', " +
-					"NumberAiMutantsKilled='%d', " +
-					"Lines_Covered='%s', " +
-					"Lines_Uncovered='%s'," +
-					"Points = %d " +
-					"WHERE Test_ID='%d';",
-					mutantsKilled, aiMutantsKilled, linesCoveredString, linesUncoveredString, score, id);
-			stmt.execute(sql);
-
-			conn.close();
-			stmt.close();
-			return true;
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
+			for (int i : lineCoverage.getLinesUncovered()) {
+				linesUncoveredString += i + ",";
+			}
+			if (linesCoveredString.length() > 0) {
+				linesCoveredString = linesCoveredString.substring(0, linesCoveredString.length() - 1);
+			}
+			if (linesUncoveredString.length() > 0) {
+				linesUncoveredString = linesUncoveredString.substring(0, linesUncoveredString.length() - 1);
+			}
 		}
-		return false;
+		//-1 for the left over comma
+		String query = "UPDATE tests SET mutantsKilled=?, NumberAiMutantsKilled=?, Lines_Covered=?, Lines_Uncovered=?, Points = ? WHERE Test_ID=?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantsKilled),
+				DB.getDBV(aiMutantsKilled),
+				DB.getDBV(linesCoveredString),
+				DB.getDBV(linesUncoveredString),
+				DB.getDBV(score),
+				DB.getDBV(id)};
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return DB.executeUpdate(stmt, conn);
 	}
 
 	public String getFullyQualifiedClassName() {
@@ -260,16 +221,19 @@ public class Test {
 	public void setAiMutantsKilled(int count) {
 		aiMutantsKilled = count;
 	}
+
 	public int getAiMutantsKilled() {
-		if(aiMutantsKilled == 0) {
+		if (aiMutantsKilled == 0) {
 			//Retrieve from DB.
 			aiMutantsKilled = DatabaseAccess.getNumAiMutantsKilledByTest(getId());
 		}
 		return aiMutantsKilled;
 	}
+
 	public void incrementAiMutantsKilled() {
 		aiMutantsKilled++;
 	}
+
 	public String getJavaFile() {
 		return javaFile;
 	}

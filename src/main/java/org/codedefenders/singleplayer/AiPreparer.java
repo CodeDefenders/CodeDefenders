@@ -16,7 +16,7 @@ public class AiPreparer extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.sendRedirect("games/upload");
+        response.sendRedirect(request.getContextPath()+"/games/upload");
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -36,6 +36,6 @@ public class AiPreparer extends HttpServlet {
                 break;
         }
 
-        response.sendRedirect("games/upload");
+        response.sendRedirect(request.getContextPath()+"/games/upload");
     }
 }

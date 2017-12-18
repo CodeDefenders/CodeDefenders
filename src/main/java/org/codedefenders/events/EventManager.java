@@ -18,10 +18,11 @@ public class EventManager extends HttpServlet {
 	private static final Logger logger = LoggerFactory.getLogger(EventManager.class);
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		String contextPath = request.getContextPath();
 		try {
 			if (!canAccess(request)) {
 				logger.debug("Access denied");
-				response.sendRedirect("/games/user");
+				response.sendRedirect(contextPath+"/games/user");
 			} else {
 				logger.debug("Access granted");
 				response.setContentType("text/json");
@@ -62,7 +63,7 @@ public class EventManager extends HttpServlet {
 			}
 		} catch (Exception e){
 			logger.error("Exception caught", e);
-			response.sendRedirect("/games/user");
+			response.sendRedirect(contextPath+"/games/user");
 		}
 	}
 

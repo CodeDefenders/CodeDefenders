@@ -8,7 +8,7 @@
         gameId = Integer.parseInt(request.getParameter("id"));
         session.setAttribute("mpGameId", gameId);
     } catch (NumberFormatException e) {
-        logger.info("Game ID was not passed in the  Restoring from session.");
+        logger.info("Game ID was not passed in the request " + request.getContextPath() + request.getRequestURI() +". Restoring from session.");
         if (session.getAttribute("mpGameId") != null) {
             gameId = (Integer) session.getAttribute("mpGameId");
         } else {
@@ -27,7 +27,7 @@
     }
 
     if (redirectToGames){
-        response.sendRedirect("/games/user");
+        response.sendRedirect(request.getContextPath()+"/games/user");
         return;
     }
 %>
@@ -51,7 +51,7 @@
 	HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<>();
 
     if ((mg.getState().equals(GameState.CREATED) || mg.getState().equals(GameState.FINISHED)) && (!role.equals(Role.CREATOR))) {
-        response.sendRedirect("/games/user");
+        response.sendRedirect(request.getContextPath()+"/games/user");
     }
 
     List<Test> tests = mg.getTests(true); // get executable defenders' tests
@@ -60,7 +60,7 @@
     for (Test t : tests) {
         for (Integer lc : t.getLineCoverage().getLinesCovered()) {
             if (!linesCovered.containsKey(lc)) {
-                linesCovered.put(lc, new ArrayList<>());
+                linesCovered.put(lc, new ArrayList<Test>());
             }
             linesCovered.get(lc).add(t);
         }
@@ -117,11 +117,11 @@
 
                 messages.add(String.format("Flagged %d mutant%s as equivalent", nClaimed, (nClaimed == 1 ? "" : 's')));
 
-                response.sendRedirect("play");
+                response.sendRedirect(request.getContextPath()+"/multiplayer/play");
             } else {
             	// equivLine is not covered, possible iff passed directly as url argument
                 messages.add(MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
-                response.sendRedirect("play");
+                response.sendRedirect(request.getContextPath()+"/multiplayer/play");
                 return;
             }
         } catch (NumberFormatException e){}
@@ -146,7 +146,7 @@
                             new Timestamp(System.currentTimeMillis()));
                     notifEquiv.insert();
 
-                    response.sendRedirect("play");
+                    response.sendRedirect(request.getContextPath()+"/multiplayer/play");
                 }
             }
         } catch (NumberFormatException e){}
@@ -160,11 +160,12 @@
 
     // Ensure that mutants marked equivalent are drawn to display
     //mutantsAlive.addAll(mutantsEquiv);
+    //mutantsAlive.addAll(mutantsPending);
 
     for (Mutant m : mutantsAlive) {
         for (int line : m.getLines()){
             if (!mutantLines.containsKey(line)){
-                mutantLines.put(line, new ArrayList<>());
+                mutantLines.put(line, new ArrayList<Mutant>());
             }
 
             mutantLines.get(line).add(m);
@@ -181,27 +182,21 @@
         }
     }
 
-//    for (Mutant m : mutantsPending){
-//        mutantsAlive.add(m);
-//    }
-
-	mutantsAlive.addAll(mutantsPending);
+    mutantsAlive.addAll(mutantsPending);
 
     List<Mutant> mutantsKilled = mg.getKilledMutants();
 
     for (Mutant m : mutantsKilled) {
         for (int line : m.getLines()){
             if (!mutantKilledLines.containsKey(line)){
-                mutantKilledLines.put(line, new ArrayList<>());
+                mutantKilledLines.put(line, new ArrayList<Mutant>());
             }
-
             mutantKilledLines.get(line).add(m);
-
         }
     }
     //ArrayList<String> messages = new ArrayList<String>();
 %>
-
+    <%@ include file="/jsp/scoring_tooltip.jsp" %>
     <%@ include file="/jsp/multiplayer/game_scoreboard.jsp" %>
 <div class="crow fly no-gutter up">
     <% switch (role){
@@ -217,16 +212,18 @@
         default:
             if (request.getParameter("defender") != null){
                 mg.addPlayer(uid, Role.DEFENDER);
+                %><meta http-equiv="refresh" content="1" /><%
             } else if (request.getParameter("attacker") != null){
                 mg.addPlayer(uid, Role.ATTACKER);
+                %><meta http-equiv="refresh" content="1" /><%
             } else {
-                response.sendRedirect("multiplayer/games/user");
+                // response.sendRedirect(request.getContextPath()+"/multiplayer/games/user");
+                response.sendRedirect(request.getContextPath()+"/games/user");
                 break;
             }
             %>
             <p>Joining Game...</p>
 <%
-            response.setIntHeader("Refresh", 1);
             break;
     }
 %>

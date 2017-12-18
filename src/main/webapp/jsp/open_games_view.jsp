@@ -75,7 +75,7 @@
 		<td class="col-sm-2"><%= defName %></td>
 		<td class="col-sm-1"><%= g.getLevel().name() %></td>
 		<td class="col-sm-2">
-			<form id="view" action="games" method="post">
+			<form id="view" action="<%=request.getContextPath() %>/games" method="post">
 				<input type="hidden" name="formType" value="joinGame">
 				<input type="hidden" name="game" value=<%=g.getId()%>>
 				<input type="submit" class="btn btn-primary" value="Join Game">
@@ -90,7 +90,13 @@
 	<%}
 	%>
 </table>
-	<a href="/games/create">Create Duel</a>
+
+	<!-- Alessio disabled this to avoid students creating stuff. Then it should be enough to set visibility to null  -->
+	<!-- 
+	<a href="<%=request.getContextPath()%>/games/create">Create Duel</a>
+	-->
+	
+	
 	<hr />
 	<h3>Battlegrounds</h3>
 	<table id="tableMPGames" class="table table-hover table-responsive table-paragraphs games-table dataTable display">
@@ -152,8 +158,8 @@
 			<td class="col-sm-1"><%= g.getStartDateTime() %></td>
 			<td class="col-sm-1"><%= g.getFinishDateTime() %></td>
 			<td class="col-sm-2">
-				<a href="multiplayer/games?attacker=1&id=<%= g.getId() %>">Join as Attacker</a><br>
-				<a href="multiplayer/games?defender=1&id=<%= g.getId() %>">Join as Defender</a>
+				<a href="<%=request.getContextPath()%>/multiplayer/games?attacker=1&id=<%= g.getId() %>">Join as Attacker</a><br>
+				<a href="<%=request.getContextPath()%>/multiplayer/games?defender=1&id=<%= g.getId() %>">Join as Defender</a>
 			</td>
 		</tr>
 		<%
@@ -163,7 +169,11 @@
 		</tbody>
 	</table>
 
-	<a href="/multiplayer/games/create">Create Battleground</a>
+	<!-- Alessio disabled this -->
+	<!-- 
+	<a href="<%=request.getContextPath()%>/multiplayer/games/create">Create Battleground</a>
+	-->
+
 	<script>
 		$(document).ready(function() {
 			$.fn.dataTable.moment( 'DD/MM/YY HH:mm' );

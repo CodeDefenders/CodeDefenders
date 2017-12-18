@@ -1,14 +1,30 @@
+<%@ page import="org.codedefenders.duel.DuelGame" %>
+<%@ page import="org.codedefenders.Role" %>
+<%@ page import="org.codedefenders.Mutant" %>
+<%@ page import="org.codedefenders.GameLevel" %>
+<%@ page import="org.codedefenders.Constants" %>
+
+<%
+// Not sure where those variables come from...
+boolean disableAttack = false;
+if (role == Role.ATTACKER && mutantsPending != null ){
+	disableAttack = ( mutantsPending.size() > 0 ) &&
+					( session.getAttribute( Constants.BLOCK_ATTACKER ) != null ) && // This should be superflous since we always set this session attribute
+					((Boolean) session.getAttribute( Constants.BLOCK_ATTACKER ) );
+}
+%>
 <% codeDivName = "newmut-div"; %>
+
 <div class="crow">
 	<div class="w-45 up">
 	<%@include file="/jsp/multiplayer/game_mutants.jsp"%>
 	<%@include file="/jsp/multiplayer/game_unit_tests.jsp"%>
 	</div>
 	<div class="w-55" id="newmut-div">
-		<form id="atk" action="/multiplayer/move" method="post">
+		<form id="atk" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
 			<h2>Create a mutant here
 				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk" onClick="this.form.submit(); this.disabled=true; this.value='Attacking...';"
-						<% if (!mg.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>
+						<% if (!mg.getState().equals(GameState.ACTIVE) || disableAttack ) { %> disabled <% } %>>
 					Attack!
 				</button>
 			</h2>

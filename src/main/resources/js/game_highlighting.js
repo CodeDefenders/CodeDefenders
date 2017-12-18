@@ -59,6 +59,7 @@ var mutantLine = function (lineQuant, superDiv) {
         if (lineQuant.difference &&
             lineQuant.difference.deltas &&
             lineQuant[l].difference.deltas.length > 0) {
+            // TODO How do we get the contextPath ? it might not be necessary if we use relative href
             content += '<a href="multiplayer/play?equivLine=' + lineQuant[l][0] + '" style="color: #FEFCFC"> Mark Line Equivalent </a>';
             content += '</span>';
         }
@@ -71,19 +72,17 @@ var mutantLine = function (lineQuant, superDiv) {
                 drawMutants(lineNum, this);
             }, function () {
                 timeoutFunction = setTimeout(function () {
-                    $('#mutationPopup').fadeOut(500);
-                }, 5000);
+                    $('#mutationPopup').fadeOut(50);
+                }, 500);
             }
         );
     }
 };
 
 var drawMutants = function (lineNum, ele) {
-    if (!$.contains(ele, $('#mutationPopup')[0])) {
-        $('#mutationPopup').remove();
-        var content = lineContent[lineNum];
-        $(ele).append(content);
-    }
+    $('#mutationPopup').remove();
+    var content = lineContent[lineNum];
+    $(ele).append(content);
 };
 
 killedLineContent = [];
@@ -124,8 +123,8 @@ var mutantKilledLine = function (lineQuant, superDiv) {
                 drawKilledMutants(lineNum, this);
             }, function () {
                 timeoutFunction = setTimeout(function () {
-                    $('#mutationPopup').fadeOut(500);
-                }, 5000);
+                    $('#mutationPopup').fadeOut(50);
+                }, 500);
             }
         );
     }

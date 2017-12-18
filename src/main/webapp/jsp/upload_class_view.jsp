@@ -5,7 +5,7 @@
 	<div class="w-100 up">
 		<h2>Upload Class</h2>
 		<div id="divUpload" >
-			<form id="formUpload" action="upload" class="form-upload" method="post" enctype="multipart/form-data">
+			<form id="formUpload" action="<%=request.getContextPath() %>/upload" class="form-upload" method="post" enctype="multipart/form-data">
 				<input id="classAlias" name="classAlias" type="text" class="form-control" placeholder="Optional class alias" >
 				<!--
 				<input type="checkbox" name="prepareForSingle" value="prepare" style="margin-right:5px;">Generate mutants and tests for single-player mode? (It may take a while...)</input>
@@ -63,7 +63,7 @@
 							</td>
 							<!--
 							<td>
-								<form id="aiPrepButton<%= c.getId() %>" action="ai_preparer" method="post" >
+								<form id="aiPrepButton<%= c.getId() %>" action="<%=request.getContextPath() %>/ai_preparer" method="post" >
 									<button type="submit" class="btn btn-primary btn-game btn-right" form="aiPrepButton<%= c.getId() %>" onClick="this.form.submit(); this.disabled=true; this.value='Preparing...';"
 											<% if (PrepareAI.isPrepared(c)) { %> disabled <% } %>>
 										Prepare AI

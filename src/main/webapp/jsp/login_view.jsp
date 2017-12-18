@@ -6,12 +6,12 @@
 	  Object uid = request.getSession().getAttribute("uid");
 	  Object username = request.getSession().getAttribute("username");
 	  if (uid != null && username != null)
-		  response.sendRedirect("games");
+		  response.sendRedirect(request.getContextPath()+"/games");
   %>
 
 
   <div id="login" class="container">
-      <form  action="login" method="post" class="form-signin">
+      <form  action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
           <input type="hidden" name="formType" value="login">
           <h2 class="form-signin-heading">Sign in</h2>
           <label for="inputUsername" class="sr-only">Username/Email</label>
@@ -22,7 +22,13 @@
               <input type="checkbox" id="consentOK" style="margin-right:5px;" checked>I understand and consent that the mutants and tests I create in the game will be used for research purposes.
           </div>
           <button class="btn btn-lg btn-primary btn-block" id="signInButton" type="submit">Sign in</button>
+          
+          <!--  Alessio disable this to avoid students creating additional users. Ideally this should be configure at build time -->
+          <!-- 
           <a href="#" class="text-center new-account" data-toggle="modal" data-target="#myModal">Create an account</a>
+           -->
+          
+          
       </form>
   </div>
 
@@ -38,7 +44,7 @@
               </div>
               <div class="modal-body">
 	            <div id="create">
-                    <form  action="login" method="post" class="form-signin">
+                    <form  action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
                       <input type="hidden" name="formType" value="create">
                       <label for="inputUsername" class="sr-only">Username</label>
                       <input type="text" id="inputUsernameCreate" name="username" class="form-control" placeholder="Username" required autofocus>

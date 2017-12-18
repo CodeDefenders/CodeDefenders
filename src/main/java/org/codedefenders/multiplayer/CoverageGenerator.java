@@ -1,11 +1,17 @@
 package org.codedefenders.multiplayer;
 
-import org.jacoco.core.analysis.*;
-
-import org.jacoco.core.tools.ExecFileLoader;
-
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map.Entry;
+
+import org.codedefenders.GameClass;
+import org.jacoco.core.analysis.Analyzer;
+import org.jacoco.core.analysis.CoverageBuilder;
+import org.jacoco.core.analysis.IClassCoverage;
+import org.jacoco.core.analysis.ICounter;
+import org.jacoco.core.analysis.ILine;
+import org.jacoco.core.tools.ExecFileLoader;
 
 /**
  * Created by thoma on 16/06/2016.
@@ -32,18 +38,30 @@ public class CoverageGenerator {
      *
      * @throws IOException
      */
-    public void create(String clazz) throws IOException {
+    public void create(GameClass clazz) throws IOException {
         loadExecutionData();
+        // Original Code
         analyzeStructure(clazz);
+        // Include Uncovered lines corresponding to Non initialized fields
+        includeNonInitializedFields(clazz);
 
     }
 
-    private void loadExecutionData() throws IOException {
+	private void includeNonInitializedFields(GameClass clazz) {
+		for (Integer nonInitializedField : clazz.getLinesOfNonCoverableCode()) {
+			linesCovered.add(nonInitializedField);
+			if (linesUncovered.contains(nonInitializedField)) {
+				linesUncovered.remove(nonInitializedField);
+			}
+		}
+	}
+
+	private void loadExecutionData() throws IOException {
         execFileLoader = new ExecFileLoader();
         execFileLoader.load(executionDataFile);
     }
 
-    private void analyzeStructure(String clazz) throws IOException {
+    private void analyzeStructure(GameClass clazz) throws IOException {
         final CoverageBuilder coverageBuilder = new CoverageBuilder();
         final Analyzer analyzer = new Analyzer(
                 execFileLoader.getExecutionDataStore(), coverageBuilder);
@@ -52,13 +70,16 @@ public class CoverageGenerator {
 
         for (IClassCoverage cc : coverageBuilder.getClasses()){
             String fullyQualifiedName = cc.getName().replace("/",".");
-            if (fullyQualifiedName != null && fullyQualifiedName.startsWith(clazz)) {
+            if (fullyQualifiedName != null && fullyQualifiedName.startsWith(clazz.getName())) {
                 for (int i = cc.getFirstLine(); i <= cc.getLastLine(); i++) {
-                    ILine line = cc.getLine(i);
+
+					ILine line = cc.getLine(i);
+
                     if (line.getInstructionCounter().getStatus() == ICounter.FULLY_COVERED ||
                             line.getInstructionCounter().getStatus() == ICounter.PARTLY_COVERED) {
                         linesCovered.add(i);
-                    } else if (line.getInstructionCounter().getStatus() == ICounter.NOT_COVERED){
+                    }
+                        else if (line.getInstructionCounter().getStatus() == ICounter.NOT_COVERED){
                         linesUncovered.add(i);
                     }
                 }

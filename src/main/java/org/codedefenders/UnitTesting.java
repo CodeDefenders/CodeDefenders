@@ -82,7 +82,7 @@ public class UnitTesting extends HttpServlet {
 		if (newTest == null) {
 			messages.add(TEST_INVALID_MESSAGE);
 			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-			response.sendRedirect("utesting");
+			response.sendRedirect(request.getContextPath()+"/utesting");
 			return;
 		}
 		System.out.println("New Test " + newTest.getId());
@@ -107,7 +107,7 @@ public class UnitTesting extends HttpServlet {
 			messages.add(compileTestTarget.message);
 			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 		}
-		response.sendRedirect("utesting");
+		response.sendRedirect(request.getContextPath()+"/utesting");
 	}
 
 	/**

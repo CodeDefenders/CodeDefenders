@@ -4,8 +4,8 @@ import org.codedefenders.*;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
 import org.codedefenders.events.EventType;
+import org.codedefenders.exceptions.CodeValidatorException;
 import org.codedefenders.util.DatabaseAccess;
-import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.*;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,28 +33,45 @@ public class MultiplayerGameManager extends HttpServlet {
 		ArrayList<String> messages = new ArrayList<String>();
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
-		int gameId = (Integer) session.getAttribute("mpGameId");
+		// The following raises exception when playing around with curl, not sure it's a feature.
+		//		int gameId = (Integer) session.getAttribute("mpGameId");
+		// Why this must be set with the session from game_view.jsp ?
+		int gameId = -1;
+		if (session.getAttribute("mpGameId") != null) {
+			gameId = (Integer) session.getAttribute("mpGameId");
+        } else if (request.getParameter("mpGameID") != null) {
+        	// During integration tests the session value is empty, but we car read it from the url as parameter
+            gameId = Integer.parseInt(request.getParameter("mpGameID"));
+            // Set this value in the session
+            session.setAttribute("mpGameId", gameId);
+		} else {
+			// TODO Not sure this is 100% right
+			logger.error("Problem setting gameID !");
+			response.setStatus(500);
+			return;
+		}
 		session.setAttribute("messages", messages);
+
+		String contextPath = request.getContextPath();
 
 		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(gameId);
 
 		switch (request.getParameter("formType")) {
 			case "startGame": {
-				if(activeGame.getState().equals(GameState.CREATED)) {
+				if (activeGame.getState().equals(GameState.CREATED)) {
 					logger.info("Starting multiplayer game {} (Setting state to ACTIVE)", activeGame.getId());
 					activeGame.setState(GameState.ACTIVE);
 					activeGame.update();
-
 				}
 				break;
 			}
 			case "endGame": {
-				if(activeGame.getState().equals(GameState.ACTIVE)) {
+				if (activeGame.getState().equals(GameState.ACTIVE)) {
 					logger.info("Ending multiplayer game {} (Setting state to FINISHED)", activeGame.getId());
 					activeGame.setState(GameState.FINISHED);
 					activeGame.update();
 
-					response.sendRedirect("games");
+					response.sendRedirect(contextPath+"/multiplayer/games");
 					return;
 				} else {
 					break;
@@ -63,21 +80,32 @@ public class MultiplayerGameManager extends HttpServlet {
 			case "resolveEquivalence": {
 				int currentEquivMutantID = Integer.parseInt(request.getParameter("currentEquivMutant"));
 
-				if (activeGame.getState().equals(GameState.FINISHED)){
+				if (activeGame.getState().equals(GameState.FINISHED)) {
 					messages.add(String.format("Game %d has finished.", activeGame.getId()));
-					response.sendRedirect("games");
+					response.sendRedirect(contextPath+"/multiplayer/games");
 				}
 
 				// Get the text submitted by the user.
 				String testText = request.getParameter("test");
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
-				Test newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
 
+				Test newTest = null;
+
+				try {
+					newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
+				} catch (CodeValidatorException cve) {
+					messages.add(TEST_GENERIC_ERROR_MESSAGE);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+					response.sendRedirect(contextPath+"/multiplayer/play");
+					return;
+				}
+
+				// If test is null, it compiled but codevalidator triggered
 				if (newTest == null) {
 					messages.add(TEST_INVALID_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect("play");
+					response.sendRedirect(contextPath+"/multiplayer/play");
 					return;
 				}
 
@@ -103,7 +131,7 @@ public class MultiplayerGameManager extends HttpServlet {
 										uid,
 										DatabaseAccess.getUser(uid)
 												.getUsername() +
-										" killed a mutant in an equivalence " +
+												" killed a mutant in an equivalence " +
 												"duel.",
 										EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
 										new Timestamp(System.currentTimeMillis()));
@@ -132,20 +160,20 @@ public class MultiplayerGameManager extends HttpServlet {
 						}
 						if (killedClaimed) {
 							messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
-							if (killedOthers==1)
+							if (killedOthers == 1)
 								messages.add("...and it also killed another claimed mutant!");
-							else if (killedOthers>1)
+							else if (killedOthers > 1)
 								messages.add(String.format("...and it also killed other %d claimed mutants!", killedOthers));
 						} else {
 							messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
-							if (killedOthers==1)
+							if (killedOthers == 1)
 								messages.add("...however, your test did kill another claimed mutant!");
-							else if (killedOthers>1)
+							else if (killedOthers > 1)
 								messages.add(String.format("...however, your test killed other %d claimed mutants!", killedOthers));
 						}
 						newTest.update();
 						activeGame.update();
-						response.sendRedirect("play");
+						response.sendRedirect(contextPath+"/multiplayer/play");
 						return;
 					} else {
 						//  (testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
@@ -161,7 +189,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 				}
 			}
-				break;
+			break;
 
 			case "createMutant":
 
@@ -170,10 +198,11 @@ public class MultiplayerGameManager extends HttpServlet {
 					// Get the text submitted by the user.
 					String mutantText = request.getParameter("mutant");
 
-					if (! GameManager.isMutantValid(activeGame.getClassId(), mutantText)) {
+					String validityMessage = GameManager.getMutantValidityMessage(activeGame.getClassId(), mutantText);
+					if (!validityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE)) {
 						// Mutant is either the same as the CUT or it contains invalid code
 						// Do not restore mutated code
-						messages.add(MUTANT_INVALID_MESSAGE);
+						messages.add(validityMessage);
 						break;
 					}
 					Mutant existingMutant = GameManager.existingMutant(activeGame.getId(), mutantText);
@@ -182,7 +211,7 @@ public class MultiplayerGameManager extends HttpServlet {
 						TargetExecution existingMutantTarget = DatabaseAccess.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
 						if (existingMutantTarget != null
 								&& !existingMutantTarget.status.equals("SUCCESS")
-								&& existingMutantTarget.message != null && !existingMutantTarget .message.isEmpty()) {
+								&& existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
 							messages.add(existingMutantTarget.message);
 						}
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
@@ -227,20 +256,30 @@ public class MultiplayerGameManager extends HttpServlet {
 					String testText = request.getParameter("test");
 
 					// If it can be written to file and compiled, end turn. Otherwise, dont.
-					Test newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
+					Test newTest = null;
+
+					try {
+						newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
+					} catch (CodeValidatorException cve) {
+						messages.add(TEST_GENERIC_ERROR_MESSAGE);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						response.sendRedirect(contextPath+"/multiplayer/play");
+						return;
+					}
+
+					// If test is null, then test did compile but codevalidator triggered
+					if (newTest == null) {
+						messages.add(TEST_INVALID_MESSAGE);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						response.sendRedirect(contextPath+"/multiplayer/play");
+						return;
+					}
 
 					logger.info("New Test " + newTest.getId() + " by user " + uid);
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-					if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-						if (! CodeValidator.validTestCode(newTest.getJavaFile())) {
-							messages.add(TEST_INVALID_MESSAGE);
-							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-							response.sendRedirect("play");
-							return;
-						}
-						// the test is valid, but does it pass on the original class?
-						TargetExecution testOriginalTarget = AntRunner.testOriginal(new File(newTest.getDirectory()), newTest);
+					if (compileTestTarget.status.equals("SUCCESS")) {
+						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
 						if (testOriginalTarget.status.equals("SUCCESS")) {
 							messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 
@@ -272,7 +311,7 @@ public class MultiplayerGameManager extends HttpServlet {
 				break;
 		}
 
-		response.sendRedirect("play");//doGet(request, response);
+		response.sendRedirect(contextPath+"/multiplayer/play");//doGet(request, response);
 	}
 
 }

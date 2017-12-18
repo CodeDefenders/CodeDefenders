@@ -1,18 +1,5 @@
 package org.codedefenders;
 
-import difflib.Chunk;
-import difflib.Delta;
-import difflib.DiffUtils;
-import difflib.Patch;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.codedefenders.duel.DuelGame;
-import org.codedefenders.util.DatabaseAccess;
-import org.codedefenders.validation.CodeValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -20,13 +7,26 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.codedefenders.duel.DuelGame;
+import org.codedefenders.util.DB;
+import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.DatabaseValue;
+import org.codedefenders.validation.CodeValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import difflib.Chunk;
+import difflib.Delta;
+import difflib.DiffUtils;
+import difflib.Patch;
 
 public class Mutant implements Serializable {
 
@@ -44,7 +44,9 @@ public class Mutant implements Serializable {
 	private Equivalence equivalent;
 
 	/* Mutant Equivalence */
-	public enum Equivalence { ASSUMED_NO, PENDING_TEST, DECLARED_YES, ASSUMED_YES, PROVEN_NO}
+	public enum Equivalence {
+		ASSUMED_NO, PENDING_TEST, DECLARED_YES, ASSUMED_YES, PROVEN_NO
+	}
 
 	private int roundCreated;
 	private int roundKilled;
@@ -62,6 +64,7 @@ public class Mutant implements Serializable {
 
 	/**
 	 * Creates a mutant
+	 *
 	 * @param gameId
 	 * @param jFile
 	 * @param cFile
@@ -81,6 +84,7 @@ public class Mutant implements Serializable {
 
 	/**
 	 * Creates a mutant
+	 *
 	 * @param mid
 	 * @param gid
 	 * @param jFile
@@ -166,12 +170,17 @@ public class Mutant implements Serializable {
 	}
 
 	public boolean isCovered() {
-		List<Test> tests = DatabaseAccess.getExecutableTests(gameId,true);
+		List<Test> tests = DatabaseAccess.getExecutableTests(gameId, true);
 		for (Test t : tests) {
 			if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), getLines()))
 				return true;
 		}
 		return false;
+	}
+
+	public boolean doesRequireRecompilation() {
+		GameClass cut = DatabaseAccess.getClassForGame(gameId);
+		return CollectionUtils.containsAny(cut.getLinesOfCompileTimeConstants(), getLines());
 	}
 
 	/**
@@ -208,7 +217,7 @@ public class Mutant implements Serializable {
 	 * @return defender points for this mutant in DUEL MODE
 	 */
 	public int getDefenderPoints() {
-		if (! alive && classFile != null) {
+		if (!alive && classFile != null) {
 			if (equivalent.equals(Equivalence.ASSUMED_NO) || equivalent.equals(Equivalence.DECLARED_YES)) {
 				return 1; // accepted equivalent
 			} else if (equivalent.equals(Equivalence.ASSUMED_YES)) {
@@ -267,8 +276,9 @@ public class Mutant implements Serializable {
 		try {
 			if (Files.exists(path))
 				lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-			else
+			else {
 				logger.error("File not found {}", path);
+			}
 		} catch (IOException e) {
 			e.printStackTrace();  // TODO handle properly
 		} finally {
@@ -281,38 +291,26 @@ public class Mutant implements Serializable {
 	// Default values for Equivalent (ASSUMED_NO), Alive(1), RoundKilled(NULL) are assigned.
 	// Currently Mutant ID isnt set yet after insertion, if Mutant needs to be used straight away it needs a similar insert method to MultiplayerGame.
 	public boolean insert() {
-
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-			logger.info("Inserting mutant");
-
-			conn = DatabaseAccess.getConnection();
-
-			stmt = conn.createStatement();
-			String jFileDB = "'" + DatabaseAccess.addSlashes(javaFile) + "'";
-			String cFileDB = classFile == null ? null : "'" + DatabaseAccess.addSlashes(classFile) + "'";
-			String sql = String.format("INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5)" +
-					" VALUES (%s, %s, %d, %d, %d, %d, %d, '%s');", jFileDB, cFileDB, gameId, roundCreated, sqlAlive(), playerId, score, md5);
-
-			stmt.execute(sql, Statement.RETURN_GENERATED_KEYS);
-
-			ResultSet rs = stmt.getGeneratedKeys();
-
-			if (rs.next()) {
-				this.id = rs.getInt(1);
-				System.out.println("setting mutant ID to: " + this.id);
-				stmt.close();
-				conn.close();
-				return true;
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
+		logger.info("Inserting mutant");
+		Connection conn = DB.getConnection();
+		String jFileDB = DatabaseAccess.addSlashes(javaFile);
+		String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
+		String query = "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5)" +
+				" VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(jFileDB),
+				DB.getDBV(cFileDB),
+				DB.getDBV(gameId),
+				DB.getDBV(roundCreated),
+				DB.getDBV(sqlAlive()),
+				DB.getDBV(playerId),
+				DB.getDBV(score),
+				DB.getDBV(md5)};
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		int res = DB.executeUpdateGetKeys(stmt, conn);
+		if (res > -1) {
+			this.id = res;
+			System.out.println("setting mutant ID to: " + this.id);
+			return true;
 		}
 		return false;
 	}
@@ -321,49 +319,37 @@ public class Mutant implements Serializable {
 	// Updates values of Equivalent, Alive, RoundKilled.
 	// These values update when Mutants are suspected of being equivalent, go through an equivalence test, or are killed.
 	public boolean update() {
-
 		logger.info("Updating Mutant {}", getId());
-
-		Connection conn = null;
-		Statement stmt = null;
-
-		try {
-			conn = DatabaseAccess.getConnection();
-
-			stmt = conn.createStatement();
-			String sql = String.format("UPDATE mutants SET Equivalent='%s', Alive='%d', RoundKilled='%d', NumberAiKillingTests='%d', Points=%d WHERE Mutant_ID='%d';",
-					equivalent.name(), sqlAlive(), roundKilled, killedByAITests, score, id);
-			stmt.execute(sql);
-
-			conn.close();
-			stmt.close();
-			return true;
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DatabaseAccess.cleanup(conn, stmt);
-		}
-		return false;
+		Connection conn = DB.getConnection();
+		String query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, NumberAiKillingTests=?, Points=? WHERE Mutant_ID=?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(equivalent.name()),
+				DB.getDBV(sqlAlive()),
+				DB.getDBV(roundKilled),
+				DB.getDBV(killedByAITests),
+				DB.getDBV(score),
+				DB.getDBV(id)};
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return DB.executeUpdate(stmt, conn);
 	}
 
 	public void setTimesKilledAi(int count) {
 		killedByAITests = count;
 	}
+
 	public int getTimesKilledAi() {
-		if(killedByAITests == 0) {
+		if (killedByAITests == 0) {
 			//Retrieve from DB.
 			killedByAITests = DatabaseAccess.getNumTestsKillMutant(getId());
 		}
 		return killedByAITests;
 	}
+
 	public void incrementTimesKilledAi() {
-		killedByAITests ++;
+		killedByAITests++;
 	}
 
 	public ArrayList<Integer> getLines() {
-		if (lines != null){
+		if (lines != null) {
 			return lines;
 		}
 		lines = new ArrayList<>();
@@ -382,7 +368,7 @@ public class Mutant implements Serializable {
 			if (endLine > firstLine) {
 				// if more than one line, report range of lines;
 				// may not be 100% accurate, but is all we have in the delta chunk
-				for (int l = firstLine + 1 ; l <= endLine; l++) {
+				for (int l = firstLine + 1; l <= endLine; l++) {
 					lines.add(l);
 				}
 				desc = String.format("lines %d-%d", firstLine, endLine);
@@ -400,7 +386,7 @@ public class Mutant implements Serializable {
 	}
 
 	public List<String> getHTMLReadout() throws IOException {
-		if (description != null){
+		if (description != null) {
 			return description;
 		}
 		// for efficiency, getLines actually create the list of messages
@@ -439,7 +425,7 @@ public class Mutant implements Serializable {
 				.toHashCode();
 	}
 
-	public void prepareForSerialise(boolean showDifferences){
+	public void prepareForSerialise(boolean showDifferences) {
 		try {
 			getHTMLReadout();
 		} catch (IOException e) {
@@ -450,5 +436,26 @@ public class Mutant implements Serializable {
 			getDifferences();
 		else
 			difference = new Patch();
+	}
+
+	// TODO Ideally this should have a timestamp ... we use the ID instead
+	// First created appears first
+	public static Comparator<Mutant> orderByIdAscending() {
+		return new Comparator<Mutant>() {
+			@Override
+			public int compare(Mutant o1, Mutant o2) {
+				return o1.id - o2.id;
+			}
+		};
+	}
+
+	// Last created appears first
+	public static Comparator<Mutant> orderByIdDescending() {
+		return new Comparator<Mutant>() {
+			@Override
+			public int compare(Mutant o1, Mutant o2) {
+				return o2.id - o1.id;
+			}
+		};
 	}
 }
