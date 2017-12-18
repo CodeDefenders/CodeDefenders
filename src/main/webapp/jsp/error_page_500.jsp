@@ -1,3 +1,4 @@
+<%@ page isErrorPage="true" import="java.io.*" contentType="text/plain"%>
 <!DOCTYPE h<!DOCTYPE html>
 <html>
 <head>
@@ -66,11 +67,11 @@
 </head>
 
 <body>
+	<a href="<%=request.getContextPath()%>"> <img
+		src="<%=request.getContextPath()%>/images/logo.png">
+	</a>
 
-
-<img href="/" src="/images/logo.png">
-
-<h1>
+	<h1>
     500
 </h1>
 <div class="container">
