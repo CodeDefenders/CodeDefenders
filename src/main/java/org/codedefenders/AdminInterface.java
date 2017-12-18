@@ -476,9 +476,10 @@ public class AdminInterface extends HttpServlet {
                 AdminDAO.deleteMutantTargetExecutions(m.getId());
         }
         DatabaseAccess.removePlayerEventsForGame(gid, pid);
+        AdminDAO.deleteAttackerEquivalences(pid);
+        AdminDAO.deleteDefenderEquivalences(pid);
         AdminDAO.deletePlayerTest(pid);
         AdminDAO.deletePlayerMutants(pid);
-        AdminDAO.deletePlayerEquivalences(pid);
         return AdminDAO.deletePlayer(pid);
     }
 
