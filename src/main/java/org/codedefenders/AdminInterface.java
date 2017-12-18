@@ -157,7 +157,7 @@ public class AdminInterface extends HttpServlet {
                         defendersPerGame = Integer.parseInt(request.getParameter("defenders"));
                         extraAttackersPerGame = Integer.parseInt(request.getParameter("attackers_extra"));
                         extraDefendersPerGame = Integer.parseInt(request.getParameter("defenders_extra"));
-                        gamesLevel = request.getParameter("level") == null ? GameLevel.HARD : GameLevel.EASY;
+                        gamesLevel = request.getParameterValues("level") == null ? GameLevel.HARD : GameLevel.EASY;
                         gamesState = request.getParameter("gamesState").equals(GameState.ACTIVE.name()) ? GameState.ACTIVE : GameState.CREATED;
                         startTime = Long.parseLong(request.getParameter("startTime"));
                         finishTime = Long.parseLong(request.getParameter("finishTime"));
@@ -177,7 +177,7 @@ public class AdminInterface extends HttpServlet {
                         selectedUserIDs.add(Integer.parseInt(u));
                     }
 
-                    messages.add("Creating games for users " + selectedUserIDs + " with CUT " + cutID + ", assigning roles " +
+                    messages.add("Creating " + gamesLevel + " games for users " + selectedUserIDs + " with CUT " + cutID + ", assigning roles " +
                             roleAssignmentMethod + ", assigning teams " + teamAssignmentMethod + " with " + attackersPerGame +
                             " Attackers and " + defendersPerGame + " Defenders each.");
                     createAndFillGames(session);
