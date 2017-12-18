@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -438,6 +439,18 @@ public class Mutant implements Serializable {
 			difference = new Patch();
 	}
 
+	/*
+	 * This comparators place first mutants that modify lines at the top of the file.
+	 */
+	public static Comparator<Mutant> sortByLineNumberAscending() {
+		return new Comparator<Mutant>() {
+			@Override
+			public int compare(Mutant o1, Mutant o2) {
+				return ((Integer) Collections.min( o1.getLines() ) ) - ((Integer) Collections.min( o2.getLines() )); 
+			}
+		};
+	}
+	
 	// TODO Ideally this should have a timestamp ... we use the ID instead
 	// First created appears first
 	public static Comparator<Mutant> orderByIdAscending() {

@@ -101,7 +101,7 @@ if (role == Role.ATTACKER && true){
 <%
 						// Sorting mutants
 						List<Mutant> sortedMutants = new ArrayList<Mutant>( mutantsAlive );
-								Collections.sort( sortedMutants, Mutant.orderByIdDescending());
+								Collections.sort( sortedMutants, Mutant.sortByLineNumberAscending());
 %>
 						<% for (Mutant m : sortedMutants) { %>
 							<tr>
@@ -167,7 +167,12 @@ if (role == Role.ATTACKER && true){
 						</thead>
 
 						<tbody>
-						<%	for (Mutant m : mutantsKilled) { %>
+<%
+						//Sorting mutants
+						List<Mutant> sortedKilledMutants = new ArrayList<Mutant>( mutantsKilled );
+						Collections.sort( sortedKilledMutants, Mutant.sortByLineNumberAscending());
+						for (Mutant m : sortedKilledMutants) { 
+%>
 						<tr>
 							<% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
 							<td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> [UID: <%= creator.getId() %>]</h4>
@@ -218,7 +223,12 @@ if (role == Role.ATTACKER && true){
 						</thead>
 
 						<tbody>
-						<%	for (Mutant m : mutantsEquiv) { %>
+<%
+						//Sorting mutants
+						List<Mutant> sortedMutantsEquiv = new ArrayList<Mutant>( mutantsEquiv );
+						Collections.sort( sortedMutantsEquiv, Mutant.sortByLineNumberAscending());
+						for (Mutant m : sortedMutantsEquiv) { 
+%>
 						<tr>
 							<% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
 							<td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> [UID: <%= creator.getId() %>]</h4>
