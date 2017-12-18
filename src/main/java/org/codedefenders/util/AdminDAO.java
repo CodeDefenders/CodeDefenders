@@ -134,7 +134,11 @@ public class AdminDAO {
     public final static String DELETE_PLAYER = "DELETE FROM players WHERE ID =?;";
     public final static String DELETE_TESTS = "DELETE FROM tests WHERE Player_ID =?;";
     public final static String DELETE_MUTANTS = "DELETE FROM mutants WHERE Player_ID =?;";
-    public final static String DELETE_EQUIVALENCES = "DELETE FROM equivalences WHERE Defender_ID =?;";
+    public final static String DELETE_DEFENDER_EQUIVALENCES = "DELETE FROM equivalences WHERE Defender_ID =?;";
+    public final static String DELETE_ATTACKER_EQUIVALENCES = "DELETE FROM equivalences\n" +
+			"WHERE Mutant_ID IN (SELECT Mutant_ID\n" +
+			"                    FROM mutants\n" +
+			"                    WHERE Player_ID = ?);";
     public final static String DELETE_TEST_TARGETEXECUTIONS = "DELETE FROM targetexecutions WHERE Test_ID =?;";
     public final static String DELETE_MUTANT_TARGETEXECUTIONS = "DELETE FROM targetexecutions WHERE Mutant_ID = ?;";
 
@@ -310,9 +314,15 @@ public class AdminDAO {
         return DB.executeUpdate(mutants_stmt, conn);
     }
 
-    public static boolean deletePlayerEquivalences(int pid) {
+    public static boolean deleteDefenderEquivalences(int pid) {
         Connection conn = DB.getConnection();
-        PreparedStatement equivalences_stmt = DB.createPreparedStatement(conn, DELETE_EQUIVALENCES, DB.getDBV(pid));
+        PreparedStatement equivalences_stmt = DB.createPreparedStatement(conn, DELETE_DEFENDER_EQUIVALENCES, DB.getDBV(pid));
+        return DB.executeUpdate(equivalences_stmt, conn);
+    }
+
+    public static boolean deleteAttackerEquivalences(int pid) {
+        Connection conn = DB.getConnection();
+        PreparedStatement equivalences_stmt = DB.createPreparedStatement(conn, DELETE_ATTACKER_EQUIVALENCES, DB.getDBV(pid));
         return DB.executeUpdate(equivalences_stmt, conn);
     }
 
