@@ -193,7 +193,7 @@
         <% }
         %>
 
-        <a href="<%=request.getContextPath()%>/multiplayer/games/create"> Create single game </a>
+        <a href="<%=request.getContextPath()%>/multiplayer/games/create?fromAdmin=true"> Create single Game </a>
 
     </form>
     <form id="insertGames" action="admin" method="post">
