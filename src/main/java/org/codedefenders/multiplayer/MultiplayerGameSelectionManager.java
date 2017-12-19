@@ -1,11 +1,11 @@
 package org.codedefenders.multiplayer;
 
+import org.codedefenders.GameLevel;
+import org.codedefenders.GameState;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
 import org.codedefenders.events.EventType;
 import org.codedefenders.util.DatabaseAccess;
-import org.codedefenders.GameLevel;
-import org.codedefenders.GameState;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -69,7 +69,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     double lineCoverage = lineCovGoal == null ? 1.1 : Double.parseDouble(lineCovGoal);
                     double mutantCoverage = mutCovGoal == null ? 1.1 : Double.parseDouble(mutCovGoal);
                     GameLevel level = request.getParameter("level") == null ? GameLevel.HARD : GameLevel.EASY;
-
                     // Create the game with supplied parameters and insert it in the database.
                     MultiplayerGame nGame = new MultiplayerGame(classId, uid, level, (float) lineCoverage,
                             (float) mutantCoverage, 1f, 100, 100,
@@ -88,6 +87,11 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     //rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getLong("Finish_Time"),
                     //        rs.getString("State")
 
+                    // Redirect to admin interface
+                    if (request.getParameter("fromAdmin").equals("true")) {
+                        response.sendRedirect(contextPath + "/admin");
+                        break;
+                    }
                     // Redirect to the game selection menu.
                     response.sendRedirect(contextPath+"/multiplayer/games");
                     break;

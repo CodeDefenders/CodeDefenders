@@ -176,6 +176,7 @@
 					</script>
 				</td>
 			</tr>
+			<input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 			<tr><td /><td><button class="btn btn-lg btn-primary btn-block" type="submit" value="Create">Create</button></td><td /></tr>
 		</table>
 	</form>
