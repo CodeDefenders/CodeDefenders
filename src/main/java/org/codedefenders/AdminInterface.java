@@ -282,8 +282,8 @@ public class AdminInterface extends HttpServlet {
         session.setAttribute(CREATED_GAMES_LISTS_SESSION_ATTRIBUTE, createdGames);
 
         if (teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_DESCENDING) || teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_SHUFFLED)) {
-            Collections.sort(attackerIDs, new ReverseScoreComparator());
-            Collections.sort(defenderIDs, new ReverseScoreComparator());
+            Collections.sort(attackerIDs, new ReverseDefenderScoreComparator());
+            Collections.sort(defenderIDs, new ReverseDefenderScoreComparator());
             if (teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_SHUFFLED)) {
                 attackerIDs = getBlockShuffledList(attackerIDs, NB_CATEGORIES_FOR_SHUFFLING);
                 defenderIDs = getBlockShuffledList(defenderIDs, NB_CATEGORIES_FOR_SHUFFLING);
@@ -299,7 +299,16 @@ public class AdminInterface extends HttpServlet {
                 defendersPerGame));
     }
 
-    class ReverseScoreComparator implements Comparator<Integer> {
+    class ReverseDefenderScoreComparator implements Comparator<Integer> {
+        @Override
+        public int compare(Integer o1, Integer o2) {
+            Integer score1 = AdminDAO.getScore(o1).getDefenderScore();
+            Integer score2 = AdminDAO.getScore(o2).getDefenderScore();
+            return (-1) * Integer.compare(score1, score2);
+        }
+    }
+
+    class ReverseTotalScoreComparator implements Comparator<Integer> {
         @Override
         public int compare(Integer o1, Integer o2) {
             Integer score1 = AdminDAO.getScore(o1).getTotalPoints();
