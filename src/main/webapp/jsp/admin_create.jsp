@@ -450,6 +450,14 @@
         </table>
         <div class="form-group">
             <label for="user_name_list">User Names</label>
+            <a data-toggle="collapse" href="#demo" style="color:black">
+                <span class = "glyphicon glyphicon-question-sign"></span>
+            </a>
+            <div id="demo" class="collapse">
+                Newline seperated list of usernames or emails.
+                <br/>The union of these users and the users selected in the table above will be used to create games.
+                <br/>Only unassigned users are taken into account.
+            </div>
             <textarea class="form-control" rows="5" id="user_name_list" name ="user_name_list"
                       oninput="document.getElementById('submit_users_btn').disabled = false"></textarea>
         </div>
