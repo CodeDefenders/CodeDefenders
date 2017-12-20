@@ -26,6 +26,7 @@ public class AdminInterface extends HttpServlet {
     public static final String ATTACKER_LISTS_SESSION_ATTRIBUTE = "attackerLists";
     public static final String CREATED_GAMES_LISTS_SESSION_ATTRIBUTE = "createdGames";
     private static final int NB_CATEGORIES_FOR_SHUFFLING = 3;
+    private static final String USER_NAME_LIST_DELIMITER = "[\\r\\n]+";
 
     private int currentUserID;
     private List<Integer> selectedUserIDs;
@@ -146,9 +147,14 @@ public class AdminInterface extends HttpServlet {
                         }
                     }
                 } else { // if admin is batch creating games
+                    attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.ATTACKER_LISTS_SESSION_ATTRIBUTE);
+                    defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.DEFENDER_LISTS_SESSION_ATTRIBUTE);
+                    createdGames = (List<MultiplayerGame>) session.getAttribute(AdminInterface.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
                     String[] selectedUsers;
+                    String userNameListString;
                     try {
                         selectedUsers = request.getParameterValues("selectedUsers");
+                        userNameListString = request.getParameter("user_name_list");
                         cutID = Integer.parseInt(request.getParameter("class"));
                         roleAssignmentMethod = request.getParameter("roles").equals(RoleAssignmentMethod.OPPOSITE.name())
                                 ? RoleAssignmentMethod.OPPOSITE : RoleAssignmentMethod.RANDOM;
@@ -167,20 +173,41 @@ public class AdminInterface extends HttpServlet {
                         break;
                     }
 
-                    if (selectedUsers == null) {
-                        messages.add("Please select at least one User.");
-                        response.sendRedirect(request.getContextPath() + "/admin");
-                        break;
-                    }
                     selectedUserIDs = new ArrayList<>();
-                    for (String u : selectedUsers) {
-                        selectedUserIDs.add(Integer.parseInt(u));
+                    if (selectedUsers != null) {
+                        for (String u : selectedUsers) {
+                            selectedUserIDs.add(Integer.parseInt(u));
+                        }
+                    }
+                    if (userNameListString != null) {
+                        for (String uName : userNameListString.split(USER_NAME_LIST_DELIMITER)) {
+                            if (uName.length() > 0) {
+                                User u = DatabaseAccess.getUserForNameOrEmail(uName);
+                                if (u == null)
+                                    messages.add("No user with name or email \'" + uName + "\'!");
+                                else if (!selectedUserIDs.contains(u.getId()))
+                                    selectedUserIDs.add(u.getId());
+                            }
+                        }
                     }
 
-                    messages.add("Creating " + gamesLevel + " games for users " + selectedUserIDs + " with CUT " + cutID + ", assigning roles " +
-                            roleAssignmentMethod + ", assigning teams " + teamAssignmentMethod + " with " + attackersPerGame +
-                            " Attackers and " + defendersPerGame + " Defenders each.");
-                    createAndFillGames(session);
+                    List<Integer> unassignedUserIds = getUnassignedUsers(attackerIdsList, defenderIdsList);
+                    for (Integer uid : new ArrayList<>(selectedUserIDs)) {
+                        if (!unassignedUserIds.contains(uid)) {
+                            messages.add("user " + uid + " is already playing another game!");
+                            selectedUserIDs.remove(uid);
+                        }
+                    }
+
+
+                    if (selectedUserIDs.size() == 0) {
+                        messages.add("Please select at least one User.");
+                    } else {
+                        messages.add("Creating " + gamesLevel + " games for users " + selectedUserIDs + " with CUT " + cutID + ", assigning roles " +
+                                roleAssignmentMethod + ", assigning teams " + teamAssignmentMethod + " with " + attackersPerGame +
+                                " Attackers and " + defendersPerGame + " Defenders each.");
+                        createAndFillGames(session, createdGames, attackerIdsList, defenderIdsList);
+                    }
                 }
                 response.sendRedirect(request.getContextPath() + "/admin");
                 break;
@@ -200,8 +227,7 @@ public class AdminInterface extends HttpServlet {
                         attackerIds.remove(userToRemoveId);
                         if (switchUser)
                             defenderIds.add(userToRemoveId);
-                    }
-                    else {
+                    } else {
                         defenderIds.remove(userToRemoveId);
                         if (switchUser)
                             attackerIds.add(userToRemoveId);
@@ -260,7 +286,7 @@ public class AdminInterface extends HttpServlet {
         for (int did : defenderIDs) multiplayerGame.addPlayerForce(did, Role.DEFENDER);
     }
 
-    private void createAndFillGames(HttpSession session) {
+    private void createAndFillGames(HttpSession session, List<MultiplayerGame> createdGames, List<List<Integer>> attackerIdsList, List<List<Integer>> defenderIdsList) {
         int nbGames;
         List<Integer> attackerIDs;
         List<Integer> defenderIDs;
@@ -276,10 +302,9 @@ public class AdminInterface extends HttpServlet {
             defenderIDs = getRandomUserList(selectedUserIDs, selectedUserIDs.size());
         }
 
-        List<MultiplayerGame> createdGames = createGames(nbGames, attackersPerGame, defendersPerGame,
+        List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
                 extraAttackersPerGame, extraDefendersPerGame, cutID, currentUserID, gamesLevel, gamesState,
                 startTime, finishTime);
-        session.setAttribute(CREATED_GAMES_LISTS_SESSION_ATTRIBUTE, createdGames);
 
         if (teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_DESCENDING) || teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_SHUFFLED)) {
             Collections.sort(attackerIDs, new ReverseDefenderScoreComparator());
@@ -292,11 +317,21 @@ public class AdminInterface extends HttpServlet {
             Collections.shuffle(attackerIDs);
             Collections.shuffle(defenderIDs);
         }
+        List<List<Integer>> newAttackerIdsList = getUserLists(newlyCreatedGames, attackerIDs, attackersPerGame);
+        List<List<Integer>> newDefenderIdsList = getUserLists(newlyCreatedGames, defenderIDs, defendersPerGame);
 
-        session.setAttribute(ATTACKER_LISTS_SESSION_ATTRIBUTE, getUserLists(createdGames, attackerIDs,
-                attackersPerGame));
-        session.setAttribute(DEFENDER_LISTS_SESSION_ATTRIBUTE, getUserLists(createdGames, defenderIDs,
-                defendersPerGame));
+        if (createdGames != null && attackerIdsList != null && defenderIdsList != null) {
+            createdGames.addAll(newlyCreatedGames);
+            attackerIdsList.addAll(newAttackerIdsList);
+            defenderIdsList.addAll(newDefenderIdsList);
+        } else {
+            createdGames = newlyCreatedGames;
+            attackerIdsList = newAttackerIdsList;
+            defenderIdsList = newDefenderIdsList;
+        }
+        session.setAttribute(CREATED_GAMES_LISTS_SESSION_ATTRIBUTE, createdGames);
+        session.setAttribute(ATTACKER_LISTS_SESSION_ATTRIBUTE, attackerIdsList);
+        session.setAttribute(DEFENDER_LISTS_SESSION_ATTRIBUTE, defenderIdsList);
     }
 
     class ReverseDefenderScoreComparator implements Comparator<Integer> {
@@ -338,9 +373,9 @@ public class AdminInterface extends HttpServlet {
     }
 
     private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame,
-													 int extraAttackersPerGame, int extraDefendersPerGame,
-													 int cutID, int creatorID, GameLevel level, GameState state,
-													 long startTime, long finishTime) {
+                                                     int extraAttackersPerGame, int extraDefendersPerGame,
+                                                     int cutID, int creatorID, GameLevel level, GameState state,
+                                                     long startTime, long finishTime) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
             MultiplayerGame multiplayerGame = new MultiplayerGame(cutID, creatorID, level, (float) 1, (float) 1,
@@ -373,7 +408,7 @@ public class AdminInterface extends HttpServlet {
     }
 
     public static List<List<Integer>> getUserLists(List<MultiplayerGame> createdGames, List<Integer> userIds,
-												   int nbUsersPerGame) {
+                                                   int nbUsersPerGame) {
         List<List<Integer>> userLists = new ArrayList<>();
         for (MultiplayerGame mg : createdGames) {
             userLists.add(fillGame(userIds, nbUsersPerGame));
@@ -476,11 +511,11 @@ public class AdminInterface extends HttpServlet {
     }
 
     private static boolean deletePlayer(int pid, int gid) {
-        for (Test t : DatabaseAccess.getTestsForGame(gid)){
+        for (Test t : DatabaseAccess.getTestsForGame(gid)) {
             if (t.getPlayerId() == pid)
                 AdminDAO.deleteTestTargetExecutions(t.getId());
         }
-        for (Mutant m : DatabaseAccess.getMutantsForGame(gid)){
+        for (Mutant m : DatabaseAccess.getMutantsForGame(gid)) {
             if (m.getPlayerId() == pid)
                 AdminDAO.deleteMutantTargetExecutions(m.getId());
         }
@@ -492,20 +527,20 @@ public class AdminInterface extends HttpServlet {
         return AdminDAO.deletePlayer(pid);
     }
 
-	private static void distributeRemainingUsers(List<Integer> selectedUserIDs, List<Integer> attackerIDs,
-												 List<Integer> defenderIDs) {
-		List<Integer> remainingUsers = new ArrayList<>();
-		for (int uid : selectedUserIDs) {
-			if (!(attackerIDs.contains(uid) || defenderIDs.contains(uid))) {
-				remainingUsers.add(uid);
-			}
-		}
-		Collections.shuffle(remainingUsers);
+    private static void distributeRemainingUsers(List<Integer> selectedUserIDs, List<Integer> attackerIDs,
+                                                 List<Integer> defenderIDs) {
+        List<Integer> remainingUsers = new ArrayList<>();
+        for (int uid : selectedUserIDs) {
+            if (!(attackerIDs.contains(uid) || defenderIDs.contains(uid))) {
+                remainingUsers.add(uid);
+            }
+        }
+        Collections.shuffle(remainingUsers);
 
-		int nbDefenders = remainingUsers.size() / 2;
-		for (int i = 0; i < remainingUsers.size(); ++i) {
-			(i < nbDefenders ? defenderIDs : attackerIDs).add(remainingUsers.get(i));
-		}
-	}
+        int nbDefenders = remainingUsers.size() / 2;
+        for (int i = 0; i < remainingUsers.size(); ++i) {
+            (i < nbDefenders ? defenderIDs : attackerIDs).add(remainingUsers.get(i));
+        }
+    }
 
 }
