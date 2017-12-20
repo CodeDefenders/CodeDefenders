@@ -117,5 +117,5 @@ public class Constants {
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_TEST = "previousTest";
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_MUTANT = "previousMutant";
 
-	public static final String MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE = "Invalid mutant, sorry! Your mutant changes one or more method signatures.";;
+	public static final String MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE = "Invalid mutant, sorry! Your mutant changes one or more method signatures or field names";
 }

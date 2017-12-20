@@ -45,6 +45,46 @@ public class CodeValidatorTest {
 	}
 
 	@Test
+	public void testChangeFieldNameTriggersValidation(){
+		String originalCode = "public class UnderTest{\n"
+				+ "private int foo;\n"
+				+ "public UnderTest(){}\n"
+				+ "private void setFoo(int foo){}\n"
+				+ "protected void setBar(int bar){}\n"
+				+ "public int getBib(){ return -1; }\n"
+				+ "};";
+		String mutatedCode = "public class UnderTest{\n"
+				+ "private int bar;\n"
+				+ "public UnderTest(){}\n"
+				+ "private void setFoo(int foo){}\n"
+				+ "protected void setBar(int bar){}\n"
+				+ "public int getBib(){ return -1; }\n"
+				+ "};";
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		assertEquals(Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE, validationMessage);
+	}
+
+	@Test
+	public void testChangeFieldInitializerDoesNotTriggersValidation(){
+		String originalCode = "public class UnderTest{\n"
+				+ "private int foo;\n"
+				+ "public UnderTest(){}\n"
+				+ "private void setFoo(int foo){}\n"
+				+ "protected void setBar(int bar){}\n"
+				+ "public int getBib(){ return -1; }\n"
+				+ "};";
+		String mutatedCode = "public class UnderTest{\n"
+				+ "private int foo = 1;\n"
+				+ "public UnderTest(){}\n"
+				+ "private void setFoo(int foo){}\n"
+				+ "protected void setBar(int bar){}\n"
+				+ "public int getBib(){ return -1; }\n"
+				+ "};";
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		assertEquals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE, validationMessage);
+	}
+
+	@Test
 	public void testChangeInConstructorSignatureTriggersValidation(){
 		String originalCode = "public class UnderTest{\n"
 				+ "public UnderTest(){}\n"

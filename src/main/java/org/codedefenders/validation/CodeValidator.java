@@ -28,8 +28,10 @@ import com.github.javaparser.TokenMgrError;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.stmt.BlockStmt;
 
 /**
@@ -63,11 +65,11 @@ public class CodeValidator {
 		}
 
 		// If the mutants contains changes to method signatures, mark it as not valid
-		if (mutantChangesMethodSignatures(originalCode, mutatedCode)) {
+		if (mutantChangesMethodSignatures(originalCode, mutatedCode) || mutantChangesFieldNames(originalCode, mutatedCode)) {
 			return Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE;
 		}
 
-        /*for (int i = 0; i < originalLines.length; ++i) {
+		/*for (int i = 0; i < originalLines.length; ++i) {
             String originalLine = originalLines[i];
             String mutatedLine = mutatedLines[i];
             // rudimentary word-level matching as dmp works on character level
@@ -196,20 +198,35 @@ public class CodeValidator {
 		return removeQuoted(origWithoudStrings, "\'").equals(removeQuoted(mutaWithoutStrings, "\'"));
 	}
 
-	private static Set<String> extractMethodSignatures(CompilationUnit cu ){
+	private static Set<String> extractMethodSignaturesByType(TypeDeclaration td) {
 		Set<String> methodSignatures = new HashSet<>();
-
-		for (TypeDeclaration td : cu.getTypes()) {
-			// Method signatures in the class including constructors
-			for (BodyDeclaration bd : td.getMembers()) {
-				if (bd instanceof MethodDeclaration) {
-					methodSignatures.add(((MethodDeclaration) bd).getDeclarationAsString());
-				} else if (bd instanceof ConstructorDeclaration) {
-					methodSignatures.add(((ConstructorDeclaration) bd).getDeclarationAsString());
-				}
+		// Method signatures in the class including constructors
+		for (BodyDeclaration bd : td.getMembers()) {
+			if (bd instanceof MethodDeclaration) {
+				methodSignatures.add(((MethodDeclaration) bd).getDeclarationAsString());
+			} else if (bd instanceof ConstructorDeclaration) {
+				methodSignatures.add(((ConstructorDeclaration) bd).getDeclarationAsString());
+			} else if (bd instanceof TypeDeclaration) {
+				// Inner classes
+				methodSignatures.addAll(extractMethodSignaturesByType((TypeDeclaration) bd));
 			}
 		}
 		return methodSignatures;
+	}
+
+	private static Set<String> extractFieldNamesByType(TypeDeclaration td) {
+		Set<String> fieldNames = new HashSet<>();
+		// Method signatures in the class including constructors
+		for (BodyDeclaration bd : td.getMembers()) {
+			if (bd instanceof FieldDeclaration) {
+				for (VariableDeclarator vd : ((FieldDeclaration) bd).getVariables()) {
+					fieldNames.add(vd.getId().getName());
+				}
+			} else if (bd instanceof TypeDeclaration) {
+				fieldNames.addAll( extractFieldNamesByType( (TypeDeclaration) bd ));
+			}
+		}
+		return fieldNames;
 	}
 
 	private static Boolean mutantChangesMethodSignatures(final String orig, final String muta) {
@@ -219,7 +236,10 @@ public class CodeValidator {
 
 		try (InputStream is = new ByteArrayInputStream(orig.getBytes())) {
 			CompilationUnit cu = JavaParser.parse(is);
-			cutMethodSignatures.addAll(extractMethodSignatures(cu));
+
+			for( TypeDeclaration td : cu.getTypes() ){
+				cutMethodSignatures.addAll(extractMethodSignaturesByType(td));
+			}
 
 		} catch (ParseException | TokenMgrError ignored) {
 			ignored.printStackTrace();
@@ -229,8 +249,9 @@ public class CodeValidator {
 
 		try (InputStream is = new ByteArrayInputStream(muta.getBytes())) {
 			CompilationUnit cu = JavaParser.parse(is);
-			mutantMethodSignatures.addAll(extractMethodSignatures(cu));
-
+			for( TypeDeclaration td : cu.getTypes() ){
+				mutantMethodSignatures.addAll(extractMethodSignaturesByType(td));
+			}
 		} catch (ParseException | TokenMgrError ignored) {
 			ignored.printStackTrace();
 		} catch (IOException e) {
@@ -238,6 +259,37 @@ public class CodeValidator {
 		}
 
 		return !cutMethodSignatures.equals(mutantMethodSignatures);
+	}
+
+	private static Boolean mutantChangesFieldNames(final String orig, final String muta) {
+		// Parse original and extract method signatures -> Set of string
+		Set<String> cutFieldNames = new HashSet<>();
+		Set<String> mutantFieldNames = new HashSet<>();
+
+		try (InputStream is = new ByteArrayInputStream(orig.getBytes())) {
+			CompilationUnit cu = JavaParser.parse(is);
+			for( TypeDeclaration td : cu.getTypes() ){
+				cutFieldNames.addAll(extractFieldNamesByType(td));
+			}
+
+		} catch (ParseException | TokenMgrError ignored) {
+			ignored.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try (InputStream is = new ByteArrayInputStream(muta.getBytes())) {
+			CompilationUnit cu = JavaParser.parse(is);
+			for( TypeDeclaration td : cu.getTypes() ){
+				mutantFieldNames.addAll(extractFieldNamesByType(td));
+			}
+		} catch (ParseException | TokenMgrError ignored) {
+			ignored.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return !cutFieldNames.equals(mutantFieldNames);
 	}
 
 	private static String validInsertion(String diff) {
