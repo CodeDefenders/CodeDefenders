@@ -1,10 +1,20 @@
 package org.codedefenders.validation;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseException;
-import com.github.javaparser.TokenMgrError;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.stmt.BlockStmt;
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Pattern;
+
 import org.apache.commons.io.FileUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.Constants;
@@ -12,12 +22,15 @@ import org.codedefenders.exceptions.CodeValidatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.regex.Pattern;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseException;
+import com.github.javaparser.TokenMgrError;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.stmt.BlockStmt;
 
 /**
  * @author Jose Rojas
@@ -33,6 +46,7 @@ public class CodeValidator {
 		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE.equals(getValidationMessage(originalCode, mutatedCode));
 	}
 
+	// This validation pipeline should use the Chain-of-Command design pattern
 	public static String getValidationMessage(String originalCode, String mutatedCode) {
 
 		String originalLines[] = originalCode.split("\\r?\\n");
@@ -46,6 +60,11 @@ public class CodeValidator {
 		// if only string literals were changed
 		if (onlyLiteralsChanged(originalCode, mutatedCode)) {
 			return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
+		}
+
+		// If the mutants contains changes to method signatures, mark it as not valid
+		if (mutantChangesMethodSignatures(originalCode, mutatedCode)) {
+			return Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE;
 		}
 
         /*for (int i = 0; i < originalLines.length; ++i) {
@@ -177,6 +196,49 @@ public class CodeValidator {
 		return removeQuoted(origWithoudStrings, "\'").equals(removeQuoted(mutaWithoutStrings, "\'"));
 	}
 
+	private static Set<String> extractMethodSignatures(CompilationUnit cu ){
+		Set<String> methodSignatures = new HashSet<>();
+
+		for (TypeDeclaration td : cu.getTypes()) {
+			// Method signatures in the class including constructors
+			for (BodyDeclaration bd : td.getMembers()) {
+				if (bd instanceof MethodDeclaration) {
+					methodSignatures.add(((MethodDeclaration) bd).getDeclarationAsString());
+				} else if (bd instanceof ConstructorDeclaration) {
+					methodSignatures.add(((ConstructorDeclaration) bd).getDeclarationAsString());
+				}
+			}
+		}
+		return methodSignatures;
+	}
+
+	private static Boolean mutantChangesMethodSignatures(final String orig, final String muta) {
+		// Parse original and extract method signatures -> Set of string
+		Set<String> cutMethodSignatures = new HashSet<>();
+		Set<String> mutantMethodSignatures = new HashSet<>();
+
+		try (InputStream is = new ByteArrayInputStream(orig.getBytes())) {
+			CompilationUnit cu = JavaParser.parse(is);
+			cutMethodSignatures.addAll(extractMethodSignatures(cu));
+
+		} catch (ParseException | TokenMgrError ignored) {
+			ignored.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try (InputStream is = new ByteArrayInputStream(muta.getBytes())) {
+			CompilationUnit cu = JavaParser.parse(is);
+			mutantMethodSignatures.addAll(extractMethodSignatures(cu));
+
+		} catch (ParseException | TokenMgrError ignored) {
+			ignored.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return !cutMethodSignatures.equals(mutantMethodSignatures);
+	}
 
 	private static String validInsertion(String diff) {
 		try {

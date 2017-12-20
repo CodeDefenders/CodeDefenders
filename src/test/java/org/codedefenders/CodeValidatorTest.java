@@ -16,8 +16,7 @@ import java.nio.file.Files;
 
 import static org.codedefenders.validation.CodeValidator.validMutant;
 import static org.codedefenders.validation.CodeValidator.validTestCode;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * @author Jose Rojas
@@ -26,6 +25,96 @@ public class CodeValidatorTest {
 
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+	@Test
+	public void testValidChangeDoesNotTriggersValidation(){
+		String originalCode = "public class UnderTest{\n"
+				+ "public UnderTest(){}\n"
+				+ "private void setFoo(int foo){}\n"
+				+ "protected void setBar(int bar){}\n"
+				+ "public int getBib(){ return -1; }\n"
+				+ "};";
+		String mutatedCode = "public class UnderTest{\n"
+				+ "public UnderTest(){}\n"
+				+ "private void setFoo(int foo){}\n"
+				+ "protected void setBar(int bar){}\n"
+				+ "public int getBib(){ return 0; }\n"
+				+ "};";
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		assertEquals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE, validationMessage);
+	}
+
+	@Test
+	public void testChangeInConstructorSignatureTriggersValidation(){
+		String originalCode = "public class UnderTest{\n"
+				+ "public UnderTest(){}\n"
+				+ "private void setFoo(int foo){}\n"
+				+ "protected void setBar(int bar){}\n"
+				+ "public int getBib(){ return -1; }\n"
+				+ "};";
+		String mutatedCode = "public class UnderTest{\n"
+				+ "public UnderTest(int bar){}\n"
+				+ "private void setFoo(int foo){}\n"
+				+ "protected void setBar(int bar){}\n"
+				+ "public int getBib(){ return -1; }\n"
+				+ "};";
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		assertEquals(Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE, validationMessage);
+	}
+
+	@Test
+	public void testChangeInPrivateMethodSignatureTriggersValidation(){
+		String originalCode = "public class UnderTest{\n"
+				+ "public UnderTest(){}\n"
+				+ "private void setFoo(int foo){}\n"
+				+ "protected void setBar(int bar){}\n"
+				+ "public int getBib(){ return -1; }\n"
+				+ "};";
+		String mutatedCode = "public class UnderTest{\n"
+				+ "public UnderTest(){}\n"
+				+ "private void setFoo(int fooXXX){}\n"
+				+ "protected void setBar(int bar){}\n"
+				+ "public int getBib(){ return -1; }\n"
+				+ "};";
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		assertEquals(Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE, validationMessage);
+	}
+
+	@Test
+	public void testChangeInProtectedMethodSignatureTriggersValidation(){
+		String originalCode = "public class UnderTest{\n"
+				+ "public UnderTest(){}\n"
+				+ "private void setFoo(int foo){}\n"
+				+ "protected void setBar(int bar){}\n"
+				+ "public int getBib(){ return -1; }\n"
+				+ "};";
+		String mutatedCode = "public class UnderTest{\n"
+				+ "public UnderTest(){}\n"
+				+ "private void setFoo(int foo){}\n"
+				+ "protected int setBar(int bar){ return 0;}\n"
+				+ "public int getBib(){ return -1; }\n"
+				+ "};";
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		assertEquals(Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE, validationMessage);
+	}
+
+	@Test
+	public void testChangeInPublicMethodSignatureTriggersValidation(){
+		String originalCode = "public class UnderTest{\n"
+				+ "public UnderTest(){}\n"
+				+ "private void setFoo(int foo){}\n"
+				+ "protected void setBar(int bar){}\n"
+				+ "public int getBib(){ return -1; }\n"
+				+ "};";
+		String mutatedCode = "public class UnderTest{\n"
+				+ "public UnderTest(){}\n"
+				+ "private void setFoo(int foo){}\n"
+				+ "protected void setBar(int bar){}\n"
+				+ "public int getBibXXX(){ return -1; }\n"
+				+ "};";
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		assertEquals(Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE, validationMessage);
+	}
 
 	@Ignore
 	@Test
