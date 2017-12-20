@@ -16,6 +16,7 @@
 				<span id="submit-button">
 					<input type="submit" text="Upload" class="fileinput-upload-button" value="Upload" onClick="this.form.submit(); this.disabled=true; this.value='Uploading...';" />
 				</span>
+				<input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 			</form>
 		</div>
 	</div>
