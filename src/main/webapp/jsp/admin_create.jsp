@@ -448,6 +448,13 @@
             %>
             </tbody>
         </table>
+        <div class="form-group">
+            <label for="user_name_list">User Names</label>
+            <textarea class="form-control" rows="5" id="user_name_list" name ="user_name_list"
+                      oninput="document.getElementById('submit_users_btn').disabled = false"></textarea>
+        </div>
+
+
         <div class="row">
             <div class="col-sm-2">
                 <label for="cut_select" class="label-normal">CUT</label>
