@@ -65,7 +65,7 @@ public class AdminDAO {
             "SELECT *\n" +
                     "FROM\n" +
                     "  games\n" +
-                    "WHERE State = 'ACTIVE' AND Mode = 'PARTY' AND Finish_Time > NOW();";
+                    "WHERE State != 'FINISHED' AND Mode = 'PARTY' AND Finish_Time > NOW();";
 
     private static final String UNFINISHED_MULTIPLAYER_GAMES_QUERY =
             "SELECT *\n" +
