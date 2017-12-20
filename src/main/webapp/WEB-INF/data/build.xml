@@ -58,7 +58,7 @@
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-test" description="compile a single test">
 		<!--<classpath refid="test.cp" />-->
-		<javac srcdir="${test.file}" destdir="${test.file}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false"/>
+		<javac srcdir="${test.file}" destdir="${test.file}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" debug="true"/>
 	</target>
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
@@ -128,7 +128,8 @@
 				target="1.7" source="1.7"
 				classpathref="nocut.cp"
 				classpath="${mutant.file}"
-				includeantruntime="false"/>
+				includeantruntime="false"
+				debug="true"/>
 	</target>
 
 	<target name="recompiled-test-mutant" description="recompile the test using the mutant, and test the mutant to see if test fails"
