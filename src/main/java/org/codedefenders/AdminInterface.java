@@ -147,6 +147,8 @@ public class AdminInterface extends HttpServlet {
 						}
 					}
 				} else { // if admin is batch creating games
+					attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.ATTACKER_LISTS_SESSION_ATTRIBUTE);
+					defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.DEFENDER_LISTS_SESSION_ATTRIBUTE);
 					String[] selectedUsers;
 					String userNameListString;
 					try {
@@ -187,6 +189,15 @@ public class AdminInterface extends HttpServlet {
 							}
 						}
 					}
+
+					List<Integer> unassignedUserIds = getUnassignedUsers(attackerIdsList, defenderIdsList);
+					for (Integer uid : new ArrayList<>(selectedUserIDs)) {
+						if (!unassignedUserIds.contains(uid)) {
+							messages.add("user " + uid + " is already playing another game!");
+							selectedUserIDs.remove(uid);
+						}
+					}
+
 
 					if (selectedUserIDs.size() == 0) {
 						messages.add("Please select at least one User.");
