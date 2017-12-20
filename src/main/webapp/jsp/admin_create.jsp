@@ -519,12 +519,22 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-1">
-                <label for="level" class="label-normal">Level</label>
-                <input type="checkbox" id="level" name="level" class="form-control" data-size="medium"
-                       data-toggle="toggle" data-on="Easy" data-off="Hard" data-onstyle="info" data-offstyle="warning">
-            </div>
             <div class="col-sm-2">
+                <label for="level_group" class="label-normal">Games Level</label>
+                <div id="level_group">
+                    <div class="radio">
+                        <label class="label-normal"><input TYPE="radio" name="gamesLevel"
+                                                           VALUE="<%=GameLevel.HARD%>" checked="checked"/>
+                            Hard</label>
+                    </div>
+                    <div class="radio">
+                        <label class="label-normal"><input TYPE="radio" name="gamesLevel"
+                                                           value="<%=GameLevel.EASY%>"/>
+                            Easy</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-1">
             </div>
             <div class="col-sm-2">
                 <label for="state_group" class="label-normal">Games State</label>
