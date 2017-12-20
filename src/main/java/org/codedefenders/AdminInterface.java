@@ -157,7 +157,7 @@ public class AdminInterface extends HttpServlet {
                         defendersPerGame = Integer.parseInt(request.getParameter("defenders"));
                         extraAttackersPerGame = Integer.parseInt(request.getParameter("attackers_extra"));
                         extraDefendersPerGame = Integer.parseInt(request.getParameter("defenders_extra"));
-                        gamesLevel = request.getParameterValues("level") == null ? GameLevel.HARD : GameLevel.EASY;
+                        gamesLevel = GameLevel.valueOf(request.getParameter("gamesLevel"));
                         gamesState = request.getParameter("gamesState").equals(GameState.ACTIVE.name()) ? GameState.ACTIVE : GameState.CREATED;
                         startTime = Long.parseLong(request.getParameter("startTime"));
                         finishTime = Long.parseLong(request.getParameter("finishTime"));
