@@ -104,18 +104,19 @@
                     }
                 }
 
-                Event notifMutant = new Event(-1, mg.getId(),
-                        uid,
-                        DatabaseAccess.getUser(uid)
-                                .getUsername() + " flagged " + nClaimed +
-                                " mutant" + (nClaimed == 1? "" : "s") +
-                                " as equivalent.",
-                        EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
-                        new Timestamp(System.currentTimeMillis()));
+                if (nClaimed >= 1) {
+                    String flaggingChatMessage = DatabaseAccess.getUser(uid).getUsername() + " flagged " + nClaimed +
+                            " mutant" + (nClaimed == 1 ? "" : "s") + " as equivalent.";
+                    Event notifMutant = new Event(-1, mg.getId(), uid, flaggingChatMessage,
+                            EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
+                            new Timestamp(System.currentTimeMillis()));
 
-                notifMutant.insert();
+                    notifMutant.insert();
+                }
 
-                messages.add(String.format("Flagged %d mutant%s as equivalent", nClaimed, (nClaimed == 1 ? "" : 's')));
+                String flaggingMessage = nClaimed < 1 ? "Mutant has already been claimed as equivalent or killed!" :
+                        String.format("Flagged %d mutant%s as equivalent", nClaimed, (nClaimed == 1 ? "" : 's'));
+                messages.add(flaggingMessage);
 
                 response.sendRedirect(request.getContextPath()+"/multiplayer/play");
             } else {
