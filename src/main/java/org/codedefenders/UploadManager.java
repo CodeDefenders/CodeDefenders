@@ -32,6 +32,7 @@ import java.util.List;
 public class UploadManager extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
+	private boolean fromAdmin;
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -67,6 +68,8 @@ public class UploadManager extends HttpServlet {
 						classAlias = fieldValue;
 					else if (fieldName.equals("prepareForSingle"))
 						shouldPrepareAI = true;
+					else if (fieldName.equals("fromAdmin"))
+						fromAdmin = fieldValue.equals("true");
 					else
 						System.out.println("Unrecognized parameter");
 				} else {
@@ -186,7 +189,9 @@ public class UploadManager extends HttpServlet {
 				}
 			}
 			messages.add("Class uploaded successfully. It will be referred to as: " + cut.getAlias());
-			response.sendRedirect(contextPath+"/games/user");
+			// Redirect to admin interface if corresponding url param is set
+			String redirect = fromAdmin ? contextPath + "/admin" : contextPath + "/games/user";
+			response.sendRedirect(redirect);
 
 		} else {
 			cut.delete();

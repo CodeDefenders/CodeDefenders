@@ -457,6 +457,8 @@
                     </option>
                     <%}%>
                 </select>
+                <br/>
+                <a href="<%=request.getContextPath()%>/games/upload?fromAdmin=true"> Upload Class </a>
             </div>
             <div class="col-sm-1"></div>
             <div class="col-sm-2">
