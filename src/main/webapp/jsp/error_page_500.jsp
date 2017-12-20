@@ -1,9 +1,9 @@
-<%@ page isErrorPage="true" import="java.io.*" contentType="text/plain"%>
-<!DOCTYPE h<!DOCTYPE html>
+<%@ page isErrorPage="true" import="java.io.*" contentType="text/html; charset=ISO-8859-1"%>
+<!DOCTYPE html>
 <html>
 <head>
     <meta content="width=device-width, initial-scale=1, maximum-scale=1" name="viewport">
-    <title>The page you're looking for could not be found (404)</title>
+    <title>Internal Server Error (500)</title>
     <style>
         body {
             color: #666;
