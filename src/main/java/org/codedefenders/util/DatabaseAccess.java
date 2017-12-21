@@ -245,7 +245,7 @@ public class DatabaseAccess {
 		try {
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
-				GameClass classRecord = new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile"));
+				GameClass classRecord = new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile"), rs.getBoolean("RequireMocking"));
 				return classRecord;
 			}
 		} catch (SQLException se) {
@@ -267,7 +267,7 @@ public class DatabaseAccess {
 		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 		try {
 			while (rs.next()) {
-				classList.add(new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile")));
+				classList.add(new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile"), rs.getBoolean("RequireMocking")));
 			}
 		} catch (SQLException se) {
 			logger.error("SQL exception caught", se);

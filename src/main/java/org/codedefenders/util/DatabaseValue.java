@@ -8,10 +8,11 @@ public class DatabaseValue {
     private String stringVal;
     private Type type;
     private float floatVal;
-     private Timestamp timestampVal;
+    private Timestamp timestampVal;
+    private Boolean boolVal;
 
     public enum Type {
-        LONG, INT, STRING, FLOAT, TIMESTAMP
+        LONG, INT, STRING, FLOAT, TIMESTAMP, BOOLEAN
     }
 
     DatabaseValue(String v) {
@@ -34,12 +35,19 @@ public class DatabaseValue {
         intVal = v;
     }
 
+    DatabaseValue(boolean v) {
+        this.type = Type.BOOLEAN;
+        boolVal = v;
+    }
+
     DatabaseValue(Long v) {
         this.type = Type.LONG;
         longVal = v;
     }
 
-
+	Boolean getBoolVal() {
+		return this.boolVal;
+	}
 
     public Type getType() {
         return this.type;
