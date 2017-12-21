@@ -8,7 +8,16 @@
 // Not sure where those variables come from...
 boolean disableAttack = false;
 if (role == Role.ATTACKER && mutantsPending != null ){
-	disableAttack = ( mutantsPending.size() > 0 ) &&
+
+	boolean playerHasPendingMutants = false;
+	for (Mutant m : mutantsPending){
+        if (m.getPlayerId() == playerId &&  m.getEquivalent() == Mutant.Equivalence.PENDING_TEST){
+			playerHasPendingMutants = true;
+            break;
+        }
+    }
+
+	disableAttack = ( playerHasPendingMutants ) &&
 					( session.getAttribute( Constants.BLOCK_ATTACKER ) != null ) && // This should be superflous since we always set this session attribute
 					((Boolean) session.getAttribute( Constants.BLOCK_ATTACKER ) );
 }
