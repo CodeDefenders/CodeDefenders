@@ -45,24 +45,29 @@
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-cut" description="compile a class under test">
 		<javac srcdir="${cut.dir}" destdir="${cut.dir}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" listfiles="yes" fork="yes"
-			   debug="true">
-			<!-- <include name="${classname}" /> -->
-		</javac>
+			   debug="true" nowarn="true" />
 	</target>
 
 	<!-- requires mutant to compile only -->
 	<target name="compile-mutant" description="compile a single mutant">
-		<javac srcdir="${mutant.file}" destdir="${mutant.file}" target="1.7" classpathref="nocut.cp" source="1.7" includeantruntime="false"/>
+		<javac srcdir="${mutant.file}" destdir="${mutant.file}" target="1.7" classpathref="nocut.cp" source="1.7" includeantruntime="false"
+		   debug="true" nowarn="true" />
 	</target>
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-test" description="compile a single test">
 		<!--<classpath refid="test.cp" />-->
-		<javac srcdir="${test.file}" destdir="${test.file}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" debug="true"/>
+		<javac srcdir="${test.file}" destdir="${test.file}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false"
+			   debug="true" nowarn="true" />
+	</target>
+
+	<target name="echo-path" description="Echo test path">
+		<pathconvert targetos="unix" property="test.path.unix" refid="test.cp"/>
+		<echo message="Test path: ${test.path.unix}"/>
 	</target>
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
-	<target name="test-original" description="run test on original code to ensure it passes">
+	<target name="test-original" depends="echo-path" description="run test on original code to ensure it passes">
 		<jacoco:coverage enabled="true" destFile="${test.file}/jacoco.exec"  dumponexit="true" >
 			<junit printsummary="true" haltonfailure="false"  includeantruntime="true" fork="true" clonevm="true">
 				<classpath refid="test.cp" />
@@ -93,7 +98,8 @@
 
 	<target name="mutant-gen-cut" description="generate mutants using major">
 		<mkdir dir="${ai.cuts.dir}/${classalias}"/>
-		<javac fork="yes" executable="${major.home}/bin/javac" sourcepath="" srcdir="${cut.dir}" destdir="${ai.cuts.dir}/${classalias}">
+		<javac fork="yes" executable="${major.home}/bin/javac" sourcepath="" srcdir="${cut.dir}" destdir="${ai.cuts.dir}/${classalias}"
+			   debug="true" nowarn="true" >
 			<compilerarg value="-XMutator${mutOp}"/>
 			<!--<arg value="-J-Dmajor.export.mutants=true"/>-->
 			<compilerarg value="-J-Dmajor.export.directory=${ai.mutants.dir}/${classalias}"/>
@@ -116,7 +122,8 @@
 	</target>
 
 	<target name="compile-gen-tests" description="compile a generated test suite">
-		<javac srcdir="${ai.tests.dir}/${classalias}" destdir="${ai.tests.dir}/${classalias}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false"/>
+		<javac srcdir="${ai.tests.dir}/${classalias}" destdir="${ai.tests.dir}/${classalias}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false"
+			   debug="true" nowarn="true" />
 	</target>
 
 	<!-- in some cases we need to recompile the test with the mutant and then execute the test -->
@@ -129,7 +136,7 @@
 				classpathref="nocut.cp"
 				classpath="${mutant.file}"
 				includeantruntime="false"
-				debug="true"/>
+				debug="true" nowarn="true" />
 	</target>
 
 	<target name="recompiled-test-mutant" description="recompile the test using the mutant, and test the mutant to see if test fails"
