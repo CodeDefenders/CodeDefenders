@@ -42,7 +42,7 @@ if (role == Role.ATTACKER && mutantsPending != null ){
 			<%
 				String mutantCode;
 				String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-				request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+				// request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
 				if (previousMutantCode != null) {
 					mutantCode = previousMutantCode;
 				} else

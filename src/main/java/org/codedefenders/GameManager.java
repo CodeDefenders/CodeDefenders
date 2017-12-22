@@ -373,6 +373,15 @@ public class GameManager extends HttpServlet {
 		return DatabaseAccess.getMutant(gid, md5Mutant);
 	}
 
+	public static boolean hasAttackerPendingMutantsInGame(int gid, int attackerId){
+		for( Mutant m : DatabaseAccess.getMutantsForGame(gid) ){
+			if (m.getPlayerId() == attackerId &&  m.getEquivalent() == Mutant.Equivalence.PENDING_TEST){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
 		// Mutant is assumed valid here
 
