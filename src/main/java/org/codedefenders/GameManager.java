@@ -9,6 +9,8 @@ import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mysql.fabric.xmlrpc.base.Data;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -371,6 +373,15 @@ public class GameManager extends HttpServlet {
 
 		// return the mutant in the game with same MD5 if it exists; return null otherwise
 		return DatabaseAccess.getMutant(gid, md5Mutant);
+	}
+
+	public static boolean hasAttackerPendingMutantsInGame(int gid, int attackerId){
+		for( Mutant m : DatabaseAccess.getMutantsForGame(gid) ){
+			if (m.getPlayerId() == attackerId &&  m.getEquivalent() == Mutant.Equivalence.PENDING_TEST){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
