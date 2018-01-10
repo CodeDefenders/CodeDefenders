@@ -158,16 +158,16 @@ public class Mutant implements Serializable {
 		this.score += score;
 	}
 
-	public void kill() {
-		kill(equivalent);
+	public boolean kill() {
+		return kill(equivalent);
 	}
 
-	public void kill(Equivalence equivalent) {
+	public boolean kill(Equivalence equivalent) {
 		alive = false;
 		roundKilled = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
 		setEquivalent(equivalent);
 
-		update();
+		return update();
 	}
 
 	public boolean isCovered() {

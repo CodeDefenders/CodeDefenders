@@ -134,6 +134,7 @@ public class MutationTester {
 
 					@Override
 					public Boolean call() throws Exception {
+						// This automatically update the 'mutants' and 'tests' tables, as well as the test and mutant objects.
 						return testVsMutant(test, mutant);
 					}
 				});
@@ -144,18 +145,9 @@ public class MutationTester {
 				sharedExecutorService.execute(task);
 			}
 
-			// TODO Mayse use some timeout ?!
 			for (final Mutant mutant : mutants) {
 				if (useMutantCoverage && !test.isMutantCovered(mutant))
 					continue;
-
-				// checks if task done
-				// System.out.println(
-				// "Is mutant done? " + tasks.get(mutant).isDone());
-				// checks if task canceled
-				// System.out.println("Is mutant cancelled? "
-				// + tasks.get(mutant).isCancelled());
-				// fetches result and waits if not ready
 
 				// THIS IS BLOCKING !!!
 				try {
@@ -417,7 +409,8 @@ public class MutationTester {
     }
 
     /**
-     * Returns {@code true} iff {@code test} kills {@code mutant}.
+     * Returns {@code true} iff {@code test} kills {@code mutant}. If the mutant was killed in the meanwhile,
+     * returns {@false} even if the ANT task was executed successfully.
      *
      * @param test
      * @param mutant
@@ -425,16 +418,29 @@ public class MutationTester {
      */
     private static boolean testVsMutant(Test test, Mutant mutant) {
         if (DatabaseAccess.getTargetExecutionForPair(test.getId(), mutant.getId()) == null) {
-            // Run the test against the mutant and get the result
+			// Run the test against the mutant and get the result. Note that
+			// this might run tests against mutants that are dead by the time
+			// this execution ends.
             TargetExecution executedTarget = AntRunner.testMutant(mutant, test);
 
             // If the test did NOT pass, the mutant was detected and should be killed.
+            // TODO Note that target execution at this point is out of synch ... and it should be changed !
+            //
             if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
-                logger.info(String.format("Test %d kills Mutant %d", test.getId(), mutant.getId()));
-                mutant.kill(ASSUMED_NO);
-                test.killMutant();
-                return true;
-            }
+				// Mark the mutant as killed and update the DB.
+				// If the mutants is already dead, kill returns false because
+				// the update to the db does not update any row (assuming
+				// useAffectedRows=true" is specified!)
+				if (mutant.kill(ASSUMED_NO)) {
+					logger.info(String.format("Test %d kills Mutant %d", test.getId(), mutant.getId()));
+					test.killMutant();
+					return true;
+				} else {
+					logger.info(String.format("Test %d would have killed Mutant %d, but Mutant %d was alredy dead !",
+							test.getId(), mutant.getId(), mutant.getId()));
+					return false;
+				}
+			}
         } else
             logger.error(String.format("No execution result found for (m: %d,t: %d)", mutant.getId(), test.getId()));
         return false;
