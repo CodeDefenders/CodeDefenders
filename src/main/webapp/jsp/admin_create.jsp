@@ -519,20 +519,10 @@
             <div class="col-sm-2">
                 <label for="attackers" class="label-normal">Attackers per Game</label>
                 <input type="number" value="3" id="attackers" name="attackers" min="1" class="form-control"/>
-                <div class="input-group mb-2 mb-sm-0">
-                    <div class="input-group-addon">extra</div>
-                    <input type="number" value="1" id="attackers_extra" name="attackers_extra"
-                           class="form-control"/>
-                </div>
             </div>
             <div class="col-sm-2">
                 <label for="defenders" class="label-normal">Defenders per Game</label>
                 <input type="number" value="3" id="defenders" name="defenders" min="1" class="form-control"/>
-                <div class="input-group mb-2 mb-sm-0">
-                    <div class="input-group-addon">extra</div>
-                    <input type="number" value="1" id="defenders_extra" name="defenders_extra"
-                           class="form-control"/>
-                </div>
             </div>
         </div>
         <div class="row">
