@@ -121,7 +121,7 @@
 
                     </button>
                 </td>
-            <tr id="playersTableActive">
+            <tr id="playersTableActive" hidden>
                 <th></th>
                 <th></th>
                 <th></th>
@@ -150,8 +150,8 @@
                     String lastActionTS = AdminInterface.getTimeSinceLastSubmission(pid);
                     int gameScore = AdminInterface.getPlayerScore(g, pid);
             %>
-            <tr style="height: 3px;" id="playersTableActive"></tr>
-            <tr id="playersTableActive">
+            <tr style="height: 3px;" id="playersTableActive" hidden></tr>
+            <tr id="playersTableActive" hidden>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -288,8 +288,8 @@
                 <td class="col-sm-2"><%= g.getFinishDateTime() %>
                 </td>
                 <td class="col-sm-4">
-                    <div id="playersTableHidden" hidden style="color: lightgray;"> (hidden)</div>
-                    <table id="playersTableCreated">
+                    <div id="playersTableHidden" style="color: lightgray;"> (hidden)</div>
+                    <table id="playersTableCreated" hidden>
                         <%
                             List<Integer> attackerAndDefenderIds = ListUtils.union(attackerIds, defenderIds);
                             for (int id : attackerAndDefenderIds) {
@@ -671,16 +671,26 @@
             });
 
             $('#togglePlayersCreated').click(function () {
+                localStorage.setItem("showCreatedPlayers", localStorage.getItem("showCreatedPlayers") === "true" ? "false" : "true");
                 $("[id=playersTableCreated]").toggle();
                 $("[id=playersTableHidden]").toggle();
             });
 
             $('#togglePlayersActive').click(function () {
+                localStorage.setItem("showActivePlayers", localStorage.getItem("showActivePlayers") === "true" ? "false" : "true");
                 $("[id=playersTableActive]").toggle();
             });
 
 
             $(document).ready(function () {
+                if(localStorage.getItem("showActivePlayers") === "true") {
+                    $("[id=playersTableActive]").show();
+                }
+
+                if(localStorage.getItem("showCreatedPlayers") === "true") {
+                    $("[id=playersTableCreated]").show();
+                    $("[id=playersTableHidden]").hide();
+                }
                 $('#tableAddUsers').DataTable({
                     "paging": false,
                     "lengthChange": false,
