@@ -346,10 +346,6 @@
         <input type="hidden" name="formType" value="createGame">
 
         <h3>Unassigned Users</h3>
-        <% if (request.getParameterValues("toggleUserTable") != null) {%>
-        <a class="btn btn-sm btn-default" onclick="location.href='admin'">
-            <span class="glyphicon glyphicon-eye-close"/>
-        </a>
         <table id="tableAddUsers"
                class="table table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
@@ -385,13 +381,13 @@
             <%
             } else {
                 int currentUserID = (Integer) session.getAttribute("uid");
-                for (int uid : unassignedUserIds) {
-                    Timestamp ts = AdminDAO.getLastLogin(uid);
+                for (List<String> userInfo : unassignedUsersInfo) {
+                    int uid = Integer.valueOf(userInfo.get(0));
+                    String username = userInfo.get(1);
+                    String ts = userInfo.get(2);
                     String lastLogin = ts == null ? "-- never --" : ts.toString().substring(0, ts.toString().length() - 5);
-                    Role lastRole = AdminDAO.getLastRole(uid);
-                    Entry score = AdminDAO.getScore(uid);
-                    int totalScore = score.getTotalPoints();
-                    String username = DatabaseAccess.getUser(uid).getUsername();
+                    String lastRole = userInfo.get(3);
+                    String totalScore = userInfo.get(4);
             %>
 
             <tr>
@@ -454,11 +450,6 @@
             %>
             </tbody>
         </table>
-        <%} else {%>
-        <a class="btn btn-sm btn-default" onclick="location.href='admin?toggleUserTable=true'">
-            <span class="glyphicon glyphicon-eye-open"/>
-        </a>
-        <%}%>
 
         <div class="form-group">
             <label for="user_name_list">User Names</label>
@@ -704,7 +695,7 @@
 
             $(document).ready(function () {
                 $('#tableAddUsers').DataTable({
-                    "paging": false,
+                    pagingType: "full_numbers",
                     "lengthChange": false,
                     "searching": true,
                     "order": [[5, "desc"]],
