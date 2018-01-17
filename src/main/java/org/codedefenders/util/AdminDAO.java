@@ -284,14 +284,7 @@ public class AdminDAO {
         ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
         try {
             if (rs.next()) {
-                switch (rs.getString(3)) {
-                    case "ATTACKER":
-                        return Role.ATTACKER;
-                    case "DEFENDER":
-                        return Role.DEFENDER;
-                    default:
-                        return Role.NONE;
-                }
+                return Role.valueOf(rs.getString(3));
             }
         } catch (SQLException se) {
             logger.error("SQL exception caught", se);
@@ -331,46 +324,37 @@ public class AdminDAO {
     }
 
     public static boolean deletePlayerTest(int pid) {
-
-        Connection conn = DB.getConnection();
-        PreparedStatement tests_stmt = DB.createPreparedStatement(conn, DELETE_TESTS, DB.getDBV(pid));
-        return DB.executeUpdate(tests_stmt, conn);
+        return deleteFromTable(DELETE_TESTS, pid);
     }
 
     public static boolean deletePlayerMutants(int pid) {
-        Connection conn = DB.getConnection();
-        PreparedStatement mutants_stmt = DB.createPreparedStatement(conn, DELETE_MUTANTS, DB.getDBV(pid));
-        return DB.executeUpdate(mutants_stmt, conn);
+        return deleteFromTable(DELETE_MUTANTS, pid);
     }
 
     public static boolean deleteDefenderEquivalences(int pid) {
-        Connection conn = DB.getConnection();
-        PreparedStatement equivalences_stmt = DB.createPreparedStatement(conn, DELETE_DEFENDER_EQUIVALENCES, DB.getDBV(pid));
-        return DB.executeUpdate(equivalences_stmt, conn);
+        return deleteFromTable(DELETE_DEFENDER_EQUIVALENCES, pid);
     }
 
     public static boolean deleteAttackerEquivalences(int pid) {
-        Connection conn = DB.getConnection();
-        PreparedStatement equivalences_stmt = DB.createPreparedStatement(conn, DELETE_ATTACKER_EQUIVALENCES, DB.getDBV(pid));
-        return DB.executeUpdate(equivalences_stmt, conn);
+        return deleteFromTable(DELETE_ATTACKER_EQUIVALENCES, pid);
     }
 
     public static boolean deletePlayer(int pid) {
-        Connection conn = DB.getConnection();
-        PreparedStatement player_stmt = DB.createPreparedStatement(conn, DELETE_PLAYER, DB.getDBV(pid));
-        return DB.executeUpdate(player_stmt, conn);
+        return deleteFromTable(DELETE_PLAYER, pid);
     }
 
     public static boolean deleteTestTargetExecutions(int tid) {
-        Connection conn = DB.getConnection();
-        PreparedStatement player_stmt = DB.createPreparedStatement(conn, DELETE_TEST_TARGETEXECUTIONS, DB.getDBV(tid));
-        return DB.executeUpdate(player_stmt, conn);
+        return deleteFromTable(DELETE_TEST_TARGETEXECUTIONS, tid);
     }
 
     public static boolean deleteMutantTargetExecutions(int mid) {
+        return deleteFromTable(DELETE_MUTANT_TARGETEXECUTIONS, mid);
+    }
+
+    private static boolean deleteFromTable(String query, int id){
         Connection conn = DB.getConnection();
-        PreparedStatement player_stmt = DB.createPreparedStatement(conn, DELETE_MUTANT_TARGETEXECUTIONS, DB.getDBV(mid));
-        return DB.executeUpdate(player_stmt, conn);
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
+        return DB.executeUpdate(stmt, conn);
     }
 
     public static List<List<String>> getUnassignedUsersInfo() {
