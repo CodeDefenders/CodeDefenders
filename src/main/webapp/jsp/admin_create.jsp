@@ -121,7 +121,7 @@
 
                     </button>
                 </td>
-            <tr id="playersTableActive">
+            <tr id="playersTableActive" hidden>
                 <th></th>
                 <th></th>
                 <th></th>
@@ -150,8 +150,8 @@
                     String lastActionTS = AdminInterface.getTimeSinceLastSubmission(pid);
                     int gameScore = AdminInterface.getPlayerScore(g, pid);
             %>
-            <tr style="height: 3px;" id="playersTableActive"></tr>
-            <tr id="playersTableActive">
+            <tr style="height: 3px;" id="playersTableActive" hidden></tr>
+            <tr id="playersTableActive" hidden>
                 <td></td>
                 <td></td>
                 <td></td>
@@ -288,8 +288,8 @@
                 <td class="col-sm-2"><%= g.getFinishDateTime() %>
                 </td>
                 <td class="col-sm-4">
-                    <div id="playersTableHidden" hidden style="color: lightgray;"> (hidden)</div>
-                    <table id="playersTableCreated">
+                    <div id="playersTableHidden" style="color: lightgray;"> (hidden)</div>
+                    <table id="playersTableCreated" hidden>
                         <%
                             List<Integer> attackerAndDefenderIds = ListUtils.union(attackerIds, defenderIds);
                             for (int id : attackerAndDefenderIds) {
@@ -522,20 +522,10 @@
             <div class="col-sm-2">
                 <label for="attackers" class="label-normal">Attackers per Game</label>
                 <input type="number" value="3" id="attackers" name="attackers" min="1" class="form-control"/>
-                <div class="input-group mb-2 mb-sm-0">
-                    <div class="input-group-addon">extra</div>
-                    <input type="number" value="1" id="attackers_extra" name="attackers_extra"
-                           class="form-control"/>
-                </div>
             </div>
             <div class="col-sm-2">
                 <label for="defenders" class="label-normal">Defenders per Game</label>
                 <input type="number" value="3" id="defenders" name="defenders" min="1" class="form-control"/>
-                <div class="input-group mb-2 mb-sm-0">
-                    <div class="input-group-addon">extra</div>
-                    <input type="number" value="1" id="defenders_extra" name="defenders_extra"
-                           class="form-control"/>
-                </div>
             </div>
         </div>
         <div class="row">
@@ -684,16 +674,26 @@
             });
 
             $('#togglePlayersCreated').click(function () {
+                localStorage.setItem("showCreatedPlayers", localStorage.getItem("showCreatedPlayers") === "true" ? "false" : "true");
                 $("[id=playersTableCreated]").toggle();
                 $("[id=playersTableHidden]").toggle();
             });
 
             $('#togglePlayersActive').click(function () {
+                localStorage.setItem("showActivePlayers", localStorage.getItem("showActivePlayers") === "true" ? "false" : "true");
                 $("[id=playersTableActive]").toggle();
             });
 
 
             $(document).ready(function () {
+                if(localStorage.getItem("showActivePlayers") === "true") {
+                    $("[id=playersTableActive]").show();
+                }
+
+                if(localStorage.getItem("showCreatedPlayers") === "true") {
+                    $("[id=playersTableCreated]").show();
+                    $("[id=playersTableHidden]").hide();
+                }
                 $('#tableAddUsers').DataTable({
                     pagingType: "full_numbers",
                     "lengthChange": false,

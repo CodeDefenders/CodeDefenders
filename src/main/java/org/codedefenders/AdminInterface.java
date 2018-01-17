@@ -33,7 +33,7 @@ public class AdminInterface extends HttpServlet {
     private int cutID;
     private RoleAssignmentMethod roleAssignmentMethod;
     private TeamAssignmentMethod teamAssignmentMethod;
-    private int attackersPerGame, defendersPerGame, extraAttackersPerGame, extraDefendersPerGame;
+    private int attackersPerGame, defendersPerGame;
     private GameLevel gamesLevel;
     private GameState gamesState;
     private long startTime;
@@ -161,8 +161,6 @@ public class AdminInterface extends HttpServlet {
                         teamAssignmentMethod = TeamAssignmentMethod.valueOf(request.getParameter("teams"));
                         attackersPerGame = Integer.parseInt(request.getParameter("attackers"));
                         defendersPerGame = Integer.parseInt(request.getParameter("defenders"));
-                        extraAttackersPerGame = Integer.parseInt(request.getParameter("attackers_extra"));
-                        extraDefendersPerGame = Integer.parseInt(request.getParameter("defenders_extra"));
                         gamesLevel = GameLevel.valueOf(request.getParameter("gamesLevel"));
                         gamesState = request.getParameter("gamesState").equals(GameState.ACTIVE.name()) ? GameState.ACTIVE : GameState.CREATED;
                         startTime = Long.parseLong(request.getParameter("startTime"));
@@ -303,7 +301,7 @@ public class AdminInterface extends HttpServlet {
         }
 
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
-                extraAttackersPerGame, extraDefendersPerGame, cutID, currentUserID, gamesLevel, gamesState,
+                 cutID, currentUserID, gamesLevel, gamesState,
                 startTime, finishTime);
 
         if (teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_DESCENDING) || teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_SHUFFLED)) {
@@ -373,14 +371,13 @@ public class AdminInterface extends HttpServlet {
     }
 
     private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame,
-                                                     int extraAttackersPerGame, int extraDefendersPerGame,
                                                      int cutID, int creatorID, GameLevel level, GameState state,
                                                      long startTime, long finishTime) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
             MultiplayerGame multiplayerGame = new MultiplayerGame(cutID, creatorID, level, (float) 1, (float) 1,
-                    (float) 1, 10, 4, defendersPerGame + extraDefendersPerGame,
-                    attackersPerGame + extraAttackersPerGame, 0, 0, startTime,
+                    (float) 1, 10, 4, 0,
+                    0, 0, 0, startTime,
                     finishTime, state.name(), false);
             gameList.add(multiplayerGame);
         }
