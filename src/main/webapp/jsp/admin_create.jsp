@@ -311,14 +311,14 @@
                                 <button class="btn btn-sm btn-primary"
                                         value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
                                         name="tempGameUserSwitchButton">
-                                    <span class = "glyphicon glyphicon-transfer"></span>
+                                    <span class="glyphicon glyphicon-transfer"></span>
                                 </button>
                             </td>
                             <td>
                                 <button class="btn btn-sm btn-danger"
                                         value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
                                         name="tempGameUserRemoveButton">
-                                    <span class = "glyphicon glyphicon-trash"></span>
+                                    <span class="glyphicon glyphicon-trash"></span>
                                 </button>
                             </td>
                         </tr>
@@ -346,6 +346,10 @@
         <input type="hidden" name="formType" value="createGame">
 
         <h3>Unassigned Users</h3>
+        <% if (request.getParameterValues("toggleUserTable") != null) {%>
+        <a class="btn btn-sm btn-default" onclick="location.href='admin'">
+            <span class="glyphicon glyphicon-eye-close"/>
+        </a>
         <table id="tableAddUsers"
                class="table table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
@@ -368,8 +372,8 @@
             <%
                 List<MultiplayerGame> availableGames = AdminDAO.getAvailableGames();
                 createdGames = (List<MultiplayerGame>) session.getAttribute(AdminInterface.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
-                List<Integer> unassignedUserIds = AdminInterface.getUnassignedUsers(attackerIdsList, defenderIdsList);
-                if (unassignedUserIds.isEmpty()) {
+                List<List<String>> unassignedUsersInfo = AdminInterface.getUnassignedUsers(attackerIdsList, defenderIdsList);
+                if (unassignedUsersInfo.isEmpty()) {
             %>
 
             <div class="panel panel-default">
@@ -409,7 +413,8 @@
                 <td class="col-sm-2"><%= lastLogin %>
                 </td>
                 <td class="col-sm-1" style="padding-top:3px; padding-bottom:3px">
-                    <select name="<%="game_" + uid%>" class="form-control selectpicker" data-size="small" id="game">
+                    <select name="<%="game_" + uid%>" class="form-control selectpicker" data-size="small"
+                            id="game">
                         <% for (MultiplayerGame g : availableGames) { %>
                         <option value="<%=g.getId()%>"><%=String.valueOf(g.getId()) + ": " + g.getCUT().getAlias()%>
                         </option>
@@ -429,7 +434,8 @@
                 </td>
                 <td class=" col-sm-1
                         " style="padding-top:3px; padding-bottom:3px">
-                    <select name="<%="role_" + uid%>" class="form-control selectpicker" data-size="small" id="role">
+                    <select name="<%="role_" + uid%>" class="form-control selectpicker" data-size="small"
+                            id="role">
                         <option value="<%=Role.ATTACKER%>">Attacker</option>
                         <option value="<%=Role.DEFENDER%>">Defender</option>
                     </select>
@@ -448,17 +454,23 @@
             %>
             </tbody>
         </table>
+        <%} else {%>
+        <a class="btn btn-sm btn-default" onclick="location.href='admin?toggleUserTable=true'">
+            <span class="glyphicon glyphicon-eye-open"/>
+        </a>
+        <%}%>
+
         <div class="form-group">
             <label for="user_name_list">User Names</label>
             <a data-toggle="collapse" href="#demo" style="color:black">
-                <span class = "glyphicon glyphicon-question-sign"></span>
+                <span class="glyphicon glyphicon-question-sign"></span>
             </a>
             <div id="demo" class="collapse">
                 Newline seperated list of usernames or emails.
                 <br/>The union of these users and the users selected in the table above will be used to create games.
                 <br/>Only unassigned users are taken into account.
             </div>
-            <textarea class="form-control" rows="5" id="user_name_list" name ="user_name_list"
+            <textarea class="form-control" rows="5" id="user_name_list" name="user_name_list"
                       oninput="document.getElementById('submit_users_btn').disabled = false"></textarea>
         </div>
 
