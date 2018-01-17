@@ -191,7 +191,7 @@ public class AdminInterface extends HttpServlet {
                         }
                     }
 
-                    List<Integer> unassignedUserIds = getUnassignedUsers(attackerIdsList, defenderIdsList);
+                    List<Integer> unassignedUserIds = getUnassignedUserIds(attackerIdsList, defenderIdsList);
                     for (Integer uid : new ArrayList<>(selectedUserIDs)) {
                         if (!unassignedUserIds.contains(uid)) {
                             messages.add("user " + uid + " is already playing another game!");
@@ -435,7 +435,24 @@ public class AdminInterface extends HttpServlet {
         return blockShuffledList;
     }
 
-    public static List<Integer> getUnassignedUsers(List<List<Integer>> attackerIdsLists, List<List<Integer>> defenderIdsLists) {
+    public static List<List<String>> getUnassignedUsers(List<List<Integer>> attackerIdsLists, List<List<Integer>> defenderIdsLists) {
+        List<List<String>> unassignedUsersFromDB = AdminDAO.getUnassignedUsersInfo();
+        List<Integer> defenderIds = new ArrayList<>();
+        List<Integer> attackerIds = new ArrayList<>();
+        List<List<String>> unassignedUserIds = new ArrayList<>();
+        if (attackerIdsLists != null && defenderIdsLists != null) {
+            defenderIds = flattenListOfLists(defenderIdsLists);
+            attackerIds = flattenListOfLists(attackerIdsLists);
+        }
+        for (List<String> userInfo : unassignedUsersFromDB) {
+            int uid = Integer.valueOf(userInfo.get(0));
+            if (!(attackerIds.contains(uid) || defenderIds.contains(uid)))
+                unassignedUserIds.add(userInfo);
+        }
+        return unassignedUserIds;
+    }
+
+    public static List<Integer> getUnassignedUserIds(List<List<Integer>> attackerIdsLists, List<List<Integer>> defenderIdsLists) {
         List<User> unassignedUsersFromDB = AdminDAO.getUnassignedUsers();
         List<Integer> defenderIds = new ArrayList<>();
         List<Integer> attackerIds = new ArrayList<>();
