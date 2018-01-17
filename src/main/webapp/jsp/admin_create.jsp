@@ -311,14 +311,14 @@
                                 <button class="btn btn-sm btn-primary"
                                         value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
                                         name="tempGameUserSwitchButton">
-                                    <span class = "glyphicon glyphicon-transfer"></span>
+                                    <span class="glyphicon glyphicon-transfer"></span>
                                 </button>
                             </td>
                             <td>
                                 <button class="btn btn-sm btn-danger"
                                         value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
                                         name="tempGameUserRemoveButton">
-                                    <span class = "glyphicon glyphicon-trash"></span>
+                                    <span class="glyphicon glyphicon-trash"></span>
                                 </button>
                             </td>
                         </tr>
@@ -368,8 +368,8 @@
             <%
                 List<MultiplayerGame> availableGames = AdminDAO.getAvailableGames();
                 createdGames = (List<MultiplayerGame>) session.getAttribute(AdminInterface.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
-                List<Integer> unassignedUserIds = AdminInterface.getUnassignedUsers(attackerIdsList, defenderIdsList);
-                if (unassignedUserIds.isEmpty()) {
+                List<List<String>> unassignedUsersInfo = AdminInterface.getUnassignedUsers(attackerIdsList, defenderIdsList);
+                if (unassignedUsersInfo.isEmpty()) {
             %>
 
             <div class="panel panel-default">
@@ -381,13 +381,13 @@
             <%
             } else {
                 int currentUserID = (Integer) session.getAttribute("uid");
-                for (int uid : unassignedUserIds) {
-                    Timestamp ts = AdminDAO.getLastLogin(uid);
+                for (List<String> userInfo : unassignedUsersInfo) {
+                    int uid = Integer.valueOf(userInfo.get(0));
+                    String username = userInfo.get(1);
+                    String ts = userInfo.get(2);
                     String lastLogin = ts == null ? "-- never --" : ts.toString().substring(0, ts.toString().length() - 5);
-                    Role lastRole = AdminDAO.getLastRole(uid);
-                    Entry score = AdminDAO.getScore(uid);
-                    int totalScore = score.getTotalPoints();
-                    String username = DatabaseAccess.getUser(uid).getUsername();
+                    String lastRole = userInfo.get(3);
+                    String totalScore = userInfo.get(4);
             %>
 
             <tr>
@@ -409,7 +409,8 @@
                 <td class="col-sm-2"><%= lastLogin %>
                 </td>
                 <td class="col-sm-1" style="padding-top:3px; padding-bottom:3px">
-                    <select name="<%="game_" + uid%>" class="form-control selectpicker" data-size="small" id="game">
+                    <select name="<%="game_" + uid%>" class="form-control selectpicker" data-size="small"
+                            id="game">
                         <% for (MultiplayerGame g : availableGames) { %>
                         <option value="<%=g.getId()%>"><%=String.valueOf(g.getId()) + ": " + g.getCUT().getAlias()%>
                         </option>
@@ -429,7 +430,8 @@
                 </td>
                 <td class=" col-sm-1
                         " style="padding-top:3px; padding-bottom:3px">
-                    <select name="<%="role_" + uid%>" class="form-control selectpicker" data-size="small" id="role">
+                    <select name="<%="role_" + uid%>" class="form-control selectpicker" data-size="small"
+                            id="role">
                         <option value="<%=Role.ATTACKER%>">Attacker</option>
                         <option value="<%=Role.DEFENDER%>">Defender</option>
                     </select>
@@ -448,17 +450,18 @@
             %>
             </tbody>
         </table>
+
         <div class="form-group">
             <label for="user_name_list">User Names</label>
             <a data-toggle="collapse" href="#demo" style="color:black">
-                <span class = "glyphicon glyphicon-question-sign"></span>
+                <span class="glyphicon glyphicon-question-sign"></span>
             </a>
             <div id="demo" class="collapse">
                 Newline seperated list of usernames or emails.
                 <br/>The union of these users and the users selected in the table above will be used to create games.
                 <br/>Only unassigned users are taken into account.
             </div>
-            <textarea class="form-control" rows="5" id="user_name_list" name ="user_name_list"
+            <textarea class="form-control" rows="5" id="user_name_list" name="user_name_list"
                       oninput="document.getElementById('submit_users_btn').disabled = false"></textarea>
         </div>
 
@@ -692,7 +695,7 @@
 
             $(document).ready(function () {
                 $('#tableAddUsers').DataTable({
-                    "paging": false,
+                    pagingType: "full_numbers",
                     "lengthChange": false,
                     "searching": true,
                     "order": [[5, "desc"]],

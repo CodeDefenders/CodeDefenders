@@ -71,11 +71,6 @@ public class AdminDAO {
             "SELECT *\n" +
                     "FROM games\n" +
                     "WHERE Mode = 'PARTY' AND (State = 'ACTIVE' OR State = 'CREATED');";
-
-    private static final String LAST_LOGIN_QUERY =
-            "SELECT MAX(Timestamp)\n" +
-                    "FROM sessions\n" +
-                    "WHERE User_ID = ?;";
     private static final String LAST_SUBMISSION_TS_QUERY =
             "SELECT MAX(ts)\n" +
                     "FROM (SELECT MAX(mutants.Timestamp) AS ts\n" +
@@ -131,6 +126,60 @@ public class AdminDAO {
                     "    AS Defender ON U.user_id = Defender.user_id\n" +
                     "WHERE U.user_id = ?;";
 
+    public final static String UNASSIGNED_USERS_INFO_QUERY =
+            "SELECT DISTINCT\n" +
+                    "  users.User_ID,\n" +
+                    "  users.Username,\n" +
+                    "  lastLogin.ts AS lastLogin,\n" +
+                    "  Role         AS lastRole,\n" +
+                    "  totalScore\n" +
+                    "FROM\n" +
+                    "  users\n" +
+                    "  JOIN (SELECT\n" +
+                    "          MAX(Timestamp) AS ts,\n" +
+                    "          user_id\n" +
+                    "        FROM sessions\n" +
+                    "        GROUP BY User_ID) AS lastLogin ON lastLogin.User_ID = users.User_ID\n" +
+                    "  JOIN\n" +
+                    "  (SELECT\n" +
+                    "     players.User_ID,\n" +
+                    "     Role\n" +
+                    "   FROM users\n" +
+                    "     INNER JOIN players ON users.User_ID = players.User_ID\n" +
+                    "     INNER JOIN games ON players.Game_ID = games.ID\n" +
+                    "     INNER JOIN\n" +
+                    "     (SELECT\n" +
+                    "        players.User_ID,\n" +
+                    "        max(players.Game_ID) AS latestGame\n" +
+                    "      FROM players\n" +
+                    "      GROUP BY players.User_ID) AS lg ON lg.User_ID = players.User_ID AND lg.latestGame = games.ID) AS lastRole\n" +
+                    "    ON lastRole.User_ID = users.User_ID\n" +
+                    "  JOIN\n" +
+                    "    (SELECT\n" +
+                    "       U.User_ID                            ,\n" +
+                    "       IFNULL(AScore, 0) + IFNULL(DScore, 0) AS TotalScore\n" +
+                    "     FROM users U LEFT JOIN\n" +
+                    "       (SELECT\n" +
+                    "          PA.user_id,\n" +
+                    "          sum(M.Points)      AS AScore\n" +
+                    "        FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID\n" +
+                    "        GROUP BY PA.user_id)\n" +
+                    "         AS Attacker ON U.user_id = Attacker.user_id\n" +
+                    "       LEFT JOIN\n" +
+                    "       (SELECT\n" +
+                    "          PD.user_id,\n" +
+                    "          sum(T.Points)        AS DScore\n" +
+                    "        FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID\n" +
+                    "        GROUP BY PD.user_id)\n" +
+                    "         AS Defender ON U.user_id = Defender.user_id) AS totalScore ON totalScore.User_ID = users.User_ID\n" +
+                    "WHERE users.User_ID > 2 AND users.User_ID NOT IN (\n" +
+                    "  SELECT DISTINCT players.User_ID\n" +
+                    "  FROM (players\n" +
+                    "    INNER JOIN games ON players.Game_ID = games.ID)\n" +
+                    "  WHERE (State = 'ACTIVE' OR State = 'CREATED') AND Finish_Time > NOW() AND Role IN ('ATTACKER', 'DEFENDER')\n" +
+                    ")\n" +
+                    "ORDER BY lastLogin DESC, User_ID;\n";
+
     public final static String DELETE_PLAYER = "DELETE FROM players WHERE ID =?;";
     public final static String DELETE_TESTS = "DELETE FROM tests WHERE Player_ID =?;";
     public final static String DELETE_MUTANTS = "DELETE FROM mutants WHERE Player_ID =?;";
@@ -164,14 +213,6 @@ public class AdminDAO {
         return activeUsers;
     }
 
-    public static List<User> getActiveUsers() {
-        return getUsers(ACTIVE_USERS_QUERY);
-    }
-
-    public static List<User> getInactiveUsers() {
-        return getUsers(INACTIVE_USERS_QUERY);
-    }
-
     public static List<User> getUnassignedUsers() {
         return getUsers(UNASSIGNED_USERS_QUERY);
     }
@@ -199,12 +240,6 @@ public class AdminDAO {
         return gamesList;
     }
 
-    public static MultiplayerGame getActiveGameForUser(String userName) {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, GAMES_FOR_USER_QUERY, DB.getDBV(userName));
-        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        return getGamesFromRS(rs, conn, stmt).get(0);
-    }
 
     public static List<MultiplayerGame> getAvailableGames() {
         Connection conn = DB.getConnection();
@@ -236,12 +271,6 @@ public class AdminDAO {
         return null;
     }
 
-    public static Timestamp getLastLogin(int uid) {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, LAST_LOGIN_QUERY, DB.getDBV(uid));
-        return getLast(conn, stmt);
-    }
-
     public static Timestamp getLastSubmissionTS(int pid) {
         Connection conn = DB.getConnection();
         DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(pid), DB.getDBV(pid)};
@@ -255,14 +284,7 @@ public class AdminDAO {
         ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
         try {
             if (rs.next()) {
-                switch (rs.getString(3)) {
-                    case "ATTACKER":
-                        return Role.ATTACKER;
-                    case "DEFENDER":
-                        return Role.DEFENDER;
-                    default:
-                        return Role.NONE;
-                }
+                return Role.valueOf(rs.getString(3));
             }
         } catch (SQLException se) {
             logger.error("SQL exception caught", se);
@@ -302,45 +324,62 @@ public class AdminDAO {
     }
 
     public static boolean deletePlayerTest(int pid) {
-
-        Connection conn = DB.getConnection();
-        PreparedStatement tests_stmt = DB.createPreparedStatement(conn, DELETE_TESTS, DB.getDBV(pid));
-        return DB.executeUpdate(tests_stmt, conn);
+        return deleteFromTable(DELETE_TESTS, pid);
     }
 
     public static boolean deletePlayerMutants(int pid) {
-        Connection conn = DB.getConnection();
-        PreparedStatement mutants_stmt = DB.createPreparedStatement(conn, DELETE_MUTANTS, DB.getDBV(pid));
-        return DB.executeUpdate(mutants_stmt, conn);
+        return deleteFromTable(DELETE_MUTANTS, pid);
     }
 
     public static boolean deleteDefenderEquivalences(int pid) {
-        Connection conn = DB.getConnection();
-        PreparedStatement equivalences_stmt = DB.createPreparedStatement(conn, DELETE_DEFENDER_EQUIVALENCES, DB.getDBV(pid));
-        return DB.executeUpdate(equivalences_stmt, conn);
+        return deleteFromTable(DELETE_DEFENDER_EQUIVALENCES, pid);
     }
 
     public static boolean deleteAttackerEquivalences(int pid) {
-        Connection conn = DB.getConnection();
-        PreparedStatement equivalences_stmt = DB.createPreparedStatement(conn, DELETE_ATTACKER_EQUIVALENCES, DB.getDBV(pid));
-        return DB.executeUpdate(equivalences_stmt, conn);
+        return deleteFromTable(DELETE_ATTACKER_EQUIVALENCES, pid);
     }
 
     public static boolean deletePlayer(int pid) {
-        Connection conn = DB.getConnection();
-        PreparedStatement player_stmt = DB.createPreparedStatement(conn, DELETE_PLAYER, DB.getDBV(pid));
-        return DB.executeUpdate(player_stmt, conn);
+        return deleteFromTable(DELETE_PLAYER, pid);
     }
 
     public static boolean deleteTestTargetExecutions(int tid) {
-        Connection conn = DB.getConnection();
-        PreparedStatement player_stmt = DB.createPreparedStatement(conn, DELETE_TEST_TARGETEXECUTIONS, DB.getDBV(tid));
-        return DB.executeUpdate(player_stmt, conn);
+        return deleteFromTable(DELETE_TEST_TARGETEXECUTIONS, tid);
     }
 
     public static boolean deleteMutantTargetExecutions(int mid) {
+        return deleteFromTable(DELETE_MUTANT_TARGETEXECUTIONS, mid);
+    }
+
+    private static boolean deleteFromTable(String query, int id){
         Connection conn = DB.getConnection();
-        PreparedStatement player_stmt = DB.createPreparedStatement(conn, DELETE_MUTANT_TARGETEXECUTIONS, DB.getDBV(mid));
-        return DB.executeUpdate(player_stmt, conn);
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
+        return DB.executeUpdate(stmt, conn);
+    }
+
+    public static List<List<String>> getUnassignedUsersInfo() {
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, UNASSIGNED_USERS_INFO_QUERY);
+        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+
+        List<List<String>> unassignedUsers = new ArrayList<>();
+        try {
+            while (rs.next()) {
+                List<String> userInfo = new ArrayList<>();
+                userInfo.add(String.valueOf(rs.getInt("User_ID")));
+                userInfo.add(rs.getString("Username"));
+                userInfo.add(rs.getTimestamp("lastLogin").toString());
+                userInfo.add(rs.getString("lastRole"));
+                userInfo.add(String.valueOf(rs.getInt("TotalScore")));
+                unassignedUsers.add(userInfo);
+            }
+        } catch (SQLException se) {
+            logger.error("SQL exception caught", se);
+        } catch (Exception e) {
+            logger.error("Exception caught", e);
+        } finally {
+            DB.cleanup(conn, stmt);
+        }
+        return unassignedUsers;
     }
 }
