@@ -14,6 +14,7 @@ import java.util.List;
 
 public class AdminDAO {
 
+    public static final String TIMETSTAMP_NEVER = "never";
     private static final Logger logger = LoggerFactory.getLogger(AdminDAO.class);
     private static final String ACTIVE_USERS_QUERY =
             "SELECT DISTINCT\n" +
@@ -180,6 +181,73 @@ public class AdminDAO {
                     ")\n" +
                     "ORDER BY lastLogin DESC, User_ID;\n";
 
+    public static final String PLAYERS_INFO_QUERY =
+            "SELECT\n" +
+                    "  ID,\n" +
+                    "  Username,\n" +
+                    "  Role,\n" +
+                    "  lastSubmission,\n" +
+                    "  TotalScore,\n" +
+                    "  nbSubmissions\n" +
+                    "FROM (SELECT\n" +
+                    "        User_ID,\n" +
+                    "        Role,\n" +
+                    "        ID\n" +
+                    "      FROM players\n" +
+                    "      WHERE Game_ID = ? AND Active = TRUE) AS activePlayers\n" +
+                    "  JOIN users ON activePlayers.User_ID = users.User_ID\n" +
+                    "  JOIN\n" +
+                    "  (SELECT\n" +
+                    "     U.User_ID,\n" +
+                    "     IFNULL(AScore, 0) + IFNULL(DScore, 0) AS TotalScore\n" +
+                    "   FROM users U LEFT JOIN\n" +
+                    "     (SELECT\n" +
+                    "        PA.user_id,\n" +
+                    "        sum(M.Points) AS AScore\n" +
+                    "      FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID\n" +
+                    "      GROUP BY PA.user_id)\n" +
+                    "       AS Attacker ON U.user_id = Attacker.user_id\n" +
+                    "     LEFT JOIN\n" +
+                    "     (SELECT\n" +
+                    "        PD.user_id,\n" +
+                    "        sum(T.Points) AS DScore\n" +
+                    "      FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID\n" +
+                    "      GROUP BY PD.user_id)\n" +
+                    "       AS Defender ON U.user_id = Defender.user_id) AS totalScore ON totalScore.User_ID = users.User_ID\n" +
+                    "  LEFT JOIN (SELECT\n" +
+                    "               MAX(ts) AS lastSubmission,\n" +
+                    "               Player_ID\n" +
+                    "             FROM (SELECT\n" +
+                    "                     MAX(mutants.Timestamp) AS ts,\n" +
+                    "                     Player_ID\n" +
+                    "                   FROM mutants\n" +
+                    "                   GROUP BY Player_ID\n" +
+                    "                   UNION\n" +
+                    "                   SELECT\n" +
+                    "                     MAX(tests.Timestamp) AS ts,\n" +
+                    "                     Player_ID\n" +
+                    "                   FROM tests\n" +
+                    "                   GROUP BY Player_ID\n" +
+                    "                  ) AS t\n" +
+                    "             GROUP BY Player_ID) AS lastAction\n" +
+                    "    ON Player_ID = activePlayers.ID\n" +
+                    "  LEFT JOIN (SELECT\n" +
+                    "               COUNT(*) AS nbSubmissions,\n" +
+                    "               Player_ID\n" +
+                    "             FROM (SELECT\n" +
+                    "                     Player_ID,\n" +
+                    "                     tests.Test_ID\n" +
+                    "                   FROM (tests\n" +
+                    "                     JOIN targetexecutions t2 ON tests.Test_ID = t2.Test_ID)\n" +
+                    "                   WHERE t2.Target = 'COMPILE_TEST' AND t2.Status = 'SUCCESS'\n" +
+                    "                   UNION SELECT\n" +
+                    "                           Player_ID,\n" +
+                    "                           mutants.Mutant_ID\n" +
+                    "                         FROM (mutants\n" +
+                    "                           JOIN targetexecutions t2 ON mutants.Mutant_ID = t2.Mutant_ID)\n" +
+                    "                         WHERE t2.Target = 'COMPILE_MUTANT' AND t2.Status = 'SUCCESS') AS TestsAndMutants\n" +
+                    "             GROUP BY Player_ID) AS submissions ON submissions.Player_ID = ID;";
+
     public final static String DELETE_PLAYER = "DELETE FROM players WHERE ID =?;";
     public final static String DELETE_TESTS = "DELETE FROM tests WHERE Player_ID =?;";
     public final static String DELETE_MUTANTS = "DELETE FROM mutants WHERE Player_ID =?;";
@@ -271,12 +339,6 @@ public class AdminDAO {
         return null;
     }
 
-    public static Timestamp getLastSubmissionTS(int pid) {
-        Connection conn = DB.getConnection();
-        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(pid), DB.getDBV(pid)};
-        PreparedStatement stmt = DB.createPreparedStatement(conn, LAST_SUBMISSION_TS_QUERY, valueList);
-        return getLast(conn, stmt);
-    }
 
     public static Role getLastRole(int uid) {
         Connection conn = DB.getConnection();
@@ -381,5 +443,34 @@ public class AdminDAO {
             DB.cleanup(conn, stmt);
         }
         return unassignedUsers;
+    }
+
+    public static List<List<String>> getPlayersInfo(int gid) {
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, PLAYERS_INFO_QUERY, DB.getDBV(gid));
+        long start = System.currentTimeMillis();
+        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+        System.out.println("query took: " + String.valueOf(System.currentTimeMillis()-start) + " ms");
+        List<List<String>> players = new ArrayList<>();
+        try {
+            while (rs.next()) {
+                List<String> playerInfo = new ArrayList<>();
+                playerInfo.add(String.valueOf(rs.getInt("ID")));
+                playerInfo.add(rs.getString("Username"));
+                playerInfo.add(rs.getString("Role"));
+                Timestamp ts = rs.getTimestamp("lastSubmission");
+                playerInfo.add(ts == null ? TIMETSTAMP_NEVER: ts.toString());
+                playerInfo.add(String.valueOf(rs.getInt("TotalScore")));
+                playerInfo.add(String.valueOf(rs.getInt("nbSubmissions")));
+                players.add(playerInfo);
+            }
+        } catch (SQLException se) {
+            logger.error("SQL exception caught", se);
+        } catch (Exception e) {
+            logger.error("Exception caught", e);
+        } finally {
+            DB.cleanup(conn, stmt);
+        }
+        return players;
     }
 }

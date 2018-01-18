@@ -60,38 +60,39 @@
             <tbody>
             <%
                 for (MultiplayerGame g : insertedGames) {
+                	GameClass CUT = g.getCUT();
                     String startStopButtonIcon = g.getState().equals(GameState.ACTIVE) ?
                             "glyphicon glyphicon-stop" : "glyphicon glyphicon-play";
                     String startStopButtonClass = g.getState().equals(GameState.ACTIVE) ?
                             "btn btn-sm btn-danger" : "btn btn-sm btn-primary";
                     String startStopButtonAction = g.getState().equals(GameState.ACTIVE) ?
                             "return confirm('Are you sure you want to stop this Game?');" : "";
+                    int gid = g.getId();
             %>
             <tr style="border-top: 1px solid lightgray; border-bottom: 1px solid lightgray">
-                <td><%= g.getId() %>
+                <td><%= gid %>
                 </td>
                 <td>
                     <a class="btn btn-sm btn-primary"
-                       href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Observe</a>
+                       href="<%= request.getContextPath() %>/multiplayer/games?id=<%= gid %>">Observe</a>
                 </td>
                 <td class="col-sm-2">
-                    <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
-                        <%=g.getCUT().getAlias()%>
+                    <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gid%>">
+                        <%=CUT.getAlias()%>
                     </a>
-                    <div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;">
+                    <div id="modalCUTFor<%=gid%>" class="modal fade" role="dialog" style="text-align: left;">
                         <div class="modal-dialog">
-                            <!-- Modal content-->
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                    <h4 class="modal-title"><%=g.getCUT().getAlias()%>
+                                    <h4 class="modal-title"><%=CUT.getAlias()%>
                                     </h4>
                                 </div>
                                 <div class="modal-body">
                                     <pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
-                                                                        id="sut<%=g.getId()%>" name="cut<%=g.getId()%>"
+                                                                        id="sut<%=gid%>" name="cut<%=gid%>"
                                                                         cols="80"
-                                                                        rows="30"><%=g.getCUT().getAsString()%></textarea></pre>
+                                                                        rows="30"><%=CUT.getAsString()%></textarea></pre>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -115,7 +116,7 @@
                 <td class="col-sm-2"><%= g.getFinishDateTime() %>
                 </td>
                 <td class="col-sm-1" style="padding-top:4px; padding-bottom:4px">
-                    <button class="<%=startStopButtonClass%>" type="submit" value="<%=g.getId()%>" name="start_stop_btn"
+                    <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
                             onclick="<%=startStopButtonAction%>">
                         <span class="<%=startStopButtonIcon%>"></span>
 
@@ -134,20 +135,16 @@
                 <th style="border-bottom: 1px solid black"></th>
             </tr>
             <%
-                List attackerIds = Arrays.stream(g.getAttackerIds()).boxed().collect(Collectors.toList());
-                List defenderIds = Arrays.stream(g.getDefenderIds()).boxed().collect(Collectors.toList());
-                List<Integer> attackerAndDefenderIds = ListUtils.union(attackerIds, defenderIds);
-                for (int pid : attackerAndDefenderIds) {
-                    User user = DatabaseAccess.getUserFromPlayer(pid);
-                    int id = user.getId();
-                    String userName = user.getUsername();
-                    //Timestamp ts = AdminDAO.getLastLogin(aid);
-                    Entry score = AdminDAO.getScore(id);
-                    int totalScore = score.getTotalPoints();
-                    Role role = attackerIds.contains(pid) ? Role.ATTACKER : Role.DEFENDER;
-                    String color = attackerIds.contains(pid) ? "#edcece" : "#ced6ed";
-                    int submissionsCount = AdminInterface.getSubmissionsCount(g, pid);
-                    String lastActionTS = AdminInterface.getTimeSinceLastSubmission(pid);
+                List<List<String>> playersInfo = AdminDAO.getPlayersInfo(gid);
+                for (List<String> playerInfo : playersInfo) {
+                    int pid = Integer.parseInt(playerInfo.get(0));
+                    String userName = playerInfo.get(1);
+                    Role role = Role.valueOf(playerInfo.get(2));
+                    String ts = playerInfo.get(3);
+                    String lastSubmissionTS = ts.equals(AdminDAO.TIMETSTAMP_NEVER) ? ts : AdminInterface.formatTimestamp(ts);
+                    int totalScore = Integer.parseInt(playerInfo.get(4));
+                    int submissionsCount = Integer.parseInt(playerInfo.get(5));
+                    String color = role == Role.ATTACKER ? "#edcece" : "#ced6ed";
                     int gameScore = AdminInterface.getPlayerScore(g, pid);
             %>
             <tr style="height: 3px;" id="playersTableActive"></tr>
@@ -160,7 +157,7 @@
                 </td>
                 <td style="background: <%= color %>"><%= submissionsCount %>
                 </td>
-                <td style="background: <%= color %>"><%= lastActionTS %>
+                <td style="background: <%= color %>"><%= lastSubmissionTS %>
                 </td>
                 <td style="background: <%= color %>"><%= gameScore %>
                 </td>
@@ -168,7 +165,7 @@
                 </td>
                 <td style="background: <%= color %>">
 
-                    <button class="btn btn-sm btn-danger" value="<%=pid + "-" + g.getId() + "-" + role%>"
+                    <button class="btn btn-sm btn-danger" value="<%=pid + "-" + gid + "-" + role%>"
                             onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
                              'This will also delete ALL of his tests, mutants and claimed equivalences ' +
                               'and might create inconsistencies in the Game.');"
@@ -178,7 +175,7 @@
                 </td>
                 <td style="background: <%= color %>; border-top-right-radius: 7px;border-bottom-right-radius: 7px;">
 
-                    <button class="btn btn-sm btn-danger" value="<%=pid + "-" + g.getId()%>"
+                    <button class="btn btn-sm btn-danger" value="<%=pid + "-" + gid%>"
                             onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
                              'This will also delete ALL of his tests, mutants and claimed equivalences ' +
                               'and might create inconsistencies in the Game.');"
@@ -245,6 +242,7 @@
                     MultiplayerGame g = createdGames.get(i);
                     List<Integer> attackerIds = attackerIdsList.get(i);
                     List<Integer> defenderIds = defenderIdsList.get(i);
+                    GameClass CUT = g.getCUT();
 
             %>
             <tr>
@@ -257,7 +255,7 @@
                 </td>
                 <td class="col-sm-2">
                     <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
-                        <%=g.getCUT().getAlias()%>
+                        <%=CUT.getAlias()%>
                     </a>
                     <div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;">
                         <div class="modal-dialog">
@@ -265,14 +263,14 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                    <h4 class="modal-title"><%=g.getCUT().getAlias()%>
+                                    <h4 class="modal-title"><%=CUT.getAlias()%>
                                     </h4>
                                 </div>
                                 <div class="modal-body">
                                     <pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
                                                                         id="sut<%=g.getId()%>" name="cut<%=g.getId()%>"
                                                                         cols="80"
-                                                                        rows="30"><%=g.getCUT().getAsString()%></textarea></pre>
+                                                                        rows="30"><%=CUT.getAsString()%></textarea></pre>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
