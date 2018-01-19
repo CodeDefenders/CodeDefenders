@@ -50,7 +50,7 @@ public class AdminDAO {
                     "  SELECT DISTINCT players.User_ID\n" +
                     "  FROM (players\n" +
                     "    INNER JOIN games ON players.Game_ID = games.ID)\n" +
-                    "  WHERE (State = 'ACTIVE' OR State = 'CREATED') AND Finish_Time > NOW() AND Role IN ('ATTACKER', 'DEFENDER')\n" +
+                    "  WHERE (State = 'ACTIVE' OR State = 'CREATED') AND Finish_Time > NOW() AND Role IN ('ATTACKER', 'DEFENDER') AND Active = TRUE\n" +
                     ")\n" +
                     "GROUP BY Username, User_ID;";
     private static final String GAMES_FOR_USER_QUERY =
