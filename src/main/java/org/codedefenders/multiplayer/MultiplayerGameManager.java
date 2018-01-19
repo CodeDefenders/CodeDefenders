@@ -273,6 +273,10 @@ public class MultiplayerGameManager extends HttpServlet {
 				}
 				break;
 
+			case "reset":
+				session.removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+				break;
+
 			case "createTest":
 				if(!activeGame.getRole(uid).equals(Role.DEFENDER)) {
 					messages.add("Can only submit tests if you are an Defender!");

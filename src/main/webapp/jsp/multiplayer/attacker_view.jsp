@@ -30,13 +30,19 @@ if (role == Role.ATTACKER && mutantsPending != null ){
 	<%@include file="/jsp/multiplayer/game_unit_tests.jsp"%>
 	</div>
 	<div class="w-55" id="newmut-div">
+		<h2 style=" margin-bottom: 0">Create a mutant here</h2>
+		<form id="reset" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
+			<input type="hidden" name="formType" value="reset">
+			<button class="btn btn-primary btn-warning btn-game btn-right " style="margin-top: -30px; margin-left: 15px">
+			Reset
+			</button>
+		</form>
 		<form id="atk" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
-			<h2>Create a mutant here
-				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk" onClick="this.form.submit(); this.disabled=true; this.value='Attacking...';"
-						<% if (!mg.getState().equals(GameState.ACTIVE) || disableAttack ) { %> disabled <% } %>>
-					Attack!
-				</button>
-			</h2>
+			<button type="submit" class="btn btn-primary btn-game btn-right" form="atk" onClick="this.form.submit(); this.disabled=true; this.value='Attacking...';"
+					<% if (!mg.getState().equals(GameState.ACTIVE) || disableAttack ) { %> disabled <% } %>
+					style="margin-top: -30px">
+				Attack!
+			</button>
 			<input type="hidden" name="formType" value="createMutant">
 			<input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
 			<%
