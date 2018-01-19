@@ -136,12 +136,12 @@ public class AdminDAO {
                     "  totalScore\n" +
                     "FROM\n" +
                     "  users\n" +
-                    "  JOIN (SELECT\n" +
+                    "  LEFT JOIN (SELECT\n" +
                     "          MAX(Timestamp) AS ts,\n" +
                     "          user_id\n" +
                     "        FROM sessions\n" +
                     "        GROUP BY User_ID) AS lastLogin ON lastLogin.User_ID = users.User_ID\n" +
-                    "  JOIN\n" +
+                    "  LEFT JOIN\n" +
                     "  (SELECT\n" +
                     "     players.User_ID,\n" +
                     "     Role\n" +
@@ -430,7 +430,8 @@ public class AdminDAO {
                 List<String> userInfo = new ArrayList<>();
                 userInfo.add(String.valueOf(rs.getInt("User_ID")));
                 userInfo.add(rs.getString("Username"));
-                userInfo.add(rs.getTimestamp("lastLogin").toString());
+                Timestamp ts = rs.getTimestamp("lastLogin");
+                userInfo.add(ts == null ? "-- never --" : ts.toString().substring(0, ts.toString().length() - 5));
                 userInfo.add(rs.getString("lastRole"));
                 userInfo.add(String.valueOf(rs.getInt("TotalScore")));
                 unassignedUsers.add(userInfo);
