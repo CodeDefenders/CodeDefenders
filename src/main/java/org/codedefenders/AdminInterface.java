@@ -484,44 +484,29 @@ public class AdminInterface extends HttpServlet {
         return 0;
     }
 
-    public static int getSubmissionsCount(MultiplayerGame mg, int pid) {
-        HashMap mutantScores = mg.getMutantScores();
-        HashMap testScores = mg.getTestScores();
-        if (testScores.containsKey(pid) && testScores.get(pid) != null) {
-            return ((PlayerScore) testScores.get(pid)).getQuantity();
-        } else if (mutantScores.containsKey(pid) && mutantScores.get(pid) != null) {
-            return ((PlayerScore) mutantScores.get(pid)).getQuantity();
-        }
-        return 0;
-    }
 
     private static String zeroPad(long toPad) {
         String s = String.valueOf(toPad);
         return s.length() > 1 ? s : "0" + s;
     }
 
-    public static String getTimeSinceLastSubmission(int pid) {
-        Timestamp lastSubmissionTS = AdminDAO.getLastSubmissionTS(pid);
-        if (lastSubmissionTS == null) {
-            return "never";
-        } else {
-            Timestamp currentTS = new Timestamp(System.currentTimeMillis());
-            long diff = currentTS.getTime() - lastSubmissionTS.getTime();
-            long diffSeconds = diff / 1000 % 60;
-            long diffMinutes = diff / (60 * 1000) % 60;
-            long diffHours = diff / (60 * 60 * 1000);
-            long diffDays = (int) (diff / (1000 * 60 * 60 * 24));
-            String diffString = "";
-            if (diffDays >= 1)
-                return "more than 1 day";
-            //if (diffHours >= 1)
-            diffString += zeroPad(diffHours) + "h ";
-            //if (diffMinutes >= 1)
-            diffString += zeroPad(diffMinutes) + "m ";
-            //if (diffSeconds >= 1)
-            diffString += zeroPad(diffSeconds) + "s ";
-            return diffString;
-        }
+    public static String formatTimestamp(String lastSubmissionTime) {
+        Timestamp currentTS = new Timestamp(System.currentTimeMillis());
+        long diff = currentTS.getTime() - Long.parseLong(lastSubmissionTime);
+        long diffSeconds = diff / 1000 % 60;
+        long diffMinutes = diff / (60 * 1000) % 60;
+        long diffHours = diff / (60 * 60 * 1000);
+        long diffDays = (int) (diff / (1000 * 60 * 60 * 24));
+        String diffString = "";
+        if (diffDays >= 1)
+            return "more than 1 day";
+        //if (diffHours >= 1)
+        diffString += zeroPad(diffHours) + "h ";
+        //if (diffMinutes >= 1)
+        diffString += zeroPad(diffMinutes) + "m ";
+        //if (diffSeconds >= 1)
+        diffString += zeroPad(diffSeconds) + "s ";
+        return diffString;
     }
 
     private static boolean deletePlayer(int pid, int gid) {
