@@ -64,7 +64,7 @@ public class ConsistencyTest {
 	// This really should be only per class, not per test... in each test we can
 	// truncate the tables ?
 	@Rule
-	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql", "useAffectedRows=true");
+	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql"); //, "useAffectedRows=true");
 
 	//
 	private static File codedefendersHome;
@@ -247,9 +247,9 @@ public class ConsistencyTest {
 			tests.add(GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(),
 					"mp"));
 		}
-		System.out.println("ConsistencyTest.testRunAllTestsOnMutant() tests " + tests);
+		System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + tests);
 		// List<org.codedefenders.Test> theTests = activeGame.getTests(true);
-		System.out.println("ConsistencyTest.testRunAllTestsOnMutant() tests " + activeGame.getTests(true));
+		System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + activeGame.getTests(true));
 
 		// Now "submit the tests in parallel"
 
@@ -278,7 +278,7 @@ public class ConsistencyTest {
 
 		int totalKilled = 0;
 		for (final org.codedefenders.Test newTest : tests) {
-			System.out.println("ConsistencyTest.testRunAllTestsOnMutant() " + newTest.getMutantsKilled());
+			System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() " + newTest.getMutantsKilled());
 			totalKilled = totalKilled + newTest.getMutantsKilled();
 		}
 		assertEquals("Mutant killed multiple times !", 1, totalKilled);

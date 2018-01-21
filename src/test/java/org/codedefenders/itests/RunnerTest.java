@@ -63,7 +63,7 @@ public class RunnerTest {
 	// This will re-create the same DB from scratch every time... is this really
 	// necessary ?!
 	@Rule
-	DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql", "useAffectedRows=true");
+	DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
 
 	@Before
 	public void mockDBConnections() throws Exception {
@@ -86,6 +86,7 @@ public class RunnerTest {
 	private GameClass cut2;
 	private Mutant mutant1;
 	private org.codedefenders.Test test;
+
 
 	@Test
 	public void testInsertUser() throws Exception {
@@ -223,7 +224,6 @@ public class RunnerTest {
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
 		Mutant mutant2 = new Mutant(100, multiplayerGame.getId(), "TEST_J_FILE2", "TEST_C_FILE2", false,
 				Mutant.Equivalence.ASSUMED_YES, 2, 2, pid);
-
 		assertTrue(mutant1.insert());
 		assertTrue(mutant2.insert());
 		Mutant[] ml = { mutant1, mutant2 };
@@ -257,6 +257,41 @@ public class RunnerTest {
 		//
 		assertFalse(mutant1.kill(Equivalence.ASSUMED_NO));
 		assertFalse(mutant1.kill(Equivalence.ASSUMED_NO));
+	}
+
+	@Test
+	public void testCannotUpdateKilledMutant() throws Exception {
+		PowerMockito.mockStatic(CodeValidator.class);
+		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE1")).thenReturn("MD5_1");
+		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE2")).thenReturn("MD5_2");
+
+		assumeTrue(creator.insert());
+		assumeTrue(user1.insert());
+		assumeTrue(cut2.insert());
+
+		Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
+		// multiplayerGame.classId = cut2.getId();
+
+		assertTrue(multiplayerGame.insert());
+		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
+
+		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		Mutant mutant1 = new Mutant(99, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
+
+		assertTrue(mutant1.insert());
+		// Kill the mutant
+		assertTrue(mutant1.kill(Equivalence.ASSUMED_NO));
+		int score = mutant1.getScore();
+		// Prevent score update
+		mutant1.setScore( 10 );
+		assertFalse(mutant1.update());
+		//
+
+		Mutant storedMutant = DatabaseAccess.getMutantById( mutant1.getId() );
+		assertEquals("Score does not match", score, storedMutant.getScore());
+		//
+		assertEquals(mutant1, storedMutant);
 	}
 
 	@Test

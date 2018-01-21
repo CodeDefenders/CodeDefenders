@@ -154,15 +154,41 @@ public class Mutant implements Serializable {
 		return score;
 	}
 
+	//
+	public void incrementScore(int score){
+		
+		if( score == 0 ){
+			logger.info("Do not update mutant {} score by 0", getId());
+			return;
+		}
+		
+		String query = "UPDATE mutants SET Points = Points + ? WHERE Mutant_ID=? AND Alive=1;";
+		Connection conn = DB.getConnection();
+
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(score),
+						DB.getDBV(id)};
+				
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+				
+		boolean incremented = DB.executeUpdate(stmt, conn);
+		
+		logger.info("Mutant.incrementScore() for {} by {}. Was updated ? {} ", toString(), score, incremented);
+		
+	}
+	
+	@Deprecated
 	public void setScore(int score) {
 		this.score += score;
 	}
 
 	public boolean kill() {
+		logger.info("Mutant.kill() for " + toString() );
 		return kill(equivalent);
 	}
 
 	public boolean kill(Equivalence equivalent) {
+		
+		logger.info("Mutant.kill() " + equivalent + " for " + toString());
 		alive = false;
 		roundKilled = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
 		setEquivalent(equivalent);
@@ -310,7 +336,6 @@ public class Mutant implements Serializable {
 		int res = DB.executeUpdateGetKeys(stmt, conn);
 		if (res > -1) {
 			this.id = res;
-			System.out.println("setting mutant ID to: " + this.id);
 			return true;
 		}
 		return false;
@@ -319,10 +344,17 @@ public class Mutant implements Serializable {
 	// update will run when changes to a mutant are made.
 	// Updates values of Equivalent, Alive, RoundKilled.
 	// These values update when Mutants are suspected of being equivalent, go through an equivalence test, or are killed.
+	/*
+	 * Update a mutant ONLY if in the DB it is still alive. This should prevent zombie mutants. but does not prevent messing up the score.
+	 * 
+	 */
 	public boolean update() {
-		logger.info("Updating Mutant {}", getId());
+		
+		// This should be blocking
 		Connection conn = DB.getConnection();
-		String query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, NumberAiKillingTests=?, Points=? WHERE Mutant_ID=?;";
+		
+		// We cannot update killed mutants
+		String query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, NumberAiKillingTests=?, Points=? WHERE Mutant_ID=? AND Alive=1;";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(equivalent.name()),
 				DB.getDBV(sqlAlive()),
 				DB.getDBV(roundKilled),
@@ -330,7 +362,15 @@ public class Mutant implements Serializable {
 				DB.getDBV(score),
 				DB.getDBV(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		return DB.executeUpdate(stmt, conn);
+		
+		boolean updated = DB.executeUpdate(stmt, conn);
+		logger.info("Updating mutant : {}. Was is updated? {}", toString(), updated);
+		return updated;
+	}
+	
+	@Override
+	public String toString() {
+		return "Mutant " + getId() + "; Alive:"+ isAlive() + "; Equivalent: " + getEquivalent() + " - " + getScore();
 	}
 
 	public void setTimesKilledAi(int count) {

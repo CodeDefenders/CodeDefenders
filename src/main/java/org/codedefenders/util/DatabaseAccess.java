@@ -954,4 +954,13 @@ public class DatabaseAccess {
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		DB.executeUpdate(stmt, conn);
 	}
+
+
+	public static Mutant getMutantById(int mutantId) {
+		String query = "SELECT * FROM mutants WHERE Mutant_ID=?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantId)};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return getMutantFromDB(stmt, conn);
+	}
 }

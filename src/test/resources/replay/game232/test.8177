@@ -1,0 +1,14 @@
+/* no package name */
+
+import static org.junit.Assert.*;
+
+import org.junit.*;
+public class TestIntHashMap {
+	@Test(timeout = 4000)
+	public void test() throws Throwable {
+		// test here!
+		IntHashMap hm = new IntHashMap();
+		hm.put(0,"zero");
+		assertEquals("zero", hm.remove(0));
+	}
+}
