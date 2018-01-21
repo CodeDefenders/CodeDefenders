@@ -28,6 +28,7 @@ public class DatabaseRule extends ExternalResource {
 		return dbName;
 	
 	}
+	
 	public DatabaseRule(String dbName, String initFile, String... options) {
 		this(dbName, "root", "", initFile, options);
 	}

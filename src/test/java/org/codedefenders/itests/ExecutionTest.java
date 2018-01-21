@@ -50,7 +50,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 public class ExecutionTest {
 
     @Rule
-    public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql", "useAffectedRows=true");
+    public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
 
     // PROBLEM: @ClassRule cannot be used with PowerMock ...
     private static File codedefendersHome;

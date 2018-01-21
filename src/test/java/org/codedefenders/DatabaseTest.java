@@ -19,7 +19,7 @@ public class DatabaseTest {
 
 	// Eclipse by default filters out resources
 	@Rule
-	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql", "useAffectedRows=true");
+	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
 
 	@Test
 	public void testCleanDB() throws Exception {
