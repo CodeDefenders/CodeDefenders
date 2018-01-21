@@ -1,8 +1,15 @@
 package org.codedefenders;
 
-import edu.emory.mathcs.backport.java.util.Arrays;
-import javassist.ClassPool;
-import javassist.CtClass;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.multiplayer.LineCoverage;
@@ -12,15 +19,8 @@ import org.codedefenders.util.DatabaseValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import javassist.ClassPool;
+import javassist.CtClass;
 
 public class Test {
 
@@ -65,6 +65,27 @@ public class Test {
 		return score;
 	}
 
+	// TODO Check that increment score does not consider mutants that were killed already
+	public void incrementScore(int score) {
+		if (score == 0) {
+			// Why this is appenining?
+			logger.warn("Do not increment score for test {} when score is zero", getId());
+			return;
+
+		}
+		String query = "UPDATE tests SET Points = Points + ? WHERE Test_ID=?;";
+		Connection conn = DB.getConnection();
+
+		DatabaseValue[] valueList = new DatabaseValue[] { DB.getDBV(score), DB.getDBV(id) };
+
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+
+		boolean incremented = DB.executeUpdate(stmt, conn);
+
+		logger.info("Increment score for {} by {}. Update? {} ", toString(), score, incremented);
+	}
+
+	@Deprecated
 	public void setScore(int s) {
 		score += s;
 	}
@@ -119,9 +140,28 @@ public class Test {
 		return file.getAbsoluteFile().getParent();
 	}
 
+	// Increment the number of mutant killed directly on the DB
+	// And update the local object. But it requires several queries/connections
+	//
+	// TODO Check that this method is neverl called for tests that kill a mutant that was already dead...
 	public void killMutant() {
-		mutantsKilled++;
-		update();
+		// mutantsKilled++;
+		// update();
+		logger.info("Test {} killed a new mutant", getId());
+
+		String query = "UPDATE tests SET MutantsKilled = MutantsKilled + ? WHERE Test_ID=?;";
+		Connection conn = DB.getConnection();
+
+		DatabaseValue[] valueList = new DatabaseValue[] { DB.getDBV(1), DB.getDBV(id) };
+
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+
+		boolean updated = DB.executeUpdate(stmt, conn);
+
+		// Eventually update the kill count from the DB
+		mutantsKilled = DatabaseAccess.getTestForId(getId()).getMutantsKilled();
+		
+		logger.info("Test {} new killcount is {}. Was updated ? {} ", toString(), mutantsKilled, updated);
 	}
 
 	public boolean isMutantCovered(Mutant mutant) {
@@ -170,7 +210,6 @@ public class Test {
 
 	public boolean update() {
 		logger.debug("Updating Test");
-		String sql = null;
 		Connection conn = DB.getConnection();
 		String linesCoveredString = "";
 		String linesUncoveredString = "";

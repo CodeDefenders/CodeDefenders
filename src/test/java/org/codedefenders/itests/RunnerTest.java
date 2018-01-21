@@ -1,8 +1,6 @@
 package org.codedefenders.itests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
 
 import java.sql.Connection;
@@ -14,6 +12,7 @@ import org.codedefenders.GameClass;
 import org.codedefenders.GameLevel;
 import org.codedefenders.GameState;
 import org.codedefenders.Mutant;
+import org.codedefenders.Mutant.Equivalence;
 import org.codedefenders.Role;
 import org.codedefenders.TargetExecution;
 import org.codedefenders.User;
@@ -87,6 +86,7 @@ public class RunnerTest {
 	private GameClass cut2;
 	private Mutant mutant1;
 	private org.codedefenders.Test test;
+
 
 	@Test
 	public void testInsertUser() throws Exception {
@@ -229,6 +229,69 @@ public class RunnerTest {
 		Mutant[] ml = { mutant1, mutant2 };
 		assertTrue(Arrays.equals(DatabaseAccess.getMutantsForPlayer(pid).toArray(), ml));
 		assertTrue(Arrays.equals(DatabaseAccess.getMutantsForGame(multiplayerGame.getId()).toArray(), ml));
+	}
+
+	@Test
+	public void testDoubleUpdateMutant() throws Exception {
+		PowerMockito.mockStatic(CodeValidator.class);
+		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE1")).thenReturn("MD5_1");
+		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE2")).thenReturn("MD5_2");
+
+		assumeTrue(creator.insert());
+		assumeTrue(user1.insert());
+		assumeTrue(cut2.insert());
+
+		Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
+		// multiplayerGame.classId = cut2.getId();
+
+		assertTrue(multiplayerGame.insert());
+		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
+
+		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		Mutant mutant1 = new Mutant(99, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
+
+		assertTrue(mutant1.insert());
+
+		assertTrue(mutant1.kill(Equivalence.ASSUMED_NO));
+		//
+		assertFalse(mutant1.kill(Equivalence.ASSUMED_NO));
+		assertFalse(mutant1.kill(Equivalence.ASSUMED_NO));
+	}
+
+	@Test
+	public void testCannotUpdateKilledMutant() throws Exception {
+		PowerMockito.mockStatic(CodeValidator.class);
+		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE1")).thenReturn("MD5_1");
+		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE2")).thenReturn("MD5_2");
+
+		assumeTrue(creator.insert());
+		assumeTrue(user1.insert());
+		assumeTrue(cut2.insert());
+
+		Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
+		// multiplayerGame.classId = cut2.getId();
+
+		assertTrue(multiplayerGame.insert());
+		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
+
+		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		Mutant mutant1 = new Mutant(99, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
+
+		assertTrue(mutant1.insert());
+		// Kill the mutant
+		assertTrue(mutant1.kill(Equivalence.ASSUMED_NO));
+		int score = mutant1.getScore();
+		// Prevent score update
+		mutant1.setScore( 10 );
+		assertFalse(mutant1.update());
+		//
+
+		Mutant storedMutant = DatabaseAccess.getMutantById( mutant1.getId() );
+		assertEquals("Score does not match", score, storedMutant.getScore());
+		//
+		assertEquals(mutant1, storedMutant);
 	}
 
 	@Test

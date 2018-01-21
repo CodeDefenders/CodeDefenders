@@ -1,0 +1,19 @@
+/* no package name */
+
+import static org.junit.Assert.*;
+
+import org.junit.*;
+public class TestIntHashMap {
+	@Test(timeout = 4000)
+	public void test() throws Throwable {
+		boolean check = false;
+
+		try {
+			IntHashMap map = new IntHashMap(1,0);
+		} catch(IllegalArgumentException e) {
+			check = true;
+		}
+		
+		assertTrue(check);
+	}
+}

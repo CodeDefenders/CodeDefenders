@@ -1,0 +1,24 @@
+// @@ -181,6 +181,7 @@
+//                  return true;
+//              }
+//          }
+// +		tab[0] = null;
+//          return false;
+//      }
+//  
+//
+/* no package name */
+
+import static org.junit.Assert.*;
+
+import org.junit.*;
+public class TestIntHashMap {
+	@Test(timeout = 4000)
+	public void test() throws Throwable {
+		// test here!
+		IntHashMap map = new IntHashMap();
+		map.put(1,new Integer(2));
+		map.containsKey(4);
+		assertTrue(map.containsKey(1));
+	}
+}

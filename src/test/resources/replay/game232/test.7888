@@ -1,0 +1,15 @@
+/* no package name */
+
+import static org.junit.Assert.*;
+
+import org.junit.*;
+public class TestIntHashMap {
+	@Test(timeout = 4000)
+	public void test() throws Throwable {
+		IntHashMap i = new IntHashMap(13, .99f);
+        Integer o = 8;
+        assertFalse(i.containsKey(13));
+        assertFalse(i.containsValue(o));
+        i.put(13,o);
+	}
+}
