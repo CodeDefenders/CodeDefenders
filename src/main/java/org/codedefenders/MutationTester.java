@@ -444,7 +444,7 @@ public class MutationTester {
 					return false;
 				}
 			} else {
-				logger.info("Test {} did not kill Mutant {}", test.getId(), mutant.getId());
+				logger.debug("Test {} did not kill Mutant {}", test.getId(), mutant.getId());
 			}
 		} else {
 			logger.error("No execution result found for (m: {},t: {})", mutant.getId(), test.getId());

@@ -158,7 +158,7 @@ public class Mutant implements Serializable {
 	public void incrementScore(int score){
 		
 		if( score == 0 ){
-			logger.info("Do not update mutant {} score by 0", getId());
+			logger.debug("Do not update mutant {} score by 0", getId());
 			return;
 		}
 		
@@ -170,10 +170,7 @@ public class Mutant implements Serializable {
 				
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 				
-		boolean incremented = DB.executeUpdate(stmt, conn);
-		
-		logger.info("Mutant.incrementScore() for {} by {}. Was updated ? {} ", toString(), score, incremented);
-		
+		DB.executeUpdate(stmt, conn);
 	}
 	
 	@Deprecated
