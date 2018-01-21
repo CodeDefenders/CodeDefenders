@@ -182,13 +182,10 @@ public class Mutant implements Serializable {
 	}
 
 	public boolean kill() {
-		logger.info("Mutant.kill() for " + toString() );
 		return kill(equivalent);
 	}
 
 	public boolean kill(Equivalence equivalent) {
-		
-		logger.info("Mutant.kill() " + equivalent + " for " + toString());
 		alive = false;
 		roundKilled = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
 		setEquivalent(equivalent);
@@ -363,9 +360,7 @@ public class Mutant implements Serializable {
 				DB.getDBV(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		
-		boolean updated = DB.executeUpdate(stmt, conn);
-		logger.info("Updating mutant : {}. Was is updated? {}", toString(), updated);
-		return updated;
+		return DB.executeUpdate(stmt, conn);
 	}
 	
 	@Override

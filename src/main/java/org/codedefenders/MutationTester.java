@@ -162,8 +162,6 @@ public class MutationTester {
 				// THIS IS BLOCKING !!!
 				try {
 					if (tasks.get(mutant).get()) {
-						logger.info("runTestOnAllMultiplayerMutants test {} kills mutant {}. mutant was worth {}.",
-								test.getId(), mutant.getId(), mutant.getScore());
 						killed++;
 						killedMutants.add(mutant);
 					}
@@ -184,8 +182,6 @@ public class MutationTester {
 				}
 
 				if (testVsMutant(test, mutant)) {
-					logger.info("runTestOnAllMultiplayerMutants test {} kills mutant {}. mutant was worth {}.",
-							test.getId(), mutant.getId(), mutant.getScore());
 					killed++;
 					killedMutants.add(mutant);
 				}
@@ -269,8 +265,6 @@ public class MutationTester {
 					public Boolean call() throws Exception {
 
 						if (testVsMutant(test, mutant)) {
-							logger.info("runAllTestsOnMutant: Test {} kills mutant {}. Mutant was worth {}.", test.getId(), mutant.getId(), mutant.getScore());
-
 							// Notify the *other* tasks we already killed
 							// the mutant. Note, we cannot call t.cancel on this
 							// and then get its result...
@@ -482,7 +476,7 @@ public class MutationTester {
         	if (mutant.kill(PROVEN_NO)) {
         		logger.info("Test {} kills mutant {} and resolve equivalence.", test.getId(), mutant.getId());
         		test.killMutant();
-        		} else {
+        	} else {
 				logger.info("Test {} would have killed Mutant {} and resolve equivalence, but Mutant {} was alredy dead. No need to resolve equivalence.!", test.getId(), mutant.getId(), mutant.getId());
 			}
         } else {

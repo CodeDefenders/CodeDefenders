@@ -210,7 +210,6 @@ public class Test {
 
 	public boolean update() {
 		logger.debug("Updating Test");
-		String sql = null;
 		Connection conn = DB.getConnection();
 		String linesCoveredString = "";
 		String linesUncoveredString = "";
