@@ -51,7 +51,7 @@ public class AdminDAO {
                     "  SELECT DISTINCT players.User_ID\n" +
                     "  FROM (players\n" +
                     "    INNER JOIN games ON players.Game_ID = games.ID)\n" +
-                    "  WHERE (State = 'ACTIVE' OR State = 'CREATED') AND Finish_Time > NOW() AND Role IN ('ATTACKER', 'DEFENDER')\n" +
+                    "  WHERE (State = 'ACTIVE' OR State = 'CREATED') AND Finish_Time > NOW() AND Role IN ('ATTACKER', 'DEFENDER') AND Active = TRUE\n" +
                     ")\n" +
                     "GROUP BY Username, User_ID;";
     private static final String GAMES_FOR_USER_QUERY =
@@ -156,30 +156,31 @@ public class AdminDAO {
                     "      GROUP BY players.User_ID) AS lg ON lg.User_ID = players.User_ID AND lg.latestGame = games.ID) AS lastRole\n" +
                     "    ON lastRole.User_ID = users.User_ID\n" +
                     "  JOIN\n" +
-                    "    (SELECT\n" +
-                    "       U.User_ID                            ,\n" +
-                    "       IFNULL(AScore, 0) + IFNULL(DScore, 0) AS TotalScore\n" +
-                    "     FROM users U LEFT JOIN\n" +
-                    "       (SELECT\n" +
-                    "          PA.user_id,\n" +
-                    "          sum(M.Points)      AS AScore\n" +
-                    "        FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID\n" +
-                    "        GROUP BY PA.user_id)\n" +
-                    "         AS Attacker ON U.user_id = Attacker.user_id\n" +
-                    "       LEFT JOIN\n" +
-                    "       (SELECT\n" +
-                    "          PD.user_id,\n" +
-                    "          sum(T.Points)        AS DScore\n" +
-                    "        FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID\n" +
-                    "        GROUP BY PD.user_id)\n" +
-                    "         AS Defender ON U.user_id = Defender.user_id) AS totalScore ON totalScore.User_ID = users.User_ID\n" +
+                    "  (SELECT\n" +
+                    "     U.User_ID,\n" +
+                    "     IFNULL(AScore, 0) + IFNULL(DScore, 0) AS TotalScore\n" +
+                    "   FROM users U LEFT JOIN\n" +
+                    "     (SELECT\n" +
+                    "        PA.user_id,\n" +
+                    "        sum(M.Points) AS AScore\n" +
+                    "      FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID\n" +
+                    "      GROUP BY PA.user_id)\n" +
+                    "       AS Attacker ON U.user_id = Attacker.user_id\n" +
+                    "     LEFT JOIN\n" +
+                    "     (SELECT\n" +
+                    "        PD.user_id,\n" +
+                    "        sum(T.Points) AS DScore\n" +
+                    "      FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID\n" +
+                    "      GROUP BY PD.user_id)\n" +
+                    "       AS Defender ON U.user_id = Defender.user_id) AS totalScore ON totalScore.User_ID = users.User_ID\n" +
                     "WHERE users.User_ID > 2 AND users.User_ID NOT IN (\n" +
                     "  SELECT DISTINCT players.User_ID\n" +
                     "  FROM (players\n" +
                     "    INNER JOIN games ON players.Game_ID = games.ID)\n" +
-                    "  WHERE (State = 'ACTIVE' OR State = 'CREATED') AND Finish_Time > NOW() AND Role IN ('ATTACKER', 'DEFENDER')\n" +
+                    "  WHERE\n" +
+                    "    (State = 'ACTIVE' OR State = 'CREATED') AND Finish_Time > NOW() AND Role IN ('ATTACKER', 'DEFENDER') AND Active = 1\n" +
                     ")\n" +
-                    "ORDER BY lastLogin DESC, User_ID;\n";
+                    "ORDER BY lastLogin DESC, User_ID;";
 
     public static final String PLAYERS_INFO_QUERY =
             "SELECT\n" +
