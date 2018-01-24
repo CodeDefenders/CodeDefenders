@@ -382,8 +382,7 @@
                 for (List<String> userInfo : unassignedUsersInfo) {
                     int uid = Integer.valueOf(userInfo.get(0));
                     String username = userInfo.get(1);
-                    String ts = userInfo.get(2);
-                    String lastLogin = ts == null ? "-- never --" : ts.toString().substring(0, ts.toString().length() - 5);
+                    String lastLogin = userInfo.get(2);
                     String lastRole = userInfo.get(3);
                     String totalScore = userInfo.get(4);
             %>
