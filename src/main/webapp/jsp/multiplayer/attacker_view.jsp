@@ -33,14 +33,14 @@ if (role == Role.ATTACKER && mutantsPending != null ){
 		<h2 style=" margin-bottom: 0">Create a mutant here</h2>
 		<form id="reset" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
 			<input type="hidden" name="formType" value="reset">
-			<button class="btn btn-primary btn-warning btn-game btn-right " style="margin-top: -30px; margin-left: 15px">
+			<button class="btn btn-primary btn-warning btn-game btn-right " style="margin-top: -30px; margin-right: 80px">
 			Reset
 			</button>
 		</form>
 		<form id="atk" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
 			<button type="submit" class="btn btn-primary btn-game btn-right" form="atk" onClick="this.form.submit(); this.disabled=true; this.value='Attacking...';"
 					<% if (!mg.getState().equals(GameState.ACTIVE) || disableAttack ) { %> disabled <% } %>
-					style="margin-top: -30px">
+					style="margin-top: -50px">
 				Attack!
 			</button>
 			<input type="hidden" name="formType" value="createMutant">
@@ -54,7 +54,7 @@ if (role == Role.ATTACKER && mutantsPending != null ){
 				} else
 					mutantCode = mg.getCUT().getAsString();
 			%>
-			<pre><textarea id="code" name="mutant" cols="80" rows="50" style="min-width: 512px;"><%= mutantCode %></textarea></pre>
+			<pre style=" margin-top: 20px; "><textarea id="code" name="mutant" cols="80" rows="50" style="min-width: 512px;"><%= mutantCode %></textarea></pre>
 		</form>
 		<script>
 			var editorSUT = CodeMirror.fromTextArea(document.getElementById("code"), {

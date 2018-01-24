@@ -9,7 +9,15 @@
                 for (String l : t.getHTMLReadout()) { tc += l + "\n"; }
                 User creator = DatabaseAccess.getUserFromPlayer(t.getPlayerId());
         %>
-        <div><h4>Test <%= t.getId() %> | Creator: <%= creator.getUsername() %> [UID: <%= creator.getId() %>]</h4>
+        <div>
+            <ul>
+                <li style=" display: inline-block; "><h4>Test <%= t.getId() %>
+                </h4></li>
+                <li style=" display: inline-block; "><h4> | Creator: <%= creator.getUsername() %>
+                    [UID: <%= creator.getId() %>] </h4></li>
+                <li style=" display: inline-block; float:right"><h4>points: <%= t.getScore() %>
+                </h4></li>
+            </ul>
             <pre class="readonly-pre"><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre>
         </div>
         <%
