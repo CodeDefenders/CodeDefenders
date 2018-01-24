@@ -110,6 +110,10 @@ if (role == Role.ATTACKER && true){
 									<% for (String change : m.getHTMLReadout()) { %>
 									<p><%=change%><p>
 									<% } %></td>
+								<td class="col-sm-1"></td>
+								<td class="col-sm-1">
+									<h4>points: <%=m.getScore()%></h4>
+								</td>
 								<td class="col-sm-1">
 									<% if (role.equals(Role.DEFENDER)
 											&& m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
@@ -179,6 +183,10 @@ if (role == Role.ATTACKER && true){
 								<% for (String change : m.getHTMLReadout()) { %>
 								<p><%=change%><p>
 								<% } %></td>
+							<td class="col-sm-1"></td>
+							<td class="col-sm-1">
+								<h4>points: <%=m.getScore()%></h4>
+							</td>
 							<td class="col-sm-1">
 								<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 								<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
@@ -235,6 +243,10 @@ if (role == Role.ATTACKER && true){
 								<% for (String change : m.getHTMLReadout()) { %>
 								<p><%=change%><p>
 								<% } %></td>
+							<td class="col-sm-1"></td>
+							<td class="col-sm-1">
+								<h4>points: <%=m.getScore()%></h4>
+							</td>
 							<td class="col-sm-1">
 								<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 								<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
