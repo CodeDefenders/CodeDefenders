@@ -189,7 +189,7 @@ public class AdminDAO {
                     "  Role,\n" +
                     "  lastSubmission,\n" +
                     "  TotalScore,\n" +
-                    "  nbSubmissions\n" +
+                    "  IFNULL(nbSubmissions, 0) as nbSubmissions\n" +
                     "FROM (SELECT\n" +
                     "        User_ID,\n" +
                     "        Role,\n" +
@@ -247,7 +247,8 @@ public class AdminDAO {
                     "                         FROM (mutants\n" +
                     "                           JOIN targetexecutions t2 ON mutants.Mutant_ID = t2.Mutant_ID)\n" +
                     "                         WHERE t2.Target = 'COMPILE_MUTANT' AND t2.Status = 'SUCCESS') AS TestsAndMutants\n" +
-                    "             GROUP BY Player_ID) AS submissions ON submissions.Player_ID = ID;";
+                    "             GROUP BY Player_ID) AS submissions ON submissions.Player_ID = ID\n" +
+                    "ORDER BY Role, nbSubmissions;";
 
     public final static String DELETE_PLAYER = "DELETE FROM players WHERE ID =?;";
     public final static String DELETE_TESTS = "DELETE FROM tests WHERE Player_ID =?;";
