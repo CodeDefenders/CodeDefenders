@@ -190,8 +190,15 @@ public class Mutant implements Serializable {
 		// This should be blocking
 		Connection conn = DB.getConnection();
 
-		// We cannot update killed mutants
-		String query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=? WHERE Mutant_ID=? AND Alive=1;";
+		String query;
+		if (equivalent.equals(Equivalence.DECLARED_YES) || equivalent.equals(Equivalence.ASSUMED_YES)) {
+			// if mutant is equivalent, we need to set score to 0
+			query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, Points=0 WHERE Mutant_ID=? AND Alive=1;";
+		} else {
+			// We cannot update killed mutants
+			query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=? WHERE Mutant_ID=? AND Alive=1;";
+		}
+
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(equivalent.name()),
 				DB.getDBV(sqlAlive()),
 				DB.getDBV(roundKilled),
