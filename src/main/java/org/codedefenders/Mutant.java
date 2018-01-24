@@ -187,7 +187,18 @@ public class Mutant implements Serializable {
 		roundKilled = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
 		setEquivalent(equivalent);
 
-		return update();
+		// This should be blocking
+		Connection conn = DB.getConnection();
+
+		// We cannot update killed mutants
+		String query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=? WHERE Mutant_ID=? AND Alive=1;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(equivalent.name()),
+				DB.getDBV(sqlAlive()),
+				DB.getDBV(roundKilled),
+				DB.getDBV(id)};
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		//
+		return DB.executeUpdate(stmt, conn);
 	}
 
 	public boolean isCovered() {
@@ -342,6 +353,7 @@ public class Mutant implements Serializable {
 	 * Update a mutant ONLY if in the DB it is still alive. This should prevent zombie mutants. but does not prevent messing up the score.
 	 * 
 	 */
+	@Deprecated
 	public boolean update() {
 		
 		// This should be blocking
