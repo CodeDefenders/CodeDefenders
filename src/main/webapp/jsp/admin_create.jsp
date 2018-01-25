@@ -141,7 +141,7 @@
                     String userName = playerInfo.get(1);
                     Role role = Role.valueOf(playerInfo.get(2));
                     String ts = playerInfo.get(3);
-					String lastSubmissionTS = AdminDAO.TIMETSTAMP_NEVER.equalsIgnoreCase(ts) ? ts : AdminInterface.formatTimestamp(ts);
+                    String lastSubmissionTS = AdminDAO.TIMETSTAMP_NEVER.equalsIgnoreCase(ts) ? ts : AdminInterface.formatTimestamp(ts);
                     int totalScore = Integer.parseInt(playerInfo.get(4));
                     int submissionsCount = Integer.parseInt(playerInfo.get(5));
                     String color = role == Role.ATTACKER ? "#edcece" : "#ced6ed";
