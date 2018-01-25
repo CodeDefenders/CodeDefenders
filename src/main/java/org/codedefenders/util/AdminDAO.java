@@ -1,5 +1,6 @@
 package org.codedefenders.util;
 
+import org.codedefenders.AdminInterface;
 import org.codedefenders.GameLevel;
 import org.codedefenders.Role;
 import org.codedefenders.User;
@@ -462,7 +463,7 @@ public class AdminDAO {
                 playerInfo.add(rs.getString("Username"));
                 playerInfo.add(rs.getString("Role"));
                 Timestamp ts = rs.getTimestamp("lastSubmission");
-                playerInfo.add(ts == null ? TIMETSTAMP_NEVER: ts.toString());
+                playerInfo.add(ts == null ? TIMETSTAMP_NEVER: "" + ts.getTime());
                 playerInfo.add(String.valueOf(rs.getInt("TotalScore")));
                 playerInfo.add(String.valueOf(rs.getInt("nbSubmissions")));
                 players.add(playerInfo);
