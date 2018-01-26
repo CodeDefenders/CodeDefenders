@@ -170,7 +170,7 @@ public class GameClass {
 		else
 			sb.append(String.format("/* no package name */%n"));
 		sb.append(String.format("%n"));
-		sb.append(String.format("import static org.junit.Assert.*;%n"));
+		sb.append(String.format("import static org.junit.Assert.*;%n%n"));
 
 		if (this.isMockingEnabled) {
 			sb.append(String.format("import static org.mockito.Mockito.*;%n%n"));
