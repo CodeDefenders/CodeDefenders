@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.codedefenders.GameClass;
@@ -19,6 +20,7 @@ import org.codedefenders.User;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
+import org.codedefenders.events.EventType;
 import org.codedefenders.leaderboard.Entry;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
@@ -110,6 +112,35 @@ public class DatabaseAccess {
 		return getEvents(stmt, conn);
 	}
 
+	/**
+	 * Retrieve the latest (in the past 5 minutes and not yet seen)
+	 * events that belong to a game and relate to equivalence duels
+	 *
+	 * @param gameId
+	 * @param timestamp
+	 * @return
+	 */
+	// FIXME userId not useful
+	public static ArrayList<Event> getNewEquivalenceDuelEventsForGame(int gameId, int lastMessageId) {
+		String query = "SELECT * FROM events LEFT JOIN event_messages AS em ON events.Event_Type = em.Event_Type " +
+				"LEFT JOIN event_chat AS ec ON events.Event_Id = ec.Event_Id " + // FIXME this is here otherwise the getEvents call fails, get rid of this...
+				"WHERE Game_ID=? AND Event_Status=? AND (events.Event_Type=? OR events.Event_Type=? OR events.Event_Type=?) " +
+				"AND Timestamp >= FROM_UNIXTIME(UNIX_TIMESTAMP()-300) "+
+				"AND events.Event_ID > ?";
+		// DEFENDER_MUTANT_CLAIMED_EQUIVALENT
+		// EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
+		// ATTACKER_MUTANT_KILLED_EQUIVALENT
+		DatabaseValue[] valueList = new DatabaseValue[]{
+//				DB.getDBV(userId),
+				DB.getDBV(gameId),
+				DB.getDBV(EventStatus.GAME.toString()),
+				DB.getDBV(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT.toString()), DB.getDBV(EventType.DEFENDER_MUTANT_EQUIVALENT.toString()), DB.getDBV(EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT.toString()),
+				DB.getDBV(lastMessageId)};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return getEventsWithMessage(stmt, conn);
+	}
+
 	public static ArrayList<Event> getEventsForUser(int userId) {
 		String query = "SELECT * FROM events " + "LEFT JOIN event_messages AS em ON events.Event_Type = em.Event_Type " + "LEFT JOIN event_chat AS ec ON events.Event_Id = ec.Event_Id " + "WHERE " + "Event_Status!='DELETED' " + "AND Player_ID=?;";
 		Connection conn = DB.getConnection();
@@ -117,6 +148,7 @@ public class DatabaseAccess {
 		return getEvents(stmt, conn);
 	}
 
+	// Is userId the same as Player_ID ?
 	public static ArrayList<Event> getNewEventsForUser(int userId, long time) {
 		String query = "SELECT * FROM events " + "LEFT JOIN event_messages AS em ON events.Event_Type = em.Event_Type " + "LEFT JOIN event_chat AS ec ON events.Event_Id = ec.Event_Id " + "WHERE Player_ID=? AND Event_Status<>? AND Event_Status<>? " + "AND Timestamp >= FROM_UNIXTIME(?)";
 		DatabaseValue[] valueList = new DatabaseValue[]{
@@ -223,6 +255,33 @@ public class DatabaseAccess {
 						rs.getInt("Game_ID"),
 						rs.getInt("Player_ID"),
 						rs.getString("em.Message"),
+						rs.getString("events.Event_Type"),
+						rs.getString("Event_Status"),
+						rs.getTimestamp("Timestamp"));
+				String chatMessage = rs.getString("ec.Message");
+				event.setChatMessage(chatMessage);
+				events.add(event);
+			}
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+			DB.cleanup(conn, stmt);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return events;
+	}
+
+	private static ArrayList<Event> getEventsWithMessage(PreparedStatement stmt, Connection conn) {
+		ArrayList<Event> events = new ArrayList<Event>();
+		try {
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				Event event = new Event(rs.getInt("events.Event_ID"),
+						rs.getInt("Game_ID"),
+						rs.getInt("Player_ID"),
+						rs.getString("events.Event_Message"),
 						rs.getString("events.Event_Type"),
 						rs.getString("Event_Status"),
 						rs.getTimestamp("Timestamp"));

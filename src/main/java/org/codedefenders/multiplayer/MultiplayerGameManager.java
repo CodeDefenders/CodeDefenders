@@ -135,8 +135,7 @@ public class MultiplayerGameManager extends HttpServlet {
 										uid,
 										DatabaseAccess.getUser(uid)
 												.getUsername() +
-												" killed a mutant in an equivalence " +
-												"duel.",
+												" killed mutant " + mPending.getId() +" in an equivalence duel.",
 										EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
 										new Timestamp(System.currentTimeMillis()));
 								notif.insert();
@@ -153,7 +152,7 @@ public class MultiplayerGameManager extends HttpServlet {
 											DatabaseAccess.getUser(uid)
 													.getUsername() + " lost " +
 													"an equivalence duel. " +
-													"Mutant is assumed " +
+													"Mutant " + mPending.getId() +" is assumed " +
 													"equivalent.",
 											EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
 											new Timestamp(System.currentTimeMillis()));
