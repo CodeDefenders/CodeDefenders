@@ -308,7 +308,7 @@ public class GameClass {
 			}
 
 		} catch (ParseException | IOException e) {
-			logger.warn("Swallow exception", e);
+			logger.warn("Swallow exception" + e);
 		}
 		return nonInitializedFieldsLines;
 	}
@@ -336,7 +336,7 @@ public class GameClass {
 			}
 
 		} catch (ParseException | IOException e) {
-			logger.warn("Swallow exception", e);
+			logger.warn("Swallow exception" + e);
 		}
 		return compileTimeConstantsLine;
 	}
