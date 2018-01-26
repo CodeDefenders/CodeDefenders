@@ -212,7 +212,7 @@ public class GameClass {
 
 		} catch (ParseException | IOException e) {
 			// If a java file is not provided, there's no import at all.
-			logger.warn("Swallow Exception" + e.getMessage() );
+			logger.warn("Swallow Exception" + e );
 		}
 		return additionalImports;
 	}

@@ -19,6 +19,7 @@
 		<pathelement path="${codedef.home}/lib/junit-4.12.jar"/>
 		<pathelement path="${codedef.home}/lib/hamcrest-all-1.3.jar"/>
 		<pathelement path="${major.home}/config/config.jar"/>
+		<pathelement path="${codedef.home}/lib/mockito-all-1.9.5.jar"/>
 		<pathelement path="${cuts.deps}"/>
 	</path>
 

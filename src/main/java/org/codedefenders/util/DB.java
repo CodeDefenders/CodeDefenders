@@ -47,6 +47,9 @@ public class DB {
             int count = 1;
             for (DatabaseValue val : values) {
                 switch (val.getType()) {
+                    case BOOLEAN:
+                        stmt.setBoolean(count++, val.getBoolVal());
+                        break;
                     case INT:
                         stmt.setInt(count++, val.getIntVal());
                         break;
