@@ -47,6 +47,9 @@ public class DB {
             int count = 1;
             for (DatabaseValue val : values) {
                 switch (val.getType()) {
+                    case BOOLEAN:
+                        stmt.setBoolean(count++, val.getBoolVal());
+                        break;
                     case INT:
                         stmt.setInt(count++, val.getIntVal());
                         break;
@@ -142,6 +145,10 @@ public class DB {
     }
 
     public static DatabaseValue getDBV(int v) {
+        return new DatabaseValue(v);
+    }
+
+    public static DatabaseValue getDBV(boolean v) {
         return new DatabaseValue(v);
     }
 

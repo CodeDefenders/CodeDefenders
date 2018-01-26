@@ -33,6 +33,7 @@ CREATE TABLE `classes` (
   `ClassFile` varchar(255) NOT NULL,
   `Alias` varchar(50) NOT NULL,
   `AiPrepared` TINYINT(1) DEFAULT '0',
+  `RequireMocking` TINYINT(1) DEFAULT '0',
   PRIMARY KEY (`Class_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=221 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX classes_Alias_uindex ON classes (Alias);

@@ -42,22 +42,24 @@ public class GameClass {
 	private String javaFile;
 	private String classFile;
 
+	private boolean isMockingEnabled = false;
+
 	private Set<String> additionalImports = new HashSet<String>();
 	// Store begin and end line which corresponds to uncoverable non-initializad fields
 	private List<Integer> linesOfNonCoverableCode = new ArrayList<>();
 	private List<Integer> linesOfCompileTimeConstants= new ArrayList<>();
 
-	public GameClass(String name, String alias, String jFile, String cFile) {
+	public GameClass(int id, String name, String alias, String jFile, String cFile, boolean isMockingEnabled) {
+		this(name, alias, jFile, cFile, isMockingEnabled);
+		this.id = id;
+	}
+
+	public GameClass(String name, String alias, String jFile, String cFile, boolean isMockingEnabled) {
 		this.name = name;
 		this.alias = alias;
 		this.javaFile = jFile;
 		this.classFile = cFile;
-
-		/*
-		 * According to :https://stackoverflow.com/questions/22684264/how-get-the-fully-qualified-name-of-the-java-class
-		 * it is not easy to resolve the imports of the CUT automatically. So we follow a simple heuristic:
-		 * We take all the imports declared in the CUT.
-		 */
+		this.isMockingEnabled = isMockingEnabled;
 		this.additionalImports.addAll(includeAdditionalImportsFromCUT());
 		this.linesOfNonCoverableCode.addAll( findNonInitializedFields());
 		this.linesOfNonCoverableCode.addAll( findCompileTimeConstants());
@@ -65,10 +67,14 @@ public class GameClass {
 		this.linesOfCompileTimeConstants.addAll( findCompileTimeConstants());
 	}
 
-
+	// FIXME
 	public GameClass(int id, String name, String alias, String jFile, String cFile) {
-		this(name, alias, jFile, cFile);
+		this(name, alias, jFile, cFile, false);
 		this.id = id;
+	}
+	
+	public GameClass(String name, String alias, String jFile, String cFile) {
+		this(name, alias, jFile, cFile, false);
 	}
 
 	public int getId() {
@@ -123,12 +129,15 @@ public class GameClass {
 	}
 
 	public boolean insert() {
-		logger.debug("Inserting class (Name={}, Alias={}, JavaFile={}, ClassFile={})", name, alias, javaFile, classFile);
+		logger.debug("Inserting class (Name={}, Alias={}, JavaFile={}, ClassFile={}, RequireMocking={})", name, alias, javaFile, classFile, isMockingEnabled);
 		// Attempt to insert game info into database
 		Connection conn = DB.getConnection();
-		String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile) VALUES (?, ?, ?, ?);";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(name), DB.getDBV(alias),
-				DB.getDBV(javaFile), DB.getDBV(classFile)};
+		String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile, RequireMocking) VALUES (?, ?, ?, ?, ?);";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(name),
+				DB.getDBV(alias),
+				DB.getDBV(javaFile),
+				DB.getDBV(classFile),
+				DB.getDBV(isMockingEnabled)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		int res = DB.executeUpdateGetKeys(stmt, conn);
 		if (res > -1) {
@@ -140,14 +149,15 @@ public class GameClass {
 	}
 
 	public boolean update() {
-		logger.debug("Updating class (Name={}, Alias={}, JavaFile={}, ClassFile={})", name, alias, javaFile, classFile);
+		logger.debug("Updating class (Name={}, Alias={}, JavaFile={}, ClassFile={}, RequireMocking={})", name, alias, javaFile, classFile, isMockingEnabled);
 		// Attempt to update game info into database
 		Connection conn = DB.getConnection();
-		String query = "UPDATE classes SET Name=?, Alias=?, JavaFile=?, ClassFile=? WHERE Class_ID=?;";
+		String query = "UPDATE classes SET Name=?, Alias=?, JavaFile=?, ClassFile=?, RequireMocking=? WHERE Class_ID=?;";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(name),
 				DB.getDBV(alias),
 				DB.getDBV(javaFile),
 				DB.getDBV(classFile),
+				DB.getDBV(isMockingEnabled),
 				DB.getDBV(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		return DB.executeUpdate(stmt, conn);
@@ -160,7 +170,11 @@ public class GameClass {
 		else
 			sb.append(String.format("/* no package name */%n"));
 		sb.append(String.format("%n"));
-		sb.append(String.format("import static org.junit.Assert.*;%n%n"));
+		sb.append(String.format("import static org.junit.Assert.*;%n"));
+
+		if (this.isMockingEnabled) {
+			sb.append(String.format("import static org.mockito.Mockito.*;%n%n"));
+		}
 
 		sb.append(String.format("import org.junit.*;%n"));
 
@@ -197,7 +211,8 @@ public class GameClass {
 			}
 
 		} catch (ParseException | IOException e) {
-			logger.warn("Swallow exception", e);
+			// If a java file is not provided, there's no import at all.
+			logger.warn("Swallow Exception" + e );
 		}
 		return additionalImports;
 	}
@@ -216,6 +231,14 @@ public class GameClass {
 
 	public void setClassFile(String classFile) {
 		this.classFile = classFile;
+	}
+
+	public void setMockingEnabled(boolean isMockingEnabled) {
+		this.isMockingEnabled = isMockingEnabled;
+	}
+
+	public boolean isMockingEnabled() {
+		return this.isMockingEnabled;
 	}
 
 	public DuelGame getDummyGame() throws NoDummyGameException {
@@ -285,7 +308,7 @@ public class GameClass {
 			}
 
 		} catch (ParseException | IOException e) {
-			logger.warn("Swallow exception", e);
+			logger.warn("Swallow exception" + e);
 		}
 		return nonInitializedFieldsLines;
 	}
@@ -313,7 +336,7 @@ public class GameClass {
 			}
 
 		} catch (ParseException | IOException e) {
-			logger.warn("Swallow exception", e);
+			logger.warn("Swallow exception" + e);
 		}
 		return compileTimeConstantsLine;
 	}
@@ -334,4 +357,5 @@ public class GameClass {
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
 		return DB.executeUpdate(stmt, conn);
 	}
+
 }

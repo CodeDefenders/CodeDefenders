@@ -384,7 +384,7 @@ public class AntRunner {
 				env.put("JAVA_HOME", clusterJavaHome);
 			}
 			// Somehow ant requires the libs specified on the CLASSPATH env. Probably mocking lib and such shall be included as well.
-			env.put("CLASSPATH", "lib/hamcrest-all-1.3.jar:lib/junit-4.12.jar");
+			env.put("CLASSPATH", "lib/hamcrest-all-1.3.jar"+File.pathSeparator+"lib/junit-4.12.jar"+File.pathSeparator+"lib/mockito-all-1.9.5.jar");
 			//
 			command.add("srun");
 
@@ -400,8 +400,8 @@ public class AntRunner {
 			//
 			command.add("ant");
 		} else {
-			logger.info("Local Execution");
-			env.put("CLASSPATH", "lib/hamcrest-all-1.3.jar:lib/junit-4.12.jar");
+			logger.debug("Local Execution");
+			env.put("CLASSPATH", "lib/hamcrest-all-1.3.jar"+File.pathSeparator+"lib/junit-4.12.jar"+File.pathSeparator+"lib/mockito-all-1.9.5.jar");
 
 			String command_ = antHome + "/bin/ant";
 
