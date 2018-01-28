@@ -1,5 +1,6 @@
 package org.codedefenders.multiplayer;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.*;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
@@ -328,12 +329,17 @@ public class MultiplayerGameManager extends HttpServlet {
 						} else {
 							// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
 							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
-							messages.add(testOriginalTarget.message);
+							// TODO This might not prevent injection of malicious code !
+							messages.add(
+									StringEscapeUtils.escapeHtml(testOriginalTarget.message));
+							//
 							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						}
 					} else {
 						messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
-						messages.add(compileTestTarget.message);
+						messages.add(
+								StringEscapeUtils.escapeHtml(
+										compileTestTarget.message));
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					}
 				} else {
