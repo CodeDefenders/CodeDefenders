@@ -963,4 +963,50 @@ public class DatabaseAccess {
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		return getMutantFromDB(stmt, conn);
 	}
+
+	public static int getLastCompletedTestForUserInGame(int userId, int gameId) {
+		String query = "SELECT MAX(test_id) FROM tests WHERE game_id=? AND player_id = (SELECT id FROM players WHERE game_id=? AND user_id=?);";
+		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(gameId),
+				DB.getDBV(gameId),
+				DB.getDBV(userId)
+		};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		try (ResultSet rs = stmt.executeQuery()){
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return -1;
+	}
+
+	public static TargetExecution.Target getStatusOfRequestForUserInGame(int userId, int gameId, int lastTestId) {
+		// Current test is the one right after lastTestId in the user/game context
+		String query = "SELECT * FROM targetexecutions WHERE Test_ID > ? AND Test_ID in "
+				+ "(SELECT Test_ID FROM tests WHERE game_id=? AND player_id = (SELECT id from players where game_id=? and user_id=?))"
+				+ "AND TargetExecution_ID >= (SELECT MAX(TargetExecution_ID) from targetexecutions);";
+
+		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(lastTestId),
+				DB.getDBV(gameId),
+				DB.getDBV(gameId),
+				DB.getDBV(userId)
+		};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		TargetExecution t = getTargetExecutionSQL(stmt, conn);
+		if(  t != null){
+			System.out.println("DatabaseAccess.getStatusOfRequestForUserInGame() Target Execution " + t.testId + " " + t.status);
+			return t.target;
+		} else {
+			return null;
+		}
+	}
 }
