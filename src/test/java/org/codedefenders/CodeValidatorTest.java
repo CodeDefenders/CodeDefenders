@@ -1,11 +1,14 @@
 package org.codedefenders;
 
-import org.codedefenders.exceptions.CodeValidatorException;
-import org.codedefenders.validation.CodeValidator;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
+import static org.codedefenders.validation.CodeValidator.validMutant;
+import static org.codedefenders.validation.CodeValidator.validTestCode;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,18 +17,123 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 
-import static org.codedefenders.validation.CodeValidator.validMutant;
-import static org.codedefenders.validation.CodeValidator.validTestCode;
-import static org.junit.Assert.*;
+import org.apache.commons.io.FileUtils;
+import org.codedefenders.exceptions.CodeValidatorException;
+import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.validation.CodeValidator;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * @author Jose Rojas
  */
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({DatabaseAccess.class})
 public class CodeValidatorTest {
 
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+	// TODO Validation should be checked at the game interface level !
+	@Test
+	public void testSameStringsShouldTriggerValidation() throws IOException{
+		String originalCode = "@Override\n"+ 
+"  public final String toString() {\n"+
+"    StringBuilder buffer = new StringBuilder();\n"+
+"    buffer.append(\"Document<\");\n"+
+"    for (int i = 0; i < fields.size(); i++) {\n"+
+"      Fieldable field = fields.get(i);\n"+
+"      buffer.append(field.toString());\n"+
+"      if (i != fields.size()-1)\n"+
+"        buffer.append(\" \");\n"+
+"    }\n"+
+"    buffer.append(\">\");\n"+
+"    return buffer.toString();\n"+
+"  }";
+		
+		String mutatedCode = "@Override\n"+ 
+				"  public final String toString() {\n"+
+				"    StringBuilder buffer = new StringBuilder();\n"+
+				"    buffer.append(\"Document<\");\n"+
+				"    for (int i = 0; i < fields.size(); i++) {\n"+
+				"      Fieldable field = fields.get(i);\n"+
+				"      buffer.append(field.toString());\n"+
+				"      if (i != fields.size()-1)\n"+
+				"        buffer.append(\" \");\n"+
+				"    }\n"+
+				"    buffer.append(\">\");\n"+
+				"    return buffer.toString();\n"+
+				"  }";
+
+		File tmpFile = temporaryFolder.newFile();
+		FileUtils.writeStringToFile(tmpFile, originalCode);
+		
+		// Mock the class provide a temmp sourceFile with original content in it
+		GameClass mockedGameClass = mock(GameClass.class); //new GameClass(1, "name", "name", "jFile", "cFile", true);
+		
+		when(mockedGameClass.getJavaFile()).thenReturn( tmpFile.getPath() );
+		
+		PowerMockito.mockStatic(DatabaseAccess.class);
+		when(DatabaseAccess.getClassForKey(anyString(), anyInt())).thenReturn( mockedGameClass );
+		
+		String validityMessage = GameManager.getMutantValidityMessage(1, originalCode);
+		assertEquals(Constants.MUTANT_VALIDATION_IDENTICAL_MESSAGE, validityMessage);
+	}
+	
+	@Test
+	public void testAddSpaceToStringsShouldNotTriggerValidation() throws IOException{
+		String originalCode = "@Override\n"+ 
+"  public final String toString() {\n"+
+"    StringBuilder buffer = new StringBuilder();\n"+
+"    buffer.append(\"Document<\");\n"+
+"    for (int i = 0; i < fields.size(); i++) {\n"+
+"      Fieldable field = fields.get(i);\n"+
+"      buffer.append(field.toString());\n"+
+"      if (i != fields.size()-1)\n"+
+"        buffer.append(\" \");\n"+
+"    }\n"+
+"    buffer.append(\">\");\n"+
+"    return buffer.toString();\n"+
+"  }";
+		
+		String mutatedCode = "@Override\n"+ 
+				"  public final String toString() {\n"+
+				"    StringBuilder buffer = new StringBuilder();\n"+
+				// This is the mutated line !
+				"    buffer.append(\"Document< \");\n"+
+				//
+				"    for (int i = 0; i < fields.size(); i++) {\n"+
+				"      Fieldable field = fields.get(i);\n"+
+				"      buffer.append(field.toString());\n"+
+				"      if (i != fields.size()-1)\n"+
+				"        buffer.append(\" \");\n"+
+				"    }\n"+
+				"    buffer.append(\">\");\n"+
+				"    return buffer.toString();\n"+
+				"  }";
+
+		File tmpFile = temporaryFolder.newFile();
+		FileUtils.writeStringToFile(tmpFile, originalCode);
+		
+		// Mock the class provide a temmp sourceFile with original content in it
+		GameClass mockedGameClass = mock(GameClass.class); //new GameClass(1, "name", "name", "jFile", "cFile", true);
+		
+		when(mockedGameClass.getJavaFile()).thenReturn( tmpFile.getPath() );
+		
+		PowerMockito.mockStatic(DatabaseAccess.class);
+		when(DatabaseAccess.getClassForKey(anyString(), anyInt())).thenReturn( mockedGameClass );
+		
+		String validityMessage = GameManager.getMutantValidityMessage(1, mutatedCode);
+		assertEquals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE, validityMessage);
+
+	}
+	
 	@Test
 	public void testValidChangeDoesNotTriggersValidation(){
 		String originalCode = "public class UnderTest{\n"
