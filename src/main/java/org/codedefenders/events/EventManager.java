@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class EventManager extends HttpServlet {
 
@@ -36,7 +37,15 @@ public class EventManager extends HttpServlet {
 				int userId =
 						(int) request.getSession().getAttribute("uid");
 
-				if (request.getParameter("gameId") != null) {
+				if(request.getParameter("gameId") != null && request.getParameter("userId") != null) {
+					int gameId =
+							Integer.parseInt(request.getParameter("gameId"));
+					events =  DatabaseAccess.getNewEquivalenceDuelEventsForGame(gameId, (request.getSession().getAttribute("lastMsg") != null ? (Integer) request.getSession().getAttribute("lastMsg") : 0));
+					if( events.size() > 0 ){
+						int lastMsg = ((Event) Collections.max(events, Event.MAX_ID_COMPARATOR)).getId();
+						request.getSession().setAttribute("lastMsg", new Integer( lastMsg ) );
+					}
+				} else if (request.getParameter("gameId") != null) {
 					int gameId =
 							Integer.parseInt(request.getParameter("gameId"));
 					events = DatabaseAccess.getNewEventsForGame(

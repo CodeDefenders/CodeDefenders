@@ -93,6 +93,63 @@
         }
     );
 </script>
+
+
+<script type="text/javascript">
+
+	var updateMessages = function(url) {
+        $.get(url, function (r) {
+			$(r).each(function (index) {
+
+				// Skip messages that belong to the current user
+				if( r[index].userId == <%=request.getSession().getAttribute("uid")%> ){
+					return;
+				}
+				// Create the Div to host events if that's not there
+				if( document.getElementById("push-events-div") == null ){
+					var div = document.createElement('div');
+					div.setAttribute('class','alert alert-info');
+					div.setAttribute('id','push-events-div');
+					// This is fine, but then it closes it and no messaged can be shown anymore !
+					div.innerHTML='<a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><br />';
+					var form = document.getElementById('logout');
+					form.parentNode.insertBefore(div, form.nextSibling);
+				}
+
+				var msgId='_' + Math.random().toString(36).substr(2, 9);
+				var msg = document.createElement('pre');
+				msg.setAttribute('id', msgId);
+				msg.innerHTML="<strong>"+r[index].message+"</strong>"
+				document.getElementById("push-events-div").appendChild( msg );
+				// Fade out and remove the message
+				$('#'+msgId).delay(10000).fadeOut("normal", function() {
+					$(this).remove();
+					// Check how many elements are left, in case no more messages are there, remove the bar as well...
+					var div = document.getElementById("push-events-div");
+					if( div != null ){
+						if( div.getElementsByTagName('*').length <= 2){ // There's <a> and <br>
+							document.getElementById("push-events-div").remove();
+						}
+					}
+				});
+			});
+		});
+	}
+
+	$(document).ready(function() {
+            //notifications written here:
+            // refreshed every 5 seconds
+            var interval = 5000;
+            setInterval(function () {
+                var url = "<%=request.getContextPath()%>" + "/game_notifications?test=1&userId=" + <%=request.getSession().getAttribute("uid")%> +"&gameId=" + <%=gameId%> +"&timestamp=" + (new Date().getTime() - interval);
+                updateMessages(url);
+            }, interval)
+    }
+    );
+</script>
+
+
+
 <div id="game-notification-bar" class="min<%
 if (role.equals(Role.CREATOR)) { %> creator<% } %>">
 <a id="notification-show-bar"><span>(<span

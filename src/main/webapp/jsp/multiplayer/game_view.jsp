@@ -100,13 +100,22 @@
                         notifEquivFlag.insert();
 
                         DatabaseAccess.insertEquivalence(m, playerId);
+
                         nClaimed++;
+
+                        // Storing all the mutant related events
+                        String flaggingChatMessage = DatabaseAccess.getUser(uid).getUsername() + " flagged mutant" + m.getId() + " as equivalent.";
+                        Event notifMutant = new Event(-1, mg.getId(), uid, flaggingChatMessage,
+                                EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
+                                new Timestamp(System.currentTimeMillis()));
+                        notifMutant.insert();
                     }
                 }
-
-                if (nClaimed >= 1) {
+                // TODO Will this break something ?!
+               if (nClaimed >= 1) {
                     String flaggingChatMessage = DatabaseAccess.getUser(uid).getUsername() + " flagged " + nClaimed +
                             " mutant" + (nClaimed == 1 ? "" : "s") + " as equivalent.";
+
                     Event notifMutant = new Event(-1, mg.getId(), uid, flaggingChatMessage,
                             EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
@@ -142,7 +151,7 @@
                     Event notifEquiv = new Event(-1, mg.getId(),
                             uid,
                             eventUser.getUsername() +
-                                    " accepts that their mutant is equivalent.",
+                                    " accepts that their mutant " + m.getId() + " is equivalent.",
                             EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
                     notifEquiv.insert();
