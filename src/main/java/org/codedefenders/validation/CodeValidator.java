@@ -126,6 +126,8 @@ public class CodeValidator {
 		return diffs;
 	}
 
+	// This remove " from Strings...
+	
 	private static List<String> getTokens(StreamTokenizer st) {
 
 		List<String> tokens = new ArrayList<>();
@@ -133,11 +135,19 @@ public class CodeValidator {
 			while (st.nextToken() != StreamTokenizer.TT_EOF) {
 				if (st.ttype == StreamTokenizer.TT_NUMBER) {
 					tokens.add(String.valueOf(st.nval));
+				} else if (st.ttype == StreamTokenizer.TT_WORD) {
+					tokens.add(st.sval.trim());
 				} else {
 					if (st.sval != null) {
-						tokens.add(st.sval);
-					} else {
-						tokens.add(Character.toString((char) st.ttype));
+						if( ((char) st.ttype) == '"' || ((char) st.ttype) == '\'' ){
+							tokens.add('"'+st.sval+'"');
+						}else{
+							tokens.add(st.sval.trim());
+						}
+					}  else {
+						if( Character.toString((char) st.ttype) != " "){
+							tokens.add(Character.toString((char) st.ttype));
+						}
 					}
 				}
 			}
@@ -374,6 +384,10 @@ public class CodeValidator {
 		StreamTokenizer st = new StreamTokenizer(new StringReader(code));
 		st.slashSlashComments(true);
 		st.slashStarComments(true);
-		return getTokens(st).toString().replaceAll("\\s+", "");
+		st.quoteChar('"');
+		// Trim each token instead of generally removing why spaces in the string representation of this List  
+		String partialString = getTokens(st).toString();
+		// Why do we need to remove spaces, I understand
+		return partialString;//.replaceAll("\\s+", "");
 	}
 }
