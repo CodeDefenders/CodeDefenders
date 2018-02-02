@@ -95,6 +95,8 @@ if (role == Role.ATTACKER && true){
 						<tr>
 							<th></th>
 							<th></th>
+							<th></th>
+							<th></th>
 						</tr>
 						</thead>
 						<tbody>
@@ -167,6 +169,8 @@ if (role == Role.ATTACKER && true){
 						<tr>
 							<th></th>
 							<th></th>
+							<th></th>
+							<th></th>
 						</tr>
 						</thead>
 
@@ -225,6 +229,8 @@ if (role == Role.ATTACKER && true){
 						<% if (! mutantsEquiv.isEmpty()) { %>
 						<thead>  <!-- needed for datatable apparently -->
 						<tr>
+							<th></th>
+							<th></th>
 							<th></th>
 							<th></th>
 						</tr>
