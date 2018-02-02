@@ -91,6 +91,8 @@
     })();
 </script>
 
+<%System.err.println(exception.getMessage());%>
+
 </body>
 </html>
 
