@@ -40,6 +40,54 @@ public class CodeValidatorTest {
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+	@Test
+	public void testMakingStringLiteralsDoesNotTriggersValidation() throws IOException{
+		String originalCode = "" + "\n" +
+"	public final String[] getValues(String name) {" + "\n" +
+"	    List<String> result = new ArrayList<String>();" + "\n" +
+"	    for (Fieldable field : fields) {" + "\n" +
+"	      if (field.name().equals(name) && (!field.isBinary()))" + "\n" +
+"	        result.add(field.stringValue());" + "\n" +
+"	    }" + "\n" +
+"" + "\n" +
+"	    if (result.size() == 0)" + "\n" +
+"	      return NO_STRINGS;" + "\n" +
+"" + "\n" +
+"	    return result.toArray(new String[result.size()]);" + "\n" +
+"	  }";
+
+		String mutatedCode = "" + "\n" +
+"	public final String[] getValues(String name) {" + "\n" +
+"	    List<String> result = new ArrayList<String>();" + "\n" +
+"	    for (Fieldable field : fields) {" + "\n" +
+// The following line is changed !
+"	      if (field.name().equals(\"name\") && (!field.isBinary()))" + "\n" +
+//
+"	        result.add(field.stringValue());" + "\n" +
+"	    }" + "\n" +
+"" + "\n" +
+"	    if (result.size() == 0)" + "\n" +
+"	      return NO_STRINGS;" + "\n" +
+"" + "\n" +
+"	    return result.toArray(new String[result.size()]);" + "\n" +
+"	  }";
+
+		File tmpFile = temporaryFolder.newFile();
+		FileUtils.writeStringToFile(tmpFile, originalCode);
+
+		// Mock the class provide a temmp sourceFile with original content in it
+		GameClass mockedGameClass = mock(GameClass.class);
+
+		when(mockedGameClass.getJavaFile()).thenReturn(tmpFile.getPath());
+
+		PowerMockito.mockStatic(DatabaseAccess.class);
+		when(DatabaseAccess.getClassForKey(anyString(), anyInt())).thenReturn(mockedGameClass);
+
+		String validityMessage = GameManager.getMutantValidityMessage(1, mutatedCode);
+
+		assertEquals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE, validityMessage);
+	}
+
 	// TODO Validation should be checked at the game interface level !
 	@Test
 	public void testSameStringsShouldTriggerValidation() throws IOException{
