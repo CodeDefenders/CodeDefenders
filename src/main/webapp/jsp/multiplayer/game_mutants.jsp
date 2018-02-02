@@ -74,7 +74,7 @@ if (role == Role.ATTACKER && true){
  if (renderMutants) { %>
 	<!-- Nav tabs -->
 		<h2>Existing Mutants</h2>
-		<div class="tabs bg-grey bg-minus-3" role="tablist">
+		<div class="tabs bg-minus-3" role="tablist">
 			<div class="crow fly no-gutter down">
 
 				<div>
@@ -87,11 +87,11 @@ if (role == Role.ATTACKER && true){
 					<a class="tab-link button text-black" href="#mutequivtab" role="tab" data-toggle="tab">Equivalent(<%= mutantsEquiv.size() %>)</a>
 				</div>
 			</div>
-			<div class="tab-content bg-grey">
+			<div class="tab-content">
 				<div class="tab-pane fade active in" id="mutalivetab">
-					<table id="alive-mutants" class="mutant-table display dataTable table table-hover table-responsive table-paragraphs bg-white">
-						<% if (! mutantsAlive.isEmpty()) { %>
-						<thead>  <!-- needed for datatable apparently -->
+				<% if (! mutantsAlive.isEmpty()) { %>
+				<table id="alive-mutants" class="mutant-table display dataTable table table-hover table-responsive table-paragraphs bg-white">
+					<thead>  <!-- needed for datatable apparently -->
 						<tr>
 							<th></th>
 							<th></th>
@@ -154,18 +154,21 @@ if (role == Role.ATTACKER && true){
 							</tr>
 						<% } %>
 						</tbody>
-						<% } else {%>
-						<tr>
-							<td class="col-sm-1" colspan="2">No mutants alive.</td>
-						</tr>
-						<% } %>
-					</table>
+				</table>
+					<% } else {%>
+					<div class="panel panel-default" style="background: white">
+						<div class="panel-body" style="    color: gray;    text-align: center;">
+							No mutants alive.
+						</div>
+					</div>
+					<% } %>
+
 
 				</div>
-				<div class="tab-pane fade  bg-grey" id="mutkilledtab">
+				<div class="tab-pane fade" id="mutkilledtab">
+					<% if (! mutantsKilled.isEmpty()) { %>
 					<table id="killed-mutants" class="mutant-table display dataTable table table-hover table-responsive table-paragraphs bg-white">
-						<% if (! mutantsKilled.isEmpty()) { %>
-						<thead>  <!-- needed for datatable apparently -->
+					<thead>  <!-- needed for datatable apparently -->
 						<tr>
 							<th></th>
 							<th></th>
@@ -216,18 +219,21 @@ if (role == Role.ATTACKER && true){
 						</tr>
 						<% } %>
 						</tbody>
+					</table>
 						<% } else {%>
-						<tr>
-							<td  class="col-sm-1" colspan="2">No mutants killed.</td>
-						</tr>
+						<div class="panel panel-default" style="background: white">
+							<div class="panel-body" style="    color: gray;    text-align: center;">
+								No mutants killed.
+							</div>
+						</div>
 						<%}
 						%>
-					</table>
 				</div>
-				<div class="tab-pane fade  bg-grey" id="mutequivtab">
+				<div class="tab-pane fade" id="mutequivtab">
+					<% if (! mutantsEquiv.isEmpty()) { %>
 					<table id="equiv-mutants" class="mutant-table display dataTable table table-hover table-responsive table-paragraphs bg-white">
-						<% if (! mutantsEquiv.isEmpty()) { %>
-						<thead>  <!-- needed for datatable apparently -->
+
+					<thead>  <!-- needed for datatable apparently -->
 						<tr>
 							<th></th>
 							<th></th>
@@ -277,13 +283,16 @@ if (role == Role.ATTACKER && true){
 						</tr>
 						<% } %>
 						</tbody>
-						<% } else {%>
-						<tr>
-							<td class="col-sm-1">No mutants equivalent.</td>
-						</tr>
-						<%}
-						%>
 					</table>
+					<% } else {%>
+					<div class="panel panel-default" style="background: white">
+						<div class="panel-body" style="    color: gray;    text-align: center;">
+							No mutants equivalent.
+						</div>
+					</div>
+					<%
+						}
+					%>
 				</div>
 			</div>
 		</div> <!-- tab-content -->
