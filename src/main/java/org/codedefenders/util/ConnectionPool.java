@@ -22,8 +22,8 @@ import java.util.Queue;
 public final class ConnectionPool {
 
 	private static ConnectionPool connectionPool;
-	private List<Connection> connections = new ArrayList<>();
-	private Queue<Connection> availableConnections = new LinkedList<>();
+	private List<Connection> connections;
+	private Queue<Connection> availableConnections;
 	private Logger logger = LoggerFactory.getLogger(ConnectionPool.class.getName());
 
 	/**
@@ -54,6 +54,8 @@ public final class ConnectionPool {
 		}
 
 		Connection newConnection = null;
+		availableConnections = new LinkedList<>();
+		connections = new ArrayList<>();
 		try {
 			for (int i = 0; i < NB_CONNECTIONS; ++i) {
 				newConnection = refresh(newConnection);
@@ -104,6 +106,7 @@ public final class ConnectionPool {
 			connections.removeAll(closedConnections);
 		}
 		logger.info("Closed ConnectionPool connections successfully.");
+		connectionPool = null;
 	}
 
 	/**
@@ -208,7 +211,7 @@ public final class ConnectionPool {
 	 *
 	 * @author wendling
 	 */
-	public class StorageException extends RuntimeException {
+	public static class StorageException extends RuntimeException {
 
 		private static final long serialVersionUID = -6071779646574124576L;
 
