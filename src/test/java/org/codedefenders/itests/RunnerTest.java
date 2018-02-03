@@ -1,21 +1,9 @@
 package org.codedefenders.itests;
 
-import static org.junit.Assert.*;
-import static org.junit.Assume.assumeTrue;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Arrays;
-
-import org.codedefenders.GameClass;
-import org.codedefenders.GameLevel;
-import org.codedefenders.GameState;
-import org.codedefenders.Mutant;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ColumnListHandler;
+import org.codedefenders.*;
 import org.codedefenders.Mutant.Equivalence;
-import org.codedefenders.Role;
-import org.codedefenders.TargetExecution;
-import org.codedefenders.User;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
@@ -23,6 +11,7 @@ import org.codedefenders.events.EventType;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.util.ConnectionPool;
 import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.util.DatabaseConnection;
 import org.codedefenders.validation.CodeValidator;
@@ -38,6 +27,14 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Arrays;
+
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * @author Jose Rojas
@@ -402,5 +399,44 @@ public class RunnerTest {
 		assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), 0, Role.DEFENDER).size(), 1);
 		assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), 0, Role.ATTACKER).size(), 2);
 		assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), (int) 1E20, Role.ATTACKER).size(), 0);
+	}
+
+	/**
+	 * Requests as many connections as the CP can give and checks if requesting
+	 * one more works after releasing a connection and fails after that. Also checks
+	 * if number of connections is as expected.
+	 *
+	 * @throws ConnectionPool.NoMoreConnectionsException
+	 */
+	@Test
+	public void testConnectionPool() throws SQLException, ConnectionPool.NoMoreConnectionsException {
+		int nbConnectionsBefore = getNbConnections();
+
+		int dbNumberOfConnections = ConnectionPool.NB_CONNECTIONS;
+		ConnectionPool connectionPool = ConnectionPool.getInstanceOf();
+		Connection lastConn = null;
+
+		for (int i = 0; i < dbNumberOfConnections; ++i) {
+			lastConn = connectionPool.getDBConnection();
+		}
+		connectionPool.releaseDBConnection(lastConn);
+		assertNotNull("releasing didn't work", connectionPool.getDBConnection());
+
+		try {
+			connectionPool.getDBConnection();
+			fail();
+		} catch (ConnectionPool.NoMoreConnectionsException e) {
+
+		}
+
+		assertEquals(nbConnectionsBefore + ConnectionPool.NB_CONNECTIONS, getNbConnections());
+	}
+
+	private int getNbConnections() throws SQLException {
+		Connection conn = db.getConnection();
+		QueryRunner qr = new QueryRunner();
+		int nbConnections = Math.toIntExact(qr.query(conn, "SELECT COUNT(*) FROM information_schema.PROCESSLIST;", new ColumnListHandler<Long>()).get(0));
+		conn.close();
+		return nbConnections;
 	}
 }
