@@ -307,6 +307,12 @@
 		<url-pattern>/game_mutants</url-pattern>
 	</servlet-mapping>
 
+	<listener>
+		<listener-class>
+			org.codedefenders.util.SystemStartStop
+		</listener-class>
+	</listener>
+
 
     <servlet>
         <servlet-name>adminInterface</servlet-name>
