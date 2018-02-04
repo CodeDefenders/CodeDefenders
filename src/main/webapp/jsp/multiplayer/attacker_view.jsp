@@ -38,7 +38,7 @@ if (role == Role.ATTACKER && mutantsPending != null ){
 			</button>
 		</form>
 		<form id="atk" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
-			<button type="submit" class="btn btn-primary btn-game btn-right" form="atk" onClick="this.form.submit(); this.disabled=true; this.value='Attacking...';"
+			<button type="submit" class="btn btn-primary btn-game btn-right" form="atk" onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';"
 					<% if (!mg.getState().equals(GameState.ACTIVE) || disableAttack ) { %> disabled <% } %>
 					style="margin-top: -50px">
 				Attack!
@@ -94,6 +94,52 @@ if (role == Role.ATTACKER && mutantsPending != null ){
 			});
 
 			$('#finishedModal').modal('show');
+
+
+            var updateProgressBar = function(url) {
+                var progressBarDiv = document.getElementById("progress-bar");
+                $.get(url, function (r) {
+                        $(r).each(function (index) {
+                            switch( r[index] ){
+                                case 'COMPILE_MUTANT': // After test is compiled
+                                    progressBarDiv.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 66%; font-size: 15px; line-height: 40px;" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100">Running first Test Against Mutant</div>';
+                                    break;
+                                case "TEST_MUTANT": // After testing original
+                                    progressBarDiv.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 90%; font-size: 15px; line-height: 40px;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">Running more Tests Against Mutant</div>';
+                                    break;
+                            }
+                        });
+                    }
+                );
+            };
+
+            function progressBar(){
+
+                // Create the Div to host events if that's not there
+                if( document.getElementById("progress-bar") == null ){
+                    // Load the progress bar
+                    var progressBar = document.createElement('div');
+                    progressBar.setAttribute('class','progress');
+                    progressBar.setAttribute('id','progress-bar');
+                    progressBar.setAttribute('style','height: 40px; font-size: 30px');
+                    //
+                    progressBar.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 33%; font-size: 15px; line-height: 40px;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">Validating and Compiling Mutant</div>';
+                    var form = document.getElementById('logout');
+                    // Insert progress bar right under logout... this will conflicts with the other push-events
+                    form.parentNode.insertBefore(progressBar, form.nextSibling);
+                }
+                // Do a first request right away, such that compilation of this test is hopefully not yet started. This one will set the session...
+                var updateURL = "<%= request.getContextPath()%>" +
+                    "/game_notifications?progressBar=1&userId=" + <%=uid%> +"&gameId=" + <%=gameId%>;
+                updateProgressBar(updateURL);
+
+                // Register the requests to start in 1 sec
+                var interval = 1000;
+                setInterval(function () {
+                    updateProgressBar(updateURL);
+                }, interval)
+            }
 		</script>
+		<% request.getSession().removeAttribute("lastMutant"); %>
 	</div> <!-- col-md6 newmut -->
 </div>

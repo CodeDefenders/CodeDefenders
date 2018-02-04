@@ -102,15 +102,15 @@
               $(r).each(function (index) {
          					switch( r[index] ){
            						case 'COMPILE_TEST': // After test is compiled
-           							progressBarDiv.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 66%; font-size: 15px; line-height: 40px;" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100">Running Test Against Original</div>';
+           							progressBarDiv.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 50%; font-size: 15px; line-height: 40px;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">Running Test Against Original</div>';
            							break;
            						case "TEST_ORIGINAL": // After testing original
-                                   	progressBarDiv.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 100%; font-size: 15px; line-height: 40px;" aria-valuenow="99" aria-valuemin="0" aria-valuemax="100">Running Test Against Mutants</div>';
+                                   	progressBarDiv.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 75%; font-size: 15px; line-height: 40px;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">Running Test Against first Mutant</div>';
                                 	break;
                                 // Not sure will ever get this one... since the test_mutant target execution might be written after testing mutants.
-                                //case "TEST_MUTANT":
-                                //   progressBar.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 100%; font-size: 15px; line-height: 40px;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Running Test Against Mutants</div>';
-                                // 	break;
+                                case "TEST_MUTANT":
+                                   progressBar.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 90%; font-size: 15px; line-height: 40px;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">Running Test Against more Mutants</div>';
+                                	break;
            					}
                         });
                     }
@@ -127,14 +127,14 @@
               progressBar.setAttribute('id','progress-bar');
               progressBar.setAttribute('style','height: 40px; font-size: 30px');
               //
-              progressBar.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 33%; font-size: 15px; line-height: 40px;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">Validating and Compiling the Test</div>';
+              progressBar.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 25%; font-size: 15px; line-height: 40px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Validating and Compiling the Test</div>';
               var form = document.getElementById('logout');
               // Insert progress bar right under logout... this will conflicts with the other push-events
               form.parentNode.insertBefore(progressBar, form.nextSibling);
               }
               // Do a first request right away, such that compilation of this test is hopefully not yet started. This one will set the session...
 			  var updateURL = "<%= request.getContextPath()%>" +
-				  "/game_notifications?progressBar=1&userId=" + <%=uid%> +"&gameId=" + <%=gameId%>;
+				  "/game_notifications?progressBar=1&userId=" + <%=uid%> +"&gameId=" + <%=gameId%> + "&isDefender=1";
               updateProgressBar(updateURL);
               
               // Register the requests to start in 1 sec
