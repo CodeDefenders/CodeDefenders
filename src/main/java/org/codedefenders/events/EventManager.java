@@ -1,20 +1,18 @@
 package org.codedefenders.events;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.google.gson.Gson;
 import org.codedefenders.TargetExecution;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
 
 public class EventManager extends HttpServlet {
 
@@ -34,10 +32,9 @@ public class EventManager extends HttpServlet {
 				int userId = (int) request.getSession().getAttribute("uid");
 
 				if (request.getParameter("progressBar") != null) {
-
 					TargetExecution.Target status = null;
 					int gameId = -1;
-					int lastTestId = -1;
+					int lastSubmissionId = -1;
 					userId = -1;
 
 					if (request.getParameter("gameId") == null) {
@@ -50,27 +47,28 @@ public class EventManager extends HttpServlet {
 						} else {
 							userId = Integer.parseInt(request.getParameter("userId"));
 
+							boolean isDefender = request.getParameter("isDefender") != null;
+							String attributeName = isDefender ? "lastTest" : "lastMutant";
 							// Check if we have any data on the
-							// lastSubmittedTest
-							if (request.getSession().getAttribute("lastTest") != null ) {
-								lastTestId = (int) request.getSession().getAttribute("lastTest");
+							// last Submitted Test / Mutant
+							if (request.getSession().getAttribute(attributeName) != null ) {
+								lastSubmissionId = (int) request.getSession().getAttribute(attributeName);
 							} else {
 								// Retrieve from the DB, it might be also -1 -
 								// none
-								lastTestId = DatabaseAccess.getLastCompletedTestForUserInGame(userId, gameId);
-								request.getSession().setAttribute("lastTest", lastTestId);
+								lastSubmissionId = DatabaseAccess.getLastCompletedSubmissionForUserInGame(userId, gameId, isDefender);
+								request.getSession().setAttribute(attributeName, lastSubmissionId);
 							}
 
 							PrintWriter out = response.getWriter();
 
-							status = DatabaseAccess.getStatusOfRequestForUserInGame(userId, gameId, lastTestId);
+							status = DatabaseAccess.getStatusOfRequestForUserInGame(userId, gameId, lastSubmissionId, isDefender);
 
 							ArrayList<TargetExecution.Target> progressBarUpdates = new ArrayList<>();
 							
 							if (status != null) {
 								progressBarUpdates.add( status );
 							}
-
 							out.print(gson.toJson(progressBarUpdates));
 							out.flush();
 						}
