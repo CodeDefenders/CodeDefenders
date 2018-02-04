@@ -97,7 +97,7 @@
 		}
 	
     var updateProgressBar = function(url) {
-        var progressBarDiv = document.getElementById("progress-bar")
+        var progressBarDiv = document.getElementById("progress-bar");
         $.get(url, function (r) {
               $(r).each(function (index) {
          					switch( r[index] ){
@@ -115,7 +115,7 @@
                         });
                     }
               );
-    }
+    };
 
               function progressBar(){
               
@@ -133,13 +133,14 @@
               form.parentNode.insertBefore(progressBar, form.nextSibling);
               }
               // Do a first request right away, such that compilation of this test is hopefully not yet started. This one will set the session...
-              updateProgressBar("http://localhost:8080/game_notifications?progressBar=1&userId=" + 8 +"&gameId=" + 18);
+			  var updateURL = "<%= request.getContextPath()%>" +
+				  "/game_notifications?progressBar=1&userId=" + <%=uid%> +"&gameId=" + <%=gameId%>;
+              updateProgressBar(updateURL);
               
-              // Register the requests to start in 3 sec
-              var interval = 3000;
+              // Register the requests to start in 1 sec
+              var interval = 1000;
               setInterval(function () {
-                          var url = "http://localhost:8080/game_notifications?progressBar=1&userId=" + 8 +"&gameId=" + 18;
-                          updateProgressBar(url);
+                          updateProgressBar(updateURL);
                           }, interval)
               }
               
