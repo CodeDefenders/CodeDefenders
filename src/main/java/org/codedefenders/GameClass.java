@@ -26,11 +26,19 @@ import com.github.javaparser.ParseException;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.ModifierSet;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.PrimitiveType;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 public class GameClass {
 
@@ -61,10 +69,12 @@ public class GameClass {
 		this.classFile = cFile;
 		this.isMockingEnabled = isMockingEnabled;
 		this.additionalImports.addAll(includeAdditionalImportsFromCUT());
-		this.linesOfNonCoverableCode.addAll( findNonInitializedFields());
-		this.linesOfNonCoverableCode.addAll( findCompileTimeConstants());
+		this.linesOfNonCoverableCode.addAll(getLinesOfNonInitializedFields());
+		this.linesOfNonCoverableCode.addAll(getCompileTimeConstants());
+		this.linesOfNonCoverableCode.addAll(getLinesOfMethodSignatures());
+		this.linesOfNonCoverableCode.addAll(getUnreachableClosingBracketsForIfStatements());
 		//
-		this.linesOfCompileTimeConstants.addAll( findCompileTimeConstants());
+		this.linesOfCompileTimeConstants.addAll(getCompileTimeConstants());
 	}
 
 	// FIXME
@@ -287,7 +297,7 @@ public class GameClass {
 
 	// TODO Probably this shall be refactor using some code visitor so we do not
 	// reanalyze everything from scratch each time
-	private List<Integer> findNonInitializedFields() {
+	public List<Integer> getLinesOfNonInitializedFields() {
 		List<Integer> nonInitializedFieldsLines = new ArrayList<>();
 		CompilationUnit cu;
 		try (FileInputStream in = new FileInputStream(javaFile)) {
@@ -315,7 +325,7 @@ public class GameClass {
 
 	// TODO Probably this shall be refactor using some code visitor so we do not
 	// reanalyze everything from scratch each time
-	private List<Integer> findCompileTimeConstants(){
+	public List<Integer> getCompileTimeConstants() {
 		List<Integer> compileTimeConstantsLine = new ArrayList<>();
 		CompilationUnit cu;
 		try (FileInputStream in = new FileInputStream(javaFile)) {
@@ -339,6 +349,89 @@ public class GameClass {
 			logger.warn("Swallow exception" + e);
 		}
 		return compileTimeConstantsLine;
+	}
+
+	// Lines such as method signature are not coverable
+	public List<Integer> getLinesOfMethodSignatures() {
+		List<Integer> methodSignatures = new ArrayList<>();
+		CompilationUnit cu;
+		try (FileInputStream in = new FileInputStream(javaFile)) {
+			// parse the file
+			cu = JavaParser.parse(in);
+
+			for (TypeDeclaration td : cu.getTypes()) {
+				// Static final or static final primitive in the class
+				methodSignatures.addAll(findMethodSignaturesByType(td));
+
+				// We look for FieldDeclaration inside inner classes
+				for (BodyDeclaration bd : td.getMembers()) {
+					if (bd instanceof TypeDeclaration) {
+						methodSignatures.addAll(findMethodSignaturesByType((TypeDeclaration) bd));
+					}
+				}
+
+			}
+
+		} catch (ParseException | IOException e) {
+			logger.warn("Swallow exception" + e);
+		}
+
+		Collections.sort(methodSignatures);
+		return methodSignatures;
+	}
+
+	// Lines such as method signature are not coverable
+	// https://tomassetti.me/getting-started-with-javaparser-analyzing-java-code-programmatically/
+	// Returns the lines of the "}" which closes if statements without else branches
+	public List<Integer> getUnreachableClosingBracketsForIfStatements() {
+		final List<Integer> lines = new ArrayList<>();
+		try (FileInputStream in = new FileInputStream(javaFile)) {
+			new VoidVisitorAdapter<Object>() {
+				@Override
+				public void visit(IfStmt n, Object arg) {
+					super.visit(n, arg);
+					if(n.getElseStmt() != null )
+						return;
+					Statement then = n.getThenStmt();
+					if( then instanceof BlockStmt ) {
+						List<Statement> stmts = ((BlockStmt) then).getStmts();
+						if( stmts.size() > 0 && ( stmts.get( stmts.size() - 1).getEndLine() < n.getEndLine())){
+							lines.add( n.getEndLine() );
+						}
+					} 
+				}
+			}.visit(JavaParser.parse(in), null);
+		} catch (ParseException | IOException e) {
+			logger.warn("Swallow exception" + e);
+		}
+		Collections.sort(lines);
+		return lines;
+	}
+
+	private List<Integer> findMethodSignaturesByType(TypeDeclaration type) {
+		List<Integer> methodSignatureLines = new ArrayList<>();
+		for (BodyDeclaration bd : type.getMembers()) {
+			if (bd instanceof MethodDeclaration) {
+				MethodDeclaration md = (MethodDeclaration) bd;
+				// Note that md.getEndLine() returns the last line of the
+				// method, not of the signature
+				if (md.getBody() == null)
+					continue;
+				// Also note that interfaces have no body !
+				for (int line = md.getBeginLine(); line <= md.getBody().getBeginLine(); line++) {
+					methodSignatureLines.add(line);
+				}
+			} else if (bd instanceof ConstructorDeclaration) {
+				ConstructorDeclaration cd = (ConstructorDeclaration) bd;
+				// System.out.println("GameClass.findMethodSignaturesByType()
+				// Found " + cd.getDeclarationAsString() + " "
+				// + cd.getBeginLine() + " - " + cd.getbo());
+				for (int line = cd.getBeginLine(); line <= cd.getBlock().getBeginLine(); line++) {
+					methodSignatureLines.add(line);
+				}
+			}
+		}
+		return methodSignatureLines;
 	}
 
 	public List<Integer> getLinesOfNonCoverableCode() {
