@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.codedefenders.GameClass;
@@ -1021,5 +1020,55 @@ public class DatabaseAccess {
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		return getMutantFromDB(stmt, conn);
+	}
+
+	public static int getLastCompletedSubmissionForUserInGame(int userId, int gameId, boolean isDefender) {
+		String query = isDefender ? "SELECT MAX(test_id) FROM tests" : "SELECT MAX(mutant_id) FROM mutants";
+		query += " WHERE game_id=? AND player_id = (SELECT id FROM players WHERE game_id=? AND user_id=?);";
+		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(gameId),
+				DB.getDBV(gameId),
+				DB.getDBV(userId)
+		};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		try (ResultSet rs = stmt.executeQuery()){
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return -1;
+	}
+
+	public static TargetExecution.Target getStatusOfRequestForUserInGame(int userId, int gameId, int lastSubmissionId, boolean isDefender) {
+		// Current test is the one right after lastTestId in the user/game context
+		String query = isDefender ?
+				"SELECT * FROM targetexecutions WHERE Test_ID > ? AND Test_ID in (SELECT Test_ID FROM tests" :
+				"SELECT * FROM targetexecutions WHERE Mutant_ID > ? AND Mutant_ID in (SELECT Mutant_ID FROM mutants";
+		query += " WHERE game_id=? AND player_id = (SELECT id from players where game_id=? and user_id=?))"
+				+ "AND TargetExecution_ID >= (SELECT MAX(TargetExecution_ID) from targetexecutions);";
+
+		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(lastSubmissionId),
+				DB.getDBV(gameId),
+				DB.getDBV(gameId),
+				DB.getDBV(userId)
+		};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		TargetExecution t = getTargetExecutionSQL(stmt, conn);
+		if(  t != null){
+			System.out.println("DatabaseAccess.getStatusOfRequestForUserInGame() Target Execution for test" + t.testId +
+					",mutant " + t.mutantId + "w/ status " + t.status);
+			return t.target;
+		} else {
+			return null;
+		}
 	}
 }
