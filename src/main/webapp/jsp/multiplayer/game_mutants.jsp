@@ -120,12 +120,19 @@ if (role == Role.ATTACKER && true){
 									<% if (role.equals(Role.DEFENDER)
 											&& m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
 											&& !mg.getState().equals(GameState.FINISHED)
-											&& m.isCovered()){ %>
+											&& m.isCovered()){
+											if( m.getLines().size() > 1 ){%>
+											<a href="<%=request.getContextPath() %>/multiplayer/play?equivLines=<%=m.getLines().toString().replaceAll(", ", ",")%>"
+											 class="btn btn-default btn-diff"
+											 onclick="return confirm('This will mark all mutants on lines <%=m.getLines()%> as equivalent. Are you sure?');">
+												Claim Equivalent</a>
+										<% } else { %>
 										<a href="<%=request.getContextPath() %>/multiplayer/play?equivLine=<%=m.getLines().get(0)%>"
 										 class="btn btn-default btn-diff"
 										 onclick="return confirm('This will mark all mutants on line <%=m.getLines().get(0)%> as equivalent. Are you sure?');">
 											Claim Equivalent</a>
-									<% }
+									<% 		}
+										}
 									if (m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){
 										%><span>Flagged Equivalent</span><%
 									}%>
