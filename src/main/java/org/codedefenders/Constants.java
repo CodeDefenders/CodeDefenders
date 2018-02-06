@@ -117,7 +117,7 @@ public class Constants {
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_TEST = "previousTest";
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_MUTANT = "previousMutant";
 
-	public static final String MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE = "Invalid mutant, sorry! Your mutant changes one or more method signatures or field names";
+	public static final String MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE = "Invalid mutant, sorry! Your mutant changes one or more method signatures or field names or import statements";
 
 	public static final String ATTACKER_HAS_PENDING_DUELS = "Sorry your mutant cannot be accepted because you have pending equivalence duels !\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
 }

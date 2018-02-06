@@ -26,6 +26,7 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
 import com.github.javaparser.TokenMgrError;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
@@ -65,7 +66,7 @@ public class CodeValidator {
 		}
 
 		// If the mutants contains changes to method signatures, mark it as not valid
-		if (mutantChangesMethodSignatures(originalCode, mutatedCode) || mutantChangesFieldNames(originalCode, mutatedCode)) {
+		if (mutantChangesMethodSignatures(originalCode, mutatedCode) || mutantChangesFieldNames(originalCode, mutatedCode) || mutantChangesImportStatements(originalCode, mutatedCode)) {
 			return Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE;
 		}
 
@@ -224,6 +225,14 @@ public class CodeValidator {
 		return methodSignatures;
 	}
 
+	private static Set<String> extractImportStatements(CompilationUnit cu) {
+		Set<String> additionalImports = new HashSet<String>();
+		for (ImportDeclaration declaredImport : cu.getImports()) {
+			additionalImports.add(declaredImport.toStringWithoutComments());
+		}
+		return additionalImports;
+	}
+
 	private static Set<String> extractFieldNamesByType(TypeDeclaration td) {
 		Set<String> fieldNames = new HashSet<>();
 		// Method signatures in the class including constructors
@@ -269,6 +278,32 @@ public class CodeValidator {
 		}
 
 		return !cutMethodSignatures.equals(mutantMethodSignatures);
+	}
+
+	private static Boolean mutantChangesImportStatements(final String orig, final String muta) {
+		// Parse original and extract method signatures -> Set of string
+		Set<String> cutImportStatements = new HashSet<>();
+		Set<String> mutantImportStatements = new HashSet<>();
+
+		try (InputStream is = new ByteArrayInputStream(orig.getBytes())) {
+			CompilationUnit cu = JavaParser.parse(is);
+			cutImportStatements.addAll(extractImportStatements(cu));
+		} catch (ParseException | TokenMgrError ignored) {
+			ignored.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try (InputStream is = new ByteArrayInputStream(muta.getBytes())) {
+			CompilationUnit cu = JavaParser.parse(is);
+			mutantImportStatements.addAll(extractImportStatements(cu));
+		} catch (ParseException | TokenMgrError ignored) {
+			ignored.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return !cutImportStatements.equals(mutantImportStatements);
 	}
 
 	private static Boolean mutantChangesFieldNames(final String orig, final String muta) {
