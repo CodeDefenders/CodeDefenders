@@ -28,7 +28,7 @@ if (role == Role.ATTACKER && true){
     if (!renderMutants){
 
         %><div>
-			<h2>Equivalent Mutant Claimed</h2>
+			<h2>Mutant <%=equiv.getId() %> Claimed Equivalent</h2>
 			<div class="nest crow fly" style="border: 5px dashed #f00; border-radius: 10px; width: 100%;">
 				<form id="equivalenceForm" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
 					<input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= equiv.getId() %>">
