@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.Range;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.util.DB;
@@ -54,8 +55,12 @@ public class GameClass {
 
 	private Set<String> additionalImports = new HashSet<String>();
 	// Store begin and end line which corresponds to uncoverable non-initializad fields
-	private List<Integer> linesOfNonCoverableCode = new ArrayList<>();
 	private List<Integer> linesOfCompileTimeConstants= new ArrayList<>();
+	private List<Integer> linesOfNonCoverableCode = new ArrayList<>();
+
+	private List<Range<Integer>> linesOfMethods = new ArrayList<>();
+	private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
+	private List<Range<Integer>>  linesOfClosingBrackets = new ArrayList<>();
 
 	public GameClass(int id, String name, String alias, String jFile, String cFile, boolean isMockingEnabled) {
 		this(name, alias, jFile, cFile, isMockingEnabled);
@@ -69,12 +74,17 @@ public class GameClass {
 		this.classFile = cFile;
 		this.isMockingEnabled = isMockingEnabled;
 		this.additionalImports.addAll(includeAdditionalImportsFromCUT());
-		this.linesOfNonCoverableCode.addAll(getLinesOfNonInitializedFields());
-		this.linesOfNonCoverableCode.addAll(getCompileTimeConstants());
-		this.linesOfNonCoverableCode.addAll(getLinesOfMethodSignatures());
-		this.linesOfNonCoverableCode.addAll(getUnreachableClosingBracketsForIfStatements());
 		//
 		this.linesOfCompileTimeConstants.addAll(getCompileTimeConstants());
+		//
+		this.linesOfNonCoverableCode.addAll(getLinesOfNonInitializedFields());
+		//
+		this.linesOfNonCoverableCode.addAll(getLinesOfCompileTimeConstants());
+		//
+		this.linesOfNonCoverableCode.addAll(getLinesOfMethodSignatures());
+		//
+		this.linesOfNonCoverableCode.addAll(getUnreachableClosingBracketsForIfStatements());
+		//
 	}
 
 	// FIXME
@@ -388,17 +398,32 @@ public class GameClass {
 		try (FileInputStream in = new FileInputStream(javaFile)) {
 			new VoidVisitorAdapter<Object>() {
 				@Override
-				public void visit(IfStmt n, Object arg) {
-					super.visit(n, arg);
-					if(n.getElseStmt() != null )
-						return;
-					Statement then = n.getThenStmt();
+				public void visit(IfStmt ifStmt, Object arg) {
+					super.visit(ifStmt, arg);
+					Statement then = ifStmt.getThenStmt();
+					Statement elze = ifStmt.getElseStmt();
+					// There might be plenty of empty lines
 					if( then instanceof BlockStmt ) {
-						List<Statement> stmts = ((BlockStmt) then).getStmts();
-						if( stmts.size() > 0 && ( stmts.get( stmts.size() - 1).getEndLine() < n.getEndLine())){
-							lines.add( n.getEndLine() );
+
+						List<Statement> thenBlockStmts = ((BlockStmt) then).getStmts();
+						if( elze == null ){
+							/*
+							 * This takes only the non-coverable one, meaning
+							 * that if } is on the same line of the last stmt it
+							 * is not considered here because it is should be already
+							 * considered
+							 */
+							if( thenBlockStmts.size() > 0 && ( thenBlockStmts.get( thenBlockStmts.size() - 1).getEndLine() < ifStmt.getEndLine())){
+								// Add the range
+								linesOfClosingBrackets.add( Range.between( then.getBeginLine(), ifStmt.getEndLine()));
+								lines.add( ifStmt.getEndLine() );
+							}
+						}else {
+								// Add the range
+								linesOfClosingBrackets.add( Range.between( then.getBeginLine(), elze.getBeginLine()));
+								lines.add( elze.getBeginLine() );
 						}
-					} 
+					}
 				}
 			}.visit(JavaParser.parse(in), null);
 		} catch (ParseException | IOException e) {
@@ -421,6 +446,9 @@ public class GameClass {
 				for (int line = md.getBeginLine(); line <= md.getBody().getBeginLine(); line++) {
 					methodSignatureLines.add(line);
 				}
+
+				linesOfMethodSignatures.add( Range.between(md.getBeginLine(), md.getBody().getBeginLine()));
+				linesOfMethods.add( Range.between(md.getBeginLine(), md.getEndLine()));
 			} else if (bd instanceof ConstructorDeclaration) {
 				ConstructorDeclaration cd = (ConstructorDeclaration) bd;
 				// System.out.println("GameClass.findMethodSignaturesByType()
@@ -429,6 +457,9 @@ public class GameClass {
 				for (int line = cd.getBeginLine(); line <= cd.getBlock().getBeginLine(); line++) {
 					methodSignatureLines.add(line);
 				}
+
+				linesOfMethodSignatures.add( Range.between(cd.getBeginLine(), cd.getBlock().getBeginLine()));
+				linesOfMethods.add( Range.between(cd.getBeginLine(), cd.getEndLine()));
 			}
 		}
 		return methodSignatureLines;
@@ -438,6 +469,10 @@ public class GameClass {
 		return linesOfNonCoverableCode;
 	}
 
+	/**
+	 * Return the lines which correspond to Compile Time Constants. Mutation of those lines requries the tests to be recompiled against the mutant
+	 * @return
+	 */
 	public List<Integer> getLinesOfCompileTimeConstants() {
 		return linesOfCompileTimeConstants;
 	}
@@ -449,6 +484,41 @@ public class GameClass {
 		String query = "DELETE FROM classes WHERE Class_ID=?;";
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
 		return DB.executeUpdate(stmt, conn);
+	}
+
+	/**
+	 * Return the lines of the method signature for the method which contains the coveredLine
+	 * @param coveredLine
+	 * @return
+	 */
+	public List<Integer> getLinesOfMethodSignaturesFor(Integer coveredLine) {
+		List<Integer> lines = new ArrayList<Integer>();
+		// Check if the coveredLine belongs to the method
+		for( Range<Integer> rMethod : linesOfMethods ){
+			// Now that the first line of the method, which belongs to the corresponding signature
+			if( rMethod.contains( coveredLine ) ){
+				for( Range<Integer> r : linesOfMethodSignatures ){
+					if( r.contains( rMethod.getMinimum() ) ){
+						for( int i = r.getMinimum(); i <= r.getMaximum(); i++){
+							lines.add( i );
+						}
+					}
+				}
+			}
+		}
+
+		return lines;
+	}
+
+	public List<Integer> getLineOfClosingBracketFor(Integer coveredLine) {
+		List<Integer> lines = new ArrayList<Integer>();
+		for( Range<Integer> r : linesOfClosingBrackets){
+			if( r.contains( coveredLine ) ){
+				lines.add( r.getMaximum() );
+			}
+		}
+
+		return lines;
 	}
 
 }
