@@ -3,7 +3,8 @@ package org.codedefenders.multiplayer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map.Entry;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.codedefenders.GameClass;
 import org.jacoco.core.analysis.Analyzer;
@@ -42,18 +43,28 @@ public class CoverageGenerator {
         loadExecutionData();
         // Original Code
         analyzeStructure(clazz);
-        // Include Uncovered lines corresponding to Non initialized fields
-        includeNonInitializedFields(clazz);
+        // Use heuristics to include uncoverable lines
+        matchNonCoverableCode(clazz);
 
     }
 
-	private void includeNonInitializedFields(GameClass clazz) {
-		for (Integer nonInitializedField : clazz.getLinesOfNonCoverableCode()) {
-			linesCovered.add(nonInitializedField);
-			if (linesUncovered.contains(nonInitializedField)) {
-				linesUncovered.remove(nonInitializedField);
-			}
+	private void matchNonCoverableCode(GameClass clazz) {
+		Set<Integer> linesToAdd = new HashSet<>();
+		// If there's at least one line covered, then static field initializer and compile time constants are covered
+		if( linesCovered.size() > 0 ){
+			linesToAdd.addAll(clazz.getLinesOfCompileTimeConstants());
+			linesToAdd.addAll(clazz.getLinesOfNonInitializedFields());
 		}
+
+		// Now we need to map lines covered with methods and then-branches of ifstatements in the class
+		for( Integer coveredLine : linesCovered ){
+			linesToAdd.addAll( clazz.getLinesOfMethodSignaturesFor(coveredLine));
+			linesToAdd.addAll( clazz.getLineOfClosingBracketFor(coveredLine));
+			// If covered line belongs to method, add the method signature
+		}
+		//
+		linesCovered.addAll( linesToAdd );
+		linesUncovered.removeAll( linesToAdd );
 	}
 
 	private void loadExecutionData() throws IOException {
@@ -86,6 +97,7 @@ public class CoverageGenerator {
             }
         }
     }
+
     public ArrayList<Integer> getLinesCovered(){
         return linesCovered;
     }
