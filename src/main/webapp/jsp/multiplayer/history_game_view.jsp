@@ -52,13 +52,12 @@
     int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
     List<Mutant> mutantsAlive = mg.getAliveMutants();
 
+    List<Mutant> mutantsPending = mg.getMutantsMarkedEquivalentPending();
     List<Mutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();
 
     Map<Integer, List<Mutant>> mutantLines = new HashMap<>();
     Map<Integer, List<Mutant>> mutantEquivPending = new HashMap<>();
     Map<Integer, List<Mutant>> mutantKilledLines = new HashMap<>();
-
-    List<Mutant> mutantsPending = new ArrayList<>(); // assume no pending tasks
 
     for (Mutant m : mutantsAlive) {
         for (int line : m.getLines()){
