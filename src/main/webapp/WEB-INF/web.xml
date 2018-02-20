@@ -356,7 +356,6 @@
 	</welcome-file-list>-->
 
 	<error-page>
-		<error-code>404</error-code>
 		<location>/jsp/error_page_404.jsp</location>
 	</error-page>
 
