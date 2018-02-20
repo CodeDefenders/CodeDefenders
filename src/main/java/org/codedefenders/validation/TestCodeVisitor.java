@@ -74,8 +74,8 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 	public Node visit (NameExpr stmt, Object args)
 	{
 		super.visit(stmt,args);
-		if (stmt.getName().equals("System") || stmt.getName().equals("Random") ) {
-			logger.info("Invalid test contains System/Random uses");
+		if (stmt.getName().equals("System") || stmt.getName().equals("Random") || stmt.getName().equals("Thread") ) {
+			logger.info("Invalid test contains System/Random/Thread uses");
 			isValid = false;
 		}
 		return stmt;
