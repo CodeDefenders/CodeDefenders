@@ -173,8 +173,9 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 	@Override
 	public Node visit (VariableDeclarator stmt, Object args) {
 		super.visit(stmt,args);
-		if (stmt.getInit() != null && (stmt.getInit().toString().startsWith("System.*") || stmt.getInit().toString().startsWith("Random.*"))) {
-			logger.info("There is a variable declaration using System/Random.*");
+		if (stmt.getInit() != null && (stmt.getInit().toString().startsWith("System.*") || stmt.getInit().toString().startsWith("Random.*") ||
+				stmt.getInit().toString().contains("Thread"))) {
+			logger.info("There is a variable declaration using Thread/System/Random.*");
 			isValid = false;
 		}
 		return stmt;
