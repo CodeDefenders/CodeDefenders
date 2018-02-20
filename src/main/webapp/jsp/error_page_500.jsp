@@ -91,7 +91,8 @@
     })();
 </script>
 
-<%System.err.println(exception.getMessage());%>
+<%System.err.println(exception.toString());
+exception.printStackTrace();%>
 
 </body>
 </html>
