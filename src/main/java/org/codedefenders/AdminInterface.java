@@ -78,31 +78,45 @@ public class AdminInterface extends HttpServlet {
                             messages.add("Inserting user " + userId + " failed! \n Please check the logs!");
                     }
 
-                } else { // admin is inserting or deleting selected temp games
-                    int gameId = -1;
-                    // Get the identifying information required to create a game from the submitted form.
+                } else {  // admin is starting or stopping selected games
+                    String[] selectedGames = request.getParameterValues("selectedGames");
 
-                    try {
-                        gameId = Integer.parseInt(request.getParameter("start_stop_btn"));
-                    } catch (Exception e) {
-                        messages.add("There was a problem with the form.");
-                        response.sendRedirect(request.getContextPath() + "/admin");
-                        break;
-                    }
+                    if (selectedGames == null) {
+                        // admin is starting or stopping a single game
+                        int gameId = -1;
+                        // Get the identifying information required to create a game from the submitted form.
+
+                        try {
+                            gameId = Integer.parseInt(request.getParameter("start_stop_btn"));
+                        } catch (Exception e) {
+                            messages.add("There was a problem with the form.");
+                            response.sendRedirect(request.getContextPath() + "/admin");
+                            break;
+                        }
 
 
-                    errorMessage = "ERROR trying to start or stop game " + String.valueOf(gameId)
-                            + ".\nIf this problem persists, contact your administrator.";
+                        errorMessage = "ERROR trying to start or stop game " + String.valueOf(gameId)
+                                + ".\nIf this problem persists, contact your administrator.";
 
-                    mg = DatabaseAccess.getMultiplayerGame(gameId);
+                        mg = DatabaseAccess.getMultiplayerGame(gameId);
 
-                    if (mg == null) {
-                        messages.add(errorMessage);
-                    } else {
-                        GameState newState = mg.getState() == GameState.ACTIVE ? GameState.FINISHED : GameState.ACTIVE;
-                        mg.setState(newState);
-                        if (!mg.update()) {
+                        if (mg == null) {
                             messages.add(errorMessage);
+                        } else {
+                            GameState newState = mg.getState() == GameState.ACTIVE ? GameState.FINISHED : GameState.ACTIVE;
+                            mg.setState(newState);
+                            if (!mg.update()) {
+                                messages.add(errorMessage);
+                            }
+                        }
+                    } else {
+                        GameState newState = request.getParameter("games_btn").equals("Start Games") ? GameState.ACTIVE : GameState.FINISHED;
+                        for (String gameId : selectedGames) {
+                            mg = DatabaseAccess.getMultiplayerGame(Integer.parseInt(gameId));
+                            mg.setState(newState);
+                            if (!mg.update()) {
+                                messages.add("ERROR trying to start or stop game " + String.valueOf(gameId));
+                            }
                         }
                     }
                 }
@@ -232,18 +246,18 @@ public class AdminInterface extends HttpServlet {
                     }
 
                 } else { // admin is inserting or deleting selected temp games
-                    String[] selectedGames;
-                    selectedGames = request.getParameterValues("selectedGames");
+                    String[] selectedTempGames;
+                    selectedTempGames = request.getParameterValues("selectedTempGames");
                     createdGames = (List<MultiplayerGame>) session.getAttribute(AdminInterface.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
 
-                    if (selectedGames == null) {
+                    if (selectedTempGames == null) {
                         messages.add("Please select at least one Game to insert.");
                         response.sendRedirect(request.getContextPath() + "/admin");
                         break;
                     }
 
                     selectedGameIndices = new ArrayList<>();
-                    for (String u : selectedGames) {
+                    for (String u : selectedTempGames) {
                         selectedGameIndices.add(Integer.parseInt(u));
                     }
 
