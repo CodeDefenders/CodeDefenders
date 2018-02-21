@@ -317,7 +317,7 @@
 
     <servlet>
         <servlet-name>AdminGamesMgmt</servlet-name>
-		<jsp-file>/jsp/admin_games_mgmt.jsp</jsp-file>
+		<servlet-class>org.codedefenders.AdminGamesMgmt</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>AdminGamesMgmt</servlet-name>
@@ -327,7 +327,7 @@
 
 	<servlet>
 		<servlet-name>AdminUserMgmt</servlet-name>
-		<jsp-file>/jsp/admin_user_mgmt.jsp</jsp-file>
+		<servlet-class>org.codedefenders.AdminUserMgmt</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AdminUserMgmt</servlet-name>

@@ -6,7 +6,6 @@ import org.codedefenders.multiplayer.PlayerScore;
 import org.codedefenders.util.AdminDAO;
 import org.codedefenders.util.DatabaseAccess;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,8 +45,7 @@ public class AdminGamesMgmt extends HttpServlet {
     private MultiplayerGame mg;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP);
-        dispatcher.forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_GAMES_JSP);
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
