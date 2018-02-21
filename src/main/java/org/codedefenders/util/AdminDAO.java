@@ -1,6 +1,5 @@
 package org.codedefenders.util;
 
-import org.codedefenders.AdminInterface;
 import org.codedefenders.GameLevel;
 import org.codedefenders.Role;
 import org.codedefenders.User;

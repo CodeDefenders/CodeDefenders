@@ -18,9 +18,14 @@
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="org.apache.commons.collections.ListUtils" %>
 <%@ page import="java.util.Arrays" %>
-<% String pageTitle = "Create Games"; %>
+<% String pageTitle = null; %>
 <%@ include file="/jsp/header.jsp" %>
 <div class="full-width">
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#">Manage Games</a></li>
+        <li><a href="<%=request.getContextPath()%>/admin/users"> Manage Users</a></li>
+    </ul>
+
     <form id="games" action="admin" method="post">
         <input type="hidden" name="formType" value="startStopGame">
         <h3>Inserted Games</h3>
