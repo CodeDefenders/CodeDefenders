@@ -182,6 +182,55 @@ public class AdminDAO {
                     ")\n" +
                     "ORDER BY lastLogin DESC, User_ID;";
 
+
+    public final static String USERS_INFO_QUERY =
+            "SELECT DISTINCT\n" +
+                    "  users.User_ID,\n" +
+                    "  users.Username,\n" +
+                    "  lastLogin.ts AS lastLogin,\n" +
+                    "  Role         AS lastRole,\n" +
+                    "  totalScore\n" +
+                    "FROM\n" +
+                    "  users\n" +
+                    "  LEFT JOIN (SELECT\n" +
+                    "          MAX(Timestamp) AS ts,\n" +
+                    "          user_id\n" +
+                    "        FROM sessions\n" +
+                    "        GROUP BY User_ID) AS lastLogin ON lastLogin.User_ID = users.User_ID\n" +
+                    "  LEFT JOIN\n" +
+                    "  (SELECT\n" +
+                    "     players.User_ID,\n" +
+                    "     Role\n" +
+                    "   FROM users\n" +
+                    "     INNER JOIN players ON users.User_ID = players.User_ID\n" +
+                    "     INNER JOIN games ON players.Game_ID = games.ID\n" +
+                    "     INNER JOIN\n" +
+                    "     (SELECT\n" +
+                    "        players.User_ID,\n" +
+                    "        max(players.Game_ID) AS latestGame\n" +
+                    "      FROM players\n" +
+                    "      GROUP BY players.User_ID) AS lg ON lg.User_ID = players.User_ID AND lg.latestGame = games.ID) AS lastRole\n" +
+                    "    ON lastRole.User_ID = users.User_ID\n" +
+                    "  JOIN\n" +
+                    "  (SELECT\n" +
+                    "     U.User_ID,\n" +
+                    "     IFNULL(AScore, 0) + IFNULL(DScore, 0) AS TotalScore\n" +
+                    "   FROM users U LEFT JOIN\n" +
+                    "     (SELECT\n" +
+                    "        PA.user_id,\n" +
+                    "        sum(M.Points) AS AScore\n" +
+                    "      FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID\n" +
+                    "      GROUP BY PA.user_id)\n" +
+                    "       AS Attacker ON U.user_id = Attacker.user_id\n" +
+                    "     LEFT JOIN\n" +
+                    "     (SELECT\n" +
+                    "        PD.user_id,\n" +
+                    "        sum(T.Points) AS DScore\n" +
+                    "      FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID\n" +
+                    "      GROUP BY PD.user_id)\n" +
+                    "       AS Defender ON U.user_id = Defender.user_id) AS totalScore ON totalScore.User_ID = users.User_ID\n" +
+                    "ORDER BY lastLogin DESC, User_ID;";
+
     public static final String PLAYERS_INFO_QUERY =
             "SELECT\n" +
                     "  ID,\n" +
@@ -260,6 +309,7 @@ public class AdminDAO {
 			"                    WHERE Player_ID = ?);";
     public final static String DELETE_TEST_TARGETEXECUTIONS = "DELETE FROM targetexecutions WHERE Test_ID =?;";
     public final static String DELETE_MUTANT_TARGETEXECUTIONS = "DELETE FROM targetexecutions WHERE Mutant_ID = ?;";
+    public final static String SET_USER_PW = "UPDATE users SET Password = ? WHERE User_ID = ?;";
 
     public static List<User> getUsers(String query) {
         Connection conn = DB.getConnection();
@@ -422,8 +472,17 @@ public class AdminDAO {
     }
 
     public static List<List<String>> getUnassignedUsersInfo() {
+        return getUsersInfo(UNASSIGNED_USERS_INFO_QUERY);
+    }
+
+    public static List<List<String>> getAllUsersInfo() {
+        return getUsersInfo(USERS_INFO_QUERY);
+    }
+
+
+    private static List<List<String>> getUsersInfo(String query) {
         Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, UNASSIGNED_USERS_INFO_QUERY);
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query);
         ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 
         List<List<String>> unassignedUsers = new ArrayList<>();
@@ -475,5 +534,12 @@ public class AdminDAO {
             DB.cleanup(conn, stmt);
         }
         return players;
+    }
+
+    public static boolean setUserPassword(int uid, String password) {
+        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(password), DB.getDBV(uid)};
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, SET_USER_PW, valueList);
+        return DB.executeUpdate(stmt, conn);
     }
 }
