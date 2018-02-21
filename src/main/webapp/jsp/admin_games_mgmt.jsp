@@ -141,11 +141,11 @@
                     String userName = playerInfo.get(1);
                     Role role = Role.valueOf(playerInfo.get(2));
                     String ts = playerInfo.get(3);
-                    String lastSubmissionTS = AdminDAO.TIMETSTAMP_NEVER.equalsIgnoreCase(ts) ? ts : AdminInterface.formatTimestamp(ts);
+                    String lastSubmissionTS = AdminDAO.TIMETSTAMP_NEVER.equalsIgnoreCase(ts) ? ts : AdminGamesMgmt.formatTimestamp(ts);
                     int totalScore = Integer.parseInt(playerInfo.get(4));
                     int submissionsCount = Integer.parseInt(playerInfo.get(5));
                     String color = role == Role.ATTACKER ? "#edcece" : "#ced6ed";
-                    int gameScore = AdminInterface.getPlayerScore(g, pid);
+                    int gameScore = AdminGamesMgmt.getPlayerScore(g, pid);
             %>
             <tr style="height: 3px;" id="playersTableActive" hidden></tr>
             <tr id="playersTableActive" hidden>
@@ -197,9 +197,9 @@
         <input type="hidden" name="formType" value="insertGames"/>
         <h3>Temporary Games</h3>
         <%
-            List<MultiplayerGame> createdGames = (List<MultiplayerGame>) session.getAttribute(AdminInterface.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
-            List<List<Integer>> attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.ATTACKER_LISTS_SESSION_ATTRIBUTE);
-            List<List<Integer>> defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.DEFENDER_LISTS_SESSION_ATTRIBUTE);
+            List<MultiplayerGame> createdGames = (List<MultiplayerGame>) session.getAttribute(AdminGamesMgmt.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
+            List<List<Integer>> attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminGamesMgmt.ATTACKER_LISTS_SESSION_ATTRIBUTE);
+            List<List<Integer>> defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminGamesMgmt.DEFENDER_LISTS_SESSION_ATTRIBUTE);
             if (createdGames == null || createdGames.isEmpty()) {
         %>
         <div class="panel panel-default">
@@ -365,8 +365,8 @@
 
             <%
                 List<MultiplayerGame> availableGames = AdminDAO.getAvailableGames();
-                createdGames = (List<MultiplayerGame>) session.getAttribute(AdminInterface.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
-                List<List<String>> unassignedUsersInfo = AdminInterface.getUnassignedUsers(attackerIdsList, defenderIdsList);
+                createdGames = (List<MultiplayerGame>) session.getAttribute(AdminGamesMgmt.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
+                List<List<String>> unassignedUsersInfo = AdminGamesMgmt.getUnassignedUsers(attackerIdsList, defenderIdsList);
                 if (unassignedUsersInfo.isEmpty()) {
             %>
 
@@ -481,14 +481,14 @@
                 <div id="roles_group">
                     <div class="radio">
                         <label class="label-normal"><input TYPE="radio" name="roles"
-                                                           value="<%=AdminInterface.RoleAssignmentMethod.RANDOM%>"
+                                                           value="<%=AdminGamesMgmt.RoleAssignmentMethod.RANDOM%>"
                                                            checked="checked"/>
                             Random
                         </label>
                     </div>
                     <div class="radio">
                         <label class="label-normal"><input TYPE="radio" name="roles"
-                                                           VALUE="<%=AdminInterface.RoleAssignmentMethod.OPPOSITE%>"/>
+                                                           VALUE="<%=AdminGamesMgmt.RoleAssignmentMethod.OPPOSITE%>"/>
                             Opposite Role
                         </label>
                     </div>
@@ -499,18 +499,18 @@
                 <div id="teams_group">
                     <div class="radio">
                         <label class="label-normal"><input TYPE="radio" name="teams"
-                                                           value="<%=AdminInterface.TeamAssignmentMethod.RANDOM%>"
+                                                           value="<%=AdminGamesMgmt.TeamAssignmentMethod.RANDOM%>"
                                                            checked="checked"/>Random</label>
                     </div>
                     <div class="radio">
                         <label class="label-normal"><input TYPE="radio" name="teams"
-                                                           VALUE="<%=AdminInterface.TeamAssignmentMethod.SCORE_DESCENDING%>"/>
+                                                           VALUE="<%=AdminGamesMgmt.TeamAssignmentMethod.SCORE_DESCENDING%>"/>
                             Scores descending
                         </label>
                     </div>
                     <div class="radio">
                         <label class="label-normal"><input TYPE="radio" name="teams"
-                                                           VALUE="<%=AdminInterface.TeamAssignmentMethod.SCORE_SHUFFLED%>"/>
+                                                           VALUE="<%=AdminGamesMgmt.TeamAssignmentMethod.SCORE_SHUFFLED%>"/>
                             Scores block shuffled
                         </label>
                     </div>

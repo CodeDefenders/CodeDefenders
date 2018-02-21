@@ -18,6 +18,7 @@
 		<web-resource-collection>
 			<web-resource-name>SecuredBookSite</web-resource-name>
 			<url-pattern>/admin</url-pattern>
+			<url-pattern>/admin/*</url-pattern>
 			<http-method>GET</http-method>
 			<http-method>POST</http-method>
 		</web-resource-collection>
@@ -315,13 +316,23 @@
 
 
     <servlet>
-        <servlet-name>adminInterface</servlet-name>
-        <servlet-class>org.codedefenders.AdminInterface</servlet-class>
+        <servlet-name>AdminGamesMgmt</servlet-name>
+		<jsp-file>/jsp/admin_games_mgmt.jsp</jsp-file>
     </servlet>
     <servlet-mapping>
-        <servlet-name>adminInterface</servlet-name>
-        <url-pattern>/admin</url-pattern>
+        <servlet-name>AdminGamesMgmt</servlet-name>
+		<url-pattern>/admin/games</url-pattern>
+		<url-pattern>/admin</url-pattern>
     </servlet-mapping>
+
+	<servlet>
+		<servlet-name>AdminUserMgmt</servlet-name>
+		<jsp-file>/jsp/admin_user_mgmt.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AdminUserMgmt</servlet-name>
+		<url-pattern>/admin/users</url-pattern>
+	</servlet-mapping>
 
 	<!-- End Notification JSON Servlets -->
 

@@ -68,8 +68,8 @@ public class Constants {
 	public static final String DEFENDER_VIEW_JSP = "jsp" + F_SEP + "defender_view.jsp";
 	public static final String SCORE_VIEW_JSP = "jsp" + F_SEP + "score_view.jsp";
 	public static final String UTESTING_VIEW_JSP = "jsp" + F_SEP + "utesting_view.jsp";
-	public static final String ADMIN_VIEW_JSP = "jsp" + F_SEP + "admin_monitor.jsp";
-	public static final String ADMIN_CREATE_JSP = "jsp" + F_SEP + "admin_create.jsp";
+	public static final String ADMIN_USER_JSP = "jsp" + F_SEP + "admin_user_mgmt.jsp";
+	public static final String ADMIN_GAMES_JSP = "jsp" + F_SEP + "admin_games_mgmt.jsp";
 
 	// Messages
 	public static final String WINNER_MESSAGE = "You won!";
