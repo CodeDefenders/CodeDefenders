@@ -1,5 +1,6 @@
 <%@ page import="org.codedefenders.*" %>
 <%@ page import="org.codedefenders.util.AdminDAO" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header.jsp" %>
 
@@ -8,6 +9,40 @@
         <li><a href="<%=request.getContextPath()%>/admin/games"> Manage Games</a></li>
         <li class="active"><a href="#">Manage Users</a></li>
     </ul>
+
+    <%
+        String editUser = request.getParameter("editUser");
+        if (editUser != null && editUser.length() > 0 && StringUtils.isNumeric(editUser)) {
+            User u = DatabaseAccess.getUser(Integer.parseInt(editUser));
+            if (u != null) {
+    %>
+    <h3>Edit Info for User <%=u.getId()%>
+    </h3>
+
+    <form id="editUser" action="admin/users" method="post">
+        <input type="hidden" name="formType" value="editUser">
+        <input type="hidden" name="uid" value="<%=u.getId()%>">
+        <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i> </span>
+            <input style ="padding-left:5px" id="name" type="text" class="form-control" name="name" value="<%=u.getUsername()%>">
+        </div>
+        <br>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+            <input style ="padding-left:5px" id="email" type="text" class="form-control" name="email" value="<%=u.getEmail()%>">
+        </div>
+        <br>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+            <input style ="padding-left:5px" id="password" type="password" class="form-control" name="password" placeholder="unchanged">
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+    </form>
+    <%
+            }
+        }
+    %>
 
     <h3>Users</h3>
 
@@ -23,8 +58,9 @@
                 <th>EMail</th>
                 <th>Total Score</th>
                 <th>Last Login</th>
-                <th>Reset Password</th>
-                <th>Delete</th>
+                <th></th>
+                <th></th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -63,7 +99,12 @@
                 </td>
                 <td class="col-sm-2"><%= lastLogin %>
                 </td>
-                <td class="col-sm-1" style="padding-top:4px; padding-bottom:4px">
+                <td style="padding-top:4px; padding-bottom:4px">
+                    <button class="btn btn-sm btn-primary" name="editUserInfo" type="submit" value="<%=uid%>">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+                </td>
+                <td style="padding-top:4px; padding-bottom:4px">
                     <%if (currentUserID != uid) {%>
                     <button class="btn btn-sm btn-warning" type="submit" value="<%=uid%>" name="resetPasswordButton"
                             onclick="return confirm('Are you sure you want to reset <%=username%>\'s password?');">
@@ -71,7 +112,7 @@
                     </button>
                     <%}%>
                 </td>
-                <td class="col-sm-1" style="padding-top:4px; padding-bottom:4px">
+                <td style="padding-top:4px; padding-bottom:4px">
                     <%if (currentUserID != uid) {%>
                     <button class="btn btn-sm btn-danger" type="submit" value="<%=uid%>" name="deleteUserButton"
                             onclick="return confirm('Are you sure you want to permanently delete <%=username%>\'s ' +
@@ -91,6 +132,10 @@
         </table>
 
         <script>
+            function reload() {
+                location.reload();
+            }
+
             $(document).ready(function () {
                 $('[data-toggle="tooltip"]').tooltip();
 
@@ -104,6 +149,9 @@
                         "orderable": false
                     }, {
                         "targets": 6,
+                        "orderable": false
+                    }, {
+                        "targets": 7,
                         "orderable": false
                     }]
                 });

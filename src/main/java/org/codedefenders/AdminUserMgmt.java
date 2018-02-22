@@ -36,26 +36,55 @@ public class AdminUserMgmt extends HttpServlet {
 		int currentUserID = (Integer) session.getAttribute("uid");
 		ArrayList<String> messages = new ArrayList<String>();
 		session.setAttribute("messages", messages);
+		String responsePath = request.getContextPath() + "/admin/users";
 
 		switch (request.getParameter("formType")) {
 			case "manageUsers":
 				String userToResetIdString = request.getParameter("resetPasswordButton");
 				String userToDeleteIdString = request.getParameter("deleteUserButton");
+				String userToEditIdString = request.getParameter("editUserInfo");
 				if (userToResetIdString != null) {
 					messages.add(resetUserPW(Integer.parseInt(userToResetIdString)));
 				} else if (userToDeleteIdString != null) {
 					messages.add(deleteUser(Integer.parseInt(userToDeleteIdString)));
+				} else if (userToEditIdString != null) {
+					responsePath = request.getContextPath() + "/" + Constants.ADMIN_USER_JSP + "?editUser=" + userToEditIdString;
 				}
 				break;
 			case "createUsers":
 				createUserAccounts(request.getParameter("user_name_list"), messages);
+				break;
+			case "editUser":
+				messages.add(editUser(request.getParameter("uid"), request));
 				break;
 			default:
 				System.err.println("Action not recognised");
 				break;
 		}
 
-		response.sendRedirect(request.getContextPath() + "/admin/users");
+		response.sendRedirect(responsePath);
+	}
+
+	private String editUser(String uid, HttpServletRequest request) {
+		String errorMessage = "Error trying to update info for user " + uid;
+		User u = DatabaseAccess.getUser(Integer.parseInt(uid));
+		if (u != null) {
+			String name = request.getParameter("name");
+			String email = request.getParameter("email");
+			String password = request.getParameter("password");
+			boolean changePassword = password != null && !password.equals("");
+
+			if (name != null && !name.equals("")) u.setUsername(name);
+			if (email != null && !email.equals("")) u.setEmail(email);
+			if (changePassword) u.setPassword(password);
+
+			u.update(changePassword);
+			User uNew = DatabaseAccess.getUser(Integer.parseInt(uid));
+			if (uNew.getEmail().equals(u.getEmail()) && uNew.getUsername().equals(u.getUsername()) && uNew.getPassword().equals(u.getPassword())) {
+				return "Successfully updated info for " + u.getUsername();
+			}
+		}
+		return errorMessage;
 	}
 
 	private void createUserAccounts(String userNameListString, ArrayList<String> messages) {
