@@ -387,9 +387,9 @@
                 for (List<String> userInfo : unassignedUsersInfo) {
                     int uid = Integer.valueOf(userInfo.get(0));
                     String username = userInfo.get(1);
-                    String lastLogin = userInfo.get(2);
-                    String lastRole = userInfo.get(3);
-                    String totalScore = userInfo.get(4);
+                    String lastLogin = userInfo.get(3);
+                    String lastRole = userInfo.get(4);
+                    String totalScore = userInfo.get(5);
             %>
 
             <tr>

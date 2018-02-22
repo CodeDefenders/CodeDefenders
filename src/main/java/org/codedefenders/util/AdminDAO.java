@@ -131,6 +131,7 @@ public class AdminDAO {
             "SELECT DISTINCT\n" +
                     "  users.User_ID,\n" +
                     "  users.Username,\n" +
+                    "  users.Email,\n" +
                     "  lastLogin.ts AS lastLogin,\n" +
                     "  Role         AS lastRole,\n" +
                     "  totalScore\n" +
@@ -187,6 +188,7 @@ public class AdminDAO {
             "SELECT DISTINCT\n" +
                     "  users.User_ID,\n" +
                     "  users.Username,\n" +
+                    "  users.Email,\n" +
                     "  lastLogin.ts AS lastLogin,\n" +
                     "  Role         AS lastRole,\n" +
                     "  totalScore\n" +
@@ -310,6 +312,7 @@ public class AdminDAO {
     public final static String DELETE_TEST_TARGETEXECUTIONS = "DELETE FROM targetexecutions WHERE Test_ID =?;";
     public final static String DELETE_MUTANT_TARGETEXECUTIONS = "DELETE FROM targetexecutions WHERE Mutant_ID = ?;";
     public final static String SET_USER_PW = "UPDATE users SET Password = ? WHERE User_ID = ?;";
+    public final static String DELETE_USER = "DELETE FROM users WHERE User_ID = ?;";
 
     public static List<User> getUsers(String query) {
         Connection conn = DB.getConnection();
@@ -491,6 +494,7 @@ public class AdminDAO {
                 List<String> userInfo = new ArrayList<>();
                 userInfo.add(String.valueOf(rs.getInt("User_ID")));
                 userInfo.add(rs.getString("Username"));
+                userInfo.add(rs.getString("Email"));
                 Timestamp ts = rs.getTimestamp("lastLogin");
                 userInfo.add(ts == null ? "-- never --" : ts.toString().substring(0, ts.toString().length() - 5));
                 userInfo.add(rs.getString("lastRole"));
@@ -512,7 +516,6 @@ public class AdminDAO {
         PreparedStatement stmt = DB.createPreparedStatement(conn, PLAYERS_INFO_QUERY, DB.getDBV(gid));
         long start = System.currentTimeMillis();
         ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        System.out.println("query took: " + String.valueOf(System.currentTimeMillis()-start) + " ms");
         List<List<String>> players = new ArrayList<>();
         try {
             while (rs.next()) {
@@ -541,5 +544,12 @@ public class AdminDAO {
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, SET_USER_PW, valueList);
         return DB.executeUpdate(stmt, conn);
+    }
+
+    public static boolean deleteUser(int uid) {
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, DELETE_USER, DB.getDBV(uid));
+        return DB.executeUpdate(stmt, conn);
+        // this does not work as foreign keys are not deleted (recommended: update w/ ON DELETE CASCADE)
     }
 }

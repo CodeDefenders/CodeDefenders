@@ -21,6 +21,7 @@ public class AdminUserMgmt extends HttpServlet {
 	private static final char[] DIGITS = "0123456789".toCharArray();
 	private static final char[] PUNCTUATION = "!@#$%&*()_+-=[]|,./?><".toCharArray();
 	private static final int PASSWORD_LENGTH = 8;
+	static final String USER_INFO_TOKENS_DELIMITER = "[ ,;]+";
 	private static final Logger logger = LoggerFactory.getLogger(AdminUserMgmt.class);
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -59,10 +60,20 @@ public class AdminUserMgmt extends HttpServlet {
 	private void createUserAccounts(String userNameListString, ArrayList<String> messages) {
 		if (userNameListString != null) {
 			for (String nameOrEmail : userNameListString.split(AdminGamesMgmt.USER_NAME_LIST_DELIMITER)) {
+				nameOrEmail = nameOrEmail.trim();
+				String name, email, password;
+
 				if (nameOrEmail.length() > 0) {
-					String email = nameOrEmail.contains("@") ? nameOrEmail : nameOrEmail + "@NOT.SPECIFIED";
-					String name = nameOrEmail.contains("@") ? nameOrEmail.split("@")[0] : nameOrEmail;
-					String password = generatePW();
+					if (nameOrEmail.split(USER_INFO_TOKENS_DELIMITER).length > 1) {
+						String[] tokens = nameOrEmail.split(USER_INFO_TOKENS_DELIMITER);
+						email = tokens[0].contains("@") ? tokens[0] : tokens[1];
+						name = tokens[0].contains("@") ? tokens[1] : tokens[0];
+						password = tokens.length > 2 ? tokens[2] : generatePW();
+					} else {
+						email = nameOrEmail.contains("@") ? nameOrEmail : nameOrEmail + "@NOT.SPECIFIED";
+						name = nameOrEmail.contains("@") ? nameOrEmail.split("@")[0] : nameOrEmail;
+						password = generatePW();
+					}
 					User u = new User(name, password, email);
 					if (u.insert()) {
 						messages.add(name + "'s password is: " + password);

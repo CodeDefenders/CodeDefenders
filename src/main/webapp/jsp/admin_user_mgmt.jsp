@@ -14,14 +14,13 @@
     <form id="manageUsers" action="admin/users" method="post">
         <input type="hidden" name="formType" value="manageUsers">
 
-        <h3>Unassigned Users</h3>
         <table id="tableUsers"
                class="table table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
             <tr>
                 <th>ID</th>
                 <th>User</th>
-                <th>Last Role</th>
+                <th>EMail</th>
                 <th>Total Score</th>
                 <th>Last Login</th>
                 <th>Reset Password</th>
@@ -47,9 +46,9 @@
                 for (List<String> userInfo : unassignedUsersInfo) {
                     int uid = Integer.valueOf(userInfo.get(0));
                     String username = userInfo.get(1);
-                    String lastLogin = userInfo.get(2);
-                    String lastRole = userInfo.get(3);
-                    String totalScore = userInfo.get(4);
+                    String email = userInfo.get(2);
+                    String lastLogin = userInfo.get(3);
+                    String totalScore = userInfo.get(5);
             %>
 
             <tr>
@@ -58,7 +57,7 @@
                 </td>
                 <td class="col-sm-2"><%= username %>
                 </td>
-                <td class="col-sm-1"><%= lastRole %>
+                <td class="col-sm-1"><%= email %>
                 </td>
                 <td class="col-sm-1"><%= totalScore %>
                 </td>
@@ -123,8 +122,11 @@
             <div id="demo" class="collapse">
                 Newline seperated list of usernames or Email Addresses.
                 <br/>Email Addresses are any strings with an @, usernames anything else.
-                <br/>Usernames are generated from the Email Addresses (name@domain.tld -> name).
+                <br/>Usernames are generated from the Email Addresses (<i>name@domain.tld</i> -> <i>name</i>).
                 <br/>Passwords are auto generated and shown as messages plus written to the logs.
+                <br/><br/>You can also specify name, Email address (and password) in the form:
+                <br/> <i>name mail</i>, <i>mail name</i>, <i>name mail password</i>, <i>mail name password</i>,
+                delimited by spaces, semicolons or commas
             </div>
             <textarea class="form-control" rows="10" id="user_name_list" name="user_name_list"
                       oninput="document.getElementById('submit_users_btn').disabled = false;"></textarea>
