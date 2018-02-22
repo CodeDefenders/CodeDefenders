@@ -25,7 +25,7 @@ public class AdminGamesMgmt extends HttpServlet {
     public static final String ATTACKER_LISTS_SESSION_ATTRIBUTE = "attackerLists";
     public static final String CREATED_GAMES_LISTS_SESSION_ATTRIBUTE = "createdGames";
     private static final int NB_CATEGORIES_FOR_SHUFFLING = 3;
-    private static final String USER_NAME_LIST_DELIMITER = "[\\r\\n]+";
+    static final String USER_NAME_LIST_DELIMITER = "[\\r\\n]+";
 
     private int currentUserID;
     private List<Integer> selectedUserIDs;

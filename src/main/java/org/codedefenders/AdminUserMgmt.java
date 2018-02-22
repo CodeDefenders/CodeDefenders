@@ -2,6 +2,8 @@ package org.codedefenders;
 
 import org.apache.commons.lang.math.IntRange;
 import org.codedefenders.util.AdminDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.servlet.ServletException;
@@ -19,6 +21,7 @@ public class AdminUserMgmt extends HttpServlet {
 	private static final char[] DIGITS = "0123456789".toCharArray();
 	private static final char[] PUNCTUATION = "!@#$%&*()_+-=[]|,./?><".toCharArray();
 	private static final int PASSWORD_LENGTH = 8;
+	private static final Logger logger = LoggerFactory.getLogger(AdminUserMgmt.class);
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_USER_JSP);
@@ -36,13 +39,15 @@ public class AdminUserMgmt extends HttpServlet {
 			case "manageUsers":
 				String userToResetIdString = request.getParameter("resetPasswordButton");
 				String userToDeleteIdString = request.getParameter("deleteUserButton");
-				if(userToResetIdString != null) {
+				if (userToResetIdString != null) {
 					messages.add(resetUserPW(Integer.parseInt(userToResetIdString)));
-				} else if(userToDeleteIdString != null) {
+				} else if (userToDeleteIdString != null) {
 					messages.add(deleteUser(Integer.parseInt(userToDeleteIdString)));
 				}
 				break;
-
+			case "createUsers":
+				createUserAccounts(request.getParameter("user_name_list"), messages);
+				break;
 			default:
 				System.err.println("Action not recognised");
 				break;
@@ -51,8 +56,27 @@ public class AdminUserMgmt extends HttpServlet {
 		response.sendRedirect(request.getContextPath() + "/admin/users");
 	}
 
+	private void createUserAccounts(String userNameListString, ArrayList<String> messages) {
+		if (userNameListString != null) {
+			for (String nameOrEmail : userNameListString.split(AdminGamesMgmt.USER_NAME_LIST_DELIMITER)) {
+				if (nameOrEmail.length() > 0) {
+					String email = nameOrEmail.contains("@") ? nameOrEmail : nameOrEmail + "@NOT.SPECIFIED";
+					String name = nameOrEmail.contains("@") ? nameOrEmail.split("@")[0] : nameOrEmail;
+					String password = generatePW();
+					User u = new User(name, password, email);
+					if (u.insert()) {
+						messages.add(name + "'s password is: " + password);
+						logger.info("Generated password " + password + " for user " + name);
+					} else {
+						messages.add("Error trying to create an account for " + name + " (email: " + email + ")!");
+					}
+				}
+			}
+		}
+	}
+
 	private String deleteUser(int uid) {
-		return "not implemented yet";
+		return (AdminDAO.deleteUser(uid) ? "Successfully deleted user " : "Error trying to delete user ") + uid + "!";
 	}
 
 	private String resetUserPW(int uid) {
@@ -64,18 +88,18 @@ public class AdminUserMgmt extends HttpServlet {
 		return success ? "User " + uid + "'s password set to: " + newPassword : "Could not reset password for user " + uid;
 	}
 
-	private String generatePW() {
+	private static String generatePW() {
 
 		StringBuilder sb = new StringBuilder();
 		char[] initialSet = LOWER;
 
 		Random random = new Random();
-		for (int i= 0; i < PASSWORD_LENGTH; i++) {
+		for (int i = 0; i < PASSWORD_LENGTH; i++) {
 			sb.append(initialSet[random.nextInt(initialSet.length)]);
 		}
 		char[] resultChars = sb.toString().toCharArray();
 
-		List<Integer> randomInts = Arrays.stream(new IntRange(0, PASSWORD_LENGTH-1).toArray()).boxed().collect(Collectors.toList());
+		List<Integer> randomInts = Arrays.stream(new IntRange(0, PASSWORD_LENGTH - 1).toArray()).boxed().collect(Collectors.toList());
 		Collections.shuffle(randomInts);
 
 		int c = 0;

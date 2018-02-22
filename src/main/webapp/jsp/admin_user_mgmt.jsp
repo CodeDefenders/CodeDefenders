@@ -111,5 +111,29 @@
     </form>
 
     <h3>Create Accounts</h3>
+
+    <form id="createUsers" action="admin/users" method="post">
+        <input type="hidden" name="formType" value="createUsers">
+
+        <div class="form-group">
+            <label for="user_name_list">User Names or Email Addresses</label>
+            <a data-toggle="collapse" href="#demo" style="color:black">
+                <span class="glyphicon glyphicon-question-sign"></span>
+            </a>
+            <div id="demo" class="collapse">
+                Newline seperated list of usernames or Email Addresses.
+                <br/>Email Addresses are any strings with an @, usernames anything else.
+                <br/>Usernames are generated from the Email Addresses (name@domain.tld -> name).
+                <br/>Passwords are auto generated and shown as messages plus written to the logs.
+            </div>
+            <textarea class="form-control" rows="10" id="user_name_list" name="user_name_list"
+                      oninput="document.getElementById('submit_users_btn').disabled = false;"></textarea>
+        </div>
+
+        <button class="btn btn-md btn-primary" type="submit" name="submit_users_btn" id="submit_users_btn" disabled>
+            Create Accounts
+        </button>
+
+    </form>
 </div>
 <%@ include file="/jsp/footer.jsp" %>
