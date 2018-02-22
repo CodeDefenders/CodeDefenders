@@ -2,6 +2,7 @@ package org.codedefenders;
 
 import org.apache.commons.lang.math.IntRange;
 import org.codedefenders.util.AdminDAO;
+import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -75,11 +76,15 @@ public class AdminUserMgmt extends HttpServlet {
 						password = generatePW();
 					}
 					User u = new User(name, password, email);
-					if (u.insert()) {
-						messages.add(name + "'s password is: " + password);
-						logger.info("Generated password " + password + " for user " + name);
+					if (DatabaseAccess.getUserForNameOrEmail(name) == null && DatabaseAccess.getUserForNameOrEmail(email) == null) {
+						if (u.insert()) {
+							messages.add(name + "'s password is: " + password);
+							logger.info("Generated password " + password + " for user " + name);
+						} else {
+							messages.add("Error trying to create an account for " + name + " (email: " + email + ")!");
+						}
 					} else {
-						messages.add("Error trying to create an account for " + name + " (email: " + email + ")!");
+						messages.add(name + " (email: " + email + ") already has an account!");
 					}
 				}
 			}
