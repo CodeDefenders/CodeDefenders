@@ -67,14 +67,16 @@
                     <%if (currentUserID != uid) {%>
                     <button class="btn btn-sm btn-warning" type="submit" value="<%=uid%>" name="resetPasswordButton"
                             onclick="return confirm('Are you sure you want to reset <%=username%>\'s password?');">
-                        <span class="glyphicon glyphicon-repeat"></span>
+                        <span data-toggle="tooltip" title="Reset Password" class="glyphicon glyphicon-repeat"></span>
                     </button>
                     <%}%>
                 </td>
                 <td class="col-sm-1" style="padding-top:4px; padding-bottom:4px">
                     <%if (currentUserID != uid) {%>
                     <button class="btn btn-sm btn-danger" type="submit" value="<%=uid%>" name="deleteUserButton"
-                            onclick="return confirm('Are you sure you want to permanently delete <%=username%>\'s account?');">
+                            onclick="return confirm('Are you sure you want to permanently delete <%=username%>\'s ' +
+                                    'account? \nThis will also delete all their games, mutants, tests, equivalences' +
+                                    ' plus the games\'s mutants, tests and equivalences');">
                         <span class="glyphicon glyphicon-trash"></span>
                     </button>
                     <%}%>
@@ -90,6 +92,8 @@
 
         <script>
             $(document).ready(function () {
+                $('[data-toggle="tooltip"]').tooltip();
+
                 $('#tableUsers').DataTable({
                     pagingType: "full_numbers",
                     lengthChange: false,
