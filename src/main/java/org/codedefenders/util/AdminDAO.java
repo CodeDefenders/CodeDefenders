@@ -1,6 +1,5 @@
 package org.codedefenders.util;
 
-import org.codedefenders.AdminInterface;
 import org.codedefenders.GameLevel;
 import org.codedefenders.Role;
 import org.codedefenders.User;
@@ -454,7 +453,6 @@ public class AdminDAO {
         PreparedStatement stmt = DB.createPreparedStatement(conn, PLAYERS_INFO_QUERY, DB.getDBV(gid));
         long start = System.currentTimeMillis();
         ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        System.out.println("query took: " + String.valueOf(System.currentTimeMillis()-start) + " ms");
         List<List<String>> players = new ArrayList<>();
         try {
             while (rs.next()) {
