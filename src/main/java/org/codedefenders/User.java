@@ -71,19 +71,14 @@ public class User {
 	}
 
 
-	public boolean update(boolean encodePassword) {
+	public boolean update() {
 		DatabaseValue[] valueList;
 		Connection conn = DB.getConnection();
-		String safePassword = password;
-		if (encodePassword) {
-			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-			safePassword = passwordEncoder.encode(password);
-		}
 
 		String query = "UPDATE users SET Username = ?, Email = ?, Password = ?, Validated = ? WHERE User_ID = ?;";
 		valueList = new DatabaseValue[]{DB.getDBV(username),
 				DB.getDBV(email),
-				DB.getDBV(safePassword),
+				DB.getDBV(password),
 				DB.getDBV(validated),
 				DB.getDBV(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);

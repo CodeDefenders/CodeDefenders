@@ -66,25 +66,28 @@ public class AdminUserMgmt extends HttpServlet {
 	}
 
 	private String editUser(String uid, HttpServletRequest request) {
-		String errorMessage = "Error trying to update info for user " + uid;
 		User u = DatabaseAccess.getUser(Integer.parseInt(uid));
 		if (u != null) {
 			String name = request.getParameter("name");
 			String email = request.getParameter("email");
 			String password = request.getParameter("password");
-			boolean changePassword = password != null && !password.equals("");
 
-			if (name != null && !name.equals("")) u.setUsername(name);
-			if (email != null && !email.equals("")) u.setEmail(email);
-			if (changePassword) u.setPassword(password);
-
-			u.update(changePassword);
-			User uNew = DatabaseAccess.getUser(Integer.parseInt(uid));
-			if (uNew.getEmail().equals(u.getEmail()) && uNew.getUsername().equals(u.getUsername()) && uNew.getPassword().equals(u.getPassword())) {
-				return "Successfully updated info for " + u.getUsername();
+			if (password != null && !password.equals("")) {
+				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+				u.setPassword(passwordEncoder.encode(password));
 			}
+			u.setUsername(name);
+			u.setEmail(email);
+
+			u.update();
+			User uUpdated = DatabaseAccess.getUser(Integer.parseInt(uid));
+
+			if (uUpdated.getEmail().equals(u.getEmail())
+					&& uUpdated.getUsername().equals(u.getUsername())
+					&& uUpdated.getPassword().equals(u.getPassword()))
+				return "Successfully updated info for " + u.getUsername();
 		}
-		return errorMessage;
+		return "Error. User " + uid + " cannot be retrieved from database.";
 	}
 
 	private void createUserAccounts(String userNameListString, ArrayList<String> messages) {
