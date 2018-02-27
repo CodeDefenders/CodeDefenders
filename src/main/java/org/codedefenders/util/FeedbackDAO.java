@@ -32,10 +32,11 @@ public class FeedbackDAO {
 
 		List<DatabaseValue> allValuesList = new ArrayList<>();
 		for (int i = 0; i < ratingsList.size(); i++) {
+			int boundedValue = Math.max(Feedback.MIN_RATING, ratingsList.get(i)) % (Feedback.MAX_RATING + 1);
 			List<DatabaseValue> valueList = Arrays.asList(DB.getDBV(uid),
 					DB.getDBV(gid),
 					DB.getDBV(feedbackTypes[i].name()),
-					DB.getDBV(ratingsList.get(i)));
+					DB.getDBV(boundedValue));
 			allValuesList = ListUtils.union(allValuesList, valueList);
 			query += queryValues;
 		}
@@ -57,7 +58,7 @@ public class FeedbackDAO {
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_FEEDBACK_QUERY, valueList);
 		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-		if (rs == null )
+		if (rs == null)
 			return null;
 		try {
 			while (rs.next()) {

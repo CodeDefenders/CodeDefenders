@@ -15,6 +15,9 @@ import java.util.List;
 
 public class Feedback extends HttpServlet {
 
+	public final static int MAX_RATING = 5;
+	public final static int MIN_RATING = -1;
+
 	public enum FeedbackType {
 		CUT_MUTATION_DIFFICULTY {
 			public String toString() {
@@ -86,7 +89,7 @@ public class Feedback extends HttpServlet {
 			String rating = request.getParameter("rating" + f.name());
 			ratingsList.add(rating == null ? 0 : Integer.parseInt(rating));
 		}
-		FeedbackDAO.updateFeedback(gid, uid, ratingsList);
+		FeedbackDAO.insertFeedback(gid, uid, ratingsList);
 	}
 
 }
