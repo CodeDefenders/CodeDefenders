@@ -1,3 +1,4 @@
+<%@ page import="org.codedefenders.util.FeedbackDAO" %>
 <div id="playerFeedback" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
 
     <style>
@@ -65,22 +66,30 @@
                         <tbody>
 
                         <%
+                            int[] oldValues = FeedbackDAO.getFeedbackValues(gameId, uid);
                             for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {
+                                int oldValue = oldValues == null ? -1 : oldValues[f.ordinal()];
                         %>
 
                         <tr>
-                            <td><%=f%></td>
+                            <td><%=f%>
+                            </td>
                             <td>
                                 <fieldset class="rating">
-                                    <input type="radio" id="star5_<%=f.name()%>" name="rating<%=f.name()%>" value=5>
+                                    <input type="radio" id="star5_<%=f.name()%>" name="rating<%=f.name()%>" value=5
+                                        <%=oldValue == 5 ? "checked" : ""%>>
                                     <label class="full" for="star5_<%=f.name()%>" title="very much"></label>
-                                    <input type="radio" id="star4_<%=f.name()%>" name="rating<%=f.name()%>" value=4>
+                                    <input type="radio" id="star4_<%=f.name()%>" name="rating<%=f.name()%>" value=4
+                                        <%=oldValue == 4 ? "checked" : ""%>>
                                     <label class="full" for="star4_<%=f.name()%>" title="a lot"></label>
-                                    <input type="radio" id="star3_<%=f.name()%>" name="rating<%=f.name()%>" value=3>
+                                    <input type="radio" id="star3_<%=f.name()%>" name="rating<%=f.name()%>" value=3
+                                        <%=oldValue == 3 ? "checked" : ""%>>
                                     <label class="full" for="star3_<%=f.name()%>" title="somewhat"></label>
-                                    <input type="radio" id="star2_<%=f.name()%>" name="rating<%=f.name()%>" value=2>
+                                    <input type="radio" id="star2_<%=f.name()%>" name="rating<%=f.name()%>" value=2
+                                        <%=oldValue == 2 ? "checked" : ""%>>
                                     <label class="full" for="star2_<%=f.name()%>" title="a bit"></label>
-                                    <input type="radio" id="star1_<%=f.name()%>" name="rating<%=f.name()%>" value=1>
+                                    <input type="radio" id="star1_<%=f.name()%>" name="rating<%=f.name()%>" value=1
+                                        <%=oldValue == 1 ? "checked" : ""%>>
                                     <label class="full" for="star1_<%=f.name()%>" title="not at all"></label>
                                 </fieldset>
                             </td>
