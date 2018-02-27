@@ -67,27 +67,33 @@ public class AdminUserMgmt extends HttpServlet {
 
 	private String editUser(String uid, HttpServletRequest request) {
 		User u = DatabaseAccess.getUser(Integer.parseInt(uid));
-		if (u != null) {
-			String name = request.getParameter("name");
-			String email = request.getParameter("email");
-			String password = request.getParameter("password");
+		if (u == null)
+			return "Error. User " + uid + " cannot be retrieved from database.";
 
-			if (password != null && !password.equals("")) {
-				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-				u.setPassword(passwordEncoder.encode(password));
-			}
-			u.setUsername(name);
-			u.setEmail(email);
+		String name = request.getParameter("name");
+		String email = request.getParameter("email");
+		String password = request.getParameter("password");
+		String confirm_password = request.getParameter("confirm_password");
 
-			u.update();
-			User uUpdated = DatabaseAccess.getUser(Integer.parseInt(uid));
+		if (!password.equals(confirm_password))
+			return "Error! Passwords don't match!";
 
-			if (uUpdated.getEmail().equals(u.getEmail())
-					&& uUpdated.getUsername().equals(u.getUsername())
-					&& uUpdated.getPassword().equals(u.getPassword()))
-				return "Successfully updated info for " + u.getUsername();
+		if (!password.equals("")) {
+			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+			u.setPassword(passwordEncoder.encode(password));
 		}
-		return "Error. User " + uid + " cannot be retrieved from database.";
+		u.setUsername(name);
+		u.setEmail(email);
+
+		u.update();
+		User uUpdated = DatabaseAccess.getUser(Integer.parseInt(uid));
+
+		if (uUpdated.getEmail().equals(u.getEmail())
+				&& uUpdated.getUsername().equals(u.getUsername())
+				&& uUpdated.getPassword().equals(u.getPassword()))
+			return "Successfully updated info for " + u.getUsername();
+
+		return "Error trying to update info for user " + uid + "!";
 	}
 
 	private void createUserAccounts(String userNameListString, ArrayList<String> messages) {

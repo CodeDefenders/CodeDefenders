@@ -34,10 +34,31 @@
         <br>
         <div class="input-group">
             <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
-            <input style ="padding-left:5px" id="password" type="password" class="form-control" name="password" placeholder="unchanged">
+            <input style ="padding-left:5px" id="password" type="password" class="form-control"
+                   name="password" placeholder="unchanged" onkeyup="check()">
+        </div>
+        <span class = "label label-danger" style = "color: white" id = "pw_confirm_message"></span>
+        <br>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span>
+            <input style ="padding-left:5px" id="confirm_password" type="password" class="form-control"
+                   name="confirm_password" placeholder="confirm password" onkeyup="check()">
         </div>
         <br>
-        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+        <button type="submit" class="btn btn-primary btn-block" name = "submit_edit_user" id = "submit_edit_user"> Submit</button>
+
+        <script>
+            function check() {
+                if (document.getElementById('password').value ==
+                    document.getElementById('confirm_password').value) {
+                    document.getElementById('pw_confirm_message').innerHTML = '';
+                    document.getElementById('submit_edit_user').disabled = false;
+                } else {
+                    document.getElementById('pw_confirm_message').innerHTML = 'Passwords don\'t match!';
+                    document.getElementById('submit_edit_user').disabled = true;
+                }
+            }
+        </script>
     </form>
     <%
             }
