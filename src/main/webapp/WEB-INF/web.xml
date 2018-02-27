@@ -19,6 +19,8 @@
 			<web-resource-name>SecuredBookSite</web-resource-name>
 			<url-pattern>/admin</url-pattern>
 			<url-pattern>/admin/*</url-pattern>
+			<url-pattern>/jsp/admin_user_mgmt.jsp</url-pattern>
+			<url-pattern>/jsp/admin_games_mgmt.jsp</url-pattern>
 			<http-method>GET</http-method>
 			<http-method>POST</http-method>
 		</web-resource-collection>
