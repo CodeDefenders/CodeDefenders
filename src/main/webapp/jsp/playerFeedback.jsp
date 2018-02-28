@@ -51,13 +51,13 @@
 
     <div class="modal-dialog">
         <!-- Modal content-->
-        <div class="modal-content" style="z-index: 10000; position: absolute; width: 150%; left:-15%;">
+        <div class="modal-content" style="z-index: 10000; position: absolute; width: 75%; left:12%;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h3 class="modal-title">Rate your Experience</h3>
             </div>
             <div class="modal-body">
-                <b><h4>How much do you agree with the following statements:</h4></b>
+                <h4><b>How much do you agree with the following statements:</b></h4>
                 <br>
 
                 <form id="sendFeedback" action="feedback" method="post">
@@ -69,6 +69,14 @@
                             int[] oldValues = FeedbackDAO.getFeedbackValues(gameId, uid);
                             for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {
                                 int oldValue = oldValues == null ? -1 : oldValues[f.ordinal()];
+                                if ((role.equals(Role.DEFENDER) &&
+                                        (f.equals(Feedback.FeedbackType.CUT_MUTATION_DIFFICULTY) ||
+                                                f.equals(Feedback.FeedbackType.DEFENDER_FAIRNESS)))
+                                        ||
+                                        (role.equals(Role.ATTACKER) &&
+                                                (f.equals(Feedback.FeedbackType.CUT_TEST_DIFFICULTY) ||
+                                                        f.equals(Feedback.FeedbackType.ATTACKER_FAIRNESS))))
+                                    continue;
                         %>
 
                         <tr>
@@ -100,18 +108,15 @@
                     </table>
 
                     <br>
-                    <p>In providing feedback you help us improve game mechanics, hone match making and select CUTs that
-                        are engaging and fun.</p>
-                    <p>You can change your ratings as long as the game is running.</p>
+                    <p>In providing feedback you help us improve gameplay mechanics, <br>
+                        hone match making and select CUTs that are engaging and fun.</p>
+                    <p>You can change your feedback even after the game finishes.</p>
                     <p>Thank you for your time.</p>
                     <br>
 
                     <button class="btn btn-primary" type="submit"> Save Feedback</button>
                 </form>
             </div>
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
     </div>
 </div>

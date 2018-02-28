@@ -13,11 +13,6 @@
 <div class="game-container">
 <nav class="nest" style="width: 90%; margin-left: auto; margin-right: auto;">
     <div class="crow fly">
-        <div>
-            <a href="#" class="btn btn-default btn-diff" id="btnFeedback" data-toggle="modal" data-target="#playerFeedback">
-                Feedback
-            </a>
-        </div>
         <div style="text-align: left">
             <h3><%= role %>::<%= mg.getState().toString() %></h3>
         </div>
@@ -28,6 +23,9 @@
             <span class="glyphicon glyphicon-question-sign"></span>
             </a>
             <a href="#" class="btn btn-default btn-diff" id="btnScoreboard" data-toggle="modal" data-target="#scoreboard">Show Scoreboard</a>
+            <a href="#" class="btn btn-default btn-diff" id="btnFeedback" data-toggle="modal" data-target="#playerFeedback">
+                Feedback
+            </a>
         </div>
     </div>
 </nav>
