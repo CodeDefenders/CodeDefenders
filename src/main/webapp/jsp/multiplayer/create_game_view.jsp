@@ -1,6 +1,7 @@
 <%@ page import="org.joda.time.DateTime" %>
 <%@ page import="org.joda.time.format.DateTimeFormat" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
+<%@ page import="org.codedefenders.util.FeedbackDAO" %>
 <% String pageTitle = "Create Battleground"; %>
 <%@ include file="/jsp/header.jsp"%>
 <div id="creategame" class="container">
@@ -8,11 +9,22 @@
 		<input type="hidden" name="formType" value="createGame">
 		<table class="tableform">
 			<tr>
-				<td width="25%">Java Class</td>
+				<td width="35%">Java Class</td>
 				<td>
+					<%
+						List<GameClass> allClasses = DatabaseAccess.getAllClasses();
+						List<Double> avgMutationDifficulties = FeedbackDAO.getAverageMutationDifficulties();
+						List<Double> avgTestDifficulties = FeedbackDAO.getAverageTestDifficulties();
+					%>
 					<select name="class" class="form-control selectpicker" data-size="large" >
-						<% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
-						<option value="<%=c.getId()%>"><%=c.getAlias()%></option>
+						<% for (int i = 0; i < allClasses.size(); i++) {
+						GameClass c = allClasses.get(i);
+						double mutationDiff = avgMutationDifficulties.get(i);
+						double testingDiff = avgTestDifficulties.get(i);%>
+                        <option value="<%=c.getId()%>">
+							<%=c.getAlias() + (mutationDiff > 0 ? "     Mutation: " + mutationDiff : "")
+									+ (testingDiff > 0 ? "     Testing: " + testingDiff : "")%>
+						</option>
 						<%}%>
 					</select>
 				</td>

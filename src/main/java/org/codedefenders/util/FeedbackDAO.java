@@ -27,15 +27,14 @@ public class FeedbackDAO {
 			"WHERE Game_ID = ? AND User_ID = ? AND type = ?;";
 
 	private static final String GET_AVERAGE_CLASS_DIFFICULTIES = "SELECT\n" +
-			"  AVG(value) AS 'average',\n" +
+			"  IFNULL(AVG(value), -1)   AS 'average',\n" +
 			"  c.Class_ID,\n" +
-			"  c.Alias,\n" +
-			"  COUNT(value)           AS 'votes'\n" +
-			"FROM ratings\n" +
-			"  JOIN games g ON ratings.Game_ID = g.ID\n" +
-			"  JOIN classes c ON g.Class_ID = c.Class_ID\n" +
-			"  WHERE type = ? AND value > 0\n" +
-			"GROUP BY c.Class_ID;";
+			"  COUNT(value) AS 'votes'\n" +
+			"FROM\n" +
+			"  (SELECT * FROM ratings WHERE type = ? AND value > 0) as filteredRatings\n" +
+			"  RIGHT JOIN games g ON filteredRatings.Game_ID = g.ID\n" +
+			"  RIGHT JOIN classes c ON g.Class_ID = c.Class_ID\n" +
+			"GROUP BY c.Class_ID ORDER BY c.Class_ID;";
 
 	private static final String GET_AVERAGE_GAME_RATINGS = "SELECT\n" +
 			"  AVG(value) AS 'average',\n" +
@@ -150,9 +149,8 @@ public class FeedbackDAO {
 		return values;
 	}
 
-	public static int[] getAverageCassDifficultyRatings (Feedback.FeedbackType feedbackType) {
-		int[] values = new int[Feedback.FeedbackType.values().length];
-		Arrays.fill(values, -1);
+	private static List<Double> getAverageClassDifficultyRatings (Feedback.FeedbackType feedbackType) {
+		List<Double> values = new ArrayList<>();
 
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_AVERAGE_CLASS_DIFFICULTIES, DB.getDBV(feedbackType.name()));
@@ -162,8 +160,7 @@ public class FeedbackDAO {
 				return null;
 			rs.beforeFirst();
 			while (rs.next()) {
-				int typeIndex = Feedback.FeedbackType.valueOf(rs.getString(2)).ordinal();
-				values[typeIndex] = rs.getInt(1);
+				values.add(rs.getDouble(1));
 			}
 		} catch (SQLException e) {
 			logger.error("SQLException while parsing result set for statement\n\t", stmt);
@@ -172,6 +169,14 @@ public class FeedbackDAO {
 			DB.cleanup(conn, stmt);
 		}
 		return values;
+	}
+
+	public static List<Double> getAverageMutationDifficulties () {
+		return getAverageClassDifficultyRatings(Feedback.FeedbackType.CUT_MUTATION_DIFFICULTY);
+	}
+
+	public static List<Double> getAverageTestDifficulties () {
+		return getAverageClassDifficultyRatings(Feedback.FeedbackType.CUT_TEST_DIFFICULTY);
 	}
 
 	public static int getNBFeedbacksForGame(int gid) {
