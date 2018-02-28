@@ -62,9 +62,10 @@ public class FeedbackDAO {
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_FEEDBACK_QUERY, valueList);
 		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-		if (rs == null)
-			return null;
 		try {
+			if (rs == null || !rs.next())
+				return null;
+			rs.beforeFirst();
 			while (rs.next()) {
 				int typeIndex = Feedback.FeedbackType.valueOf(rs.getString(2)).ordinal();
 				values[typeIndex] = rs.getInt(1);
