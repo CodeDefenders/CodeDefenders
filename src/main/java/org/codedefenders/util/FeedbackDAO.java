@@ -22,6 +22,10 @@ public class FeedbackDAO {
 			"FROM ratings\n" +
 			"WHERE Game_ID = ? AND User_ID = ?;";
 
+	private static final String UPDATE_FEEDBACK_QUERY = "UPDATE ratings\n" +
+			"SET value = ?\n" +
+			"WHERE Game_ID = ? AND User_ID = ? AND type = ?;";
+
 	public static boolean insertFeedback(int gid, int uid, List<Integer> ratingsList) {
 		Feedback.FeedbackType[] feedbackTypes = Feedback.FeedbackType.values();
 		String query = "INSERT INTO ratings VALUES ";
@@ -72,6 +76,26 @@ public class FeedbackDAO {
 			DB.cleanup(conn, stmt);
 		}
 		return values;
+	}
+
+	public static boolean updateFeedback(int gid, int uid, List<Integer> ratingsList) {
+		Feedback.FeedbackType[] feedbackTypes = Feedback.FeedbackType.values();
+
+		if (ratingsList.size() > feedbackTypes.length || ratingsList.size() < 1)
+			return false;
+
+		Connection conn = DB.getConnection();
+		for (int i = 0; i < ratingsList.size(); i++) {
+			int boundedValue = Math.max(Feedback.MIN_RATING, ratingsList.get(i)) % (Feedback.MAX_RATING + 1);
+			DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(boundedValue),
+					DB.getDBV(gid),
+					DB.getDBV(uid),
+					DB.getDBV(feedbackTypes[i].name())};
+			PreparedStatement stmt = DB.createPreparedStatement(conn, UPDATE_FEEDBACK_QUERY, valueList);
+			if (!DB.executeUpdate(stmt, conn))
+				return false;
+		}
+		return true;
 	}
 
 }

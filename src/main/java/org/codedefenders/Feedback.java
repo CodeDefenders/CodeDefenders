@@ -77,19 +77,22 @@ public class Feedback extends HttpServlet {
 
 		switch (request.getParameter("formType")) {
 			case "sendFeedback":
-				updateFeedback(request, uid, gameId);
+				if (!saveFeedback(request, uid, gameId))
+					messages.add("Could not save your feedback. Please try again later!");
 		}
 
 		response.sendRedirect(contextPath + "/multiplayer/play");//doGet(request, response);
 	}
 
-	private void updateFeedback(HttpServletRequest request, int uid, int gid) {
+	private boolean saveFeedback(HttpServletRequest request, int uid, int gid) {
 		List ratingsList = new ArrayList<Integer>();
 		for (FeedbackType f : FeedbackType.values()) {
 			String rating = request.getParameter("rating" + f.name());
 			ratingsList.add(rating == null ? 0 : Integer.parseInt(rating));
 		}
-		FeedbackDAO.insertFeedback(gid, uid, ratingsList);
+		if   (FeedbackDAO.getFeedbackValues(gid, uid) == null)
+			return FeedbackDAO.insertFeedback(gid, uid, ratingsList);
+		return FeedbackDAO.updateFeedback(gid, uid, ratingsList);
 	}
 
 }
