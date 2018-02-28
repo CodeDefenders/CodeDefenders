@@ -99,4 +99,8 @@ public class FeedbackDAO {
 		return true;
 	}
 
+	public static boolean hasNotRated(int gid, int uid) {
+		return getFeedbackValues(gid, uid) == null;
+	}
+
 }

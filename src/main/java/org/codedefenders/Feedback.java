@@ -90,7 +90,7 @@ public class Feedback extends HttpServlet {
 			String rating = request.getParameter("rating" + f.name());
 			ratingsList.add(rating == null ? 0 : Integer.parseInt(rating));
 		}
-		if   (FeedbackDAO.getFeedbackValues(gid, uid) == null)
+		if   (FeedbackDAO.hasNotRated(gid, uid))
 			return FeedbackDAO.insertFeedback(gid, uid, ratingsList);
 		return FeedbackDAO.updateFeedback(gid, uid, ratingsList);
 	}

@@ -51,6 +51,8 @@
 
     <div class="modal-dialog">
         <!-- Modal content-->
+
+        <% if (role.equals(Role.DEFENDER) || role.equals(Role.ATTACKER)) {%>
         <div class="modal-content" style="z-index: 10000; position: absolute; width: 75%; left:12%;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -118,5 +120,78 @@
                 </form>
             </div>
         </div>
+        <%} else if (role.equals(Role.CREATOR)) {%>
+        <div class="modal-content" style="z-index: 10000; position: absolute; width: 200%; left:-50%;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h3 class="modal-title">Feeback for Game <%=gameId%>
+                </h3>
+            </div>
+            <div class="modal-body">
+                <br>
+
+                <table class="table-hover table-bordered table-responsive">
+                    <thead>
+                    <tr>
+                        <th>Player</th>
+                        <% for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {%>
+                        <th title = "<%=f.toString()%>"><%=f.name().toLowerCase().replace('_', ' ')%>
+                        </th>
+                        <%}%>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    <%
+                        int[] attackerIDs = mg.getAttackerIds();
+                        for (int pid : mg.getPlayerIds()) {
+                            User userFromPlayer = DatabaseAccess.getUserFromPlayer(pid);
+                            int userFromPlayerId = userFromPlayer.getId();
+                            String userName = userFromPlayer.getUsername();
+
+                            if (FeedbackDAO.hasNotRated(gameId, userFromPlayerId))
+                                continue;
+
+                            String rowColor = ArrayUtils.contains(attackerIDs, pid) ? "#9a002914" : "#0029a01a";
+                    %>
+                    <tr style="background-color:<%=rowColor%>">
+                        <td><%=userName%>
+                        </td>
+                        <%
+                            int[] ratingValues = FeedbackDAO.getFeedbackValues(gameId, userFromPlayerId);
+                            for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {
+                                int ratingValue = ratingValues == null ? -1 : ratingValues[f.ordinal()];
+                                if (ratingValue < 1) {
+                        %>
+                        <td></td>
+
+                        <%} else {%>
+
+                        <td>
+                            <fieldset class="rating">
+                                <%for (int i = Feedback.MAX_RATING; i > 0; i--) {%>
+                                <label class="full" for="star<%=i%>_<%=f.name()+"_user"+userFromPlayerId%>" title="<%=i%>"
+                                       style="font-size:13px; color:<%=i <= ratingValue  ? "#FFD700" : "#bdbdbd"%>"></label>
+                                <%}%>
+                            </fieldset>
+                        </td>
+
+                        <%
+                                }
+                            }
+                        %>
+                    </tr>
+
+                    <%
+                        }
+                    %>
+                    <tr></tr>
+
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+        <%}%>
     </div>
 </div>
