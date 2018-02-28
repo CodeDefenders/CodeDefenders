@@ -128,14 +128,15 @@
                 </h3>
             </div>
             <div class="modal-body">
-                <br>
 
-                <table class="table-hover table-bordered table-responsive">
+                <% if (FeedbackDAO.getNBFeedbacksForGame(gameId) > 0) {%>
+
+                <table class="table-hover table-bordered table-responsive" style="margin: auto">
                     <thead>
                     <tr>
                         <th>Player</th>
                         <% for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {%>
-                        <th title = "<%=f.toString()%>"><%=f.name().toLowerCase().replace('_', ' ')%>
+                        <th title="<%=f.toString()%>"><%=f.name().toLowerCase().replace('_', ' ')%>
                         </th>
                         <%}%>
                     </tr>
@@ -170,7 +171,7 @@
                         <td>
                             <fieldset class="rating">
                                 <%for (int i = Feedback.MAX_RATING; i > 0; i--) {%>
-                                <label class="full" for="star<%=i%>_<%=f.name()+"_user"+userFromPlayerId%>" title="<%=i%>"
+                                <label class="full" title="<%=i%>"
                                        style="font-size:13px; color:<%=i <= ratingValue  ? "#FFD700" : "#bdbdbd"%>"></label>
                                 <%}%>
                             </fieldset>
@@ -186,10 +187,43 @@
                         }
                     %>
                     <tr></tr>
+                    <tr>
+                        <td>Average</td>
+                        <%
+                            double[] avgRatings = FeedbackDAO.getAverageGameRatings(gameId);
+                            for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {
+                                double ratingValue = avgRatings == null ? -1 : avgRatings[f.ordinal()];
+                                if (ratingValue < 1) {
+                        %>
+                        <td></td>
 
+                        <%} else {%>
+
+                        <td>
+                            <fieldset class="rating">
+                                <%for (int i = Feedback.MAX_RATING; i > 0; i--) {%>
+                                <label class="full" title="<%=i%>"
+                                       style="font-size:13px; color:<%=i <= Math.round(ratingValue)  ? "#FFD700" : "#bdbdbd"%>"></label>
+                                <%}%>
+                            </fieldset>
+                            <br>
+                            <p style="    text-align:  center;"><%=String.format("%.1f", ratingValue)%>
+                            </p>
+                        </td>
+
+                        <%
+                                }
+                            }
+                        %>
+                    </tr>
                     </tbody>
 
                 </table>
+                <% } else {
+                %>
+                    <h4>No Player has provided feedback for this Game yet.</h4>
+                <%
+                    }%>
             </div>
         </div>
         <%}%>

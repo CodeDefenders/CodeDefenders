@@ -26,6 +26,29 @@ public class FeedbackDAO {
 			"SET value = ?\n" +
 			"WHERE Game_ID = ? AND User_ID = ? AND type = ?;";
 
+	private static final String GET_AVERAGE_CLASS_DIFFICULTIES = "SELECT\n" +
+			"  AVG(value) AS 'average',\n" +
+			"  c.Class_ID,\n" +
+			"  c.Alias,\n" +
+			"  COUNT(value)           AS 'votes'\n" +
+			"FROM ratings\n" +
+			"  JOIN games g ON ratings.Game_ID = g.ID\n" +
+			"  JOIN classes c ON g.Class_ID = c.Class_ID\n" +
+			"  WHERE type = ? AND value > 0\n" +
+			"GROUP BY c.Class_ID;";
+
+	private static final String GET_AVERAGE_GAME_RATINGS = "SELECT\n" +
+			"  AVG(value) AS 'average',\n" +
+			"  type\n" +
+			"FROM ratings\n" +
+			"WHERE Game_ID = ? AND value > 0\n" +
+			"GROUP BY type;";
+
+	private static final String GET_NB_FEEDBACKS_FOR_GAME = "SELECT COUNT(DISTINCT User_ID) AS 'nb_feedbacks'\n" +
+			"FROM\n" +
+			"  ratings\n" +
+			"WHERE Game_ID = ?;";
+
 	public static boolean insertFeedback(int gid, int uid, List<Integer> ratingsList) {
 		Feedback.FeedbackType[] feedbackTypes = Feedback.FeedbackType.values();
 		String query = "INSERT INTO ratings VALUES ";
@@ -101,6 +124,73 @@ public class FeedbackDAO {
 
 	public static boolean hasNotRated(int gid, int uid) {
 		return getFeedbackValues(gid, uid) == null;
+	}
+
+	public static double[] getAverageGameRatings (int gid) {
+		double[] values = new double[Feedback.FeedbackType.values().length];
+		Arrays.fill(values, -1);
+
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_AVERAGE_GAME_RATINGS, DB.getDBV(gid));
+		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+		try {
+			if (rs == null || !rs.next())
+				return null;
+			rs.beforeFirst();
+			while (rs.next()) {
+				int typeIndex = Feedback.FeedbackType.valueOf(rs.getString(2)).ordinal();
+				values[typeIndex] = rs.getDouble(1);
+			}
+		} catch (SQLException e) {
+			logger.error("SQLException while parsing result set for statement\n\t", stmt);
+			e.printStackTrace();
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return values;
+	}
+
+	public static int[] getAverageCassDifficultyRatings (Feedback.FeedbackType feedbackType) {
+		int[] values = new int[Feedback.FeedbackType.values().length];
+		Arrays.fill(values, -1);
+
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_AVERAGE_CLASS_DIFFICULTIES, DB.getDBV(feedbackType.name()));
+		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+		try {
+			if (rs == null || !rs.next())
+				return null;
+			rs.beforeFirst();
+			while (rs.next()) {
+				int typeIndex = Feedback.FeedbackType.valueOf(rs.getString(2)).ordinal();
+				values[typeIndex] = rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			logger.error("SQLException while parsing result set for statement\n\t", stmt);
+			e.printStackTrace();
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return values;
+	}
+
+	public static int getNBFeedbacksForGame(int gid) {
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_NB_FEEDBACKS_FOR_GAME, DB.getDBV(gid));
+		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+		try {
+			if (rs == null)
+				return 0;
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			logger.error("SQLException while parsing result set for statement\n\t", stmt);
+			e.printStackTrace();
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return 0;
 	}
 
 }
