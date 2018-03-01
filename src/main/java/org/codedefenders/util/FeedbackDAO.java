@@ -48,8 +48,9 @@ public class FeedbackDAO {
 			"  ratings\n" +
 			"WHERE Game_ID = ?;";
 
+	private static Feedback.FeedbackType[] feedbackTypes = Feedback.FeedbackType.values();
+
 	public static boolean insertFeedback(int gid, int uid, List<Integer> ratingsList) {
-		Feedback.FeedbackType[] feedbackTypes = Feedback.FeedbackType.values();
 		String query = "INSERT INTO ratings VALUES ";
 		String queryValues = "(?, ?, ?, ?),";
 
@@ -78,7 +79,7 @@ public class FeedbackDAO {
 	public static int[] getFeedbackValues(int gid, int uid) {
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(gid),
 				DB.getDBV(uid)};
-		int[] values = new int[Feedback.FeedbackType.values().length];
+		int[] values = new int[feedbackTypes.length];
 		Arrays.fill(values, -1);
 
 		Connection conn = DB.getConnection();
@@ -89,8 +90,13 @@ public class FeedbackDAO {
 				return null;
 			rs.beforeFirst();
 			while (rs.next()) {
-				int typeIndex = Feedback.FeedbackType.valueOf(rs.getString(2)).ordinal();
-				values[typeIndex] = rs.getInt(1);
+				String typeString = rs.getString(2);
+				if (isValidFeedbackType(typeString)) {
+					int typeIndex = Feedback.FeedbackType.valueOf(typeString).ordinal();
+					values[typeIndex] = rs.getInt(1);
+				} else {
+					logger.warn("No such feedback type: " + typeString);
+				}
 			}
 		} catch (SQLException e) {
 			logger.error("SQLException while parsing result set for statement\n\t", stmt);
@@ -102,8 +108,6 @@ public class FeedbackDAO {
 	}
 
 	public static boolean updateFeedback(int gid, int uid, List<Integer> ratingsList) {
-		Feedback.FeedbackType[] feedbackTypes = Feedback.FeedbackType.values();
-
 		if (ratingsList.size() > feedbackTypes.length || ratingsList.size() < 1)
 			return false;
 
@@ -126,7 +130,7 @@ public class FeedbackDAO {
 	}
 
 	public static double[] getAverageGameRatings (int gid) {
-		double[] values = new double[Feedback.FeedbackType.values().length];
+		double[] values = new double[feedbackTypes.length];
 		Arrays.fill(values, -1);
 
 		Connection conn = DB.getConnection();
@@ -137,8 +141,13 @@ public class FeedbackDAO {
 				return null;
 			rs.beforeFirst();
 			while (rs.next()) {
-				int typeIndex = Feedback.FeedbackType.valueOf(rs.getString(2)).ordinal();
-				values[typeIndex] = rs.getDouble(1);
+				String typeString = rs.getString(2);
+				if (isValidFeedbackType(typeString)) {
+					int typeIndex = Feedback.FeedbackType.valueOf(typeString).ordinal();
+					values[typeIndex] = rs.getDouble(1);
+				} else {
+					logger.warn("No such feedback type: " + typeString);
+				}
 			}
 		} catch (SQLException e) {
 			logger.error("SQLException while parsing result set for statement\n\t", stmt);
@@ -196,6 +205,14 @@ public class FeedbackDAO {
 			DB.cleanup(conn, stmt);
 		}
 		return 0;
+	}
+
+	private static boolean isValidFeedbackType(String typeName) {
+		List<String> feedbackTypeNames = new ArrayList<>();
+		for (Feedback.FeedbackType f : feedbackTypes) {
+			feedbackTypeNames.add(f.name());
+		}
+		return feedbackTypeNames.contains(typeName);
 	}
 
 }
