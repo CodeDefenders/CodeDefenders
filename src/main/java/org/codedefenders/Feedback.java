@@ -17,6 +17,7 @@ public class Feedback extends HttpServlet {
 
 	public final static int MAX_RATING = 5;
 	public final static int MIN_RATING = -1;
+	public static final boolean SHOW_OTHER_PLAYER_FEEDBACK = false;
 
 	public enum FeedbackType {
 		CUT_MUTATION_DIFFICULTY {
@@ -81,7 +82,7 @@ public class Feedback extends HttpServlet {
 					messages.add("Could not save your feedback. Please try again later!");
 		}
 
-		response.sendRedirect(contextPath + "/multiplayer/play");//doGet(request, response);
+		response.sendRedirect(request.getHeader("referer"));
 	}
 
 	private boolean saveFeedback(HttpServletRequest request, int uid, int gid) {

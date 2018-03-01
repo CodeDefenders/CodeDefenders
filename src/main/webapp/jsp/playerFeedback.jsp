@@ -51,14 +51,31 @@
 
     <div class="modal-dialog">
         <!-- Modal content-->
-
-        <% if (role.equals(Role.DEFENDER) || role.equals(Role.ATTACKER)) {%>
-        <div class="modal-content" style="z-index: 10000; position: absolute; width: 75%; left:12%;">
+        <div class="modal-content"
+             style="z-index: 10000; position: absolute; width: 200%; left:-50%;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h3 class="modal-title">Rate your Experience</h3>
+                <h3 class="modal-title">Feedback for Game <%=gameId%>
+                </h3>
             </div>
-            <div class="modal-body">
+
+            <% boolean canSeePlayerFeedback = role.equals(Role.CREATOR) || Feedback.SHOW_OTHER_PLAYER_FEEDBACK;
+            boolean canGiveFeedback = role.equals(Role.DEFENDER) || role.equals(Role.ATTACKER);
+                if (canGiveFeedback) {%>
+            <ul class="nav nav-tabs">
+                <li class="active" id="provideFeedbackLink">
+                    <a onClick="switchModal()">
+                        Give Feedback
+                    </a>
+                </li>
+                <li id="viewFeedbackLink">
+                    <a onClick="switchModal()">
+                        View Feedback
+                    </a>
+                </li>
+            </ul>
+
+            <div class="modal-body" id="provide_feedback_modal">
                 <h4><b>How much do you agree with the following statements:</b></h4>
                 <br>
 
@@ -119,22 +136,17 @@
                     <button class="btn btn-primary" type="submit"> Save Feedback</button>
                 </form>
             </div>
-        </div>
-        <%} else if (role.equals(Role.CREATOR)) {%>
-        <div class="modal-content" style="z-index: 10000; position: absolute; width: 200%; left:-50%;">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h3 class="modal-title">Feeback for Game <%=gameId%>
-                </h3>
-            </div>
-            <div class="modal-body">
+            <%}%>
+
+            <div class="modal-body" id="view_feedback_modal"
+                 style="<%=canGiveFeedback ? "display: none;" : ""%>">
 
                 <% if (FeedbackDAO.getNBFeedbacksForGame(gameId) > 0) {%>
 
                 <table class="table-hover table-bordered table-responsive" style="margin: auto">
                     <thead>
                     <tr>
-                        <th>Player</th>
+                        <th><%=canSeePlayerFeedback ? "Player" : ""%></th>
                         <% for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {%>
                         <th title="<%=f.toString()%>"><%=f.name().toLowerCase().replace('_', ' ')%>
                         </th>
@@ -144,16 +156,17 @@
                     <tbody>
 
                     <%
-                        int[] attackerIDs = mg.getAttackerIds();
-                        for (int pid : mg.getPlayerIds()) {
-                            User userFromPlayer = DatabaseAccess.getUserFromPlayer(pid);
-                            int userFromPlayerId = userFromPlayer.getId();
-                            String userName = userFromPlayer.getUsername();
+                        if (canSeePlayerFeedback) {
+                            int[] attackerIDs = mg.getAttackerIds();
+                            for (int pid : mg.getPlayerIds()) {
+                                User userFromPlayer = DatabaseAccess.getUserFromPlayer(pid);
+                                int userFromPlayerId = userFromPlayer.getId();
+                                String userName = userFromPlayer.getUsername();
 
-                            if (FeedbackDAO.hasNotRated(gameId, userFromPlayerId))
-                                continue;
+                                if (FeedbackDAO.hasNotRated(gameId, userFromPlayerId))
+                                    continue;
 
-                            String rowColor = ArrayUtils.contains(attackerIDs, pid) ? "#9a002914" : "#0029a01a";
+                                String rowColor = ArrayUtils.contains(attackerIDs, pid) ? "#9a002914" : "#0029a01a";
                     %>
                     <tr style="background-color:<%=rowColor%>">
                         <td><%=userName%>
@@ -184,6 +197,7 @@
                     </tr>
 
                     <%
+                            }
                         }
                     %>
                     <tr></tr>
@@ -221,11 +235,20 @@
                 </table>
                 <% } else {
                 %>
-                    <h4>No Player has provided feedback for this Game yet.</h4>
+                <h4>No Player has provided feedback for this Game yet.</h4>
                 <%
                     }%>
             </div>
         </div>
-        <%}%>
     </div>
 </div>
+
+<script>
+    function switchModal() {
+        var provideFeedbackModalStyle = document.getElementById('provide_feedback_modal').style.display;
+        document.getElementById('view_feedback_modal').style.display = provideFeedbackModalStyle;
+        document.getElementById('provide_feedback_modal').style.display = provideFeedbackModalStyle == 'none' ? 'block' : 'none';
+        document.getElementById('provideFeedbackLink').classList.toggle('active');
+        document.getElementById('viewFeedbackLink').classList.toggle('active');
+    }
+</script>
