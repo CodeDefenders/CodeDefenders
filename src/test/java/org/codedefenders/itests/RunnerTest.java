@@ -2,6 +2,7 @@ package org.codedefenders.itests;
 
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
+import org.apache.commons.lang3.ArrayUtils;
 import org.codedefenders.*;
 import org.codedefenders.Mutant.Equivalence;
 import org.codedefenders.duel.DuelGame;
@@ -14,6 +15,7 @@ import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.util.ConnectionPool;
 import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.util.DatabaseConnection;
+import org.codedefenders.util.FeedbackDAO;
 import org.codedefenders.validation.CodeValidator;
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,7 +33,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.junit.Assume.assumeTrue;
@@ -438,5 +443,39 @@ public class RunnerTest {
 		int nbConnections = Math.toIntExact(qr.query(conn, "SELECT COUNT(*) FROM information_schema.PROCESSLIST;", new ColumnListHandler<Long>()).get(0));
 		conn.close();
 		return nbConnections;
+	}
+
+	@Test
+	public void testRatings() {
+		assumeTrue(creator.insert());
+		assumeTrue(user1.insert());
+		assumeTrue(cut1.insert());
+		Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
+		assumeTrue(multiplayerGame.insert());
+
+		Integer[] ratings = new Integer[]{Feedback.MIN_RATING - 1, Feedback.MIN_RATING, Feedback.MAX_RATING, Feedback.MAX_RATING + 1};
+		List<Feedback.FeedbackType> feedbackTypesList = new ArrayList();
+		feedbackTypesList = Arrays.asList(ArrayUtils.subarray(Feedback.FeedbackType.values(), 0, ratings.length));
+		// shuffle feedback type list
+		Collections.shuffle(feedbackTypesList);
+		Feedback.FeedbackType[] feedbackTypes = new Feedback.FeedbackType[feedbackTypesList.size()];
+		feedbackTypes = feedbackTypesList.toArray(feedbackTypes);
+
+		List<Integer> ratingsList = Arrays.asList(ratings);
+		assertTrue("Feedback could not be inserted",
+				FeedbackDAO.insertFeedback(multiplayerGame.getId(), user1.getId(), ratingsList, feedbackTypes));
+
+		Integer[] ratingsFromDB = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId(), feedbackTypes);
+		Integer[] user1RatingsSanitized = new Integer[]{Feedback.MIN_RATING, Feedback.MIN_RATING, Feedback.MAX_RATING, Feedback.MAX_RATING};
+
+		assertEquals(user1RatingsSanitized, ratingsFromDB);
+
+		Integer[] updatedRatings = new Integer[]{Feedback.MAX_RATING, Feedback.MAX_RATING-1, Feedback.MIN_RATING+1, Feedback.MIN_RATING};
+		List<Integer> updatedRatingsList = Arrays.asList(updatedRatings);
+		assertTrue("Feedback could not be updated",
+				FeedbackDAO.updateFeedback(multiplayerGame.getId(), user1.getId(), updatedRatingsList, feedbackTypes));
+
+		Integer[] updatedRatingsFromDB = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId(), feedbackTypes);
+		assertEquals(updatedRatings, updatedRatingsFromDB);
 	}
 }
