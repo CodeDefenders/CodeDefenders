@@ -50,7 +50,7 @@ public class FeedbackDAO {
 
 	private static Feedback.FeedbackType[] feedbackTypes = Feedback.FeedbackType.values();
 
-	public static boolean insertFeedback(int gid, int uid, List<Integer> ratingsList) {
+	public static boolean insertFeedback(int gid, int uid, List<Integer> ratingsList, Feedback.FeedbackType[] feedbackTypes) {
 		String query = "INSERT INTO ratings VALUES ";
 		String queryValues = "(?, ?, ?, ?),";
 
@@ -59,7 +59,7 @@ public class FeedbackDAO {
 
 		List<DatabaseValue> allValuesList = new ArrayList<>();
 		for (int i = 0; i < ratingsList.size(); i++) {
-			int boundedValue = Math.max(Feedback.MIN_RATING, ratingsList.get(i)) % (Feedback.MAX_RATING + 1);
+			int boundedValue = Math.min(Math.max(Feedback.MIN_RATING, ratingsList.get(i)), Feedback.MAX_RATING);
 			List<DatabaseValue> valueList = Arrays.asList(DB.getDBV(uid),
 					DB.getDBV(gid),
 					DB.getDBV(feedbackTypes[i].name()),
@@ -76,10 +76,14 @@ public class FeedbackDAO {
 		return DB.executeUpdate(stmt, conn);
 	}
 
-	public static int[] getFeedbackValues(int gid, int uid) {
+	public static boolean insertFeedback(int gid, int uid, List<Integer> ratingsList) {
+		return insertFeedback(gid, uid, ratingsList, feedbackTypes);
+	}
+
+	public static Integer[] getFeedbackValues(int gid, int uid, Feedback.FeedbackType[] feedbackTypes) {
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(gid),
 				DB.getDBV(uid)};
-		int[] values = new int[feedbackTypes.length];
+		Integer[] values = new Integer[feedbackTypes.length];
 		Arrays.fill(values, -1);
 
 		Connection conn = DB.getConnection();
@@ -91,9 +95,8 @@ public class FeedbackDAO {
 			rs.beforeFirst();
 			while (rs.next()) {
 				String typeString = rs.getString(2);
-				if (isValidFeedbackType(typeString)) {
-					int typeIndex = Feedback.FeedbackType.valueOf(typeString).ordinal();
-					values[typeIndex] = rs.getInt(1);
+				if (isValidFeedbackType(typeString, feedbackTypes)) {
+					values[getFeedbackIndex(typeString, feedbackTypes)] = rs.getInt(1);
 				} else {
 					logger.warn("No such feedback type: " + typeString);
 				}
@@ -107,7 +110,11 @@ public class FeedbackDAO {
 		return values;
 	}
 
-	public static boolean updateFeedback(int gid, int uid, List<Integer> ratingsList) {
+	public static Integer[] getFeedbackValues(int gid, int uid) {
+		return getFeedbackValues(gid, uid, feedbackTypes);
+	}
+
+	public static boolean updateFeedback(int gid, int uid, List<Integer> ratingsList, Feedback.FeedbackType[] feedbackTypes) {
 		if (ratingsList.size() > feedbackTypes.length || ratingsList.size() < 1)
 			return false;
 
@@ -125,11 +132,15 @@ public class FeedbackDAO {
 		return true;
 	}
 
+	public static boolean updateFeedback(int gid, int uid, List<Integer> ratingsList) {
+		return updateFeedback(gid, uid, ratingsList, feedbackTypes);
+	}
+
 	public static boolean hasNotRated(int gid, int uid) {
 		return getFeedbackValues(gid, uid) == null;
 	}
 
-	public static double[] getAverageGameRatings (int gid) {
+	public static double[] getAverageGameRatings(int gid) {
 		double[] values = new double[feedbackTypes.length];
 		Arrays.fill(values, -1);
 
@@ -142,9 +153,8 @@ public class FeedbackDAO {
 			rs.beforeFirst();
 			while (rs.next()) {
 				String typeString = rs.getString(2);
-				if (isValidFeedbackType(typeString)) {
-					int typeIndex = Feedback.FeedbackType.valueOf(typeString).ordinal();
-					values[typeIndex] = rs.getDouble(1);
+				if (isValidFeedbackType(typeString, feedbackTypes)) {
+					values[getFeedbackIndex(typeString, feedbackTypes)] = rs.getDouble(1);
 				} else {
 					logger.warn("No such feedback type: " + typeString);
 				}
@@ -158,7 +168,7 @@ public class FeedbackDAO {
 		return values;
 	}
 
-	private static List<Double> getAverageClassDifficultyRatings (Feedback.FeedbackType feedbackType) {
+	private static List<Double> getAverageClassDifficultyRatings(Feedback.FeedbackType feedbackType) {
 		List<Double> values = new ArrayList<>();
 
 		Connection conn = DB.getConnection();
@@ -180,11 +190,11 @@ public class FeedbackDAO {
 		return values;
 	}
 
-	public static List<Double> getAverageMutationDifficulties () {
+	public static List<Double> getAverageMutationDifficulties() {
 		return getAverageClassDifficultyRatings(Feedback.FeedbackType.CUT_MUTATION_DIFFICULTY);
 	}
 
-	public static List<Double> getAverageTestDifficulties () {
+	public static List<Double> getAverageTestDifficulties() {
 		return getAverageClassDifficultyRatings(Feedback.FeedbackType.CUT_TEST_DIFFICULTY);
 	}
 
@@ -207,12 +217,20 @@ public class FeedbackDAO {
 		return 0;
 	}
 
-	private static boolean isValidFeedbackType(String typeName) {
+	private static boolean isValidFeedbackType(String typeName, Feedback.FeedbackType[] feedbackTypes) {
+		return getFeedbackNames(feedbackTypes).contains(typeName);
+	}
+
+	private static int getFeedbackIndex(String typeName, Feedback.FeedbackType[] feedbackTypes) {
+		return getFeedbackNames(feedbackTypes).indexOf(typeName);
+	}
+
+	private static List<String> getFeedbackNames(Feedback.FeedbackType[] feedbackTypes) {
 		List<String> feedbackTypeNames = new ArrayList<>();
 		for (Feedback.FeedbackType f : feedbackTypes) {
 			feedbackTypeNames.add(f.name());
 		}
-		return feedbackTypeNames.contains(typeName);
+		return feedbackTypeNames;
 	}
 
 }
