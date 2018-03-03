@@ -81,21 +81,15 @@ public class AdminUserMgmt extends HttpServlet {
 		if (!password.equals("")) {
 			// we don't want to encode the already encoded password from the DB
 			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-			u.setPassword(passwordEncoder.encode(password));
+			password = passwordEncoder.encode(password);
 		}
 		u.setUsername(name);
 		u.setEmail(email);
 
 		if (!u.update(password))
 			return "Error trying to update info for user " + uid + "!";
-		User uUpdated = DatabaseAccess.getUser(Integer.parseInt(uid));
+		return "Successfully updated info for " + u.getUsername();
 
-		if (uUpdated.getEmail().equals(u.getEmail())
-				&& uUpdated.getUsername().equals(u.getUsername())
-				&& uUpdated.getPassword().equals(u.getPassword()))
-			return "Successfully updated info for " + u.getUsername();
-
-		return "Error trying to update info for user " + uid + "!";
 	}
 
 	private void createUserAccounts(String userNameListString, ArrayList<String> messages) {
