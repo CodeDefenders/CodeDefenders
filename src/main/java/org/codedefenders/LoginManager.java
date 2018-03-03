@@ -1,7 +1,10 @@
 package org.codedefenders;
 
-import java.io.IOException;
-import java.util.ArrayList;
+import org.codedefenders.util.AdminDAO;
+import org.codedefenders.util.DatabaseAccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -14,11 +17,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.codedefenders.util.DatabaseAccess;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import java.io.IOException;
+import java.util.ArrayList;
 
 public class LoginManager extends HttpServlet {
 
@@ -85,30 +85,37 @@ public class LoginManager extends HttpServlet {
 			} else {
 				String dbPassword = activeUser.getPassword();
 				BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-				if (passwordEncoder.matches(password, dbPassword)) {
-					HttpSession session = request.getSession();
-					DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
-					session.setAttribute("uid", activeUser.getId());
-					session.setAttribute("username", activeUser.getUsername());
-					//
-					storeApplicationDataInSession(session);
-
-					Object from = session.getAttribute("loginFrom");
-					if (from != null && ! ((String) from).endsWith(".ico")
-							&& ! ((String) from).endsWith(".css")
-							&& ! ((String) from).endsWith(".js")) {
-						if (((String) from).startsWith(request.getContextPath())) {
-							response.sendRedirect((String) from);
-						} else {
-							response.sendRedirect(request.getContextPath() + "/" + (String) from);
-						}
-					} else
-						response.sendRedirect(request.getContextPath()+"/games");
-				} else {
-					// TODO: Shouldn't the user exist if we can retrieve it from the DB?
-					messages.add("Username does not exist or your password was incorrect.");
+				boolean requireValidation = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REQUIRE_MAIL_VALIDATION).getBoolValue();
+				if(requireValidation && !activeUser.isValidated()) {
+					messages.add("Account email is not validated.");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
+				} else {
+					if (passwordEncoder.matches(password, dbPassword)) {
+						HttpSession session = request.getSession();
+						DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
+						session.setAttribute("uid", activeUser.getId());
+						session.setAttribute("username", activeUser.getUsername());
+						//
+						storeApplicationDataInSession(session);
+
+						Object from = session.getAttribute("loginFrom");
+						if (from != null && !((String) from).endsWith(".ico")
+								&& !((String) from).endsWith(".css")
+								&& !((String) from).endsWith(".js")) {
+							if (((String) from).startsWith(request.getContextPath())) {
+								response.sendRedirect((String) from);
+							} else {
+								response.sendRedirect(request.getContextPath() + "/" + (String) from);
+							}
+						} else
+							response.sendRedirect(request.getContextPath() + "/games");
+					} else {
+						// TODO: Shouldn't the user exist if we can retrieve it from the DB?
+						messages.add("Username does not exist or your password was incorrect.");
+						RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+						dispatcher.forward(request, response);
+					}
 				}
 			}
 		}
