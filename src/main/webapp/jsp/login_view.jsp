@@ -56,7 +56,8 @@
                       <input type="password" id="inputConfirmPassword" name="confirm" class="form-control" placeholder="Confirm Password" required>
                       <button class="btn btn-lg btn-primary btn-block" type="submit">Create Account</button>
                     </form>
-                    <span style="margin-right:5px; font-size:small;">Valid username: 3-20 alphanumerics starting with a letter (a-z), no space or special character.<br>Valid password: 3-20 alphanumeric characters, no whitespace or special character.</span>
+                    <span style="margin-right:5px; font-size:small;">Valid username: 3-20 alphanumerics starting with a letter (a-z), no space or special character.<br>
+                        Valid password: <%=AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()%>-20 alphanumeric characters, no whitespace or special character.</span>
                 </div>
               </div>
               <div class="modal-footer">

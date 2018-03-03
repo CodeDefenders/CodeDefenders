@@ -191,12 +191,13 @@ public class LoginManager extends HttpServlet {
 	}
 
 	/**
-	 * Password must contain 3 to 20 alphanumeric characters,
+	 * Password must contain MIN_PASSWORD_LENGTH to 20 alphanumeric characters,
 	 * with no whitespace or special character.
 	*/
 	public static boolean validPassword(String password) {
-		// 3-10 alphanumeric characters (a-z, A-Z, 0-9) (no whitespaces)
-		String pattern = "^[a-zA-Z0-9]{3,20}$";
+		// MIN_PASSWORD_LENGTH-10 alphanumeric characters (a-z, A-Z, 0-9) (no whitespaces)
+		int minLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
+		String pattern = "^[a-zA-Z0-9]{" + minLength  + ",20}$";
 		return password != null && password.matches(pattern);
 	}
 }
