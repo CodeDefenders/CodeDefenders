@@ -430,7 +430,7 @@ public class RunnerTest {
 	public void testConnectionPool() throws SQLException, ConnectionPool.NoMoreConnectionsException {
 		int nbConnectionsBefore = getNbConnections();
 
-		int dbNumberOfConnections = ConnectionPool.NB_CONNECTIONS;
+		int dbNumberOfConnections = ConnectionPool.getInstanceOf().getNbConnections();
 		ConnectionPool connectionPool = ConnectionPool.getInstanceOf();
 		Connection lastConn = null;
 
@@ -447,7 +447,7 @@ public class RunnerTest {
 
 		}
 
-		assertEquals(nbConnectionsBefore + ConnectionPool.NB_CONNECTIONS, getNbConnections());
+		assertEquals(nbConnectionsBefore + ConnectionPool.getInstanceOf().getNbConnections(), getNbConnections());
 	}
 
 	private int getNbConnections() throws SQLException {
