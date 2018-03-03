@@ -2,6 +2,7 @@
 <%@ page import="org.codedefenders.Constants" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.codedefenders.util.AdminDAO" %>
+<%@ page import="org.codedefenders.AdminSystemSettings" %>
 <%@ include file="/jsp/header_base.jsp" %>
 
 <script>
