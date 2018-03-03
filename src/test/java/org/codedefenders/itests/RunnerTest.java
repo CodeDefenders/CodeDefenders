@@ -103,6 +103,24 @@ public class RunnerTest {
 	}
 
 	@Test
+	public void testUpdateUser() {
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+		assumeTrue(user1.insert());
+
+		user1.setPassword(passwordEncoder.encode(user1.getPassword() + "_new"));
+		user1.setUsername(user1.getUsername() + "_new");
+		user1.setEmail(user1.getEmail() + "_new");
+
+		assertTrue(user1.update(user1.getPassword()));
+		User userFromDB = DatabaseAccess.getUser(user1.getId());
+		assertEquals(user1.getId(), userFromDB.getId());
+		assertEquals(user1.getUsername(), userFromDB.getUsername());
+		assertEquals(user1.getEmail(), userFromDB.getEmail());
+		assertEquals(user1.getPassword(), userFromDB.getPassword());
+	}
+
+	@Test
 	public void testInsertClasses() throws Exception {
 		assertEquals(0, DatabaseAccess.getAllClasses().size());
 
