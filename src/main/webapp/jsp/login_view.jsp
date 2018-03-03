@@ -1,3 +1,5 @@
+<%@ page import="org.codedefenders.util.AdminDAO" %>
+<%@ page import="org.codedefenders.*" %>
 <% String pageTitle = "Login"; %>
 
 <%@ include file="/jsp/header_logout.jsp" %>
@@ -22,12 +24,10 @@
               <input type="checkbox" id="consentOK" style="margin-right:5px;" checked>I understand and consent that the mutants and tests I create in the game will be used for research purposes.
           </div>
           <button class="btn btn-lg btn-primary btn-block" id="signInButton" type="submit">Sign in</button>
-          
-          <!--  Alessio disable this to avoid students creating additional users. Ideally this should be configure at build time -->
-          <!-- 
+
+          <%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REGISTRATION).getBoolValue()) { %>
           <a href="#" class="text-center new-account" data-toggle="modal" data-target="#myModal">Create an account</a>
-           -->
-          
+          <%}%>
           
       </form>
   </div>

@@ -405,8 +405,8 @@
 </div>
 
 
-	<!-- Alessio disabled this -->
-	<%-- <a href="<%= request.getContextPath() %>/games/create">Create Duel</a> --%>
-	<!-- Alessio disabled this -->
-	<%-- <a href="<%= request.getContextPath() %>/multiplayer/games/create">Create Battleground</a> --%>
+<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue()) { %>
+<a href="<%= request.getContextPath() %>/games/create">Create Duel</a>
+<a href="<%= request.getContextPath() %>/multiplayer/games/create">Create Battleground</a>
+<%}%>
 <%@ include file="/jsp/footer.jsp" %>
