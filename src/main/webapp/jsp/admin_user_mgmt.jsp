@@ -29,7 +29,7 @@
         <br>
         <div class="input-group">
             <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
-            <input style ="padding-left:5px" id="email" type="text" class="form-control" name="email" value="<%=u.getEmail()%>">
+            <input style ="padding-left:5px" id="email" type="email" class="form-control" name="email" value="<%=u.getEmail()%>">
         </div>
         <br>
         <div class="input-group">
@@ -49,7 +49,7 @@
 
         <script>
             function check() {
-                if (document.getElementById('password').value ==
+                if (document.getElementById('password').value ===
                     document.getElementById('confirm_password').value) {
                     document.getElementById('pw_confirm_message').innerHTML = '';
                     document.getElementById('submit_edit_user').disabled = false;
