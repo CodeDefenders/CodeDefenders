@@ -79,13 +79,15 @@ public class AdminUserMgmt extends HttpServlet {
 			return "Error! Passwords don't match!";
 
 		if (!password.equals("")) {
+			// we don't want to encode the already encoded password from the DB
 			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 			u.setPassword(passwordEncoder.encode(password));
 		}
 		u.setUsername(name);
 		u.setEmail(email);
 
-		u.update();
+		if (!u.update(password))
+			return "Error trying to update info for user " + uid + "!";
 		User uUpdated = DatabaseAccess.getUser(Integer.parseInt(uid));
 
 		if (uUpdated.getEmail().equals(u.getEmail())
