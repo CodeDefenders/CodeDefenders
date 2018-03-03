@@ -70,6 +70,7 @@ public class Constants {
 	public static final String UTESTING_VIEW_JSP = "jsp" + F_SEP + "utesting_view.jsp";
 	public static final String ADMIN_USER_JSP = "jsp" + F_SEP + "admin_user_mgmt.jsp";
 	public static final String ADMIN_GAMES_JSP = "jsp" + F_SEP + "admin_games_mgmt.jsp";
+	public static final String ADMIN_SETTINGS_JSP = "jsp" + F_SEP + "admin_system_settings.jsp";
 
 	// Messages
 	public static final String WINNER_MESSAGE = "You won!";
