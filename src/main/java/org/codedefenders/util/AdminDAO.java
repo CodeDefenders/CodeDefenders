@@ -6,6 +6,7 @@ import org.codedefenders.User;
 import org.codedefenders.AdminSystemSettings;
 import org.codedefenders.leaderboard.Entry;
 import org.codedefenders.multiplayer.MultiplayerGame;
+import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -357,7 +358,9 @@ public class AdminDAO {
                         (float) rs.getDouble("Mutant_Goal"), rs.getInt("Prize"), rs.getInt("Defender_Value"),
                         rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
                         rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),
-                        rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"));
+                        rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"),
+                        rs.getInt("MaxAssertionsPerTest"),rs.getBoolean("ChatEnabled"),
+                        CodeValidator.CodeValidatorLevel.valueOf(rs.getString("MutantValidator")), rs.getBoolean("MarkUncovered"));
                 mg.setId(rs.getInt("ID"));
                 gamesList.add(mg);
             }

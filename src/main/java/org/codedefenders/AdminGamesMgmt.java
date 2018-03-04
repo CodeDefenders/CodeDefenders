@@ -376,7 +376,7 @@ public class AdminGamesMgmt extends HttpServlet {
             MultiplayerGame multiplayerGame = new MultiplayerGame(cutID, creatorID, level, (float) 1, (float) 1,
                     (float) 1, 10, 4, 0,
                     0, 0, 0, startTime,
-                    finishTime, state.name(), false);
+                    finishTime, state.name(), false, 2, true, null, false);
             gameList.add(multiplayerGame);
         }
         return gameList;

@@ -8,10 +8,11 @@ import org.codedefenders.events.EventType;
 import org.codedefenders.util.DB;
 import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.util.DatabaseValue;
+import org.codedefenders.validation.CodeValidator;
 
-import javax.xml.crypto.Data;
-import java.awt.image.DataBuffer;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,21 +37,29 @@ public class MultiplayerGame extends AbstractGame {
 	private long startDateTime;
 	private long finishDateTime;
 	private boolean requiresValidation;
+	private int maxAssertionsPerTest;
+	private boolean chatEnabled;
+	private CodeValidator.CodeValidatorLevel mutantValidatorLevel;
+	private boolean markUncovered;
 
 	public MultiplayerGame(int classId, int creatorId, GameLevel level,
 						   float lineCoverage, float mutantCoverage, float prize,
 						   int defenderValue, int attackerValue, int defenderLimit,
 						   int attackerLimit, int minDefenders, int minAttackers,
-						   long startDateTime, long finishDateTime, String status) {
+						   long startDateTime, long finishDateTime, String status, int maxAssertionsPerTest,
+						   boolean chatEnabled, CodeValidator.CodeValidatorLevel mutantValidatorLevel, boolean markUncovered) {
 		this(classId, creatorId, level, lineCoverage, mutantCoverage, prize, defenderValue, attackerValue, defenderLimit, attackerLimit,
-				minDefenders, minAttackers, startDateTime, finishDateTime, status, false);
+				minDefenders, minAttackers, startDateTime, finishDateTime, status, false, maxAssertionsPerTest,
+				chatEnabled, mutantValidatorLevel, markUncovered);
 	}
 
 	public MultiplayerGame(int classId, int creatorId, GameLevel level,
 						   float lineCoverage, float mutantCoverage, float prize,
 						   int defenderValue, int attackerValue, int defenderLimit,
 						   int attackerLimit, int minDefenders, int minAttackers,
-						   long startDateTime, long finishDateTime, String status, boolean requiresValidation) {
+						   long startDateTime, long finishDateTime, String status, boolean requiresValidation,
+						   int maxAssertionsPerTest, boolean chatEnabled, CodeValidator.CodeValidatorLevel mutantValidatorLevel,
+						   boolean markUncovered) {
 		this.classId = classId;
 		this.creatorId = creatorId;
 		this.level = level;
@@ -68,6 +77,10 @@ public class MultiplayerGame extends AbstractGame {
 		this.startDateTime = startDateTime;
 		this.finishDateTime = finishDateTime;
 		this.requiresValidation = requiresValidation;
+		this.maxAssertionsPerTest = maxAssertionsPerTest;
+		this.chatEnabled = chatEnabled;
+		this.mutantValidatorLevel = mutantValidatorLevel;
+		this.markUncovered = markUncovered;
 	}
 
 	public int getAttackerLimit() {
@@ -245,14 +258,17 @@ public class MultiplayerGame extends AbstractGame {
 		// Attempt to insert game info into database
 		String query = "INSERT INTO games " +
 				"(Class_ID, Level, Prize, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " +
-				"Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Start_Time, Finish_Time, State, Mode) VALUES " +
-				"(?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, 'PARTY');";
+				"Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Start_Time, Finish_Time, State, Mode," +
+				"MaxAssertionsPerTest, ChatEnabled, MutantValidator, MarkUncovered) VALUES " +
+				"(?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, 'PARTY',?,?,?,?);";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId), DB.getDBV(level.name()),
 				DB.getDBV(prize), DB.getDBV(defenderValue), DB.getDBV(attackerValue),
 				DB.getDBV(lineCoverage), DB.getDBV(mutantCoverage), DB.getDBV(creatorId),
 				DB.getDBV(minAttackers), DB.getDBV(minDefenders), DB.getDBV(attackerLimit),
 				DB.getDBV(defenderLimit), DB.getDBV(new Timestamp(startDateTime)),
-				DB.getDBV(new Timestamp(finishDateTime)), DB.getDBV(state.name())};
+				DB.getDBV(new Timestamp(finishDateTime)), DB.getDBV(state.name()),
+				DB.getDBV(maxAssertionsPerTest), DB.getDBV(chatEnabled), DB.getDBV(mutantValidatorLevel.name()),
+				DB.getDBV(markUncovered)};
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		int res = DB.executeUpdateGetKeys(stmt, conn);
