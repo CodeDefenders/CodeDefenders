@@ -151,6 +151,10 @@ public class MultiplayerGame extends AbstractGame {
 		return chatEnabled;
 	}
 
+	public int getMaxAssertionsPerTest() {
+		return maxAssertionsPerTest;
+	}
+
 	/**
 	 * Get winning team. Return NONE if a draw.
 	 *

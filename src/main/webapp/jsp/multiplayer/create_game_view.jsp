@@ -2,6 +2,7 @@
 <%@ page import="org.joda.time.format.DateTimeFormat" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="org.codedefenders.validation.CodeValidator" %>
+<%@ page import="static org.codedefenders.validation.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
 <% String pageTitle = "Create Battleground"; %>
 <%@ include file="/jsp/header.jsp" %>
 <div id="creategame" class="container">
@@ -197,7 +198,7 @@
                     Max. Assertions per Test
                 </td>
                 <td>
-                    <input class="form-control" type="number" value="2" name="maxAssertionsPerTest"
+                    <input class="form-control" type="number" value="<%=DEFAULT_NB_ASSERTIONS%>" name="maxAssertionsPerTest"
                            id="maxAssertionsPerTest" min = 1 required/>
                 </td>
             </tr>

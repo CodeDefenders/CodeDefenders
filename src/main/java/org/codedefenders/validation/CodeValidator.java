@@ -23,6 +23,9 @@ import java.util.regex.Pattern;
  */
 public class CodeValidator {
 
+	//Default number of max. allowed assertions for mutliplayer games, also value used for duel games
+	public static final int DEFAULT_NB_ASSERTIONS = 2;
+
 	public enum CodeValidatorLevel {
 		RELAXED,
 		MODERATE,
@@ -356,18 +359,22 @@ public class CodeValidator {
 
 	}
 
-	public static boolean validTestCode(String javaFile) throws CodeValidatorException {
+	public static boolean validTestCode(String javaFile, int maxNumberOfAssertions) throws CodeValidatorException {
 		try {
 			CompilationUnit cu = getCompilationUnit(javaFile);
 			if (cu == null)
 				return false;
-			TestCodeVisitor visitor = new TestCodeVisitor();
+			TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions);
 			visitor.visit(cu, null);
 			return visitor.isValid();
 		} catch (Throwable e) {
 			logger.error("Problem in validating test code " + javaFile);
 			throw new CodeValidatorException("Problem in validating test code " + javaFile, e);
 		}
+	}
+
+	public static boolean validTestCode(String javaFile) throws CodeValidatorException {
+		return validTestCode(javaFile, DEFAULT_NB_ASSERTIONS);
 	}
 
 	public static CompilationUnit getCompilationUnit(String javaFile) {
