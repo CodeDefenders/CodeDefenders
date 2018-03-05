@@ -142,7 +142,8 @@ public class AdminUserMgmt extends HttpServlet {
 	}
 
 	private String deleteUser(int uid) {
-		return (AdminDAO.deleteUser(uid) ? "Successfully deleted user " : "Error trying to delete user ") + uid + "!";
+		return "Currently disabled!";
+		//return (AdminDAO.deleteUser(uid) ? "Successfully deleted user " : "Error trying to delete user ") + uid + "!";
 	}
 
 	private String resetUserPW(int uid) {

@@ -138,7 +138,7 @@
                     <button class="btn btn-sm btn-danger" type="submit" value="<%=uid%>" name="deleteUserButton"
                             onclick="return confirm('Are you sure you want to permanently delete <%=username%>\'s ' +
                                     'account? \nThis will also delete all their games, mutants, tests, equivalences' +
-                                    ' plus the games\'s mutants, tests and equivalences');">
+                                    ' plus the games\'s mutants, tests and equivalences');" disabled>
                         <span class="glyphicon glyphicon-trash"></span>
                     </button>
                     <%}%>
