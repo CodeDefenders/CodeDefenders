@@ -1,23 +1,13 @@
-<%@ page import="org.codedefenders.*" %>
-<%@ page import="org.codedefenders.duel.DuelGame" %>
-<%@ page import="org.codedefenders.util.DatabaseAccess" %>
-<%@ page import="org.codedefenders.util.AdminDAO" %>
-<%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
-<%@ page import="java.io.StreamTokenizer" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Collections" %>
-<%@ page import="java.util.stream.Collectors" %>
-<%@ page import="java.sql.Time" %>
-<%@ page import="java.sql.Timestamp" %>
-<%@ page import="org.codedefenders.multiplayer.PlayerScore" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="org.codedefenders.scoring.Scorer" %>
+<%@ page import="org.apache.commons.collections.ListUtils" %>
+<%@ page import="org.codedefenders.AdminGamesMgmt" %>
+<%@ page import="org.codedefenders.GameLevel" %>
+<%@ page import="org.codedefenders.GameState" %>
 <%@ page import="org.codedefenders.leaderboard.Entry" %>
+<%@ page import="org.codedefenders.validation.CodeValidator" %>
 <%@ page import="org.joda.time.DateTime" %>
 <%@ page import="org.joda.time.format.DateTimeFormat" %>
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
-<%@ page import="org.apache.commons.collections.ListUtils" %>
-<%@ page import="java.util.Arrays" %>
+<%@ page import="java.util.List" %>
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header.jsp" %>
 <div class="full-width">
@@ -66,7 +56,7 @@
             <tbody>
             <%
                 for (MultiplayerGame g : insertedGames) {
-                	GameClass CUT = g.getCUT();
+                    GameClass CUT = g.getCUT();
                     String startStopButtonIcon = g.getState().equals(GameState.ACTIVE) ?
                             "glyphicon glyphicon-stop" : "glyphicon glyphicon-play";
                     String startStopButtonClass = g.getState().equals(GameState.ACTIVE) ?
@@ -663,6 +653,78 @@
 
 
         </div>
+        <div class="row">
+            <div class="col-sm-2">
+                <label class="label-normal" title="Click the question sign for more information on the levels"
+                       for="mutantValidatorLevel">
+                    Mutant validator
+                    <a data-toggle="collapse" href="#validatorExplanation" style="color:black">
+                        <span class="glyphicon glyphicon-question-sign"></span>
+                    </a>
+                </label>
+                <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
+                        data-size="medium">
+                    <%for (CodeValidator.CodeValidatorLevel cvl : CodeValidator.CodeValidatorLevel.values()) {%>
+                    <option value=<%=cvl.name()%>><%=cvl.name().toLowerCase()%>
+                    </option>
+                    <%}%>
+                </select>
+            </div>
+            <div class="col-sm-1">
+            </div>
+            <div class="col-sm-2">
+                <label class="label-normal" title="Players can chat with their team and with all players in the game"
+                       for="chatEnabled">
+                    Enable Game Chat
+                </label>
+                <input type="checkbox" id="chatEnabled" name="chatEnabled"
+                       class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
+                       data-onstyle="primary" data-offstyle="" checked>
+            </div>
+            <div class="col-sm-3">
+                <label class="label-normal" title="Attackers can mark uncovered lines as equivalent"
+                       for="markUncovered">
+                    Mark uncovered lines as equivalent
+                </label>
+                <input type="checkbox" id="markUncovered" name="markUncovered"
+                       class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
+                       data-onstyle="primary" data-offstyle="">
+            </div>
+            <div class="col-sm-2">
+                <label for="maxAssertionsPerTest" class="label-normal"
+                       title="Maximum number of assertions per test. Increase this for difficult to test classes.">Max.
+                    Assertions per Test</label>
+                <br/>
+                <input class="form-control" type="number" value="2" name="maxAssertionsPerTest"
+                       id="maxAssertionsPerTest" min=1 required/>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-sm-5">
+                <div id="validatorExplanation" class="collapse panel panel-default" style="font-size: 12px;">
+                    <div class="panel-body" style="padding: 10px;">
+                        <b>Relaxed</b> <br>
+                        <ul>
+                            <li>No calls to <i>System.*</i>,<i>Random.*</i></li>
+                            <li>No new control structures (<i>switch</i>, <i>if</i>, <i>for</i>, ...)</li>
+                        </ul>
+                        <b>Moderate</b> <br>
+                        <ul>
+                            <li>No comments</li>
+                            <li>No additional logical operators (<i>&&</i>, <i>||</i>)</li>
+                            <li>No ternary operators</li>
+                        </ul>
+                        <b>Strict</b> <br>
+                        <ul>
+                            <li>No reflection</li>
+                            <li>No bitshifts</li>
+                            <li>No signature changes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
         <button class="btn btn-md btn-primary" type="submit" name="submit_users_btn" id="submit_users_btn" disabled>
             Create Games
         </button>
@@ -689,11 +751,11 @@
 
 
             $(document).ready(function () {
-                if(localStorage.getItem("showActivePlayers") === "true") {
+                if (localStorage.getItem("showActivePlayers") === "true") {
                     $("[id=playersTableActive]").show();
                 }
 
-                if(localStorage.getItem("showCreatedPlayers") === "true") {
+                if (localStorage.getItem("showCreatedPlayers") === "true") {
                     $("[id=playersTableCreated]").show();
                     $("[id=playersTableHidden]").hide();
                 }
