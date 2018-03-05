@@ -155,6 +155,10 @@ public class MultiplayerGame extends AbstractGame {
 		return maxAssertionsPerTest;
 	}
 
+	public boolean isMarkUncovered(){
+		return markUncovered;
+	}
+
 	/**
 	 * Get winning team. Return NONE if a draw.
 	 *
