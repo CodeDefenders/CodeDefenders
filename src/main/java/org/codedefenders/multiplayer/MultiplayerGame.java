@@ -159,6 +159,10 @@ public class MultiplayerGame extends AbstractGame {
 		return markUncovered;
 	}
 
+	public CodeValidator.CodeValidatorLevel getMutantValidatorLevel(){
+		return mutantValidatorLevel;
+	}
+
 	/**
 	 * Get winning team. Return NONE if a draw.
 	 *
