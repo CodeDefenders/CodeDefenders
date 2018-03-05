@@ -54,7 +54,12 @@ public class AdminUserMgmt extends HttpServlet {
 				createUserAccounts(request.getParameter("user_name_list"), messages);
 				break;
 			case "editUser":
-				messages.add(editUser(request.getParameter("uid"), request));
+				String uidString = request.getParameter("uid");
+				String successMsg = "Successfully updated info for User " + uidString;
+				String msg = editUser(uidString, request, successMsg);
+				messages.add(msg);
+				if (!msg.equals(successMsg))
+					responsePath = request.getContextPath() + "/" + Constants.ADMIN_USER_JSP + "?editUser=" + uidString;
 				break;
 			default:
 				System.err.println("Action not recognised");
@@ -64,7 +69,7 @@ public class AdminUserMgmt extends HttpServlet {
 		response.sendRedirect(responsePath);
 	}
 
-	private String editUser(String uid, HttpServletRequest request) {
+	private String editUser(String uid, HttpServletRequest request, String successMsg) {
 		User u = DatabaseAccess.getUser(Integer.parseInt(uid));
 		if (u == null)
 			return "Error. User " + uid + " cannot be retrieved from database.";
@@ -77,8 +82,19 @@ public class AdminUserMgmt extends HttpServlet {
 		if (!password.equals(confirm_password))
 			return "Error! Passwords don't match!";
 
+		if (!name.equals(u.getUsername()) && DatabaseAccess.getUserForNameOrEmail(name) != null)
+			return "Username " + name + " is already taken";
+
+		if(!email.equals(u.getEmail()) && DatabaseAccess.getUserForNameOrEmail(email) != null)
+			return "Email " + email + " is already in use!";
+
+		if(!LoginManager.validEmailAddress(email))
+			return "Email Address is not valid";
+
 		if (!password.equals("")) {
 			// we don't want to encode the already encoded password from the DB
+			if(!LoginManager.validPassword(password))
+				return "Password is not valid";
 			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 			password = passwordEncoder.encode(password);
 		}
@@ -87,8 +103,7 @@ public class AdminUserMgmt extends HttpServlet {
 
 		if (!u.update(password))
 			return "Error trying to update info for user " + uid + "!";
-		return "Successfully updated info for " + u.getUsername();
-
+		return successMsg;
 	}
 
 	private void createUserAccounts(String userNameListString, ArrayList<String> messages) {
