@@ -147,6 +147,10 @@ public class MultiplayerGame extends AbstractGame {
 		this.prize = prize;
 	}
 
+	public boolean isChatEnabled() {
+		return chatEnabled;
+	}
+
 	/**
 	 * Get winning team. Return NONE if a draw.
 	 *
