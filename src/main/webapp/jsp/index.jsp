@@ -13,3 +13,4 @@
 		</p>
 	</div>
 <%@ include file="/jsp/footer_logout.jsp" %>
+<%@ include file="/jsp/footer.jsp" %>
