@@ -196,6 +196,16 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>siteNotice</servlet-name>
+		<jsp-file>/jsp/site_notice.jsp</jsp-file>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>siteNotice</servlet-name>
+		<url-pattern>/site_notice</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>study</servlet-name>
 		<jsp-file>/jsp/study.jsp</jsp-file>
 	</servlet>
