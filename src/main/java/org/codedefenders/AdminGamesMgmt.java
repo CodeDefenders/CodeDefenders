@@ -5,6 +5,7 @@ import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.multiplayer.PlayerScore;
 import org.codedefenders.util.AdminDAO;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.validation.CodeValidator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -43,6 +44,10 @@ public class AdminGamesMgmt extends HttpServlet {
     private List<Integer> selectedGameIndices;
     private String errorMessage;
     private MultiplayerGame mg;
+    boolean chatEnabled;
+    boolean markUncovered;
+    int maxAssertionsPerTest;
+    CodeValidator.CodeValidatorLevel mutantValidatorLevel;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_GAMES_JSP);
@@ -163,6 +168,10 @@ public class AdminGamesMgmt extends HttpServlet {
                         gamesState = request.getParameter("gamesState").equals(GameState.ACTIVE.name()) ? GameState.ACTIVE : GameState.CREATED;
                         startTime = Long.parseLong(request.getParameter("startTime"));
                         finishTime = Long.parseLong(request.getParameter("finishTime"));
+                        chatEnabled = request.getParameter("chatEnabled") != null;
+                        markUncovered = request.getParameter("markUncovered") != null;
+                        maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
+						mutantValidatorLevel = CodeValidator.CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
                     } catch (Exception e) {
                         messages.add("There was a problem with the form.");
                         response.sendRedirect(request.getContextPath() + "/admin");
@@ -300,7 +309,8 @@ public class AdminGamesMgmt extends HttpServlet {
 
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
                  cutID, currentUserID, gamesLevel, gamesState,
-                startTime, finishTime);
+                startTime, finishTime, maxAssertionsPerTest, chatEnabled,
+                mutantValidatorLevel, markUncovered);
 
         if (teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_DESCENDING) || teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_SHUFFLED)) {
             Collections.sort(attackerIDs, new ReverseDefenderScoreComparator());
@@ -370,13 +380,15 @@ public class AdminGamesMgmt extends HttpServlet {
 
     private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame,
                                                      int cutID, int creatorID, GameLevel level, GameState state,
-                                                     long startTime, long finishTime) {
+                                                     long startTime, long finishTime, int maxAssertionsPerTest,
+                                                     boolean chatEnabled, CodeValidator.CodeValidatorLevel mutantValidatorLevel,
+                                                     boolean markUncovered) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
             MultiplayerGame multiplayerGame = new MultiplayerGame(cutID, creatorID, level, (float) 1, (float) 1,
                     (float) 1, 10, 4, 0,
                     0, 0, 0, startTime,
-                    finishTime, state.name(), false);
+                    finishTime, state.name(), false, maxAssertionsPerTest, chatEnabled, mutantValidatorLevel, markUncovered);
             gameList.add(multiplayerGame);
         }
         return gameList;

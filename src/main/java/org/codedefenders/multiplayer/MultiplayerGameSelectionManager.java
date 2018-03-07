@@ -6,6 +6,9 @@ import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
 import org.codedefenders.events.EventType;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.validation.CodeValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,6 +20,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 
 public class MultiplayerGameSelectionManager extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameSelectionManager.class);
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		String contextPath = request.getContextPath();
@@ -53,7 +57,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         String contextPath = request.getContextPath();
         ArrayList<String> messages = new ArrayList<String>();
         session.setAttribute("messages", messages);
-        try {
             // Get their user id from the session.
             int uid = (Integer) session.getAttribute("uid");
 
@@ -69,12 +72,18 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     double lineCoverage = lineCovGoal == null ? 1.1 : Double.parseDouble(lineCovGoal);
                     double mutantCoverage = mutCovGoal == null ? 1.1 : Double.parseDouble(mutCovGoal);
                     GameLevel level = request.getParameter("level") == null ? GameLevel.HARD : GameLevel.EASY;
+                    boolean chatEnabled = request.getParameter("chatEnabled") != null;
+                    boolean markUncovered = request.getParameter("markUncovered") != null;
+
                     // Create the game with supplied parameters and insert it in the database.
                     MultiplayerGame nGame = new MultiplayerGame(classId, uid, level, (float) lineCoverage,
                             (float) mutantCoverage, 1f, 100, 100,
                             Integer.parseInt(request.getParameter("defenderLimit")), Integer.parseInt(request.getParameter("attackerLimit")),
                             Integer.parseInt(request.getParameter("minDefenders")), Integer.parseInt(request.getParameter("minAttackers")),
-                            Long.parseLong(request.getParameter("startTime")), Long.parseLong(request.getParameter("finishTime")), GameState.CREATED.name());
+                            Long.parseLong(request.getParameter("startTime")), Long.parseLong(request.getParameter("finishTime")), GameState.CREATED.name(),
+                            Integer.parseInt(request.getParameter("maxAssertionsPerTest")), chatEnabled,
+                            CodeValidator.CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel")),
+                            markUncovered);
                     if (nGame.insert()){
                         Event event = new Event(-1, nGame.getId(), uid, "Game" +
                                 " Created",
@@ -124,13 +133,5 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     response.sendRedirect(redirect);
                     break;
             }
-        } catch (Exception e) {
-            messages.add("An error occurred");
-            String redirect = (String) request.getHeader("referer");
-			if( ! redirect.startsWith(request.getContextPath())){
-				redirect = request.getContextPath()+"/" + redirect;
-			}
-			response.sendRedirect(redirect);
-        }
     }
 }

@@ -98,7 +98,7 @@ public class MultiplayerGameManager extends HttpServlet {
 				Test newTest = null;
 
 				try {
-					newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
+					newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp", activeGame.getMaxAssertionsPerTest());
 				} catch (CodeValidatorException cve) {
 					messages.add(TEST_GENERIC_ERROR_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -108,7 +108,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 				// If test is null, it compiled but codevalidator triggered
 				if (newTest == null) {
-					messages.add(TEST_INVALID_MESSAGE);
+					messages.add(String.format(TEST_INVALID_MESSAGE, activeGame.getMaxAssertionsPerTest()));
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					response.sendRedirect(contextPath+"/multiplayer/play");
 					return;
@@ -290,7 +290,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					Test newTest = null;
 
 					try {
-						newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp");
+						newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp", activeGame.getMaxAssertionsPerTest());
 					} catch (CodeValidatorException cve) {
 						messages.add(TEST_GENERIC_ERROR_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -300,7 +300,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 					// If test is null, then test did compile but codevalidator triggered
 					if (newTest == null) {
-						messages.add(TEST_INVALID_MESSAGE);
+						messages.add(String.format(TEST_INVALID_MESSAGE, activeGame.getMaxAssertionsPerTest()));
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						response.sendRedirect(contextPath+"/multiplayer/play");
 						return;

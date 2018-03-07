@@ -3,8 +3,10 @@ package org.codedefenders.util;
 import org.codedefenders.GameLevel;
 import org.codedefenders.Role;
 import org.codedefenders.User;
+import org.codedefenders.AdminSystemSettings;
 import org.codedefenders.leaderboard.Entry;
 import org.codedefenders.multiplayer.MultiplayerGame;
+import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -313,6 +315,13 @@ public class AdminDAO {
     public final static String DELETE_MUTANT_TARGETEXECUTIONS = "DELETE FROM targetexecutions WHERE Mutant_ID = ?;";
     public final static String SET_USER_PW = "UPDATE users SET Password = ? WHERE User_ID = ?;";
     public final static String DELETE_USER = "DELETE FROM users WHERE User_ID = ?;";
+	public final static String GET_ALL_SETTINGS = "SELECT * FROM settings;";
+	public  final static String UPDATE_SETTING_1 = "UPDATE settings\n" +
+            "SET ";
+    public  final static String UPDATE_SETTING_2 = " = ?\n" +
+            "WHERE name = ?;";
+    private static final String GET_SETTING = "SELECT *\n" +
+            "FROM settings WHERE settings.name = ?;";
 
     public static List<User> getUsers(String query) {
         Connection conn = DB.getConnection();
@@ -349,7 +358,9 @@ public class AdminDAO {
                         (float) rs.getDouble("Mutant_Goal"), rs.getInt("Prize"), rs.getInt("Defender_Value"),
                         rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
                         rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),
-                        rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"));
+                        rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"),
+                        rs.getInt("MaxAssertionsPerTest"),rs.getBoolean("ChatEnabled"),
+                        CodeValidator.CodeValidatorLevel.valueOf(rs.getString("MutantValidator")), rs.getBoolean("MarkUncovered"));
                 mg.setId(rs.getInt("ID"));
                 gamesList.add(mg);
             }
@@ -552,4 +563,79 @@ public class AdminDAO {
         return DB.executeUpdate(stmt, conn);
         // this does not work as foreign keys are not deleted (recommended: update w/ ON DELETE CASCADE)
     }
+
+    public static List<AdminSystemSettings.SettingsDTO> getSystemSettings(){
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, GET_ALL_SETTINGS);
+        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+        return getSettings(rs, conn, stmt);
+	}
+
+    public static boolean updateSystemSetting(AdminSystemSettings.SettingsDTO setting) {
+        Connection conn = DB.getConnection();
+        String valueToSet = setting.getType().name();
+        DatabaseValue[] valueList = new DatabaseValue[]{null, DB.getDBV(setting.getName().name())};
+        switch (setting.getType()) {
+            case STRING_VALUE:
+                valueList[0] = DB.getDBV(setting.getStringValue());
+                break;
+            case INT_VALUE:
+                valueList[0] = DB.getDBV(setting.getIntValue());
+                break;
+            case BOOL_VALUE:
+                valueList[0] = DB.getDBV(setting.getBoolValue());
+                break;
+        }
+        PreparedStatement stmt = DB.createPreparedStatement(conn, UPDATE_SETTING_1 + valueToSet + UPDATE_SETTING_2, valueList);
+        return DB.executeUpdate(stmt, conn);
+    }
+
+    private static List<AdminSystemSettings.SettingsDTO> getSettings(ResultSet rs, Connection conn, PreparedStatement stmt) {
+        List<AdminSystemSettings.SettingsDTO> settings = new ArrayList<>();
+        try {
+            while (rs.next()) {
+                AdminSystemSettings.SettingsDTO setting = null;
+                AdminSystemSettings.SETTING_NAME name = AdminSystemSettings.SETTING_NAME.valueOf(rs.getString("name"));
+                AdminSystemSettings.SETTING_TYPE settingType = AdminSystemSettings.SETTING_TYPE.valueOf(rs.getString("type"));
+                switch (settingType) {
+                    case STRING_VALUE:
+                        setting = new AdminSystemSettings.SettingsDTO(name, rs.getString(settingType.name()));
+                        break;
+                    case INT_VALUE:
+                        setting = new AdminSystemSettings.SettingsDTO(name,rs.getInt(settingType.name()));
+                        break;
+                    case BOOL_VALUE:
+                        setting = new AdminSystemSettings.SettingsDTO(name,rs.getBoolean(settingType.name()));
+                        break;
+                }
+                settings.add(setting);
+            }
+        } catch (SQLException se) {
+            logger.error("SQL exception caught", se);
+        } catch (Exception e) {
+            logger.error("Exception caught", e);
+        } finally {
+            DB.cleanup(conn, stmt);
+        }
+        return settings;
+    }
+
+    public static AdminSystemSettings.SettingsDTO getSystemSetting(AdminSystemSettings.SETTING_NAME name){
+        Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_SETTING, DB.getDBV(name.name()));
+		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+		return getSettings(rs, conn, stmt).get(0);
+    }
+
+
+	public static AdminSystemSettings.SettingsDTO getSystemSettingInt(AdminSystemSettings.SETTING_NAME name, Connection conn) throws SQLException {
+		PreparedStatement stmt = conn.prepareStatement(GET_SETTING);
+		stmt.setString(1, name.name());
+		ResultSet rs = stmt.executeQuery();
+		if (rs.next()) {
+			AdminSystemSettings.SETTING_TYPE settingType = AdminSystemSettings.SETTING_TYPE.valueOf(rs.getString("type"));
+			return new AdminSystemSettings.SettingsDTO(name, rs.getInt(settingType.name()));
+		}
+		return null;
+	}
 }

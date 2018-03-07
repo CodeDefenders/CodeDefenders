@@ -8,6 +8,7 @@
     <ul class="nav nav-tabs">
         <li><a href="<%=request.getContextPath()%>/admin/games"> Manage Games</a></li>
         <li class="active"><a href="#">Manage Users</a></li>
+        <li><a href="<%=request.getContextPath()%>/admin/settings">System Settings</a></li>
     </ul>
 
     <%

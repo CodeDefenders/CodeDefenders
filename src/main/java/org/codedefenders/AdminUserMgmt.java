@@ -21,7 +21,6 @@ public class AdminUserMgmt extends HttpServlet {
 	private static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
 	private static final char[] DIGITS = "0123456789".toCharArray();
 	private static final char[] PUNCTUATION = "!@#$%&*()_+-=[]|,./?><".toCharArray();
-	private static final int PASSWORD_LENGTH = 8;
 	static final String USER_INFO_TOKENS_DELIMITER = "[ ,;]+";
 	private static final Logger logger = LoggerFactory.getLogger(AdminUserMgmt.class);
 
@@ -55,7 +54,6 @@ public class AdminUserMgmt extends HttpServlet {
 				createUserAccounts(request.getParameter("user_name_list"), messages);
 				break;
 			case "editUser":
-				Boolean wasSuccessful = false;
 				String uidString = request.getParameter("uid");
 				String successMsg = "Successfully updated info for User " + uidString;
 				String msg = editUser(uidString, request, successMsg);
@@ -88,7 +86,7 @@ public class AdminUserMgmt extends HttpServlet {
 			return "Username " + name + " is already taken";
 
 		if(!email.equals(u.getEmail()) && DatabaseAccess.getUserForNameOrEmail(email) != null)
-			return "Email " + email + "is already in use!";
+			return "Email " + email + " is already in use!";
 
 		if(!LoginManager.validEmailAddress(email))
 			return "Email Address is not valid";
@@ -156,17 +154,18 @@ public class AdminUserMgmt extends HttpServlet {
 	}
 
 	private static String generatePW() {
+		int length = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
 
 		StringBuilder sb = new StringBuilder();
 		char[] initialSet = LOWER;
 
 		Random random = new Random();
-		for (int i = 0; i < PASSWORD_LENGTH; i++) {
+		for (int i = 0; i < length; i++) {
 			sb.append(initialSet[random.nextInt(initialSet.length)]);
 		}
 		char[] resultChars = sb.toString().toCharArray();
 
-		List<Integer> randomInts = Arrays.stream(new IntRange(0, PASSWORD_LENGTH - 1).toArray()).boxed().collect(Collectors.toList());
+		List<Integer> randomInts = Arrays.stream(new IntRange(0, length - 1).toArray()).boxed().collect(Collectors.toList());
 		Collections.shuffle(randomInts);
 
 		int c = 0;

@@ -120,9 +120,9 @@
 				<input type="hidden" name="formType" value="enterGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
 				<% if (uid == turnId ) {%>
-				<input class="btn btn-primary" type="submit" value="<%=btnLabel%>">
+				<button class="btn btn-primary" type="submit"><%=btnLabel%></button>
 				<% } else {%>
-				<a  class="btn btn-default btn-sm" type="submit" value="Enter Game">Enter Game</a>
+				<button  class="btn btn-default btn-sm" type="submit" value="Enter Game">Enter Game</button>
 				<% }%>
 			</form>
 
@@ -226,10 +226,14 @@
 		} // Closes FOR
 	} // Closes ELSE
 %>
+
 </table>
 <%
 /********* OPEN GAMES *******************************************************************************************************/
 %>
+	<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue()) { %>
+	<a href="<%= request.getContextPath() %>/multiplayer/games/create">Create Battleground</a>
+	<%}%>
 <h2 class="full-width page-title">Open Games</h2>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
@@ -312,7 +316,7 @@
 			<form id="view" action="<%=request.getContextPath() %>/games" method="post">
 					<input type="hidden" name="formType" value="joinGame">
 					<input type="hidden" name="game" value=<%=g.getId()%>>
-					<a type="submit" class="btn btn-primary btn-sm" value="Join Game">Join Game</a>
+					<button type="submit" class="btn btn-primary btn-sm" value="Join Game">Join Game</button>
 				</form>
 			</td>
 		</tr>
@@ -402,11 +406,9 @@
 			}
 		});
 	</script>
+
+	<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue()) { %>
+	<a href="<%= request.getContextPath() %>/games/create">Create Duel</a>
+	<%}%>
 </div>
-
-
-	<!-- Alessio disabled this -->
-	<%-- <a href="<%= request.getContextPath() %>/games/create">Create Duel</a> --%>
-	<!-- Alessio disabled this -->
-	<%-- <a href="<%= request.getContextPath() %>/multiplayer/games/create">Create Battleground</a> --%>
 <%@ include file="/jsp/footer.jsp" %>

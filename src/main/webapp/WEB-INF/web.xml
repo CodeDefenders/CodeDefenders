@@ -336,6 +336,15 @@
 		<url-pattern>/admin/users</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>AdminSettings</servlet-name>
+		<servlet-class>org.codedefenders.AdminSystemSettings</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AdminSettings</servlet-name>
+		<url-pattern>/admin/settings</url-pattern>
+	</servlet-mapping>
+
 	<!-- End Notification JSON Servlets -->
 
 	<resource-ref>
