@@ -1,20 +1,12 @@
 package org.codedefenders.validation;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
-
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseException;
+import com.github.javaparser.TokenMgrError;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.body.*;
+import com.github.javaparser.ast.stmt.BlockStmt;
 import org.apache.commons.io.FileUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.Constants;
@@ -22,23 +14,23 @@ import org.codedefenders.exceptions.CodeValidatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseException;
-import com.github.javaparser.TokenMgrError;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.ConstructorDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.stmt.BlockStmt;
+import java.io.*;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * @author Jose Rojas
  */
 public class CodeValidator {
+
+	//Default number of max. allowed assertions for mutliplayer games, also value used for duel games
+	public static final int DEFAULT_NB_ASSERTIONS = 2;
+
+	public enum CodeValidatorLevel {
+		RELAXED,
+		MODERATE,
+		STRICT
+	}
 
 	//TODO check if removing ";" makes people take advantage of using multiple statements
 	public final static String[] PROHIBITED_OPERATORS = {"<<", ">>", ">>>", "?", "//", "/*"};
@@ -367,18 +359,22 @@ public class CodeValidator {
 
 	}
 
-	public static boolean validTestCode(String javaFile) throws CodeValidatorException {
+	public static boolean validTestCode(String javaFile, int maxNumberOfAssertions) throws CodeValidatorException {
 		try {
 			CompilationUnit cu = getCompilationUnit(javaFile);
 			if (cu == null)
 				return false;
-			TestCodeVisitor visitor = new TestCodeVisitor();
+			TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions);
 			visitor.visit(cu, null);
 			return visitor.isValid();
 		} catch (Throwable e) {
 			logger.error("Problem in validating test code " + javaFile);
 			throw new CodeValidatorException("Problem in validating test code " + javaFile, e);
 		}
+	}
+
+	public static boolean validTestCode(String javaFile) throws CodeValidatorException {
+		return validTestCode(javaFile, DEFAULT_NB_ASSERTIONS);
 	}
 
 	public static CompilationUnit getCompilationUnit(String javaFile) {

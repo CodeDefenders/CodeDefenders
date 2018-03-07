@@ -120,7 +120,7 @@ if (role == Role.ATTACKER && true){
 									<% if (role.equals(Role.DEFENDER)
 											&& m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
 											&& !mg.getState().equals(GameState.FINISHED)
-											&& m.isCovered()){
+											&& (m.isCovered() || mg.isMarkUncovered())){
 											if( m.getLines().size() > 1 ){%>
 											<a href="<%=request.getContextPath() %>/multiplayer/play?equivLines=<%=m.getLines().toString().replaceAll(", ", ",")%>"
 											 class="btn btn-default btn-diff"

@@ -1,6 +1,8 @@
 <%@ page import="org.apache.commons.lang.ArrayUtils" %>
 <%@ page import="org.codedefenders.Constants" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="org.codedefenders.util.AdminDAO" %>
+<%@ page import="org.codedefenders.AdminSystemSettings" %>
 <%@ include file="/jsp/header_base.jsp" %>
 
 <script>
@@ -83,9 +85,10 @@
                                 Games</a></li> --%>
                             <li><a href="<%=request.getContextPath() %>/games/history" style="width:100%;">History</a></li>
                 </ul></li>
-                <!-- Alessio: Disabled this -->
-                <!-- <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="games/upload" style="width:100%;">Upload Class</a></li> -->
-                
+                <%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) { %>
+                <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="games/upload" style="width:100%;">Upload Class</a></li>
+                <%}%>
+
                 <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="leaderboards" style="width: 100%;">Leaderboard</a></li>
                 <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="help" style="width:100%;">Help</a></li>
                 <li style="float: none" class="dropdown"><a

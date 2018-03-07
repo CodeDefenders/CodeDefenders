@@ -1,8 +1,26 @@
 package org.codedefenders.itests.parallelize;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import org.codedefenders.*;
+import org.codedefenders.exceptions.CodeValidatorException;
+import org.codedefenders.itests.IntegrationTest;
+import org.codedefenders.multiplayer.MultiplayerGame;
+import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.DatabaseConnection;
+import org.junit.*;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
+import javax.naming.*;
+import javax.naming.spi.InitialContextFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -18,42 +36,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.spi.InitialContextFactory;
-
-import org.codedefenders.Constants;
-import org.codedefenders.GameClass;
-import org.codedefenders.GameLevel;
-import org.codedefenders.GameManager;
-import org.codedefenders.GameState;
-import org.codedefenders.Mutant;
-import org.codedefenders.MutationTester;
-import org.codedefenders.Role;
-import org.codedefenders.User;
-import org.codedefenders.exceptions.CodeValidatorException;
-import org.codedefenders.itests.IntegrationTest;
-import org.codedefenders.multiplayer.MultiplayerGame;
-import org.codedefenders.rules.DatabaseRule;
-import org.codedefenders.util.DatabaseAccess;
-import org.codedefenders.util.DatabaseConnection;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
@@ -212,7 +196,7 @@ public class ConsistencyTest {
 
 		//
 		MultiplayerGame multiplayerGame = new MultiplayerGame(cut.getId(), observer.getId(), GameLevel.HARD, (float) 1,
-				(float) 1, (float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false);
+				(float) 1, (float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true, null, false);
 		// Store to db
 		multiplayerGame.insert();
 
