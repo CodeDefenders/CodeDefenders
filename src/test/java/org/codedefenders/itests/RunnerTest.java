@@ -172,13 +172,15 @@ public class RunnerTest {
 		assumeTrue(dg1.insert());
 
 		MultiplayerGame mg2 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true, null, false);
+				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true,
+				CodeValidator.CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg2.insert());
 		assumeTrue(mg2.addPlayer(user1.getId(), Role.DEFENDER));
 		assertTrue(mg2.update());
 		
 		MultiplayerGame mg3 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true, null, false);
+				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true,
+				CodeValidator.CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg3.insert());
 		
 		assumeTrue(mg3.addPlayer(user1.getId(), Role.DEFENDER));
@@ -186,7 +188,8 @@ public class RunnerTest {
 		assumeTrue(mg3.update());
 
 		MultiplayerGame mg4 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.FINISHED.name(), false, 2, true, null, false);
+				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.FINISHED.name(), false, 2, true,
+				CodeValidator.CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg4.insert());
 		
 		// TODO Why is 0
@@ -442,7 +445,6 @@ public class RunnerTest {
 		int dbNumberOfConnections = ConnectionPool.getInstanceOf().getNbConnections();
 		ConnectionPool connectionPool = ConnectionPool.getInstanceOf();
 		Connection lastConn = null;
-
 		for (int i = 0; i < dbNumberOfConnections; ++i) {
 			lastConn = connectionPool.getDBConnection();
 		}

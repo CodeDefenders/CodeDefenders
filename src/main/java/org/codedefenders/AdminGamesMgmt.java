@@ -48,7 +48,6 @@ public class AdminGamesMgmt extends HttpServlet {
     boolean markUncovered;
     int maxAssertionsPerTest;
     CodeValidator.CodeValidatorLevel mutantValidatorLevel;
-	private MultiplayerGame mg;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_GAMES_JSP);
@@ -85,8 +84,8 @@ public class AdminGamesMgmt extends HttpServlet {
     }
 
 	private void insertGame(HttpServletResponse response, HttpServletRequest request, ArrayList<String> messages, HttpSession session) throws IOException {
-		attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.ATTACKER_LISTS_SESSION_ATTRIBUTE);
-		defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.DEFENDER_LISTS_SESSION_ATTRIBUTE);
+		attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminGamesMgmt.ATTACKER_LISTS_SESSION_ATTRIBUTE);
+		defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminGamesMgmt.DEFENDER_LISTS_SESSION_ATTRIBUTE);
 		String gameAndUserRemoveId = request.getParameter("tempGameUserRemoveButton");
 		String gameAndUserSwitchId = request.getParameter("tempGameUserSwitchButton");
 		if (gameAndUserRemoveId != null || gameAndUserSwitchId != null) { // admin is removing user  from temp game or switching their role
@@ -109,7 +108,7 @@ public class AdminGamesMgmt extends HttpServlet {
 		} else { // admin is inserting or deleting selected temp games
 			String[] selectedTempGames;
 			selectedTempGames = request.getParameterValues("selectedTempGames");
-			createdGames = (List<MultiplayerGame>) session.getAttribute(AdminInterface.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
+			createdGames = (List<MultiplayerGame>) session.getAttribute(AdminGamesMgmt.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
 
 			if (selectedTempGames == null) {
 				messages.add("Please select at least one Game to insert.");
@@ -153,12 +152,12 @@ public class AdminGamesMgmt extends HttpServlet {
 			List<Integer> userList = new ArrayList<>();
 			boolean isTempGame = gidString.startsWith("T");
 			if (isTempGame) {
-				createdGames = (List<MultiplayerGame>) session.getAttribute(AdminInterface.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
+				createdGames = (List<MultiplayerGame>) session.getAttribute(AdminGamesMgmt.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
 				gid = Integer.parseInt(gidString.substring(1));
 				mg = createdGames.get(gid);
 				userList = (role.equals(Role.ATTACKER) ?
-						(List<List<Integer>>) session.getAttribute(AdminInterface.ATTACKER_LISTS_SESSION_ATTRIBUTE) :
-						(List<List<Integer>>) session.getAttribute(AdminInterface.DEFENDER_LISTS_SESSION_ATTRIBUTE))
+						(List<List<Integer>>) session.getAttribute(AdminGamesMgmt.ATTACKER_LISTS_SESSION_ATTRIBUTE) :
+						(List<List<Integer>>) session.getAttribute(AdminGamesMgmt.DEFENDER_LISTS_SESSION_ATTRIBUTE))
 						.get(gid);
 			} else {
 				gid = Integer.parseInt(gidString);
@@ -187,9 +186,9 @@ public class AdminGamesMgmt extends HttpServlet {
 	}
 
 	private void batchCreateGames(HttpServletRequest request, HttpServletResponse response, HttpSession session, ArrayList<String> messages) throws IOException {
-		attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.ATTACKER_LISTS_SESSION_ATTRIBUTE);
-		defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.DEFENDER_LISTS_SESSION_ATTRIBUTE);
-		createdGames = (List<MultiplayerGame>) session.getAttribute(AdminInterface.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
+		attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminGamesMgmt.ATTACKER_LISTS_SESSION_ATTRIBUTE);
+		defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminGamesMgmt.DEFENDER_LISTS_SESSION_ATTRIBUTE);
+		createdGames = (List<MultiplayerGame>) session.getAttribute(AdminGamesMgmt.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
 		String[] selectedUsers;
 		String userNameListString;
 		try {
