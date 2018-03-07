@@ -37,6 +37,10 @@
                class="table-hover table-responsive table-paragraphs games-table display table-condensed">
             <thead>
             <tr style="border-bottom: 1px solid black">
+                <th><input type="checkbox" id="selectallGames"
+                           onchange="document.getElementById('start_games_btn').disabled = !this.checked;
+                           document.getElementById('stop_games_btn').disabled = !this.checked">
+                </th>
                 <th>ID</th>
                 <th></th>
                 <th>Class</th>
@@ -66,6 +70,11 @@
                     int gid = g.getId();
             %>
             <tr style="border-top: 1px solid lightgray; border-bottom: 1px solid lightgray">
+                <td>
+                    <input type="checkbox" name="selectedGames" id="selectedGames" value="<%= gid%>" onchange=
+                            "document.getElementById('start_games_btn').disabled = false;
+                            document.getElementById('stop_games_btn').disabled = false">
+                </td>
                 <td><%= gid %>
                 </td>
                 <td>
@@ -183,6 +192,16 @@
             <% } %>
             </tbody>
         </table>
+        <br></br>
+        <button class="btn btn-md btn-primary" type="submit" name="games_btn" id="start_games_btn"
+                disabled value="Start Games">
+            Start Games
+        </button>
+        <button class="btn btn-md btn-danger" type="submit" name="games_btn" id="stop_games_btn"
+                onclick="return confirm('Are you sure you want to stop the selected Games?');"
+                disabled value="Stop Games">
+            Stop Games
+        </button>
         <% }
         %>
 
@@ -210,7 +229,7 @@
                class="table table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
             <tr>
-                <th><input type="checkbox" id="selectallGames"
+                <th><input type="checkbox" id="selectallTempGames"
                            onchange="document.getElementById('insert_games_btn').disabled = !this.checked;
                            document.getElementById('delete_games_btn').disabled = !this.checked">
                 </th>
@@ -243,7 +262,7 @@
             %>
             <tr>
                 <td>
-                    <input type="checkbox" name="selectedGames" id="selectedGames" value="<%= i%>" onchange=
+                    <input type="checkbox" name="selectedTempGames" id="selectedTempGames" value="<%= i%>" onchange=
                             "document.getElementById('insert_games_btn').disabled = false;
                             document.getElementById('delete_games_btn').disabled = false">
                 </td>
@@ -731,6 +750,10 @@
 
         <script>
             $('#selectallUsers').click(function () {
+                $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
+            });
+
+            $('#selectallTempGames').click(function () {
                 $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
             });
 

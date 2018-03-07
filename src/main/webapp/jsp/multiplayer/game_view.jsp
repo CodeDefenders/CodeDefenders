@@ -209,7 +209,8 @@
     }
     //ArrayList<String> messages = new ArrayList<String>();
 %>
-    <%@ include file="/jsp/scoring_tooltip.jsp" %>
+<%@ include file="/jsp/scoring_tooltip.jsp" %>
+<%@ include file="/jsp/playerFeedback.jsp" %>
     <%@ include file="/jsp/multiplayer/game_scoreboard.jsp" %>
 <div class="crow fly no-gutter up">
     <% switch (role){

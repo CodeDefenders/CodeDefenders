@@ -345,6 +345,15 @@
 		<url-pattern>/admin/settings</url-pattern>
 	</servlet-mapping>
 
+	<servlet>
+		<servlet-name>feedback</servlet-name>
+		<servlet-class>org.codedefenders.Feedback</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>feedback</servlet-name>
+		<url-pattern>/feedback</url-pattern>
+	</servlet-mapping>
+
 	<!-- End Notification JSON Servlets -->
 
 	<resource-ref>
@@ -378,7 +387,6 @@
 	</welcome-file-list>-->
 
 	<error-page>
-		<error-code>404</error-code>
 		<location>/jsp/error_page_404.jsp</location>
 	</error-page>
 
