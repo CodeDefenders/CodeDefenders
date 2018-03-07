@@ -85,7 +85,7 @@
                         <tbody>
 
                         <%
-                            int[] oldValues = FeedbackDAO.getFeedbackValues(gameId, uid);
+                            Integer[] oldValues = FeedbackDAO.getFeedbackValues(gameId, uid);
                             for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {
                                 int oldValue = oldValues == null ? -1 : oldValues[f.ordinal()];
                                 if ((role.equals(Role.DEFENDER) &&
@@ -172,7 +172,7 @@
                         <td><%=userName%>
                         </td>
                         <%
-                            int[] ratingValues = FeedbackDAO.getFeedbackValues(gameId, userFromPlayerId);
+                            Integer[] ratingValues = FeedbackDAO.getFeedbackValues(gameId, userFromPlayerId);
                             for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {
                                 int ratingValue = ratingValues == null ? -1 : ratingValues[f.ordinal()];
                                 if (ratingValue < 1) {
