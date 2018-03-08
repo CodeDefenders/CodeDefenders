@@ -805,7 +805,10 @@
                 return document.getElementById(id).value.trim() !== "";
             }
 
-            $('#tableAddUsers').on('draw.dt', deselectCheckboxes);
+            $('#tableAddUsers').on('draw.dt', function () {
+                deselectCheckboxes();
+                document.getElementById('submit_users_btn').disabled = !containsText('user_name_list');
+            });
 
 
             $(document).ready(function () {
