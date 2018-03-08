@@ -72,8 +72,9 @@
             <tr style="border-top: 1px solid lightgray; border-bottom: 1px solid lightgray">
                 <td>
                     <input type="checkbox" name="selectedGames" id="selectedGames" value="<%= gid%>" onchange=
-                            "document.getElementById('start_games_btn').disabled = false;
-                            document.getElementById('stop_games_btn').disabled = false">
+                            "document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
+                            document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
+                            setSelectAllGamesCheckbox()">
                 </td>
                 <td><%= gid %>
                 </td>
@@ -263,8 +264,9 @@
             <tr>
                 <td>
                     <input type="checkbox" name="selectedTempGames" id="selectedTempGames" value="<%= i%>" onchange=
-                            "document.getElementById('insert_games_btn').disabled = false;
-                            document.getElementById('delete_games_btn').disabled = false">
+                            "document.getElementById('insert_games_btn').disabled = !areAnyChecked('selectedTempGames');
+                            document.getElementById('delete_games_btn').disabled = !areAnyChecked('selectedTempGames');
+                            setSelectAllTempGamesCheckbox();">
                 </td>
                 <td><%=i%>
                 </td>
@@ -404,7 +406,9 @@
                 <td class="col-sm-1">
                     <% if (uid != currentUserID) { %>
                     <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%= uid%>" onchange=
-                            "document.getElementById('submit_users_btn').disabled = false">
+                            "document.getElementById('submit_users_btn').disabled =
+                            !(areAnyChecked('selectedUsers') || containsText('user_name_list'));
+                            setSelectAllUsersCheckbox();">
                     <%}%>
                 </td>
                 <td class="col-sm-1"><%= uid%>
@@ -472,7 +476,8 @@
                 <br/>Only unassigned users are taken into account.
             </div>
             <textarea class="form-control" rows="5" id="user_name_list" name="user_name_list"
-                      oninput="document.getElementById('submit_users_btn').disabled = false"></textarea>
+                      oninput="document.getElementById('submit_users_btn').disabled =
+                        !(areAnyChecked('selectedUsers') || containsText('user_name_list'))"></textarea>
         </div>
 
 
@@ -772,10 +777,50 @@
 
             function deselectCheckbox() {
                 var checkboxes = document.getElementsByName('selectedUsers');
-                checkboxes.forEach(function(element) {
-                    element.checked=false;
+                checkboxes.forEach(function (element) {
+                    element.checked = false;
                 });
-                document.getElementById('selectallUsers').checked=false;
+                document.getElementById('selectallUsers').checked = false;
+            }
+
+            function setSelectAllUsersCheckbox() {
+                var checkboxes = document.getElementsByName('selectedUsers');
+                var allChecked = true;
+                checkboxes.forEach(function (element) {
+                    allChecked = allChecked && element.checked;
+                });
+                document.getElementById('selectallUsers').checked = allChecked;
+            }
+
+            function setSelectAllTempGamesCheckbox() {
+                var checkboxes = document.getElementsByName('selectedTempGames');
+                var allChecked = true;
+                checkboxes.forEach(function (element) {
+                    allChecked = allChecked && element.checked;
+                });
+                document.getElementById('selectallTempGames').checked = allChecked;
+            }
+
+            function setSelectAllGamesCheckbox() {
+                var checkboxes = document.getElementsByName('selectedGames');
+                var allChecked = true;
+                checkboxes.forEach(function (element) {
+                    allChecked = allChecked && element.checked;
+                });
+                document.getElementById('selectallGames').checked = allChecked;
+            }
+
+            function areAnyChecked(name) {
+                var checkboxes = document.getElementsByName(name);
+                var anyChecked = false;
+                checkboxes.forEach(function (element) {
+                    anyChecked = anyChecked || element.checked;
+                });
+                return anyChecked;
+            }
+
+            function containsText(id) {
+                return document.getElementById(id).value.trim() !== "";
             }
 
             $('#tableAddUsers').on('draw.dt', deselectCheckbox);
