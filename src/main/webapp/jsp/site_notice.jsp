@@ -1,5 +1,5 @@
+<%@ page import="org.codedefenders.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.util.AdminDAO" %>
-<%@ page import="org.codedefenders.*" %>
 <% String pageTitle = "Site Notice"; %>
 
 <%@ include file="/jsp/header_base.jsp" %>
@@ -8,7 +8,7 @@
     <h2 style="text-align: center">Site Notice</h2>
     <div class="panel panel-default" style="padding:25px">
         <div class="panel-body">
-            <%="still need to merge system settings"/*AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SITE_NOTICE).getStringValue()*/%>
+            <%=AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SITE_NOTICE).getStringValue()%>
         </div>
     </div>
 </div>
