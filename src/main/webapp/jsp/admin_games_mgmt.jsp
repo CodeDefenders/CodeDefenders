@@ -37,7 +37,7 @@
                class="table-hover table-responsive table-paragraphs games-table display table-condensed">
             <thead>
             <tr style="border-bottom: 1px solid black">
-                <th><input type="checkbox" id="selectallGames"
+                <th><input type="checkbox" id="selectAllGames"
                            onchange="document.getElementById('start_games_btn').disabled = !this.checked;
                            document.getElementById('stop_games_btn').disabled = !this.checked">
                 </th>
@@ -74,7 +74,7 @@
                     <input type="checkbox" name="selectedGames" id="selectedGames" value="<%= gid%>" onchange=
                             "document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
                             document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
-                            setSelectAllGamesCheckbox()">
+                            setSelectAllCheckbox('selectedGames', 'selectAllGames')">
                 </td>
                 <td><%= gid %>
                 </td>
@@ -230,7 +230,7 @@
                class="table table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
             <tr>
-                <th><input type="checkbox" id="selectallTempGames"
+                <th><input type="checkbox" id="selectAllTempGames"
                            onchange="document.getElementById('insert_games_btn').disabled = !this.checked;
                            document.getElementById('delete_games_btn').disabled = !this.checked">
                 </th>
@@ -266,7 +266,7 @@
                     <input type="checkbox" name="selectedTempGames" id="selectedTempGames" value="<%= i%>" onchange=
                             "document.getElementById('insert_games_btn').disabled = !areAnyChecked('selectedTempGames');
                             document.getElementById('delete_games_btn').disabled = !areAnyChecked('selectedTempGames');
-                            setSelectAllTempGamesCheckbox();">
+                            setSelectAllCheckbox('selectedTempGames', 'selectAllTempGames');">
                 </td>
                 <td><%=i%>
                 </td>
@@ -365,7 +365,7 @@
                class="table table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
             <tr>
-                <th><input type="checkbox" id="selectallUsers"
+                <th><input type="checkbox" id="selectAllUsers"
                            onchange="document.getElementById('submit_users_btn').disabled = !this.checked">
                 </th>
                 <th>User ID</th>
@@ -408,7 +408,7 @@
                     <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%= uid%>" onchange=
                             "document.getElementById('submit_users_btn').disabled =
                             !(areAnyChecked('selectedUsers') || containsText('user_name_list'));
-                            setSelectAllUsersCheckbox();">
+                            setSelectAllCheckbox('selectedUsers', 'selectAllUsers');">
                     <%}%>
                 </td>
                 <td class="col-sm-1"><%= uid%>
@@ -752,15 +752,15 @@
         </button>
 
         <script>
-            $('#selectallUsers').click(function () {
+            $('#selectAllUsers').click(function () {
                 $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
             });
 
-            $('#selectallTempGames').click(function () {
+            $('#selectAllTempGames').click(function () {
                 $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
             });
 
-            $('#selectallGames').click(function () {
+            $('#selectAllGames').click(function () {
                 $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
             });
 
@@ -775,39 +775,21 @@
                 $("[id=playersTableActive]").toggle();
             });
 
-            function deselectCheckbox() {
+            function deselectCheckboxes() {
                 var checkboxes = document.getElementsByName('selectedUsers');
                 checkboxes.forEach(function (element) {
                     element.checked = false;
                 });
-                document.getElementById('selectallUsers').checked = false;
+                document.getElementById('selectAllUsers').checked = false;
             }
 
-            function setSelectAllUsersCheckbox() {
-                var checkboxes = document.getElementsByName('selectedUsers');
+            function setSelectAllCheckbox(checkboxesName, selectAllCheckboxId) {
+                var checkboxes = document.getElementsByName(checkboxesName);
                 var allChecked = true;
                 checkboxes.forEach(function (element) {
                     allChecked = allChecked && element.checked;
                 });
-                document.getElementById('selectallUsers').checked = allChecked;
-            }
-
-            function setSelectAllTempGamesCheckbox() {
-                var checkboxes = document.getElementsByName('selectedTempGames');
-                var allChecked = true;
-                checkboxes.forEach(function (element) {
-                    allChecked = allChecked && element.checked;
-                });
-                document.getElementById('selectallTempGames').checked = allChecked;
-            }
-
-            function setSelectAllGamesCheckbox() {
-                var checkboxes = document.getElementsByName('selectedGames');
-                var allChecked = true;
-                checkboxes.forEach(function (element) {
-                    allChecked = allChecked && element.checked;
-                });
-                document.getElementById('selectallGames').checked = allChecked;
+                document.getElementById(selectAllCheckboxId).checked = allChecked;
             }
 
             function areAnyChecked(name) {
@@ -823,7 +805,7 @@
                 return document.getElementById(id).value.trim() !== "";
             }
 
-            $('#tableAddUsers').on('draw.dt', deselectCheckbox);
+            $('#tableAddUsers').on('draw.dt', deselectCheckboxes);
 
 
             $(document).ready(function () {
