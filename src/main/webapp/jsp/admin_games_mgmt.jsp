@@ -371,9 +371,7 @@
                 <th>Last Role</th>
                 <th>Total Score</th>
                 <th>Last Login</th>
-                <th>Select Game</th>
-                <th>Role</th>
-                <th>Add</th>
+                <th>Add to existing Game</th>
             </tr>
             </thead>
             <tbody>
@@ -420,36 +418,36 @@
                 </td>
                 <td class="col-sm-2"><%= lastLogin %>
                 </td>
-                <td class="col-sm-1" style="padding-top:3px; padding-bottom:3px">
-                    <select name="<%="game_" + uid%>" class="form-control selectpicker" data-size="small"
-                            id="game">
-                        <% for (MultiplayerGame g : availableGames) { %>
-                        <option value="<%=g.getId()%>"><%=String.valueOf(g.getId()) + ": " + g.getCUT().getAlias()%>
-                        </option>
-                        <%
-                            }
-                            if (createdGames != null) {
-                                for (int gameIndex = 0; gameIndex < createdGames.size(); ++gameIndex) {
-                                    String classAlias = createdGames.get(gameIndex).getCUT().getAlias();
-                        %>
-                        <option style="color:gray"
-                                value=<%="T" + String.valueOf(gameIndex)%>><%="T" + String.valueOf(gameIndex)
-                                + ": " + classAlias%>
-                        </option>
-                        <%}%>
-                        <%}%>
-                    </select>
-                </td>
-                <td class=" col-sm-1
-                        " style="padding-top:3px; padding-bottom:3px">
-                    <select name="<%="role_" + uid%>" class="form-control selectpicker" data-size="small"
-                            id="role">
-                        <option value="<%=Role.ATTACKER%>">Attacker</option>
-                        <option value="<%=Role.DEFENDER%>">Defender</option>
-                    </select>
-                </td>
-                <td class="col-sm-1" style="padding-top:4px; padding-bottom:4px">
+                <td class="col-sm-4" style="padding-top:3px; padding-bottom:3px; ">
+                    <div style="max-width: 160px; float: left;">
+                        <select name="<%="game_" + uid%>" class="form-control selectpicker" data-size="small"
+                                id="game">
+                            <% for (MultiplayerGame g : availableGames) { %>
+                            <option value="<%=g.getId()%>"><%=String.valueOf(g.getId()) + ": " + g.getCUT().getAlias()%>
+                            </option>
+                            <%
+                                }
+                                if (createdGames != null) {
+                                    for (int gameIndex = 0; gameIndex < createdGames.size(); ++gameIndex) {
+                                        String classAlias = createdGames.get(gameIndex).getCUT().getAlias();
+                            %>
+                            <option style="color:gray"
+                                    value=<%="T" + String.valueOf(gameIndex)%>><%="T" + String.valueOf(gameIndex)
+                                    + ": " + classAlias%>
+                            </option>
+                            <%}%>
+                            <%}%>
+                        </select>
+                    </div>
+                    <div style="float: left; max-width: 120px; margin-left:2px">
+                        <select name="<%="role_" + uid%>" class="form-control selectpicker" data-size="small"
+                                id="role">
+                            <option value="<%=Role.ATTACKER%>">Attacker</option>
+                            <option value="<%=Role.DEFENDER%>">Defender</option>
+                        </select>
+                    </div>
                     <button class="btn btn-sm btn-primary" type="submit" value="<%=uid%>" name="userListButton"
+                            style="margin: 2px;"
                             <%=availableGames.isEmpty() && (createdGames == null || createdGames.isEmpty()) ? "disabled" : ""%>>
                         <span class="glyphicon glyphicon-plus"></span>
                     </button>
@@ -792,12 +790,6 @@
                         "orderable": false
                     }, {
                         "targets": 6,
-                        "orderable": false
-                    }, {
-                        "targets": 7,
-                        "orderable": false
-                    }, {
-                        "targets": 8,
                         "orderable": false
                     }]
                 });
