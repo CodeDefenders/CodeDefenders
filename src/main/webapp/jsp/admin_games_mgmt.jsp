@@ -770,6 +770,16 @@
                 $("[id=playersTableActive]").toggle();
             });
 
+            function deselectCheckbox() {
+                var checkboxes = document.getElementsByName('selectedUsers');
+                checkboxes.forEach(function(element) {
+                    element.checked=false;
+                });
+                document.getElementById('selectallUsers').checked=false;
+            }
+
+            $('#tableAddUsers').on('draw.dt', deselectCheckbox);
+
 
             $(document).ready(function () {
                 if (localStorage.getItem("showActivePlayers") === "true") {
