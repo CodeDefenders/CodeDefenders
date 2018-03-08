@@ -1,3 +1,5 @@
+<%@ page import="org.codedefenders.util.AdminDAO" %>
+<%@ page import="org.codedefenders.*" %>
 <% String pageTitle = "Login"; %>
 
 <%@ include file="/jsp/header_logout.jsp" %>
@@ -22,12 +24,10 @@
               <input type="checkbox" id="consentOK" style="margin-right:5px;" checked>I understand and consent that the mutants and tests I create in the game will be used for research purposes.
           </div>
           <button class="btn btn-lg btn-primary btn-block" id="signInButton" type="submit">Sign in</button>
-          
-          <!--  Alessio disable this to avoid students creating additional users. Ideally this should be configure at build time -->
-          <!-- 
+
+          <%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REGISTRATION).getBoolValue()) { %>
           <a href="#" class="text-center new-account" data-toggle="modal" data-target="#myModal">Create an account</a>
-           -->
-          
+          <%}%>
           
       </form>
   </div>
@@ -56,7 +56,8 @@
                       <input type="password" id="inputConfirmPassword" name="confirm" class="form-control" placeholder="Confirm Password" required>
                       <button class="btn btn-lg btn-primary btn-block" type="submit">Create Account</button>
                     </form>
-                    <span style="margin-right:5px; font-size:small;">Valid username: 3-20 alphanumerics starting with a letter (a-z), no space or special character.<br>Valid password: 3-20 alphanumeric characters, no whitespace or special character.</span>
+                    <span style="margin-right:5px; font-size:small;">Valid username: 3-20 alphanumerics starting with a letter (a-z), no space or special character.<br>
+                        Valid password: <%=AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()%>-20 alphanumeric characters, no whitespace or special character.</span>
                 </div>
               </div>
               <div class="modal-footer">

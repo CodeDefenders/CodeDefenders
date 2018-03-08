@@ -5,8 +5,8 @@ import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.multiplayer.PlayerScore;
 import org.codedefenders.util.AdminDAO;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.validation.CodeValidator;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 
-public class AdminInterface extends HttpServlet {
+public class AdminGamesMgmt extends HttpServlet {
 
     public enum RoleAssignmentMethod {RANDOM, OPPOSITE}
 
@@ -26,7 +26,7 @@ public class AdminInterface extends HttpServlet {
     public static final String ATTACKER_LISTS_SESSION_ATTRIBUTE = "attackerLists";
     public static final String CREATED_GAMES_LISTS_SESSION_ATTRIBUTE = "createdGames";
     private static final int NB_CATEGORIES_FOR_SHUFFLING = 3;
-    private static final String USER_NAME_LIST_DELIMITER = "[\\r\\n]+";
+    static final String USER_NAME_LIST_DELIMITER = "[\\r\\n]+";
 
     private int currentUserID;
     private List<Integer> selectedUserIDs;
@@ -41,11 +41,16 @@ public class AdminInterface extends HttpServlet {
     private List<MultiplayerGame> createdGames;
     private List<List<Integer>> attackerIdsList;
     private List<List<Integer>> defenderIdsList;
-	private MultiplayerGame mg;
+    private List<Integer> selectedGameIndices;
+    private String errorMessage;
+    private MultiplayerGame mg;
+    boolean chatEnabled;
+    boolean markUncovered;
+    int maxAssertionsPerTest;
+    CodeValidator.CodeValidatorLevel mutantValidatorLevel;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.ADMIN_CREATE_JSP);
-        dispatcher.forward(request, response);
+        response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_GAMES_JSP);
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -79,8 +84,8 @@ public class AdminInterface extends HttpServlet {
     }
 
 	private void insertGame(HttpServletResponse response, HttpServletRequest request, ArrayList<String> messages, HttpSession session) throws IOException {
-		attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.ATTACKER_LISTS_SESSION_ATTRIBUTE);
-		defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.DEFENDER_LISTS_SESSION_ATTRIBUTE);
+		attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminGamesMgmt.ATTACKER_LISTS_SESSION_ATTRIBUTE);
+		defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminGamesMgmt.DEFENDER_LISTS_SESSION_ATTRIBUTE);
 		String gameAndUserRemoveId = request.getParameter("tempGameUserRemoveButton");
 		String gameAndUserSwitchId = request.getParameter("tempGameUserSwitchButton");
 		if (gameAndUserRemoveId != null || gameAndUserSwitchId != null) { // admin is removing user  from temp game or switching their role
@@ -103,7 +108,7 @@ public class AdminInterface extends HttpServlet {
 		} else { // admin is inserting or deleting selected temp games
 			String[] selectedTempGames;
 			selectedTempGames = request.getParameterValues("selectedTempGames");
-			createdGames = (List<MultiplayerGame>) session.getAttribute(AdminInterface.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
+			createdGames = (List<MultiplayerGame>) session.getAttribute(AdminGamesMgmt.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
 
 			if (selectedTempGames == null) {
 				messages.add("Please select at least one Game to insert.");
@@ -147,12 +152,12 @@ public class AdminInterface extends HttpServlet {
 			List<Integer> userList = new ArrayList<>();
 			boolean isTempGame = gidString.startsWith("T");
 			if (isTempGame) {
-				createdGames = (List<MultiplayerGame>) session.getAttribute(AdminInterface.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
+				createdGames = (List<MultiplayerGame>) session.getAttribute(AdminGamesMgmt.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
 				gid = Integer.parseInt(gidString.substring(1));
 				mg = createdGames.get(gid);
 				userList = (role.equals(Role.ATTACKER) ?
-						(List<List<Integer>>) session.getAttribute(AdminInterface.ATTACKER_LISTS_SESSION_ATTRIBUTE) :
-						(List<List<Integer>>) session.getAttribute(AdminInterface.DEFENDER_LISTS_SESSION_ATTRIBUTE))
+						(List<List<Integer>>) session.getAttribute(AdminGamesMgmt.ATTACKER_LISTS_SESSION_ATTRIBUTE) :
+						(List<List<Integer>>) session.getAttribute(AdminGamesMgmt.DEFENDER_LISTS_SESSION_ATTRIBUTE))
 						.get(gid);
 			} else {
 				gid = Integer.parseInt(gidString);
@@ -181,9 +186,9 @@ public class AdminInterface extends HttpServlet {
 	}
 
 	private void batchCreateGames(HttpServletRequest request, HttpServletResponse response, HttpSession session, ArrayList<String> messages) throws IOException {
-		attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.ATTACKER_LISTS_SESSION_ATTRIBUTE);
-		defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminInterface.DEFENDER_LISTS_SESSION_ATTRIBUTE);
-		createdGames = (List<MultiplayerGame>) session.getAttribute(AdminInterface.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
+		attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminGamesMgmt.ATTACKER_LISTS_SESSION_ATTRIBUTE);
+		defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminGamesMgmt.DEFENDER_LISTS_SESSION_ATTRIBUTE);
+		createdGames = (List<MultiplayerGame>) session.getAttribute(AdminGamesMgmt.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
 		String[] selectedUsers;
 		String userNameListString;
 		try {
@@ -329,7 +334,8 @@ public class AdminInterface extends HttpServlet {
 
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
                  cutID, currentUserID, gamesLevel, gamesState,
-                startTime, finishTime);
+                startTime, finishTime, maxAssertionsPerTest, chatEnabled,
+                mutantValidatorLevel, markUncovered);
 
         if (teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_DESCENDING) || teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_SHUFFLED)) {
             Collections.sort(attackerIDs, new ReverseDefenderScoreComparator());
@@ -399,13 +405,15 @@ public class AdminInterface extends HttpServlet {
 
     private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame,
                                                      int cutID, int creatorID, GameLevel level, GameState state,
-                                                     long startTime, long finishTime) {
+                                                     long startTime, long finishTime, int maxAssertionsPerTest,
+                                                     boolean chatEnabled, CodeValidator.CodeValidatorLevel mutantValidatorLevel,
+                                                     boolean markUncovered) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
             MultiplayerGame multiplayerGame = new MultiplayerGame(cutID, creatorID, level, (float) 1, (float) 1,
                     (float) 1, 10, 4, 0,
                     0, 0, 0, startTime,
-                    finishTime, state.name(), false);
+                    finishTime, state.name(), false, maxAssertionsPerTest, chatEnabled, mutantValidatorLevel, markUncovered);
             gameList.add(multiplayerGame);
         }
         return gameList;

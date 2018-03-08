@@ -3,8 +3,10 @@ package org.codedefenders.util;
 import org.codedefenders.GameLevel;
 import org.codedefenders.Role;
 import org.codedefenders.User;
+import org.codedefenders.AdminSystemSettings;
 import org.codedefenders.leaderboard.Entry;
 import org.codedefenders.multiplayer.MultiplayerGame;
+import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -131,6 +133,7 @@ public class AdminDAO {
             "SELECT DISTINCT\n" +
                     "  users.User_ID,\n" +
                     "  users.Username,\n" +
+                    "  users.Email,\n" +
                     "  lastLogin.ts AS lastLogin,\n" +
                     "  Role         AS lastRole,\n" +
                     "  totalScore\n" +
@@ -180,6 +183,56 @@ public class AdminDAO {
                     "  WHERE\n" +
                     "    (State = 'ACTIVE' OR State = 'CREATED') AND Finish_Time > NOW() AND Role IN ('ATTACKER', 'DEFENDER') AND Active = 1\n" +
                     ")\n" +
+                    "ORDER BY lastLogin DESC, User_ID;";
+
+
+    public final static String USERS_INFO_QUERY =
+            "SELECT DISTINCT\n" +
+                    "  users.User_ID,\n" +
+                    "  users.Username,\n" +
+                    "  users.Email,\n" +
+                    "  lastLogin.ts AS lastLogin,\n" +
+                    "  Role         AS lastRole,\n" +
+                    "  totalScore\n" +
+                    "FROM\n" +
+                    "  users\n" +
+                    "  LEFT JOIN (SELECT\n" +
+                    "          MAX(Timestamp) AS ts,\n" +
+                    "          user_id\n" +
+                    "        FROM sessions\n" +
+                    "        GROUP BY User_ID) AS lastLogin ON lastLogin.User_ID = users.User_ID\n" +
+                    "  LEFT JOIN\n" +
+                    "  (SELECT\n" +
+                    "     players.User_ID,\n" +
+                    "     Role\n" +
+                    "   FROM users\n" +
+                    "     INNER JOIN players ON users.User_ID = players.User_ID\n" +
+                    "     INNER JOIN games ON players.Game_ID = games.ID\n" +
+                    "     INNER JOIN\n" +
+                    "     (SELECT\n" +
+                    "        players.User_ID,\n" +
+                    "        max(players.Game_ID) AS latestGame\n" +
+                    "      FROM players\n" +
+                    "      GROUP BY players.User_ID) AS lg ON lg.User_ID = players.User_ID AND lg.latestGame = games.ID) AS lastRole\n" +
+                    "    ON lastRole.User_ID = users.User_ID\n" +
+                    "  JOIN\n" +
+                    "  (SELECT\n" +
+                    "     U.User_ID,\n" +
+                    "     IFNULL(AScore, 0) + IFNULL(DScore, 0) AS TotalScore\n" +
+                    "   FROM users U LEFT JOIN\n" +
+                    "     (SELECT\n" +
+                    "        PA.user_id,\n" +
+                    "        sum(M.Points) AS AScore\n" +
+                    "      FROM players PA LEFT JOIN mutants M ON PA.id = M.Player_ID\n" +
+                    "      GROUP BY PA.user_id)\n" +
+                    "       AS Attacker ON U.user_id = Attacker.user_id\n" +
+                    "     LEFT JOIN\n" +
+                    "     (SELECT\n" +
+                    "        PD.user_id,\n" +
+                    "        sum(T.Points) AS DScore\n" +
+                    "      FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID\n" +
+                    "      GROUP BY PD.user_id)\n" +
+                    "       AS Defender ON U.user_id = Defender.user_id) AS totalScore ON totalScore.User_ID = users.User_ID\n" +
                     "ORDER BY lastLogin DESC, User_ID;";
 
     public static final String PLAYERS_INFO_QUERY =
@@ -260,6 +313,15 @@ public class AdminDAO {
 			"                    WHERE Player_ID = ?);";
     public final static String DELETE_TEST_TARGETEXECUTIONS = "DELETE FROM targetexecutions WHERE Test_ID =?;";
     public final static String DELETE_MUTANT_TARGETEXECUTIONS = "DELETE FROM targetexecutions WHERE Mutant_ID = ?;";
+    public final static String SET_USER_PW = "UPDATE users SET Password = ? WHERE User_ID = ?;";
+    public final static String DELETE_USER = "DELETE FROM users WHERE User_ID = ?;";
+	public final static String GET_ALL_SETTINGS = "SELECT * FROM settings;";
+	public  final static String UPDATE_SETTING_1 = "UPDATE settings\n" +
+            "SET ";
+    public  final static String UPDATE_SETTING_2 = " = ?\n" +
+            "WHERE name = ?;";
+    private static final String GET_SETTING = "SELECT *\n" +
+            "FROM settings WHERE settings.name = ?;";
 
     public static List<User> getUsers(String query) {
         Connection conn = DB.getConnection();
@@ -296,7 +358,9 @@ public class AdminDAO {
                         (float) rs.getDouble("Mutant_Goal"), rs.getInt("Prize"), rs.getInt("Defender_Value"),
                         rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
                         rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),
-                        rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"));
+                        rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"),
+                        rs.getInt("MaxAssertionsPerTest"),rs.getBoolean("ChatEnabled"),
+                        CodeValidator.CodeValidatorLevel.valueOf(rs.getString("MutantValidator")), rs.getBoolean("MarkUncovered"));
                 mg.setId(rs.getInt("ID"));
                 gamesList.add(mg);
             }
@@ -422,8 +486,17 @@ public class AdminDAO {
     }
 
     public static List<List<String>> getUnassignedUsersInfo() {
+        return getUsersInfo(UNASSIGNED_USERS_INFO_QUERY);
+    }
+
+    public static List<List<String>> getAllUsersInfo() {
+        return getUsersInfo(USERS_INFO_QUERY);
+    }
+
+
+    private static List<List<String>> getUsersInfo(String query) {
         Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, UNASSIGNED_USERS_INFO_QUERY);
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query);
         ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 
         List<List<String>> unassignedUsers = new ArrayList<>();
@@ -432,6 +505,7 @@ public class AdminDAO {
                 List<String> userInfo = new ArrayList<>();
                 userInfo.add(String.valueOf(rs.getInt("User_ID")));
                 userInfo.add(rs.getString("Username"));
+                userInfo.add(rs.getString("Email"));
                 Timestamp ts = rs.getTimestamp("lastLogin");
                 userInfo.add(ts == null ? "-- never --" : ts.toString().substring(0, ts.toString().length() - 5));
                 userInfo.add(rs.getString("lastRole"));
@@ -475,4 +549,93 @@ public class AdminDAO {
         }
         return players;
     }
+
+    public static boolean setUserPassword(int uid, String password) {
+        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(password), DB.getDBV(uid)};
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, SET_USER_PW, valueList);
+        return DB.executeUpdate(stmt, conn);
+    }
+
+    public static boolean deleteUser(int uid) {
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, DELETE_USER, DB.getDBV(uid));
+        return DB.executeUpdate(stmt, conn);
+        // this does not work as foreign keys are not deleted (recommended: update w/ ON DELETE CASCADE)
+    }
+
+    public static List<AdminSystemSettings.SettingsDTO> getSystemSettings(){
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, GET_ALL_SETTINGS);
+        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+        return getSettings(rs, conn, stmt);
+	}
+
+    public static boolean updateSystemSetting(AdminSystemSettings.SettingsDTO setting) {
+        Connection conn = DB.getConnection();
+        String valueToSet = setting.getType().name();
+        DatabaseValue[] valueList = new DatabaseValue[]{null, DB.getDBV(setting.getName().name())};
+        switch (setting.getType()) {
+            case STRING_VALUE:
+                valueList[0] = DB.getDBV(setting.getStringValue());
+                break;
+            case INT_VALUE:
+                valueList[0] = DB.getDBV(setting.getIntValue());
+                break;
+            case BOOL_VALUE:
+                valueList[0] = DB.getDBV(setting.getBoolValue());
+                break;
+        }
+        PreparedStatement stmt = DB.createPreparedStatement(conn, UPDATE_SETTING_1 + valueToSet + UPDATE_SETTING_2, valueList);
+        return DB.executeUpdate(stmt, conn);
+    }
+
+    private static List<AdminSystemSettings.SettingsDTO> getSettings(ResultSet rs, Connection conn, PreparedStatement stmt) {
+        List<AdminSystemSettings.SettingsDTO> settings = new ArrayList<>();
+        try {
+            while (rs.next()) {
+                AdminSystemSettings.SettingsDTO setting = null;
+                AdminSystemSettings.SETTING_NAME name = AdminSystemSettings.SETTING_NAME.valueOf(rs.getString("name"));
+                AdminSystemSettings.SETTING_TYPE settingType = AdminSystemSettings.SETTING_TYPE.valueOf(rs.getString("type"));
+                switch (settingType) {
+                    case STRING_VALUE:
+                        setting = new AdminSystemSettings.SettingsDTO(name, rs.getString(settingType.name()));
+                        break;
+                    case INT_VALUE:
+                        setting = new AdminSystemSettings.SettingsDTO(name,rs.getInt(settingType.name()));
+                        break;
+                    case BOOL_VALUE:
+                        setting = new AdminSystemSettings.SettingsDTO(name,rs.getBoolean(settingType.name()));
+                        break;
+                }
+                settings.add(setting);
+            }
+        } catch (SQLException se) {
+            logger.error("SQL exception caught", se);
+        } catch (Exception e) {
+            logger.error("Exception caught", e);
+        } finally {
+            DB.cleanup(conn, stmt);
+        }
+        return settings;
+    }
+
+    public static AdminSystemSettings.SettingsDTO getSystemSetting(AdminSystemSettings.SETTING_NAME name){
+        Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_SETTING, DB.getDBV(name.name()));
+		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+		return getSettings(rs, conn, stmt).get(0);
+    }
+
+
+	public static AdminSystemSettings.SettingsDTO getSystemSettingInt(AdminSystemSettings.SETTING_NAME name, Connection conn) throws SQLException {
+		PreparedStatement stmt = conn.prepareStatement(GET_SETTING);
+		stmt.setString(1, name.name());
+		ResultSet rs = stmt.executeQuery();
+		if (rs.next()) {
+			AdminSystemSettings.SETTING_TYPE settingType = AdminSystemSettings.SETTING_TYPE.valueOf(rs.getString("type"));
+			return new AdminSystemSettings.SettingsDTO(name, rs.getInt(settingType.name()));
+		}
+		return null;
+	}
 }

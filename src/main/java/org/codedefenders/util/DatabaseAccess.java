@@ -1,21 +1,6 @@
 package org.codedefenders.util;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.codedefenders.GameClass;
-import org.codedefenders.GameLevel;
-import org.codedefenders.GameMode;
-import org.codedefenders.GameState;
-import org.codedefenders.Mutant;
-import org.codedefenders.Role;
-import org.codedefenders.TargetExecution;
-import org.codedefenders.Test;
-import org.codedefenders.User;
+import org.codedefenders.*;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
@@ -25,8 +10,16 @@ import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.singleplayer.SinglePlayerGame;
+import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @SuppressWarnings("ALL")
@@ -589,7 +582,9 @@ public class DatabaseAccess {
 						(float) rs.getDouble("Mutant_Goal"), rs.getInt("Prize"), rs.getInt("Defender_Value"),
 						rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
 						rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),
-						rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"));
+						rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"),
+						rs.getInt("MaxAssertionsPerTest"),rs.getBoolean("ChatEnabled"),
+						CodeValidator.CodeValidatorLevel.valueOf(rs.getString("MutantValidator")), rs.getBoolean("MarkUncovered"));
 				mg.setId(rs.getInt("ID"));
 				gameList.add(mg);
 			}
