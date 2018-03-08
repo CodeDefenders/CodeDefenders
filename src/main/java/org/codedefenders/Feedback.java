@@ -17,7 +17,6 @@ public class Feedback extends HttpServlet {
 
 	public final static int MAX_RATING = 5;
 	public final static int MIN_RATING = -1;
-	public static final boolean SHOW_OTHER_PLAYER_FEEDBACK = false;
 
 	public enum FeedbackType {
 		CUT_MUTATION_DIFFICULTY {

@@ -35,6 +35,11 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 	private int methodCount = 0;
 	private int stmtCount = 0;
 	private int assertionCount = 0;
+	private int maxNumberOfAssertions;
+
+	public TestCodeVisitor(int maxNumberOfAssertions) {
+		this.maxNumberOfAssertions = maxNumberOfAssertions;
+	}
 
 	public boolean isValid() {
 		if (classCount > 1)
@@ -43,9 +48,9 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 			logger.info("Invalid test suite contains more than one method declaration.");
 		if (stmtCount == 0)
 			logger.info("Invalid test does not contain any valid statement.");
-		if (assertionCount > 2)
-			logger.info("Invalid test contains more than 2 assertions");
-		return (isValid && classCount == 1 && methodCount == 1 && stmtCount > 0 && assertionCount <= 2);
+		if (assertionCount > maxNumberOfAssertions)
+			logger.info("Invalid test contains more than " + maxNumberOfAssertions + " assertions");
+		return (isValid && classCount == 1 && methodCount == 1 && stmtCount > 0 && assertionCount <= maxNumberOfAssertions);
 	}
 
 	@Override

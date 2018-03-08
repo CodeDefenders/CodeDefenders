@@ -1,5 +1,6 @@
 package org.codedefenders.util;
 
+import org.codedefenders.AdminSystemSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,12 +30,12 @@ public final class ConnectionPool {
 	/**
 	 * Amount of time a thread waits to be notified of newly available connections.
 	 */
-	private static final long WAITING_TIME = 5000;
+	private int waitingTime;
 
 	/**
 	 * Number of constantly open connections.
 	 */
-	public static final int NB_CONNECTIONS = 20;
+	private int nbConnections;
 
 	private ConnectionPool() {
 		init();
@@ -47,6 +48,7 @@ public final class ConnectionPool {
 		logger.info("Initializing ConnectionPool...");
 		try {
 			Connection conn = DatabaseConnection.getConnection();
+			getParametersFromDB(conn);
 			conn.close();
 		} catch (NamingException | SQLException e) {
 			logger.warn("JDBC Driver not found.", e);
@@ -56,8 +58,9 @@ public final class ConnectionPool {
 		Connection newConnection = null;
 		availableConnections = new LinkedList<>();
 		connections = new ArrayList<>();
+
 		try {
-			for (int i = 0; i < NB_CONNECTIONS; ++i) {
+			for (int i = 0; i < nbConnections; ++i) {
 				newConnection = refresh(newConnection);
 				connections.add(newConnection);
 				availableConnections.add(connections.get(i));
@@ -67,7 +70,7 @@ public final class ConnectionPool {
 			closeDBConnections();
 			throw new StorageException();
 		}
-		logger.info("ConnectionPool initialized.");
+		logger.info("ConnectionPool initialized with " + nbConnections + " connections.");
 	}
 
 	/**
@@ -123,7 +126,7 @@ public final class ConnectionPool {
 			returnConn = availableConnections.poll();
 		} else {
 			try {
-				wait(WAITING_TIME);
+				wait(waitingTime);
 			} catch (InterruptedException e) {
 				logger.warn("The DB thread was interrupted while waiting for a connection.");
 				throw new Error();
@@ -182,6 +185,49 @@ public final class ConnectionPool {
 			}*/
 			notifyAll();
 		}
+	}
+
+	public void updateSize(int newSize) {
+		if (newSize < nbConnections) {
+			for (int i = newSize; i < nbConnections; i++) {
+				Connection conn = connections.get(i);
+				if(availableConnections.contains(conn)) {
+					availableConnections.remove(conn);
+				}
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			nbConnections = newSize;
+			connections = connections.subList(0, nbConnections);
+		} else if (newSize > nbConnections) {
+			Connection newConnection = null;
+			for (int i = nbConnections; i < newSize; i++) {
+				try {
+					newConnection = refresh(newConnection);
+					connections.add(newConnection);
+					availableConnections.add(connections.get(i));
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			nbConnections = newSize;
+		}
+	}
+
+	public void updateWaitingTime(int newWaitingTime) {
+		waitingTime = newWaitingTime;
+	}
+
+	private void getParametersFromDB(Connection conn) throws SQLException {
+		nbConnections = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_POOL_CONNECTIONS, conn).getIntValue();
+		waitingTime = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_WAITING_TIME, conn).getIntValue();
+	}
+
+	public int getNbConnections() {
+		return nbConnections;
 	}
 
 	/**

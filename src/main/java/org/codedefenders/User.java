@@ -1,14 +1,14 @@
 package org.codedefenders;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-
 import org.codedefenders.util.DB;
 import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.util.DatabaseValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
 
 public class User {
 
@@ -62,12 +62,34 @@ public class User {
 		}
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		int key = DB.executeUpdateGetKeys(stmt, conn);
-		if( key != -1 ){
+		if (key != -1) {
 			this.id = key;
 			return true;
 		} else {
-			 return false;
+			return false;
 		}
+	}
+
+
+	public boolean update(String encodedPassword) {
+		DatabaseValue[] valueList;
+		Connection conn = DB.getConnection();
+
+		String query = "UPDATE users SET Username = ?, Email = ?, Password = ?, Validated = ? WHERE User_ID = ?;";
+		valueList = new DatabaseValue[]{DB.getDBV(username),
+				DB.getDBV(email),
+				DB.getDBV(encodedPassword),
+				DB.getDBV(validated),
+				DB.getDBV(id)};
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return DB.executeUpdate(stmt, conn);
+	}
+
+
+	public boolean update() {
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		String safePassword = passwordEncoder.encode(password);
+		return update(safePassword);
 	}
 
 	public boolean isValidated() {

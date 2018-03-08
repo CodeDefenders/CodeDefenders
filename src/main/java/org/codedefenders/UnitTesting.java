@@ -38,6 +38,7 @@ import static org.codedefenders.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.Constants.TEST_INVALID_MESSAGE;
 import static org.codedefenders.Constants.TEST_PASSED_ON_CUT_MESSAGE;
+import static org.codedefenders.validation.CodeValidator.DEFAULT_NB_ASSERTIONS;
 
 public class UnitTesting extends HttpServlet {
 
@@ -80,7 +81,7 @@ public class UnitTesting extends HttpServlet {
 		// If it can be written to file and compiled, end turn. Otherwise, dont.
 		Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
 		if (newTest == null) {
-			messages.add(TEST_INVALID_MESSAGE);
+			messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
 			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 			response.sendRedirect(request.getContextPath()+"/utesting");
 			return;

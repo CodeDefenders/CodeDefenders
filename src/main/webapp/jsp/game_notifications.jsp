@@ -149,7 +149,7 @@
 </script>
 
 
-
+<%if(mg.isChatEnabled()) {%>
 <div id="game-notification-bar" class="min<%
 if (role.equals(Role.CREATOR)) { %> creator<% } %>">
 <a id="notification-show-bar"><span>(<span
@@ -209,3 +209,4 @@ id="notif-game-total-count">0</span>)</span>
             </div>
      </div><!-- col-md-6 left bottom -->
 </div>
+<%}%>

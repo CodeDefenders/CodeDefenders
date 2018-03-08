@@ -115,7 +115,7 @@
 				}
 			}
 
-			if (noneCovered) {
+			if (noneCovered && !mg.isMarkUncovered()) {
 				// equivLine is not covered, possible iff passed directly as url argument
 				messages.add(MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
 				response.sendRedirect(request.getContextPath() + "/multiplayer/play");

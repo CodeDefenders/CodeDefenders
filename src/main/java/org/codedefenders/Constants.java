@@ -68,8 +68,9 @@ public class Constants {
 	public static final String DEFENDER_VIEW_JSP = "jsp" + F_SEP + "defender_view.jsp";
 	public static final String SCORE_VIEW_JSP = "jsp" + F_SEP + "score_view.jsp";
 	public static final String UTESTING_VIEW_JSP = "jsp" + F_SEP + "utesting_view.jsp";
-	public static final String ADMIN_VIEW_JSP = "jsp" + F_SEP + "admin_monitor.jsp";
-	public static final String ADMIN_CREATE_JSP = "jsp" + F_SEP + "admin_create.jsp";
+	public static final String ADMIN_USER_JSP = "jsp" + F_SEP + "admin_user_mgmt.jsp";
+	public static final String ADMIN_GAMES_JSP = "jsp" + F_SEP + "admin_games_mgmt.jsp";
+	public static final String ADMIN_SETTINGS_JSP = "jsp" + F_SEP + "admin_system_settings.jsp";
 
 	// Messages
 	public static final String WINNER_MESSAGE = "You won!";
@@ -79,7 +80,7 @@ public class Constants {
 	public static final String TEST_GENERIC_ERROR_MESSAGE = "Sorry ! An error on the server prevented the compilation of your test.";
 
 	public static final String TEST_DID_NOT_COMPILE_MESSAGE = "Your test did not compile. Try again, but with compilable code.";
-	public static final String TEST_INVALID_MESSAGE = "Your test is not valid. Remember the rules: Only one non-empty test, at most two assertions per test, no conditionals and no loops!";
+	public static final String TEST_INVALID_MESSAGE = "Your test is not valid. Remember the rules: Only one non-empty test, at most %d assertions per test, no conditionals and no loops!";
 	public static final String TEST_PASSED_ON_CUT_MESSAGE = "Great! Your test compiled and passed on the original class under test.";
 	public static final String TEST_DID_NOT_PASS_ON_CUT_MESSAGE = "Your test did not pass on the original class under test. Try again.";
 	public static final String TEST_KILLED_CLAIMED_MUTANT_MESSAGE = "Yay, your test killed the allegedly equivalent mutant. You won the duel!";
