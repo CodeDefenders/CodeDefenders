@@ -27,6 +27,9 @@ public class AdminUserMgmt extends HttpServlet {
 			"An account has been created for you with Username %s and Password %s.\n" +
 			"You can log int at %s. \n\n Happy coding!";
 	private static final String EMAIL_NOT_SPECIFIED_DOMAIN = "@NOT.SPECIFIED";
+	private static final String PASSWORD_RESET_MSG = "%s, \n\n " +
+			"your password has been reset to %s\n" +
+			"Please change it at your next convenience.";
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_USER_JSP);
@@ -164,9 +167,16 @@ public class AdminUserMgmt extends HttpServlet {
 
 		String newPassword = generatePW();
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		boolean success = AdminDAO.setUserPassword(uid, passwordEncoder.encode(newPassword));
 
-		return success ? "User " + uid + "'s password set to: " + newPassword : "Could not reset password for user " + uid;
+		if (AdminDAO.setUserPassword(uid, passwordEncoder.encode(newPassword))) {
+			if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()) {
+				User u = DatabaseAccess.getUser(uid);
+				String msg = String.format(PASSWORD_RESET_MSG, u.getUsername(), newPassword);
+				EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg);
+			}
+			return "User " + uid + "'s password set to: " + newPassword;
+		}
+		return "Could not reset password for user " + uid;
 	}
 
 	private static String generatePW() {
