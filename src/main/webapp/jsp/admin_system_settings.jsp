@@ -33,9 +33,9 @@
         <div class="input-group">
             <span class="input-group-addon" style=" width: 250px; text-align: left;"
                   title="<%=explanation%>"><%=readableName%> </span>
-            <input class="form-control" name="<%=setting.getName().name()%>"
+            <input class="form-control" name="<%=setting.getName().name()%>" required style = "padding-left:10px"
                    type="<%=setting.getName().name().contains("PASSWORD") ? "password" : "text"%>"
-                   id="<%=setting.getName().name()%>"><%=setting.getStringValue()%>
+                   id="<%=setting.getName().name()%>" value="<%=setting.getStringValue()%>">
         </div>
         <%
                 }
