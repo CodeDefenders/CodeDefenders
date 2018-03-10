@@ -90,3 +90,5 @@
 		</ul>
 	</div>
 </div>
+
+<%@ include file="/jsp/footer.jsp" %>

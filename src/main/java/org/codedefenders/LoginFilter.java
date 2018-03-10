@@ -1,17 +1,11 @@
 package org.codedefenders;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
+import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // Implements Filter class
 public class LoginFilter implements Filter {
@@ -52,7 +46,9 @@ public class LoginFilter implements Filter {
 				|| (path.endsWith(context + "/video")) || (path.endsWith(context + "/video.mp4"))
 				|| (path.contains(context + "/papers"))
 				|| (path.endsWith(context + "/sendEmail"))
-				|| (path.endsWith(context + "/index.jsp")))
+				|| (path.endsWith(context + "/index.jsp"))
+				|| path.endsWith(context + "/site_notice")
+				|| path.endsWith(context + "/contact"))
 			return true;
 
 		Pattern excludeUrls = Pattern.compile("^.*/(css|js|images)/.*$", Pattern.CASE_INSENSITIVE);

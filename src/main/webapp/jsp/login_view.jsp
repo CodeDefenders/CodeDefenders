@@ -77,3 +77,5 @@
         }
   });
 </script>
+
+<%@ include file="/jsp/footer.jsp" %>
