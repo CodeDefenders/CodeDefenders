@@ -103,12 +103,7 @@
   </div>
 <script>
   $('#consentOK').click(function () {
-        if ($(this).is(':checked')) {
-            // if consent checkbox is checked
-            document.getElementById("signInButton").disabled = false;
-        } else {
-            document.getElementById("signInButton").disabled = true;
-        }
+        document.getElementById("signInButton").disabled = !$(this).is(':checked');
   });
 
   $(document).ready(function () {
