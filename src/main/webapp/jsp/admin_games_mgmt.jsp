@@ -814,6 +814,10 @@
                 }
             }
 
+            $('#tableAddUsers').on('draw.dt', function () {
+                setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
+            });
+
 
             $(document).ready(function () {
                 if (localStorage.getItem("showActivePlayers") === "true") {
