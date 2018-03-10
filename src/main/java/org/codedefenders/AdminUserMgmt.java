@@ -27,7 +27,7 @@ public class AdminUserMgmt extends HttpServlet {
 			"An account has been created for you with Username %s and Password %s.\n" +
 			"You can log int at %s. \n\n Happy coding!";
 	private static final String EMAIL_NOT_SPECIFIED_DOMAIN = "@NOT.SPECIFIED";
-	private static final String PASSWORD_RESET_MSG = "%s, \n\n " +
+	static final String PASSWORD_RESET_MSG = "%s, \n\n " +
 			"your password has been reset to %s\n" +
 			"Please change it at your next convenience.";
 
@@ -179,7 +179,7 @@ public class AdminUserMgmt extends HttpServlet {
 		return "Could not reset password for user " + uid;
 	}
 
-	private static String generatePW() {
+	static String generatePW() {
 		int length = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
 
 		StringBuilder sb = new StringBuilder();

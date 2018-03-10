@@ -121,6 +121,24 @@ public class LoginManager extends HttpServlet {
 					}
 				}
 				break;
+			case "resetPassword":
+				email = request.getParameter("accountEmail");
+				username = request.getParameter("accountUsername");
+				User u;
+				if((u = DatabaseAccess.getUserForNameOrEmail(email)) != null && u.getUsername().equals(username) &&
+						u.getEmail().equals(email)) {
+					String newPassword = AdminUserMgmt.generatePW();
+					BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+					if(AdminDAO.setUserPassword(u.getId(), passwordEncoder.encode(newPassword))) {
+						String msg = String.format(AdminUserMgmt.PASSWORD_RESET_MSG, u.getUsername(), newPassword);
+						if(EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg))
+							messages.add("Your new password has been sent to " + email);
+					} else {
+						messages.add("Your password could not be reset.");
+					}
+				}
+				response.sendRedirect(request.getContextPath() + "/login");
+				break;
 		}
 	}
 

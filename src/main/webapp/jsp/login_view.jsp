@@ -28,10 +28,44 @@
           <%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REGISTRATION).getBoolValue()) { %>
           <a href="#" class="text-center new-account" data-toggle="modal" data-target="#myModal">Create an account</a>
           <%}%>
-          
+
+          <%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()) {
+          // a newly generated password can only be sent to the user if mails are enabled%>
+          <a href="#" class="text-center new-account" data-toggle="modal" data-target="#passwordResetModal"
+             style=" float: right; ">Password forgotten</a>
+          <%}%>
+
       </form>
   </div>
 
+<div id="passwordResetModal" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Reset your password</h4>
+            </div>
+            <div class="modal-body">
+                <form action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
+                    <input type="hidden" name="formType" value="resetPassword">
+                    <label for="inputUsername" class="sr-only">Username</label>
+                    <input type="text" id="accountUsername" name="accountUsername" class="form-control" placeholder="Username" required autofocus>
+                    <label for="inputEmail" class="sr-only">Email</label>
+                    <input type="email" id="accountEmail" name="accountEmail" class="form-control" placeholder="Email" required>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Reset Password</button>
+                </form>
+                <span style="margin-right:5px; font-size:small;">
+                    This will send a mail with a newly generated password to your email account.
+                </span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+
+    </div>
+</div>
 
   <!-- Modal -->
   <div id="myModal" class="modal fade" role="dialog">
