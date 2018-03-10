@@ -405,7 +405,7 @@
             <tr>
                 <td>
                     <% if (uid != currentUserID) { %>
-                    <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%= uid%>" onchange=
+                    <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%= uid%>" onchange =
                             "updateCheckbox(this.value, this.checked);">
                     <%}%>
                 </td>
@@ -753,7 +753,12 @@
 
         <script>
             $('#selectAllUsers').click(function () {
-                $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
+                var checkboxes = document.getElementsByName('selectedUsers');
+                var isChecked = document.getElementById('selectAllUsers').checked;
+                checkboxes.forEach(function (element) {
+                    if(element.checked !== isChecked)
+                        element.click();
+                });
             });
 
             $('#selectAllTempGames').click(function () {
