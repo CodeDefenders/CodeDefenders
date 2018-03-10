@@ -1,8 +1,13 @@
 package org.codedefenders;
 
+import org.codedefenders.util.AdminDAO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.mail.*;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.util.Date;
 import java.util.Properties;
 
 /**
@@ -10,32 +15,47 @@ import java.util.Properties;
  */
 public class EmailUtils {
 
-    public static void sendEmail(String to,
-                                 String from,
-                                 String subject,
-                                 String text) throws MessagingException {
+	private static final Logger logger = LoggerFactory.getLogger(AdminDAO.class);
+
+	public static boolean sendEmail(String to, String subject, String text) {
+
+		final String smtpHost = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_HOST).getStringValue();
+		final int smtpPort = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_PORT).getIntValue();
+		final String emailAddress = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS).getStringValue();
+		final String emailPassword = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_PASSWORD).getStringValue();
+		final boolean debug = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.DEBUG_MODE).getBoolValue();
 
 
-        Properties props = new Properties();
-        props.put("mail.smtp.host", "localhost");
-        props.put("mail.smtp.port", "35");
+		try	{
+			Properties props = System.getProperties();
+			props.put("mail.smtp.starttls.enable", "true");
+			props.put("mail.smtp.auth", "true");
+			props.put("mail.smtp.host", smtpHost);
+			props.put("mail.smtp.port", smtpPort);
 
-        Session session = Session.getDefaultInstance(props);
+			Session session = Session.getInstance(props, new javax.mail.Authenticator(){
+				protected PasswordAuthentication getPasswordAuthentication() {
+					return new PasswordAuthentication(emailAddress, emailPassword);
+				}});
 
-        try {
+			session.setDebug(debug);
+			MimeMessage msg = new MimeMessage(session);
 
-            Message message = new MimeMessage(session);
-            message.setFrom(new InternetAddress(from));
-            message.setRecipients(Message.RecipientType.TO,
-                    InternetAddress.parse(to));
-            message.setSubject(subject);
-            message.setText(text);
+			msg.setFrom(new InternetAddress(emailAddress));
+			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
+			msg.setSubject(subject);
+			msg.setContent(text, "text/plain");
+			msg.setSentDate(new Date());
 
-            Transport.send(message);
-
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
+			Transport transport = session.getTransport("smtp");
+			transport.connect(smtpHost, smtpPort, emailAddress, emailPassword);
+			Transport.send(msg);
+			transport.close();
+		} catch (MessagingException messagingException) {
+			logger.warn(messagingException.toString());
+			return false;
+		}
+		return true;
     }
 
 }
