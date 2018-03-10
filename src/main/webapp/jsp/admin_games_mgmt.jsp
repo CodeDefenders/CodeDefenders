@@ -403,7 +403,7 @@
             %>
 
             <tr>
-                <td class="col-sm-1">
+                <td >
                     <% if (uid != currentUserID) { %>
                     <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%= uid%>" onchange=
                             "document.getElementById('submit_users_btn').disabled =
@@ -411,19 +411,19 @@
                             setSelectAllCheckbox('selectedUsers', 'selectAllUsers');">
                     <%}%>
                 </td>
-                <td class="col-sm-1"><%= uid%>
+                <td class=""><%= uid%>
                     <input type="hidden" name="added_uid" value=<%=uid%>>
                 </td>
-                <td class="col-sm-2"><%= username %>
+                <td ><%= username %>
                 </td>
-                <td class="col-sm-1"><%= lastRole %>
+                <td ><%= lastRole %>
                 </td>
-                <td class="col-sm-1"><%= totalScore %>
+                <td ><%= totalScore %>
                 </td>
-                <td class="col-sm-2"><%= lastLogin %>
+                <td ><%= lastLogin %>
                 </td>
-                <td class="col-sm-4" style="padding-top:3px; padding-bottom:3px; ">
-                    <div style="max-width: 160px; float: left;">
+                <td style="padding-top:3px; padding-bottom:3px; ">
+                    <div style="max-width: 150px; float: left;">
                         <select name="<%="game_" + uid%>" class="form-control selectpicker" data-size="small"
                                 id="game">
                             <% for (MultiplayerGame g : availableGames) { %>
@@ -451,7 +451,7 @@
                         </select>
                     </div>
                     <button class="btn btn-sm btn-primary" type="submit" value="<%=uid%>" name="userListButton"
-                            style="margin: 2px;"
+                            style="margin: 2px; float:left"
                             <%=availableGames.isEmpty() && (createdGames == null || createdGames.isEmpty()) ? "disabled" : ""%>>
                         <span class="glyphicon glyphicon-plus"></span>
                     </button>
