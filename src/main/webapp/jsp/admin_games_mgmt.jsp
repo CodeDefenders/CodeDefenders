@@ -403,24 +403,22 @@
             %>
 
             <tr>
-                <td >
+                <td>
                     <% if (uid != currentUserID) { %>
                     <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%= uid%>" onchange=
-                            "document.getElementById('submit_users_btn').disabled =
-                            !(areAnyChecked('selectedUsers') || containsText('user_name_list'));
-                            setSelectAllCheckbox('selectedUsers', 'selectAllUsers');">
+                            "updateCheckbox(this.value, this.checked);" hidden>
                     <%}%>
                 </td>
                 <td class=""><%= uid%>
                     <input type="hidden" name="added_uid" value=<%=uid%>>
                 </td>
-                <td ><%= username %>
+                <td><%= username %>
                 </td>
-                <td ><%= lastRole %>
+                <td><%= lastRole %>
                 </td>
-                <td ><%= totalScore %>
+                <td><%= totalScore %>
                 </td>
-                <td ><%= lastLogin %>
+                <td><%= lastLogin %>
                 </td>
                 <td style="padding-top:3px; padding-bottom:3px; ">
                     <div style="max-width: 150px; float: left;">
@@ -464,6 +462,8 @@
             %>
             </tbody>
         </table>
+
+        <input type="text" class="form-control" id="hidden_user_id_list" name="hidden_user_id_list">
 
         <div class="form-group">
             <label for="user_name_list">User Names</label>
@@ -775,14 +775,6 @@
                 $("[id=playersTableActive]").toggle();
             });
 
-            function deselectCheckboxes() {
-                var checkboxes = document.getElementsByName('selectedUsers');
-                checkboxes.forEach(function (element) {
-                    element.checked = false;
-                });
-                document.getElementById('selectAllUsers').checked = false;
-            }
-
             function setSelectAllCheckbox(checkboxesName, selectAllCheckboxId) {
                 var checkboxes = document.getElementsByName(checkboxesName);
                 var allChecked = true;
@@ -805,10 +797,17 @@
                 return document.getElementById(id).value.trim() !== "";
             }
 
-            $('#tableAddUsers').on('draw.dt', function () {
-                deselectCheckboxes();
-                document.getElementById('submit_users_btn').disabled = !containsText('user_name_list');
-            });
+            function updateCheckbox(checkboxVal, isChecked) {
+                document.getElementById('submit_users_btn').disabled =
+                    !(areAnyChecked('selectedUsers') || containsText('user_name_list'));
+                setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
+                var hiddenIdList = document.getElementById('hidden_user_id_list');
+                if (isChecked) {
+                    hiddenIdList.value = hiddenIdList.value.trim() + '<' + checkboxVal + '>,';
+                } else {
+                    hiddenIdList.value = hiddenIdList.value.replace('<' + checkboxVal + '>,', '');
+                }
+            }
 
 
             $(document).ready(function () {
