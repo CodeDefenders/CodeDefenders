@@ -68,6 +68,42 @@ public class AdminSystemSettings extends HttpServlet {
 			public String toString() {
 				return "HTML formatted text shown in the site notice. This is mandatory in many regions.";
 			}
+		},
+		EMAIL_SMTP_HOST {
+			@Override
+			public String toString() {
+				return "SMTP host";
+			}
+		},
+		EMAIL_SMTP_PORT {
+			@Override
+			public String toString() {
+				return "SMTP port";
+			}
+		},
+		EMAIL_ADDRESS {
+			@Override
+			public String toString() {
+				return "System mail account";
+			}
+		},
+		EMAIL_PASSWORD {
+			@Override
+			public String toString() {
+				return "Password for the system mail account";
+			}
+		},
+		EMAILS_ENABLED {
+			@Override
+			public String toString() {
+				return "Send emails from the specified account for verification, resetting passwords and when the admin changes user info";
+			}
+		},
+		DEBUG_MODE {
+			@Override
+			public String toString() {
+				return "Turn on certain debugging features such as detailed debug prints for javax.mail";
+			}
 		}
 	}
 

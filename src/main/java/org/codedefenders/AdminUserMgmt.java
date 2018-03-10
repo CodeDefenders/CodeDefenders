@@ -23,6 +23,13 @@ public class AdminUserMgmt extends HttpServlet {
 	private static final char[] PUNCTUATION = "!@#$%&*()_+-=[]|,./?><".toCharArray();
 	static final String USER_INFO_TOKENS_DELIMITER = "[ ,;]+";
 	private static final Logger logger = LoggerFactory.getLogger(AdminUserMgmt.class);
+	private static final String NEW_ACCOUNT_MSG = "Welcome to Code Defenders! \n\n " +
+			"An account has been created for you with Username %s and Password %s.\n" +
+			"You can log int at %s. \n\n Happy coding!";
+	private static final String EMAIL_NOT_SPECIFIED_DOMAIN = "@NOT.SPECIFIED";
+	private static final String PASSWORD_RESET_MSG = "%s, \n\n " +
+			"your password has been reset to %s\n" +
+			"Please change it at your next convenience.";
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_USER_JSP);
@@ -51,7 +58,7 @@ public class AdminUserMgmt extends HttpServlet {
 				}
 				break;
 			case "createUsers":
-				createUserAccounts(request.getParameter("user_name_list"), messages);
+				createUserAccounts(request.getParameter("user_name_list"), messages, request);
 				break;
 			case "editUser":
 				String uidString = request.getParameter("uid");
@@ -85,15 +92,15 @@ public class AdminUserMgmt extends HttpServlet {
 		if (!name.equals(u.getUsername()) && DatabaseAccess.getUserForNameOrEmail(name) != null)
 			return "Username " + name + " is already taken";
 
-		if(!email.equals(u.getEmail()) && DatabaseAccess.getUserForNameOrEmail(email) != null)
+		if (!email.equals(u.getEmail()) && DatabaseAccess.getUserForNameOrEmail(email) != null)
 			return "Email " + email + " is already in use!";
 
-		if(!LoginManager.validEmailAddress(email))
+		if (!LoginManager.validEmailAddress(email))
 			return "Email Address is not valid";
 
 		if (!password.equals("")) {
 			// we don't want to encode the already encoded password from the DB
-			if(!LoginManager.validPassword(password))
+			if (!LoginManager.validPassword(password))
 				return "Password is not valid";
 			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 			password = passwordEncoder.encode(password);
@@ -106,7 +113,7 @@ public class AdminUserMgmt extends HttpServlet {
 		return successMsg;
 	}
 
-	private void createUserAccounts(String userNameListString, ArrayList<String> messages) {
+	private void createUserAccounts(String userNameListString, ArrayList<String> messages, HttpServletRequest request) {
 		if (userNameListString != null) {
 			for (String nameOrEmail : userNameListString.split(AdminGamesMgmt.USER_NAME_LIST_DELIMITER)) {
 				nameOrEmail = nameOrEmail.trim();
@@ -119,7 +126,7 @@ public class AdminUserMgmt extends HttpServlet {
 						name = tokens[0].contains("@") ? tokens[1] : tokens[0];
 						password = tokens.length > 2 ? tokens[2] : generatePW();
 					} else {
-						email = nameOrEmail.contains("@") ? nameOrEmail : nameOrEmail + "@NOT.SPECIFIED";
+						email = nameOrEmail.contains("@") ? nameOrEmail : nameOrEmail + EMAIL_NOT_SPECIFIED_DOMAIN;
 						name = nameOrEmail.contains("@") ? nameOrEmail.split("@")[0] : nameOrEmail;
 						password = generatePW();
 					}
@@ -128,6 +135,13 @@ public class AdminUserMgmt extends HttpServlet {
 						if (u.insert()) {
 							messages.add(name + "'s password is: " + password);
 							logger.info("Generated password " + password + " for user " + name);
+
+							if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()
+									&& !email.endsWith(EMAIL_NOT_SPECIFIED_DOMAIN)) {
+								if (!sendNewAccountMsg(email, name, password,
+										request.getServerName() + ":" + request.getServerPort() + "/" + request.getContextPath()))
+									messages.add("Couldn't send an email to " + email + " for user " + name);
+							}
 						} else {
 							messages.add("Error trying to create an account for " + name + " (email: " + email + ")!");
 						}
@@ -139,6 +153,11 @@ public class AdminUserMgmt extends HttpServlet {
 		}
 	}
 
+	private boolean sendNewAccountMsg(String email, String name, String password, String hostAddr) {
+		String message = String.format(NEW_ACCOUNT_MSG, name, password, hostAddr);
+		return EmailUtils.sendEmail(email, "Your Code Defenders Account", message);
+	}
+
 	private String deleteUser(int uid) {
 		return "Currently disabled!";
 		//return (AdminDAO.deleteUser(uid) ? "Successfully deleted user " : "Error trying to delete user ") + uid + "!";
@@ -148,9 +167,16 @@ public class AdminUserMgmt extends HttpServlet {
 
 		String newPassword = generatePW();
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		boolean success = AdminDAO.setUserPassword(uid, passwordEncoder.encode(newPassword));
 
-		return success ? "User " + uid + "'s password set to: " + newPassword : "Could not reset password for user " + uid;
+		if (AdminDAO.setUserPassword(uid, passwordEncoder.encode(newPassword))) {
+			if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()) {
+				User u = DatabaseAccess.getUser(uid);
+				String msg = String.format(PASSWORD_RESET_MSG, u.getUsername(), newPassword);
+				EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg);
+			}
+			return "User " + uid + "'s password set to: " + newPassword;
+		}
+		return "Could not reset password for user " + uid;
 	}
 
 	private static String generatePW() {
