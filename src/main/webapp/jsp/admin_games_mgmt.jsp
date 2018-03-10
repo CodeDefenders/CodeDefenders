@@ -406,10 +406,10 @@
                 <td>
                     <% if (uid != currentUserID) { %>
                     <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%= uid%>" onchange=
-                            "updateCheckbox(this.value, this.checked);" hidden>
+                            "updateCheckbox(this.value, this.checked);">
                     <%}%>
                 </td>
-                <td class=""><%= uid%>
+                <td><%= uid%>
                     <input type="hidden" name="added_uid" value=<%=uid%>>
                 </td>
                 <td><%= username %>
@@ -463,7 +463,7 @@
             </tbody>
         </table>
 
-        <input type="text" class="form-control" id="hidden_user_id_list" name="hidden_user_id_list">
+        <input type="text" class="form-control" id="hidden_user_id_list" name="hidden_user_id_list" hidden>
 
         <div class="form-group">
             <label for="user_name_list">User Names</label>
