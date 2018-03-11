@@ -37,7 +37,7 @@
                class="table-hover table-responsive table-paragraphs games-table display table-condensed">
             <thead>
             <tr style="border-bottom: 1px solid black">
-                <th><input type="checkbox" id="selectallGames"
+                <th><input type="checkbox" id="selectAllGames"
                            onchange="document.getElementById('start_games_btn').disabled = !this.checked;
                            document.getElementById('stop_games_btn').disabled = !this.checked">
                 </th>
@@ -72,8 +72,9 @@
             <tr style="border-top: 1px solid lightgray; border-bottom: 1px solid lightgray">
                 <td>
                     <input type="checkbox" name="selectedGames" id="selectedGames" value="<%= gid%>" onchange=
-                            "document.getElementById('start_games_btn').disabled = false;
-                            document.getElementById('stop_games_btn').disabled = false">
+                            "document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
+                            document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
+                            setSelectAllCheckbox('selectedGames', 'selectAllGames')">
                 </td>
                 <td><%= gid %>
                 </td>
@@ -229,7 +230,7 @@
                class="table table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
             <tr>
-                <th><input type="checkbox" id="selectallTempGames"
+                <th><input type="checkbox" id="selectAllTempGames"
                            onchange="document.getElementById('insert_games_btn').disabled = !this.checked;
                            document.getElementById('delete_games_btn').disabled = !this.checked">
                 </th>
@@ -263,8 +264,9 @@
             <tr>
                 <td>
                     <input type="checkbox" name="selectedTempGames" id="selectedTempGames" value="<%= i%>" onchange=
-                            "document.getElementById('insert_games_btn').disabled = false;
-                            document.getElementById('delete_games_btn').disabled = false">
+                            "document.getElementById('insert_games_btn').disabled = !areAnyChecked('selectedTempGames');
+                            document.getElementById('delete_games_btn').disabled = !areAnyChecked('selectedTempGames');
+                            setSelectAllCheckbox('selectedTempGames', 'selectAllTempGames');">
                 </td>
                 <td><%=i%>
                 </td>
@@ -363,7 +365,7 @@
                class="table table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
             <tr>
-                <th><input type="checkbox" id="selectallUsers"
+                <th><input type="checkbox" id="selectAllUsers"
                            onchange="document.getElementById('submit_users_btn').disabled = !this.checked">
                 </th>
                 <th>User ID</th>
@@ -371,9 +373,7 @@
                 <th>Last Role</th>
                 <th>Total Score</th>
                 <th>Last Login</th>
-                <th>Select Game</th>
-                <th>Role</th>
-                <th>Add</th>
+                <th>Add to existing Game</th>
             </tr>
             </thead>
             <tbody>
@@ -403,53 +403,53 @@
             %>
 
             <tr>
-                <td class="col-sm-1">
+                <td>
                     <% if (uid != currentUserID) { %>
-                    <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%= uid%>" onchange=
-                            "document.getElementById('submit_users_btn').disabled = false">
+                    <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%= uid%>" onchange =
+                            "updateCheckbox(this.value, this.checked);">
                     <%}%>
                 </td>
-                <td class="col-sm-1"><%= uid%>
+                <td><%= uid%>
                     <input type="hidden" name="added_uid" value=<%=uid%>>
                 </td>
-                <td class="col-sm-2"><%= username %>
+                <td><%= username %>
                 </td>
-                <td class="col-sm-1"><%= lastRole %>
+                <td><%= lastRole %>
                 </td>
-                <td class="col-sm-1"><%= totalScore %>
+                <td><%= totalScore %>
                 </td>
-                <td class="col-sm-2"><%= lastLogin %>
+                <td><%= lastLogin %>
                 </td>
-                <td class="col-sm-1" style="padding-top:3px; padding-bottom:3px">
-                    <select name="<%="game_" + uid%>" class="form-control selectpicker" data-size="small"
-                            id="game">
-                        <% for (MultiplayerGame g : availableGames) { %>
-                        <option value="<%=g.getId()%>"><%=String.valueOf(g.getId()) + ": " + g.getCUT().getAlias()%>
-                        </option>
-                        <%
-                            }
-                            if (createdGames != null) {
-                                for (int gameIndex = 0; gameIndex < createdGames.size(); ++gameIndex) {
-                                    String classAlias = createdGames.get(gameIndex).getCUT().getAlias();
-                        %>
-                        <option style="color:gray"
-                                value=<%="T" + String.valueOf(gameIndex)%>><%="T" + String.valueOf(gameIndex)
-                                + ": " + classAlias%>
-                        </option>
-                        <%}%>
-                        <%}%>
-                    </select>
-                </td>
-                <td class=" col-sm-1
-                        " style="padding-top:3px; padding-bottom:3px">
-                    <select name="<%="role_" + uid%>" class="form-control selectpicker" data-size="small"
-                            id="role">
-                        <option value="<%=Role.ATTACKER%>">Attacker</option>
-                        <option value="<%=Role.DEFENDER%>">Defender</option>
-                    </select>
-                </td>
-                <td class="col-sm-1" style="padding-top:4px; padding-bottom:4px">
+                <td style="padding-top:3px; padding-bottom:3px; ">
+                    <div style="max-width: 150px; float: left;">
+                        <select name="<%="game_" + uid%>" class="form-control selectpicker" data-size="small"
+                                id="game">
+                            <% for (MultiplayerGame g : availableGames) { %>
+                            <option value="<%=g.getId()%>"><%=String.valueOf(g.getId()) + ": " + g.getCUT().getAlias()%>
+                            </option>
+                            <%
+                                }
+                                if (createdGames != null) {
+                                    for (int gameIndex = 0; gameIndex < createdGames.size(); ++gameIndex) {
+                                        String classAlias = createdGames.get(gameIndex).getCUT().getAlias();
+                            %>
+                            <option style="color:gray"
+                                    value=<%="T" + String.valueOf(gameIndex)%>><%="T" + String.valueOf(gameIndex)
+                                    + ": " + classAlias%>
+                            </option>
+                            <%}%>
+                            <%}%>
+                        </select>
+                    </div>
+                    <div style="float: left; max-width: 120px; margin-left:2px">
+                        <select name="<%="role_" + uid%>" class="form-control selectpicker" data-size="small"
+                                id="role">
+                            <option value="<%=Role.ATTACKER%>">Attacker</option>
+                            <option value="<%=Role.DEFENDER%>">Defender</option>
+                        </select>
+                    </div>
                     <button class="btn btn-sm btn-primary" type="submit" value="<%=uid%>" name="userListButton"
+                            style="margin: 2px; float:left"
                             <%=availableGames.isEmpty() && (createdGames == null || createdGames.isEmpty()) ? "disabled" : ""%>>
                         <span class="glyphicon glyphicon-plus"></span>
                     </button>
@@ -463,6 +463,8 @@
             </tbody>
         </table>
 
+        <input type="text" class="form-control" id="hidden_user_id_list" name="hidden_user_id_list" hidden>
+
         <div class="form-group">
             <label for="user_name_list">User Names</label>
             <a data-toggle="collapse" href="#demo" style="color:black">
@@ -474,7 +476,8 @@
                 <br/>Only unassigned users are taken into account.
             </div>
             <textarea class="form-control" rows="5" id="user_name_list" name="user_name_list"
-                      oninput="document.getElementById('submit_users_btn').disabled = false"></textarea>
+                      oninput="document.getElementById('submit_users_btn').disabled =
+                        !(areAnyChecked('selectedUsers') || containsText('user_name_list'))"></textarea>
         </div>
 
 
@@ -749,15 +752,20 @@
         </button>
 
         <script>
-            $('#selectallUsers').click(function () {
+            $('#selectAllUsers').click(function () {
+                var checkboxes = document.getElementsByName('selectedUsers');
+                var isChecked = document.getElementById('selectAllUsers').checked;
+                checkboxes.forEach(function (element) {
+                    if(element.checked !== isChecked)
+                        element.click();
+                });
+            });
+
+            $('#selectAllTempGames').click(function () {
                 $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
             });
 
-            $('#selectallTempGames').click(function () {
-                $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
-            });
-
-            $('#selectallGames').click(function () {
+            $('#selectAllGames').click(function () {
                 $(this.form.elements).filter(':checkbox').prop('checked', this.checked);
             });
 
@@ -770,6 +778,44 @@
             $('#togglePlayersActive').click(function () {
                 localStorage.setItem("showActivePlayers", localStorage.getItem("showActivePlayers") === "true" ? "false" : "true");
                 $("[id=playersTableActive]").toggle();
+            });
+
+            function setSelectAllCheckbox(checkboxesName, selectAllCheckboxId) {
+                var checkboxes = document.getElementsByName(checkboxesName);
+                var allChecked = true;
+                checkboxes.forEach(function (element) {
+                    allChecked = allChecked && element.checked;
+                });
+                document.getElementById(selectAllCheckboxId).checked = allChecked;
+            }
+
+            function areAnyChecked(name) {
+                var checkboxes = document.getElementsByName(name);
+                var anyChecked = false;
+                checkboxes.forEach(function (element) {
+                    anyChecked = anyChecked || element.checked;
+                });
+                return anyChecked;
+            }
+
+            function containsText(id) {
+                return document.getElementById(id).value.trim() !== "";
+            }
+
+            function updateCheckbox(checkboxVal, isChecked) {
+                document.getElementById('submit_users_btn').disabled =
+                    !(areAnyChecked('selectedUsers') || containsText('user_name_list'));
+                setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
+                var hiddenIdList = document.getElementById('hidden_user_id_list');
+                if (isChecked) {
+                    hiddenIdList.value = hiddenIdList.value.trim() + '<' + checkboxVal + '>,';
+                } else {
+                    hiddenIdList.value = hiddenIdList.value.replace('<' + checkboxVal + '>,', '');
+                }
+            }
+
+            $('#tableAddUsers').on('draw.dt', function () {
+                setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
             });
 
 
@@ -792,12 +838,6 @@
                         "orderable": false
                     }, {
                         "targets": 6,
-                        "orderable": false
-                    }, {
-                        "targets": 7,
-                        "orderable": false
-                    }, {
-                        "targets": 8,
                         "orderable": false
                     }]
                 });

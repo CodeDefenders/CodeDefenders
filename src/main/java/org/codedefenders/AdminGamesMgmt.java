@@ -189,10 +189,10 @@ public class AdminGamesMgmt extends HttpServlet {
 		attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminGamesMgmt.ATTACKER_LISTS_SESSION_ATTRIBUTE);
 		defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminGamesMgmt.DEFENDER_LISTS_SESSION_ATTRIBUTE);
 		createdGames = (List<MultiplayerGame>) session.getAttribute(AdminGamesMgmt.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
-		String[] selectedUsers;
+		String userIdListString ;
 		String userNameListString;
 		try {
-			selectedUsers = request.getParameterValues("selectedUsers");
+			userIdListString = request.getParameter("hidden_user_id_list");
 			userNameListString = request.getParameter("user_name_list");
 			cutID = Integer.parseInt(request.getParameter("class"));
 			roleAssignmentMethod = request.getParameter("roles").equals(RoleAssignmentMethod.OPPOSITE.name())
@@ -211,9 +211,11 @@ public class AdminGamesMgmt extends HttpServlet {
 		}
 
 		selectedUserIDs = new ArrayList<>();
-		if (selectedUsers != null) {
-			for (String u : selectedUsers) {
-				selectedUserIDs.add(Integer.parseInt(u));
+		if (userIdListString != null && !userIdListString.equals("")) {
+			String[] userIdList = userIdListString.trim().split(",");
+			for (String u : userIdList) {
+				String idString = u.replace("<", "").replace(">", "");
+				selectedUserIDs.add(Integer.parseInt(idString));
 			}
 		}
 		if (userNameListString != null) {
