@@ -20,7 +20,8 @@
             String readableName = setting.getName().name().toLowerCase().replace("_", " ");
             String explanation = setting.getName().toString();
             switch (setting.getType()) {
-                case STRING_VALUE: %>
+                case STRING_VALUE:
+                    if (setting.getName().equals(AdminSystemSettings.SETTING_NAME.SITE_NOTICE)) {%>
         <div class="form-group">
             <label for="<%=setting.getName().name()%>" title="<%=explanation%>"><%=readableName%>
             </label>
@@ -28,8 +29,19 @@
                       id="<%=setting.getName().name()%>"><%=setting.getStringValue()%></textarea>
         </div>
 
-        <% break;
-            case BOOL_VALUE: %>
+        <% } else {%>
+        <div class="input-group">
+            <span class="input-group-addon" style=" width: 250px; text-align: left;"
+                  title="<%=explanation%>"><%=readableName%> </span>
+            <input class="form-control" name="<%=setting.getName().name()%>" required style = "padding-left:10px"
+                   type="<%=setting.getName().name().contains("PASSWORD") ? "password" : "text"%>"
+                   id="<%=setting.getName().name()%>" value="<%=setting.getStringValue()%>">
+        </div>
+        <%
+                }
+                break;
+            case BOOL_VALUE:
+        %>
         <div class="input-group">
             <span class="input-group-addon" style=" width: 250px; text-align: left;"
                   title="<%=explanation%>"><%=readableName%> </span>
