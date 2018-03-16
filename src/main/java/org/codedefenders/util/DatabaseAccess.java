@@ -1066,4 +1066,40 @@ public class DatabaseAccess {
 			return null;
 		}
 	}
+
+	public static boolean setPasswordResetSecret(int userId, String pwResetSecret) {
+		String query = "UPDATE users\n" +
+				"SET pw_reset_secret = ?, pw_reset_timestamp = CURRENT_TIMESTAMP\n" +
+				"WHERE User_ID = ?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(pwResetSecret), DB.getDBV(userId)};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return DB.executeUpdate(stmt, conn);
+	}
+
+	public static boolean checkPasswordResetSecret(int userId, String pwResetSecret) {
+		String query = "SELECT COUNT(*) = 1\n" +
+				"FROM users\n" +
+				"WHERE TIMESTAMPDIFF(HOUR, pw_reset_timestamp, CURRENT_TIMESTAMP) < (SELECT INT_VALUE\n" +
+				"                                                                                          FROM settings\n" +
+				"                                                                                          WHERE name =\n" +
+				"                                                                                                'PASSWORD_RESET_SECRET_LIFESPAN')\n" +
+				"      AND\n" +
+				"      pw_reset_secret = ? AND User_ID = ?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(pwResetSecret), DB.getDBV(userId)};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+		System.out.println(stmt);
+		try {
+			if (rs.next()) {
+				return rs.getBoolean(1);
+			}
+		} catch (SQLException e) {
+			logger.error("SQL exception caught", e);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return false;
+	}
 }

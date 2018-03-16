@@ -38,6 +38,41 @@
       </form>
   </div>
 
+<%  String resetPw = request.getParameter("resetPW");
+    String userId = request.getParameter("user");
+    if(resetPw != null && userId != null &&
+            DatabaseAccess.checkPasswordResetSecret(Integer.parseInt(userId), resetPw)) {%>
+<div id="changePasswordModal" class="fade in" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <a class="close" href = 'login'>&times;</a>
+                <h4 class="modal-title">Change your password</h4>
+            </div>
+            <div class="modal-body">
+                <form action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
+                    <input type="hidden" name="resetPwSecret" id = "resetPwSecret" value="<%=resetPw%>">
+                    <input type="hidden" name="userId" id = "userId" value="<%=userId%>">
+
+                    <input type="hidden" name="formType" value="changePassword">
+                    <label for="inputPassword" class="sr-only">Password</label>
+                    <input type="password" id="inputPasswordChange" name="inputPasswordChange" class="form-control" placeholder="Password" required>
+                    <label for="inputPassword" class="sr-only">Password</label>
+                    <input type="password" id="inputConfirmPasswordChange" name="inputConfirmPasswordChange" class="form-control" placeholder="Confirm Password" required>
+                    <button class="btn btn-lg btn-primary btn-block" type="submit">Change Password</button>
+                </form>
+                <span style="margin-right:5px; font-size:small;">Valid password:
+                    <%=AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()%>
+                    -20 alphanumeric characters, no whitespace or special character.</span>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<%}%>
+
 <div id="passwordResetModal" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <!-- Modal content-->
@@ -56,7 +91,7 @@
                     <button class="btn btn-lg btn-primary btn-block" type="submit">Reset Password</button>
                 </form>
                 <span style="margin-right:5px; font-size:small;">
-                    This will send a mail with a newly generated password to your email account.
+                    This will send a mail with a link to change your password to your email account.
                 </span>
             </div>
             <div class="modal-footer">
