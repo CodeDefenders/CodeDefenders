@@ -153,4 +153,4 @@
         <div class="bg-plus-3" style="padding:2px 0; margin-bottom: 0px; margin-top: 5px;"></div>
     </div>
 </div>
-<div  style="background-color: #fafafa; min-height: 90%; box-shadow: 0 10px 10px #aaa; padding-bottom: 20px;">
+<div  style="background-color: #fafafa; min-height: 90%; padding-bottom: 20px;">
