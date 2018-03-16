@@ -43,7 +43,14 @@
     if (resetPw != null && userId != null &&
             DatabaseAccess.checkPasswordResetSecret(Integer.parseInt(userId), resetPw)) {
         int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();%>
-<div id="changePasswordModal" class="fade in" role="dialog">
+<div id="changePasswordModal" class="fade in" role="dialog" style="
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1050;
+    background: #00000080;">
     <div class="modal-dialog">
         <!-- Modal content-->
         <div class="modal-content">
