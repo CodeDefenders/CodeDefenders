@@ -38,10 +38,11 @@
       </form>
   </div>
 
-<%  String resetPw = request.getParameter("resetPW");
+<% String resetPw = request.getParameter("resetPW");
     String userId = request.getParameter("user");
-    if(resetPw != null && userId != null &&
-            DatabaseAccess.checkPasswordResetSecret(Integer.parseInt(userId), resetPw)) {%>
+    if (resetPw != null && userId != null &&
+            DatabaseAccess.checkPasswordResetSecret(Integer.parseInt(userId), resetPw)) {
+        int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();%>
 <div id="changePasswordModal" class="fade in" role="dialog">
     <div class="modal-dialog">
         <!-- Modal content-->
@@ -57,13 +58,30 @@
 
                     <input type="hidden" name="formType" value="changePassword">
                     <label for="inputPassword" class="sr-only">Password</label>
-                    <input type="password" id="inputPasswordChange" name="inputPasswordChange" class="form-control" placeholder="Password" required>
-                    <label for="inputPassword" class="sr-only">Password</label>
-                    <input type="password" id="inputConfirmPasswordChange" name="inputConfirmPasswordChange" class="form-control" placeholder="Confirm Password" required>
-                    <button class="btn btn-lg btn-primary btn-block" type="submit">Change Password</button>
+                    <input type="password" id="inputPasswordChange" name="inputPasswordChange" class="form-control"
+                           onkeyup="check()" placeholder="Password" required minlength="<%=pwMinLength%>">
+                    <span class = "label label-danger" style = "color: white" id = "pw_confirm_message"></span>
+                    <label for="inputPassword" class="sr-only">Confirm Password</label>
+                    <input type="password" id="inputConfirmPasswordChange" name="inputConfirmPasswordChange"
+                           onkeyup="check()" class="form-control" placeholder="Confirm Password" required minlength="<%=pwMinLength%>">
+                    <button id = "submitChangePassword" disabled class="btn btn-lg btn-primary btn-block"
+                            type="submit">Change Password</button>
+
+                    <script>
+                        function check() {
+                            if (document.getElementById('inputPasswordChange').value ===
+                                document.getElementById('inputConfirmPasswordChange').value) {
+                                document.getElementById('pw_confirm_message').innerHTML = '';
+                                document.getElementById('submitChangePassword').disabled = false;
+                            } else {
+                                document.getElementById('pw_confirm_message').innerHTML = 'Passwords don\'t match!';
+                                document.getElementById('submitChangePassword').disabled = true;
+                            }
+                        }
+                    </script>
                 </form>
                 <span style="margin-right:5px; font-size:small;">Valid password:
-                    <%=AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()%>
+                    <%=pwMinLength%>
                     -20 alphanumeric characters, no whitespace or special character.</span>
 
             </div>
