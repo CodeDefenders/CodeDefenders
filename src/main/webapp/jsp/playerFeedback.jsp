@@ -59,7 +59,7 @@
                 </h3>
             </div>
 
-            <% boolean canSeePlayerFeedback = role.equals(Role.CREATOR) || Feedback.SHOW_OTHER_PLAYER_FEEDBACK;
+            <% boolean canSeePlayerFeedback = role.equals(Role.CREATOR) || AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SHOW_PLAYER_FEEDBACK).getBoolValue();
             boolean canGiveFeedback = role.equals(Role.DEFENDER) || role.equals(Role.ATTACKER);
                 if (canGiveFeedback) {%>
             <ul class="nav nav-tabs">
