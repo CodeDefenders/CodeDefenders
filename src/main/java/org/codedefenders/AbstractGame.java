@@ -84,8 +84,14 @@ public abstract class AbstractGame {
 		return DatabaseAccess.getExecutableTests(this.id, defendersOnly);
 	}
 
+	private List<Mutant> mutants = null;
+
 	public List<Mutant> getMutants() {
-		return DatabaseAccess.getMutantsForGame(id);
+		// This ensures we're only querying the db once for mutants
+		if (mutants == null){
+			mutants = DatabaseAccess.getMutantsForGame(id);
+		}
+		return mutants;
 	}
 
 	public List<Mutant> getAliveMutants() {

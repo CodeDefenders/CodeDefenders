@@ -1,65 +1,31 @@
+<%@ page import="com.google.gson.Gson" %>
+<%Gson gson = new Gson();%>
+
 highlightCoverage = function(){
 highlightLine([<% for (Integer i : linesCovered.keySet()){%>
 [<%=i%>, <%=((float)linesCovered.get(i).size() / (float) tests.size())%>],
 <% } %>], COVERED_COLOR, "<%="#" + codeDivName%>");
 };
 
-
+getMutants = function(){
+    return JSON.parse("<%= gson.toJson(mutants).replace("\"", "\\\"") %>");
+}
 
 showMutants = function(){
-mutantLine([
-<% for (Integer line : mutantLines.keySet()) {
-%>
-[<%= line %>,
-<%= mutantLines.get(line).size() %>, [
-<% for(Mutant mm : mutantLines.get(line)){%>
-<%= mm.getId() %>,
-<%}%>
-]],
-<%
-    } %>
-],"<%="#" + codeDivName%>", <%= role.equals(Role.DEFENDER)? "true" : "false" %>);
+mutantLine("<%="#" + codeDivName%>", <%= role.equals(Role.DEFENDER)? "true" : "false" %>);
 };
 
-
-showMutantsEquiv = function(){
-mutantEquivLine([
-<% for (Integer line : mutantEquivPending.keySet()) {
-%>
-[<%= line %>,
-<%= mutantEquivPending.get(line).size() %>, [
-<% for(Mutant mm : mutantEquivPending.get(line)){%>
-<%= mm.getId() %>,
-<%}%>
-]],
-<%
-    } %>
-],"<%="#" + codeDivName%>", <%= role.equals(Role.DEFENDER)? "true" : "false" %>);
-};
-
-showKilledMutants = function(){
-mutantKilledLine([
-<% for (Integer line : mutantKilledLines.keySet()) {
-%>
-[<%= line %>,
-<%= mutantKilledLines.get(line).size() %>, [
-<% for(Mutant mm : mutantKilledLines.get(line)){%>
-<%= mm.getId() %>,
-<%}%>
-]],
-<%
-    } %>
-],"<%="#" + codeDivName%>");
-};
-editorSUT.on("viewportChange", function(){
+var updateCUT = function(){
     showMutants();
-    showMutantsEquiv();
-    showKilledMutants();
     highlightCoverage();
+};
+
+editorSUT.on("viewportChange", function(){
+    updateCUT();
 });
 $(document).ready(function(){
-    showMutants();
-    showMutantsEquiv();
-    showKilledMutants();
-    highlightCoverage();
+    updateCUT();
 });
+
+//inline due to bug in Chrome?
+$(window).resize(function (e){setTimeout(updateCUT, 500);});

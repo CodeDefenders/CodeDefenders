@@ -73,6 +73,13 @@
     session.setAttribute("messages", messages);
 
     int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
+
+    List<Mutant> mutants = mg.getMutants();
+
+    for (Mutant m : mutants){
+        m.getLines();
+    }
+
     List<Mutant> mutantsAlive = mg.getAliveMutants();
 
     List<Mutant> mutantsPending = mg.getMutantsMarkedEquivalentPending();

@@ -59,8 +59,8 @@ public class Mutant implements Serializable {
 	private int score; // multiplayer
 
 	private ArrayList<Integer> lines = null;
-	private ArrayList<String> description = null;
-	private Patch difference = null;
+	private transient ArrayList<String> description = null;
+	private transient Patch difference = null;
 
 	/**
 	 * Creates a mutant
