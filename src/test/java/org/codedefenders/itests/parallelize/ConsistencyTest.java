@@ -31,19 +31,24 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({DatabaseConnection.class}) // , MutationTester.class })
-public class ParallelizeTest {
+@PrepareForTest({ DatabaseConnection.class }) // , MutationTester.class })
+public class ConsistencyTest {
 
 	// PowerMock does not work with @ClassRule !!
 	// This really should be only per class, not per test... in each test we can
 	// truncate the tables ?
 	@Rule
-	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
+	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql"); //, "useAffectedRows=true");
 
 	//
 	private static File codedefendersHome;
@@ -147,20 +152,33 @@ public class ParallelizeTest {
 		// TODO ?
 	}
 
+	/**
+	 * Setup a game with an attacker and multiple defendes and check that a
+	 * mutant can be killed only once and points are reported correctly.
+	 * 
+	 * @throws IOException
+	 * @throws CodeValidatorException
+	 * @throws InterruptedException 
+	 */
 	@Test
-	public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException {
+	public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException, InterruptedException {
 		User observer = new User("observer", "password", "demo@observer.com");
 		observer.insert();
 		//
 		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Observer " + observer.getId());
 		User attacker = new User("demoattacker", "password", "demo@attacker.com");
 		attacker.insert();
-		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Attacker " + attacker.getId());
-		User defender = new User("demodefender", "password", "demo@defender.com");
-		defender.insert();
-		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Defender " + defender.getId());
+		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Attacker" + attacker.getId());
 		//
+		// Create 3 defenders
 		//
+		User[] defenders = new User[3];
+		for (int i = 0; i < defenders.length; i++) {
+			defenders[i] = new User("demodefender" + i, "password", "demo"+i+"@defender.com");
+			defenders[i].insert();
+			System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Defender " + defenders[i].getId());
+		}
+
 		// Upload the Class Under test - Maybe better use Classloader
 		// TODO Work only on Linux/Mac
 		File cutFolder = new File(Constants.CUTS_DIR, "Lift");
@@ -184,63 +202,73 @@ public class ParallelizeTest {
 
 		// Attacker and Defender must join the game. Those calls update also the
 		// db
-		multiplayerGame.addPlayer(defender.getId(), Role.DEFENDER);
 		multiplayerGame.addPlayer(attacker.getId(), Role.ATTACKER);
+		//
+		for (User defender : defenders) {
+			multiplayerGame.addPlayer(defender.getId(), Role.DEFENDER);
+		}
 
-		//
 		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Game " + multiplayerGame.getId());
-		//
-		//
+
 		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(multiplayerGame.getId());
 		assertEquals("Cannot find the right active game", multiplayerGame.getId(), activeGame.getId());
 
-		// Read and submit some test- This will call AntRunner
-		// Are those saved to DB ?!
-		for (int i = 1; i <= 4; i++) {
-			String testText = new String(
-					Files.readAllBytes(
-							new File("src/test/resources/itests/tests/PassingTestLift" + i + ".java").toPath()),
-					Charset.defaultCharset());
-			GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(), "mp");
-		}
-		// List<org.codedefenders.Test> tests = activeGame.getTests(true); //
-		// executable
-		// tests
-		// submitted
-		// by
-		// Assertion roulette ?
-		// assertEquals("Missing input test from defender!", 4, tests.size());
-
-		// Schedule a test which kills the mutant - Where ? in the middle ?
-		String testText = new String(
-				Files.readAllBytes(new File("src/test/resources/itests/tests/KillingTestLift.java").toPath()),
-				Charset.defaultCharset());
-		GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(), "mp");
-
-		// Read and Submit the mutants - No tests so far
+		// Attack
 		String mutantText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
 				Charset.defaultCharset());
+		//
 		Mutant mutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
 				attacker.getId(), "mp");
 
-		assertNotNull("Invalid mutant", mutant.getClassFile());
+		// Generate the tests for the clients
+		String testText = new String(
+				Files.readAllBytes(new File("src/test/resources/itests/tests/KillingTestLift.java").toPath()),
+				Charset.defaultCharset());
+		//
+		List<org.codedefenders.Test> tests = new ArrayList<>();
+		for (final User defender : defenders) {
+			tests.add(GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(),
+					"mp"));
+		}
+		System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + tests);
+		// List<org.codedefenders.Test> theTests = activeGame.getTests(true);
+		System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + activeGame.getTests(true));
 
-		ArrayList<String> messages = new ArrayList<>();
-		// TODO Mock the AntRunner... an interface would make things a lot
-		// easier !
-		// Finally invoke the method.... For the moment this invokes AntRunner
-		MutationTester.runAllTestsOnMutant(activeGame, mutant, messages);
+		// Now "submit the tests in parallel"
 
+		ExecutorService executorService = Executors.newFixedThreadPool(defenders.length);
+
+		for (final org.codedefenders.Test newTest : tests) {
+
+			executorService.submit(new Runnable() {
+
+				@Override
+				public void run() {
+					System.out.println("Submit test " + newTest.getId());
+					MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, new ArrayList<>());
+					activeGame.update();
+				}
+			});
+		}
+		executorService.shutdown();
+		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+
+		// Refresh the state of the mutant... since there's no refresh method, we reload the object from the DB
+		mutant = activeGame.getMutantByID(mutant.getId());
+		
 		// assertMutant is killed !
 		assertFalse("Mutant not killed", mutant.isAlive());
 
-		// FIXME. With the parallel implementation we have the "issue" that
-		// cancelled tasks will run to completion, and store their data on the
-		// db
+		int totalKilled = 0;
+		for (final org.codedefenders.Test newTest : tests) {
+			System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() " + newTest.getMutantsKilled());
+			totalKilled = totalKilled + newTest.getMutantsKilled();
+		}
+		assertEquals("Mutant killed multiple times !", 1, totalKilled);
+		// Assert
+		// List<org.codedefenders.Test> tests = activeGame.getTests(true); //
 
 	}
-	// public static void runAllTestsOnMutant(AbstractGame game, Mutant mutant,
-	// ArrayList<String> messages) {
 
 }

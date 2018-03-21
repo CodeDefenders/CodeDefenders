@@ -1,22 +1,10 @@
 package org.codedefenders.itests;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assume.assumeTrue;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Arrays;
-
-import org.codedefenders.GameClass;
-import org.codedefenders.GameLevel;
-import org.codedefenders.GameState;
-import org.codedefenders.Mutant;
-import org.codedefenders.Role;
-import org.codedefenders.TargetExecution;
-import org.codedefenders.User;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.ColumnListHandler;
+import org.apache.commons.lang3.ArrayUtils;
+import org.codedefenders.*;
+import org.codedefenders.Mutant.Equivalence;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
@@ -24,8 +12,10 @@ import org.codedefenders.events.EventType;
 import org.codedefenders.multiplayer.LineCoverage;
 import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.util.ConnectionPool;
 import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.util.DatabaseConnection;
+import org.codedefenders.util.FeedbackDAO;
 import org.codedefenders.validation.CodeValidator;
 import org.junit.Before;
 import org.junit.Rule;
@@ -39,6 +29,17 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 
 /**
  * @author Jose Rojas
@@ -58,7 +59,7 @@ public class RunnerTest {
 		cut1 = new GameClass("MyClass", "", "", "");
 		cut2 = new GameClass("", "AliasForClass2", "", "");
 		multiplayerGame = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.CREATED.name(), false);
+				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.CREATED.name(), false, 5, true, CodeValidator.CodeValidatorLevel.MODERATE, false);
 	}
 
 	// This will re-create the same DB from scratch every time... is this really
@@ -88,6 +89,7 @@ public class RunnerTest {
 	private Mutant mutant1;
 	private org.codedefenders.Test test;
 
+
 	@Test
 	public void testInsertUser() throws Exception {
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -103,6 +105,24 @@ public class RunnerTest {
 		assertNotEquals("Password should not be stored in plain text", user1.getPassword(), userFromDB.getPassword());
 		// FIXME Split this in two tests
 		// assertFalse("Inserting a user twice should fail", user1.insert());
+	}
+
+	@Test
+	public void testUpdateUser() {
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+		assumeTrue(user1.insert());
+
+		user1.setPassword(passwordEncoder.encode(user1.getPassword() + "_new"));
+		user1.setUsername(user1.getUsername() + "_new");
+		user1.setEmail(user1.getEmail() + "_new");
+
+		assertTrue(user1.update(user1.getPassword()));
+		User userFromDB = DatabaseAccess.getUser(user1.getId());
+		assertEquals(user1.getId(), userFromDB.getId());
+		assertEquals(user1.getUsername(), userFromDB.getUsername());
+		assertEquals(user1.getEmail(), userFromDB.getEmail());
+		assertEquals(user1.getPassword(), userFromDB.getPassword());
 	}
 
 	@Test
@@ -135,6 +155,10 @@ public class RunnerTest {
 		assertEquals(multiplayerGameFromDB.getAttackerLimit(), multiplayerGame.getAttackerLimit());
 		assertEquals(multiplayerGameFromDB.getMinAttackers(), multiplayerGame.getMinAttackers());
 		assertEquals(multiplayerGameFromDB.getMinDefenders(), multiplayerGame.getMinDefenders());
+		assertEquals(multiplayerGameFromDB.getMaxAssertionsPerTest() , multiplayerGame.getMaxAssertionsPerTest());
+		assertEquals(multiplayerGameFromDB.isMarkUncovered() , multiplayerGame.isMarkUncovered());
+		assertEquals(multiplayerGameFromDB.isChatEnabled(), multiplayerGame.isChatEnabled());
+		assertEquals(multiplayerGameFromDB.getMutantValidatorLevel() , multiplayerGame.getMutantValidatorLevel());
 	}
 
 	@Test
@@ -148,13 +172,15 @@ public class RunnerTest {
 		assumeTrue(dg1.insert());
 
 		MultiplayerGame mg2 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false);
+				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true,
+				CodeValidator.CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg2.insert());
 		assumeTrue(mg2.addPlayer(user1.getId(), Role.DEFENDER));
 		assertTrue(mg2.update());
 		
 		MultiplayerGame mg3 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false);
+				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true,
+				CodeValidator.CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg3.insert());
 		
 		assumeTrue(mg3.addPlayer(user1.getId(), Role.DEFENDER));
@@ -162,7 +188,8 @@ public class RunnerTest {
 		assumeTrue(mg3.update());
 
 		MultiplayerGame mg4 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.FINISHED.name(), false);
+				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.FINISHED.name(), false, 2, true,
+				CodeValidator.CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg4.insert());
 		
 		// TODO Why is 0
@@ -229,6 +256,69 @@ public class RunnerTest {
 		Mutant[] ml = { mutant1, mutant2 };
 		assertTrue(Arrays.equals(DatabaseAccess.getMutantsForPlayer(pid).toArray(), ml));
 		assertTrue(Arrays.equals(DatabaseAccess.getMutantsForGame(multiplayerGame.getId()).toArray(), ml));
+	}
+
+	@Test
+	public void testDoubleUpdateMutant() throws Exception {
+		PowerMockito.mockStatic(CodeValidator.class);
+		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE1")).thenReturn("MD5_1");
+		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE2")).thenReturn("MD5_2");
+
+		assumeTrue(creator.insert());
+		assumeTrue(user1.insert());
+		assumeTrue(cut2.insert());
+
+		Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
+		// multiplayerGame.classId = cut2.getId();
+
+		assertTrue(multiplayerGame.insert());
+		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
+
+		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		Mutant mutant1 = new Mutant(99, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
+
+		assertTrue(mutant1.insert());
+
+		assertTrue(mutant1.kill(Equivalence.ASSUMED_NO));
+		//
+		assertFalse(mutant1.kill(Equivalence.ASSUMED_NO));
+		assertFalse(mutant1.kill(Equivalence.ASSUMED_NO));
+	}
+
+	@Test
+	public void testCannotUpdateKilledMutant() throws Exception {
+		PowerMockito.mockStatic(CodeValidator.class);
+		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE1")).thenReturn("MD5_1");
+		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE2")).thenReturn("MD5_2");
+
+		assumeTrue(creator.insert());
+		assumeTrue(user1.insert());
+		assumeTrue(cut2.insert());
+
+		Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
+		// multiplayerGame.classId = cut2.getId();
+
+		assertTrue(multiplayerGame.insert());
+		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
+
+		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		Mutant mutant1 = new Mutant(99, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
+
+		assertTrue(mutant1.insert());
+		// Kill the mutant
+		assertTrue(mutant1.kill(Equivalence.ASSUMED_NO));
+		int score = mutant1.getScore();
+		// Prevent score update
+		mutant1.setScore( 10 );
+		assertFalse(mutant1.update());
+		//
+
+		Mutant storedMutant = DatabaseAccess.getMutantById( mutant1.getId() );
+		assertEquals("Score does not match", score, storedMutant.getScore());
+		//
+		assertEquals(mutant1, storedMutant);
 	}
 
 	@Test
@@ -339,5 +429,77 @@ public class RunnerTest {
 		assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), 0, Role.DEFENDER).size(), 1);
 		assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), 0, Role.ATTACKER).size(), 2);
 		assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), (int) 1E20, Role.ATTACKER).size(), 0);
+	}
+
+	/**
+	 * Requests as many connections as the CP can give and checks if requesting
+	 * one more works after releasing a connection and fails after that. Also checks
+	 * if number of connections is as expected.
+	 *
+	 * @throws ConnectionPool.NoMoreConnectionsException
+	 */
+	@Test
+	public void testConnectionPool() throws SQLException, ConnectionPool.NoMoreConnectionsException {
+		int nbConnectionsBefore = getNbConnections();
+
+		int dbNumberOfConnections = ConnectionPool.getInstanceOf().getNbConnections();
+		ConnectionPool connectionPool = ConnectionPool.getInstanceOf();
+		Connection lastConn = null;
+		for (int i = 0; i < dbNumberOfConnections; ++i) {
+			lastConn = connectionPool.getDBConnection();
+		}
+		connectionPool.releaseDBConnection(lastConn);
+		assertNotNull("releasing didn't work", connectionPool.getDBConnection());
+
+		try {
+			connectionPool.getDBConnection();
+			fail();
+		} catch (ConnectionPool.NoMoreConnectionsException e) {
+
+		}
+
+		assertEquals(nbConnectionsBefore + ConnectionPool.getInstanceOf().getNbConnections(), getNbConnections());
+	}
+
+	private int getNbConnections() throws SQLException {
+		Connection conn = db.getConnection();
+		QueryRunner qr = new QueryRunner();
+		int nbConnections = Math.toIntExact(qr.query(conn, "SELECT COUNT(*) FROM information_schema.PROCESSLIST;", new ColumnListHandler<Long>()).get(0));
+		conn.close();
+		return nbConnections;
+	}
+
+	@Test
+	public void testRatings() {
+		assumeTrue(creator.insert());
+		assumeTrue(user1.insert());
+		assumeTrue(cut1.insert());
+		Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
+		assumeTrue(multiplayerGame.insert());
+
+		Integer[] ratings = new Integer[]{Feedback.MIN_RATING - 1, Feedback.MIN_RATING, Feedback.MAX_RATING, Feedback.MAX_RATING + 1};
+		List<Feedback.FeedbackType> feedbackTypesList = new ArrayList();
+		feedbackTypesList = Arrays.asList(ArrayUtils.subarray(Feedback.FeedbackType.values(), 0, ratings.length));
+		// shuffle feedback type list
+		Collections.shuffle(feedbackTypesList);
+		Feedback.FeedbackType[] feedbackTypes = new Feedback.FeedbackType[feedbackTypesList.size()];
+		feedbackTypes = feedbackTypesList.toArray(feedbackTypes);
+
+		List<Integer> ratingsList = Arrays.asList(ratings);
+		assertTrue("Feedback could not be inserted",
+				FeedbackDAO.insertFeedback(multiplayerGame.getId(), user1.getId(), ratingsList, feedbackTypes));
+
+		Integer[] ratingsFromDB = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId(), feedbackTypes);
+		Integer[] user1RatingsSanitized = new Integer[]{Feedback.MIN_RATING, Feedback.MIN_RATING, Feedback.MAX_RATING, Feedback.MAX_RATING};
+
+		assertEquals(user1RatingsSanitized, ratingsFromDB);
+
+		Integer[] updatedRatings = new Integer[]{Feedback.MAX_RATING, Feedback.MAX_RATING-1, Feedback.MIN_RATING+1, Feedback.MIN_RATING};
+		List<Integer> updatedRatingsList = Arrays.asList(updatedRatings);
+		assertTrue("Feedback could not be updated",
+				FeedbackDAO.updateFeedback(multiplayerGame.getId(), user1.getId(), updatedRatingsList, feedbackTypes));
+
+		Integer[] updatedRatingsFromDB = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId(), feedbackTypes);
+		assertEquals(updatedRatings, updatedRatingsFromDB);
 	}
 }

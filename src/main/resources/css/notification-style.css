@@ -119,6 +119,32 @@
     display: block;
 }
 
+.CodeMirror #mutationPopup .mutationInfoExpanded h5 {
+    margin: 0px;
+    padding: 5px;
+}
+
+.CodeMirror #mutationPopup .mutationInfoExpanded p .header {
+    text-decoration: underline;
+}
+
+.CodeMirror #mutationPopup .mutationInfoExpanded p {
+    width: 100%;
+    clear: both;
+    margin: 0px;
+    padding: 3px;
+}
+
+.CodeMirror #mutationPopup .mutationInfoExpanded p .left {
+    float:left;
+    text-align: left;
+}
+
+.CodeMirror #mutationPopup .mutationInfoExpanded p .right {
+    float:right;
+    text-align: right;
+}
+
 .CodeMirror #mutationPopup .action {
     margin: 0px;
     color: #fff;

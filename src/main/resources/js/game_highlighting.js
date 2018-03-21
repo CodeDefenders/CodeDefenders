@@ -72,14 +72,26 @@ var createAction = function(label, classType, contents){
 return '<span class="action"><a onmouseover="' +
     ' $(\'#mutationPopup\').find(\'.mutationInfoExpanded\').show();' +
     '$(\'#mutationPopup\').find(\'.mutationInfoExpanded\').html(\'' +
-    contents +
+    contents.split("\"").join("\\'") +
     '\');">' +
     '<span class="mutantCUTIcon ' + classType + '">' +
         '<span></span>' +
     '</span>' +
     '<span>' + label + '</span>' +
     '</a></span>';
-}
+};
+
+var prepareMutantDetail = function(mutant){
+    return '<p><span class="left">' + mutant.id + '</span><span' +
+        ' class="right">' +
+        mutant.score + '</span></p>';
+};
+
+var prepareMutantHeading = function(title){
+    return '<h5>' + title + '</h5><p><span class="left header">Mutant' +
+        ' ID</span>' +
+        '<span class="right header">Points</span></p>';
+};
 
 var mutantLine = function (superDiv, showEquivalenceButton) {
     if (!superDiv) {
@@ -109,34 +121,40 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
 
         var mutantDescriptions = [];
 
-        mutantDescriptions['alive'] = "<h5>Mutants Alive</h5>";
-        mutantDescriptions['equiv'] = "<h5>Mutants Equivalent</h5>";
-        mutantDescriptions['flagged'] = "<h5>Mutants Flagged</h5>";
-        mutantDescriptions['killed'] = "<h5>Mutants Killed</h5>";
+        mutantDescriptions['alive'] = prepareMutantHeading("<h5>Mutants Alive");
+        mutantDescriptions['equiv'] = prepareMutantHeading("Mutants Equivalent");
+        mutantDescriptions['flagged'] = prepareMutantHeading("Mutants Flagged");
+        mutantDescriptions['killed'] = prepareMutantHeading("Mutants Killed");
+
+        // sort mutants by score
+        preparedMutants[l].sort(function(a, b){
+            return b.score - a.score;
+        });
 
         for (var m in preparedMutants[l]) {
             var mutant = preparedMutants[l][m];
+            var detail = prepareMutantDetail(mutant);
             if (mutant.status == MutantStatus.ALIVE){
                 if (aliveMutants < MUTANT_SHOW_LIMIT) {
-                    mutantDescriptions['alive'] += "<p>" + mutant.id + "</p>";
+                    mutantDescriptions['alive'] += detail;
                 }
 
                 aliveMutants++;
             } else if (mutant.status == MutantStatus.EQUIVALENT){
                 if (equivalentMutants < MUTANT_SHOW_LIMIT) {
-                    mutantDescriptions['equiv'] += "<p>" + mutant.id + "</p>";
+                    mutantDescriptions['equiv'] += detail;
                 }
 
                 equivalentMutants++;
             } else if (mutant.status == MutantStatus.FLAGGED_EQUIVALENT){
                 if (flaggedMutants < MUTANT_SHOW_LIMIT) {
-                    mutantDescriptions['flagged'] += "<p>" + mutant.id + "</p>";
+                    mutantDescriptions['flagged'] += detail;
                 }
 
                 flaggedMutants++;
             } else { // it's impossible for status to be unknown
                 if (killedMutants < MUTANT_SHOW_LIMIT) {
-                    mutantDescriptions['killed'] += "<p>" + mutant.id + "</p>";
+                    mutantDescriptions['killed'] += detail;
                 }
                 killedMutants++;
             }
