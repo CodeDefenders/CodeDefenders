@@ -1,31 +1,25 @@
 package org.codedefenders.util;
 
+import org.codedefenders.*;
+import org.codedefenders.duel.DuelGame;
+import org.codedefenders.events.Event;
+import org.codedefenders.events.EventStatus;
+import org.codedefenders.events.EventType;
+import org.codedefenders.leaderboard.Entry;
+import org.codedefenders.multiplayer.LineCoverage;
+import org.codedefenders.multiplayer.MultiplayerGame;
+import org.codedefenders.singleplayer.NoDummyGameException;
+import org.codedefenders.singleplayer.SinglePlayerGame;
+import org.codedefenders.validation.CodeValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.codedefenders.GameClass;
-import org.codedefenders.GameLevel;
-import org.codedefenders.GameMode;
-import org.codedefenders.GameState;
-import org.codedefenders.Mutant;
-import org.codedefenders.Role;
-import org.codedefenders.TargetExecution;
-import org.codedefenders.Test;
-import org.codedefenders.User;
-import org.codedefenders.duel.DuelGame;
-import org.codedefenders.events.Event;
-import org.codedefenders.events.EventStatus;
-import org.codedefenders.leaderboard.Entry;
-import org.codedefenders.multiplayer.LineCoverage;
-import org.codedefenders.multiplayer.MultiplayerGame;
-import org.codedefenders.singleplayer.NoDummyGameException;
-import org.codedefenders.singleplayer.SinglePlayerGame;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 @SuppressWarnings("ALL")
@@ -110,6 +104,35 @@ public class DatabaseAccess {
 		return getEvents(stmt, conn);
 	}
 
+	/**
+	 * Retrieve the latest (in the past 5 minutes and not yet seen)
+	 * events that belong to a game and relate to equivalence duels
+	 *
+	 * @param gameId
+	 * @param timestamp
+	 * @return
+	 */
+	// FIXME userId not useful
+	public static ArrayList<Event> getNewEquivalenceDuelEventsForGame(int gameId, int lastMessageId) {
+		String query = "SELECT * FROM events LEFT JOIN event_messages AS em ON events.Event_Type = em.Event_Type " +
+				"LEFT JOIN event_chat AS ec ON events.Event_Id = ec.Event_Id " + // FIXME this is here otherwise the getEvents call fails, get rid of this...
+				"WHERE Game_ID=? AND Event_Status=? AND (events.Event_Type=? OR events.Event_Type=? OR events.Event_Type=?) " +
+				"AND Timestamp >= FROM_UNIXTIME(UNIX_TIMESTAMP()-300) "+
+				"AND events.Event_ID > ?";
+		// DEFENDER_MUTANT_CLAIMED_EQUIVALENT
+		// EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
+		// ATTACKER_MUTANT_KILLED_EQUIVALENT
+		DatabaseValue[] valueList = new DatabaseValue[]{
+//				DB.getDBV(userId),
+				DB.getDBV(gameId),
+				DB.getDBV(EventStatus.GAME.toString()),
+				DB.getDBV(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT.toString()), DB.getDBV(EventType.DEFENDER_MUTANT_EQUIVALENT.toString()), DB.getDBV(EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT.toString()),
+				DB.getDBV(lastMessageId)};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return getEventsWithMessage(stmt, conn);
+	}
+
 	public static ArrayList<Event> getEventsForUser(int userId) {
 		String query = "SELECT * FROM events " + "LEFT JOIN event_messages AS em ON events.Event_Type = em.Event_Type " + "LEFT JOIN event_chat AS ec ON events.Event_Id = ec.Event_Id " + "WHERE " + "Event_Status!='DELETED' " + "AND Player_ID=?;";
 		Connection conn = DB.getConnection();
@@ -117,6 +140,7 @@ public class DatabaseAccess {
 		return getEvents(stmt, conn);
 	}
 
+	// Is userId the same as Player_ID ?
 	public static ArrayList<Event> getNewEventsForUser(int userId, long time) {
 		String query = "SELECT * FROM events " + "LEFT JOIN event_messages AS em ON events.Event_Type = em.Event_Type " + "LEFT JOIN event_chat AS ec ON events.Event_Id = ec.Event_Id " + "WHERE Player_ID=? AND Event_Status<>? AND Event_Status<>? " + "AND Timestamp >= FROM_UNIXTIME(?)";
 		DatabaseValue[] valueList = new DatabaseValue[]{
@@ -241,11 +265,38 @@ public class DatabaseAccess {
 		return events;
 	}
 
+	private static ArrayList<Event> getEventsWithMessage(PreparedStatement stmt, Connection conn) {
+		ArrayList<Event> events = new ArrayList<Event>();
+		try {
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				Event event = new Event(rs.getInt("events.Event_ID"),
+						rs.getInt("Game_ID"),
+						rs.getInt("Player_ID"),
+						rs.getString("events.Event_Message"),
+						rs.getString("events.Event_Type"),
+						rs.getString("Event_Status"),
+						rs.getTimestamp("Timestamp"));
+				String chatMessage = rs.getString("ec.Message");
+				event.setChatMessage(chatMessage);
+				events.add(event);
+			}
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+			DB.cleanup(conn, stmt);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return events;
+	}
+
 	private static GameClass getClass(PreparedStatement stmt, Connection conn) {
 		try {
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
-				GameClass classRecord = new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile"));
+				GameClass classRecord = new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile"), rs.getBoolean("RequireMocking"));
 				return classRecord;
 			}
 		} catch (SQLException se) {
@@ -267,7 +318,7 @@ public class DatabaseAccess {
 		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 		try {
 			while (rs.next()) {
-				classList.add(new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile")));
+				classList.add(new GameClass(rs.getInt("Class_ID"), rs.getString("Name"), rs.getString("Alias"), rs.getString("JavaFile"), rs.getString("ClassFile"), rs.getBoolean("RequireMocking")));
 			}
 		} catch (SQLException se) {
 			logger.error("SQL exception caught", se);
@@ -531,7 +582,9 @@ public class DatabaseAccess {
 						(float) rs.getDouble("Mutant_Goal"), rs.getInt("Prize"), rs.getInt("Defender_Value"),
 						rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
 						rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),
-						rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"));
+						rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"),
+						rs.getInt("MaxAssertionsPerTest"),rs.getBoolean("ChatEnabled"),
+						CodeValidator.CodeValidatorLevel.valueOf(rs.getString("MutantValidator")), rs.getBoolean("MarkUncovered"));
 				mg.setId(rs.getInt("ID"));
 				gameList.add(mg);
 			}
@@ -953,5 +1006,64 @@ public class DatabaseAccess {
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		DB.executeUpdate(stmt, conn);
+	}
+
+
+	public static Mutant getMutantById(int mutantId) {
+		String query = "SELECT * FROM mutants WHERE Mutant_ID=?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantId)};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return getMutantFromDB(stmt, conn);
+	}
+
+	public static int getLastCompletedSubmissionForUserInGame(int userId, int gameId, boolean isDefender) {
+		String query = isDefender ? "SELECT MAX(test_id) FROM tests" : "SELECT MAX(mutant_id) FROM mutants";
+		query += " WHERE game_id=? AND player_id = (SELECT id FROM players WHERE game_id=? AND user_id=?);";
+		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(gameId),
+				DB.getDBV(gameId),
+				DB.getDBV(userId)
+		};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		try (ResultSet rs = stmt.executeQuery()){
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return -1;
+	}
+
+	public static TargetExecution.Target getStatusOfRequestForUserInGame(int userId, int gameId, int lastSubmissionId, boolean isDefender) {
+		// Current test is the one right after lastTestId in the user/game context
+		String query = isDefender ?
+				"SELECT * FROM targetexecutions WHERE Test_ID > ? AND Test_ID in (SELECT Test_ID FROM tests" :
+				"SELECT * FROM targetexecutions WHERE Mutant_ID > ? AND Mutant_ID in (SELECT Mutant_ID FROM mutants";
+		query += " WHERE game_id=? AND player_id = (SELECT id from players where game_id=? and user_id=?))"
+				+ "AND TargetExecution_ID >= (SELECT MAX(TargetExecution_ID) from targetexecutions);";
+
+		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(lastSubmissionId),
+				DB.getDBV(gameId),
+				DB.getDBV(gameId),
+				DB.getDBV(userId)
+		};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		TargetExecution t = getTargetExecutionSQL(stmt, conn);
+		if(  t != null){
+			System.out.println("DatabaseAccess.getStatusOfRequestForUserInGame() Target Execution for test" + t.testId +
+					",mutant " + t.mutantId + "w/ status " + t.status);
+			return t.target;
+		} else {
+			return null;
+		}
 	}
 }

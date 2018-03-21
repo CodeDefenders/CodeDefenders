@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -153,20 +154,58 @@ public class Mutant implements Serializable {
 		return score;
 	}
 
+	//
+	public void incrementScore(int score){
+		
+		if( score == 0 ){
+			logger.debug("Do not update mutant {} score by 0", getId());
+			return;
+		}
+		
+		String query = "UPDATE mutants SET Points = Points + ? WHERE Mutant_ID=? AND Alive=1;";
+		Connection conn = DB.getConnection();
+
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(score),
+						DB.getDBV(id)};
+				
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+				
+		DB.executeUpdate(stmt, conn);
+	}
+	
+	@Deprecated
 	public void setScore(int score) {
 		this.score += score;
 	}
 
-	public void kill() {
-		kill(equivalent);
+	public boolean kill() {
+		return kill(equivalent);
 	}
 
-	public void kill(Equivalence equivalent) {
+	public boolean kill(Equivalence equivalent) {
 		alive = false;
 		roundKilled = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
 		setEquivalent(equivalent);
 
-		update();
+		// This should be blocking
+		Connection conn = DB.getConnection();
+
+		String query;
+		if (equivalent.equals(Equivalence.DECLARED_YES) || equivalent.equals(Equivalence.ASSUMED_YES)) {
+			// if mutant is equivalent, we need to set score to 0
+			query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, Points=0 WHERE Mutant_ID=? AND Alive=1;";
+		} else {
+			// We cannot update killed mutants
+			query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=? WHERE Mutant_ID=? AND Alive=1;";
+		}
+
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(equivalent.name()),
+				DB.getDBV(sqlAlive()),
+				DB.getDBV(roundKilled),
+				DB.getDBV(id)};
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		//
+		return DB.executeUpdate(stmt, conn);
 	}
 
 	public boolean isCovered() {
@@ -309,7 +348,6 @@ public class Mutant implements Serializable {
 		int res = DB.executeUpdateGetKeys(stmt, conn);
 		if (res > -1) {
 			this.id = res;
-			System.out.println("setting mutant ID to: " + this.id);
 			return true;
 		}
 		return false;
@@ -318,10 +356,18 @@ public class Mutant implements Serializable {
 	// update will run when changes to a mutant are made.
 	// Updates values of Equivalent, Alive, RoundKilled.
 	// These values update when Mutants are suspected of being equivalent, go through an equivalence test, or are killed.
+	/*
+	 * Update a mutant ONLY if in the DB it is still alive. This should prevent zombie mutants. but does not prevent messing up the score.
+	 * 
+	 */
+	@Deprecated
 	public boolean update() {
-		logger.info("Updating Mutant {}", getId());
+		
+		// This should be blocking
 		Connection conn = DB.getConnection();
-		String query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, NumberAiKillingTests=?, Points=? WHERE Mutant_ID=?;";
+		
+		// We cannot update killed mutants
+		String query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, NumberAiKillingTests=?, Points=? WHERE Mutant_ID=? AND Alive=1;";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(equivalent.name()),
 				DB.getDBV(sqlAlive()),
 				DB.getDBV(roundKilled),
@@ -329,7 +375,13 @@ public class Mutant implements Serializable {
 				DB.getDBV(score),
 				DB.getDBV(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		
 		return DB.executeUpdate(stmt, conn);
+	}
+	
+	@Override
+	public String toString() {
+		return "Mutant " + getId() + "; Alive:"+ isAlive() + "; Equivalent: " + getEquivalent() + " - " + getScore();
 	}
 
 	public void setTimesKilledAi(int count) {
@@ -438,6 +490,18 @@ public class Mutant implements Serializable {
 			difference = new Patch();
 	}
 
+	/*
+	 * This comparators place first mutants that modify lines at the top of the file.
+	 */
+	public static Comparator<Mutant> sortByLineNumberAscending() {
+		return new Comparator<Mutant>() {
+			@Override
+			public int compare(Mutant o1, Mutant o2) {
+				return ((Integer) Collections.min( o1.getLines() ) ) - ((Integer) Collections.min( o2.getLines() )); 
+			}
+		};
+	}
+	
 	// TODO Ideally this should have a timestamp ... we use the ID instead
 	// First created appears first
 	public static Comparator<Mutant> orderByIdAscending() {

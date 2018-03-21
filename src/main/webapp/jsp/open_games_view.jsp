@@ -91,11 +91,10 @@
 	%>
 </table>
 
-	<!-- Alessio disabled this to avoid students creating stuff. Then it should be enough to set visibility to null  -->
-	<!-- 
+	<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue()) { %>
 	<a href="<%=request.getContextPath()%>/games/create">Create Duel</a>
-	-->
-	
+	<%}%>
+
 	
 	<hr />
 	<h3>Battlegrounds</h3>
@@ -169,10 +168,9 @@
 		</tbody>
 	</table>
 
-	<!-- Alessio disabled this -->
-	<!-- 
+	<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue()) { %>
 	<a href="<%=request.getContextPath()%>/multiplayer/games/create">Create Battleground</a>
-	-->
+	<%}%>
 
 	<script>
 		$(document).ready(function() {

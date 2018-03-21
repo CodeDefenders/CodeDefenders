@@ -26,7 +26,7 @@
   margin: 10px;
   margin-bottom: 30px;
   width:calc(100% - 20px);
-  position: absolute;
+  /*position: absolute;*/
   overflow: hidden;
 
   margin-bottom: 50px;
@@ -5366,7 +5366,7 @@ th {
 }
 html,
 body {
-  height: 100%;
+  height: 90%; /*leave room for footer*/
   margin: 0;
 }
 body {

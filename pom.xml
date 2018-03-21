@@ -223,6 +223,7 @@
 												<file>src/test/resources/itests/lib/org.jacoco.ant-0.7.7.201606060606.jar</file>
 												<file>src/test/resources/itests/lib/org.jacoco.core-0.7.7.201606060606.jar</file>
 												<file>src/test/resources/itests/lib/org.jacoco.report-0.7.7.201606060606.jar</file>
+												<file>src/test/resources/itests/lib/mockito-all-1.9.5.jar</file>
 											</files>
 										</requireFilesExist>
 									</rules>

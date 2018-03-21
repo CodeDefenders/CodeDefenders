@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.Range;
 import org.codedefenders.duel.DuelGame;
 import org.codedefenders.singleplayer.NoDummyGameException;
 import org.codedefenders.util.DB;
@@ -26,11 +27,19 @@ import com.github.javaparser.ParseException;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.ModifierSet;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.PrimitiveType;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 public class GameClass {
 
@@ -42,33 +51,50 @@ public class GameClass {
 	private String javaFile;
 	private String classFile;
 
+	private boolean isMockingEnabled = false;
+
 	private Set<String> additionalImports = new HashSet<String>();
 	// Store begin and end line which corresponds to uncoverable non-initializad fields
-	private List<Integer> linesOfNonCoverableCode = new ArrayList<>();
 	private List<Integer> linesOfCompileTimeConstants= new ArrayList<>();
+	private List<Integer> linesOfNonCoverableCode = new ArrayList<>();
 
-	public GameClass(String name, String alias, String jFile, String cFile) {
+	private List<Range<Integer>> linesOfMethods = new ArrayList<>();
+	private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
+	private List<Range<Integer>>  linesOfClosingBrackets = new ArrayList<>();
+
+	public GameClass(int id, String name, String alias, String jFile, String cFile, boolean isMockingEnabled) {
+		this(name, alias, jFile, cFile, isMockingEnabled);
+		this.id = id;
+	}
+
+	public GameClass(String name, String alias, String jFile, String cFile, boolean isMockingEnabled) {
 		this.name = name;
 		this.alias = alias;
 		this.javaFile = jFile;
 		this.classFile = cFile;
-
-		/*
-		 * According to :https://stackoverflow.com/questions/22684264/how-get-the-fully-qualified-name-of-the-java-class
-		 * it is not easy to resolve the imports of the CUT automatically. So we follow a simple heuristic:
-		 * We take all the imports declared in the CUT.
-		 */
+		this.isMockingEnabled = isMockingEnabled;
 		this.additionalImports.addAll(includeAdditionalImportsFromCUT());
-		this.linesOfNonCoverableCode.addAll( findNonInitializedFields());
-		this.linesOfNonCoverableCode.addAll( findCompileTimeConstants());
 		//
-		this.linesOfCompileTimeConstants.addAll( findCompileTimeConstants());
+		this.linesOfCompileTimeConstants.addAll(getCompileTimeConstants());
+		//
+		this.linesOfNonCoverableCode.addAll(getLinesOfNonInitializedFields());
+		//
+		this.linesOfNonCoverableCode.addAll(getLinesOfCompileTimeConstants());
+		//
+		this.linesOfNonCoverableCode.addAll(getLinesOfMethodSignatures());
+		//
+		this.linesOfNonCoverableCode.addAll(getUnreachableClosingBracketsForIfStatements());
+		//
 	}
 
-
+	// FIXME
 	public GameClass(int id, String name, String alias, String jFile, String cFile) {
-		this(name, alias, jFile, cFile);
+		this(name, alias, jFile, cFile, false);
 		this.id = id;
+	}
+	
+	public GameClass(String name, String alias, String jFile, String cFile) {
+		this(name, alias, jFile, cFile, false);
 	}
 
 	public int getId() {
@@ -123,12 +149,15 @@ public class GameClass {
 	}
 
 	public boolean insert() {
-		logger.debug("Inserting class (Name={}, Alias={}, JavaFile={}, ClassFile={})", name, alias, javaFile, classFile);
+		logger.debug("Inserting class (Name={}, Alias={}, JavaFile={}, ClassFile={}, RequireMocking={})", name, alias, javaFile, classFile, isMockingEnabled);
 		// Attempt to insert game info into database
 		Connection conn = DB.getConnection();
-		String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile) VALUES (?, ?, ?, ?);";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(name), DB.getDBV(alias),
-				DB.getDBV(javaFile), DB.getDBV(classFile)};
+		String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile, RequireMocking) VALUES (?, ?, ?, ?, ?);";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(name),
+				DB.getDBV(alias),
+				DB.getDBV(javaFile),
+				DB.getDBV(classFile),
+				DB.getDBV(isMockingEnabled)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		int res = DB.executeUpdateGetKeys(stmt, conn);
 		if (res > -1) {
@@ -140,14 +169,15 @@ public class GameClass {
 	}
 
 	public boolean update() {
-		logger.debug("Updating class (Name={}, Alias={}, JavaFile={}, ClassFile={})", name, alias, javaFile, classFile);
+		logger.debug("Updating class (Name={}, Alias={}, JavaFile={}, ClassFile={}, RequireMocking={})", name, alias, javaFile, classFile, isMockingEnabled);
 		// Attempt to update game info into database
 		Connection conn = DB.getConnection();
-		String query = "UPDATE classes SET Name=?, Alias=?, JavaFile=?, ClassFile=? WHERE Class_ID=?;";
+		String query = "UPDATE classes SET Name=?, Alias=?, JavaFile=?, ClassFile=?, RequireMocking=? WHERE Class_ID=?;";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(name),
 				DB.getDBV(alias),
 				DB.getDBV(javaFile),
 				DB.getDBV(classFile),
+				DB.getDBV(isMockingEnabled),
 				DB.getDBV(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		return DB.executeUpdate(stmt, conn);
@@ -161,6 +191,10 @@ public class GameClass {
 			sb.append(String.format("/* no package name */%n"));
 		sb.append(String.format("%n"));
 		sb.append(String.format("import static org.junit.Assert.*;%n%n"));
+
+		if (this.isMockingEnabled) {
+			sb.append(String.format("import static org.mockito.Mockito.*;%n%n"));
+		}
 
 		sb.append(String.format("import org.junit.*;%n"));
 
@@ -197,7 +231,8 @@ public class GameClass {
 			}
 
 		} catch (ParseException | IOException e) {
-			logger.warn("Swallow exception", e);
+			// If a java file is not provided, there's no import at all.
+			logger.warn("Swallow Exception" + e );
 		}
 		return additionalImports;
 	}
@@ -216,6 +251,14 @@ public class GameClass {
 
 	public void setClassFile(String classFile) {
 		this.classFile = classFile;
+	}
+
+	public void setMockingEnabled(boolean isMockingEnabled) {
+		this.isMockingEnabled = isMockingEnabled;
+	}
+
+	public boolean isMockingEnabled() {
+		return this.isMockingEnabled;
 	}
 
 	public DuelGame getDummyGame() throws NoDummyGameException {
@@ -264,7 +307,7 @@ public class GameClass {
 
 	// TODO Probably this shall be refactor using some code visitor so we do not
 	// reanalyze everything from scratch each time
-	private List<Integer> findNonInitializedFields() {
+	public List<Integer> getLinesOfNonInitializedFields() {
 		List<Integer> nonInitializedFieldsLines = new ArrayList<>();
 		CompilationUnit cu;
 		try (FileInputStream in = new FileInputStream(javaFile)) {
@@ -285,14 +328,14 @@ public class GameClass {
 			}
 
 		} catch (ParseException | IOException e) {
-			logger.warn("Swallow exception", e);
+			logger.warn("Swallow exception" + e);
 		}
 		return nonInitializedFieldsLines;
 	}
 
 	// TODO Probably this shall be refactor using some code visitor so we do not
 	// reanalyze everything from scratch each time
-	private List<Integer> findCompileTimeConstants(){
+	public List<Integer> getCompileTimeConstants() {
 		List<Integer> compileTimeConstantsLine = new ArrayList<>();
 		CompilationUnit cu;
 		try (FileInputStream in = new FileInputStream(javaFile)) {
@@ -313,15 +356,123 @@ public class GameClass {
 			}
 
 		} catch (ParseException | IOException e) {
-			logger.warn("Swallow exception", e);
+			logger.warn("Swallow exception" + e);
 		}
 		return compileTimeConstantsLine;
+	}
+
+	// Lines such as method signature are not coverable
+	public List<Integer> getLinesOfMethodSignatures() {
+		List<Integer> methodSignatures = new ArrayList<>();
+		CompilationUnit cu;
+		try (FileInputStream in = new FileInputStream(javaFile)) {
+			// parse the file
+			cu = JavaParser.parse(in);
+
+			for (TypeDeclaration td : cu.getTypes()) {
+				// Static final or static final primitive in the class
+				methodSignatures.addAll(findMethodSignaturesByType(td));
+
+				// We look for FieldDeclaration inside inner classes
+				for (BodyDeclaration bd : td.getMembers()) {
+					if (bd instanceof TypeDeclaration) {
+						methodSignatures.addAll(findMethodSignaturesByType((TypeDeclaration) bd));
+					}
+				}
+
+			}
+
+		} catch (ParseException | IOException e) {
+			logger.warn("Swallow exception" + e);
+		}
+
+		Collections.sort(methodSignatures);
+		return methodSignatures;
+	}
+
+	// Lines such as method signature are not coverable
+	// https://tomassetti.me/getting-started-with-javaparser-analyzing-java-code-programmatically/
+	// Returns the lines of the "}" which closes if statements without else branches
+	public List<Integer> getUnreachableClosingBracketsForIfStatements() {
+		final List<Integer> lines = new ArrayList<>();
+		try (FileInputStream in = new FileInputStream(javaFile)) {
+			new VoidVisitorAdapter<Object>() {
+				@Override
+				public void visit(IfStmt ifStmt, Object arg) {
+					super.visit(ifStmt, arg);
+					Statement then = ifStmt.getThenStmt();
+					Statement elze = ifStmt.getElseStmt();
+					// There might be plenty of empty lines
+					if( then instanceof BlockStmt ) {
+
+						List<Statement> thenBlockStmts = ((BlockStmt) then).getStmts();
+						if( elze == null ){
+							/*
+							 * This takes only the non-coverable one, meaning
+							 * that if } is on the same line of the last stmt it
+							 * is not considered here because it is should be already
+							 * considered
+							 */
+							if( thenBlockStmts.size() > 0 && ( thenBlockStmts.get( thenBlockStmts.size() - 1).getEndLine() < ifStmt.getEndLine())){
+								// Add the range
+								linesOfClosingBrackets.add( Range.between( then.getBeginLine(), ifStmt.getEndLine()));
+								lines.add( ifStmt.getEndLine() );
+							}
+						}else {
+								// Add the range
+								linesOfClosingBrackets.add( Range.between( then.getBeginLine(), elze.getBeginLine()));
+								lines.add( elze.getBeginLine() );
+						}
+					}
+				}
+			}.visit(JavaParser.parse(in), null);
+		} catch (ParseException | IOException e) {
+			logger.warn("Swallow exception" + e);
+		}
+		Collections.sort(lines);
+		return lines;
+	}
+
+	private List<Integer> findMethodSignaturesByType(TypeDeclaration type) {
+		List<Integer> methodSignatureLines = new ArrayList<>();
+		for (BodyDeclaration bd : type.getMembers()) {
+			if (bd instanceof MethodDeclaration) {
+				MethodDeclaration md = (MethodDeclaration) bd;
+				// Note that md.getEndLine() returns the last line of the
+				// method, not of the signature
+				if (md.getBody() == null)
+					continue;
+				// Also note that interfaces have no body !
+				for (int line = md.getBeginLine(); line <= md.getBody().getBeginLine(); line++) {
+					methodSignatureLines.add(line);
+				}
+
+				linesOfMethodSignatures.add( Range.between(md.getBeginLine(), md.getBody().getBeginLine()));
+				linesOfMethods.add( Range.between(md.getBeginLine(), md.getEndLine()));
+			} else if (bd instanceof ConstructorDeclaration) {
+				ConstructorDeclaration cd = (ConstructorDeclaration) bd;
+				// System.out.println("GameClass.findMethodSignaturesByType()
+				// Found " + cd.getDeclarationAsString() + " "
+				// + cd.getBeginLine() + " - " + cd.getbo());
+				for (int line = cd.getBeginLine(); line <= cd.getBlock().getBeginLine(); line++) {
+					methodSignatureLines.add(line);
+				}
+
+				linesOfMethodSignatures.add( Range.between(cd.getBeginLine(), cd.getBlock().getBeginLine()));
+				linesOfMethods.add( Range.between(cd.getBeginLine(), cd.getEndLine()));
+			}
+		}
+		return methodSignatureLines;
 	}
 
 	public List<Integer> getLinesOfNonCoverableCode() {
 		return linesOfNonCoverableCode;
 	}
 
+	/**
+	 * Return the lines which correspond to Compile Time Constants. Mutation of those lines requries the tests to be recompiled against the mutant
+	 * @return
+	 */
 	public List<Integer> getLinesOfCompileTimeConstants() {
 		return linesOfCompileTimeConstants;
 	}
@@ -334,4 +485,40 @@ public class GameClass {
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
 		return DB.executeUpdate(stmt, conn);
 	}
+
+	/**
+	 * Return the lines of the method signature for the method which contains the coveredLine
+	 * @param coveredLine
+	 * @return
+	 */
+	public List<Integer> getLinesOfMethodSignaturesFor(Integer coveredLine) {
+		List<Integer> lines = new ArrayList<Integer>();
+		// Check if the coveredLine belongs to the method
+		for( Range<Integer> rMethod : linesOfMethods ){
+			// Now that the first line of the method, which belongs to the corresponding signature
+			if( rMethod.contains( coveredLine ) ){
+				for( Range<Integer> r : linesOfMethodSignatures ){
+					if( r.contains( rMethod.getMinimum() ) ){
+						for( int i = r.getMinimum(); i <= r.getMaximum(); i++){
+							lines.add( i );
+						}
+					}
+				}
+			}
+		}
+
+		return lines;
+	}
+
+	public List<Integer> getLineOfClosingBracketFor(Integer coveredLine) {
+		List<Integer> lines = new ArrayList<Integer>();
+		for( Range<Integer> r : linesOfClosingBrackets){
+			if( r.contains( coveredLine ) ){
+				lines.add( r.getMaximum() );
+			}
+		}
+
+		return lines;
+	}
+
 }

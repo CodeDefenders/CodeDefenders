@@ -4,6 +4,8 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
 import com.github.javaparser.TokenMgrError;
 import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import org.apache.commons.io.FileUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
@@ -13,16 +15,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
  * @author Jose Rojas
  */
 public class CodeValidator {
+
+	//Default number of max. allowed assertions for mutliplayer games, also value used for duel games
+	public static final int DEFAULT_NB_ASSERTIONS = 2;
+
+	public enum CodeValidatorLevel {
+		RELAXED,
+		MODERATE,
+		STRICT
+	}
 
 	//TODO check if removing ";" makes people take advantage of using multiple statements
 	public final static String[] PROHIBITED_OPERATORS = {"<<", ">>", ">>>", "?", "//", "/*"};
@@ -33,6 +41,7 @@ public class CodeValidator {
 		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE.equals(getValidationMessage(originalCode, mutatedCode));
 	}
 
+	// This validation pipeline should use the Chain-of-Command design pattern
 	public static String getValidationMessage(String originalCode, String mutatedCode) {
 
 		String originalLines[] = originalCode.split("\\r?\\n");
@@ -48,7 +57,12 @@ public class CodeValidator {
 			return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
 		}
 
-        /*for (int i = 0; i < originalLines.length; ++i) {
+		// If the mutants contains changes to method signatures, mark it as not valid
+		if (mutantChangesMethodSignatures(originalCode, mutatedCode) || mutantChangesFieldNames(originalCode, mutatedCode) || mutantChangesImportStatements(originalCode, mutatedCode)) {
+			return Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE;
+		}
+
+		/*for (int i = 0; i < originalLines.length; ++i) {
             String originalLine = originalLines[i];
             String mutatedLine = mutatedLines[i];
             // rudimentary word-level matching as dmp works on character level
@@ -105,6 +119,8 @@ public class CodeValidator {
 		return diffs;
 	}
 
+	// This remove " from Strings...
+	
 	private static List<String> getTokens(StreamTokenizer st) {
 
 		List<String> tokens = new ArrayList<>();
@@ -112,11 +128,19 @@ public class CodeValidator {
 			while (st.nextToken() != StreamTokenizer.TT_EOF) {
 				if (st.ttype == StreamTokenizer.TT_NUMBER) {
 					tokens.add(String.valueOf(st.nval));
+				} else if (st.ttype == StreamTokenizer.TT_WORD) {
+					tokens.add(st.sval.trim());
 				} else {
 					if (st.sval != null) {
-						tokens.add(st.sval);
-					} else {
-						tokens.add(Character.toString((char) st.ttype));
+						if( ((char) st.ttype) == '"' || ((char) st.ttype) == '\'' ){
+							tokens.add('"'+st.sval+'"');
+						}else{
+							tokens.add(st.sval.trim());
+						}
+					}  else {
+						if( Character.toString((char) st.ttype) != " "){
+							tokens.add(Character.toString((char) st.ttype));
+						}
 					}
 				}
 			}
@@ -177,6 +201,133 @@ public class CodeValidator {
 		return removeQuoted(origWithoudStrings, "\'").equals(removeQuoted(mutaWithoutStrings, "\'"));
 	}
 
+	private static Set<String> extractMethodSignaturesByType(TypeDeclaration td) {
+		Set<String> methodSignatures = new HashSet<>();
+		// Method signatures in the class including constructors
+		for (BodyDeclaration bd : td.getMembers()) {
+			if (bd instanceof MethodDeclaration) {
+				methodSignatures.add(((MethodDeclaration) bd).getDeclarationAsString());
+			} else if (bd instanceof ConstructorDeclaration) {
+				methodSignatures.add(((ConstructorDeclaration) bd).getDeclarationAsString());
+			} else if (bd instanceof TypeDeclaration) {
+				// Inner classes
+				methodSignatures.addAll(extractMethodSignaturesByType((TypeDeclaration) bd));
+			}
+		}
+		return methodSignatures;
+	}
+
+	private static Set<String> extractImportStatements(CompilationUnit cu) {
+		Set<String> additionalImports = new HashSet<String>();
+		for (ImportDeclaration declaredImport : cu.getImports()) {
+			additionalImports.add(declaredImport.toStringWithoutComments());
+		}
+		return additionalImports;
+	}
+
+	private static Set<String> extractFieldNamesByType(TypeDeclaration td) {
+		Set<String> fieldNames = new HashSet<>();
+		// Method signatures in the class including constructors
+		for (BodyDeclaration bd : td.getMembers()) {
+			if (bd instanceof FieldDeclaration) {
+				for (VariableDeclarator vd : ((FieldDeclaration) bd).getVariables()) {
+					fieldNames.add(vd.getId().getName());
+				}
+			} else if (bd instanceof TypeDeclaration) {
+				fieldNames.addAll( extractFieldNamesByType( (TypeDeclaration) bd ));
+			}
+		}
+		return fieldNames;
+	}
+
+	private static Boolean mutantChangesMethodSignatures(final String orig, final String muta) {
+		// Parse original and extract method signatures -> Set of string
+		Set<String> cutMethodSignatures = new HashSet<>();
+		Set<String> mutantMethodSignatures = new HashSet<>();
+
+		try (InputStream is = new ByteArrayInputStream(orig.getBytes())) {
+			CompilationUnit cu = JavaParser.parse(is);
+
+			for( TypeDeclaration td : cu.getTypes() ){
+				cutMethodSignatures.addAll(extractMethodSignaturesByType(td));
+			}
+
+		} catch (ParseException | TokenMgrError ignored) {
+			ignored.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try (InputStream is = new ByteArrayInputStream(muta.getBytes())) {
+			CompilationUnit cu = JavaParser.parse(is);
+			for( TypeDeclaration td : cu.getTypes() ){
+				mutantMethodSignatures.addAll(extractMethodSignaturesByType(td));
+			}
+		} catch (ParseException | TokenMgrError ignored) {
+			ignored.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return !cutMethodSignatures.equals(mutantMethodSignatures);
+	}
+
+	private static Boolean mutantChangesImportStatements(final String orig, final String muta) {
+		// Parse original and extract method signatures -> Set of string
+		Set<String> cutImportStatements = new HashSet<>();
+		Set<String> mutantImportStatements = new HashSet<>();
+
+		try (InputStream is = new ByteArrayInputStream(orig.getBytes())) {
+			CompilationUnit cu = JavaParser.parse(is);
+			cutImportStatements.addAll(extractImportStatements(cu));
+		} catch (ParseException | TokenMgrError ignored) {
+			ignored.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try (InputStream is = new ByteArrayInputStream(muta.getBytes())) {
+			CompilationUnit cu = JavaParser.parse(is);
+			mutantImportStatements.addAll(extractImportStatements(cu));
+		} catch (ParseException | TokenMgrError ignored) {
+			ignored.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return !cutImportStatements.equals(mutantImportStatements);
+	}
+
+	private static Boolean mutantChangesFieldNames(final String orig, final String muta) {
+		// Parse original and extract method signatures -> Set of string
+		Set<String> cutFieldNames = new HashSet<>();
+		Set<String> mutantFieldNames = new HashSet<>();
+
+		try (InputStream is = new ByteArrayInputStream(orig.getBytes())) {
+			CompilationUnit cu = JavaParser.parse(is);
+			for( TypeDeclaration td : cu.getTypes() ){
+				cutFieldNames.addAll(extractFieldNamesByType(td));
+			}
+
+		} catch (ParseException | TokenMgrError ignored) {
+			ignored.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		try (InputStream is = new ByteArrayInputStream(muta.getBytes())) {
+			CompilationUnit cu = JavaParser.parse(is);
+			for( TypeDeclaration td : cu.getTypes() ){
+				mutantFieldNames.addAll(extractFieldNamesByType(td));
+			}
+		} catch (ParseException | TokenMgrError ignored) {
+			ignored.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return !cutFieldNames.equals(mutantFieldNames);
+	}
 
 	private static String validInsertion(String diff) {
 		try {
@@ -208,18 +359,22 @@ public class CodeValidator {
 
 	}
 
-	public static boolean validTestCode(String javaFile) throws CodeValidatorException {
+	public static boolean validTestCode(String javaFile, int maxNumberOfAssertions) throws CodeValidatorException {
 		try {
 			CompilationUnit cu = getCompilationUnit(javaFile);
 			if (cu == null)
 				return false;
-			TestCodeVisitor visitor = new TestCodeVisitor();
+			TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions);
 			visitor.visit(cu, null);
 			return visitor.isValid();
 		} catch (Throwable e) {
 			logger.error("Problem in validating test code " + javaFile);
 			throw new CodeValidatorException("Problem in validating test code " + javaFile, e);
 		}
+	}
+
+	public static boolean validTestCode(String javaFile) throws CodeValidatorException {
+		return validTestCode(javaFile, DEFAULT_NB_ASSERTIONS);
 	}
 
 	public static CompilationUnit getCompilationUnit(String javaFile) {
@@ -260,6 +415,10 @@ public class CodeValidator {
 		StreamTokenizer st = new StreamTokenizer(new StringReader(code));
 		st.slashSlashComments(true);
 		st.slashStarComments(true);
-		return getTokens(st).toString().replaceAll("\\s+", "");
+		st.quoteChar('"');
+		// Trim each token instead of generally removing why spaces in the string representation of this List  
+		String partialString = getTokens(st).toString();
+		// Why do we need to remove spaces, I understand
+		return partialString;//.replaceAll("\\s+", "");
 	}
 }

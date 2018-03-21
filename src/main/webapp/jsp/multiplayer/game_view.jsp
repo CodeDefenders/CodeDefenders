@@ -84,53 +84,67 @@
 
     List<Mutant> mutantsPending = mg.getMutantsMarkedEquivalentPending();
 
-    if (role.equals(Role.DEFENDER) && request.getParameter("equivLine") != null &&
+    if (role.equals(Role.DEFENDER) && (request.getParameter("equivLine") != null || request.getParameter("equivLines") != null) &&
             (mg.getState().equals(GameState.ACTIVE) || mg.getState().equals(GameState.GRACE_ONE))){
         try {
-            int equivLine = Integer.parseInt(request.getParameter("equivLine"));
-
-            if (mg.isLineCovered(equivLine)) {
-                int nClaimed = 0;
-                for (Mutant m : mutantsAlive) {
-                    if (m.getLines().contains(equivLine)) {
-                        m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-                        m.update();
-
-                        User mutantOwner = DatabaseAccess.getUserFromPlayer(m.getPlayerId());
-
-                        Event notifEquivFlag = new Event(-1, mg.getId(),
-                                mutantOwner.getId(),
-                                "One or more of your mutants is flagged equivalent.",
-                                EventType.DEFENDER_MUTANT_EQUIVALENT,
-                                EventStatus.NEW,
-                                new Timestamp(System.currentTimeMillis()));
-                        notifEquivFlag.insert();
-
-                        DatabaseAccess.insertEquivalence(m, playerId);
-                        nClaimed++;
-                    }
-                }
-
-                Event notifMutant = new Event(-1, mg.getId(),
-                        uid,
-                        DatabaseAccess.getUser(uid)
-                                .getUsername() + " flagged " + nClaimed +
-                                " mutant" + (nClaimed == 1? "" : "s") +
-                                " as equivalent.",
-                        EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
-                        new Timestamp(System.currentTimeMillis()));
-
-                notifMutant.insert();
-
-                messages.add(String.format("Flagged %d mutant%s as equivalent", nClaimed, (nClaimed == 1 ? "" : 's')));
-
-                response.sendRedirect(request.getContextPath()+"/multiplayer/play");
+            List<Integer> equivLines = new ArrayList<Integer>();
+            if( request.getParameter("equivLine") != null ){
+				equivLines.add(Integer.parseInt(request.getParameter("equivLine")));
             } else {
-            	// equivLine is not covered, possible iff passed directly as url argument
-                messages.add(MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
-                response.sendRedirect(request.getContextPath()+"/multiplayer/play");
-                return;
+				for( String s : request.getParameter("equivLines").replaceAll("\\[|\\]", "").split(",")){
+					equivLines.add(Integer.parseInt(s));
+				}
             }
+
+            int nClaimed = 0;
+            boolean noneCovered = true;
+            for (Integer equivLine : equivLines) {
+				if (mg.isLineCovered(equivLine)) {
+					noneCovered = false;
+					for (Mutant m : mutantsAlive) {
+						if (m.getLines().contains(equivLine)) {
+							m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+							// BAD
+							m.update();
+
+							User mutantOwner = DatabaseAccess.getUserFromPlayer(m.getPlayerId());
+
+							Event notifEquivFlag = new Event(-1, mg.getId(), mutantOwner.getId(),
+									"One or more of your mutants is flagged equivalent.",
+									EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
+									new Timestamp(System.currentTimeMillis()));
+							notifEquivFlag.insert();
+
+							DatabaseAccess.insertEquivalence(m, playerId);
+							nClaimed++;
+						}
+					}
+				}
+			}
+
+			if (noneCovered && !mg.isMarkUncovered()) {
+				// equivLine is not covered, possible iff passed directly as url argument
+				messages.add(MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
+				response.sendRedirect(request.getContextPath() + "/multiplayer/play");
+				return;
+			}
+
+			if (nClaimed >= 1) {
+				String flaggingChatMessage = DatabaseAccess.getUser(uid).getUsername() + " flagged "
+						+ nClaimed + " mutant" + (nClaimed == 1 ? "" : "s") + " as equivalent.";
+				Event notifMutant = new Event(-1, mg.getId(), uid, flaggingChatMessage,
+						EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
+						new Timestamp(System.currentTimeMillis()));
+
+				notifMutant.insert();
+			}
+
+			String flaggingMessage = nClaimed < 1
+					? "Mutant has already been claimed as equivalent or killed!"
+					: String.format("Flagged %d mutant%s as equivalent", nClaimed,
+							(nClaimed == 1 ? "" : 's'));
+			messages.add(flaggingMessage);
+			response.sendRedirect(request.getContextPath() + "/multiplayer/play");
         } catch (NumberFormatException e){}
 
     } else if (role.equals(Role.ATTACKER) && request.getParameter("acceptEquiv") != null){
@@ -148,7 +162,7 @@
                     Event notifEquiv = new Event(-1, mg.getId(),
                             uid,
                             eventUser.getUsername() +
-                                    " accepts that their mutant is equivalent.",
+                                    " accepts that their mutant " + m.getId() + " is equivalent.",
                             EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
                     notifEquiv.insert();
@@ -203,7 +217,8 @@
     }
     //ArrayList<String> messages = new ArrayList<String>();
 %>
-    <%@ include file="/jsp/scoring_tooltip.jsp" %>
+<%@ include file="/jsp/scoring_tooltip.jsp" %>
+<%@ include file="/jsp/playerFeedback.jsp" %>
     <%@ include file="/jsp/multiplayer/game_scoreboard.jsp" %>
 <div class="crow fly no-gutter up">
     <% switch (role){

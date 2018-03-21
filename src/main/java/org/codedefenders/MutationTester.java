@@ -134,6 +134,8 @@ public class MutationTester {
 
 					@Override
 					public Boolean call() throws Exception {
+						// This automatically update the 'mutants' and 'tests'
+						// tables, as well as the test and mutant objects.
 						return testVsMutant(test, mutant);
 					}
 				});
@@ -202,16 +204,15 @@ public class MutationTester {
 						break;
 					}
 				}
-
-				mutant.setScore(Scorer.score(game, mutant, missedTests));
-
-				mutant.update();
+				// mutant.setScore(Scorer.score(game, mutant, missedTests));
+				// mutant.update();
+				mutant.incrementScore(Scorer.score(game, mutant, missedTests));
 			}
 		}
 
-		test.setScore(Scorer.score(game, test, killedMutants));
-
-		test.update();
+		// test.setScore(Scorer.score(game, test, killedMutants));
+		// test.update();
+		test.incrementScore(Scorer.score(game, test, killedMutants));
 
 		if (killed == 0)
 			if (mutants.size() == 0)
@@ -254,7 +255,7 @@ public class MutationTester {
 			// Assumption: submitting tasks is faster than processing tasks...
 			for (Test test : tests) {
 				if (useMutantCoverage && !test.isMutantCovered(mutant)) {
-					System.out.println("Skipping non-covered mutant " + mutant.getId() + ", test " + test.getId());
+					logger.info("Skipping non-covered mutant " + mutant.getId() + ", test " + test.getId());
 					continue;
 				}
 
@@ -264,8 +265,6 @@ public class MutationTester {
 					public Boolean call() throws Exception {
 
 						if (testVsMutant(test, mutant)) {
-							logger.info("Test {} kills mutant {}", test.getId(), mutant.getId());
-
 							// Notify the *other* tasks we already killed
 							// the mutant. Note, we cannot call t.cancel on this
 							// and then get its result...
@@ -332,14 +331,18 @@ public class MutationTester {
 
                     if (hasTestkilledTheMutant) {
                         // This test killede the mutant...
-                        logger.info(">> Double Check. Test {} kills mutant {}", test.getId(), mutant.getId());
                         messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
                         if (game instanceof MultiplayerGame) {
                             ArrayList<Mutant> mlist = new ArrayList<Mutant>();
                             mlist.add(mutant);
-                            test.setScore(Scorer.score((MultiplayerGame) game, test, mlist));
-                            test.update();
-                        }
+
+							logger.info(">> Test {} kills mutant {} get {} points. Mutant is still alive ? {}",
+									test.getId(), mutant.getId(), Scorer.score((MultiplayerGame) game, test, mlist),
+									mutant.isAlive());
+							// test.setScore(Scorer.score((MultiplayerGame) game, test, mlist));
+							// test.update();
+							test.incrementScore(Scorer.score((MultiplayerGame) game, test, mlist));
+						}
 
                         Event notif = new Event(-1, game.getId(),
                                 DatabaseAccess.getUserFromPlayer(test.getPlayerId()).getId(),
@@ -363,7 +366,7 @@ public class MutationTester {
 
             for (Test test : tests) {
                 if (useMutantCoverage && !test.isMutantCovered(mutant)) {
-                    System.out.println("Skipping non-covered mutant " + mutant.getId() + ", test " + test.getId());
+                    logger.info("Skipping non-covered mutant " + mutant.getId() + ", test " + test.getId());
                     continue;
                 }
 
@@ -376,9 +379,10 @@ public class MutationTester {
                     if (game instanceof MultiplayerGame) {
                         ArrayList<Mutant> mlist = new ArrayList<Mutant>();
                         mlist.add(mutant);
-                        test.setScore(Scorer.score((MultiplayerGame) game, test, mlist));
-                        test.update();
-                    }
+						// test.setScore(Scorer.score((MultiplayerGame) game, test, mlist));
+						// test.update();
+						test.incrementScore(Scorer.score((MultiplayerGame) game, test, mlist));
+					}
 
                     Event notif = new Event(-1, game.getId(),
                             DatabaseAccess.getUserFromPlayer(test.getPlayerId()).getId(),
@@ -399,8 +403,9 @@ public class MutationTester {
                 if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), mutant.getLines()))
                     missedTests.add(t);
             }
-            mutant.setScore(1 + Scorer.score((MultiplayerGame) game, mutant, missedTests));
-            mutant.update();
+//            mutant.setScore(1 + Scorer.score((MultiplayerGame) game, mutant, missedTests));
+//            mutant.update();
+            mutant.incrementScore(1 + Scorer.score((MultiplayerGame) game, mutant, missedTests));
         }
 
         int nbRelevantTests = missedTests.size();
@@ -428,17 +433,24 @@ public class MutationTester {
             // Run the test against the mutant and get the result
             TargetExecution executedTarget = AntRunner.testMutant(mutant, test);
 
-            // If the test did NOT pass, the mutant was detected and should be killed.
-            if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
-                logger.info(String.format("Test %d kills Mutant %d", test.getId(), mutant.getId()));
-                mutant.kill(ASSUMED_NO);
-                test.killMutant();
-                return true;
-            }
-        } else
-            logger.error(String.format("No execution result found for (m: %d,t: %d)", mutant.getId(), test.getId()));
-        return false;
-    }
+			// If the test did NOT pass, the mutant was detected and should be killed.
+			if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
+				if (mutant.kill(ASSUMED_NO)) {
+					logger.info("Test {} kills Mutant {}", test.getId(), mutant.getId());
+					test.killMutant();
+					return true;
+				} else {
+					logger.info("Test {} would have killed Mutant {}, but Mutant {} was alredy dead!", test.getId(), mutant.getId(), mutant.getId());
+					return false;
+				}
+			} else {
+				logger.debug("Test {} did not kill Mutant {}", test.getId(), mutant.getId());
+			}
+		} else {
+			logger.error("No execution result found for (m: {},t: {})", mutant.getId(), test.getId());
+		}
+		return false;
+	}
 
     /**
      * Runs an equivalence test using an attacker supplied test and a mutant thought to be equivalent.
@@ -461,7 +473,12 @@ public class MutationTester {
         if (executedTarget.status.equals("ERROR") || executedTarget.status.equals("FAIL")) {
             // If the test did NOT pass, the mutant was detected and is proven
             // to be non-equivalent
-            mutant.kill(PROVEN_NO);
+        	if (mutant.kill(PROVEN_NO)) {
+        		logger.info("Test {} kills mutant {} and resolve equivalence.", test.getId(), mutant.getId());
+        		test.killMutant();
+        	} else {
+				logger.info("Test {} would have killed Mutant {} and resolve equivalence, but Mutant {} was alredy dead. No need to resolve equivalence.!", test.getId(), mutant.getId(), mutant.getId());
+			}
         } else {
             // If the test DID pass, the mutant went undetected and it is
             // assumed to be equivalent.

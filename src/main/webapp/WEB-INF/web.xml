@@ -18,6 +18,9 @@
 		<web-resource-collection>
 			<web-resource-name>SecuredBookSite</web-resource-name>
 			<url-pattern>/admin</url-pattern>
+			<url-pattern>/admin/*</url-pattern>
+			<url-pattern>/jsp/admin_user_mgmt.jsp</url-pattern>
+			<url-pattern>/jsp/admin_games_mgmt.jsp</url-pattern>
 			<http-method>GET</http-method>
 			<http-method>POST</http-method>
 		</web-resource-collection>
@@ -196,6 +199,16 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>siteNotice</servlet-name>
+		<jsp-file>/jsp/site_notice.jsp</jsp-file>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>siteNotice</servlet-name>
+		<url-pattern>/site_notice</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>study</servlet-name>
 		<jsp-file>/jsp/study.jsp</jsp-file>
 	</servlet>
@@ -307,15 +320,49 @@
 		<url-pattern>/game_mutants</url-pattern>
 	</servlet-mapping>
 
+	<listener>
+		<listener-class>
+			org.codedefenders.util.SystemStartStop
+		</listener-class>
+	</listener>
+
 
     <servlet>
-        <servlet-name>adminInterface</servlet-name>
-        <servlet-class>org.codedefenders.AdminInterface</servlet-class>
+        <servlet-name>AdminGamesMgmt</servlet-name>
+		<servlet-class>org.codedefenders.AdminGamesMgmt</servlet-class>
     </servlet>
     <servlet-mapping>
-        <servlet-name>adminInterface</servlet-name>
-        <url-pattern>/admin</url-pattern>
+        <servlet-name>AdminGamesMgmt</servlet-name>
+		<url-pattern>/admin/games</url-pattern>
+		<url-pattern>/admin</url-pattern>
     </servlet-mapping>
+
+	<servlet>
+		<servlet-name>AdminUserMgmt</servlet-name>
+		<servlet-class>org.codedefenders.AdminUserMgmt</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AdminUserMgmt</servlet-name>
+		<url-pattern>/admin/users</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>AdminSettings</servlet-name>
+		<servlet-class>org.codedefenders.AdminSystemSettings</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AdminSettings</servlet-name>
+		<url-pattern>/admin/settings</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>feedback</servlet-name>
+		<servlet-class>org.codedefenders.Feedback</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>feedback</servlet-name>
+		<url-pattern>/feedback</url-pattern>
+	</servlet-mapping>
 
 	<!-- End Notification JSON Servlets -->
 
@@ -350,7 +397,6 @@
 	</welcome-file-list>-->
 
 	<error-page>
-		<error-code>404</error-code>
 		<location>/jsp/error_page_404.jsp</location>
 	</error-page>
 

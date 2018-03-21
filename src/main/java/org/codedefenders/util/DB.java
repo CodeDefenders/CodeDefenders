@@ -3,36 +3,32 @@ package org.codedefenders.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.sql.*;
 
 public class DB {
 
+    private static ConnectionPool connPool = ConnectionPool.getInstanceOf();
     private static final Logger logger = LoggerFactory.getLogger(DB.class);
 
     public synchronized static Connection getConnection() {
         try {
-            return DatabaseConnection.getConnection();
-        } catch (Exception e) {
-            logger.error("Database not available", e);
+            return connPool.getDBConnection();
+        } catch (ConnectionPool.NoMoreConnectionsException e) {
+            logger.error("No more Connections", e);
+            throw new ConnectionPool.StorageException("No more Connections");
         }
-        return null;
     }
 
-    public static void cleanup(Connection c, Statement s) {
+    public static void cleanup(Connection conn, PreparedStatement stmt) {
         try {
-            if (s != null) {
-                s.close();
+            if (stmt != null) {
+                stmt.close();
             }
         } catch (SQLException se2) {
-            logger.error("SQL exception caught", se2);
+            logger.error("SQL exception while closing statement!", se2);
         }
-        try {
-            if (c != null) {
-                c.close();
-            }
-        } catch (SQLException se3) {
-            logger.error("SQL exception caught", se3);
-        }
+        connPool.releaseDBConnection(conn);
     }
 
     public static PreparedStatement createPreparedStatement(Connection conn, String query, DatabaseValue value) {
@@ -47,6 +43,9 @@ public class DB {
             int count = 1;
             for (DatabaseValue val : values) {
                 switch (val.getType()) {
+                    case BOOLEAN:
+                        stmt.setBoolean(count++, val.getBoolVal());
+                        break;
                     case INT:
                         stmt.setInt(count++, val.getIntVal());
                         break;
@@ -142,6 +141,10 @@ public class DB {
     }
 
     public static DatabaseValue getDBV(int v) {
+        return new DatabaseValue(v);
+    }
+
+    public static DatabaseValue getDBV(boolean v) {
         return new DatabaseValue(v);
     }
 

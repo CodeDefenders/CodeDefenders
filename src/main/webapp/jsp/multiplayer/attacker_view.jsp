@@ -8,7 +8,16 @@
 // Not sure where those variables come from...
 boolean disableAttack = false;
 if (role == Role.ATTACKER && mutantsPending != null ){
-	disableAttack = ( mutantsPending.size() > 0 ) &&
+
+	boolean playerHasPendingMutants = false;
+	for (Mutant m : mutantsPending){
+        if (m.getPlayerId() == playerId &&  m.getEquivalent() == Mutant.Equivalence.PENDING_TEST){
+			playerHasPendingMutants = true;
+            break;
+        }
+    }
+
+	disableAttack = ( playerHasPendingMutants ) &&
 					( session.getAttribute( Constants.BLOCK_ATTACKER ) != null ) && // This should be superflous since we always set this session attribute
 					((Boolean) session.getAttribute( Constants.BLOCK_ATTACKER ) );
 }
@@ -21,26 +30,35 @@ if (role == Role.ATTACKER && mutantsPending != null ){
 	<%@include file="/jsp/multiplayer/game_unit_tests.jsp"%>
 	</div>
 	<div class="w-55" id="newmut-div">
+		<h2 style=" margin-bottom: 0">Create a mutant here</h2>
+		<form id="reset" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
+			<input type="hidden" name="formType" value="reset">
+			<button class="btn btn-primary btn-warning btn-game btn-right " style="margin-top: -30px; margin-right: 80px">
+			Reset
+			</button>
+		</form>
 		<form id="atk" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
-			<h2>Create a mutant here
-				<button type="submit" class="btn btn-primary btn-game btn-right" form="atk" onClick="this.form.submit(); this.disabled=true; this.value='Attacking...';"
-						<% if (!mg.getState().equals(GameState.ACTIVE) || disableAttack ) { %> disabled <% } %>>
-					Attack!
-				</button>
-			</h2>
+			<button type="submit" class="btn btn-primary btn-game btn-right" form="atk" onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';"
+					<% if (!mg.getState().equals(GameState.ACTIVE) || disableAttack ) { %> disabled <% } %>
+					style="margin-top: -50px">
+				Attack!
+			</button>
 			<input type="hidden" name="formType" value="createMutant">
 			<input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
 			<%
 				String mutantCode;
 				String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-				request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+				// request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
 				if (previousMutantCode != null) {
 					mutantCode = previousMutantCode;
 				} else
 					mutantCode = mg.getCUT().getAsString();
 			%>
-			<pre><textarea id="code" name="mutant" cols="80" rows="50" style="min-width: 512px;"><%= mutantCode %></textarea></pre>
+
+			<pre style=" margin-top: 20px; "><textarea id="code" name="mutant" cols="80" rows="50" style="min-width: 512px;"><%= mutantCode %></textarea></pre>
+
 			<%@include file="/jsp/multiplayer/game_key.jsp"%>
+
 		</form>
 		<script>
 			var editorSUT = CodeMirror.fromTextArea(document.getElementById("code"), {
@@ -80,6 +98,52 @@ if (role == Role.ATTACKER && mutantsPending != null ){
 			});
 
 			$('#finishedModal').modal('show');
+
+
+            var updateProgressBar = function(url) {
+                var progressBarDiv = document.getElementById("progress-bar");
+                $.get(url, function (r) {
+                        $(r).each(function (index) {
+                            switch( r[index] ){
+                                case 'COMPILE_MUTANT': // After test is compiled
+                                    progressBarDiv.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 66%; font-size: 15px; line-height: 40px;" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100">Running first Test Against Mutant</div>';
+                                    break;
+                                case "TEST_MUTANT": // After testing original
+                                    progressBarDiv.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 90%; font-size: 15px; line-height: 40px;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">Running more Tests Against Mutant</div>';
+                                    break;
+                            }
+                        });
+                    }
+                );
+            };
+
+            function progressBar(){
+
+                // Create the Div to host events if that's not there
+                if( document.getElementById("progress-bar") == null ){
+                    // Load the progress bar
+                    var progressBar = document.createElement('div');
+                    progressBar.setAttribute('class','progress');
+                    progressBar.setAttribute('id','progress-bar');
+                    progressBar.setAttribute('style','height: 40px; font-size: 30px');
+                    //
+                    progressBar.innerHTML='<div class="progress-bar bg-danger" role="progressbar" style="width: 33%; font-size: 15px; line-height: 40px;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">Validating and Compiling Mutant</div>';
+                    var form = document.getElementById('logout');
+                    // Insert progress bar right under logout... this will conflicts with the other push-events
+                    form.parentNode.insertBefore(progressBar, form.nextSibling);
+                }
+                // Do a first request right away, such that compilation of this test is hopefully not yet started. This one will set the session...
+                var updateURL = "<%= request.getContextPath()%>" +
+                    "/game_notifications?progressBar=1&userId=" + <%=uid%> +"&gameId=" + <%=gameId%>;
+                updateProgressBar(updateURL);
+
+                // Register the requests to start in 1 sec
+                var interval = 1000;
+                setInterval(function () {
+                    updateProgressBar(updateURL);
+                }, interval)
+            }
 		</script>
+		<% request.getSession().removeAttribute("lastMutant"); %>
 	</div> <!-- col-md6 newmut -->
 </div>

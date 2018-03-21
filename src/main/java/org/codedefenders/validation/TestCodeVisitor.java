@@ -35,6 +35,11 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 	private int methodCount = 0;
 	private int stmtCount = 0;
 	private int assertionCount = 0;
+	private int maxNumberOfAssertions;
+
+	public TestCodeVisitor(int maxNumberOfAssertions) {
+		this.maxNumberOfAssertions = maxNumberOfAssertions;
+	}
 
 	public boolean isValid() {
 		if (classCount > 1)
@@ -43,9 +48,9 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 			logger.info("Invalid test suite contains more than one method declaration.");
 		if (stmtCount == 0)
 			logger.info("Invalid test does not contain any valid statement.");
-		if (assertionCount > 2)
-			logger.info("Invalid test contains more than 2 assertions");
-		return (isValid && classCount == 1 && methodCount == 1 && stmtCount > 0 && assertionCount <= 2);
+		if (assertionCount > maxNumberOfAssertions)
+			logger.info("Invalid test contains more than " + maxNumberOfAssertions + " assertions");
+		return (isValid && classCount == 1 && methodCount == 1 && stmtCount > 0 && assertionCount <= maxNumberOfAssertions);
 	}
 
 	@Override
@@ -74,8 +79,8 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 	public Node visit (NameExpr stmt, Object args)
 	{
 		super.visit(stmt,args);
-		if (stmt.getName().equals("System") || stmt.getName().equals("Random") ) {
-			logger.info("Invalid test contains System/Random uses");
+		if (stmt.getName().equals("System") || stmt.getName().equals("Random") || stmt.getName().equals("Thread") ) {
+			logger.info("Invalid test contains System/Random/Thread uses");
 			isValid = false;
 		}
 		return stmt;
@@ -173,8 +178,9 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 	@Override
 	public Node visit (VariableDeclarator stmt, Object args) {
 		super.visit(stmt,args);
-		if (stmt.getInit() != null && (stmt.getInit().toString().startsWith("System.*") || stmt.getInit().toString().startsWith("Random.*"))) {
-			logger.info("There is a variable declaration using System/Random.*");
+		if (stmt.getInit() != null && (stmt.getInit().toString().startsWith("System.*") || stmt.getInit().toString().startsWith("Random.*") ||
+				stmt.getInit().toString().contains("Thread"))) {
+			logger.info("There is a variable declaration using Thread/System/Random.*");
 			isValid = false;
 		}
 		return stmt;

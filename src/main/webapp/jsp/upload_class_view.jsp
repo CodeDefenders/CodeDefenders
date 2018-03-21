@@ -1,4 +1,5 @@
 <%@ page import="org.codedefenders.singleplayer.PrepareAI" %>
+<%@ page import="org.codedefenders.util.FeedbackDAO" %>
 <% String pageTitle=null; %>
 <%@ include file="/jsp/header.jsp" %>
 <div>
@@ -13,9 +14,13 @@
 				<span id="file-select">
 					<input id="fileUpload" name="fileUpload" type="file" class="file-loading" accept=".java" />
 				</span>
+				<span id="mocking-enabled">
+					<input type="checkbox" name="enableMocking" value="isMocking" style="margin-right:5px;">Enable Mocking for this class</input>
+				</span>
 				<span id="submit-button">
 					<input type="submit" text="Upload" class="fileinput-upload-button" value="Upload" onClick="this.form.submit(); this.disabled=true; this.value='Uploading...';" />
 				</span>
+				<input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 			</form>
 		</div>
 	</div>
@@ -25,17 +30,26 @@
 		<div id="classList" >
 			<%
 				List<GameClass> gameClasses = DatabaseAccess.getAllClasses();
+				List<Double> avgMutationDifficulties = FeedbackDAO.getAverageMutationDifficulties();
+				List<Double> avgTestDifficulties = FeedbackDAO.getAverageTestDifficulties();
 			%>
-			<table class="table table-hover table-responsive table-paragraphs games-table">
+			<table class="table table-hover table-responsive table-paragraphs games-table" id = "tableUploadedClasses">
+				<thead>
 				<tr>
 					<th class="col-sm-1 col-sm-offset-2">ID</th>
-					<th class="col-sm-8">Class name (alias)</th>
-					<th class="col-sm-1">Action</th>
+					<th>Class name (alias)</th>
+					<th>Mutation Difficulty</th>
+					<th>Testing Difficulty</th>
 				</tr>
+				</thead>
+				<tbody>
 				<% if (gameClasses.isEmpty()) { %>
 					<tr><td colspan="100%">No classes uploaded.</td></tr>
 				<% } else {
-					for (GameClass c : gameClasses) {
+					for (int i = 0; i < gameClasses.size(); i++) {
+						GameClass c = gameClasses.get(i);
+						double mutationDiff = avgMutationDifficulties.get(i);
+						double testingDiff = avgTestDifficulties.get(i);
 					%>
 						<tr>
 							<td><%= c.getId() %></td>
@@ -61,6 +75,8 @@
 									</div>
 								</div>
 							</td>
+							<td><%=mutationDiff > 0 ? String.valueOf(mutationDiff) : ""%></td>
+							<td><%=testingDiff > 0 ? String.valueOf(testingDiff) : ""%></td>
 							<!--
 							<td>
 								<form id="aiPrepButton<%= c.getId() %>" action="<%=request.getContextPath() %>/ai_preparer" method="post" >
@@ -75,6 +91,7 @@
 							-->
 						</tr>
 					<% } %>
+				</tbody>
 				<% } %>
 			</table>
 		</div>
@@ -93,6 +110,15 @@
 				editorDiff.setSize("100%", 500);
 			}
 		});
+
+        $(document).ready(function () {
+            $('#tableUploadedClasses').DataTable({
+                'paging': false,
+                lengthChange: false,
+                searching: false,
+                order: [[0, "desc"]]
+            });
+        });
 	</script>
 </div>
 <%@ include file="/jsp/footer.jsp" %>

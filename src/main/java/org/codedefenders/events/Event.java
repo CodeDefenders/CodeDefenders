@@ -1,5 +1,12 @@
 package org.codedefenders.events;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.util.Comparator;
+import java.util.HashMap;
+
+import org.apache.xerces.impl.dv.xs.DateDV;
 import org.codedefenders.Role;
 import org.codedefenders.User;
 import org.codedefenders.util.DB;
@@ -7,11 +14,6 @@ import org.codedefenders.util.DatabaseAccess;
 import org.codedefenders.util.DatabaseValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Timestamp;
-import java.util.HashMap;
 
 /**
  * Created by thomas on 06/03/2017.
@@ -27,6 +29,12 @@ public class Event {
 		ROLE_COLORS.put(Role.ATTACKER, "#FF0000");
 		ROLE_COLORS.put(Role.DEFENDER, "#0000FF");
 		ROLE_COLORS.put(Role.CREATOR, "#00FF00");
+	}
+
+	@Override
+	public String toString() {
+		return "Event " + getEventType() + " " + getEventStatus() + //" from user " + getUser().getId() +
+				" with message "+ getMessage();
 	}
 
 	private int eventId;
@@ -151,6 +159,10 @@ public class Event {
 		parse(new HashMap<String, String>(), emphasise);
 	}
 
+	public String getMessage() {
+		return message;
+	}
+
 	public String getParsedMessage() {
 		if (parsedMessage == null) {
 			parse(true);
@@ -181,11 +193,27 @@ public class Event {
 
 	public boolean insert() {
 		Connection conn = DB.getConnection();
-		String query = "INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status) VALUES (?, ?, ?, ?);";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(gameId),
-				DB.getDBV(userId),
-				DB.getDBV(eventType.toString()),
-				DB.getDBV(eventStatus.toString())};
+		String query = "";
+		DatabaseValue[] valueList = null;
+
+		if( eventType.equals(EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT) ||
+			eventType.equals(EventType.DEFENDER_MUTANT_EQUIVALENT) ||
+			eventType.equals(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT) ){
+			query="INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message) VALUES (?, ?, ?, ?, ?);";
+			valueList = new DatabaseValue[]{DB.getDBV(gameId),
+					DB.getDBV(userId),
+					DB.getDBV(eventType.toString()),
+					DB.getDBV(eventStatus.toString()),
+					DB.getDBV( message)};
+		}
+		else {
+			query="INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status) VALUES (?, ?, ?, ?);";
+			valueList = new DatabaseValue[]{DB.getDBV(gameId),
+					DB.getDBV(userId),
+					DB.getDBV(eventType.toString()),
+					DB.getDBV(eventStatus.toString())};
+		}
+
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		eventId = DB.executeUpdateGetKeys(stmt, conn);
 		if (eventId >= 0) {
@@ -215,4 +243,14 @@ public class Event {
 		return DB.executeUpdate(stmt, conn);
 	}
 
+	public final static Comparator<Event> MAX_ID_COMPARATOR = new Comparator<Event>() {
+		@Override
+		public int compare(Event o1, Event o2) {
+			return o1.eventId - o2.eventId;
+		}
+	};
+
+	public int getId() {
+		return this.eventId;
+	}
 }

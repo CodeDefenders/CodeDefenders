@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.codedefenders.Constants.*;
+import static org.codedefenders.validation.CodeValidator.DEFAULT_NB_ASSERTIONS;
 
 public class GameManager extends HttpServlet {
 
@@ -116,7 +117,7 @@ public class GameManager extends HttpServlet {
 						return;
 					}
 					if (newTest == null) {
-						messages.add(TEST_INVALID_MESSAGE);
+						messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						response.sendRedirect(request.getContextPath()+"/play");
 						return;
@@ -308,7 +309,7 @@ public class GameManager extends HttpServlet {
 
 
 				if (newTest == null) {
-					messages.add(TEST_INVALID_MESSAGE);
+					messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					response.sendRedirect(request.getContextPath()+"/play");
 					return;
@@ -373,6 +374,15 @@ public class GameManager extends HttpServlet {
 		return DatabaseAccess.getMutant(gid, md5Mutant);
 	}
 
+	public static boolean hasAttackerPendingMutantsInGame(int gid, int attackerId){
+		for( Mutant m : DatabaseAccess.getMutantsForGame(gid) ){
+			if (m.getPlayerId() == attackerId &&  m.getEquivalent() == Mutant.Equivalence.PENDING_TEST){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
 		// Mutant is assumed valid here
 
@@ -412,7 +422,7 @@ public class GameManager extends HttpServlet {
 	 * @throws IOException
 	 * @throws CodeValidatorException
 	 */
-	public static Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException, CodeValidatorException {
+	public static Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory, int maxNumberOfAssertions) throws IOException, CodeValidatorException {
 
 		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
 
@@ -431,7 +441,7 @@ public class GameManager extends HttpServlet {
 		}
 		
 		// Validate code or short circuit here
-		if (!CodeValidator.validTestCode(javaFile)) {
+		if (!CodeValidator.validTestCode(javaFile, maxNumberOfAssertions)) {
 			return null;
 		}
 
@@ -440,6 +450,10 @@ public class GameManager extends HttpServlet {
 			AntRunner.testOriginal(newTestDir, newTest);
 		}
 		return newTest;
+	}
+
+	public static Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException, CodeValidatorException {
+		return createTest(gid, cid, testText, ownerId, subDirectory, DEFAULT_NB_ASSERTIONS);
 	}
 
 }

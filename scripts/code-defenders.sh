@@ -172,8 +172,9 @@ function create_balanced_game_scripts(){
 
 # Last Role Played
 
-# Order ALL students by Total score
-__private_query_db "SELECT U.username AS username, IFNULL(AScore,0)+IFNULL(DScore,0) AS TotalScore FROM users U LEFT JOIN ( SELECT PA.user_id, sum(M.Points) as AScore  FROM players PA LEFT JOIN mutants M on PA.id = M.Player_ID GROUP BY PA.user_id ) AS Attacker ON U.user_id = Attacker.user_id LEFT JOIN ( SELECT PD.user_id, sum(T.Points) as DScore FROM players PD LEFT JOIN tests T on PD.id = T.Player_ID GROUP BY PD.user_id ) AS Defender ON U.user_id = Defender.user_id WHERE U.user_id > 2 ORDER BY TotalScore DESC;" > sorted-all-participants
+# Order ALL students by Defender score only
+__private_query_db "SELECT U.username AS username, IFNULL(DScore,0) AS Score FROM users U LEFT JOIN ( SELECT PA.user_id, sum(M.Points) as AScore  FROM players PA LEFT JOIN mutants M on PA.id = M.Player_ID GROUP BY PA.user_id ) AS Attacker ON U.user_id = Attacker.user_id LEFT JOIN ( SELECT PD.user_id, sum(T.Points) as DScore FROM players PD LEFT JOIN tests T on PD.id = T.Player_ID GROUP BY PD.user_id ) AS Defender ON U.user_id = Defender.user_id WHERE U.user_id > 2 ORDER BY Score DESC;" > sorted-all-participants
+
 # Filter on students in class
 grep -f ${participants} sorted-all-participants > sorted-participants
 
