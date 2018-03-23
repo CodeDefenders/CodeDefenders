@@ -36,9 +36,14 @@ var lastLine = 0;
 var mutants = [];
 var preparedMutants = [];
 
+var getMutantsFunc = function(){return [];};
+
+
 $(document).ready(function(){
-    // getMutants() is defined in game_highlight.jsp
-    mutants = getMutants();
+    if (typeof(getMutants) === typeof(Function)){
+        getMutantsFunc = getMutants;
+    }
+    mutants = getMutantsFunc();
     prepareMutants();
 });
 
@@ -107,12 +112,9 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
 
     for (var l in preparedMutants) {
         const lineNum = l;
-        const quant = preparedMutants[l].length;
         const id = "mutantLine" + lineNum;
-        var mutantTypes = [];
 
-        const divId = "#" + id;
-        var mutantSummary = "";
+        const divId = " #" + id;
 
         var aliveMutants = 0;
         var equivalentMutants = 0;
@@ -121,7 +123,7 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
 
         var mutantDescriptions = [];
 
-        mutantDescriptions['alive'] = prepareMutantHeading("<h5>Mutants Alive");
+        mutantDescriptions['alive'] = prepareMutantHeading("Mutants Alive");
         mutantDescriptions['equiv'] = prepareMutantHeading("Mutants Equivalent");
         mutantDescriptions['flagged'] = prepareMutantHeading("Mutants Flagged");
         mutantDescriptions['killed'] = prepareMutantHeading("Mutants Killed");
@@ -158,7 +160,6 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
                 }
                 killedMutants++;
             }
-            mutantSummary = mutantSummary + mutant.id + ",";
 
         }
 
@@ -198,24 +199,12 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
 
         $(allLines[lineNum]).before(icon);
 
-
-
-        mutantSummary = mutantSummary.substr(0, mutantSummary.length - 1);
-
-        const mutantsOnLine = mutantSummary;
-
         var content = '<span id="mutationPopup">'
-
-        // this drawn an arrow coming from the icons but isn't supported on
-        // firefox
-        //content += '<div class="arrow left-arrow"></div>';
 
         content += "<span" +
             " class='mutationInfoExpanded' style='display: none;'>" +
             "<h5>Info</h5><p>Hover" +
             " over for info</p></span>"
-
-        var defaultInfo = false;
 
         if (aliveMutants > 0) {
             content += createAction("Alive Mutants", "mutantImageAlive", mutantDescriptions['alive'])
