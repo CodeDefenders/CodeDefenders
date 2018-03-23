@@ -29,7 +29,9 @@ MutantStatus.FLAGGED_EQUIVALENT = 1;
 MutantStatus.KILLED = 2;
 MutantStatus.EQUIVALENT = 3;
 
-lineContent = [];
+var lineContent = [];
+
+var lineSummary = [];
 
 var timeoutFunction = null;
 var lastLine = 0;
@@ -74,16 +76,17 @@ var prepareMutants = function(){
 };
 
 var createAction = function(label, classType, contents){
-return '<span class="action"><a onmouseover="' +
-    ' $(\'#mutationPopup\').find(\'.mutationInfoExpanded\').show();' +
-    '$(\'#mutationPopup\').find(\'.mutationInfoExpanded\').html(\'' +
-    contents.split("\"").join("\\'") +
-    '\');">' +
-    '<span class="mutantCUTIcon ' + classType + '">' +
-        '<span></span>' +
-    '</span>' +
-    '<span>' + label + '</span>' +
-    '</a></span>';
+// return '<span class="action"><a onmouseover="' +
+//     ' $(\'#mutationPopup\').find(\'.mutationInfoExpanded\').show();' +
+//     '$(\'#mutationPopup\').find(\'.mutationInfoExpanded\').html(\'' +
+//     contents.split("\"").join("\\'") +
+//     '\');">' +
+//     '<span class="mutantCUTIcon ' + classType + '">' +
+//         '<span></span>' +
+//     '</span>' +
+//     '<span>' + label + '</span>' +
+//     '</a></span>';
+    return '';
 };
 
 var prepareMutantDetail = function(mutant){
@@ -97,6 +100,15 @@ var prepareMutantHeading = function(title){
         ' ID</span>' +
         '<span class="right header">Points</span></p>';
 };
+
+var createPopupFunction = function(mutantType){
+    return function(){
+        var t = $(this);
+        var parent = t.parent();
+        parent.mouseenter();
+        $('#mutationPopup').find('.mutationInfoExpanded').html(lineSummary[lastLine][mutantType]);
+    };
+}
 
 var mutantLine = function (superDiv, showEquivalenceButton) {
     if (!superDiv) {
@@ -202,35 +214,38 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
         var content = '<span id="mutationPopup">'
 
         content += "<span" +
-            " class='mutationInfoExpanded' style='display: none;'>" +
+            " class='mutationInfoExpanded'>" +
             "<h5>Info</h5><p>Hover" +
             " over for info</p></span>"
 
-        if (aliveMutants > 0) {
-            content += createAction("Alive Mutants", "mutantImageAlive", mutantDescriptions['alive'])
-        }
-
-        if (flaggedMutants > 0) {
-            content += createAction("Flagged Mutants", "mutantImageFlagged", mutantDescriptions['flagged'])
-        }
-
-        if (equivalentMutants > 0) {
-            content += createAction("Equivalent Mutants", "mutantImageEquiv", mutantDescriptions['equiv'])
-        }
-
-        if (killedMutants > 0) {
-            content += createAction("Killed Mutants", "mutantImageKilled", mutantDescriptions['killed'])
-        }
+        // if (aliveMutants > 0) {
+        //     content += createAction("Alive Mutants", "mutantImageAlive", mutantDescriptions['alive'])
+        // }
+        //
+        // if (flaggedMutants > 0) {
+        //     content += createAction("Flagged Mutants", "mutantImageFlagged", mutantDescriptions['flagged'])
+        // }
+        //
+        // if (equivalentMutants > 0) {
+        //     content += createAction("Equivalent Mutants", "mutantImageEquiv", mutantDescriptions['equiv'])
+        // }
+        //
+        // if (killedMutants > 0) {
+        //     content += createAction("Killed Mutants", "mutantImageKilled", mutantDescriptions['killed'])
+        // }
         if (showEquivalenceButton && aliveMutants > 0) {
             // TODO How do we get the contextPath ? it might not be necessary if we use relative href
             content += '<span class="action"><a href="javascript:' +
                 ' if(window.confirm(\'Flag line ' + lineNum + ' as' +
-                ' Equivalent?\')){window.location.href = \'multiplayer/play?equivLine=' + lineNum + '\';}"><span class="mutantCUTIcon mutantImageFlagAction"><span></span></span> Claim' +
-                ' Equivalence </a></span>';
+                ' Equivalent?\')){window.location.href = \'multiplayer/play?equivLine=' + lineNum + '\';}">' +
+                '<span class="mutantCUTIcon mutantImageFlagAction"><span></span>' +
+                '</span> Claim Equivalence</a></span>';
         }
         content += '</span>';
 
         lineContent[lineNum] = content;
+
+        lineSummary[lineNum] = mutantDescriptions;
 
         $(divId).hover(
             function () {
@@ -247,6 +262,11 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
             }
         );
     }
+
+    $(".mutantCUTImage.mutantImageAlive").hover(createPopupFunction('alive'), function(){});
+    $(".mutantCUTImage.mutantImageKilled").hover(createPopupFunction('killed'), function(){});
+    $(".mutantCUTImage.mutantImageEquiv").hover(createPopupFunction('equiv'), function(){});
+    $(".mutantCUTImage.mutantImageFlagged").hover(createPopupFunction('flagged'), function(){});
 };
 
 var drawMutants = function (lineNum, ele) {

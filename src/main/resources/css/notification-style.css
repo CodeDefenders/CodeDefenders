@@ -109,13 +109,10 @@
 
 .CodeMirror #mutationPopup .mutationInfoExpanded {
     float:left;
-    margin-left:200px;
+    margin-left:0px;
     width: 200px;
     border: 2px solid lightgray;
     color: black;
-    background-color: white;
-    border-radius: 5px;
-    position: absolute;
     display: block;
 }
 
