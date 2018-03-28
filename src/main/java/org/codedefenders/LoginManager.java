@@ -145,7 +145,8 @@ public class LoginManager extends HttpServlet {
 							AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN).intValue);
 					if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg))
 						messages.add("A link for changing your password has been sent to " + email);
-				}
+				} else
+					messages.add("No such User found or Email and Username do not match");
 				response.sendRedirect(request.getContextPath() + "/login");
 				break;
 
