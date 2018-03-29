@@ -204,6 +204,10 @@ public class AdminGamesMgmt extends HttpServlet {
 			gamesState = request.getParameter("gamesState").equals(GameState.ACTIVE.name()) ? GameState.ACTIVE : GameState.CREATED;
 			startTime = Long.parseLong(request.getParameter("startTime"));
 			finishTime = Long.parseLong(request.getParameter("finishTime"));
+			maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
+			mutantValidatorLevel = CodeValidator.CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
+			chatEnabled = request.getParameter("chatEnabled") != null;
+			markUncovered = request.getParameter("markUncovered") != null;
 		} catch (Exception e) {
 			messages.add("There was a problem with the form.");
 			response.sendRedirect(request.getContextPath() + "/admin");
