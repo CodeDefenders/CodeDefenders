@@ -235,7 +235,7 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
         // }
         if (showEquivalenceButton && aliveMutants > 0) {
             // TODO How do we get the contextPath ? it might not be necessary if we use relative href
-            content += '<span class="action"><a href="javascript:' +
+            mutantDescriptions['alive'] += '<span class="action"><a href="javascript:' +
                 ' if(window.confirm(\'Flag line ' + lineNum + ' as' +
                 ' Equivalent?\')){window.location.href = \'multiplayer/play?equivLine=' + lineNum + '\';}">' +
                 '<span class="mutantCUTIcon mutantImageFlagAction"><span></span>' +
