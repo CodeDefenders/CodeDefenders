@@ -1,10 +1,9 @@
+### Libraries ###
 src/test/resources/itests/lib/*.jar
 
+### Credentials ###
 credentials*
-
 config.properties*
-config.properties
-config.properties.system-tests@localhost
 
 ### Logs ###
 *.log
@@ -14,11 +13,9 @@ config.properties.system-tests@localhost
 *.class
 
 # Package Files #
-
 *.war
 
 # Maven #
-
 target/
 
 ### Backup ###
@@ -34,3 +31,6 @@ target/
 .idea/libraries/
 .idea/dataSources.local.xml
 out/
+.idea/
+*.iml
+
