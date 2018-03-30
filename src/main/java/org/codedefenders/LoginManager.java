@@ -30,8 +30,8 @@ public class LoginManager extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoginManager.class);
 	private static final int PW_RESET_SECRET_LENGTH = 20;
-	private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n " +
-			"Click this link to change your password: %s\n" +
+	private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n" +
+			"Change your password here: %s\n" +
 			"This link is only valid for %d hours.\n\n" +
 			"Greetings, your CodeDefenders team";
 

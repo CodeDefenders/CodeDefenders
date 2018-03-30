@@ -27,7 +27,7 @@ public class AdminUserMgmt extends HttpServlet {
 			"An account has been created for you with Username %s and Password %s.\n" +
 			"You can log int at %s. \n\n Happy coding!";
 	private static final String EMAIL_NOT_SPECIFIED_DOMAIN = "@NOT.SPECIFIED";
-	private static final String PASSWORD_RESET_MSG = "%s, \n\n " +
+	private static final String PASSWORD_RESET_MSG = "%s, \n\n" +
 			"your password has been reset to %s\n" +
 			"Please change it at your next convenience.";
 
