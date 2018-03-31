@@ -442,15 +442,15 @@ public class DatabaseAccess {
 	}
 
 	public static List<MultiplayerGame> getJoinedMultiplayerGamesForUser(int userId) {
-		String query = "SELECT * FROM games AS m " + "LEFT JOIN players AS p ON p.Game_ID=m.ID \n" + "WHERE m.Mode = 'PARTY' AND (p.User_ID=?)" + "GROUP BY m.ID;";
+		String query = "SELECT DISTINCT m.* FROM games AS m " + "LEFT JOIN players AS p ON p.Game_ID=m.ID \n" + "WHERE m.Mode = 'PARTY' AND (p.User_ID=?);";
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(userId));
 		return getMultiplayerGames(stmt, conn);
 	}
 
 	public static List<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
-		String query = "SELECT * FROM games AS m LEFT JOIN players AS p ON p.Game_ID=m.ID  AND p.Active=TRUE" +
-				" WHERE m.Mode = 'PARTY' AND (p.User_ID=? OR m.Creator_ID=?) AND m.State != 'FINISHED' GROUP BY m.ID;";
+		String query = "SELECT DISTINCT m.* FROM games AS m LEFT JOIN players AS p ON p.Game_ID=m.ID  AND p.Active=TRUE" +
+				" WHERE m.Mode = 'PARTY' AND (p.User_ID=? OR m.Creator_ID=?) AND m.State != 'FINISHED';";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(userId),
 				DB.getDBV(userId)};
 		Connection conn = DB.getConnection();
@@ -459,7 +459,7 @@ public class DatabaseAccess {
 	}
 
 	public static List<MultiplayerGame> getFinishedMultiplayerGamesForUser(int userId) {
-		String query = "SELECT * FROM games AS m " + "LEFT JOIN players AS p ON p.Game_ID=m.ID  AND p.Active=TRUE \n" + "WHERE (p.User_ID=? OR m.Creator_ID=?) AND m.State = 'FINISHED' AND m.Mode='PARTY'" + "GROUP BY m.ID;";
+		String query = "SELECT DISTINCT m.* FROM games AS m " + "LEFT JOIN players AS p ON p.Game_ID=m.ID  AND p.Active=TRUE \n" + "WHERE (p.User_ID=? OR m.Creator_ID=?) AND m.State = 'FINISHED' AND m.Mode='PARTY';";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(userId),
 				DB.getDBV(userId)};
 		Connection conn = DB.getConnection();
