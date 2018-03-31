@@ -26,9 +26,9 @@
   margin: 10px;
   margin-bottom: 30px;
   width:calc(100% - 20px);
-  /*position: absolute;*/
+  position: absolute;
   overflow: hidden;
-
+  background: #fafafa;
   margin-bottom: 50px;
 }
 
