@@ -43,9 +43,8 @@
 </div>
 
 <% String resetPw = request.getParameter("resetPW");
-    String userId = request.getParameter("user");
-    if (resetPw != null && userId != null &&
-            DatabaseAccess.checkPasswordResetSecret(Integer.parseInt(userId), resetPw)) {
+    if (resetPw != null &&
+            DatabaseAccess.getUserIDForPWResetSecret(resetPw) > 0) {
         int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();%>
 <div id="changePasswordModal" class="fade in" role="dialog" style="
     position: fixed;
@@ -65,7 +64,6 @@
             <div class="modal-body">
                 <form action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
                     <input type="hidden" name="resetPwSecret" id="resetPwSecret" value="<%=resetPw%>">
-                    <input type="hidden" name="userId" id="userId" value="<%=userId%>">
 
                     <input type="hidden" name="formType" value="changePassword">
                     <label for="inputPassword" class="sr-only">Password</label>

@@ -140,7 +140,7 @@ public class LoginManager extends HttpServlet {
 					String resetPwSecret = generatePasswordResetSecret();
 					setPasswordResetSecret(u.getId(), resetPwSecret);
 					String hostAddr = request.getServerName() + ":" + request.getServerPort()  + request.getContextPath();
-					String url =  hostAddr + "/login?resetPW=" + resetPwSecret + "&user=" + u.getId();
+					String url =  hostAddr + "/login?resetPW=" + resetPwSecret;
 					String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
 							AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN).intValue);
 					if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg))
@@ -152,20 +152,19 @@ public class LoginManager extends HttpServlet {
 
 			case "changePassword":
 				String resetPwSecret = request.getParameter("resetPwSecret");
-				String userId = request.getParameter("userId");
 				confirm = request.getParameter("inputConfirmPasswordChange");
 				password = request.getParameter("inputPasswordChange");
 
-				String responseURL = request.getContextPath() + "/login?resetPW=" + resetPwSecret + "&user=" + userId;
-				if (resetPwSecret != null && userId != null &&
-						DatabaseAccess.checkPasswordResetSecret(Integer.parseInt(userId), resetPwSecret)) {
+				String responseURL = request.getContextPath() + "/login?resetPW=" + resetPwSecret;
+				int userId = DatabaseAccess.getUserIDForPWResetSecret(resetPwSecret);
+				if (resetPwSecret != null && userId > -1) {
 					if (!(validPassword(password))) {
 						messages.add("Password not changed. Make sure it is valid.");
 					} else if (password.equals(confirm)) {
-						User user = DatabaseAccess.getUser(Integer.parseInt(userId));
+						User user = DatabaseAccess.getUser(userId);
 						user.setPassword(password);
 						if (user.update()) {
-							DatabaseAccess.setPasswordResetSecret(Integer.parseInt(userId), null);
+							DatabaseAccess.setPasswordResetSecret(user.getId(), null);
 							responseURL = request.getContextPath() + "/login";
 							messages.add("Successfully changed your Password.");
 						}
