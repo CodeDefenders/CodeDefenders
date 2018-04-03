@@ -54,7 +54,11 @@ if (role == Role.ATTACKER && mutantsPending != null ){
 				} else
 					mutantCode = mg.getCUT().getAsString();
 			%>
+
 			<pre style=" margin-top: 20px; "><textarea id="code" name="mutant" cols="80" rows="50" style="min-width: 512px;"><%= mutantCode %></textarea></pre>
+
+			<%@include file="/jsp/multiplayer/game_key.jsp"%>
+
 		</form>
 		<script>
 			var editorSUT = CodeMirror.fromTextArea(document.getElementById("code"), {

@@ -51,6 +51,7 @@
 
     int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
     List<Mutant> mutantsAlive = mg.getAliveMutants();
+    List<Mutant> mutants = mg.getMutants();
 
     List<Mutant> mutantsPending = mg.getMutantsMarkedEquivalentPending();
     List<Mutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();

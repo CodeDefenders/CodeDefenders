@@ -427,7 +427,11 @@ public class AntRunner {
 		command.add("-DtestClassname=" + testClassName);
 		//
 		if (mutantDir != null && testDir != null) {
-			String[] tokens = mutantDir.split(F_SEP);
+			String separator = F_SEP;
+			if (separator.equals("\\")){
+				separator = "\\\\";
+			}
+			String[] tokens = mutantDir.split(separator);
 			String mutantFile = String.format("%s-%s", tokens[tokens.length - 2], tokens[tokens.length - 1]);
 			String testMutantFile = testDir.replace("original", mutantFile);
 			// TODO This might need refactoring

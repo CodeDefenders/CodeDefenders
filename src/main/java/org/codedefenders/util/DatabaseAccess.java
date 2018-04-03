@@ -601,7 +601,8 @@ public class DatabaseAccess {
 	public static List<Mutant> getMutantsForGame(int gid) {
 		List<Mutant> mutList = new ArrayList<>();
 
-		String query = "SELECT * FROM mutants WHERE Game_ID=? AND ClassFile IS NOT NULL;";
+		String query = "SELECT mutants.*, users.Username FROM mutants LEFT " +
+				"JOIN players ON players.ID = mutants.Player_ID LEFT JOIN users ON players.User_ID = users.User_ID WHERE mutants.Game_ID=? AND mutants.ClassFile IS NOT NULL;";
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gid));
 		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
@@ -612,6 +613,7 @@ public class DatabaseAccess {
 						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
 						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
 				newMutant.setScore(rs.getInt("Points"));
+				newMutant.setPlayerName(rs.getString("Username"));
 				mutList.add(newMutant);
 			}
 		} catch (SQLException se) {
