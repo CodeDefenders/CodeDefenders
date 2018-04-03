@@ -21,8 +21,6 @@
 
 
 .CodeMirror #mutationPopup {
-    border: 1px solid #cccccc;
-    border-top: none;
     border-radius: 5px;
     color: #fff;
     background-color: #fff;
@@ -60,6 +58,14 @@
     float: left;
     display: flex;
     margin-top: 0px;
+}
+
+.mutantCUTLegendDesc {
+    text-align: left;
+    float: left;
+    font-weight: bold;
+    font-family: 'Ubuntu', 'Open Sans', sans-serif;
+    margin: 0 8px 0 2px;
 }
 
 .mutantCUTImage span, .CodeMirror .mutantCUTImage span {
@@ -135,11 +141,20 @@
 .CodeMirror #mutationPopup .mutationInfoExpanded p .left {
     float:left;
     text-align: left;
+    width: 45%;
+    overflow: hidden;
+}
+
+.CodeMirror #mutationPopup .mutationInfoExpanded p .central {
+    float: left;
+    text-align: center;
+    width: 27%;
 }
 
 .CodeMirror #mutationPopup .mutationInfoExpanded p .right {
     float:right;
     text-align: right;
+    width: 27%;
 }
 
 .CodeMirror #mutationPopup .action {

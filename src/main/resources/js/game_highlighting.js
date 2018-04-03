@@ -42,6 +42,8 @@ var getMutantsFunc = function(){return [];};
 
 
 $(document).ready(function(){
+    // getMutants may be defined in game_highlighting.jsp if we're on a page
+    // which uses it
     if (typeof(getMutants) === typeof(Function)){
         getMutantsFunc = getMutants;
     }
@@ -90,14 +92,14 @@ var createAction = function(label, classType, contents){
 };
 
 var prepareMutantDetail = function(mutant){
-    return '<p><span class="left">' + mutant.id + '</span><span' +
-        ' class="right">' +
-        mutant.score + '</span></p>';
+    return '<p><span class="left">' + mutant.playerName + '</span>' +
+        '<span class="central">' + mutant.id + '</span>' +
+        '<span class="right">' + mutant.score + '</span></p>';
 };
 
 var prepareMutantHeading = function(title){
-    return '<h5>' + title + '</h5><p><span class="left header">Mutant' +
-        ' ID</span>' +
+    return '<h5>' + title + '</h5><p><span class="left header">Creator</span>' +
+        '<span class="central header">Mutant ID</span>' +
         '<span class="right header">Points</span></p>';
 };
 
@@ -249,6 +251,10 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
 
         $(divId).hover(
             function () {
+                // Setting the current div z-index stops mutant icons
+                // appearing through the popup.
+                $('.codedef-line-mutant').css("z-index", "2000")
+                $(divId).css("z-index", "3000");
                 if (lastLine != lineNum) {
                     drawMutants(lineNum, this);
                     lastLine = lineNum;

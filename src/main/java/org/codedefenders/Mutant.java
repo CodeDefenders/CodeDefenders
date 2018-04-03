@@ -53,6 +53,7 @@ public class Mutant implements Serializable {
 	private int roundKilled;
 
 	private int playerId;
+	private String playerName;
 
 	private transient int killedByAITests = 0; //How many times this mutant is killed
 	// by an AI test.
@@ -176,6 +177,14 @@ public class Mutant implements Serializable {
 	@Deprecated
 	public void setScore(int score) {
 		this.score += score;
+	}
+
+	public void setPlayerName(String username){
+		playerName = username;
+	}
+
+	public String getPlayerName(){
+		return playerName;
 	}
 
 	public boolean kill() {
