@@ -141,20 +141,20 @@
 .CodeMirror #mutationPopup .mutationInfoExpanded p .left {
     float:left;
     text-align: left;
-    width: 45%;
+    width: 40%;
     overflow: hidden;
 }
 
 .CodeMirror #mutationPopup .mutationInfoExpanded p .central {
     float: left;
     text-align: center;
-    width: 27%;
+    width: 29%;
 }
 
 .CodeMirror #mutationPopup .mutationInfoExpanded p .right {
     float:right;
     text-align: right;
-    width: 27%;
+    width: 29%;
 }
 
 .CodeMirror #mutationPopup .action {
