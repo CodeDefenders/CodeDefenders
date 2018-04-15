@@ -17,7 +17,7 @@ public class EmailUtils {
 
 	private static final Logger logger = LoggerFactory.getLogger(AdminDAO.class);
 
-	public static boolean sendEmail(String to, String subject, String text) {
+	public static boolean sendEmail(String from, String to, String subject, String text) {
 
 		final String smtpHost = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_HOST).getStringValue();
 		final int smtpPort = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_PORT).getIntValue();
@@ -33,7 +33,7 @@ public class EmailUtils {
 			props.put("mail.smtp.host", smtpHost);
 			props.put("mail.smtp.port", smtpPort);
 
-			Session session = Session.getInstance(props, new javax.mail.Authenticator(){
+			Session session = Session.getInstance(props, new javax.mail.Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
 					return new PasswordAuthentication(emailAddress, emailPassword);
 				}});
@@ -41,7 +41,8 @@ public class EmailUtils {
 			session.setDebug(debug);
 			MimeMessage msg = new MimeMessage(session);
 
-			msg.setFrom(new InternetAddress(emailAddress));
+			msg.setFrom(new InternetAddress(from));
+			msg.setReplyTo(InternetAddress.parse(from));
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 			msg.setSubject(subject);
 			msg.setContent(text, "text/plain");
@@ -51,6 +52,9 @@ public class EmailUtils {
 			transport.connect(smtpHost, smtpPort, emailAddress, emailPassword);
 			Transport.send(msg);
 			transport.close();
+
+			logger.debug(String.format("Mail sent: from: %s, to: %s, subject: %s, text: %s", from, to, subject, text));
+
 		} catch (MessagingException messagingException) {
 			logger.warn(messagingException.toString());
 			return false;
@@ -58,4 +62,13 @@ public class EmailUtils {
 		return true;
     }
 
+	public static boolean sendEmail(String to, String subject, String text) {
+		final String emailAddress = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS).getStringValue();
+		return sendEmail(emailAddress, to, subject, text);
+	}
+
+	public static boolean sendEmailToSelf(String from, String subject, String text) {
+		final String emailAddress = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS).getStringValue();
+		return sendEmail(from, emailAddress, subject, text);
+	}
 }
