@@ -138,8 +138,8 @@ public class AdminUserMgmt extends HttpServlet {
 
 							if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()
 									&& !email.endsWith(EMAIL_NOT_SPECIFIED_DOMAIN)) {
-								if (!sendNewAccountMsg(email, name, password,
-										request.getServerName() + ":" + request.getServerPort() + "/" + request.getContextPath()))
+								String hostAddr = request.getScheme()+"://"+request.getServerName() + ":" + request.getServerPort()  + request.getContextPath();
+								if (!sendNewAccountMsg(email, name, password, hostAddr))
 									messages.add("Couldn't send an email to " + email + " for user " + name);
 							}
 						} else {

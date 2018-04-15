@@ -139,7 +139,7 @@ public class LoginManager extends HttpServlet {
 						u.getEmail().equals(email)) {
 					String resetPwSecret = generatePasswordResetSecret();
 					setPasswordResetSecret(u.getId(), resetPwSecret);
-					String hostAddr = request.getServerName() + ":" + request.getServerPort()  + request.getContextPath();
+					String hostAddr = request.getScheme()+"://"+request.getServerName() + ":" + request.getServerPort()  + request.getContextPath();
 					String url =  hostAddr + "/login?resetPW=" + resetPwSecret;
 					String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
 							AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN).intValue);
