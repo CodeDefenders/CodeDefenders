@@ -338,7 +338,7 @@ public class DatabaseAccess {
 		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 		try {
 			while (rs.next()) {
-				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"));
+				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"), rs.getBoolean("Active"));
 				uList.add(userRecord);
 			}
 		} catch (SQLException se) {
@@ -383,7 +383,7 @@ public class DatabaseAccess {
 		try {
 			ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
-				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"));
+				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"), rs.getBoolean("Active"));
 				return userRecord;
 			}
 		} catch (SQLException se) {
