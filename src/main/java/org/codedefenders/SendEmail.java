@@ -14,15 +14,14 @@ public class SendEmail extends HttpServlet {
 		final String name     = request.getParameter("name");
 		final String email    = request.getParameter("email");
 		final String subject  = request.getParameter("subject");
-		final String message  = request.getParameter("message");
-        final String from = String.format("\"%s\"<%s>", name, email);
+		final String message  = String.format("From: %s <%s>\n\n%s", name, email, request.getParameter("message"));
 
-        if (EmailUtils.sendEmailToSelf(from, subject, message)) {
+        if (EmailUtils.sendEmailToSelf(subject, message, email)) {
             request.getSession().setAttribute("emailSent", "Thanks for your message, we'll get back to you soon! --The Code Defenders Team");
         } else {
             request.getSession().setAttribute("emailSent", "Sorry! The message was not sent. Please, try emailing us: {j.rojas,gordon.fraser}@sheffield.ac.uk.");
         }
 
-		response.sendRedirect(request.getContextPath()+"/#contact");
+		response.sendRedirect(request.getContextPath()+"/contact");
 	}
 }
