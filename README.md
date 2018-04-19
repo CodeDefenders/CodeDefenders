@@ -9,7 +9,92 @@ This is Code Defenders, a mutation testing game.
 - Maven
 - MySQL
 
-## Database
+## Build
+Building code-defenders requires a `config.properties` file to be in the root of the project. This file contains all the configuration and properties that are required to build, install, and deploy code-defenders.
+
+Maven does a basic check that the `config.properties` is there, and fails the build otherwise.
+
+During the build, maven will output the value of some of those variables for you to check if they are correct.
+
+Since the `config.properties` file contains also your passwords, please **do not commit** it to the repo.
+
+In case you want to provide a file with a different name (let's say `config.test`), you can add the following option to your maven command: `-Dconfig.properties=config.test` 
+
+Having the `config.properties` ready and a running tomcat instance we can move on to deploy it (see Deployment).
+
+## Installation and Setup
+
+To install code-defenders invoke the `setup.sh` script under the `installation folder` passing the `config.properties` as input:
+
+```bash
+cd installation
+./setup.sh ../config.properties
+```
+
+In particular, installing code-defenders requires these variables to have a value:
+
+```bash
+# The main code-defenders folder, e.g., /var/lib/codefenders
+data.dir=...
+
+# Location of ant command
+ant.home=...
+
+# MySQL Database URL and credential to access it
+db.url=...
+db.username=...
+db.password=...
+```
+
+The script performs a basic check on the availability of the required software, creates the database, creates the folder structure, and download all the required dependencies and files. If any of this installation step fails, all the installation process fails.
+
+## Deployment
+
+### Tomcat admin user
+
+Add manager-script role and user to `$CATALINA_HOME/conf/tomcat-users.xml` (`$CATALINA_HOME` should be set to your Tomcat installation root directory):
+
+```xml
+<role rolename="manager-script"/>  
+<user username="adminscript" password="adm3b5eM3JG" roles="manager-script"/>  
+```
+
+The same values must be present inside the `config.properties` file.
+
+  
+### Deploy first time
+
+Tomcat and MySQL passwords must be provided inside the `config.properties` file to deploy code-defenders, and both tomcat and MySQL must be running and reacheable.
+
+To deploy code-defenders the _first time_, invoke the following command:
+
+```bash
+mvn clean compile package install war:war tomcat7:deploy -DskipTests
+```
+
+### Redeploy
+To _redeploy_ the application instead use the following command:
+
+```bash
+mvn clean compile package install war:war tomcat7:redeploy -DskipTests
+```
+
+
+<!--, either by editing `makefile` or by passing them as arguments:
+
+```bash
+make first [TOMCAT_PASSWORD=... MYSQL_PASSWORD=...]
+```
+### Redeploy
+
+To compile and _redeploy_:
+
+```bash
+make
+```
+-->
+
+<!--## Database
 
 To create the database, execute `src/main/resources/db/codedefenders.sql`:
 
@@ -17,8 +102,8 @@ To create the database, execute `src/main/resources/db/codedefenders.sql`:
 mysql -u [username] -p
 > source src/main/resources/db/codedefenders.sql;
 ```
-
-## Data Storage
+-->
+<!--## Data Storage
 
 Classes, tests and mutants are stored in `/var/lib/codedefenders/`, these directories must exist:
 
@@ -29,21 +114,9 @@ mkdir -p /var/lib/codedefenders/sources /var/lib/codedefenders/tests /var/lib/co
 The tomcat user (and possibly the user running Code Defenders) must have full permissions on this directory.
 
 Major and Evosuite must be stored in their respective folders within this directory (codedefenders/major and codedefenders/evosuite).
+-->
 
-## Build
-Building codedefenders now requires a config.properties file to be in the root of the project. This file contains all the properties that are required to deploy and run codedefenders.
-
-Maven enforces this rule, so if the config.properties is not there, the build will fail.
-
-Therefore, create a config.properties file using the provided config.properties.template. Properties name are self-explanatory.
-
-During the build, maven will output the value of those variables for you to check if they have the correct value.
-
-Since the config.properties contains also your passwords, please **do not commit** it to the repo.
-
-In case you want to provide a file with a different name (let's say config.test), you can add the following option to your maven command: `-Dconfig.properties=config.test` 
-
-## Integration testing
+<!--## Integration testing
 Before running integration tests, which are activated by using the maven IT profile (-PIT) you need to set up the test resources. Otherwise, the enforcer plugin will break your build.
 
 You can setup the resources by copying the required libraries inside the following folder:
@@ -66,32 +139,7 @@ cd -
 Once these libraries are in place you can run the integration tests (note the war:war in the command):
 
 ```mvn compile test-compile war:war test -PIT```
-
-## Deployment
-
-### Tomcat admin user
-
-Add manager-script role and user to `$CATALINA_HOME/conf/tomcat-users.xml` (`$CATALINA_HOME` should be set to your Tomcat installation root directory):
-
-```xml
-<role rolename="manager-script"/>  
-<user username="adminscript" password="adm3b5eM3JG" roles="manager-script"/>  
-```
-  
-### Deploy first time
-
-Tomcat and MySQL passwords must be provided to compile and deploy _the first time_, either by editing `makefile` or by passing them as arguments:
-
-```bash
-make first [TOMCAT_PASSWORD=... MYSQL_PASSWORD=...]
-```
-### Redeploy
-
-To compile and _redeploy_:
-
-```bash
-make
-```
+-->
 
 ## IntelliJ Project
 
