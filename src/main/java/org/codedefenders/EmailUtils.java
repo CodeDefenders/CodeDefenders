@@ -15,16 +15,15 @@ import java.util.Properties;
  */
 public class EmailUtils {
 
-	private static final Logger logger = LoggerFactory.getLogger(AdminDAO.class);
+	private static final Logger logger = LoggerFactory.getLogger(EmailUtils.class);
 
-	public static boolean sendEmail(String to, String subject, String text) {
+	public static boolean sendEmail(String to, String subject, String text, String replyTo) {
 
 		final String smtpHost = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_HOST).getStringValue();
 		final int smtpPort = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_PORT).getIntValue();
 		final String emailAddress = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS).getStringValue();
 		final String emailPassword = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_PASSWORD).getStringValue();
 		final boolean debug = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.DEBUG_MODE).getBoolValue();
-
 
 		try	{
 			Properties props = System.getProperties();
@@ -33,7 +32,7 @@ public class EmailUtils {
 			props.put("mail.smtp.host", smtpHost);
 			props.put("mail.smtp.port", smtpPort);
 
-			Session session = Session.getInstance(props, new javax.mail.Authenticator(){
+			Session session = Session.getInstance(props, new javax.mail.Authenticator() {
 				protected PasswordAuthentication getPasswordAuthentication() {
 					return new PasswordAuthentication(emailAddress, emailPassword);
 				}});
@@ -42,6 +41,7 @@ public class EmailUtils {
 			MimeMessage msg = new MimeMessage(session);
 
 			msg.setFrom(new InternetAddress(emailAddress));
+			msg.setReplyTo(InternetAddress.parse(replyTo));
 			msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
 			msg.setSubject(subject);
 			msg.setContent(text, "text/plain");
@@ -51,6 +51,9 @@ public class EmailUtils {
 			transport.connect(smtpHost, smtpPort, emailAddress, emailPassword);
 			Transport.send(msg);
 			transport.close();
+
+			logger.info(String.format("Mail sent: to: %s, replyTo: %s", to, replyTo));
+
 		} catch (MessagingException messagingException) {
 			logger.warn(messagingException.toString());
 			return false;
@@ -58,4 +61,13 @@ public class EmailUtils {
 		return true;
     }
 
+	public static boolean sendEmail(String to, String subject, String text) {
+		final String emailAddress = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS).getStringValue();
+		return sendEmail(to, subject, text, emailAddress);
+	}
+
+	public static boolean sendEmailToSelf(String subject, String text, String replyTo) {
+		final String emailAddress = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_ADDRESS).getStringValue();
+		return sendEmail(emailAddress, subject, text, replyTo);
+	}
 }
