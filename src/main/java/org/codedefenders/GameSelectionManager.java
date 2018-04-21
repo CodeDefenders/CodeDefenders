@@ -55,9 +55,10 @@ public class GameSelectionManager extends HttpServlet {
                     }
 
                     switch (modeName) {
-                        case "sing":
+                        /* Disable single player mode for release. */
+                        /* case "sing":
                             mode = GameMode.SINGLE;
-                            break;
+                            break; */
                         case "duel":
                             mode = GameMode.DUEL;
                             break;
@@ -68,7 +69,9 @@ public class GameSelectionManager extends HttpServlet {
                             mode = GameMode.UTESTING;
                             break;
                         default:
-                            mode = GameMode.SINGLE;
+                            mode = GameMode.DUEL;
+                            /* Disable single player mode for release. */
+                            /* mode = GameMode.SINGLE; */
                     }
 
                     if (classId != 0 && DatabaseAccess.getClassForKey("Class_ID", classId) != null) {

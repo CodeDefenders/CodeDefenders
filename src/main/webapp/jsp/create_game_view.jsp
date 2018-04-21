@@ -25,7 +25,8 @@
 				<td>
 					<select name="mode" class="form-control selectpicker" data-size="large">
 						<option value="duel">Duel</option>
-						<option value="sing">Singleplayer</option>
+						<%-- Disable single player mode for release. --%>
+						<%-- <option value="sing">Singleplayer</option> --%>
 						<option value="utst">Unit Testing</option>
 					</select>
 				</td>
