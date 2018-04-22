@@ -48,6 +48,14 @@ db.password=...
 
 The script performs a basic check on the availability of the required software, creates the database, creates the folder structure, and download all the required dependencies and files. If any of this installation step fails, all the installation process fails.
 
+### Set up code-defenders admin users
+Code-defenders relies on Tomcat authentication system to identify admin users, that is, users which can access the protected pages of the application. If a user try to reach one of such pages, the browser (not the code-defenders) will ask for the username and password and tomcat (not the code-defenders) will check those. The standard way to configure Tomcat security is to edit the `$CATALINA_HOME/conf/tomcat-users.xml` and add your credentials, e.g., `<MY_ADMIN_USER>` and `<MY_ADMIN_PWD>`:
+
+```xml
+<role rolename="manager-gui"/>  
+<user username="<MY_ADMIN_USER>" password="<MY_ADMIN_PWD>" roles="manager-gui"/>
+```
+
 ## Deployment
 
 ### Tomcat admin user
