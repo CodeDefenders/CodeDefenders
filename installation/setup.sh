@@ -47,17 +47,17 @@ done < <(sed -e '/^$/d' -e '/^#/d' ${config_file} | sed 's|=| |')
 : ${tomcat_username:?Please provide a value for tomcat.username in $config_file }
 : ${tomcat_password:?Please provide a value for tomcat.password  in $config_file }
 
-# Check preconditions on sowftware
+# Check preconditions on software
 echo "* Check preconditions on software"
 
 # Can we connect to mysql with given user name and pwd ?
 echo "* Check mysql (credentials)"
 
-DB_NAME=$(echo "$db_url" | sed 's|^.*jdbc:mysql://localhost:[0-9][0-9]*/\(.*\)?.*|\1|')
+DB_NAME=$(echo "$db_url" | sed 's|^.*localhost:[0-9]\{4,\}/\([a-zA-Z0-9]*\).*$|\1|')
 
 mysql -u${db_username} -p${db_password} -e "SELECT USER(),CURRENT_USER()" > /dev/null
 
-# Can we connect the db? Note that this might fail because the use lacks the proper grants/permission (i.e., INDEX creation)
+# Can we connect the db? Note that this might fail because the user lacks the proper grants/permission (i.e., INDEX creation)
 read -p "* Setting up '${DB_NAME}' as code-defenders DB.\
 This will delete any previous db named '${DB_NAME}'.\
 Continue (y/n)?" choice
@@ -68,11 +68,11 @@ n|N ) echo "no";;
 esac
 
 
-# Do we have mvn adn ant installed ?
-echo "* Check maven"
+# Do we have Maven and Ant installed ?
+echo "* Check Maven"
 mvn -version > /dev/null
 
-echo "* Check ant"
+echo "* Check Ant"
 ${ant_home}/bin/ant -version > /dev/null
 
 echo "* Create folder structure under $data_dir"
@@ -83,7 +83,7 @@ mkdir -vp ${data_dir}/mutants
 mkdir -vp ${data_dir}/tests
 mkdir -vp ${data_dir}/ai
 
-# ATM Thid downloads more deps than necessary. The issue might be jacoco agent which comes with a broken manifest otherwise.
+# Currently, this downloads more dependencies than necessary. The issue might be jacoco agent which comes with a broken manifest otherwise.
 
 echo "* Download dependencies and copy resources"
 set -x
@@ -94,6 +94,6 @@ mvn -f installation-pom.xml clean validate package -Dconfig.properties=$config_f
 #chgrp -R defender defender/
 #chmod -R 770 defender/
 
-echo "Done"
+echo "* Done"
 
 exit 0
