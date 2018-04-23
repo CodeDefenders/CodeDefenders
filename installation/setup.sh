@@ -27,19 +27,25 @@ fi
 echo "* Loading configuration from ${config_file}"
 
 while read -r NAME VALUE; do
-    echo "* Found ${NAME} "
+#    echo "* Found ${NAME} "
     declare $(echo ${NAME} | sed 's/\./_/g')="${VALUE}"
-done < <(sed '/^$/d' ${config_file} | sed 's|=| |')
+done < <(sed -e '/^$/d' -e '/^#/d' ${config_file} | sed 's|=| |')
 
 
 # FAIL if any of the required configurations is missing
 
-: ${data_dir:?Missing}
-: ${ant_home:?Missing}
+: ${data_dir:?Please provide a value for data.dir in $config_file }
+# Not sure this is actually require
+: ${ant_home:?Please provide a value for ant.home in $config_file }
 
-: ${db_url:?Missing}
-: ${db_username:?Missing}
-: ${db_password:?Missing} # Do we require this ? Really ?
+: ${db_url:?Please provide a value for db.url in $config_file }
+: ${db_username:?Please provide a value for db.username in $config_file }
+: ${db_password:?Please provide a value for db.password in $config_file }
+
+: ${tomcat_url:?Please provide a value for tomcat.url in $config_file }
+: ${tomcat_path:?Please provide a value for tomcat.path in $config_file }
+: ${tomcat_username:?Please provide a value for tomcat.username in $config_file }
+: ${tomcat_password:?Please provide a value for tomcat.password  in $config_file }
 
 # Check preconditions on sowftware
 echo "* Check preconditions on software"
