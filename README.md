@@ -18,6 +18,7 @@ Code Defenders requires a `config.properties` file for initial setup, building a
 `config.properties` can hold confidential configuration data, so **please** do not include it into the repository.
 
 Following properties are required:
+
 ```bash
 # The main Code Defenders folder. E.g. /var/lib/codefenders
 data.dir=...
@@ -51,12 +52,13 @@ cd installation
 ./setup.sh ../config.properties
 ```
 
-The script performs a basic availability check of required software. The data directory folder structure and database schema are created Required dependencies and files are downloaded.
+The script performs a basic availability check of required software. The data directory folder structure and database schema are created. All the required dependencies and files are automatically downloaded.
 
-If any installation steps fail, the installation process aborts and prints an error message.
+If any installation step fails, the installation process aborts and prints an error message.
 
 ### Tomcat User Management
-For deployment, Tomcat requires a user with `manager-script` role, which be be configured in `$CATALINA_HOME/conf/tomcat-users.xml` (CATALINA_HOME is the Tomcat installation directory).
+For deployment, Tomcat requires a user with `manager-script` role, which be be configured in `$CATALINA_HOME/conf/tomcat-users.xml` (`CATALINA_HOME` is the Tomcat installation directory).
+
 ```xml
 <role rolename="manager-script"/>
 <user username="<MY_USER>" password="<MY_USER_PASSWORD>" roles="manager-script"/>
@@ -65,6 +67,7 @@ For deployment, Tomcat requires a user with `manager-script` role, which be be c
 ### Set up Code Defenders admin users
 Code Defenders relies on the Tomcat authentication system to identify admin users, who can access protected pages). Access control is enforced through Tomcat using Basic Authentication in the browser.
 Adding a tomcat admin can be done by applying the `manager-gui` role to a user.
+
 ```xml
 <role rolename="manager-gui"/>
 <user username="<MY_ADMIN_USER>" password="<MY_ADMIN_PWD>" roles="manager-gui"/>
@@ -84,7 +87,7 @@ mvn clean compile package install war:war tomcat7:deploy -DskipTests
 ```
 
 ### Redeploy
-To _redeploy_ instead use:
+To redeploy instead use:
 
 ```bash
 mvn clean compile package install war:war tomcat7:redeploy -DskipTests
@@ -92,7 +95,7 @@ mvn clean compile package install war:war tomcat7:redeploy -DskipTests
 
 # Project Import
 
-Code Defenders and most of its dependencies is organised and can be imported into IDEs (IntelliJ) using Maven.
+Code Defenders and most of its dependencies are handled via Maven. Code-defenders can also be imported into common IDEs (e.g., IntelliJ and Eclipse).
 
 <!--
 TODO: Do we really need this?

@@ -40,7 +40,8 @@ done < <(sed -e '/^$/d' -e '/^#/d' ${config_file} | sed 's|=| |')
 
 : ${db_url:?Please provide a value for db.url in $config_file }
 : ${db_username:?Please provide a value for db.username in $config_file }
-: ${db_password:?Please provide a value for db.password in $config_file }
+# Password is optional
+#: ${db_password:?Please provide a value for db.password in $config_file }
 
 : ${tomcat_url:?Please provide a value for tomcat.url in $config_file }
 : ${tomcat_path:?Please provide a value for tomcat.path in $config_file }
@@ -53,13 +54,49 @@ echo "* Check preconditions on software"
 # Can we connect to mysql with given user name and pwd ?
 echo "* Check mysql (credentials)"
 
-DB_NAME=$(echo "$db_url" | sed 's|^.*localhost:[0-9]\{4,\}/\([a-zA-Z0-9]*\).*$|\1|')
+# THIS IS MOSTLY ILLUSTRATIVE. IT
+# extract the protocol
+proto="$(echo $db_url | grep :// | sed -e's,^\(.*://\).*,\1,g')"
+# remove the protocol
+url="$(echo ${db_url/$proto/})"
+# extract the user (if any)
+user="$(echo $url | grep @ | cut -d@ -f1)"
+# extract the host
+host="$(echo ${url/$user@/} | cut -d/ -f1)"
+# by request - try to extract the port
+port="$(echo $host | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
+# extract the path (if any)
+path="$(echo $url | grep / | cut -d/ -f2-)"
 
-mysql -u${db_username} -p${db_password} -e "SELECT USER(),CURRENT_USER()" > /dev/null
+# Remove query string if ANY. Sed does not support ? operation for optional elements
+
+if [[ $path = *"?"* ]]; then
+    DB_NAME="$(echo $path | sed 's,^\(.*\)?.*,\1,')"
+else
+    DB_NAME="$path"
+fi
+
+#DEBUG
+#echo "url: $url"
+#echo "  proto: $proto"
+#echo "  user: $user"
+#echo "  host: $host"
+#echo "  port: $port"
+#echo "  path: $path"
+#echo "  DB_NAME: $DB_NAME"
+
+#https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
+if [ -z "${db_password}" ]; then
+  DB_PASSWORD="" # Unset db_password
+else
+  DB_PASSWORD="-p${db_password}"
+fi
+
+mysql -u${db_username} ${DB_PASSWORD} -e "SELECT USER(),CURRENT_USER()" > /dev/null
 
 # Can we connect the db? Note that this might fail because the user lacks the proper grants/permission (i.e., INDEX creation)
-read -p "* Setting up '${DB_NAME}' as code-defenders DB.\
-This will delete any previous db named '${DB_NAME}'.\
+read -p "* Setting up '${DB_NAME}' as code-defenders DB. \
+This will delete any previous db named '${DB_NAME}'. \
 Continue (y/n)?" choice
 case "$choice" in
 y|Y ) mysql -u${db_username} -p${db_password} ${DB_NAME} < ../src/main/resources/db/codedefenders.sql;;
