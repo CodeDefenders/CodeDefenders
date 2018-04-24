@@ -72,7 +72,7 @@
                     <%
 					DateTime startDate = DateTime.now();
 					DateTime finishDate = startDate.plusDays(3);
-					DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
+					DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy/MM/dd");
 				%>
                 <td>Start Time</td>
                 <td>
@@ -93,7 +93,7 @@
                     <script>
                         $(document).ready(function () {
                             $("#startTime").val(new Date().getTime());
-                            $("#start_dateTime").val($.datepicker.formatDate('mm/DD/yyyy', new Date(timeStamp)));
+                            $("#start_dateTime").val($.datepicker.formatDate('yyyy/MM/dd', new Date(timeStamp)));
                             updateStartTimestamp();
                         });
                         var voidFunct = function () {
@@ -152,9 +152,8 @@
                     </div>
                     <script>
                         $(document).ready(function () {
-                            var timeStamp = new Date().getTime() + (1000 * 60 * 60 * 24 * 7);
-                            $("#finishtTime").val(timeStamp);
-                            $("#finish_dateTime").val($.datepicker.formatDate('mm/DD/yyyy', new Date(timeStamp)));
+                            $("#finishTime").val(new Date().getTime());
+                            $("#finish_dateTime").val($.datepicker.formatDate('yyyy/MM/dd', new Date(timeStamp)));
                             updateFinishTimestamp();
                         });
                         var updateFinishTimestamp = function () {
