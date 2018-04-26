@@ -73,15 +73,18 @@ public class DatabaseAccess {
 	}
 
 	public static void removePlayerEventsForGame(int gameId, int playerId) {
-		String query = "SELECT * FROM events WHERE Game_ID=? " + "AND Player_ID=?";
+		String query = "UPDATE events SET Event_Status=? WHERE Game_ID=? AND Player_ID=?";
 		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(EventStatus.DELETED.toString()),
 				DB.getDBV(gameId),
 				DB.getDBV(playerId)};
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		for (Event e : getEvents(stmt, conn)) {
-			e.setStatus(EventStatus.DELETED);
-			e.update();
+		try {
+            stmt.executeUpdate();
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+			DB.cleanup(conn, stmt);
 		}
 	}
 
