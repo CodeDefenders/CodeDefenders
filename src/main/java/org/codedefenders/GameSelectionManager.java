@@ -43,10 +43,11 @@ public class GameSelectionManager extends HttpServlet {
 
                     int rounds = Integer.parseInt(request.getParameter("rounds"));
 
-                    String modeName = request.getParameter("mode");
+                    /* Disable mode selection for release. */
+                    /* String modeName = request.getParameter("mode"); */
                     Role role = request.getParameter("role") == null ? Role.DEFENDER : Role.ATTACKER;
                     GameLevel level = request.getParameter("level") == null ? GameLevel.HARD : GameLevel.EASY;
-                    GameMode mode = null;
+                    GameMode mode = GameMode.DUEL;
 
                     if (rounds < 1 || rounds > 10) {
                         messages.add("Invalid rounds amount");
@@ -54,6 +55,8 @@ public class GameSelectionManager extends HttpServlet {
                         return;
                     }
 
+                    /* Disable mode selection for release. */
+                    /*
                     switch (modeName) {
                         case "sing":
                             mode = GameMode.SINGLE;
@@ -70,6 +73,7 @@ public class GameSelectionManager extends HttpServlet {
                         default:
                             mode = GameMode.SINGLE;
                     }
+                    */
 
                     if (classId != 0 && DatabaseAccess.getClassForKey("Class_ID", classId) != null) {
                         //Valid class selected.
