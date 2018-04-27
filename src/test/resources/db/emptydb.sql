@@ -1,9 +1,3 @@
--- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
---
--- Host: localhost    Database: codedefenders
--- ------------------------------------------------------
--- Server version	5.7.11-log
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -19,6 +13,52 @@
 -- CREATE DATABASE codedefenders;
 -- USE codedefenders;
 
+
+DROP TABLE IF EXISTS `settings`;
+CREATE TABLE settings
+(
+  name         VARCHAR(50) PRIMARY KEY NOT NULL,
+  type         ENUM ('STRING_VALUE', 'INT_VALUE', 'BOOL_VALUE'),
+  STRING_VALUE TEXT,
+  INT_VALUE    INTEGER,
+  BOOL_VALUE   BOOL
+);
+
+INSERT INTO settings (name, type, STRING_VALUE, INT_VALUE, BOOL_VALUE) VALUES
+  ('SHOW_PLAYER_FEEDBACK', 'BOOL_VALUE', NULL, NULL, FALSE),
+  ('REGISTRATION', 'BOOL_VALUE', NULL, NULL, TRUE),
+  ('CLASS_UPLOAD', 'BOOL_VALUE', NULL, NULL, TRUE),
+  ('GAME_CREATION', 'BOOL_VALUE', NULL, NULL, TRUE),
+  ('REQUIRE_MAIL_VALIDATION', 'BOOL_VALUE', NULL, NULL, FALSE),
+  ('SITE_NOTICE', 'STRING_VALUE', 'please add a site notice', NULL, NULL),
+  ('PASSWORD_RESET_SECRET_LIFESPAN', 'INT_VALUE', NULL, 12, NULL),
+  ('MIN_PASSWORD_LENGTH', 'INT_VALUE', NULL, 8, NULL),
+  ('CONNECTION_POOL_CONNECTIONS', 'INT_VALUE', NULL, 20, NULL),
+  ('CONNECTION_WAITING_TIME', 'INT_VALUE', NULL, 5000, NULL),
+  ('EMAIL_SMTP_HOST', 'STRING_VALUE', '', NULL, NULL),
+  ('EMAIL_SMTP_PORT', 'INT_VALUE', '', NULL, NULL),
+  ('EMAIL_ADDRESS', 'STRING_VALUE', '', NULL, NULL),
+  ('EMAILS_ENABLED', 'BOOL_VALUE', NULL, NULL, FALSE),
+  ('DEBUG_MODE', 'BOOL_VALUE', NULL, NULL, FALSE),
+  ('EMAIL_PASSWORD', 'STRING_VALUE', '', NULL, NULL);
+
+
+DROP TABLE IF EXISTS `ratings`;
+CREATE TABLE ratings
+(
+  User_ID INT DEFAULT -1 NOT NULL,
+  Game_ID INT DEFAULT -1 NOT NULL,
+  type    VARCHAR (128),
+  value INT DEFAULT 0 NOT NULL,
+  CONSTRAINT fk_ratings_userID_users FOREIGN KEY (User_ID) REFERENCES users (User_ID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT fk_ratings_gameID_games FOREIGN KEY (Game_ID) REFERENCES games (ID)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT game_user_type_unique UNIQUE (User_ID, Game_ID, type)
+);
+
 --
 -- Table structure for table `classes`
 --
@@ -33,6 +73,7 @@ CREATE TABLE `classes` (
   `ClassFile` varchar(255) NOT NULL,
   `Alias` varchar(50) NOT NULL,
   `AiPrepared` TINYINT(1) DEFAULT '0',
+  `RequireMocking` TINYINT(1) DEFAULT '0',
   PRIMARY KEY (`Class_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=221 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX classes_Alias_uindex ON classes (Alias);
@@ -58,8 +99,12 @@ CREATE TABLE `games` (
   `Mutant_Goal` float DEFAULT NULL,
   `Attackers_Needed` int(11) DEFAULT '0',
   `Defenders_Needed` int(11) DEFAULT '0',
-  `Start_Time` TIMESTAMP DEFAULT 0,
-  `Finish_Time` TIMESTAMP DEFAULT 0,
+  `Start_Time` TIMESTAMP DEFAULT '1970-02-02 01:01:01',
+  `Finish_Time` TIMESTAMP DEFAULT '1970-02-02 01:01:01',
+  MaxAssertionsPerTest INT DEFAULT 2 NOT NULL,
+  MutantValidator ENUM('STRICT', 'MODERATE', 'RELAXED') DEFAULT 'MODERATE' NOT NULL,
+  MarkUncovered BOOL DEFAULT FALSE  NOT NULL,
+  ChatEnabled BOOL DEFAULT TRUE  NULL,
   `Attackers_Limit` int(11) DEFAULT '0',
   `Defenders_Limit` int(11) DEFAULT '0',
   `State` enum('CREATED','ACTIVE','FINISHED','GRACE_ONE','GRACE_TWO') DEFAULT 'CREATED',
@@ -72,9 +117,9 @@ CREATE TABLE `games` (
   PRIMARY KEY (`ID`),
   KEY `fk_creatorId_idx` (`Creator_ID`),
   KEY `fk_className_idx` (`Class_ID`),
-  CONSTRAINT `fk_classId` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_className` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_classId` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_className` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -102,8 +147,8 @@ CREATE TABLE `mutants` (
   PRIMARY KEY (`Mutant_ID`),
   KEY `fk_gameId_idx` (`Game_ID`),
   KEY `fk_playerId_idx` (`Player_ID`),
-  CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX mutants_Game_ID_MD5_index ON mutants (Game_ID, MD5);
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -125,8 +170,8 @@ CREATE TABLE `players` (
   PRIMARY KEY (`ID`),
   KEY `fk_userId_players_idx` (`User_ID`),
   KEY `fk_gameId_players_idx` (`Game_ID`),
-  CONSTRAINT `fk_gameId_players` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_userId_players` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_gameId_players` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_userId_players` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX players_User_ID_Game_ID_uindex ON players (User_ID, Game_ID);
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -178,8 +223,8 @@ CREATE TABLE `tests` (
   KEY `fk_playerId_idx` (`Player_ID`),
   KEY `fk_gameId_tests_idx` (`Game_ID`),
   KEY `fk_playerId_tests_idx` (`Player_ID`),
-  CONSTRAINT `fk_gameId_tests` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_gameId_tests` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -196,7 +241,7 @@ CREATE TABLE `usedaimutants` (
   `Game_ID` int(11) NOT NULL,
   PRIMARY KEY (`UsedMutant_ID`),
   KEY `fk_gameId_ai_mutants_idx` (`Game_ID`),
-  CONSTRAINT `fk_gameId_ai_mutants` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_gameId_ai_mutants` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -213,7 +258,7 @@ CREATE TABLE `usedaitests` (
   `Game_ID` int(11) NOT NULL,
   PRIMARY KEY (`UsedTest_ID`),
   KEY `fk_gameId_ai_test_idx` (`Game_ID`),
-  CONSTRAINT `fk_gameId_ai_test` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_gameId_ai_test` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -243,13 +288,16 @@ CREATE TABLE `users` (
   `Password` char(60) NOT NULL,
   `Email` varchar(254) NOT NULL,
   `Validated` TINYINT(1) DEFAULT '0' NOT NULL,
+  pw_reset_timestamp TIMESTAMP DEFAULT NULL  NULL,
+  pw_reset_secret VARCHAR(254) DEFAULT NULL  NULL,
   PRIMARY KEY (`User_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX users_email_index ON users (Email);
+CREATE UNIQUE INDEX users_pw_reset_secret_uindex ON users (pw_reset_secret);
 DELIMITER $$
 CREATE TRIGGER ins_users
-BEFORE INSERT ON `users`
-FOR EACH ROW BEGIN
+  BEFORE INSERT ON `users`
+  FOR EACH ROW BEGIN
   IF (NEW.Email IN (SELECT * FROM registeredEmails)) THEN
     SET NEW.Validated = TRUE;
   END IF;
@@ -279,7 +327,7 @@ CREATE TABLE `sessions` (
   `IP_Address` varchar(320) NOT NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`Session_ID`),
-  CONSTRAINT `fk_userId_sessions` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_userId_sessions` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -294,8 +342,8 @@ CREATE TABLE `equivalences` (
   UNIQUE KEY `ID_UNIQUE` (`ID`),
   KEY `fk_equiv_def_idx` (`Defender_ID`),
   KEY `fk_equiv_mutant_idx` (`Mutant_ID`),
-  CONSTRAINT `fk_equiv_def` FOREIGN KEY (`Defender_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_equiv_mutant` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_equiv_def` FOREIGN KEY (`Defender_ID`) REFERENCES `players` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_equiv_mutant` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 --
