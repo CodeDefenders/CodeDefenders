@@ -76,11 +76,11 @@ Adding a tomcat admin can be done by applying the `manager-gui` role to a user.
 <user username="<MY_ADMIN_USER>" password="<MY_ADMIN_PWD>" roles="manager-gui"/>
 ```
 
-All the configuration and privileged features are accessible under the `admin` page. Configurations are organized in three groups:
+All system configuration and privileged features are accessible for admin users under the `/admin` page. Configurations are organized in three groups:
 
-* Game management. This allows admin users to create bulk games for an entire class, distribute students among the games, and assign roles to students.
-* User management. This allows admin users to check and update users settings, and forcefully reset passwords.
-* System settings. This allows admin users to customize the technical aspects of Code Defenders and include several advanced settings.
+* Game management: Create bulk games for an entire class, distribute students among the games, and assign roles to students.
+* User management: Check and update users settings, and forcefully reset passwords.
+* System settings: Customize technical aspects of Code Defenders and include several advanced settings.
 
 
 ## Build and Deployment
@@ -105,7 +105,7 @@ mvn clean compile package install war:war tomcat7:redeploy -DskipTests
 
 # Project Import
 
-Code Defenders and most of its dependencies are handled via Maven. Code-defenders can also be imported into common IDEs (e.g., IntelliJ and Eclipse).
+Code Defenders and most of its dependencies are handled via Maven. Code Defenders can also be imported into common IDEs (e.g., IntelliJ and Eclipse).
 
 <!--
 TODO: Do we really need this?
