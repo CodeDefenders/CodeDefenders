@@ -123,7 +123,6 @@ mkdir -vp ${data_dir}/ai
 # Currently, this downloads more dependencies than necessary. The issue might be jacoco agent which comes with a broken manifest otherwise.
 
 echo "* Download dependencies and copy resources"
-set -x
 mvn -f installation-pom.xml clean validate package -Dconfig.properties=$config_file > /dev/null
 
 # Do we need to check/set group permissions?
