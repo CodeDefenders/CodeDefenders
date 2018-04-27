@@ -45,7 +45,7 @@ tomcat.path=...
 
 ### Installation script
 
-To install Code Defenders automatically, execute the `setup.sh` script under the `installation` folder passing the `config.properties` file as input. Depending on the chosen data directory, root access may be required to create folders.
+To install Code Defenders automatically, execute the `setup.sh` script under the `installation` folder passing the `config.properties` file as input. 
 
 ```bash
 cd installation
@@ -56,6 +56,8 @@ The script performs a basic availability check of required software. The data di
 
 If any installation step fails, the installation process aborts and prints an error message.
 
+**Note** Depending on the chosen data directory and tomcat installation in place, root access may be required to create the required folders. Similarly, additional configurations might be needed. For example, if tomcat runs under a different user then data directory accesses and ownership might be changed. 
+
 ### Tomcat User Management
 For deployment, Tomcat requires a user with `manager-script` role, which be be configured in `$CATALINA_HOME/conf/tomcat-users.xml` (`CATALINA_HOME` is the Tomcat installation directory).
 
@@ -65,13 +67,21 @@ For deployment, Tomcat requires a user with `manager-script` role, which be be c
 ```
 
 ### Set up Code Defenders admin users
-Code Defenders relies on the Tomcat authentication system to identify admin users, who can access protected pages). Access control is enforced through Tomcat using Basic Authentication in the browser.
+Code Defenders relies on the Tomcat authentication system to identify admin users, who can access protected pages and customize Code Defenders settings.
+Access control is enforced through Tomcat using Basic Authentication in the browser.
 Adding a tomcat admin can be done by applying the `manager-gui` role to a user.
 
 ```xml
 <role rolename="manager-gui"/>
 <user username="<MY_ADMIN_USER>" password="<MY_ADMIN_PWD>" roles="manager-gui"/>
 ```
+
+All the configuration and privileged features are accessible under the `admin` page. Configurations are organized in three groups:
+
+* Game management. This allows admin users to create bulk games for an entire class, distribute students among the games, and assign roles to students.
+* User management. This allows admin users to check and update users settings, and forcefully reset passwords.
+* System settings. This allows admin users to customize the technical aspects of Code Defenders and include several advanced settings.
+
 
 ## Build and Deployment
 
