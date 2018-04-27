@@ -1,22 +1,5 @@
 package org.codedefenders;
 
-import static org.codedefenders.validation.CodeValidator.validMutant;
-import static org.codedefenders.validation.CodeValidator.validTestCode;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-
 import org.apache.commons.io.FileUtils;
 import org.codedefenders.exceptions.CodeValidatorException;
 import org.codedefenders.util.DatabaseAccess;
@@ -30,12 +13,29 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+
+import static org.codedefenders.validation.CodeValidator.validMutant;
+import static org.codedefenders.validation.CodeValidator.validTestCode;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
  * @author Jose Rojas
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({DatabaseAccess.class})
 public class CodeValidatorTest {
+
+	private CodeValidator.CodeValidatorLevel codeValidatorLevel = CodeValidator.CodeValidatorLevel.STRICT;
 
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -83,7 +83,7 @@ public class CodeValidatorTest {
 		PowerMockito.mockStatic(DatabaseAccess.class);
 		when(DatabaseAccess.getClassForKey(anyString(), anyInt())).thenReturn(mockedGameClass);
 
-		String validityMessage = GameManager.getMutantValidityMessage(1, mutatedCode);
+		String validityMessage = GameManager.getMutantValidityMessage(1, mutatedCode, codeValidatorLevel);
 
 		assertEquals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE, validityMessage);
 	}
@@ -130,7 +130,7 @@ public class CodeValidatorTest {
 		PowerMockito.mockStatic(DatabaseAccess.class);
 		when(DatabaseAccess.getClassForKey(anyString(), anyInt())).thenReturn( mockedGameClass );
 		
-		String validityMessage = GameManager.getMutantValidityMessage(1, originalCode);
+		String validityMessage = GameManager.getMutantValidityMessage(1, originalCode, codeValidatorLevel);
 		assertEquals(Constants.MUTANT_VALIDATION_IDENTICAL_MESSAGE, validityMessage);
 	}
 	
@@ -177,7 +177,7 @@ public class CodeValidatorTest {
 		PowerMockito.mockStatic(DatabaseAccess.class);
 		when(DatabaseAccess.getClassForKey(anyString(), anyInt())).thenReturn( mockedGameClass );
 		
-		String validityMessage = GameManager.getMutantValidityMessage(1, mutatedCode);
+		String validityMessage = GameManager.getMutantValidityMessage(1, mutatedCode, codeValidatorLevel);
 		assertEquals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE, validityMessage);
 
 	}
@@ -196,7 +196,7 @@ public class CodeValidatorTest {
 				+ "protected void setBar(int bar){}\n"
 				+ "public int getBib(){ return 0; }\n"
 				+ "};";
-		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode, codeValidatorLevel);
 		assertEquals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE, validationMessage);
 	}
 
@@ -216,7 +216,7 @@ public class CodeValidatorTest {
 				+ "protected void setBar(int bar){}\n"
 				+ "public int getBib(){ return -1; }\n"
 				+ "};";
-		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode, codeValidatorLevel);
 		assertEquals(Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE, validationMessage);
 	}
 
@@ -236,7 +236,7 @@ public class CodeValidatorTest {
 				+ "protected void setBar(int bar){}\n"
 				+ "public int getBib(){ return -1; }\n"
 				+ "};";
-		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode, codeValidatorLevel);
 		assertEquals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE, validationMessage);
 	}
 
@@ -254,7 +254,7 @@ public class CodeValidatorTest {
 				+ "protected void setBar(int bar){}\n"
 				+ "public int getBib(){ return -1; }\n"
 				+ "};";
-		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode, codeValidatorLevel);
 		assertEquals(Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE, validationMessage);
 	}
 
@@ -272,7 +272,7 @@ public class CodeValidatorTest {
 				+ "protected void setBar(int bar){}\n"
 				+ "public int getBib(){ return -1; }\n"
 				+ "};";
-		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode, codeValidatorLevel);
 		assertEquals(Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE, validationMessage);
 	}
 
@@ -290,7 +290,7 @@ public class CodeValidatorTest {
 				+ "protected int setBar(int bar){ return 0;}\n"
 				+ "public int getBib(){ return -1; }\n"
 				+ "};";
-		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode, codeValidatorLevel);
 		assertEquals(Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE, validationMessage);
 	}
 
@@ -308,7 +308,7 @@ public class CodeValidatorTest {
 				+ "protected void setBar(int bar){}\n"
 				+ "public int getBibXXX(){ return -1; }\n"
 				+ "};";
-		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode);
+		String validationMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode, codeValidatorLevel);
 		assertEquals(Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE, validationMessage);
 	}
 
@@ -404,7 +404,7 @@ public class CodeValidatorTest {
 		String mutatedCode = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/InvalidMutantLift1.java").toPath()),
 				Charset.defaultCharset());
-		assertTrue(validMutant(originalCode, mutatedCode));
+		assertTrue(validMutant(originalCode, mutatedCode, codeValidatorLevel));
 	}
 
 	@Test
@@ -416,7 +416,7 @@ public class CodeValidatorTest {
 				Files.readAllBytes(
 						new File("src/test/resources/itests/mutants/XmlElement/MutantXmlElement1.java").toPath()),
 				Charset.defaultCharset());
-		assertTrue(validMutant(originalCode, mutatedCode));
+		assertTrue(validMutant(originalCode, mutatedCode, codeValidatorLevel));
 	}
 
 	@Test //TODO change this if CodeValidator is reverted to prohibiting new lines
@@ -427,7 +427,7 @@ public class CodeValidatorTest {
 		String mutatedCode = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
 				Charset.defaultCharset());
-		assertTrue("Line added, mutant is valid", validMutant(originalCode, mutatedCode));
+		assertTrue("Line added, mutant is valid", validMutant(originalCode, mutatedCode, codeValidatorLevel));
 	}
 
 	@Test
@@ -440,63 +440,63 @@ public class CodeValidatorTest {
 	public void testValidMutant1() {
 		String orig = "int x = x + 0;";
 		String mutant = "int x = x + 1;";
-		assertTrue(validMutant(orig, mutant));
+		assertTrue(validMutant(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
 	public void testValidMutant2() {
 		String orig = "int x = x + 1;";
 		String mutant = "int x = x - 1;";
-		assertTrue(validMutant(orig, mutant));
+		assertTrue(validMutant(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test //TODO change this if CodeValidator is reverted to prohibiting multiple statements
 	public void testInValidMutant3() {
 		String orig = "int x = 0;";
 		String mutant = "int x = 0; x++;";
-		assertTrue("Should be valid as mutant has multiple statements per line", validMutant(orig, mutant));
+		assertTrue("Should be valid as mutant has multiple statements per line", validMutant(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
 	public void testInvalidMutant1() {
 		String orig = "int x = 0;";
 		String mutant = "int x = 0; if (x>0) {return false;}";
-		assertFalse(validMutant(orig, mutant));
+		assertFalse(validMutant(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
 	public void testInvalidMutant2() {
 		String orig = "int x = 0;";
 		String mutant = "int x = 0; while (x>0) {return false;}";
-		assertFalse(validMutant(orig, mutant));
+		assertFalse(validMutant(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
 	public void testInvalidMutantContainsIf() {
 		String orig = "if (x >= 0) return 1; else return -x;";
 		String mutant = "if (x >= 0) if (x >= 0) { return 1; } else return -x;";
-		assertFalse(validMutant(orig, mutant));
+		assertFalse(validMutant(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
 	public void testInvalidMutantContainsSystemCall() {
 		String orig = "if (x >= 0) return 1; else return -x;";
 		String mutant = "if (x >= 0) { System.currentTimeMillis(); return x; } else return -x;";
-		assertFalse(validMutant(orig, mutant));
+		assertFalse(validMutant(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
 	public void testInvalidMutantWithTernaryOperator1() {
 		String orig = "x = 1;";
 		String mutant = "x = x == 0 ? 1 : 0;";
-		assertFalse(validMutant(orig, mutant));
+		assertFalse(validMutant(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
 	public void testInvalidMutantWithTernaryOperator2() {
 		String orig = "currentFloor--;";
 		String mutant = "currentFloor = currentFloor + currentFloor % 8 == 0 ? (-1) : 0;";
-		assertFalse(validMutant(orig, mutant));
+		assertFalse(validMutant(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
@@ -504,61 +504,61 @@ public class CodeValidatorTest {
 		String orig = "if (!isHierachic(path))";
 		String mutant = "if (!isHierachic(\"test.value\"))"; // raises
 		// com.github.javaparser.TokenMgrException
-		assertTrue(validMutant(orig, mutant));
+		assertTrue(validMutant(orig, mutant, codeValidatorLevel));
 	}
 
 	@Ignore
 	@Test
 	public void testMultipleStatements() throws Exception {
-		assertFalse(validMutant("mul();", "mul(); add();"));
-		assertFalse(validMutant("for (int i = 0; i <= 10; i ++) {", "mul(); for (int i = 0; i <= 10; i ++) {"));
+		assertFalse(validMutant("mul();", "mul(); add();", codeValidatorLevel));
+		assertFalse(validMutant("for (int i = 0; i <= 10; i ++) {", "mul(); for (int i = 0; i <= 10; i ++) {", codeValidatorLevel));
 	}
 
 	@Test
 	public void testBitshifts() throws Exception {
-		assertFalse(validMutant("r.num = r.num;", "r.num = r.num | ((r.num & (1 << 29)) << 1);"));
-		assertFalse(validMutant("r.num = r.num;", "r.num = r.num << 1+344;"));
+		assertFalse(validMutant("r.num = r.num;", "r.num = r.num | ((r.num & (1 << 29)) << 1);", codeValidatorLevel));
+		assertFalse(validMutant("r.num = r.num;", "r.num = r.num << 1+344;", codeValidatorLevel));
 	}
 
 	@Test
 	public void testSignatureChange() throws Exception {
-		assertFalse(validMutant("public class Rational  {", "public final class Rational  {"));
-		assertFalse(validMutant("class Rational  {", "public class Rational  {"));
-		assertFalse(validMutant("class Rational  {", "final class Rational  {"));
-		assertFalse(validMutant("public class Rational  {", "class Rational  {"));
-		assertFalse(validMutant("public class Rational  {", "protected class Rational  {"));
-		assertFalse(validMutant("final class Rational  {", "class Rational  {"));
+		assertFalse(validMutant("public class Rational  {", "public final class Rational  {", codeValidatorLevel));
+		assertFalse(validMutant("class Rational  {", "public class Rational  {", codeValidatorLevel));
+		assertFalse(validMutant("class Rational  {", "final class Rational  {", codeValidatorLevel));
+		assertFalse(validMutant("public class Rational  {", "class Rational  {", codeValidatorLevel));
+		assertFalse(validMutant("public class Rational  {", "protected class Rational  {", codeValidatorLevel));
+		assertFalse(validMutant("final class Rational  {", "class Rational  {", codeValidatorLevel));
 
 	}
 
 	@Ignore //TODO figure out if this is worth the effort if it can't be achieved with line-by-line matching
 	@Test
 	public void testLiterals() throws Exception {
-		assertTrue(validMutant("format(\"first\", \"second\", \"third\");", "format(\"\", \"sec\", \"third\");"));
-		assertTrue(validMutant("String s = \"\";", "String s = \" \";"));
-		assertTrue(validMutant("String s = \"stringval\";", "String s = \"stringval \";"));
+		assertTrue(validMutant("format(\"first\", \"second\", \"third\");", "format(\"\", \"sec\", \"third\");", codeValidatorLevel));
+		assertTrue(validMutant("String s = \"\";", "String s = \" \";", codeValidatorLevel));
+		assertTrue(validMutant("String s = \"stringval\";", "String s = \"stringval \";", codeValidatorLevel));
 		for (String p : CodeValidator.PROHIBITED_OPERATORS) {
 			assertTrue(p + " in a String should be valid",
-					validMutant("String s = \"\";", "String s = \"" + p + "\";"));
+					validMutant("String s = \"\";", "String s = \"" + p + "\";", codeValidatorLevel));
 		}
-		assertTrue(validMutant("String s = \"\";", "String s = \";?{} <<\";"));
-		assertTrue(validMutant("String s = \"\";", "String s = \"public final protected\";"));
-		assertTrue(validMutant("Char c = \'c\';", "Char c = \';\';"));
+		assertTrue(validMutant("String s = \"\";", "String s = \";?{} <<\";", codeValidatorLevel));
+		assertTrue(validMutant("String s = \"\";", "String s = \"public final protected\";", codeValidatorLevel));
+		assertTrue(validMutant("Char c = \'c\';", "Char c = \';\';", codeValidatorLevel));
 	}
 
 	@Test
 	public void testComments() throws Exception {
-		assertFalse("added single line comment", validMutant("String s = \"\";", "String s = \"\";// added comment"));
+		assertFalse("added single line comment", validMutant("String s = \"\";", "String s = \"\";// added comment", codeValidatorLevel));
 		assertFalse("added single line comment in new line",
-				validMutant("if(x > 0) \n\t return x;", "if(x > 1) \n\t return x; // comment"));
+				validMutant("if(x > 0) \n\t return x;", "if(x > 1) \n\t return x; // comment", codeValidatorLevel));
 		//TODO check if there is a way to prohibit this without being to restrictive
         /*assertFalse("modified single line comment",
                 validMutant("if(x > 0) \n\t return x; //x is positive", "if(x > 1) \n\t return x; //x is gt 1"));*/
 		assertTrue("modified code, single line comment unchanged",
-				validMutant("String s = \"old\";// comment", "String s = \"new\";// comment"));
-		assertFalse("added multiline comment", validMutant("String s = \"\";", "String s = \"\"; /*added comment*/"));
+				validMutant("String s = \"old\";// comment", "String s = \"new\";// comment", codeValidatorLevel));
+		assertFalse("added multiline comment", validMutant("String s = \"\";", "String s = \"\"; /*added comment*/", codeValidatorLevel));
 		assertTrue("changed code in new line after unchanged comment",
-				validMutant("String test = \"\"; // comment\nfoo1", "String test = \"\"; // comment\nfoo2"));
+				validMutant("String test = \"\"; // comment\nfoo1", "String test = \"\"; // comment\nfoo2", codeValidatorLevel));
         /*assertFalse("modified comment in new line after unchanged comment", validMutant(
                 "String s = \"\"//comment\nfoo; // comment\nfoo1", "String s = \"\"; //comment\nfoo//new comment"));*/
 	}
