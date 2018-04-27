@@ -56,9 +56,9 @@ The script performs a basic availability check of required software. The data di
 
 If any installation step fails, the installation process aborts and prints an error message.
 
-**Note** Depending on the chosen data directory and tomcat installation in place, root access may be required to create the required folders. Similarly, additional configurations might be needed. For example, if tomcat runs under a different user then data directory accesses and ownership might be changed. 
+**Note:** Depending on the chosen data directory and Tomcat installation in place, root access may be necessary to create required folders. Similarly, additional configurations might be needed. For example, if Tomcat runs under a different user, data directory accesses and ownership might be need to be adjusted.
 
-**Note** Code Defenders also requires that its mysql user owns specific privileges to create databases and tables. Additionally, it requires INDEX privileges, otherwise the installation fails with an error message similar to:
+**Note:** Code Defenders also requires that its MySQL user owns specific privileges to create databases and tables. Additionally, it requires INDEX privileges, otherwise the installation fails with an error message similar to:
 
 ```ERROR 1142 (42000) at line 183: INDEX command denied to user```
 
