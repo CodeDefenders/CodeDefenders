@@ -41,16 +41,8 @@ public class CodeValidator {
 		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE.equals(getValidationMessage(originalCode, mutatedCode));
 	}
 
-	// This validation pipeline should use the Chain-of-Command design pattern
+	// This validation pipeline should use the Chain-of-Responsibility design pattern
 	public static String getValidationMessage(String originalCode, String mutatedCode) {
-
-		String originalLines[] = originalCode.split("\\r?\\n");
-		String mutatedLines[] = mutatedCode.split("\\r?\\n");
-
-		//TODO check if this is too restrictive
-		// if lines were added or removed, mutant is invalid
-        /*if (originalLines.length != mutatedLines.length)
-            return Constants.MUTANT_VALIDATION_LINES_MESSAGE;*/
 
 		// if only string literals were changed
 		if (onlyLiteralsChanged(originalCode, mutatedCode)) {
@@ -61,19 +53,6 @@ public class CodeValidator {
 		if (mutantChangesMethodSignatures(originalCode, mutatedCode) || mutantChangesFieldNames(originalCode, mutatedCode) || mutantChangesImportStatements(originalCode, mutatedCode)) {
 			return Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE;
 		}
-
-		/*for (int i = 0; i < originalLines.length; ++i) {
-            String originalLine = originalLines[i];
-            String mutatedLine = mutatedLines[i];
-            // rudimentary word-level matching as dmp works on character level
-            List<DiffMatchPatch.Diff> word_changes = tokenDiff(originalLine, mutatedLine);
-            if (containsProhibitedModifierChanges(word_changes))
-                return Constants.MUTANT_VALIDATION_MODIFIER_MESSAGE;
-
-            //if comments were changed in any way, mutant is invalid
-            if (containsModifiedComments(originalLine, mutatedLine))
-                return Constants.MUTANT_VALIDATION_COMMENT_MESSAGE;
-        }*/
 
 		// rudimentary word-level matching as dmp works on character level
 		List<DiffMatchPatch.Diff> word_changes = tokenDiff(originalCode, mutatedCode);
@@ -119,7 +98,7 @@ public class CodeValidator {
 		return diffs;
 	}
 
-	// This remove " from Strings...
+	// This removes " from Strings...
 	
 	private static List<String> getTokens(StreamTokenizer st) {
 
