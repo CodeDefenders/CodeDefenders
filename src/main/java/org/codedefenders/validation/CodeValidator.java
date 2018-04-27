@@ -33,16 +33,21 @@ public class CodeValidator {
 	}
 
 	//TODO check if removing ";" makes people take advantage of using multiple statements
-	public final static String[] PROHIBITED_OPERATORS = {"<<", ">>", ">>>", "?", "//", "/*"};
-	public final static String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
+	public final static String[] PROHIBITED_OPERATORS = {"<<", ">>", ">>>", "//", "/*"};
+	public final static String[] PROHIBITED_CONTROL_STRUCTURES = {"if", "for", "while", "switch"};
+	private final static String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
+	private final static String[] PROHIBITED_CALLS = {"System.", "Random.", "Thread."};
+	public final static String[] COMMENT_TOKENS = {"//", "/*"};
+	private final static String TERNARY_OP_REGEX = "(?:\\?.*\\:)";
+
 	private static final Logger logger = LoggerFactory.getLogger(CodeValidator.class);
 
-	public static boolean validMutant(String originalCode, String mutatedCode) {
-		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE.equals(getValidationMessage(originalCode, mutatedCode));
+	public static boolean validMutant(String originalCode, String mutatedCode, CodeValidatorLevel level) {
+		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE.equals(getValidationMessage(originalCode, mutatedCode, level));
 	}
 
 	// This validation pipeline should use the Chain-of-Responsibility design pattern
-	public static String getValidationMessage(String originalCode, String mutatedCode) {
+	public static String getValidationMessage(String originalCode, String mutatedCode, CodeValidatorLevel level) {
 
 		// if only string literals were changed
 		if (onlyLiteralsChanged(originalCode, mutatedCode)) {
@@ -50,13 +55,13 @@ public class CodeValidator {
 		}
 
 		// If the mutants contains changes to method signatures, mark it as not valid
-		if (mutantChangesMethodSignatures(originalCode, mutatedCode) || mutantChangesFieldNames(originalCode, mutatedCode) || mutantChangesImportStatements(originalCode, mutatedCode)) {
+		if (level.equals(CodeValidatorLevel.STRICT) && (mutantChangesMethodSignatures(originalCode, mutatedCode) || mutantChangesFieldNames(originalCode, mutatedCode) || mutantChangesImportStatements(originalCode, mutatedCode))) {
 			return Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE;
 		}
 
 		// rudimentary word-level matching as dmp works on character level
 		List<DiffMatchPatch.Diff> word_changes = tokenDiff(originalCode, mutatedCode);
-		if (containsProhibitedModifierChanges(word_changes))
+		if (level.equals(CodeValidatorLevel.STRICT) &&  containsProhibitedModifierChanges(word_changes))
 			return Constants.MUTANT_VALIDATION_MODIFIER_MESSAGE;
 
 		// Runs diff match patch between the two Strings to see if there are any differences.
@@ -68,7 +73,7 @@ public class CodeValidator {
 			if (d.operation != DiffMatchPatch.Operation.EQUAL) {
 				hasChanges = true;
 				if (d.operation == DiffMatchPatch.Operation.INSERT) {
-					String insertionValidityMessage = validInsertion(d.text);
+					String insertionValidityMessage = validInsertion(d.text, level);
 					if (!insertionValidityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE))
 						return insertionValidityMessage;
 				}
@@ -225,6 +230,7 @@ public class CodeValidator {
 		Set<String> mutantMethodSignatures = new HashSet<>();
 
 		try (InputStream is = new ByteArrayInputStream(orig.getBytes())) {
+			System.out.println(muta);
 			CompilationUnit cu = JavaParser.parse(is);
 
 			for( TypeDeclaration td : cu.getTypes() ){
@@ -308,7 +314,7 @@ public class CodeValidator {
 		return !cutFieldNames.equals(mutantFieldNames);
 	}
 
-	private static String validInsertion(String diff) {
+	private static String validInsertion(String diff, CodeValidatorLevel level) {
 		try {
 			BlockStmt blockStmt = JavaParser.parseBlock("{ " + diff + " }");
 			MutationVisitor visitor = new MutationVisitor();
@@ -320,22 +326,37 @@ public class CodeValidator {
 		// remove whitespaces
 		String diff2 = diff.replaceAll("\\s+", "");
 		// forbid logical operators unless they appear on their own (LOR)
-		if ((diff2.contains("|") && !("|".equals(diff2) || "||".equals(diff2)))
-				|| (diff2.contains("&") && !("&".equals(diff2) || "&&".equals(diff2)))) {
+		if (!level.equals(CodeValidatorLevel.RELAXED) &&  ((diff2.contains("|") && !("|".equals(diff2) || "||".equals(diff2)))
+				|| (diff2.contains("&") && !("&".equals(diff2) || "&&".equals(diff2))))) {
 			return Constants.MUTANT_VALIDATION_LOGIC_MESSAGE;
 		}
-		// forbid if, while, for, and system calls, and ?: operator
-		String regex = "(?:(?:if|while|for)\\s*\\(.*|[\\s\\;\\{\\(\\)]System\\.|[\\s\\;\\{\\(\\)]Random\\.|^System\\.|^Random\\.|\\?.*\\:)";
-		Pattern p = Pattern.compile(regex);
-		if (p.matcher(diff2).find())
+
+		if (!level.equals(CodeValidatorLevel.RELAXED) && Pattern.compile(TERNARY_OP_REGEX).matcher(diff2).find())
+			return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE;
+
+		if(!level.equals(CodeValidatorLevel.RELAXED) && containsAny(diff2, PROHIBITED_CONTROL_STRUCTURES))
 			return Constants.MUTANT_VALIDATION_CALLS_MESSAGE;
-		// If bitshifts are used or diff contains "?" (hinting at a ternary operator)
-		for (String operator : PROHIBITED_OPERATORS) {
-			if (diff2.contains(operator))
-				return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE; // TODO: Is there a better way to handle this for ternary operator?
-		}
+
+		if(!level.equals(CodeValidatorLevel.RELAXED) && containsAny(diff2, COMMENT_TOKENS))
+			return Constants.MUTANT_VALIDATION_COMMENT_MESSAGE;
+
+		if (containsAny(diff2, PROHIBITED_CALLS))
+			return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE;
+
+		// If bitshifts are used
+		if (level.equals(CodeValidatorLevel.STRICT) && containsAny(diff2, PROHIBITED_OPERATORS))
+			return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE;
+
 		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
 
+	}
+
+	private static boolean containsAny(String str, String[] tokens){
+		for (String token : tokens) {
+			if (str.contains(token))
+				return true;
+		}
+		return false;
 	}
 
 	public static boolean validTestCode(String javaFile, int maxNumberOfAssertions) throws CodeValidatorException {
