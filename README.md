@@ -58,6 +58,11 @@ If any installation step fails, the installation process aborts and prints an er
 
 **Note** Depending on the chosen data directory and tomcat installation in place, root access may be required to create the required folders. Similarly, additional configurations might be needed. For example, if tomcat runs under a different user then data directory accesses and ownership might be changed. 
 
+**Note** Code Defenders also requires that its mysql user owns specific privileges to create databases and tables. Additionally, it requires INDEX privileges, otherwise the installation fails with an error message similar to:
+
+```ERROR 1142 (42000) at line 183: INDEX command denied to user```
+
+
 ### Tomcat User Management
 For deployment, Tomcat requires a user with `manager-script` role, which be be configured in `$CATALINA_HOME/conf/tomcat-users.xml` (`CATALINA_HOME` is the Tomcat installation directory).
 
