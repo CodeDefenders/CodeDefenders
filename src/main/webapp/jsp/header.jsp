@@ -8,19 +8,19 @@
 <script>
     //If the user is logged in, start receiving notifications
     var updateUserNotifications = function(url) {
-        $.get(url, function (r) {
+        $.getJSON(url, function (r) {
 
             var notificationCount = 0;
 
             $(r).each(function (index) {
                 $("#userDropDown li:first-child").after(
                     "<li><a " +
-                    "href=\"" + "<%=request.getContextPath().toString()%>" +
+                    "href=\"" + "<%=request.getContextPath()%>" +
                     "/multiplayer/games?id=" + r[index].gameId +
                     "\" style=\"width:100%;\">" +
                     r[index].parsedMessage +
                     "</a></li>"
-                )
+                );
 
                 if (r[index].eventStatus == "NEW"){
                     notificationCount += 1;
@@ -37,7 +37,7 @@
 
             $("#notificationCount").html(notifCount);
         });
-    }
+    };
 
     $(document).ready(function() {
             if ($("#userDropDown").length) {
@@ -102,7 +102,7 @@
                     style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
                         <li><a
-                               href="<%=request.getContextPath().toString()%>/logout"
+                               href="<%=request.getContextPath()%>/logout"
                                style="width:100%;border-bottom:1px solid
                                black">Logout
                         </a></li>
