@@ -8,7 +8,7 @@
     <ul class="nav nav-tabs">
         <li><a href="<%=request.getContextPath()%>/admin/games"> Manage Games</a></li>
         <li><a href="<%=request.getContextPath()%>/admin/users">Manage Users</a></li>
-        <li class="active"><a href="#">System Settings</a></li>
+        <li class="active"><a >System Settings</a></li>
     </ul>
 
     <h3>System Settings</h3>
