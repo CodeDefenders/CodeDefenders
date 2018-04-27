@@ -12,7 +12,7 @@
 <%@ include file="/jsp/header.jsp" %>
 <div class="full-width">
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#">Manage Games</a></li>
+        <li class="active"><a>Manage Games</a></li>
         <li><a href="<%=request.getContextPath()%>/admin/users"> Manage Users</a></li>
         <li><a href="<%=request.getContextPath()%>/admin/settings">System Settings</a></li>
     </ul>
