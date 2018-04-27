@@ -1,9 +1,3 @@
--- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
---
--- Host: localhost    Database: codedefenders
--- ------------------------------------------------------
--- Server version	5.7.11-log
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
