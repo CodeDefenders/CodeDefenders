@@ -92,7 +92,11 @@ else
   DB_PASSWORD="-p${db_password}"
 fi
 
-mysql -u${db_username} ${DB_PASSWORD} -e "SELECT USER(),CURRENT_USER()" > /dev/null
+mysql -u${db_username} ${DB_PASSWORD} -e "SELECT USER(),CURRENT_USER()" > /dev/null 2> /dev/null
+
+echo "* Check mysql (database existence)"
+
+result=$(mysql -u${db_username} ${DB_PASSWORD} -s -N -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${DB_NAME}'" 2>/dev/null); if [ -z "$result" ]; then echo "Database ${DB_NAME} does not exists. Please create it before running this script."; exit 1; fi
 
 # Can we connect the db? Note that this might fail because the user lacks the proper grants/permission (i.e., INDEX creation)
 read -p "* Setting up '${DB_NAME}' as code-defenders DB. \
