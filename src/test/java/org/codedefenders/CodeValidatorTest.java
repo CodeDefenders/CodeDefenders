@@ -563,59 +563,67 @@ public class CodeValidatorTest {
                 "String s = \"\"//comment\nfoo; // comment\nfoo1", "String s = \"\"; //comment\nfoo//new comment"));*/
 	}
 
-	//bitshifts and signature changes are valid with a moderate validator
 	@Test
 	public void testModerateLevel() throws Exception {
-		codeValidatorLevel = CodeValidator.CodeValidatorLevel.MODERATE;
+		checkModerateRelaxations(CodeValidator.CodeValidatorLevel.STRICT);
+		checkModerateRelaxations(CodeValidator.CodeValidatorLevel.MODERATE);
+	}
 
-		assertTrue(validMutant("public class Rational  {", "public final class Rational  {", codeValidatorLevel));
-		assertTrue(validMutant("class Rational  {", "public class Rational  {", codeValidatorLevel));
-		assertTrue(validMutant("class Rational  {", "final class Rational  {", codeValidatorLevel));
-		assertTrue(validMutant("public class Rational  {", "class Rational  {", codeValidatorLevel));
-		assertTrue(validMutant("public class Rational  {", "protected class Rational  {", codeValidatorLevel));
-		assertTrue(validMutant("final class Rational  {", "class Rational  {", codeValidatorLevel));
+	//bitshifts and signature changes are valid with a moderate validator
+	public void checkModerateRelaxations(CodeValidator.CodeValidatorLevel level) {
+		boolean isValid = !level.equals(CodeValidator.CodeValidatorLevel.STRICT);
 
-		assertTrue(validMutant("r.num = r.num;", "r.num = r.num | ((r.num & (1 << 29)) << 1);", codeValidatorLevel));
-		assertTrue(validMutant("r.num = r.num;", "r.num = r.num << 1+344;", codeValidatorLevel));
-		codeValidatorLevel = CodeValidator.CodeValidatorLevel.STRICT;
+		assertEquals(isValid, validMutant("public class Rational  {", "public final class Rational  {", level));
+		assertEquals(isValid, validMutant("class Rational  {", "public class Rational  {", level));
+		assertEquals(isValid, validMutant("class Rational  {", "final class Rational  {", level));
+		assertEquals(isValid, validMutant("public class Rational  {", "class Rational  {", level));
+		assertEquals(isValid, validMutant("public class Rational  {", "protected class Rational  {", level));
+		assertEquals(isValid, validMutant("final class Rational  {", "class Rational  {", level));
+
+		assertEquals(isValid, validMutant("r.num = r.num;", "r.num = r.num | ((r.num & (1 << 29)) << 1);", level));
+		assertEquals(isValid, validMutant("r.num = r.num;", "r.num = r.num << 1+344;", level));
+	}
+
+	@Test
+	public void testRelaxedLevel() throws Exception {
+		checkModerateRelaxations(CodeValidator.CodeValidatorLevel.STRICT);
+		checkModerateRelaxations(CodeValidator.CodeValidatorLevel.RELAXED);
+		checkRelaxedRelaxations(CodeValidator.CodeValidatorLevel.MODERATE);
+		checkRelaxedRelaxations(CodeValidator.CodeValidatorLevel.RELAXED);
 
 	}
 
 	// additional comments, additional logical operators, ternary operators, new control structures are valid with a relaxed validator
-	@Test
-	public void testRelaxedLevel() throws Exception {
-		codeValidatorLevel = CodeValidator.CodeValidatorLevel.RELAXED;
+	private void checkRelaxedRelaxations(CodeValidator.CodeValidatorLevel level){
+		// all the following mutants should be invalid unless the validator is relaxed
+		boolean isValid = level.equals(CodeValidator.CodeValidatorLevel.RELAXED);
 
-		assertTrue("added single line comment", validMutant("String s = \"\";", "String s = \"\";// added comment", codeValidatorLevel));
-		assertTrue("added single line comment in new line",
-				validMutant("if(x > 0) \n\t return x;", "if(x > 1) \n\t return x; // comment", codeValidatorLevel));
-		assertTrue("modified code, single line comment unchanged",
-				validMutant("String s = \"old\";// comment", "String s = \"new\";// comment", codeValidatorLevel));
-		assertTrue("added multiline comment", validMutant("String s = \"\";", "String s = \"\"; /*added comment*/", codeValidatorLevel));
-		assertTrue("changed code in new line after unchanged comment",
-				validMutant("String test = \"\"; // comment\nfoo1", "String test = \"\"; // comment\nfoo2", codeValidatorLevel));
-
+		assertEquals(isValid, validMutant("String s = \"\";", "String s = \"\";// added comment", level));
+		assertEquals(isValid, validMutant("if(x > 0) \n\t return x;", "if(x > 1) \n\t return x; // comment", level));
+		assertEquals(isValid, validMutant("String s = \"\";", "String s = \"\"; /*added comment*/", level));
 
 		String orig = "x = 1;";
 		String mutant = "x = x == 0 ? 1 : 0;";
-		assertTrue(validMutant(orig, mutant, codeValidatorLevel));
+		assertEquals(isValid, validMutant(orig, mutant, level));
 		orig = "currentFloor--;";
 		mutant = "currentFloor = currentFloor + currentFloor % 8 == 0 ? (-1) : 0;";
-		assertTrue(validMutant(orig, mutant, codeValidatorLevel));
-
+		assertEquals(isValid, validMutant(orig, mutant, level));
 
 		orig = "if (x >= 0) return 1; else return -x;";
 		mutant = "if (x >= 0) if (x >= 0) { return 1; } else return -x;";
-		assertTrue(validMutant(orig, mutant, codeValidatorLevel));
+		assertEquals(isValid, validMutant(orig, mutant, level));
 
 		orig = "int x = 0;";
 		mutant = "int x = 0; if (x>0) {return false;}";
-		assertTrue(validMutant(orig, mutant, codeValidatorLevel));
+		assertEquals(isValid, validMutant(orig, mutant, level));
 
 		orig = "int x = 0;";
 		mutant = "int x = 0; while (x>0) {return false;}";
-		assertTrue(validMutant(orig, mutant, codeValidatorLevel));
-		codeValidatorLevel = CodeValidator.CodeValidatorLevel.STRICT;
+		assertEquals(isValid, validMutant(orig, mutant, level));
+	}
 
+	@Test
+	public void test() {
+		assertTrue(validMutant("String s = \"\";", "String s = \"\";// added comment", CodeValidator.CodeValidatorLevel.RELAXED));
 	}
 }
