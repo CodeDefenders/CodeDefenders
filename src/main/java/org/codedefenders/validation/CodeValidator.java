@@ -324,7 +324,7 @@ public class CodeValidator {
 	private static String validInsertion(String diff, CodeValidatorLevel level) {
 		try {
 			BlockStmt blockStmt = JavaParser.parseBlock("{ " + diff + " }");
-			MutationVisitor visitor = new MutationVisitor();
+			MutationVisitor visitor = new MutationVisitor(level);
 			visitor.visit(blockStmt, null);
 			if (!visitor.isValid())
 				return visitor.getMessage();
