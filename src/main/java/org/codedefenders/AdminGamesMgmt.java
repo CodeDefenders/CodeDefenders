@@ -5,6 +5,7 @@ import org.codedefenders.multiplayer.MultiplayerGame;
 import org.codedefenders.multiplayer.PlayerScore;
 import org.codedefenders.util.AdminDAO;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.Redirect;
 import org.codedefenders.validation.CodeValidator;
 
 import javax.servlet.ServletException;
@@ -74,11 +75,7 @@ public class AdminGamesMgmt extends HttpServlet {
                 break;
             default:
                 System.err.println("Action not recognised");
-                String redirect = (String) request.getHeader("referer");
-                if (!redirect.startsWith(request.getContextPath())) {
-                    redirect = request.getContextPath() + "/" + redirect;
-                }
-                response.sendRedirect(redirect);
+                Redirect.redirectBack(request, response);
                 break;
         }
     }
