@@ -483,6 +483,10 @@ public class CodeValidatorTest {
 		String orig = "if (x >= 0) return 1; else return -x;";
 		String mutant = "if (x >= 0) { System.currentTimeMillis(); return x; } else return -x;";
 		assertFalse(validMutant(orig, mutant, codeValidatorLevel));
+
+		orig = "highestFloor = 10;";
+		mutant = "highestFloor = java.util.Random().nextInt();";
+		assertFalse(validMutant(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
@@ -620,5 +624,10 @@ public class CodeValidatorTest {
 		orig = "int x = 0;";
 		mutant = "int x = 0; while (x>0) {return false;}";
 		assertEquals(isValid, validMutant(orig, mutant, level));
+	}
+
+	@Test
+	public void testInvalidMutantWithLogicalOps() {
+		assertFalse(validMutant("if (numRiders + numEntering <= capacity) {", "if (numRiders + numEntering <= capacity && false) {", CodeValidator.CodeValidatorLevel.MODERATE));
 	}
 }
