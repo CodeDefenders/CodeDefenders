@@ -33,8 +33,9 @@ public class CodeValidator {
 	}
 
 	//TODO check if removing ";" makes people take advantage of using multiple statements
-	public final static String[] PROHIBITED_OPERATORS = {"<<", ">>", ">>>", "//", "/*"};
+	public final static String[] PROHIBITED_BITWISE_OPERATORS = {"<<", ">>", ">>>", "|", "&"};
 	public final static String[] PROHIBITED_CONTROL_STRUCTURES = {"if", "for", "while", "switch"};
+	public final static String[] PROHIBITED_LOGICAL_OPS = {"&&", "||"};
 	private final static String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
 	private final static String[] PROHIBITED_CALLS = {"System.", "Random.", "Thread."};
 	public final static String[] COMMENT_TOKENS = {"//", "/*"};
@@ -67,6 +68,9 @@ public class CodeValidator {
 
 		if (!level.equals(CodeValidatorLevel.RELAXED) && ternaryAdded(originalCode, mutatedCode))
 			return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE;
+
+		if (!level.equals(CodeValidatorLevel.RELAXED) && logicalOpAdded(originalCode, mutatedCode))
+			return Constants.MUTANT_VALIDATION_LOGIC_MESSAGE;
 
 		// Runs diff match patch between the two Strings to see if there are any differences.
 		DiffMatchPatch dmp = new DiffMatchPatch();
@@ -328,11 +332,6 @@ public class CodeValidator {
 		}
 		// remove whitespaces
 		String diff2 = diff.replaceAll("\\s+", "");
-		// forbid logical operators unless they appear on their own (LOR)
-		if (!level.equals(CodeValidatorLevel.RELAXED) &&  ((diff2.contains("|") && !("|".equals(diff2) || "||".equals(diff2)))
-				|| (diff2.contains("&") && !("&".equals(diff2) || "&&".equals(diff2))))) {
-			return Constants.MUTANT_VALIDATION_LOGIC_MESSAGE;
-		}
 
 		if(!level.equals(CodeValidatorLevel.RELAXED) && containsAny(diff2, PROHIBITED_CONTROL_STRUCTURES))
 			return Constants.MUTANT_VALIDATION_CALLS_MESSAGE;
@@ -344,7 +343,7 @@ public class CodeValidator {
 			return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE;
 
 		// If bitshifts are used
-		if (level.equals(CodeValidatorLevel.STRICT) && containsAny(diff2, PROHIBITED_OPERATORS))
+		if (level.equals(CodeValidatorLevel.STRICT) && containsAny(diff2, PROHIBITED_BITWISE_OPERATORS))
 			return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE;
 
 		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
@@ -353,6 +352,10 @@ public class CodeValidator {
 
 	private static boolean ternaryAdded(String orig, String muta){
 		return !Pattern.compile(TERNARY_OP_REGEX).matcher(orig).find() && Pattern.compile(TERNARY_OP_REGEX).matcher(muta).find();
+	}
+
+	private static boolean logicalOpAdded(String orig, String muta){
+		return !containsAny(orig, PROHIBITED_LOGICAL_OPS) && containsAny(muta, PROHIBITED_LOGICAL_OPS);
 	}
 
 	private static boolean containsAny(String str, String[] tokens){

@@ -740,7 +740,7 @@
                         <b>Strict</b> <br>
                         <ul>
                             <li>No reflection</li>
-                            <li>No bitshifts</li>
+                            <li>No bitwise operators (bitshifts and logical)</li>
                             <li>No signature changes</li>
                         </ul>
                     </div>
