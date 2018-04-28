@@ -38,7 +38,7 @@ public class CodeValidator {
 	private final static String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
 	private final static String[] PROHIBITED_CALLS = {"System.", "Random.", "Thread."};
 	public final static String[] COMMENT_TOKENS = {"//", "/*"};
-	private final static String TERNARY_OP_REGEX = "(?:\\?.*\\:)";
+	private final static String TERNARY_OP_REGEX = ".*\\?.*:.*";
 
 	private static final Logger logger = LoggerFactory.getLogger(CodeValidator.class);
 
@@ -63,6 +63,10 @@ public class CodeValidator {
 		List<DiffMatchPatch.Diff> word_changes = tokenDiff(originalCode, mutatedCode);
 		if (level.equals(CodeValidatorLevel.STRICT) &&  containsProhibitedModifierChanges(word_changes))
 			return Constants.MUTANT_VALIDATION_MODIFIER_MESSAGE;
+
+
+		if (!level.equals(CodeValidatorLevel.RELAXED) && ternaryAdded(originalCode, mutatedCode))
+			return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE;
 
 		// Runs diff match patch between the two Strings to see if there are any differences.
 		DiffMatchPatch dmp = new DiffMatchPatch();
@@ -230,7 +234,6 @@ public class CodeValidator {
 		Set<String> mutantMethodSignatures = new HashSet<>();
 
 		try (InputStream is = new ByteArrayInputStream(orig.getBytes())) {
-			System.out.println(muta);
 			CompilationUnit cu = JavaParser.parse(is);
 
 			for( TypeDeclaration td : cu.getTypes() ){
@@ -331,9 +334,6 @@ public class CodeValidator {
 			return Constants.MUTANT_VALIDATION_LOGIC_MESSAGE;
 		}
 
-		if (!level.equals(CodeValidatorLevel.RELAXED) && Pattern.compile(TERNARY_OP_REGEX).matcher(diff2).find())
-			return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE;
-
 		if(!level.equals(CodeValidatorLevel.RELAXED) && containsAny(diff2, PROHIBITED_CONTROL_STRUCTURES))
 			return Constants.MUTANT_VALIDATION_CALLS_MESSAGE;
 
@@ -349,6 +349,10 @@ public class CodeValidator {
 
 		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
 
+	}
+
+	private static boolean ternaryAdded(String orig, String muta){
+		return !Pattern.compile(TERNARY_OP_REGEX).matcher(orig).find() && Pattern.compile(TERNARY_OP_REGEX).matcher(muta).find();
 	}
 
 	private static boolean containsAny(String str, String[] tokens){
