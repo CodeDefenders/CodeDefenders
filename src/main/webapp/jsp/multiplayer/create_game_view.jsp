@@ -208,7 +208,9 @@
                 <td>
                     <select id = "mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker" data-size="medium">
                         <%for (CodeValidator.CodeValidatorLevel cvl : CodeValidator.CodeValidatorLevel.values()){%>
-                        <option value=<%=cvl.name()%>><%=cvl.name().toLowerCase()%></option>
+                        <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidator.CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
+                            <%=cvl.name().toLowerCase()%>
+                        </option>
                         <%}%>
                     </select>
                     <div id="validatorExplanation" class="collapse panel panel-default" style="font-size: 12px;">
