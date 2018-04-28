@@ -621,9 +621,4 @@ public class CodeValidatorTest {
 		mutant = "int x = 0; while (x>0) {return false;}";
 		assertEquals(isValid, validMutant(orig, mutant, level));
 	}
-
-	@Test
-	public void test() {
-		assertTrue(validMutant("String s = \"\";", "String s = \"\";// added comment", CodeValidator.CodeValidatorLevel.RELAXED));
-	}
 }
