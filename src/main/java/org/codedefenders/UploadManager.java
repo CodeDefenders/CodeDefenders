@@ -14,6 +14,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.codedefenders.singleplayer.PrepareAI;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.Redirect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,22 +98,14 @@ public class UploadManager extends HttpServlet {
 		// Not a java file
 		if (!fileName.endsWith(".java")) {
 			messages.add("The class under test must be a .java file.");
-			String redirect = (String) request.getHeader("referer");
-			if( ! redirect.startsWith(request.getContextPath())){
-				redirect = request.getContextPath()+"/" + redirect;
-			}
-			response.sendRedirect(redirect);
+			Redirect.redirectBack(request, response);
 			return;
 		}
 
 		// no file content?
 		if (fileContent == null || fileContent.isEmpty()) {
 			messages.add("File content could not be read. Please try again.");
-			String redirect = (String) request.getHeader("referer");
-			if( ! redirect.startsWith(request.getContextPath())){
-				redirect = request.getContextPath()+"/" + redirect;
-			}
-			response.sendRedirect(redirect);
+			Redirect.redirectBack(request, response);
 			return;
 		}
 
@@ -202,11 +195,7 @@ public class UploadManager extends HttpServlet {
 		} else {
 			cut.delete();
 			messages.add("We were unable to compile your class, please try with a simpler one (no dependencies)");
-			String redirect = (String) request.getHeader("referer");
-			if( ! redirect.startsWith(request.getContextPath())){
-				redirect = request.getContextPath()+"/" + redirect;
-			}
-			response.sendRedirect(redirect);
+			Redirect.redirectBack(request, response);
 			return;
 		}
 	}
