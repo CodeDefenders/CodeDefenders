@@ -7,6 +7,9 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import difflib.Chunk;
+import difflib.Delta;
+import difflib.DiffUtils;
 import org.apache.commons.io.FileUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.Constants;
@@ -17,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author Jose Rojas
@@ -60,19 +64,28 @@ public class CodeValidator {
 			return Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE;
 		}
 
+
+		// line-level diff
+		List<List<?>> originalLines = getOriginalLines(originalCode, mutatedCode);
+		List<List<?>> changedLines = getChangedLines(originalCode, mutatedCode);
+		assert(originalLines.size() == changedLines.size());
+
+		if (!level.equals(CodeValidatorLevel.RELAXED) && containsModifiedComments(originalLines, changedLines))
+			return Constants.MUTANT_VALIDATION_COMMENT_MESSAGE;
+
 		// rudimentary word-level matching as dmp works on character level
 		List<DiffMatchPatch.Diff> word_changes = tokenDiff(originalCode, mutatedCode);
 		if (level.equals(CodeValidatorLevel.STRICT) &&  containsProhibitedModifierChanges(word_changes))
 			return Constants.MUTANT_VALIDATION_MODIFIER_MESSAGE;
 
 
-		if (!level.equals(CodeValidatorLevel.RELAXED) && ternaryAdded(originalCode, mutatedCode))
+		if (!level.equals(CodeValidatorLevel.RELAXED) && ternaryAdded(originalLines, changedLines))
 			return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE;
 
-		if (!level.equals(CodeValidatorLevel.RELAXED) && logicalOpAdded(originalCode, mutatedCode))
+		if (!level.equals(CodeValidatorLevel.RELAXED) && logicalOpAdded(originalLines, changedLines))
 			return Constants.MUTANT_VALIDATION_LOGIC_MESSAGE;
 
-		// Runs diff match patch between the two Strings to see if there are any differences.
+		// Runs character-level diff match patch between the two Strings to see if there are any differences.
 		DiffMatchPatch dmp = new DiffMatchPatch();
 		LinkedList<DiffMatchPatch.Diff> changes = dmp.diffMain(originalCode.trim().replace("\n", "").replace("\r", ""), mutatedCode.trim().replace("\n", "").replace("\r", ""), true);
 		boolean hasChanges = false;
@@ -154,6 +167,14 @@ public class CodeValidator {
 		return false;
 	}
 
+	private static Boolean containsModifiedComments(List<List<?>> orig, List<List<?>> muta) {
+		for (int i = 0; i < orig.size(); i ++) {
+			if (containsModifiedComments(orig.get(i).toString(), muta.get(i).toString()))
+				return true;
+		}
+		return false;
+	}
+
 	private static Boolean containsModifiedComments(String orig, String muta) {
 		String[] commentTokens = {"//", "/*", "*/"};
 		for (String ct : commentTokens) {
@@ -172,6 +193,7 @@ public class CodeValidator {
 
 			String commentTokensOrig = orig.substring(orig.indexOf("/*"), commentTokensOrigLimit);
 			String commentTokensMuta = orig.substring(muta.indexOf("/*"), commentTokensMutaLimit);
+			//noinspection RedundantIfStatement
 			if (!commentTokensMuta.equals(commentTokensOrig))
 				return true;
 		}
@@ -350,8 +372,24 @@ public class CodeValidator {
 
 	}
 
+	private static boolean ternaryAdded(List<List<?>> orig, List<List<?>> muta){
+		for (int i = 0; i < orig.size(); i ++) {
+			if (ternaryAdded(orig.get(i).toString(), muta.get(i).toString()))
+				return true;
+		}
+		return false;
+	}
+
 	private static boolean ternaryAdded(String orig, String muta){
 		return !Pattern.compile(TERNARY_OP_REGEX).matcher(orig).find() && Pattern.compile(TERNARY_OP_REGEX).matcher(muta).find();
+	}
+
+	private static boolean logicalOpAdded(List<List<?>> orig, List<List<?>> muta){
+		for (int i = 0; i < orig.size(); i ++) {
+			if (logicalOpAdded(orig.get(i).toString(), muta.get(i).toString()))
+				return true;
+		}
+		return false;
 	}
 
 	private static boolean logicalOpAdded(String orig, String muta){
@@ -427,5 +465,27 @@ public class CodeValidator {
 		String partialString = getTokens(st).toString();
 		// Why do we need to remove spaces, I understand
 		return partialString;//.replaceAll("\\s+", "");
+	}
+
+	private static List<String> trimLines(List<String> lines) {
+		return lines.stream().map(String::trim).collect(Collectors.toList());
+	}
+
+	public static List<Delta> getDeltas(String original, String changed) {
+		List<String> originalLines = trimLines(Arrays.asList(original.split("\n")));
+		List<String> changedLines = trimLines(Arrays.asList(changed.split("\n")));
+		return DiffUtils.diff(originalLines, changedLines).getDeltas();
+	}
+
+	private static List<List<?>> getChangedLines(String original, String changed) {
+		List<Delta> deltas = getDeltas(original, changed);
+		List<Chunk> chunks = deltas.stream().map(Delta::getRevised).collect(Collectors.toList());
+		return chunks.stream().map(Chunk::getLines).collect(Collectors.toList());
+	}
+
+	private static List<List<?>> getOriginalLines(String original, String changed) {
+		List<Delta> deltas = getDeltas(original, changed);
+		List<Chunk> chunks = deltas.stream().map(Delta::getOriginal).collect(Collectors.toList());
+		return chunks.stream().map(Chunk::getLines).collect(Collectors.toList());
 	}
 }
