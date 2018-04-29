@@ -1,9 +1,3 @@
--- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
---
--- Host: localhost    Database: codedefenders
--- ------------------------------------------------------
--- Server version	5.7.11-log
-
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -243,13 +237,16 @@ CREATE TABLE `users` (
   `Password` char(60) NOT NULL,
   `Email` varchar(254) NOT NULL,
   `Validated` TINYINT(1) DEFAULT '0' NOT NULL,
+  pw_reset_timestamp TIMESTAMP DEFAULT NULL  NULL,
+  pw_reset_secret VARCHAR(254) DEFAULT NULL  NULL,
   PRIMARY KEY (`User_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX users_email_index ON users (Email);
+CREATE UNIQUE INDEX users_pw_reset_secret_uindex ON users (pw_reset_secret);
 DELIMITER $$
 CREATE TRIGGER ins_users
-BEFORE INSERT ON `users`
-FOR EACH ROW BEGIN
+  BEFORE INSERT ON `users`
+  FOR EACH ROW BEGIN
   IF (NEW.Email IN (SELECT * FROM registeredEmails)) THEN
     SET NEW.Validated = TRUE;
   END IF;

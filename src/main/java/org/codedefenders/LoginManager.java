@@ -1,5 +1,6 @@
 package org.codedefenders;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.util.AdminDAO;
 import org.codedefenders.util.DatabaseAccess;
 import org.slf4j.Logger;
@@ -19,10 +20,20 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
+
+import static org.codedefenders.AdminUserMgmt.DIGITS;
+import static org.codedefenders.AdminUserMgmt.LOWER;
+import static org.codedefenders.util.DatabaseAccess.setPasswordResetSecret;
 
 public class LoginManager extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoginManager.class);
+	private static final int PW_RESET_SECRET_LENGTH = 20;
+	private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n" +
+			"Change your password here: %s\n" +
+			"This link is only valid for %d hours.\n\n" +
+			"Greetings, your CodeDefenders team";
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -40,7 +51,6 @@ public class LoginManager extends HttpServlet {
 		String password = request.getParameter("password");
 		String email = request.getParameter("email");
 		String formType = request.getParameter("formType");
-		int uid;
 
 		switch (formType) {
 			case "create":
@@ -125,21 +135,62 @@ public class LoginManager extends HttpServlet {
 				email = request.getParameter("accountEmail");
 				username = request.getParameter("accountUsername");
 				User u;
-				if((u = DatabaseAccess.getUserForNameOrEmail(email)) != null && u.getUsername().equals(username) &&
+				if ((u = DatabaseAccess.getUserForNameOrEmail(email)) != null && u.getUsername().equals(username) &&
 						u.getEmail().equals(email)) {
-					String newPassword = AdminUserMgmt.generatePW();
-					BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-					if(AdminDAO.setUserPassword(u.getId(), passwordEncoder.encode(newPassword))) {
-						String msg = String.format(AdminUserMgmt.PASSWORD_RESET_MSG, u.getUsername(), newPassword);
-						if(EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg))
-							messages.add("Your new password has been sent to " + email);
-					} else {
-						messages.add("Your password could not be reset.");
-					}
-				}
+					String resetPwSecret = generatePasswordResetSecret();
+					setPasswordResetSecret(u.getId(), resetPwSecret);
+					String hostAddr = request.getScheme()+"://"+request.getServerName() + ":" + request.getServerPort()  + request.getContextPath();
+					String url =  hostAddr + "/login?resetPW=" + resetPwSecret;
+					String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
+							AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN).intValue);
+					if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg))
+						messages.add("A link for changing your password has been sent to " + email);
+				} else
+					messages.add("No such User found or Email and Username do not match");
 				response.sendRedirect(request.getContextPath() + "/login");
 				break;
+
+			case "changePassword":
+				String resetPwSecret = request.getParameter("resetPwSecret");
+				confirm = request.getParameter("inputConfirmPasswordChange");
+				password = request.getParameter("inputPasswordChange");
+
+				String responseURL = request.getContextPath() + "/login?resetPW=" + resetPwSecret;
+				int userId = DatabaseAccess.getUserIDForPWResetSecret(resetPwSecret);
+				if (resetPwSecret != null && userId > -1) {
+					if (!(validPassword(password))) {
+						messages.add("Password not changed. Make sure it is valid.");
+					} else if (password.equals(confirm)) {
+						User user = DatabaseAccess.getUser(userId);
+						user.setPassword(password);
+						if (user.update()) {
+							DatabaseAccess.setPasswordResetSecret(user.getId(), null);
+							responseURL = request.getContextPath() + "/login";
+							messages.add("Successfully changed your Password.");
+						}
+					} else {
+						messages.add("Your Two Password Entries Did Not Match");
+					}
+				} else {
+					messages.add("Your Password reset link is not valid or has expired");
+					responseURL = request.getContextPath() + "/login";
+				}
+				response.sendRedirect(responseURL);
+				break;
 		}
+	}
+
+
+	private static String generatePasswordResetSecret() {
+		StringBuilder sb = new StringBuilder();
+		char[] initialSet = LOWER;
+		initialSet = ArrayUtils.addAll(initialSet, DIGITS);
+
+		Random random = new Random();
+		for (int i = 0; i < PW_RESET_SECRET_LENGTH; i++) {
+			sb.append(initialSet[random.nextInt(initialSet.length)]);
+		}
+		return sb.toString();
 	}
 
 	/*

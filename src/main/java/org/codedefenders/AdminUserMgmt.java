@@ -18,16 +18,16 @@ import java.util.stream.Collectors;
 
 public class AdminUserMgmt extends HttpServlet {
 
-	private static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
-	private static final char[] DIGITS = "0123456789".toCharArray();
+	static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+	static final char[] DIGITS = "0123456789".toCharArray();
 	private static final char[] PUNCTUATION = "!@#$%&*()_+-=[]|,./?><".toCharArray();
-	static final String USER_INFO_TOKENS_DELIMITER = "[ ,;]+";
+	private static final String USER_INFO_TOKENS_DELIMITER = "[ ,;]+";
 	private static final Logger logger = LoggerFactory.getLogger(AdminUserMgmt.class);
 	private static final String NEW_ACCOUNT_MSG = "Welcome to Code Defenders! \n\n " +
 			"An account has been created for you with Username %s and Password %s.\n" +
 			"You can log int at %s. \n\n Happy coding!";
 	private static final String EMAIL_NOT_SPECIFIED_DOMAIN = "@NOT.SPECIFIED";
-	static final String PASSWORD_RESET_MSG = "%s, \n\n " +
+	private static final String PASSWORD_RESET_MSG = "%s, \n\n" +
 			"your password has been reset to %s\n" +
 			"Please change it at your next convenience.";
 
@@ -138,8 +138,8 @@ public class AdminUserMgmt extends HttpServlet {
 
 							if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()
 									&& !email.endsWith(EMAIL_NOT_SPECIFIED_DOMAIN)) {
-								if (!sendNewAccountMsg(email, name, password,
-										request.getServerName() + ":" + request.getServerPort() + "/" + request.getContextPath()))
+								String hostAddr = request.getScheme()+"://"+request.getServerName() + ":" + request.getServerPort()  + request.getContextPath();
+								if (!sendNewAccountMsg(email, name, password, hostAddr))
 									messages.add("Couldn't send an email to " + email + " for user " + name);
 							}
 						} else {
