@@ -91,7 +91,7 @@ public class LoginManager extends HttpServlet {
 			case "login":
 				User activeUser = DatabaseAccess.getUserForNameOrEmail(username);
 				if (activeUser == null) {
-					messages.add("User could not be retrieved from DB");
+					messages.add("Username not found.");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
 				} else {
@@ -123,8 +123,7 @@ public class LoginManager extends HttpServlet {
 							} else
 								response.sendRedirect(request.getContextPath() + "/games");
 						} else {
-							// TODO: Shouldn't the user exist if we can retrieve it from the DB?
-							messages.add("Username does not exist or your password was incorrect.");
+							messages.add("Username and password do not match.");
 							RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 							dispatcher.forward(request, response);
 						}
