@@ -41,7 +41,7 @@ public class CodeValidator {
 	public final static String[] PROHIBITED_CONTROL_STRUCTURES = {"if", "for", "while", "switch"};
 	public final static String[] PROHIBITED_LOGICAL_OPS = {"&&", "||"};
 	private final static String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
-	private final static String[] PROHIBITED_CALLS = {"System.", "Random.", "Thread.", "Random()"};
+	private final static String[] PROHIBITED_CALLS = {"System.", "Random.", "Thread.", "Random(", "random(", "randomUUID(", "Date("};
 	public final static String[] COMMENT_TOKENS = {"//", "/*"};
 	private final static String TERNARY_OP_REGEX = ".*\\?.*:.*";
 
