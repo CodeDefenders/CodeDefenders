@@ -20,8 +20,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 
-import static org.codedefenders.validation.CodeValidator.validMutant;
-import static org.codedefenders.validation.CodeValidator.validTestCode;
+import static org.codedefenders.validation.CodeValidator.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -427,6 +426,7 @@ public class CodeValidatorTest {
 		String mutatedCode = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
 				Charset.defaultCharset());
+		System.out.println(getValidationMessage(originalCode, mutatedCode, codeValidatorLevel));
 		assertTrue("Line added, mutant is valid", validMutant(originalCode, mutatedCode, codeValidatorLevel));
 	}
 
@@ -555,16 +555,18 @@ public class CodeValidatorTest {
 		assertFalse("added single line comment", validMutant("String s = \"\";", "String s = \"\";// added comment", codeValidatorLevel));
 		assertFalse("added single line comment in new line",
 				validMutant("if(x > 0) \n\t return x;", "if(x > 1) \n\t return x; // comment", codeValidatorLevel));
-		//TODO check if there is a way to prohibit this without being to restrictive
-        /*assertFalse("modified single line comment",
-                validMutant("if(x > 0) \n\t return x; //x is positive", "if(x > 1) \n\t return x; //x is gt 1"));*/
+        assertFalse("modified single line comment",
+                validMutant("if(x > 0) \n\t return x; //x is positive",
+						"if(x > 1) \n\t return x; //x is gt 1",
+						codeValidatorLevel));
 		assertTrue("modified code, single line comment unchanged",
 				validMutant("String s = \"old\";// comment", "String s = \"new\";// comment", codeValidatorLevel));
 		assertFalse("added multiline comment", validMutant("String s = \"\";", "String s = \"\"; /*added comment*/", codeValidatorLevel));
 		assertTrue("changed code in new line after unchanged comment",
 				validMutant("String test = \"\"; // comment\nfoo1", "String test = \"\"; // comment\nfoo2", codeValidatorLevel));
-        /*assertFalse("modified comment in new line after unchanged comment", validMutant(
-                "String s = \"\"//comment\nfoo; // comment\nfoo1", "String s = \"\"; //comment\nfoo//new comment"));*/
+        assertFalse("modified comment in new line after unchanged comment", validMutant(
+                "String s = \"\"//comment\nfoo; // comment\nfoo1", "String s = \"\"; //comment\nfoo//new comment",
+				codeValidatorLevel));
 	}
 
 	@Test
@@ -628,6 +630,35 @@ public class CodeValidatorTest {
 
 	@Test
 	public void testInvalidMutantWithLogicalOps() {
-		assertFalse(validMutant("if (numRiders + numEntering <= capacity) {", "if (numRiders + numEntering <= capacity && false) {", CodeValidator.CodeValidatorLevel.MODERATE));
+		assertTrue(validMutant("if (numRiders + numEntering <= capacity) {",
+				"if (numRiders + numEntering <= capacity && false) {",
+				CodeValidator.CodeValidatorLevel.RELAXED));
+		assertFalse(validMutant("if (numRiders + numEntering <= capacity) {",
+				"if (numRiders + numEntering <= capacity && false) {",
+				CodeValidator.CodeValidatorLevel.MODERATE));
+		assertFalse(validMutant("if (numRiders + numEntering <= capacity) {",
+				"if (numRiders + numEntering <= capacity && false) {",
+				CodeValidator.CodeValidatorLevel.STRICT));
+	}
+
+	@Test
+	public void testInvalidMutantWithChangedAccess(){
+		assertFalse(validMutant("public void test() {", "void test() {", codeValidatorLevel));
+		assertFalse(validMutant("public void test() {", "protected void test() {", codeValidatorLevel));
+		assertFalse(validMutant("public void test() {", "private void test() {", codeValidatorLevel));
+	}
+
+
+	@Test
+	public void testInvalidMutantWithLogicalOps2() throws IOException {
+		String originalCode = new String(
+				Files.readAllBytes(new File("src/test/resources/itests/sources/Lift/Lift.java").toPath()),
+				Charset.defaultCharset());
+		String mutatedCode = new String(
+				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/InvalidMutantLift2.java").toPath()),
+				Charset.defaultCharset());
+		assertTrue(validMutant(originalCode, mutatedCode, CodeValidatorLevel.RELAXED));
+		assertFalse(validMutant(originalCode, mutatedCode, CodeValidatorLevel.MODERATE));
+		assertFalse(validMutant(originalCode, mutatedCode, CodeValidatorLevel.STRICT));
 	}
 }
