@@ -37,21 +37,6 @@ String levelStyling = validatorLevel.equals(CodeValidator.CodeValidatorLevel.REL
 	<div class="w-55" id="newmut-div">
 		<h2 style=" margin-bottom: 0">Create a mutant here</h2>
 
-		<div style="display: inline-block;"> Validator Level:</div>
-		<div data-toggle="collapse" href="#validatorExplanation"
-			 title="Click the question sign for more information on the levels"
-			 class="<%="validatorLevelTag btn " + levelStyling%>">
-			<%=level.substring(0, 1).toUpperCase() + level.substring(1)%>
-		</div>
-		<div style="display: inline-block;">
-			<a data-toggle="collapse" href="#validatorExplanation" style="color:black">
-				<span class="glyphicon glyphicon-question-sign"></span>
-			</a>
-		</div>
-		<div id="validatorExplanation" class="collapse panel panel-default" style="margin: 10px 0 0; max-width: 50%;">
-			<%@ include file="/jsp/validator_explanation.jsp" %>
-		</div>
-
 		<form id="reset" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
 			<input type="hidden" name="formType" value="reset">
 			<button class="btn btn-primary btn-warning btn-game btn-right " style="margin-top: -40px; margin-right: 80px">
@@ -79,6 +64,23 @@ String levelStyling = validatorLevel.equals(CodeValidator.CodeValidatorLevel.REL
 			<pre style=" margin-top: 10px; "><textarea id="code" name="mutant" cols="80" rows="50" style="min-width: 512px;"><%= mutantCode %></textarea></pre>
 
 			<%@include file="/jsp/multiplayer/game_key.jsp"%>
+
+			<div style = "float:right">
+				<div style="display: inline-block;"> Mutant restrictions:</div>
+				<div data-toggle="collapse" href="#validatorExplanation"
+					 title="Click the question sign for more information on the levels"
+					 class="<%="validatorLevelTag btn " + levelStyling%>">
+					<%=level.substring(0, 1).toUpperCase() + level.substring(1)%>
+				</div>
+				<div style="display: inline-block;">
+					<a data-toggle="collapse" href="#validatorExplanation" style="color:black">
+						<span class="glyphicon glyphicon-question-sign"></span>
+					</a>
+				</div>
+			</div>
+			<div id="validatorExplanation" class="collapse panel panel-default" style="margin:auto; margin-top: 50px; max-width: 50%;">
+				<%@ include file="/jsp/validator_explanation.jsp" %>
+			</div>
 
 		</form>
 		<script>
