@@ -18,6 +18,9 @@
     <link href="css/slick_1.5.9.css" rel="stylesheet" type="text/css" />
     <script src="js/slick_1.5.9.min.js" type="text/javascript" ></script>
 
+	<!-- Favicon.ico -->
+	<link rel="icon" href="favicon.ico" type="image/x-icon">
+
     <!-- File Input -->
     <!--
     <script src="js/fileinput.min.js" type="text/javascript"></script>

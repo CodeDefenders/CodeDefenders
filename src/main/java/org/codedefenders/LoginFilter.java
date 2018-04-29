@@ -40,7 +40,8 @@ public class LoginFilter implements Filter {
 	private boolean shouldAllow(HttpServletRequest request) {
 		String path = request.getRequestURI().toString();
 		String context = request.getContextPath().toString();
-		if ((path.endsWith(context + "/"))
+		if ((path.endsWith(context + "/")) //
+				|| (path.endsWith(context + "/favicon.ico")) //
 				|| (path.endsWith(context + "/login"))
 				|| (path.endsWith(context + "/help"))
 				|| (path.endsWith(context + "/video")) || (path.endsWith(context + "/video.mp4"))
