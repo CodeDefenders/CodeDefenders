@@ -2,7 +2,7 @@
 <%@ page import="org.codedefenders.duel.DuelGame" %>
 <%@ page import="org.codedefenders.util.DatabaseAccess" %>
 <% String pageTitle="Open Games"; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 <div class="full-width">
 	<h3>Duels</h3>
 <table class="table table-hover table-responsive table-paragraphs games-table">

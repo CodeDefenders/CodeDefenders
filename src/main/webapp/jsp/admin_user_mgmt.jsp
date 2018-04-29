@@ -2,7 +2,7 @@
 <%@ page import="org.codedefenders.util.AdminDAO" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <% String pageTitle = null; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 
 <div class="full-width">
     <ul class="nav nav-tabs">

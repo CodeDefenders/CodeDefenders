@@ -1,7 +1,7 @@
 <%@ page import="org.codedefenders.singleplayer.PrepareAI" %>
 <%@ page import="org.codedefenders.util.FeedbackDAO" %>
 <% String pageTitle=null; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 <div>
 	<div class="w-100 up">
 		<h2>Upload Class</h2>

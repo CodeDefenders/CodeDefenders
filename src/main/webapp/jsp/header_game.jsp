@@ -1,7 +1,7 @@
 <% String pTitle = pageTitle;
 pageTitle = null;
 %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 </div></div></div></div></div>
 <%@ page import="java.util.*" %>
 <%@ page import="org.codedefenders.*" %>
