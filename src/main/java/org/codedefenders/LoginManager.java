@@ -91,7 +91,7 @@ public class LoginManager extends HttpServlet {
 			case "login":
 				User activeUser = DatabaseAccess.getUserForNameOrEmail(username);
 				if (activeUser == null) {
-					messages.add("Username not found.");
+					messages.add("Username not found or password incorrect.");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
 				} else {
@@ -123,7 +123,7 @@ public class LoginManager extends HttpServlet {
 							} else
 								response.sendRedirect(request.getContextPath() + "/games");
 						} else {
-							messages.add("Username and password do not match.");
+							messages.add("Username not found or password incorrect.");
 							RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 							dispatcher.forward(request, response);
 						}
