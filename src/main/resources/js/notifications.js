@@ -6,7 +6,7 @@ var sendMessage = function(elem){
     var ele = $(elem);
     if (ele.attr("target") && ele.attr("gameId")) {
         var inp = $(ele.parent().find("input"));
-        // TODO Not sure how we get the contextPath here so we use relative url
+        // TODO: Not sure how we get the contextPath here so we use relative url
         var url = "messages/send?message=" + encodeURI(inp.val()) + "&target=" + ele.attr("target") + "&gameId=" + ele.attr("gameId");
 
         $('.send-message input').val('');
@@ -14,8 +14,6 @@ var sendMessage = function(elem){
         $.get(url, function (r) {
             if (r.status != "Success"){
                 window.alert("Could not send message: " + r.status);
-            } else {
-                //TODO: Put newly sent message here.
             }
         });
     }

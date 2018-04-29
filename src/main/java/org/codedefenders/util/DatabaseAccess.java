@@ -73,15 +73,18 @@ public class DatabaseAccess {
 	}
 
 	public static void removePlayerEventsForGame(int gameId, int playerId) {
-		String query = "SELECT * FROM events WHERE Game_ID=? " + "AND Player_ID=?";
+		String query = "UPDATE events SET Event_Status=? WHERE Game_ID=? AND Player_ID=?";
 		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(EventStatus.DELETED.toString()),
 				DB.getDBV(gameId),
 				DB.getDBV(playerId)};
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		for (Event e : getEvents(stmt, conn)) {
-			e.setStatus(EventStatus.DELETED);
-			e.update();
+		try {
+            stmt.executeUpdate();
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+			DB.cleanup(conn, stmt);
 		}
 	}
 
@@ -442,15 +445,15 @@ public class DatabaseAccess {
 	}
 
 	public static List<MultiplayerGame> getJoinedMultiplayerGamesForUser(int userId) {
-		String query = "SELECT * FROM games AS m " + "LEFT JOIN players AS p ON p.Game_ID=m.ID \n" + "WHERE m.Mode = 'PARTY' AND (p.User_ID=?)" + "GROUP BY m.ID;";
+		String query = "SELECT DISTINCT m.* FROM games AS m " + "LEFT JOIN players AS p ON p.Game_ID=m.ID \n" + "WHERE m.Mode = 'PARTY' AND (p.User_ID=?);";
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(userId));
 		return getMultiplayerGames(stmt, conn);
 	}
 
 	public static List<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
-		String query = "SELECT * FROM games AS m LEFT JOIN players AS p ON p.Game_ID=m.ID  AND p.Active=TRUE" +
-				" WHERE m.Mode = 'PARTY' AND (p.User_ID=? OR m.Creator_ID=?) AND m.State != 'FINISHED' GROUP BY m.ID;";
+		String query = "SELECT DISTINCT m.* FROM games AS m LEFT JOIN players AS p ON p.Game_ID=m.ID  AND p.Active=TRUE" +
+				" WHERE m.Mode = 'PARTY' AND (p.User_ID=? OR m.Creator_ID=?) AND m.State != 'FINISHED';";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(userId),
 				DB.getDBV(userId)};
 		Connection conn = DB.getConnection();
@@ -459,7 +462,7 @@ public class DatabaseAccess {
 	}
 
 	public static List<MultiplayerGame> getFinishedMultiplayerGamesForUser(int userId) {
-		String query = "SELECT * FROM games AS m " + "LEFT JOIN players AS p ON p.Game_ID=m.ID  AND p.Active=TRUE \n" + "WHERE (p.User_ID=? OR m.Creator_ID=?) AND m.State = 'FINISHED' AND m.Mode='PARTY'" + "GROUP BY m.ID;";
+		String query = "SELECT DISTINCT m.* FROM games AS m " + "LEFT JOIN players AS p ON p.Game_ID=m.ID  AND p.Active=TRUE \n" + "WHERE (p.User_ID=? OR m.Creator_ID=?) AND m.State = 'FINISHED' AND m.Mode='PARTY';";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(userId),
 				DB.getDBV(userId)};
 		Connection conn = DB.getConnection();
@@ -601,7 +604,8 @@ public class DatabaseAccess {
 	public static List<Mutant> getMutantsForGame(int gid) {
 		List<Mutant> mutList = new ArrayList<>();
 
-		String query = "SELECT * FROM mutants WHERE Game_ID=? AND ClassFile IS NOT NULL;";
+		String query = "SELECT mutants.*, users.Username FROM mutants LEFT " +
+				"JOIN players ON players.ID = mutants.Player_ID LEFT JOIN users ON players.User_ID = users.User_ID WHERE mutants.Game_ID=? AND mutants.ClassFile IS NOT NULL;";
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gid));
 		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
@@ -612,6 +616,7 @@ public class DatabaseAccess {
 						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
 						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
 				newMutant.setScore(rs.getInt("Points"));
+				newMutant.setPlayerName(rs.getString("Username"));
 				mutList.add(newMutant);
 			}
 		} catch (SQLException se) {

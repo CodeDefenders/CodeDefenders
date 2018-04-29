@@ -6,6 +6,7 @@ import org.codedefenders.events.Event;
 import org.codedefenders.events.EventStatus;
 import org.codedefenders.events.EventType;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.Redirect;
 import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,11 +127,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     break;
                 default:
                     System.err.println("Action not recognised");
-                    String redirect = (String) request.getHeader("referer");
-                    if( ! redirect.startsWith(request.getContextPath())){
-                        redirect = request.getContextPath()+"/" + redirect;
-                    }
-                    response.sendRedirect(redirect);
+                    Redirect.redirectBack(request, response);
                     break;
             }
     }

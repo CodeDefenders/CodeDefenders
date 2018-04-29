@@ -1,101 +1,120 @@
 # Code Defenders
 
-This is Code Defenders, a mutation testing game.
+This is Code Defenders, a mutation testing game. Publicly available at [code-defenders.org](<http://code-defenders.org>).
 
-## Requirements
+# Installation
 
-- Tomcat Server v7 or later
-- Ant (default executable `/usr/local/bin/ant`, set environment variable `ANT_HOME`)
-- Maven
-- MySQL
+## Software Requirements
 
-## Database
+- Tomcat Server (Version 7 or later)
+- Apache Maven
+- Apache Ant
+- MySQL (e.g. [MariaDB](https://mariadb.org/))
 
-To create the database, execute `src/main/resources/db/codedefenders.sql`:
+## Installation and Setup
+### Configuration file
+Code Defenders requires a `config.properties` file for initial setup, building and deployment. All necessary configuration properties are listed. The file needs to be in the project root directory.
 
-```bash
-mysql -u [username] -p
-> source src/main/resources/db/codedefenders.sql;
-```
+`config.properties` can hold confidential configuration data, so **please** do not include it into the repository.
 
-## Data Storage
-
-Classes, tests and mutants are stored in `/var/lib/codedefenders/`, these directories must exist:
+Following properties are required:
 
 ```bash
-mkdir -p /var/lib/codedefenders/sources /var/lib/codedefenders/tests /var/lib/codedefenders/mutants
+# The main Code Defenders folder. E.g. /var/lib/codefenders
+data.dir=...
+
+# Location of Ant command
+ant.home=...
+
+# MySQL database URL and credential to access it
+db.url=...
+db.username=...
+db.password=...
+
+# Tomcat credentials with <manager-script> role.
+tomcat.username=...
+tomcat.password=...
+# Deployment URL ,looks like http://<domain>:<port>/manager/text
+tomcat.url=...
+# Path to Tomcat executable
+tomcat.path=...
 ```
 
-The tomcat user (and possibly the user running Code Defenders) must have full permissions on this directory.
+### Database
+`config.properties` requires a URL to an existing database. The database needs to be created before installation.
 
-Major and Evosuite must be stored in their respective folders within this directory (codedefenders/major and codedefenders/evosuite).
+### Installation script
 
-## Build
-Building codedefenders now requires a config.properties file to be in the root of the project. This file contains all the properties that are required to deploy and run codedefenders.
-
-Maven enforces this rule, so if the config.properties is not there, the build will fail.
-
-Therefore, create a config.properties file using the provided config.properties.template. Properties name are self-explanatory.
-
-During the build, maven will output the value of those variables for you to check if they have the correct value.
-
-Since the config.properties contains also your passwords, please **do not commit** it to the repo.
-
-In case you want to provide a file with a different name (let's say config.test), you can add the following option to your maven command: `-Dconfig.properties=config.test` 
-
-## Integration testing
-Before running integration tests, which are activated by using the maven IT profile (-PIT) you need to set up the test resources. Otherwise, the enforcer plugin will break your build.
-
-You can setup the resources by copying the required libraries inside the following folder:
-```
-src/test/resources/itests/lib/
-```
-
-The required libraries are listed inside the following file: ```src/test/resources/itests/lib/libraries.list```
- 
-Otherwise, you can runn the following script (Mac/Linux and default maven installation) which looks for those libraries in your local maven repository and copies then in the right folder:
+To install Code Defenders automatically, execute the `setup.sh` script under the `installation` folder passing the `config.properties` file as input. 
 
 ```bash
-mvn -U clean compile test-compile
-cd src/test/resources/itests/lib
-for F in $(cat libraries.list); do
-  find ~/.m2 -iname "${F}" -exec cp {} . \;
-done
-cd -
+cd installation
+./setup.sh ../config.properties
 ```
-Once these libraries are in place you can run the integration tests (note the war:war in the command):
 
-```mvn compile test-compile war:war test -PIT```
+The script performs a basic availability check of required software. The data directory folder structure and database schema are created. All the required dependencies and files are automatically downloaded.
 
-## Deployment
+If any installation step fails, the installation process aborts and prints an error message.
 
-### Tomcat admin user
+**Note:** Depending on the chosen data directory and Tomcat installation in place, root access may be necessary to create required folders. Similarly, additional configurations might be needed. For example, if Tomcat runs under a different user, data directory accesses and ownership might be need to be adjusted.
 
-Add manager-script role and user to `$CATALINA_HOME/conf/tomcat-users.xml` (`$CATALINA_HOME` should be set to your Tomcat installation root directory):
+**Note:** Code Defenders also requires that its MySQL user owns specific privileges to create databases and tables. Additionally, it requires INDEX privileges, otherwise the installation fails with an error message similar to:
+
+```ERROR 1142 (42000) at line 183: INDEX command denied to user```
+
+
+### Tomcat User Management
+For deployment, Tomcat requires a user with `manager-script` role, which be be configured in `$CATALINA_HOME/conf/tomcat-users.xml` (`CATALINA_HOME` is the Tomcat installation directory).
 
 ```xml
-<role rolename="manager-script"/>  
-<user username="adminscript" password="adm3b5eM3JG" roles="manager-script"/>  
+<role rolename="manager-script"/>
+<user username="<MY_USER>" password="<MY_USER_PASSWORD>" roles="manager-script"/>
 ```
-  
+
+### Set up Code Defenders admin users
+Code Defenders relies on the Tomcat authentication system to identify admin users, who can access protected pages and customize Code Defenders settings.
+Access control is enforced through Tomcat using Basic Authentication in the browser.
+Adding a tomcat admin can be done by applying the `manager-gui` role to a user.
+
+```xml
+<role rolename="manager-gui"/>
+<user username="<MY_ADMIN_USER>" password="<MY_ADMIN_PWD>" roles="manager-gui"/>
+```
+
+All system configuration and privileged features are accessible for admin users under the `/admin` page. Configurations are organized in three groups:
+
+* Game management: Create bulk games for an entire class, distribute students among the games, and assign roles to students.
+* User management: Check and update users settings, and forcefully reset passwords.
+* System settings: Customize technical aspects of Code Defenders and include several advanced settings.
+
+
+## Build and Deployment
+
+For successful deployment, both Tomcat and MySQL services must be running.
+Code Defenders is built and deployed with Maven using the following commands.
+
 ### Deploy first time
 
-Tomcat and MySQL passwords must be provided to compile and deploy _the first time_, either by editing `makefile` or by passing them as arguments:
+To deploy Code Defenders the _first time_, execute:
 
 ```bash
-make first [TOMCAT_PASSWORD=... MYSQL_PASSWORD=...]
+mvn clean compile package install war:war tomcat7:deploy -DskipTests
 ```
+
 ### Redeploy
-
-To compile and _redeploy_:
+To redeploy instead use:
 
 ```bash
-make
+mvn clean compile package install war:war tomcat7:redeploy -DskipTests
 ```
 
-## IntelliJ Project
+# Project Import
 
-- Import Maven project from existing sources
+Code Defenders and most of its dependencies are handled via Maven. Code Defenders can also be imported into common IDEs (e.g., IntelliJ and Eclipse).
+
+<!--
+TODO: Do we really need this?
+ - Import Maven project from existing sources
 - Configure Tomcat server
   - Preferences -> Build, Execution, Deployment -> Application Servers -> Add Tomcat Server
 - Configure Artifact (as Web Application: Exploded), it must include:
@@ -105,7 +124,4 @@ make
   - \`webapps\` directory contents
 - Add Run/Debug Configuration
   - Run -> Edit Configurations... -> Add New Tomcat Server configuration -> Add \`Build artifact\` in \`Before launch\` panel and check On Update action: Redeploy. -> OK
-
-## Public URL
-
-<http://code-defenders.org>
+-->

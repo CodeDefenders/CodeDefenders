@@ -122,7 +122,7 @@
 	if (messages != null && ! messages.isEmpty()) {
 %>
 <div class="alert alert-info" id="messages-div">
-    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><br />
+    <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a><br />
     <%
         boolean fadeOut = true;
         for (String m : messages) { %>

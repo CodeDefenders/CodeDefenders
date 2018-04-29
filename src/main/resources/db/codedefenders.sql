@@ -1,6 +1,5 @@
 -- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
 --
--- Host: localhost    Database: codedefenders
 -- ------------------------------------------------------
 -- Server version	5.7.11-log
 
@@ -14,10 +13,6 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
-DROP DATABASE IF EXISTS `codedefenders`;
-CREATE DATABASE codedefenders;
-USE codedefenders;
 
 DROP TABLE IF EXISTS `settings`;
 CREATE TABLE settings
@@ -181,7 +176,7 @@ CREATE TABLE `players` (
   CONSTRAINT `fk_gameId_players` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_userId_players` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
-CREATE UNIQUE INDEX players_User_ID_Game_ID_uindex ON codedefenders.players (User_ID, Game_ID);
+CREATE UNIQUE INDEX players_User_ID_Game_ID_uindex ON players (User_ID, Game_ID);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --

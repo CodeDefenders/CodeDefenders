@@ -16,33 +16,8 @@ import java.util.List;
 
 public class AdminDAO {
 
-    public static final String TIMETSTAMP_NEVER = "never";
+    public static final String TIMESTAMP_NEVER = "never";
     private static final Logger logger = LoggerFactory.getLogger(AdminDAO.class);
-    private static final String ACTIVE_USERS_QUERY =
-            "SELECT DISTINCT\n" +
-                    "  Username,\n" +
-                    "  users.User_ID,\n" +
-                    "  MAX(players.Game_ID) AS newestGame\n" +
-                    "FROM (users\n" +
-                    "  INNER JOIN players ON users.User_ID = players.User_ID) INNER JOIN (games\n" +
-                    "  INNER JOIN classes ON games.Class_ID = classes.Class_ID) ON players.Game_ID = games.ID\n" +
-                    "WHERE State = 'ACTIVE' AND Mode = 'PARTY' AND Finish_Time > NOW()\n" +
-                    "GROUP BY Username, users.User_ID\n" +
-                    "ORDER BY newestGame DESC;";
-    private static final String INACTIVE_USERS_QUERY =
-            "SELECT DISTINCT\n" +
-                    "  users.User_ID,\n" +
-                    "  users.Username,\n" +
-                    "  MAX(sessions.Timestamp) AS 'Last Login'\n" +
-                    "FROM\n" +
-                    "  users LEFT JOIN sessions on users.User_ID = sessions.User_ID\n" +
-                    "WHERE users.User_ID > 2 AND users.User_ID NOT IN (\n" +
-                    "  SELECT DISTINCT players.User_ID\n" +
-                    "  FROM (players\n" +
-                    "    INNER JOIN games ON players.Game_ID = games.ID)\n" +
-                    "  WHERE State = 'ACTIVE' AND Finish_Time > NOW() AND Role IN ('ATTACKER', 'DEFENDER')\n" +
-                    ") GROUP BY Username, User_ID\n" +
-                    "ORDER BY `Last Login` DESC;";
     private static final String UNASSIGNED_USERS_QUERY =
             "SELECT DISTINCT\n" +
                     "  users.User_ID,\n" +
@@ -55,15 +30,7 @@ public class AdminDAO {
                     "    INNER JOIN games ON players.Game_ID = games.ID)\n" +
                     "  WHERE (State = 'ACTIVE' OR State = 'CREATED') AND Finish_Time > NOW() AND Role IN ('ATTACKER', 'DEFENDER') AND Active = TRUE\n" +
                     ")\n" +
-                    "GROUP BY Username, User_ID;";
-    private static final String GAMES_FOR_USER_QUERY =
-            "SELECT games.*\n" +
-                    "FROM (users\n" +
-                    "  INNER JOIN players ON users.User_ID = players.User_ID) INNER JOIN (games\n" +
-                    "  INNER JOIN classes ON games.Class_ID = classes.Class_ID) ON players.Game_ID = games.ID\n" +
-                    "WHERE State = 'ACTIVE' AND Mode = 'PARTY' AND (role = 'ATTACKER' OR role = 'DEFENDER')\n" +
-                    "      AND Finish_Time > NOW() AND Username = ?\n" +
-                    "ORDER BY games.Timestamp DESC;";
+                    "ORDER BY Username, User_ID;";
     private static final String AVAILABLE_GAMES_QUERY =
             "SELECT *\n" +
                     "FROM\n" +
@@ -74,17 +41,6 @@ public class AdminDAO {
             "SELECT *\n" +
                     "FROM games\n" +
                     "WHERE Mode = 'PARTY' AND (State = 'ACTIVE' OR State = 'CREATED');";
-    private static final String LAST_SUBMISSION_TS_QUERY =
-            "SELECT MAX(ts)\n" +
-                    "FROM (SELECT MAX(mutants.Timestamp) AS ts\n" +
-                    "      FROM players\n" +
-                    "        LEFT JOIN mutants ON mutants.Player_ID = players.ID\n" +
-                    "      WHERE players.ID = ?\n" +
-                    "      UNION\n" +
-                    "      SELECT MAX(tests.Timestamp) AS ts\n" +
-                    "      FROM players\n" +
-                    "        LEFT JOIN tests ON tests.Player_ID = players.ID\n" +
-                    "      WHERE players.ID = ?) AS t;";
     private static final String LAST_ROLE_QUERY =
             "SELECT\n" +
                     "  players.User_ID,\n" +
@@ -389,22 +345,6 @@ public class AdminDAO {
         return getGamesFromRS(rs, conn, stmt);
     }
 
-    public static Timestamp getLast(Connection conn, PreparedStatement stmt) {
-        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        try {
-            if (rs.next()) {
-                return rs.getTimestamp(1);
-            }
-        } catch (SQLException se) {
-            logger.error("SQL exception caught", se);
-        } catch (Exception e) {
-            logger.error("Exception caught", e);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-        return null;
-    }
-
 
     public static Role getLastRole(int uid) {
         Connection conn = DB.getConnection();
@@ -535,7 +475,7 @@ public class AdminDAO {
                 playerInfo.add(rs.getString("Username"));
                 playerInfo.add(rs.getString("Role"));
                 Timestamp ts = rs.getTimestamp("lastSubmission");
-                playerInfo.add(ts == null ? TIMETSTAMP_NEVER: "" + ts.getTime());
+                playerInfo.add(ts == null ? TIMESTAMP_NEVER : "" + ts.getTime());
                 playerInfo.add(String.valueOf(rs.getInt("TotalScore")));
                 playerInfo.add(String.valueOf(rs.getInt("nbSubmissions")));
                 players.add(playerInfo);

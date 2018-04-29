@@ -12,7 +12,7 @@
 <%@ include file="/jsp/header.jsp" %>
 <div class="full-width">
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#">Manage Games</a></li>
+        <li class="active"><a>Manage Games</a></li>
         <li><a href="<%=request.getContextPath()%>/admin/users"> Manage Users</a></li>
         <li><a href="<%=request.getContextPath()%>/admin/settings">System Settings</a></li>
     </ul>
@@ -147,7 +147,7 @@
                     String userName = playerInfo.get(1);
                     Role role = Role.valueOf(playerInfo.get(2));
                     String ts = playerInfo.get(3);
-                    String lastSubmissionTS = AdminDAO.TIMETSTAMP_NEVER.equalsIgnoreCase(ts) ? ts : AdminGamesMgmt.formatTimestamp(ts);
+                    String lastSubmissionTS = AdminDAO.TIMESTAMP_NEVER.equalsIgnoreCase(ts) ? ts : AdminGamesMgmt.formatTimestamp(ts);
                     int totalScore = Integer.parseInt(playerInfo.get(4));
                     int submissionsCount = Integer.parseInt(playerInfo.get(5));
                     String color = role == Role.ATTACKER ? "#edcece" : "#ced6ed";
