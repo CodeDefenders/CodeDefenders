@@ -634,8 +634,6 @@
 
 
             $(document).ready(function () {
-                setCreatedPlayersSpan();
-
                 if (localStorage.getItem("showActivePlayers") === "true") {
                     $("[id=playersTableActive]").show();
                 }
@@ -671,6 +669,8 @@
                         "orderable": false
                     }]
                 });
+
+                setCreatedPlayersSpan();
             });
 
             $('.modal').on('shown.bs.modal', function () {
