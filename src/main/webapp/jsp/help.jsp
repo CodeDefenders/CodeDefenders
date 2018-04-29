@@ -1,6 +1,15 @@
 <% String pageTitle = "Help"; %>
 
-<%@ include file="/jsp/header_base.jsp" %>
+
+<%
+	Object uid = request.getSession().getAttribute("uid");
+	Object username = request.getSession().getAttribute("username");
+	if (uid != null && username != null){
+%>
+<%@ include file="/jsp/header.jsp" %>
+<%} else {%>
+<%@ include file="/jsp/header_logout.jsp" %>
+<%}%>
 
 <div style="padding: 0px 16px 0px 16px">
 	<h1>Help</h1>
