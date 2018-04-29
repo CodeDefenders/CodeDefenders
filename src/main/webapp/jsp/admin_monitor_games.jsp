@@ -45,8 +45,8 @@
                 <th>Starting</th>
                 <th>Finishing</th>
                 <th>
-                    <a id="togglePlayersActive" class="btn btn-sm btn-default">
-                        <span class="glyphicon glyphicon-eye-close"></span>
+                    <a id="togglePlayersActive" class="btn btn-sm btn-default" title="Show list of Players for each Game.">
+                        <span id = "togglePlayersActiveSpan" class="glyphicon glyphicon-alert"></span>
                     </a>
                 </th>
             </tr>
@@ -122,6 +122,8 @@
 
                     </button>
                 </td>
+                    <%List<List<String>> playersInfo = AdminDAO.getPlayersInfo(gid);
+                if(!playersInfo.isEmpty()){%>
             <tr id="playersTableActive" hidden>
                 <th></th>
                 <th></th>
@@ -135,7 +137,7 @@
                 <th style="border-bottom: 1px solid black"></th>
             </tr>
             <%
-                List<List<String>> playersInfo = AdminDAO.getPlayersInfo(gid);
+                }
                 for (List<String> playerInfo : playersInfo) {
                     int pid = Integer.parseInt(playerInfo.get(0));
                     String userName = playerInfo.get(1);
@@ -215,9 +217,17 @@
             });
 
             $('#togglePlayersActive').click(function () {
-                localStorage.setItem("showActivePlayers", localStorage.getItem("showActivePlayers") === "true" ? "false" : "true");
+                var showPlayers = localStorage.getItem("showActivePlayers") === "true";
+                localStorage.setItem("showActivePlayers", showPlayers ? "false" : "true");
                 $("[id=playersTableActive]").toggle();
+                setActivePlayersSpan()
             });
+
+            function setActivePlayersSpan() {
+                var showPlayers = localStorage.getItem("showActivePlayers") === "true";
+                var buttonClass = showPlayers ? "glyphicon glyphicon-eye-close" : "glyphicon glyphicon-eye-open";
+                document.getElementById("togglePlayersActiveSpan").setAttribute("class", buttonClass);
+            }
 
             function setSelectAllCheckbox(checkboxesName, selectAllCheckboxId) {
                 var checkboxes = document.getElementsByName(checkboxesName);
@@ -247,6 +257,8 @@
                     $("[id=playersTableCreated]").show();
                     $("[id=playersTableHidden]").hide();
                 }
+
+                setActivePlayersSpan();
 
             });
 

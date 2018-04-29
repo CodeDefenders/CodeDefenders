@@ -53,7 +53,7 @@
                         <div class="col-sm-4">Last Role</div>
                         <div class="col-sm-3">Score</div>
                         <a id="togglePlayersCreated" class="btn btn-sm btn-default">
-                            <span class="glyphicon glyphicon-eye-close"></span>
+                            <span id = "togglePlayersCreatedSpan" class="glyphicon glyphicon-alert"></span>
                         </a>
                     </div>
                 </th>
@@ -581,15 +581,18 @@
             });
 
             $('#togglePlayersCreated').click(function () {
-                localStorage.setItem("showCreatedPlayers", localStorage.getItem("showCreatedPlayers") === "true" ? "false" : "true");
+                var showPlayers = localStorage.getItem("showCreatedPlayers") === "true";
+                localStorage.setItem("showCreatedPlayers", showPlayers ? "false" : "true");
                 $("[id=playersTableCreated]").toggle();
                 $("[id=playersTableHidden]").toggle();
+                setCreatedPlayersSpan()
             });
 
-            $('#togglePlayersActive').click(function () {
-                localStorage.setItem("showActivePlayers", localStorage.getItem("showActivePlayers") === "true" ? "false" : "true");
-                $("[id=playersTableActive]").toggle();
-            });
+            function setCreatedPlayersSpan() {
+                var showPlayers = localStorage.getItem("showCreatedPlayers") === "true";
+                var buttonClass = showPlayers ? "glyphicon glyphicon-eye-close" : "glyphicon glyphicon-eye-open";
+                document.getElementById("togglePlayersCreatedSpan").setAttribute("class", buttonClass);
+            }
 
             function setSelectAllCheckbox(checkboxesName, selectAllCheckboxId) {
                 var checkboxes = document.getElementsByName(checkboxesName);
@@ -631,6 +634,8 @@
 
 
             $(document).ready(function () {
+                setCreatedPlayersSpan();
+
                 if (localStorage.getItem("showActivePlayers") === "true") {
                     $("[id=playersTableActive]").show();
                 }
