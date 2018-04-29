@@ -12,6 +12,14 @@
   width: 100%;
 }
 
+.validatorLevelTag{
+  display: inline-block;
+  padding: 0;
+  margin-top: -2px;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
 .clear {
   clear: both;
   float: left;
