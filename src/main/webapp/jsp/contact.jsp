@@ -20,11 +20,20 @@
 <%
 	}
 %>
-
+<div class="container" style=" max-width: 50%; min-width: 25%; ">
+	<h2 style="text-align: center">Contact Us</h2>
+	<p>
+		Code Defenders is an open source project; you can find details on the
+		<a href="https://github.com/CodeDefenders/CodeDefenders">GitHub</a> project page.
+	</p>
+</div>
+	<%
+	final String smtpHost = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_HOST).getStringValue();
+	if(smtpHost != null && !smtpHost.isEmpty()) {
+%>
 <div class="container">
 	<form  action="<%=request.getContextPath() %>/sendEmail" method="post" class="form-signin">
 		<input type="hidden" name="formType" value="login">
-		<h2 class="form-signin-heading">Contact Us</h2>
 		<label for="inputName" class="sr-only">Name</label>
 		<input type="text" id="inputName" name="name" class="form-control" placeholder="Name" required autofocus>
 		<label for="inputEmail" class="sr-only">Email</label>
@@ -35,6 +44,9 @@
 		<textarea id="inputMessage" name="message" class="form-control" placeholder="Message" rows="8" required></textarea>
 		<button class="btn btn-lg btn-primary btn-block" type="submit">Send</button>
 	</form>
+<%
+	}
+%>
 </div>
 
 <%@ include file="/jsp/footer.jsp" %>
