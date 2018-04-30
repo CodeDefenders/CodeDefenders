@@ -7,6 +7,9 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.*;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import difflib.Chunk;
+import difflib.Delta;
+import difflib.DiffUtils;
 import org.apache.commons.io.FileUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.Constants;
@@ -15,8 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * @author Jose Rojas
@@ -33,54 +38,61 @@ public class CodeValidator {
 	}
 
 	//TODO check if removing ";" makes people take advantage of using multiple statements
-	public final static String[] PROHIBITED_OPERATORS = {"<<", ">>", ">>>", "?", "//", "/*"};
-	public final static String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
+	public final static String[] PROHIBITED_BITWISE_OPERATORS = {"<<", ">>", ">>>", "|", "&"};
+	public final static String[] PROHIBITED_CONTROL_STRUCTURES = {"if", "for", "while", "switch"};
+	public final static String[] PROHIBITED_LOGICAL_OPS = {"&&", "||"};
+	private final static String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
+	// This is package protected to enable TestCodeVisitor to check for prohibited call as well
+	final static String[] PROHIBITED_CALLS = {"System.", "Random.", "Thread.", "Random(", "random(", "randomUUID(", "Date(", "java.io", "java.nio", "java.sql", "java.net"};
+	public final static String[] COMMENT_TOKENS = {"//", "/*"};
+	private final static String TERNARY_OP_REGEX = ".*\\?.*:.*";
+
 	private static final Logger logger = LoggerFactory.getLogger(CodeValidator.class);
 
-	public static boolean validMutant(String originalCode, String mutatedCode) {
-		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE.equals(getValidationMessage(originalCode, mutatedCode));
+	public static boolean validMutant(String originalCode, String mutatedCode, CodeValidatorLevel level) {
+		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE.equals(getValidationMessage(originalCode, mutatedCode, level));
 	}
 
-	// This validation pipeline should use the Chain-of-Command design pattern
-	public static String getValidationMessage(String originalCode, String mutatedCode) {
+	// This validation pipeline should use the Chain-of-Responsibility design pattern
+	public static String getValidationMessage(String originalCode, String mutatedCode, CodeValidatorLevel level) {
 
-		String originalLines[] = originalCode.split("\\r?\\n");
-		String mutatedLines[] = mutatedCode.split("\\r?\\n");
-
-		//TODO check if this is too restrictive
-		// if lines were added or removed, mutant is invalid
-        /*if (originalLines.length != mutatedLines.length)
-            return Constants.MUTANT_VALIDATION_LINES_MESSAGE;*/
-
+		try {
+			Files.createTempFile("temp", null);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// if only string literals were changed
 		if (onlyLiteralsChanged(originalCode, mutatedCode)) {
 			return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
 		}
 
 		// If the mutants contains changes to method signatures, mark it as not valid
-		if (mutantChangesMethodSignatures(originalCode, mutatedCode) || mutantChangesFieldNames(originalCode, mutatedCode) || mutantChangesImportStatements(originalCode, mutatedCode)) {
+		if (level.equals(CodeValidatorLevel.STRICT) && (mutantChangesMethodSignatures(originalCode, mutatedCode) || mutantChangesFieldNames(originalCode, mutatedCode) || mutantChangesImportStatements(originalCode, mutatedCode))) {
 			return Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE;
 		}
 
-		/*for (int i = 0; i < originalLines.length; ++i) {
-            String originalLine = originalLines[i];
-            String mutatedLine = mutatedLines[i];
-            // rudimentary word-level matching as dmp works on character level
-            List<DiffMatchPatch.Diff> word_changes = tokenDiff(originalLine, mutatedLine);
-            if (containsProhibitedModifierChanges(word_changes))
-                return Constants.MUTANT_VALIDATION_MODIFIER_MESSAGE;
+		// line-level diff
+		List<List<?>> originalLines = getOriginalLines(originalCode, mutatedCode);
+		List<List<?>> changedLines = getChangedLines(originalCode, mutatedCode);
+		assert(originalLines.size() == changedLines.size());
 
-            //if comments were changed in any way, mutant is invalid
-            if (containsModifiedComments(originalLine, mutatedLine))
-                return Constants.MUTANT_VALIDATION_COMMENT_MESSAGE;
-        }*/
+		if (!level.equals(CodeValidatorLevel.RELAXED) && containsModifiedComments(originalLines, changedLines))
+			return Constants.MUTANT_VALIDATION_COMMENT_MESSAGE;
 
 		// rudimentary word-level matching as dmp works on character level
 		List<DiffMatchPatch.Diff> word_changes = tokenDiff(originalCode, mutatedCode);
-		if (containsProhibitedModifierChanges(word_changes))
+		if (level.equals(CodeValidatorLevel.STRICT) &&  containsProhibitedModifierChanges(word_changes))
 			return Constants.MUTANT_VALIDATION_MODIFIER_MESSAGE;
 
-		// Runs diff match patch between the two Strings to see if there are any differences.
+
+		if (!level.equals(CodeValidatorLevel.RELAXED) && ternaryAdded(originalLines, changedLines))
+			return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE;
+
+		if (!level.equals(CodeValidatorLevel.RELAXED) && logicalOpAdded(originalLines, changedLines))
+			return Constants.MUTANT_VALIDATION_LOGIC_MESSAGE;
+
+		// Runs character-level diff match patch between the two Strings to see if there are any differences.
 		DiffMatchPatch dmp = new DiffMatchPatch();
 		LinkedList<DiffMatchPatch.Diff> changes = dmp.diffMain(originalCode.trim().replace("\n", "").replace("\r", ""), mutatedCode.trim().replace("\n", "").replace("\r", ""), true);
 		boolean hasChanges = false;
@@ -89,7 +101,7 @@ public class CodeValidator {
 			if (d.operation != DiffMatchPatch.Operation.EQUAL) {
 				hasChanges = true;
 				if (d.operation == DiffMatchPatch.Operation.INSERT) {
-					String insertionValidityMessage = validInsertion(d.text);
+					String insertionValidityMessage = validInsertion(d.text, level);
 					if (!insertionValidityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE))
 						return insertionValidityMessage;
 				}
@@ -119,7 +131,7 @@ public class CodeValidator {
 		return diffs;
 	}
 
-	// This remove " from Strings...
+	// This removes " from Strings...
 	
 	private static List<String> getTokens(StreamTokenizer st) {
 
@@ -162,6 +174,14 @@ public class CodeValidator {
 		return false;
 	}
 
+	private static Boolean containsModifiedComments(List<List<?>> orig, List<List<?>> muta) {
+		for (int i = 0; i < orig.size(); i ++) {
+			if (containsModifiedComments(orig.get(i).toString(), muta.get(i).toString()))
+				return true;
+		}
+		return false;
+	}
+
 	private static Boolean containsModifiedComments(String orig, String muta) {
 		String[] commentTokens = {"//", "/*", "*/"};
 		for (String ct : commentTokens) {
@@ -180,6 +200,7 @@ public class CodeValidator {
 
 			String commentTokensOrig = orig.substring(orig.indexOf("/*"), commentTokensOrigLimit);
 			String commentTokensMuta = orig.substring(muta.indexOf("/*"), commentTokensMutaLimit);
+			//noinspection RedundantIfStatement
 			if (!commentTokensMuta.equals(commentTokensOrig))
 				return true;
 		}
@@ -329,10 +350,10 @@ public class CodeValidator {
 		return !cutFieldNames.equals(mutantFieldNames);
 	}
 
-	private static String validInsertion(String diff) {
+	private static String validInsertion(String diff, CodeValidatorLevel level) {
 		try {
 			BlockStmt blockStmt = JavaParser.parseBlock("{ " + diff + " }");
-			MutationVisitor visitor = new MutationVisitor();
+			MutationVisitor visitor = new MutationVisitor(level);
 			visitor.visit(blockStmt, null);
 			if (!visitor.isValid())
 				return visitor.getMessage();
@@ -340,23 +361,54 @@ public class CodeValidator {
 		}
 		// remove whitespaces
 		String diff2 = diff.replaceAll("\\s+", "");
-		// forbid logical operators unless they appear on their own (LOR)
-		if ((diff2.contains("|") && !("|".equals(diff2) || "||".equals(diff2)))
-				|| (diff2.contains("&") && !("&".equals(diff2) || "&&".equals(diff2)))) {
-			return Constants.MUTANT_VALIDATION_LOGIC_MESSAGE;
-		}
-		// forbid if, while, for, and system calls, and ?: operator
-		String regex = "(?:(?:if|while|for)\\s*\\(.*|[\\s\\;\\{\\(\\)]System\\.|[\\s\\;\\{\\(\\)]Random\\.|^System\\.|^Random\\.|\\?.*\\:)";
-		Pattern p = Pattern.compile(regex);
-		if (p.matcher(diff2).find())
+
+		if(!level.equals(CodeValidatorLevel.RELAXED) && containsAny(diff2, PROHIBITED_CONTROL_STRUCTURES))
 			return Constants.MUTANT_VALIDATION_CALLS_MESSAGE;
-		// If bitshifts are used or diff contains "?" (hinting at a ternary operator)
-		for (String operator : PROHIBITED_OPERATORS) {
-			if (diff2.contains(operator))
-				return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE; // TODO: Is there a better way to handle this for ternary operator?
-		}
+
+		if(!level.equals(CodeValidatorLevel.RELAXED) && containsAny(diff2, COMMENT_TOKENS))
+			return Constants.MUTANT_VALIDATION_COMMENT_MESSAGE;
+
+		if (containsAny(diff2, PROHIBITED_CALLS))
+			return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE;
+
+		// If bitshifts are used
+		if (level.equals(CodeValidatorLevel.STRICT) && containsAny(diff2, PROHIBITED_BITWISE_OPERATORS))
+			return Constants.MUTANT_VALIDATION_OPERATORS_MESSAGE;
+
 		return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
 
+	}
+
+	private static boolean ternaryAdded(List<List<?>> orig, List<List<?>> muta){
+		for (int i = 0; i < orig.size(); i ++) {
+			if (ternaryAdded(orig.get(i).toString(), muta.get(i).toString()))
+				return true;
+		}
+		return false;
+	}
+
+	private static boolean ternaryAdded(String orig, String muta){
+		return !Pattern.compile(TERNARY_OP_REGEX).matcher(orig).find() && Pattern.compile(TERNARY_OP_REGEX).matcher(muta).find();
+	}
+
+	private static boolean logicalOpAdded(List<List<?>> orig, List<List<?>> muta){
+		for (int i = 0; i < orig.size(); i ++) {
+			if (logicalOpAdded(orig.get(i).toString(), muta.get(i).toString()))
+				return true;
+		}
+		return false;
+	}
+
+	private static boolean logicalOpAdded(String orig, String muta){
+		return !containsAny(orig, PROHIBITED_LOGICAL_OPS) && containsAny(muta, PROHIBITED_LOGICAL_OPS);
+	}
+
+	private static boolean containsAny(String str, String[] tokens){
+		for (String token : tokens) {
+			if (str.contains(token))
+				return true;
+		}
+		return false;
 	}
 
 	public static boolean validTestCode(String javaFile, int maxNumberOfAssertions) throws CodeValidatorException {
@@ -420,5 +472,27 @@ public class CodeValidator {
 		String partialString = getTokens(st).toString();
 		// Why do we need to remove spaces, I understand
 		return partialString;//.replaceAll("\\s+", "");
+	}
+
+	private static List<String> trimLines(List<String> lines) {
+		return lines.stream().map(String::trim).collect(Collectors.toList());
+	}
+
+	public static List<Delta> getDeltas(String original, String changed) {
+		List<String> originalLines = trimLines(Arrays.asList(original.split("\n")));
+		List<String> changedLines = trimLines(Arrays.asList(changed.split("\n")));
+		return DiffUtils.diff(originalLines, changedLines).getDeltas();
+	}
+
+	private static List<List<?>> getChangedLines(String original, String changed) {
+		List<Delta> deltas = getDeltas(original, changed);
+		List<Chunk> chunks = deltas.stream().map(Delta::getRevised).collect(Collectors.toList());
+		return chunks.stream().map(Chunk::getLines).collect(Collectors.toList());
+	}
+
+	private static List<List<?>> getOriginalLines(String original, String changed) {
+		List<Delta> deltas = getDeltas(original, changed);
+		List<Chunk> chunks = deltas.stream().map(Delta::getOriginal).collect(Collectors.toList());
+		return chunks.stream().map(Chunk::getLines).collect(Collectors.toList());
 	}
 }

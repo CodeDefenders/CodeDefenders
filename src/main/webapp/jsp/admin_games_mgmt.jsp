@@ -687,7 +687,8 @@
                 <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
                         data-size="medium">
                     <%for (CodeValidator.CodeValidatorLevel cvl : CodeValidator.CodeValidatorLevel.values()) {%>
-                    <option value=<%=cvl.name()%>><%=cvl.name().toLowerCase()%>
+                    <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidator.CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
+                        <%=cvl.name().toLowerCase()%>
                     </option>
                     <%}%>
                 </select>

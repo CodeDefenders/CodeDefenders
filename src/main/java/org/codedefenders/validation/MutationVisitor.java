@@ -17,9 +17,14 @@ import org.slf4j.LoggerFactory;
 class MutationVisitor extends ModifierVisitorAdapter {
 
 	private static final Logger logger = LoggerFactory.getLogger(MutationVisitor.class);
+	private final CodeValidator.CodeValidatorLevel level;
 
 	private boolean isValid = true;
 	private String message;
+
+	public MutationVisitor(CodeValidator.CodeValidatorLevel level) {
+		this.level = level;
+	}
 
 	public boolean isValid() {
 		return isValid;
@@ -61,6 +66,8 @@ class MutationVisitor extends ModifierVisitorAdapter {
 	@Override
 	public Node visit(ForeachStmt stmt, Object args) {
 		super.visit(stmt, args);
+		if(level.equals(CodeValidator.CodeValidatorLevel.RELAXED))
+			return stmt;
 		this.message = "Invalid mutation contains a ForeachStmt statement";
 		logger.info(message);
 		isValid = false;
@@ -70,6 +77,8 @@ class MutationVisitor extends ModifierVisitorAdapter {
 	@Override
 	public Node visit(IfStmt stmt, Object args) {
 		super.visit(stmt, args);
+		if(level.equals(CodeValidator.CodeValidatorLevel.RELAXED))
+			return stmt;
 		this.message = "Invalid mutation contains an IfStmt statement";
 		logger.info(message);
 		isValid = false;
@@ -79,6 +88,8 @@ class MutationVisitor extends ModifierVisitorAdapter {
 	@Override
 	public Node visit(ForStmt stmt, Object args) {
 		super.visit(stmt, args);
+		if(level.equals(CodeValidator.CodeValidatorLevel.RELAXED))
+			return stmt;
 		this.message = "Invalid mutation contains a ForStmt statement";
 		logger.info(message);
 		isValid = false;
@@ -88,6 +99,8 @@ class MutationVisitor extends ModifierVisitorAdapter {
 	@Override
 	public Node visit(WhileStmt stmt, Object args) {
 		super.visit(stmt, args);
+		if(level.equals(CodeValidator.CodeValidatorLevel.RELAXED))
+			return stmt;
 		this.message = "Invalid mutation contains a WhileStmt statement";
 		logger.info(message);
 		isValid = false;
@@ -97,6 +110,8 @@ class MutationVisitor extends ModifierVisitorAdapter {
 	@Override
 	public Node visit(DoStmt stmt, Object args) {
 		super.visit(stmt, args);
+		if(level.equals(CodeValidator.CodeValidatorLevel.RELAXED))
+			return stmt;
 		this.message = "Invalid mutation contains a DoStmt statement";
 		logger.info(message);
 		isValid = false;
@@ -106,6 +121,8 @@ class MutationVisitor extends ModifierVisitorAdapter {
 	@Override
 	public Node visit(SwitchStmt stmt, Object args) {
 		super.visit(stmt, args);
+		if(level.equals(CodeValidator.CodeValidatorLevel.RELAXED))
+			return stmt;
 		this.message = "Invalid mutation contains a SwitchStmt statement";
 		logger.info(message);
 		isValid = false;
