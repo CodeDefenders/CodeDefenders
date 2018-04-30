@@ -25,9 +25,12 @@ import com.github.javaparser.ast.visitor.ModifierVisitorAdapter;
 
 /**
  * @author Jose Rojas
+ * @author gambi (Last modified)
  */
 class TestCodeVisitor extends ModifierVisitorAdapter {
 
+	// TODO This can be improved to stop the visit as soon as we hit an invalid condition
+	// Additionally, we can use TypeSolver for the visit to implement a fine grain security mechanism
 	private static final Logger logger = LoggerFactory.getLogger(TestCodeVisitor.class);
 
 	private boolean isValid = true;
@@ -70,15 +73,24 @@ class TestCodeVisitor extends ModifierVisitorAdapter {
 	@Override
 	public Node visit (ExpressionStmt stmt, Object args)
 	{
-		super.visit(stmt,args);
+		String stringStmt = stmt.toStringWithoutComments();
+		for(String prohibited : CodeValidator.PROHIBITED_CALLS ){
+			// This might be a bit too strict... We shall use typeSolver otherwise.
+			if( stringStmt.contains(  prohibited ) ){
+				logger.info("Invalid test contains a call to prohibited " + prohibited);
+				isValid = false;
+				break;
+			}
+		}
 		stmtCount++;
-		return stmt;
+		return super.visit(stmt,args);
 	}
 
 	@Override
 	public Node visit (NameExpr stmt, Object args)
 	{
 		super.visit(stmt,args);
+		// TODO This seems code which does not do anything
 		if (stmt.getName().equals("System") || stmt.getName().equals("Random") || stmt.getName().equals("Thread") ) {
 			logger.info("Invalid test contains System/Random/Thread uses");
 			isValid = false;

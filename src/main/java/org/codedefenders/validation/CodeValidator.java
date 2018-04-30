@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -41,7 +42,8 @@ public class CodeValidator {
 	public final static String[] PROHIBITED_CONTROL_STRUCTURES = {"if", "for", "while", "switch"};
 	public final static String[] PROHIBITED_LOGICAL_OPS = {"&&", "||"};
 	private final static String[] PROHIBITED_MODIFIER_CHANGES = {"public", "final", "protected", "private", "static"};
-	private final static String[] PROHIBITED_CALLS = {"System.", "Random.", "Thread.", "Random(", "random(", "randomUUID(", "Date("};
+	// This is package protected to enable TestCodeVisitor to check for prohibited call as well
+	final static String[] PROHIBITED_CALLS = {"System.", "Random.", "Thread.", "Random(", "random(", "randomUUID(", "Date(", "java.io", "java.nio", "java.sql", "java.net"};
 	public final static String[] COMMENT_TOKENS = {"//", "/*"};
 	private final static String TERNARY_OP_REGEX = ".*\\?.*:.*";
 
@@ -54,6 +56,12 @@ public class CodeValidator {
 	// This validation pipeline should use the Chain-of-Responsibility design pattern
 	public static String getValidationMessage(String originalCode, String mutatedCode, CodeValidatorLevel level) {
 
+		try {
+			Files.createTempFile("temp", null);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		// if only string literals were changed
 		if (onlyLiteralsChanged(originalCode, mutatedCode)) {
 			return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
@@ -63,7 +71,6 @@ public class CodeValidator {
 		if (level.equals(CodeValidatorLevel.STRICT) && (mutantChangesMethodSignatures(originalCode, mutatedCode) || mutantChangesFieldNames(originalCode, mutatedCode) || mutantChangesImportStatements(originalCode, mutatedCode))) {
 			return Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE;
 		}
-
 
 		// line-level diff
 		List<List<?>> originalLines = getOriginalLines(originalCode, mutatedCode);
