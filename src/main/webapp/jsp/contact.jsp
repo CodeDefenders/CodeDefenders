@@ -1,7 +1,14 @@
 <% String pageTitle = "Contact Us"; %>
 
-<%@ include file="/jsp/header_base.jsp" %>
-
+<%
+	Object uid = request.getSession().getAttribute("uid");
+	Object username = request.getSession().getAttribute("username");
+	if (uid != null && username != null){
+%>
+<%@ include file="/jsp/header.jsp" %>
+<%} else {%>
+<%@ include file="/jsp/header_logout.jsp" %>
+<%}%>
 <%
 	String result = (String)request.getSession().getAttribute("emailSent");
 	request.getSession().removeAttribute("emailSent");

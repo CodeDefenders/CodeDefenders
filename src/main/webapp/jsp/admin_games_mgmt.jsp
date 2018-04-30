@@ -9,7 +9,7 @@
 <%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="java.util.List" %>
 <% String pageTitle = null; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 <div class="full-width">
     <ul class="nav nav-tabs">
         <li class="active"><a>Manage Games</a></li>

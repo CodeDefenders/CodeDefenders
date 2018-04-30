@@ -4,7 +4,7 @@
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.util.DatabaseAccess" %>
 <% String pageTitle= null ; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 <%
 	String atkName;
 	String defName;
