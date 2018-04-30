@@ -19,7 +19,7 @@ public class SendEmail extends HttpServlet {
         if (EmailUtils.sendEmailToSelf(subject, message, email)) {
             request.getSession().setAttribute("emailSent", "Thanks for your message, we'll get back to you soon! --The Code Defenders Team");
         } else {
-            request.getSession().setAttribute("emailSent", "Sorry! The message was not sent. Please, try emailing us: {j.rojas,gordon.fraser}@sheffield.ac.uk.");
+            request.getSession().setAttribute("emailSent", "Sorry! There was an error when trying to send the message.");
         }
 
 		response.sendRedirect(request.getContextPath()+"/contact");
