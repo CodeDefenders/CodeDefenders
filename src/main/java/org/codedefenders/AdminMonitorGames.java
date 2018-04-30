@@ -101,7 +101,7 @@ public class AdminMonitorGames extends HttpServlet {
 				}
 			}
 		}
-		response.sendRedirect(request.getContextPath() + "/admin");
+		response.sendRedirect(request.getContextPath() + "/admin/monitor");
 	}
 
 

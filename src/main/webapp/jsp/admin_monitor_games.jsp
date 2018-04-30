@@ -11,7 +11,7 @@
         <li><a href="<%=request.getContextPath()%>/admin/settings">System Settings</a></li>
     </ul>
 
-    <form id="games" action="admin" method="post">
+    <form id="games" action="admin/monitor" method="post">
         <input type="hidden" name="formType" value="startStopGame">
         <h3>Inserted Games</h3>
 
