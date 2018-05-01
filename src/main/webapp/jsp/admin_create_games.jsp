@@ -19,7 +19,7 @@
     </ul>
     <form id="insertGames" action="admin" method="post">
         <input type="hidden" name="formType" value="insertGames"/>
-        <h3>Temporary Games</h3>
+        <h3>Staged Games</h3>
         <%
             List<MultiplayerGame> createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
             List<List<Integer>> attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE);
@@ -28,7 +28,7 @@
         %>
         <div class="panel panel-default">
             <div class="panel-body" style="    color: gray;    text-align: center;">
-                There are currently no created multiplayer games.
+                There are currently no staged multiplayer games.
             </div>
         </div>
         <%
@@ -154,7 +154,7 @@
         </table>
         <button class="btn btn-md btn-primary" type="submit" name="games_btn" id="insert_games_btn"
                 disabled value="insert Games">
-            Insert games
+            Create games
         </button>
         <button class="btn btn-md btn-danger" type="submit" name="games_btn" id="delete_games_btn"
                 onclick="return confirm('Are you sure you want to discard the selected Games?');"
@@ -495,7 +495,7 @@
                 <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
                         data-size="medium">
                     <%for (CodeValidator.CodeValidatorLevel cvl : CodeValidator.CodeValidatorLevel.values()) {%>
-                    <option value=<%=cvl.name()%>><%=cvl.name().toLowerCase()%>
+                    <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidator.CodeValidatorLevel.MODERATE) ? "selected" : ""%>><%=cvl.name().toLowerCase()%>
                     </option>
                     <%}%>
                 </select>
@@ -532,35 +532,18 @@
         <br>
         <div class="row">
             <div class="col-sm-5">
-                <div id="validatorExplanation" class="collapse panel panel-default" style="font-size: 12px;">
-                    <div class="panel-body" style="padding: 10px;">
-                        <b>Relaxed</b> <br>
-                        <ul>
-                            <li>No calls to <i>System.*</i>,<i>Random.*</i></li>
-                            <li>No new control structures (<i>switch</i>, <i>if</i>, <i>for</i>, ...)</li>
-                        </ul>
-                        <b>Moderate</b> <br>
-                        <ul>
-                            <li>No comments</li>
-                            <li>No additional logical operators (<i>&&</i>, <i>||</i>)</li>
-                            <li>No ternary operators</li>
-                        </ul>
-                        <b>Strict</b> <br>
-                        <ul>
-                            <li>No reflection</li>
-                            <li>No bitshifts</li>
-                            <li>No signature changes</li>
-                        </ul>
-                    </div>
+                <div id="validatorExplanation" class="collapse panel panel-default" style="...">
+                    <%@ include file="/jsp/validator_explanation.jsp" %>
                 </div>
             </div>
         </div>
         <button class="btn btn-md btn-primary" type="submit" name="submit_users_btn" id="submit_users_btn" disabled>
-            Create Games
+            Stage Games
         </button>
 
-        <a href="<%=request.getContextPath()%>/multiplayer/games/create?fromAdmin=true"> Create single Game </a>
-
+        <p>
+            If you just want to create a single open game without assigning players, you can also use the <a href="<%=request.getContextPath()%>/multiplayer/games/create?fromAdmin=true"> Create game</a> interface.
+        </p>
 
             <script>
             $('#selectAllUsers').click(function () {

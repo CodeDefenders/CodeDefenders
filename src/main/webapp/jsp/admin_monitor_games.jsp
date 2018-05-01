@@ -13,7 +13,7 @@
 
     <form id="games" action="admin/monitor" method="post">
         <input type="hidden" name="formType" value="startStopGame">
-        <h3>Inserted Games</h3>
+        <h3>Current Games</h3>
 
         <%
             List<MultiplayerGame> insertedGames = AdminDAO.getUnfinishedMultiplayerGames();
