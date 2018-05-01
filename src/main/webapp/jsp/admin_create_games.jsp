@@ -495,7 +495,8 @@
                 <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
                         data-size="medium">
                     <%for (CodeValidator.CodeValidatorLevel cvl : CodeValidator.CodeValidatorLevel.values()) {%>
-                    <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidator.CodeValidatorLevel.MODERATE) ? "selected" : ""%>><%=cvl.name().toLowerCase()%>
+                    <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidator.CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
+                        <%=cvl.name().toLowerCase()%>
                     </option>
                     <%}%>
                 </select>
@@ -532,7 +533,7 @@
         <br>
         <div class="row">
             <div class="col-sm-5">
-                <div id="validatorExplanation" class="collapse panel panel-default" style="...">
+                <div id="validatorExplanation" class="collapse panel panel-default" style="font-size: 12px;">
                     <%@ include file="/jsp/validator_explanation.jsp" %>
                 </div>
             </div>
