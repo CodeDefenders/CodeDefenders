@@ -89,10 +89,10 @@ public class AdminUserMgmt extends HttpServlet {
 		if (!password.equals(confirm_password))
 			return "Error! Passwords don't match!";
 
-		if (!name.equals(u.getUsername()) && DatabaseAccess.getUserForNameOrEmail(name) != null)
+		if (!name.equals(u.getUsername()) && DatabaseAccess.getUserForName(name) != null)
 			return "Username " + name + " is already taken";
 
-		if (!email.equals(u.getEmail()) && DatabaseAccess.getUserForNameOrEmail(email) != null)
+		if (!email.equals(u.getEmail()) && DatabaseAccess.getUserForEmail(email) != null)
 			return "Email " + email + " is already in use!";
 
 		if (!LoginManager.validEmailAddress(email))
@@ -131,7 +131,7 @@ public class AdminUserMgmt extends HttpServlet {
 						password = generatePW();
 					}
 					User u = new User(name, password, email);
-					if (DatabaseAccess.getUserForNameOrEmail(name) == null && DatabaseAccess.getUserForNameOrEmail(email) == null) {
+					if (DatabaseAccess.getUserForName(name) == null && DatabaseAccess.getUserForEmail(email) == null) {
 						if (u.insert()) {
 							messages.add(name + "'s password is: " + password);
 							logger.info("Generated password " + password + " for user " + name);

@@ -35,17 +35,16 @@ public class LoginManager extends HttpServlet {
 			"This link is only valid for %d hours.\n\n" +
 			"Greetings, your CodeDefenders team";
 
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
 		RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 		dispatcher.forward(request, response);
 	}
 
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
 		ArrayList<String> messages = new ArrayList<String>();
 		request.getSession().setAttribute("messages", messages);
-
 
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
@@ -55,41 +54,53 @@ public class LoginManager extends HttpServlet {
 		switch (formType) {
 			case "create":
 				String confirm = request.getParameter("confirm");
-				if (!(validUsername(username)
-						&& validEmailAddress(email)
-						&& validPassword(password))) {
-					messages.add("User not created. Make sure username, password and email are valid.");
+				if (!(validUsername(username))) {
+					// This check should be performed in the user interface too.
+					messages.add("Could not create user. Invalid username.");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
-				} else if (password.equals(confirm)) {
-					if (DatabaseAccess.getUserForNameOrEmail(username) == null) {
-						User newUser = new User(username, password, email);
-						if (newUser.insert()) {
-							HttpSession session = request.getSession();
-							session.setAttribute("uid", newUser.getId());
-							session.setAttribute("username", newUser.getUsername());
-							session.setAttribute("messages", messages);
+				} else if (!validPassword(password)) {
+					// This check should be performed in the user interface too.
+					messages.add("Could not create user. Invalid password.");
+					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+					dispatcher.forward(request, response);
+				} else if (!validEmailAddress(email)) {
+					// This check should be performed in the user interface too.
+					messages.add("Could not create user. Invalid E-Mail address.");
+					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+					dispatcher.forward(request, response);
+				} else if (!password.equals(confirm)) {
+					// This check should be performed in the user interface too.
+					messages.add("Could not create user. Password entries did not match.");
+					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+					dispatcher.forward(request, response);
+				} else if (DatabaseAccess.getUserForName(username) != null) {
+					messages.add("Could not create user. Username is already taken.");
+					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+					dispatcher.forward(request, response);
+				} else if (DatabaseAccess.getUserForEmail(email) != null) {
+					messages.add("Could not create user. Email has already been used. You can reset your password.");
+					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+					dispatcher.forward(request, response);
+				} else {
+					User newUser = new User(username, password, email);
+					if (newUser.insert()) {
+						HttpSession session = request.getSession();
+						session.setAttribute("uid", newUser.getId());
+						session.setAttribute("username", newUser.getUsername());
+						session.setAttribute("messages", messages);
 
-							response.sendRedirect(request.getContextPath() + "/games");
-						} else {
-							// TODO: How about some error handling?
-							messages.add("Could not create a user for you, sorry!");
-							RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-							dispatcher.forward(request, response);
-						}
+						response.sendRedirect(request.getContextPath() + "/games");
 					} else {
-						messages.add("Username is already taken or Email has already been used");
+						// TODO: How about some error handling?
+						messages.add("Could not create a user for you, sorry!");
 						RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 						dispatcher.forward(request, response);
 					}
-				} else {
-					messages.add("Your Two Password Entries Did Not Match");
-					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
-					dispatcher.forward(request, response);
 				}
 				break;
 			case "login":
-				User activeUser = DatabaseAccess.getUserForNameOrEmail(username);
+				User activeUser = DatabaseAccess.getUserForName(username);
 				if (activeUser == null) {
 					messages.add("Username not found or password incorrect.");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
@@ -134,7 +145,7 @@ public class LoginManager extends HttpServlet {
 				email = request.getParameter("accountEmail");
 				username = request.getParameter("accountUsername");
 				User u;
-				if ((u = DatabaseAccess.getUserForNameOrEmail(email)) != null && u.getUsername().equals(username) &&
+				if ((u = DatabaseAccess.getUserForEmail(email)) != null && u.getUsername().equals(username) &&
 						u.getEmail().equals(email)) {
 					String resetPwSecret = generatePasswordResetSecret();
 					setPasswordResetSecret(u.getId(), resetPwSecret);
@@ -211,7 +222,7 @@ public class LoginManager extends HttpServlet {
 		session.setAttribute(Constants.BLOCK_ATTACKER, isAttackerBlocked);
 	}
 
-	public String getClientIpAddress(HttpServletRequest request) {
+	private String getClientIpAddress(HttpServletRequest request) {
 		String ip = request.getHeader("X-Forwarded-For");
 		if (invalidIP(ip)) {
 			ip = request.getHeader("Proxy-Client-IP");
@@ -244,12 +255,13 @@ public class LoginManager extends HttpServlet {
 	 * @param username
 	 * @return true iff valid username
 	 */
-
-	public static boolean validUsername(String username) {
+	// TODO extract that method to a util class
+	private static boolean validUsername(String username) {
 		String pattern = "^[a-zA-Z][a-zA-Z0-9]{2,19}$";
 		return username != null && username.matches(pattern);
 	}
 
+	// TODO extract that method to a util class
 	public static boolean validEmailAddress(String email) {
 		if (email == null) return false;
 		boolean result = true;
@@ -266,6 +278,7 @@ public class LoginManager extends HttpServlet {
 	 * Password must contain MIN_PASSWORD_LENGTH to 20 alphanumeric characters,
 	 * with no whitespace or special character.
 	 */
+	// TODO extract that method to a util class
 	public static boolean validPassword(String password) {
 		// MIN_PASSWORD_LENGTH-10 alphanumeric characters (a-z, A-Z, 0-9) (no whitespaces)
 		int minLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
