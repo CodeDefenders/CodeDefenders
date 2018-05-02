@@ -36,7 +36,7 @@
                 // a newly generated password can only be sent to the user if mails are enabled
         %>
         <a href="#" class="text-center new-account" data-toggle="modal" data-target="#passwordResetModal"
-           style=" float: right;" hidden id="passwordForgotten">Password forgotten</a>
+           style=" float: right;" id="passwordForgotten">Password forgotten</a>
         <%}%>
 
     </form>
@@ -208,13 +208,6 @@
 <script>
     $('#consentOK').click(function () {
         document.getElementById("signInButton").disabled = !$(this).is(':checked');
-    });
-
-    $(document).ready(function () {
-        var messagesDiv = document.getElementById("messages-div");
-        if (messagesDiv !== null && messagesDiv.innerText.includes("password was incorrect")) {
-            document.getElementById("passwordForgotten").hidden = false;
-        }
     });
 </script>
 
