@@ -96,7 +96,6 @@
                             $("#start_minutes").val(mins);
                         });
 
-                        // check whether the selected date is before today; if so, change the selection to today's date
                         $("#start_dateTime").on("change", function () {
                             updateStartTimestamp();
                         });
@@ -127,27 +126,25 @@
                             var timestamp = new Date($("#start_dateTime").val()).getTime();
                             timestamp += parseInt(($("#start_hours").val()) * 60 * 60 * 1000);
                             timestamp += parseInt($("#start_minutes").val()) * 60 * 1000;
-                            var now = new Date().getTime();
+
                             var finishTime = new Date($("#finish_dateTime").val()).getTime();
 
-                            if (timestamp < now) {
-                                //display error message above start_dateTime field when selected time is in the past
-                                document.getElementById("startTimeWarning").style.display = "inline";
-                                //invalid timestamp, set it to now
-                                timestamp = now;
-                                $("#start_dateTime").datepicker("setDate", timestamp);
-                                $("#start_hours").val(new Date(timestamp).getHours());
-                                $("#start_minutes").val(new Date(timestamp).getMinutes());
-
-                            } else if (finishTime < timestamp) {
+                            // check whether the selected start time is before finish date
+                            if (finishTime < timestamp) {
                                 //display error message above start_dateTime field when finish time is behind selected one
-                               document.getElementById("finishTimeWarning").style.display = "inline";
+                                document.getElementById("finishTimeWarning").style.display = "inline";
+                                // disable submit button
+                                document.getElementById("createButton").disabled = true;
                             } else {
+                                // error messages disappear due to right input
                                 document.getElementById("startTimeWarning").style.display = "none";
                                 document.getElementById("finishTimeWarning").style.display = "none";
+                                // enable submit button
+                                document.getElementById("createButton").disabled = false;
                             }
                             $("#startTime").val(timestamp);
-                        }
+                        };
+
                     </script>
                 </td>
             <tr>
@@ -217,8 +214,13 @@
                             if (timestamp < startTime) {
                                 //display error message above finish_dateTime field
                                 document.getElementById("finishTimeWarning").style.display = "inline";
+                                // disable submit button
+                                document.getElementById("createButton").disabled = true;
                             } else {
+                                // error message disappears due to valid input
                                 document.getElementById("finishTimeWarning").style.display = "none";
+                                // enable submit button
+                                document.getElementById("createButton").disabled = false;
                             }
                             $("#finishTime").val(timestamp);
                         };
@@ -299,7 +301,9 @@
             <tr>
                 <td/>
                 <td>
-                    <button class="btn btn-lg btn-primary btn-block" type="submit" value="Create">Create</button>
+                    <button id="createButton" class="btn btn-lg btn-primary btn-block" type="submit" value="Create">
+                        Create
+                    </button>
                 </td>
                 <td/>
             </tr>
