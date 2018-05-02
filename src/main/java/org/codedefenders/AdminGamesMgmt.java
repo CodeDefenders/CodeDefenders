@@ -222,7 +222,7 @@ public class AdminGamesMgmt extends HttpServlet {
 		if (userNameListString != null) {
 			for (String uName : userNameListString.split(USER_NAME_LIST_DELIMITER)) {
 				if (uName.length() > 0) {
-					User u = DatabaseAccess.getUserForNameOrEmail(uName);
+					User u = DatabaseAccess.getUserForName(uName);
 					if (u == null)
 						messages.add("No user with name or email \'" + uName + "\'!");
 					else if (!selectedUserIDs.contains(u.getId()))
