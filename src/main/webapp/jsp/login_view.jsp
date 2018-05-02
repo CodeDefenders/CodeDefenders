@@ -148,25 +148,25 @@
                     <form action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
                         <input type="hidden" name="formType" value="create">
                         <label for="inputUsername" class="sr-only">Username</label>
+                        <span class="label label-danger" id="invalid_username_message" style="color: white;visibility: hidden">3-20 alphanumerics starting with a letter (a-z), no space or special characters.</span>
                         <input type="text" id="inputUsernameCreate" name="username" class="form-control"
-                               placeholder="Username" required minlength="3" maxlength="20" autofocus>
+                               onkeyup="validateUsername()" placeholder="Username" required minlength="3" maxlength="20" autofocus>
                         <label for="inputEmail" class="sr-only">Email</label>
-                        <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email"
-                               required>
+                        <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email" required>
                         <label for="inputPassword" class="sr-only">Password</label>
                         <input type="password" id="inputPasswordCreate" name="password" class="form-control"
-                               onkeyup="check()" placeholder="Password" required minlength="<%=pwMinLength%>" maxlength="20">
+                               onkeyup="validatePassword()" placeholder="Password" required minlength="<%=pwMinLength%>" maxlength="20">
                         <span class="label label-danger" id="pw_confirm_message_create" style="color: white;visibility: hidden">Passwords do not match!</span>
                         <label for="inputPassword" class="sr-only">Password</label>
                         <input type="password" id="inputConfirmPasswordCreate" name="confirm" class="form-control"
-                              onkeyup="check()" placeholder="Confirm Password" required>
+                               onkeyup="validatePassword()" placeholder="Confirm Password" required>
                         <button class="btn btn-lg btn-primary btn-block" id="submitCreateAccount" type="submit">Create Account</button>
                     </form>
-                    <span style="margin-right:5px; font-size:small;">Valid username: 3-20 alphanumerics starting with a letter (a-z), no space or special character.<br>
-                        Valid password: <%=AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()%>-20 alphanumeric characters, no whitespace or special character.</span>
+                    <span style="margin-right:5px; font-size:small;">Valid username: 3-20 alphanumerics starting with a letter (a-z), no space or special characters.<br>
+                        Valid password: <%=AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()%>-20 alphanumeric characters, no whitespace or special characters.</span>
                 </div>
-                <script>
-                    function check() {
+                <script type="text/javascript">
+                    function validatePassword() {
                         if(document.getElementById('inputConfirmPasswordCreate').value === '') {
                             document.getElementById('pw_confirm_message_create').style.visibility = "hidden";
                             return;
@@ -178,6 +178,22 @@
                         } else {
                             document.getElementById('pw_confirm_message_create').style.visibility = "visible";
                             document.getElementById('submitCreateAccount').disabled = true;
+                        }
+                    }
+                    function validateUsername() {
+                        var username = document.getElementById('inputUsernameCreate').value;
+                        if (isValidUsername(username)) {
+                            document.getElementById('invalid_username_message').style.visibility = "hidden";
+                            document.getElementById('submitCreateAccount').disabled = false;
+                        } else {
+                            document.getElementById('invalid_username_message').style.visibility = "visible";
+                            document.getElementById('submitCreateAccount').disabled = true;
+                        }
+
+                        function isValidUsername(username) {
+                            // matches 1 a-z for the first char, 2-19 alphanumeric chars for the rest
+                            var regExp = new RegExp('^[a-z][a-zA-Z0-9]{2,19}$');
+                            return regExp.test(username);
                         }
                     }
                 </script>
