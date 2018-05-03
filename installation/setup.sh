@@ -26,15 +26,20 @@ fi
 
 echo "* Loading configuration from ${config_file}"
 
+# Create a clean config file that avoids the quirks of using "~"
+# Sed on mac is broken, so avoid "in place -i" substituion in favor of rewriting the file
+sed "s|\~|${HOME}|g" "$config_file" > "${config_file}".tmp
+
+# Load the properties from the clean file
 while read -r NAME VALUE; do
-#    echo "* Found ${NAME} "
     declare $(echo ${NAME} | sed 's/\./_/g')="${VALUE}"
-done < <(sed -e '/^$/d' -e '/^#/d' ${config_file} | sed 's|=| |')
+done < <(sed -e '/^$/d' -e '/^#/d' "${config_file}".tmp | sed 's|=| |')
 
 
 # FAIL if any of the required configurations is missing
 
 : ${data_dir:?Please provide a value for data.dir in $config_file }
+
 # Not sure this is actually require
 : ${ant_home:?Please provide a value for ant.home in $config_file }
 
@@ -118,16 +123,24 @@ ${ant_home}/bin/ant -version > /dev/null
 
 echo "* Create folder structure under $data_dir"
 
-mkdir -vp ${data_dir}/lib
-mkdir -vp ${data_dir}/sources
-mkdir -vp ${data_dir}/mutants
-mkdir -vp ${data_dir}/tests
-mkdir -vp ${data_dir}/ai
+# Create the home folder and checks this worked
+# Better safe than sorry.
+mkdir -vp "${data_dir}"
 
-# Currently, this downloads more dependencies than necessary. The issue might be jacoco agent which comes with a broken manifest otherwise.
+if [ ! -d "${data_dir}" ]; then
+    echo "ERROR: Cannot create folder ${data_dir}"
+    exit 1
+fi
+
+for FOLDER in "lib" "sources" "mutants" "tests" "ai"; do
+  mkdir -vp "${data_dir}"/${FOLDER}
+done
+
+# Currently, this downloads more dependencies than necessary.
+# The issue is that jacoco agent comes with a broken manifest otherwise.
 
 echo "* Download dependencies and copy resources"
-mvn -f installation-pom.xml clean validate package -Dconfig.properties=$config_file > /dev/null
+mvn -f installation-pom.xml clean validate package -Dconfig.properties="${config_file}".tmp > /dev/null
 
 # Do we need to check/set group permissions?
 # This might be necessary if tomcat runs with a specifc user
@@ -135,5 +148,8 @@ mvn -f installation-pom.xml clean validate package -Dconfig.properties=$config_f
 #chmod -R 770 defender/
 
 echo "* Done"
+
+# Clean up
+rm "${config_file}".tmp
 
 exit 0
