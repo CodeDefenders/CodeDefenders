@@ -1,3 +1,5 @@
+<%@ page import="org.codedefenders.util.AdminDAO" %>
+<%@ page import="static org.codedefenders.AdminSystemSettings.SETTING_NAME.*" %>
 <% String pageTitle = "Contact Us"; %>
 
 <%
@@ -22,14 +24,14 @@
 %>
 <div class="container" style=" max-width: 50%; min-width: 25%; ">
 	<h2 style="text-align: center">Contact Us</h2>
-	<p>
+	<p style="text-align: center">
 		Code Defenders is an open source project; you can find details on the
 		<a href="https://github.com/CodeDefenders/CodeDefenders">GitHub</a> project page.
 	</p>
 </div>
 	<%
-	final String smtpHost = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAIL_SMTP_HOST).getStringValue();
-	if(smtpHost != null && !smtpHost.isEmpty()) {
+	final boolean emailEnabled = AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue();
+	if(emailEnabled) {
 %>
 <div class="container">
 	<form  action="<%=request.getContextPath() %>/sendEmail" method="post" class="form-signin">
