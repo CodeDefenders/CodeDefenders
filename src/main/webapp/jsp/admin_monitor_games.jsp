@@ -16,7 +16,7 @@
         <h3>Current Games</h3>
 
         <%
-            List<MultiplayerGame> insertedGames = AdminDAO.getUnfinishedMultiplayerGames();
+            List<MultiplayerGame> insertedGames = AdminDAO.getUnfinishedMultiplayerGamesCreatedBy( (Integer)request.getSession().getAttribute("uid"));
             if (insertedGames.isEmpty()) {
         %>
         <div class="panel panel-default">
