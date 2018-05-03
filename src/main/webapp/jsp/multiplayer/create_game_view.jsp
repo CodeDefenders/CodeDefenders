@@ -1,6 +1,3 @@
-<%@ page import="org.joda.time.DateTime" %>
-<%@ page import="org.joda.time.format.DateTimeFormat" %>
-<%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="org.codedefenders.validation.CodeValidator" %>
 <%@ page import="static org.codedefenders.validation.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
 <% String pageTitle = "Create Battleground"; %>
@@ -69,126 +66,164 @@
                 </td>
             </tr>
             <tr>
-                    <%
-					DateTime startDate = DateTime.now();
-					DateTime finishDate = startDate.plusDays(3);
-					DateTimeFormatter fmt = DateTimeFormat.forPattern("yyyy/MM/dd");
-				%>
                 <td>Start Time</td>
                 <td>
                     <div class="crow">
-                        <input type="hidden" id="startTime" name="startTime" value="<%=startDate.getMillis()%>"/>
-                        <input class="ws-5" name="start_dateTime" id="start_dateTime"
-                               value="<%=fmt.print(startDate)%>"/>
+                        <input type="hidden" id="startTime" name="startTime"/>
+                        <span class="alert alert-danger" id="startTimeWarning" style="display: none">Start time must be later than today's date!</span>
+
+                        <input class="ws-5" name="start_dateTime" id="start_dateTime"/>
                         <div class="ws-7 nest">
                             <input class="ws-1" type="text" name="start_hours" id="start_hours"
-                                   value="<%=String.format("%1$02d",startDate.getHourOfDay())%>"
                                    style="text-align: center;"/>
                             <span>:</span>
                             <input class="ws-1" type="text" name="start_minutes" id="start_minutes"
-                                   value="<%=String.format("%1$02d",startDate.getMinuteOfHour())%>"
                                    style="text-align: center;"/>
                         </div>
                     </div>
                     <script>
                         $(document).ready(function () {
-                            $("#startTime").val(new Date().getTime());
-                            $("#start_dateTime").val($.datepicker.formatDate('yyyy/MM/dd', new Date(timeStamp)));
+                            var initialStartDate = new Date();
+                            $("#startTime").val(initialStartDate.getTime());
+                            $("#start_dateTime").datepicker({dateFormat: "yy/mm/dd"});
+                            $("#start_dateTime").datepicker("setDate", initialStartDate);
+                            $("#start_hours").val(initialStartDate.getHours());
+                            var mins = initialStartDate.getMinutes();
+                            if (mins < 10) {
+                                // add leading zero to minute representation
+                                mins = "0" + mins;
+                            }
+                            $("#start_minutes").val(mins);
+                        });
+
+                        $("#start_dateTime").on("change", function () {
                             updateStartTimestamp();
                         });
-                        var voidFunct = function () {
-                        };
-                        var updateStartTimestamp = function () {
-                            var timestamp = new Date($("#start_dateTime").val()).valueOf();
-                            timestamp += parseInt($("#start_hours").val()) * 60 * 60 * 1000;
-                            timestamp += parseInt($("#start_minutes").val()) * 60 * 1000;
-                            var now = new Date().getTime();
-                            if (timestamp < now) {
-                                //invalid timestamp, set it to now
-                                timestamp = now;
-                            }
-                            $("#startTime").val(timestamp);
-                        }
+
+                        // check whether the selection contains more hours than one day
                         $("#start_hours").on("change", function () {
                             var hours = $("#start_hours").val();
-                            if (hours < 0 || hours > 59) {
+                            if (hours < 0 || hours > 23) {
                                 $("#start_hours").val(0);
                             }
                             updateStartTimestamp();
-                        })
+                        });
+
                         $("#start_minutes").on("change", function () {
                             var mins = $("#start_minutes").val();
+                            // check whether the selection contains more minutes than one hour
                             if (mins < 0 || mins > 59) {
-                                $("#start_minutes").val(0);
+                                $("#start_minutes").val("00");
+                            } else if (mins < 10) {
+                                // add leading zero to minute representation
+                                $("#start_minutes").val("0" + mins);
                             }
                             updateStartTimestamp();
-                        })
-                        var dataPicker = $("#start_dateTime").datepicker({
-                            onSelect: function (selectedDate, dp) {
-                                $(".ui-datepicker a").attr("href", "javascript:voidFunct();");
-                                //var date = $.datepicker.formatDate("@", dp);
-                                //alert(date);
-                                updateStartTimestamp();
-                            }
                         });
+
+                        // update the input of hidden startTime field with selected timestamp
+                        var updateStartTimestamp = function () {
+                            var timestamp = new Date($("#start_dateTime").val()).getTime();
+                            timestamp += parseInt(($("#start_hours").val()) * 60 * 60 * 1000);
+                            timestamp += parseInt($("#start_minutes").val()) * 60 * 1000;
+
+                            var finishTime = new Date($("#finish_dateTime").val()).getTime();
+
+                            // check whether the selected start time is before finish date
+                            if (finishTime < timestamp) {
+                                //display error message above start_dateTime field when finish time is behind selected one
+                                document.getElementById("finishTimeWarning").style.display = "inline";
+                                // disable submit button
+                                document.getElementById("createButton").disabled = true;
+                            } else {
+                                // error messages disappear due to right input
+                                document.getElementById("startTimeWarning").style.display = "none";
+                                document.getElementById("finishTimeWarning").style.display = "none";
+                                // enable submit button
+                                document.getElementById("createButton").disabled = false;
+                            }
+                            $("#startTime").val(timestamp);
+                        };
+
                     </script>
                 </td>
             <tr>
                 <td>Finish Time</td>
                 <td>
                     <div class="crow">
-                        <input type="hidden" id="finishTime" name="finishTime" value="<%=finishDate.getMillis()%>"/>
-                        <input class="ws-5" name="finish_dateTime" id="finish_dateTime"
-                               value="<%=fmt.print(finishDate)%>"/>
+                        <input type="hidden" id="finishTime" name="finishTime"/>
+                        <span class="alert alert-danger" id="finishTimeWarning" style="display: none">Finish time must be later than selected start time!</span>
+                        <input class="ws-5" name="finish_dateTime" id="finish_dateTime"/>
                         <div class="ws-7 nest">
                             <input class="ws-1" type="text" name="finish_hours" id="finish_hours"
-                                   value="<%=String.format("%1$02d",finishDate.getHourOfDay())%>"
                                    style="text-align: center;"/>
                             <span>:</span>
                             <input class="ws-1" type="text" name="finish_minutes" id="finish_minutes"
-                                   value="<%=String.format("%1$02d",finishDate.getMinuteOfHour())%>"
                                    style="text-align: center;"/>
                         </div>
                     </div>
                     <script>
                         $(document).ready(function () {
-                            $("#finishTime").val(new Date().getTime());
-                            $("#finish_dateTime").val($.datepicker.formatDate('yyyy/MM/dd', new Date(timeStamp)));
+                            var initialFinishDate = new Date();
+                            // add default 3 days to initial finish date
+                            initialFinishDate.setDate(initialFinishDate.getDate() + 3);
+                            $("#finishTime").val(initialFinishDate.getTime());
+                            $("#finish_dateTime").datepicker({dateFormat: "yy/mm/dd"});
+                            $("#finish_dateTime").datepicker("setDate", initialFinishDate);
+                            $("#finish_hours").val(initialFinishDate.getHours());
+                            var mins = initialFinishDate.getMinutes();
+                            if (mins < 10) {
+                                mins = "0" + mins;
+                            }
+                            $("#finish_minutes").val(mins);
+                        });
+
+                        // check whether the selected date is before today
+                        $("#finish_dateTime").on("change", function () {
                             updateFinishTimestamp();
                         });
-                        var updateFinishTimestamp = function () {
-                            var timestamp = new Date($("#finish_dateTime").val()).valueOf();
-                            timestamp += parseInt($("#finish_hours").val()) * 60 * 60 * 1000;
-                            timestamp += parseInt($("#finish_minutes").val()) * 60 * 1000;
-                            var now = new Date().getTime();
-                            if (timestamp < now) {
-                                //invalid timestamp, set it to now+5 days
-                                timestamp = now + (3 * 24 * 60 * 60 * 1000);
-                            }
-                            $("#finishTime").val(timestamp);
-                        }
+
+                        // check whether the selection contains more hours than one day
                         $("#finish_hours").on("change", function () {
                             var hours = $("#finish_hours").val();
-                            if (hours < 0 || hours > 59) {
+                            if (hours < 0 || hours > 23) {
                                 $("#finish_hours").val(0);
                             }
                             updateFinishTimestamp();
-                        })
+                        });
+
+                        // check whether the selection contains more minutes than one hour
                         $("#finish_minutes").on("change", function () {
                             var mins = $("#finish_minutes").val();
                             if (mins < 0 || mins > 59) {
-                                $("#finish_minutes").val(0);
+                                $("#finish_minutes").val("00");
+                            } else if (mins < 10) {
+                                // add leading zero to minute representation
+                                $("#finish_minutes").val("0" + mins);
                             }
                             updateFinishTimestamp();
-                        })
-                        var dataPicker = $("#finish_dateTime").datepicker({
-                            onSelect: function (selectedDate, dp) {
-                                $(".ui-datepicker a").attr("href", "javascript:voidFunct();");
-                                //var date = $.datepicker.formatDate("@", dp);
-                                //alert(date);
-                                updateFinishTimestamp();
-                            },
                         });
+
+                        var updateFinishTimestamp = function () {
+                            var timestamp = new Date($("#finish_dateTime").val()).getTime();
+                            timestamp += parseInt(($("#finish_hours").val()) * 60 * 60 * 1000);
+                            timestamp += parseInt(($("#finish_minutes").val()) * 60 * 1000);
+                            var startTime = parseInt($("#startTime").val());
+
+                            // check whether the selected finish time is later than the start time
+                            if (timestamp < startTime) {
+                                //display error message above finish_dateTime field
+                                document.getElementById("finishTimeWarning").style.display = "inline";
+                                // disable submit button
+                                document.getElementById("createButton").disabled = true;
+                            } else {
+                                // error message disappears due to valid input
+                                document.getElementById("finishTimeWarning").style.display = "none";
+                                // enable submit button
+                                document.getElementById("createButton").disabled = false;
+                            }
+                            $("#finishTime").val(timestamp);
+                        };
                     </script>
                 </td>
             </tr>
@@ -197,8 +232,9 @@
                     Max. Assertions per Test
                 </td>
                 <td>
-                    <input class="form-control" type="number" value="<%=DEFAULT_NB_ASSERTIONS%>" name="maxAssertionsPerTest"
-                           id="maxAssertionsPerTest" min = 1 required/>
+                    <input class="form-control" type="number" value="<%=DEFAULT_NB_ASSERTIONS%>"
+                           name="maxAssertionsPerTest"
+                           id="maxAssertionsPerTest" min=1 required/>
                 </td>
             </tr>
             <tr>
@@ -206,10 +242,10 @@
                     Mutant validator
                 </td>
                 <td>
-                    <select id = "mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker" data-size="medium">
-                        <%for (CodeValidator.CodeValidatorLevel cvl : CodeValidator.CodeValidatorLevel.values()){%>
-                        <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidator.CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
-                            <%=cvl.name().toLowerCase()%>
+                    <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
+                            data-size="medium">
+                        <%for (CodeValidator.CodeValidatorLevel cvl : CodeValidator.CodeValidatorLevel.values()) {%>
+                        <option value=<%=cvl.name()%>><%=cvl.name().toLowerCase()%>
                         </option>
                         <%}%>
                     </select>
@@ -247,7 +283,9 @@
             <tr>
                 <td/>
                 <td>
-                    <button class="btn btn-lg btn-primary btn-block" type="submit" value="Create">Create</button>
+                    <button id="createButton" class="btn btn-lg btn-primary btn-block" type="submit" value="Create">
+                        Create
+                    </button>
                 </td>
                 <td/>
             </tr>
