@@ -1,6 +1,6 @@
-<%@ page import="org.codedefenders.*" %>
-<%@ page import="org.codedefenders.util.AdminDAO" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.codedefenders.User" %>
+<%@ page import="org.codedefenders.util.AdminDAO" %>
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
@@ -178,18 +178,29 @@
         <input type="hidden" name="formType" value="createUsers">
 
         <div class="form-group">
-            <label for="user_name_list">User Names or Email Addresses</label>
+            <label for="user_name_list">List of user credentials. Show help</label>
             <a data-toggle="collapse" href="#demo" style="color:black">
                 <span class="glyphicon glyphicon-question-sign"></span>
             </a>
             <div id="demo" class="collapse">
-                Newline seperated list of usernames or Email Addresses.
-                <br/>Email Addresses are any strings with an @, usernames anything else.
-                <br/>Usernames are generated from the Email Addresses (<i>name@domain.tld</i> -> <i>name</i>).
-                <br/>Passwords are auto generated and shown as messages plus written to the logs.
-                <br/><br/>You can also specify name, Email address (and password) in the form:
-                <br/> <i>name mail</i>, <i>mail name</i>, <i>name mail password</i>, <i>mail name password</i>,
-                delimited by spaces, semicolons or commas
+                List of usernames, passwords and emails (optional).
+                <br>
+                Fields are separated by commas (<code>,</code>) or semicolons (<code>;</code>).
+                Users are separated by new lines.
+                <p>
+                If an email is provided and sending emails is enabled, created users receive an email with their credentials.
+                <p>
+                Valid input examples:
+                <br>
+                <code>username,password
+                    <br>
+                    username2,password,example@mail.com
+                    <br>
+                    username3;password
+                    <br>
+                    username4;password;example@mail.com
+                </code>
+
             </div>
             <textarea class="form-control" rows="10" id="user_name_list" name="user_name_list"
                       oninput="document.getElementById('submit_users_btn').disabled = false;"></textarea>
