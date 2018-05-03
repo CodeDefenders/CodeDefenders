@@ -1,7 +1,7 @@
 <%@ page import="org.codedefenders.validation.CodeValidator" %>
 <%@ page import="static org.codedefenders.validation.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
 <% String pageTitle = "Create Battleground"; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 <div id="creategame" class="container">
     <form id="create" action="<%=request.getContextPath() %>/multiplayer/games" method="post"
           class="form-creategame-mp">
@@ -250,25 +250,7 @@
                         <%}%>
                     </select>
                     <div id="validatorExplanation" class="collapse panel panel-default" style="font-size: 12px;">
-                        <div class="panel-body" style="padding: 10px;">
-                            <b>Relaxed</b> <br>
-                            <ul>
-                                <li>No calls to <i>System.*</i>,<i>Random.*</i></li>
-                                <li>No new control structures (<i>switch</i>, <i>if</i>, <i>for</i>, ...)</li>
-                            </ul>
-                            <b>Moderate</b> <br>
-                            <ul>
-                                <li>No comments</li>
-                                <li>No additional logical operators (<i>&&</i>, <i>||</i>)</li>
-                                <li>No ternary operators</li>
-                            </ul>
-                            <b>Strict</b> <br>
-                            <ul>
-                                <li>No reflection</li>
-                                <li>No bitshifts</li>
-                                <li>No signature changes</li>
-                            </ul>
-                        </div>
+                        <%@ include file="/jsp/validator_explanation.jsp" %>
                     </div>
                 </td>
                 <td>

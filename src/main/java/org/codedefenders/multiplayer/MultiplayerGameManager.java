@@ -7,6 +7,7 @@ import org.codedefenders.events.EventStatus;
 import org.codedefenders.events.EventType;
 import org.codedefenders.exceptions.CodeValidatorException;
 import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -217,7 +218,9 @@ public class MultiplayerGameManager extends HttpServlet {
 						break;
 					}
 
-					String validityMessage = GameManager.getMutantValidityMessage(activeGame.getClassId(), mutantText);
+					CodeValidator.CodeValidatorLevel codeValidatorLevel = activeGame.getMutantValidatorLevel();
+
+					String validityMessage = GameManager.getMutantValidityMessage(activeGame.getClassId(), mutantText, codeValidatorLevel);
 
 					if (!validityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE)) {
 						// Mutant is either the same as the CUT or it contains invalid code

@@ -41,6 +41,12 @@ public class AdminDAO {
             "SELECT *\n" +
                     "FROM games\n" +
                     "WHERE Mode = 'PARTY' AND (State = 'ACTIVE' OR State = 'CREATED');";
+
+    private static final String UNFINISHED_MULTIPLAYER_GAMES_BY_USER_QUERY =
+            "SELECT *\n" +
+                    "FROM games\n" +
+                    "WHERE Mode = 'PARTY' AND (State = 'ACTIVE' OR State = 'CREATED') AND Creator_ID = ?;";
+
     private static final String LAST_ROLE_QUERY =
             "SELECT\n" +
                     "  players.User_ID,\n" +
@@ -341,6 +347,13 @@ public class AdminDAO {
     public static List<MultiplayerGame> getUnfinishedMultiplayerGames() {
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, UNFINISHED_MULTIPLAYER_GAMES_QUERY);
+        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+        return getGamesFromRS(rs, conn, stmt);
+    }
+
+    public static List<MultiplayerGame> getUnfinishedMultiplayerGamesCreatedBy(int userID) {
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, UNFINISHED_MULTIPLAYER_GAMES_BY_USER_QUERY, DB.getDBV(userID));
         ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
         return getGamesFromRS(rs, conn, stmt);
     }

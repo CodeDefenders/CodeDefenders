@@ -2,11 +2,12 @@
 <%@ page import="org.codedefenders.util.AdminDAO" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <% String pageTitle = null; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 
 <div class="full-width">
     <ul class="nav nav-tabs">
-        <li><a href="<%=request.getContextPath()%>/admin/games"> Manage Games</a></li>
+        <li><a href="<%=request.getContextPath()%>/admin/games"> Create Games</a></li>
+        <li><a href="<%=request.getContextPath()%>/admin/monitor"> Monitor Games</a></li>
         <li class="active"><a>Manage Users</a></li>
         <li><a href="<%=request.getContextPath()%>/admin/settings">System Settings</a></li>
     </ul>
@@ -82,7 +83,6 @@
                 <th>Last Login</th>
                 <th></th>
                 <th></th>
-                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -128,14 +128,6 @@
                 </td>
                 <td style="padding-top:4px; padding-bottom:4px">
                     <%if (currentUserID != uid) {%>
-                    <button class="btn btn-sm btn-warning" type="submit" value="<%=uid%>" name="resetPasswordButton"
-                            onclick="return confirm('Are you sure you want to reset <%=username%>\'s password?');">
-                        <span data-toggle="tooltip" title="Reset Password" class="glyphicon glyphicon-repeat"></span>
-                    </button>
-                    <%}%>
-                </td>
-                <td style="padding-top:4px; padding-bottom:4px">
-                    <%if (currentUserID != uid) {%>
                     <button class="btn btn-sm btn-danger" type="submit" value="<%=uid%>" name="deleteUserButton"
                             onclick="return confirm('Are you sure you want to permanently delete <%=username%>\'s ' +
                                     'account? \nThis will also delete all their games, mutants, tests, equivalences' +
@@ -171,9 +163,6 @@
                         "orderable": false
                     }, {
                         "targets": 6,
-                        "orderable": false
-                    }, {
-                        "targets": 7,
                         "orderable": false
                     }]
                 });

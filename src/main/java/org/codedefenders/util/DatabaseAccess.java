@@ -359,10 +359,17 @@ public class DatabaseAccess {
 		return getUserForKey("User_ID", uid);
 	}
 
-	public static User getUserForNameOrEmail(String usernameOrEmail) {
-		String query = "SELECT * FROM users WHERE Username=? OR Email=?;";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(usernameOrEmail),
-				DB.getDBV(usernameOrEmail)};
+	public static User getUserForEmail(String email) {
+		String query = "SELECT * FROM users WHERE Email=?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(email)};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return getUserFromDB(stmt, conn);
+	}
+
+	public static User getUserForName(String username) {
+		String query = "SELECT * FROM users WHERE Username=?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(username)};
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		return getUserFromDB(stmt, conn);

@@ -2,7 +2,15 @@
 <%@ page import="org.codedefenders.util.AdminDAO" %>
 <% String pageTitle = "About CodeDefenders"; %>
 
-<%@ include file="/jsp/header_base.jsp" %>
+<%
+    Object uid = request.getSession().getAttribute("uid");
+    Object username = request.getSession().getAttribute("username");
+    if (uid != null && username != null){
+%>
+<%@ include file="/jsp/header.jsp" %>
+<%} else {%>
+<%@ include file="/jsp/header_logout.jsp" %>
+<%}%>
 
 <div class="container" style=" max-width: 50%; min-width: 25%; ">
     <h2 style="text-align: center">About CodeDefenders</h2>

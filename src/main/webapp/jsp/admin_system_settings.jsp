@@ -2,11 +2,12 @@
 <%@ page import="org.codedefenders.util.AdminDAO" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <% String pageTitle = null; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 
 <div class="full-width">
     <ul class="nav nav-tabs">
-        <li><a href="<%=request.getContextPath()%>/admin/games"> Manage Games</a></li>
+        <li><a href="<%=request.getContextPath()%>/admin/games"> Create Games</a></li>
+        <li><a href="<%=request.getContextPath()%>/admin/monitor"> Monitor Games</a></li>
         <li><a href="<%=request.getContextPath()%>/admin/users">Manage Users</a></li>
         <li class="active"><a >System Settings</a></li>
     </ul>

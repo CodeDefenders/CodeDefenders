@@ -1,5 +1,5 @@
 <% String pageTitle="Duel Creation"; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 
 
 <div id="creategame" class="container">

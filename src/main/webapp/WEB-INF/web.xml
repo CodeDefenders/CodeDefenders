@@ -21,6 +21,8 @@
 			<url-pattern>/admin/*</url-pattern>
 			<url-pattern>/jsp/admin_user_mgmt.jsp</url-pattern>
 			<url-pattern>/jsp/admin_games_mgmt.jsp</url-pattern>
+			<url-pattern>/jsp/admin_monitor_games.jsp</url-pattern>
+			<url-pattern>/jsp/admin_create_games.jsp</url-pattern>
 			<http-method>GET</http-method>
 			<http-method>POST</http-method>
 		</web-resource-collection>
@@ -327,15 +329,24 @@
 	</listener>
 
 
-    <servlet>
-        <servlet-name>AdminGamesMgmt</servlet-name>
-		<servlet-class>org.codedefenders.AdminGamesMgmt</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AdminGamesMgmt</servlet-name>
+	<servlet>
+		<servlet-name>AdminGamesMgmt</servlet-name>
+		<servlet-class>org.codedefenders.AdminCreateGames</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AdminGamesMgmt</servlet-name>
 		<url-pattern>/admin/games</url-pattern>
 		<url-pattern>/admin</url-pattern>
-    </servlet-mapping>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>AdminMonitorGames</servlet-name>
+		<servlet-class>org.codedefenders.AdminMonitorGames</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AdminMonitorGames</servlet-name>
+		<url-pattern>/admin/monitor</url-pattern>
+	</servlet-mapping>
 
 	<servlet>
 		<servlet-name>AdminUserMgmt</servlet-name>

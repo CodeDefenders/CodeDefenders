@@ -122,7 +122,6 @@ span.defenderTotal {
 #research {
 	position: relative;
 	width: 100%;
-	height: 650px;
 	z-index:15;
 	margin: auto;
 	text-align:center;
@@ -455,7 +454,6 @@ nav li a {
 /* Papercite */
 
 .paper-list {
-	width: 500px;
 	margin: 10px
 }
 
