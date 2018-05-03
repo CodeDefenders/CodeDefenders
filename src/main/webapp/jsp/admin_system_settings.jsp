@@ -6,7 +6,8 @@
 
 <div class="full-width">
     <ul class="nav nav-tabs">
-        <li><a href="<%=request.getContextPath()%>/admin/games"> Manage Games</a></li>
+        <li><a href="<%=request.getContextPath()%>/admin/games"> Create Games</a></li>
+        <li><a href="<%=request.getContextPath()%>/admin/monitor"> Monitor Games</a></li>
         <li><a href="<%=request.getContextPath()%>/admin/users">Manage Users</a></li>
         <li class="active"><a >System Settings</a></li>
     </ul>

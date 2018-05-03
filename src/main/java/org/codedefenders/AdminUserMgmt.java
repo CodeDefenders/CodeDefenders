@@ -115,7 +115,7 @@ public class AdminUserMgmt extends HttpServlet {
 
 	private void createUserAccounts(String userNameListString, ArrayList<String> messages, HttpServletRequest request) {
 		if (userNameListString != null) {
-			for (String nameOrEmail : userNameListString.split(AdminGamesMgmt.USER_NAME_LIST_DELIMITER)) {
+			for (String nameOrEmail : userNameListString.split(AdminCreateGames.USER_NAME_LIST_DELIMITER)) {
 				nameOrEmail = nameOrEmail.trim();
 				String name, email, password;
 
