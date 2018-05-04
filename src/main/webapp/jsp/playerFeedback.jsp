@@ -148,7 +148,7 @@
                     <tr>
                         <th><%=canSeePlayerFeedback ? "Player" : ""%></th>
                         <% for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {%>
-                        <th title="<%=f.toString()%>"><%=f.name().toLowerCase().replace('_', ' ')%>
+                        <th title="<%=f.toString()%>"><%=f.name().toUpperCase().replace('_', ' ').replace("CUT ", "")%>
                         </th>
                         <%}%>
                     </tr>
@@ -235,7 +235,7 @@
                 </table>
                 <% } else {
                 %>
-                <h4>No Player has provided feedback for this Game yet.</h4>
+                <h4>No player has provided feedback for this game yet.</h4>
                 <%
                     }%>
             </div>
