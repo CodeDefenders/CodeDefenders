@@ -474,7 +474,7 @@ INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`) VALUES (1, 'Mut
 INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`) VALUES (2, 'TestGen', 'AI_DEFENDER_INACCESSIBLE', 'codedef_testgen@sheffield.ac.uk');
 
 -- Event to activate multiplayer game
-SET @@global.event_scheduler = 1;
+-- SET @@global.event_scheduler = 1;
 
 --
 -- Handling equivalences after time expiration
