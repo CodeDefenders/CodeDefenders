@@ -349,11 +349,11 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>AdminUserMgmt</servlet-name>
-		<servlet-class>org.codedefenders.AdminUserMgmt</servlet-class>
+		<servlet-name>AdminUserManagement</servlet-name>
+		<servlet-class>org.codedefenders.AdminUserManagement</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>AdminUserMgmt</servlet-name>
+		<servlet-name>AdminUserManagement</servlet-name>
 		<url-pattern>/admin/users</url-pattern>
 	</servlet-mapping>
 
