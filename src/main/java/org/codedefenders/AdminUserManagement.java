@@ -170,8 +170,19 @@ public class AdminUserManagement extends HttpServlet {
 			messages.add("Username '" + username + "' already in use.");
 			return;
 		}
+		if(!LoginManager.validUsername(username)) {
+			logger.info("Failed to create user. Username invalid:" + username);
+			messages.add("Username '" + username + "' invalid, user not created");
+			return;
+		}
 
 		final String password = credentials[1].trim();
+		if(!LoginManager.validPassword(password)) {
+			logger.info("Failed to create user. Password invalid:" + password);
+			messages.add("Password for user "+ username +" invalid, user not created");
+			return;
+		}
+
 		final String email;
 
 		final boolean hasMail = credentials.length == 3;
@@ -194,6 +205,7 @@ public class AdminUserManagement extends HttpServlet {
 			logger.error(errorMsg);
 			messages.add(errorMsg);
 		} else {
+			messages.add("Created user "+ username + (hasMail ? " ("+email+")" : ""));
 			logger.info("Successfully created account for user '" + username + "'");
 			if (hasMail && sendMail) {
 				final boolean mailSuccess = sendNewAccountMsg(email, username, password, hostAddress);
