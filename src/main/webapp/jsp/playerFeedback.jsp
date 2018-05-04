@@ -52,7 +52,7 @@
     <div class="modal-dialog">
         <!-- Modal content-->
         <div class="modal-content"
-             style="z-index: 10000; position: absolute; width: 200%; left:-50%;">
+             style="z-index: 10000; position: absolute; width: 100%; left:0%;">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h3 class="modal-title">Feedback for Game <%=gameId%>
@@ -138,10 +138,45 @@
             </div>
             <%}%>
 
+
             <div class="modal-body" id="view_feedback_modal"
                  style="<%=canGiveFeedback ? "display: none;" : ""%>">
 
                 <% if (FeedbackDAO.getNBFeedbacksForGame(gameId) > 0) {%>
+
+				<table class="table-hover table-bordered table-responsive" style="margin: auto">
+					<thead>
+					<tr><th>Feedback On</th><th>Average Score</th></tr>
+					</thead>
+					<tbody>
+						<!-- Generate a row for each type of feedback if that is visible -->
+                   <% for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {
+                   		double[] avgRatings = FeedbackDAO.getAverageGameRatings(gameId);
+                       	double ratingValue = avgRatings == null ? -1 : avgRatings[f.ordinal()];
+                        if (ratingValue < 1) continue; // Not sure this is right... 
+                    %>
+                        <tr>
+                        <!-- Feedback on -->
+                        	<td>
+                        	<%=f.name().toUpperCase().replace('_', ' ').replace("CUT ", "")%>
+                        	</td>
+                        <!-- Average Score -->
+                        	<td>
+ 	                           <fieldset class="rating">
+                                <%for (int i = Feedback.MAX_RATING; i > 0; i--) {%>
+    	                            <label class="full" title="<%=i%>"
+        	                               style="font-size:13px; color:<%=i <= Math.round(ratingValue)  ? "#FFD700" : "#bdbdbd"%>"></label>
+                                <%}%>
+            	                </fieldset>
+                	            <br>
+                    	        <p style="    text-align:  center;"><%=String.format("%.1f", ratingValue)%></p>
+                        	</td>
+                    	</tr>
+                    <%}%>
+					</tbody>
+				</table>
+
+				<%-- <h4>OLD VERSION :</h4>
 
                 <table class="table-hover table-bordered table-responsive" style="margin: auto">
                     <thead>
@@ -232,7 +267,7 @@
                     </tr>
                     </tbody>
 
-                </table>
+                </table> --%>
                 <% } else {
                 %>
                 <h4>No player has provided feedback for this game yet.</h4>
