@@ -21,11 +21,11 @@ public class Feedback extends HttpServlet {
 	public enum FeedbackType {
 		CUT_MUTATION_DIFFICULTY {
 			public String toString() {
-				return "The CUT is difficult to mutate";
+				return "The class under test is difficult to mutate";
 			}
 		}, CUT_TEST_DIFFICULTY {
 			public String toString() {
-				return "The CUT is difficult to test";
+				return "The class under test is difficult to test";
 			}
 		}, ATTACKER_COMPETENCE {
 			public String toString() {

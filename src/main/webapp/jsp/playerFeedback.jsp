@@ -128,7 +128,7 @@
 
                     <br>
                     <p>In providing feedback you help us improve gameplay mechanics, <br>
-                        hone match making and select CUTs that are engaging and fun.</p>
+                        hone match making and select classes that are engaging and fun.</p>
                     <p>You can change your feedback even after the game finishes.</p>
                     <p>Thank you for your time.</p>
                     <br>
