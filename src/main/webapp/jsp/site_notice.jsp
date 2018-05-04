@@ -19,6 +19,11 @@
 
         <div class="panel-body">
 
+            <h3>Version</h3>
+            <p>
+                This is Code Defenders version <%=org.codedefenders.GameClass.class.getPackage().getImplementationVersion() %>.
+            </p>
+
             <h3>Source Code</h3>
             <p>
             CodeDefenders is developed and maintained at the <a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Chair of Software Engineering II</a> at the University of Passau and the <a href="https://www2.le.ac.uk/departments/informatics/people/jrojas">University of Leicester</a>.
