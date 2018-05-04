@@ -128,7 +128,7 @@
 
                     <br>
                     <p>In providing feedback you help us improve gameplay mechanics, <br>
-                        hone match making and select CUTs that are engaging and fun.</p>
+                        hone match making and select classes that are engaging and fun.</p>
                     <p>You can change your feedback even after the game finishes.</p>
                     <p>Thank you for your time.</p>
                     <br>
@@ -148,7 +148,7 @@
                     <tr>
                         <th><%=canSeePlayerFeedback ? "Player" : ""%></th>
                         <% for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {%>
-                        <th title="<%=f.toString()%>"><%=f.name().toLowerCase().replace('_', ' ')%>
+                        <th title="<%=f.toString()%>"><%=f.name().toUpperCase().replace('_', ' ').replace("CUT ", "")%>
                         </th>
                         <%}%>
                     </tr>
@@ -235,7 +235,7 @@
                 </table>
                 <% } else {
                 %>
-                <h4>No Player has provided feedback for this Game yet.</h4>
+                <h4>No player has provided feedback for this game yet.</h4>
                 <%
                     }%>
             </div>
