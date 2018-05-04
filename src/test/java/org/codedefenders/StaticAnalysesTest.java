@@ -5,20 +5,23 @@ import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 
-public class StaticAnalaysesTest {
+public class StaticAnalysesTest {
 
 	@org.junit.Test
-	public void testTestHasUnitializedFields() {
+	public void testUncoverableLinesIdentification() {
 		GameClass gc = new GameClass("XmlElement", "XmlElement",
 				"src/test/resources/itests/sources/XmlElement/XmlElement.java",
 				"src/test/resources/itests/sources/XmlElement/XmlElement.class");
 
 		for (Integer line : gc.getLinesOfNonCoverableCode()) {
-			System.out.println("StaticAnalaysesTest " + line );
+			System.out.println("Uncoverable line " + line );
 		}
 
 		// We know that there are 5 non initialized fields from that class
-		assertEquals(5, gc.getLinesOfNonCoverableCode().size());
+		// There are 35 lines that are method/constructor signatures or annotations
+		// CodeDefenders currently identifies 17 closing braces.
+		// TODO this may need updating depending on the rules of what CodeDefenders identifies as uncoverable
+		assertEquals(57, gc.getLinesOfNonCoverableCode().size());
 		// TODO add assertions that check line number corresponds
 	}
 
@@ -29,7 +32,7 @@ public class StaticAnalaysesTest {
 				"src/test/resources/itests/sources/Option/Option.class");
 
 		for (Integer line : gc.getLinesOfCompileTimeConstants()) {
-			System.out.println("StaticAnalaysesTest " + line );
+			System.out.println("StaticAnalysesTest " + line );
 		}
 
 		// We know that there are 5 non initialized fields from that class
