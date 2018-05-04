@@ -2,6 +2,29 @@
 <%@ page import="static org.codedefenders.validation.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
 <% String pageTitle = "Create Battleground"; %>
 <%@ include file="/jsp/header_main.jsp" %>
+<%
+    List<GameClass> gameClasses = DatabaseAccess.getAllClasses();
+    if(gameClasses.isEmpty()) {
+        if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) {
+%>
+<div id="creategame" class="container">
+    <p>
+        Before you can start games, please <a href="games/upload" class="text-center new-account">upload a class under test</a>.
+    </p>
+</div>
+<%
+        } else {
+%>
+<div id="creategame" class="container">
+    <p>
+        Games can only be started once at least one class under test has been uploaded.
+    </p>
+</div>
+<%
+        }
+    } else {
+
+%>
 <div id="creategame" class="container">
     <form id="create" action="<%=request.getContextPath() %>/multiplayer/games" method="post"
           class="form-creategame-mp">
@@ -293,4 +316,7 @@
         </table>
     </form>
 </div>
+<%
+    }
+%>
 <%@ include file="/jsp/footer.jsp" %>
