@@ -285,7 +285,7 @@
             </div>
             <textarea class="form-control" rows="5" id="user_name_list" name="user_name_list"
                       oninput="document.getElementById('submit_users_btn').disabled =
-                        !(areAnyChecked('selectedUsers') || containsText('user_name_list'))"></textarea>
+                        !(areAnyChecked('selectedUsers') || containsText('user_name_list')) || (document.getElementById('cut_select').selectedIndex != 0)"></textarea>
         </div>
 
 
@@ -602,7 +602,7 @@
 
             function updateCheckbox(checkboxVal, isChecked) {
                 document.getElementById('submit_users_btn').disabled =
-                    !(areAnyChecked('selectedUsers') || containsText('user_name_list'));
+                    !(areAnyChecked('selectedUsers') || containsText('user_name_list')) || (document.getElementById('cut_select').selectedIndex != 0);
                 setSelectAllCheckbox('selectedUsers', 'selectAllUsers');
                 var hiddenIdList = document.getElementById('hidden_user_id_list');
                 if (isChecked) {
