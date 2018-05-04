@@ -29,23 +29,23 @@ public class Feedback extends HttpServlet {
 			}
 		}, ATTACKER_COMPETENCE {
 			public String toString() {
-				return "The attacking Team is competent";
+				return "The attacking team is competent";
 			}
 		}, DEFENDER_COMPETENCE {
 			public String toString() {
-				return "The defending Team is competent";
+				return "The defending team is competent";
 			}
 		}, ATTACKER_FAIRNESS {
 			public String toString() {
-				return "The attacking Team is playing fair";
+				return "The attacking team is playing fair";
 			}
 		}, DEFENDER_FAIRNESS {
 			public String toString() {
-				return "The defending Team is playing fair";
+				return "The defending team is playing fair";
 			}
 		}, GAME_ENGAGING {
 			public String toString() {
-				return "The Game is engaging";
+				return "The game is engaging";
 			}
 		}
 
