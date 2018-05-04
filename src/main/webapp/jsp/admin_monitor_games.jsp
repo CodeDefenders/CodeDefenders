@@ -2,7 +2,7 @@
 <%@ page import="org.codedefenders.GameState" %>
 <%@ page import="java.util.List" %>
 <% String pageTitle = null; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 <div class="full-width">
     <ul class="nav nav-tabs">
         <li><a href="<%=request.getContextPath()%>/admin/games"> Create Games</a></li>
