@@ -70,11 +70,21 @@ user="$(echo $url | grep @ | cut -d@ -f1)"
 host="$(echo ${url/$user@/} | cut -d/ -f1)"
 # by request - try to extract the port
 port="$(echo $host | sed -e 's,^.*:,:,g' -e 's,.*:\([0-9]*\).*,\1,g' -e 's,[^0-9],,g')"
+
+if [[ $host = *":"* ]]; then
+  DB_HOST="-h ${host%:$port}"
+else
+  DB_HOST="-h ${host}"
+fi
+
+if [ ! -z "$port" ]; then
+  DB_PORT="-P $port"
+fi
+
 # extract the path (if any)
 path="$(echo $url | grep / | cut -d/ -f2-)"
 
 # Remove query string if ANY. Sed does not support ? operation for optional elements
-
 if [[ $path = *"?"* ]]; then
     DB_NAME="$(echo $path | sed 's,^\(.*\)?.*,\1,')"
 else
@@ -89,6 +99,8 @@ fi
 #echo "  port: $port"
 #echo "  path: $path"
 #echo "  DB_NAME: $DB_NAME"
+#echo "  DB_HOST: $DB_HOST"
+#echo "  DB_PORT: $DB_PORT"
 
 #https://stackoverflow.com/questions/3601515/how-to-check-if-a-variable-is-set-in-bash
 if [ -z "${db_password}" ]; then
@@ -97,18 +109,18 @@ else
   DB_PASSWORD="-p${db_password}"
 fi
 
-mysql -u${db_username} ${DB_PASSWORD} -e "SELECT USER(),CURRENT_USER()" > /dev/null 2> /dev/null
+mysql -u${db_username} ${DB_PASSWORD} ${DB_HOST} ${DB_PORT} -e "SELECT USER(),CURRENT_USER()" > /dev/null 2> /dev/null
 
 echo "* Check mysql (database existence)"
 
-result=$(mysql -u${db_username} ${DB_PASSWORD} -s -N -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${DB_NAME}'" 2>/dev/null); if [ -z "$result" ]; then echo "Database ${DB_NAME} does not exists. Please create it before running this script."; exit 1; fi
+result=$(mysql -u${db_username} ${DB_PASSWORD} ${DB_HOST} ${DB_PORT} -s -N -e "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME='${DB_NAME}'" 2>/dev/null); if [ -z "$result" ]; then echo "Database ${DB_NAME} does not exists. Please create it before running this script."; exit 1; fi
 
 # Can we connect the db? Note that this might fail because the user lacks the proper grants/permission (i.e., INDEX creation)
-read -p "* Setting up '${DB_NAME}' as code-defenders DB. \
-This will delete any previous db named '${DB_NAME}'. \
-Continue (y/n)?" choice
+read -p "* Setting up ${DB_NAME} as code-defenders DB. \
+This will delete any previous db named ${DB_NAME} from ${DB_HOST}. \
+Continue (y/n)? " choice
 case "$choice" in
-y|Y ) mysql -u${db_username} -p${db_password} ${DB_NAME} < ../src/main/resources/db/codedefenders.sql;;
+y|Y ) mysql -u${db_username} -p${db_password} ${DB_HOST} ${DB_PORT} ${DB_NAME} < ../src/main/resources/db/codedefenders.sql;;
 n|N ) echo "no";;
 * ) echo "invalid. Abort"; exit 1;;
 esac
