@@ -22,8 +22,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static org.codedefenders.AdminUserMgmt.DIGITS;
-import static org.codedefenders.AdminUserMgmt.LOWER;
+import static org.codedefenders.AdminUserManagement.DIGITS;
+import static org.codedefenders.AdminUserManagement.LOWER;
 import static org.codedefenders.util.DatabaseAccess.setPasswordResetSecret;
 
 public class LoginManager extends HttpServlet {
@@ -256,7 +256,7 @@ public class LoginManager extends HttpServlet {
 	 * @return true iff valid username
 	 */
 	// TODO extract that method to a util class
-	private static boolean validUsername(String username) {
+	public static boolean validUsername(String username) {
 		String pattern = "^[a-zA-Z][a-zA-Z0-9]{2,19}$";
 		return username != null && username.matches(pattern);
 	}
