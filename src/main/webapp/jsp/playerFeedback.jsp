@@ -18,7 +18,6 @@
         }
 
         .rating > label:before {
-            margin: 5px;
             font-size: 1.25em;
             display: inline-block;
             content: "\e006";
@@ -49,10 +48,9 @@
         }
     </style>
 
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg">
         <!-- Modal content-->
-        <div class="modal-content"
-             style="z-index: 10000; position: absolute; width: 200%; left:-50%;">
+        <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h3 class="modal-title">Feedback for Game <%=gameId%>
@@ -142,8 +140,8 @@
                  style="<%=canGiveFeedback ? "display: none;" : ""%>">
 
                 <% if (FeedbackDAO.getNBFeedbacksForGame(gameId) > 0) {%>
-
-                <table class="table-hover table-bordered table-responsive" style="margin: auto">
+                <div class="table-responsive">
+                <table class="table-hover table-bordered table-responsive table-sm">
                     <thead>
                     <tr>
                         <th><%=canSeePlayerFeedback ? "Player" : ""%></th>
@@ -185,7 +183,7 @@
                             <fieldset class="rating">
                                 <%for (int i = Feedback.MAX_RATING; i > 0; i--) {%>
                                 <label class="full" title="<%=i%>"
-                                       style="font-size:13px; color:<%=i <= ratingValue  ? "#FFD700" : "#bdbdbd"%>"></label>
+                                       style="font-size:9px; color:<%=i <= ratingValue  ? "#FFD700" : "#bdbdbd"%>"></label>
                                 <%}%>
                             </fieldset>
                         </td>
@@ -214,15 +212,13 @@
                         <%} else {%>
 
                         <td>
+                            <p style="text-align: left;"><%=String.format("%.1f", ratingValue)%></p>
                             <fieldset class="rating">
                                 <%for (int i = Feedback.MAX_RATING; i > 0; i--) {%>
                                 <label class="full" title="<%=i%>"
-                                       style="font-size:13px; color:<%=i <= Math.round(ratingValue)  ? "#FFD700" : "#bdbdbd"%>"></label>
+                                       style="font-size:9px; color:<%=i <= Math.round(ratingValue)  ? "#FFD700" : "#bdbdbd"%>"></label>
                                 <%}%>
                             </fieldset>
-                            <br>
-                            <p style="    text-align:  center;"><%=String.format("%.1f", ratingValue)%>
-                            </p>
                         </td>
 
                         <%
@@ -233,6 +229,7 @@
                     </tbody>
 
                 </table>
+                </div>
                 <% } else {
                 %>
                 <h4>No player has provided feedback for this game yet.</h4>
