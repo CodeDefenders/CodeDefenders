@@ -295,6 +295,7 @@ CREATE TABLE `users` (
   `Password` char(60) NOT NULL,
   `Email` varchar(254) NOT NULL,
   `Validated` TINYINT(1) DEFAULT '0' NOT NULL,
+  `Active` TINYINT(1) DEFAULT '1' NOT NULL,
   PRIMARY KEY (`User_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX users_email_index ON users (Email);
