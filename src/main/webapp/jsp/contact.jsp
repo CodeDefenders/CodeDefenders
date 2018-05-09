@@ -1,48 +1,16 @@
-<!DOCTYPE html>
-<html>
+<%@ page import="org.codedefenders.util.AdminDAO" %>
+<%@ page import="static org.codedefenders.AdminSystemSettings.SETTING_NAME.*" %>
+<% String pageTitle = "Contact Us"; %>
 
-<head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-
-	<!-- App context -->
-    <base href="<%=request.getContextPath() %>/">
-
-	<!-- Title -->
-	<title>Code Defenders - Contact Us</title>
-
-	<!-- jQuery -->
-	<script src="js/jquery.min.js" type="text/javascript" ></script>
-
-	<!-- Bootstrap -->
-	<script src="js/bootstrap.min.js" type="text/javascript" ></script>
-	<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-
-	<!-- MultiplayerGame -->
-	<link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
-
-	<script>
-		$(document).ready(function() {
-			$('#messages-div').delay(10000).fadeOut();
-		});
-	</script>
-</head>
-<body>
-
-<nav class="navbar navbar-inverse navbar-fixed-top">
-	<div class="container-fluid">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
-			</button>
-			<a class="navbar-brand" href="<%=request.getContextPath() %>/">
-				<span><img class="logo" href="<%=request.getContextPath() %>/" src="images/logo.png"/></span>
-				Code Defenders
-			</a>
-		</div>
-	</div>
-</nav>
+<%
+	Object uid = request.getSession().getAttribute("uid");
+	Object username = request.getSession().getAttribute("username");
+	if (uid != null && username != null){
+%>
+<%@ include file="/jsp/header.jsp" %>
+<%} else {%>
+<%@ include file="/jsp/header_logout.jsp" %>
+<%}%>
 <%
 	String result = (String)request.getSession().getAttribute("emailSent");
 	request.getSession().removeAttribute("emailSent");
@@ -54,11 +22,20 @@
 <%
 	}
 %>
-
+<div class="container" style=" max-width: 50%; min-width: 25%; ">
+	<h2 style="text-align: center">Contact Us</h2>
+	<p style="text-align: center">
+		Code Defenders is an open source project; you can find details on the
+		<a href="https://github.com/CodeDefenders/CodeDefenders">GitHub</a> project page.
+	</p>
+</div>
+	<%
+	final boolean emailEnabled = AdminDAO.getSystemSetting(EMAILS_ENABLED).getBoolValue();
+	if(emailEnabled) {
+%>
 <div class="container">
 	<form  action="<%=request.getContextPath() %>/sendEmail" method="post" class="form-signin">
 		<input type="hidden" name="formType" value="login">
-		<h2 class="form-signin-heading">Contact Us</h2>
 		<label for="inputName" class="sr-only">Name</label>
 		<input type="text" id="inputName" name="name" class="form-control" placeholder="Name" required autofocus>
 		<label for="inputEmail" class="sr-only">Email</label>
@@ -69,8 +46,9 @@
 		<textarea id="inputMessage" name="message" class="form-control" placeholder="Message" rows="8" required></textarea>
 		<button class="btn btn-lg btn-primary btn-block" type="submit">Send</button>
 	</form>
+<%
+	}
+%>
 </div>
-</body>
-</html>
 
 <%@ include file="/jsp/footer.jsp" %>

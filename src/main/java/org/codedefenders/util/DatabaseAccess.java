@@ -73,15 +73,18 @@ public class DatabaseAccess {
 	}
 
 	public static void removePlayerEventsForGame(int gameId, int playerId) {
-		String query = "SELECT * FROM events WHERE Game_ID=? " + "AND Player_ID=?";
+		String query = "UPDATE events SET Event_Status=? WHERE Game_ID=? AND Player_ID=?";
 		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(EventStatus.DELETED.toString()),
 				DB.getDBV(gameId),
 				DB.getDBV(playerId)};
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		for (Event e : getEvents(stmt, conn)) {
-			e.setStatus(EventStatus.DELETED);
-			e.update();
+		try {
+            stmt.executeUpdate();
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+			DB.cleanup(conn, stmt);
 		}
 	}
 
@@ -356,10 +359,17 @@ public class DatabaseAccess {
 		return getUserForKey("User_ID", uid);
 	}
 
-	public static User getUserForNameOrEmail(String usernameOrEmail) {
-		String query = "SELECT * FROM users WHERE Username=? OR Email=?;";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(usernameOrEmail),
-				DB.getDBV(usernameOrEmail)};
+	public static User getUserForEmail(String email) {
+		String query = "SELECT * FROM users WHERE Email=?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(email)};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return getUserFromDB(stmt, conn);
+	}
+
+	public static User getUserForName(String username) {
+		String query = "SELECT * FROM users WHERE Username=?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(username)};
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		return getUserFromDB(stmt, conn);
@@ -1067,5 +1077,40 @@ public class DatabaseAccess {
 		} else {
 			return null;
 		}
+	}
+
+	public static boolean setPasswordResetSecret(int userId, String pwResetSecret) {
+		String query = "UPDATE users\n" +
+				"SET pw_reset_secret = ?, pw_reset_timestamp = CURRENT_TIMESTAMP\n" +
+				"WHERE User_ID = ?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(pwResetSecret), DB.getDBV(userId)};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		return DB.executeUpdate(stmt, conn);
+	}
+
+	public static int getUserIDForPWResetSecret(String pwResetSecret) {
+		String query = "SELECT User_ID\n" +
+				"FROM users\n" +
+				"WHERE TIMESTAMPDIFF(HOUR, pw_reset_timestamp, CURRENT_TIMESTAMP) < (SELECT INT_VALUE\n" +
+				"                                                                                          FROM settings\n" +
+				"                                                                                          WHERE name =\n" +
+				"                                                                                                'PASSWORD_RESET_SECRET_LIFESPAN')\n" +
+				"      AND\n" +
+				"      pw_reset_secret = ?;";
+		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(pwResetSecret)};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+		try {
+			if (rs.next()) {
+				return rs.getInt(1);
+			}
+		} catch (SQLException e) {
+			logger.error("SQL exception caught", e);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return -1;
 	}
 }

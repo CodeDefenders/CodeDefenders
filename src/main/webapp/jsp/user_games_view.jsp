@@ -4,7 +4,7 @@
 <%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.util.DatabaseAccess" %>
 <% String pageTitle= null ; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 <%
 	String atkName;
 	String defName;
@@ -231,9 +231,13 @@
 <%
 /********* OPEN GAMES *******************************************************************************************************/
 %>
+
 	<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue()) { %>
-	<a href="<%= request.getContextPath() %>/multiplayer/games/create">Create Battleground</a>
+	<a class = "btn btn-primary" href="<%=request.getContextPath()%>/multiplayer/games/create">Create Battleground</a>
+	<a class = "btn btn-primary" href="<%=request.getContextPath()%>/games/create">Create Duel</a>
 	<%}%>
+
+
 <h2 class="full-width page-title">Open Games</h2>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
@@ -407,8 +411,5 @@
 		});
 	</script>
 
-	<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue()) { %>
-	<a href="<%= request.getContextPath() %>/games/create">Create Duel</a>
-	<%}%>
 </div>
 <%@ include file="/jsp/footer.jsp" %>

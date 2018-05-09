@@ -71,11 +71,7 @@ public class GameManager extends HttpServlet {
 			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.DEFENDER_VIEW_JSP);
 			dispatcher.forward(request, response);
 		}// else
-//		String redirect = (String) request.getHeader("referer");
-//		if (!redirect.startsWith(request.getContextPath())) {
-//			redirect = request.getContextPath() + "/" + redirect;
-//		}
-//		response.sendRedirect(redirect);
+//		Redirect.redirectBack(request, response);
 	}
 
 	// Based on the data provided, update information for the game
@@ -229,8 +225,9 @@ public class GameManager extends HttpServlet {
 
 				// Get the text submitted by the user.
 				String mutantText = request.getParameter("mutant");
-				
-				String validityMessage = getMutantValidityMessage(activeGame.getClassId(), mutantText);
+
+				// Duels are always 'strict'
+				String validityMessage = getMutantValidityMessage(activeGame.getClassId(), mutantText, CodeValidator.CodeValidatorLevel.STRICT);
 				if (!validityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE)) {
 					// Mutant is either the same as the CUT or it contains invalid code
 					// Do not restore mutated code
@@ -350,7 +347,7 @@ public class GameManager extends HttpServlet {
 		response.sendRedirect(request.getContextPath()+"/play");//doGet(request, response);
 	}
 
-	public static String getMutantValidityMessage(int cid, String mutatedCode) throws IOException {
+	public static String getMutantValidityMessage(int cid, String mutatedCode, CodeValidator.CodeValidatorLevel codeValidatorLevel) throws IOException {
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 
 		File sourceFile = new File(classMutated.getJavaFile());
@@ -364,7 +361,7 @@ public class GameManager extends HttpServlet {
 		if (md5CUT.equals(md5Mutant))
 			return Constants.MUTANT_VALIDATION_IDENTICAL_MESSAGE;
 
-		return CodeValidator.getValidationMessage(sourceCode, mutatedCode);
+		return CodeValidator.getValidationMessage(sourceCode, mutatedCode, codeValidatorLevel);
 	}
 
 	public static Mutant existingMutant(int gid, String mutatedCode) throws IOException {

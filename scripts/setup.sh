@@ -13,8 +13,8 @@ fi
 echo "Data folder is: $HOME_FOLDER/defender"
 
 tar xf defender.tar.gz -C ${HOME_FOLDER}
-chgrp -R defender defender/
-chmod -R 770 defender/
+#chgrp -R defender defender/
+#chmod -R 770 defender/
 
 # TODO: Check if defender group exists
 #chgrp groupA ./folderA

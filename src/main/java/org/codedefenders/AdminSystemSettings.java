@@ -99,6 +99,12 @@ public class AdminSystemSettings extends HttpServlet {
 				return "Send emails from the specified account for verification, resetting passwords and when the admin changes user info";
 			}
 		},
+		PASSWORD_RESET_SECRET_LIFESPAN {
+			@Override
+			public String toString() {
+				return "How long (in hours) a password reset secret is valid";
+			}
+		},
 		DEBUG_MODE {
 			@Override
 			public String toString() {

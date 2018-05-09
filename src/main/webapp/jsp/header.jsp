@@ -8,19 +8,19 @@
 <script>
     //If the user is logged in, start receiving notifications
     var updateUserNotifications = function(url) {
-        $.get(url, function (r) {
+        $.getJSON(url, function (r) {
 
             var notificationCount = 0;
 
             $(r).each(function (index) {
                 $("#userDropDown li:first-child").after(
                     "<li><a " +
-                    "href=\"" + "<%=request.getContextPath().toString()%>" +
+                    "href=\"" + "<%=request.getContextPath()%>" +
                     "/multiplayer/games?id=" + r[index].gameId +
                     "\" style=\"width:100%;\">" +
                     r[index].parsedMessage +
                     "</a></li>"
-                )
+                );
 
                 if (r[index].eventStatus == "NEW"){
                     notificationCount += 1;
@@ -37,7 +37,7 @@
 
             $("#notificationCount").html(notifCount);
         });
-    }
+    };
 
     $(document).ready(function() {
             if ($("#userDropDown").length) {
@@ -102,7 +102,7 @@
                     style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
                         <li><a
-                               href="<%=request.getContextPath().toString()%>/logout"
+                               href="<%=request.getContextPath()%>/logout"
                                style="width:100%;border-bottom:1px solid
                                black">Logout
                         </a></li>
@@ -122,7 +122,7 @@
 	if (messages != null && ! messages.isEmpty()) {
 %>
 <div class="alert alert-info" id="messages-div">
-    <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a><br />
+    <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a><br />
     <%
         boolean fadeOut = true;
         for (String m : messages) { %>
@@ -140,13 +140,3 @@
     <% } %>
 </div>
 <%	} %>
-<div class="nest">
-    <div class="full-width">
-        <div class="bg-plus-2" style="padding:2px 0;">
-        </div>
-        <% if (pageTitle != null) { %>
-            <h2 class="full-width page-title"><%= pageTitle %></h2>
-        <% } %>
-        <div class="nest">
-            <div class="crow fly no-gutter">
-                <div class="crow fly no-gutter">

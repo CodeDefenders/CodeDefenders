@@ -25,6 +25,12 @@
                 id="bs-example-navbar-collapse-1"
                 style="z-index: 1000; text-align: center; list-style:none;
                 width: 80%; float: none; margin: 0 auto;">
+
+                <%if(!pageTitle.equals("Login")) {%>
+                <li style="float: none"><a class="text-white button tab-link bg-minus-1"
+                                           href="login" style="width:100%;">Login</a></li>
+                <%}%>
+
                 <li style="float: none"><a
                         class="text-white button tab-link bg-minus-1"
                        href="#research" style="width:100%;">Research</a></li>

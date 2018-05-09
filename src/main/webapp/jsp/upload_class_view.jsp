@@ -1,7 +1,7 @@
 <%@ page import="org.codedefenders.singleplayer.PrepareAI" %>
 <%@ page import="org.codedefenders.util.FeedbackDAO" %>
 <% String pageTitle=null; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 <div>
 	<div class="w-100 up">
 		<h2>Upload Class</h2>
@@ -26,7 +26,9 @@
 	</div>
 	<div class="w-100">
 		<h2>Uploaded Classes</h2>
+		<!-- Deactivated because single player mode is not activated currently
 		<span>Preparing classes for the single player mode (action 'Prepare AI') may take a long time.</span>
+		-->
 		<div id="classList" >
 			<%
 				List<GameClass> gameClasses = DatabaseAccess.getAllClasses();

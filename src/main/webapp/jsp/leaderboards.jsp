@@ -1,7 +1,7 @@
 <%@ page import="org.codedefenders.leaderboard.Leaderboard" %>
 <%@ page import="org.codedefenders.leaderboard.Entry" %>
 <% String pageTitle="Leaderboard"; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 <div class="w-100">
 	<h3>Battlegrounds</h3>
 	<table id="tableMPLeaderboard" class="table table-hover table-responsive table-paragraphs games-table dataTable display">

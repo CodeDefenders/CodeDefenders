@@ -1,6 +1,5 @@
 -- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
 --
--- Host: localhost    Database: codedefenders
 -- ------------------------------------------------------
 -- Server version	5.7.11-log
 
@@ -14,10 +13,6 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
-DROP DATABASE IF EXISTS `codedefenders`;
-CREATE DATABASE codedefenders;
-USE codedefenders;
 
 DROP TABLE IF EXISTS `settings`;
 CREATE TABLE settings
@@ -35,7 +30,8 @@ INSERT INTO settings (name, type, STRING_VALUE, INT_VALUE, BOOL_VALUE) VALUES
   ('CLASS_UPLOAD', 'BOOL_VALUE', NULL, NULL, TRUE),
   ('GAME_CREATION', 'BOOL_VALUE', NULL, NULL, TRUE),
   ('REQUIRE_MAIL_VALIDATION', 'BOOL_VALUE', NULL, NULL, FALSE),
-  ('SITE_NOTICE', 'STRING_VALUE', 'please add a site notice', NULL, NULL),
+  ('SITE_NOTICE', 'STRING_VALUE', '', NULL, NULL),
+  ('PASSWORD_RESET_SECRET_LIFESPAN', 'INT_VALUE', NULL, 12, NULL),
   ('MIN_PASSWORD_LENGTH', 'INT_VALUE', NULL, 8, NULL),
   ('CONNECTION_POOL_CONNECTIONS', 'INT_VALUE', NULL, 20, NULL),
   ('CONNECTION_WAITING_TIME', 'INT_VALUE', NULL, 5000, NULL),
@@ -109,7 +105,7 @@ CREATE TABLE `games` (
   `Start_Time` TIMESTAMP DEFAULT '1970-02-02 01:01:01',
   `Finish_Time` TIMESTAMP DEFAULT '1970-02-02 01:01:01',
   MaxAssertionsPerTest INT DEFAULT 2 NOT NULL,
-  MutantValidator ENUM('STRICT', 'MODERATE', 'RELAXED') DEFAULT 'STRICT' NOT NULL,
+  MutantValidator ENUM('STRICT', 'MODERATE', 'RELAXED') DEFAULT 'MODERATE' NOT NULL,
   MarkUncovered BOOL DEFAULT FALSE  NOT NULL,
   ChatEnabled BOOL DEFAULT TRUE  NULL,
   `Attackers_Limit` int(11) DEFAULT '0',
@@ -180,7 +176,7 @@ CREATE TABLE `players` (
   CONSTRAINT `fk_gameId_players` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_userId_players` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
-CREATE UNIQUE INDEX players_User_ID_Game_ID_uindex ON codedefenders.players (User_ID, Game_ID);
+CREATE UNIQUE INDEX players_User_ID_Game_ID_uindex ON players (User_ID, Game_ID);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -296,9 +292,12 @@ CREATE TABLE `users` (
   `Email` varchar(254) NOT NULL,
   `Validated` TINYINT(1) DEFAULT '0' NOT NULL,
   `Active` TINYINT(1) DEFAULT '1' NOT NULL,
+  pw_reset_timestamp TIMESTAMP DEFAULT NULL  NULL,
+  pw_reset_secret VARCHAR(254) DEFAULT NULL  NULL,
   PRIMARY KEY (`User_ID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX users_email_index ON users (Email);
+CREATE UNIQUE INDEX users_pw_reset_secret_uindex ON users (pw_reset_secret);
 DELIMITER $$
 CREATE TRIGGER ins_users
 BEFORE INSERT ON `users`
@@ -476,7 +475,7 @@ INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`) VALUES (1, 'Mut
 INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`) VALUES (2, 'TestGen', 'AI_DEFENDER_INACCESSIBLE', 'codedef_testgen@sheffield.ac.uk');
 
 -- Event to activate multiplayer game
-SET @@global.event_scheduler = 1;
+-- SET @@global.event_scheduler = 1;
 
 --
 -- Handling equivalences after time expiration

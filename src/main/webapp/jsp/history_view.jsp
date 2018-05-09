@@ -2,7 +2,7 @@
 <%@ page import="org.codedefenders.duel.DuelGame" %>
 <%@ page import="org.codedefenders.util.DatabaseAccess" %>
 <% String pageTitle="DuelGame History"; %>
-<%@ include file="/jsp/header.jsp" %>
+<%@ include file="/jsp/header_main.jsp" %>
 <div>
 <h3> Duels </h3>
 <table class="table table-hover table-responsive table-paragraphs games-table">

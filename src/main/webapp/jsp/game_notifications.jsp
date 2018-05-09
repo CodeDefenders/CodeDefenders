@@ -1,7 +1,7 @@
 <script>
     //If the user is logged in, start receiving notifications
     var updateGameNotifications = function(url) {
-        $.get(url, function (r) {
+        $.getJSON(url, function (r) {
 
             var notificationCount = 0;
 
@@ -63,7 +63,7 @@
     };
 
     var updateGameMutants = function(url) {
-        $.get(url, function (r) {
+        $.getJSON(url, function (r) {
             var mutLines = [];
             $(r).each(function (index) {
                 var mut = r[index];
@@ -98,7 +98,7 @@
 <script type="text/javascript">
 
 	var updateMessages = function(url) {
-        $.get(url, function (r) {
+        $.getJSON(url, function (r) {
 			$(r).each(function (index) {
 
 				// Skip messages that belong to the current user

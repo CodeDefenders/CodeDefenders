@@ -7,44 +7,54 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
 
-public class AdminUserMgmt extends HttpServlet {
+/**
+ * This {@link HttpServlet} handles admin requests for managing {@link User}s.
+ * <p>
+ * Serves on path: `/admin/users`.
+ */
+public class AdminUserManagement extends HttpServlet {
+	private static final Logger logger = LoggerFactory.getLogger(AdminUserManagement.class);
 
-	private static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
-	private static final char[] DIGITS = "0123456789".toCharArray();
+	static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
+	static final char[] DIGITS = "0123456789".toCharArray();
+
 	private static final char[] PUNCTUATION = "!@#$%&*()_+-=[]|,./?><".toCharArray();
-	static final String USER_INFO_TOKENS_DELIMITER = "[ ,;]+";
-	private static final Logger logger = LoggerFactory.getLogger(AdminUserMgmt.class);
 	private static final String NEW_ACCOUNT_MSG = "Welcome to Code Defenders! \n\n " +
 			"An account has been created for you with Username %s and Password %s.\n" +
 			"You can log int at %s. \n\n Happy coding!";
 	private static final String EMAIL_NOT_SPECIFIED_DOMAIN = "@NOT.SPECIFIED";
-	static final String PASSWORD_RESET_MSG = "%s, \n\n " +
+	private static final String PASSWORD_RESET_MSG = "%s, \n\n" +
 			"your password has been reset to %s\n" +
 			"Please change it at your next convenience.";
 
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_USER_JSP);
 	}
 
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
-		HttpSession session = request.getSession();
-		// Get their user id from the session.
-		int currentUserID = (Integer) session.getAttribute("uid");
-		ArrayList<String> messages = new ArrayList<String>();
+		final HttpSession session = request.getSession();
+		final ArrayList<String> messages = new ArrayList<>();
 		session.setAttribute("messages", messages);
 		String responsePath = request.getContextPath() + "/admin/users";
 
-		switch (request.getParameter("formType")) {
+		final String formType = request.getParameter("formType");
+		switch (formType) {
 			case "manageUsers":
 				String userToResetIdString = request.getParameter("resetPasswordButton");
 				String userToDeleteIdString = request.getParameter("deleteUserButton");
@@ -58,18 +68,26 @@ public class AdminUserMgmt extends HttpServlet {
 				}
 				break;
 			case "createUsers":
-				createUserAccounts(request.getParameter("user_name_list"), messages, request);
+				final String userList = request.getParameter("user_name_list");
+				if (userList == null) {
+					logger.error("Creating users failed. Missing parameter 'user_name_list'");
+				} else {
+					logger.info("Creating users....");
+					createUserAccounts(request, userList, messages);
+					logger.info("Creating users succeeded.");
+				}
 				break;
 			case "editUser":
 				String uidString = request.getParameter("uid");
 				String successMsg = "Successfully updated info for User " + uidString;
 				String msg = editUser(uidString, request, successMsg);
 				messages.add(msg);
-				if (!msg.equals(successMsg))
+				if (!msg.equals(successMsg)) {
 					responsePath = request.getContextPath() + "/" + Constants.ADMIN_USER_JSP + "?editUser=" + uidString;
+				}
 				break;
 			default:
-				System.err.println("Action not recognised");
+				logger.error("Action {" + formType + "} not recognised.");
 				break;
 		}
 
@@ -89,10 +107,10 @@ public class AdminUserMgmt extends HttpServlet {
 		if (!password.equals(confirm_password))
 			return "Error! Passwords don't match!";
 
-		if (!name.equals(u.getUsername()) && DatabaseAccess.getUserForNameOrEmail(name) != null)
+		if (!name.equals(u.getUsername()) && DatabaseAccess.getUserForName(name) != null)
 			return "Username " + name + " is already taken";
 
-		if (!email.equals(u.getEmail()) && DatabaseAccess.getUserForNameOrEmail(email) != null)
+		if (!email.equals(u.getEmail()) && DatabaseAccess.getUserForEmail(email) != null)
 			return "Email " + email + " is already in use!";
 
 		if (!LoginManager.validEmailAddress(email))
@@ -113,41 +131,89 @@ public class AdminUserMgmt extends HttpServlet {
 		return successMsg;
 	}
 
-	private void createUserAccounts(String userNameListString, ArrayList<String> messages, HttpServletRequest request) {
-		if (userNameListString != null) {
-			for (String nameOrEmail : userNameListString.split(AdminGamesMgmt.USER_NAME_LIST_DELIMITER)) {
-				nameOrEmail = nameOrEmail.trim();
-				String name, email, password;
+	private void createUserAccounts(HttpServletRequest request, String userNameListString, List<String> messages) {
+		final String[] lines = userNameListString.split(AdminCreateGames.USER_NAME_LIST_DELIMITER);
 
-				if (nameOrEmail.length() > 0) {
-					if (nameOrEmail.split(USER_INFO_TOKENS_DELIMITER).length > 1) {
-						String[] tokens = nameOrEmail.split(USER_INFO_TOKENS_DELIMITER);
-						email = tokens[0].contains("@") ? tokens[0] : tokens[1];
-						name = tokens[0].contains("@") ? tokens[1] : tokens[0];
-						password = tokens.length > 2 ? tokens[2] : generatePW();
-					} else {
-						email = nameOrEmail.contains("@") ? nameOrEmail : nameOrEmail + EMAIL_NOT_SPECIFIED_DOMAIN;
-						name = nameOrEmail.contains("@") ? nameOrEmail.split("@")[0] : nameOrEmail;
-						password = generatePW();
-					}
-					User u = new User(name, password, email);
-					if (DatabaseAccess.getUserForNameOrEmail(name) == null && DatabaseAccess.getUserForNameOrEmail(email) == null) {
-						if (u.insert()) {
-							messages.add(name + "'s password is: " + password);
-							logger.info("Generated password " + password + " for user " + name);
+		final boolean sendMail = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue();
+		final String hostAddress = request.getRequestURL().toString();
 
-							if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()
-									&& !email.endsWith(EMAIL_NOT_SPECIFIED_DOMAIN)) {
-								if (!sendNewAccountMsg(email, name, password,
-										request.getServerName() + ":" + request.getServerPort() + "/" + request.getContextPath()))
-									messages.add("Couldn't send an email to " + email + " for user " + name);
-							}
-						} else {
-							messages.add("Error trying to create an account for " + name + " (email: " + email + ")!");
-						}
-					} else {
-						messages.add(name + " (email: " + email + ") already has an account!");
-					}
+		for (String credentials : lines) {
+			createUserAccount(credentials.trim(), messages, sendMail, hostAddress);
+		}
+	}
+
+	/**
+	 * Creates a user for a given string, which has to be formatted like:
+	 * <p>
+	 * {@code username,password}
+	 * <p>
+     * {@code username,password,email}
+	 *
+	 * Values can be separated by either ',' or ';'.
+	 */
+	private void createUserAccount(String userCredentials, List<String> messages, boolean sendMail, String hostAddress) {
+		// credentials have following form: username, password, email (optional)
+		final String[] credentials = userCredentials.split("[,;]+");
+		if (credentials.length < 2) {
+			logger.info("Failed to create user due to not enough arguments:" + credentials.length);
+			messages.add("Please provide at least username and password");
+			return;
+		} else if (credentials.length > 3) {
+			logger.info("Failed to create user due to too many arguments:" + credentials.length);
+			messages.add("Please provide at maximum username,password and email");
+			return;
+		}
+
+		final String username = credentials[0].trim();
+		if (DatabaseAccess.getUserForName(username) != null) {
+		    logger.info("Failed to create user. Username already in use:" + username);
+			messages.add("Username '" + username + "' already in use.");
+			return;
+		}
+		if(!LoginManager.validUsername(username)) {
+			logger.info("Failed to create user. Username invalid:" + username);
+			messages.add("Username '" + username + "' invalid, user not created");
+			return;
+		}
+
+		final String password = credentials[1].trim();
+		if(!LoginManager.validPassword(password)) {
+			logger.info("Failed to create user. Password invalid:" + password);
+			messages.add("Password for user "+ username +" invalid, user not created");
+			return;
+		}
+
+		final String email;
+
+		final boolean hasMail = credentials.length == 3;
+		if (hasMail) {
+			email = credentials[2].trim();
+			if (DatabaseAccess.getUserForEmail(email) != null) {
+				logger.info("Failed to create user. Email address already in use:" + email);
+				messages.add("Email '" + email + "' already in use.");
+				return;
+			}
+		} else {
+			email = username + EMAIL_NOT_SPECIFIED_DOMAIN;
+		}
+
+		final User user = new User(username, password, email);
+		final boolean createSuccess = user.insert();
+
+		if (!createSuccess) {
+			final String errorMsg = "Failed to create account for user '" + username + "'";
+			logger.error(errorMsg);
+			messages.add(errorMsg);
+		} else {
+			messages.add("Created user "+ username + (hasMail ? " ("+email+")" : ""));
+			logger.info("Successfully created account for user '" + username + "'");
+			if (hasMail && sendMail) {
+				final boolean mailSuccess = sendNewAccountMsg(email, username, password, hostAddress);
+				if (!mailSuccess) {
+					messages.add("Could not send email to user " + username + " with email " + email);
+					logger.error("Failed to send account creation mail to user " + username + "<" + email + ">");
+				} else {
+					logger.info("Successfully sent account creation mail to user " + username + "<" + email + ">");
 				}
 			}
 		}
@@ -179,7 +245,7 @@ public class AdminUserMgmt extends HttpServlet {
 		return "Could not reset password for user " + uid;
 	}
 
-	static String generatePW() {
+	private static String generatePW() {
 		int length = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
 
 		StringBuilder sb = new StringBuilder();
@@ -201,5 +267,4 @@ public class AdminUserMgmt extends HttpServlet {
 
 		return new String(resultChars);
 	}
-
 }
