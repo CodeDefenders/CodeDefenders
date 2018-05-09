@@ -291,6 +291,7 @@ CREATE TABLE `users` (
   `Password` char(60) NOT NULL,
   `Email` varchar(254) NOT NULL,
   `Validated` TINYINT(1) DEFAULT '0' NOT NULL,
+  `Active` TINYINT(1) DEFAULT '1' NOT NULL,
   pw_reset_timestamp TIMESTAMP DEFAULT NULL  NULL,
   pw_reset_secret VARCHAR(254) DEFAULT NULL  NULL,
   PRIMARY KEY (`User_ID`)

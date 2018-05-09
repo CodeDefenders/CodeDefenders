@@ -19,6 +19,7 @@ public class User {
 	private String password;
 	private String email;
 	private boolean validated;
+	private boolean active;
 
 	public User(String username, String password) {
 		this(username, password, "");
@@ -29,15 +30,16 @@ public class User {
 	}
 
 	public User(int id, String username, String password, String email) {
-		this(id, username, password, email, false);
+		this(id, username, password, email, false, true);
 	}
 
-	public User(int id, String username, String password, String email, boolean validated) {
+	public User(int id, String username, String password, String email, boolean validated, boolean active) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.email = email.toLowerCase();
 		this.validated = validated;
+		this.active = active;
 	}
 
 	public boolean insert() {
@@ -75,11 +77,12 @@ public class User {
 		DatabaseValue[] valueList;
 		Connection conn = DB.getConnection();
 
-		String query = "UPDATE users SET Username = ?, Email = ?, Password = ?, Validated = ? WHERE User_ID = ?;";
+		String query = "UPDATE users SET Username = ?, Email = ?, Password = ?, Validated = ?, Active = ? WHERE User_ID = ?;";
 		valueList = new DatabaseValue[]{DB.getDBV(username),
 				DB.getDBV(email),
 				DB.getDBV(encodedPassword),
 				DB.getDBV(validated),
+				DB.getDBV(active),
 				DB.getDBV(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		return DB.executeUpdate(stmt, conn);
@@ -126,6 +129,14 @@ public class User {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
 	}
 
 	public void logSession(String ipAddress) {

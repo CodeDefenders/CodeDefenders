@@ -115,24 +115,30 @@ public class LoginManager extends HttpServlet {
 						dispatcher.forward(request, response);
 					} else {
 						if (passwordEncoder.matches(password, dbPassword)) {
-							HttpSession session = request.getSession();
-							DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
-							session.setAttribute("uid", activeUser.getId());
-							session.setAttribute("username", activeUser.getUsername());
-							//
-							storeApplicationDataInSession(session);
+						    if (activeUser.isActive()) {
+								HttpSession session = request.getSession();
+								DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
+								session.setAttribute("uid", activeUser.getId());
+								session.setAttribute("username", activeUser.getUsername());
+								//
+								storeApplicationDataInSession(session);
 
-							Object from = session.getAttribute("loginFrom");
-							if (from != null && !((String) from).endsWith(".ico")
-									&& !((String) from).endsWith(".css")
-									&& !((String) from).endsWith(".js")) {
-								if (((String) from).startsWith(request.getContextPath())) {
-									response.sendRedirect((String) from);
-								} else {
-									response.sendRedirect(request.getContextPath() + "/" + (String) from);
-								}
-							} else
-								response.sendRedirect(request.getContextPath() + "/games");
+								Object from = session.getAttribute("loginFrom");
+								if (from != null && !((String) from).endsWith(".ico")
+										&& !((String) from).endsWith(".css")
+										&& !((String) from).endsWith(".js")) {
+									if (((String) from).startsWith(request.getContextPath())) {
+										response.sendRedirect((String) from);
+									} else {
+										response.sendRedirect(request.getContextPath() + "/" + (String) from);
+									}
+								} else
+									response.sendRedirect(request.getContextPath() + "/games");
+							} else {
+								messages.add("Your account is inactive, login is only possible with an active account.");
+								RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
+								dispatcher.forward(request, response);
+							}
 						} else {
 							messages.add("Username not found or password incorrect.");
 							RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
