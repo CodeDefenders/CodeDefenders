@@ -61,7 +61,6 @@ mvn -f installation-pom.xml clean validate package -Dconfig.properties="${config
 
 # This is tricky but necessary: we need to replace ./codedefenders with /codedefenders inside
 #echo "WARN Please manually update the $(find ${data_dir} -iname security.policy) file ... "
-set -x
 echo "Update security.policy file"
 mv "${data_dir}"/security.policy "${data_dir}"/security.policy.tmp
 sed -e 's|\./codedefenders/|/codedefenders/|' "${data_dir}"/security.policy.tmp > "${data_dir}"/security.policy
