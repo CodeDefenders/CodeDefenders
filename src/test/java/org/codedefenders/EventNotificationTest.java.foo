@@ -1,0 +1,169 @@
+package org.codedefenders;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
+
+import org.codedefenders.events.Event;
+import org.codedefenders.events.EventStatus;
+import org.codedefenders.events.EventType;
+import org.codedefenders.util.DB;
+import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.util.DatabaseConnection;
+import org.codedefenders.util.DatabaseValue;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+
+/**
+ * @author gambi
+ */
+@RunWith(PowerMockRunner.class)
+ @PrepareForTest({ DatabaseConnection.class }) // , MutationTester.class })
+public class EventNotificationTest {
+	//
+	private static File codedefendersHome;
+
+	// PROBLEM: @ClassRule cannot be used with PowerMock ...
+	@BeforeClass
+	public static void setupEnvironment() throws IOException {
+		codedefendersHome = Files.createTempDirectory("integration-tests").toFile();
+		// TODO Will this remove all the files ?
+		codedefendersHome.deleteOnExit();
+	}
+
+	@Mock
+	private InitialContextFactory mockedFactory;
+
+	public static class MyContextFactory implements InitialContextFactory {
+		@Override
+		public Context getInitialContext(Hashtable<?, ?> environment) throws NamingException {
+			
+			System.out.println("ParallelizeAntRunnerTest.MyContextFactory.getInitialContext()");
+			
+			InitialContext mockedInitialContext = PowerMockito.mock(InitialContext.class);
+			NamingEnumeration<NameClassPair> mockedEnumeration = PowerMockito.mock(NamingEnumeration.class);
+			// Look at this again ...
+			PowerMockito.mockStatic(NamingEnumeration.class);
+			//
+			PowerMockito.when(mockedEnumeration.hasMore()).thenReturn(true, true, true, true, false);
+			PowerMockito.when(mockedEnumeration.next()).thenReturn(
+					new NameClassPair("data.dir", String.class.getName()),
+					new NameClassPair("parallelize", String.class.getName()),
+					new NameClassPair("mutant.coverage", String.class.getName()),
+					new NameClassPair("ant.home", String.class.getName())//
+			);
+			
+				String dataResourceName = "jdbc/codedefenders";
+//				DataSource dataSource = (DataSource) environmentContext.lookup(dataResourceName);
+//				return dataSource.getConnection();
+//			}
+			
+			//
+			PowerMockito.when(mockedInitialContext.toString()).thenReturn("Mocked Initial Context");
+			PowerMockito.when(mockedInitialContext.list("java:/comp/env")).thenReturn(mockedEnumeration);
+			//
+			Context mockedEnvironmentContext = PowerMockito.mock(Context.class);
+			PowerMockito.when(mockedInitialContext.lookup("java:/comp/env")).thenReturn(mockedEnvironmentContext);
+
+			PowerMockito.when(mockedEnvironmentContext.lookup("mutant.coverage")).thenReturn("enabled");
+			// FIXMED
+			PowerMockito.when(mockedEnvironmentContext.lookup("parallelize")).thenReturn("enabled");
+			//
+			PowerMockito.when(mockedEnvironmentContext.lookup("data.dir"))
+					.thenReturn(codedefendersHome.getAbsolutePath());
+
+			PowerMockito.when(mockedEnvironmentContext.lookup("ant.home")).thenReturn("/usr/local");
+			// Prepare the connection object
+			try {
+				DriverManager.registerDriver((Driver) Class.forName("com.mysql.jdbc.Driver").newInstance());
+				PowerMockito.mockStatic(DatabaseConnection.class);
+				PowerMockito.when(DatabaseConnection.getConnection()).thenReturn(DriverManager.getConnection("jdbc:mysql://localhost:3306/defender?sessionVariables=sql_mode='STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'", "gambi", "al3ss10"));
+			} catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			// TODO This probably leaks ?!
+			
+			return mockedInitialContext;
+		}
+	}
+
+	@Before
+	public void setupClass() throws IOException, SQLException, NamingException {
+		// Initialize this as mock class
+		MockitoAnnotations.initMocks(this);
+		
+		
+		
+		// Be sure to setup the "java.naming.factory.initial" to the inner
+		// MyContextFactory class
+		System.setProperty("java.naming.factory.initial", this.getClass().getCanonicalName() + "$MyContextFactory");
+		//
+		// Recreate codedefenders' folders
+		boolean isCreated = false;
+		isCreated = (new File(Constants.MUTANTS_DIR)).mkdirs() || (new File(Constants.MUTANTS_DIR)).exists();
+		System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
+		isCreated = (new File(Constants.CUTS_DIR)).mkdirs() || (new File(Constants.CUTS_DIR)).exists();
+		System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
+		isCreated = (new File(Constants.TESTS_DIR)).mkdirs() || (new File(Constants.TESTS_DIR)).exists();
+		System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
+		//
+		// Setup the environment
+		Files.createSymbolicLink(new File(Constants.DATA_DIR, "build.xml").toPath(),
+				Paths.get(new File("src/test/resources/itests/build.xml").getAbsolutePath()));
+
+		Files.createSymbolicLink(new File(Constants.DATA_DIR, "security.policy").toPath(),
+				Paths.get(new File("src/test/resources/itests/relaxed.security.policy").getAbsolutePath()));
+
+		Files.createSymbolicLink(new File(Constants.DATA_DIR, "lib").toPath(),
+				Paths.get(new File("src/test/resources/itests/lib").getAbsolutePath()));
+
+	}
+
+	@Test
+	public void testCleanDB() throws Exception {
+		System.out.println("EventNotificationTest.testCleanDB()");
+		String query = "SELECT * FROM events LEFT JOIN event_messages AS em ON events.Event_Type = em.Event_Type " +
+				"LEFT JOIN event_chat AS ec ON events.Event_Id = ec.Event_Id " + // FIXME this is here otherwise the getEvents call fails, get rid of this... 
+				"WHERE Game_ID=? AND Event_Status=? AND (events.Event_Type=? OR events.Event_Type=? OR events.Event_Type=?) " +
+//				"AND Timestamp >= FROM_UNIXTIME(UNIX_TIMESTAMP()-300) "+ 
+				"AND events.Event_ID > ?";
+		// DEFENDER_MUTANT_CLAIMED_EQUIVALENT
+		// EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
+		// ATTACKER_MUTANT_KILLED_EQUIVALENT
+		DatabaseValue[] valueList = new DatabaseValue[]{
+//				DB.getDBV(userId),
+				DB.getDBV(20),
+				DB.getDBV(EventStatus.GAME.toString()),
+				DB.getDBV(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT.toString()), DB.getDBV(EventType.DEFENDER_MUTANT_EQUIVALENT.toString()), DB.getDBV(EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT.toString()),
+				DB.getDBV(0)};
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+		List<Event> events = DatabaseAccess.getEventsWithMessage(stmt, conn);
+		
+		System.out.println("EventNotificationTest.testCleanDB() " + events);
+	}
+
+}

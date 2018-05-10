@@ -1,0 +1,16 @@
+data.dir=/codedefenders
+ant.home=/usr
+
+db.url=jdbc:mysql://db:3306/defender
+db.username=defender
+db.password=defender
+
+cluster.mode=disabled
+cluster.java.home=
+cluster.timeout=
+cluster.reservation.name=
+
+parallelize=enabled
+forceLocalExecution=enabled
+mutant.coverage=enabled
+block.attacker=enabled

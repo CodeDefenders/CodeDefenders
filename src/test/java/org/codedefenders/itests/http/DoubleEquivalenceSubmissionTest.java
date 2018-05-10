@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import org.codedefenders.User;
-import org.codedefenders.itests.SystemTest;
+import org.codedefenders.systemtests.SystemTest;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -47,7 +47,7 @@ import com.gargoylesoftware.htmlunit.util.NameValuePair;
  * @author gambi
  *
  */
-@Category(SystemTest.class)
+//@Category(SystemTest.class)
 public class DoubleEquivalenceSubmissionTest {
 
 	// Use directly form submission, do not care about UI interactions, cannot

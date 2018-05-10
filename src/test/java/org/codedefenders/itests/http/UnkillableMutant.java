@@ -14,8 +14,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.RegexFileFilter;
 import org.codedefenders.User;
-import org.codedefenders.itests.SystemTest;
 import org.codedefenders.itests.http.utils.HelperUser;
+import org.codedefenders.systemtests.SystemTest;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -39,7 +39,7 @@ import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
  * @author gambi
  *
  */
-@Category(SystemTest.class)
+//@Category(SystemTest.class)
 public class UnkillableMutant {
 
 	private static int TIMEOUT = 10000;
@@ -136,7 +136,7 @@ public class UnkillableMutant {
 	public void testUnkillableMutant() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 		// // This test assumes an empty db !
 		User creatorUser = new User("creator", "test");
-		HelperUser creator = new HelperUser(creatorUser, WebClientFactory.getNewWebClient());
+		HelperUser creator = new HelperUser(creatorUser, WebClientFactory.getNewWebClient(), "localhost");
 		creator.doLogin();
 		System.out.println("Creator Login");
 
@@ -152,7 +152,7 @@ public class UnkillableMutant {
 		creator.startGame(newGameId);
 		//
 		User attackerUser = new User("demoattacker", "test");
-		HelperUser attacker = new HelperUser(attackerUser, WebClientFactory.getNewWebClient());
+		HelperUser attacker = new HelperUser(attackerUser, WebClientFactory.getNewWebClient(), "localhost");
 		attacker.doLogin();
 		System.out.println("Attacker Login");
 		//
@@ -167,7 +167,7 @@ public class UnkillableMutant {
 		System.out.println("Attacker attack in game " + newGameId);
 		//
 		User defenderUser = new User("demodefender", "test");
-		HelperUser defender = new HelperUser(defenderUser, WebClientFactory.getNewWebClient());
+		HelperUser defender = new HelperUser(defenderUser, WebClientFactory.getNewWebClient(), "localhost");
 		defender.doLogin();
 		//
 		System.out.println("Defender Login");

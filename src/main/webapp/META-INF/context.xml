@@ -8,7 +8,8 @@
 		maxTotal="200"
 		maxWaitMillis="1000"
 		
-		driverClassName="com.mysql.jdbc.Driver"
+		driverClassName="com.mysql.cj.jdbc.Driver"
+
 		url="${db.url}"
 		username="${db.username}"
 		password="${db.password}" />

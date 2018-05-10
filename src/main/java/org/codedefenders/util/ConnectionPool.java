@@ -1,16 +1,17 @@
 package org.codedefenders.util;
 
-import org.codedefenders.AdminSystemSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.naming.NamingException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+
+import javax.naming.NamingException;
+
+import org.codedefenders.AdminSystemSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements the <code>Singleton</code>-pattern and object pooling. Handles
@@ -26,6 +27,9 @@ public final class ConnectionPool {
 	private List<Connection> connections;
 	private Queue<Connection> availableConnections;
 	private Logger logger = LoggerFactory.getLogger(ConnectionPool.class.getName());
+
+	private static int MAX_RETRIES = 5;
+	private static long RETRY_TIMEOUT = 5000;
 
 	/**
 	 * Amount of time a thread waits to be notified of newly available connections.
@@ -45,14 +49,27 @@ public final class ConnectionPool {
 	 * Initializes the connections list and queue of available connections.
 	 */
 	private void init() {
-		logger.info("Initializing ConnectionPool...");
-		try {
-			Connection conn = DatabaseConnection.getConnection();
-			getParametersFromDB(conn);
-			conn.close();
-		} catch (NamingException | SQLException e) {
-			logger.warn("JDBC Driver not found.", e);
-			throw new StorageException();
+
+		for (int i = 0; i < MAX_RETRIES; i++) {
+			logger.info("Initializing ConnectionPool... (retry " + i + ")");
+			try {
+				Connection conn = DatabaseConnection.getConnection();
+				getParametersFromDB(conn);
+				conn.close();
+			} catch (NamingException | SQLException e) {
+				logger.warn("Cannot connect to the Database", e);
+				if (i >= MAX_RETRIES) {
+					logger.warn("Give up and fail deployment");
+					throw new StorageException();
+				} else {
+					try {
+						logger.info("Retry connecting to DB in " + RETRY_TIMEOUT + " msec ");
+						Thread.sleep(RETRY_TIMEOUT);
+					} catch (InterruptedException e1) {
+						// Ignored
+					}
+				}
+			}
 		}
 
 		Connection newConnection = null;

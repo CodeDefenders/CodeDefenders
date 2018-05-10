@@ -1,11 +1,12 @@
 package org.codedefenders;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.codedefenders.util.AdminDAO;
-import org.codedefenders.util.DatabaseAccess;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import static org.codedefenders.AdminUserManagement.DIGITS;
+import static org.codedefenders.AdminUserManagement.LOWER;
+import static org.codedefenders.util.DatabaseAccess.setPasswordResetSecret;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Random;
 
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
@@ -18,13 +19,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
 
-import static org.codedefenders.AdminUserManagement.DIGITS;
-import static org.codedefenders.AdminUserManagement.LOWER;
-import static org.codedefenders.util.DatabaseAccess.setPasswordResetSecret;
+import org.apache.commons.lang.ArrayUtils;
+import org.codedefenders.util.AdminDAO;
+import org.codedefenders.util.DatabaseAccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class LoginManager extends HttpServlet {
 
