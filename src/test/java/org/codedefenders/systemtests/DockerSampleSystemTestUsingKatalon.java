@@ -13,6 +13,7 @@ import org.junit.experimental.categories.Category;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.connection.DockerPort;
@@ -45,7 +46,10 @@ public class DockerSampleSystemTestUsingKatalon {
 		// environment
 		// https://stackoverflow.com/questions/7450416/selenium-2-chrome-driver?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 		WebDriverManager.chromedriver().setup();
-		driver = new ChromeDriver();
+		ChromeOptions options = new ChromeOptions();
+		// This 
+		options.setHeadless( true );
+		driver = new ChromeDriver( options );
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 	}
 
