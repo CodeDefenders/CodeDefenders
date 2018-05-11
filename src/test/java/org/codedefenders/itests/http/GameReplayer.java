@@ -1,5 +1,15 @@
 package org.codedefenders.itests.http;
 
+import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
+
+import org.codedefenders.compilation.TargetExecution;
+import org.codedefenders.itests.http.UnkillableMutant.WebClientFactory;
+import org.codedefenders.itests.http.utils.AttackAction;
+import org.codedefenders.itests.http.utils.CodeDefenderAction;
+import org.codedefenders.itests.http.utils.DefendAction;
+import org.codedefenders.itests.http.utils.HelperUser;
+import org.codedefenders.model.User;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -14,16 +24,6 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.codedefenders.TargetExecution;
-import org.codedefenders.User;
-import org.codedefenders.itests.http.UnkillableMutant.WebClientFactory;
-import org.codedefenders.itests.http.utils.AttackAction;
-import org.codedefenders.itests.http.utils.CodeDefenderAction;
-import org.codedefenders.itests.http.utils.DefendAction;
-import org.codedefenders.itests.http.utils.HelperUser;
-
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 
 /**
  * Given a trace file this class replay the game as close as possible...

@@ -1,7 +1,15 @@
 <% String pageTitle="In Game"; %>
-<%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
-<%@ page import="org.codedefenders.*" %>
-<%@ page import="org.codedefenders.util.DatabaseAccess" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%
     // Get their user id from the session.
     int uid = ((Integer) session.getAttribute("uid")).intValue();

@@ -1,8 +1,8 @@
 <%@ page import="org.apache.commons.lang.ArrayUtils" %>
-<%@ page import="org.codedefenders.Constants" %>
+<%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="org.codedefenders.util.AdminDAO" %>
-<%@ page import="org.codedefenders.AdminSystemSettings" %>
+<%@ page import="org.codedefenders.database.AdminDAO" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ include file="/jsp/header_base.jsp" %>
 
 <script>

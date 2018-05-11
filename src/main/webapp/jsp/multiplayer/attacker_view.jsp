@@ -1,8 +1,8 @@
-<%@ page import="org.codedefenders.duel.DuelGame" %>
-<%@ page import="org.codedefenders.Role" %>
-<%@ page import="org.codedefenders.Mutant" %>
-<%@ page import="org.codedefenders.GameLevel" %>
-<%@ page import="org.codedefenders.Constants" %>
+<%@ page import="org.codedefenders.game.duel.DuelGame" %>
+<%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
+<%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.validation.CodeValidator" %>
 
 <%

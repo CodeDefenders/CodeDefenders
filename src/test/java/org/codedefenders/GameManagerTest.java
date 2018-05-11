@@ -1,23 +1,29 @@
 package org.codedefenders;
 
-import org.apache.commons.io.FileUtils;
-import org.codedefenders.util.FileManager;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.servlets.auth.LoginManager;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import static org.codedefenders.Constants.MUTANTS_DIR;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import static org.codedefenders.util.Constants.MUTANTS_DIR;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 
 /**
@@ -30,7 +36,7 @@ public class GameManagerTest {
 	@Before
 	public void setUp() {
 		originalMutantsDir = Constants.MUTANTS_DIR;
-		Constants.MUTANTS_DIR = FileUtils.getTempDirectoryPath();
+		Constants.MUTANTS_DIR = org.apache.commons.io.FileUtils.getTempDirectoryPath();
 		File folder = new File(MUTANTS_DIR);
 		folder.mkdir();
 	}
@@ -56,14 +62,14 @@ public class GameManagerTest {
 
 		verify(request, atLeast(1)).getParameter("username"); // only if you want to verify username was called...
 		writer.flush(); // it may not have been flushed yet...
-		assertTrue(FileUtils.readFileToString(new File("somefile.txt"), "UTF-8")
+		assertTrue(org.apache.commons.io.FileUtils.readFileToString(new File("somefile.txt"), "UTF-8")
 				.contains("My Expected String"));
 	}
 
 	@Test
 	public void testGetNextSubDirEmpty() throws IOException {
 		File folder = getCleanTmpGameDir(1);
-		assertEquals(folder.getAbsolutePath() + File.separator + "00000001", FileManager.getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
+		assertEquals(folder.getAbsolutePath() + File.separator + "00000001", FileUtils.getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
 	}
 
 	@Test
@@ -72,7 +78,7 @@ public class GameManagerTest {
 		File subfolder = new File(folder.getAbsolutePath() + File.separator + "00000001");
 		subfolder.delete();
 		subfolder.mkdir();
-		assertEquals(folder.getAbsolutePath() + File.separator + "00000002", FileManager.getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
+		assertEquals(folder.getAbsolutePath() + File.separator + "00000002", FileUtils.getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
 	}
 
 	@Test
@@ -84,7 +90,7 @@ public class GameManagerTest {
 		File subfolder2 = new File(folder.getAbsolutePath() + File.separator + "00000002");
 		subfolder2.delete();
 		subfolder2.mkdir();
-		assertEquals(folder.getAbsolutePath() + File.separator + "00000003", FileManager.getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
+		assertEquals(folder.getAbsolutePath() + File.separator + "00000003", FileUtils.getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
 	}
 
 	@Test
@@ -99,14 +105,14 @@ public class GameManagerTest {
 		File subfolder3 = new File(folder.getAbsolutePath() + File.separator + "foo");
 		subfolder3.delete();
 		subfolder3.mkdir();
-		assertEquals(folder.getAbsolutePath() + File.separator + "00000003", FileManager.getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
+		assertEquals(folder.getAbsolutePath() + File.separator + "00000003", FileUtils.getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
 	}
 
 	private File getCleanTmpGameDir(int gameId) throws IOException {
-		File folder = new File(FileUtils.getTempDirectory().getAbsolutePath() + File.separator + "testCodeDefenders" + File.separator + gameId);
+		File folder = new File(org.apache.commons.io.FileUtils.getTempDirectory().getAbsolutePath() + File.separator + "testCodeDefenders" + File.separator + gameId);
 		folder.delete();
 		folder.mkdirs();
-		FileUtils.cleanDirectory(folder);
+		org.apache.commons.io.FileUtils.cleanDirectory(folder);
 		return folder;
 	}
 

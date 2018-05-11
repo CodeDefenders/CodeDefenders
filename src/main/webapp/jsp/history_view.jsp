@@ -1,6 +1,9 @@
-<%@ page import="org.codedefenders.*" %>
-<%@ page import="org.codedefenders.duel.DuelGame" %>
-<%@ page import="org.codedefenders.util.DatabaseAccess" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.game.duel.DuelGame" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="java.util.List" %>
 <% String pageTitle="DuelGame History"; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div>

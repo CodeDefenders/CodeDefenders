@@ -120,16 +120,16 @@
 
 <body class="page-grid">
 <%@ page import="java.util.*" %>
-<%@ page import="org.codedefenders.Test" %>
-<%@ page import="org.codedefenders.User" %>
-<%@ page import="org.codedefenders.Mutant" %>
-<%@ page import="org.codedefenders.duel.DuelGame" %>
-<%@ page import="org.codedefenders.Constants" %>
-<%@ page import="org.codedefenders.util.DatabaseAccess" %>
-<%@ page import="org.codedefenders.Role" %>
-<%@ page import="static org.codedefenders.GameState.ACTIVE" %>
-<%@ page import="org.codedefenders.GameClass" %>
-<%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="org.codedefenders.game.duel.DuelGame" %>
+<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="static org.codedefenders.game.GameState.ACTIVE" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="java.util.ArrayList" %>
     <% DuelGame game = (DuelGame) session.getAttribute("game"); %>
 <div class="menu-top bg-grey bg-plus-4 text-white" style="padding-bottom:0px;">

@@ -1,3 +1,8 @@
+<%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.List" %>
 <% String pageTitle="Resolve Equivalence"; %>
 <%@ include file="/jsp/header_game.jsp" %>
 

@@ -1,3 +1,4 @@
+<%@ page import="java.util.ArrayList" %>
 <%@ include file="/jsp/header_base.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {

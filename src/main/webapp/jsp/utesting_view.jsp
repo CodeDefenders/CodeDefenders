@@ -48,11 +48,10 @@
 
 <body>
 <%@ page import="java.util.*" %>
-<%@ page import="org.codedefenders.Test" %>
-<%@ page import="org.codedefenders.duel.DuelGame" %>
-<%@ page import="org.codedefenders.Constants" %>
-<%@ page import="static org.codedefenders.GameState.ACTIVE" %>
-<%@ page import="static org.codedefenders.GameState.FINISHED" %>
+<%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="org.codedefenders.game.duel.DuelGame" %>
+<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="static org.codedefenders.game.GameState.FINISHED" %>
 <% DuelGame uTestingSession = (DuelGame) session.getAttribute("game"); %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">

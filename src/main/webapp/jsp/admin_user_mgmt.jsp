@@ -1,6 +1,8 @@
 <%@ page import="org.apache.commons.lang.StringUtils" %>
-<%@ page import="org.codedefenders.User" %>
-<%@ page import="org.codedefenders.util.AdminDAO" %>
+<%@ page import="org.codedefenders.database.AdminDAO" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="java.util.List" %>
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 

@@ -1,8 +1,8 @@
 <%@ page import="java.util.HashMap" %>
-<%@ page import="org.codedefenders.util.DatabaseAccess" %>
-<%@ page import="org.codedefenders.User" %>
-<%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
-<%@ page import="org.codedefenders.multiplayer.PlayerScore" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%
 
     HashMap mutantScores = mg.getMutantScores();

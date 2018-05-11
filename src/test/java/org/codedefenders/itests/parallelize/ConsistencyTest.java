@@ -1,13 +1,24 @@
 package org.codedefenders.itests.parallelize;
 
-import org.codedefenders.*;
-import org.codedefenders.exceptions.CodeValidatorException;
+import org.codedefenders.compilation.MutationTester;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.itests.IntegrationTest;
-import org.codedefenders.multiplayer.MultiplayerGame;
+import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
-import org.codedefenders.util.DatabaseAccess;
-import org.codedefenders.util.DatabaseConnection;
-import org.junit.*;
+import org.codedefenders.servlets.games.GameManager;
+import org.codedefenders.util.Constants;
+import org.codedefenders.validation.CodeValidatorException;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -19,8 +30,6 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import javax.naming.*;
-import javax.naming.spi.InitialContextFactory;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -35,6 +44,13 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -226,20 +242,20 @@ public class ConsistencyTest {
 				Files.readAllBytes(new File("src/test/resources/itests/tests/KillingTestLift.java").toPath()),
 				Charset.defaultCharset());
 		//
-		List<org.codedefenders.Test> tests = new ArrayList<>();
+		List<org.codedefenders.game.Test> tests = new ArrayList<>();
 		for (final User defender : defenders) {
 			tests.add(GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(),
 					"mp"));
 		}
 		System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + tests);
-		// List<org.codedefenders.Test> theTests = activeGame.getTests(true);
+		// List<org.codedefenders.game.Test> theTests = activeGame.getTests(true);
 		System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + activeGame.getTests(true));
 
 		// Now "submit the tests in parallel"
 
 		ExecutorService executorService = Executors.newFixedThreadPool(defenders.length);
 
-		for (final org.codedefenders.Test newTest : tests) {
+		for (final org.codedefenders.game.Test newTest : tests) {
 
 			executorService.submit(new Runnable() {
 
@@ -261,13 +277,13 @@ public class ConsistencyTest {
 		assertFalse("Mutant not killed", mutant.isAlive());
 
 		int totalKilled = 0;
-		for (final org.codedefenders.Test newTest : tests) {
+		for (final org.codedefenders.game.Test newTest : tests) {
 			System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() " + newTest.getMutantsKilled());
 			totalKilled = totalKilled + newTest.getMutantsKilled();
 		}
 		assertEquals("Mutant killed multiple times !", 1, totalKilled);
 		// Assert
-		// List<org.codedefenders.Test> tests = activeGame.getTests(true); //
+		// List<org.codedefenders.game.Test> tests = activeGame.getTests(true); //
 
 	}
 

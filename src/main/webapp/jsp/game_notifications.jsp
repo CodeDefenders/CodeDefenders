@@ -1,3 +1,4 @@
+<%@ page import="org.codedefenders.game.Role" %>
 <script>
     //If the user is logged in, start receiving notifications
     var updateGameNotifications = function(url) {

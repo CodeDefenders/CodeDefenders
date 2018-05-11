@@ -1,5 +1,5 @@
-<%@ page import="org.codedefenders.util.AdminDAO" %>
-<%@ page import="static org.codedefenders.AdminSystemSettings.SETTING_NAME.*" %>
+<%@ page import="org.codedefenders.database.AdminDAO" %>
+<%@ page import="static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.*" %>
 <% String pageTitle = "Contact Us"; %>
 
 <%

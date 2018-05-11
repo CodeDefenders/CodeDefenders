@@ -1,5 +1,7 @@
 package org.codedefenders;
 
+import org.codedefenders.game.GameClass;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.StringContains.containsString;

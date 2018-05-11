@@ -1,6 +1,10 @@
-<%@ page import="org.codedefenders.*" %>
-<%@ page import="org.codedefenders.duel.DuelGame" %>
-<%@ page import="org.codedefenders.util.DatabaseAccess" %>
+<%@ page import="org.codedefenders.database.AdminDAO" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
+<%@ page import="org.codedefenders.game.duel.DuelGame" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="java.util.List" %>
 <% String pageTitle="Open Games"; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div class="full-width">
