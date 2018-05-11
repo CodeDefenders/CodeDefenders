@@ -44,7 +44,7 @@
                 <li>Marvin Kreis (University of Passau)</li>
                 <li>Rob Sharp (The University of Sheffield)</li>
                 <li>Lorenz Wendlinger (University of Passau)</li>
-                <li>Philemon Werli (University of Passau)</li>
+                <li><a href="https://github.com/werli">Phil Werli</a> (University of Passau)</li>
                 <li>Thomas White (The University of Sheffield)</li>
             </ul>
             </p>

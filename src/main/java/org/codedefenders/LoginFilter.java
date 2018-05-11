@@ -2,13 +2,19 @@ package org.codedefenders;
 
 import org.codedefenders.util.DatabaseAccess;
 
-import javax.servlet.*;
+import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.io.IOException;
 
 // Implements Filter class
 public class LoginFilter implements Filter {
@@ -53,7 +59,7 @@ public class LoginFilter implements Filter {
 				|| (path.contains(context + "/papers"))
 				|| (path.endsWith(context + "/sendEmail"))
 				|| (path.endsWith(context + "/index.jsp"))
-				|| path.endsWith(context + "/site_notice")
+				|| path.endsWith(context + "/about")
 				|| path.endsWith(context + "/contact"))
 			return true;
 

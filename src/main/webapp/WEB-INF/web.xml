@@ -201,13 +201,13 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>siteNotice</servlet-name>
-		<jsp-file>/jsp/site_notice.jsp</jsp-file>
+		<servlet-name>about</servlet-name>
+		<jsp-file>/jsp/about_page.jsp</jsp-file>
 	</servlet>
 
 	<servlet-mapping>
-		<servlet-name>siteNotice</servlet-name>
-		<url-pattern>/site_notice</url-pattern>
+		<servlet-name>about</servlet-name>
+		<url-pattern>/about</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
