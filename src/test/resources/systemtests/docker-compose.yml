@@ -6,7 +6,7 @@ db:
     MYSQL_PASSWORD: defender
     MYSQL_DATABASE: defender
   volumes:
-    - "./db:/docker-entrypoint-initdb.d"
+    - "../../../main/resources/db:/docker-entrypoint-initdb.d"
   ports:
     - "3306"
 
