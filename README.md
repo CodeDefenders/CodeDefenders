@@ -182,3 +182,29 @@ TODO: Do we really need this?
 - Add Run/Debug Configuration
   - Run -> Edit Configurations... -> Add New Tomcat Server configuration -> Add \`Build artifact\` in \`Before launch\` panel and check On Update action: Redeploy. -> OK
 -->
+
+# FAQ
+### Q: I cannot deploy code-defenders anymore, there's a SQL exception.
+If you are running MySQL 5.7 and the SQL exception reads as follows:
+
+```
+java.sql.SQLException: Cannot create PoolableConnectionFactory
+(The server time zone value 'CEST' is unrecognized or represents
+more than one time zone. You must configure either the server or
+JDBC driver (via the serverTimezone configuration property) to use
+a more specific time zone value if you want to utilize time zone
+support.)
+```
+
+This happens because the newest versions of mysql-connector perform some extra check on your DB and won't let you establish a connection unless everything is correct.
+
+Run the following command to resolve it (until you restart mysql):
+
+```
+mysql -uroot -p
+SET GLOBAL time_zone = '+1:00';
+```
+Use whatever matches your local time zone instead of `'+1:00'`
+
+You can also fix it for good by updating your mysql configuration.
+
