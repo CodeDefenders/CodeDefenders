@@ -60,7 +60,7 @@ public class AdminCreateGames extends HttpServlet {
     CodeValidator.CodeValidatorLevel mutantValidatorLevel;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_GAMES_JSP);
+        request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP).forward(request, response);
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

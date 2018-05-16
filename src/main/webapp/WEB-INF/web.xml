@@ -19,10 +19,11 @@
 			<web-resource-name>SecuredBookSite</web-resource-name>
 			<url-pattern>/admin</url-pattern>
 			<url-pattern>/admin/*</url-pattern>
-			<url-pattern>/jsp/admin_user_mgmt.jsp</url-pattern>
-			<url-pattern>/jsp/admin_games_mgmt.jsp</url-pattern>
-			<url-pattern>/jsp/admin_monitor_games.jsp</url-pattern>
-			<url-pattern>/jsp/admin_create_games.jsp</url-pattern>
+			<url-pattern>/admin/games</url-pattern>
+			<url-pattern>/admin/manage</url-pattern>
+			<url-pattern>/admin/monitor</url-pattern>
+			<url-pattern>/admin/users</url-pattern>
+			<url-pattern>/admin/settings</url-pattern>
 			<http-method>GET</http-method>
 			<http-method>POST</http-method>
 		</web-resource-collection>
@@ -40,6 +41,12 @@
 		<auth-method>BASIC</auth-method>
 	</login-config>
 
+    <!--System listener-->
+	<listener>
+		<listener-class>
+			org.codedefenders.SystemStartStop
+		</listener-class>
+	</listener>
 
 	<servlet>
 		<servlet-name>loginManager</servlet-name>
@@ -90,7 +97,6 @@
 		<servlet-name>intro</servlet-name>
 		<jsp-file>/jsp/index.jsp</jsp-file>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>intro</servlet-name>
 		<url-pattern>/intro</url-pattern>
@@ -100,7 +106,6 @@
 		<servlet-name>help</servlet-name>
 		<jsp-file>/jsp/help.jsp</jsp-file>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>help</servlet-name>
 		<url-pattern>/help</url-pattern>
@@ -110,7 +115,6 @@
 		<servlet-name>leaderboards</servlet-name>
 		<jsp-file>/jsp/leaderboards.jsp</jsp-file>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>leaderboards</servlet-name>
 		<url-pattern>/leaderboards</url-pattern>
@@ -120,7 +124,6 @@
 		<servlet-name>index</servlet-name>
 		<jsp-file>/jsp/index.jsp</jsp-file>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>index</servlet-name>
 		<url-pattern></url-pattern>
@@ -204,7 +207,6 @@
 		<servlet-name>about</servlet-name>
 		<jsp-file>/jsp/about_page.jsp</jsp-file>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>about</servlet-name>
 		<url-pattern>/about</url-pattern>
@@ -214,7 +216,6 @@
 		<servlet-name>study</servlet-name>
 		<jsp-file>/jsp/study.jsp</jsp-file>
 	</servlet>
-
 	<servlet-mapping>
 		<servlet-name>study</servlet-name>
 		<url-pattern>/study</url-pattern>
@@ -322,21 +323,15 @@
 		<url-pattern>/game_mutants</url-pattern>
 	</servlet-mapping>
 
-	<listener>
-		<listener-class>
-			org.codedefenders.SystemStartStop
-		</listener-class>
-	</listener>
-
-
+    <!--Admin pages-->
 	<servlet>
-		<servlet-name>AdminGamesMgmt</servlet-name>
+		<servlet-name>AdminCreateGames</servlet-name>
 		<servlet-class>org.codedefenders.servlets.admin.AdminCreateGames</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>AdminGamesMgmt</servlet-name>
-		<url-pattern>/admin/games</url-pattern>
+		<servlet-name>AdminCreateGames</servlet-name>
 		<url-pattern>/admin</url-pattern>
+		<url-pattern>/admin/games</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

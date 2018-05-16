@@ -1,14 +1,14 @@
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.util.Constants;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.util.Constants;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class AdminMonitorGames extends HttpServlet {
     private MultiplayerGame mg;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_MONITOR_JSP);
+		request.getRequestDispatcher(Constants.ADMIN_MONITOR_JSP).forward(request, response);
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
