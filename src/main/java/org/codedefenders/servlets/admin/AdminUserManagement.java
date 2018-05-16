@@ -47,7 +47,7 @@ public class AdminUserManagement extends HttpServlet {
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_USER_JSP);
+		request.getRequestDispatcher(Constants.ADMIN_USER_JSP).forward(request, response);
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class AdminUserManagement extends HttpServlet {
 				} else if (userToDeleteIdString != null) {
 					messages.add(deleteUser(Integer.parseInt(userToDeleteIdString)));
 				} else if (userToEditIdString != null) {
-					responsePath = request.getContextPath() + "/" + Constants.ADMIN_USER_JSP + "?editUser=" + userToEditIdString;
+					responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userToEditIdString;
 				}
 				break;
 			case "createUsers":
@@ -87,7 +87,7 @@ public class AdminUserManagement extends HttpServlet {
 				String msg = editUser(uidString, request, successMsg);
 				messages.add(msg);
 				if (!msg.equals(successMsg)) {
-					responsePath = request.getContextPath() + "/" + Constants.ADMIN_USER_JSP + "?editUser=" + uidString;
+					responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + uidString;
 				}
 				break;
 			default:

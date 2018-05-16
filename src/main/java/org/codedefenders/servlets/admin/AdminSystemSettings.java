@@ -1,8 +1,8 @@
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.util.Constants;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.ConnectionPool;
+import org.codedefenders.util.Constants;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -181,7 +181,7 @@ public class AdminSystemSettings extends HttpServlet {
 	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_SETTINGS_JSP);
+		request.getRequestDispatcher(Constants.ADMIN_SETTINGS_JSP).forward(request, response);
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
