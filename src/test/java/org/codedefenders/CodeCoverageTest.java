@@ -1,11 +1,11 @@
 package org.codedefenders;
 
-import static org.junit.Assert.assertEquals;
+import org.codedefenders.game.GameClass;
+import org.junit.Test;
 
 import java.io.IOException;
 
-import org.codedefenders.multiplayer.CoverageGenerator;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Alessio Gambi

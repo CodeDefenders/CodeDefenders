@@ -1,3 +1,10 @@
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="org.codedefenders.model.User" %>
+
 <% if (role.equals(Role.DEFENDER) || role.equals(Role.CREATOR) || mg.getLevel().equals(GameLevel.EASY) || mg.getState().equals(GameState.FINISHED)){
 %>
 <div class="ws-12">

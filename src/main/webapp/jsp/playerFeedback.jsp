@@ -1,4 +1,11 @@
-<%@ page import="org.codedefenders.util.FeedbackDAO" %>
+<%@ page import="org.apache.commons.lang.ArrayUtils" %>
+<%@ page import="org.codedefenders.database.AdminDAO" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.database.FeedbackDAO" %>
+<%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="org.codedefenders.servlets.FeedbackManager" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <div id="playerFeedback" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
 
     <style>
@@ -84,15 +91,15 @@
 
                         <%
                             Integer[] oldValues = FeedbackDAO.getFeedbackValues(gameId, uid);
-                            for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {
+                            for (FeedbackManager.FeedbackType f : FeedbackManager.FeedbackType.values()) {
                                 int oldValue = oldValues == null ? -1 : oldValues[f.ordinal()];
                                 if ((role.equals(Role.DEFENDER) &&
-                                        (f.equals(Feedback.FeedbackType.CUT_MUTATION_DIFFICULTY) ||
-                                                f.equals(Feedback.FeedbackType.DEFENDER_FAIRNESS)))
+                                        (f.equals(FeedbackManager.FeedbackType.CUT_MUTATION_DIFFICULTY) ||
+                                                f.equals(FeedbackManager.FeedbackType.DEFENDER_FAIRNESS)))
                                         ||
                                         (role.equals(Role.ATTACKER) &&
-                                                (f.equals(Feedback.FeedbackType.CUT_TEST_DIFFICULTY) ||
-                                                        f.equals(Feedback.FeedbackType.ATTACKER_FAIRNESS))))
+                                                (f.equals(FeedbackManager.FeedbackType.CUT_TEST_DIFFICULTY) ||
+                                                        f.equals(FeedbackManager.FeedbackType.ATTACKER_FAIRNESS))))
                                     continue;
                         %>
 
@@ -145,7 +152,7 @@
                     <thead>
                     <tr>
                         <th><%=canSeePlayerFeedback ? "Player" : ""%></th>
-                        <% for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {%>
+                        <% for (FeedbackManager.FeedbackType f : FeedbackManager.FeedbackType.values()) {%>
                         <th title="<%=f.toString()%>"><%=f.name().toUpperCase().replace('_', ' ').replace("CUT ", "")%>
                         </th>
                         <%}%>
@@ -171,7 +178,7 @@
                         </td>
                         <%
                             Integer[] ratingValues = FeedbackDAO.getFeedbackValues(gameId, userFromPlayerId);
-                            for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {
+                            for (FeedbackManager.FeedbackType f : FeedbackManager.FeedbackType.values()) {
                                 int ratingValue = ratingValues == null ? -1 : ratingValues[f.ordinal()];
                                 if (ratingValue < 1) {
                         %>
@@ -181,7 +188,7 @@
 
                         <td>
                             <fieldset class="rating">
-                                <%for (int i = Feedback.MAX_RATING; i > 0; i--) {%>
+                                <%for (int i = FeedbackManager.MAX_RATING; i > 0; i--) {%>
                                 <label class="full" title="<%=i%>"
                                        style="font-size:9px; color:<%=i <= ratingValue  ? "#FFD700" : "#bdbdbd"%>"></label>
                                 <%}%>
@@ -203,7 +210,7 @@
                         <td>Average</td>
                         <%
                             double[] avgRatings = FeedbackDAO.getAverageGameRatings(gameId);
-                            for (Feedback.FeedbackType f : Feedback.FeedbackType.values()) {
+                            for (FeedbackManager.FeedbackType f : FeedbackManager.FeedbackType.values()) {
                                 double ratingValue = avgRatings == null ? -1 : avgRatings[f.ordinal()];
                                 if (ratingValue < 1) {
                         %>
@@ -214,7 +221,7 @@
                         <td>
                             <p style="text-align: left;"><%=String.format("%.1f", ratingValue)%></p>
                             <fieldset class="rating">
-                                <%for (int i = Feedback.MAX_RATING; i > 0; i--) {%>
+                                <%for (int i = FeedbackManager.MAX_RATING; i > 0; i--) {%>
                                 <label class="full" title="<%=i%>"
                                        style="font-size:9px; color:<%=i <= Math.round(ratingValue)  ? "#FFD700" : "#bdbdbd"%>"></label>
                                 <%}%>

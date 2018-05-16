@@ -1,6 +1,12 @@
-<%@ page import="org.codedefenders.AdminCreateGames" %>
-<%@ page import="org.codedefenders.GameState" %>
+<%@ page import="org.codedefenders.database.AdminDAO" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminCreateGames" %>
 <%@ page import="java.util.List" %>
+
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div class="full-width">

@@ -1,5 +1,8 @@
-<%@ page import="org.codedefenders.singleplayer.PrepareAI" %>
-<%@ page import="org.codedefenders.util.FeedbackDAO" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.database.FeedbackDAO" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.singleplayer.PrepareAI" %>
+<%@ page import="java.util.List" %>
 <% String pageTitle=null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div>

@@ -1,7 +1,15 @@
-<%@ page import="static org.codedefenders.GameState.ACTIVE" %>
-<%@ page import="org.codedefenders.*" %>
-<%@ page import="org.codedefenders.duel.DuelGame" %>
-<%@ page import="org.codedefenders.util.DatabaseAccess" %>
+<%@ page import="static org.codedefenders.game.GameState.ACTIVE" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <% String pageTitle="Defending Class"; %>
 <%@ include file="/jsp/header_game.jsp" %>
 

@@ -1,6 +1,6 @@
 package org.codedefenders;
 
-import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.database.DatabaseAccess;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;

@@ -43,7 +43,7 @@
 
 	<servlet>
 		<servlet-name>loginManager</servlet-name>
-		<servlet-class>org.codedefenders.LoginManager</servlet-class>
+		<servlet-class>org.codedefenders.servlets.auth.LoginManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>loginManager</servlet-name>
@@ -52,7 +52,7 @@
 
 	<servlet>
 		<servlet-name>gameSelectionManager</servlet-name>
-		<servlet-class>org.codedefenders.GameSelectionManager</servlet-class>
+		<servlet-class>org.codedefenders.servlets.games.GameSelectionManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>gameSelectionManager</servlet-name>
@@ -61,7 +61,7 @@
 
 	<servlet>
 		<servlet-name>uploadManager</servlet-name>
-		<servlet-class>org.codedefenders.UploadManager</servlet-class>
+		<servlet-class>org.codedefenders.servlets.UploadManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>uploadManager</servlet-name>
@@ -70,7 +70,7 @@
 	
 	<servlet>
 		<servlet-name>aiPreparer</servlet-name>
-		<servlet-class>org.codedefenders.singleplayer.AiPreparer</servlet-class>
+		<servlet-class>org.codedefenders.game.singleplayer.AiPreparer</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>aiPreparer</servlet-name>
@@ -79,7 +79,7 @@
 
 	<servlet>
 		<servlet-name>gameManager</servlet-name>
-		<servlet-class>org.codedefenders.GameManager</servlet-class>
+		<servlet-class>org.codedefenders.servlets.games.GameManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>gameManager</servlet-name>
@@ -173,7 +173,7 @@
 
 	<servlet>
 		<servlet-name>utesting</servlet-name>
-		<servlet-class>org.codedefenders.UnitTesting</servlet-class>
+		<servlet-class>org.codedefenders.servlets.UnitTesting</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>utesting</servlet-name>
@@ -183,7 +183,7 @@
 
 	<filter>
 		<filter-name>loginFilter</filter-name>
-		<filter-class>org.codedefenders.LoginFilter</filter-class>
+		<filter-class>org.codedefenders.servlets.auth.LoginFilter</filter-class>
 	</filter>
 	<filter-mapping>
 		<filter-name>loginFilter</filter-name>
@@ -222,7 +222,7 @@
 
 	<servlet>
 		<servlet-name>sendEmail</servlet-name>
-		<servlet-class>org.codedefenders.SendEmail</servlet-class>
+		<servlet-class>org.codedefenders.servlets.SendEmail</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>sendEmail</servlet-name>
@@ -231,7 +231,7 @@
 
 	<servlet>
 		<servlet-name>logout</servlet-name>
-		<servlet-class>org.codedefenders.LogoutManager</servlet-class>
+		<servlet-class>org.codedefenders.servlets.auth.LogoutManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>logout</servlet-name>
@@ -242,7 +242,7 @@
 	<!-- multiplayer servlets -->
 	<servlet>
 		<servlet-name>multiplayerGameSelectionManager</servlet-name>
-		<servlet-class>org.codedefenders.multiplayer.MultiplayerGameSelectionManager</servlet-class>
+		<servlet-class>org.codedefenders.servlets.games.MultiplayerGameSelectionManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>multiplayerGameSelectionManager</servlet-name>
@@ -284,7 +284,7 @@
 
 	<servlet>
 		<servlet-name>multiplayerGameManager</servlet-name>
-		<servlet-class>org.codedefenders.multiplayer.MultiplayerGameManager</servlet-class>
+		<servlet-class>org.codedefenders.servlets.games.MultiplayerGameManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>multiplayerGameManager</servlet-name>
@@ -296,7 +296,7 @@
 
 	<servlet>
 		<servlet-name>game_notification</servlet-name>
-		<servlet-class>org.codedefenders.events.EventManager</servlet-class>
+		<servlet-class>org.codedefenders.servlets.events.EventManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>game_notification</servlet-name>
@@ -305,7 +305,7 @@
 
 	<servlet>
 		<servlet-name>game_message</servlet-name>
-		<servlet-class>org.codedefenders.events.MessageManager</servlet-class>
+		<servlet-class>org.codedefenders.servlets.events.MessageManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>game_message</servlet-name>
@@ -315,7 +315,7 @@
 
 	<servlet>
 		<servlet-name>mutants</servlet-name>
-		<servlet-class>org.codedefenders.json.MutantManager</servlet-class>
+		<servlet-class>org.codedefenders.servlets.games.MutantManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>mutants</servlet-name>
@@ -324,14 +324,14 @@
 
 	<listener>
 		<listener-class>
-			org.codedefenders.util.SystemStartStop
+			org.codedefenders.SystemStartStop
 		</listener-class>
 	</listener>
 
 
 	<servlet>
 		<servlet-name>AdminGamesMgmt</servlet-name>
-		<servlet-class>org.codedefenders.AdminCreateGames</servlet-class>
+		<servlet-class>org.codedefenders.servlets.admin.AdminCreateGames</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AdminGamesMgmt</servlet-name>
@@ -341,7 +341,7 @@
 
 	<servlet>
 		<servlet-name>AdminMonitorGames</servlet-name>
-		<servlet-class>org.codedefenders.AdminMonitorGames</servlet-class>
+		<servlet-class>org.codedefenders.servlets.admin.AdminMonitorGames</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AdminMonitorGames</servlet-name>
@@ -350,7 +350,7 @@
 
 	<servlet>
 		<servlet-name>AdminUserManagement</servlet-name>
-		<servlet-class>org.codedefenders.AdminUserManagement</servlet-class>
+		<servlet-class>org.codedefenders.servlets.admin.AdminUserManagement</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AdminUserManagement</servlet-name>
@@ -359,7 +359,7 @@
 
 	<servlet>
 		<servlet-name>AdminSettings</servlet-name>
-		<servlet-class>org.codedefenders.AdminSystemSettings</servlet-class>
+		<servlet-class>org.codedefenders.servlets.admin.AdminSystemSettings</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>AdminSettings</servlet-name>
@@ -368,7 +368,7 @@
 
 	<servlet>
 		<servlet-name>feedback</servlet-name>
-		<servlet-class>org.codedefenders.Feedback</servlet-class>
+		<servlet-class>org.codedefenders.servlets.FeedbackManager</servlet-class>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>feedback</servlet-name>

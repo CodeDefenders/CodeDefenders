@@ -1,3 +1,5 @@
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
 <% String pageTitle="Duel Creation"; %>
 <%@ include file="/jsp/header_main.jsp" %>
 

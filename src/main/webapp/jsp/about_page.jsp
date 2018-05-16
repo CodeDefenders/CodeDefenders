@@ -1,5 +1,6 @@
-<%@ page import="org.codedefenders.AdminSystemSettings" %>
-<%@ page import="org.codedefenders.util.AdminDAO" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="org.codedefenders.database.AdminDAO" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
 <% String pageTitle = "About CodeDefenders"; %>
 
 <%
@@ -21,8 +22,7 @@
 
             <h3>Version</h3>
             <p>
-                This is Code Defenders version <%=org.codedefenders.GameClass.class.getPackage().getImplementationVersion() %>.
-            </p>
+                This is Code Defenders version <%=GameClass.class.getPackage().getImplementationVersion() %>.
 
             <h3>Source Code</h3>
             <p>

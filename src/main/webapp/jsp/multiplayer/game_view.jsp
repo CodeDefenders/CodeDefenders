@@ -33,16 +33,25 @@
 %>
 
 <% String pageTitle="In Game"; %>
-<%@ page import="org.codedefenders.multiplayer.MultiplayerGame" %>
-<%@ page import="org.codedefenders.*" %>
-<%@ page import="org.codedefenders.util.DatabaseAccess" %>
-<%@ page import="org.codedefenders.events.Event" %>
-<%@ page import="org.codedefenders.events.EventType" %>
-<%@ page import="org.codedefenders.events.EventStatus" %>
-<%@ page import="java.sql.Timestamp" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.model.Event" %>
+<%@ page import="org.codedefenders.model.EventStatus" %>
+<%@ page import="org.codedefenders.model.EventType" %>
+<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="static org.codedefenders.util.Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE" %>
+<%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page import="static org.codedefenders.Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE" %>
+<%@ page import="java.sql.Timestamp" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%
 	boolean renderMutants = true;
 	boolean redirect = false;

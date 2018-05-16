@@ -1,9 +1,12 @@
 package org.codedefenders;
 
 import org.apache.commons.io.FileUtils;
-import org.codedefenders.exceptions.CodeValidatorException;
-import org.codedefenders.util.DatabaseAccess;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.servlets.games.GameManager;
+import org.codedefenders.util.Constants;
 import org.codedefenders.validation.CodeValidator;
+import org.codedefenders.validation.CodeValidatorException;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,8 +23,13 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 
-import static org.codedefenders.validation.CodeValidator.*;
-import static org.junit.Assert.*;
+import static org.codedefenders.validation.CodeValidator.CodeValidatorLevel;
+import static org.codedefenders.validation.CodeValidator.getValidationMessage;
+import static org.codedefenders.validation.CodeValidator.validMutant;
+import static org.codedefenders.validation.CodeValidator.validTestCode;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;

@@ -1,5 +1,5 @@
-<%@ page import="org.codedefenders.leaderboard.Leaderboard" %>
-<%@ page import="org.codedefenders.leaderboard.Entry" %>
+<%@ page import="org.codedefenders.game.leaderboard.Leaderboard" %>
+<%@ page import="org.codedefenders.game.leaderboard.Entry" %>
 <% String pageTitle="Leaderboard"; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div class="w-100">

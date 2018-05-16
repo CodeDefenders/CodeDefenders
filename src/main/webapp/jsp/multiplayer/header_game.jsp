@@ -3,13 +3,13 @@
 <%@ include file="/jsp/header_main.jsp" %>
 </div></div></div></div></div>
 <%@ page import="java.util.*" %>
-<%@ page import="org.codedefenders.Test" %>
-<%@ page import="org.codedefenders.Mutant" %>
-<%@ page import="org.codedefenders.duel.DuelGame" %>
-<%@ page import="org.codedefenders.Constants" %>
-<%@ page import="org.codedefenders.util.DatabaseAccess" %>
-<%@ page import="org.codedefenders.GameClass" %>
-<%@ page import="static org.codedefenders.GameState.ACTIVE" %>
+<%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="org.codedefenders.game.duel.DuelGame" %>
+<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="static org.codedefenders.game.GameState.ACTIVE" %>
 <div class="game-container">
 <nav class="nest" style="width: 90%; margin-left: auto; margin-right: auto;">
     <div class="crow fly">

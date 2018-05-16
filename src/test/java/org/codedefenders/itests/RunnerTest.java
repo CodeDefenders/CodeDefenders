@@ -3,19 +3,26 @@ package org.codedefenders.itests;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.lang3.ArrayUtils;
-import org.codedefenders.*;
-import org.codedefenders.Mutant.Equivalence;
-import org.codedefenders.duel.DuelGame;
-import org.codedefenders.events.Event;
-import org.codedefenders.events.EventStatus;
-import org.codedefenders.events.EventType;
-import org.codedefenders.multiplayer.LineCoverage;
-import org.codedefenders.multiplayer.MultiplayerGame;
+import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.database.ConnectionPool;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.database.FeedbackDAO;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Mutant.Equivalence;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.game.multiplayer.LineCoverage;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
-import org.codedefenders.util.ConnectionPool;
-import org.codedefenders.util.DatabaseAccess;
-import org.codedefenders.util.DatabaseConnection;
-import org.codedefenders.util.FeedbackDAO;
+import org.codedefenders.servlets.FeedbackManager;
 import org.codedefenders.validation.CodeValidator;
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,7 +45,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 /**
@@ -87,7 +99,7 @@ public class RunnerTest {
 	private GameClass cut1;
 	private GameClass cut2;
 	private Mutant mutant1;
-	private org.codedefenders.Test test;
+	private org.codedefenders.game.Test test;
 
 
 	@Test
@@ -334,11 +346,11 @@ public class RunnerTest {
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
 
 		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
-		test = new org.codedefenders.Test(99, multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10, pid);
+		test = new org.codedefenders.game.Test(99, multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10, pid);
 		test.setPlayerId(pid);
 
 		assertTrue(test.insert());
-		org.codedefenders.Test testFromDB = DatabaseAccess.getTestForId(test.getId());
+		org.codedefenders.game.Test testFromDB = DatabaseAccess.getTestForId(test.getId());
 		assertEquals(testFromDB.getJavaFile(), test.getJavaFile());
 		assertEquals(testFromDB.getClassFile(), test.getClassFile());
 		assertEquals(testFromDB.getGameId(), test.getGameId());
@@ -387,7 +399,7 @@ public class RunnerTest {
 
 		//
 		int pidDefender = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
-		test = new org.codedefenders.Test(99, multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10,
+		test = new org.codedefenders.game.Test(99, multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10,
 				pidDefender);
 		test.setPlayerId(pidDefender);
 		assumeTrue(test.insert());
@@ -477,12 +489,12 @@ public class RunnerTest {
 		Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
 		assumeTrue(multiplayerGame.insert());
 
-		Integer[] ratings = new Integer[]{Feedback.MIN_RATING - 1, Feedback.MIN_RATING, Feedback.MAX_RATING, Feedback.MAX_RATING + 1};
-		List<Feedback.FeedbackType> feedbackTypesList = new ArrayList();
-		feedbackTypesList = Arrays.asList(ArrayUtils.subarray(Feedback.FeedbackType.values(), 0, ratings.length));
+		Integer[] ratings = new Integer[]{FeedbackManager.MIN_RATING - 1, FeedbackManager.MIN_RATING, FeedbackManager.MAX_RATING, FeedbackManager.MAX_RATING + 1};
+		List<FeedbackManager.FeedbackType> feedbackTypesList = new ArrayList();
+		feedbackTypesList = Arrays.asList(ArrayUtils.subarray(FeedbackManager.FeedbackType.values(), 0, ratings.length));
 		// shuffle feedback type list
 		Collections.shuffle(feedbackTypesList);
-		Feedback.FeedbackType[] feedbackTypes = new Feedback.FeedbackType[feedbackTypesList.size()];
+		FeedbackManager.FeedbackType[] feedbackTypes = new FeedbackManager.FeedbackType[feedbackTypesList.size()];
 		feedbackTypes = feedbackTypesList.toArray(feedbackTypes);
 
 		List<Integer> ratingsList = Arrays.asList(ratings);
@@ -490,11 +502,11 @@ public class RunnerTest {
 				FeedbackDAO.insertFeedback(multiplayerGame.getId(), user1.getId(), ratingsList, feedbackTypes));
 
 		Integer[] ratingsFromDB = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId(), feedbackTypes);
-		Integer[] user1RatingsSanitized = new Integer[]{Feedback.MIN_RATING, Feedback.MIN_RATING, Feedback.MAX_RATING, Feedback.MAX_RATING};
+		Integer[] user1RatingsSanitized = new Integer[]{FeedbackManager.MIN_RATING, FeedbackManager.MIN_RATING, FeedbackManager.MAX_RATING, FeedbackManager.MAX_RATING};
 
 		assertEquals(user1RatingsSanitized, ratingsFromDB);
 
-		Integer[] updatedRatings = new Integer[]{Feedback.MAX_RATING, Feedback.MAX_RATING-1, Feedback.MIN_RATING+1, Feedback.MIN_RATING};
+		Integer[] updatedRatings = new Integer[]{FeedbackManager.MAX_RATING, FeedbackManager.MAX_RATING-1, FeedbackManager.MIN_RATING+1, FeedbackManager.MIN_RATING};
 		List<Integer> updatedRatingsList = Arrays.asList(updatedRatings);
 		assertTrue("Feedback could not be updated",
 				FeedbackDAO.updateFeedback(multiplayerGame.getId(), user1.getId(), updatedRatingsList, feedbackTypes));
