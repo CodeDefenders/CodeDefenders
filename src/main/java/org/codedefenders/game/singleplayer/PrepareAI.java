@@ -1,7 +1,7 @@
 package org.codedefenders.game.singleplayer;
 
 import org.apache.commons.io.FileUtils;
-import org.codedefenders.compilation.AntRunner;
+import org.codedefenders.execution.AntRunner;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.singleplayer.automated.attacker.AiAttacker;

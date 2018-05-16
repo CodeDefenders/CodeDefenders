@@ -1,6 +1,6 @@
 package org.codedefenders.itests;
 
-import org.codedefenders.compilation.MutationTester;
+import org.codedefenders.execution.MutationTester;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;

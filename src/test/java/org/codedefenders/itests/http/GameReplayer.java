@@ -2,7 +2,7 @@ package org.codedefenders.itests.http;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 
-import org.codedefenders.compilation.TargetExecution;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.itests.http.UnkillableMutant.WebClientFactory;
 import org.codedefenders.itests.http.utils.AttackAction;
 import org.codedefenders.itests.http.utils.CodeDefenderAction;

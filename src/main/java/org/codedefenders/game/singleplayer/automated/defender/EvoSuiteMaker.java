@@ -1,10 +1,10 @@
 package org.codedefenders.game.singleplayer.automated.defender;
 
-import org.codedefenders.compilation.AntRunner;
+import org.codedefenders.execution.AntRunner;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.compilation.TargetExecution;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Test;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;

@@ -2,7 +2,7 @@ package org.codedefenders.servlets.events;
 
 import com.google.gson.Gson;
 
-import org.codedefenders.compilation.TargetExecution;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;

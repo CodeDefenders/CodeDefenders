@@ -3,7 +3,7 @@ package org.codedefenders.itests;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.lang3.ArrayUtils;
-import org.codedefenders.compilation.TargetExecution;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.database.ConnectionPool;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;

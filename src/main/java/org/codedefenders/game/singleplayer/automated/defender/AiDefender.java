@@ -1,9 +1,9 @@
 package org.codedefenders.game.singleplayer.automated.defender;
 
-import org.codedefenders.compilation.AntRunner;
+import org.codedefenders.execution.AntRunner;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
-import org.codedefenders.compilation.MutationTester;
+import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.multiplayer.LineCoverage;
 import org.codedefenders.game.singleplayer.AiPlayer;
@@ -11,7 +11,7 @@ import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.codedefenders.game.singleplayer.PrepareAI;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.Mutant;
-import org.codedefenders.compilation.TargetExecution;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,7 +1,7 @@
 package org.codedefenders.game.singleplayer.automated.attacker;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-import org.codedefenders.compilation.AntRunner;
+import org.codedefenders.execution.AntRunner;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.database.DatabaseAccess;

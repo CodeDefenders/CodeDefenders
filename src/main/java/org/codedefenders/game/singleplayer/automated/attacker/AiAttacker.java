@@ -2,7 +2,7 @@ package org.codedefenders.game.singleplayer.automated.attacker;
 
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
-import org.codedefenders.compilation.MutationTester;
+import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.singleplayer.AiPlayer;
 import org.codedefenders.game.singleplayer.NoDummyGameException;

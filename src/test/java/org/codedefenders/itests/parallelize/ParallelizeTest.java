@@ -1,6 +1,6 @@
 package org.codedefenders.itests.parallelize;
 
-import org.codedefenders.compilation.MutationTester;
+import org.codedefenders.execution.MutationTester;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.game.GameClass;

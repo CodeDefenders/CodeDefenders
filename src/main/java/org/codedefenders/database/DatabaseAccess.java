@@ -15,7 +15,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
 import org.codedefenders.game.Mutant;
-import org.codedefenders.compilation.TargetExecution;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.User;
 import org.codedefenders.validation.CodeValidator;

@@ -13,11 +13,11 @@ import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 
-import org.codedefenders.compilation.AntRunner;
+import org.codedefenders.execution.AntRunner;
 import org.codedefenders.util.Constants;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameState;
-import org.codedefenders.compilation.TargetExecution;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Test;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.duel.DuelGame;
