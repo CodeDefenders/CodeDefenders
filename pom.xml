@@ -504,11 +504,19 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- See https://github.com/palantir/docker-compose-rule -->
 		<dependency>
 			<groupId>com.palantir.docker.compose</groupId>
 			<artifactId>docker-compose-rule-junit4</artifactId>
 			<version>0.33.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Docker client to make assertions on docker containers. Ideally we 
+			should use this in combination with Hamcrest -->
+		<dependency>
+			<groupId>com.spotify</groupId>
+			<artifactId>docker-client</artifactId>
+			<version>8.11.2</version>
 			<scope>test</scope>
 		</dependency>
 
