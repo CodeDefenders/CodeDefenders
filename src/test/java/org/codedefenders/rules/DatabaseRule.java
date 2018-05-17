@@ -11,9 +11,13 @@ import ch.vorburger.mariadb4j.DB;
 import ch.vorburger.mariadb4j.DBConfigurationBuilder;
 
 /**
- * @author Jose Rojas
+ * @author Jose Rojas, Alessio Gambi
  */
 public class DatabaseRule extends ExternalResource {
+
+	// These ensures we do not mess up with the timeZone problem during integration testing
+	private static final String[] DEFAULT_OPTIONS = new String[] { "useUnicode=true",
+			"useJDBCCompliantTimezoneShift=true", "useLegacyDatetimeCode=false", "serverTimezone=UTC" };
 
 	private DB db;
 	protected DBConfigurationBuilder config;
@@ -26,24 +30,28 @@ public class DatabaseRule extends ExternalResource {
 
 	public String getDbName() {
 		return dbName;
-	
+
 	}
-	
-	public DatabaseRule(String dbName, String initFile, String... options) {
+
+	public DatabaseRule(String dbName, String initFile, String[] options) {
 		this(dbName, "root", "", initFile, options);
 	}
-	
-	public DatabaseRule(String dbName, String username, String password, String initFile, String... connectionOptions) {
-		this.dbName= dbName;
+
+	public DatabaseRule(String dbName, String initFile) {
+		this(dbName, "root", "", initFile, DEFAULT_OPTIONS);
+	}
+
+	public DatabaseRule(String dbName, String username, String password, String initFile, String[] connectionOptions) {
+		this.dbName = dbName;
 		this.initFile = initFile;
 		StringBuffer sb = new StringBuffer();
-		if( connectionOptions != null && connectionOptions.length > 0 ){
+		if (connectionOptions != null && connectionOptions.length > 0) {
 			sb.append("?");
-			for( String option : connectionOptions ){
+			for (String option : connectionOptions) {
 				sb.append(option).append("&");
 			}
 			// Remove trailing "&"
-			sb.deleteCharAt( sb.lastIndexOf("&"));
+			sb.deleteCharAt(sb.lastIndexOf("&"));
 		}
 		this.connectionOptions = sb.toString();
 	}
@@ -69,10 +77,13 @@ public class DatabaseRule extends ExternalResource {
 			// quiet
 		}
 	}
-	// we can add additional connectionOptions to the URL as parameters:+"[?][parameter=value[&parameter=value]]"
-	// for example, to return the updated query - not the matched ones +"?""useAffectedRows=true"
+
+	// we can add additional connectionOptions to the URL as
+	// parameters:+"[?][parameter=value[&parameter=value]]"
+	// for example, to return the updated query - not the matched ones
+	// +"?""useAffectedRows=true"
 	public Connection getConnection() throws SQLException {
 		String connectionURL = config.getURL(dbName) + connectionOptions;
-		return DriverManager.getConnection( connectionURL, username, password);
+		return DriverManager.getConnection(connectionURL, username, password);
 	}
 }

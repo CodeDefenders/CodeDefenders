@@ -107,13 +107,13 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.6</version>
 				<configuration>
-				  <archive>
-				    <manifest>
-				      <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-				      <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-				    </manifest>
-				  </archive>
-				  <webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+					</archive>
+					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
 					<webResources>
 						<resource>
 							<directory>src/main/resources</directory>
@@ -192,16 +192,19 @@
 							<includes>
 								<include>**/*.class</include>
 							</includes>
-							<excludedGroups>org.codedefenders.itests.IntegrationTest</excludedGroups>
-							<!-- Exclude resources for integration tests. Note that those are actual java and class files for mutants and tests -->
+							<excludedGroups>org.codedefenders.itests.IntegrationTest,org.codedefenders.systemtests.SystemTest</excludedGroups>
+							<!-- Exclude resources for integration tests. Note that those are 
+								actual java and class files for mutants and tests -->
 							<excludes>
-								<exclude>itests/**/*.*</exclude>
+								<exclude>**/itests/**/*.*</exclude>
+								<exclude>**/systemtests/**/*.*</exclude>
 							</excludes>
 						</configuration>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
+		<!-- Integration Tests are run locally without docker or anything else -->
 		<profile>
 			<id>IT</id>
 			<build>
@@ -254,11 +257,6 @@
 							</dependency>
 						</dependencies>
 						<configuration>
-							<!-- From : http://maven.apache.org/surefire/maven-surefire-plugin/examples/fork-options-and-parallel-execution.html 
-								forkCount=1/reuseForks=false executes each test class in its own JVM process, 
-								one after another. It creates the highest level of separation for the test 
-								execution, but it would probably also give you the longest execution time 
-								of all the available options. Consider it as a last resort. -->
 							<!-- Do not parallelize, but just fork a new JVM each time -->
 							<forkCount>1</forkCount>
 							<reuseForks>false</reuseForks>
@@ -267,6 +265,75 @@
 							<!-- Do not clog the console but write to output files -->
 							<redirectTestOutputToFile>true</redirectTestOutputToFile>
 						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<!-- System tests use Docker, Docker-Compose, Selenium and probably something 
+			else. Before test we ensure the system is rebuild and repackage as war file 
+			using config.properties@docker as config file. Not sure how this can be enforces 
+			if not encoding the value of ${config.properties} Then we use surefire (not 
+			failsafe) to execute the tests, but we bind this phase to integration-tests 
+			instead of regular unit-tests: https://stackoverflow.com/questions/1399240/how-do-i-get-my-maven-integration-tests-to-run?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa -->
+		<profile>
+			<id>ST</id>
+			<properties>
+				<!-- Read the properties from this specific file -->
+				<config.properties>config.properties@docker</config.properties>
+			</properties>
+			<build>
+				<!-- TODO Use the maven plugin to build codedefenders/frontend and tomcat:8.5 -->
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-war-plugin</artifactId>
+						<version>3.2.0</version>
+						<configuration>
+							<outputDirectory>src/test/resources/systemtests/frontend</outputDirectory>
+						</configuration>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>2.20.1</version>
+						<dependencies>
+							<dependency>
+								<groupId>org.apache.maven.surefire</groupId>
+								<artifactId>surefire-junit47</artifactId>
+								<version>2.20.1</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+							<skipTests>true</skipTests>
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-test</id>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<phase>integration-test</phase>
+								<configuration>
+									<skipTests>false</skipTests>
+									<includes>
+										<include>**/systemtests/*.class</include>
+									</includes>
+									<excludedGroups>org.codedefenders.itests.IntegrationTest</excludedGroups>
+									<!-- Exclude resources for integration tests. Note that those are 
+										actual java and class files for mutants and tests -->
+									<excludes>
+										<exclude>**/itests/**/*.*</exclude>
+									</excludes>
+									<!-- Do not parallelize, but just fork a new JVM each time -->
+									<forkCount>1</forkCount>
+									<reuseForks>false</reuseForks>
+									<!-- Only consider tests marked as IntegrationTest -->
+									<groups>org.codedefenders.systemtests.SystemTest</groups>
+									<!-- Do not clog the console but write to output files -->
+									<redirectTestOutputToFile>true</redirectTestOutputToFile>
+								</configuration>
+							</execution>
+						</executions>
 					</plugin>
 				</plugins>
 			</build>
@@ -308,7 +375,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.38</version>
+			<version>8.0.11</version>
 		</dependency>
 
 		<dependency>
@@ -385,12 +452,14 @@
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.3.1</version>
+			<version>2.8.4</version>
 		</dependency>
+		<!-- Test. Shall we keep this around now that we use docker ? -->
 		<dependency>
 			<groupId>ch.vorburger.mariaDB4j</groupId>
 			<artifactId>mariaDB4j</artifactId>
 			<version>2.2.3</version>
+			<scope>test</scope>
 		</dependency>
 
 		<dependency>
@@ -398,6 +467,13 @@
 			<artifactId>commons-dbutils</artifactId>
 			<version>1.7</version>
 		</dependency>
+
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.7</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.powermock</groupId>
@@ -419,5 +495,32 @@
 			<version>2.18</version>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Selenium -->
+		<dependency>
+			<groupId>org.seleniumhq.selenium</groupId>
+			<artifactId>selenium-java</artifactId>
+			<version>3.11.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- See https://github.com/palantir/docker-compose-rule -->
+		<dependency>
+			<groupId>com.palantir.docker.compose</groupId>
+			<artifactId>docker-compose-rule-junit4</artifactId>
+			<version>0.33.0</version>
+			<scope>test</scope>
+		</dependency>
+
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>Palantir</id>
+			<url>https://dl.bintray.com/palantir/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 </project>

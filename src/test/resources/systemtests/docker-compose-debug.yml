@@ -1,0 +1,28 @@
+db:
+  image: mysql:latest
+  environment:
+    MYSQL_ROOT_PASSWORD: root
+    MYSQL_USER: defender
+    MYSQL_PASSWORD: defender
+    MYSQL_DATABASE: defender
+  volumes:
+    - "../../../main/resources/db:/docker-entrypoint-initdb.d"
+  ports:
+    - "3306"
+
+frontend: 
+  image: codedefenders/frontend:latest
+  ports:
+   - 8080
+  volumes:
+    - "./frontend/codedefenders.war:/usr/local/tomcat/webapps/codedefenders.war"
+  links:
+    - db
+
+selenium:
+  image: selenium/standalone-chrome-debug
+  ports:
+   - "4444:4444"
+   - "5900:5900"
+  volumes:
+   - /dev/shm:/dev/shm

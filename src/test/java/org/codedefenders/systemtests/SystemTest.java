@@ -1,4 +1,4 @@
-package org.codedefenders.itests;
+package org.codedefenders.systemtests;
 
 /**
  * Marker interface for tagging integration tests. This is to be used with

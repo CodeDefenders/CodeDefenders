@@ -108,6 +108,71 @@ To redeploy instead use:
 mvn clean compile package install war:war tomcat7:redeploy -DskipTests
 ```
 
+### System Tests
+System tests work by deploying code-defenders inside disposable Docker containers and interacting with it by means of Selenium, which is again, running inside a Docker container.
+This means that the DATA inside the DB are lost after the tests end.
+
+Since we use Docker containers which are not (yet) registered in any Docker public repository, we need to manually build them. Once those are in place, system tests can be run from maven as follows (note that we use the System Test profile `ST`):
+
+```bash
+mvn clean compile package war:war integration-test -PST
+```
+
+This command rebuilds and repackages the application using the `config.properties@docker` file. Then, it copies the resulting `.war` file in the right folder (`src/test/resources/systemtests/frontend`). An, finally, it runs all the tests which are annotated with `@Category(SystemTest.class)`. Each test starts two docker instances for code-defenders (one for the backend and on one for the front-end) and one docker instance for Selenium. 
+When containers are ready, the test code send the commands to the Selenium instance which must necessarily run on port 4444. When a test ends, it disposes all the containers. 
+
+There's few catches. Since we use selenium-standalone we can run ONLY one system test at the time. The alternative (not in place) is to start a selenium-hub.
+
+#### Debug system tests
+
+There's a `docker-compose-debug.yml` file under `src/test/resources/systemtests`. This file contains the configuration to run the debug-enabled selenium container, which opens a VNC port 5900 to which you can connect to (using any VNC client).
+
+#### Build codedefenders/frontend:latest
+
+Assuming that you have `docker` and `docker-compose` installed.
+
+```bash
+cd src/test/resources/systemtests/tomcat8.5-jdk8
+docker build -t codedefenders/tomcat:8.5 .
+cd -
+cd src/test/resources/systemtests/frontend
+./setup-filesystem.sh ./config.properties
+docker build -t codedefenders/frontend .
+```
+
+#### Manually deploy the system using docker-compose
+If you want to try out code-defenders on docker, assuming you have build the right images. Run the following commands:
+
+```bash
+mvn clean compile package war:war -PST
+cd  src/test/resources/systemtests/
+docker-compose up
+```
+
+You should see the outputs of both containers on the console. Since the database in build on the fly, it takes more time to start mysql than usual. Tomcat retries to connect to the database several time. Tomcat receives a random port when it starts, so we need to get it from docker.
+
+```bash
+docker ps
+```
+
+Should produce an output similar to:
+
+```bash
+CONTAINER ID        IMAGE                           COMMAND                  CREATED             STATUS              PORTS                     NAMES
+5a4893783257        codedefenders/frontend:latest   "catalina.sh run"        3 minutes ago       Up 3 minutes        0.0.0.0:32799->8080/tcp   systemtests_frontend_1
+77470959a24c        mysql:latest                    "docker-entrypoint.s…"   3 minutes ago       Up 3 minutes        0.0.0.0:32798->3306/tcp   systemtests_db_1
+```
+Locate the PORT corresponding to `codedefenders/frontend:latest`, e.g., and connect to code-defenders using the browser, e.g., `http://localhost:32799/codedefenders/`
+
+To shutdown the application, Ctrl-C the docker-compose process.
+
+```bash
+Gracefully stopping... (press Ctrl+C again to force)
+Stopping systemtests_frontend_1 ... done
+Stopping systemtests_db_1       ... done
+```
+
+
 # Project Import
 
 Code Defenders and most of its dependencies are handled via Maven. Code Defenders can also be imported into common IDEs (e.g., IntelliJ and Eclipse).
@@ -125,3 +190,29 @@ TODO: Do we really need this?
 - Add Run/Debug Configuration
   - Run -> Edit Configurations... -> Add New Tomcat Server configuration -> Add \`Build artifact\` in \`Before launch\` panel and check On Update action: Redeploy. -> OK
 -->
+
+# FAQ
+### Q: I cannot deploy code-defenders anymore, there's a SQL exception.
+If you are running MySQL 5.7 and the SQL exception reads as follows:
+
+```
+java.sql.SQLException: Cannot create PoolableConnectionFactory
+(The server time zone value 'CEST' is unrecognized or represents
+more than one time zone. You must configure either the server or
+JDBC driver (via the serverTimezone configuration property) to use
+a more specific time zone value if you want to utilize time zone
+support.)
+```
+
+This happens because the newest versions of mysql-connector perform some extra check on your DB and won't let you establish a connection unless everything is correct.
+
+Run the following command to resolve it (until you restart mysql):
+
+```
+mysql -uroot -p
+SET GLOBAL time_zone = '+1:00';
+```
+Use whatever matches your local time zone instead of `'+1:00'`
+
+You can also fix it for good by updating your mysql configuration.
+

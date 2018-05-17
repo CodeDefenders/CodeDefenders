@@ -1,15 +1,8 @@
 package org.codedefenders.servlets.auth;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.codedefenders.util.Constants;
-import org.codedefenders.model.User;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.util.EmailUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import static org.codedefenders.database.DatabaseAccess.setPasswordResetSecret;
+import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
+import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -27,9 +20,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static org.codedefenders.database.DatabaseAccess.setPasswordResetSecret;
-import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
-import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
+import org.apache.commons.lang.ArrayUtils;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.model.User;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.EmailUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class LoginManager extends HttpServlet {
 
