@@ -5,6 +5,8 @@
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.stream.Collectors" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="java.util.Set" %>
 
 <% if (role.equals(Role.DEFENDER) || role.equals(Role.CREATOR) || mg.getLevel().equals(GameLevel.EASY) || mg.getState().equals(GameState.FINISHED)){
 %>
@@ -16,6 +18,8 @@
                 String tc = "";
                 for (String l : t.getHTMLReadout()) { tc += l + "\n"; }
                 User creator = DatabaseAccess.getUserFromPlayer(t.getPlayerId());
+                final Set<Mutant> coveredMutants = t.getCoveredMutants();
+                final Set<Mutant> killedMutants = t.getKilledMutants();
         %>
         <div>
             <ul>
@@ -25,12 +29,12 @@
                     [UID: <%= creator.getId() %>] </h4></li>
                 <li style=" display: inline-block; float:right"><h4>points: <%= t.getScore() %>
                 </h4></li>
-            <% if(!t.getCoveredMutants().isEmpty()) { %>
-                <br/><li style=" display: inline-block;"><h4>Covered mutants: <%= t.getCoveredMutants().stream().map(Mutant::getId).map(Object::toString).collect(Collectors.joining(", ")) %>
+                <% if(!coveredMutants.isEmpty()) { %>
+                <br/><li style=" display: inline-block;"><h4>Covered mutants: <%= coveredMutants.stream().map(mutant-> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>
             </li></h4>
             <% } %>
-            <% if(!t.getKilledMutants().isEmpty()) { %>
-                <br/><li style=" display: inline-block;"><h4>Killed mutants: <%= t.getKilledMutants().stream().map(Mutant::getId).map(Object::toString).collect(Collectors.joining(", ")) %>
+                <% if(!killedMutants.isEmpty()) { %>
+                <br/><li style=" display: inline-block;"><h4>Killed mutants: <%= killedMutants.stream().map(mutant -> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>
             </li></h4>
             <% } %>
             </ul>
