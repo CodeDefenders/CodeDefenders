@@ -12,6 +12,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.codedefenders.execution.AntRunner;
+import org.codedefenders.execution.CutCompileException;
 import org.codedefenders.util.Constants;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.database.DatabaseAccess;
@@ -215,10 +216,13 @@ public class UploadManager extends HttpServlet {
 		String javaFileNameDB = DatabaseAccess.addSlashes(targetFile.getAbsolutePath());
 		// Create CUT, temporarily using file name as class name for compilation
 		cut.setJavaFile(javaFileNameDB);
-		// Compile original class, using alias as directory name
-		String classFileName = AntRunner.compileCUT(cut);
 
-		if (classFileName != null) {
+		// Try to compile original class, using alias as directory name
+		String classFileName = null;
+		try{
+			classFileName = AntRunner.compileCUT(cut);
+
+			// If compilation succeeds
 			String classFileNameDB = DatabaseAccess.addSlashes(classFileName);
 
 			// get fully qualified name
@@ -243,8 +247,7 @@ public class UploadManager extends HttpServlet {
 			// Redirect to admin interface if corresponding url param is set
 			String redirect = fromAdmin ? contextPath + "/admin" : contextPath + "/games/user";
 			response.sendRedirect(redirect);
-
-		} else {
+		} catch (CutCompileException e) {
 			/*
 			 * If the class was not compilable, we delete the entry from the db
 			 * and the files from the file system.
@@ -261,7 +264,9 @@ public class UploadManager extends HttpServlet {
 				logger.error("Cannot remove source folder (" + folderRemoved + ")for uncompilable class " + targetFile);
 			}
 
-			messages.add("We were unable to compile your class, please try with a simpler one (no dependencies)");
+			messages.add("We were unable to compile your class");
+			messages.add( e.getMessage() );
+
 			Redirect.redirectBack(request, response);
 			return;
 		}

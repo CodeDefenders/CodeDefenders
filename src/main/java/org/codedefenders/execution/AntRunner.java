@@ -217,7 +217,7 @@ public class AntRunner {
 	 * @param cut Class under test
 	 * @return The path to the compiled CUT
 	 */
-	public static String compileCUT(GameClass cut) {
+	public static String compileCUT(GameClass cut) throws CutCompileException {
 		AntProcessResult result = runAntTarget("compile-cut", null, null, cut, null, forceLocalExecution);
 
 		logger.info("Compile New CUT, Compilation result: {}", result);
@@ -234,7 +234,9 @@ public class AntRunner {
 				pathCompiledClassName = matchingFiles.get(0).getAbsolutePath();
 		} else {
 			// Otherwise the CUT failed to compile
-			logger.error("Failed to compile uploaded CUT: {}", result.getCompilerOutput());
+			String message = result.getCompilerOutput();
+			logger.error("Failed to compile uploaded CUT: {}", message);
+			throw new CutCompileException( message );
 		}
 		return pathCompiledClassName;
 	}
