@@ -109,15 +109,23 @@ mvn clean compile package install war:war tomcat7:redeploy -DskipTests
 ```
 
 ### System Tests
-System tests work by deploying code-defenders inside disposable Docker containers and interacting with it by means of Selenium.
+System tests work by deploying code-defenders inside disposable Docker containers and interacting with it by means of Selenium, which is again, running inside a Docker container.
+This means that the DATA inside the DB are lost after the tests end.
 
-We use Docker containers which are not (yet) registered in the public repository, so we need to manually build them. Once those are in place, system tests can be run from maven as follows (using the ST -System Test- profile):
+Since we use Docker containers which are not (yet) registered in any Docker public repository, we need to manually build them. Once those are in place, system tests can be run from maven as follows (note that we use the System Test profile `ST`):
 
 ```bash
-mvn clean integration-test -PST
+mvn clean compile package war:war integration-test -PST
 ```
 
-This rebuilds and repackages the application using the `config.properties@docker` file. Then, it copies the resulting `.war` file in the right folder. Finally, it runs all the tests which are annotated with `@Category(SystemTest.class)`. Each test starts two docker instances: one for the backend and on one from the front-end. Next, it starts Selenium. And, finally, it dispose all the containers. Data inside the containers are lost.
+This command rebuilds and repackages the application using the `config.properties@docker` file. Then, it copies the resulting `.war` file in the right folder (`src/test/resources/systemtests/frontend`). An, finally, it runs all the tests which are annotated with `@Category(SystemTest.class)`. Each test starts two docker instances for code-defenders (one for the backend and on one for the front-end) and one docker instance for Selenium. 
+When containers are ready, the test code send the commands to the Selenium instance which must necessarily run on port 4444. When a test ends, it disposes all the containers. 
+
+There's few catches. Since we use selenium-standalone we can run ONLY one system test at the time. The alternative (not in place) is to start a selenium-hub.
+
+#### Debug system tests
+
+There's a `docker-compose-debug.yml` file under `src/test/resources/systemtests`. This file contains the configuration to run the debug-enabled selenium container, which opens a VNC port 5900 to which you can connect to (using any VNC client).
 
 #### Build codedefenders/frontend:latest
 

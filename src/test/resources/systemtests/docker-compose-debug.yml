@@ -20,8 +20,9 @@ frontend:
     - db
 
 selenium:
-  image: selenium/standalone-chrome
+  image: selenium/standalone-chrome-debug
   ports:
    - "4444:4444"
+   - "5900:5900"
   volumes:
    - /dev/shm:/dev/shm
