@@ -94,7 +94,8 @@ public class LoginManager extends HttpServlet {
 						session.setAttribute("uid", newUser.getId());
 						session.setAttribute("username", newUser.getUsername());
 						session.setAttribute("messages", messages);
-
+						// Log user activity including the timestamp
+						DatabaseAccess.logSession(newUser.getId(), getClientIpAddress(request));
 						response.sendRedirect(request.getContextPath() + "/games");
 					} else {
 						// TODO: How about some error handling?
@@ -122,6 +123,7 @@ public class LoginManager extends HttpServlet {
 						if (passwordEncoder.matches(password, dbPassword)) {
 						    if (activeUser.isActive()) {
 								HttpSession session = request.getSession();
+								// // Log user activity including the timestamp
 								DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
 								session.setAttribute("uid", activeUser.getId());
 								session.setAttribute("username", activeUser.getUsername());

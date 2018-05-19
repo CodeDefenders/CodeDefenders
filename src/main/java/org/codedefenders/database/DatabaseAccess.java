@@ -1018,6 +1018,11 @@ public class DatabaseAccess {
 		return null;
 	}
 
+	/**
+	 * This also automatically update the Timestamp field using CURRENT_TIMESTAMP()
+	 * @param uid
+	 * @param ipAddress
+	 */
 	public static void logSession(int uid, String ipAddress) {
 		String query = "INSERT INTO sessions (User_ID, IP_Address) VALUES (?, ?);";
 		DatabaseValue[] valueList = new DatabaseValue[]{
