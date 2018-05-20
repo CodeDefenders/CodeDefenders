@@ -47,7 +47,7 @@
 	<div class="col-md-6" id="utest-div">
 		<h2> Write a new JUnit test here
 			<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Role.DEFENDER)) {%>
-			<button type="submit" class="btn btn-primary btn-game btn-right" form="def" onClick="this.form.submit(); this.disabled=true; this.value='Defending...';">Defend!</button>
+			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def" onClick="this.form.submit(); this.disabled=true; this.value='Defending...';">Defend!</button>
 			<%}%>
 		</h2>
 		<form id="def" action="<%=request.getContextPath() %>/play" method="post">

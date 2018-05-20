@@ -82,7 +82,7 @@
 				if (defName == null) {defName = "Empty";}
 
 %>
-	<tr>
+	<tr id="<%="game-"+g.getId()%>">
 		<td class="col-sm-1"><%= g.getId() %></td>
 		<td class="col-sm-1">Duel</td>
 		<td class="col-sm-1"></td>
@@ -125,9 +125,9 @@
 				<input type="hidden" name="formType" value="enterGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
 				<% if (uid == turnId ) {%>
-				<button class="btn btn-primary" type="submit"><%=btnLabel%></button>
+				<button class="btn btn-primary" id="<%="duel-myturn-"+g.getId()%>" type="submit"><%=btnLabel%></button>
 				<% } else {%>
-				<button  class="btn btn-default btn-sm" type="submit" value="Enter Game">Enter Game</button>
+				<button  class="btn btn-default btn-sm" id="<%="duel-enter-"+g.getId()%>" type="submit" value="Enter Game">Enter Game</button>
 				<% }%>
 			</form>
 
@@ -143,7 +143,7 @@
 				MultiplayerGame g = (MultiplayerGame) ag;
 				Role role = g.getRole(uid);
 %>
-	<tr>
+	<tr id="<%="game-"+g.getId()%>">
 		<td class="col-sm-1"><%= g.getId() %></td>
 		<td class="col-sm-1">Multiplayer</td>
 		<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
@@ -177,13 +177,13 @@
 				switch(role){
 					case CREATOR:
 %>
-			<a class = "btn btn-sm btn-primary" href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Observe</a>
+			<a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>" href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Observe</a>
 <%
 					break;
 					case ATTACKER:
 						if(!g.getState().equals(GameState.CREATED)) {
 %>
-			<a class = "btn btn-sm btn-primary"  style="background-color: #884466;border-color: #772233;"
+			<a class = "btn btn-sm btn-primary" id="<%="attack-"+g.getId()%>" style="background-color: #884466;border-color: #772233;"
 			   href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Attack</a>
 <%
 						} else {
@@ -192,7 +192,7 @@
 			<form id="attLeave" action="<%= request.getContextPath() %>/multiplayer/games" method="post">
 				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
-				<button class = "btn btn-sm btn-danger" type="submit" form="attLeave" value="Leave">
+				<button class="btn btn-sm btn-danger" id="<%="leave-attacker-"+g.getId()%>" type="submit" form="attLeave" value="Leave">
 					Leave
 				</button>
 			</form>
@@ -202,7 +202,7 @@
 					case DEFENDER:
 						if(!g.getState().equals(GameState.CREATED)) {
 %>
-			<a class = "btn btn-sm btn-primary" style="background-color: #446688;border-color: #225577"
+			<a class = "btn btn-sm btn-primary" id="<%="defend-"+g.getId()%>" style="background-color: #446688;border-color: #225577"
 			   href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Defend</a>
 <%
 						} else {
@@ -211,7 +211,9 @@
 			<form id="defLeave" action="<%= request.getContextPath() %>/multiplayer/games" method="post">
 				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
-				<button class = "btn btn-sm btn-danger" type="submit" form="defLeave" value="Leave">Leave</button>
+				<button class = "btn btn-sm btn-danger" id="<%="leave-defender-"+g.getId()%>" type="submit" form="defLeave" value="Leave">
+					Leave
+				</button>
 			</form>
 <%
 						}
@@ -238,8 +240,8 @@
 %>
 
 	<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue()) { %>
-	<a class = "btn btn-primary" href="<%=request.getContextPath()%>/multiplayer/games/create">Create Battleground</a>
-	<a class = "btn btn-primary" href="<%=request.getContextPath()%>/games/create">Create Duel</a>
+	<a id="createBattleground" class = "btn btn-primary" href="<%=request.getContextPath()%>/multiplayer/games/create">Create Battleground</a>
+	<a id="createDuel" class = "btn btn-primary" href="<%=request.getContextPath()%>/games/create">Create Duel</a>
 	<%}%>
 
 
@@ -290,7 +292,7 @@
 				if (defName == null) {defName = "Empty";}
 		%>
 
-		<tr>
+		<tr id="<%="game-"+g.getId()%>">
 			<td class="col-sm-1"><%= g.getId() %></td>
 			<td class="col-sm-1">Duel</td>
 			<td class="col-sm-1"></td>
@@ -325,7 +327,7 @@
 			<form id="view" action="<%=request.getContextPath() %>/games" method="post">
 					<input type="hidden" name="formType" value="joinGame">
 					<input type="hidden" name="game" value=<%=g.getId()%>>
-					<button type="submit" class="btn btn-primary btn-sm" value="Join Game">Join Game</button>
+					<button type="submit" id="<%="duel-join-"+g.getId()%>" class="btn btn-primary btn-sm" value="Join Game">Join Game</button>
 				</form>
 			</td>
 		</tr>
@@ -336,7 +338,7 @@
 				MultiplayerGame g = (MultiplayerGame) ag;
 				Role role = g.getRole(uid);
 %>
-		<tr>
+		<tr id="<%="game-"+g.getId()%>">
 			<td class="col-sm-1"><%= g.getId() %></td>
 			<td class="col-sm-1">Multiplayer</td>
 			<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
@@ -371,9 +373,9 @@
 			<td class="col-sm-1"><%= g.getStartDateTime() %></td>
 			<td class="col-sm-1"><%= g.getFinishDateTime() %></td>
 			<td class="col-sm-2">
-				<a class="btn btn-sm btn-primary" style="background-color: #884466;border-color: #772233; margin-bottom: 3px;"
+				<a class="btn btn-sm btn-primary" id="<%="join-attacker-"+g.getId()%>" style="background-color: #884466;border-color: #772233; margin-bottom: 3px;"
 				   href="<%=request.getContextPath()%>/multiplayer/games?attacker=1&id=<%= g.getId() %>">Join as Attacker</a>
-				<a class="btn btn-sm btn-primary" style="background-color: #446688;border-color: #225577"
+				<a class="btn btn-sm btn-primary" id="<%="join-defender-"+g.getId()%>" style="background-color: #446688;border-color: #225577"
 				   href="<%=request.getContextPath()%>/multiplayer/games?defender=1&id=<%= g.getId() %>">Join as Defender</a>
 			</td>
 		</tr>
