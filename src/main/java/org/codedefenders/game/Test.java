@@ -175,7 +175,7 @@ public class Test {
 
 	public Set<Mutant> getCoveredMutants() {
 		List<Integer> coverage = lineCoverage.getLinesCovered();
-		Set<Mutant> coveredMutants = new TreeSet<>();
+		Set<Mutant> coveredMutants = new TreeSet<>(Mutant.orderByIdAscending());
 
 		for(Mutant m : DatabaseAccess.getMutantsForGame(gameId)) {
 			if(CollectionUtils.containsAny(coverage, m.getLines())) {

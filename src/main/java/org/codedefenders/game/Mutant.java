@@ -29,7 +29,7 @@ import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
 
-public class Mutant implements Serializable, Comparable<Mutant> {
+public class Mutant implements Serializable {
 
 	private static final Logger logger = LoggerFactory.getLogger(Mutant.class);
 
@@ -484,11 +484,6 @@ public class Mutant implements Serializable, Comparable<Mutant> {
 				.append(md5)
 				.append(classFile)
 				.toHashCode();
-	}
-
-	@Override
-	public int compareTo(Mutant o) {
-		return Integer.compare(id, o.id);
 	}
 
 	public void prepareForSerialise(boolean showDifferences) {
