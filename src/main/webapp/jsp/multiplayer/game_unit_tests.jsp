@@ -26,17 +26,18 @@
                 <li style=" display: inline-block; "><h4>Test <%= t.getId() %>
                 </h4></li>
                 <li style=" display: inline-block; "><h4> | Creator: <%= creator.getUsername() %>
-                    [UID: <%= creator.getId() %>] </h4></li>
-                <li style=" display: inline-block; float:right"><h4>points: <%= t.getScore() %>
+                   <!-- [UID: <%= creator.getId() %>] -->
                 </h4></li>
                 <% if(!coveredMutants.isEmpty()) { %>
-                <br/><li style=" display: inline-block;"><h4>Covered mutants: <%= coveredMutants.stream().map(mutant-> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>
-            </li></h4>
-            <% } %>
+                <li style=" display: inline-block;"><h4> | <a href="javascript:void(0);" data-toggle="tooltip" title="<%= coveredMutants.stream().map(mutant-> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>">Covered: <%= coveredMutants.size()%></a>
+                </h4></li>
+                <% } %>
                 <% if(!killedMutants.isEmpty()) { %>
-                <br/><li style=" display: inline-block;"><h4>Killed mutants: <%= killedMutants.stream().map(mutant -> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>
-            </li></h4>
-            <% } %>
+                <li style=" display: inline-block;"><h4> | <a href="javascript:void(0);" data-toggle="tooltip" title="<%= killedMutants.stream().map(mutant-> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>">Killed: <%= killedMutants.size()%></a>
+                </h4></li>
+                <% } %>                <li style=" display: inline-block;"><h4> | Points: <%= t.getScore() %>
+                </h4></li>
+
             </ul>
             <pre class="readonly-pre"><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre>
         </div>

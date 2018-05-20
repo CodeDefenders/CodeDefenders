@@ -55,6 +55,7 @@
 
                 updateUserNotifications(url);
             }
+            $('[data-toggle="tooltip"]').tooltip();
         }
         );
 </script>
