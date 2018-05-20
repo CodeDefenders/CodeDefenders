@@ -967,7 +967,7 @@ public class DatabaseAccess {
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(tid));
 		List<TargetExecution> executions = getAllTargetExecutionsSQL(stmt, conn);
-		Set<Mutant> killedMutants = new LinkedHashSet<>();
+		Set<Mutant> killedMutants = new TreeSet<>();
 		for(TargetExecution targ : executions) {
 			Mutant m = getMutantById(targ.mutantId);
 			killedMutants.add(m);

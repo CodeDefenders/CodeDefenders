@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -176,7 +175,7 @@ public class Test {
 
 	public Set<Mutant> getCoveredMutants() {
 		List<Integer> coverage = lineCoverage.getLinesCovered();
-		Set<Mutant> coveredMutants = new LinkedHashSet<>();
+		Set<Mutant> coveredMutants = new TreeSet<>();
 
 		for(Mutant m : DatabaseAccess.getMutantsForGame(gameId)) {
 			if(CollectionUtils.containsAny(coverage, m.getLines())) {
