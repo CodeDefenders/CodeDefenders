@@ -3,6 +3,7 @@ package org.codedefenders.systemtests;
 import static org.junit.Assert.fail;
 
 import java.net.URL;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
@@ -15,6 +16,7 @@ import org.junit.experimental.categories.Category;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -125,13 +127,20 @@ public class UploadUncompilableClassTest {
 		// Do not click this, otherwise it will open the local file window
 		// driver.findElement(By.id("fileUpload")).click();
 
-		// THIS ACTION IS TRIGGERED FROM WITHIN THE SELENIUM CONTAINER, that's why we need to mount this local folder to it  !!!
+		// THIS ACTION IS TRIGGERED FROM WITHIN THE SELENIUM CONTAINER, that's
+		// why we need to mount this local folder to it !!!
 		driver.findElement(By.id("fileUpload")).sendKeys("/sources/Uncompilable/Uncompilable.java");
 
 		driver.findElement(By.xpath("//input[@value='Upload']")).click();
 
-		// Assert that "Uncompilable" is not listed in the page
-		Assert.assertFalse("Element present", driver.getPageSource().contains("Uncompilable"));
+		// Check that the list of uploaded class does not show Uncompilable.
+		// Note that if the compilation was ok, this page is not visualized and
+		// the findBy fails
+		List<WebElement> rows = driver.findElements(By.xpath("//table[@id='tableUploadedClasses']/tbody/tr"));
+
+		Assert.assertEquals(1, rows.size());
+
+		Assert.assertEquals("No classes uploaded.", rows.get(0).findElement(By.xpath("td")).getText());
 
 		// Assert that in the data folder there's no file
 		// TODO Wrap this into an utility or assertThat
@@ -139,7 +148,8 @@ public class UploadUncompilableClassTest {
 
 		final DockerClient dockerClient = DefaultDockerClient.fromEnv().build();
 
-		// We use docker exec to run a command inside running container with attached STDOUT and STDERR
+		// We use docker exec to run a command inside running container with
+		// attached STDOUT and STDERR
 		// We basically count how many files there are in that folder.
 		final String[] command = { "/bin/bash", "-c",
 				"find /codedefenders/sources/ -type f | wc -l | awk '{print $1}'" };
