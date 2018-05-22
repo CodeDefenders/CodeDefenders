@@ -76,13 +76,7 @@ public class UploadUncompilableClassTest {
 		((RemoteWebDriver) driver).setFileDetector(new LocalFileDetector());
 		// This is important: docker-compose randomly assign ports and names to
 		// those logical entities so we get them from the rule
-		DockerPort frontend = docker.containers().container("frontend").port(8080);
-		// The docker container deploys codedefenders in this specific context.
-		// Since we cannot connect to "localhost" from within the
-		// selenium-chrome, we rely on the
-		// host.docker.internal (internal Docker DNS) to find out where
-		// codedefenders run
-		String codeDefendersHome = frontend.inFormat("http://host.docker.internal:$EXTERNAL_PORT/codedefenders");
+		String codeDefendersHome = "http://frontend:8080/codedefenders";
 		//
 		//
 		driver.get(codeDefendersHome);
