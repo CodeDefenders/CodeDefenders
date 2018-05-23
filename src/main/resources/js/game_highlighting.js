@@ -66,14 +66,22 @@ var prepareMutants = function(){
       } else {
           mutant.status = MutantStatus.KILLED;
       }
+      mutant.coveredBy = [];
 
+      testSet = {}
       for (l in mutant.lines){
           line = mutant.lines[l];
           if (!preparedMutants[line]){
               preparedMutants[line] = [];
           }
           preparedMutants[line].push(mutant);
+          if(line in testMap) {
+              testMap[line].forEach(function(t) {
+                 testSet[t] = 1;
+              });
+          }
       }
+      mutant.coveredBy = Object.keys(testSet);
   }
 };
 
@@ -92,14 +100,37 @@ var createAction = function(label, classType, contents){
 };
 
 var prepareMutantDetail = function(mutant){
+    retval =  '<p><span class="left">' + mutant.playerName + '</span>' +
+        '<span class="central">' + mutant.id + '</span>';
+    if(mutant.coveredBy.length == 0) {
+        retval += '<span class="central"> - </span>';
+    } else if(mutant.coveredBy.length <= MUTANT_SHOW_LIMIT) {
+        retval += '<span class="central">' + mutant.coveredBy + '</span>';
+    } else {
+        retval += '<span class="central">' + mutant.coveredBy.slice(0, MUTANT_SHOW_LIMIT) + ' ...</span>';
+    }
+    retval += '<span class="right">' + mutant.score + '</span></p>';
+    return retval;
+};
+
+var prepareDeadMutantDetail = function(mutant){
     return '<p><span class="left">' + mutant.playerName + '</span>' +
         '<span class="central">' + mutant.id + '</span>' +
+        '<span class="central">' + mutant.killingTestId + '</span>' +
         '<span class="right">' + mutant.score + '</span></p>';
 };
 
 var prepareMutantHeading = function(title){
     return '<h5>' + title + '</h5><p><span class="left header">Creator</span>' +
         '<span class="central header">Mutant ID</span>' +
+        '<span class="central header">Covered by</span>' +
+        '<span class="right header">Points</span></p>';
+};
+
+var prepareDeadMutantHeading = function(title){
+    return '<h5>' + title + '</h5><p><span class="left header">Creator</span>' +
+        '<span class="central header">Mutant ID</span>' +
+        '<span class="central header">Killed by</span>' +
         '<span class="right header">Points</span></p>';
 };
 
@@ -140,7 +171,7 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
         mutantDescriptions['alive'] = prepareMutantHeading("Mutants Alive");
         mutantDescriptions['equiv'] = prepareMutantHeading("Mutants Equivalent");
         mutantDescriptions['flagged'] = prepareMutantHeading("Mutants Flagged");
-        mutantDescriptions['killed'] = prepareMutantHeading("Mutants Killed");
+        mutantDescriptions['killed'] = prepareDeadMutantHeading("Mutants Killed");
 
         // sort mutants by score
         preparedMutants[l].sort(function(a, b){
@@ -149,26 +180,29 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
 
         for (var m in preparedMutants[l]) {
             var mutant = preparedMutants[l][m];
-            var detail = prepareMutantDetail(mutant);
             if (mutant.status == MutantStatus.ALIVE){
+                var detail = prepareMutantDetail(mutant);
                 if (aliveMutants < MUTANT_SHOW_LIMIT) {
                     mutantDescriptions['alive'] += detail;
                 }
 
                 aliveMutants++;
             } else if (mutant.status == MutantStatus.EQUIVALENT){
+                var detail = prepareMutantDetail(mutant);
                 if (equivalentMutants < MUTANT_SHOW_LIMIT) {
                     mutantDescriptions['equiv'] += detail;
                 }
 
                 equivalentMutants++;
             } else if (mutant.status == MutantStatus.FLAGGED_EQUIVALENT){
+                var detail = prepareMutantDetail(mutant);
                 if (flaggedMutants < MUTANT_SHOW_LIMIT) {
                     mutantDescriptions['flagged'] += detail;
                 }
 
                 flaggedMutants++;
             } else { // it's impossible for status to be unknown
+                var detail = prepareDeadMutantDetail(mutant);
                 if (killedMutants < MUTANT_SHOW_LIMIT) {
                     mutantDescriptions['killed'] += detail;
                 }

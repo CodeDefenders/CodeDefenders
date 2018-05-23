@@ -1,5 +1,12 @@
 <%@ page import="com.google.gson.Gson" %>
+<%@ page import="java.util.stream.Collectors" %>
 <%Gson gson = new Gson();%>
+
+testMap = {<% for (Integer i : linesCovered.keySet()){%>
+<%= i%>: [<%= linesCovered.get(i).stream().map(t -> Integer.toString(t.getId())).collect(Collectors.joining(","))%>],
+<% } %>
+};
+
 
 highlightCoverage = function(){
 highlightLine([<% for (Integer i : linesCovered.keySet()){%>

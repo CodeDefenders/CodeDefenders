@@ -19,10 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -41,6 +38,8 @@ public class Mutant implements Serializable {
 	private transient String classFile;
 
 	private boolean alive = true;
+
+	private int killingTestId = 0;
 
 	private Equivalence equivalent;
 
@@ -103,6 +102,8 @@ public class Mutant implements Serializable {
 		this.equivalent = equiv;
 		this.roundCreated = rCreated;
 		this.roundKilled = rKilled;
+		if(roundKilled > 0)
+			this.killingTestId = DatabaseAccess.getKillingTestIdForMutant(id);
 
 		score = 0;
 	}
@@ -154,6 +155,8 @@ public class Mutant implements Serializable {
 	public int getScore() {
 		return score;
 	}
+
+
 
 	//
 	public void incrementScore(int score){
@@ -224,6 +227,18 @@ public class Mutant implements Serializable {
 				return true;
 		}
 		return false;
+	}
+
+	public Set<Test> getCoveringTests() {
+		Set<Test> coveringTests = new LinkedHashSet<>();
+
+		for(Test t : DatabaseAccess.getTestsForGame(gameId)) {
+			if(t.isMutantCovered(this)) {
+				coveringTests.add(t);
+			}
+		}
+
+		return coveringTests;
 	}
 
 	public boolean doesRequireRecompilation() {
