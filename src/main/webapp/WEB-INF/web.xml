@@ -138,6 +138,7 @@
 		<url-pattern>/games/user</url-pattern>
 	</servlet-mapping>
 
+	<!--
 	<servlet>
 		<servlet-name>open_games_view.jsp</servlet-name>
 		<jsp-file>/jsp/open_games_view.jsp</jsp-file>
@@ -146,6 +147,7 @@
 		<servlet-name>open_games_view.jsp</servlet-name>
 		<url-pattern>/games/open</url-pattern>
 	</servlet-mapping>
+	-->
 
 	<servlet>
 		<servlet-name>create_game_view.jsp</servlet-name>
