@@ -78,11 +78,7 @@
                             style="width:100%;" data-toggle="dropdown" href="#">Games <span class="glyphicon glyphicon-menu-hamburger" style="float: right;"></span></a>
                         <ul class="dropdown-menu" style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
-                            <li><a
-                                   href="<%=request.getContextPath() %>/games/user" style="width:100%;">Games</a></li>
-                            <%-- <li><a
-                                   href="<%=request.getContextPath() %>/games/open" style="width:100%;">Open
-                                Games</a></li> --%>
+                            <li><a href="<%=request.getContextPath() %>/games/user" style="width:100%;">Games</a></li>
                             <li><a href="<%=request.getContextPath() %>/games/history" style="width:100%;">History</a></li>
                 </ul></li>
                 <%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) { %>
