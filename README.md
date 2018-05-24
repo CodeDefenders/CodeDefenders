@@ -191,6 +191,53 @@ TODO: Do we really need this?
 -->
 
 # FAQ
+### Q: When I try to create a BattleGround, I got a 500 error page
+Code Defenders requires Java 1.8 also to compile the JSP. This is not the default options in many tomcat versions, despite you run tomcat on Java 1.8+.
+
+To enable this feature, you must update the main tomcat's `web.xml` file, which is under `<TOMCAT_HOME>/conf/`.
+
+Locate the following XML tags:
+
+```xml
+<servlet>
+    <servlet-name>jsp</servlet-name>
+    <servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
+    ...
+    <load-on-startup>3</load-on-startup>
+  </servlet>
+```
+
+And add the following inside the XML tag `<servlet>':
+
+```xml
+    <init-param>
+        <param-name>compiler</param-name>
+        <param-value>modern</param-value>
+    </init-param>
+    <init-param>
+        <param-name>compilerSourceVM</param-name>
+        <param-value>1.8</param-value>
+    </init-param>
+    <init-param>
+        <param-name>compilerTargetVM</param-name>
+        <param-value>1.8</param-value>
+    </init-param>
+    <init-param>
+        <param-name>suppressSmap</param-name>
+        <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>fork</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <init-param>
+      <param-name>xpoweredBy</param-name>
+      <param-value>false</param-value>
+    </init-param>
+```
+
+This solution is inspired by and adapted from this [solution](https://stackoverflow.com/questions/18208805/does-tomcat-8-support-java-8) presented on StackOverflow.
+
 ### Q: I cannot deploy Code Defenders anymore, there's a SQL exception.
 If you are running MySQL 5.7 and the SQL exception reads as follows:
 
