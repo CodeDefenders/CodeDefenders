@@ -19,6 +19,7 @@ import java.util.logging.Level;
 import org.codedefenders.model.User;
 import org.junit.After;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.gargoylesoftware.htmlunit.AlertHandler;
@@ -362,6 +363,7 @@ public class DoubleEquivalenceSubmissionTest {
 
 	}
 
+	@Ignore
 	@Test
 	public void doubleSubmissionTest() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 		User creatorUser = new User("creator", "test");
