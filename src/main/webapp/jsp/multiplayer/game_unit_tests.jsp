@@ -28,14 +28,21 @@
                 <li style=" display: inline-block; "><h4> | Creator: <%= creator.getUsername() %>
                    <!-- [UID: <%= creator.getId() %>] -->
                 </h4></li>
-                <% if(!coveredMutants.isEmpty()) { %>
-                <li style=" display: inline-block;"><h4> | <a href="javascript:void(0);" data-toggle="tooltip" title="<%= coveredMutants.stream().map(mutant-> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>">Covered: <%= coveredMutants.size()%></a>
+                <li style=" display: inline-block;"><h4> |
+                    <% if(!coveredMutants.isEmpty()) { %>
+                        <a href="javascript:void(0);" data-toggle="tooltip" title="<%= coveredMutants.stream().map(mutant-> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>">Covered: <%= coveredMutants.size()%></a>
+                    <% } else { %>
+                        Covered: 0
+                    <% } %>
                 </h4></li>
+                <li style=" display: inline-block;"><h4> |
+                    <% if(!killedMutants.isEmpty()) { %>
+                        <a href="javascript:void(0);" data-toggle="tooltip" title="<%= killedMutants.stream().map(mutant-> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>">Killed: <%= killedMutants.size()%></a>
+                    <% } else { %>
+                        Killed: 0
                 <% } %>
-                <% if(!killedMutants.isEmpty()) { %>
-                <li style=" display: inline-block;"><h4> | <a href="javascript:void(0);" data-toggle="tooltip" title="<%= killedMutants.stream().map(mutant-> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>">Killed: <%= killedMutants.size()%></a>
                 </h4></li>
-                <% } %>                <li style=" display: inline-block;"><h4> | Points: <%= t.getScore() %>
+                <li style=" display: inline-block;"><h4> | Points: <%= t.getScore() %>
                 </h4></li>
 
             </ul>
