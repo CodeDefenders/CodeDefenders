@@ -16,8 +16,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -109,11 +108,17 @@ public class Test {
 	}
 
 	public Test(int tid, int gid, String jFile, String cFile, int roundCreated, int mutantsKilled, int playerId) {
+		this(tid, gid, jFile, cFile, roundCreated, mutantsKilled, playerId, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
+	}
+
+	public Test(int tid, int gid, String jFile, String cFile, int roundCreated, int mutantsKilled, int playerId, List<Integer> linesCovered, List<Integer> linesUncovered) {
 		this(gid, jFile, cFile, playerId);
 
 		this.id = tid;
 		this.roundCreated = roundCreated;
 		this.mutantsKilled = mutantsKilled;
+		lineCoverage.setLinesCovered(linesCovered);
+		lineCoverage.setLinesUncovered(linesUncovered);
 	}
 
 	public int getId() {
@@ -166,6 +171,23 @@ public class Test {
 
 	public boolean isMutantCovered(Mutant mutant) {
 		return CollectionUtils.containsAny(lineCoverage.getLinesCovered(), mutant.getLines());
+	}
+
+	public Set<Mutant> getCoveredMutants() {
+		List<Integer> coverage = lineCoverage.getLinesCovered();
+		Set<Mutant> coveredMutants = new TreeSet<>(Mutant.orderByIdAscending());
+
+		for(Mutant m : DatabaseAccess.getMutantsForGame(gameId)) {
+			if(CollectionUtils.containsAny(coverage, m.getLines())) {
+				coveredMutants.add(m);
+			}
+		}
+
+		return coveredMutants;
+	}
+
+	public Set<Mutant> getKilledMutants() {
+		return DatabaseAccess.getKilledMutantsForTestId(id);
 	}
 
 	public List<String> getHTMLReadout() throws IOException {
