@@ -17,10 +17,10 @@
 <%@ include file="/jsp/header_main.jsp" %>
 <div class="full-width">
     <ul class="nav nav-tabs">
-        <li class="active"><a>Create Games</a></li>
-        <li><a href="<%=request.getContextPath()%>/admin/monitor"> Monitor Games</a></li>
-        <li><a href="<%=request.getContextPath()%>/admin/users"> Manage Users</a></li>
-        <li><a href="<%=request.getContextPath()%>/admin/settings">System Settings</a></li>
+        <li class="active"><a id="adminCreateGames">Create Games</a></li>
+        <li><a id="adminMonitorGames" href="<%=request.getContextPath()%>/admin/monitor">Monitor Games</a></li>
+        <li><a id="adminUserMgmt" href="<%=request.getContextPath()%>/admin/users">Manage Users</a></li>
+        <li><a id="adminSystemSettings" href="<%=request.getContextPath()%>/admin/settings">System Settings</a></li>
     </ul>
     <form id="insertGames" action="admin" method="post">
         <input type="hidden" name="formType" value="insertGames"/>
@@ -74,9 +74,9 @@
                     GameClass CUT = g.getCUT();
 
             %>
-            <tr>
+            <tr id="<%="temp_games_"+i%>">
                 <td>
-                    <input type="checkbox" name="selectedTempGames" id="selectedTempGames" value="<%= i%>" onchange=
+                    <input type="checkbox" name="selectedTempGames" id="<%="selectedTempGames_"+i%>" value="<%= i%>" onchange=
                             "document.getElementById('insert_games_btn').disabled = !areAnyChecked('selectedTempGames');
                             document.getElementById('delete_games_btn').disabled = !areAnyChecked('selectedTempGames');
                             setSelectAllCheckbox('selectedTempGames', 'selectAllTempGames');">
@@ -138,6 +138,7 @@
                             <td>
                                 <button class="btn btn-sm btn-primary"
                                         value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
+                                        id="<%="switch_player_"+id+"_game_"+i%>"
                                         name="tempGameUserSwitchButton">
                                     <span class="glyphicon glyphicon-transfer"></span>
                                 </button>
@@ -145,6 +146,7 @@
                             <td>
                                 <button class="btn btn-sm btn-danger"
                                         value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
+                                        id="<%="remove_player_"+id+"_game_"+i%>"
                                         name="tempGameUserRemoveButton">
                                     <span class="glyphicon glyphicon-trash"></span>
                                 </button>
@@ -215,7 +217,7 @@
                     String totalScore = userInfo.get(5);
             %>
 
-            <tr>
+            <tr id="<%="user_row_"+uid%>">
                 <td>
                     <% if (uid != currentUserID) { %>
                     <input type="checkbox" name="selectedUsers" id="selectedUsers" value="<%= uid%>" onchange =
@@ -233,8 +235,8 @@
                 </td>
                 <td><%= lastLogin %>
                 </td>
-                <td style="padding-top:3px; padding-bottom:3px; ">
-                    <div style="max-width: 150px; float: left;">
+                <td id="<%="addToExistingGameTd_"+uid%>" style="padding-top:3px; padding-bottom:3px; ">
+                    <div id="<%="game_"+uid%>" style="max-width: 150px; float: left;">
                         <select name="<%="game_" + uid%>" class="form-control selectpicker" data-size="small"
                                 id="game">
                             <% for (MultiplayerGame g : availableGames) { %>
@@ -254,7 +256,7 @@
                             <%}%>
                         </select>
                     </div>
-                    <div style="float: left; max-width: 120px; margin-left:2px">
+                    <div id="<%="role_"+uid%>" style="float: left; max-width: 120px; margin-left:2px">
                         <select name="<%="role_" + uid%>" class="form-control selectpicker" data-size="small"
                                 id="role">
                             <option value="<%=Role.ATTACKER%>">Attacker</option>
@@ -263,6 +265,7 @@
                     </div>
                     <button class="btn btn-sm btn-primary" type="submit" value="<%=uid%>" name="userListButton"
                             style="margin: 2px; float:left"
+                            id="<%="add_"+uid%>"
                             <%=availableGames.isEmpty() && (createdGames == null || createdGames.isEmpty()) ? "disabled" : ""%>>
                         <span class="glyphicon glyphicon-plus"></span>
                     </button>
@@ -295,7 +298,7 @@
 
 
         <div class="row">
-            <div class="col-sm-2">
+            <div class="col-sm-2" id="cutDiv">
                 <label for="cut_select" class="label-normal">CUT</label>
                 <select name="class" class="form-control selectpicker" data-size="large" id="cut_select">
                     <% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
@@ -489,7 +492,7 @@
 
         </div>
         <div class="row">
-            <div class="col-sm-2">
+            <div class="col-sm-2" id="mutantValidatorLevelDiv">
                 <label class="label-normal" title="Click the question sign for more information on the levels"
                        for="mutantValidatorLevel">
                     Mutant validator
@@ -508,7 +511,7 @@
             </div>
             <div class="col-sm-1">
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-2" id="chatEnabledDiv">
                 <label class="label-normal" title="Players can chat with their team and with all players in the game"
                        for="chatEnabled">
                     Enable Game Chat
@@ -517,7 +520,7 @@
                        class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
                        data-onstyle="primary" data-offstyle="" checked>
             </div>
-            <div class="col-sm-3">
+            <div class="col-sm-3" id="markUncoveredDiv">
                 <label class="label-normal" title="Attackers can mark uncovered lines as equivalent"
                        for="markUncovered">
                     Mark uncovered lines as equivalent
