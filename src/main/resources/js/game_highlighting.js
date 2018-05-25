@@ -1,3 +1,5 @@
+
+
 var highlightLine = function (lines, color, superDiv) {
     if (!superDiv) {
         superDiv = "#cut-div";
@@ -5,12 +7,20 @@ var highlightLine = function (lines, color, superDiv) {
     var allLines = [];
     $(superDiv + ' .CodeMirror-linenumber').each(function (i, e) {
         var line = parseInt(e.innerHTML);
+
+        // Add tooltip that lists covering test IDs
+        if(line in testMap) {
+            e.innerHTML = "<div class=\"createdDiv\" data-toggle=\"tooltip\" data-position=\"top\" title=\"Covered by: "+testMap[line]+"\">" + line + "</div>";
+        }
         allLines[line] = $(e).parent("div").parent("div")[0];
     });
     for (var l in lines) {
         $(allLines[lines[l][0]]).css('background-color', 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',' + lines[l][1] + ')');
         //$(allLines[lines[l][0]]).css('opacity', lines[l][1]);
     }
+    $('body').tooltip({
+        selector: '.createdDiv'
+    });
 };
 var MUTANT_SHOW_LIMIT = 5;
 var COVERED_COLOR = [];
@@ -100,6 +110,12 @@ var createAction = function(label, classType, contents){
 };
 
 var prepareMutantDetail = function(mutant){
+    return  '<p><span class="left">' + mutant.playerName + '</span>' +
+        '<span class="central">' + mutant.id + '</span>' +
+        '<span class="right">' + mutant.score + '</span></p>';
+};
+
+var prepareDeadMutantDetail = function(mutant){
     retval =  '<p><span class="left">' + mutant.playerName + '</span>' +
         '<span class="central">' + mutant.id + '</span>';
     if(mutant.coveredBy.length == 0) {
@@ -114,24 +130,23 @@ var prepareMutantDetail = function(mutant){
 };
 
 var prepareDeadMutantDetail = function(mutant){
-    return '<p><span class="left">' + mutant.playerName + '</span>' +
-        '<span class="central">' + mutant.id + '</span>' +
-        '<span class="central">' + mutant.killingTestId + '</span>' +
-        '<span class="right">' + mutant.score + '</span></p>';
+    return '<p><span class="left" style="width: 38%;">' + mutant.playerName + '</span>' +
+        '<span class="central" style="width: 10%;">' + mutant.id + '</span>' +
+        '<span class="central" style="width: 18%;">' + mutant.killingTestId + '</span>' +
+        '<span class="right" style="width: 20%;">' + mutant.score + '</span></p>';
 };
 
 var prepareMutantHeading = function(title){
     return '<h5>' + title + '</h5><p><span class="left header">Creator</span>' +
-        '<span class="central header">Mutant ID</span>' +
-        '<span class="central header">Covered by</span>' +
+        '<span class="central header">ID</span>' +
         '<span class="right header">Points</span></p>';
 };
 
 var prepareDeadMutantHeading = function(title){
-    return '<h5>' + title + '</h5><p><span class="left header">Creator</span>' +
-        '<span class="central header">Mutant ID</span>' +
-        '<span class="central header">Killed by</span>' +
-        '<span class="right header">Points</span></p>';
+    return '<h5>' + title + '</h5><p><span class="left header" style="width: 38%;">Creator</span>' +
+        '<span class="central header" style="width: 10%;">ID</span>' +
+        '<span class="central header" style="width: 18%;">Killed by</span>' +
+        '<span class="right header" style="width: 20%;">Points</span></p>';
 };
 
 var createPopupFunction = function(mutantType){
