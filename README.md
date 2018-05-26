@@ -132,7 +132,7 @@ There's a `docker-compose-debug.yml` file under `src/test/resources/systemtests`
 Assuming that you have `docker` and `docker-compose` installed.
 
 ```bash
-cd src/test/resources/systemtests/tomcat9-jre
+cd src/test/resources/systemtests/tomcat9-jdk8
 docker build -t codedefenders/tomcat:9 .
 cd ../frontend
 ./setup-filesystem.sh ./config.properties
