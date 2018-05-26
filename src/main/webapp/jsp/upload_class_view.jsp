@@ -18,10 +18,10 @@
 					<input id="fileUpload" name="fileUpload" type="file" class="file-loading" accept=".java" />
 				</span>
 				<span id="mocking-enabled">
-					<input type="checkbox" name="enableMocking" value="isMocking" style="margin-right:5px;">Enable Mocking for this class</input>
+					<input id="mockingEnabled" type="checkbox" name="enableMocking" value="isMocking" style="margin-right:5px;">Enable Mocking for this class</input>
 				</span>
 				<span id="submit-button">
-					<input type="submit" text="Upload" class="fileinput-upload-button" value="Upload" onClick="this.form.submit(); this.disabled=true; this.value='Uploading...';" />
+					<input id="upload" type="submit" text="Upload" class="fileinput-upload-button" value="Upload" onClick="this.form.submit(); this.disabled=true; this.value='Uploading...';" />
 				</span>
 				<input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 			</form>

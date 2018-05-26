@@ -35,7 +35,7 @@
 			defName = defender == null ? "-" : defender.getUsername();
 	%>
 
-	<tr>
+	<tr id="<%="game"+g.getId()%>">
 		<td class="col-sm-2"><%= g.getId() %></td>
 		<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
 		<td class="col-sm-2"><%= atkName %></td>
@@ -45,7 +45,7 @@
 			<form id="view" action="<%=request.getContextPath() %>/games" method="post">
 				<input type="hidden" name="formType" value="enterGame">
 				<input type="hidden" name="game" value=<%=g.getId()%>>
-				<input type="submit" class="btn btn-default" value="View Scores">
+				<input id="<%="results-"+g.getId()%>" type="submit" class="btn btn-default" value="View Scores">
 			</form>
 		</td>
 	</tr>
@@ -81,7 +81,7 @@
 			for (MultiplayerGame g : mgames) {
 				Role role = g.getRole(uid);
 		%>
-		<tr>
+		<tr id="<%="game"+g.getId()%>">
 			<td class="col-sm-2"><%= g.getId() %></td>
 			<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
 			<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
@@ -89,7 +89,7 @@
 			<td class="col-sm-1"><%= g.getDefenderIds().length %></td>
 			<td class="col-sm-2"><%= g.getLevel().name() %></td>
 			<td class="col-sm-2">
-				<a href="multiplayer/history?id=<%= g.getId() %>">View Results</a>
+				<a id="<%="results-"+g.getId()%>" href="multiplayer/history?id=<%= g.getId() %>">View Results</a>
 			</td>
 		</tr>
 		<%

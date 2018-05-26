@@ -68,26 +68,30 @@
                 Menu <span class="glyphicon glyphicon-plus"></span>
             </button>
             <ul
-                    class="crow fly no-gutter navbar navbar-nav collapse navbar-collapse"
-               id="bs-example-navbar-collapse-1"
-                 style="z-index: 1000; text-align: center; list-style:none;
+                class="crow fly no-gutter navbar navbar-nav collapse navbar-collapse"
+                id="bs-example-navbar-collapse-1"
+                style="z-index: 1000; text-align: center; list-style:none;
                  width: 80%; float: none; margin: 0 auto;">
                 <li style="float: none" class="dropdown"><a
+                            id="headerGamesDropdown"
                             class="text-white button tab-link bg-minus-1 dropdown-toggle"
                             href="<%=request.getContextPath() %>/games/user"
                             style="width:100%;" data-toggle="dropdown" href="#">Games <span class="glyphicon glyphicon-menu-hamburger" style="float: right;"></span></a>
                         <ul class="dropdown-menu" style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
-                            <li><a href="<%=request.getContextPath() %>/games/user" style="width:100%;">Games</a></li>
-                            <li><a href="<%=request.getContextPath() %>/games/history" style="width:100%;">History</a></li>
-                </ul></li>
+                            <li><a id="headerUserGames" href="<%=request.getContextPath() %>/games/user" style="width:100%;">Games</a></li>
+                            <%-- <li><a id="headerOpenGames" href="<%=request.getContextPath() %>/games/open" style="width:100%;">Open Games</a></li> --%>
+                            <li><a id="headerGamesHistory" href="<%=request.getContextPath() %>/games/history" style="width:100%;">History</a></li>
+                        </ul>
+                </li>
                 <%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) { %>
-                <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="games/upload" style="width:100%;">Upload Class</a></li>
+                <li style="float: none"><a id="headerUploadButton" class="text-white button tab-link bg-minus-1" href="games/upload" style="width:100%;">Upload Class</a></li>
                 <%}%>
 
-                <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="leaderboards" style="width: 100%;">Leaderboard</a></li>
-                <li style="float: none"><a class="text-white button tab-link bg-minus-1" href="help" style="width:100%;">Help</a></li>
+                <li style="float: none"><a id="headerLeaderboardButton" class="text-white button tab-link bg-minus-1" href="leaderboards" style="width: 100%;">Leaderboard</a></li>
+                <li style="float: none"><a id="headerHelpButton" class="text-white button tab-link bg-minus-1" href="help" style="width:100%;">Help</a></li>
                 <li style="float: none" class="dropdown"><a
+                        id="headerUserDropdown"
                         class="text-white button tab-link bg-minus-1 dropdown-toggle"
                         href="<%=request.getContextPath() %>/games/user"
                         style="width:100%;" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
@@ -98,6 +102,7 @@
                     style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
                         <li><a
+                               id="headerLogout"
                                href="<%=request.getContextPath()%>/logout"
                                style="width:100%;border-bottom:1px solid
                                black">Logout
