@@ -284,15 +284,14 @@
 	</servlet-mapping>
 	<!-- end multiplayer servlets -->
 
-	<!-- Notification JSON Servlets -->
-
+	<!-- Notification Servlets -->
 	<servlet>
-		<servlet-name>game_notification</servlet-name>
-		<servlet-class>org.codedefenders.servlets.events.EventManager</servlet-class>
+		<servlet-name>notifications</servlet-name>
+		<servlet-class>org.codedefenders.servlets.events.NotificationsHandler</servlet-class>
 	</servlet>
 	<servlet-mapping>
-		<servlet-name>game_notification</servlet-name>
-		<url-pattern>/game_notifications</url-pattern>
+		<servlet-name>notifications</servlet-name>
+		<url-pattern>/notifications</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
