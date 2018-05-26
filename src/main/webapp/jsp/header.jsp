@@ -3,6 +3,8 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="org.codedefenders.model.NotificationType" %>
+
 <%@ include file="/jsp/header_base.jsp" %>
 
 <script>
@@ -45,16 +47,14 @@
                 // refreshed every 5 seconds
                 var interval = 5000;
                 setInterval(function () {
-                    var url = "<%=request.getContextPath()%>" + "/game_notifications?userId=" + <%=request.getSession().getAttribute("uid")%> +"&timestamp=" + (new Date().getTime() - interval);
-
+                    var url = "<%=request.getContextPath()%>/notifications?type=<%=NotificationType.USEREVENT%>&timestamp=" + (new Date().getTime() - interval);
                     updateUserNotifications(url);
+                }, interval);
 
-                }, interval)
-
-                var url = "<%=request.getContextPath()%>" + "/game_notifications?userId=" + <%=request.getSession().getAttribute("uid")%> +"&timestamp=" + 0;
-
+                var url = "<%=request.getContextPath()%>/notifications?type=<%=NotificationType.USEREVENT%>&timestamp=0";
                 updateUserNotifications(url);
             }
+            $('[data-toggle="tooltip"]').tooltip();
         }
         );
 </script>

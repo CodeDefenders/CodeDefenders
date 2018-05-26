@@ -156,8 +156,8 @@ String levelStyling = validatorLevel.equals(CodeValidator.CodeValidatorLevel.REL
                     form.parentNode.insertBefore(progressBar, form.nextSibling);
                 }
                 // Do a first request right away, such that compilation of this test is hopefully not yet started. This one will set the session...
-                var updateURL = "<%= request.getContextPath()%>" +
-                    "/game_notifications?progressBar=1&userId=" + <%=uid%> +"&gameId=" + <%=gameId%>;
+
+                var updateURL = "<%= request.getContextPath()%>/notifications?type=<%=NotificationType.PUSHEVENT%>&progressBar=1&gameId=" + <%=gameId%>;
                 updateProgressBar(updateURL);
 
                 // Register the requests to start in 1 sec

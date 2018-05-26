@@ -1,6 +1,9 @@
 ### Libraries ###
 src/test/resources/itests/lib/*.jar
 
+# Docker outputs
+src/test/resources/systemtests/frontend/codedefenders/
+
 ### Credentials ###
 credentials*
 config.properties*
