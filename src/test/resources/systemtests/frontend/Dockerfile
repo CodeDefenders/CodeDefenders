@@ -1,4 +1,4 @@
-FROM codedefenders/tomcat:8.5
+FROM codedefenders/tomcat:9
 
 # Delete existing default applications
 RUN rm -rf /usr/local/tomcat/webapps/ROOT
