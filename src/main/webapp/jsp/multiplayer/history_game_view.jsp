@@ -12,19 +12,23 @@
 <%@ page import="java.util.Map" %>
 <%
     // Get their user id from the session.
-    int uid = ((Integer) session.getAttribute("uid")).intValue();
+    int uid = ((Integer) session.getAttribute("uid"));
+    String gameIdString = request.getParameter("id");
     int gameId = 0;
-    try {
+
+    if (gameIdString != null) {
         try {
             gameId = Integer.parseInt(request.getParameter("id"));
-            session.setAttribute("mpGameId", new Integer(gameId));
+            session.setAttribute("mpGameId", gameId);
         } catch (NumberFormatException e) {
-            gameId = ((Integer) session.getAttribute("mpGameId")).intValue();
+            response.sendRedirect(request.getContextPath()+"/games/history");
+            return;
         }
-    } catch (Exception e2){
-        // response.sendRedirect(request.getContextPath()+"/multiplayer/games/user");
-        response.sendRedirect(request.getContextPath()+"/games/user");
+    } else {
+        response.sendRedirect(request.getContextPath()+"/games/history");
+        return;
     }
+
     boolean renderMutants = true;
 
     HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<Integer, ArrayList<Test>>();
@@ -131,6 +135,7 @@
                 <pre><textarea id="code" name="mutant" cols="80" rows="50" style="min-width: 512px;"><%= mutantCode %></textarea></pre>
             <script>
                 var editorSUT = CodeMirror.fromTextArea(document.getElementById("code"), {
+                    readOnly: true,
                     lineNumbers: true,
                     indentUnit: 4,
                     indentWithTabs: true,
