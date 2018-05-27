@@ -42,10 +42,15 @@
         junitMethods = ["assertArrayEquals", "assertEquals", "assertTrue", "assertFalse", "assertNull",
             "assertNotNull", "assertSame", "assertNotSame", "fail"];
         autocompletelist = [];
-        setTimeout(function () {
+
+        updateAutocompleteList = function () {
             var regex = /[a-zA-Z][a-zA-Z0-9]*/gm;
             var set = new Set(junitMethods);
-            var texts = [editorSUT.getValue()];
+
+            var testClass = editorTest.getValue();
+            testClass.slice(8, testClass.length - 2);
+
+            var texts = [testClass, editorSUT.getValue()];
 
             texts.forEach(function (text) {
                 var m;
@@ -59,7 +64,7 @@
                 }
             });
             autocompletelist = Array.from(set);
-        }, 0);
+        };
 
         CodeMirror.commands.autocomplete = function (cm) {
             cm.showHint({
@@ -109,6 +114,12 @@
 				change.cancel();
 			}
 		});
+        editorTest.on('keyHandled', function (cm, name, event) {
+            // 9 == Tab, 13 == Enter
+            if ([9, 13].includes(event.keyCode)) {
+                updateAutocompleteList();
+            }
+        });
 		editorTest.setSize("100%", 500);
 		var editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
 			lineNumbers: true,
