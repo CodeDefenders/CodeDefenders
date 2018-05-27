@@ -39,9 +39,55 @@
 </div>
 <div>
 	<script>
-        CodeMirror.commands.autocomplete = function(cm) {
-            cm.showHint({hint: CodeMirror.hint.anyword});
+        junitMethods = ["assertArrayEquals", "assertEquals", "assertTrue", "assertFalse", "assertNull",
+            "assertNotNull", "assertSame", "assertNotSame", "fail"];
+        autocompletelist = [];
+        setTimeout(function () {
+            var regex = /[a-zA-Z][a-zA-Z0-9]*/gm;
+            var set = new Set(junitMethods);
+            var texts = [editorSUT.getValue()];
+
+            texts.forEach(function (text) {
+                var m;
+                while ((m = regex.exec(text)) !== null) {
+                    if (m.index === regex.lastIndex) {
+                        regex.lastIndex++;
+                    }
+                    m.forEach(function (match) {
+                        set.add(match)
+                    });
+                }
+            });
+            autocompletelist = Array.from(set);
+        }, 0);
+
+        CodeMirror.commands.autocomplete = function (cm) {
+            cm.showHint({
+                hint: function (editor) {
+                    var reg = /[a-zA-Z][a-zA-Z0-9]*/;
+
+                    var list = autocompletelist;
+                    var cursor = editor.getCursor();
+                    var currentLine = editor.getLine(cursor.line);
+                    var start = cursor.ch;
+                    var end = start;
+                    while (end < currentLine.length && reg.test(currentLine.charAt(end))) ++end;
+                    while (start && reg.test(currentLine.charAt(start - 1))) --start;
+                    var curWord = start != end && currentLine.slice(start, end);
+                    var regex = new RegExp('^' + curWord, 'i');
+                    var result = {
+                        list: (!curWord ? list : list.filter(function (item) {
+                            return item.match(regex);
+                        })).sort(),
+                        from: CodeMirror.Pos(cursor.line, start),
+                        to: CodeMirror.Pos(cursor.line, end)
+                    };
+
+                    return result;
+                }
+            });
         };
+
 		var editorTest = CodeMirror.fromTextArea(document.getElementById("code"), {
             lineNumbers: true,
             indentUnit: 4,
