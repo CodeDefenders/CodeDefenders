@@ -39,12 +39,20 @@
 </div>
 <div>
 	<script>
+        CodeMirror.commands.autocomplete = function(cm) {
+            cm.showHint({hint: CodeMirror.hint.anyword});
+        };
 		var editorTest = CodeMirror.fromTextArea(document.getElementById("code"), {
-			lineNumbers: true,
-			indentUnit: 4,
-			indentWithTabs: true,
-			matchBrackets: true,
-			mode: "text/x-java"
+            lineNumbers: true,
+            indentUnit: 4,
+            smartIndent: true,
+            indentWithTabs: true,
+            matchBrackets: true,
+            mode: "text/x-java",
+            autoCloseBrackets: true,
+            styleActiveLine: true,
+            extraKeys: {"Ctrl-Space": "autocomplete"},
+            keyMap: "default"
 		});
 		editorTest.on('beforeChange',function(cm,change) {
 			var text = cm.getValue();

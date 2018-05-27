@@ -84,18 +84,25 @@ String levelStyling = validatorLevel.equals(CodeValidator.CodeValidatorLevel.REL
 
 		</form>
 		<script>
+            CodeMirror.commands.autocomplete = function(cm) {
+              cm.showHint({hint: CodeMirror.hint.anyword});
+            };
 			var editorSUT = CodeMirror.fromTextArea(document.getElementById("code"), {
 				lineNumbers: true,
 				indentUnit: 4,
+                smartIndent: true,
 				indentWithTabs: true,
 				matchBrackets: true,
-				mode: "text/x-java"
+				mode: "text/x-java",
+				autoCloseBrackets: true,
+				styleActiveLine: true,
+				extraKeys: {"Ctrl-Space": "autocomplete"},
+				keyMap: "default"
 			});
 			editorSUT.setSize("100%", 500);
 
 			var x = document.getElementsByClassName("utest");
-			var i;
-			for (i = 0; i < x.length; i++) {
+			for (var i = 0; i < x.length; i++) {
 				CodeMirror.fromTextArea(x[i], {
 					lineNumbers: true,
 					matchBrackets: true,
