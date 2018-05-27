@@ -13,7 +13,7 @@
     </p>
 </div>
 <%
-        } else {
+} else {
 %>
 <div id="creategame" class="container">
     <p>
@@ -21,19 +21,20 @@
     </p>
 </div>
 <%
-        }
-    } else {
+    }
+} else {
 
 %>
 <div id="creategame" class="container">
     <form id="create" action="<%=request.getContextPath() %>/multiplayer/games" method="post"
-          class="form-creategame-mp">
+          class="form-creategame-mp" role="form">
         <input type="hidden" name="formType" value="createGame">
         <table class="tableform">
             <tr>
                 <td width="25%">Java Class</td>
                 <td>
-                    <select name="class" class="form-control selectpicker" data-size="large">
+                    <select name="class" class="form-control selectpicker" data-size="
+                    large">
                         <% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
                         <option value="<%=c.getId()%>"><%=c.getAlias()%>
                         </option>
@@ -93,8 +94,7 @@
                 <td>
                     <div class="crow">
                         <input type="hidden" id="startTime" name="startTime"/>
-                        <span class="alert alert-danger" id="startTimeWarning" style="display: none">Start time must be later than today's date!</span>
-
+                        <span class="alert alert-warning" id="startDateWarning" style="display: none">Invalid date or format (expected: YYYY/MM/DD). </span>
                         <input class="ws-5" name="start_dateTime" id="start_dateTime"/>
                         <div class="ws-7 nest">
                             <input class="ws-1" type="text" name="start_hours" id="start_hours"
@@ -120,6 +120,16 @@
                         });
 
                         $("#start_dateTime").on("change", function () {
+                            var date = ($("#start_dateTime")).val();
+                            if (isValidDate(date)) {
+                                document.getElementById("startDateWarning").style.display = "none";
+                                document.getElementById("createButton").disabled = false;
+                            } else {
+                                // remove other warning for only having actual one presented
+                                document.getElementById("finishTimeWarning").style.display = "none";
+                                document.getElementById("startDateWarning").style.display = "inline";
+                                document.getElementById("createButton").disabled = true;
+                            }
                             updateStartTimestamp();
                         });
 
@@ -147,8 +157,8 @@
                         // update the input of hidden startTime field with selected timestamp
                         var updateStartTimestamp = function () {
                             var timestamp = new Date($("#start_dateTime").val()).getTime();
-                            timestamp += parseInt(($("#start_hours").val()) * 60 * 60 * 1000);
-                            timestamp += parseInt($("#start_minutes").val()) * 60 * 1000;
+                            timestamp += parseInt($("#start_hours").val() * 60 * 60 * 1000);
+                            timestamp += parseInt($("#start_minutes").val() * 60 * 1000);
 
                             var finishTime = new Date($("#finish_dateTime").val()).getTime();
 
@@ -160,7 +170,6 @@
                                 document.getElementById("createButton").disabled = true;
                             } else {
                                 // error messages disappear due to right input
-                                document.getElementById("startTimeWarning").style.display = "none";
                                 document.getElementById("finishTimeWarning").style.display = "none";
                                 // enable submit button
                                 document.getElementById("createButton").disabled = false;
@@ -168,14 +177,42 @@
                             $("#startTime").val(timestamp);
                         };
 
+                        // date validation used in start and finish date
+                        function isValidDate(dateString) {
+                            // check pattern for YYYY/MM/DD
+                            if(!/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(dateString))
+                                return false;
+
+                            // parse the date parts to integers
+                            var parts = dateString.split("/");
+                            var year = parseInt(parts[0], 10);
+                            var month = parseInt(parts[1], 10);
+                            var day = parseInt(parts[2], 10);
+
+                            // check the ranges of month and year
+                            if (year < 1000 || year > 3000 || month === 0 || month > 12)
+                                return false;
+
+                            var monthLength = [ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 ];
+
+                            // check for leap years
+                            if (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) {
+                                monthLength[1] = 29;
+                            }
+
+                            // check the range of the day
+                            return day > 0 && day <= monthLength[month - 1];
+                        }
                     </script>
                 </td>
+            </tr>
             <tr>
                 <td>Finish Time</td>
                 <td>
                     <div class="crow">
                         <input type="hidden" id="finishTime" name="finishTime"/>
-                        <span class="alert alert-danger" id="finishTimeWarning" style="display: none">Finish time must be later than selected start time!</span>
+                        <span class="alert alert-warning" id="finishTimeWarning" style="display: none">Finish time must be later than selected start time!</span>
+                        <span class="alert alert-warning" id="finishDateWarning" style="text-align: left; display: none">Invalid date or format (expected: YYYY/MM/DD).</span>
                         <input class="ws-5" name="finish_dateTime" id="finish_dateTime"/>
                         <div class="ws-7 nest">
                             <input class="ws-1" type="text" name="finish_hours" id="finish_hours"
@@ -201,8 +238,17 @@
                             $("#finish_minutes").val(mins);
                         });
 
-                        // check whether the selected date is before today
                         $("#finish_dateTime").on("change", function () {
+                            var date = ($("#finish_dateTime")).val();
+                            if (isValidDate(date)) {
+                                document.getElementById("finishDateWarning").style.display = "none";
+                                document.getElementById("createButton").disabled = false;
+                            } else {
+                                // remove other warning for only having actual one presented
+                                document.getElementById("finishTimeWarning").style.display = "none";
+                                document.getElementById("finishDateWarning").style.display = "inline";
+                                document.getElementById("createButton").disabled = true;
+                            }
                             updateFinishTimestamp();
                         });
 
@@ -229,20 +275,18 @@
 
                         var updateFinishTimestamp = function () {
                             var timestamp = new Date($("#finish_dateTime").val()).getTime();
-                            timestamp += parseInt(($("#finish_hours").val()) * 60 * 60 * 1000);
-                            timestamp += parseInt(($("#finish_minutes").val()) * 60 * 1000);
+                            timestamp += parseInt($("#finish_hours").val() * 60 * 60 * 1000);
+                            timestamp += parseInt($("#finish_minutes").val() * 60 * 1000);
                             var startTime = parseInt($("#startTime").val());
 
-                            // check whether the selected finish time is later than the start time
+                            // check whether selected finish time is later than start time
                             if (timestamp < startTime) {
-                                //display error message above finish_dateTime field
+                                // display error message above finish_dateTime field
                                 document.getElementById("finishTimeWarning").style.display = "inline";
-                                // disable submit button
                                 document.getElementById("createButton").disabled = true;
                             } else {
                                 // error message disappears due to valid input
                                 document.getElementById("finishTimeWarning").style.display = "none";
-                                // enable submit button
                                 document.getElementById("createButton").disabled = false;
                             }
                             $("#finishTime").val(timestamp);
@@ -269,7 +313,7 @@
                             data-size="medium">
                         <%for (CodeValidator.CodeValidatorLevel cvl : CodeValidator.CodeValidatorLevel.values()) {%>
                         <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidator.CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
-                        <%=cvl.name().toLowerCase()%>
+                            <%=cvl.name().toLowerCase()%>
                         </option>
                         <%}%>
                     </select>
