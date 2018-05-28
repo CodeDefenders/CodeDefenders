@@ -9,6 +9,7 @@ pageTitle = null;
 <%@ page import="static org.codedefenders.game.GameState.FINISHED" %>
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
 <div class="game-container"><h2 class="full-width page-title" style="text-align: center"><%= pTitle %></h2>
 <nav>
     <div class="container-fluid">
@@ -25,6 +26,13 @@ pageTitle = null;
             } else if (game.getState().equals(FINISHED)) {
                 turnMsg = "Finished";
             }
+
+            List<Mutant> mutants = game.getMutants();
+
+            for (Mutant m : mutants){
+                m.getLines();
+            }
+
             String loggedName = (String) request.getSession().getAttribute("username");
             String atkName = DatabaseAccess.getUserForKey("User_ID", game.getAttackerId()).getUsername();
             String defName = DatabaseAccess.getUserForKey("User_ID", game.getDefenderId()).getUsername();
