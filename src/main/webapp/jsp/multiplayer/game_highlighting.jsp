@@ -3,7 +3,7 @@
 <%Gson gson = new Gson();%>
 
 testMap = {<% for (Integer i : linesCovered.keySet()){%>
-<%= i%>: [<%= linesCovered.get(i).stream().map(t -> Integer.toString(t.getId())).collect(Collectors.joining(","))%>],
+<%= i%>: [<%= linesCovered.get(i).stream().map(t -> Integer.toString(t.getId())).distinct().collect(Collectors.joining(","))%>],
 <% } %>
 };
 
