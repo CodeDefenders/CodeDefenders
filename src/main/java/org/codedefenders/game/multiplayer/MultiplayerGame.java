@@ -1,21 +1,8 @@
 package org.codedefenders.game.multiplayer;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
-import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.DatabaseValue;
-import org.codedefenders.game.AbstractGame;
-import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.GameMode;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Role;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
-import org.codedefenders.model.User;
-import org.codedefenders.validation.CodeValidator;
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,7 +15,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.codedefenders.game.Mutant.Equivalence.*;
+import org.apache.commons.lang.ArrayUtils;
+import org.codedefenders.database.DB;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameMode;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+import org.codedefenders.model.User;
+import org.codedefenders.validation.CheckDateFormat;
+import org.codedefenders.validation.CodeValidator;
 
 public class MultiplayerGame extends AbstractGame {
 
@@ -41,7 +44,11 @@ public class MultiplayerGame extends AbstractGame {
 	private int defenderLimit;
 	private int minAttackers;
 	private int minDefenders;
+
+	@CheckDateFormat(pattern="yyyy/MM/dd HH:mm", message = "Invalid date for Start Time")
 	private long startDateTime;
+
+	@CheckDateFormat(pattern="yyyy/MM/dd HH:mm", message = "Invalid date for Finish Time")
 	private long finishDateTime;
 	private boolean requiresValidation;
 	private int maxAssertionsPerTest;
