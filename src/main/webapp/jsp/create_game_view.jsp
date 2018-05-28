@@ -11,8 +11,8 @@
 		<table class="tableform">
 			<tr>
 				<td>Java Class</td>
-				<td>
-					<select name="class" class="form-control selectpicker" data-size="large" >
+				<td id="classTd">
+					<select id="class" name="class" class="form-control selectpicker" data-size="large" >
 						<% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
 						<option value="<%=c.getId()%>"><%=c.getAlias()%></option>
 						<%}%>
@@ -35,16 +35,16 @@
 			</tr>
 			--%>
 			<tr>
-				<td>Role</td> <td><input type="checkbox" id="role" name="role" class="form-control" data-size="large" data-toggle="toggle" data-on="Attacker" data-off="Defender" data-onstyle="success" data-offstyle="primary"></td>
+				<td>Role</td> <td id="roleTd"><input type="checkbox" id="role" name="role" class="form-control" data-size="large" data-toggle="toggle" data-on="Attacker" data-off="Defender" data-onstyle="success" data-offstyle="primary"></td>
 			</tr>
 			<tr>
-				<td>Rounds</td><td><input class="form-control" type="number" name="rounds" value="3" min="1" max="10"></td>
+				<td>Rounds</td> <td id="roundsTd"><input class="form-control" type="number" id="rounds" name="rounds" value="3" min="1" max="10"></td>
 			</tr>
 			<tr>
-            <td>Level</td> <td><input type="checkbox" id="level" name="level" class="form-control" data-size="large" data-toggle="toggle" data-on="Easy" data-off="Hard" data-onstyle="info" data-offstyle="warning">
+            <td>Level</td> <td id="levelTd"><input type="checkbox" id="level" name="level" class="form-control" data-size="large" data-toggle="toggle" data-on="Easy" data-off="Hard" data-onstyle="info" data-offstyle="warning">
 			</tr>
 		</table>
-		<button class="btn btn-lg btn-primary btn-block" type="submit" value="Create">Create</button>
+		<button id="createButton" class="btn btn-lg btn-primary btn-block" type="submit" value="Create">Create</button>
 	</form>
 </div>
 <%@ include file="/jsp/footer.jsp" %>

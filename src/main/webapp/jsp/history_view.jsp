@@ -4,7 +4,7 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.List" %>
-<% String pageTitle="DuelGame History"; %>
+<% String pageTitle="Game History"; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div>
 <h3> Duels </h3>
@@ -20,22 +20,24 @@
 
 
 	<%
-		boolean isGames = false;
 		String atkName;
 		String defName;
 		int uid = (Integer)request.getSession().getAttribute("uid");
 		int atkId;
 		int defId;
-		for (DuelGame g : DatabaseAccess.getHistoryForUser(uid)) {
-			atkId = g.getAttackerId();
-			defId = g.getDefenderId();
-			User attacker = DatabaseAccess.getUserForKey("User_ID", atkId);
-			User defender = DatabaseAccess.getUserForKey("User_ID", defId);
-			atkName = attacker == null ? "-" : attacker.getUsername();
-			defName = defender == null ? "-" : defender.getUsername();
+		List<DuelGame> games = DatabaseAccess.getHistoryForUser(uid);
+
+		if (!games.isEmpty()) {
+            for (DuelGame g : games) {
+                atkId = g.getAttackerId();
+                defId = g.getDefenderId();
+                User attacker = DatabaseAccess.getUserForKey("User_ID", atkId);
+                User defender = DatabaseAccess.getUserForKey("User_ID", defId);
+                atkName = attacker == null ? "-" : attacker.getUsername();
+                defName = defender == null ? "-" : defender.getUsername();
 	%>
 
-	<tr>
+	<tr id="<%="game_"+g.getId()%>">
 		<td class="col-sm-2"><%= g.getId() %></td>
 		<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
 		<td class="col-sm-2"><%= atkName %></td>
@@ -45,19 +47,21 @@
 			<form id="view" action="<%=request.getContextPath() %>/games" method="post">
 				<input type="hidden" name="formType" value="enterGame">
 				<input type="hidden" name="game" value=<%=g.getId()%>>
-				<input type="submit" class="btn btn-default" value="View Scores">
+				<button id="<%="results_"+g.getId()%>" type="submit" class="btn btn-sm btn-default">View Scores</button>
 			</form>
 		</td>
 	</tr>
 
 	<%
-		}
-		if (!isGames) {%>
-	<tr><td colspan="100%"> Empty duels history. </td></tr>
-	<%}
+			}
+		} else {
 	%>
+
+	<tr><td colspan="100%"> Empty duels history. </td></tr>
+
+	<%  } %>
+
 </table>
-	<hr />
 	<h3>Battlegrounds</h3>
 	<table class="table table-hover table-responsive table-paragraphs games-table">
 		<tr>
@@ -69,19 +73,15 @@
 			<th>Level</th>
 			<th>Actions</th>
 		</tr>
+
 		<%
 			List<MultiplayerGame> mgames = DatabaseAccess.getFinishedMultiplayerGamesForUser(uid);
-			if (mgames.isEmpty()) {
+			if (!mgames.isEmpty()) {
+				for (MultiplayerGame g : mgames) {
+					Role role = g.getRole(uid);
 		%>
-		<tr><td colspan="100%"> Empty multi-player games history. </td></tr>
-		<%
-		} else {
-		%>
-		<%
-			for (MultiplayerGame g : mgames) {
-				Role role = g.getRole(uid);
-		%>
-		<tr>
+
+		<tr id="<%="game_"+g.getId()%>">
 			<td class="col-sm-2"><%= g.getId() %></td>
 			<td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
 			<td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
@@ -89,13 +89,19 @@
 			<td class="col-sm-1"><%= g.getDefenderIds().length %></td>
 			<td class="col-sm-2"><%= g.getLevel().name() %></td>
 			<td class="col-sm-2">
-				<a href="multiplayer/history?id=<%= g.getId() %>">View Results</a>
+				<a class="btn btn-sm btn-default" id="<%="results_"+g.getId()%>" href="multiplayer/history?id=<%= g.getId() %>">View Results</a>
 			</td>
 		</tr>
+
 		<%
-			}
-		}
+				}
+			} else {
 		%>
+
+		<tr><td colspan="100%"> Empty multi-player games history. </td></tr>
+
+		<%  } %>
+
 	</table>
 
 </div>

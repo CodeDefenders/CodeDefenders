@@ -27,13 +27,13 @@
 %>
 <div id="creategame" class="container">
     <form id="create" action="<%=request.getContextPath() %>/multiplayer/games" method="post"
-          class="form-creategame-mp" role="form">
+          class="form-creategame-mp">
         <input type="hidden" name="formType" value="createGame">
         <table class="tableform">
             <tr>
                 <td width="25%">Java Class</td>
-                <td>
-                    <select name="class" class="form-control selectpicker" data-size="
+                <td id="classTd">
+                    <select id="class" name="class" class="form-control selectpicker" data-size="
                     large">
                         <% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
                         <option value="<%=c.getId()%>"><%=c.getAlias()%>
@@ -55,7 +55,7 @@
             -->
             <tr>
                 <td>Level</td>
-                <td>
+                <td id="levelTd">
                     <input type="checkbox" id="level" name="level" class="form-control" data-size="large"
                            data-toggle="toggle" data-on="Easy" data-off="Hard" data-onstyle="info"
                            data-offstyle="warning">
@@ -73,7 +73,7 @@
             %>
             <tr>
                 <td>Defenders</td>
-                <td class="crow fly">
+                <td class="crow fly" id="defendersTd">
                     <label style="font-weight: normal;" for="minDefenders">Min</label>
                     <input type="number" name="minDefenders" id="minDefenders" value="2"/>
                     <label style="font-weight: normal;" for="defenderLimit">Max</label>
@@ -82,7 +82,7 @@
             </tr>
             <tr>
                 <td>Attackers</td>
-                <td class="crow fly">
+                <td class="crow fly" id="attackersTd">
                     <label style="font-weight: normal;" for="minAttackers">Min</label>
                     <input type="number" value="2" name="minAttackers" id="minAttackers"/>
                     <label style="font-weight: normal;" for="attackerLimit">Max</label>
@@ -91,7 +91,7 @@
             </tr>
             <tr>
                 <td>Start Time</td>
-                <td>
+                <td id="startTimeTd">
                     <div class="crow">
                         <input type="hidden" id="startTime" name="startTime"/>
                         <span class="alert alert-warning" id="startDateWarning" style="display: none">Invalid date or format (expected: YYYY/MM/DD). </span>
@@ -208,7 +208,7 @@
             </tr>
             <tr>
                 <td>Finish Time</td>
-                <td>
+                <td id="finishTimeTd">
                     <div class="crow">
                         <input type="hidden" id="finishTime" name="finishTime"/>
                         <span class="alert alert-warning" id="finishTimeWarning" style="display: none">Finish time must be later than selected start time!</span>
@@ -298,7 +298,7 @@
                 <td title="Maximum number of assertions per test. Increase this for difficult to test classes.">
                     Max. Assertions per Test
                 </td>
-                <td>
+                <td id="maxAssertionsPerTestTd">
                     <input class="form-control" type="number" value="<%=DEFAULT_NB_ASSERTIONS%>"
                            name="maxAssertionsPerTest"
                            id="maxAssertionsPerTest" min=1 required/>
@@ -308,7 +308,7 @@
                 <td title="Click the question sign for more information on the levels">
                     Mutant validator
                 </td>
-                <td>
+                <td id="mutantValidatorLevelTd">
                     <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
                             data-size="medium">
                         <%for (CodeValidator.CodeValidatorLevel cvl : CodeValidator.CodeValidatorLevel.values()) {%>
@@ -331,7 +331,7 @@
                 <td title="Attackers can mark uncovered lines as equivalent">
                     Mark uncovered lines as equivalent
                 </td>
-                <td>
+                <td id="markUncoveredTd">
                     <input type="checkbox" id="markUncovered" name="markUncovered"
                            class="form-control" data-size="large" data-toggle="toggle" data-on="On" data-off="Off"
                            data-onstyle="primary" data-offstyle="">
@@ -341,7 +341,7 @@
                 <td title="Players can chat with their team and with all players in the game">
                     Chat
                 </td>
-                <td>
+                <td id="chatEnabledTd">
                     <input type="checkbox" id="chatEnabled" name="chatEnabled"
                            class="form-control" data-size="large" data-toggle="toggle" data-on="On" data-off="Off"
                            data-onstyle="primary" data-offstyle="" checked>

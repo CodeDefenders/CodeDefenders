@@ -10,7 +10,6 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.game.leaderboard.Entry;
-import org.codedefenders.game.multiplayer.LineCoverage;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
@@ -26,8 +25,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @SuppressWarnings("ALL")
@@ -486,7 +485,14 @@ public class DatabaseAccess {
 	}
 
 	public static List<MultiplayerGame> getOpenMultiplayerGamesForUser(int userId) {
-		String query = "SELECT * FROM games AS g\n" + "INNER JOIN (SELECT gatt.ID, sum(CASE WHEN Role = 'ATTACKER' THEN 1 ELSE 0 END) nAttackers, sum(CASE WHEN Role = 'DEFENDER' THEN 1 ELSE 0 END) nDefenders\n" + "              FROM games AS gatt LEFT JOIN players ON gatt.ID=players.Game_ID AND players.Active=TRUE GROUP BY gatt.ID) AS nplayers\n" + "ON g.ID=nplayers.ID\n" + "WHERE g.Mode='PARTY' AND g.Creator_ID!=? AND (g.State='CREATED' OR g.State='ACTIVE')\n" + "\tAND (g.RequiresValidation=FALSE OR (? IN (SELECT User_ID FROM users WHERE Validated=TRUE)))\n" + "\tAND g.ID NOT IN (SELECT g.ID FROM games g INNER JOIN players p ON g.ID=p.Game_ID WHERE p.User_ID=? AND p.Active=TRUE)\n" + "\tAND nplayers.nAttackers < g.Attackers_Limit AND nplayers.nDefenders < g.Defenders_Limit;";
+		String query = "SELECT * FROM games AS g\n"
+				+ "INNER JOIN (SELECT gatt.ID, sum(CASE WHEN Role = 'ATTACKER' THEN 1 ELSE 0 END) nAttackers, sum(CASE WHEN Role = 'DEFENDER' THEN 1 ELSE 0 END) nDefenders\n"
+				+ "              FROM games AS gatt LEFT JOIN players ON gatt.ID=players.Game_ID AND players.Active=TRUE GROUP BY gatt.ID) AS nplayers\n"
+				+ "ON g.ID=nplayers.ID\n"
+				+ "WHERE g.Mode='PARTY' AND g.Creator_ID!=? AND (g.State='CREATED' OR g.State='ACTIVE')\n"
+				+ "AND (g.RequiresValidation=FALSE OR (? IN (SELECT User_ID FROM users WHERE Validated=TRUE)))\n"
+				+ "AND g.ID NOT IN (SELECT g.ID FROM games g INNER JOIN players p ON g.ID=p.Game_ID WHERE p.User_ID=? AND p.Active=TRUE)\n"
+				+ "AND (nplayers.nAttackers < g.Attackers_Limit OR nplayers.nDefenders < g.Defenders_Limit);";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(userId),
 				DB.getDBV(userId),
 				DB.getDBV(userId)};
@@ -892,25 +898,19 @@ public class DatabaseAccess {
 			// Load the MultiplayerGame Data with the provided ID.
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
-				Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"),
+                String lcs = rs.getString("Lines_Covered");
+                String lucs = rs.getString("Lines_Uncovered");
+                List<Integer> covered = new ArrayList<>();
+                List<Integer> uncovered = new ArrayList<>();
+                if(lcs != null)
+                    covered.addAll(Arrays.stream(lcs.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
+                if(lucs != null)
+                    uncovered.addAll(Arrays.stream(lucs.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
+
+                Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
-						rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"), rs.getInt("Player_ID"));
-				String lcs = rs.getString("Lines_Covered");
-				String lucs = rs.getString("Lines_Uncovered");
-				LineCoverage lc = new LineCoverage();
-				if (lcs != null && lucs != null && lcs.length() > 0 && lucs.length() > 0) {
-					ArrayList<Integer> covered = new ArrayList<>();
-					ArrayList<Integer> uncovered = new ArrayList<>();
-					for (String s : lcs.split(",")) {
-						covered.add(Integer.parseInt(s));
-					}
-					for (String s : lucs.split(",")) {
-						uncovered.add(Integer.parseInt(s));
-					}
-					lc.setLinesUncovered(uncovered);
-					lc.setLinesCovered(covered);
-				}
-				newTest.setLineCoverage(lc);
+						rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"), rs.getInt("Player_ID"),
+                        covered, uncovered);
 				newTest.setScore(rs.getInt("Points"));
 				testList.add(newTest);
 			}
@@ -969,6 +969,19 @@ public class DatabaseAccess {
 		return (targ != null) ? targ.testId : -1; // TODO: We shouldn't give away that we don't know which test killed the mutant?
 	}
 
+	public static Set<Mutant> getKilledMutantsForTestId(int tid) {
+		String query = "SELECT * FROM targetexecutions WHERE Target='TEST_MUTANT' AND Status!='SUCCESS' AND Test_ID=?;";
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(tid));
+		List<TargetExecution> executions = getAllTargetExecutionsSQL(stmt, conn);
+		Set<Mutant> killedMutants = new TreeSet<>(Mutant.orderByIdAscending());
+		for(TargetExecution targ : executions) {
+			Mutant m = getMutantById(targ.mutantId);
+			killedMutants.add(m);
+		}
+		return killedMutants;
+	}
+
 	public static TargetExecution getTargetExecutionForPair(int tid, int mid) {
 		String query = "SELECT * FROM targetexecutions WHERE Test_ID=? AND Mutant_ID=?;";
 		DatabaseValue[] valueList = new DatabaseValue[]{
@@ -996,6 +1009,27 @@ public class DatabaseAccess {
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		return getTargetExecutionSQL(stmt, conn);
+	}
+
+	public static List<TargetExecution> getAllTargetExecutionsSQL(PreparedStatement stmt, Connection conn) {
+		List<TargetExecution> executions = new ArrayList<>();
+		try {
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				TargetExecution targetExecution = new TargetExecution(rs.getInt("TargetExecution_ID"), rs.getInt("Test_ID"),
+						rs.getInt("Mutant_ID"), TargetExecution.Target.valueOf(rs.getString("Target")),
+						rs.getString("Status"), rs.getString("Message"), rs.getString("Timestamp"));
+				executions.add(targetExecution);
+			}
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+			DB.cleanup(conn, stmt);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return executions;
 	}
 
 	public static TargetExecution getTargetExecutionSQL(PreparedStatement stmt, Connection conn) {

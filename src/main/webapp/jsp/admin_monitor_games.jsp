@@ -11,10 +11,10 @@
 <%@ include file="/jsp/header_main.jsp" %>
 <div class="full-width">
     <ul class="nav nav-tabs">
-        <li><a href="<%=request.getContextPath()%>/admin/games"> Create Games</a></li>
-        <li class="active"><a>Monitor Games</a></li>
-        <li><a href="<%=request.getContextPath()%>/admin/users"> Manage Users</a></li>
-        <li><a href="<%=request.getContextPath()%>/admin/settings">System Settings</a></li>
+        <li><a id="adminCreateGames" href="<%=request.getContextPath()%>/admin/games">Create Games</a></li>
+        <li class="active"><a id="adminMonitorGames">Monitor Games</a></li>
+        <li><a id="adminUserMgmt" href="<%=request.getContextPath()%>/admin/users">Manage Users</a></li>
+        <li><a id="adminSystemSettings" href="<%=request.getContextPath()%>/admin/settings">System Settings</a></li>
     </ul>
 
     <form id="games" action="admin/monitor" method="post">
@@ -69,9 +69,9 @@
                             "return confirm('Are you sure you want to stop this Game?');" : "";
                     int gid = g.getId();
             %>
-            <tr style="border-top: 1px solid lightgray; border-bottom: 1px solid lightgray">
+            <tr style="border-top: 1px solid lightgray; border-bottom: 1px solid lightgray" id="<%="game_row_"+gid%>">
                 <td>
-                    <input type="checkbox" name="selectedGames" id="selectedGames" value="<%= gid%>" onchange=
+                    <input type="checkbox" name="selectedGames" id="<%="selectedGames_"+gid%>" value="<%= gid%>" onchange=
                             "document.getElementById('start_games_btn').disabled = !areAnyChecked('selectedGames');
                             document.getElementById('stop_games_btn').disabled = !areAnyChecked('selectedGames');
                             setSelectAllCheckbox('selectedGames', 'selectAllGames')">
@@ -79,7 +79,7 @@
                 <td><%= gid %>
                 </td>
                 <td>
-                    <a class="btn btn-sm btn-primary"
+                    <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
                        href="<%= request.getContextPath() %>/multiplayer/games?id=<%= gid %>">Observe</a>
                 </td>
                 <td class="col-sm-2">
@@ -123,7 +123,7 @@
                 </td>
                 <td class="col-sm-1" style="padding-top:4px; padding-bottom:4px">
                     <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"
-                            onclick="<%=startStopButtonAction%>">
+                            onclick="<%=startStopButtonAction%>" id="<%="start_stop_"+g.getId()%>">
                         <span class="<%=startStopButtonIcon%>"></span>
 
                     </button>
@@ -177,6 +177,7 @@
                             onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
                              'This will also delete ALL of his tests, mutants and claimed equivalences ' +
                               'and might create inconsistencies in the Game.');"
+                            id="<%="switch_player_"+pid+"_game_"+gid%>"
                             name="activeGameUserSwitchButton">
                         <span class="glyphicon glyphicon-transfer"></span>
                     </button>
@@ -187,6 +188,7 @@
                             onclick="return confirm('Are you sure you want to permanently remove this player? \n' +
                              'This will also delete ALL of his tests, mutants and claimed equivalences ' +
                               'and might create inconsistencies in the Game.');"
+                            id="<%="remove_player_"+pid+"_game_"+gid%>"
                             name="activeGameUserRemoveButton">Remove
                     </button>
                 </td>
