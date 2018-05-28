@@ -10,7 +10,15 @@ var highlightLine = function (lines, color, superDiv) {
 
         // Add tooltip that lists covering test IDs
         if(line in testMap) {
-            e.innerHTML = "<div class=\"createdDiv\" data-toggle=\"tooltip\" data-position=\"top\" title=\"Covered by: "+testMap[line]+"\">" + line + "</div>";
+            selector = '#testCoveredDiv'+line
+            e.innerHTML = "<div id=\"" + selector + "\" data-toggle=\"tooltip\" data-position=\"top\" title=\"Covered by: "+testMap[line]+"\">" + line + "</div>";
+            $(e).tooltip({
+                selector: selector,
+                position:{
+                    within: selector,
+                    my: "left+25 top-30"
+                }
+            });
         }
         allLines[line] = $(e).parent("div").parent("div")[0];
     });
@@ -18,9 +26,7 @@ var highlightLine = function (lines, color, superDiv) {
         $(allLines[lines[l][0]]).css('background-color', 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',' + lines[l][1] + ')');
         //$(allLines[lines[l][0]]).css('opacity', lines[l][1]);
     }
-    $('body').tooltip({
-        selector: '.createdDiv'
-    });
+
 };
 var MUTANT_SHOW_LIMIT = 5;
 var COVERED_COLOR = [];

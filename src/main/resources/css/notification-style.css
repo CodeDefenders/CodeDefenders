@@ -1,3 +1,9 @@
+.createdDivTooltip {
+    margin-top: -25px;
+    margin-left: 25px;
+    position:absolute;
+}
+
 #mutationPopup .arrow {
     border-style: solid;
 }
