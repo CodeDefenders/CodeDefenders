@@ -27,7 +27,7 @@
 %>
 <div id="creategame" class="container">
     <form id="create" action="<%=request.getContextPath() %>/multiplayer/games" method="post"
-          class="form-creategame-mp">
+          class="form-creategame-mp" type="form">
         <input type="hidden" name="formType" value="createGame">
         <table class="tableform">
             <tr>
@@ -136,7 +136,8 @@
                         // check whether the selection contains more hours than one day
                         $("#start_hours").on("change", function () {
                             var hours = $("#start_hours").val();
-                            if (hours < 0 || hours > 23) {
+
+                            if (hours < 0 || hours > 23 || hours === "") {
                                 $("#start_hours").val(0);
                             }
                             updateStartTimestamp();
@@ -144,6 +145,12 @@
 
                         $("#start_minutes").on("change", function () {
                             var mins = $("#start_minutes").val();
+
+                            // replace minutes with zero when user didn't enter anything
+                            if (mins === "") {
+                                mins = "0";
+                            }
+
                             // check whether the selection contains more minutes than one hour
                             if (mins < 0 || mins > 59) {
                                 $("#start_minutes").val("00");
@@ -255,7 +262,7 @@
                         // check whether the selection contains more hours than one day
                         $("#finish_hours").on("change", function () {
                             var hours = $("#finish_hours").val();
-                            if (hours < 0 || hours > 23) {
+                            if (hours < 0 || hours > 23 || hours === "") {
                                 $("#finish_hours").val(0);
                             }
                             updateFinishTimestamp();
@@ -264,6 +271,12 @@
                         // check whether the selection contains more minutes than one hour
                         $("#finish_minutes").on("change", function () {
                             var mins = $("#finish_minutes").val();
+
+                            // check if input is empty and replace it with zero minutes
+                            if (mins === "") {
+                                mins = "0";
+                            }
+
                             if (mins < 0 || mins > 59) {
                                 $("#finish_minutes").val("00");
                             } else if (mins < 10) {
