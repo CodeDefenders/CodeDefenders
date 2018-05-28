@@ -114,6 +114,9 @@
 				change.cancel();
 			}
 		});
+        editorTest.on('focus', function (cm, event) {
+            updateAutocompleteList();
+        });
         editorTest.on('keyHandled', function (cm, name, event) {
             // 9 == Tab, 13 == Enter
             if ([9, 13].includes(event.keyCode)) {
