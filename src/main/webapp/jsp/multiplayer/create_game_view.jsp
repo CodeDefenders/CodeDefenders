@@ -144,7 +144,7 @@
                         $("#start_minutes").on("change", function () {
                             var mins = $("#start_minutes").val();
 
-                            // replace minutes with zero when user didn't enter anything or input is not a number
+                            // replace minutes with zero if input is empty/not a number/out of valid range
                             if (mins === "" || isNaN(mins) || (mins < 0 || mins > 59)) {
                                 mins = "0";
                             }
@@ -265,7 +265,7 @@
                         $("#finish_minutes").on("change", function () {
                             var mins = $("#finish_minutes").val();
 
-                            // check if input is empty and replace it with zero minutes
+                            // check if input is empty/not a number/not in a valid range and replace it with zero minutes
                             if (mins === "" || isNaN(mins) || (mins < 0 || mins > 59)) {
                                 mins = "0";
                             }
