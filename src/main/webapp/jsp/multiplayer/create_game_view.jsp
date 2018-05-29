@@ -27,7 +27,7 @@
 %>
 <div id="creategame" class="container">
     <form id="create" action="<%=request.getContextPath() %>/multiplayer/games" method="post"
-          class="form-creategame-mp" type="form">
+          class="form-creategame-mp">
         <input type="hidden" name="formType" value="createGame">
         <table class="tableform">
             <tr>
@@ -123,65 +123,60 @@
                             var date = ($("#start_dateTime")).val();
                             if (isValidDate(date)) {
                                 document.getElementById("startDateWarning").style.display = "none";
-                                document.getElementById("createButton").disabled = false;
+                                updateStartTimestamp();
                             } else {
-                                // remove other warning for only having actual one presented
                                 document.getElementById("finishTimeWarning").style.display = "none";
                                 document.getElementById("startDateWarning").style.display = "inline";
                                 document.getElementById("createButton").disabled = true;
                             }
-                            updateStartTimestamp();
                         });
 
-                        // check whether the selection contains more hours than one day
                         $("#start_hours").on("change", function () {
                             var hours = $("#start_hours").val();
-
-                            if (hours < 0 || hours > 23 || hours === "") {
+                            if (hours < 0 || hours > 23 || hours === "" || isNaN(hours)) {
                                 $("#start_hours").val(0);
                             }
-                            updateStartTimestamp();
+                            if (isValidDate($("#start_dateTime")).val()) {
+                                updateStartTimestamp();
+                            }
                         });
 
                         $("#start_minutes").on("change", function () {
                             var mins = $("#start_minutes").val();
 
-                            // replace minutes with zero when user didn't enter anything
-                            if (mins === "") {
+                            // replace minutes with zero when user didn't enter anything or input is not a number
+                            if (mins === "" || isNaN(mins) || (mins < 0 || mins > 59)) {
                                 mins = "0";
                             }
-
-                            // check whether the selection contains more minutes than one hour
-                            if (mins < 0 || mins > 59) {
-                                $("#start_minutes").val("00");
-                            } else if (mins < 10) {
+                            if (mins < 10) {
                                 // add leading zero to minute representation
-                                $("#start_minutes").val("0" + mins);
+                                mins = "0" + mins;
                             }
-                            updateStartTimestamp();
+                            $("#start_minutes").val(mins);
+                            if (isValidDate($("#start_dateTime")).val()) {
+                                updateStartTimestamp();
+                            }
                         });
 
                         // update the input of hidden startTime field with selected timestamp
                         var updateStartTimestamp = function () {
-                            var timestamp = new Date($("#start_dateTime").val()).getTime();
-                            timestamp += parseInt($("#start_hours").val() * 60 * 60 * 1000);
-                            timestamp += parseInt($("#start_minutes").val() * 60 * 1000);
+                            var newStartTime = new Date($("#start_dateTime").val()).getTime();
+                            newStartTime += parseInt($("#start_hours").val() * 60 * 60 * 1000);
+                            newStartTime += parseInt($("#start_minutes").val() * 60 * 1000);
+                            var finishTime = parseInt($("#finishTime").val());
 
-                            var finishTime = new Date($("#finish_dateTime").val()).getTime();
-
-                            // check whether the selected start time is before finish date
-                            if (finishTime < timestamp) {
-                                //display error message above start_dateTime field when finish time is behind selected one
-                                document.getElementById("finishTimeWarning").style.display = "inline";
-                                // disable submit button
-                                document.getElementById("createButton").disabled = true;
-                            } else {
-                                // error messages disappear due to right input
+                            if (finishTime > newStartTime) {
                                 document.getElementById("finishTimeWarning").style.display = "none";
-                                // enable submit button
-                                document.getElementById("createButton").disabled = false;
+                                if (isValidDate($("#finish_dateTime").val())) {
+                                    document.getElementById("createButton").disabled = false;
+                                }
+                            } else {
+                                if (isValidDate($("#finish_dateTime").val())) {
+                                    document.getElementById("finishTimeWarning").style.display = "inline";
+                                }
+                                document.getElementById("createButton").disabled = true;
                             }
-                            $("#startTime").val(timestamp);
+                            $("#startTime").val(newStartTime);
                         };
 
                         // date validation used in start and finish date
@@ -249,60 +244,59 @@
                             var date = ($("#finish_dateTime")).val();
                             if (isValidDate(date)) {
                                 document.getElementById("finishDateWarning").style.display = "none";
-                                document.getElementById("createButton").disabled = false;
+                                updateFinishTimestamp();
                             } else {
-                                // remove other warning for only having actual one presented
                                 document.getElementById("finishTimeWarning").style.display = "none";
                                 document.getElementById("finishDateWarning").style.display = "inline";
                                 document.getElementById("createButton").disabled = true;
                             }
-                            updateFinishTimestamp();
                         });
 
-                        // check whether the selection contains more hours than one day
                         $("#finish_hours").on("change", function () {
                             var hours = $("#finish_hours").val();
-                            if (hours < 0 || hours > 23 || hours === "") {
+                            if (hours < 0 || hours > 23 || hours === "" || isNaN(hours)) {
                                 $("#finish_hours").val(0);
                             }
-                            updateFinishTimestamp();
+                            if (isValidDate(($("#finish_dateTime")).val())) {
+                                updateFinishTimestamp();
+                            }
                         });
 
-                        // check whether the selection contains more minutes than one hour
                         $("#finish_minutes").on("change", function () {
                             var mins = $("#finish_minutes").val();
 
                             // check if input is empty and replace it with zero minutes
-                            if (mins === "") {
+                            if (mins === "" || isNaN(mins) || (mins < 0 || mins > 59)) {
                                 mins = "0";
                             }
 
-                            if (mins < 0 || mins > 59) {
-                                $("#finish_minutes").val("00");
-                            } else if (mins < 10) {
+                            if (mins < 10) {
                                 // add leading zero to minute representation
                                 $("#finish_minutes").val("0" + mins);
                             }
-                            updateFinishTimestamp();
+                            if (isValidDate(($("#finish_dateTime")).val())) {
+                                updateFinishTimestamp();
+                            }
                         });
 
                         var updateFinishTimestamp = function () {
-                            var timestamp = new Date($("#finish_dateTime").val()).getTime();
-                            timestamp += parseInt($("#finish_hours").val() * 60 * 60 * 1000);
-                            timestamp += parseInt($("#finish_minutes").val() * 60 * 1000);
+                            var newFinishTime = new Date($("#finish_dateTime").val()).getTime();
+                            newFinishTime += parseInt($("#finish_hours").val() * 60 * 60 * 1000);
+                            newFinishTime += parseInt($("#finish_minutes").val() * 60 * 1000);
                             var startTime = parseInt($("#startTime").val());
 
-                            // check whether selected finish time is later than start time
-                            if (timestamp < startTime) {
-                                // display error message above finish_dateTime field
-                                document.getElementById("finishTimeWarning").style.display = "inline";
-                                document.getElementById("createButton").disabled = true;
-                            } else {
-                                // error message disappears due to valid input
+                            if (newFinishTime > startTime) {
                                 document.getElementById("finishTimeWarning").style.display = "none";
-                                document.getElementById("createButton").disabled = false;
+                                if (isValidDate($("#start_dateTime").val())) {
+                                    document.getElementById("createButton").disabled = false;
+                                }
+                            } else {
+                                if (isValidDate($("#start_dateTime").val())) {
+                                    document.getElementById("finishTimeWarning").style.display = "inline";
+                                }
+                                document.getElementById("createButton").disabled = true;
                             }
-                            $("#finishTime").val(timestamp);
+                            $("#finishTime").val(newFinishTime);
                         };
                     </script>
                 </td>
