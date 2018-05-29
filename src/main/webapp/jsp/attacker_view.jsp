@@ -9,6 +9,10 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="com.google.gson.Gson" %>
+<%@ page import="java.util.stream.Collectors" %>
+<%Gson gson = new Gson();%>
+
 <% String pageTitle="Attacking Class"; %>
 <%@ include file="/jsp/header_game.jsp" %>
 
@@ -166,7 +170,7 @@
 			<%
 				boolean isTests = false;
 
-				String codeDivName = "newmut-div";
+				String codeDivName = "cut-div";
 				HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<Integer, ArrayList<Test>>();
 				List<Test> tests = game.getTests();
 
@@ -193,7 +197,7 @@
 		</div> <!-- slider single-item -->
 	</div> <!-- col-md6 mutants -->
 
-	<div class="col-md-6" id="newmut-div">
+	<div class="col-md-6" id="cut-div">
 		<form id="atk" action="<%=request.getContextPath() %>/play" method="post">
 			<h2>Create a mutant here
 				<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Role.ATTACKER)) {%>
@@ -224,49 +228,40 @@
 	});
 	editor.setSize("100%", 500);
 
-	highlightCoverage = function(){
-		highlightLine([<% for (Integer i : linesCovered.keySet()){%>
-			[<%=i%>, <%=((float)linesCovered.get(i).size() / (float) tests.size())%>],
-			<% } %>], COVERED_COLOR, "<%="#" + codeDivName%>");
-	};
-	showMutants = function(){
-		mutantLine([
-			<% for (Integer line : mutantLines.keySet()) {
-            %>
-			[<%= line %>,
-				<%= mutantLines.get(line).size() %>, [
-				<% for(Mutant mm : mutantLines.get(line)){%>
-				<%= mm.getId() %>,
-				<%}%>
-			]],
-			<%
-                } %>
-		],"<%="#" + codeDivName%>", false );
-	};
-	showKilledMutants = function(){
-		mutantKilledLine([
-			<% for (Integer line : mutantKilledLines.keySet()) {
-			%>
-			[<%= line %>,
-				<%= mutantKilledLines.get(line).size() %>, [
-				<% for(Mutant mm : mutantKilledLines.get(line)){%>
-				<%= mm.getId() %>,
-				<%}%>
-			]],
-			<%
-				} %>
-		],"<%="#" + codeDivName%>");
-	};
-	editor.on("viewportChange", function(){
-		showMutants();
-		showKilledMutants();
-		highlightCoverage();
-	});
-	$(document).ready(function(){
-		showMutants();
-		showKilledMutants();
-		highlightCoverage();
-	});
+    testMap = {<% for (Integer i : linesCovered.keySet()){%>
+    <%= i%>: [<%= linesCovered.get(i).stream().map(t -> Integer.toString(t.getId())).distinct().collect(Collectors.joining(","))%>],
+    <% } %>
+    };
+
+
+    highlightCoverage = function(){
+        highlightLine([<% for (Integer i : linesCovered.keySet()){%>
+            [<%=i%>, <%=((float)linesCovered.get(i).size() / (float) tests.size())%>],
+            <% } %>], COVERED_COLOR, "<%="#" + codeDivName%>");
+    };
+
+    getMutants = function(){
+        return JSON.parse("<%= gson.toJson(mutants).replace("\"", "\\\"") %>");
+    }
+
+    showMutants = function(){
+        mutantLine("<%="#" + codeDivName%>", "false");
+    };
+
+    var updateCUT = function(){
+        showMutants();
+        highlightCoverage();
+    };
+
+    editor.on("viewportChange", function(){
+        updateCUT();
+    });
+    $(document).ready(function(){
+        updateCUT();
+    });
+
+    //inline due to bug in Chrome?
+    $(window).resize(function (e){setTimeout(updateCUT, 500);});
 
 	var x = document.getElementsByClassName("utest");
 	var i;
