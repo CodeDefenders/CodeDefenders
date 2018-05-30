@@ -27,13 +27,13 @@
 %>
 <div id="creategame" class="container">
     <form id="create" action="<%=request.getContextPath() %>/multiplayer/games" method="post"
-          class="form-creategame-mp" role="form">
+          class="form-creategame-mp">
         <input type="hidden" name="formType" value="createGame">
         <table class="tableform">
             <tr>
                 <td width="25%">Java Class</td>
-                <td>
-                    <select name="class" class="form-control selectpicker" data-size="
+                <td id="classTd">
+                    <select id="class" name="class" class="form-control selectpicker" data-size="
                     large">
                         <% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
                         <option value="<%=c.getId()%>"><%=c.getAlias()%>
@@ -55,7 +55,7 @@
             -->
             <tr>
                 <td>Level</td>
-                <td>
+                <td id="levelTd">
                     <input type="checkbox" id="level" name="level" class="form-control" data-size="large"
                            data-toggle="toggle" data-on="Easy" data-off="Hard" data-onstyle="info"
                            data-offstyle="warning">
@@ -73,7 +73,7 @@
             %>
             <tr>
                 <td>Defenders</td>
-                <td class="crow fly">
+                <td class="crow fly" id="defendersTd">
                     <label style="font-weight: normal;" for="minDefenders">Min</label>
                     <input type="number" name="minDefenders" id="minDefenders" value="2"/>
                     <label style="font-weight: normal;" for="defenderLimit">Max</label>
@@ -82,7 +82,7 @@
             </tr>
             <tr>
                 <td>Attackers</td>
-                <td class="crow fly">
+                <td class="crow fly" id="attackersTd">
                     <label style="font-weight: normal;" for="minAttackers">Min</label>
                     <input type="number" value="2" name="minAttackers" id="minAttackers"/>
                     <label style="font-weight: normal;" for="attackerLimit">Max</label>
@@ -91,7 +91,7 @@
             </tr>
             <tr>
                 <td>Start Time</td>
-                <td>
+                <td id="startTimeTd">
                     <div class="crow">
                         <input type="hidden" id="startTime" name="startTime"/>
                         <span class="alert alert-warning" id="startDateWarning" style="display: none">Invalid date or format (expected: YYYY/MM/DD). </span>
@@ -123,58 +123,60 @@
                             var date = ($("#start_dateTime")).val();
                             if (isValidDate(date)) {
                                 document.getElementById("startDateWarning").style.display = "none";
-                                document.getElementById("createButton").disabled = false;
+                                updateStartTimestamp();
                             } else {
-                                // remove other warning for only having actual one presented
                                 document.getElementById("finishTimeWarning").style.display = "none";
                                 document.getElementById("startDateWarning").style.display = "inline";
                                 document.getElementById("createButton").disabled = true;
                             }
-                            updateStartTimestamp();
                         });
 
-                        // check whether the selection contains more hours than one day
                         $("#start_hours").on("change", function () {
                             var hours = $("#start_hours").val();
-                            if (hours < 0 || hours > 23) {
+                            if (hours < 0 || hours > 23 || hours === "" || isNaN(hours)) {
                                 $("#start_hours").val(0);
                             }
-                            updateStartTimestamp();
+                            if (isValidDate($("#start_dateTime")).val()) {
+                                updateStartTimestamp();
+                            }
                         });
 
                         $("#start_minutes").on("change", function () {
                             var mins = $("#start_minutes").val();
-                            // check whether the selection contains more minutes than one hour
-                            if (mins < 0 || mins > 59) {
-                                $("#start_minutes").val("00");
-                            } else if (mins < 10) {
-                                // add leading zero to minute representation
-                                $("#start_minutes").val("0" + mins);
+
+                            // replace minutes with zero if input is empty/not a number/out of valid range
+                            if (mins === "" || isNaN(mins) || (mins < 0 || mins > 59)) {
+                                mins = "0";
                             }
-                            updateStartTimestamp();
+                            if (mins < 10) {
+                                // add leading zero to minute representation
+                                mins = "0" + mins;
+                            }
+                            $("#start_minutes").val(mins);
+                            if (isValidDate($("#start_dateTime")).val()) {
+                                updateStartTimestamp();
+                            }
                         });
 
                         // update the input of hidden startTime field with selected timestamp
                         var updateStartTimestamp = function () {
-                            var timestamp = new Date($("#start_dateTime").val()).getTime();
-                            timestamp += parseInt($("#start_hours").val() * 60 * 60 * 1000);
-                            timestamp += parseInt($("#start_minutes").val() * 60 * 1000);
+                            var newStartTime = new Date($("#start_dateTime").val()).getTime();
+                            newStartTime += parseInt($("#start_hours").val() * 60 * 60 * 1000);
+                            newStartTime += parseInt($("#start_minutes").val() * 60 * 1000);
+                            var finishTime = parseInt($("#finishTime").val());
 
-                            var finishTime = new Date($("#finish_dateTime").val()).getTime();
-
-                            // check whether the selected start time is before finish date
-                            if (finishTime < timestamp) {
-                                //display error message above start_dateTime field when finish time is behind selected one
-                                document.getElementById("finishTimeWarning").style.display = "inline";
-                                // disable submit button
-                                document.getElementById("createButton").disabled = true;
-                            } else {
-                                // error messages disappear due to right input
+                            if (finishTime > newStartTime) {
                                 document.getElementById("finishTimeWarning").style.display = "none";
-                                // enable submit button
-                                document.getElementById("createButton").disabled = false;
+                                if (isValidDate($("#finish_dateTime").val())) {
+                                    document.getElementById("createButton").disabled = false;
+                                }
+                            } else {
+                                if (isValidDate($("#finish_dateTime").val())) {
+                                    document.getElementById("finishTimeWarning").style.display = "inline";
+                                }
+                                document.getElementById("createButton").disabled = true;
                             }
-                            $("#startTime").val(timestamp);
+                            $("#startTime").val(newStartTime);
                         };
 
                         // date validation used in start and finish date
@@ -208,7 +210,7 @@
             </tr>
             <tr>
                 <td>Finish Time</td>
-                <td>
+                <td id="finishTimeTd">
                     <div class="crow">
                         <input type="hidden" id="finishTime" name="finishTime"/>
                         <span class="alert alert-warning" id="finishTimeWarning" style="display: none">Finish time must be later than selected start time!</span>
@@ -242,54 +244,59 @@
                             var date = ($("#finish_dateTime")).val();
                             if (isValidDate(date)) {
                                 document.getElementById("finishDateWarning").style.display = "none";
-                                document.getElementById("createButton").disabled = false;
+                                updateFinishTimestamp();
                             } else {
-                                // remove other warning for only having actual one presented
                                 document.getElementById("finishTimeWarning").style.display = "none";
                                 document.getElementById("finishDateWarning").style.display = "inline";
                                 document.getElementById("createButton").disabled = true;
                             }
-                            updateFinishTimestamp();
                         });
 
-                        // check whether the selection contains more hours than one day
                         $("#finish_hours").on("change", function () {
                             var hours = $("#finish_hours").val();
-                            if (hours < 0 || hours > 23) {
+                            if (hours < 0 || hours > 23 || hours === "" || isNaN(hours)) {
                                 $("#finish_hours").val(0);
                             }
-                            updateFinishTimestamp();
+                            if (isValidDate(($("#finish_dateTime")).val())) {
+                                updateFinishTimestamp();
+                            }
                         });
 
-                        // check whether the selection contains more minutes than one hour
                         $("#finish_minutes").on("change", function () {
                             var mins = $("#finish_minutes").val();
-                            if (mins < 0 || mins > 59) {
-                                $("#finish_minutes").val("00");
-                            } else if (mins < 10) {
+
+                            // check if input is empty/not a number/not in a valid range and replace it with zero minutes
+                            if (mins === "" || isNaN(mins) || (mins < 0 || mins > 59)) {
+                                mins = "0";
+                            }
+
+                            if (mins < 10) {
                                 // add leading zero to minute representation
                                 $("#finish_minutes").val("0" + mins);
                             }
-                            updateFinishTimestamp();
+                            if (isValidDate(($("#finish_dateTime")).val())) {
+                                updateFinishTimestamp();
+                            }
                         });
 
                         var updateFinishTimestamp = function () {
-                            var timestamp = new Date($("#finish_dateTime").val()).getTime();
-                            timestamp += parseInt($("#finish_hours").val() * 60 * 60 * 1000);
-                            timestamp += parseInt($("#finish_minutes").val() * 60 * 1000);
+                            var newFinishTime = new Date($("#finish_dateTime").val()).getTime();
+                            newFinishTime += parseInt($("#finish_hours").val() * 60 * 60 * 1000);
+                            newFinishTime += parseInt($("#finish_minutes").val() * 60 * 1000);
                             var startTime = parseInt($("#startTime").val());
 
-                            // check whether selected finish time is later than start time
-                            if (timestamp < startTime) {
-                                // display error message above finish_dateTime field
-                                document.getElementById("finishTimeWarning").style.display = "inline";
-                                document.getElementById("createButton").disabled = true;
-                            } else {
-                                // error message disappears due to valid input
+                            if (newFinishTime > startTime) {
                                 document.getElementById("finishTimeWarning").style.display = "none";
-                                document.getElementById("createButton").disabled = false;
+                                if (isValidDate($("#start_dateTime").val())) {
+                                    document.getElementById("createButton").disabled = false;
+                                }
+                            } else {
+                                if (isValidDate($("#start_dateTime").val())) {
+                                    document.getElementById("finishTimeWarning").style.display = "inline";
+                                }
+                                document.getElementById("createButton").disabled = true;
                             }
-                            $("#finishTime").val(timestamp);
+                            $("#finishTime").val(newFinishTime);
                         };
                     </script>
                 </td>
@@ -298,7 +305,7 @@
                 <td title="Maximum number of assertions per test. Increase this for difficult to test classes.">
                     Max. Assertions per Test
                 </td>
-                <td>
+                <td id="maxAssertionsPerTestTd">
                     <input class="form-control" type="number" value="<%=DEFAULT_NB_ASSERTIONS%>"
                            name="maxAssertionsPerTest"
                            id="maxAssertionsPerTest" min=1 required/>
@@ -308,7 +315,7 @@
                 <td title="Click the question sign for more information on the levels">
                     Mutant validator
                 </td>
-                <td>
+                <td id="mutantValidatorLevelTd">
                     <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
                             data-size="medium">
                         <%for (CodeValidator.CodeValidatorLevel cvl : CodeValidator.CodeValidatorLevel.values()) {%>
@@ -331,7 +338,7 @@
                 <td title="Attackers can mark uncovered lines as equivalent">
                     Mark uncovered lines as equivalent
                 </td>
-                <td>
+                <td id="markUncoveredTd">
                     <input type="checkbox" id="markUncovered" name="markUncovered"
                            class="form-control" data-size="large" data-toggle="toggle" data-on="On" data-off="Off"
                            data-onstyle="primary" data-offstyle="">
@@ -341,7 +348,7 @@
                 <td title="Players can chat with their team and with all players in the game">
                     Chat
                 </td>
-                <td>
+                <td id="chatEnabledTd">
                     <input type="checkbox" id="chatEnabled" name="chatEnabled"
                            class="form-control" data-size="large" data-toggle="toggle" data-on="On" data-off="Off"
                            data-onstyle="primary" data-offstyle="" checked>

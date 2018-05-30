@@ -34,8 +34,8 @@
     <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 
     <!-- JQuery UI -->
-    <script src="js/jquery-ui.js" type="text/javascript" ></script>
-    <link href="css/jquery-ui.css" rel="stylesheet" type="text/css" />
+    <script src="js/jquery-ui.min.js" type="text/javascript" ></script>
+    <link href="css/jquery-ui.min.css" rel="stylesheet" type="text/css" />
 
     <link href="css/bootstrap-toggle_2.2.0.min.css" rel="stylesheet" type="text/css" />
     <script src="js/bootstrap-toggle_2.2.0.min.js" type="text/javascript" ></script>
@@ -141,7 +141,7 @@
                         <div class="tabs-blue-grey">
                             <a href="${pageContext.request.contextPath}/" class="main-title" id="site-logo">
                                 <div class="crow">
-                                    <div class="ws-12" style="font-size: 36px; text-align: center;">
+                                    <div id="home" class="ws-12" style="font-size: 36px; text-align: center;">
                                         <span><img class="logo" href="${pageContext.request.contextPath}/" src="images/logo.png"/></span>
                                         Code Defenders
                                     </div>

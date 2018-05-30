@@ -8,10 +8,10 @@
 
 <div class="full-width">
     <ul class="nav nav-tabs">
-        <li><a href="<%=request.getContextPath()%>/admin/games"> Create Games</a></li>
-        <li><a href="<%=request.getContextPath()%>/admin/monitor"> Monitor Games</a></li>
-        <li class="active"><a>Manage Users</a></li>
-        <li><a href="<%=request.getContextPath()%>/admin/settings">System Settings</a></li>
+        <li><a id="adminCreateGames" href="<%=request.getContextPath()%>/admin/games">Create Games</a></li>
+        <li><a id="adminMonitorGames" href="<%=request.getContextPath()%>/admin/monitor">Monitor Games</a></li>
+        <li class="active"><a id="adminUserMgmt">Manage Users</a></li>
+        <li><a id="adminSystemSettings" href="<%=request.getContextPath()%>/admin/settings">System Settings</a></li>
     </ul>
 
     <%
@@ -111,7 +111,7 @@
                     String totalScore = userInfo.get(5);
             %>
 
-            <tr>
+            <tr id="<%="user_row_"+uid%>">
                 <td class="col-sm-1"><%= uid%>
                     <input type="hidden" name="added_uid" value=<%=uid%>>
                 </td>
@@ -124,13 +124,13 @@
                 <td class="col-sm-2"><%= lastLogin %>
                 </td>
                 <td style="padding-top:4px; padding-bottom:4px">
-                    <button class="btn btn-sm btn-primary" name="editUserInfo" type="submit" value="<%=uid%>">
+                    <button class="btn btn-sm btn-primary" id="<%="edit_user_"+uid%>" name="editUserInfo" type="submit" value="<%=uid%>">
                         <span class="glyphicon glyphicon-pencil"></span>
                     </button>
                 </td>
                 <td style="padding-top:4px; padding-bottom:4px">
                     <%if (currentUserID != uid) {%>
-                    <button class="btn btn-sm btn-danger" type="submit" value="<%=uid%>" name="deleteUserButton"
+                    <button class="btn btn-sm btn-danger" id="<%="remove_user_"+uid%>" type="submit" value="<%=uid%>" name="deleteUserButton"
                             onclick="return confirm('Are you sure you want to permanently delete <%=username%>\'s ' +
                                     'account? \nThis will also delete all their games, mutants, tests, equivalences' +
                                     ' plus the games\'s mutants, tests and equivalences');" disabled>

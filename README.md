@@ -109,7 +109,7 @@ mvn clean compile package install war:war tomcat7:redeploy -DskipTests
 ```
 
 ### System Tests
-System tests work by deploying code-defenders inside disposable Docker containers and interacting with it by means of Selenium, which is again, running inside a Docker container.
+System tests work by deploying Code Defenders inside disposable Docker containers and interacting with it by means of Selenium, which is again, running inside a Docker container.
 This means that the DATA inside the DB are lost after the tests end.
 
 Since we use Docker containers which are not (yet) registered in any Docker public repository, we need to manually build them. Once those are in place, system tests can be run from maven as follows (note that we use the System Test profile `ST`):
@@ -118,8 +118,8 @@ Since we use Docker containers which are not (yet) registered in any Docker publ
 mvn clean compile package war:war integration-test -PST
 ```
 
-This command rebuilds and repackages the application using the `config.properties@docker` file. Then, it copies the resulting `.war` file in the right folder (`src/test/resources/systemtests/frontend`). An, finally, it runs all the tests which are annotated with `@Category(SystemTest.class)`. Each test starts two docker instances for code-defenders (one for the backend and on one for the front-end) and one docker instance for Selenium. 
-When containers are ready, the test code send the commands to the Selenium instance which must necessarily run on port 4444. When a test ends, it disposes all the containers. 
+This command rebuilds and repackages the application using the `config.properties@docker` file. Then, it copies the resulting `.war` file in the right folder (`src/test/resources/systemtests/frontend`). Finally, it runs all tests, which are annotated with `@Category(SystemTest.class)`. Each test starts two docker instances for Code Defenders (one for the backend and on one for the front-end) and one docker instance for Selenium. 
+When containers are ready, the test code send the commands to the Selenium instance which must necessarily run on port 4444. When a test ends, all containers are disposed.
 
 There's few catches. Since we use selenium-standalone we can run ONLY one system test at the time. The alternative (not in place) is to start a selenium-hub.
 
@@ -132,16 +132,15 @@ There's a `docker-compose-debug.yml` file under `src/test/resources/systemtests`
 Assuming that you have `docker` and `docker-compose` installed.
 
 ```bash
-cd src/test/resources/systemtests/tomcat8.5-jdk8
-docker build -t codedefenders/tomcat:8.5 .
-cd -
-cd src/test/resources/systemtests/frontend
+cd src/test/resources/systemtests/tomcat9-jdk8
+docker build -t codedefenders/tomcat:9 .
+cd ../frontend
 ./setup-filesystem.sh ./config.properties
 docker build -t codedefenders/frontend .
 ```
 
 #### Manually deploy the system using docker-compose
-If you want to try out code-defenders on docker, assuming you have build the right images. Run the following commands:
+If you want to try out Code Defenders on docker, assuming you have build the right images. Run the following commands:
 
 ```bash
 mvn clean compile package war:war -PST
@@ -149,7 +148,7 @@ cd  src/test/resources/systemtests/
 docker-compose up
 ```
 
-You should see the outputs of both containers on the console. Since the database in build on the fly, it takes more time to start mysql than usual. Tomcat retries to connect to the database several time. Tomcat receives a random port when it starts, so we need to get it from docker.
+You should see the outputs of both containers on the console. Since the database is built on the fly, it takes more time to start mysql than usual. Tomcat retries to connect to the database several time. Tomcat receives a random port when it starts, so we need to get it from docker.
 
 ```bash
 docker ps
@@ -162,7 +161,7 @@ CONTAINER ID        IMAGE                           COMMAND                  CRE
 5a4893783257        codedefenders/frontend:latest   "catalina.sh run"        3 minutes ago       Up 3 minutes        0.0.0.0:32799->8080/tcp   systemtests_frontend_1
 77470959a24c        mysql:latest                    "docker-entrypoint.s…"   3 minutes ago       Up 3 minutes        0.0.0.0:32798->3306/tcp   systemtests_db_1
 ```
-Locate the PORT corresponding to `codedefenders/frontend:latest`, e.g., and connect to code-defenders using the browser, e.g., `http://localhost:32799/codedefenders/`
+Locate the PORT corresponding to `codedefenders/frontend:latest`, e.g., and connect to Code Defenders using the browser, e.g., `http://localhost:32799/codedefenders/`
 
 To shutdown the application, Ctrl-C the docker-compose process.
 
@@ -192,7 +191,54 @@ TODO: Do we really need this?
 -->
 
 # FAQ
-### Q: I cannot deploy code-defenders anymore, there's a SQL exception.
+### Q: When I try to create a BattleGround, I got a 500 error page
+Code Defenders requires Java 1.8 also to compile the JSP. This is not the default options in many tomcat versions, despite you run tomcat on Java 1.8+.
+
+To enable this feature, you must update the main tomcat's `web.xml` file, which is under `<TOMCAT_HOME>/conf/`.
+
+Locate the following XML tags:
+
+```xml
+<servlet>
+    <servlet-name>jsp</servlet-name>
+    <servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
+    ...
+    <load-on-startup>3</load-on-startup>
+  </servlet>
+```
+
+And add the following inside the XML tag `<servlet>':
+
+```xml
+    <init-param>
+        <param-name>compiler</param-name>
+        <param-value>modern</param-value>
+    </init-param>
+    <init-param>
+        <param-name>compilerSourceVM</param-name>
+        <param-value>1.8</param-value>
+    </init-param>
+    <init-param>
+        <param-name>compilerTargetVM</param-name>
+        <param-value>1.8</param-value>
+    </init-param>
+    <init-param>
+        <param-name>suppressSmap</param-name>
+        <param-value>true</param-value>
+    </init-param>
+    <init-param>
+      <param-name>fork</param-name>
+      <param-value>false</param-value>
+    </init-param>
+    <init-param>
+      <param-name>xpoweredBy</param-name>
+      <param-value>false</param-value>
+    </init-param>
+```
+
+This solution is inspired by and adapted from this [solution](https://stackoverflow.com/questions/18208805/does-tomcat-8-support-java-8) presented on StackOverflow.
+
+### Q: I cannot deploy Code Defenders anymore, there's a SQL exception.
 If you are running MySQL 5.7 and the SQL exception reads as follows:
 
 ```

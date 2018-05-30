@@ -22,6 +22,8 @@ frontend:
 selenium:
   image: selenium/standalone-chrome
   ports:
-   - "4444:4444"
+    - "4444:4444"
   volumes:
-   - /dev/shm:/dev/shm
+    - /dev/shm:/dev/shm
+  links:
+    - "frontend:frontend"

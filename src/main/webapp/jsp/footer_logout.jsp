@@ -3,7 +3,7 @@
 <div id="research" class="paper-list">
 
 	<h1>
-		<a data-toggle="collapse" href="#researchBox" style="color:black"
+		<a id="showResearch" data-toggle="collapse" href="#researchBox" style="color:black"
 		onclick="changeChevron()">
 			Research
 			<span id = "researchBoxToggle" class="glyphicon glyphicon-chevron-down" style=" font-size: 25px; margin: 5px; "></span>

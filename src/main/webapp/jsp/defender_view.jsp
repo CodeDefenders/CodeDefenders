@@ -10,7 +10,11 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="com.google.gson.Gson" %>
+<%@ page import="java.util.stream.Collectors" %>
 <% String pageTitle="Defending Class"; %>
+<%Gson gson = new Gson();%>
+
 <%@ include file="/jsp/header_game.jsp" %>
 
 <%
@@ -47,7 +51,7 @@
 	<div class="col-md-6" id="utest-div">
 		<h2> Write a new JUnit test here
 			<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Role.DEFENDER)) {%>
-			<button type="submit" class="btn btn-primary btn-game btn-right" form="def" onClick="this.form.submit(); this.disabled=true; this.value='Defending...';">Defend!</button>
+			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def" onClick="this.form.submit(); this.disabled=true; this.value='Defending...';">Defend!</button>
 			<%}%>
 		</h2>
 		<form id="def" action="<%=request.getContextPath() %>/play" method="post">
@@ -271,50 +275,41 @@
 	});
 	editorSUT.setSize("100%", 500);
 
-	highlightCoverage = function(){
-		highlightLine([<% for (Integer i : linesCovered.keySet()){%>
-			[<%=i%>, <%=((float)linesCovered.get(i).size() / (float) tests.size())%>],
-			<% } %>], COVERED_COLOR, "<%="#" + codeDivName%>");
-	};
+    testMap = {<% for (Integer i : linesCovered.keySet()){%>
+    <%= i%>: [<%= linesCovered.get(i).stream().map(t -> Integer.toString(t.getId())).distinct().collect(Collectors.joining(","))%>],
+    <% } %>
+    };
 
-	showMutants = function(){
-		mutantLine([
-			<% for (Integer line : mutantLines.keySet()) {
-            %>
-			[<%= line %>,
-				<%= mutantLines.get(line).size() %>, [
-				<% for(Mutant mm : mutantLines.get(line)){%>
-				<%= mm.getId() %>,
-				<%}%>
-			]],
-			<%
-                } %>
-		],"<%="#" + codeDivName%>", false);
-	};
-	showKilledMutants = function(){
-		mutantKilledLine([
-			<% for (Integer line : mutantKilledLines.keySet()) {
-			%>
-			[<%= line %>,
-				<%= mutantKilledLines.get(line).size() %>, [
-				<% for(Mutant mm : mutantKilledLines.get(line)){%>
-				<%= mm.getId() %>,
-				<%}%>
-			]],
-			<%
-				} %>
-		],"<%="#" + codeDivName%>");
-	};
-	editorSUT.on("viewportChange", function(){
-		showMutants();
-		showKilledMutants();
-		highlightCoverage();
-	});
-	$(document).ready(function(){
-		showMutants();
-		showKilledMutants();
-		highlightCoverage();
-	});
+
+    highlightCoverage = function(){
+        highlightLine([<% for (Integer i : linesCovered.keySet()){%>
+            [<%=i%>, <%=((float)linesCovered.get(i).size() / (float) tests.size())%>],
+            <% } %>], COVERED_COLOR, "<%="#" + codeDivName%>");
+    };
+
+    getMutants = function(){
+        return JSON.parse("<%= gson.toJson(mutants).replace("\"", "\\\"") %>");
+    }
+
+    showMutants = function(){
+        mutantLine("<%="#" + codeDivName%>", "true");
+    };
+
+    var updateCUT = function(){
+        showMutants();
+        highlightCoverage();
+    };
+
+    editorSUT.on("viewportChange", function(){
+        updateCUT();
+    });
+    $(document).ready(function(){
+        updateCUT();
+    });
+
+    //inline due to bug in Chrome?
+    $(window).resize(function (e){setTimeout(updateCUT, 500);});
+
 
 
 	/* Submitted tests */

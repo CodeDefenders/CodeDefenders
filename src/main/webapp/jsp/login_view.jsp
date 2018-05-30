@@ -29,7 +29,7 @@
         <button class="btn btn-lg btn-primary btn-block" id="signInButton" type="submit">Sign in</button>
 
         <%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REGISTRATION).getBoolValue()) { %>
-        <a href="#" class="text-center new-account" data-toggle="modal" data-target="#createAccountModal">Create an account</a>
+        <a id="createAccountToggle" href="#" class="text-center new-account" data-toggle="modal" data-target="#createAccountModal">Create an account</a>
         <%}%>
 
         <%
