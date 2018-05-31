@@ -58,11 +58,17 @@
     <script src="codemirror/addon/scroll/annotatescrollbar.js" type="text/javascript" ></script>
     <script src="codemirror/addon/search/matchesonscrollbar.js" type="text/javascript" ></script>
     <script src="codemirror/addon/search/jump-to-line.js" type="text/javascript" ></script>
+    <script src="codemirror/addon/selection/active-line.js" type="text/javascript" ></script>
+    <script src="codemirror/addon/edit/matchbrackets.js" type="text/javascript" ></script>
+    <script src="codemirror/addon/edit/closebrackets.js" type="text/javascript" ></script>
+    <script src="codemirror/addon/hint/show-hint.js" type="text/javascript" ></script>
+    <script src="codemirror/addon/hint/anyword-hint.js" type="text/javascript" ></script>
 
     <link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
     <!-- <link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" > -->
     <link href="codemirror/addon/dialog/dialog.css" rel="stylesheet" type="text/css" >
     <link href="codemirror/addon/search/matchesonscrollbar.css" rel="stylesheet" type="text/css" >
+    <link href="codemirror/addon/hint/show-hint.css" rel="stylesheet" type="text/css" >
 
     <!-- Table sorter -->
     <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
