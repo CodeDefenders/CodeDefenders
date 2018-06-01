@@ -136,7 +136,7 @@
                             if (hours < 0 || hours > 23 || hours === "" || isNaN(hours)) {
                                 $("#start_hours").val(0);
                             }
-                            if (isValidDate($("#start_dateTime")).val()) {
+                            if (isValidDate(($("#start_dateTime")).val())) {
                                 updateStartTimestamp();
                             }
                         });
@@ -153,7 +153,7 @@
                                 mins = "0" + mins;
                             }
                             $("#start_minutes").val(mins);
-                            if (isValidDate($("#start_dateTime")).val()) {
+                            if (isValidDate(($("#start_dateTime")).val())) {
                                 updateStartTimestamp();
                             }
                         });
