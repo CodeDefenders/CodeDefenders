@@ -4,16 +4,17 @@
 <%@ include file="/jsp/header_main.jsp" %>
 <%
     List<GameClass> gameClasses = DatabaseAccess.getAllClasses();
-    if(gameClasses.isEmpty()) {
+    if (gameClasses.isEmpty()) {
         if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) {
 %>
 <div id="creategame" class="container">
     <p>
-        Before you can start games, please <a href="games/upload" class="text-center new-account">upload a class under test</a>.
+        Before you can start games, please <a href="games/upload" class="text-center new-account">upload a class under
+        test</a>.
     </p>
 </div>
 <%
-        } else {
+} else {
 %>
 <div id="creategame" class="container">
     <p>
@@ -21,8 +22,8 @@
     </p>
 </div>
 <%
-        }
-    } else {
+    }
+} else {
 
 %>
 <div id="creategame" class="container">
@@ -33,7 +34,8 @@
             <tr>
                 <td width="25%">Java Class</td>
                 <td id="classTd">
-                    <select id="class" name="class" class="form-control selectpicker" data-size="large">
+                    <select id="class" name="class" class="form-control selectpicker" data-size="
+                    large">
                         <% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
                         <option value="<%=c.getId()%>"><%=c.getAlias()%>
                         </option>
@@ -93,15 +95,23 @@
                 <td id="startTimeTd">
                     <div class="crow">
                         <input type="hidden" id="startTime" name="startTime"/>
-                        <span class="alert alert-danger" id="startTimeWarning" style="display: none">Start time must be later than today's date!</span>
-
-                        <input class="ws-5" name="start_dateTime" id="start_dateTime"/>
+                        <input class="ws-5" name="start_dateTime" id="start_dateTime"
+                               data-toggle="popover"
+                               data-content="Invalid date or format (expected: YYYY/MM/DD)"
+                               data-placement="left"
+                               data-trigger="manual"/>
                         <div class="ws-7 nest">
                             <input class="ws-1" type="text" name="start_hours" id="start_hours"
-                                   style="text-align: center;"/>
+                                   style="text-align: center;" data-toggle="popover"
+                                   data-content="Hours must be a number between 0 and 23"
+                                   data-placement="top"
+                                   data-trigger="manual"/>
                             <span>:</span>
                             <input class="ws-1" type="text" name="start_minutes" id="start_minutes"
-                                   style="text-align: center;"/>
+                                   style="text-align: center;" data-toggle="popover"
+                                   data-content="Minutes must be a number between 0 and 59"
+                                   data-placement="right"
+                                   data-trigger="manual"/>
                         </div>
                     </div>
                     <script>
@@ -120,71 +130,152 @@
                         });
 
                         $("#start_dateTime").on("change", function () {
-                            updateStartTimestamp();
+                            var date = ($("#start_dateTime")).val();
+
+                            if (isValidDate(date)) {
+                                updateStartTimestamp();
+                            } else {
+                                document.getElementById("createButton").disabled = true;
+                                $("#start_dateTime").popover("show");
+                                setTimeout(function () {
+                                    $("#start_dateTime").popover("hide")
+                                }, 6000);
+                                document.getElementById("finishTimeWarning").style.display = "none";
+                            }
                         });
 
-                        // check whether the selection contains more hours than one day
                         $("#start_hours").on("change", function () {
                             var hours = $("#start_hours").val();
-                            if (hours < 0 || hours > 23) {
-                                $("#start_hours").val(0);
+
+                            if (hours < 0 || hours > 23 || hours === "" || isNaN(hours)) {
+                                document.getElementById("createButton").disabled = true;
+                                $("#start_hours").popover("show");
+                                setTimeout(function () {
+                                    $("#start_hours").popover("hide");
+                                }, 6000);
+                            } else {
+                                updateStartTimestamp();
                             }
-                            updateStartTimestamp();
                         });
 
                         $("#start_minutes").on("change", function () {
                             var mins = $("#start_minutes").val();
-                            // check whether the selection contains more minutes than one hour
-                            if (mins < 0 || mins > 59) {
-                                $("#start_minutes").val("00");
-                            } else if (mins < 10) {
-                                // add leading zero to minute representation
-                                $("#start_minutes").val("0" + mins);
+
+                            // check invalid input to show error popover and disable submit button
+                            if (mins === "" || isNaN(mins) || (mins < 0 || mins > 59)) {
+                                document.getElementById("createButton").disabled = true;
+                                $("#start_minutes").popover("show");
+                                setTimeout(function () {
+                                    $("#start_minutes").popover("hide");
+                                }, 6000);
+                            } else {
+                                if (mins < 10) {
+                                    // add leading zero to minute representation
+                                    $("#start_minutes").val("0" + mins);
+                                }
+                                updateStartTimestamp();
                             }
-                            updateStartTimestamp();
                         });
 
                         // update the input of hidden startTime field with selected timestamp
                         var updateStartTimestamp = function () {
-                            var timestamp = new Date($("#start_dateTime").val()).getTime();
-                            timestamp += parseInt(($("#start_hours").val()) * 60 * 60 * 1000);
-                            timestamp += parseInt($("#start_minutes").val()) * 60 * 1000;
+                            var startDate = $("#start_dateTime").val();
+                            var hours = $("#start_hours").val();
+                            var mins = $("#start_minutes").val();
 
-                            var finishTime = new Date($("#finish_dateTime").val()).getTime();
+                            // update hidden start timestamp only if whole input is valid
+                            if (isValidDate(startDate)
+                                && !(hours < 0 || hours > 23 || hours === "" || isNaN(hours))
+                                && !(mins === "" || isNaN(mins) || (mins < 0 || mins > 59))) {
+                                var newStartTime = new Date(startDate).getTime();
+                                newStartTime += parseInt(hours * 60 * 60 * 1000);
+                                newStartTime += parseInt(mins * 60 * 1000);
+                                var finishTime = parseInt($("#finishTime").val());
 
-                            // check whether the selected start time is before finish date
-                            if (finishTime < timestamp) {
-                                //display error message above start_dateTime field when finish time is behind selected one
-                                document.getElementById("finishTimeWarning").style.display = "inline";
-                                // disable submit button
-                                document.getElementById("createButton").disabled = true;
-                            } else {
-                                // error messages disappear due to right input
-                                document.getElementById("startTimeWarning").style.display = "none";
-                                document.getElementById("finishTimeWarning").style.display = "none";
-                                // enable submit button
-                                document.getElementById("createButton").disabled = false;
+                                var finishHours = $("#finish_hours").val();
+                                var finishMins = $("#finish_minutes").val();
+
+                                if (finishTime > newStartTime) {
+
+                                    if (isValidDate($("#finish_dateTime").val())
+                                        && !(finishHours < 0 || finishHours > 23 || finishHours === "" || isNaN(finishHours))
+                                        && !(finishMins === "" || isNaN(finishMins) || (finishMins < 0 || finishMins > 59))) {
+                                        document.getElementById("createButton").disabled = false;
+                                    }
+                                } else {
+                                    if (isValidDate($("#finish_dateTime").val())
+                                        && !(finishHours < 0 || finishHours > 23 || finishHours === "" || isNaN(finishHours))
+                                        && !(finishMins === "" || isNaN(finishMins) || (finishMins < 0 || finishMins > 59))) {
+                                        $("#finishBeforeStartWarning").popover("show");
+                                        setTimeout(function () {
+                                            $("#finishBeforeStartWarning").popover("hide");
+                                        }, 6000);                                    }
+                                    document.getElementById("createButton").disabled = true;
+                                }
+                                $("#startTime").val(newStartTime);
                             }
-                            $("#startTime").val(timestamp);
                         };
+
+                        // date validation used in start and finish date
+                        function isValidDate(dateString) {
+                            // check pattern for YYYY/MM/DD
+                            if (!/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(dateString))
+                                return false;
+
+                            // parse the date parts to integers
+                            var parts = dateString.split("/");
+                            var year = parseInt(parts[0], 10);
+                            var month = parseInt(parts[1], 10);
+                            var day = parseInt(parts[2], 10);
+
+                            // check the ranges of month and year
+                            if (year < 1000 || year > 3000 || month === 0 || month > 12)
+                                return false;
+
+                            var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+                            // check for leap years
+                            if (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) {
+                                monthLength[1] = 29;
+                            }
+
+                            // check the range of the day
+                            return day > 0 && day <= monthLength[month - 1];
+                        };
+
 
                     </script>
                 </td>
+            </tr>
             <tr>
                 <td>Finish Time</td>
                 <td id="finishTimeTd">
                     <div class="crow">
                         <input type="hidden" id="finishTime" name="finishTime"/>
-                        <span class="alert alert-danger" id="finishTimeWarning" style="display: none">Finish time must be later than selected start time!</span>
-                        <input class="ws-5" name="finish_dateTime" id="finish_dateTime"/>
+                        <span class="alert alert-warning" id="finishTimeWarning" style="display: none"></span>
+                        <input class="ws-5" name="finish_dateTime" id="finish_dateTime"
+                               data-toggle="popover" data-content="Invalid date or format (expected: YYYY/MM/DD)"
+                               data-placement="left"
+                               data-trigger="manual"/>
                         <div class="ws-7 nest">
                             <input class="ws-1" type="text" name="finish_hours" id="finish_hours"
-                                   style="text-align: center;"/>
+                                   style="text-align: center;" data-toggle="popover"
+                                   data-content="Hours must be a number between 0 and 23"
+                                   data-placement="bottom"
+                                   data-trigger="manual"/>
                             <span>:</span>
                             <input class="ws-1" type="text" name="finish_minutes" id="finish_minutes"
-                                   style="text-align: center;"/>
+                                   style="text-align: center;" data-toggle="popover"
+                                   data-content="Minutes must be a number between 0 and 59"
+                                   data-placement="right"
+                                   data-trigger="manual"/>
                         </div>
                     </div>
+                    <span id="finishBeforeStartWarning" data-toggle="popover"
+                          data-content="Finish time must be later than selected start time!"
+                          data-placement="bottom"
+                          data-trigger="manual"></span>
+
                     <script>
                         $(document).ready(function () {
                             var initialFinishDate = new Date();
@@ -199,53 +290,92 @@
                                 mins = "0" + mins;
                             }
                             $("#finish_minutes").val(mins);
+                            $("#test").popover("show");
                         });
 
-                        // check whether the selected date is before today
                         $("#finish_dateTime").on("change", function () {
-                            updateFinishTimestamp();
+                            var date = ($("#finish_dateTime")).val();
+
+                            if (isValidDate(date)) {
+                                updateFinishTimestamp();
+                            } else {
+                                document.getElementById("createButton").disabled = true;
+                                $("#finish_dateTime").popover("show");
+                                setTimeout(function () {
+                                    $("#finish_dateTime").popover("hide")
+                                }, 6000);
+                                document.getElementById("finishTimeWarning").style.display = "none";
+                            }
                         });
 
-                        // check whether the selection contains more hours than one day
                         $("#finish_hours").on("change", function () {
                             var hours = $("#finish_hours").val();
-                            if (hours < 0 || hours > 23) {
-                                $("#finish_hours").val(0);
+
+                            if (hours < 0 || hours > 23 || hours === "" || isNaN(hours)) {
+                                document.getElementById("createButton").disabled = true;
+                                $("#finish_hours").popover("show");
+                                setTimeout(function () {
+                                    $("#finish_hours").popover("hide");
+                                }, 6000);
+                            } else {
+                                updateFinishTimestamp();
                             }
-                            updateFinishTimestamp();
                         });
 
-                        // check whether the selection contains more minutes than one hour
                         $("#finish_minutes").on("change", function () {
                             var mins = $("#finish_minutes").val();
-                            if (mins < 0 || mins > 59) {
-                                $("#finish_minutes").val("00");
-                            } else if (mins < 10) {
-                                // add leading zero to minute representation
-                                $("#finish_minutes").val("0" + mins);
+
+                            if (mins === "" || isNaN(mins) || (mins < 0 || mins > 59)) {
+                                document.getElementById("createButton").disabled = true;
+                                $("#finish_minutes").popover("show");
+                                setTimeout(function () {
+                                    $("#finish_minutes").popover("hide");
+                                }, 6000);
+                            } else {
+                                if (mins < 10) {
+                                    // add leading zero to minute representation
+                                    $("#finish_minutes").val("0" + mins);
+                                }
+                                // update hidden finish timestamp only if whole input is valid
+                                updateFinishTimestamp();
+
                             }
-                            updateFinishTimestamp();
                         });
 
                         var updateFinishTimestamp = function () {
-                            var timestamp = new Date($("#finish_dateTime").val()).getTime();
-                            timestamp += parseInt(($("#finish_hours").val()) * 60 * 60 * 1000);
-                            timestamp += parseInt(($("#finish_minutes").val()) * 60 * 1000);
-                            var startTime = parseInt($("#startTime").val());
+                            var finishDate = $("#finish_dateTime").val();
+                            var finishHours = $("#finish_hours").val();
+                            var finishMins = $("#finish_minutes").val();
 
-                            // check whether the selected finish time is later than the start time
-                            if (timestamp < startTime) {
-                                //display error message above finish_dateTime field
-                                document.getElementById("finishTimeWarning").style.display = "inline";
-                                // disable submit button
-                                document.getElementById("createButton").disabled = true;
-                            } else {
-                                // error message disappears due to valid input
-                                document.getElementById("finishTimeWarning").style.display = "none";
-                                // enable submit button
-                                document.getElementById("createButton").disabled = false;
+                            if (isValidDate(finishDate)
+                                && !(finishHours < 0 || finishHours > 23 || finishHours === "" || isNaN(finishHours))
+                                && !(finishMins === "" || isNaN(finishMins) || (finishMins < 0 || finishMins > 59))) {
+                                var newFinishTime = new Date($("#finish_dateTime").val()).getTime();
+                                newFinishTime += parseInt($("#finish_hours").val() * 60 * 60 * 1000);
+                                newFinishTime += parseInt($("#finish_minutes").val() * 60 * 1000);
+                                var startTime = parseInt($("#startTime").val());
+
+                                var startHours = $("#start_hours").val();
+                                var startMins = $("#start_minutes").val();
+
+                                if (newFinishTime > startTime) {
+                                    if (isValidDate($("#start_dateTime").val())
+                                        && !(startHours < 0 || startHours > 23 || startHours === "" || isNaN(startHours))
+                                        && !(startMins === "" || isNaN(startMins) || (startMins < 0 || startMins > 59))) {
+                                        document.getElementById("createButton").disabled = false;
+                                    }
+                                } else {
+                                    if (isValidDate($("#start_dateTime").val())
+                                        && !(startHours < 0 || startHours > 23 || startHours === "" || isNaN(startHours))
+                                        && !(startMins === "" || isNaN(startMins) || (startMins < 0 || startMins > 59))) {
+                                        $("#finishBeforeStartWarning").popover("show");
+                                        setTimeout(function () {
+                                            $("#finishBeforeStartWarning").popover("hide");
+                                        }, 6000);                                    }
+                                    document.getElementById("createButton").disabled = true;
+                                }
+                                $("#finishTime").val(newFinishTime);
                             }
-                            $("#finishTime").val(timestamp);
                         };
                     </script>
                 </td>
@@ -269,7 +399,7 @@
                             data-size="medium">
                         <%for (CodeValidator.CodeValidatorLevel cvl : CodeValidator.CodeValidatorLevel.values()) {%>
                         <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidator.CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
-                        <%=cvl.name().toLowerCase()%>
+                            <%=cvl.name().toLowerCase()%>
                         </option>
                         <%}%>
                     </select>
