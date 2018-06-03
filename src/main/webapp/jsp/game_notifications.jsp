@@ -4,7 +4,12 @@
     //If the user is logged in, start receiving notifications
     var updateGameNotifications = function(url) {
         $.getJSON(url, function (r) {
-
+            for (var i = 0; i < r.length; i++){
+                r[i].time = Date.parse(r[i].time);
+            }
+            r.sort(function (a, b) {
+                return a.time - b.time;
+            });
             $(r).each(function (index) {
 
                 var eventClass = "#game-notifications-game"
@@ -36,6 +41,8 @@
 
                 eventClass += " .events";
 
+                $(eventClass).scrollTop(0)
+
                 var oldNotifications = $(eventClass).html();
 
                 oldNotifications =
@@ -49,8 +56,8 @@
 
                 var totalCount = parseInt(lastTotalCount.html()) + 1;
 
-                if (isNaN(total)){
-                    total = 1;
+                if (isNaN(totalCount)){
+                    totalCount = 1;
                 }
 
                 lastTotalCount.html(totalCount);

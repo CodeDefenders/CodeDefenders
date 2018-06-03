@@ -39,12 +39,79 @@
 </div>
 <div>
 	<script>
+        // If you make changes to the autocompletion, change it for an attacker too.
+        junitMethods = ["assertArrayEquals", "assertEquals", "assertTrue", "assertFalse", "assertNull",
+            "assertNotNull", "assertSame", "assertNotSame", "fail"];
+        autocompletelist = [];
+
+        filterOutComments = function(text) {
+            var blockCommentRegex = /\/\*(.|\s)*?\*\//gm;
+            var lineCommentRegex = /\/\/.*(\r\n|\r|\n)/g;
+            return text.replace(blockCommentRegex, "").replace(lineCommentRegex, "")
+        };
+        updateAutocompleteList = function () {
+            var wordRegex = /[a-zA-Z][a-zA-Z0-9]*/gm;
+            var set = new Set(junitMethods);
+
+            var testClass = editorTest.getValue().split("\n");
+            testClass.slice(8, testClass.length - 2);
+            testClass = testClass.join("\n");
+            var texts = [testClass, editorSUT.getValue()];
+
+            texts.forEach(function (text) {
+                text = filterOutComments(text);
+                var m;
+                while ((m = wordRegex.exec(text)) !== null) {
+                    if (m.index === wordRegex.lastIndex) {
+                        wordRegex.lastIndex++;
+                    }
+                    m.forEach(function (match) {
+                        set.add(match)
+                    });
+                }
+            });
+            autocompleteList =  Array.from(set);
+        };
+
+        CodeMirror.commands.autocomplete = function (cm) {
+            cm.showHint({
+                hint: function (editor) {
+                    var reg = /[a-zA-Z][a-zA-Z0-9]*/;
+
+                    var list = autocompleteList;
+                    var cursor = editor.getCursor();
+                    var currentLine = editor.getLine(cursor.line);
+                    var start = cursor.ch;
+                    var end = start;
+                    while (end < currentLine.length && reg.test(currentLine.charAt(end))) ++end;
+                    while (start && reg.test(currentLine.charAt(start - 1))) --start;
+                    var curWord = start != end && currentLine.slice(start, end);
+                    var regex = new RegExp('^' + curWord, 'i');
+
+                    var result = {
+                        list: (!curWord ? list : list.filter(function (item) {
+                            return item.match(regex);
+                        })).sort(),
+                        from: CodeMirror.Pos(cursor.line, start),
+                        to: CodeMirror.Pos(cursor.line, end)
+                    };
+
+                    return result;
+                }
+            });
+        };
+
 		var editorTest = CodeMirror.fromTextArea(document.getElementById("code"), {
-			lineNumbers: true,
-			indentUnit: 4,
-			indentWithTabs: true,
-			matchBrackets: true,
-			mode: "text/x-java"
+            lineNumbers: true,
+            indentUnit: 4,
+            smartIndent: true,
+            indentWithTabs: true,
+            matchBrackets: true,
+            mode: "text/x-java",
+            autoCloseBrackets: true,
+            styleActiveLine: true,
+            extraKeys: {"Ctrl-Space": "autocomplete"},
+            keyMap: "default"
 		});
 		editorTest.on('beforeChange',function(cm,change) {
 			var text = cm.getValue();
@@ -55,6 +122,15 @@
 				change.cancel();
 			}
 		});
+        editorTest.on('focus', function () {
+            updateAutocompleteList();
+        });
+        editorTest.on('keyHandled', function (cm, name, event) {
+            // 9 == Tab, 13 == Enter
+            if ([9, 13].includes(event.keyCode)) {
+                updateAutocompleteList();
+            }
+        });
 		editorTest.setSize("100%", 500);
 		var editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
 			lineNumbers: true,
