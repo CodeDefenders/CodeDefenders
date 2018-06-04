@@ -28,6 +28,7 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -43,6 +44,10 @@ public class UploadManager extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
 	private boolean fromAdmin;
+
+	static List<String> getReservedClassNames() {
+		return Arrays.asList("Test.java");
+	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -108,6 +113,12 @@ public class UploadManager extends HttpServlet {
 		// Not a java file - file is not yet stored, so no need to cleanup
 		if (!fileName.endsWith(".java")) {
 			messages.add("The class under test must be a .java file.");
+			Redirect.redirectBack(request, response);
+			return;
+		}
+
+		if(getReservedClassNames().contains(fileName)) {
+			messages.add(fileName + " is a reserved class name, please rename your Java class.");
 			Redirect.redirectBack(request, response);
 			return;
 		}
