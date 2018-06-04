@@ -373,10 +373,14 @@
 			<td class="col-sm-1"><%= g.getStartDateTime() %></td>
 			<td class="col-sm-1"><%= g.getFinishDateTime() %></td>
 			<td class="col-sm-2">
+				<% if(g.getAttackerIds().length < g.getAttackerLimit()) { %>
 				<a class="btn btn-sm btn-primary" id="<%="join-attacker-"+g.getId()%>" style="background-color: #884466;border-color: #772233; margin-bottom: 3px;"
 				   href="<%=request.getContextPath()%>/multiplayer/games?attacker=1&id=<%= g.getId() %>">Join as Attacker</a>
+				<% } %>
+				<% if(g.getDefenderIds().length < g.getDefenderLimit()) { %>
 				<a class="btn btn-sm btn-primary" id="<%="join-defender-"+g.getId()%>" style="background-color: #446688;border-color: #225577"
 				   href="<%=request.getContextPath()%>/multiplayer/games?defender=1&id=<%= g.getId() %>">Join as Defender</a>
+				<% } %>
 			</td>
 		</tr>
 <%
