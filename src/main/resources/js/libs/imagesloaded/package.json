@@ -1,20 +1,26 @@
 {
   "name": "imagesloaded",
-  "version": "3.1.8",
-  "description": "You images done yet or what?",
+  "version": "4.1.4",
+  "description": "JavaScript is all like _You images done yet or what?_",
   "main": "imagesloaded.js",
-  "devDependencies": {
-    "grunt": "~0.4.0",
-    "grunt-contrib-jshint": "~0.1.1",
-    "grunt-contrib-uglify": "~0.1.2",
-    "grunt-contrib-watch": "~0.3.1",
-    "highlight.js": "~7.3.0",
-    "marked": "~0.2.8",
-    "grunt-requirejs": "~0.4.0"
-  },
   "dependencies": {
-    "wolfy87-eventemitter": "4.x",
-    "eventie": ">=1.0.4 <2"
+    "ev-emitter": "^1.0.0"
+  },
+  "devDependencies": {
+    "chalk": "^1.1.1",
+    "cheerio": "^0.19.0",
+    "gulp": "^3.9.0",
+    "gulp-jshint": "^1.11.2",
+    "gulp-json-lint": "^0.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-replace": "^0.5.4",
+    "gulp-requirejs-optimize": "github:metafizzy/gulp-requirejs-optimize",
+    "gulp-uglify": "^1.4.2",
+    "gulp-util": "^3.0.7",
+    "highlight.js": "^8.9.1",
+    "marked": "^0.3.5",
+    "minimist": "^1.2.0",
+    "transfob": "^1.0.0"
   },
   "repository": {
     "type": "git",
@@ -27,5 +33,16 @@
     "dom",
     "jquery-plugin"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/desandro/imagesloaded/issues"
+  },
+  "homepage": "https://github.com/desandro/imagesloaded",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "David DeSandro"
 }
