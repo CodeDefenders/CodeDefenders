@@ -74,12 +74,6 @@ public class CodeValidator {
 	// This validation pipeline should use the Chain-of-Responsibility design pattern
 	public static String getValidationMessage(String originalCode, String mutatedCode, CodeValidatorLevel level) {
 
-		try {
-			Files.createTempFile("temp", null);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		// if only string literals were changed
 		if (onlyLiteralsChanged(originalCode, mutatedCode)) {
 			return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
