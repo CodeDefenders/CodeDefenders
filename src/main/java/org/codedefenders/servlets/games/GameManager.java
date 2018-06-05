@@ -386,8 +386,8 @@ public class GameManager extends HttpServlet {
 		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
 
 		// is it an actual mutation?
-		String md5CUT = CodeValidator.getMD5(sourceCode);
-		String md5Mutant = CodeValidator.getMD5(mutatedCode);
+		String md5CUT = CodeValidator.getMD5FromText(sourceCode);
+		String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
 
 		// mutant is valid only if it differs from CUT and does not contain forbidden constructs
 		if (md5CUT.equals(md5Mutant))
@@ -397,7 +397,7 @@ public class GameManager extends HttpServlet {
 	}
 
 	public static Mutant existingMutant(int gid, String mutatedCode) throws IOException {
-		String md5Mutant = CodeValidator.getMD5(mutatedCode);
+		String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
 
 		// return the mutant in the game with same MD5 if it exists; return null otherwise
 		return DatabaseAccess.getMutant(gid, md5Mutant);
@@ -433,7 +433,7 @@ public class GameManager extends HttpServlet {
 		bw.close();
 
 		// sanity check
-		String md5Mutant = CodeValidator.getMD5(mutatedCode);
+		String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
 		String md5FromMutantFile = CodeValidator.getMD5FromFile(mutantFileName);
 		assert md5Mutant.equals(md5FromMutantFile) : "MD5 hashes differ between code as text and code from new file";
 

@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -461,13 +460,13 @@ public class CodeValidator {
 	public static String getMD5FromFile(String filename) {
 		try {
 			String code = FileUtils.readFileToString(new File(filename));
-			return getMD5(code);
+			return getMD5FromText(code);
 		} catch (IOException e) {
 			return null;
 		}
 	}
 
-	public static String getMD5(String code) {
+	public static String getMD5FromText(String code) {
 		String codeWithoutComments = getCodeWithoutComments(code);
 		return org.apache.commons.codec.digest.DigestUtils.md5Hex(codeWithoutComments);
 	}
