@@ -451,7 +451,6 @@
                     if (isValidDate(date)) {
                         updateStartTimestamp();
                     } else {
-                        console.log("yay");
                         document.getElementById("submit_users_btn").disabled = true;
                         $("#start_dateTime").popover("show");
                         setTimeout(function () {
