@@ -392,8 +392,6 @@ public class CodeValidator {
 	public static boolean validTestCode(String javaFile, int maxNumberOfAssertions) throws CodeValidatorException {
 		try {
 			CompilationUnit cu = getCompilationUnitFromFile(javaFile);
-			if (cu == null)
-				return false;
 			TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions);
 			visitor.visit(cu, null);
 			return visitor.isValid();
@@ -430,7 +428,7 @@ public class CodeValidator {
 			String code = FileUtils.readFileToString(new File(filename));
 			return getMD5FromText(code);
 		} catch (IOException e) {
-			return null;
+			return null; // TODO: This error should be handled
 		}
 	}
 
