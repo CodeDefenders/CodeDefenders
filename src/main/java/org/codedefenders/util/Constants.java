@@ -79,7 +79,7 @@ public class Constants {
 	public static final String LOSER_MESSAGE = "You lost!";
 	public static final String DRAW_MESSAGE = "It was a draw!";
 
-	public static final String TEST_GENERIC_ERROR_MESSAGE = "Sorry ! An error on the server prevented the compilation of your test.";
+	public static final String TEST_GENERIC_ERROR_MESSAGE = "Sorry! An error on the server prevented the compilation of your test.";
 
 	public static final String TEST_DID_NOT_COMPILE_MESSAGE = "Your test did not compile. Try again, but with compilable code.";
 	public static final String TEST_INVALID_MESSAGE = "Your test is not valid. Remember the rules: Only one non-empty test, at most %d assertions per test, no conditionals and no loops!";
@@ -122,5 +122,5 @@ public class Constants {
 
 	public static final String MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE = "Invalid mutant, sorry! Your mutant changes one or more method signatures or field names or import statements";
 
-	public static final String ATTACKER_HAS_PENDING_DUELS = "Sorry your mutant cannot be accepted because you have pending equivalence duels !\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
+	public static final String ATTACKER_HAS_PENDING_DUELS = "Sorry, your mutant cannot be accepted because you have pending equivalence duels !\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
 }

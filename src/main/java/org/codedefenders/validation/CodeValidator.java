@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -74,20 +73,26 @@ public class CodeValidator {
 	// This validation pipeline should use the Chain-of-Responsibility design pattern
 	public static String getValidationMessage(String originalCode, String mutatedCode, CodeValidatorLevel level) {
 
-		try {
-			Files.createTempFile("temp", null);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		// if only string literals were changed
 		if (onlyLiteralsChanged(originalCode, mutatedCode)) {
 			return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
 		}
 
 		// If the mutants contains changes to method signatures, mark it as not valid
-		if (level.equals(CodeValidatorLevel.STRICT) && (mutantChangesMethodSignatures(originalCode, mutatedCode) || mutantChangesFieldNames(originalCode, mutatedCode) || mutantChangesImportStatements(originalCode, mutatedCode))) {
-			return Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE;
+		if (level.equals(CodeValidatorLevel.STRICT)) {
+			try {
+				CompilationUnit originalCU = getCompilationUnitFromText(originalCode);
+				CompilationUnit mutatedCU = getCompilationUnitFromText(mutatedCode);
+				if (mutantChangesMethodSignatures(originalCU, mutatedCU)
+						|| mutantChangesFieldNames(originalCU, mutatedCU)
+						|| mutantChangesImportStatements(originalCU, mutatedCU)) {
+					return Constants.MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE;
+				}
+			} catch(ParseException | IOException e) {
+				logger.debug("Error parsing code: {}", e.getMessage());
+				// The current behaviour is to ignore this error, since it
+				// is not a violation of these constraints
+			}
 		}
 
 		// line-level diff
@@ -175,7 +180,7 @@ public class CodeValidator {
 				}
 			}
 		} catch (IOException e) {
-			logger.warn("Swallowing IOException", e);
+			logger.warn("Swallowing IOException", e); // TODO: Why are we swallowing this?
 		}
 		return tokens;
 	}
@@ -279,90 +284,44 @@ public class CodeValidator {
 		return fieldNames;
 	}
 
-	private static Boolean mutantChangesMethodSignatures(final String orig, final String muta) {
+	private static Boolean mutantChangesMethodSignatures(final CompilationUnit orig, final CompilationUnit muta) {
 		// Parse original and extract method signatures -> Set of string
 		Set<String> cutMethodSignatures = new HashSet<>();
 		Set<String> mutantMethodSignatures = new HashSet<>();
 
-		try (InputStream is = new ByteArrayInputStream(orig.getBytes())) {
-			CompilationUnit cu = JavaParser.parse(is);
-
-			for( TypeDeclaration td : cu.getTypes() ){
-				cutMethodSignatures.addAll(extractMethodSignaturesByType(td));
-			}
-
-		} catch (ParseException | TokenMgrError ignored) {
-			ignored.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		for( TypeDeclaration td : orig.getTypes() ){
+			cutMethodSignatures.addAll(extractMethodSignaturesByType(td));
 		}
 
-		try (InputStream is = new ByteArrayInputStream(muta.getBytes())) {
-			CompilationUnit cu = JavaParser.parse(is);
-			for( TypeDeclaration td : cu.getTypes() ){
-				mutantMethodSignatures.addAll(extractMethodSignaturesByType(td));
-			}
-		} catch (ParseException | TokenMgrError ignored) {
-			ignored.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		for( TypeDeclaration td : muta.getTypes() ){
+			mutantMethodSignatures.addAll(extractMethodSignaturesByType(td));
 		}
 
 		return !cutMethodSignatures.equals(mutantMethodSignatures);
 	}
 
-	private static Boolean mutantChangesImportStatements(final String orig, final String muta) {
+	private static Boolean mutantChangesImportStatements(final CompilationUnit orig, final CompilationUnit muta) {
 		// Parse original and extract method signatures -> Set of string
 		Set<String> cutImportStatements = new HashSet<>();
 		Set<String> mutantImportStatements = new HashSet<>();
 
-		try (InputStream is = new ByteArrayInputStream(orig.getBytes())) {
-			CompilationUnit cu = JavaParser.parse(is);
-			cutImportStatements.addAll(extractImportStatements(cu));
-		} catch (ParseException | TokenMgrError ignored) {
-			ignored.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		try (InputStream is = new ByteArrayInputStream(muta.getBytes())) {
-			CompilationUnit cu = JavaParser.parse(is);
-			mutantImportStatements.addAll(extractImportStatements(cu));
-		} catch (ParseException | TokenMgrError ignored) {
-			ignored.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		cutImportStatements.addAll(extractImportStatements(orig));
+		mutantImportStatements.addAll(extractImportStatements(muta));
 
 		return !cutImportStatements.equals(mutantImportStatements);
 	}
 
-	private static Boolean mutantChangesFieldNames(final String orig, final String muta) {
+	private static Boolean mutantChangesFieldNames(final CompilationUnit orig, final CompilationUnit muta) {
 		// Parse original and extract method signatures -> Set of string
 		Set<String> cutFieldNames = new HashSet<>();
 		Set<String> mutantFieldNames = new HashSet<>();
 
-		try (InputStream is = new ByteArrayInputStream(orig.getBytes())) {
-			CompilationUnit cu = JavaParser.parse(is);
-			for( TypeDeclaration td : cu.getTypes() ){
-				cutFieldNames.addAll(extractFieldNamesByType(td));
-			}
-
-		} catch (ParseException | TokenMgrError ignored) {
-			ignored.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		for( TypeDeclaration td : orig.getTypes() ){
+			cutFieldNames.addAll(extractFieldNamesByType(td));
 		}
 
-		try (InputStream is = new ByteArrayInputStream(muta.getBytes())) {
-			CompilationUnit cu = JavaParser.parse(is);
-			for( TypeDeclaration td : cu.getTypes() ){
-				mutantFieldNames.addAll(extractFieldNamesByType(td));
-			}
-		} catch (ParseException | TokenMgrError ignored) {
-			ignored.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		for( TypeDeclaration td : muta.getTypes() ){
+			mutantFieldNames.addAll(extractFieldNamesByType(td));
 		}
 
 		return !cutFieldNames.equals(mutantFieldNames);
@@ -376,6 +335,7 @@ public class CodeValidator {
 			if (!visitor.isValid())
 				return visitor.getMessage();
 		} catch (ParseException | TokenMgrError ignored) {
+			// TODO: Why is ignoring this acceptable?
 		}
 		// remove whitespaces
 		String diff2 = diff.replaceAll("\\s+", "");
@@ -431,14 +391,15 @@ public class CodeValidator {
 
 	public static boolean validTestCode(String javaFile, int maxNumberOfAssertions) throws CodeValidatorException {
 		try {
-			CompilationUnit cu = getCompilationUnit(javaFile);
-			if (cu == null)
-				return false;
+			CompilationUnit cu = getCompilationUnitFromFile(javaFile);
 			TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions);
 			visitor.visit(cu, null);
 			return visitor.isValid();
+		} catch(IOException | ParseException e) {
+			// Parse error means this is not valid test code
+			return false;
 		} catch (Throwable e) {
-			logger.error("Problem in validating test code " + javaFile);
+			logger.error("Problem in validating test code {}", javaFile);
 			throw new CodeValidatorException("Problem in validating test code " + javaFile, e);
 		}
 	}
@@ -447,33 +408,31 @@ public class CodeValidator {
 		return validTestCode(javaFile, DEFAULT_NB_ASSERTIONS);
 	}
 
-	public static CompilationUnit getCompilationUnit(String javaFile) {
-		FileInputStream in = null;
-		try {
-			in = new FileInputStream(javaFile);
-			CompilationUnit cu;
-			try {
-				cu = JavaParser.parse(in);
-				return cu;
-			} finally {
-				in.close();
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
+	public static CompilationUnit getCompilationUnitFromText(String code) throws ParseException, IOException {
+		try (InputStream is = new ByteArrayInputStream(code.getBytes())) {
+			CompilationUnit cu = JavaParser.parse(is);
+			return cu;
 		}
-		return null;
+	}
+
+	public static CompilationUnit getCompilationUnitFromFile(String javaFile) throws IOException, ParseException {
+		try(FileInputStream in = new FileInputStream(javaFile)) {
+			CompilationUnit cu;
+			cu = JavaParser.parse(in);
+			return cu;
+		}
 	}
 
 	public static String getMD5FromFile(String filename) {
 		try {
 			String code = FileUtils.readFileToString(new File(filename));
-			return getMD5(code);
+			return getMD5FromText(code);
 		} catch (IOException e) {
-			return null;
+			return null; // TODO: This error should be handled
 		}
 	}
 
-	public static String getMD5(String code) {
+	public static String getMD5FromText(String code) {
 		String codeWithoutComments = getCodeWithoutComments(code);
 		return org.apache.commons.codec.digest.DigestUtils.md5Hex(codeWithoutComments);
 	}
