@@ -433,9 +433,7 @@ public class GameManager extends HttpServlet {
 		bw.close();
 
 		// sanity check
-		String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
-		String md5FromMutantFile = CodeValidator.getMD5FromFile(mutantFileName);
-		assert md5Mutant.equals(md5FromMutantFile) : "MD5 hashes differ between code as text and code from new file";
+		assert CodeValidator.getMD5FromText(mutatedCode).equals(CodeValidator.getMD5FromFile(mutantFileName)) : "MD5 hashes differ between code as text and code from new file";
 
 		// Compile the mutant and add it to the game if possible; otherwise, TODO: delete these files created?
 		return AntRunner.compileMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
