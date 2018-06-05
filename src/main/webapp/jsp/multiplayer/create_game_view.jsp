@@ -122,11 +122,17 @@
                             $("#start_dateTime").datepicker("setDate", initialStartDate);
                             $("#start_hours").val(initialStartDate.getHours());
                             var mins = initialStartDate.getMinutes();
+                            var hours = initialStartDate.getHours();
                             if (mins < 10) {
                                 // add leading zero to minute representation
                                 mins = "0" + mins;
                             }
+                            if (hours < 10) {
+                                // add leading zero to minute representation
+                                hours = "0" + hours;
+                            }
                             $("#start_minutes").val(mins);
+                            $("#start_hours").val(hours);
                         });
 
                         $("#start_dateTime").on("change", function () {
@@ -154,6 +160,10 @@
                                     $("#start_hours").popover("hide");
                                 }, 6000);
                             } else {
+                                if (hours < 10) {
+                                    // add leading zero to hour representation
+                                    $("#start_hours").val("0" + hours);
+                                }
                                 updateStartTimestamp();
                             }
                         });
@@ -161,7 +171,6 @@
                         $("#start_minutes").on("change", function () {
                             var mins = $("#start_minutes").val();
 
-                            // check invalid input to show error popover and disable submit button
                             if (mins === "" || isNaN(mins) || (mins < 0 || mins > 59)) {
                                 document.getElementById("createButton").disabled = true;
                                 $("#start_minutes").popover("show");
@@ -286,11 +295,15 @@
                             $("#finish_dateTime").datepicker("setDate", initialFinishDate);
                             $("#finish_hours").val(initialFinishDate.getHours());
                             var mins = initialFinishDate.getMinutes();
+                            var hours = initialFinishDate.getHours();
                             if (mins < 10) {
                                 mins = "0" + mins;
                             }
+                            if (hours < 10) {
+                                hours = "0" + hours;
+                            }
                             $("#finish_minutes").val(mins);
-                            $("#test").popover("show");
+                            $("#finish_hours").val(hours);
                         });
 
                         $("#finish_dateTime").on("change", function () {
@@ -318,6 +331,10 @@
                                     $("#finish_hours").popover("hide");
                                 }, 6000);
                             } else {
+                                if (hours < 10) {
+                                    // add leading zero to hour representation
+                                    $("#finish_hours").val("0" + hours);
+                                }
                                 updateFinishTimestamp();
                             }
                         });
@@ -336,7 +353,6 @@
                                     // add leading zero to minute representation
                                     $("#finish_minutes").val("0" + mins);
                                 }
-                                // update hidden finish timestamp only if whole input is valid
                                 updateFinishTimestamp();
 
                             }

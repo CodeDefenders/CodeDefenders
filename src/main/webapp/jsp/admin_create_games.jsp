@@ -394,102 +394,308 @@
             </div>
             <div class="col-sm-3">
             </div>
-
-
-            <%
-                DateTime startDate = DateTime.now();
-                DateTime finishDate = startDate.plusHours(2);
-                DateTimeFormatter fmt = DateTimeFormat.forPattern("MM/dd/yyyy");
-            %>
             <div class="col-sm-2">
                 <label for="startTime" class="label-normal">Start Time</label>
                 <br/>
-                <input type="hidden" id="startTime" name="startTime" value="<%=startDate.getMillis()%>"/>
+                <input type="hidden" id="startTime" name="startTime"/>
                 <input class="form-control" name="start_dateTime" id="start_dateTime"
-                       value="<%=fmt.print(startDate)%>"/>
+                       data-toggle="popover"
+                       data-content="Invalid date or format (expected: YYYY/MM/DD)"
+                       data-placement="top"
+                       data-trigger="manual"/>
                 <div>
                     <input class="ws-2" type="text" name="start_hours" id="start_hours"
-                           value="<%=String.format("%1$02d",startDate.getHourOfDay())%>"
-                           style="text-align: center;" min="0" max="59"/>
+                           style="text-align: center;" min="0" max="59"
+                           data-toggle="popover"
+                           data-content="Hours must be a number between 0 and 23"
+                           data-placement="bottom"
+                           data-trigger="manual"/>
                     <span>:</span>
                     <input class="ws-2" type="text" name="start_minutes" id="start_minutes"
-                           value="<%=String.format("%1$02d",startDate.getMinuteOfHour())%>"
-                           style="text-align: center;" min="0" max="59"/>
+                           style="text-align: center;" min="0" max="59"
+                           data-toggle="popover"
+                           data-content="Minutes must be a number between 0 and 59"
+                           data-placement="bottom"
+                           data-trigger="manual"/>
                 </div>
+                <span id="finishBeforeStartWarning" data-toggle="popover"
+                      data-content="Finish time must be later than selected start time!"
+                      data-placement="bottom"
+                      data-trigger="manual"></span>
             </div>
+
             <script>
-                var voidFunct = function () {
-                };
-                var updateStartTimestamp = function () {
-                    var timestamp = new Date($("#start_dateTime").val()).valueOf();
-                    timestamp += parseInt($("#start_hours").val()) * 60 * 60 * 1000;
-                    timestamp += parseInt($("#start_minutes").val()) * 60 * 1000;
-                    var now = new Date().getTime();
-                    if (timestamp < now) {
-                        //invalid timestamp, set it to now
-                        timestamp = now;
+                $(document).ready(function () {
+                    var initialStartDate = new Date();
+                    $("#startTime").val(initialStartDate.getTime());
+                    $("#start_dateTime").datepicker({dateFormat: "yy/mm/dd"});
+                    $("#start_dateTime").datepicker("setDate", initialStartDate);
+                    $("#start_hours").val(initialStartDate.getHours());
+                    var mins = initialStartDate.getMinutes();
+                    var hours = initialStartDate.getHours();
+                    if (mins < 10) {
+                        // add leading zero to minute representation
+                        mins = "0" + mins;
                     }
-                    $("#startTime").val(timestamp);
-                }
+                    if (hours < 10) {
+                        // add leading zero to minute representation
+                        hours = "0" + hours;
+                    }
+                    $("#start_minutes").val(mins);
+                    $("#start_hours").val(hours);
+                });
+
+                $("#start_dateTime").on("change", function () {
+                    var date = ($("#start_dateTime")).val();
+
+                    if (isValidDate(date)) {
+                        updateStartTimestamp();
+                    } else {
+                        console.log("yay");
+                        document.getElementById("submit_users_btn").disabled = true;
+                        $("#start_dateTime").popover("show");
+                        setTimeout(function () {
+                            $("#start_dateTime").popover("hide")
+                        }, 6000);
+                        document.getElementById("finishTimeWarning").style.display = "none";
+                    }
+                });
+
                 $("#start_hours").on("change", function () {
                     var hours = $("#start_hours").val();
-                    updateStartTimestamp();
-                })
-                $("#start_minutes").on("change", function () {
-                    var mins = $("#start_minutes").val();
-                    updateStartTimestamp();
-                })
-                var dataPicker = $("#start_dateTime").datepicker({
-                    onSelect: function (selectedDate, dp) {
-                        $(".ui-datepicker a").attr("href", "javascript:voidFunct();");
+
+                    if (hours < 0 || hours > 23 || hours === "" || isNaN(hours)) {
+                        document.getElementById("submit_users_btn").disabled = true;
+                        $("#start_hours").popover("show");
+                        setTimeout(function () {
+                            $("#start_hours").popover("hide");
+                        }, 6000);
+                    } else {
+                        if (hours < 10) {
+                            // add leading zero to hour representation
+                            $("#start_hours").val("0" + hours);
+                        }
                         updateStartTimestamp();
                     }
                 });
+
+                $("#start_minutes").on("change", function () {
+                    var mins = $("#start_minutes").val();
+
+                    // check invalid input to show error popover and disable submit button
+                    if (mins === "" || isNaN(mins) || (mins < 0 || mins > 59)) {
+                        document.getElementById("submit_users_btn").disabled = true;
+                        $("#start_minutes").popover("show");
+                        setTimeout(function () {
+                            $("#start_minutes").popover("hide");
+                        }, 6000);
+                    } else {
+                        if (mins < 10) {
+                            // add leading zero to minute representation
+                            $("#start_minutes").val("0" + mins);
+                        }
+                        updateStartTimestamp();
+                    }
+                });
+
+                // update the input of hidden startTime field with selected timestamp
+                var updateStartTimestamp = function () {
+                    var startDate = $("#start_dateTime").val();
+                    var hours = $("#start_hours").val();
+                    var mins = $("#start_minutes").val();
+
+                    // update hidden start timestamp only if whole input is valid
+                    if (isValidDate(startDate)
+                        && !(hours < 0 || hours > 23 || hours === "" || isNaN(hours))
+                        && !(mins === "" || isNaN(mins) || (mins < 0 || mins > 59))) {
+                        var newStartTime = new Date(startDate).getTime();
+                        newStartTime += parseInt(hours * 60 * 60 * 1000);
+                        newStartTime += parseInt(mins * 60 * 1000);
+                        var finishTime = parseInt($("#finishTime").val());
+
+                        var finishHours = $("#finish_hours").val();
+                        var finishMins = $("#finish_minutes").val();
+
+                        if (finishTime > newStartTime) {
+
+                            if (isValidDate($("#finish_dateTime").val())
+                                && !(finishHours < 0 || finishHours > 23 || finishHours === "" || isNaN(finishHours))
+                                && !(finishMins === "" || isNaN(finishMins) || (finishMins < 0 || finishMins > 59))) {
+                                document.getElementById("submit_users_btn").disabled = false;
+                            }
+                        } else {
+                            if (isValidDate($("#finish_dateTime").val())
+                                && !(finishHours < 0 || finishHours > 23 || finishHours === "" || isNaN(finishHours))
+                                && !(finishMins === "" || isNaN(finishMins) || (finishMins < 0 || finishMins > 59))) {
+                                $("#finishBeforeStartWarning").popover("show");
+                                setTimeout(function () {
+                                    $("#finishBeforeStartWarning").popover("hide");
+                                }, 6000);                                    }
+                            document.getElementById("submit_users_btn").disabled = true;
+                        }
+                        $("#startTime").val(newStartTime);
+                    }
+                };
+
+                // date validation used in start and finish date
+                function isValidDate(dateString) {
+                    // check pattern for YYYY/MM/DD
+                    if (!/^\d{4}\/\d{1,2}\/\d{1,2}$/.test(dateString))
+                        return false;
+
+                    // parse the date parts to integers
+                    var parts = dateString.split("/");
+                    var year = parseInt(parts[0], 10);
+                    var month = parseInt(parts[1], 10);
+                    var day = parseInt(parts[2], 10);
+
+                    // check the ranges of month and year
+                    if (year < 1000 || year > 3000 || month === 0 || month > 12)
+                        return false;
+
+                    var monthLength = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+                    // check for leap years
+                    if (year % 400 === 0 || (year % 100 !== 0 && year % 4 === 0)) {
+                        monthLength[1] = 29;
+                    }
+
+                    // check the range of the day
+                    return day > 0 && day <= monthLength[month - 1];
+                };
+
             </script>
             <div class="col-sm-2">
                 <label for="finishTime" class="label-normal">Finish Time</label>
-                <input type="hidden" id="finishTime" name="finishTime" value="<%=finishDate.getMillis()%>"/>
+                <input type="hidden" id="finishTime" name="finishTime"/>
                 <input class="form-control" name="finish_dateTime" id="finish_dateTime"
-                       value="<%=fmt.print(finishDate)%>"/>
+                       data-toggle="popover" data-content="Invalid date or format (expected: YYYY/MM/DD)"
+                       data-placement="top"
+                       data-trigger="manual"/>
                 <div>
                     <input class="ws-2" type="text" name="finish_hours" id="finish_hours"
-                           value="<%=String.format("%1$02d",finishDate.getHourOfDay())%>"
-                           style="text-align: center;" min="0" max="59"/>
+                           style="text-align: center;" min="0" max="59"
+                           data-toggle="popover"
+                           data-content="Hours must be a number between 0 and 23"
+                           data-placement="bottom"
+                           data-trigger="manual"/>
                     <span>:</span>
                     <input class="ws-2" type="text" name="finish_minutes" id="finish_minutes"
-                           value="<%=String.format("%1$02d",finishDate.getMinuteOfHour())%>"
-                           style="text-align: center;" min="0" max="59"/>
+                           style="text-align: center;" min="0" max="59"
+                           data-toggle="popover"
+                           data-content="Minutes must be a number between 0 and 59"
+                           data-placement="bottom"
+                           data-trigger="manual"/>
                 </div>
             </div>
             <script>
-                var updateFinishTimestamp = function () {
-                    var timestamp = new Date($("#finish_dateTime").val()).valueOf();
-                    timestamp += parseInt($("#finish_hours").val()) * 60 * 60 * 1000;
-                    timestamp += parseInt($("#finish_minutes").val()) * 60 * 1000;
-                    var now = new Date().getTime();
-                    if (timestamp < now) {
-                        //invalid timestamp, set it to now+2 hours
-                        timestamp = now + (2 * 60 * 60 * 1000);
+                $(document).ready(function () {
+                    var initialFinishDate = new Date();
+                    // add default 3 days to initial finish date
+                    initialFinishDate.setDate(initialFinishDate.getDate() + 3);
+                    $("#finishTime").val(initialFinishDate.getTime());
+                    $("#finish_dateTime").datepicker({dateFormat: "yy/mm/dd"});
+                    $("#finish_dateTime").datepicker("setDate", initialFinishDate);
+                    $("#finish_hours").val(initialFinishDate.getHours());
+                    var mins = initialFinishDate.getMinutes();
+                    var hours = initialFinishDate.getHours();
+                    if (mins < 10) {
+                        mins = "0" + mins;
                     }
-                    $("#finishTime").val(timestamp);
-                }
+                    if (hours < 10) {
+                        hours = "0" + hours;
+                    }
+                    $("#finish_minutes").val(mins);
+                    $("#finish_hours").val(hours);
+                });
+
+                $("#finish_dateTime").on("change", function () {
+                    var date = ($("#finish_dateTime")).val();
+
+                    if (isValidDate(date)) {
+                        updateFinishTimestamp();
+                    } else {
+                        document.getElementById("submit_users_btn").disabled = true;
+                        $("#finish_dateTime").popover("show");
+                        setTimeout(function () {
+                            $("#finish_dateTime").popover("hide")
+                        }, 6000);
+                        document.getElementById("finishTimeWarning").style.display = "none";
+                    }
+                });
+
                 $("#finish_hours").on("change", function () {
                     var hours = $("#finish_hours").val();
-                    updateFinishTimestamp();
-                })
+
+                    if (hours < 0 || hours > 23 || hours === "" || isNaN(hours)) {
+                        document.getElementById("submit_users_btn").disabled = true;
+                        $("#finish_hours").popover("show");
+                        setTimeout(function () {
+                            $("#finish_hours").popover("hide");
+                        }, 6000);
+                    } else {
+                        if (hours < 10) {
+                            // add leading zero to hour representation
+                            $("#finish_hours").val("0" + hours);
+                        }
+                        updateFinishTimestamp();
+                    }
+                });
+
                 $("#finish_minutes").on("change", function () {
                     var mins = $("#finish_minutes").val();
-                    updateFinishTimestamp();
-                })
-                var dataPicker = $("#finish_dateTime").datepicker({
-                    onSelect: function (selectedDate, dp) {
-                        $(".ui-datepicker a").attr("href", "javascript:voidFunct();");
+
+                    if (mins === "" || isNaN(mins) || (mins < 0 || mins > 59)) {
+                        document.getElementById("submit_users_btn").disabled = true;
+                        $("#finish_minutes").popover("show");
+                        setTimeout(function () {
+                            $("#finish_minutes").popover("hide");
+                        }, 6000);
+                    } else {
+                        if (mins < 10) {
+                            // add leading zero to minute representation
+                            $("#finish_minutes").val("0" + mins);
+                        }
                         updateFinishTimestamp();
-                    },
+                    }
                 });
+
+                var updateFinishTimestamp = function () {
+                    var finishDate = $("#finish_dateTime").val();
+                    var finishHours = $("#finish_hours").val();
+                    var finishMins = $("#finish_minutes").val();
+
+                    if (isValidDate(finishDate)
+                        && !(finishHours < 0 || finishHours > 23 || finishHours === "" || isNaN(finishHours))
+                        && !(finishMins === "" || isNaN(finishMins) || (finishMins < 0 || finishMins > 59))) {
+                        var newFinishTime = new Date($("#finish_dateTime").val()).getTime();
+                        newFinishTime += parseInt($("#finish_hours").val() * 60 * 60 * 1000);
+                        newFinishTime += parseInt($("#finish_minutes").val() * 60 * 1000);
+                        var startTime = parseInt($("#startTime").val());
+
+                        var startHours = $("#start_hours").val();
+                        var startMins = $("#start_minutes").val();
+
+                        if (newFinishTime > startTime) {
+                            if (isValidDate($("#start_dateTime").val())
+                                && !(startHours < 0 || startHours > 23 || startHours === "" || isNaN(startHours))
+                                && !(startMins === "" || isNaN(startMins) || (startMins < 0 || startMins > 59))) {
+                                document.getElementById("submit_users_btn").disabled = false;
+                            }
+                        } else {
+                            if (isValidDate($("#start_dateTime").val())
+                                && !(startHours < 0 || startHours > 23 || startHours === "" || isNaN(startHours))
+                                && !(startMins === "" || isNaN(startMins) || (startMins < 0 || startMins > 59))) {
+                                $("#finishBeforeStartWarning").popover("show");
+                                setTimeout(function () {
+                                    $("#finishBeforeStartWarning").popover("hide");
+                                }, 6000);                                    }
+                            document.getElementById("submit_users_btn").disabled = true;
+                        }
+                        $("#finishTime").val(newFinishTime);
+                    }
+                };
             </script>
-
-
         </div>
         <div class="row">
             <div class="col-sm-2" id="mutantValidatorLevelDiv">

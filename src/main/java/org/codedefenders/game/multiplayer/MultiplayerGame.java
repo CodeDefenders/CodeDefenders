@@ -196,13 +196,13 @@ public class MultiplayerGame extends AbstractGame {
 
 	public String getStartDateTime() {
 		Date date = new Date(startDateTime);
-		Format format = new SimpleDateFormat("dd/MM/yy HH:mm");
+		Format format = new SimpleDateFormat("yy/MM/dd HH:mm");
 		return format.format(date);
 	}
 
 	public String getFinishDateTime() {
 		Date date = new Date(finishDateTime);
-		Format format = new SimpleDateFormat("dd/MM/yy HH:mm");
+		Format format = new SimpleDateFormat("yy/MM/dd HH:mm");
 		return format.format(date);
 	}
 
