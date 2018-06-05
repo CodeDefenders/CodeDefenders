@@ -45,10 +45,10 @@ public class MultiplayerGame extends AbstractGame {
 	private int minAttackers;
 	private int minDefenders;
 
-	@CheckDateFormat(pattern="yyyy/MM/dd HH:mm", message = "Invalid date for Start Time")
+	@CheckDateFormat(patterns={"yyyy/MM/dd HH:mm", "yyyy/MM/dd H:m", "yyyy/MM/dd HH:m", "yyyy/MM/dd H:mm"}, message = "Invalid date format for Start Time")
 	private long startDateTime;
 
-	@CheckDateFormat(pattern="yyyy/MM/dd HH:mm", message = "Invalid date for Finish Time")
+	@CheckDateFormat(patterns={"yyyy/MM/dd HH:mm", "yyyy/MM/dd H:m", "yyyy/MM/dd HH:m", "yyyy/MM/dd H:mm"}, message = "Invalid date format for Finish Time")
 	private long finishDateTime;
 	private boolean requiresValidation;
 	private int maxAssertionsPerTest;
