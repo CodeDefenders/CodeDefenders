@@ -5,14 +5,15 @@ import java.time.format.DateTimeFormatter;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-// For some reason this is broken...
 public class CheckDateValidator implements ConstraintValidator<CheckDateFormat, Object> {
 
-	private String pattern;
+	// Those are checked with AT LEAST semantics, i.e., they are composed with
+	// OR
+	private String[] patterns;
 
 	@Override
 	public void initialize(CheckDateFormat constraintAnnotation) {
-		this.pattern = constraintAnnotation.pattern();
+		this.patterns = constraintAnnotation.patterns();
 	}
 
 	@Override
@@ -20,13 +21,17 @@ public class CheckDateValidator implements ConstraintValidator<CheckDateFormat, 
 		if (object == null) {
 			return true;
 		} else if (object instanceof String) {
-			try {
-				DateTimeFormatter.ofPattern(pattern).parse(String.valueOf(object));
-				return true;
-			} catch (Throwable e) {
-				return false;
+
+			for (String pattern : patterns) {
+				try {
+					DateTimeFormatter.ofPattern(pattern).parse(String.valueOf(object));
+					return true;
+				} catch (Throwable e) {
+					// We do not care about this one, since there might be more than one format
+				}
 			}
-		} else if ( object instanceof Long){
+			return false;
+		} else if (object instanceof Long) {
 			return true;
 		}
 		return false;

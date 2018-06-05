@@ -21,6 +21,7 @@ public @interface CheckDateFormat {
 
     Class<? extends Payload>[] payload() default { };
 
-    String pattern();
+    // Those are composed with OR
+    String[] patterns();
 
 }
