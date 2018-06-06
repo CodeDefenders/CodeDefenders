@@ -6,6 +6,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 public class SeleniumTestUtils {
@@ -39,6 +41,22 @@ public class SeleniumTestUtils {
             Thread.sleep(500);
         }
         fail("Timeout while waiting for element to be visible.");
+    }
+
+    /**
+     * Login if not logged in already.
+     */
+    public static void login(WebDriver driver, String codeDefendersHome, String username, String password) {
+        driver.get(codeDefendersHome);
+        driver.findElement(By.id("enter")).click();
+
+        if (driver.getCurrentUrl().contains("login")) {
+            driver.findElement(By.id("inputUsername")).clear();
+            driver.findElement(By.id("inputUsername")).sendKeys(username);
+            driver.findElement(By.id("inputPassword")).clear();
+            driver.findElement(By.id("inputPassword")).sendKeys(password);
+            driver.findElement(By.id("signInButton")).click();
+        }
     }
 
 }

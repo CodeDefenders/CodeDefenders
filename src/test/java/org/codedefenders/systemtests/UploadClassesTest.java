@@ -30,7 +30,7 @@ public class UploadClassesTest extends AbstractEmptyDBSystemTest {
 	@ClassRule
 	public static DockerComposeRule docker = DockerComposeRule.builder()//
 			.files(DockerComposeFiles.from("src/test/resources/systemtests/docker-compose.yml",
-					"src/test/resources/systemtests/db-insert-test-users.yml",
+					"src/test/resources/systemtests/insert-test-users.yml",
 					"src/test/resources/systemtests/mount-sources-folder.yml"))
 
 			.waitingForService("selenium", HealthChecks.toHaveAllPortsOpen())
@@ -121,17 +121,7 @@ public class UploadClassesTest extends AbstractEmptyDBSystemTest {
 			localDriver.setFileDetector(new LocalFileDetector());
 		}
 
-		driver.get(codeDefendersHome);
-		driver.findElement(By.id("enter")).click();
-
-		/* Log in if not logged in already */
-		if (driver.getCurrentUrl().contains("login")) {
-			driver.findElement(By.id("inputUsername")).clear();
-			driver.findElement(By.id("inputUsername")).sendKeys("codedefenders");
-			driver.findElement(By.id("inputPassword")).clear();
-			driver.findElement(By.id("inputPassword")).sendKeys("codedefenderspw");
-			driver.findElement(By.id("signInButton")).click();
-		}
+		SeleniumTestUtils.login(driver, codeDefendersHome, "codedefenders", "codedefenderspw");
 
 		driver.findElement(By.id("headerUploadButton")).click();
 	}

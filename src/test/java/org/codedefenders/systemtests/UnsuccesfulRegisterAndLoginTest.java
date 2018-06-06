@@ -29,7 +29,7 @@ public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder()//
             .files(DockerComposeFiles.from("src/test/resources/systemtests/docker-compose.yml",
-                    "src/test/resources/systemtests/db-insert-test-users.yml"))
+                    "src/test/resources/systemtests/insert-test-users.yml"))
 
             .waitingForService("selenium", HealthChecks.toHaveAllPortsOpen())
             .waitingForService("db", HealthChecks.toHaveAllPortsOpen())
