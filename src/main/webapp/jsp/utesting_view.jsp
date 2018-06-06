@@ -110,17 +110,17 @@
 
 <div class="row-fluid">
 	<div class="col-md-6" id="cut-div">
-		<h2>Class Under Test</h2>
+		<h3>Class Under Test</h3>
 		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30"><%=uTestingSession.getCUT().getAsString()%></textarea></pre>
 	</div> <!-- col-md6 left -->
 	<div class="col-md-6" id="utest-div">
-		<h2> Write a new JUnit test here
+		<h3> Write a new JUnit test here
 			<% if (uTestingSession.getState().equals(FINISHED)) {%>
 			<button class="btn btn-primary btn-game btn-right disabled">Finished</button>
 			<%} else { %>
 			<button type="submit" class="btn btn-primary btn-game btn-right" form="def">Submit</button>
 			<%} %>
-		</h2>
+		</h3>
 		<form id="def" action="<%=request.getContextPath() %>/utesting" method="post">
 			<%
 				String testCode;
@@ -138,7 +138,7 @@
 
 <div class="row-fluid">
 	<div class="col-md-6" id="submitted-div">
-		<h2> JUnit tests </h2>
+		<h3>JUnit tests </h3>
 		<div class="slider single-item">
 			<%
 				boolean isTests = false;
@@ -151,7 +151,7 @@
 			<%
 				}
 				if (!isTests) {%>
-			<div><h2></h2><p> There are currently no tests </p></div>
+			<div><h3></h3><p> There are currently no tests </p></div>
 			<%}
 			%>
 		</div> <!-- slider single-item -->

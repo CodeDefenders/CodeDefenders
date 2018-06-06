@@ -120,7 +120,7 @@
             <%@include file="/jsp/multiplayer/game_unit_tests.jsp"%>
         </div>
         <div class="w-55" id="newmut-div">
-                <h2>Class Under Test</h2>
+                <h3>Class Under Test</h3>
                 <input type="hidden" name="formType" value="createMutant">
                 <input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
                 <%

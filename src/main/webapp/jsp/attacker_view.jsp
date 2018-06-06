@@ -44,7 +44,7 @@
 
 <div class="row-fluid">
 	<div class="col-md-6" id="mutants-div">
-		<h2>Mutants</h2>
+		<h3>Mutants</h3>
 		<!-- Nav tabs -->
 		<ul class="nav nav-tabs" role="tablist">
 			<li class="active">
@@ -165,7 +165,7 @@
 				</table>
 			</div>
 		</div> <!-- tab-content -->
-		<h2> JUnit Tests </h2>
+		<h3>JUnit Tests </h3>
 		<div class="slider single-item">
 			<%
 				boolean isTests = false;
@@ -191,7 +191,7 @@
 			<%
 				}
 				if (tests.isEmpty()) {%>
-			<div><h2></h2><p> There are currently no tests </p></div>
+			<div><h3></h3><p> There are currently no tests </p></div>
 			<%}
 			%>
 		</div> <!-- slider single-item -->
@@ -199,10 +199,10 @@
 
 	<div class="col-md-6" id="cut-div">
 		<form id="atk" action="<%=request.getContextPath() %>/play" method="post">
-			<h2>Create a mutant here
+			<h3>Create a mutant here
 				<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Role.ATTACKER)) {%>
 				<button type="submit" class="btn btn-primary btn-game btn-right" id="submitMutant" form="atk" onClick="this.form.submit(); this.disabled=true; this.value='Attacking...';">Attack!</button><%}%>
-			</h2>
+			</h3>
 			<input type="hidden" name="formType" value="createMutant">
 			<%
 				String mutantCode;
