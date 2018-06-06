@@ -80,7 +80,7 @@ public class Mutant implements Serializable {
 		this.alive = alive;
 		this.equivalent = Equivalence.ASSUMED_NO;
 		this.playerId = playerId;
-		this.md5 = CodeValidator.getMD5FromFile(jFile);
+		this.md5 = CodeValidator.getMD5FromFile(jFile); // TODO: This may be null
 	}
 
 	/**
