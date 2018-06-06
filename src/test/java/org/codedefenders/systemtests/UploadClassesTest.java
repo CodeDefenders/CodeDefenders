@@ -1,0 +1,139 @@
+package org.codedefenders.systemtests;
+
+import com.palantir.docker.compose.DockerComposeRule;
+import com.palantir.docker.compose.configuration.DockerComposeFiles;
+import com.palantir.docker.compose.connection.waiting.HealthChecks;
+import org.junit.*;
+import org.junit.experimental.categories.Category;
+import org.openqa.selenium.By;
+import org.openqa.selenium.remote.LocalFileDetector;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+/**
+ * System test that uploads a valid class and three invalid classes.
+ * The test only checks if the classes appear in the list of uploaded classes.
+ *
+ * The three invalid classes:
+ * <ul>
+ *     <li>a class with an invalid file extension</li>
+ *     <li>a file with non-java content</li>
+ *     <li>a class with syntax errors</li>
+ * </ul>
+ */
+@Category(SystemTest.class)
+public class UploadClassesTest extends AbstractEmptyDBSystemTest {
+
+	@ClassRule
+	public static DockerComposeRule docker = DockerComposeRule.builder()//
+			.files(DockerComposeFiles.from("src/test/resources/systemtests/docker-compose.yml",
+					"src/test/resources/systemtests/db-insert-test-users.yml",
+					"src/test/resources/systemtests/mount-sources-folder.yml"))
+
+			.waitingForService("selenium", HealthChecks.toHaveAllPortsOpen())
+			.waitingForService("db", HealthChecks.toHaveAllPortsOpen())
+			.waitingForService("frontend", HealthChecks.toRespond2xxOverHttp(8080,
+					t -> t.inFormat("http://$HOST:$EXTERNAL_PORT/codedefenders")))
+			.build();
+
+	/**
+	 * Upload a valid class.
+	 */
+	@Test
+	public void testValid() throws Exception {
+	    setLocalFileDetectorAndLogin();
+
+        driver.findElement(By.id("headerUploadButton")).click();
+        driver.findElement(By.id("fileUpload")).click();
+        driver.findElement(By.id("fileUpload")).clear();
+        driver.findElement(By.id("fileUpload")).sendKeys("/sources/UploadTest/Valid.java");
+        driver.findElement(By.id("upload")).click();
+        driver.findElement(By.id("headerUploadButton")).click();
+
+		/* Check if the uploaded class is in the list */
+        assertTrue(driver.findElement(By.id("tableUploadedClasses")).getText().contains("Valid"));
+	}
+
+	/**
+	 * Upload a class with an invalid file extension.
+	 */
+	@Test
+	public void testInvalidExtension() throws Exception {
+		setLocalFileDetectorAndLogin();
+
+		driver.findElement(By.id("headerUploadButton")).click();
+		driver.findElement(By.id("fileUpload")).click();
+		driver.findElement(By.id("fileUpload")).clear();
+		driver.findElement(By.id("fileUpload")).sendKeys("/sources/UploadTest/InvalidExtension.jav");
+		driver.findElement(By.id("upload")).click();
+		driver.findElement(By.id("headerUploadButton")).click();
+
+		/* Check if the uploaded class is in the list */
+		assertFalse(driver.findElement(By.id("tableUploadedClasses")).getText().contains("InvalidExtension"));
+	}
+
+	/**
+	 * Upload file with non-java content.
+	 */
+	@Test
+	public void testNonJava() throws Exception {
+		setLocalFileDetectorAndLogin();
+
+		driver.findElement(By.id("headerUploadButton")).click();
+		driver.findElement(By.id("fileUpload")).click();
+		driver.findElement(By.id("fileUpload")).clear();
+		driver.findElement(By.id("fileUpload")).sendKeys("/sources/UploadTest/NonJava.java");
+		driver.findElement(By.id("upload")).click();
+		driver.findElement(By.id("headerUploadButton")).click();
+
+		/* Check if the uploaded class is in the list */
+		assertFalse(driver.findElement(By.id("tableUploadedClasses")).getText().contains("NonJava"));
+	}
+
+	/**
+	 * Upload a class with syntax errors.
+	 */
+	@Test
+	public void testSyntaxErrors() throws Exception {
+	    setLocalFileDetectorAndLogin();
+
+		driver.findElement(By.id("headerUploadButton")).click();
+		driver.findElement(By.id("fileUpload")).click();
+		driver.findElement(By.id("fileUpload")).clear();
+		driver.findElement(By.id("fileUpload")).sendKeys("/sources/UploadTest/SyntaxErrors.java");
+		driver.findElement(By.id("upload")).click();
+		driver.findElement(By.id("headerUploadButton")).click();
+
+		/* Check if the uploaded class is in the list */
+		assertFalse(driver.findElement(By.id("tableUploadedClasses")).getText().contains("SyntaxErrors"));
+	}
+
+	/**
+	 * Helper function to login and enable file upload.
+	 */
+	private void setLocalFileDetectorAndLogin() {
+	    /* Set LocalFileDetector if not set already. */
+		RemoteWebDriver localDriver = ((RemoteWebDriver) driver);
+		if (!(localDriver.getFileDetector() instanceof LocalFileDetector)) {
+			localDriver.setFileDetector(new LocalFileDetector());
+		}
+
+		driver.get(codeDefendersHome);
+		driver.findElement(By.id("enter")).click();
+
+		/* Log in if not logged in already */
+		if (driver.getCurrentUrl().contains("login")) {
+			driver.findElement(By.id("inputUsername")).clear();
+			driver.findElement(By.id("inputUsername")).sendKeys("codedefenders");
+			driver.findElement(By.id("inputPassword")).clear();
+			driver.findElement(By.id("inputPassword")).sendKeys("codedefenderspw");
+			driver.findElement(By.id("signInButton")).click();
+		}
+
+		driver.findElement(By.id("headerUploadButton")).click();
+	}
+
+}

@@ -1,4 +1,4 @@
 db:
   volumes:
     - "./db/insert-test-users.sql:/docker-entrypoint-initdb.d/z01-insert-test-users.sql"
-    # Mount the sql file with the name z.., because the sql files get executed in alphabetic order.
+    # Mount the sql file with the name z##.., because the sql files get executed in alphabetic order.

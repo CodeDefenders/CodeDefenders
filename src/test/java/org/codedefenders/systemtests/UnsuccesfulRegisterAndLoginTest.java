@@ -2,44 +2,44 @@ package org.codedefenders.systemtests;
 
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.configuration.DockerComposeFiles;
-import com.palantir.docker.compose.connection.DockerPort;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.RemoteWebDriver;
-
-import java.net.URL;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import static org.codedefenders.systemtests.SeleniumTestUtils.assertURLDoesntEndWith;
 import static org.codedefenders.systemtests.SeleniumTestUtils.waitForVisible;
-import static org.junit.Assert.fail;
 
+/**
+ * System test which tries to register with invalid data.
+ *
+ * The data:
+ * <ul>
+ *     <li>missing fields</li>
+ *     <li>invalid email address</li>
+ *     <li>non-matching password and confirm password</li>
+ *     <li>email that is taken by another user</li>
+ *     <li>username that is taken by another user</li>
+ * </ul>
+ */
 @Category(SystemTest.class)
-public class UnsuccesfulRegisterAndLoginTest {
-
-    WebDriver driver;
-    private StringBuffer verificationErrors = new StringBuffer();
-    private String codeDefendersHome;
+public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
 
     @ClassRule
     public static DockerComposeRule docker = DockerComposeRule.builder()//
             .files(DockerComposeFiles.from("src/test/resources/systemtests/docker-compose.yml",
                     "src/test/resources/systemtests/db-insert-test-users.yml"))
+
             .waitingForService("selenium", HealthChecks.toHaveAllPortsOpen())
             .waitingForService("db", HealthChecks.toHaveAllPortsOpen())
             .waitingForService("frontend", HealthChecks.toRespond2xxOverHttp(8080,
                     t -> t.inFormat("http://$HOST:$EXTERNAL_PORT/codedefenders")))
             .build();
 
+    /**
+     * Unsuccessful account registration due to missing data.
+     */
 	@Test
 	public void testUnsuccessfulRegisterNoData() throws Exception {
         driver.get(codeDefendersHome);
@@ -55,6 +55,10 @@ public class UnsuccesfulRegisterAndLoginTest {
         assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders/games/user");
 	}
 
+
+    /**
+     * Unsuccessful account registration due to invalid email address.
+     */
 	@Test
 	public void testUnsuccessfulRegisterInvalidEmail() throws Exception {
         driver.get(codeDefendersHome);
@@ -80,6 +84,9 @@ public class UnsuccesfulRegisterAndLoginTest {
         assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders/games/user");
 	}
 
+    /**
+     * Unsuccessful account registration due to "password" and "confirm password" not matching.
+     */
 	@Test
 	public void testUnsuccessfulRegisterNonmatchingPasswords() throws Exception {
         driver.get(codeDefendersHome);
@@ -105,6 +112,9 @@ public class UnsuccesfulRegisterAndLoginTest {
         assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders/games/user");
     }
 
+    /**
+     * Unsuccessful account registration due to email already taken by another user.
+     */
     @Test
     public void testUnsuccessfulRegisterExistingEmail() throws Exception {
         driver.get(codeDefendersHome);
@@ -130,6 +140,10 @@ public class UnsuccesfulRegisterAndLoginTest {
         assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders/games/user");
 	}
 
+
+    /**
+     * Unsuccessful account registration due to username already taken by another user.
+     */
     @Test
     public void testUnsuccessfulRegisterExistingUsername() throws Exception {
         driver.get(codeDefendersHome);
@@ -154,23 +168,4 @@ public class UnsuccesfulRegisterAndLoginTest {
         /* Make sure the registration wasn't successful */
         assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders/games/user");
 	}
-
-    @Before
-    public void setUp() throws Exception {
-        ChromeOptions options = new ChromeOptions();
-        driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"), options);
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        driver.manage().window().setSize(new Dimension(1024, 768));
-        codeDefendersHome = "http://frontend:8080/codedefenders";
-        driver.get(codeDefendersHome);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        driver.quit();
-        String verificationErrorString = verificationErrors.toString();
-        if (!"".equals(verificationErrorString)) {
-            fail(verificationErrorString);
-        }
-    }
 }
