@@ -4,15 +4,6 @@
     $(document).ready(function() {
         $('#messages-div').delay(10000).fadeOut();
     });
-    var $j = jQuery.noConflict();
-
-    $j(document).ready(function() {
-        // Toggle Single Bibtex entry
-        $j('a.papercite_toggle').click(function() {
-            $j( "#" + $j(this).attr("id") + "_block" ).toggle();
-            return false;
-        });
-    });
 </script>
 <div class="menu-top bg-light-blue .minus-2 text-white" style="padding: 5px;">
     <div class="full-width" style="padding-top: 3px;">
