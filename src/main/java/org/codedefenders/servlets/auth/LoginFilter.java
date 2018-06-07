@@ -64,7 +64,7 @@ public class LoginFilter implements Filter {
 				|| path.endsWith(context + "/contact"))
 			return true;
 
-		Pattern excludeUrls = Pattern.compile("^.*/(css|js|images)/.*$", Pattern.CASE_INSENSITIVE);
+		Pattern excludeUrls = Pattern.compile("^.*/(css|js|images|fonts|codemirror)/.*$", Pattern.CASE_INSENSITIVE);
 		Matcher m = excludeUrls.matcher(path);
 		return m.matches();
 	}
