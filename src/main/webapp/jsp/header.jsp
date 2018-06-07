@@ -90,14 +90,14 @@
 
                 <li style="float: none"><a id="headerLeaderboardButton" class="text-white button tab-link bg-minus-1" href="leaderboards" style="width: 100%;">Leaderboard</a></li>
                 <li style="float: none"><a id="headerHelpButton" class="text-white button tab-link bg-minus-1" href="help" style="width:100%;">Help</a></li>
-                <li style="float: none" class="dropdown"><a
+                <li style="float: none; white-space: nowrap;" class="dropdown"><a
                         id="headerUserDropdown"
                         class="text-white button tab-link bg-minus-1 dropdown-toggle"
                         href="<%=request.getContextPath() %>/games/user"
                         style="width:100%;" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                     <%=request.getSession().getAttribute("username")%>
                     (<span id="notificationCount"></span>)
-                    <span class="glyphicon glyphicon-menu-hamburger" style="float: right;"></span></a>
+                    <span class="glyphicon glyphicon-menu-hamburger"></span></a>
                     <ul id="userDropDown" class="dropdown-menu"
                     style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
