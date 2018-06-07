@@ -4,17 +4,17 @@
 %>
 <div class="ws-12">
 	<div class="col-md-6" id="cut-div">
-		<h2>Class Under Test</h2>
+		<h3>Class Under Test</h3>
 		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30"><%=mg.getCUT().getAsString()%></textarea></pre>
 		<%@include file="/jsp/multiplayer/game_key.jsp"%>
 	</div> <!-- col-md6 left -->
 	<div class="col-md-6" id="utest-div" style="float: right; min-width: 480px">
-		<h2> Write a new JUnit test here
+		<h3>Write a new JUnit test here
 			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def" onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
 					<% if (!mg.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>
 				Defend!
 			</button>
-		</h2>
+		</h3>
 		<form id="def" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
 			<%
 				String testCode;

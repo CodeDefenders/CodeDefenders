@@ -35,7 +35,7 @@ String levelStyling = validatorLevel.equals(CodeValidator.CodeValidatorLevel.REL
 	<%@include file="/jsp/multiplayer/game_unit_tests.jsp"%>
 	</div>
 	<div class="w-55" id="newmut-div">
-		<h2 style=" margin-bottom: 0">Create a mutant here</h2>
+		<h3 style="margin-bottom: 0;">Create a mutant here</h3>
 
 		<form id="reset" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
 			<input type="hidden" name="formType" value="reset">

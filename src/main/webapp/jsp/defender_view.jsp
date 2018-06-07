@@ -45,15 +45,15 @@
 
 <div class="row-fluid">
 	<div class="col-md-6" id="cut-div">
-		<h2>Class Under Test</h2>
+		<h3>Class Under Test</h3>
 		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30"><%=game.getCUT().getAsString()%></textarea></pre>
 	</div> <!-- col-md6 left -->
 	<div class="col-md-6" id="utest-div">
-		<h2> Write a new JUnit test here
+		<h3> <span class="text-nowrap">Write a new JUnit test here
 			<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Role.DEFENDER)) {%>
 			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def" onClick="this.form.submit(); this.disabled=true; this.value='Defending...';">Defend!</button>
-			<%}%>
-		</h2>
+			<%}%></span>
+		</h3>
 		<form id="def" action="<%=request.getContextPath() %>/play" method="post">
 			<%
 				String testCode;
@@ -72,7 +72,7 @@
 
 <div class="row-fluid">
 	<div class="col-md-6" id="submitted-div">
-		<h2> JUnit tests </h2>
+		<h3>JUnit tests </h3>
 		<div class="slider single-item">
 			<%
 				Role role = game.getRole(uid);
@@ -98,13 +98,13 @@
 			<%
 				}
 				if (tests.isEmpty()) {%>
-			<div><h2></h2><p> There are currently no tests </p></div>
+			<div><h3></h3><p> There are currently no tests </p></div>
 			<%}
 			%>
 		</div> <!-- slider single-item -->
 	</div> <!-- col-md-6 left bottom -->
 	<div class="col-md-6" id="mutants-div">
-		<h2>Mutants</h2>
+		<h3>Mutants</h3>
 		<!-- Nav tabs -->
 		<ul class="nav nav-tabs" role="tablist">
 			<li class="active">

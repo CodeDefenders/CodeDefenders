@@ -11,7 +11,7 @@
 <% if (role.equals(Role.DEFENDER) || role.equals(Role.CREATOR) || mg.getLevel().equals(GameLevel.EASY) || mg.getState().equals(GameState.FINISHED)){
 %>
 <div class="ws-12">
-    <h2> JUnit tests </h2>
+    <h3>JUnit tests </h3>
     <div class="slider single-item">
         <%
             for (Test t : tests) {
@@ -51,7 +51,7 @@
         <%
             }
             if (tests.isEmpty()) {%>
-        <div><h2></h2><p> There are currently no tests </p></div>
+        <div><h3></h3><p> There are currently no tests </p></div>
         <%}
         %>
     </div> <!-- slider single-item -->
