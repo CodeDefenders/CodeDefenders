@@ -40,8 +40,20 @@
 <div>
 	<script>
         // If you make changes to the autocompletion, change it for an attacker too.
-        junitMethods = ["assertArrayEquals", "assertEquals", "assertTrue", "assertFalse", "assertNull",
+        testMethods = ["assertArrayEquals", "assertEquals", "assertTrue", "assertFalse", "assertNull",
             "assertNotNull", "assertSame", "assertNotSame", "fail"];
+        <%
+        if(mg.getCUT().isMockingEnabled()) {
+        %>
+        mockitoMethods = ["mock", "when", "then", "thenThrow", "doThrow", "doReturn", "doNothing"];
+        // Answer object handling is currently not included (Mockito.doAnswer(), OngoingStubbing.then/thenAnswer
+        // Calling real methods is currently not included (Mockito.doCallRealMethod / OngoingStubbing.thenCallRealMethod)
+        // Behavior verification is currentlty not implemented (Mockito.verify)
+
+        testMethods = testMethods.concat(mockitoMethods)
+        <%
+        }
+        %>
         autocompletelist = [];
 
         filterOutComments = function(text) {
@@ -51,7 +63,7 @@
         };
         updateAutocompleteList = function () {
             var wordRegex = /[a-zA-Z][a-zA-Z0-9]*/gm;
-            var set = new Set(junitMethods);
+            var set = new Set(testMethods);
 
             var testClass = editorTest.getValue().split("\n");
             testClass.slice(8, testClass.length - 2);
