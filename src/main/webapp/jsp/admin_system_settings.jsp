@@ -6,12 +6,8 @@
 <%@ include file="/jsp/header_main.jsp" %>
 
 <div class="full-width">
-    <ul class="nav nav-tabs">
-        <li><a id="adminCreateGames" href="<%=request.getContextPath()%>/admin/games">Create Games</a></li>
-        <li><a id="adminMonitorGames" href="<%=request.getContextPath()%>/admin/monitor">Monitor Games</a></li>
-        <li><a id="adminUserMgmt" href="<%=request.getContextPath()%>/admin/users">Manage Users</a></li>
-        <li class="active"><a id="adminSystemSettings">System Settings</a></li>
-    </ul>
+    <% request.setAttribute("adminActivePage", "adminSystemSettings"); %>
+    <%@ include file="/jsp/admin_navigation.jsp" %>
 
     <h3>System Settings</h3>
     <form id="changeSettings" name="changeSettings" action="admin/settings" onsubmit="return validateForm()" method="post">
