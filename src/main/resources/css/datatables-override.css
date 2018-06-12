@@ -16,3 +16,19 @@
 .dataTables_wrapper table.mutant-table {
     height: 405px;
 }
+
+.table-striped > tbody > tr:nth-of-type(2n) {
+    background: #fdfdfd;
+}
+
+.table-striped > tbody > tr:nth-of-type(2n+1) {
+    background: #f8f8f8;
+}
+
+.table-hover > tbody > tr:hover > td {
+    background-color: #f3f3f3;
+}
+
+.dataTables_wrapper .input-sm[type="search"] {
+    height: 20px;
+}

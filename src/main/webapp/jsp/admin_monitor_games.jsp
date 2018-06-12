@@ -30,7 +30,7 @@
         } else {
         %>
         <table id="tableActiveGames"
-               class="table-hover table-responsive table-paragraphs games-table display table-condensed">
+               class="table-hover table-striped table-responsive table-paragraphs games-table display table-condensed">
             <thead>
             <tr style="border-bottom: 1px solid black">
                 <th><input type="checkbox" id="selectAllGames"

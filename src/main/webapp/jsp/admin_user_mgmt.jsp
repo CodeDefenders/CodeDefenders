@@ -71,7 +71,7 @@
         <input type="hidden" name="formType" value="manageUsers">
 
         <table id="tableUsers"
-               class="table table-hover table-responsive table-paragraphs games-table dataTable display">
+               class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
             <tr>
                 <th>ID</th>

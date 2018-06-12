@@ -35,7 +35,7 @@
         } else {
         %>
         <table id="tableCreatedGames"
-               class="table table-hover table-responsive table-paragraphs games-table dataTable display">
+               class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
             <tr>
                 <th><input type="checkbox" id="selectAllTempGames"
@@ -172,7 +172,7 @@
 
         <h3>Unassigned Users</h3>
         <table id="tableAddUsers"
-               class="table table-hover table-responsive table-paragraphs games-table dataTable display">
+               class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
             <tr>
                 <th><input type="checkbox" id="selectAllUsers"
