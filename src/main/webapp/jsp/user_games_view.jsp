@@ -38,7 +38,7 @@
 
 <div class="w-100">
 <h2 class="full-width page-title">My Games</h2>
-<table class="table table-hover table-responsive table-paragraphs games-table">
+<table id="my-games" class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
 		<th>ID</th>
 		<th>Type</th>
@@ -246,7 +246,7 @@
 
 
 <h2 class="full-width page-title">Open Games</h2>
-<table class="table table-hover table-responsive table-paragraphs games-table">
+<table id="open-games" class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
 		<th>ID</th>
 		<th>Type</th>

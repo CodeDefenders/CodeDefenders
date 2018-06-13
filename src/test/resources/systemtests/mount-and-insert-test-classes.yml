@@ -1,0 +1,11 @@
+# Don't use this when uploading classes, as any uploaded classes will appear
+# in src/test/resources/systemtests/data/sources.
+
+frontend:
+  volumes:
+    - "./data/sources:/var/lib/codedefenders/sources"
+
+db:
+  volumes:
+    - "./db/insert-test-classes.sql:/docker-entrypoint-initdb.d/z02-insert-test-classes.sql"
+    # Mount the sql file with the name z##.., because the sql files get executed in alphabetic order.
