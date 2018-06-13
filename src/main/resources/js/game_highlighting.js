@@ -7,6 +7,9 @@ var highlightLine = function (lines, color, superDiv) {
     var allLines = [];
     $(superDiv + ' .CodeMirror-linenumber').each(function (i, e) {
         var line = parseInt(e.innerHTML);
+        if(isNaN(line)) {
+            line = parseInt(e.children[0].innerHTML)
+        }
 
         // Add tooltip that lists covering test IDs
         if(line in testMap) {
@@ -172,6 +175,9 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
     var allLines = [];
     $(superDiv + ' .CodeMirror-linenumber').each(function (i, e) {
         var line = parseInt(e.innerHTML);
+        if(isNaN(line)) {
+            line = parseInt(e.children[0].innerHTML)
+        }
         allLines[line] = $(e).parent("div").parent("div")[0];
     });
 
