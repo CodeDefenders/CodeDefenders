@@ -1,6 +1,7 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="java.io.IOException" %>
 <% String pageTitle = "About CodeDefenders"; %>
 
 <%
@@ -20,9 +21,28 @@
 
         <div class="panel-body">
 
+             <%
+                String version  = GameClass.class.getPackage().getImplementationVersion();
+
+                // version may now be null: https://stackoverflow.com/questions/21907528/war-manifest-mf-and-version?rq=1
+                if (version==null) {
+                    Properties prop = new Properties();
+                    try {
+                        prop.load(getServletContext().getResourceAsStream("/META-INF/MANIFEST.MF"));
+                        version = prop.getProperty("Implementation-Version");
+                    } catch (IOException e) {
+                        // Ignore -- if we have no version, then we show no version section
+                    }
+                }
+                if(version != null) {
+                    %>
             <h3>Version</h3>
             <p>
-                This is Code Defenders version <%=GameClass.class.getPackage().getImplementationVersion() %>.
+                This is Code Defenders version <%= version%>.
+            </p>
+                <%
+                }
+                %>
 
             <h3>Source Code</h3>
             <p>
