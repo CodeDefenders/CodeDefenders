@@ -21,29 +21,28 @@
                 final Set<Mutant> coveredMutants = t.getCoveredMutants();
                 final Set<Mutant> killedMutants = t.getKilledMutants();
         %>
-        <div>
-            <ul>
-                <li style=" display: inline-block; "><h4>Test <%= t.getId() %>
-                </h4></li>
-                <li style=" display: inline-block; "><h4> | Creator: <%= creator.getUsername() %>
+        <div class="container nowrap" style="overflow:hidden;white-space:nowrap;">
+            <ul class="list-inline white-space:nowrap">
+                <li style=" display: inline-block;">Test <%= t.getId() %></li>
+                <li style=" display: inline-block;"> | Creator: <%= creator.getUsername() %>
                    <!-- [UID: <%= creator.getId() %>] -->
-                </h4></li>
-                <li style=" display: inline-block;"><h4> |
+                </li>
+                <li style=" display: inline-block;"> |
                     <% if(!coveredMutants.isEmpty()) { %>
                         <a href="javascript:void(0);" data-toggle="tooltip" title="<%= coveredMutants.stream().map(mutant-> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>">Covered: <%= coveredMutants.size()%></a>
                     <% } else { %>
                         Covered: 0
                     <% } %>
-                </h4></li>
-                <li style=" display: inline-block;"><h4> |
+                </li>
+                <li style=" display: inline-block;"> |
                     <% if(!killedMutants.isEmpty()) { %>
                         <a href="javascript:void(0);" data-toggle="tooltip" title="<%= killedMutants.stream().map(mutant-> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>">Killed: <%= killedMutants.size()%></a>
                     <% } else { %>
                         Killed: 0
                 <% } %>
-                </h4></li>
-                <li style=" display: inline-block;"><h4> | Points: <%= t.getScore() %>
-                </h4></li>
+                </li>
+                <li style=" display: inline-block;"> | Points: <%= t.getScore() %>
+                </li>
 
             </ul>
             <pre class="readonly-pre"><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre>
