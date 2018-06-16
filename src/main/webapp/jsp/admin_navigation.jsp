@@ -1,5 +1,4 @@
-<%@ page import="org.slf4j.Logger" %>
-<%@ page import="org.slf4j.LoggerFactory" %><%
+<%
     /* Check what admin page is currently active. */
 
     /* Name of the active page. */
@@ -9,9 +8,6 @@
     if (activePageObject instanceof String) {
         activePage = (String) activePageObject;
     }
-
-    final Logger logger = LoggerFactory.getLogger("game_view.jsp");
-    logger.info("adminActivePage: " + activePage);
 %>
 
 <%!
