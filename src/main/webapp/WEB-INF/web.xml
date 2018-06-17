@@ -391,6 +391,15 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>AdminAnalyticsUsersApi</servlet-name>
+		<servlet-class>org.codedefenders.servlets.admin.api.AdminAnalyticsUsersApi</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AdminAnalyticsUsersApi</servlet-name>
+		<url-pattern>/api/users</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>feedback</servlet-name>
 		<servlet-class>org.codedefenders.servlets.FeedbackManager</servlet-class>
 	</servlet>
