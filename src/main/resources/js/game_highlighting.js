@@ -140,10 +140,10 @@ var prepareDeadMutantDetail = function(mutant){
 };
 
 var prepareDeadMutantDetail = function(mutant){
-    return '<p><span class="left" style="width: 38%;">' + mutant.playerName + '</span>' +
-        '<span class="central" style="width: 10%;">' + mutant.id + '</span>' +
-        '<span class="central" style="width: 18%;">' + mutant.killingTestId + '</span>' +
-        '<span class="right" style="width: 20%;">' + mutant.score + '</span></p>';
+    return '<p><span class="left" style="width: 33%;">' + mutant.playerName + '</span>' +
+        '<span class="central" style="width: 18%;">' + mutant.id + '</span>' +
+        '<span class="central" style="width: 24%;">' + mutant.killingTestId + '</span>' +
+        '<span class="right" style="width: 18%;">' + mutant.score + '</span></p>';
 };
 
 var prepareMutantHeading = function(title){
@@ -153,10 +153,10 @@ var prepareMutantHeading = function(title){
 };
 
 var prepareDeadMutantHeading = function(title){
-    return '<h5>' + title + '</h5><p><span class="left header" style="width: 38%;">Creator</span>' +
-        '<span class="central header" style="width: 10%;">ID</span>' +
-        '<span class="central header" style="width: 18%;">Killed by</span>' +
-        '<span class="right header" style="width: 20%;">Points</span></p>';
+    return '<h5>' + title + '</h5><p><span class="left header" style="width: 33%;">Creator</span>' +
+        '<span class="central header" style="width: 18%;">ID</span>' +
+        '<span class="central header" style="width: 24%;">Killed by</span>' +
+        '<span class="right header" style="width: 18%;">Points</span></p>';
 };
 
 var createPopupFunction = function(mutantType){

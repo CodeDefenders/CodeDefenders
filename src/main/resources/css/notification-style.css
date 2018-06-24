@@ -122,7 +122,7 @@
 .CodeMirror #mutationPopup .mutationInfoExpanded {
     float:left;
     margin-left:0px;
-    width: 200px;
+    width: 250px;
     border: 2px solid lightgray;
     color: black;
     display: block;
@@ -149,18 +149,26 @@
     text-align: left;
     width: 40%;
     overflow: hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
 }
 
 .CodeMirror #mutationPopup .mutationInfoExpanded p .central {
     float: left;
     text-align: center;
     width: 29%;
+    overflow: hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
 }
 
 .CodeMirror #mutationPopup .mutationInfoExpanded p .right {
     float:right;
     text-align: right;
     width: 29%;
+    overflow: hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
 }
 
 .CodeMirror #mutationPopup .action {
