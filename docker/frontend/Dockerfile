@@ -1,22 +1,16 @@
 # Inspired by: https://dzone.com/articles/a-dockerfile-for-maven-based-github-projects
 
 ############################################################################################################################
-# Checkout the latest commit with GIT AS build. GitLab TOKEN must be passed as build arg
+# Checkout the latest commit with GIT AS build.
 ############################################################################################################################
 
 FROM alpine/git AS git
-
-ARG gitlab_username
-ARG gitlab_access_token
-
-# Check for mandatory build arguments
-RUN \
-    : "${gitlab_username:?Build argument needs to be set and non-empty.}" && \
-    : "${gitlab_access_token:?Build argument needs to be set and non-empty.}"
-
-
-WORKDIR /app
-RUN git clone --depth=1 https://$gitlab_username:$gitlab_access_token@gitlab.infosun.fim.uni-passau.de/gambi/CodeDefenders.git
+WORKDIR /
+RUN git clone --depth 1 https://github.com/CodeDefenders/CodeDefenders.git
+WORKDIR /CodeDefenders
+# Collect label values to file since we cannot tag containers from within Docker
+RUN  echo "export GIT_COMMIT=$(git rev-parse HEAD)" > .git-data && \
+     echo "export GIT_DATE=\"$(git log -1 --format=%cd)\"" >> .git-data
 
 ############################################################################################################################
 # Build the WAR file with Maven and create the data folder structure
@@ -24,34 +18,21 @@ RUN git clone --depth=1 https://$gitlab_username:$gitlab_access_token@gitlab.inf
 
 FROM maven:3.5-jdk-8-alpine AS build
 
-WORKDIR /app
-COPY --from=git /app/CodeDefenders /app
+COPY --from=git /CodeDefenders /CodeDefenders
+WORKDIR /CodeDefenders
 
-### TODO Not sure how to handle this ... and make it parametric since there's some env variables...
-COPY config.properties /app/config.properties
-
-# Build Code Defenders for Docker using config.properties
-RUN mvn clean compile package war:war -DskipTests
+# Build Code Defenders for Docker using config.properties@docker
+RUN cp config.properties@docker config.properties && \
+	mvn clean compile package war:war -DskipTests
 
 # Run the file system setup script
-RUN cd /app/src/test/resources/systemtests/frontend && \
-  ./setup-filesystem.sh /app/config.properties
+RUN cd /CodeDefenders/src/test/resources/systemtests/frontend && \
+  ./setup-filesystem.sh /CodeDefenders/config.properties
 
 ############################################################################################################################
 # Install tomcat on JDK, ant, and copy over codedefenders
 ############################################################################################################################
 FROM openjdk:8-jdk AS tomcat
-
-ARG GIT_COMMIT=unknown
-ARG RELEASE_DATE=unknown
-#ARG tomcat_password
-#ARG tomcat_user
-
-
-LABEL maintainer="alessio.gambi@uni-passau.de"
-
-LABEL codedefenders.git.commit=$GIT_COMMIT
-LABEL codedefenders.release.date=$RELEASE_DATE
 
 ### INSTALL TOMCAT
 
@@ -224,7 +205,7 @@ RUN rm -rf /usr/local/tomcat/webapps/host-manager
 COPY context.xml /usr/local/tomcat/webapps/manager/META-INF/context.xml
 
 # Install codedefenders in tomcat
-COPY --from=build /app/target/codedefenders.war /usr/local/tomcat/webapps/codedefenders.war
+COPY --from=build /CodeDefenders/target/codedefenders.war /usr/local/tomcat/webapps/codedefenders.war
 
 # Copy the data directory from build
 COPY --from=build /codedefenders/ /codedefenders/
@@ -237,11 +218,19 @@ RUN apt-get update && apt-get install -y \
 # Define admin roles in tomcat - TODO Use provided args ! Probably use CMD and sed to replace or cat
 COPY tomcat-users.xml /usr/local/tomcat/conf/tomcat-users.xml
 
-###########################################################################
-#
-# Finalize the image with ENV variables ?
-#
-###########################################################################
+## TODO Replace tomcat users and password from ARGS
+
+ARG tomcat_password
+ARG tomcat_user
+
+ENV tomcat_password=${tomcat_password}
+ENV tomcat_user=${tomcat_user}
+
+COPY --from=git /CodeDefenders/.git-data /.git-data
+
+LABEL maintainer="alessio.gambi@uni-passau.de"
+#LABEL codedefenders.git.commit=$GIT_COMMIT
+#LABEL codedefenders.release.date=$RELEASE_DATE
 
 EXPOSE 8080
 CMD ["catalina.sh", "run"]

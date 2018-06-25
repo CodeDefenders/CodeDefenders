@@ -1,0 +1,37 @@
+version: '2'
+services:
+  db:
+    build: ./backend
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: defender
+      MYSQL_PASSWORD: defender
+      MYSQL_DATABASE: defender
+    ports:
+      - "3306"
+    volumes:
+      - dbvolume:/var/lib/mysql
+
+  # Tomcat nodes. We do not expose directly their ports to the outside
+  frontend:
+    build: ./frontend
+    restart: always
+    links:
+      - db
+    volumes:
+      - datavolume:/codedefenders/
+
+  # Note that we build this one... Since we need to install the sticky-session module
+  load-balancer:
+    build: ./load-balancer
+    restart: always
+    tty: true
+    links:
+      - frontend
+    ports:
+      - "80:80"
+
+volumes:
+    datavolume:
+    dbvolume:
