@@ -1,7 +1,8 @@
 package org.codedefenders.servlets.admin.api;
 
 import com.google.gson.Gson;
-import org.codedefenders.database.AdminDAO;
+import org.codedefenders.api.analytics.UserDataDTO;
+import org.codedefenders.database.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.LinkedList;
 import java.util.List;
 
 public class AdminAnalyticsUsersApi extends HttpServlet {
@@ -21,20 +21,7 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        List<UserDataDto> users = new LinkedList<>();
-        List<List<String>> unassignedUsersInfo = AdminDAO.getAllUsersInfo();
-
-        for (List<String> userInfo : unassignedUsersInfo) {
-            UserDataDto user = new UserDataDto();
-
-            user.uid = Integer.valueOf(userInfo.get(0));
-            user.username = userInfo.get(1);
-            user.email = userInfo.get(2);
-            user.lastLogin = userInfo.get(3);
-            user.totalScore = userInfo.get(5);
-
-            users.add(user);
-        }
+        List<UserDataDTO> users = DatabaseAccess.getAnalyticsUserData();
 
         Gson gson = new Gson();
         out.print(gson.toJson(users));
@@ -42,13 +29,4 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException { }
-
-    private static class UserDataDto {
-        private int uid;
-        private String username;
-        private String email;
-        private String lastLogin;
-        private String totalScore;
-    }
-
 }

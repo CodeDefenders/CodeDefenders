@@ -12,8 +12,11 @@
         <thead>
             <tr>
                 <th id="toggle-all-details"><span class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span></th>
-                <th>User</th>
-                <th>EMail</th>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Games Played</th>
+                <th>Attacker Score</th>
+                <th>Defender Score</th>
                 <th>Total Score</th>
             </tr>
         </thead>
@@ -23,16 +26,25 @@
 
     <script>
         function format(data) {
-            return ''+
+            return '' +
                 '<table class="table-child-details">'+
                     '<tbody>'+
                         '<tr>'+
-                            '<td class="child-details-left">User ID:</td>'+
-                            '<td>'+data.uid+'</td>'+
+                            '<td>Mutants Submitted:</td>'+
+                            '<td>'+data.mutantsSubmitted+'</td>'+
+                            '<td>Equivalent:</td>'+
+                            '<td>'+data.equivalentMutantsSubmitted+'</td>'+
+                        '</tr>'+
+                        '<tr/>'+
+                        '<tr>'+
+                            '<td>Tests Submitted:</td>'+
+                            '<td>'+data.testsSubmitted+'</td>'+
                         '</tr>'+
                         '<tr>'+
-                            '<td class="child-details-left">Last Login:</td>'+
-                            '<td>'+data.lastLogin+'</td>'+
+                            '<td>Mutants Killed:</td>'+
+                            '<td>'+data.mutantsKilled+'</td>'+
+                            '<td>Per Test:</td>'+
+                            '<td>'+(data.testsSubmitted === 0 ? 0 : (data.mutantsKilled/data.testsSubmitted).toFixed(2))+'</td>'+
                         '</tr>'+
                     '</tbody>'+
                 '</table>';
@@ -51,8 +63,11 @@
                         "data":           null,
                         "defaultContent": '<span class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span>'
                     },
+                    { "data": "id" },
                     { "data": "username" },
-                    { "data": "email" },
+                    { "data": "gamesPlayed" },
+                    { "data": "attackerScore" },
+                    { "data": "defenderScore" },
                     { "data": "totalScore" }
                 ],
                 "order": [[ 1, "asc" ]]

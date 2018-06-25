@@ -32,8 +32,9 @@
 .table-child-details {
     margin-left: 50px;
 }
-.child-details-left {
-    padding-right: 25px;
+.table-child-details > tbody > tr > td {
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 /* Borders between child table rows */

@@ -29,6 +29,8 @@
  *     ],
  *     ...
  * });
+ *
+ * Tables in child rows should have the class "table-child-details".
  */
 var setupChildRows = function(tableSelector, table, format) {
     $('#tableUsers tbody').on('click', '.toggle-details', function () {

@@ -1,5 +1,6 @@
 package org.codedefenders.database;
 
+import org.codedefenders.api.analytics.UserDataDTO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
@@ -959,6 +960,86 @@ public class DatabaseAccess {
 			DB.cleanup(conn, stmt);
 		}
 		return leaderboard;
+	}
+
+	public static List<UserDataDTO> getAnalyticsUserData() {
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = null;
+
+		String query = String.join("\n",
+		" SELECT users.User_ID                 AS ID,",
+		"	    users.username                AS Username,",
+        "       IFNULL(NrMutants,0)           AS MutantsSubmitted,",
+        "       IFNULL(NrEquivalentMutants,0) AS EquivalentMutantsSubmitted,",
+        "       IFNULL(NrTests,0)             AS TestsSubmitted,",
+        "       IFNULL(NrMutantsKilled,0)     AS MutantsKilled,",
+        "       IFNULL(AttackerScore,0)       AS AttackerScore,",
+        "       IFNULL(DefenderScore,0)       AS DefenderScore,",
+        "       IFNULL(NrGamesPlayed,0)       AS GamesPlayed",
+
+		"FROM users",
+
+		"LEFT JOIN",
+		"(",
+        "  SELECT players.User_ID,",
+		"		 COUNT(mutants.Mutant_ID) AS NrMutants,",
+		"         SUM(CASE WHEN mutants.Equivalent = 'DECLARED_YES' THEN 1 ELSE 0 END) AS NrEquivalentMutants,",
+		"         SUM(mutants.Points) AS AttackerScore",
+		"  FROM players, mutants",
+		"  WHERE players.ID = mutants.Player_ID",
+		"  GROUP BY players.User_ID",
+		")",
+		"AS attackers ON users.User_ID = attackers.User_ID",
+
+		"LEFT JOIN",
+		"(",
+		"  SELECT players.User_ID,",
+		"  	     COUNT(tests.Test_ID) AS NrTests,",
+		"         SUM(tests.Points) AS DefenderScore,",
+		"         SUM(tests.MutantsKilled) AS NrMutantsKilled",
+		"  FROM players, tests",
+		"  WHERE players.ID = tests.Player_ID",
+		"  GROUP BY players.User_ID",
+        ")",
+		"AS defenders ON users.User_ID = defenders.User_ID",
+
+		"LEFT JOIN",
+		"(",
+		"  SELECT players.User_ID,",
+		"         COUNT(*) AS NrGamesPlayed",
+		"  FROM players",
+		" GROUP BY players.User_ID",
+        ")",
+		"AS nr_games ON users.User_ID = nr_games.User_ID",
+
+		"WHERE users.User_ID > 2;");
+
+		List<UserDataDTO> userList = new ArrayList<>();
+		try {
+			stmt = DB.createPreparedStatement(conn, query);
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				UserDataDTO u = new UserDataDTO();
+				u.setId(rs.getLong("ID"));
+				u.setUsername(rs.getString("Username"));
+				u.setMutantsSubmitted(rs.getInt("MutantsSubmitted"));
+				u.setEquivalentMutantsSubmitted(rs.getInt("EquivalentMutantsSubmitted"));
+				u.setTestsSubmitted(rs.getInt("TestsSubmitted"));
+				u.setMutantsKilled(rs.getInt("MutantsKilled"));
+				u.setAttackerScore(rs.getInt("AttackerScore"));
+				u.setDefenderScore(rs.getInt("DefenderScore"));
+				u.setTotalScore(u.getAttackerScore() + u.getDefenderScore());
+				u.setGamesPlayed(rs.getInt("GamesPlayed"));
+				userList.add(u);
+			}
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return userList;
 	}
 
 	public static int getKillingTestIdForMutant(int mid) {
