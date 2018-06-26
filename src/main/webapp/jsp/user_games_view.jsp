@@ -38,22 +38,19 @@
 
 <div class="w-100">
 <h2 class="full-width page-title">My Games</h2>
-<table class="table table-striped table-hover table-responsive table-paragraphs games-table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Type</th>
-            <th>Creator</th>
-            <th>Class</th>
-            <th>Attack</th>
-            <th>Defense</th>
-            <th>Level</th>
-            <th>Starting</th>
-            <th>Finishing</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+<table id="my-games" class="table table-striped table-hover table-responsive table-paragraphs games-table">
+	<tr>
+		<th>ID</th>
+		<th>Type</th>
+		<th>Creator</th>
+		<th>Class</th>
+		<th>Attack</th>
+		<th>Defense</th>
+		<th>Level</th>
+		<th>Starting</th>
+		<th>Finishing</th>
+		<th></th>
+	</tr>
 <%
 	if (games.isEmpty()) {
 %>
@@ -236,7 +233,7 @@
 		} // Closes FOR
 	} // Closes ELSE
 %>
-    </tbody>
+
 </table>
 <%
 /********* OPEN GAMES *******************************************************************************************************/
@@ -249,22 +246,20 @@
 
 
 <h2 class="full-width page-title">Open Games</h2>
-<table class="table table-striped table-hover table-responsive table-paragraphs games-table">
-	<thead>
-        <tr>
-            <th>ID</th>
-            <th>Type</th>
-            <th>Creator</th>
-            <th>Class</th>
-            <th>Attack</th>
-            <th>Defense</th>
-            <th>Level</th>
-            <th>Starting</th>
-            <th>Finishing</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
+<table class="table table-hover table-responsive table-paragraphs games-table">
+	<tr>
+		<th>ID</th>
+		<th>Type</th>
+		<th>Creator</th>
+		<th>Class</th>
+		<th>Attack</th>
+		<th>Defense</th>
+		<th>Level</th>
+		<th>Starting</th>
+		<th>Finishing</th>
+		<th></th>
+
+	</tr>
 <%
 	if (openGames.isEmpty()) {
 %>
@@ -397,8 +392,7 @@
 		} // Closes FOR
 	} // Closes ELSE
 %>
-    </tbody>
-</table>
+	</table>
 
 	<script>
 		$(document).ready(function() {

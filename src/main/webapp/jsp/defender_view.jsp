@@ -292,7 +292,7 @@
     }
 
     showMutants = function(){
-        mutantLine("<%="#" + codeDivName%>", "true");
+        mutantLine("<%="#" + codeDivName%>", "<%= game.getState().equals(ACTIVE) ? "true" : "false"%>");
     };
 
     var updateCUT = function(){

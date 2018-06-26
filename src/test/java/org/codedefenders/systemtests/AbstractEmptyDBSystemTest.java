@@ -54,6 +54,7 @@ public abstract class AbstractEmptyDBSystemTest {
 	 * subclasses
 	 */
 	WebDriver driver;
+	String codeDefendersHome;
 	// This was automatically generate by Katalon
 	private StringBuffer verificationErrors = new StringBuffer();
 
@@ -84,7 +85,7 @@ public abstract class AbstractEmptyDBSystemTest {
 		 * (internal Docker DNS) to find out where codedefenders runs
 		 */
 //		String codeDefendersHome = frontend.inFormat("http://host.docker.internal:$EXTERNAL_PORT/codedefenders");
-		String codeDefendersHome = "http://frontend:8080/codedefenders";
+		codeDefendersHome = "http://frontend:8080/codedefenders";
 		//
 		driver.get(codeDefendersHome);
 	}

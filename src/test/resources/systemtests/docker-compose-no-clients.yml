@@ -6,7 +6,7 @@ db:
     MYSQL_PASSWORD: defender
     MYSQL_DATABASE: defender
   volumes:
-    - "../../../main/resources/db:/docker-entrypoint-initdb.d"
+    - "../../../main/resources/db/codedefenders.sql:/docker-entrypoint-initdb.d/codedefenders.sql:ro"
   ports:
     - "3306"
 
@@ -15,6 +15,6 @@ frontend:
   ports:
    - 8080
   volumes:
-    - "./frontend/codedefenders.war:/usr/local/tomcat/webapps/codedefenders.war"
+    - "./frontend/codedefenders.war:/usr/local/tomcat/webapps/codedefenders.war:ro"
   links:
     - db
