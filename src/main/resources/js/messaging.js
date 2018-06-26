@@ -11,7 +11,7 @@ var sendMessage = function(elem){
 
         $('.send-message input').val('');
 
-        $.get(url, function (r) {
+        $.post(url, function (r) {
             if (r.status != "Success"){
                 window.alert("Could not send message: " + r.status);
             }

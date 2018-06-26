@@ -44,7 +44,7 @@ public class NotificationsHandler extends HttpServlet {
 			return;
 		}
         final HttpSession session = request.getSession();
-        response.setContentType("text/json");
+        response.setContentType("application/json");
 
         int userId = (int) session.getAttribute("uid");
 
