@@ -4,6 +4,7 @@ public class UserDataDTO {
     private long id;
     private String username;
     private int mutantsSubmitted;
+    private int mutantsAlive;
     private int equivalentMutantsSubmitted;
     private int testsSubmitted;
     private int mutantsKilled;
@@ -34,6 +35,14 @@ public class UserDataDTO {
 
     public void setMutantsSubmitted(int mutantsSubmitted) {
         this.mutantsSubmitted = mutantsSubmitted;
+    }
+
+    public int getMutantsAlive() {
+        return mutantsAlive;
+    }
+
+    public void setMutantsAlive(int mutantsAlive) {
+        this.mutantsAlive = mutantsAlive;
     }
 
     public int getEquivalentMutantsSubmitted() {

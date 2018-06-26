@@ -967,24 +967,26 @@ public class DatabaseAccess {
 		PreparedStatement stmt = null;
 
 		String query = String.join("\n",
-		" SELECT users.User_ID                 AS ID,",
-		"	    users.username                AS Username,",
-        "       IFNULL(NrMutants,0)           AS MutantsSubmitted,",
-        "       IFNULL(NrEquivalentMutants,0) AS EquivalentMutantsSubmitted,",
-        "       IFNULL(NrTests,0)             AS TestsSubmitted,",
-        "       IFNULL(NrMutantsKilled,0)     AS MutantsKilled,",
-        "       IFNULL(AttackerScore,0)       AS AttackerScore,",
-        "       IFNULL(DefenderScore,0)       AS DefenderScore,",
-        "       IFNULL(NrGamesPlayed,0)       AS GamesPlayed",
+		" SELECT users.User_ID                AS ID,",
+		"       users.username                AS Username,",
+		"       IFNULL(NrMutants,0)           AS MutantsSubmitted,",
+		"       IFNULL(NrMutantsAlive,0)      AS MutantsAlive,",
+		"       IFNULL(NrEquivalentMutants,0) AS EquivalentMutantsSubmitted,",
+		"       IFNULL(NrTests,0)             AS TestsSubmitted,",
+		"       IFNULL(NrMutantsKilled,0)     AS MutantsKilled,",
+		"       IFNULL(AttackerScore,0)       AS AttackerScore,",
+		"       IFNULL(DefenderScore,0)       AS DefenderScore,",
+		"       IFNULL(NrGamesPlayed,0)       AS GamesPlayed",
 
 		"FROM users",
 
 		"LEFT JOIN",
 		"(",
-        "  SELECT players.User_ID,",
-		"		 COUNT(mutants.Mutant_ID) AS NrMutants,",
-		"         SUM(CASE WHEN mutants.Equivalent = 'DECLARED_YES' THEN 1 ELSE 0 END) AS NrEquivalentMutants,",
-		"         SUM(mutants.Points) AS AttackerScore",
+		"  SELECT players.User_ID,",
+		"        COUNT(mutants.Mutant_ID) AS NrMutants,",
+		"        SUM(mutants.Alive) AS NrMutantsAlive,",
+		"        SUM(CASE WHEN mutants.Equivalent = 'DECLARED_YES' THEN 1 ELSE 0 END) AS NrEquivalentMutants,",
+		"        SUM(mutants.Points) AS AttackerScore",
 		"  FROM players, mutants",
 		"  WHERE players.ID = mutants.Player_ID",
 		"  GROUP BY players.User_ID",
@@ -994,7 +996,7 @@ public class DatabaseAccess {
 		"LEFT JOIN",
 		"(",
 		"  SELECT players.User_ID,",
-		"  	     COUNT(tests.Test_ID) AS NrTests,",
+		"         COUNT(tests.Test_ID) AS NrTests,",
 		"         SUM(tests.Points) AS DefenderScore,",
 		"         SUM(tests.MutantsKilled) AS NrMutantsKilled",
 		"  FROM players, tests",
@@ -1023,6 +1025,7 @@ public class DatabaseAccess {
 				u.setId(rs.getLong("ID"));
 				u.setUsername(rs.getString("Username"));
 				u.setMutantsSubmitted(rs.getInt("MutantsSubmitted"));
+				u.setMutantsAlive(rs.getInt("MutantsAlive"));
 				u.setEquivalentMutantsSubmitted(rs.getInt("EquivalentMutantsSubmitted"));
 				u.setTestsSubmitted(rs.getInt("TestsSubmitted"));
 				u.setMutantsKilled(rs.getInt("MutantsKilled"));

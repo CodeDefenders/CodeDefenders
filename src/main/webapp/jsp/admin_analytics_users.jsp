@@ -32,6 +32,8 @@
                         '<tr>'+
                             '<td>Mutants Submitted:</td>'+
                             '<td>'+data.mutantsSubmitted+'</td>'+
+                            '<td>Still Alive:</td>'+
+                            '<td>'+data.mutantsAlive+'</td>'+
                             '<td>Equivalent:</td>'+
                             '<td>'+data.equivalentMutantsSubmitted+'</td>'+
                         '</tr>'+
