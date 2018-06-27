@@ -38,7 +38,7 @@
 
 <div class="w-100">
 <h2 class="full-width page-title">My Games</h2>
-<table id="my-games" class="table table-hover table-responsive table-paragraphs games-table">
+<table id="my-games" class="table table-striped table-hover table-responsive table-paragraphs games-table">
 	<tr>
 		<th>ID</th>
 		<th>Type</th>
@@ -125,9 +125,9 @@
 				<input type="hidden" name="formType" value="enterGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
 				<% if (uid == turnId ) {%>
-				<button class="btn btn-sm btn-primary" id="<%="duel-myturn-"+g.getId()%>" type="submit"><%=btnLabel%></button>
+				<button class="btn btn-primary" id="<%="duel-myturn-"+g.getId()%>" type="submit"><%=btnLabel%></button>
 				<% } else {%>
-				<button class="btn btn-sm btn-primary" id="<%="duel-enter-"+g.getId()%>" type="submit" value="Enter Game">Enter Game</button>
+				<button  class="btn btn-default btn-sm" id="<%="duel-enter-"+g.getId()%>" type="submit" value="Enter Game">Enter Game</button>
 				<% }%>
 			</form>
 
@@ -246,7 +246,7 @@
 
 
 <h2 class="full-width page-title">Open Games</h2>
-<table id="open-games" class="table table-hover table-responsive table-paragraphs games-table">
+<table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
 		<th>ID</th>
 		<th>Type</th>

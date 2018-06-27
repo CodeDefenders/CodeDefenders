@@ -31,7 +31,7 @@
 	</div> <!-- col-md6 left -->
 	<div class="col-md-6">
 		<h2>Equivalent mutant?</h2>
-		<table class="table table-hover table-responsive table-paragraphs">
+		<table class="table table-striped table-hover table-responsive table-paragraphs">
 
 			<%
 				List<Mutant> equivMutants = game.getMutantsMarkedEquivalent();

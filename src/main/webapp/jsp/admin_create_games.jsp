@@ -9,19 +9,14 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminCreateGames" %>
 <%@ page import="org.codedefenders.validation.CodeValidator" %>
-<%@ page import="org.joda.time.DateTime" %>
-<%@ page import="org.joda.time.format.DateTimeFormat" %>
-<%@ page import="org.joda.time.format.DateTimeFormatter" %>
 <%@ page import="java.util.List" %>
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
+
 <div class="full-width">
-    <ul class="nav nav-tabs">
-        <li class="active"><a id="adminCreateGames">Create Games</a></li>
-        <li><a id="adminMonitorGames" href="<%=request.getContextPath()%>/admin/monitor">Monitor Games</a></li>
-        <li><a id="adminUserMgmt" href="<%=request.getContextPath()%>/admin/users">Manage Users</a></li>
-        <li><a id="adminSystemSettings" href="<%=request.getContextPath()%>/admin/settings">System Settings</a></li>
-    </ul>
+    <% request.setAttribute("adminActivePage", "adminCreateGames"); %>
+    <%@ include file="/jsp/admin_navigation.jsp" %>
+
     <form id="insertGames" action="admin" method="post">
         <input type="hidden" name="formType" value="insertGames"/>
         <h3>Staged Games</h3>
@@ -40,7 +35,7 @@
         } else {
         %>
         <table id="tableCreatedGames"
-               class="table table-hover table-responsive table-paragraphs games-table dataTable display">
+               class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
             <tr>
                 <th><input type="checkbox" id="selectAllTempGames"
@@ -177,7 +172,7 @@
 
         <h3>Unassigned Users</h3>
         <table id="tableAddUsers"
-               class="table table-hover table-responsive table-paragraphs games-table dataTable display">
+               class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
             <tr>
                 <th><input type="checkbox" id="selectAllUsers"

@@ -24,6 +24,7 @@
 			<url-pattern>/admin/monitor</url-pattern>
 			<url-pattern>/admin/users</url-pattern>
 			<url-pattern>/admin/settings</url-pattern>
+			<url-pattern>/api/*</url-pattern>
 			<http-method>GET</http-method>
 			<http-method>POST</http-method>
 		</web-resource-collection>
@@ -349,6 +350,24 @@
 	<servlet-mapping>
 		<servlet-name>AdminSettings</servlet-name>
 		<url-pattern>/admin/settings</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>AdminAnalyticsUsers</servlet-name>
+		<servlet-class>org.codedefenders.servlets.admin.AdminAnalyticsUsers</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AdminAnalyticsUsers</servlet-name>
+		<url-pattern>/admin/analytics/users</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>AdminAnalyticsUsersApi</servlet-name>
+		<servlet-class>org.codedefenders.servlets.admin.api.AdminAnalyticsUsersApi</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AdminAnalyticsUsersApi</servlet-name>
+		<url-pattern>/api/users</url-pattern>
 	</servlet-mapping>
 
 	<servlet>

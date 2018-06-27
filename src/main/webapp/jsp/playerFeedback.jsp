@@ -148,7 +148,7 @@
 
                 <% if (FeedbackDAO.getNBFeedbacksForGame(gameId) > 0) {%>
                 <div class="table-responsive">
-                <table class="table-hover table-bordered table-responsive table-sm">
+                <table class="table-striped table-hover table-bordered table-responsive table-sm">
                     <thead>
                     <tr>
                         <th><%=canSeePlayerFeedback ? "Player" : ""%></th>

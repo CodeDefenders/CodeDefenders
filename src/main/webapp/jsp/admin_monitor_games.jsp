@@ -10,12 +10,8 @@
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div class="full-width">
-    <ul class="nav nav-tabs">
-        <li><a id="adminCreateGames" href="<%=request.getContextPath()%>/admin/games">Create Games</a></li>
-        <li class="active"><a id="adminMonitorGames">Monitor Games</a></li>
-        <li><a id="adminUserMgmt" href="<%=request.getContextPath()%>/admin/users">Manage Users</a></li>
-        <li><a id="adminSystemSettings" href="<%=request.getContextPath()%>/admin/settings">System Settings</a></li>
-    </ul>
+    <% request.setAttribute("adminActivePage", "adminMonitorGames"); %>
+    <%@ include file="/jsp/admin_navigation.jsp" %>
 
     <form id="games" action="admin/monitor" method="post">
         <input type="hidden" name="formType" value="startStopGame">
@@ -34,7 +30,7 @@
         } else {
         %>
         <table id="tableActiveGames"
-               class="table-hover table-responsive table-paragraphs games-table display table-condensed">
+               class="table-hover table-striped table-responsive table-paragraphs games-table display table-condensed">
             <thead>
             <tr style="border-bottom: 1px solid black">
                 <th><input type="checkbox" id="selectAllGames"

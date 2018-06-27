@@ -90,7 +90,7 @@ if (role == Role.ATTACKER && true){
 			<div class="tab-content">
 				<div class="tab-pane fade active in" id="mutalivetab">
 				<% if (! mutantsAlive.isEmpty()) { %>
-				<table id="alive-mutants" class="mutant-table display dataTable table table-hover table-responsive table-paragraphs bg-white">
+				<table id="alive-mutants" class="mutant-table display dataTable table table-striped table-hover table-responsive table-paragraphs bg-white">
 					<thead>  <!-- needed for datatable apparently -->
 						<tr>
 							<th></th>
@@ -174,7 +174,7 @@ if (role == Role.ATTACKER && true){
 				</div>
 				<div class="tab-pane fade" id="mutkilledtab">
 					<% if (! mutantsKilled.isEmpty()) { %>
-					<table id="killed-mutants" class="mutant-table display dataTable table table-hover table-responsive table-paragraphs bg-white">
+					<table id="killed-mutants" class="mutant-table display dataTable table table-striped table-responsive table-paragraphs bg-white">
 					<thead>  <!-- needed for datatable apparently -->
 						<tr>
 							<th></th>
@@ -238,7 +238,7 @@ if (role == Role.ATTACKER && true){
 				</div>
 				<div class="tab-pane fade" id="mutequivtab">
 					<% if (! mutantsEquiv.isEmpty()) { %>
-					<table id="equiv-mutants" class="mutant-table display dataTable table table-hover table-responsive table-paragraphs bg-white">
+					<table id="equiv-mutants" class="mutant-table display dataTable table table-striped table-hover table-responsive table-paragraphs bg-white">
 
 					<thead>  <!-- needed for datatable apparently -->
 						<tr>

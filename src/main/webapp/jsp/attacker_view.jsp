@@ -56,7 +56,7 @@
 		</ul>
 		<div class="tab-content">
 			<div class="tab-pane fade active in" id="mutalivetab">
-				<table class="table table-hover table-responsive table-paragraphs">
+				<table class="table table-striped table-hover table-responsive table-paragraphs">
 					<%
 					List<Mutant> mutantsAlive = game.getAliveMutants();
 					Map<Integer, List<Mutant>> mutantLines = new HashMap<>();
@@ -110,7 +110,7 @@
 				</table>
 			</div>
 			<div class="tab-pane fade" id="mutkilledtab">
-				<table class="table table-hover table-responsive table-paragraphs">
+				<table class="table table-striped table-responsive table-paragraphs">
 					<%
 					List<Mutant> mutantsKilled = game.getKilledMutants();
 					Map<Integer, List<Mutant>> mutantKilledLines = new HashMap<>();
