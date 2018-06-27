@@ -140,36 +140,57 @@ docker build -t codedefenders/frontend .
 ```
 
 #### Manually deploy the system using docker-compose
-If you want to try out Code Defenders on docker, assuming you have build the right images. Run the following commands:
+Code Defenders can be run as a set of docker containers using the provided docker-compose.yml file. To build and run the HEAD VERSION of Code Defenders which is stored in the Git Hub repo, you can run the following commands:
 
 ```bash
-mvn clean compile package war:war -PST
-cd  src/test/resources/systemtests/
+cd docker
 docker-compose up
 ```
 
-You should see the outputs of both containers on the console. Since the database is built on the fly, it takes more time to start mysql than usual. Tomcat retries to connect to the database several time. Tomcat receives a random port when it starts, so we need to get it from docker.
+This command will build the required containers by cloning the git repo and by invoking the expected maven commands. As a consequence, the first time you run docker-compose it might take a while.
 
-```bash
-docker ps
+**Note** On the console, you will see outputs like: 
 ```
-
-Should produce an output similar to:
-
-```bash
-CONTAINER ID        IMAGE                           COMMAND                  CREATED             STATUS              PORTS                     NAMES
-5a4893783257        codedefenders/frontend:latest   "catalina.sh run"        3 minutes ago       Up 3 minutes        0.0.0.0:32799->8080/tcp   systemtests_frontend_1
-77470959a24c        mysql:latest                    "docker-entrypoint.s…"   3 minutes ago       Up 3 minutes        0.0.0.0:32798->3306/tcp   systemtests_db_1
+db_1: mbind: Operation not allowed 
 ```
-Locate the PORT corresponding to `codedefenders/frontend:latest`, e.g., and connect to Code Defenders using the browser, e.g., `http://localhost:32799/codedefenders/`
+You can ignore them.
 
-To shutdown the application, Ctrl-C the docker-compose process.
+After all components are started, you can access the application at: ```http://localhost/codedefenders```
+
+To shutdown the entire application, Ctrl-C the docker-compose process.
 
 ```bash
 Gracefully stopping... (press Ctrl+C again to force)
 Stopping systemtests_frontend_1 ... done
 Stopping systemtests_db_1       ... done
 ```
+
+### Scalability
+We enable scalability by replicating the front-end component of the application and by using a custom nginx load balancer to handle sticky sessions. Currently, the system supports up to 8 concurrent instances of the front-end. Use the scale parameter of docker run to spin off multiple front ends. The following command starts 4 front-end instances:
+
+```bash
+cd docker
+docker-compose up --scale=frontend=4
+```
+
+### Persistence
+Persistency is achieved using docker volumes. You can see which volumes are available, use the command:
+```
+docker volume ls
+```
+
+As long as the docker_datavolume and the docker_dbvolume (names might change) are there, the content of the mysql db and the data folder are persisted.
+So if you have stopped, and even destroyed, the containers by using the same docker-compose file the data are preserved.
+
+**Note** If you want to access the content of those volumes, e.g., to backup them, you must spin off a docker container which mounts them.
+
+### Reliability
+A minimum of reliability is guaranteed by automatically restarting the container if the fail or are manually stopped (by mistake). Therefore, unless you stop the docker-compose, containers will automatically restart.
+
+**Note** Restarting the containers *might* not preserve the user sessions, that is, you users might have to re-login in the system after a crash/restart.
+
+### Customization
+If you need more instances or if you need to customize the deployment, you must update the Docker and various configurations files under the ```/docker``` folder. But at that point your are on your own.
 
 
 # Project Import
