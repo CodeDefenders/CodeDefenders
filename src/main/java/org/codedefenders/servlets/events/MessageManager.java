@@ -1,7 +1,7 @@
 package org.codedefenders.servlets.events;
 
-import org.codedefenders.game.Role;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -12,86 +12,83 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+/**
+ * This {@link HttpServlet} handles uploading and storing new chat messages. Chat
+ * messages are stored as {@link Event}s.
+ * <p>
+ * Serves on path: `/messages/send`.
+ */
 public class MessageManager extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory.getLogger(MessageManager.class);
 
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		String result = "{'status':'Error'}";
-		response.setContentType("text/json");
+    /**
+     * Checks for a given request whether it holds the required parameters.
+     * Required parameters are {@code gameId}, {@code message} and {@code target}.
+     *
+     * @param request the given request as a {@link HttpServletRequest}.
+     * @return {@code true} if request has required parameters, {@code false} if not.
+     */
+    private boolean hasParameters(HttpServletRequest request) {
+        final String gameId = request.getParameter("gameId");
+        final String message = request.getParameter("message");
+        final String target = request.getParameter("target");
+
+        return gameId != null && message != null && target != null;
+    }
+
+	@Override
+	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+		response.setContentType("application/json");
 		PrintWriter out = response.getWriter();
-		try {
-			if (canAccess(request)) {
+        if (!hasParameters(request)) {
+            logger.debug("Missing required request parameters.");
+            response.setStatus(400);
+            out.print("{'status':'Error'}");
+            out.flush();
+            return;
+        }
+        int gameId = Integer.parseInt(request.getParameter("gameId"));
+        int userId = (int) request.getSession().getAttribute("uid");
 
+        final Role role = DatabaseAccess.getRole(userId, gameId);
 
-				ArrayList<Event> events = null;
+        EventType eventType = EventType.valueOf(request.getParameter("target"));
 
-				int gameId =
-						Integer.parseInt(request.getParameter("gameId"));
-				int userId = (int) request.getSession().getAttribute("uid");
+        if (eventType == EventType.GAME_MESSAGE
+                || (eventType == EventType.ATTACKER_MESSAGE && role == Role.ATTACKER)
+                || (eventType == EventType.DEFENDER_MESSAGE && role == Role.DEFENDER)) {
+            if (eventType == EventType.GAME_MESSAGE) {
+                if (role == Role.DEFENDER) {
+                    eventType = EventType.GAME_MESSAGE_DEFENDER;
+                } else if (role == Role.ATTACKER) {
+                    eventType = EventType.GAME_MESSAGE_ATTACKER;
+                }
+            }
+            final EventStatus status = EventStatus.GAME;
+            final User user = DatabaseAccess.getUser(userId);
+            final String chatMessage = request.getParameter("message");
+            final String message = user.getUsername() + ": " + chatMessage;
+            final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-				Role role = DatabaseAccess.getRole(userId, gameId);
+            final Event e = new Event(0, gameId, userId, message, eventType, status, timestamp);
+            e.setChatMessage(DatabaseAccess.sanitise(chatMessage));
 
-				EventType eventType = EventType.valueOf(request.getParameter
-						("target"));
-
-				if ((eventType == EventType.ATTACKER_MESSAGE && role.equals
-						(Role.ATTACKER)) ||
-						(eventType == EventType.DEFENDER_MESSAGE && role
-								.equals(Role.DEFENDER))
-						|| eventType == EventType.GAME_MESSAGE) {
-
-					if (eventType == EventType.GAME_MESSAGE){
-						if (role.equals(Role.DEFENDER)){
-							eventType = EventType.GAME_MESSAGE_DEFENDER;
-						} else if (role.equals(Role.ATTACKER)){
-							eventType = EventType.GAME_MESSAGE_ATTACKER;
-						}
-					}
-
-					EventStatus es = EventStatus.GAME;
-
-					User u = DatabaseAccess.getUser(userId);
-
-					String message = request.getParameter("message");
-
-					Event e = new Event(0, gameId, userId,
-							u.getUsername() + ": " + message,
-							eventType, es, new Timestamp(System.currentTimeMillis()));
-
-					e.setChatMessage(DatabaseAccess.sanitise(message));
-
-					if (e.insert()){
-						logger.info(String.format("Event %s saved in game %d.", eventType.toString(), gameId));
-						result = "{'status':'Success'}";
-					} else
-						logger.error(String.format("Problem saving event %s in game %d", eventType.toString(), gameId));
-				}
-
-			}
-		} catch (Exception e){
-			e.printStackTrace();
-		}
-
-		out.print(result);
-		out.flush();
+            if (e.insert()) {
+                logger.debug("Event {} saved in game {}.", eventType, gameId);
+                out.print("{'status':'Success'}");
+                out.flush();
+            } else {
+                logger.error("Error saving event {} in game {}", eventType, gameId);
+                out.print("{'status':'Error'}");
+                out.flush();
+            }
+        }
 	}
-
-	public boolean canAccess(HttpServletRequest request){
-		//TODO: Implement heavy load/DDOS handling
-		if (request.getParameter("gameId") != null
-				&& request.getParameter("message") != null
-				&& request.getParameter("target") != null) {
-			return true;
-		}
-		return false;
-	}
-
 }
