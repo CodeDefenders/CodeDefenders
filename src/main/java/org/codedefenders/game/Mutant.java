@@ -424,6 +424,14 @@ public class Mutant implements Serializable {
 		killedByAITests++;
 	}
 
+	/**
+	 * Identify lines in the original source code that have been modified
+	 * by a mutation.
+	 *
+	 * An insertion only modifies the line it was inserted in
+	 *
+	 * @return lines modified in the original class
+	 */
 	public ArrayList<Integer> getLines() {
 		if (lines != null) {
 			return lines;
@@ -521,7 +529,7 @@ public class Mutant implements Serializable {
 		return new Comparator<Mutant>() {
 			@Override
 			public int compare(Mutant o1, Mutant o2) {
-				return ((Integer) Collections.min( o1.getLines() ) ) - ((Integer) Collections.min( o2.getLines() )); 
+				return ((Integer) Collections.min( o1.getLines() ) ) - ((Integer) Collections.min( o2.getLines() ));
 			}
 		};
 	}
