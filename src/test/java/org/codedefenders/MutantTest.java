@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.apache.commons.io.FileUtils;
 import org.codedefenders.database.DatabaseAccess;
@@ -74,8 +75,10 @@ public class MutantTest {
 		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
-		
-		
+
+		assertEquals(1, p.getDeltas().size());
+		assertEquals(Arrays.asList(7), m.getLines());
+
 		for (Delta d : p.getDeltas()) {
 			System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d);
 		}
@@ -132,8 +135,7 @@ public class MutantTest {
 		Patch p = m.getDifferences();
 		
 		assertEquals(1, p.getDeltas().size());
-		assertEquals(4, m.getLines().size());
-		
+		assertEquals(Arrays.asList(7), m.getLines());
 	}
 	
 	
@@ -187,7 +189,7 @@ public class MutantTest {
 		Patch p = m.getDifferences();
 		
 		assertEquals(1, p.getDeltas().size());
-		assertEquals(1, m.getLines().size());		
+		assertEquals(Arrays.asList(9), m.getLines());
 	}
 	
 	@org.junit.Test
@@ -241,8 +243,8 @@ public class MutantTest {
 		Patch p = m.getDifferences();
 		
 		assertEquals(1, p.getDeltas().size());
-		assertEquals(2, m.getLines().size());
-		
+		assertEquals(Arrays.asList(8), m.getLines());
+
 		System.out.println("MutantTest.testGetLinesForInsertMultipleLines()" + m.getHTMLReadout() );
 	}
 	
@@ -296,9 +298,10 @@ public class MutantTest {
 		
 		Patch p = m.getDifferences();
 		
-//		assertEquals(1, p.getDeltas().size());
-//		assertEquals(2, m.getLines().size());
-		
+		assertEquals(2, p.getDeltas().size()); // Change and insertion
+		assertEquals(2, m.getLines().size());  // Change line, and line of insertion
+		assertEquals(Arrays.asList(7, 9), m.getLines());
+
 		System.out.println("MutantTest.testGetLinesForInsertMultipleLines()" + m.getHTMLReadout() );
 	}
 	
@@ -369,6 +372,10 @@ public class MutantTest {
 		System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getHTMLReadout());
 		
 		Patch p = m.getDifferences();
+
+		assertEquals(2, p.getDeltas().size()); // Change and insertion
+		assertEquals(Arrays.asList(9, 13), m.getLines());
+
 		for (Delta d : p.getDeltas()) {
 			System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d);
 		}
