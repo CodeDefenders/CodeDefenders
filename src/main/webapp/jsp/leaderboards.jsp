@@ -38,12 +38,10 @@
 		$(document).ready(function() {
 			$.fn.dataTable.moment( 'DD/MM/YY HH:mm' );
 			$('#tableMPLeaderboard').DataTable( {
-				"paging":   false,
-				"searching": false,
 				"order": [[ 6, "desc" ]],
-				"language": {
-					"info": ""
-				}
+				"columnDefs": [
+					{ "searchable": false, "targets": [1,2,3,4,5,6] }
+				]
 			} );
 		} );
 
