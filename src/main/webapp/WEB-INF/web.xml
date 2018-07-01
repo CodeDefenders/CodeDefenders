@@ -4,6 +4,36 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
+    <servlet>
+        <servlet-name>jsp</servlet-name>
+        <servlet-class>org.apache.jasper.servlet.JspServlet</servlet-class>
+        <init-param>
+            <param-name>compiler</param-name>
+            <param-value>modern</param-value>
+        </init-param>
+        <init-param>
+            <param-name>compilerSourceVM</param-name>
+            <param-value>1.8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>compilerTargetVM</param-name>
+            <param-value>1.8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>suppressSmap</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+          <param-name>fork</param-name>
+          <param-value>false</param-value>
+        </init-param>
+        <init-param>
+          <param-name>xpoweredBy</param-name>
+          <param-value>false</param-value>
+        </init-param>
+        <load-on-startup>3</load-on-startup>
+    </servlet>
+
 	<description>
 		Code Defenders: A Mutation Testing Game
 	</description>
@@ -368,6 +398,15 @@
 	<servlet-mapping>
 		<servlet-name>AdminAnalyticsUsersApi</servlet-name>
 		<url-pattern>/api/users</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>AdminAnalyticsClassesApi</servlet-name>
+		<servlet-class>org.codedefenders.servlets.admin.api.AdminAnalyticsClassesApi</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AdminAnalyticsClassesApi</servlet-name>
+		<url-pattern>/api/classes</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
