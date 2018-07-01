@@ -65,7 +65,7 @@
             table = $('#tableUsers').DataTable({
                 "ajax": {
                     "url": "<%=request.getContextPath() + Constants.API_ANALYTICS_USERS%>",
-                    "dataSrc": ""
+                    "dataSrc": "data"
                 },
                 "columns": [
                     {
