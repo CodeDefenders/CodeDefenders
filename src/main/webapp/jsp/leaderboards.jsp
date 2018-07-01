@@ -41,7 +41,8 @@
 				"order": [[ 6, "desc" ]],
 				"columnDefs": [
 					{ "searchable": false, "targets": [1,2,3,4,5,6] }
-				]
+				],
+				"pageLength": 50
 			} );
 		} );
 
