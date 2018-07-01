@@ -22,9 +22,18 @@
         </thead>
     </table>
 
+    <div class="btn-group">
+        <a download="user-analytics.csv" href="<%=request.getContextPath()+Constants.API_ANALYTICS_USERS%>?type=csv"
+            type="button" class="btn btn-default" id="download-csv">Download as CSV</a>
+        <a download="user-analytics.json" href="<%=request.getContextPath()+Constants.API_ANALYTICS_USERS%>?type=json"
+           type="button" class="btn btn-default" id="download-json">Download as JSON</a>
+    </div>
+
     <script src="js/datatables-child-rows.js" type="text/javascript" ></script>
 
     <script>
+        var table;
+
         function format(data) {
             return '' +
                 '<table class="table-child-details">'+
@@ -35,7 +44,7 @@
                             '<td>Still Alive:</td>'+
                             '<td>'+data.mutantsAlive+'</td>'+
                             '<td>Equivalent:</td>'+
-                            '<td>'+data.equivalentMutantsSubmitted+'</td>'+
+                            '<td>'+data.mutantsEquivalent+'</td>'+
                         '</tr>'+
                         '<tr/>'+
                         '<tr>'+
@@ -53,7 +62,7 @@
         }
 
         $(document).ready(function() {
-            var table = $('#tableUsers').DataTable({
+            table = $('#tableUsers').DataTable({
                 "ajax": {
                     "url": "<%=request.getContextPath() + Constants.API_ANALYTICS_USERS%>",
                     "dataSrc": ""
