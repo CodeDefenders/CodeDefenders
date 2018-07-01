@@ -3,15 +3,15 @@ package org.codedefenders.api.analytics;
 public class UserDataDTO {
     private long id;
     private String username;
-    private int mutantsSubmitted;
-    private int mutantsAlive;
-    private int equivalentMutantsSubmitted;
-    private int testsSubmitted;
-    private int mutantsKilled;
+    private int gamesPlayed;
     private int attackerScore;
     private int defenderScore;
     private int totalScore;
-    private int gamesPlayed;
+    private int mutantsSubmitted;
+    private int mutantsAlive;
+    private int mutantsEquivalent;
+    private int testsSubmitted;
+    private int mutantsKilled;
 
     public long getId() {
         return id;
@@ -29,44 +29,12 @@ public class UserDataDTO {
         this.username = username;
     }
 
-    public int getMutantsSubmitted() {
-        return mutantsSubmitted;
+    public int getGamesPlayed() {
+        return gamesPlayed;
     }
 
-    public void setMutantsSubmitted(int mutantsSubmitted) {
-        this.mutantsSubmitted = mutantsSubmitted;
-    }
-
-    public int getMutantsAlive() {
-        return mutantsAlive;
-    }
-
-    public void setMutantsAlive(int mutantsAlive) {
-        this.mutantsAlive = mutantsAlive;
-    }
-
-    public int getEquivalentMutantsSubmitted() {
-        return equivalentMutantsSubmitted;
-    }
-
-    public void setEquivalentMutantsSubmitted(int equivalentMutantsSubmitted) {
-        this.equivalentMutantsSubmitted = equivalentMutantsSubmitted;
-    }
-
-    public int getTestsSubmitted() {
-        return testsSubmitted;
-    }
-
-    public void setTestsSubmitted(int testsSubmitted) {
-        this.testsSubmitted = testsSubmitted;
-    }
-
-    public int getMutantsKilled() {
-        return mutantsKilled;
-    }
-
-    public void setMutantsKilled(int mutantsKilled) {
-        this.mutantsKilled = mutantsKilled;
+    public void setGamesPlayed(int gamesPlayed) {
+        this.gamesPlayed = gamesPlayed;
     }
 
     public int getAttackerScore() {
@@ -93,11 +61,43 @@ public class UserDataDTO {
         this.totalScore = totalScore;
     }
 
-    public int getGamesPlayed() {
-        return gamesPlayed;
+    public int getMutantsSubmitted() {
+        return mutantsSubmitted;
     }
 
-    public void setGamesPlayed(int gamesPlayed) {
-        this.gamesPlayed = gamesPlayed;
+    public void setMutantsSubmitted(int mutantsSubmitted) {
+        this.mutantsSubmitted = mutantsSubmitted;
+    }
+
+    public int getMutantsAlive() {
+        return mutantsAlive;
+    }
+
+    public void setMutantsAlive(int mutantsAlive) {
+        this.mutantsAlive = mutantsAlive;
+    }
+
+    public int getMutantsEquivalent() {
+        return mutantsEquivalent;
+    }
+
+    public void setMutantsEquivalent(int equivalentMutantsSubmitted) {
+        this.mutantsEquivalent = equivalentMutantsSubmitted;
+    }
+
+    public int getTestsSubmitted() {
+        return testsSubmitted;
+    }
+
+    public void setTestsSubmitted(int testsSubmitted) {
+        this.testsSubmitted = testsSubmitted;
+    }
+
+    public int getMutantsKilled() {
+        return mutantsKilled;
+    }
+
+    public void setMutantsKilled(int mutantsKilled) {
+        this.mutantsKilled = mutantsKilled;
     }
 }

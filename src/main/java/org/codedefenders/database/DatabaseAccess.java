@@ -968,15 +968,16 @@ public class DatabaseAccess {
 
 		String query = String.join("\n",
 		" SELECT users.User_ID                AS ID,",
-		"       users.username                AS Username,",
+		"       users.Username                AS Username,",
+        "       IFNULL(NrGamesPlayed,0)       AS GamesPlayed,",
+        "       IFNULL(AttackerScore,0)       AS AttackerScore,",
+        "       IFNULL(DefenderScore,0)       AS DefenderScore,",
+        "       IFNULL(AttackerScore,0)+IFNULL(DefenderScore,0) AS TotalScore,",
 		"       IFNULL(NrMutants,0)           AS MutantsSubmitted,",
 		"       IFNULL(NrMutantsAlive,0)      AS MutantsAlive,",
-		"       IFNULL(NrEquivalentMutants,0) AS EquivalentMutantsSubmitted,",
+		"       IFNULL(NrEquivalentMutants,0) AS MutantsEquivalent,",
 		"       IFNULL(NrTests,0)             AS TestsSubmitted,",
-		"       IFNULL(NrMutantsKilled,0)     AS MutantsKilled,",
-		"       IFNULL(AttackerScore,0)       AS AttackerScore,",
-		"       IFNULL(DefenderScore,0)       AS DefenderScore,",
-		"       IFNULL(NrGamesPlayed,0)       AS GamesPlayed",
+		"       IFNULL(NrMutantsKilled,0)     AS MutantsKilled",
 
 		"FROM users",
 
@@ -1024,15 +1025,15 @@ public class DatabaseAccess {
 				UserDataDTO u = new UserDataDTO();
 				u.setId(rs.getLong("ID"));
 				u.setUsername(rs.getString("Username"));
-				u.setMutantsSubmitted(rs.getInt("MutantsSubmitted"));
-				u.setMutantsAlive(rs.getInt("MutantsAlive"));
-				u.setEquivalentMutantsSubmitted(rs.getInt("EquivalentMutantsSubmitted"));
-				u.setTestsSubmitted(rs.getInt("TestsSubmitted"));
-				u.setMutantsKilled(rs.getInt("MutantsKilled"));
 				u.setAttackerScore(rs.getInt("AttackerScore"));
 				u.setDefenderScore(rs.getInt("DefenderScore"));
-				u.setTotalScore(u.getAttackerScore() + u.getDefenderScore());
+				u.setTotalScore(rs.getInt("TotalScore"));
 				u.setGamesPlayed(rs.getInt("GamesPlayed"));
+				u.setMutantsSubmitted(rs.getInt("MutantsSubmitted"));
+				u.setMutantsAlive(rs.getInt("MutantsAlive"));
+				u.setMutantsEquivalent(rs.getInt("MutantsEquivalent"));
+				u.setTestsSubmitted(rs.getInt("TestsSubmitted"));
+				u.setMutantsKilled(rs.getInt("MutantsKilled"));
 				userList.add(u);
 			}
 		} catch (SQLException se) {
