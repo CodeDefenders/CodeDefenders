@@ -66,7 +66,6 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
                 "gamesPlayed",
                 "attackerScore",
                 "defenderScore",
-                "totalScore",
                 "mutantsSubmitted",
                 "mutantsAlive",
                 "mutantsEquivalent",

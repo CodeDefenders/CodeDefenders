@@ -79,8 +79,13 @@
                     { "data": "gamesPlayed" },
                     { "data": "attackerScore" },
                     { "data": "defenderScore" },
-                    { "data": "totalScore" }
+                    { "data":
+                        function(row, type, val, meta) {
+                            return row.attackerScore + row.defenderScore;
+                        }
+                    }
                 ],
+                "pageLength": 50,
                 "order": [[ 1, "asc" ]]
             });
 

@@ -972,7 +972,6 @@ public class DatabaseAccess {
         "       IFNULL(NrGamesPlayed,0)       AS GamesPlayed,",
         "       IFNULL(AttackerScore,0)       AS AttackerScore,",
         "       IFNULL(DefenderScore,0)       AS DefenderScore,",
-        "       IFNULL(AttackerScore,0)+IFNULL(DefenderScore,0) AS TotalScore,",
 		"       IFNULL(NrMutants,0)           AS MutantsSubmitted,",
 		"       IFNULL(NrMutantsAlive,0)      AS MutantsAlive,",
 		"       IFNULL(NrEquivalentMutants,0) AS MutantsEquivalent,",
@@ -984,10 +983,10 @@ public class DatabaseAccess {
 		"LEFT JOIN",
 		"(",
 		"  SELECT players.User_ID,",
-		"        COUNT(mutants.Mutant_ID) AS NrMutants,",
-		"        SUM(mutants.Alive) AS NrMutantsAlive,",
-		"        SUM(CASE WHEN mutants.Equivalent = 'DECLARED_YES' THEN 1 ELSE 0 END) AS NrEquivalentMutants,",
-		"        SUM(mutants.Points) AS AttackerScore",
+		"         COUNT(mutants.Mutant_ID) AS NrMutants,",
+		"         SUM(mutants.Alive) AS NrMutantsAlive,",
+		"         SUM(CASE WHEN mutants.Equivalent = 'DECLARED_YES' THEN 1 ELSE 0 END) AS NrEquivalentMutants,",
+		"         SUM(mutants.Points) AS AttackerScore",
 		"  FROM players, mutants",
 		"  WHERE players.ID = mutants.Player_ID",
 		"  GROUP BY players.User_ID",
@@ -1011,7 +1010,7 @@ public class DatabaseAccess {
 		"  SELECT players.User_ID,",
 		"         COUNT(*) AS NrGamesPlayed",
 		"  FROM players",
-		" GROUP BY players.User_ID",
+		"  GROUP BY players.User_ID",
         ")",
 		"AS nr_games ON users.User_ID = nr_games.User_ID",
 
@@ -1027,7 +1026,6 @@ public class DatabaseAccess {
 				u.setUsername(rs.getString("Username"));
 				u.setAttackerScore(rs.getInt("AttackerScore"));
 				u.setDefenderScore(rs.getInt("DefenderScore"));
-				u.setTotalScore(rs.getInt("TotalScore"));
 				u.setGamesPlayed(rs.getInt("GamesPlayed"));
 				u.setMutantsSubmitted(rs.getInt("MutantsSubmitted"));
 				u.setMutantsAlive(rs.getInt("MutantsAlive"));

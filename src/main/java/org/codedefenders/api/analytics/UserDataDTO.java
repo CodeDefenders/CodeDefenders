@@ -6,7 +6,6 @@ public class UserDataDTO {
     private int gamesPlayed;
     private int attackerScore;
     private int defenderScore;
-    private int totalScore;
     private int mutantsSubmitted;
     private int mutantsAlive;
     private int mutantsEquivalent;
@@ -51,14 +50,6 @@ public class UserDataDTO {
 
     public void setDefenderScore(int defenderScore) {
         this.defenderScore = defenderScore;
-    }
-
-    public int getTotalScore() {
-        return totalScore;
-    }
-
-    public void setTotalScore(int totalScore) {
-        this.totalScore = totalScore;
     }
 
     public int getMutantsSubmitted() {
