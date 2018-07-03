@@ -27,11 +27,22 @@ var updateCUT = function(){
     highlightCoverage();
 };
 
+var updateCUTTimeout = 15;
+
 editorSUT.on("viewportChange", function(){
-    updateCUT();
+    setTimeout(updateCUT, updateCUTTimeout);
 });
+
+editorSUT.on("cursorActivity", function(){
+    setTimeout(updateCUT, updateCUTTimeout);
+});
+
+editorSUT.on("gutterContextMenu", function(line, gutter){
+    setTimeout(updateCUT, updateCUTTimeout);
+});
+
 $(document).ready(function(){
-    updateCUT();
+    setTimeout(updateCUT, updateCUTTimeout);
 });
 
 //inline due to bug in Chrome?
