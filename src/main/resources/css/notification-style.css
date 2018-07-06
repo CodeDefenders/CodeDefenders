@@ -30,7 +30,7 @@
     border-radius: 5px;
     color: #fff;
     background-color: #fff;
-    position: absolute;
+    position: relative;
     min-height: 25px;
     z-index:200009;
     text-align: center;
@@ -126,6 +126,7 @@
     border: 2px solid lightgray;
     color: black;
     display: block;
+    background-color: white;
 }
 
 .CodeMirror #mutationPopup .mutationInfoExpanded h5 {
@@ -178,6 +179,8 @@
     width: 100%;
     float:left;
     display: flex;
+    position: relative;
+    z-index: 200010;
     font-family: 'Ubuntu', 'Open Sans', sans-serif;
 }
 
@@ -189,6 +192,10 @@
     padding: 4px;
     border-bottom: white 1px solid;
     border-top: white 1px solid;
+
+    display:block;
+    height:100%;
+    width:100%;
 }
 
 .CodeMirror #mutationPopup .action a span {

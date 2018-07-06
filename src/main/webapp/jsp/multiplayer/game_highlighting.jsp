@@ -27,22 +27,32 @@ var updateCUT = function(){
     highlightCoverage();
 };
 
-var updateCUTTimeout = 15;
+var updateCUTTimeout = 60;
+
+var updateTimeout = null;
+
+var scheduleUpdate = function(){
+    if (updateTimeout != null){
+        clearTimeout(updateTimeout);
+        updateTimeout = null;
+    }
+    updateTimeout = setTimeout(updateCUT, updateCUTTimeout);
+}
 
 editorSUT.on("viewportChange", function(){
-    setTimeout(updateCUT, updateCUTTimeout);
+    scheduleUpdate();
 });
 
 editorSUT.on("cursorActivity", function(){
-    setTimeout(updateCUT, updateCUTTimeout);
+    scheduleUpdate();
 });
 
 editorSUT.on("gutterContextMenu", function(line, gutter){
-    setTimeout(updateCUT, updateCUTTimeout);
+    scheduleUpdate();
 });
 
 $(document).ready(function(){
-    setTimeout(updateCUT, updateCUTTimeout);
+    scheduleUpdate();
 });
 
 //inline due to bug in Chrome?

@@ -252,28 +252,61 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
             mutantDescriptions['killed'] += "<p>+" + (killedMutants - MUTANT_SHOW_LIMIT) + " More</p>";
         }
 
-        var icon = '<div id="' + id + '" style="height: 20px; margin-left: 5px; float: left; margin-right: -25px; position: relative; z-index:2000;" class="codedef-line-mutant">';
+        var icon = '<div id="' + id + '" style="height: 20px; margin-left: 5px; float: left; margin-right: -25px; position: absolute; z-index:2000;" class="codedef-line-mutant">';
+
+        var iconCount = 0;
 
         if (killedMutants > 0){
             icon += '<span class="mutantCUTImage mutantImageKilled"><span>' + killedMutants + '</span></span>';
-            // icon += '<img src="images/mutantKilled.png" alt="\' + quant + \' mutants on line \' + lineNum + \'" width="20" />';
+            iconCount++;
         }
 
         if (equivalentMutants > 0){
             icon += '<span class="mutantCUTImage mutantImageEquiv"><span>' + equivalentMutants + '</span></span>';
+            iconCount++;
         }
 
         if (flaggedMutants > 0){
             icon += '<span class="mutantCUTImage mutantImageFlagged"><span>' + flaggedMutants + '</span></span>';
+            iconCount++;
         }
 
         if (aliveMutants > 0){
             icon += '<span class="mutantCUTImage mutantImageAlive"><span>' + aliveMutants + '</span></span>';
+            iconCount++;
         }
 
         icon += '</div>'
 
+        var codeArea = $(superDiv).find('.CodeMirror')[0].CodeMirror;
+
+        //TODO: This does not work for defenders - fix!
+        var currentIndentations = $(allLines[lineNum]).find(".CodeMirror-line .cm-tab").length
+
+        var indentations = iconCount
+
+        if (currentIndentations == 0){
+            var lineCodeContent = $(allLines[lineNum]).find(".CodeMirror-line span").html()
+            currentIndentations = lineCodeContent.split(/\S/)[0].length/2
+
+            indentations *= 2;
+        }
+
+
+
+        if (indentations > 0 && currentIndentations < indentations){
+            for (i = 0; i < indentations-currentIndentations; i++){
+                codeArea.indentLine(l-1, "add");
+            }
+        }
+
+
+
         $(allLines[lineNum]).before(icon);
+        //var linesCode = $(allLines[lineNum]).child(".CodeMirror-line ").child("span");
+        //linesCode.html(linesCode)
+
+
 
         var content = '<span id="mutationPopup">'
 
@@ -299,9 +332,7 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
         // }
         if (showEquivalenceButton && aliveMutants > 0) {
             // TODO How do we get the contextPath ? it might not be necessary if we use relative href
-            mutantDescriptions['alive'] += '<span class="action"><a href="javascript:' +
-                ' if(window.confirm(\'Flag line ' + lineNum + ' as' +
-                ' Equivalent?\')){window.location.href = \'multiplayer/play?equivLine=' + lineNum + '\';}">' +
+            mutantDescriptions['alive'] += '<span class="action"><a id="markEquivButton">' +
                 '<span class="mutantCUTIcon mutantImageFlagAction"><span></span>' +
                 '</span> Claim Equivalence</a></span>';
         }
@@ -341,4 +372,12 @@ var drawMutants = function (lineNum, ele) {
     $('#mutationPopup').remove();
     var content = lineContent[lineNum];
     $(ele).append(content);
+    setTimeout(function() {
+        $("#mutationPopup a").mousedown(function (e) {
+            e.preventDefault();
+            if (window.confirm('Flag line ' + lastLine + ' as' + ' Equivalent?')) {
+                window.location.href = 'multiplayer/play?equivLine=' + lastLine
+            }
+        });
+    }, 100);
 };
