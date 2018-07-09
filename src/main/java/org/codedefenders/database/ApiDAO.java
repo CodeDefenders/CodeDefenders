@@ -29,6 +29,7 @@ public class ApiDAO {
 
         "FROM users",
 
+        /* Count number of mutants, alive mutants, equivalent mutants. Calculate total attacker score. */
         "LEFT JOIN",
         "(",
         "  SELECT players.User_ID,",
@@ -42,6 +43,7 @@ public class ApiDAO {
         ")",
         "AS attackers ON users.User_ID = attackers.User_ID",
 
+        /* Count number of tests, mutants killed. Calculate total defender score */
         "LEFT JOIN",
         "(",
         "  SELECT players.User_ID,",
@@ -54,11 +56,14 @@ public class ApiDAO {
         ")",
         "AS defenders ON users.User_ID = defenders.User_ID",
 
+        /* Count number of games played (active or finished). */
         "LEFT JOIN",
         "(",
         "  SELECT players.User_ID,",
-        "         COUNT(*) AS NrGamesPlayed",
-        "  FROM players",
+        "         COUNT(DISTINCT games.ID) AS NrGamesPlayed",
+        "  FROM players, games",
+        "  WHERE players.Game_ID = games.ID",
+        "    AND (games.State = \"ACTIVE\" OR games.State = \"Finished\")",
         "  GROUP BY players.User_ID",
         ")",
         "AS nr_games ON users.User_ID = nr_games.User_ID",

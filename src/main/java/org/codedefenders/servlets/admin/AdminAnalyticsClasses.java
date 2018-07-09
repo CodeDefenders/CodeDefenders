@@ -10,12 +10,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class AdminAnalyticsUsers extends HttpServlet {
-	private static final Logger logger = LoggerFactory.getLogger(AdminAnalyticsUsers.class);
+public class AdminAnalyticsClasses extends HttpServlet {
+	private static final Logger logger = LoggerFactory.getLogger(AdminAnalyticsClasses.class);
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		request.getRequestDispatcher(Constants.ADMIN_ANALYTICS_USERS_JSP).forward(request, response);
+		request.getRequestDispatcher(Constants.ADMIN_ANALYTICS_CLASSES_JSP).forward(request, response);
 	}
 
 	@Override
