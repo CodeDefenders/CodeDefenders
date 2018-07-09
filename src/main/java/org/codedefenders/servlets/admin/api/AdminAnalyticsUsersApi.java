@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -78,7 +79,7 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
         Gson gson = new Gson();
 
         JsonObject root = new JsonObject();
-        root.add("timestamp", gson.toJsonTree(System.currentTimeMillis()));
+        root.add("timestamp", gson.toJsonTree(Instant.now().getEpochSecond()));
         root.add("processingTime", gson.toJsonTree(timeEnd - timeStart));
         root.add("data", gson.toJsonTree(userData));
 
