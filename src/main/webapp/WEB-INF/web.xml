@@ -392,6 +392,15 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>AdminAnalyticsClasses</servlet-name>
+		<servlet-class>org.codedefenders.servlets.admin.AdminAnalyticsClasses</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AdminAnalyticsClasses</servlet-name>
+		<url-pattern>/admin/analytics/classes</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>AdminAnalyticsUsersApi</servlet-name>
 		<servlet-class>org.codedefenders.servlets.admin.api.AdminAnalyticsUsersApi</servlet-class>
 	</servlet>
