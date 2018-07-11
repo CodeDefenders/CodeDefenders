@@ -63,64 +63,101 @@ public class ApiDAO {
         "         COUNT(DISTINCT games.ID) AS NrGamesPlayed",
         "  FROM players, games",
         "  WHERE players.Game_ID = games.ID",
-        "    AND (games.State = \"ACTIVE\" OR games.State = \"Finished\")",
+        "    AND (games.State = 'ACTIVE' OR games.State = 'FINISHED')",
         "  GROUP BY players.User_ID",
         ")",
         "AS nr_games ON users.User_ID = nr_games.User_ID",
 
         "WHERE users.User_ID > 2;");
 
-    private static final  String GET_ANALYTICS_CLASS_DATA_QUERY = String.join("\n",
-        "SELECT classes.Class_ID AS ID,",
-        "       classes.Name AS Classname,",
-        "       NrGames AS Games,",
-        "       NrTestsTotal AS TestsSubmitted,",
-        "       NrMutantsTotal AS MutantsSubmitted,",
-        "       NrMutantsAliveTotal AS MutantsAlive,",
-        "       NrMutantsEquivalentTotal AS MutantsEquivalent",
+    private static final String GET_ANALYTICS_CLASS_DATA_QUERY = String.join("\n",
+        "SELECT classes.Class_ID                                AS ID,",
+        "       IFNULL(classes.Name,0)                          AS Classname,",
+        "       IFNULL(NrGames,0)                               AS NrGames,",
+        "       IFNULL(NrPlayers,0)                             AS NrPlayers,",
+        "       IFNULL(NrTestsTotal,0)                          AS TestsSubmitted,",
+        "       IFNULL(NrMutantsTotal,0)                        AS MutantsSubmitted,",
+        "       IFNULL(NrMutantsAliveTotal,0)                   AS MutantsAlive,",
+        "       IFNULL(NrMutantsEquivalentTotal,0)              AS MutantsEquivalent,",
+        "       IFNULL(ratings_CutMutationDifficulty_sum,0)     AS ratings_CutMutationDifficulty_sum,",
+        "       IFNULL(ratings_CutMutationDifficulty_count,0)   AS ratings_CutMutationDifficulty_count,",
+        "       IFNULL(ratings_CutTestDifficulty_sum,0)         AS ratings_CutTestDifficulty_sum,",
+        "       IFNULL(ratings_CutTestDifficulty_count,0)       AS ratings_CutTestDifficulty_count,",
+        "       IFNULL(ratings_GameEngaging_sum,0)              AS ratings_GameEngaging_sum,",
+        "       IFNULL(ratings_GameEngaging_count,0)            AS ratings_GameEngaging_count",
 
         "FROM classes",
 
-        "    LEFT JOIN",
-        "    (",
-        "        SELECT classes.Class_ID, COUNT(games.ID) AS NrGames",
-        "        FROM classes, games",
-        "        WHERE classes.Class_ID = games.Class_ID",
-        "        GROUP BY classes.Class_ID",
-        "    ) AS nr_games ON nr_games.Class_ID = classes.Class_ID",
+        /* Count number of games (active or finished), players */
+        "LEFT JOIN",
+        "  (",
+        "    SELECT classes.Class_ID,",
+        "           COUNT(DISTINCT games.ID) AS NrGames,",
+        "           COUNT(DISTINCT players.ID) AS NrPlayers",
+        "    FROM classes, games, players",
+        "    WHERE classes.Class_ID = games.Class_ID",
+        "      AND players.Game_ID = games.ID",
+        "      AND (games.State = 'ACTIVE' OR games.State = 'FINISHED')",
+        "    GROUP BY classes.Class_ID",
+        "  ) AS nr_games ON nr_games.Class_ID = classes.Class_ID",
 
-        "    LEFT JOIN",
-        "    (",
-        "        SELECT nr_tests_pre.Class_ID,",
-        "               SUM(NrTests) AS NrTestsTotal",
-        "        FROM (",
-        "            SELECT games.Class_ID,",
-        "                   COUNT(Test_ID) AS NrTests",
-        "            FROM games, tests",
-        "            WHERE games.ID = tests.Game_ID",
-        "            GROUP BY games.ID",
-        "        ) AS nr_tests_pre",
-        "        GROUP BY nr_tests_pre.Class_ID",
-        "    ) AS nr_tests ON nr_tests.Class_ID = classes.Class_ID",
+        /* Count number of tests */
+        "LEFT JOIN",
+        "  (",
+        "    SELECT nr_tests_innter.Class_ID,",
+        "    SUM(NrTests) AS NrTestsTotal",
+        "    FROM (",
+        "      SELECT games.Class_ID,",
+        "             COUNT(Test_ID) AS NrTests",
+        "      FROM games, tests",
+        "      WHERE games.ID = tests.Game_ID",
+        "      GROUP BY games.ID",
+        "    ) AS nr_tests_innter",
+        "    GROUP BY nr_tests_innter.Class_ID",
+        "  ) AS nr_tests ON nr_tests.Class_ID = classes.Class_ID",
 
-        "    LEFT JOIN",
-        "    (",
-        "        SELECT nr_mutants_pre.Class_ID,",
-        "               SUM(NrMutants) AS NrMutantsTotal,",
-        "               SUM(NrMutantsAlive) AS NrMutantsAliveTotal,",
-        "               SUM(NrMutantsEquivalent) AS NrMutantsEquivalentTotal",
-        "        FROM (",
-        "            SELECT games.Class_ID,",
-        "                   COUNT(Mutant_ID) AS NrMutants,",
-        "                   IFNULL(SUM(mutants.Alive),0) AS NrMutantsAlive,",
-        "                   SUM(CASE WHEN mutants.Equivalent = 'DECLARED_YES' THEN 1 ELSE 0 END) AS NrMutantsEquivalent",
-        "            FROM games, mutants",
-        "            WHERE games.ID = mutants.Game_ID",
-        "            GROUP BY games.ID",
-        "        ) AS nr_mutants_pre",
-        "        GROUP BY nr_mutants_pre.Class_ID",
-        "    ) AS nr_mutants ON nr_mutants.Class_ID = classes.Class_ID;");
+        /* Count number of mutants, alive mutants, equivalent mutants */
+        "LEFT JOIN",
+        "  (",
+        "    SELECT nr_mutants_inner.Class_ID,",
+        "           SUM(NrMutants)              AS NrMutantsTotal,",
+        "           SUM(NrMutantsAlive)         AS NrMutantsAliveTotal,",
+        "           SUM(NrMutantsEquivalent)    AS NrMutantsEquivalentTotal",
+        "    FROM (",
+        "      SELECT games.Class_ID,",
+        "             COUNT(Mutant_ID)      AS NrMutants,",
+        "             SUM(mutants.Alive)    AS NrMutantsAlive,",
+        "             SUM(CASE WHEN mutants.Equivalent = 'DECLARED_YES' THEN 1 ELSE 0 END) AS NrMutantsEquivalent",
+        "      FROM games, mutants",
+        "      WHERE games.ID = mutants.Game_ID",
+        "      GROUP BY games.ID",
+        "    ) AS nr_mutants_inner",
+        "    GROUP BY nr_mutants_inner.Class_ID",
+        "  ) AS nr_mutants ON nr_mutants.Class_ID = classes.Class_ID",
 
+
+        /* Count and sum feedback ratings */
+        "LEFT JOIN",
+        "  (",
+        "    SELECT feedback_inner.Class_ID,",
+        "           MAX(CASE WHEN feedback_inner.type = 'CUT_MUTATION_DIFFICULTY' THEN feedback_inner.rating_sum ELSE 0 END)     AS ratings_CutMutationDifficulty_sum,",
+        "           MAX(CASE WHEN feedback_inner.type = 'CUT_MUTATION_DIFFICULTY' THEN feedback_inner.rating_cnt ELSE 0 END)     AS ratings_CutMutationDifficulty_count,",
+        "           MAX(CASE WHEN feedback_inner.type = 'CUT_TEST_DIFFICULTY' THEN feedback_inner.rating_sum ELSE 0 END)         AS ratings_CutTestDifficulty_sum,",
+        "           MAX(CASE WHEN feedback_inner.type = 'CUT_TEST_DIFFICULTY' THEN feedback_inner.rating_cnt ELSE 0 END)         AS ratings_CutTestDifficulty_count,",
+        "           MAX(CASE WHEN feedback_inner.type = 'GAME_ENGAGING' THEN feedback_inner.rating_sum ELSE 0 END)               AS ratings_GameEngaging_sum,",
+        "           MAX(CASE WHEN feedback_inner.type = 'GAME_ENGAGING' THEN feedback_inner.rating_cnt ELSE 0 END)               AS ratings_GameEngaging_count",
+        "    FROM",
+        "      (",
+        "        SELECT games.Class_ID,",
+        "               ratings.type,",
+        "               SUM(ratings.value) as rating_sum,",
+        "               COUNT(ratings.value) as rating_cnt",
+        "        FROM ratings, games",
+        "        WHERE ratings.Game_ID = games.ID",
+        "        GROUP BY games.Class_ID, ratings.type",
+        "      ) AS feedback_inner",
+        "    GROUP BY feedback_inner.Class_ID",
+        "  ) AS feedback ON feedback.Class_ID = classes.Class_ID;");
 
     public static List<UserDataDTO> getAnalyticsUserData() {
         Connection conn = DB.getConnection();
@@ -166,11 +203,33 @@ public class ApiDAO {
                 ClassDataDTO c = new ClassDataDTO();
                 c.setId(rs.getLong("ID"));
                 c.setClassname(rs.getString("Classname"));
-                c.setGames(rs.getInt("Games"));
+                c.setNrGames(rs.getInt("NrGames"));
+                c.setNrPlayers(rs.getInt("NrPlayers"));
                 c.setTestsSubmitted(rs.getInt("TestsSubmitted"));
                 c.setMutantsSubmitted(rs.getInt("MutantsSubmitted"));
                 c.setMutantsAlive(rs.getInt("MutantsAlive"));
                 c.setMutantsEquivalent(rs.getInt("MutantsEquivalent"));
+
+                ClassDataDTO.ClassRatings ratings = new ClassDataDTO.ClassRatings();
+                ClassDataDTO.ClassRating rating;
+
+                rating = new ClassDataDTO.ClassRating();
+                rating.setCount(rs.getInt("ratings_CutMutationDifficulty_count"));
+                rating.setSum(rs.getInt("ratings_CutMutationDifficulty_sum"));
+                ratings.setCutMutationDifficulty(rating);
+
+                rating = new ClassDataDTO.ClassRating();
+                rating.setCount(rs.getInt("ratings_CutTestDifficulty_count"));
+                rating.setSum(rs.getInt("ratings_CutTestDifficulty_sum"));
+                ratings.setCutTestDifficulty(rating);
+
+                rating = new ClassDataDTO.ClassRating();
+                rating.setCount(rs.getInt("ratings_GameEngaging_count"));
+                rating.setSum(rs.getInt("ratings_GameEngaging_sum"));
+                ratings.setGameEngaging(rating);
+
+                c.setRatings(ratings);
+
                 classList.add(c);
             }
         } catch (SQLException se) {

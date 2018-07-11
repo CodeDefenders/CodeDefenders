@@ -29,14 +29,14 @@
            type="button" class="btn btn-default" id="download-json">Download as JSON</a>
     </div>
 
-    <script src="js/datatables-child-rows.js" type="text/javascript" ></script>
+    <script src="js/datatables-utils.js" type="text/javascript" ></script>
 
     <script>
         var table;
 
         function format(data) {
             return '' +
-                '<table class="table-child-details">'+
+                '<table class="table-child-details indented">'+
                     '<tbody>'+
                         '<tr>'+
                             '<td>Mutants Submitted:</td>'+

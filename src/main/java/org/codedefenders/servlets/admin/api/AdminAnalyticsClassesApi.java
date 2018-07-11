@@ -6,6 +6,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.api.ApiUtils;
 import org.codedefenders.api.analytics.ClassDataDTO;
 import org.codedefenders.api.analytics.UserDataDTO;
@@ -92,23 +93,41 @@ public class AdminAnalyticsClassesApi extends HttpServlet {
         String[] columns = new String[]{
             "id",
             "classname",
-            "games",
+            "nrGames",
+            "nrPlayers",
             "testsSubmitted",
             "mutantsSubmitted",
             "mutantsAlive",
             "mutantsEquivalent",
+            "ratingsCutMutationDifficultyCount",
+            "ratingsCutMutationDifficultySum",
+            "ratingsCutTestDifficultyCount",
+            "ratingsCutTestDifficultySum",
+            "gameEngagingCount",
+            "gameEngagingSum"
+        };
+
+        String[] ratingNames = new String[] {
+            "cutMutationDifficulty",
+            "cutTestDifficulty",
+            "gameEngaging"
         };
 
         PrintWriter out = response.getWriter();
         CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(columns));
 
         for (ClassDataDTO clazz : classData) {
-            for(String column : columns) {
-                try {
-                    csvPrinter.print(PropertyUtils.getProperty(clazz, column));
-                } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
+            try {
+                for(int i = 0; i < 8; i++) {
+                    csvPrinter.print(PropertyUtils.getProperty(clazz, columns[i]));
                 }
+                for(String ratingName : ratingNames) {
+                    ClassDataDTO.ClassRating rating = (ClassDataDTO.ClassRating) PropertyUtils.getProperty(clazz.getRatings(), ratingName);
+                    csvPrinter.print(rating.getCount());
+                    csvPrinter.print(rating.getSum());
+                }
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                throw new RuntimeException(e);
             }
             csvPrinter.println();
         }

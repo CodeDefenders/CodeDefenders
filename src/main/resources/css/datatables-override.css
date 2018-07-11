@@ -28,11 +28,17 @@
     background-color: #f3f3f3;
 }
 
-/* Child table margins and padding */
-.table-child-details {
+/* Indent for row details */
+.indented {
     margin-left: 50px;
 }
+
+/* Child table margins and padding */
 .table-child-details > tbody > tr > td {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+.table-child-details > thead > tr > th {
     padding-left: 20px;
     padding-right: 20px;
 }
