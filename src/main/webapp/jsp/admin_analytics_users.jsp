@@ -60,23 +60,23 @@
                             '<td>Mutants Submitted:</td>'+
                             '<td>'+data.mutantsSubmitted+'</td>'+
                             '<td>Per Game (as Attacker):</td>'+
-                            '<td>'+(data.attackerGamesPlayed === 0 ? 0 : (data.mutantsSubmitted/data.attackerGamesPlayed).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.mutantsSubmitted, data.attackerGamesPlayed)+'</td>'+
                         '</tr>'+
                         '<tr>'+
                             '<td>Alive Mutants:</td>'+
                             '<td>'+data.mutantsAlive+'</td>'+
                             '<td>Per Game (as Attacker):</td>'+
-                            '<td>'+(data.attackerGamesPlayed === 0 ? 0 : (data.mutantsAlive/data.attackerGamesPlayed).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.mutantsAlive, data.attackerGamesPlayed)+'</td>'+
                             '<td>Per Mutant:</td>'+
-                            '<td>'+(data.mutantsSubmitted === 0 ? 0 : (data.mutantsAlive/data.mutantsSubmitted).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.mutantsAlive, data.mutantsSubmitted)+'</td>'+
                         '</tr>'+
                         '<tr>'+
                             '<td>Equivalent Mutants:</td>'+
                             '<td>'+data.mutantsSubmitted+'</td>'+
                             '<td>Per Game (as Attacker):</td>'+
-                            '<td>'+(data.attackerGamesPlayed === 0 ? 0 : (data.mutantsEquivalent/data.attackerGamesPlayed).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.mutantsEquivalent, data.attackerGamesPlayed)+'</td>'+
                             '<td>Per Mutant</td>'+
-                            '<td>'+(data.mutantsSubmitted === 0 ? 0 : (data.mutantsEquivalent/data.mutantsSubmitted).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.mutantsEquivalent, data.mutantsSubmitted)+'</td>'+
                         '</tr>'+
                     '</tbody>'+
                     '<thead>'+
@@ -90,15 +90,15 @@
                             '<td>Tests Submitted:</td>'+
                             '<td>'+data.testsSubmitted+'</td>'+
                             '<td>Per Game (as Defender):</td>'+
-                            '<td>'+(data.defenderGamesPlayed === 0 ? 0 : (data.testsSubmitted/data.defenderGamesPlayed).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.testsSubmitted, data.defenderGamesPlayed)+'</td>'+
                         '</tr>'+
                         '<tr>'+
                             '<td>Mutants Killed:</td>'+
                             '<td>'+data.mutantsKilled+'</td>'+
                             '<td>Per Game (as Defender):</td>'+
-                            '<td>'+(data.defenderGamesPlayed === 0 ? 0 : (data.mutantsKilled/data.defenderGamesPlayed).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.mutantsKilled, data.defenderGamesPlayed)+'</td>'+
                             '<td>Per Test:</td>'+
-                            '<td>'+(data.testsSubmitted === 0 ? 0 : (data.mutantsKilled/data.testsSubmitted).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.mutantsKilled, data.testsSubmitted)+'</td>'+
                         '</tr>'+
                     '</tbody>'+
                 '</table>';

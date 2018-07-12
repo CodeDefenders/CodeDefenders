@@ -53,13 +53,13 @@
                             '<td>Attacker Wins:</td>'+
                             '<td>'+data.attackerWins+'</td>'+
                             '<td>Per Game:</td>'+
-                            '<td>'+(data.nrGames === 0 ? 0 : (data.attackerWins/data.nrGames).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.attackerWins, data.nrGames)+'</td>'+
                         '</tr>'+
                         '<tr>'+
                             '<td>Defender Wins:</td>'+
                             '<td>'+data.defenderWins+'</td>'+
                             '<td>Per Game:</td>'+
-                            '<td>'+(data.nrGames === 0 ? 0 : (data.defenderWins/data.nrGames).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.defenderWins, data.nrGames)+'</td>'+
                         '</tr>'+
                     '</tbody>'+
                     '<thead>'+
@@ -70,19 +70,19 @@
                     '<tbody>'+
                         '<tr>'+
                             '<td>Mutation Difficulty:</td>'+
-                            '<td>'+(rating1.count === 0 ? 'NA' : (rating1.sum/rating1.count).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(rating1.sum, rating1.count, 'NA')+'</td>'+
                             '<td>Number of votes:</td>'+
                             '<td>'+rating1.count+'</td>'+
                         '</tr>'+
                         '<tr>'+
                             '<td>Test Difficulty:</td>'+
-                            '<td>'+(rating2.count === 0 ? 'NA' : (rating2.sum/rating2.count).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(rating2.sum, rating2.count, 'NA')+'</td>'+
                             '<td>Number of votes:</td>'+
                             '<td>'+rating2.count+'</td>'+
                         '</tr>'+
                         '<tr>'+
                             '<td>Game is engaging:</td>'+
-                            '<td>'+(rating3.count === 0 ? 'NA' : (rating3.sum/rating3.count).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(rating3.sum, rating3.count, 'NA')+'</td>'+
                             '<td>Number of votes:</td>'+
                             '<td>'+rating3.count+'</td>'+
                         '</tr>'+
@@ -97,17 +97,17 @@
                             '<td>Mutants Alive:</td>'+
                             '<td>'+data.mutantsAlive+'</td>'+
                             '<td>Per Game:</td>'+
-                            '<td>'+(data.nrGames === 0 ? 0 : (data.mutantsAlive/data.nrGames).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.mutantsAlive, data.nrGames)+'</td>'+
                             '<td>Per Mutant:</td>'+
-                            '<td>'+(data.mutantsSubmitted === 0 ? 0 : (data.mutantsAlive/data.mutantsSubmitted).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.mutantsAlive, data.mutantsSubmitted)+'</td>'+
                         '</tr>'+
                         '<tr>'+
                             '<td>Mutants Equivalent:</td>'+
                             '<td>'+data.mutantsEquivalent+'</td>'+
                             '<td>Per Game:</td>'+
-                            '<td>'+(data.nrGames === 0 ? 0 : (data.mutantsEquivalent/data.nrGames).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.mutantsEquivalent, data.nrGames)+'</td>'+
                             '<td>Per Mutant:</td>'+
-                            '<td>'+(data.mutantsSubmitted === 0 ? 0 : (data.mutantsEquivalent/data.mutantsSubmitted)).toFixed(2)+'</td>'+
+                            '<td>'+dtDiv(data.mutantsEquivalent, data.mutantsSubmitted)+'</td>'+
                         '</tr>'+
                     '</tbody>'+
                 '</table>';
@@ -132,13 +132,13 @@
                     { "data": "testsSubmitted" },
                     { "data":
                             function(row, type, val, meta) {
-                                return row.nrGames === 0 ? 0 : (row.testsSubmitted/row.nrGames).toFixed(2);
+                                return dtDiv(row.testsSubmitted, row.nrGames);
                             }
                     },
                     { "data": "mutantsSubmitted" },
                     { "data":
                             function(row, type, val, meta) {
-                                return row.nrGames === 0 ? 0 : (row.mutantsSubmitted/row.nrGames).toFixed(2);
+                                return dtDiv(row.mutantsSubmitted, row.nrGames);
                             }
                     }
                 ],

@@ -1,5 +1,15 @@
 /*
- * Sets up clickable table cells to toggle child rows in a DataTable.
+ * Divide two numbers, or return a default value when dividing by zero.
+ */
+var dtDiv = function(a, b, defaultValue, precision) {
+    if (typeof defaultValue === 'undefined') defaultValue = 0;
+    if (typeof precision === 'undefined') precision = 2;
+
+    return b === 0 ? defaultValue : (a / b).toFixed(precision);
+}
+
+/*
+ * Set up clickable table cells to toggle child rows in a DataTable.
  *
  * tableSelector:   A selector with which the table can be selected, e.g. "#tableUsers"
  * table:           The DataTables object associated with the table
