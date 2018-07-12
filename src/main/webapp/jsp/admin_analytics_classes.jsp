@@ -50,20 +50,18 @@
                     '</thead>'+
                     '<tbody>'+
                         '<tr>'+
-                            '<td>Attacker Wins</td>'+
+                            '<td>Attacker Wins:</td>'+
                             '<td>'+data.attackerWins+'</td>'+
                             '<td>Per Game:</td>'+
                             '<td>'+(data.nrGames === 0 ? 0 : (data.attackerWins/data.nrGames).toFixed(2))+'</td>'+
                         '</tr>'+
                         '<tr>'+
-                            '<td>Defender Wins</td>'+
+                            '<td>Defender Wins:</td>'+
                             '<td>'+data.defenderWins+'</td>'+
                             '<td>Per Game:</td>'+
                             '<td>'+(data.nrGames === 0 ? 0 : (data.defenderWins/data.nrGames).toFixed(2))+'</td>'+
                         '</tr>'+
                     '</tbody>'+
-                '</table>'+
-                '<table class="table-child-details indented">'+
                     '<thead>'+
                         '<tr>'+
                             '<th>Feedback</td>'+
@@ -89,8 +87,6 @@
                             '<td>'+rating3.count+'</td>'+
                         '</tr>'+
                     '</tbody>'+
-                '</table>'+
-                '<table class="table-child-details indented">'+
                     '<thead>'+
                         '<tr>'+
                             '<th>Mutants</td>'+

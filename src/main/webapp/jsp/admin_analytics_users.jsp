@@ -37,6 +37,11 @@
         function format(data) {
             return '' +
                 '<table class="table-child-details indented">'+
+                    '<thead>'+
+                        '<tr>'+
+                            '<th>Games Played</td>'+
+                        '</tr>'+
+                    '</thead>'+
                     '<tbody>'+
                         '<tr>'+
                             '<td>Games as Attacker:</td>'+
@@ -45,8 +50,6 @@
                             '<td>'+data.defenderGamesPlayed+'</td>'+
                         '</tr>'+
                     '</tbody>'+
-                '</table>'+
-                '<table class="table-child-details indented">'+
                     '<thead>'+
                         '<tr>'+
                             '<th>Mutants</td>'+
@@ -76,8 +79,6 @@
                             '<td>'+(data.mutantsSubmitted === 0 ? 0 : (data.mutantsEquivalent/data.mutantsSubmitted).toFixed(2))+'</td>'+
                         '</tr>'+
                     '</tbody>'+
-                '</table>'+
-                '<table class="table-child-details indented">'+
                     '<thead>'+
                         '<tr>'+
                             '<th>Tests</td>'+
