@@ -51,15 +51,11 @@
                     '<tbody>'+
                         '<tr>'+
                             '<td>Attacker Wins:</td>'+
-                            '<td>'+data.attackerWins+'</td>'+
-                            '<td>Per Game:</td>'+
-                            '<td>'+dtDiv(data.attackerWins, data.nrGames)+'</td>'+
+                            '<td>'+dtValAndPerc(data.attackerWins, data.nrGames)+'</td>'+
                         '</tr>'+
                         '<tr>'+
                             '<td>Defender Wins:</td>'+
-                            '<td>'+data.defenderWins+'</td>'+
-                            '<td>Per Game:</td>'+
-                            '<td>'+dtDiv(data.defenderWins, data.nrGames)+'</td>'+
+                            '<td>'+dtValAndPerc(data.defenderWins, data.nrGames)+'</td>'+
                         '</tr>'+
                     '</tbody>'+
                     '<thead>'+
@@ -95,19 +91,15 @@
                     '<tbody>'+
                         '<tr>'+
                             '<td>Mutants Alive:</td>'+
-                            '<td>'+data.mutantsAlive+'</td>'+
+                            '<td>'+dtValAndPerc(data.mutantsAlive, data.mutantsSubmitted)+'</td>'+
                             '<td>Per Game:</td>'+
                             '<td>'+dtDiv(data.mutantsAlive, data.nrGames)+'</td>'+
-                            '<td>Per Mutant:</td>'+
-                            '<td>'+dtDiv(data.mutantsAlive, data.mutantsSubmitted)+'</td>'+
                         '</tr>'+
                         '<tr>'+
                             '<td>Mutants Equivalent:</td>'+
-                            '<td>'+data.mutantsEquivalent+'</td>'+
+                            '<td>'+dtValAndPerc(data.mutantsEquivalent, data.mutantsSubmitted)+'</td>'+
                             '<td>Per Game:</td>'+
                             '<td>'+dtDiv(data.mutantsEquivalent, data.nrGames)+'</td>'+
-                            '<td>Per Mutant:</td>'+
-                            '<td>'+dtDiv(data.mutantsEquivalent, data.mutantsSubmitted)+'</td>'+
                         '</tr>'+
                     '</tbody>'+
                 '</table>';

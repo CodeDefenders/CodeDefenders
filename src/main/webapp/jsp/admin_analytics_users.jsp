@@ -45,9 +45,9 @@
                     '<tbody>'+
                         '<tr>'+
                             '<td>Games as Attacker:</td>'+
-                            '<td>'+data.attackerGamesPlayed+'</td>'+
+                            '<td>'+dtValAndPerc(data.attackerGamesPlayed, data.gamesPlayed)+'</td>'+
                             '<td>Games as Defender:</td>'+
-                            '<td>'+data.defenderGamesPlayed+'</td>'+
+                            '<td>'+dtValAndPerc(data.defenderGamesPlayed, data.gamesPlayed)+'</td>'+
                         '</tr>'+
                     '</tbody>'+
                     '<thead>'+
@@ -64,19 +64,15 @@
                         '</tr>'+
                         '<tr>'+
                             '<td>Alive Mutants:</td>'+
-                            '<td>'+data.mutantsAlive+'</td>'+
+                            '<td>'+dtValAndPerc(data.mutantsAlive, data.mutantsSubmitted)+'</td>'+
                             '<td>Per Game (as Attacker):</td>'+
                             '<td>'+dtDiv(data.mutantsAlive, data.attackerGamesPlayed)+'</td>'+
-                            '<td>Per Mutant:</td>'+
-                            '<td>'+dtDiv(data.mutantsAlive, data.mutantsSubmitted)+'</td>'+
                         '</tr>'+
                         '<tr>'+
                             '<td>Equivalent Mutants:</td>'+
-                            '<td>'+data.mutantsSubmitted+'</td>'+
+                            '<td>'+dtValAndPerc(data.mutantsEquivalent, data.mutantsSubmitted)+'</td>'+
                             '<td>Per Game (as Attacker):</td>'+
                             '<td>'+dtDiv(data.mutantsEquivalent, data.attackerGamesPlayed)+'</td>'+
-                            '<td>Per Mutant</td>'+
-                            '<td>'+dtDiv(data.mutantsEquivalent, data.mutantsSubmitted)+'</td>'+
                         '</tr>'+
                     '</tbody>'+
                     '<thead>'+

@@ -1,11 +1,28 @@
 /*
  * Divide two numbers, or return a default value when dividing by zero.
  */
-var dtDiv = function(a, b, defaultValue, precision) {
+function dtDiv(a, b, defaultValue, precision) {
     if (typeof defaultValue === 'undefined') defaultValue = 0;
     if (typeof precision === 'undefined') precision = 2;
 
     return b === 0 ? defaultValue : (a / b).toFixed(precision);
+}
+
+/*
+ * Divide two numbers and format the result as a percentage, or return a default value when dividing by zero.
+ */
+function dtPerc(a, b, defaultValue, precision) {
+    if (typeof defaultValue === 'undefined') defaultValue = '0%';
+    if (typeof precision === 'undefined') precision = 1;
+
+    return b === 0 ? defaultValue : ((a * 100 / b).toFixed(precision) + '%');
+}
+
+/*
+ * Return a string containing "a" and the percentage of "(a / b)" in parentheses.
+ */
+function dtValAndPerc(a, b, defaultValue, precision) {
+    return a + ' (' + dtPerc(a, b, defaultValue, precision) + ')';
 }
 
 /*
@@ -42,7 +59,7 @@ var dtDiv = function(a, b, defaultValue, precision) {
  *
  * Tables in child rows should have the class "table-child-details".
  */
-var setupChildRows = function(tableSelector, table, format) {
+function setupChildRows(tableSelector, table, format) {
     $('#tableUsers tbody').on('click', '.toggle-details', function () {
         var tr = $(this).closest('tr');
         var row = table.row(tr);
