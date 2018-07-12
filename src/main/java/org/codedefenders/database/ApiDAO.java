@@ -17,16 +17,18 @@ public class ApiDAO {
     private static final Logger logger = LoggerFactory.getLogger(ApiDAO.class);
 
     private static final  String GET_ANALYTICS_USER_DATA_QUERY = String.join("\n",
-        " SELECT users.User_ID                AS ID,",
-        "       users.Username                AS Username,",
-        "       IFNULL(NrGamesPlayed,0)       AS GamesPlayed,",
-        "       IFNULL(AttackerScore,0)       AS AttackerScore,",
-        "       IFNULL(DefenderScore,0)       AS DefenderScore,",
-        "       IFNULL(NrMutants,0)           AS MutantsSubmitted,",
-        "       IFNULL(NrMutantsAlive,0)      AS MutantsAlive,",
-        "       IFNULL(NrEquivalentMutants,0) AS MutantsEquivalent,",
-        "       IFNULL(NrTests,0)             AS TestsSubmitted,",
-        "       IFNULL(NrMutantsKilled,0)     AS MutantsKilled",
+        " SELECT users.User_ID                    AS ID,",
+        "       users.Username                    AS Username,",
+        "       IFNULL(NrGamesPlayed,0)           AS GamesPlayed,",
+        "       IFNULL(NrAttackerGamesPlayed,0)   AS AttackerGamesPlayed,",
+        "       IFNULL(NrDefenderGamesPlayed,0)   AS DefenderGamesPlayed,",
+        "       IFNULL(AttackerScore,0)           AS AttackerScore,",
+        "       IFNULL(DefenderScore,0)           AS DefenderScore,",
+        "       IFNULL(NrMutants,0)               AS MutantsSubmitted,",
+        "       IFNULL(NrMutantsAlive,0)          AS MutantsAlive,",
+        "       IFNULL(NrEquivalentMutants,0)     AS MutantsEquivalent,",
+        "       IFNULL(NrTests,0)                 AS TestsSubmitted,",
+        "       IFNULL(NrMutantsKilled,0)         AS MutantsKilled",
 
         "FROM users",
 
@@ -61,7 +63,9 @@ public class ApiDAO {
         "LEFT JOIN",
         "(",
         "  SELECT players.User_ID,",
-        "         COUNT(DISTINCT games.ID) AS NrGamesPlayed",
+        "         COUNT(DISTINCT games.ID)                                                        AS NrGamesPlayed,",
+        "         COUNT(DISTINCT CASE WHEN players.role = 'ATTACKER' THEN games.ID ELSE NULL END) AS NrAttackerGamesPlayed,",
+        "         COUNT(DISTINCT CASE WHEN players.role = 'DEFENDER' THEN games.ID ELSE NULL END) AS NrDefenderGamesPlayed",
         "  FROM players, games",
         "  WHERE players.Game_ID = games.ID",
         "    AND (games.State = 'ACTIVE' OR games.State = 'FINISHED')",
@@ -175,6 +179,8 @@ public class ApiDAO {
                 u.setAttackerScore(rs.getInt("AttackerScore"));
                 u.setDefenderScore(rs.getInt("DefenderScore"));
                 u.setGamesPlayed(rs.getInt("GamesPlayed"));
+                u.setAttackerGamesPlayed(rs.getInt("AttackerGamesPlayed"));
+                u.setDefenderGamesPlayed(rs.getInt("DefenderGamesPlayed"));
                 u.setMutantsSubmitted(rs.getInt("MutantsSubmitted"));
                 u.setMutantsAlive(rs.getInt("MutantsAlive"));
                 u.setMutantsEquivalent(rs.getInt("MutantsEquivalent"));

@@ -100,6 +100,8 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
             "id",
             "username",
             "gamesPlayed",
+            "attackerGamesPlayed",
+            "defenderGamesPlayed",
             "attackerScore",
             "defenderScore",
             "mutantsSubmitted",
