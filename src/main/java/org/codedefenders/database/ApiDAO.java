@@ -2,6 +2,7 @@ package org.codedefenders.database;
 
 import org.codedefenders.api.analytics.ClassDataDTO;
 import org.codedefenders.api.analytics.UserDataDTO;
+import org.codedefenders.servlets.FeedbackManager.FeedbackType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -140,12 +141,12 @@ public class ApiDAO {
         "LEFT JOIN",
         "  (",
         "    SELECT feedback_inner.Class_ID,",
-        "           MAX(CASE WHEN feedback_inner.type = 'CUT_MUTATION_DIFFICULTY' THEN feedback_inner.rating_sum ELSE 0 END)     AS ratings_CutMutationDifficulty_sum,",
-        "           MAX(CASE WHEN feedback_inner.type = 'CUT_MUTATION_DIFFICULTY' THEN feedback_inner.rating_cnt ELSE 0 END)     AS ratings_CutMutationDifficulty_count,",
-        "           MAX(CASE WHEN feedback_inner.type = 'CUT_TEST_DIFFICULTY' THEN feedback_inner.rating_sum ELSE 0 END)         AS ratings_CutTestDifficulty_sum,",
-        "           MAX(CASE WHEN feedback_inner.type = 'CUT_TEST_DIFFICULTY' THEN feedback_inner.rating_cnt ELSE 0 END)         AS ratings_CutTestDifficulty_count,",
-        "           MAX(CASE WHEN feedback_inner.type = 'GAME_ENGAGING' THEN feedback_inner.rating_sum ELSE 0 END)               AS ratings_GameEngaging_sum,",
-        "           MAX(CASE WHEN feedback_inner.type = 'GAME_ENGAGING' THEN feedback_inner.rating_cnt ELSE 0 END)               AS ratings_GameEngaging_count",
+        "           MAX(CASE WHEN feedback_inner.type = '"+FeedbackType.CUT_MUTATION_DIFFICULTY.name()+"' THEN feedback_inner.rating_sum ELSE 0 END)     AS ratings_CutMutationDifficulty_sum,",
+        "           MAX(CASE WHEN feedback_inner.type = '"+FeedbackType.CUT_MUTATION_DIFFICULTY.name()+"' THEN feedback_inner.rating_cnt ELSE 0 END)     AS ratings_CutMutationDifficulty_count,",
+        "           MAX(CASE WHEN feedback_inner.type = '"+FeedbackType.CUT_TEST_DIFFICULTY.name()+"' THEN feedback_inner.rating_sum ELSE 0 END)         AS ratings_CutTestDifficulty_sum,",
+        "           MAX(CASE WHEN feedback_inner.type = '"+FeedbackType.CUT_TEST_DIFFICULTY.name()+"' THEN feedback_inner.rating_cnt ELSE 0 END)         AS ratings_CutTestDifficulty_count,",
+        "           MAX(CASE WHEN feedback_inner.type = '"+FeedbackType.GAME_ENGAGING.name()+"' THEN feedback_inner.rating_sum ELSE 0 END)               AS ratings_GameEngaging_sum,",
+        "           MAX(CASE WHEN feedback_inner.type = '"+FeedbackType.GAME_ENGAGING.name()+"' THEN feedback_inner.rating_cnt ELSE 0 END)               AS ratings_GameEngaging_count",
         "    FROM",
         "      (",
         "        SELECT games.Class_ID,",
