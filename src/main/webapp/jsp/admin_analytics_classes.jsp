@@ -43,22 +43,23 @@
 
             return '' +
                 '<table class="table-child-details indented">'+
+                    '<thead>'+
+                        '<tr>'+
+                            '<th>Win Rates</td>'+
+                        '</tr>'+
+                    '</thead>'+
                     '<tbody>'+
                         '<tr>'+
-                            '<td>Mutants Alive:</td>'+
-                            '<td>'+data.mutantsAlive+'</td>'+
+                            '<td>Attacker Wins</td>'+
+                            '<td>'+data.attackerWins+'</td>'+
                             '<td>Per Game:</td>'+
-                            '<td>'+(data.nrGames === 0 ? 0 : (data.mutantsAlive/data.nrGames).toFixed(2))+'</td>'+
-                            '<td>Per Mutant:</td>'+
-                            '<td>'+(data.mutantsSubmitted === 0 ? 0 : (data.mutantsAlive/data.mutantsSubmitted).toFixed(2))+'</td>'+
+                            '<td>'+(data.nrGames === 0 ? 0 : (data.attackerWins/data.nrGames).toFixed(2))+'</td>'+
                         '</tr>'+
                         '<tr>'+
-                            '<td>Mutants Equivalent:</td>'+
-                            '<td>'+data.mutantsEquivalent+'</td>'+
+                            '<td>Defender Wins</td>'+
+                            '<td>'+data.defenderWins+'</td>'+
                             '<td>Per Game:</td>'+
-                            '<td>'+(data.nrGames === 0 ? 0 : (data.mutantsEquivalent/data.nrGames).toFixed(2))+'</td>'+
-                            '<td>Per Mutant:</td>'+
-                            '<td>'+(data.mutantsSubmitted === 0 ? 0 : (data.mutantsEquivalent/data.mutantsSubmitted)).toFixed(2)+'</td>'+
+                            '<td>'+(data.nrGames === 0 ? 0 : (data.defenderWins/data.nrGames).toFixed(2))+'</td>'+
                         '</tr>'+
                     '</tbody>'+
                 '</table>'+
@@ -86,6 +87,31 @@
                             '<td>'+(rating3.count === 0 ? 'NA' : (rating3.sum/rating3.count).toFixed(2))+'</td>'+
                             '<td>Number of votes:</td>'+
                             '<td>'+rating3.count+'</td>'+
+                        '</tr>'+
+                    '</tbody>'+
+                '</table>'+
+                '<table class="table-child-details indented">'+
+                    '<thead>'+
+                        '<tr>'+
+                            '<th>Mutants</td>'+
+                        '</tr>'+
+                    '</thead>'+
+                    '<tbody>'+
+                        '<tr>'+
+                            '<td>Mutants Alive:</td>'+
+                            '<td>'+data.mutantsAlive+'</td>'+
+                            '<td>Per Game:</td>'+
+                            '<td>'+(data.nrGames === 0 ? 0 : (data.mutantsAlive/data.nrGames).toFixed(2))+'</td>'+
+                            '<td>Per Mutant:</td>'+
+                            '<td>'+(data.mutantsSubmitted === 0 ? 0 : (data.mutantsAlive/data.mutantsSubmitted).toFixed(2))+'</td>'+
+                        '</tr>'+
+                        '<tr>'+
+                            '<td>Mutants Equivalent:</td>'+
+                            '<td>'+data.mutantsEquivalent+'</td>'+
+                            '<td>Per Game:</td>'+
+                            '<td>'+(data.nrGames === 0 ? 0 : (data.mutantsEquivalent/data.nrGames).toFixed(2))+'</td>'+
+                            '<td>Per Mutant:</td>'+
+                            '<td>'+(data.mutantsSubmitted === 0 ? 0 : (data.mutantsEquivalent/data.mutantsSubmitted)).toFixed(2)+'</td>'+
                         '</tr>'+
                     '</tbody>'+
                 '</table>';

@@ -4,6 +4,8 @@ public class ClassDataDTO {
     private long id;
     private String classname;
     private int nrGames;
+    private int attackerWins;
+    private int defenderWins;
     private int nrPlayers;
     private int testsSubmitted;
     private int mutantsSubmitted;
@@ -30,6 +32,22 @@ public class ClassDataDTO {
 
     public int getNrGames() {
         return nrGames;
+    }
+
+    public int getAttackerWins() {
+        return attackerWins;
+    }
+
+    public void setAttackerWins(int attackerWins) {
+        this.attackerWins = attackerWins;
+    }
+
+    public int getDefenderWins() {
+        return defenderWins;
+    }
+
+    public void setDefenderWins(int defenderWins) {
+        this.defenderWins = defenderWins;
     }
 
     public void setNrGames(int nrGames) {

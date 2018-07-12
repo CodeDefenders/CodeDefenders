@@ -6,10 +6,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.lang.ArrayUtils;
-import org.codedefenders.api.ApiUtils;
 import org.codedefenders.api.analytics.ClassDataDTO;
-import org.codedefenders.api.analytics.UserDataDTO;
 import org.codedefenders.database.ApiDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +91,8 @@ public class AdminAnalyticsClassesApi extends HttpServlet {
             "id",
             "classname",
             "nrGames",
+            "attackerWins",
+            "defenderWins",
             "nrPlayers",
             "testsSubmitted",
             "mutantsSubmitted",
@@ -118,7 +117,7 @@ public class AdminAnalyticsClassesApi extends HttpServlet {
 
         for (ClassDataDTO clazz : classData) {
             try {
-                for(int i = 0; i < 8; i++) {
+                for(int i = 0; i < 10; i++) {
                     csvPrinter.print(PropertyUtils.getProperty(clazz, columns[i]));
                 }
                 for(String ratingName : ratingNames) {

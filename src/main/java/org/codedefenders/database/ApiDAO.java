@@ -80,6 +80,8 @@ public class ApiDAO {
         "       IFNULL(classes.Name,0)                          AS Classname,",
         "       IFNULL(NrGames,0)                               AS NrGames,",
         "       IFNULL(NrPlayers,0)                             AS NrPlayers,",
+        "       IFNULL(AttackerWins,0)                          AS AttackerWins,",
+        "       IFNULL(DefenderWins,0)                          AS DefenderWins,",
         "       IFNULL(NrTestsTotal,0)                          AS TestsSubmitted,",
         "       IFNULL(NrMutantsTotal,0)                        AS MutantsSubmitted,",
         "       IFNULL(NrMutantsAliveTotal,0)                   AS MutantsAlive,",
@@ -93,18 +95,48 @@ public class ApiDAO {
 
         "FROM classes",
 
-        /* Count number of games (active or finished), players */
+        /* Count number of games (active or finished, at least one mutant and test) and players */
         "LEFT JOIN",
         "  (",
-        "    SELECT classes.Class_ID,",
+        "    SELECT games.Class_ID,",
         "           COUNT(DISTINCT games.ID) AS NrGames,",
         "           COUNT(DISTINCT players.ID) AS NrPlayers",
-        "    FROM classes, games, players",
-        "    WHERE classes.Class_ID = games.Class_ID",
-        "      AND players.Game_ID = games.ID",
+        "    FROM games, players, tests, mutants",
+        "    WHERE players.Game_ID = games.ID",
         "      AND (games.State = 'ACTIVE' OR games.State = 'FINISHED')",
-        "    GROUP BY classes.Class_ID",
+        "      AND games.ID = tests.Game_ID",
+        "      AND games.ID = mutants.Game_ID",
+        "    GROUP BY games.Class_ID",
         "  ) AS nr_games ON nr_games.Class_ID = classes.Class_ID",
+
+        /* Count number of attacker and defender wins (in games with at least one test and mutant) */
+        "LEFT JOIN",
+        "  (",
+        "    SELECT attacker_scores.Class_ID,",
+        "    SUM(CASE WHEN AttackerScore > DefenderScore THEN 1 ELSE 0 END) AS AttackerWins,",
+        "    SUM(CASE WHEN DefenderScore > AttackerScore THEN 1 ELSE 0 END) AS DefenderWins",
+        "    FROM",
+        "      (",
+        "        SELECT games.ID,",
+        "               games.Class_ID,",
+        "               SUM(mutants.Points) AS AttackerScore",
+        "        FROM games, mutants",
+        "        WHERE mutants.Game_ID = games.ID",
+        "          AND (games.State = 'FINISHED')",
+        "        GROUP BY games.ID",
+        "      ) AS attacker_scores,",
+        "      (",
+        "              SELECT games.ID,",
+        "                     games.Class_ID,",
+        "                     SUM(tests.Points) AS DefenderScore",
+        "      FROM games, tests",
+        "      WHERE tests.Game_ID = games.ID",
+        "        AND (games.State = 'FINISHED')",
+        "      GROUP BY games.ID",
+        "      ) AS defender_scores",
+        "    WHERE attacker_scores.ID = defender_scores.ID",
+        "    GROUP BY attacker_scores.Class_ID",
+        "  ) AS nr_wins ON nr_wins.Class_ID = classes.Class_ID",
 
         /* Count number of tests */
         "LEFT JOIN",
@@ -211,6 +243,8 @@ public class ApiDAO {
                 c.setId(rs.getLong("ID"));
                 c.setClassname(rs.getString("Classname"));
                 c.setNrGames(rs.getInt("NrGames"));
+                c.setAttackerWins(rs.getInt("AttackerWins"));
+                c.setDefenderWins(rs.getInt("DefenderWins"));
                 c.setNrPlayers(rs.getInt("NrPlayers"));
                 c.setTestsSubmitted(rs.getInt("TestsSubmitted"));
                 c.setMutantsSubmitted(rs.getInt("MutantsSubmitted"));
