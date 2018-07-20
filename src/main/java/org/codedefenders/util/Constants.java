@@ -74,6 +74,10 @@ public class Constants {
 	public static final String ADMIN_SETTINGS_JSP = "/jsp" + F_SEP + "admin_system_settings.jsp";
 	public static final String ADMIN_MONITOR_JSP = "/jsp" + F_SEP + "admin_monitor_games.jsp";
 	public static final String ADMIN_ANALYTICS_USERS_JSP = "/jsp" + F_SEP + "admin_analytics_users.jsp";
+	public static final String ADMIN_ANALYTICS_CLASSES_JSP = "/jsp" + F_SEP + "admin_analytics_classes.jsp";
+
+	public static final String ADMIN_ANALYTICS_USERS = "/admin/analytics/users";
+	public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";
 
 	// Messages
 	public static final String WINNER_MESSAGE = "You won!";
@@ -126,4 +130,5 @@ public class Constants {
 	public static final String ATTACKER_HAS_PENDING_DUELS = "Sorry, your mutant cannot be accepted because you have pending equivalence duels !\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
 
 	public static final String API_ANALYTICS_USERS = "/api/users";
+	public static final String API_ANALYTICS_CLASSES = "/api/classes";
 }

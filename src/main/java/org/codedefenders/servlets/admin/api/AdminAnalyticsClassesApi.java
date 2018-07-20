@@ -1,19 +1,13 @@
 package org.codedefenders.servlets.admin.api;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mysql.cj.xdevapi.JsonString;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.lang.time.DateUtils;
-import org.codedefenders.api.analytics.UserDataDTO;
+import org.codedefenders.api.analytics.ClassDataDTO;
 import org.codedefenders.database.ApiDAO;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.servlets.util.Redirect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,18 +17,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
-import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
-public class AdminAnalyticsUsersApi extends HttpServlet {
-    private static final Logger logger = LoggerFactory.getLogger(AdminAnalyticsUsersApi.class);
+public class AdminAnalyticsClassesApi extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(AdminAnalyticsClassesApi.class);
 
     /**
-     * Returns a JSON or CSV file containing the user analytics data.
+     * Returns a JSON or CSV file containing the class analytics data.
      * <p></p>
      * The URL parameter {@code type} specifies the type of data to return:<br>
      * {@code type=json} will return JSON, {@code type=CSV} will return CSV.<br>
@@ -56,7 +47,7 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
     }
 
     /**
-     * Returns a JSON file containing the user analytics data.<br>
+     * Returns a JSON file containing the class analytics data.<br>
      * The returned JSON will have the following format:<br>
      * <pre>
      * {
@@ -72,7 +63,7 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
         response.setContentType("application/json");
 
         long timeStart = System.currentTimeMillis();
-        List<UserDataDTO> userData = ApiDAO.getAnalyticsUserData();
+        List<ClassDataDTO> classData = ApiDAO.getAnalyticsClassData();
         long timeEnd = System.currentTimeMillis();
 
         PrintWriter out = response.getWriter();
@@ -81,7 +72,7 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
         JsonObject root = new JsonObject();
         root.add("timestamp", gson.toJsonTree(Instant.now().getEpochSecond()));
         root.add("processingTime", gson.toJsonTree(timeEnd - timeStart));
-        root.add("data", gson.toJsonTree(userData));
+        root.add("data", gson.toJsonTree(classData));
 
         out.print(gson.toJson(root));
         out.flush();
@@ -94,33 +85,48 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
     private void getCSV(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
 
-        List<UserDataDTO> userData = ApiDAO.getAnalyticsUserData();
+        List<ClassDataDTO> classData = ApiDAO.getAnalyticsClassData();
 
         String[] columns = new String[]{
             "id",
-            "username",
-            "gamesPlayed",
-            "attackerGamesPlayed",
-            "defenderGamesPlayed",
-            "attackerScore",
-            "defenderScore",
+            "classname",
+            "nrGames",
+            "attackerWins",
+            "defenderWins",
+            "nrPlayers",
+            "testsSubmitted",
             "mutantsSubmitted",
             "mutantsAlive",
             "mutantsEquivalent",
-            "testsSubmitted",
-            "mutantsKilled"
+            "ratingsCutMutationDifficultyCount",
+            "ratingsCutMutationDifficultySum",
+            "ratingsCutTestDifficultyCount",
+            "ratingsCutTestDifficultySum",
+            "gameEngagingCount",
+            "gameEngagingSum"
+        };
+
+        String[] ratingNames = new String[] {
+            "cutMutationDifficulty",
+            "cutTestDifficulty",
+            "gameEngaging"
         };
 
         PrintWriter out = response.getWriter();
         CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(columns));
 
-        for (UserDataDTO user : userData) {
-            for(String column : columns) {
-                try {
-                    csvPrinter.print(PropertyUtils.getProperty(user, column));
-                } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                    throw new RuntimeException(e);
+        for (ClassDataDTO clazz : classData) {
+            try {
+                for(int i = 0; i < 10; i++) {
+                    csvPrinter.print(PropertyUtils.getProperty(clazz, columns[i]));
                 }
+                for(String ratingName : ratingNames) {
+                    ClassDataDTO.ClassRating rating = (ClassDataDTO.ClassRating) PropertyUtils.getProperty(clazz.getRatings(), ratingName);
+                    csvPrinter.print(rating.getCount());
+                    csvPrinter.print(rating.getSum());
+                }
+            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                throw new RuntimeException(e);
             }
             csvPrinter.println();
         }

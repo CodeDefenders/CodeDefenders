@@ -29,33 +29,72 @@
            type="button" class="btn btn-default" id="download-json">Download as JSON</a>
     </div>
 
-    <script src="js/datatables-child-rows.js" type="text/javascript" ></script>
+    <script src="js/datatables-utils.js" type="text/javascript" ></script>
 
     <script>
         var table;
 
         function format(data) {
             return '' +
-                '<table class="table-child-details">'+
+                '<table class="table-child-details indented">'+
+                    '<thead>'+
+                        '<tr>'+
+                            '<th>Games Played</td>'+
+                        '</tr>'+
+                    '</thead>'+
+                    '<tbody>'+
+                        '<tr>'+
+                            '<td>Games as Attacker:</td>'+
+                            '<td>'+dtValAndPerc(data.attackerGamesPlayed, data.gamesPlayed)+'</td>'+
+                            '<td>Games as Defender:</td>'+
+                            '<td>'+dtValAndPerc(data.defenderGamesPlayed, data.gamesPlayed)+'</td>'+
+                        '</tr>'+
+                    '</tbody>'+
+                    '<thead>'+
+                        '<tr>'+
+                            '<th>Mutants</td>'+
+                        '</tr>'+
+                    '</thead>'+
                     '<tbody>'+
                         '<tr>'+
                             '<td>Mutants Submitted:</td>'+
                             '<td>'+data.mutantsSubmitted+'</td>'+
-                            '<td>Still Alive:</td>'+
-                            '<td>'+data.mutantsAlive+'</td>'+
-                            '<td>Equivalent:</td>'+
-                            '<td>'+data.mutantsEquivalent+'</td>'+
+                            '<td>Per Game (as Attacker):</td>'+
+                            '<td>'+dtDiv(data.mutantsSubmitted, data.attackerGamesPlayed)+'</td>'+
                         '</tr>'+
+                        '<tr>'+
+                            '<td>Alive Mutants:</td>'+
+                            '<td>'+dtValAndPerc(data.mutantsAlive, data.mutantsSubmitted)+'</td>'+
+                            '<td>Per Game (as Attacker):</td>'+
+                            '<td>'+dtDiv(data.mutantsAlive, data.attackerGamesPlayed)+'</td>'+
+                        '</tr>'+
+                        '<tr>'+
+                            '<td>Equivalent Mutants:</td>'+
+                            '<td>'+dtValAndPerc(data.mutantsEquivalent, data.mutantsSubmitted)+'</td>'+
+                            '<td>Per Game (as Attacker):</td>'+
+                            '<td>'+dtDiv(data.mutantsEquivalent, data.attackerGamesPlayed)+'</td>'+
+                        '</tr>'+
+                    '</tbody>'+
+                    '<thead>'+
+                        '<tr>'+
+                            '<th>Tests</td>'+
+                        '</tr>'+
+                    '</thead>'+
+                    '<tbody>'+
                         '<tr/>'+
                         '<tr>'+
                             '<td>Tests Submitted:</td>'+
                             '<td>'+data.testsSubmitted+'</td>'+
+                            '<td>Per Game (as Defender):</td>'+
+                            '<td>'+dtDiv(data.testsSubmitted, data.defenderGamesPlayed)+'</td>'+
                         '</tr>'+
                         '<tr>'+
                             '<td>Mutants Killed:</td>'+
                             '<td>'+data.mutantsKilled+'</td>'+
+                            '<td>Per Game (as Defender):</td>'+
+                            '<td>'+dtDiv(data.mutantsKilled, data.defenderGamesPlayed)+'</td>'+
                             '<td>Per Test:</td>'+
-                            '<td>'+(data.testsSubmitted === 0 ? 0 : (data.mutantsKilled/data.testsSubmitted).toFixed(2))+'</td>'+
+                            '<td>'+dtDiv(data.mutantsKilled, data.testsSubmitted)+'</td>'+
                         '</tr>'+
                     '</tbody>'+
                 '</table>';
@@ -79,8 +118,13 @@
                     { "data": "gamesPlayed" },
                     { "data": "attackerScore" },
                     { "data": "defenderScore" },
-                    { "data": "totalScore" }
+                    { "data":
+                        function(row, type, val, meta) {
+                            return row.attackerScore + row.defenderScore;
+                        }
+                    }
                 ],
+                "pageLength": 50,
                 "order": [[ 1, "asc" ]]
             });
 
