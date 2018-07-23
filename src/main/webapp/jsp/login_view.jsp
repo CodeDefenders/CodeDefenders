@@ -156,7 +156,7 @@
                         <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email" required>
                         <label for="inputPassword" class="sr-only">Password</label>
                         <input type="password" id="inputPasswordCreate" name="password" class="form-control"
-                               onkeyup="validatePassword()" placeholder="Password" required minlength="<%=pwMinLength%>" maxlength="20">
+                               onkeyup="validatePassword()" placeholder="Password" required minlength="<%=pwMinLength%>">
                         <span class="label label-danger" id="pw_confirm_message_create" style="color: white;visibility: hidden">Passwords do not match!</span>
                         <label for="inputPassword" class="sr-only">Password</label>
                         <input type="password" id="inputConfirmPasswordCreate" name="confirm" class="form-control"
