@@ -1,0 +1,17 @@
+DROP TABLE IF EXISTS killmap;
+
+CREATE TABLE killmap (
+  Test_ID INTEGER NOT NULL,
+  Mutant_ID INTEGER NOT NULL,
+  Status ENUM('KILL', 'NO_KILL', 'NO_COVERAGE', 'ERROR', 'UNKNOWN') NOT NULL,
+
+  PRIMARY KEY (Test_ID, Mutant_ID),
+
+  CONSTRAINT `fk_testId` FOREIGN KEY (`Test_ID`) REFERENCES `tests` (`Test_ID`) ON DELETE CASCADE ON UPDATE CASCADE ,
+  CONSTRAINT `fk_mutantId` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+ALTER TABLE games
+ADD COLUMN HasKillMap TINYINT(1) NOT NULL DEFAULT 0,
+ADD CONSTRAINT `hasKillMap` CHECK (HasKillMap = 0 OR State = 'FINISHED') -- only finished games can have a killmap
+

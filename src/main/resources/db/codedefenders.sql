@@ -117,13 +117,33 @@ CREATE TABLE `games` (
   `Mode` enum('SINGLE','DUEL','PARTY','UTESTING') NOT NULL DEFAULT 'DUEL',
   `RequiresValidation` TINYINT(1) DEFAULT '0' NOT NULL,
   `IsAIDummyGame` TINYINT(1) DEFAULT '0' NOT NULL,
+  `HasKillMap` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`),
   KEY `fk_creatorId_idx` (`Creator_ID`),
   KEY `fk_className_idx` (`Class_ID`),
   CONSTRAINT `fk_classId` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_className` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `hasKillMap` CHECK (HasKillMap = 0 OR State = 'FINISHED') -- only finished games can have a killmap
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `killmap`
+--
+
+DROP TABLE IF EXISTS `killmap`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `killmap` (
+  `Test_ID` int(11) NOT NULL,
+  `Mutant_ID` int(11) NOT NULL,
+  `Status` enum('KILL','NO_KILL','NO_COVERAGE','ERROR','UNKNOWN') COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`Test_ID`,`Mutant_ID`),
+  KEY `fk_mutantId` (`Mutant_ID`),
+  CONSTRAINT `fk_mutantId` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_testId` FOREIGN KEY (`Test_ID`) REFERENCES `tests` (`Test_ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
