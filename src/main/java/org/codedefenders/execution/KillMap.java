@@ -9,10 +9,13 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 
 import javax.naming.*;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.*;
 
 public class KillMap {
+
+    //TODO needs a way to recalculate killmap if it's faulty
 
     private static final Logger logger = LoggerFactory.getLogger(KillMap.class);
 
@@ -84,7 +87,14 @@ public class KillMap {
                 entries.add(antExecution.get());
             }
 
-            return new KillMap(entries, game);
+            KillMap killMap = new KillMap(entries, game);
+            try {
+                DatabaseAccess.insertKillMap(killMap);
+                return killMap;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return null;
+            }
         }
     }
 

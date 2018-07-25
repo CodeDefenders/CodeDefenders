@@ -1,5 +1,6 @@
 package org.codedefenders.database;
 
+import org.codedefenders.execution.KillMap;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
@@ -25,6 +26,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1158,5 +1160,70 @@ public class DatabaseAccess {
 			DB.cleanup(conn, stmt);
 		}
 		return -1;
+	}
+
+	public static List<KillMap.KillMapEntry> getKillMapEntriesForGame(int gameId) {
+		String query = String.join("\n",
+				"SELECT killmap.*",
+		"FROM killmap, tests",
+		"WHERE killmap.Test_ID = tests.Test_ID",
+		"  AND tests.Game_ID = ?"
+		);
+
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
+		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+
+		List<KillMap.KillMapEntry> entries = new LinkedList<>();
+
+		try {
+            while (rs.next()) {
+            	int testId = rs.getInt("Test_ID");
+				int mutantId = rs.getInt("Mutant_ID");
+				String status = rs.getString("Status");
+                entries.add(new KillMap.KillMapEntry(testId, mutantId, KillMap.KillMapEntry.Status.valueOf(status)));
+			}
+		} catch (SQLException e) {
+			logger.error("SQL exception caught", e);
+			return null;
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+
+		return entries;
+	}
+
+	public static void insertKillMap(KillMap killmap) throws SQLException {
+		String updateGameQuery = String.join("\n",
+			"UPDATE games",
+			"SET HasKillMap = 1",
+			"WHERE ID = ?;"
+		);
+
+		String insertKillMapQuery = "INSERT INTO killmap (Test_ID, Mutant_ID, Status) VALUES {0};";
+
+		StringJoiner entries = new StringJoiner(",");
+		for (KillMap.KillMapEntry entry : killmap.getMap()) {
+			entries.add("(" + entry.testId + "," + entry.mutantId + ",'" + entry.status + "')");
+		}
+
+		/* Inserting the values with createPreparedStatement would enclose them in ticks, so MessageFormat is used instead. */
+		insertKillMapQuery = MessageFormat.format(insertKillMapQuery, entries);
+
+		/* Turn off auto-commit so the two changes are atomic. */
+		Connection conn = DB.getConnection();
+		boolean prevAutoCommit = conn.getAutoCommit();
+		conn.setAutoCommit(false);
+
+		/* Update "HasKillMap" on the game. */
+		PreparedStatement stmt1 = DB.createPreparedStatement(conn, updateGameQuery, DB.getDBV(killmap.getGame().getId()));
+		DB.executeUpdate(stmt1, conn);
+
+		/* Insert killmap entries into "killmap". */
+		PreparedStatement stmt2 = DB.createPreparedStatement(conn, insertKillMapQuery);
+		DB.executeUpdate(stmt2, conn);
+
+		conn.commit();
+		conn.setAutoCommit(prevAutoCommit);
 	}
 }
