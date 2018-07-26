@@ -68,6 +68,7 @@ public class DB {
         } catch (SQLException se) {
             logger.error("SQLException while creating Prepared Statement for query\n\t" + query, se);
             DB.cleanup(conn, stmt);
+            return null;
         }
         return stmt;
     }
