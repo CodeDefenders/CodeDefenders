@@ -1,11 +1,7 @@
 package org.codedefenders.database;
 
 import org.codedefenders.execution.KillMap;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.GameMode;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Role;
+import org.codedefenders.game.*;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -14,9 +10,7 @@ import org.codedefenders.game.leaderboard.Entry;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
-import org.codedefenders.game.Mutant;
 import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.Test;
 import org.codedefenders.model.User;
 import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
@@ -1159,6 +1153,30 @@ public class DatabaseAccess {
 			DB.cleanup(conn, stmt);
 		}
 		return -1;
+	}
+
+	public static Boolean hasKillMap(int gameId) {
+		String query = String.join("\n",
+				"SELECT HasKillMap",
+				"FROM games",
+				"WHERE games.ID = ?"
+		);
+
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
+		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+
+		try {
+			if (rs.next()) {
+				return rs.getBoolean("HasKillMap");
+			}
+		} catch (SQLException e) {
+			logger.error("SQL exception caught", e);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+
+		return null;
 	}
 
 	public static List<KillMap.KillMapEntry> getKillMapEntriesForGame(int gameId) {
