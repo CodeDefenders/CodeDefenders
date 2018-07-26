@@ -26,7 +26,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.MessageFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -1193,37 +1192,60 @@ public class DatabaseAccess {
 		return entries;
 	}
 
-	public static void insertKillMap(KillMap killmap) throws SQLException {
+	public static boolean insertKillMap(KillMap killmap) {
+	    /* Set "HasKillMap" on the game to 1. */
 		String updateGameQuery = String.join("\n",
 			"UPDATE games",
 			"SET HasKillMap = 1",
 			"WHERE ID = ?;"
 		);
 
-		String insertKillMapQuery = "INSERT INTO killmap (Test_ID, Mutant_ID, Status) VALUES {0};";
+		/* Insert the killmap entries into "killmap". */
+		String insertKillMapQuery = String.join("\n",
+			"INSERT INTO killmap (Test_ID, Mutant_ID, Status) VALUES (?,?,?)",
+            "ON DUPLICATE KEY UPDATE Status = VALUES(Status);"
+		);
 
-		StringJoiner entries = new StringJoiner(",");
-		for (KillMap.KillMapEntry entry : killmap.getMap()) {
-			entries.add("(" + entry.testId + "," + entry.mutantId + ",'" + entry.status + "')");
-		}
-
-		/* Inserting the values with createPreparedStatement would enclose them in ticks, so MessageFormat is used instead. */
-		insertKillMapQuery = MessageFormat.format(insertKillMapQuery, entries);
-
-		/* Turn off auto-commit so the two changes are atomic. */
 		Connection conn = DB.getConnection();
-		boolean prevAutoCommit = conn.getAutoCommit();
-		conn.setAutoCommit(false);
 
-		/* Update "HasKillMap" on the game. */
-		PreparedStatement stmt1 = DB.createPreparedStatement(conn, updateGameQuery, DB.getDBV(killmap.getGame().getId()));
-		DB.executeUpdate(stmt1, conn);
+		try {
+			/* Turn off auto-commit so the two changes are atomic. */
+			boolean prevAutoCommit = conn.getAutoCommit();
+			conn.setAutoCommit(false);
 
-		/* Insert killmap entries into "killmap". */
-		PreparedStatement stmt2 = DB.createPreparedStatement(conn, insertKillMapQuery);
-		DB.executeUpdate(stmt2, conn);
+			/* Prepare the statements. */
+			PreparedStatement stmt1 = DB.createPreparedStatement(conn, updateGameQuery, DB.getDBV(killmap.getGame().getId()));
+			PreparedStatement stmt2 = conn.prepareStatement(insertKillMapQuery);
+			for (KillMap.KillMapEntry entry : killmap.getMap()) {
+				stmt2.setInt(1, entry.testId);
+				stmt2.setInt(2, entry.mutantId);
+				stmt2.setString(3, entry.status.toString());
+				stmt2.addBatch();
+			}
 
-		conn.commit();
-		conn.setAutoCommit(prevAutoCommit);
+			/* Execute the updates and rollback changes if an error occurs. */
+			try {
+				DB.executeUpdate(stmt1, conn);
+				stmt2.executeBatch();
+				conn.commit();
+
+			} catch (SQLException e) {
+				logger.error("SQL exception caught", e);
+				logger.error("Rolling back SQL update.");
+				conn.rollback();
+				return false;
+
+			} finally {
+				conn.setAutoCommit(prevAutoCommit);
+				DB.cleanup(conn, stmt1);
+				DB.cleanup(conn, stmt2);
+			}
+
+		} catch (SQLException e) {
+			logger.error("SQL exception caught", e);
+			return false;
+        }
+
+        return true;
 	}
 }

@@ -88,11 +88,9 @@ public class KillMap {
             }
 
             KillMap killMap = new KillMap(entries, game);
-            try {
-                DatabaseAccess.insertKillMap(killMap);
+            if (DatabaseAccess.insertKillMap(killMap)) {
                 return killMap;
-            } catch (SQLException e) {
-                e.printStackTrace();
+            } else {
                 return null;
             }
         }
