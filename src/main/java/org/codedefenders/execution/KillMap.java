@@ -45,19 +45,12 @@ public class KillMap {
         }
     }
 
-    /* Game data. */
     private AbstractGame game;
-    private List<Test> tests;
-    private List<Mutant> mutants;
-
-    /* KillMap data. */
     private List<KillMapEntry> entries;
 
     private KillMap(List<KillMapEntry> entries, AbstractGame game) {
         this.entries = entries;
         this.game = game;
-        this.tests = game.getTests();
-        this.mutants = game.getMutants();
     }
 
     /**
@@ -96,6 +89,9 @@ public class KillMap {
         }
     }
 
+    /**
+     * Computes the killmap for a game by executing every test against the mutants it covers.
+     */
     private static KillMap computeForGame(AbstractGame game) throws InterruptedException, ExecutionException {
         List<KillMapEntry> entries = new LinkedList<>();
         List<Test> tests = game.getTests();
@@ -127,16 +123,43 @@ public class KillMap {
         return new KillMap(entries, game);
     }
 
-
     public AbstractGame getGame() {
         return game;
     }
 
-    public List<KillMapEntry> getMap() {
+    public List<KillMapEntry> getEntries() {
         return entries;
     }
 
-    /**
+    public Map<Integer, List<KillMapEntry>> getTestMap() {
+        Map<Integer, List<KillMapEntry>> map = new HashMap<>();
+
+        for (Test test : game.getTests()) {
+            map.put(test.getId(), new LinkedList<>());
+        }
+
+        for (KillMapEntry entry : entries) {
+            map.get(entry.testId).add(entry);
+        }
+
+        return map;
+    }
+
+    public Map<Integer, List<KillMapEntry>> getMutantMap() {
+        Map<Integer, List<KillMapEntry>> map = new HashMap<>();
+
+        for (Mutant mutant : game.getMutants()) {
+            map.put(mutant.getId(), new LinkedList<>());
+        }
+
+        for (KillMapEntry entry : entries) {
+            map.get(entry.mutantId).add(entry);
+        }
+
+        return map;
+    }
+
+   /**
      * Executes a test against a mutant and returns the result.
      */
     private static class TestVsMutantCallable implements Callable<KillMapEntry> {

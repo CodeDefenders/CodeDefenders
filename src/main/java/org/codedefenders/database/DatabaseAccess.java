@@ -1234,7 +1234,7 @@ public class DatabaseAccess {
 			/* Prepare the statements. */
 			PreparedStatement stmt1 = DB.createPreparedStatement(conn, updateGameQuery, DB.getDBV(killmap.getGame().getId()));
 			PreparedStatement stmt2 = conn.prepareStatement(insertKillMapQuery);
-			for (KillMap.KillMapEntry entry : killmap.getMap()) {
+			for (KillMap.KillMapEntry entry : killmap.getEntries()) {
 				stmt2.setInt(1, entry.testId);
 				stmt2.setInt(2, entry.mutantId);
 				stmt2.setString(3, entry.status.toString());
