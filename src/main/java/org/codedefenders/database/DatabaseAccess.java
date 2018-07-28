@@ -1157,9 +1157,9 @@ public class DatabaseAccess {
 
 	public static Boolean hasKillMap(int gameId) {
 		String query = String.join("\n",
-				"SELECT HasKillMap",
-				"FROM games",
-				"WHERE games.ID = ?"
+			"SELECT HasKillMap",
+			"FROM games",
+			"WHERE games.ID = ?"
 		);
 
 		Connection conn = DB.getConnection();
@@ -1181,10 +1181,10 @@ public class DatabaseAccess {
 
 	public static List<KillMap.KillMapEntry> getKillMapEntriesForGame(int gameId) {
 		String query = String.join("\n",
-				"SELECT killmap.*",
-		"FROM killmap, tests",
-		"WHERE killmap.Test_ID = tests.Test_ID",
-		"  AND tests.Game_ID = ?"
+			"SELECT killmap.*",
+			"FROM killmap, tests",
+			"WHERE killmap.Test_ID = tests.Test_ID",
+			"  AND tests.Game_ID = ?"
 		);
 
 		Connection conn = DB.getConnection();
@@ -1202,8 +1202,8 @@ public class DatabaseAccess {
 		for (Mutant mutant : mutants) { mutantMap.put(mutant.getId(), mutant); }
 
 		try {
-            while (rs.next()) {
-            	int testId = rs.getInt("Test_ID");
+			while (rs.next()) {
+				int testId = rs.getInt("Test_ID");
 				int mutantId = rs.getInt("Mutant_ID");
 				String status = rs.getString("Status");
                 entries.add(new KillMap.KillMapEntry(testMap.get(testId), mutantMap.get(mutantId), KillMap.KillMapEntry.Status.valueOf(status)));
@@ -1219,7 +1219,7 @@ public class DatabaseAccess {
 	}
 
 	public static boolean insertKillMap(KillMap killmap) {
-	    /* Set "HasKillMap" on the game to 1. */
+		/* Set "HasKillMap" on the game to 1. */
 		String updateGameQuery = String.join("\n",
 			"UPDATE games",
 			"SET HasKillMap = 1",
@@ -1229,7 +1229,7 @@ public class DatabaseAccess {
 		/* Insert the killmap entries into "killmap". */
 		String insertKillMapQuery = String.join("\n",
 			"INSERT INTO killmap (Test_ID, Mutant_ID, Status) VALUES (?,?,?)",
-            "ON DUPLICATE KEY UPDATE Status = VALUES(Status);"
+			"ON DUPLICATE KEY UPDATE Status = VALUES(Status);"
 		);
 
 		Connection conn = DB.getConnection();
@@ -1270,8 +1270,8 @@ public class DatabaseAccess {
 		} catch (SQLException e) {
 			logger.error("SQL exception caught", e);
 			return false;
-        }
+		}
 
-        return true;
+		return true;
 	}
 }
