@@ -102,12 +102,8 @@ public class KillMap {
 
         for (Test test : tests) {
             for (Mutant mutant : mutants) {
-                if (USE_COVERAGE) {
-                    if(test.isMutantCovered(mutant)) {
-                        executionResults.add(executor.submit(new TestVsMutantCallable(test, mutant)));
-                    } else {
-                        entries.add(new KillMapEntry(test.getId(), mutant.getId(), KillMapEntry.Status.NO_COVERAGE));
-                    }
+                if (USE_COVERAGE && !test.isMutantCovered(mutant)) {
+                    entries.add(new KillMapEntry(test, mutant, KillMapEntry.Status.NO_COVERAGE));
                 } else {
                     executionResults.add(executor.submit(new TestVsMutantCallable(test, mutant)));
                 }
@@ -123,43 +119,55 @@ public class KillMap {
         return new KillMap(entries, game);
     }
 
+    /**
+     * Returns the game the killmap is for.
+     */
     public AbstractGame getGame() {
         return game;
     }
 
+    /**
+     * Returns the kill map as a list of execution results.
+     */
     public List<KillMapEntry> getEntries() {
         return entries;
     }
 
-    public Map<Integer, List<KillMapEntry>> getTestMap() {
-        Map<Integer, List<KillMapEntry>> map = new HashMap<>();
+    /**
+     * Returns the kill map as a map from tests to their execution results.
+     */
+    public Map<Test, List<KillMapEntry>> getTestMap() {
+        Map<Test, List<KillMapEntry>> map = new TreeMap<>(Test.orderByIdDescending());
 
         for (Test test : game.getTests()) {
-            map.put(test.getId(), new LinkedList<>());
+            map.put(test, new LinkedList<>());
         }
 
         for (KillMapEntry entry : entries) {
-            map.get(entry.testId).add(entry);
+            map.get(entry.test).add(entry);
         }
 
         return map;
     }
 
-    public Map<Integer, List<KillMapEntry>> getMutantMap() {
-        Map<Integer, List<KillMapEntry>> map = new HashMap<>();
+    /**
+     * Returns the kill map as a map from mutants to their execution results.
+     */
+    public Map<Mutant, List<KillMapEntry>> getMutantMap() {
+        Map<Mutant, List<KillMapEntry>> map = new TreeMap<>(Mutant.orderByIdDescending());
 
         for (Mutant mutant : game.getMutants()) {
-            map.put(mutant.getId(), new LinkedList<>());
+            map.put(mutant, new LinkedList<>());
         }
 
         for (KillMapEntry entry : entries) {
-            map.get(entry.mutantId).add(entry);
+            map.get(entry.mutant).add(entry);
         }
 
         return map;
     }
 
-   /**
+    /**
      * Executes a test against a mutant and returns the result.
      */
     private static class TestVsMutantCallable implements Callable<KillMapEntry> {
@@ -183,7 +191,7 @@ public class KillMap {
                 default:        status = KillMapEntry.Status.UNKNOWN; break;
             }
 
-            return new KillMapEntry(test.getId(), mutant.getId(), status);
+            return new KillMapEntry(test, mutant, status);
         }
     }
 
@@ -204,14 +212,18 @@ public class KillMap {
             UNKNOWN
         }
 
-        public int testId;
-        public int mutantId;
+        public Test test;
+        public Mutant mutant;
         public Status status;
 
-        public KillMapEntry(int testId, int mutantId, Status status) {
-            this.testId = testId;
-            this.mutantId = mutantId;
+        public KillMapEntry(Test test, Mutant mutant, Status status) {
+            this.test = test;
+            this.mutant = mutant;
             this.status = status;
+        }
+
+        public String toString() {
+            return String.format("Test %d - Mutant %d: %s", test.getId(), mutant.getId(), status.toString());
         }
     }
 }

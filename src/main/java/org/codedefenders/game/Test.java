@@ -310,4 +310,24 @@ public class Test {
 	public void setClassFile(String classFile) {
 		this.classFile = classFile;
 	}
+
+	// First created appears first
+	public static Comparator<Test> orderByIdAscending() {
+		return new Comparator<Test>() {
+			@Override
+			public int compare(Test o1, Test o2) {
+				return o1.id - o2.id;
+			}
+		};
+	}
+
+	// Last created appears first
+	public static Comparator<Test> orderByIdDescending() {
+		return new Comparator<Test>() {
+			@Override
+			public int compare(Test o1, Test o2) {
+				return o2.id - o1.id;
+			}
+		};
+	}
 }

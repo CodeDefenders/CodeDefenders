@@ -1193,12 +1193,20 @@ public class DatabaseAccess {
 
 		List<KillMap.KillMapEntry> entries = new LinkedList<>();
 
+		/* Set up mapping from test id to test / mutant id to mutant. */
+		List<Test> tests = DatabaseAccess.getTestsForGame(gameId);
+		List<Mutant> mutants = DatabaseAccess.getMutantsForGame(gameId);
+		Map<Integer, Test> testMap = new HashMap<>();
+		Map<Integer, Mutant> mutantMap = new HashMap<>();
+		for (Test test : tests) { testMap.put(test.getId(), test); }
+		for (Mutant mutant : mutants) { mutantMap.put(mutant.getId(), mutant); }
+
 		try {
             while (rs.next()) {
             	int testId = rs.getInt("Test_ID");
 				int mutantId = rs.getInt("Mutant_ID");
 				String status = rs.getString("Status");
-                entries.add(new KillMap.KillMapEntry(testId, mutantId, KillMap.KillMapEntry.Status.valueOf(status)));
+                entries.add(new KillMap.KillMapEntry(testMap.get(testId), mutantMap.get(mutantId), KillMap.KillMapEntry.Status.valueOf(status)));
 			}
 		} catch (SQLException e) {
 			logger.error("SQL exception caught", e);
@@ -1235,8 +1243,8 @@ public class DatabaseAccess {
 			PreparedStatement stmt1 = DB.createPreparedStatement(conn, updateGameQuery, DB.getDBV(killmap.getGame().getId()));
 			PreparedStatement stmt2 = conn.prepareStatement(insertKillMapQuery);
 			for (KillMap.KillMapEntry entry : killmap.getEntries()) {
-				stmt2.setInt(1, entry.testId);
-				stmt2.setInt(2, entry.mutantId);
+				stmt2.setInt(1, entry.test.getId());
+				stmt2.setInt(2, entry.mutant.getId());
 				stmt2.setString(3, entry.status.toString());
 				stmt2.addBatch();
 			}
