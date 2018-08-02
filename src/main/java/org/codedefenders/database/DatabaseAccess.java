@@ -1179,6 +1179,29 @@ public class DatabaseAccess {
 		return null;
 	}
 
+	public static boolean setHasKillMap(int gameId, boolean hasKillMap) {
+		String query = String.join("\n",
+			"UPDATE games",
+			"SET HasKillMap = ?",
+			"WHERE ID = ?;"
+		);
+
+		Connection conn = DB.getConnection();
+
+		DatabaseValue[] values = new DatabaseValue[]{
+			DB.getDBV(hasKillMap),
+			DB.getDBV(gameId)
+		};
+
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, values);
+
+        try {
+            return DB.executeUpdate(stmt, conn);
+        } finally {
+            DB.cleanup(conn, stmt);
+        }
+	}
+
 	public static List<KillMap.KillMapEntry> getKillMapEntriesForGame(int gameId) {
 		String query = String.join("\n",
 			"SELECT killmap.*",
@@ -1217,15 +1240,38 @@ public class DatabaseAccess {
 		return entries;
 	}
 
+	public static boolean insertKillMapEntry(KillMap.KillMapEntry entry) {
+		String query = String.join("\n",
+			"INSERT INTO killmap (Game_ID,Test_ID,Mutant_ID,Status) VALUES (?,?,?,?)",
+			"ON DUPLICATE KEY UPDATE Status = VALUES(Status);"
+		);
+
+		Connection conn = DB.getConnection();
+
+		DatabaseValue[] values = new DatabaseValue[]{
+			DB.getDBV(entry.test.getGameId()),
+			DB.getDBV(entry.test.getId()),
+			DB.getDBV(entry.mutant.getId()),
+			DB.getDBV(entry.status.toString()),
+		};
+
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, values);
+
+		try {
+			return DB.executeUpdate(stmt, conn);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+	}
+
+	/*
 	public static boolean insertKillMap(KillMap killmap) {
-		/* Set "HasKillMap" on the game to 1. */
 		String updateGameQuery = String.join("\n",
 			"UPDATE games",
 			"SET HasKillMap = 1",
 			"WHERE ID = ?;"
 		);
 
-		/* Insert the killmap entries into "killmap". */
 		String insertKillMapQuery = String.join("\n",
 			"INSERT INTO killmap (Game_ID,Test_ID,Mutant_ID,Status) VALUES (?,?,?,?)",
 			"ON DUPLICATE KEY UPDATE Status = VALUES(Status);"
@@ -1234,11 +1280,9 @@ public class DatabaseAccess {
 		Connection conn = DB.getConnection();
 
 		try {
-			/* Turn off auto-commit so the two changes are atomic. */
 			boolean prevAutoCommit = conn.getAutoCommit();
 			conn.setAutoCommit(false);
 
-			/* Prepare the statements. */
 			PreparedStatement stmt1 = DB.createPreparedStatement(conn, updateGameQuery, DB.getDBV(killmap.getGame().getId()));
 			PreparedStatement stmt2 = conn.prepareStatement(insertKillMapQuery);
 			for (KillMap.KillMapEntry entry : killmap.getEntries()) {
@@ -1249,7 +1293,6 @@ public class DatabaseAccess {
 				stmt2.addBatch();
 			}
 
-			/* Execute the updates and rollback changes if an error occurs. */
 			try {
 				DB.executeUpdate(stmt1, conn);
 				stmt2.executeBatch();
@@ -1274,4 +1317,5 @@ public class DatabaseAccess {
 
 		return true;
 	}
+	*/
 }
