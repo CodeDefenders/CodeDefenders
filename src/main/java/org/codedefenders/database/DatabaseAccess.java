@@ -1182,9 +1182,8 @@ public class DatabaseAccess {
 	public static List<KillMap.KillMapEntry> getKillMapEntriesForGame(int gameId) {
 		String query = String.join("\n",
 			"SELECT killmap.*",
-			"FROM killmap, tests",
-			"WHERE killmap.Test_ID = tests.Test_ID",
-			"  AND tests.Game_ID = ?"
+			"FROM killmap",
+			"WHERE killmap.Game_ID = ?"
 		);
 
 		Connection conn = DB.getConnection();
@@ -1228,7 +1227,7 @@ public class DatabaseAccess {
 
 		/* Insert the killmap entries into "killmap". */
 		String insertKillMapQuery = String.join("\n",
-			"INSERT INTO killmap (Test_ID, Mutant_ID, Status) VALUES (?,?,?)",
+			"INSERT INTO killmap (Game_ID,Test_ID,Mutant_ID,Status) VALUES (?,?,?,?)",
 			"ON DUPLICATE KEY UPDATE Status = VALUES(Status);"
 		);
 
@@ -1243,9 +1242,10 @@ public class DatabaseAccess {
 			PreparedStatement stmt1 = DB.createPreparedStatement(conn, updateGameQuery, DB.getDBV(killmap.getGame().getId()));
 			PreparedStatement stmt2 = conn.prepareStatement(insertKillMapQuery);
 			for (KillMap.KillMapEntry entry : killmap.getEntries()) {
-				stmt2.setInt(1, entry.test.getId());
-				stmt2.setInt(2, entry.mutant.getId());
-				stmt2.setString(3, entry.status.toString());
+				stmt2.setInt(1, entry.test.getGameId());
+				stmt2.setInt(2, entry.test.getId());
+				stmt2.setInt(3, entry.mutant.getId());
+				stmt2.setString(4, entry.status.toString());
 				stmt2.addBatch();
 			}
 
