@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -233,23 +234,9 @@ public class Test {
 	public boolean update() {
 		logger.debug("Updating Test");
 		Connection conn = DB.getConnection();
-		String linesCoveredString = "";
-		String linesUncoveredString = "";
-		if (lineCoverage != null) {
-			for (int i : lineCoverage.getLinesCovered()) {
-				linesCoveredString += i + ",";
-			}
-			for (int i : lineCoverage.getLinesUncovered()) {
-				linesUncoveredString += i + ",";
-			}
-			if (linesCoveredString.length() > 0) {
-				linesCoveredString = linesCoveredString.substring(0, linesCoveredString.length() - 1);
-			}
-			if (linesUncoveredString.length() > 0) {
-				linesUncoveredString = linesUncoveredString.substring(0, linesUncoveredString.length() - 1);
-			}
-		}
-		//-1 for the left over comma
+		String linesCoveredString = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
+		String linesUncoveredString = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
+
 		String query = "UPDATE tests SET mutantsKilled=?, NumberAiMutantsKilled=?, Lines_Covered=?, Lines_Uncovered=?, Points = ? WHERE Test_ID=?;";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantsKilled),
 				DB.getDBV(aiMutantsKilled),

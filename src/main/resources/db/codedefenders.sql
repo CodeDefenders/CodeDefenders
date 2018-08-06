@@ -136,16 +136,19 @@ DROP TABLE IF EXISTS `killmap`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `killmap` (
-  `Game_ID` int(11) NOT NULL,
+  `Class_ID` int(11) NOT NULL,
+  `Game_ID` int(11) DEFAULT NULL,
   `Test_ID` int(11) NOT NULL,
   `Mutant_ID` int(11) NOT NULL,
   `Status` enum('KILL','NO_KILL','NO_COVERAGE','ERROR','UNKNOWN') COLLATE utf8mb4_unicode_ci NOT NULL,
   PRIMARY KEY (`Test_ID`,`Mutant_ID`),
-  KEY `fk_gameId` (`Game_ID`),
-  KEY `fk_mutantId` (`Mutant_ID`),
-  CONSTRAINT `fk_gameId` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_mutantId` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_testId` FOREIGN KEY (`Test_ID`) REFERENCES `tests` (`Test_ID`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `fk_killmap_classId` (`Class_ID`),
+  KEY `fk_killmap_gameId` (`Game_ID`),
+  KEY `fk_killmap_mutantId` (`Mutant_ID`),
+  CONSTRAINT `fk_killmap_classId` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_killmap_gameId` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_killmap_mutantId` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_killmap_testId` FOREIGN KEY (`Test_ID`) REFERENCES `tests` (`Test_ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
