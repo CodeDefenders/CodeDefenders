@@ -13,6 +13,7 @@ import org.codedefenders.game.Test;
 import javax.naming.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.BiFunction;
 
 /**
  * Maps tests to their killed mutants in a finished game.
@@ -28,7 +29,7 @@ public class KillMap {
 
     private static boolean USE_COVERAGE = true;
     private static boolean PARALLELIZE = true;
-    private final static int NUM_THREADS = 8;
+    private final static int NUM_THREADS = 20;
     /* TODO Put this into config.properties? MutationTester also has hard-coded number of threads. */
 
     /* Get settings if they are set, otherwise use defaults. */
@@ -42,45 +43,47 @@ public class KillMap {
             USE_COVERAGE = (useCoverageObj == null) ? USE_COVERAGE : "enabled".equalsIgnoreCase((String) useCoverageObj);
             PARALLELIZE = (parallelizeObj == null) ? PARALLELIZE : "enabled".equalsIgnoreCase((String) parallelizeObj);
         } catch (NamingException e) {
-            e.printStackTrace();
+            logger.warn("Encountered missing option: " + e);
         }
     }
 
-    /** The game the killmap is for. */
-    private AbstractGame game;
-    /** The tests of the game. */
+    /** The tests the killmap is computed for. */
     private List<Test> tests;
-    /** The mutants of the game. */
+    /** The mutants the killmap is computed for. */
     private List<Mutant> mutants;
-
-    /** The killmap data, as a list of "test vs. mutant" execution results. */
-    private List<KillMapEntry> entries;
-    /** The killmap data, as matrix between tests and mutants. */
-    private KillMapEntry[][] matrix;
+    /** ID of the class the killmap is computed for. */
+    private int classId;
     /** Maps each test to it's index in {@link KillMap#tests}. */
     private TreeMap<Test, Integer> indexOfTest;
     /** Maps each mutant to it's index in {@link KillMap#mutants}. */
     private TreeMap<Mutant, Integer> indexOfMutant;
 
-    /**
-     * Creates a new killmap, with the given entries, for the given finished game.
-     * The constructor does not compute the killmap, or fetch it from the database.
-     * Use {@link KillMap#forGame(AbstractGame, boolean)} to compute a killmap, or fetch it from the database.
-     *
-     * @param entries The entries of the killmap.
-     * @param game The game the killmap is for.
-     */
-    private KillMap(List<KillMapEntry> entries, AbstractGame game) {
-        this.game = game;
-        this.tests = new ArrayList<>(game.getTests());
-        this.mutants = new ArrayList<>(game.getMutants());
+    /** The killmap data, as a list of "test vs. mutant" execution results. */
+    private List<KillMapEntry> entries;
+    /** The killmap data, as matrix between tests and mutants. */
+    private KillMapEntry[][] matrix;
 
-        this.entries = entries;
+
+    /**
+     * Constructs a new killmap.
+     *
+     * @param tests The tests of the killmap.
+     * @param mutants The mutants of the killmap.
+     * @param classId The id of the class the tests and mutants are for.
+     * @param entries The already computed entries of the killmap. If no entries have been computed before, this can be
+     *                an empty list.
+     */
+    private KillMap(List<Test> tests, List<Mutant> mutants, int classId, List<KillMapEntry> entries) {
+        this.tests = tests;
+        this.mutants = mutants;
+        this.classId = classId;
         this.indexOfTest = new TreeMap<>(Test.orderByIdDescending());
         this.indexOfMutant = new TreeMap<>(Mutant.orderByIdDescending());
+
+        this.entries = entries;
         this.matrix = new KillMapEntry[tests.size()][mutants.size()];
 
-        /* Fill the matrix with existing entries. */
+        /* Fill the maps and the matrix. */
         for (int i = 0; i < this.tests.size(); i++) {
             this.indexOfTest.put(tests.get(i), i);
         }
@@ -88,66 +91,32 @@ public class KillMap {
             this.indexOfMutant.put(mutants.get(i), i);
         }
         for (KillMapEntry entry : entries) {
-            matrix[indexOf(entry.test)][indexOf(entry.mutant)] = entry;
-        }
-    }
-
-    /**
-     * Returns the killmap for the given finished game.
-     * If the killmap for the game was not computed before, it is computed by {@link #forGame(AbstractGame, boolean)}.
-     * This may take a long time.
-     * {@link DatabaseAccess#hasKillMap(int)} can be used to check if a game's killmap has already beeen computed before.
-     * <p/>
-     * Already calculated results (which are saved in the database) are not calculated again, unless {@code recalculate}
-     * is {@code true}.
-     * <p/>
-     * Only one killmap can be computed at a time. Further request are queued via {@code synchronized}.
-     * This is mostly to prevent multiple calculations, e.g. by accidentally refreshing a page.
-     *
-     * @param game The finished game to get the killmap for.
-     * @param recalculate Recalculate the whole killmap, even if it was already calculated before.
-     * @throws InterruptedException If the computation is interrupted.
-     * @throws ExecutionException If an error occured during an execution.
-     */
-    public static KillMap forGame(AbstractGame game, boolean recalculate) throws InterruptedException, ExecutionException {
-        if (game.getState() != GameState.FINISHED) {
-            throw new IllegalArgumentException("Game must be finished.");
-
-        } else if (!recalculate && DatabaseAccess.hasKillMap(game.getId())) {
-            List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForGame(game.getId());
-            return new KillMap(entries, game);
-
-        } else {
-            /* Synchronized, so only one killmap can be computed at a time. */
-            synchronized (KillMap.class) {
-                if (recalculate || !DatabaseAccess.hasKillMap(game.getId())) {
-                    if (recalculate) {
-                        DatabaseAccess.setHasKillMap(game.getId(), false);
-                    }
-                    List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForGame(game.getId());
-                    KillMap killmap = new KillMap(entries, game);
-                    killmap.compute(recalculate);
-                    return killmap;
-                } else {
-                    List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForGame(game.getId());
-                    return new KillMap(entries, game);
-                }
+            Integer testIndex = indexOf(entry.test);
+            Integer mutantIndex = indexOf(entry.mutant);
+            if (testIndex != null && mutantIndex != null) {
+                matrix[indexOf(entry.test)][indexOf(entry.mutant)] = entry;
             }
         }
     }
 
     /**
-     * Gets called by {@link KillMap#forGame(AbstractGame, boolean)} to compute a killmap.
-     * @see KillMap#forGame(AbstractGame, boolean)
+     * Computed the missing entries of a killmaps, Or recalculates all entries, if {@code recalculate} is {@code true}.
+     *
+     * @param recalculate If {@code true}, recalculate all entries, Even if they were computed before.
+     * @param filter A filter, which decides what test-mutant combinations should be computed.
+     * @throws InterruptedException If the computation is interrupted.
+     * @throws ExecutionException If an error occured during an execution.
      */
-    private void compute(boolean recalculate) throws InterruptedException, ExecutionException {
+    private void compute(boolean recalculate, BiFunction<Test, Mutant, Boolean> filter) throws InterruptedException, ExecutionException {
         List<Future<KillMapEntry>> executionResults = new LinkedList<>();
         ExecutorService executor = PARALLELIZE ? Executors.newFixedThreadPool(8) : Executors.newSingleThreadExecutor();
 
         for (int t = 0; t < tests.size(); t++) {
+            Test test = tests.get(t);
             for (int m = 0; m < mutants.size(); m++) {
-                if (matrix[t][m] == null || recalculate) {
-                    executionResults.add(executor.submit(new TestVsMutantCallable(tests.get(t), mutants.get(m))));
+                Mutant mutant = mutants.get(m);
+                if ((matrix[t][m] == null || recalculate) && filter.apply(test, mutant)) {
+                    executionResults.add(executor.submit(new TestVsMutantCallable(test, mutant, classId)));
                 }
             }
         }
@@ -159,16 +128,101 @@ public class KillMap {
             entries.add(entry);
             matrix[indexOf(entry.test)][indexOf(entry.mutant)] = entry;
         }
-
-        DatabaseAccess.setHasKillMap(game.getId(), true);
     }
 
     /**
-     * Returns the game the killmap is for.
-     * @return The game the killmap is for.
+     * Returns the killmap for the given finished game.
+     * This operation is blocking and may take a long time,
+     * {@link DatabaseAccess#hasKillMap(int)} can be used to check if a game's killmap has already beeen computed before.
+     *
+     * @param game The finished game to get the killmap for.
+     * @param recalculate Recalculate the whole killmap, even if it was already calculated before.
+     * @throws InterruptedException If the computation is interrupted.
+     * @throws ExecutionException If an error occured during an execution.
      */
-    public AbstractGame getGame() {
-        return game;
+    public static KillMap forGame(AbstractGame game, boolean recalculate) throws InterruptedException, ExecutionException {
+        if (game.getState() != GameState.FINISHED) {
+            throw new IllegalArgumentException("Game must be finished.");
+
+        } else if (!recalculate && DatabaseAccess.hasKillMap(game.getId())) {
+            List<Test> tests = game.getTests();
+            List<Mutant> mutants = game.getMutants();
+            List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForGame(game.getId());
+            return new KillMap(tests, mutants, game.getClassId(), entries);
+
+        } else {
+            /* Synchronized, so only one killmap can be computed at a time. */
+            synchronized (KillMap.class) {
+                /* If killmap was calculated in the mean time, just return the already computed killmap. */
+                if (recalculate || !DatabaseAccess.hasKillMap(game.getId())) {
+                    DatabaseAccess.setHasKillMap(game.getId(), false);
+
+                    List<Test> tests = game.getTests();
+                    List<Mutant> mutants = game.getMutants();
+                    List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForGame(game.getId());
+
+                    KillMap killmap = new KillMap(tests, mutants, game.getClassId(), entries);
+                    killmap.compute(recalculate, (test, mutant) -> true);
+
+                    DatabaseAccess.setHasKillMap(game.getId(), true);
+                    return killmap;
+
+                } else {
+                    List<Test> tests = game.getTests();
+                    List<Mutant> mutants = game.getMutants();
+                    List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForGame(game.getId());
+                    return new KillMap(tests, mutants, game.getClassId(), entries);
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns the killmap for the given class.
+     * This operation is blocking and may take a long time,
+     *
+     * @param game The class to get the killmap for.
+     * @param recalculate Recalculate the whole killmap, even if it was already calculated before.
+     * @throws InterruptedException If the computation is interrupted.
+     * @throws ExecutionException If an error occured during an execution.
+     */
+    public static KillMap forClass(int classId, boolean recalculate) throws InterruptedException, ExecutionException {
+        /* Synchronized, so only one killmap can be computed at a time. */
+        synchronized (KillMap.class) {
+            List<Test> tests = DatabaseAccess.getExecutableTestsForClass(classId);
+            List<Mutant> mutants = DatabaseAccess.getMutantsForClass(classId);
+            List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForClass(classId);
+
+            KillMap killmap = new KillMap(tests, mutants, classId, entries);
+            killmap.compute(recalculate, (test, mutant) -> true);
+
+            return killmap;
+        }
+    }
+
+    /**
+     * Returns the killmap for the given test and mutants.
+     * The tests and mutants must belong to the same class (with the same class id).
+     * This operation is blocking and may take a long time,
+     *
+     * @param tests The tests to get the killmap for.
+     * @param mutants The mutants to get the killmap for.
+     * @param classId The class id of the class the tests and mutants belong to.
+     * @param entries Already computed entries for the killmap.
+     * @param recalculate Recalculate the whole killmap, even if it was already calculated before.
+     * @param filter A filter, which decides what test-mutant combinations should be computed.
+     * @throws InterruptedException If the computation is interrupted.
+     * @throws ExecutionException If an error occured during an execution.
+     */
+    public static KillMap forCustom(List<Test> tests, List<Mutant> mutants, int classId, List<KillMapEntry> entries,
+                                    boolean recalculate, BiFunction<Test, Mutant, Boolean> filter)
+                                    throws InterruptedException, ExecutionException {
+        /* Synchronized, so only one killmap can be computed at a time. */
+        synchronized (KillMap.class) {
+            KillMap killmap = new KillMap(tests, mutants, classId, entries);
+            killmap.compute(recalculate, filter);
+            return killmap;
+        }
     }
 
     /**
@@ -264,10 +318,12 @@ public class KillMap {
     private class TestVsMutantCallable implements Callable<KillMapEntry> {
         private Test test;
         private Mutant mutant;
+        private int classId;
 
-        private TestVsMutantCallable(Test test, Mutant mutant) {
+        public TestVsMutantCallable(Test test, Mutant mutant, int classId) {
             this.test = test;
             this.mutant = mutant;
+            this.classId = classId;
         }
 
         @Override
@@ -291,8 +347,8 @@ public class KillMap {
                 entry = new KillMapEntry(test, mutant, status);
             }
 
-            if (!DatabaseAccess.insertKillMapEntry(entry)) {
-                logger.error("KillMap entry could not be inserted into DB: " + entry);
+            if (!DatabaseAccess.insertKillMapEntry(entry, classId)) {
+                logger.error("An error occured while inserting killmap entry into the DB: " + entry);
             }
 
             return entry;
