@@ -335,20 +335,22 @@ public class KillMap {
     }
 
     /**
-     * Returns the index of the given test in the matrix.
+     * Returns the index of the given test in the matrix, or null if the mutant is not part of the matrix.
      * @param test The given test.
-     * @return The index of the given test in the matrix.
+     * @return The index of the given test in the matrix, or null if the mutant is not part of the matrix.
      */
-    public int indexOf(Test test) {
+    public Integer indexOf(Test test) {
+        if (test == null) return null;
         return indexOfTest.get(test);
     }
 
     /**
-     * Returns the index of the given mutant in the matrix.
+     * Returns the index of the given mutant in the matrix, or null if the mutant is not part of the matrix.
      * @param mutant The given mutant.
-     * @return The index of the given mutant in the matrix.
+     * @return The index of the given mutant in the matrix, or null if the mutant is not part of the matrix.
      */
-    public int indexOf(Mutant mutant) {
+    public Integer indexOf(Mutant mutant) {
+        if (mutant == null) return null;
         return indexOfMutant.get(mutant);
     }
 

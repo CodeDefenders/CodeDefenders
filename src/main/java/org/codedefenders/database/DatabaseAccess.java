@@ -633,7 +633,8 @@ public class DatabaseAccess {
 				"SELECT mutants.*",
 				"FROM mutants, games",
 				"WHERE mutants.Game_ID = games.ID",
-				"  AND games.Class_ID = ?;"
+				"  AND games.Class_ID = ?",
+				"  AND mutants.ClassFile IS NOT NULL;"
 		);
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(classId));
