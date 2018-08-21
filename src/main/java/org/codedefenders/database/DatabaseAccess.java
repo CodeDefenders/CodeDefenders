@@ -816,7 +816,18 @@ public class DatabaseAccess {
 	 * @return Tests submitted by defenders which compiled and passed on CUT
 	 */
 	public static List<Test> getExecutableTests(int gameId, boolean defendersOnly) {
-		String query = "SELECT tests.* FROM tests\n" + "INNER JOIN targetexecutions ex on tests.Test_ID = ex.Test_ID\n" + (defendersOnly ? "INNER JOIN players pl on tests.Player_ID = pl.ID\n" : "") + "WHERE tests.Game_ID=? AND tests.ClassFile IS NOT NULL\n" + (defendersOnly ? "AND pl.Role='DEFENDER'\n" : "") + "AND ex.Target='TEST_ORIGINAL' AND ex.Status='SUCCESS';";
+		String query = String.join("\n",
+				"SELECT tests.* FROM tests",
+				 (defendersOnly ? "INNER JOIN players pl on tests.Player_ID = pl.ID" : ""),
+				 "WHERE tests.Game_ID=? AND tests.ClassFile IS NOT NULL",
+				 (defendersOnly ? "AND pl.Role='DEFENDER'" : ""),
+				 "  AND EXISTS (",
+				 "    SELECT * FROM targetexecutions ex",
+				 "    WHERE ex.Test_ID = tests.Test_ID",
+				 "      AND ex.Target='TEST_ORIGINAL'",
+				 "      AND ex.Status='SUCCESS'",
+				 "  );"
+		);
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
 		return getTests(stmt, conn);
@@ -825,12 +836,16 @@ public class DatabaseAccess {
 	public static List<Test> getExecutableTestsForClass(int classId) {
 		String query = String.join("\n",
 				"SELECT tests.*",
-				"FROM tests, targetexecutions ex, games",
-				"WHERE tests.Test_ID = ex.Test_ID",
-				"  AND tests.Game_ID = games.ID",
-				"  AND ex.Target='TEST_ORIGINAL' AND ex.Status='SUCCESS'",
+				"FROM tests, games",
+				"WHERE tests.Game_ID = games.ID",
+				"  AND games.Class_ID = ?",
 				"  AND tests.ClassFile IS NOT NULL",
-				"  AND games.Class_ID = ?;"
+				"  AND EXISTS (",
+				"    SELECT * FROM targetexecutions ex",
+				"    WHERE ex.Test_ID = tests.Test_ID",
+				"      AND ex.Target='TEST_ORIGINAL'",
+				"      AND ex.Status='SUCCESS'",
+				"  );"
 		);
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(classId));
@@ -1215,6 +1230,13 @@ public class DatabaseAccess {
 	}
 
 	public static List<KillMap.KillMapEntry> getKillMapEntries(PreparedStatement stmt, Connection conn, List<Test> tests, List<Mutant> mutants) {
+		try {
+			stmt.setFetchSize(Integer.MIN_VALUE);
+		} catch (SQLException e) {
+			logger.error("SQL Exception caught", e);
+			return null;
+		}
+
 		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 
 		List<KillMap.KillMapEntry> entries = new LinkedList<>();
