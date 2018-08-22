@@ -14,15 +14,31 @@
 				<!--
 				<input type="checkbox" name="prepareForSingle" value="prepare" style="margin-right:5px;">Generate mutants and tests for single-player mode? (It may take a while...)</input>
 				-->
-				<span id="file-select">
-					<input id="fileUpload" name="fileUpload" type="file" class="file-loading" accept=".java" />
+				<div>
+                    <span>Upload Class under Test</span>
+                    <span class="file-select">
+                        <input id="fileUploadCUT" name="fileUploadCUT" type="file" class="file-loading" accept=".java" required />
+                    </span>
+				</div>
+				<div>
+                    <span>Optional: Upload mutants</span>
+                    <span class="file-select">
+                        <input id="fileUploadMutant" name="fileUploadMutant" type="file" class="file-loading" accept=".java" multiple />
+                    </span>
+				</div>
+				<div>
+					<span>Optional: Upload tests</span>
+                    <span class="file-select">
+                        <input id="fileUploadTest" name="fileUploadTest" type="file" class="file-loading" accept=".java" multiple />
+                    </span>
+				</div>
+
+                <input id="mockingEnabled" type="checkbox" name="enableMocking" value="isMocking" style="margin-right:5px;">Enable Mocking for this class</input>
+
+				<span class="submit-button">
+					<input id="upload" type="submit" class="fileinput-upload-button" value="Upload" onClick="this.form.submit(); this.disabled=true; this.value='Uploading...';"/>
 				</span>
-				<span id="mocking-enabled">
-					<input id="mockingEnabled" type="checkbox" name="enableMocking" value="isMocking" style="margin-right:5px;">Enable Mocking for this class</input>
-				</span>
-				<span id="submit-button">
-					<input id="upload" type="submit" text="Upload" class="fileinput-upload-button" value="Upload" onClick="this.form.submit(); this.disabled=true; this.value='Uploading...';" />
-				</span>
+
 				<input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 			</form>
 		</div>
