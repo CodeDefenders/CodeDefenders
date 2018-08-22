@@ -1,7 +1,10 @@
 package org.codedefenders.game;
 
-import org.codedefenders.model.Event;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.game.singleplayer.SinglePlayerGame;
+import org.codedefenders.model.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,10 +16,15 @@ import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_NO;
 import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 
 /**
- * Created by jmr on 13/07/2016.
+ * Abstract class for games of different modes.
+ *
+ * @see DuelGame
+ * @see MultiplayerGame
+ * @see SinglePlayerGame
  */
 public abstract class AbstractGame {
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractGame.class);
+
 	protected int id;
 	protected int classId;
 	protected int creatorId;
@@ -24,7 +32,15 @@ public abstract class AbstractGame {
 	protected GameLevel level;
 	protected GameMode mode;
 
-	protected ArrayList<Event> events = null;
+	protected ArrayList<Event> events;
+	private List<Mutant> mutants;
+
+	public abstract boolean addPlayer(int userId, Role role);
+
+	public abstract boolean insert();
+
+	public abstract boolean update();
+
 
 	public int getId() {
 		return id;
@@ -42,9 +58,39 @@ public abstract class AbstractGame {
 		if (events == null){
 			events = DatabaseAccess.getEventsForGame(getId());
 		}
-
 		return events;
 	}
+
+	public List<Mutant> getMutants() {
+		// This ensures we're only querying the db once for mutants
+		if (mutants == null){
+			mutants = DatabaseAccess.getMutantsForGame(id);
+		}
+		return mutants;
+	}
+
+	public List<Mutant> getAliveMutants() {
+		return getMutants().stream()
+				.filter(mutant -> mutant.isAlive() && mutant.getEquivalent().equals(ASSUMED_NO) &&
+						mutant.getClassFile() != null)
+				.collect(Collectors.toList());
+	}
+
+	public List<Mutant> getKilledMutants() {
+		return getMutants().stream()
+				.filter(mutant -> !mutant.isAlive() && (mutant.getEquivalent().equals(ASSUMED_NO) || mutant.getEquivalent().equals(PROVEN_NO)) &&
+						mutant.getClassFile() != null)
+				.collect(Collectors.toList());
+	}
+
+	public Mutant getMutantByID(int mutantID) {
+		for (Mutant m : getMutants()) {
+			if (m.getId() == mutantID)
+				return m;
+		}
+		return null;
+	}
+
 
 	public GameClass getCUT() {
 		return DatabaseAccess.getClassForKey("Class_ID", classId);
@@ -84,46 +130,7 @@ public abstract class AbstractGame {
 		return DatabaseAccess.getExecutableTests(this.id, defendersOnly);
 	}
 
-	private List<Mutant> mutants = null;
-
-	public List<Mutant> getMutants() {
-		// This ensures we're only querying the db once for mutants
-		if (mutants == null){
-			mutants = DatabaseAccess.getMutantsForGame(id);
-		}
-		return mutants;
-	}
-
-	public List<Mutant> getAliveMutants() {
-		return getMutants().stream().filter(mutant -> mutant.isAlive() &&
-				mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO) &&
-				mutant.getClassFile() != null).collect(Collectors.toList());
-	}
-
-	public List<Mutant> getKilledMutants() {
-		return getMutants().stream().filter(mutant -> !mutant.isAlive() &&
-				(mutant.getEquivalent().equals(ASSUMED_NO) || mutant.getEquivalent().equals(PROVEN_NO)) &&
-				(mutant.getClassFile() != null)).collect(Collectors.toList());
-	}
-
-	public Mutant getMutantByID(int mutantID) {
-		for (Mutant m : getMutants()) {
-			if (m.getId() == mutantID)
-				return m;
-		}
-		return null;
-	}
-
-
-	public abstract boolean addPlayer(int userId, Role role);
-
 	public Role getRole(int userId){
 		return DatabaseAccess.getRole(userId, getId());
 	}
-
-	public abstract boolean insert();
-
-	public abstract boolean update();
-
-
 }

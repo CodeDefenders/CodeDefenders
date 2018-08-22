@@ -16,54 +16,76 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javassist.ClassPool;
 import javassist.CtClass;
 
+/**
+ * This class represents a test case. These test cases are created by defenders
+ * to find mutations in a game class.
+ *
+ * @see GameClass
+ * @see Mutant
+ */
 public class Test {
-
 	private static final Logger logger = LoggerFactory.getLogger(Test.class);
 
 	private int id;
+	private int playerId;
 	private int gameId;
 	private String javaFile;
 	private String classFile;
 
 	private int roundCreated;
-	private int mutantsKilled = 0;
-
-	private int playerId;
-
-	public int getMutantsKilled() {
-		return mutantsKilled;
-	}
-
+	private int mutantsKilled;
+	private int score;
+	private int aiMutantsKilled; // how many generated mutants this test killed.
 	private LineCoverage lineCoverage = new LineCoverage();
 
-	private int score;
-
-	public void setLineCoverage(LineCoverage lc) {
-		lineCoverage = lc;
+	public Test(String javaFilePath, String classFilePath) {
+		this.javaFile = javaFilePath;
+		this.classFile = classFilePath;
+		this.gameId = -1;
+		this.playerId = -1;
+		this.score = 0;
+		this.roundCreated = -1;
 	}
 
-	public LineCoverage getLineCoverage() {
-		return lineCoverage;
+	public Test(int gameId, String javaFile, String classFile, int playerId) {
+		this.gameId = gameId;
+        DuelGame g = DatabaseAccess.getGameForKey("ID", gameId);
+        if (g != null) {
+            this.roundCreated = g.getCurrentRound();
+        } else {
+            logger.error("Could not fetch game for gameId: " + gameId);
+        }
+		this.javaFile = javaFile;
+		this.classFile = classFile;
+		this.playerId = playerId;
+		this.score = 0;
 	}
 
-	public void setPlayerId(int id) {
-		playerId = id;
+	@Deprecated
+	public Test(int testId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled, int playerId) {
+		this(testId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId, Collections.emptyList(), Collections.emptyList(), 0);
 	}
 
+	public Test(int testId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled,
+				int playerId, List<Integer> linesCovered, List<Integer> linesUncovered, int score) {
+		this(gameId, javaFile, classFile, playerId);
 
-	public int getPlayerId() {
-		return playerId;
+		this.id = testId;
+		this.roundCreated = roundCreated;
+		this.mutantsKilled = mutantsKilled;
+		this.score = score;
+		lineCoverage.setLinesCovered(linesCovered);
+		lineCoverage.setLinesUncovered(linesUncovered);
 	}
-
-	public int getScore() {
-		return score;
-	}
-
 	// TODO Check that increment score does not consider mutants that were killed already
 	public void incrementScore(int score) {
 		if (score == 0) {
@@ -89,38 +111,6 @@ public class Test {
 		score += s;
 	}
 
-	private int aiMutantsKilled = 0; //How many generated mutants this test kills.
-
-	public Test(int gameId, String jFile, String cFile, int playerId) {
-		this.gameId = gameId;
-		try {
-			DuelGame g = DatabaseAccess.getGameForKey("ID", gameId);
-			if (g != null)
-				this.roundCreated = g.getCurrentRound();
-		} catch (NullPointerException e) {
-			//multiplayer game
-			logger.error("Could not fetch game", e);
-		}
-		this.javaFile = jFile;
-		this.classFile = cFile;
-		this.playerId = playerId;
-		score = 0;
-	}
-
-	public Test(int tid, int gid, String jFile, String cFile, int roundCreated, int mutantsKilled, int playerId) {
-		this(tid, gid, jFile, cFile, roundCreated, mutantsKilled, playerId, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
-	}
-
-	public Test(int tid, int gid, String jFile, String cFile, int roundCreated, int mutantsKilled, int playerId, List<Integer> linesCovered, List<Integer> linesUncovered) {
-		this(gid, jFile, cFile, playerId);
-
-		this.id = tid;
-		this.roundCreated = roundCreated;
-		this.mutantsKilled = mutantsKilled;
-		lineCoverage.setLinesCovered(linesCovered);
-		lineCoverage.setLinesUncovered(linesUncovered);
-	}
-
 	public int getId() {
 		return id;
 	}
@@ -129,16 +119,23 @@ public class Test {
 		return gameId;
 	}
 
-	public int getAttackerPoints() {
-		return 0;
+	public int getMutantsKilled() {
+		return mutantsKilled;
+	}
+
+	public int getRoundCreated() {
+		return roundCreated;
 	}
 
 	public int getDefenderPoints() {
-		if (playerId == DatabaseAccess.getGameForKey("ID", gameId).getDefenderId())
+		final DuelGame game = DatabaseAccess.getGameForKey("ID", this.gameId);
+		if (game != null && playerId == game.getDefenderId()) {
 			return mutantsKilled;
-		else
+		} else {
 			return 0;
+		}
 	}
+
 
 	public String getDirectory() {
 		File file = new File(javaFile);
@@ -148,7 +145,7 @@ public class Test {
 	// Increment the number of mutant killed directly on the DB
 	// And update the local object. But it requires several queries/connections
 	//
-	// TODO Check that this method is neverl called for tests that kill a mutant that was already dead...
+	// TODO Check that this method is never called for tests that kill a mutant that was already dead...
 	public void killMutant() {
 		// mutantsKilled++;
 		// update();
@@ -190,12 +187,12 @@ public class Test {
 		return DatabaseAccess.getKilledMutantsForTestId(id);
 	}
 
-	public List<String> getHTMLReadout() throws IOException {
+	public List<String> getHTMLReadout() {
 
 		File testFile = new File(javaFile);
 		List<String> testLines = new LinkedList<String>();
 
-		String line = "";
+		String line;
 
 		try {
 			BufferedReader in = new BufferedReader(new FileReader(testFile));
@@ -203,13 +200,14 @@ public class Test {
 				testLines.add(line);
 			}
 		} catch (IOException e) {
-			logger.error(String.format("Failed to read test class: %s", e.getLocalizedMessage()), e);
+			logger.error("Failed to read test class: ", e);
 		}
 
 		return testLines;
 	}
 
 
+	@Deprecated
 	public boolean insert() {
 		String jFileDB = DatabaseAccess.addSlashes(javaFile);
 		String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
@@ -230,31 +228,34 @@ public class Test {
 		return this.id > 0;
 	}
 
+	@Deprecated
 	public boolean update() {
 		logger.debug("Updating Test");
 		Connection conn = DB.getConnection();
-		String linesCoveredString = "";
-		String linesUncoveredString = "";
+		StringBuilder linesCoveredString = new StringBuilder();
+		StringBuilder linesUncoveredString = new StringBuilder();
 		if (lineCoverage != null) {
 			for (int i : lineCoverage.getLinesCovered()) {
-				linesCoveredString += i + ",";
+				linesCoveredString.append(i).append(",");
 			}
 			for (int i : lineCoverage.getLinesUncovered()) {
-				linesUncoveredString += i + ",";
+				linesUncoveredString.append(i).append(",");
 			}
 			if (linesCoveredString.length() > 0) {
-				linesCoveredString = linesCoveredString.substring(0, linesCoveredString.length() - 1);
+				linesCoveredString.deleteCharAt(linesCoveredString.length() - 1);
+//				linesCoveredString = new StringBuilder(linesCoveredString.substring(0, linesCoveredString.length() - 1));
 			}
 			if (linesUncoveredString.length() > 0) {
-				linesUncoveredString = linesUncoveredString.substring(0, linesUncoveredString.length() - 1);
+				linesUncoveredString.deleteCharAt(linesUncoveredString.length() - 1);
+//				linesUncoveredString = new StringBuilder(linesUncoveredString.substring(0, linesUncoveredString.length() - 1));
 			}
 		}
 		//-1 for the left over comma
 		String query = "UPDATE tests SET mutantsKilled=?, NumberAiMutantsKilled=?, Lines_Covered=?, Lines_Uncovered=?, Points = ? WHERE Test_ID=?;";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantsKilled),
 				DB.getDBV(aiMutantsKilled),
-				DB.getDBV(linesCoveredString),
-				DB.getDBV(linesUncoveredString),
+				DB.getDBV(linesCoveredString.toString()),
+				DB.getDBV(linesUncoveredString.toString()),
 				DB.getDBV(score),
 				DB.getDBV(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -277,10 +278,6 @@ public class Test {
 
 	public boolean isValid() {
 		return classFile != null;
-	}
-
-	public void setAiMutantsKilled(int count) {
-		aiMutantsKilled = count;
 	}
 
 	public int getAiMutantsKilled() {
@@ -310,4 +307,32 @@ public class Test {
 	public void setClassFile(String classFile) {
 		this.classFile = classFile;
 	}
+
+	public LineCoverage getLineCoverage() {
+		return lineCoverage;
+	}
+
+	public void setPlayerId(int id) {
+		playerId = id;
+	}
+
+
+	public int getPlayerId() {
+		return playerId;
+	}
+
+	public int getScore() {
+		return score;
+	}
+
+	@Deprecated
+	public void setAiMutantsKilled(int count) {
+		aiMutantsKilled = count;
+	}
+
+	@Deprecated
+	public void setLineCoverage(LineCoverage lineCoverage) {
+		this.lineCoverage = lineCoverage;
+	}
+
 }

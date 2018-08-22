@@ -26,6 +26,13 @@ import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
 
+/**
+ * This class represents a mutation in a game class. These mutations are created
+ * by attackers in order to survive test cases.
+ *
+ * @see GameClass
+ * @see Test
+ */
 public class Mutant implements Serializable {
 
 	private static final Logger logger = LoggerFactory.getLogger(Mutant.class);
@@ -63,18 +70,23 @@ public class Mutant implements Serializable {
 	private transient ArrayList<String> description = null;
 	private transient Patch difference = null;
 
-	/**
-	 * Creates a mutant
-	 *
-	 * @param gameId
-	 * @param jFile
-	 * @param cFile
-	 * @param alive
-	 * @param playerId
-	 */
+	public Mutant(String javaFilePath, String classFilePath, String md5) {
+		this.javaFile = javaFilePath;
+		this.classFile = classFilePath;
+		this.alive = false;
+		this.gameId = -1;
+		this.playerId = -1;
+		this.roundCreated = -1;
+		this.score = 0;
+		this.md5 = md5;
+	}
+
 	public Mutant(int gameId, String jFile, String cFile, boolean alive, int playerId) {
 		this.gameId = gameId;
-		this.roundCreated = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
+		final DuelGame id = DatabaseAccess.getGameForKey("ID", gameId);
+		if (id != null) {
+			this.roundCreated = id.getCurrentRound();
+		}
 		this.javaFile = jFile;
 		this.classFile = cFile;
 		this.alive = alive;
@@ -83,19 +95,6 @@ public class Mutant implements Serializable {
 		this.md5 = CodeValidator.getMD5FromFile(jFile); // TODO: This may be null
 	}
 
-	/**
-	 * Creates a mutant
-	 *
-	 * @param mid
-	 * @param gid
-	 * @param jFile
-	 * @param cFile
-	 * @param alive
-	 * @param equiv
-	 * @param rCreated
-	 * @param rKilled
-	 * @param playerId
-	 */
 	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId) {
 		this(gid, jFile, cFile, alive, playerId);
 		this.id = mid;
@@ -133,6 +132,18 @@ public class Mutant implements Serializable {
 
 	public String getClassFile() {
 		return classFile;
+	}
+
+	public String getJavaFile() {
+		return javaFile;
+	}
+
+	public int getRoundCreated() {
+		return roundCreated;
+	}
+
+	public String getMd5() {
+		return md5;
 	}
 
 	public String getDirectory() {
@@ -353,6 +364,7 @@ public class Mutant implements Serializable {
 	// Stores values of JavaFile, ClassFile, GameID, RoundCreated in DB. These will not change once input.
 	// Default values for Equivalent (ASSUMED_NO), Alive(1), RoundKilled(NULL) are assigned.
 	// Currently Mutant ID isnt set yet after insertion, if Mutant needs to be used straight away it needs a similar insert method to MultiplayerGame.
+	@Deprecated
 	public boolean insert() {
 		logger.info("Inserting mutant");
 		Connection conn = DB.getConnection();
