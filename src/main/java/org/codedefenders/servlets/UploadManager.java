@@ -4,6 +4,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
@@ -45,6 +46,7 @@ import javax.servlet.http.HttpSession;
 import javassist.ClassPool;
 import javassist.CtClass;
 
+import static org.codedefenders.util.Constants.F_SEP;
 
 /**
  * This {@link HttpServlet} handles the upload of Java class files, which includes file validation and storing.
@@ -78,10 +80,11 @@ public class UploadManager extends HttpServlet {
 
 		boolean isMockingEnabled = false;
 		boolean shouldPrepareAI = false;
-		boolean fromAdmin = false;
 
 		// Used to check whether multiple CUTs are uploaded.
 		int cutId = -1;
+		// The directory in which the CUT is saved in.
+		String cutDir = null;
 		// Used to run tests against the CUT.
 		String cutJavaFilePath = null;
 
@@ -132,7 +135,7 @@ public class UploadManager extends HttpServlet {
 			if (fileName == null) {
 				logger.error("Class upload failed. No class uploaded.");
 				messages.add("Class upload failed. No class uploaded.");
-				abortRequestAndCleanUp(request, response, compiledClasses);
+				abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 				return;
 			}
 
@@ -145,13 +148,13 @@ public class UploadManager extends HttpServlet {
 			if (!fileName.endsWith(".java")) {
 				logger.error("Class upload failed. Given file {} was not a .java file.", fileName);
 				messages.add("The class under test must be a .java file.");
-				abortRequestAndCleanUp(request, response, compiledClasses);
+				abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 				return;
 			}
 
 			if (reservedClassNames.contains(fileName)) {
 				messages.add(fileName + " is a reserved class name, please rename your Java class.");
-				abortRequestAndCleanUp(request, response, compiledClasses);
+				abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 				return;
 			}
 
@@ -160,7 +163,7 @@ public class UploadManager extends HttpServlet {
 			if (fileContent.isEmpty()) {
 				logger.info("Class upload failed. Given Java file {} was empty", fileName);
 				messages.add("File for " + fileName + "content could not be read. Please try again.");
-				abortRequestAndCleanUp(request, response, compiledClasses);
+				abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 				return;
 			}
 
@@ -173,7 +176,7 @@ public class UploadManager extends HttpServlet {
 					    // Upload of second CUT? Abort
                         logger.error("Class upload failed. Multiple classes under test uploaded.");
                         messages.add("Class upload failed. Multiple classes under test uploaded.");
-						abortRequestAndCleanUp(request, response, compiledClasses);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
 					}
 
@@ -183,18 +186,19 @@ public class UploadManager extends HttpServlet {
 					if (GameClassDAO.classNotExistsForAlias(classAlias)) {
 						logger.error("Class upload failed. Given alias {} was already used.", classAlias);
 						messages.add("Class upload failed. Given alias is already used.");
-						abortRequestAndCleanUp(request, response, compiledClasses);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
 					}
 
 					String javaFilePath;
 					try {
-						javaFilePath = storeJavaFile(Constants.CUTS_DIR, classAlias, fileName, fileContent);
+						cutDir = Constants.CUTS_DIR + F_SEP + classAlias;
+						javaFilePath = storeJavaFile(cutDir, fileName, fileContent);
 						cutJavaFilePath = javaFilePath;
 					} catch (IOException e) {
 						logger.error("Could not store java file " + fileName, e);
 						messages.add("Internal error. Sorry about that!");
-						abortRequestAndCleanUp(request, response, compiledClasses);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
 					}
 
@@ -205,7 +209,7 @@ public class UploadManager extends HttpServlet {
 						logger.error("Could not compile {}!\n{}", fileName, e.getMessage());
 						messages.add("Could not compile " + fileName + "!\n" + e.getMessage());
 
-						abortRequestAndCleanUp(request, response, compiledClasses, javaFilePath);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
 						return;
 					}
 
@@ -216,7 +220,7 @@ public class UploadManager extends HttpServlet {
 						logger.error("Could not get fully qualified name for " + fileName, e);
 						messages.add("Internal error. Sorry about that!");
 
-						abortRequestAndCleanUp(request, response, compiledClasses, javaFilePath, classFilePath);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath, classFilePath);
 						return;
 					}
 
@@ -226,7 +230,7 @@ public class UploadManager extends HttpServlet {
 					} catch (Exception e) {
 						logger.error("Class upload failed. Could not store class to database.");
 						messages.add("Internal error. Sorry about that!");
-						abortRequestAndCleanUp(request, response, compiledClasses, javaFilePath, classFilePath);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath, classFilePath);
 						return;
 					}
 
@@ -237,15 +241,15 @@ public class UploadManager extends HttpServlet {
 					if (cutId == -1) {
 						logger.error("Class upload failed. Mutant uploaded, but no class under test.");
 						messages.add("Internal error. Sorry about that!");
-						abortRequestAndCleanUp(request, response, compiledClasses);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
 					}
 					try {
-						javaFilePath = storeJavaFile(Constants.MUTANTS_DIR, classAlias, fileName, fileContent);
+						javaFilePath = storeJavaFile(cutDir + F_SEP + "mutants", fileName, fileContent);
 					} catch (IOException e) {
 						logger.error("Could not store java file " + fileName, e);
 						messages.add("Internal error. Sorry about that!");
-						abortRequestAndCleanUp(request, response, compiledClasses);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
 					}
 
@@ -255,7 +259,7 @@ public class UploadManager extends HttpServlet {
 						logger.error("Could not compile {}!\n{}", fileName, e.getMessage());
 						messages.add("Could not compile " + fileName + "!\n" + e.getMessage());
 
-						abortRequestAndCleanUp(request, response, compiledClasses, javaFilePath);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
 						return;
 					}
 
@@ -268,7 +272,7 @@ public class UploadManager extends HttpServlet {
 						logger.error("Class upload with mutant failed. Could not store mutant to database.");
 						messages.add("Internal error. Sorry about that!");
 
-						abortRequestAndCleanUp(request, response, compiledClasses, javaFilePath, classFilePath);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath, classFilePath);
 						return;
 					}
 
@@ -279,16 +283,16 @@ public class UploadManager extends HttpServlet {
 						logger.error("Class upload failed. Test uploaded, but no class under test.");
 						messages.add("Internal error. Sorry about that");
 
-						abortRequestAndCleanUp(request, response, compiledClasses);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
 					}
 					try {
-						javaFilePath = storeJavaFile(Constants.TESTS_DIR, classAlias, fileName, fileContent);
+						javaFilePath = storeJavaFile(cutDir + F_SEP + "tests", fileName, fileContent);
 					} catch (IOException e) {
 						logger.error("Class upload failed. Could not store java file of test class " + fileName, e);
 						messages.add("Class upload failed. Could not store java file of test class " + fileName);
 
-						abortRequestAndCleanUp(request, response, compiledClasses);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
 					}
 					try {
@@ -297,7 +301,7 @@ public class UploadManager extends HttpServlet {
 						logger.error("Class upload failed. Could not compile {}!\n{}", fileName, e.getMessage());
 						messages.add("Class upload failed. Could not compile " + fileName + "!\n" + e.getMessage());
 
-						abortRequestAndCleanUp(request, response, compiledClasses, javaFilePath);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
 						return;
 					}
 
@@ -307,7 +311,7 @@ public class UploadManager extends HttpServlet {
 						logger.error("Class upload failed. Test " + fileName + " failed", e);
 						messages.add("Class upload failed. Test " + fileName + " failed");
 
-						abortRequestAndCleanUp(request, response, compiledClasses, javaFilePath, classFilePath);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath, classFilePath);
 						return;
 					}
 
@@ -319,7 +323,7 @@ public class UploadManager extends HttpServlet {
 						logger.error("Class upload with mutant failed. Could not store mutant to database.");
 						messages.add("Internal error. Sorry about that!");
 
-						abortRequestAndCleanUp(request, response, compiledClasses, javaFilePath, classFilePath);
+						abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath, classFilePath);
 						return;
 					}
 
@@ -363,16 +367,14 @@ public class UploadManager extends HttpServlet {
 	/**
 	 * Stores a Java file for given parameters on the hard drive.
 	 *
-	 * @param directory The directory for the type of Java file.
-	 * @param folder The folder where the Java file will be stored.
+	 * @param folderPath The path of the folder the Java file will be stored in.
 	 * @param fileName The file name (e.g. {@code MyClass.java}).
 	 * @param fileContent The actual file content.
 	 * @return The path of the newly stored Java file.
 	 * @throws IOException when storing the file fails.
 	 */
-	private String storeJavaFile(String directory, String folder, String fileName, String fileContent) throws IOException {
-		final String folderPath = directory + Constants.F_SEP + folder;
-		final String filePath = folderPath + Constants.F_SEP + fileName;
+	private String storeJavaFile(String folderPath, String fileName, String fileContent) throws IOException {
+		final String filePath = folderPath + F_SEP + fileName;
 		logger.debug("storeJavaFile: folderPath={}", folderPath);
 		logger.debug("storeJavaFile: filePath={}", filePath);
 		try {
@@ -401,54 +403,58 @@ public class UploadManager extends HttpServlet {
      *
      * @param request The handled request.
      * @param response The response of the handled requests.
+	 * @param cutDir The directory in which all files are located.
      * @param compiledClasses A list of {@link CompiledClass}, which will get removed.
+	 * @param files Optional additional files, which need to be removed.
      * @throws IOException When an error during redirecting occurs.
      */
-    private void abortRequestAndCleanUp(HttpServletRequest request, HttpServletResponse response, List<CompiledClass> compiledClasses, String... files) throws IOException {
+    private void abortRequestAndCleanUp(HttpServletRequest request, HttpServletResponse response, String cutDir, List<CompiledClass> compiledClasses, String... files) throws IOException {
 		logger.info("Aborting request...");
-		final List<Integer> cuts = new LinkedList<>();
-		final List<Integer> mutants = new LinkedList<>();
-		final List<Integer> tests = new LinkedList<>();
-		try {
-			for (CompiledClass compiledClass : compiledClasses) {
-				switch (compiledClass.type) {
-					case CUT:
-						cuts.add(compiledClass.id);
-						break;
-					case MUTANT:
-						mutants.add(compiledClass.id);
-						break;
-					case TEST:
-						tests.add(compiledClass.id);
-						break;
-				}
-				Files.delete(Paths.get(compiledClass.javaFile));
-				Files.delete(Paths.get(compiledClass.classFile));
-				try {
-					final Path parentFolder = Paths.get(compiledClass.javaFile).getParent();
-					Files.delete(parentFolder);
-				} catch (DirectoryNotEmptyException ignored) {
-				}
-			}
-			for (String file : files) {
-				logger.info("Removing {} again.", file);
-				Files.delete(Paths.get(file));
+		if (cutDir != null) {
+            final List<Integer> cuts = new LinkedList<>();
+            final List<Integer> mutants = new LinkedList<>();
+            final List<Integer> tests = new LinkedList<>();
+            for (CompiledClass compiledClass : compiledClasses) {
+                switch (compiledClass.type) {
+                    case CUT:
+                        cuts.add(compiledClass.id);
+                        break;
+                    case MUTANT:
+                        mutants.add(compiledClass.id);
+                        break;
+                    case TEST:
+                        tests.add(compiledClass.id);
+                        break;
+                }
+            }
 
-				try {
-					final Path parentFolder = Paths.get(file).getParent();
-					Files.delete(parentFolder);
-				} catch (DirectoryNotEmptyException ignored) {
-				}
-			}
+            try {
+                logger.info("Removing directory {} again", cutDir);
+                FileUtils.forceDelete(new File(cutDir));
+            } catch (IOException e) {
+                // logged, but otherwise ignored. Not need to abort while aborting...
+                logger.error("Error removing directory of compiled classes.", e);
+            }
+            for (String file : files) {
+                logger.info("Removing {} again.", file);
+                try {
+                    Files.delete(Paths.get(file));
+                } catch (IOException ignored) {
+                    // file may have been removed already.
+                }
 
-		} catch (IOException e) {
-			// logged, but otherwise ignored. Not need to abort while aborting...
-			logger.error("Error removing compiled class.", e);
+                try {
+                    final Path parentFolder = Paths.get(file).getParent();
+                    Files.delete(parentFolder);
+                } catch (IOException ignored) {
+                	// folder may have been removed already.
+                }
+            }
+
+            GameClassDAO.removeClassesForIds(cuts);
+            MutantDAO.removeMutantsForIds(mutants);
+            TestDAO.removeTestsForIds(tests);
 		}
-
-		GameClassDAO.removeClassesForIds(cuts);
-		MutantDAO.removeMutantsForIds(mutants);
-		TestDAO.removeTestsForIds(tests);
 
 		Redirect.redirectBack(request, response);
 		logger.info("Aborting request...done");
