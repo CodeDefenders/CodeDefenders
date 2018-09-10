@@ -169,13 +169,13 @@ public class UploadManager extends HttpServlet {
 
 			// Currently, it is just assumed that the class under test is checked first here
 			switch (fieldName) {
-				case "fileUploadCUT":
+				case "fileUploadCUT": {
 					// For superclasses and dependencies, this case has to be adjusted.
-                    // Also, it must be assured that all files, which belong to the cut, are handled first
+					// Also, it must be assured that all files, which belong to the cut, are handled first
 					if (cutId != -1) {
-					    // Upload of second CUT? Abort
-                        logger.error("Class upload failed. Multiple classes under test uploaded.");
-                        messages.add("Class upload failed. Multiple classes under test uploaded.");
+						// Upload of second CUT? Abort
+						logger.error("Class upload failed. Multiple classes under test uploaded.");
+						messages.add("Class upload failed. Multiple classes under test uploaded.");
 						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
 					}
@@ -237,13 +237,15 @@ public class UploadManager extends HttpServlet {
 					logger.debug("Successfully uploaded Class Under Test: {}", classAlias);
 					compiledClasses.add(new CompiledClass(CompileClassType.CUT, cutId, javaFilePath, classFilePath));
 					break;
-				case "fileUploadMutant":
+				}
+				case "fileUploadMutant": {
 					if (cutId == -1) {
 						logger.error("Class upload failed. Mutant uploaded, but no class under test.");
 						messages.add("Internal error. Sorry about that!");
 						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
 					}
+					String javaFilePath;
 					try {
 						javaFilePath = storeJavaFile(cutDir + F_SEP + "mutants", fileName, fileContent);
 					} catch (IOException e) {
@@ -252,7 +254,7 @@ public class UploadManager extends HttpServlet {
 						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
 					}
-
+					String classFilePath;
 					try {
 						classFilePath = Compiler.compileJavaFileForContent(javaFilePath, fileContent);
 					} catch (CompileException e) {
@@ -268,6 +270,7 @@ public class UploadManager extends HttpServlet {
 					final Mutant mutant = new Mutant(javaFilePath, classFilePath, md5);
 					try {
 						mutantId = MutantDAO.storeMutant(mutant);
+						MutantDAO.mapMutantToClass(mutantId, cutId);
 					} catch (Exception e) {
 						logger.error("Class upload with mutant failed. Could not store mutant to database.");
 						messages.add("Internal error. Sorry about that!");
@@ -278,7 +281,8 @@ public class UploadManager extends HttpServlet {
 
 					compiledClasses.add(new CompiledClass(CompileClassType.MUTANT, mutantId, javaFilePath, classFilePath));
 					break;
-				case "fileUploadTest":
+				}
+				case "fileUploadTest": {
 					if (cutId == -1) {
 						logger.error("Class upload failed. Test uploaded, but no class under test.");
 						messages.add("Internal error. Sorry about that");
@@ -286,6 +290,7 @@ public class UploadManager extends HttpServlet {
 						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
 					}
+					String javaFilePath;
 					try {
 						javaFilePath = storeJavaFile(cutDir + F_SEP + "tests", fileName, fileContent);
 					} catch (IOException e) {
@@ -295,6 +300,7 @@ public class UploadManager extends HttpServlet {
 						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
 					}
+					String classFilePath;
 					try {
 						classFilePath = Compiler.compileJavaTestFileForContent(javaFilePath, fileContent, cutJavaFilePath);
 					} catch (CompileException e) {
@@ -319,6 +325,7 @@ public class UploadManager extends HttpServlet {
 					final Test test = new Test(javaFilePath, classFilePath);
 					try {
 						testId = TestDAO.storeTest(test);
+						TestDAO.mapTestToClass(testId, cutId);
 					} catch (Exception e) {
 						logger.error("Class upload with mutant failed. Could not store mutant to database.");
 						messages.add("Internal error. Sorry about that!");
@@ -329,6 +336,7 @@ public class UploadManager extends HttpServlet {
 
 					compiledClasses.add(new CompiledClass(CompileClassType.TEST, testId, javaFilePath, classFilePath));
 					break;
+				}
 				default:
 					logger.warn("Unrecognized parameter: " + fieldName);
 					break;
@@ -451,9 +459,9 @@ public class UploadManager extends HttpServlet {
                 }
             }
 
-            GameClassDAO.removeClassesForIds(cuts);
             MutantDAO.removeMutantsForIds(mutants);
             TestDAO.removeTestsForIds(tests);
+            GameClassDAO.removeClassesForIds(cuts);
 		}
 
 		Redirect.redirectBack(request, response);
