@@ -3,6 +3,7 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.singleplayer.PrepareAI" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.database.GameClassDAO" %>
 <% String pageTitle=null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div>
@@ -59,6 +60,7 @@
 				<tr>
 					<th class="col-sm-1 col-sm-offset-2">ID</th>
 					<th>Class name (alias)</th>
+					<th>Available tests/mutants</th>
 					<th>Mutation Difficulty</th>
 					<th>Testing Difficulty</th>
 				</tr>
@@ -96,6 +98,7 @@
 									</div>
 								</div>
 							</td>
+							<td><%=GameClassDAO.getMappedTestsForId(c.getId()).size()%>/<%=GameClassDAO.getMappedMutantsForId(c.getId()).size()%></td>
 							<td><%=mutationDiff > 0 ? String.valueOf(mutationDiff) : ""%></td>
 							<td><%=testingDiff > 0 ? String.valueOf(testingDiff) : ""%></td>
 							<!--
