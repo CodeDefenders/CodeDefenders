@@ -127,8 +127,8 @@ CREATE TABLE `games` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 # Dummy game for upload of tests and mutants together with a class
-INSERT INTO games (ID)
-VALUES (-1);
+INSERT INTO games (ID, State)
+VALUES (-1, 'FINISHED');
 
 --
 -- Table structure for table `mutants`
@@ -161,11 +161,11 @@ CREATE UNIQUE INDEX mutants_Game_ID_MD5_index ON mutants (Game_ID, MD5);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Mapping between mutants and the class the mutants are mutated from
+-- Mapping between mutants and the class the mutants are uploaded together with
 --
 
 DROP TABLE IF EXISTS `mutant_belongs_to_class`;
-CREATE TABLE `mutants_belongs_to_class` (
+CREATE TABLE `mutant_belongs_to_class` (
   `Class_ID`  int(11),
   `Mutant_ID` int(11),
   PRIMARY KEY (`Class_ID`, `Mutant_ID`),
@@ -206,7 +206,7 @@ CREATE UNIQUE INDEX players_User_ID_Game_ID_uindex ON players (User_ID, Game_ID)
 --
 
 INSERT INTO `players` (`ID`, `User_ID`, `Game_ID`)
-VALUES (-1, -1, -1), #
+VALUES (-1, -1, -1),
        (-2, -2, -1),
        (-3, -3, -1);
 
@@ -263,11 +263,11 @@ CREATE TABLE `tests` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Mapping between tests and the class the test are created for
+-- Mapping between tests and the class the test are uplaoded together with
 --
 
 DROP TABLE IF EXISTS `test_belongs_to_class`;
-CREATE TABLE `tests_belongs_to_class` (
+CREATE TABLE `test_belongs_to_class` (
   `Class_ID` int(11),
   `Test_ID`  int(11),
   PRIMARY KEY (`Class_ID`, `Test_ID`),
