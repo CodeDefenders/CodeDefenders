@@ -1,11 +1,10 @@
 package org.codedefenders.game;
 
 /**
- * Created by gordon on 20/02/2017.
+ * This enumeration shows different kinds of difficulty levels a game can have.
  */
 public enum GameLevel {
     EASY,
-    // TODO: Medium has no usage
-    MEDIUM,
+    MEDIUM, // FIXME: Medium is never used.
     HARD
 }
