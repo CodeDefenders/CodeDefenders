@@ -92,7 +92,7 @@ DROP TABLE IF EXISTS `games`;
 CREATE TABLE `games` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Class_ID` int(11) DEFAULT NULL,
-  `Level` enum('EASY','MEDIUM','HARD') DEFAULT NULL,
+  `Level` enum('EASY','MEDIUM','HARD') DEFAULT 'HARD',
   `Timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `Creator_ID` int(11) DEFAULT NULL,
   `Prize` int(11) DEFAULT NULL,
