@@ -1,6 +1,8 @@
 package org.codedefenders.database;
 
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -8,6 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -43,6 +46,72 @@ public class GameClassDAO {
             logger.error("Error while retrieving classes for alias.", e);
             return false;
         }
+    }
+
+    /**
+     * Return a {@link List} of all identifiers of {@link Mutant}s, which were uploaded
+     * together with a given class.
+     *
+     * @param classId the identifier of the given class
+     * @return a list of identifiers of mutants
+     */
+    public static List<Integer> getMappedMutantsForId(Integer classId) {
+        List<Integer> mutantIds = new LinkedList<>();
+
+        String query = "SELECT Mutant_ID FROM mutant_belongs_to_class WHERE Class_ID = ?;";
+
+        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+
+        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
+        if (resultSet == null) {
+            return mutantIds;
+        }
+        try {
+            while (resultSet.next()) {
+                final int mutantId = resultSet.getInt("Mutant_ID");
+                mutantIds.add(mutantId);
+            }
+        } catch (SQLException e) {
+            logger.error("Error during retrieval of mapped mutants for classId:{}", classId);
+        }
+
+        return mutantIds;
+    }
+
+    /**
+     * Return a {@link List} of all identifiers of {@link Test}s, which were uploaded
+     * together with a given class.
+     *
+     * @param classId the identifier of the given class
+     * @return a list of identifiers of tests
+     */
+    public static List<Integer> getMappedTestsForId(Integer classId) {
+        List<Integer> testIds = new LinkedList<>();
+
+        String query = "SELECT Test_ID FROM test_belongs_to_class WHERE Class_ID = ?;";
+
+        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+
+        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
+        if (resultSet == null) {
+            return testIds;
+        }
+        try {
+            while (resultSet.next()) {
+                final int testId = resultSet.getInt("Test_ID");
+                testIds.add(testId);
+            }
+        } catch (SQLException e) {
+            logger.error("Error during retrieval of mapped tests for classId:{}", classId);
+        }
+
+        return testIds;
     }
 
     /**
