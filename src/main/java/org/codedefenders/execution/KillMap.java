@@ -18,6 +18,9 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+
+import static org.codedefenders.execution.KillMap.KillMapEntry.Status.*;
 
 /**
  * Maps tests to their killed mutants in a finished game.
@@ -33,7 +36,7 @@ public class KillMap {
 
     private static boolean USE_COVERAGE = true;
     private static boolean PARALLELIZE = true;
-    private final static int NUM_THREADS = 20;
+    private final static int NUM_THREADS = 40;
     /* TODO Put this into config.properties? MutationTester also has hard-coded number of threads. */
 
     /* Get settings if they are set, otherwise use defaults. */
@@ -83,8 +86,8 @@ public class KillMap {
      */
     private KillMap(List<Test> tests, List<Mutant> mutants, int classId, List<KillMapEntry> entries,
                     BiFunction<Test, Mutant, Boolean> filter) {
-        this.tests = tests;
-        this.mutants = mutants;
+        this.tests = new ArrayList<>(tests);
+        this.mutants = new ArrayList<>(mutants);
         this.classId = classId;
         this.indexOfTest = new TreeMap<>(Test.orderByIdDescending());
         this.indexOfMutant = new TreeMap<>(Mutant.orderByIdDescending());
@@ -122,7 +125,7 @@ public class KillMap {
         Instant startTime = Instant.now();
 
         List<Future<KillMapEntry>> executionResults = new LinkedList<>();
-        ExecutorService executor = PARALLELIZE ? Executors.newFixedThreadPool(8) : Executors.newSingleThreadExecutor();
+        ExecutorService executor = PARALLELIZE ? Executors.newFixedThreadPool(NUM_THREADS) : Executors.newSingleThreadExecutor();
 
         if (Thread.currentThread().isInterrupted()) {
             executor.shutdownNow();
@@ -192,8 +195,8 @@ public class KillMap {
                     List<Mutant> mutants = game.getMutants();
                     List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForGame(game.getId());
 
-                    logger.info(String.format("Computing killmap for game %d: %d tests, %d mutants",
-                            game.getId(), tests.size(), mutants.size()));
+                    logger.info(String.format("Computing killmap for game %d: %d tests, %d mutants, %d entries provided",
+                            game.getId(), tests.size(), mutants.size(), entries.size()));
 
                     KillMap killmap = new KillMap(tests, mutants, game.getClassId(), entries, NO_FILTER);
                     killmap.compute(recalculate, NO_FILTER);
@@ -227,8 +230,8 @@ public class KillMap {
             List<Mutant> mutants = DatabaseAccess.getMutantsForClass(classId);
             List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForClass(classId);
 
-            logger.info(String.format("Computing killmap for class %d: %d tests, %d mutants",
-                    classId, tests.size(), mutants.size()));
+            logger.info(String.format("Computing killmap for class %d: %d tests, %d mutants, %d entries provided",
+                    classId, tests.size(), mutants.size(), entries.size()));
 
             KillMap killmap = new KillMap(tests, mutants, classId, entries, NO_FILTER);
             killmap.compute(recalculate, NO_FILTER);
@@ -242,8 +245,8 @@ public class KillMap {
      * The tests and mutants must belong to the same class (with the same class id).
      * This operation is blocking and may take a long time,
      *
-     * @param tests The tests to get the killmap for.
-     * @param mutants The mutants to get the killmap for.
+     * @param tests The tests to get the killmap for. The list must not include a mutant twice.
+     * @param mutants The mutants to get the killmap for. The list must not include a test twice.
      * @param classId The class id of the class the tests and mutants belong to.
      * @param entries Already computed entries for the killmap.
      * @param recalculate Recalculate the whole killmap, even if it was already calculated before.
@@ -256,8 +259,8 @@ public class KillMap {
                                     throws InterruptedException, ExecutionException {
         /* Synchronized, so only one killmap can be computed at a time. */
         synchronized (KillMap.class) {
-            logger.info(String.format("Computing killmap: %d tests, %d mutants",
-                    tests.size(), mutants.size()));
+            logger.info(String.format("Computing killmap: %d tests, %d mutants, %d entries provided",
+                    tests.size(), mutants.size(), entries.size()));
 
             KillMap killmap = new KillMap(tests, mutants, classId, entries, filter);
             killmap.compute(recalculate, filter);
@@ -357,7 +360,7 @@ public class KillMap {
     /**
      * Executes a test against a mutant, inserts the result into the DB, and returns the result.
      */
-    private class TestVsMutantCallable implements Callable<KillMapEntry> {
+    private static class TestVsMutantCallable implements Callable<KillMapEntry> {
         private Test test;
         private Mutant mutant;
         private int classId;
@@ -380,10 +383,10 @@ public class KillMap {
                 KillMapEntry.Status status;
 
                 switch (executedTarget.status) {
-                    case "FAIL":    status = KillMapEntry.Status.KILL; break;
-                    case "SUCCESS": status = KillMapEntry.Status.NO_KILL; break;
-                    case "ERROR":   status = KillMapEntry.Status.ERROR; break;
-                    default:        status = KillMapEntry.Status.UNKNOWN; break;
+                    case "FAIL":    status = KILL;      break;
+                    case "SUCCESS": status = NO_KILL;   break;
+                    case "ERROR":   status = ERROR;     break;
+                    default:        status = UNKNOWN;   break;
                 }
 
                 entry = new KillMapEntry(test, mutant, status);
@@ -408,7 +411,8 @@ public class KillMap {
             NO_KILL,
             /** Test doesn't cover mutant. Only used if "mutant.coverage" is enabled. */
             NO_COVERAGE,
-            /** An error occured during execution. */
+            /** An error occured during execution. If no errors occured elsewhere, then this means,
+             *  that the test execution resulted in an exception (and the mutant was killed). */
             ERROR,
             /** Status is unknown. */
             UNKNOWN
