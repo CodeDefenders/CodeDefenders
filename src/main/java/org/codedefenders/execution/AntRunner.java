@@ -474,6 +474,7 @@ public class AntRunner {
 			cg.create( c );
 		} catch (IOException e) {
 			e.printStackTrace();
+			return null;
 		}
 
 		LineCoverage lc = new LineCoverage();
