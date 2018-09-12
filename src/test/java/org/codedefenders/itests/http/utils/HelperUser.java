@@ -2,7 +2,6 @@ package org.codedefenders.itests.http.utils;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.HttpMethod;
-import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
@@ -31,11 +30,13 @@ public class HelperUser {
 	private User user;
 	private WebClient browser;
 	private String codedefendersHome;
+	private String password;
 
-	public HelperUser(User user, WebClient browser, String codedefendersHome) {
+	public HelperUser(User user, WebClient browser, String codedefendersHome, String password) {
 		this.user = user;
 		this.browser = browser;
 		this.codedefendersHome = codedefendersHome;
+		this.password = password;
 	}
 
 	public User getUser() {
@@ -47,8 +48,8 @@ public class HelperUser {
 		WebRequest registerRequest = new WebRequest(new URL(codedefendersHome + "/login"), HttpMethod.POST);
 		registerRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 				new NameValuePair("formType", "create"), new NameValuePair("username", user.getUsername()),
-				new NameValuePair("email", user.getEmail()), new NameValuePair("password", user.getPassword()),
-				new NameValuePair("confirm", user.getPassword()), }));
+				new NameValuePair("email", user.getEmail()), new NameValuePair("password", password),
+				new NameValuePair("confirm", password), }));
 		return browser.getPage(registerRequest);
 
 	}
@@ -58,7 +59,7 @@ public class HelperUser {
 		// // Then we set the request parameters
 		loginRequest.setRequestParameters(Arrays.asList(new NameValuePair[] { new NameValuePair("formType", "login"),
 				new NameValuePair("username", user.getUsername()),
-				new NameValuePair("password", user.getPassword()), }));
+				new NameValuePair("password", password), }));
 		// Finally, we can get the page
 		HtmlPage retunToGamePage = browser.getPage(loginRequest);
 	}

@@ -248,24 +248,24 @@ public class MutationTesterTest {
 	public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException, InterruptedException {
 
 		// Create the users, game, and such
-		User observer = new User("observer", "password", "demo@observer.com");
+		User observer = new User("observer", User.encodePassword("password"), "demo@observer.com");
 		observer.insert();
 
 		User[] attackers = new User[3];
-		attackers[0] = new User("demoattacker", "password", "demo@attacker.com");
+		attackers[0] = new User("demoattacker", User.encodePassword("password"), "demo@attacker.com");
 		attackers[0].insert();
-		attackers[1] = new User("demoattacker1", "password", "demo1@attacker.com");
+		attackers[1] = new User("demoattacker1", User.encodePassword("password"), "demo1@attacker.com");
 		attackers[1].insert();
-		attackers[2] = new User("demoattacker2", "password", "demo2@attacker.com");
+		attackers[2] = new User("demoattacker2", User.encodePassword("password"), "demo2@attacker.com");
 		attackers[2].insert();
 
 		//
 		User[] defenders = new User[3];
-		defenders[0] = new User("demodefender", "password", "demo@defender.com");
+		defenders[0] = new User("demodefender", User.encodePassword("password"), "demo@defender.com");
 		defenders[0].insert();
-		defenders[1] = new User("demodefender1", "password", "demo1@defender.com");
+		defenders[1] = new User("demodefender1", User.encodePassword("password"), "demo1@defender.com");
 		defenders[1].insert();
-		defenders[2] = new User("demodefender2", "password", "demo2@defender.com");
+		defenders[2] = new User("demodefender2", User.encodePassword("password"), "demo2@defender.com");
 		defenders[2].insert();
 
 		// Taken from Game 232

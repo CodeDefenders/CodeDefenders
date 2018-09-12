@@ -20,8 +20,7 @@ public class AdminDAO {
     private static final Logger logger = LoggerFactory.getLogger(AdminDAO.class);
     private static final String UNASSIGNED_USERS_QUERY =
             "SELECT DISTINCT\n" +
-                    "  users.User_ID,\n" +
-                    "  users.Username\n" +
+                    "  users.*,\n" +
                     "FROM\n" +
                     "  users\n" +
                     "WHERE users.User_ID > 2 AND users.User_ID NOT IN (\n" +
@@ -293,7 +292,7 @@ public class AdminDAO {
         List<User> activeUsers = new ArrayList<User>();
         try {
             while (rs.next()) {
-                User userRecord = new User(rs.getString("Username"), "");
+                User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"), rs.getBoolean("Active"));
                 userRecord.setId(rs.getInt("User_ID"));
                 activeUsers.add(userRecord);
             }
