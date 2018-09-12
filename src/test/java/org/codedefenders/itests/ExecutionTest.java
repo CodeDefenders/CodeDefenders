@@ -158,11 +158,11 @@ public class ExecutionTest {
         // MOVE THIS CODE TO BEFORE OF FACTORY METHOD
         ArrayList<String> messages = new ArrayList<String>();
         // Create the users
-        User observer = new User("observer", "password", "demo@observer.com");
+        User observer = new User("observer", User.encodePassword("password"), "demo@observer.com");
         observer.insert();
-        User attacker = new User("demoattacker", "password", "demo@attacker.com");
+        User attacker = new User("demoattacker", User.encodePassword("password"), "demo@attacker.com");
         attacker.insert();
-        User defender = new User("demodefender", "password", "demo@defender.com");
+        User defender = new User("demodefender", User.encodePassword("password"), "demo@defender.com");
         defender.insert();
         // CUT
         File cutFolder = new File(Constants.CUTS_DIR, "XmlElement");

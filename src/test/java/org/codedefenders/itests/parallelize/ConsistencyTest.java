@@ -178,11 +178,11 @@ public class ConsistencyTest {
 	 */
 	@Test
 	public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException, InterruptedException {
-		User observer = new User("observer", "password", "demo@observer.com");
+		User observer = new User("observer", User.encodePassword("password"), "demo@observer.com");
 		observer.insert();
 		//
 		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Observer " + observer.getId());
-		User attacker = new User("demoattacker", "password", "demo@attacker.com");
+		User attacker = new User("demoattacker", User.encodePassword("password"), "demo@attacker.com");
 		attacker.insert();
 		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Attacker" + attacker.getId());
 		//
@@ -190,7 +190,7 @@ public class ConsistencyTest {
 		//
 		User[] defenders = new User[3];
 		for (int i = 0; i < defenders.length; i++) {
-			defenders[i] = new User("demodefender" + i, "password", "demo"+i+"@defender.com");
+			defenders[i] = new User("demodefender" + i, User.encodePassword("password"), "demo"+i+"@defender.com");
 			defenders[i].insert();
 			System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Defender " + defenders[i].getId());
 		}
