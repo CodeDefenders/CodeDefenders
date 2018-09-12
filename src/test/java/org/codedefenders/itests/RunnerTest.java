@@ -35,7 +35,6 @@ import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -63,10 +62,10 @@ public class RunnerTest {
 
 	@Before // BeforeClass has to be static...
 	public void createEntities() {
-		user1 = new User("FREE_USERNAME", "TEST_PASSWORD", "TESTMAIL@TEST.TEST");
-		user2 = new User("FREE_USERNAME2", "TEST_PASSWORD2", "TESTMAIL@TEST.TEST2");
+		user1 = new User("FREE_USERNAME", User.encodePassword("TEST_PASSWORD"), "TESTMAIL@TEST.TEST");
+		user2 = new User("FREE_USERNAME2", User.encodePassword("TEST_PASSWORD2"), "TESTMAIL@TEST.TEST2");
 		//
-		creator = new User(4, "FREE_USERNAME3", "TEST_PASSWORD3", "TESTMAIL@TEST.TEST3");
+		creator = new User(4, "FREE_USERNAME3", User.encodePassword("TEST_PASSWORD3"), "TESTMAIL@TEST.TEST3");
 		//
 		cut1 = new GameClass("MyClass", "", "", "");
 		cut2 = new GameClass("", "AliasForClass2", "", "");
@@ -104,8 +103,6 @@ public class RunnerTest {
 
 	@Test
 	public void testInsertUser() throws Exception {
-		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
 		assertTrue(user1.insert());
 		User userFromDB = DatabaseAccess.getUser(user1.getId());
 		assertEquals(user1.getId(), userFromDB.getId());
@@ -113,28 +110,26 @@ public class RunnerTest {
 		assertEquals(user1.getEmail(), userFromDB.getEmail());
 		// FIXME this is never written to the DB
 		// assertEquals(user1.isValidated(), userFromDB.isValidated());
-		assertTrue(passwordEncoder.matches(user1.getPassword(), userFromDB.getPassword()));
-		assertNotEquals("Password should not be stored in plain text", user1.getPassword(), userFromDB.getPassword());
+		assertTrue(User.passwordMatches("TEST_PASSWORD", userFromDB.getEncodedPassword()));
+		assertNotEquals("Password should not be stored in plain text", "TEST_PASSWORD", userFromDB.getEncodedPassword());
 		// FIXME Split this in two tests
 		// assertFalse("Inserting a user twice should fail", user1.insert());
 	}
 
 	@Test
 	public void testUpdateUser() {
-		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
 		assumeTrue(user1.insert());
 
-		user1.setPassword(passwordEncoder.encode(user1.getPassword() + "_new"));
+		user1.setEncodedPassword(User.encodePassword("TEST_PASSWORD" + "_new"));
 		user1.setUsername(user1.getUsername() + "_new");
 		user1.setEmail(user1.getEmail() + "_new");
 
-		assertTrue(user1.update(user1.getPassword()));
+		assertTrue(user1.update());
 		User userFromDB = DatabaseAccess.getUser(user1.getId());
 		assertEquals(user1.getId(), userFromDB.getId());
 		assertEquals(user1.getUsername(), userFromDB.getUsername());
 		assertEquals(user1.getEmail(), userFromDB.getEmail());
-		assertEquals(user1.getPassword(), userFromDB.getPassword());
+		assertEquals(user1.getEncodedPassword(), userFromDB.getEncodedPassword());
 	}
 
 	@Test

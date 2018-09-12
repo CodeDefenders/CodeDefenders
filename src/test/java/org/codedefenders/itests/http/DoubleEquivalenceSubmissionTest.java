@@ -164,10 +164,12 @@ public class DoubleEquivalenceSubmissionTest {
 
 	class HelperUser {
 		private User user;
+		private String password;
 		private WebClient browser;
 
-		public HelperUser(User user) {
+		public HelperUser(User user, String password) {
 			this.user = user;
+			this.password = password;
 			this.browser = WebClientFactory.getNewWebClient();
 		}
 
@@ -176,7 +178,7 @@ public class DoubleEquivalenceSubmissionTest {
 			// // Then we set the request parameters
 			loginRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 					new NameValuePair("formType", "login"), new NameValuePair("username", user.getUsername()),
-					new NameValuePair("password", user.getPassword()), }));
+					new NameValuePair("password", password), }));
 			// Finally, we can get the page
 			HtmlPage retunToGamePage = browser.getPage(loginRequest);
 		}
@@ -366,8 +368,8 @@ public class DoubleEquivalenceSubmissionTest {
 	@Ignore
 	@Test
 	public void doubleSubmissionTest() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-		User creatorUser = new User("creator", "test");
-		HelperUser creator = new HelperUser(creatorUser);
+		User creatorUser = new User("creator");
+		HelperUser creator = new HelperUser(creatorUser, "test");
 		creator.doLogin();
 		System.out.println("Creator Login");
 		//
@@ -376,16 +378,16 @@ public class DoubleEquivalenceSubmissionTest {
 		//
 		creator.startGame(newGameId);
 		//
-		User attackerUser = new User("demoattacker", "test");
-		HelperUser attacker = new HelperUser(attackerUser);
+		User attackerUser = new User("demoattacker");
+		HelperUser attacker = new HelperUser(attackerUser, "test");
 		attacker.doLogin();
 		System.out.println("Attacker Login");
 		//
 		attacker.joinOpenGame(newGameId, true);
 		System.out.println("Attacker Join game " + newGameId);
 		//
-		User defenderUser = new User("demodefender", "test");
-		HelperUser defender = new HelperUser(defenderUser);
+		User defenderUser = new User("demodefender");
+		HelperUser defender = new HelperUser(defenderUser, "test");
 		defender.doLogin();
 		//
 		System.out.println("Defender Login");
@@ -394,8 +396,8 @@ public class DoubleEquivalenceSubmissionTest {
 		//
 		System.out.println("Defender Join game " + newGameId);
 		//
-		User defender2User = new User("demodefender2", "test");
-		HelperUser defender2 = new HelperUser(defender2User);
+		User defender2User = new User("demodefender");
+		HelperUser defender2 = new HelperUser(defender2User, "test");
 		defender2.doLogin();
 		//
 		System.out.println("Defender 2 Login");
