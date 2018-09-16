@@ -5,17 +5,17 @@
 <div class="ws-12">
 	<div class="col-md-6" id="cut-div">
 		<h3>Class Under Test</h3>
-		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30"><%=mg.getCUT().getAsString()%></textarea></pre>
+		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30"><%=game.getCUT().getAsString()%></textarea></pre>
 		<%@include file="/jsp/multiplayer/game_key.jsp"%>
 	</div> <!-- col-md6 left -->
 	<div class="col-md-6" id="utest-div" style="float: right; min-width: 480px">
 		<h3>Write a new JUnit test here
 			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def" onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
-					<% if (!mg.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>
+					<% if (!game.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>
 				Defend!
 			</button>
 		</h3>
-		<form id="def" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
+		<form id="def" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post">
 			<%
 				String testCode;
 				String previousTestCode = (String) request.getSession().getAttribute("previousTest");
@@ -23,11 +23,11 @@
 				if (previousTestCode != null) {
 					testCode = previousTestCode;
 				} else
-					testCode = mg.getCUT().getTestTemplate();
+					testCode = game.getCUT().getTestTemplate();
 			%>
 			<pre><textarea id="code" name="test" cols="80" rows="30"><%= testCode %></textarea></pre>
 			<input type="hidden" name="formType" value="createTest">
-			<input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
+			<input type="hidden" name="mpGameID" value="<%= game.getId() %>" />
 		</form>
 	</div> <!-- col-md6 right top -->
 </div> <!-- 	row-fluid 1 -->
@@ -43,7 +43,7 @@
         testMethods = ["assertArrayEquals", "assertEquals", "assertTrue", "assertFalse", "assertNull",
             "assertNotNull", "assertSame", "assertNotSame", "fail"];
         <%
-        if(mg.getCUT().isMockingEnabled()) {
+        if(game.getCUT().isMockingEnabled()) {
         %>
         mockitoMethods = ["mock", "when", "then", "thenThrow", "doThrow", "doReturn", "doNothing"];
         // Answer object handling is currently not included (Mockito.doAnswer(), OngoingStubbing.then/thenAnswer

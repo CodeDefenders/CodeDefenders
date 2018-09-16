@@ -141,13 +141,13 @@ public class GameManager extends HttpServlet {
 						logger.warn("Swallow Exception", e);
 						messages.add(TEST_GENERIC_ERROR_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect(request.getContextPath()+"/play");
+						response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 						return;
 					}
 					if (newTest == null) {
 						messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect(request.getContextPath()+"/play");
+						response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 						return;
 					}
 
@@ -174,13 +174,13 @@ public class GameManager extends HttpServlet {
 									logger.info("Test {} failed to kill mutant {}", newTest.getId(), mutant.getId());
 									messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
 								}
-								response.sendRedirect(request.getContextPath()+"/play");
+								response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 								return;
 							} else {
 								activeGame.endRound();
 								activeGame.update();
 								messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
-								response.sendRedirect(request.getContextPath()+"/play");
+								response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 								return;
 							}
 						} else {
@@ -204,7 +204,7 @@ public class GameManager extends HttpServlet {
 						messages.add(MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 						activeGame.endRound();
 						activeGame.update();
-						response.sendRedirect(request.getContextPath()+"/play");
+						response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 						return;
 					}
 				}
@@ -332,7 +332,7 @@ public class GameManager extends HttpServlet {
 					logger.warn("Swallow Exception", e);
 					messages.add(TEST_GENERIC_ERROR_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect(request.getContextPath()+"/play");
+					response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 					return;
 				}
 
@@ -340,7 +340,7 @@ public class GameManager extends HttpServlet {
 				if (newTest == null) {
 					messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect(request.getContextPath()+"/play");
+					response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 					return;
 				}
 				logger.debug("New Test " + newTest.getId());
@@ -376,7 +376,7 @@ public class GameManager extends HttpServlet {
 				break;
 		}
 
-		response.sendRedirect(request.getContextPath()+"/play");//doGet(request, response);
+		response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());//doGet(request, response);
 	}
 
 	public static String getMutantValidityMessage(int cid, String mutatedCode, CodeValidator.CodeValidatorLevel codeValidatorLevel) throws IOException {

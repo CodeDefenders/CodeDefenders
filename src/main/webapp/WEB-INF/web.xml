@@ -121,7 +121,7 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>gameManager</servlet-name>
-		<url-pattern>/play</url-pattern>
+		<url-pattern>/duelgame</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -311,7 +311,7 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>multiplayerGameManager</servlet-name>
-		<url-pattern>/multiplayer/move</url-pattern>
+		<url-pattern>/multiplayergame</url-pattern>
 	</servlet-mapping>
 	<!-- end multiplayer servlets -->
 

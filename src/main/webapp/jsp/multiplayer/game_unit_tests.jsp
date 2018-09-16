@@ -8,7 +8,7 @@
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="java.util.Set" %>
 
-<% if (role.equals(Role.DEFENDER) || role.equals(Role.CREATOR) || mg.getLevel().equals(GameLevel.EASY) || mg.getState().equals(GameState.FINISHED)){
+<% if (role.equals(Role.DEFENDER) || role.equals(Role.CREATOR) || game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED)){
 %>
 <div class="ws-12">
     <h3>JUnit tests </h3>

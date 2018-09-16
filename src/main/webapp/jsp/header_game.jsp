@@ -10,6 +10,8 @@ pageTitle = null;
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
+<% DuelGame game = (DuelGame) session.getAttribute("game"); %>
+
 <div class="game-container"><h2 class="full-width page-title" style="text-align: center"><%= pTitle %></h2>
 <nav>
     <div class="container-fluid">

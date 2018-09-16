@@ -10,27 +10,27 @@
 
         <h2>Class Under Test</h2>
 		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30">
-<%=mg.getCUT().getAsString()%>
+<%=game.getCUT().getAsString()%>
 		</textarea></pre>
 
         <div class="admin-panel">
             <h2>Admin</h2>
-            <form id="adminEndBtn" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
+            <form id="adminEndBtn" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post">
 
                     <button type="submit" class="btn btn-primary btn-game btn-right" id="endGame" form="adminEndBtn"
-                            <% if (!mg.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>
+                            <% if (!game.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>
                         End Game
                     </button>
                     <input type="hidden" name="formType" value="endGame">
-                    <input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
+                    <input type="hidden" name="mpGameID" value="<%= game.getId() %>" />
             </form>
-            <form id="adminStartBtn" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
+            <form id="adminStartBtn" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post">
                     <button type="submit" class="btn btn-primary btn-game btn-right" id="startGame" form="adminStartBtn"
-                            <% if (!mg.getState().equals(GameState.CREATED)) { %> disabled <% } %>>
+                            <% if (!game.getState().equals(GameState.CREATED)) { %> disabled <% } %>>
                         Start Game
                     </button>
                     <input type="hidden" name="formType" value="startGame">
-                    <input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
+                    <input type="hidden" name="mpGameID" value="<%= game.getId() %>" />
             </form>
         </div>
     </div>

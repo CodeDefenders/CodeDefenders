@@ -70,7 +70,7 @@
 					</div>
 				</td>
 				<td>
-					<form id="equivalenceForm" action="<%=request.getContextPath() %>/play" method="post">
+					<form id="equivalenceForm" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() %>" method="post">
 					<input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= m.getId() %>">
 					<input type="hidden" name="formType" value="resolveEquivalence">
 					<div class="btn-right">

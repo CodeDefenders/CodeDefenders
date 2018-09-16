@@ -30,7 +30,7 @@ if (role == Role.ATTACKER && true){
         %><div>
 			<h3>Mutant <%=equiv.getId() %> Claimed Equivalent</h3>
 			<div class="nest crow fly" style="border: 5px dashed #f00; border-radius: 10px; width: 100%;">
-				<form id="equivalenceForm" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
+				<form id="equivalenceForm" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post">
 					<input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= equiv.getId() %>">
 					<input type="hidden" name="formType" value="resolveEquivalence">
 					<%
@@ -41,7 +41,7 @@ if (role == Role.ATTACKER && true){
 										mutTestCode = mutPreviousTestCode;
 									} else {
 										String equivText = "// " + equiv.getPatchString().replace("\n", "\n// ").trim() + "\n";
-										mutTestCode = equivText + mg.getCUT().getTestTemplate();
+										mutTestCode = equivText + game.getCUT().getTestTemplate();
 									}
 					%>
 					<pre><textarea id="mutantSut" name="test" cols="80" rows="30"><%= mutTestCode %></textarea></pre>
@@ -119,8 +119,8 @@ if (role == Role.ATTACKER && true){
 								<td class="col-sm-1">
 									<% if (role.equals(Role.DEFENDER)
 											&& m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
-											&& !mg.getState().equals(GameState.FINISHED)
-											&& (m.isCovered() || mg.isMarkUncovered())){
+											&& !game.getState().equals(GameState.FINISHED)
+											&& (m.isCovered() || game.isMarkUncovered())){
 											if( m.getLines().size() > 1 ){%>
 											<a href="<%=request.getContextPath() %>/multiplayer/play?equivLines=<%=m.getLines().toString().replaceAll(", ", ",")%>"
 											 class="btn btn-default btn-diff"
@@ -136,7 +136,7 @@ if (role == Role.ATTACKER && true){
 									if (m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){
 										%><span>Flagged Equivalent</span><%
 									}%>
-									<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || mg.getLevel().equals(GameLevel.EASY) || mg.getState() == GameState.FINISHED){ %>
+									<% if (role.equals(Role.ATTACKER) || role.equals(Role.CREATOR) || game.getLevel().equals(GameLevel.EASY) || game.getState() == GameState.FINISHED){ %>
 										<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
 									<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
 										 style="z-index: 10000;">

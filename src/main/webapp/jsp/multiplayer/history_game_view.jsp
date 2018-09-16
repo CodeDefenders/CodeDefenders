@@ -35,14 +35,14 @@
 
     String codeDivName = "cut-div";
 
-    MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
-    Role role = mg.getRole(uid);
+    MultiplayerGame game = DatabaseAccess.getMultiplayerGame(gameId);
+    Role role = game.getRole(uid);
 
-    if ((!mg.getState().equals(GameState.FINISHED))) {
+    if ((!game.getState().equals(GameState.FINISHED))) {
         response.sendRedirect(request.getContextPath()+"/games/user");
     }
 
-    List<Test> tests = mg.getTests(); // get all executable tests
+    List<Test> tests = game.getTests(); // get all executable tests
 
     // compute line coverage information
     for (Test t : tests) {
@@ -62,11 +62,11 @@
     }
 
     int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
-    List<Mutant> mutantsAlive = mg.getAliveMutants();
-    List<Mutant> mutants = mg.getMutants();
+    List<Mutant> mutantsAlive = game.getAliveMutants();
+    List<Mutant> mutants = game.getMutants();
 
-    List<Mutant> mutantsPending = mg.getMutantsMarkedEquivalentPending();
-    List<Mutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();
+    List<Mutant> mutantsPending = game.getMutantsMarkedEquivalentPending();
+    List<Mutant> mutantsEquiv =  game.getMutantsMarkedEquivalent();
 
     Map<Integer, List<Mutant>> mutantLines = new HashMap<>();
     Map<Integer, List<Mutant>> mutantEquivPending = new HashMap<>();
@@ -97,7 +97,7 @@
 //    }
 	mutantsAlive.addAll(mutantsPending);
 
-    List<Mutant> mutantsKilled = mg.getKilledMutants();
+    List<Mutant> mutantsKilled = game.getKilledMutants();
 
     for (Mutant m : mutantsKilled) {
         for (int line : m.getLines()){
@@ -122,7 +122,7 @@
         <div class="w-55" id="newmut-div">
                 <h3>Class Under Test</h3>
                 <input type="hidden" name="formType" value="createMutant">
-                <input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
+                <input type="hidden" name="mpGameID" value="<%= game.getId() %>" />
                 <%
                     String mutantCode;
                     String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
@@ -130,7 +130,7 @@
                     if (previousMutantCode != null) {
                         mutantCode = previousMutantCode;
                     } else
-                        mutantCode = mg.getCUT().getAsString();
+                        mutantCode = game.getCUT().getAsString();
                 %>
                 <pre><textarea id="code" name="mutant" cols="80" rows="50" style="min-width: 512px;"><%= mutantCode %></textarea></pre>
             <script>
