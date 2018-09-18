@@ -36,3 +36,12 @@ ALTER TABLE `tests`
   ADD `Class_ID` int(11) DEFAULT NULL,
   ADD CONSTRAINT FOREIGN KEY (`Class_ID`) REFERENCES classes (`Class_ID`);
 
+
+-- Update the index from Game_ID and MD5 to Game_ID, Class_ID and MD5
+-- because mutants may not be unique for dummy game (-1)
+
+DROP INDEX mutants_Game_ID_MD5_index
+ON mutants;
+
+CREATE UNIQUE INDEX mutants_Game_ID_Class_ID_MD5_index
+  ON mutants (Game_ID, Class_ID, MD5);

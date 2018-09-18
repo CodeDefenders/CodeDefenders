@@ -159,7 +159,7 @@ CREATE TABLE `mutants` (
   CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_classId_muts` FOREIGN KEY (`Class_ID`) REFERENCES classes (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
-CREATE UNIQUE INDEX mutants_Game_ID_MD5_index ON mutants (Game_ID, MD5);
+CREATE UNIQUE INDEX mutants_Game_ID_Class_ID_MD5_index ON mutants (Game_ID, Class_ID, MD5);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
