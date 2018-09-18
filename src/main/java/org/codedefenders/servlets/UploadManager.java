@@ -241,7 +241,7 @@ public class UploadManager extends HttpServlet {
 				case "fileUploadMutant": {
 					if (cutId == -1) {
 						logger.error("Class upload failed. Mutant uploaded, but no class under test.");
-						messages.add("Internal error. Sorry about that!");
+						messages.add("Class upload failed. Mutant uploaded, but no class under test.");
 						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
 					}
@@ -284,7 +284,7 @@ public class UploadManager extends HttpServlet {
 				case "fileUploadTest": {
 					if (cutId == -1) {
 						logger.error("Class upload failed. Test uploaded, but no class under test.");
-						messages.add("Internal error. Sorry about that");
+						messages.add("Class upload failed. Test uploaded, but no class under test.");
 
 						abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
 						return;
