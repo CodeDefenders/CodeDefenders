@@ -105,7 +105,7 @@
 							<td>
 								<form id="aiPrepButton<%= c.getId() %>" action="<%=request.getContextPath() %>/ai_preparer" method="post" >
 									<button type="submit" class="btn btn-primary btn-game btn-right" form="aiPrepButton<%= c.getId() %>" onClick="this.form.submit(); this.disabled=true; this.value='Preparing...';"
-											<% if (PrepareAI.isPrepared(c)) { %> disabled <% } %>>
+											<% //if (PrepareAI.isPrepared(c)) { %> disabled <% //} %>>
 										Prepare AI
 									</button>
 									<input type="hidden" name="formType" value="runPrepareAi" />
