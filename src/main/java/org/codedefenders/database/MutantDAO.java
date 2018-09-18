@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -35,8 +34,9 @@ public class MutantDAO {
         int playerId = mutant.getPlayerId();
         int score = mutant.getScore();
         String md5 = mutant.getMd5();
+        Integer classId = mutant.getClassId();
 
-        String query = "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5, Class_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
         DatabaseValue[] valueList = new DatabaseValue[]{
                 DB.getDBV(javaFile),
                 DB.getDBV(classFile),
@@ -45,7 +45,9 @@ public class MutantDAO {
                 DB.getDBV(sqlAlive),
                 DB.getDBV(playerId),
                 DB.getDBV(score),
-                DB.getDBV(md5)};
+                DB.getDBV(md5),
+                (classId == null) ? null : DB.getDBV(classId)
+        };
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
@@ -65,10 +67,10 @@ public class MutantDAO {
      * @return {@code true} whether storing the mapping was successful, {@code false} otherwise.
      */
     public static boolean mapMutantToClass(Integer mutantId, Integer classId) {
-        String query = "INSERT INTO mutant_belongs_to_class (Mutant_ID, Class_ID) VALUES (?, ?)";
+        String query = "UPDATE mutants SET Class_ID = ? WHERE Mutant_ID = ?";
         DatabaseValue[] valueList = new DatabaseValue[]{
-                DB.getDBV(mutantId),
-                DB.getDBV(classId)
+                DB.getDBV(classId),
+                DB.getDBV(mutantId)
         };
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -83,11 +85,9 @@ public class MutantDAO {
      * @return {@code true} for successful removal, {@code false} otherwise.
      */
     public static boolean removeMutantForId(Integer id) {
-        String query = "DELETE FROM mutants WHERE Mutant_ID = ?;" +
-                "DELETE FROM mutant_belongs_to_class WHERE Mutant_ID = ?";
+        String query = "DELETE FROM mutants WHERE Mutant_ID = ?;";
         DatabaseValue[] valueList = new DatabaseValue[]{
                 DB.getDBV(id),
-                DB.getDBV(id)
         };
 
         Connection conn = DB.getConnection();
@@ -114,11 +114,8 @@ public class MutantDAO {
         bob.append("?);");
 
         final String range = bob.toString();
-        String query = "DELETE FROM mutants WHERE Mutant_ID in " + range +
-                "DELETE FROM mutant_belongs_to_class WHERE Mutant_ID in " + range;
+        String query = "DELETE FROM mutants WHERE Mutant_ID in " + range;
 
-        // Hack to make sure all values are listed in both 'ranges'.
-        mutants.addAll(new LinkedList<>(mutants));
         DatabaseValue[] valueList = mutants.stream().map(DB::getDBV).toArray(DatabaseValue[]::new);
 
         Connection conn = DB.getConnection();

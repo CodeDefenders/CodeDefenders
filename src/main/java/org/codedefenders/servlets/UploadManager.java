@@ -267,10 +267,9 @@ public class UploadManager extends HttpServlet {
 
 					Integer mutantId;
 					final String md5 = CodeValidator.getMD5FromText(fileContent);
-					final Mutant mutant = new Mutant(javaFilePath, classFilePath, md5);
+					final Mutant mutant = new Mutant(javaFilePath, classFilePath, md5, cutId);
 					try {
 						mutantId = MutantDAO.storeMutant(mutant);
-						MutantDAO.mapMutantToClass(mutantId, cutId);
 					} catch (Exception e) {
 						logger.error("Class upload with mutant failed. Could not store mutant to database.");
 						messages.add("Internal error. Sorry about that!");
@@ -322,10 +321,9 @@ public class UploadManager extends HttpServlet {
 					}
 
 					Integer testId;
-					final Test test = new Test(javaFilePath, classFilePath);
+					final Test test = new Test(javaFilePath, classFilePath, cutId);
 					try {
 						testId = TestDAO.storeTest(test);
-						TestDAO.mapTestToClass(testId, cutId);
 					} catch (Exception e) {
 						logger.error("Class upload with mutant failed. Could not store mutant to database.");
 						messages.add("Internal error. Sorry about that!");

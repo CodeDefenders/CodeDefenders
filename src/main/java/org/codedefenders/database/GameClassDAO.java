@@ -58,7 +58,7 @@ public class GameClassDAO {
     public static List<Integer> getMappedMutantsForId(Integer classId) {
         List<Integer> mutantIds = new LinkedList<>();
 
-        String query = "SELECT Mutant_ID FROM mutant_belongs_to_class WHERE Class_ID = ?;";
+        String query = "SELECT Mutant_ID FROM mutants WHERE Class_ID = ?;";
 
         DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
 
@@ -76,6 +76,8 @@ public class GameClassDAO {
             }
         } catch (SQLException e) {
             logger.error("Error during retrieval of mapped mutants for classId:{}", classId);
+        } finally {
+            DB.cleanup(conn, stmt);
         }
 
         return mutantIds;
@@ -91,7 +93,7 @@ public class GameClassDAO {
     public static List<Integer> getMappedTestsForId(Integer classId) {
         List<Integer> testIds = new LinkedList<>();
 
-        String query = "SELECT Test_ID FROM test_belongs_to_class WHERE Class_ID = ?;";
+        String query = "SELECT Test_ID FROM tests WHERE Class_ID = ?;";
 
         DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
 
@@ -109,6 +111,8 @@ public class GameClassDAO {
             }
         } catch (SQLException e) {
             logger.error("Error during retrieval of mapped tests for classId:{}", classId);
+        } finally {
+            DB.cleanup(conn, stmt);
         }
 
         return testIds;

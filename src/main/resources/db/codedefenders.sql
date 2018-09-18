@@ -151,29 +151,16 @@ CREATE TABLE `mutants` (
   `NumberAiKillingTests` int(11) DEFAULT '0', /* If an original ai mutant, killcount. Number of killing tests in game otherwise. */
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Points` int(11) DEFAULT '0',
+  `Class_ID` int(11) DEFAULT NULL, -- If Game_ID is -1, the mutant was uploaded together with referenced class
   PRIMARY KEY (`Mutant_ID`),
   KEY `fk_gameId_idx` (`Game_ID`),
   KEY `fk_playerId_idx` (`Player_ID`),
   CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_classId_muts` FOREIGN KEY (`Class_ID`) REFERENCES classes (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX mutants_Game_ID_MD5_index ON mutants (Game_ID, MD5);
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Mapping between mutants and the class the mutants are uploaded together with
---
-
-DROP TABLE IF EXISTS `mutant_belongs_to_class`;
-CREATE TABLE `mutant_belongs_to_class` (
-  `Class_ID`  int(11),
-  `Mutant_ID` int(11),
-  PRIMARY KEY (`Class_ID`, `Mutant_ID`),
-  FOREIGN KEY (`Class_ID`) REFERENCES classes (`Class_ID`),
-  FOREIGN KEY (`Mutant_ID`) REFERENCES mutants (`Mutant_ID`)
-)
-  ENGINE = InnoDB
-  CHARSET = utf8;
 
 --
 -- Table structure for table `players`
@@ -253,29 +240,16 @@ CREATE TABLE `tests` (
   `Lines_Covered` longtext,
   `Lines_Uncovered` longtext,
   `Points` int(11) DEFAULT '0',
+  `Class_ID` int(11) DEFAULT NULL, -- If Game_ID is -1, the test was uploaded together with referenced class
   PRIMARY KEY (`Test_ID`),
   KEY `fk_playerId_idx` (`Player_ID`),
   KEY `fk_gameId_tests_idx` (`Game_ID`),
   KEY `fk_playerId_tests_idx` (`Player_ID`),
   CONSTRAINT `fk_gameId_tests` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_classId_tests` FOREIGN KEY (`Class_ID`) REFERENCES classes (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Mapping between tests and the class the test are uplaoded together with
---
-
-DROP TABLE IF EXISTS `test_belongs_to_class`;
-CREATE TABLE `test_belongs_to_class` (
-  `Class_ID` int(11),
-  `Test_ID`  int(11),
-  PRIMARY KEY (`Class_ID`, `Test_ID`),
-  FOREIGN KEY (`Class_ID`) REFERENCES classes (`Class_ID`),
-  FOREIGN KEY (`Test_ID`) REFERENCES tests (`Test_ID`)
-)
-  ENGINE = InnoDB
-  CHARSET = utf8;
 
 --
 -- Table structure for table `usedaimutants`

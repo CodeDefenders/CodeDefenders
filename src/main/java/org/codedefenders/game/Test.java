@@ -41,19 +41,35 @@ public class Test {
 	private String javaFile;
 	private String classFile;
 
+	/**
+	 * Identifier of the class this test is created for.
+	 * Of type {@link Integer}, because the classId can be {@code null}.
+	 */
+	private Integer classId;
+
 	private int roundCreated;
 	private int mutantsKilled;
 	private int score;
 	private int aiMutantsKilled; // how many generated mutants this test killed.
 	private LineCoverage lineCoverage = new LineCoverage();
 
-	public Test(String javaFilePath, String classFilePath) {
+	/**
+	 * Creates a new Test with following attributes:
+	 * <ul>
+	 * <li><code>gameId -1</code></li>
+	 * <li><code>playerId -1</code></li>
+	 * <li><code>roundCreated -1</code></li>
+	 * <li><code>score 0</code></li>
+	 * </ul>
+	 */
+	public Test(String javaFilePath, String classFilePath, int classId) {
 		this.javaFile = javaFilePath;
 		this.classFile = classFilePath;
 		this.gameId = -1;
 		this.playerId = -1;
-		this.score = 0;
 		this.roundCreated = -1;
+		this.score = 0;
+		this.classId = classId;
 	}
 
 	public Test(int gameId, String javaFile, String classFile, int playerId) {
@@ -89,11 +105,11 @@ public class Test {
 	// TODO Check that increment score does not consider mutants that were killed already
 	public void incrementScore(int score) {
 		if (score == 0) {
-			// Why this is appenining?
+			// Why this is happening?
 			logger.warn("Do not increment score for test {} when score is zero", getId());
 			return;
-
 		}
+
 		String query = "UPDATE tests SET Points = Points + ? WHERE Test_ID=?;";
 		Connection conn = DB.getConnection();
 
@@ -304,10 +320,6 @@ public class Test {
 		return classFile;
 	}
 
-	public void setClassFile(String classFile) {
-		this.classFile = classFile;
-	}
-
 	public LineCoverage getLineCoverage() {
 		return lineCoverage;
 	}
@@ -323,6 +335,10 @@ public class Test {
 
 	public int getScore() {
 		return score;
+	}
+
+	public Integer getClassId() {
+		return classId;
 	}
 
 	@Deprecated
