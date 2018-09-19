@@ -1,23 +1,18 @@
 package org.codedefenders.execution;
 
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.JavaFileObject;
 
-import java.io.IOException;
 import java.io.StringWriter;
-import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.tools.JavaCompiler;
-import javax.tools.JavaFileObject;
-import javax.tools.SimpleJavaFileObject;
 import javax.tools.ToolProvider;
 
 /**
  * This class handles compilation of Java classes using the
- * native {@link JavaCompiler}. This class includes a static internal class {@link JavaFile}.
+ * native {@link JavaCompiler}. This class includes a static internal class {@link JavaFileObject}.
  * <p>
  * Offering static methods, java files can be compiled, either by reading the file
  * content from the hard disk or providing it. The resulting {@code .class} is returned.
@@ -26,7 +21,7 @@ import javax.tools.ToolProvider;
  *
  * @author <a href=https://github.com/werli>Phil Werli<a/>
  * @see CompileException
- * @see JavaFile
+ * @see JavaFileObject
  */
 public class Compiler {
 
@@ -39,7 +34,7 @@ public class Compiler {
      * @throws CompileException If an error during compilation occurs.
      */
     public static String compileJavaFile(String javaFilePath) throws CompileException {
-        return compileJavaFile(new JavaFile(javaFilePath));
+        return compileJavaFile(new JavaFileObject(javaFilePath));
     }
 
     /**
@@ -52,7 +47,7 @@ public class Compiler {
      * @throws CompileException If an error during compilation occurs.
      */
     public static String compileJavaFileForContent(String javaFilePath, String javaFileContent) throws CompileException {
-        return compileJavaFile(new JavaFile(javaFilePath, javaFileContent));
+        return compileJavaFile(new JavaFileObject(javaFilePath, javaFileContent));
     }
 
     /**
@@ -62,12 +57,12 @@ public class Compiler {
      * {@code javac} requires no options, but here, somehow the standard tomcat directory
      * is used, so the option {@code -d} is required.
      */
-    private static String compileJavaFile(JavaFile javaFile) throws CompileException {
-        final String outDir = javaFile.path.substring(0, javaFile.path.lastIndexOf("/"));
+    private static String compileJavaFile(JavaFileObject javaFile) throws CompileException {
+        final String outDir = javaFile.getPath().substring(0, javaFile.getPath().lastIndexOf("/"));
         javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
         final StringWriter writer = new StringWriter();
-        final List<? extends JavaFileObject> compilationUnits = Arrays.asList(javaFile);
+        final List<? extends javax.tools.JavaFileObject> compilationUnits = Arrays.asList(javaFile);
         final List<String> options = Arrays.asList(
                 "-encoding", "UTF-8",
                 "-d", outDir
@@ -77,7 +72,7 @@ public class Compiler {
 
         final Boolean success = task.call();
         if (success) {
-            return javaFile.path.replace(".java", ".class");
+            return javaFile.getPath().replace(".java", ".class");
         } else {
             throw new CompileException(writer.toString());
         }
@@ -99,7 +94,7 @@ public class Compiler {
         if (javaCutFilePath == null) {
             throw new IllegalArgumentException("File path of provided class under test must not be null.");
         }
-        return compileJavaTestFile(new JavaFile(javaTestFilePath), javaCutFilePath);
+        return compileJavaTestFile(new JavaFileObject(javaTestFilePath), javaCutFilePath);
     }
 
     /**
@@ -120,22 +115,22 @@ public class Compiler {
         if (javaCutFilePath == null) {
             throw new IllegalArgumentException("File path of provided class under test must not be null.");
         }
-        return compileJavaTestFile(new JavaFile(javaFilePath, javaFileContent), javaCutFilePath);
+        return compileJavaTestFile(new JavaFileObject(javaFilePath, javaFileContent), javaCutFilePath);
     }
 
     /**
-     * Just like {@link #compileJavaFile(JavaFile)}, but includes JUnit, Hamcrest and
+     * Just like {@link #compileJavaFile(JavaFileObject)}, but includes JUnit, Hamcrest and
      * Mockito libraries required for running the tests.
      */
-    private static String compileJavaTestFile(JavaFile testFile, String javaCutFilePath) throws CompileException {
-        final String outDir = testFile.path.substring(0, testFile.path.lastIndexOf("/"));
+    private static String compileJavaTestFile(JavaFileObject testFile, String javaCutFilePath) throws CompileException {
+        final String outDir = testFile.getPath().substring(0, testFile.getPath().lastIndexOf("/"));
         final String cutDir = javaCutFilePath.substring(0, javaCutFilePath.lastIndexOf("/"));
         final String classPath = String.format(Constants.TEST_CLASSPATH_WITH_DIR, cutDir);
 
         javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
         final StringWriter writer = new StringWriter();
-        final List<? extends JavaFileObject> compilationUnits = Arrays.asList(testFile);
+        final List<? extends javax.tools.JavaFileObject> compilationUnits = Arrays.asList(testFile);
 
         final List<String> options = Arrays.asList(
                 "-encoding", "UTF-8",
@@ -147,61 +142,9 @@ public class Compiler {
 
         final Boolean success = task.call();
         if (success) {
-            return testFile.path.replace(".java", ".class");
+            return testFile.getPath().replace(".java", ".class");
         } else {
             throw new CompileException(writer.toString());
         }
     }
-
-    /**
-     * {@link SimpleJavaFileObject} implementation, which allows for reading file content
-     * from memory (by calling constructor with path <i>and</i> content) or reading
-     * the file content from the hard-disk (by calling constructor just with path).
-     * <p>
-     * Inherited attributes {@code uri} and {@code kind}.
-     */
-    private static class JavaFile extends SimpleJavaFileObject {
-        private String path;
-        private String content;
-
-        /**
-         * Constructor for reading file content.
-         *
-         * @param path File path.
-         */
-        JavaFile(String path) {
-            super(URI.create("file:///" + path), JavaFileObject.Kind.SOURCE);
-            this.path = path;
-            this.content = null;
-        }
-
-        /**
-         * Constructor with file content already given.
-         *
-         * @param path    File path.
-         * @param content File content.
-         */
-        JavaFile(String path, String content) {
-            super(URI.create("file:///" + path), JavaFileObject.Kind.SOURCE);
-            this.path = path;
-            this.content = content;
-        }
-
-        /**
-         * Returns the content of the java file. If no content is specified yet, the
-         * file content is read from the hard disk.
-         *
-         * @param ignoreEncodingErrors ignored to match parent method signature
-         * @return the content of the java file.
-         * @throws IOException when reading the file fails.
-         */
-        @Override
-        public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
-            if (content == null) {
-                content = String.join("\n", Files.readAllLines(Paths.get(uri)));
-            }
-            return content;
-        }
-    }
-
 }
