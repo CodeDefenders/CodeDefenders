@@ -902,9 +902,9 @@ public class DatabaseAccess {
                 String lucs = rs.getString("Lines_Uncovered");
                 List<Integer> covered = new ArrayList<>();
                 List<Integer> uncovered = new ArrayList<>();
-                if(lcs != null)
+                if(lcs != null && !"".equals(lcs))
                     covered.addAll(Arrays.stream(lcs.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
-                if(lucs != null)
+                if(lucs != null && !"".equals(lucs))
                     uncovered.addAll(Arrays.stream(lucs.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
 
                 Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"),
