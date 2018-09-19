@@ -40,10 +40,10 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             int uid = (Integer) session.getAttribute("uid");
             String sId = request.getParameter("id");
             int gameId = Integer.parseInt(sId);
-            MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
+            MultiplayerGame game = DatabaseAccess.getMultiplayerGame(gameId);
 
-            if (mg != null) {
-                mg.notifyPlayers();
+            if (game != null) {
+                game.notifyPlayers();
                 String redirect = contextPath + "/multiplayer/play?id=" + gameId;
                 if (request.getParameter("attacker") != null) {
                     redirect += "&attacker=1";
@@ -173,7 +173,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 					break;
 				}
 				// Redirect to the game selection menu.
-				response.sendRedirect(contextPath + "/multiplayer/games");
+				response.sendRedirect(contextPath + "/games/user");
 			} catch (Throwable e) {
 				e.printStackTrace();
 				// TODO: handle exception
@@ -200,7 +200,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                         messages.add("An error occured while leaving game " +
                                 gameId);
                     }// Redirect to the game selection menu.
-                    response.sendRedirect(contextPath+"/multiplayer/games");
+                    response.sendRedirect(contextPath+"/games/user");
                     break;
                 default:
                     System.err.println("Action not recognised");
