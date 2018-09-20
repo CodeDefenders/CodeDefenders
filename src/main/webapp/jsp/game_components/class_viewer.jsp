@@ -1,20 +1,18 @@
 <%--
-    Parameters:
-    AbstractGame game
---%>
+    Displays the class code in a read-only CodeMirror textarea.
 
-<%@ page import="org.codedefenders.game.AbstractGame" %>
+    @param String classCode
+        The source code of the class to display.
+--%>
 
 <% { %>
 
-<%-- TODO Rename to "game" once the global game vairable has been removed --%>
-<% AbstractGame gameTODORENAME = (AbstractGame) request.getAttribute("game");  %>
+<%
+    String classCode = (String) request.getAttribute("classCode");
+%>
 
-<h3>Class Under Test</h3>
 <pre class="readonly-pre">
-    <textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30">
-        <%= gameTODORENAME.getCUT().getAsString() %>
-    </textarea>
+    <textarea class="readonly-textarea" id="sut" name="cut" title="cut" cols="80" rows="30"><%= classCode %></textarea>
 </pre>
 
 <script>

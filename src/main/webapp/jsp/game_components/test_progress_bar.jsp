@@ -1,12 +1,18 @@
 <%--
-    Parameters:
-    none
+    Adds a JavaScript function progressBar() that inserts and updates a progressbar showing the status of the last
+    submitted test. The progressbar is inserted after #logout. It reads the test status from /notifications.
+
+    @param Integer gameId The id of the game.
 --%>
 
 <% { %>
 
+<%
+    Integer gameIdTODORENAME = (Integer) request.getAttribute("gameId");
+%>
+
 <script>
-    var updateProgressBar = function(url) {
+    var updateProgressBar = function (url) {
         var progressBarDiv = document.getElementById("progress-bar");
         $.get(url, function (r) {
                 $(r).each(function (index) {
@@ -27,7 +33,7 @@
         );
     };
 
-    function progressBar() {
+    var progressBar = function () {
         // Create the Div to host events if that's not there
         if (document.getElementById("progress-bar") == null) {
             // Load the progress bar
@@ -42,7 +48,7 @@
             form.parentNode.insertBefore(progressBar, form.nextSibling);
         }
         // Do a first request right away, such that compilation of this test is hopefully not yet started. This one will set the session...
-        var updateURL = "<%= request.getContextPath()%>/notifications?type=<%=NotificationType.PROGRESSBAR%>&gameId=" + <%=gameId%> +"&isDefender=1";
+        var updateURL = "<%= request.getContextPath()%>/notifications?type=<%=NotificationType.PROGRESSBAR%>&gameId=" + <%= gameIdTODORENAME %> +"&isDefender=1";
         updateProgressBar(updateURL);
 
         // Register the requests to start in 1 sec
