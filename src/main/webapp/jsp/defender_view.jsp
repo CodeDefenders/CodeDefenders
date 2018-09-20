@@ -43,6 +43,7 @@
 	request.setAttribute("markEquivalent", true);
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
+	request.setAttribute("gameType", "DUEL");
 %>
 
 <%

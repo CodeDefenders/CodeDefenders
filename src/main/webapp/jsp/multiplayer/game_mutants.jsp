@@ -10,6 +10,7 @@
 	request.setAttribute("markEquivalent", role == Role.DEFENDER);
 	request.setAttribute("markUncoveredEquivalent", game.isMarkUncovered());
 	request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY || role == Role.ATTACKER);
+	request.setAttribute("gameType", "PARTY");
 %>
 
 <div class="ws-12 up" id="mutants-div">

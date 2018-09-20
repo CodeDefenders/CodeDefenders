@@ -7,23 +7,31 @@
 <%--
     Displays three tabs with a list of alive, killed and equivalent mutants respectively.
 
-    @param Boolean markEquivalent Enable marking mutants as equivalent.
-    @param Boolean markUncoveredEquivalent Enable marking uncovered mutants as equivalent, only works with markEquivalent.
-    @param Boolean viewDiff Enable viewing of the mutants diffs.
-    @param List<Mutant> mutantsAlive The list of alive Mutants to display.
-    @param List<Mutant> mutantsKilled The list of killed Mutants to display.
-    @param List<Mutant> mutantsEquivalent The list of equivalent Mutants to display.
+    @param Boolean markEquivalent
+        Enable marking mutants as equivalent.
+    @param Boolean markUncoveredEquivalent
+        Enable marking uncovered mutants as equivalent, only works with markEquivalent.
+    @param Boolean viewDiff
+        Enable viewing of the mutants diffs.
+    @param List<Mutant> mutantsAlive
+        The list of alive Mutants to display.
+    @param List<Mutant> mutantsKilled
+        The list of killed Mutants to display.
+    @param List<Mutant> mutantsEquivalent
+        The list of equivalent Mutants to display.
+    @param String gameType
+        Type of the game. Used for the "Claim Equivalent" URLs and dialog message.
+        TODO find a better solution for this
 --%>
-
 
 <%
     List<Mutant> mutantsAliveTODORENAME = (List<Mutant>) request.getAttribute("mutantsAlive");
     List<Mutant> mutantsKilledTODORENAME = (List<Mutant>) request.getAttribute("mutantsKilled");
     List<Mutant> mutantsEquivalentTODORENAME = (List<Mutant>) request.getAttribute("mutantsEquivalent");
-
     Boolean markEquivalent = (Boolean) request.getAttribute("markEquivalent");
     Boolean markUncoveredEquivalent = (Boolean) request.getAttribute("markUncoveredEquivalent");
     Boolean viewDiff = (Boolean) request.getAttribute("viewDiff");
+    String gameType = (String) request.getAttribute("gameType");
 %>
 
 <% { %>
@@ -79,17 +87,27 @@
                                     if (markEquivalent
                                         && m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
                                         && (markUncoveredEquivalent || m.isCovered())) {
-                                        if( m.getLines().size() > 1 ){
+                                        if ("PARTY".equals(gameType)) {
+                                            if (m.getLines().size() > 1) {
                                 %>
-                                <a href="<%= request.getContextPath() %>/multiplayer/play?equivLines=<%=m.getLines().toString().replaceAll(", ", ",") %>"
-                                   class="btn btn-default btn-diff"
-                                   onclick="return confirm('This will mark all mutants on lines <%=m.getLines()%> as equivalent. Are you sure?');">
-                                    Claim Equivalent</a>
-                                <% } else { %>
-                                <a  href="<%= request.getContextPath() %>/multiplayer/play?equivLine=<%=m.getLines().get(0) %>"
-                                   class="btn btn-default btn-diff"
-                                   onclick="return confirm('This will mark all mutants on line <%=m.getLines().get(0)%> as equivalent. Are you sure?');">
-                                    Claim Equivalent</a>
+                                                <a href="<%= request.getContextPath() %>/multiplayer/play?equivLines=<%=m.getLines().toString().replaceAll(", ", ",") %>"
+                                                   class="btn btn-default btn-diff"
+                                                   onclick="return confirm('This will mark all mutants on lines <%= m.getLines() %> as equivalent. Are you sure?');">
+                                                    Claim Equivalent</a>
+                                                <% } else { %>
+                                                <a  href="<%= request.getContextPath() %>/multiplayer/play?equivLine=<%= m.getLines().get(0) %>"
+                                                   class="btn btn-default btn-diff"
+                                                   onclick="return confirm('This will mark all mutants on line <%= m.getLines().get(0) %> as equivalent. Are you sure?');">
+                                                    Claim Equivalent</a>
+                                <%
+                                            }
+                                        } else if ("DUEL".equals(gameType)) {
+                                %>
+                                            <form id="equiv" action="<%=request.getContextPath() %>/duelgame" method="post" onsubmit="return confirm('This will mark mutant <%= m.getId() %> as equivalent. Are you sure?');">
+                                                <input type="hidden" name="formType" value="claimEquivalent">
+                                                <input type="hidden" name="mutantId" value="<%=m.getId()%>">
+                                                <button type="submit" class="btn btn-default btn-right">Claim Equivalent</button>
+                                            </form>
                                 <%
                                         }
                                     }
