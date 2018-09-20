@@ -20,10 +20,11 @@
 
 <%-- Set request attributes for the components. --%>
 <%
-	/* classCode */
+	/* class_viewer */
 	request.setAttribute("classCode", game.getCUT().getAsString());
+	request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
 
-	/* testCode */
+	/* test_editor */
 	String previousTestCode = (String) request.getSession().getAttribute("previousTest");
 	request.getSession().removeAttribute("previousTest");
 	if (previousTestCode != null) {
@@ -32,8 +33,16 @@
 		request.setAttribute("testCode", game.getCUT().getTestTemplate());
 	}
 
-	/* mockingEnabled */
-	request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
+	/* tests_carousel */
+	request.setAttribute("tests", game.getTests());
+
+	/* mutants_list */
+    request.setAttribute("mutantsAlive", game.getAliveMutants());
+    request.setAttribute("mutantsKilled", game.getKilledMutants());
+    request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
+	request.setAttribute("markEquivalent", true);
+    request.setAttribute("markUncoveredEquivalent", false);
+    request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
 %>
 
 <%
@@ -67,7 +76,7 @@
 	<div class="col-md-6" id="cut-div">
 		<h3>Class Under Test</h3>
 		<%@include file="game_components/class_viewer.jsp"%>
-	</div> <!-- col-md6 left -->
+	</div>
 
 	<div class="col-md-6" id="utest-div">
 		<h3>Write a new JUnit test here
@@ -79,188 +88,37 @@
 			<%@include file="game_components/test_editor.jsp"%>
 			<input type="hidden" name="formType" value="createTest">
 		</form>
-	</div> <!-- col-md6 right top -->
+	</div>
 
-</div> <!-- row-fluid 1 -->
+</div>
 
 <div class="row-fluid">
 	<div class="col-md-6" id="submitted-div">
 		<h3>JUnit tests </h3>
-		<div class="slider single-item">
-			<%
-				Role role = game.getRole(uid);
+		<%@include file="game_components/tests_carousel.jsp"%>
+	</div>
 
-				String codeDivName = "cut-div";
-				HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<Integer, ArrayList<Test>>();
-				List<Test> tests = game.getTests();
-
-				for (Test t : tests) {
-
-					for (Integer lc : t.getLineCoverage().getLinesCovered()){
-						if (!linesCovered.containsKey(lc)){
-							linesCovered.put(lc, new ArrayList<Test>());
-						}
-
-						linesCovered.get(lc).add(t);
-					}
-
-					String tc = "";
-					for (String l : t.getHTMLReadout()) { tc += l + "\n"; }
-			%>
-			<div><h4>Test <%= t.getId() %></h4><pre class="readonly-pre"><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
-			<%
-				}
-				if (tests.isEmpty()) {%>
-			<div><h3></h3><p> There are currently no tests </p></div>
-			<%}
-			%>
-		</div> <!-- slider single-item -->
-	</div> <!-- col-md-6 left bottom -->
 	<div class="col-md-6" id="mutants-div">
 		<h3>Mutants</h3>
-		<!-- Nav tabs -->
-		<ul class="nav nav-tabs" role="tablist">
-			<li class="active">
-				<a href="#mutalivetab" role="tab" data-toggle="tab">Alive</a>
-			</li>
-			<li>
-				<a href="#mutkilledtab" role="tab" data-toggle="tab">Killed</a>
-			</li>
-		</ul>
-		<div class="tab-content">
-			<div class="tab-pane fade active in" id="mutalivetab">
-				<table class="table table-striped table-responsive table-paragraphs">
-					<%
-						List<Mutant> mutantsAlive = game.getAliveMutants();
-
-						List<Mutant> mutantsEquiv =  game.getMutantsMarkedEquivalent();
-
-						Map<Integer, List<Mutant>> mutantLines = new HashMap<Integer, List<Mutant>>();
-
-						for (Mutant m : mutantsAlive) {
-							for (int line : m.getLines()){
-								if (!mutantLines.containsKey(line)){
-									mutantLines.put(line, new ArrayList<Mutant>());
-								}
-								mutantLines.get(line).add(m);
-							}
-						}
-
-						if (! mutantsAlive.isEmpty()) {
-						for (Mutant m : mutantsAlive) {
-					%>
-					<tr>
-						<td>
-							<h4>Mutant <%= m.getId() %></h4>
-						</td>
-						<td>
-							<% if (game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED)) { %>
-							<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
-							<% } %>
-							<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
-								<div class="modal-dialog">
-									<!-- Modal content-->
-									<div class="modal-content">
-										<div class="modal-header">
-											<button type="button" class="close" data-dismiss="modal">&times;</button>
-											<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
-										</div>
-										<div class="modal-body">
-											<pre class="readonly-pre"><textarea class="mutdiff" id="diff<%=m.getId()%>"><%=m.getPatchString()%></textarea></pre>
-										</div>
-										<div class="modal-footer">
-											<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</td>
-						<td >
-							<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Role.DEFENDER)) {%>
-							<form id="equiv" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post">
-								<input type="hidden" name="formType" value="claimEquivalent">
-								<input type="hidden" name="mutantId" value="<%=m.getId()%>">
-								<button type="submit" class="btn btn-default btn-right">Claim Equivalent</button>
-							</form>
-							<%}%>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="3">
-							<% for (String change :	m.getHTMLReadout()) { %>
-							<p><%=change%><p>
-								<% } %>
-						</td>
-					</tr>
-					<%
-						}
-					} else {%>
-					<tr class="blank_row">
-						<td class="row-borderless" colspan="2">No mutants alive.</td>
-					</tr>
-					<%}
-					%>
-				</table>
-			</div>
-			<div class="tab-pane fade" id="mutkilledtab">
-				<table class="table table-striped table-responsive table-paragraphs">
-					<%
-					List<Mutant> mutantsKilled = game.getKilledMutants();
-					Map<Integer, List<Mutant>> mutantKilledLines = new HashMap<>();
-					if (! mutantsKilled.isEmpty()) {
-						for (Mutant m : mutantsKilled) {
-							for (int line : m.getLines()){
-								if (!mutantKilledLines.containsKey(line)){
-									mutantKilledLines.put(line, new
-											ArrayList<Mutant>());
-								}
-								mutantKilledLines.get(line).add(m);
-							}
-					%>
-					<tr>
-						<td><h4>Mutant <%= m.getId() %></h4></td>
-						<td>
-							<a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
-							<div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog">
-								<div class="modal-dialog">
-									<!-- Modal content-->
-									<div class="modal-content">
-										<div class="modal-header">
-											<button type="button" class="close" data-dismiss="modal">&times;</button>
-											<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
-										</div>
-										<div class="modal-body">
-											<p>Killed by Test <%= DatabaseAccess.getKillingTestIdForMutant(m.getId()) %></p>
-											<pre class="readonly-pre"><textarea class="mutdiff" id="diff<%=m.getId()%>"><%=m.getPatchString()%></textarea></pre>
-										</div>
-										<div class="modal-footer">
-											<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-										</div>
-									</div>
-								</div>
-							</div>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2">
-							<% for (String change : m.getHTMLReadout()) { %>
-							<p><%=change%><p>
-								<% } %>
-						</td>
-					</tr>
-					<%
-						}
-					} else {%>
-					<tr class="blank_row">
-						<td class="row-borderless" colspan="2">No mutants killed.</td>
-					</tr>
-					<%}
-					%>
-				</table>
-			</div>
-		</div> <!-- tab-content -->
-	</div> <!-- col-md-6 right bottom -->
+        <%@include file="game_components/mutants_list.jsp"%>
+	</div>
 </div>
+
+<%
+	List<Test> tests = game.getTests();
+	HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<Integer, ArrayList<Test>>();
+
+	for (Test t : tests) {
+
+		for (Integer lc : t.getLineCoverage().getLinesCovered()) {
+			if (!linesCovered.containsKey(lc)) {
+				linesCovered.put(lc, new ArrayList<Test>());
+			}
+
+			linesCovered.get(lc).add(t);
+		}
+	}
+%>
 
 <script>
     testMap = {
@@ -272,7 +130,7 @@
     highlightCoverage = function(){
         highlightLine([<% for (Integer i : linesCovered.keySet()){%>
             [<%=i%>, <%=((float)linesCovered.get(i).size() / (float) tests.size())%>],
-            <% } %>], COVERED_COLOR, "<%="#" + codeDivName%>");
+            <% } %>], COVERED_COLOR, "#cut-div");
     };
 
     getMutants = function(){
@@ -280,7 +138,7 @@
     };
 
     showMutants = function(){
-        mutantLine("<%="#" + codeDivName%>", "<%= game.getState().equals(ACTIVE) ? "true" : "false"%>");
+        mutantLine("#cut-div", "<%= game.getState().equals(ACTIVE) ? "true" : "false"%>");
     };
 
     var updateCUT = function(){
@@ -297,34 +155,6 @@
 
     //inline due to bug in Chrome?
     $(window).resize(function (e){setTimeout(updateCUT, 500);});
-
-
-
-	/* Submitted tests */
-	var x = document.getElementsByClassName("utest");
-	var i;
-	for (i = 0; i < x.length; i++) {
-		CodeMirror.fromTextArea(x[i], {
-			lineNumbers: true,
-			matchBrackets: true,
-			mode: "text/x-java",
-			readOnly: true
-		});
-	}
-	/* Mutants diffs */
-	$('.modal').on('shown.bs.modal', function() {
-		var codeMirrorContainer = $(this).find(".CodeMirror")[0];
-		if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-			codeMirrorContainer.CodeMirror.refresh();
-		} else {
-			var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
-				lineNumbers: false,
-				mode: "diff",
-				readOnly: true /* onCursorActivity: null */
-			});
-			editorDiff.setSize("100%", 500);
-		}
-	});
 
 	<% if (game.getActiveRole().equals(Role.ATTACKER)) {%>
 	function checkForUpdate(){

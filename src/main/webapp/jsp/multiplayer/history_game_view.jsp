@@ -117,7 +117,7 @@
     <div class="crow">
         <div class="w-45 up">
             <%@include file="/jsp/multiplayer/game_mutants.jsp"%>
-            <%@include file="/jsp/multiplayer/game_unit_tests.jsp"%>
+            <%@include file="/jsp/game_components/tests_carousel.jsp"%>
         </div>
         <div class="w-55" id="newmut-div">
                 <h3>Class Under Test</h3>

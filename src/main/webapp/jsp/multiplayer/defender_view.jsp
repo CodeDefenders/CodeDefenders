@@ -2,10 +2,11 @@
 <%
 	codeDivName = "cut-div"; // TODO codeDivName as request attribute where needed
 
-	/* classCode */
+	/* class_viewer */
 	request.setAttribute("classCode", game.getCUT().getAsString());
+	request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
 
-	/* testCode */
+	/* test_editor */
 	String previousTestCode = (String) request.getSession().getAttribute("previousTest");
 	request.getSession().removeAttribute("previousTest");
 	if (previousTestCode != null) {
@@ -14,11 +15,11 @@
 		request.setAttribute("testCode", game.getCUT().getTestTemplate());
 	}
 
-	/* mockingEnabled */
-	request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
-
-	/* gameId */
+	/* test_notifications */
 	request.setAttribute("gameId", game.getId());
+
+	/* test_carousel */
+	request.setAttribute("tests", game.getTests());
 %>
 
 <div class="ws-12">
@@ -52,38 +53,24 @@
 
 <div class="crow fly up">
 	<%@include file="/jsp/multiplayer/game_mutants.jsp"%>
-	<%@include file="/jsp/multiplayer/game_unit_tests.jsp"%>
+
+    <%
+		// TODO is this necessary?
+		if (role.equals(Role.DEFENDER)
+				|| role.equals(Role.CREATOR)
+				|| game.getLevel().equals(GameLevel.EASY)
+				|| game.getState().equals(GameState.FINISHED)) {
+    %>
+        <div class="ws-12">
+            <h3>JUnit tests </h3>
+            <%@include file="/jsp/game_components/tests_carousel.jsp"%>
+        </div>
+    <% } %>
 </div>
 
 <div>
 	<script>
-        /* Submitted tests */
-        var x = document.getElementsByClassName("utest");
-        var i;
-        for (i = 0; i < x.length; i++) {
-            CodeMirror.fromTextArea(x[i], {
-                lineNumbers: true,
-                matchBrackets: true,
-                mode: "text/x-java",
-                readOnly: true
-            });
-        }
-
-		/* Mutants diffs */
-		$('.modal').on('shown.bs.modal', function() {
-			var codeMirrorContainer = $(this).find(".CodeMirror")[0]; // TODO class .modal is to unspecific could also influence other modals
-			if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-				codeMirrorContainer.CodeMirror.refresh();
-			} else {
-				var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
-					lineNumbers: false,
-					mode: "diff",
-					readOnly: true /* onCursorActivity: null */
-				});
-				editorDiff.setSize("100%", 500);
-			}
-		});
-
+        // TODO is this needed ?
 		$('#finishedModal').modal('show');
 	</script>
 
