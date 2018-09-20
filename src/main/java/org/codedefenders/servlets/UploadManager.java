@@ -68,6 +68,7 @@ public class UploadManager extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/games/upload");
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession();
@@ -132,6 +133,7 @@ public class UploadManager extends HttpServlet {
         }
 
         SimpleFile cutFile = null;
+        SimpleFile dependenciesZipFile = null;
         SimpleFile mutantsZipFile = null;
         SimpleFile testsZipFile = null;
 
@@ -163,7 +165,17 @@ public class UploadManager extends HttpServlet {
                     cutFile = new SimpleFile(fileName, fileContentBytes);
                     break;
                 }
-                // TODO Phil 19/09/18: switch case here for dependencies
+                case "fileUploadDependency": {
+                    if (dependenciesZipFile != null) {
+                        // Upload of second dependency ZIP file? Abort
+                        logger.error("Class upload failed. Multiple dependency ZIP files uploaded.");
+                        messages.add("Class upload failed. Multiple dependency ZIP files uploaded.");
+                        abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                        return;
+                    }
+                    dependenciesZipFile = new SimpleFile(fileName, fileContentBytes);
+                    break;
+                }
                 case "fileUploadMutant": {
                     if (mutantsZipFile != null) {
                         // Upload of second mutant ZIP file? Abort
@@ -244,15 +256,84 @@ public class UploadManager extends HttpServlet {
             }
 
             String classFilePath;
-            try {
-                classFilePath = Compiler.compileJavaFileForContent(javaFilePath, fileContent);
-            } catch (CompileException e) {
-                logger.error("Could not compile {}!\n{}", fileName, e.getMessage());
-                messages.add("Could not compile " + fileName + "!\n" + e.getMessage());
+            if (dependenciesZipFile == null) {
+                try {
+                    classFilePath = Compiler.compileJavaFileForContent(javaFilePath, fileContent);
+                } catch (CompileException e) {
+                    logger.error("Could not compile {}!\n{}", fileName, e.getMessage());
+                    messages.add("Could not compile " + fileName + "!\n" + e.getMessage());
 
-                abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                    return;
+                }
+            } else {
+                final String zipFileName = dependenciesZipFile.fileName;
+                final byte[] zipFileContent = dependenciesZipFile.fileContent;
+
+                if (!zipFileName.endsWith(".zip")) {
+                    logger.error("Class upload failed. Given file {} was not a .zip file.", zipFileName);
+                    messages.add("Dependencies must be provided in a .zip file.");
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                    return;
+                }
+
+                final List<JavaFileObject> dependencies;
+                try {
+                    final ZipFile zip = ZipFileUtils.createZip(zipFileContent);
+                    dependencies = ZipFileUtils.getFilesFromZip(zip, true);
+                } catch (IOException e) {
+                    logger.error("Class upload failed. Failed to extract dependencies ZIP file.");
+                    messages.add("Class upload failed. Failed to extract dependencies ZIP file.");
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                    return;
+                }
+                for (final JavaFileObject dependencyFile : dependencies) {
+                    final Path path = Paths.get(dependencyFile.getName());
+
+                    final String dependencyFileName = path.getFileName().toString();
+                    final String dependencyFileContent = dependencyFile.getContent();
+
+                    if (!dependencyFileName.endsWith(".java")) {
+                        logger.error("Class upload failed. Given file {} was not a .java file.", dependencyFileName);
+                        messages.add("Dependency must be a .java file.");
+                        abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                        return;
+                    }
+                    if (dependencyFileContent == null) {
+                        logger.error("Provided fileContent is null. That shouldn't happen.");
+                        messages.add("Internal error. Sorry about that!");
+                        abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                        return;
+                    }
+
+                    try {
+                        storeJavaFile(cutDir, dependencyFileName, dependencyFileContent);
+                    } catch (IOException e) {
+                        logger.error("Could not store java file " + dependencyFileName, e);
+                        messages.add("Internal error. Sorry about that!");
+                        abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                        return;
+                    }
+                }
+
+                try {
+                    classFilePath = Compiler.compileJavaFileWithDependencies(javaFilePath, dependencies);
+                } catch (CompileException e) {
+                    logger.error("Could not compile {}!\n{}", fileName, e.getMessage());
+                    messages.add("Could not compile " + fileName + "!\n" + e.getMessage());
+
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                    return;
+                }
+            }
+
+            if (true) {
+                // TODO Phil 20/09/18: remove again after successful implementation
+                logger.warn("Everything worked so far.");
+                abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                 return;
             }
+            // TODO Phil 20/09/18: store dependencies in database. If cutId is required, store them after storing CUT.
 
             String classQualifiedName;
             try {

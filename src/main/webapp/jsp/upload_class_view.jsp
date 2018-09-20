@@ -24,6 +24,16 @@
 					<span>The class used for games. Mutants are created from and tests are created for this class.</span>
 				</div>
 				<div>
+					<h3>Upload Dependencies (optional)</h3>
+					<span class="file-select">
+                        <input id="fileUploadDependency" name="fileUploadDependency" type="file" class="file-loading" accept=".zip" />
+                    </span>
+					<br>
+					<span>
+                        If the class under test has dependencies, upload them as inside a <code>zip</code> file.
+					</span>
+				</div>
+				<div>
 					<h3>Upload Mutants (optional)</h3>
 					<span class="file-select">
                         <input id="fileUploadMutant" name="fileUploadMutant" type="file" class="file-loading" accept=".zip" />
