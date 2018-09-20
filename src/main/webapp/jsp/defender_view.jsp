@@ -12,10 +12,29 @@
 <%@ page import="java.util.Map" %>
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="java.util.stream.Collectors" %>
+
 <% String pageTitle="Defending Class"; %>
 <%Gson gson = new Gson();%>
 
 <%@ include file="/jsp/header_game.jsp" %>
+
+<%-- Set request attributes for the components. --%>
+<%
+	/* classCode */
+	request.setAttribute("classCode", game.getCUT().getAsString());
+
+	/* testCode */
+	String previousTestCode = (String) request.getSession().getAttribute("previousTest");
+	request.getSession().removeAttribute("previousTest");
+	if (previousTestCode != null) {
+		request.setAttribute("testCode", previousTestCode);
+	} else {
+		request.setAttribute("testCode", game.getCUT().getTestTemplate());
+	}
+
+	/* mockingEnabled */
+	request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
+%>
 
 <%
 	if (game.getState().equals(GameState.FINISHED)) {
@@ -44,30 +63,24 @@
 <%  } %>
 
 <div class="row-fluid">
+
 	<div class="col-md-6" id="cut-div">
 		<h3>Class Under Test</h3>
-		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30"><%=game.getCUT().getAsString()%></textarea></pre>
+		<%@include file="game_components/class_viewer.jsp"%>
 	</div> <!-- col-md6 left -->
+
 	<div class="col-md-6" id="utest-div">
-		<h3> <span class="text-nowrap">Write a new JUnit test here
+		<h3>Write a new JUnit test here
 			<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Role.DEFENDER)) {%>
 			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def" onClick="this.form.submit(); this.disabled=true; this.value='Defending...';">Defend!</button>
-			<%}%></span>
+			<%}%>
 		</h3>
 		<form id="def" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() %>" method="post">
-			<%
-				String testCode;
-				String previousTestCode = (String) request.getSession().getAttribute("previousTest");
-				request.getSession().removeAttribute("previousTest");
-				if (previousTestCode != null) {
-					testCode = previousTestCode;
-				} else
-					testCode = game.getCUT().getTestTemplate();
-			%>
-			<pre><textarea id="code" name="test" cols="80" rows="30"><%= testCode %></textarea></pre>
+			<%@include file="game_components/test_editor.jsp"%>
 			<input type="hidden" name="formType" value="createTest">
 		</form>
 	</div> <!-- col-md6 right top -->
+
 </div> <!-- row-fluid 1 -->
 
 <div class="row-fluid">
@@ -250,36 +263,11 @@
 </div>
 
 <script>
-	var editorTest = CodeMirror.fromTextArea(document.getElementById("code"), {
-		lineNumbers: true,
-		indentUnit: 4,
-		indentWithTabs: true,
-		matchBrackets: true,
-		mode: "text/x-java"
-	});
-	editorTest.on('beforeChange',function(cm,change) {
-		var text = cm.getValue();
-		var lines = text.split(/\r|\r\n|\n/);
-		var readOnlyLines = [0,1,2,3,4,5,6,7];
-		var readOnlyLinesEnd = [lines.length-1,lines.length-2];
-		if ( ~readOnlyLines.indexOf(change.from.line) || ~readOnlyLinesEnd.indexOf(change.to.line)) {
-			change.cancel();
-		}
-	});
-	editorTest.setSize("100%", 500);
-	var editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
-		lineNumbers: true,
-		matchBrackets: true,
-		mode: "text/x-java",
-		readOnly: true
-	});
-	editorSUT.setSize("100%", 500);
-
-    testMap = {<% for (Integer i : linesCovered.keySet()){%>
-    <%= i%>: [<%= linesCovered.get(i).stream().map(t -> Integer.toString(t.getId())).distinct().collect(Collectors.joining(","))%>],
-    <% } %>
+    testMap = {
+        <% for (Integer i : linesCovered.keySet()){ %>
+            <%= i %>: [ <%= linesCovered.get(i).stream().map(t -> Integer.toString(t.getId())).distinct().collect(Collectors.joining(",")) %> ],
+        <% } %>
     };
-
 
     highlightCoverage = function(){
         highlightLine([<% for (Integer i : linesCovered.keySet()){%>
@@ -289,7 +277,7 @@
 
     getMutants = function(){
         return JSON.parse("<%= gson.toJson(mutants).replace("\"", "\\\"") %>");
-    }
+    };
 
     showMutants = function(){
         mutantLine("<%="#" + codeDivName%>", "<%= game.getState().equals(ACTIVE) ? "true" : "false"%>");
