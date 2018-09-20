@@ -275,7 +275,6 @@ public class UploadManager extends HttpServlet {
                 return;
             }
 
-            logger.debug("Successfully uploaded Class Under Test: {}", classAlias);
             compiledClasses.add(new CompiledClass(CompileClassType.CUT, cutId, javaFilePath, classFilePath));
         }
 
@@ -351,9 +350,8 @@ public class UploadManager extends HttpServlet {
 
         for (int index = 0; index < mutants.size(); index++) {
             final JavaFileObject mutantFile = mutants.get(index);
-            final Path path = Paths.get(mutantFile.getName());
 
-            final String fileName = path.getFileName().toString();
+            final String fileName = mutantFile.getName();
             final String fileContent = mutantFile.getContent();
 
             if (!fileName.endsWith(".java")) {
@@ -458,9 +456,8 @@ public class UploadManager extends HttpServlet {
 
         for (int index = 0; index < tests.size(); index++) {
             final JavaFileObject testFile = tests.get(index);
-            final Path path = Paths.get(testFile.getName());
 
-            final String fileName = path.getFileName().toString();
+            final String fileName = testFile.getName();
             final String fileContent = testFile.getContent();
 
             if (!fileName.endsWith(".java")) {

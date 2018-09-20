@@ -55,7 +55,7 @@ public class ZipFileUtils {
                     // Skipping folders.
                     continue;
                 }
-                final String fileName = zipEntry.getName();
+                final String fileName = Paths.get(zipEntry.getName()).getFileName().toString();
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(zipFile.getInputStream(zipEntry)));
                 StringBuilder bob = new StringBuilder();
