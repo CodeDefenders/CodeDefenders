@@ -2,8 +2,14 @@ package org.codedefenders.execution;
 
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.JavaFileObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,6 +30,7 @@ import javax.tools.ToolProvider;
  * @see JavaFileObject
  */
 public class Compiler {
+    private static final Logger logger = LoggerFactory.getLogger(Compiler.class);
 
     /**
      * Compiles a java file for a given path. The compiled class
@@ -123,8 +130,10 @@ public class Compiler {
      * Mockito libraries required for running the tests.
      */
     private static String compileJavaTestFile(JavaFileObject testFile, String javaCutFilePath) throws CompileException {
+        final Path cutPath = Paths.get(javaCutFilePath);
+
         final String outDir = testFile.getPath().substring(0, testFile.getPath().lastIndexOf("/"));
-        final String cutDir = javaCutFilePath.substring(0, javaCutFilePath.lastIndexOf("/"));
+        final String cutDir = cutPath.getParent().toString();
         final String classPath = String.format(Constants.TEST_CLASSPATH_WITH_DIR, cutDir);
 
         javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -141,6 +150,14 @@ public class Compiler {
         final JavaCompiler.CompilationTask task = compiler.getTask(writer, null, null, options, null, compilationUnits);
 
         final Boolean success = task.call();
+        try {
+            // remove resulting CUT class file again.
+            Files.deleteIfExists(Paths.get(outDir, cutPath.getFileName().toString()));
+        } catch (IOException ignored) {
+            if (success) {
+                logger.warn("Failed to remove CUT class file in test folder:{}", outDir);
+            }
+        }
         if (success) {
             return testFile.getPath().replace(".java", ".class");
         } else {

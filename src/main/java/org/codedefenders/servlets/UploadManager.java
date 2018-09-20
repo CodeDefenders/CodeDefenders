@@ -297,7 +297,7 @@ public class UploadManager extends HttpServlet {
 
         Redirect.redirectBack(request, response);
         messages.add("Class upload successful.");
-        logger.info("Class class of {} was successful", cutFileName);
+        logger.info("Class upload of {} was successful", cutFileName);
 
         // TODO Phil: Will this be used in the future? Looks like legacy code.
 //			if (shouldPrepareAI) {
