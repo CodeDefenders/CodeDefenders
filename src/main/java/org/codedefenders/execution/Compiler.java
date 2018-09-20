@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.tools.JavaCompiler;
@@ -70,6 +71,49 @@ public class Compiler {
 
         final StringWriter writer = new StringWriter();
         final List<? extends javax.tools.JavaFileObject> compilationUnits = Arrays.asList(javaFile);
+        final List<String> options = Arrays.asList(
+                "-encoding", "UTF-8",
+                "-d", outDir
+        );
+
+        final JavaCompiler.CompilationTask task = compiler.getTask(writer, null, null, options, null, compilationUnits);
+
+        final Boolean success = task.call();
+        if (success) {
+            return javaFile.getPath().replace(".java", ".class");
+        } else {
+            throw new CompileException(writer.toString());
+        }
+    }
+
+    /**
+     * Compiles a java file for a given path together with given dependencies.
+     * The compiled class is stored in the same directory the specified java file lies.
+     * <p>
+     * The dependencies have to be in the same folder as the given java file.
+     *
+     * @param javaFilePath Path to the {@code .java} file.
+     * @param dependencies a list of {@link JavaFileObject}s, which the given java file is compiled together
+     *                     with. All these files must be in the same folder as the given java file.
+     * @return A path to the {@code .class} file of the compiled given java file.
+     * @throws CompileException If an error during compilation occurs.
+     */
+    public static String compileJavaFileWithDependencies(String javaFilePath, List<JavaFileObject> dependencies) throws CompileException {
+        return compileJavaFileWithDependencies(new JavaFileObject(javaFilePath), dependencies);
+    }
+
+    /**
+     * Similar to {@link #compileJavaFile(JavaFileObject)}, but the {@code dependency} parameter
+     * is added to the compilation units.
+     */
+    private static String compileJavaFileWithDependencies(JavaFileObject javaFile, List<JavaFileObject> dependencies) throws CompileException {
+        final String outDir = javaFile.getPath().substring(0, javaFile.getPath().lastIndexOf("/"));
+        javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        final StringWriter writer = new StringWriter();
+
+        final List<javax.tools.JavaFileObject> compilationUnits = new LinkedList<>(dependencies);
+        compilationUnits.add(javaFile);
+
         final List<String> options = Arrays.asList(
                 "-encoding", "UTF-8",
                 "-d", outDir
