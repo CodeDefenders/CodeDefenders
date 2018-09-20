@@ -9,8 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_NO;
-import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
+import static org.codedefenders.game.Mutant.Equivalence.*;
 
 /**
  * Created by jmr on 13/07/2016.
@@ -104,6 +103,15 @@ public abstract class AbstractGame {
 		return getMutants().stream().filter(mutant -> !mutant.isAlive() &&
 				(mutant.getEquivalent().equals(ASSUMED_NO) || mutant.getEquivalent().equals(PROVEN_NO)) &&
 				(mutant.getClassFile() != null)).collect(Collectors.toList());
+	}
+
+	public List<Mutant> getMutantsMarkedEquivalent() {
+		return getMutants().stream().filter(mutant -> mutant.getEquivalent().equals(ASSUMED_YES) ||
+				mutant.getEquivalent().equals(DECLARED_YES)).collect(Collectors.toList());
+	}
+
+	public List<Mutant> getMutantsMarkedEquivalentPending() {
+		return getMutants().stream().filter(mutant -> mutant.getEquivalent().equals(PENDING_TEST)).collect(Collectors.toList());
 	}
 
 	public Mutant getMutantByID(int mutantID) {

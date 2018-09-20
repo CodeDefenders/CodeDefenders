@@ -34,7 +34,7 @@
 		<table class="table table-striped table-hover table-responsive table-paragraphs">
 
 			<%
-				List<Mutant> equivMutants = game.getMutantsMarkedEquivalent();
+				List<Mutant> equivMutants = game.getMutantsMarkedEquivalentPending();
 				HashMap<Integer, List<Mutant>> mutantLines = new HashMap<Integer, List<Mutant>>();
 				if (! equivMutants.isEmpty()) {
 					Mutant m = equivMutants.get(0);

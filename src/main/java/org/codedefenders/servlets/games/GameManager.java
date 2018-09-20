@@ -82,7 +82,7 @@ public class GameManager extends HttpServlet {
 
 		// If the game is finished, redirect to the score page.
 		if (activeGame.getAttackerId() == uid) {
-			List<Mutant> equivMutants = activeGame.getMutantsMarkedEquivalent();
+			List<Mutant> equivMutants = activeGame.getMutantsMarkedEquivalentPending();
 			if (equivMutants.isEmpty()) {
 				logger.info("Redirecting to attacker page");
 				List<Mutant> aliveMutants = activeGame.getAliveMutants();
