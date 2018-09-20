@@ -11,7 +11,7 @@
 		<h2>Upload Class</h2>
 		<div id="divUpload" >
 			<form id="formUpload" action="<%=request.getContextPath() %>/upload" class="form-upload" method="post" enctype="multipart/form-data">
-				<input id="classAlias" name="classAlias" type="text" class="form-control" placeholder="Optional class alias" >
+				<input id="classAlias" name="classAlias" type="text" class="form-control" placeholder="Optional class alias, otherwise class name is used" >
 				<!--
 				<input type="checkbox" name="prepareForSingle" value="prepare" style="margin-right:5px;">Generate mutants and tests for single-player mode? (It may take a while...)</input>
 				-->
@@ -22,15 +22,15 @@
                     </span>
 				</div>
 				<div>
-                    <span>Optional: Upload mutants</span>
+                    <span>Optional: Upload mutants as a <code>zip</code> file. Note that all files have to be called like the class under test.</span>
                     <span class="file-select">
-                        <input id="fileUploadMutant" name="fileUploadMutant" type="file" class="file-loading" accept=".java" multiple />
+                        <input id="fileUploadMutant" name="fileUploadMutant" type="file" class="file-loading" accept=".zip" />
                     </span>
 				</div>
 				<div>
-					<span>Optional: Upload tests</span>
+					<span>Optional: Upload tests as a <code>zip</code> file.</span>
                     <span class="file-select">
-                        <input id="fileUploadTest" name="fileUploadTest" type="file" class="file-loading" accept=".java" multiple />
+                        <input id="fileUploadTest" name="fileUploadTest" type="file" class="file-loading" accept=".zip" />
                     </span>
 				</div>
 

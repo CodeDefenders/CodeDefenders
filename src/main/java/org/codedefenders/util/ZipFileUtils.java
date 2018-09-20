@@ -6,8 +6,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -45,7 +45,7 @@ public class ZipFileUtils {
      * @throws IOException whether reading the zip file fails at any point.
      */
     public static List<JavaFileObject> getFilesFromZip(ZipFile zipFile, boolean deleteZipAfter) throws IOException {
-        final List<JavaFileObject> list = new LinkedList<>();
+        final List<JavaFileObject> list = new ArrayList<>();
 
         final Enumeration<? extends ZipEntry> entries = zipFile.entries();
         try {
