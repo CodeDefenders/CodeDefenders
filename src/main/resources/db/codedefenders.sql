@@ -126,6 +126,10 @@ CREATE TABLE `games` (
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
+# Dummy game for upload of tests and mutants together with a class
+INSERT INTO games (ID, State)
+VALUES (-1, 'FINISHED');
+
 --
 -- Table structure for table `mutants`
 --
@@ -147,13 +151,15 @@ CREATE TABLE `mutants` (
   `NumberAiKillingTests` int(11) DEFAULT '0', /* If an original ai mutant, killcount. Number of killing tests in game otherwise. */
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Points` int(11) DEFAULT '0',
+  `Class_ID` int(11) DEFAULT NULL, -- If Game_ID is -1, the mutant was uploaded together with referenced class
   PRIMARY KEY (`Mutant_ID`),
   KEY `fk_gameId_idx` (`Game_ID`),
   KEY `fk_playerId_idx` (`Player_ID`),
   CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_classId_muts` FOREIGN KEY (`Class_ID`) REFERENCES classes (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
-CREATE UNIQUE INDEX mutants_Game_ID_MD5_index ON mutants (Game_ID, MD5);
+CREATE UNIQUE INDEX mutants_Game_ID_Class_ID_MD5_index ON mutants (Game_ID, Class_ID, MD5);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -178,6 +184,18 @@ CREATE TABLE `players` (
 ) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX players_User_ID_Game_ID_uindex ON players (User_ID, Game_ID);
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Dummy player for upload of tests and mutants together with a class
+-- Dummy player attacker (for mutants) and dummy player defender (for tests)
+-- All are added under the `users` table.
+--
+
+INSERT INTO `players` (`ID`, `User_ID`, `Game_ID`)
+VALUES (-1, -1, -1),
+       (-2, -2, -1),
+       (-3, -3, -1);
 
 --
 -- Table structure for table `targetexecutions`
@@ -222,12 +240,14 @@ CREATE TABLE `tests` (
   `Lines_Covered` longtext,
   `Lines_Uncovered` longtext,
   `Points` int(11) DEFAULT '0',
+  `Class_ID` int(11) DEFAULT NULL, -- If Game_ID is -1, the test was uploaded together with referenced class
   PRIMARY KEY (`Test_ID`),
   KEY `fk_playerId_idx` (`Player_ID`),
   KEY `fk_gameId_tests_idx` (`Game_ID`),
   KEY `fk_playerId_tests_idx` (`Player_ID`),
   CONSTRAINT `fk_gameId_tests` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_classId_tests` FOREIGN KEY (`Class_ID`) REFERENCES classes (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -317,6 +337,19 @@ DELIMITER ;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+--
+-- Automated attacker and defender
+-- Dummy user for upload of tests and mutants together with a class
+-- Dummy attacker (for mutants) and dummy defender (for tests)
+--
+
+INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`)
+VALUES (1, 'Mutator', 'AI_ATTACKER_INACCESSIBLE', 'codedef_mutator@sheffield.ac.uk'),
+       (2, 'TestGen', 'AI_DEFENDER_INACCESSIBLE', 'codedef_testgen@sheffield.ac.uk'),
+       (-1, 'dummy_user', 'DUMMY_USER_INACCESSIBLE', 'user@dummy.com'),
+       (-2, 'dummy_attacker', 'DUMMY_ATTACKER_INACCESSIBLE', 'attacker@dummy.com'),
+       (-3, 'dummy_defender', 'DUMMY_DEFENDER_INACCESSIBLE', 'defender@dummy.com');
 
 --
 -- Table structure for table `sessions`
@@ -466,13 +499,6 @@ AS
     LEFT JOIN view_attackers ON U.user_id = view_attackers.user_id
     LEFT JOIN view_defenders ON U.user_id = view_defenders.user_id
   WHERE U.user_id > 2; -- Ignore automated players
-
---
--- Automated attacker and defender
---
-
-INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`) VALUES (1, 'Mutator', 'AI_ATTACKER_INACCESSIBLE', 'codedef_mutator@sheffield.ac.uk');
-INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`) VALUES (2, 'TestGen', 'AI_DEFENDER_INACCESSIBLE', 'codedef_testgen@sheffield.ac.uk');
 
 -- Event to activate multiplayer game
 -- SET @@global.event_scheduler = 1;

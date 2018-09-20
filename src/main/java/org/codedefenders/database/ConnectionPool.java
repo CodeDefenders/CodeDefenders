@@ -1,5 +1,9 @@
 package org.codedefenders.database;
 
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,10 +12,6 @@ import java.util.List;
 import java.util.Queue;
 
 import javax.naming.NamingException;
-
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implements the <code>Singleton</code>-pattern and object pooling. Handles
@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
  * @author wendling
  */
 public final class ConnectionPool {
-
 	private static ConnectionPool connectionPool;
 	private List<Connection> connections;
 	private Queue<Connection> availableConnections;
@@ -49,8 +48,7 @@ public final class ConnectionPool {
 	 * Initializes the connections list and queue of available connections.
 	 */
 	private void init() {
-
-		for (int i = 0; i < MAX_RETRIES; i++) {
+		for (int i = 1; i <= MAX_RETRIES; i++) {
 			logger.info("Initializing ConnectionPool... (retry " + i + " of "+ MAX_RETRIES + ")");
 			try {
 				Connection conn = DatabaseConnection.getConnection();
@@ -58,11 +56,11 @@ public final class ConnectionPool {
 				conn.close();
 				// If we managed to connect, we can proceed. Otherwise, we retry
 				break;
-			} catch (NamingException | SQLException e) {
+			} catch (StorageException | NamingException | SQLException e) {
 				logger.warn("Cannot connect to the Database", e);
-				if (i >= MAX_RETRIES) {
+				if (i == MAX_RETRIES) {
 					logger.warn("Give up and fail deployment");
-					throw new StorageException();
+					throw new StorageException("Could not initialize the database. Aborting.");
 				} else {
 					try {
 						logger.info("Retry connecting to DB in " + RETRY_TIMEOUT + " msec ");
@@ -97,7 +95,7 @@ public final class ConnectionPool {
 	 *
 	 * @return single <code> ConnectionPool</code> object.
 	 */
-	public static ConnectionPool getInstanceOf() {
+	public static synchronized ConnectionPool getInstanceOf() {
 		if (connectionPool == null) {
 			connectionPool = new ConnectionPool();
 		}
@@ -115,9 +113,7 @@ public final class ConnectionPool {
 		try {
 			for (Connection connection : connections) {
 				connection.close();
-				if (availableConnections.contains(connection)) {
-					availableConnections.remove(connection);
-				}
+				availableConnections.remove(connection);
 				closedConnections.add(connection);
 			}
 
@@ -138,8 +134,7 @@ public final class ConnectionPool {
 	 * @return a free connection or null if none is available.
 	 * @throws NoMoreConnectionsException if there are no free connections
 	 */
-	public synchronized Connection getDBConnection()
-			throws NoMoreConnectionsException {
+	public synchronized Connection getDBConnection() throws NoMoreConnectionsException {
 		Connection returnConn;
 		if (availableConnections.peek() != null) {
 			returnConn = availableConnections.poll();
@@ -210,9 +205,7 @@ public final class ConnectionPool {
 		if (newSize < nbConnections) {
 			for (int i = newSize; i < nbConnections; i++) {
 				Connection conn = connections.get(i);
-				if(availableConnections.contains(conn)) {
-					availableConnections.remove(conn);
-				}
+                availableConnections.remove(conn);
 				try {
 					conn.close();
 				} catch (SQLException e) {
@@ -240,9 +233,17 @@ public final class ConnectionPool {
 		waitingTime = newWaitingTime;
 	}
 
-	private void getParametersFromDB(Connection conn) throws SQLException {
-		nbConnections = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_POOL_CONNECTIONS, conn).getIntValue();
-		waitingTime = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_WAITING_TIME, conn).getIntValue();
+	private void getParametersFromDB(Connection conn) throws StorageException, SQLException {
+		final AdminSystemSettings.SettingsDTO conns = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_POOL_CONNECTIONS, conn);
+		if (conns == null) {
+			throw new StorageException("Could not retrieve CONNECTION_POOL_CONNECTIONS from database");
+		}
+		nbConnections = conns.getIntValue();
+		final AdminSystemSettings.SettingsDTO waitingTime = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_WAITING_TIME, conn);
+		if (waitingTime == null) {
+			throw new StorageException("Could not retrieve CONNECTION_WAITING_TIME from database");
+		}
+		this.waitingTime = waitingTime.getIntValue();
 	}
 
 	public int getNbConnections() {
@@ -255,13 +256,8 @@ public final class ConnectionPool {
 	 *
 	 * @author wendling
 	 */
-
 	public class NoMoreConnectionsException extends Exception {
-
-		private static final long serialVersionUID = 1L;
-
 		NoMoreConnectionsException() {
-
 		}
 
 		public NoMoreConnectionsException(String message) {
@@ -281,12 +277,10 @@ public final class ConnectionPool {
 		private static final long serialVersionUID = -6071779646574124576L;
 
 		StorageException() {
-
 		}
 
 		public StorageException(String message) {
 			super(message);
 		}
 	}
-
 }

@@ -910,8 +910,7 @@ public class DatabaseAccess {
                 Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
 						rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"), rs.getInt("Player_ID"),
-                        covered, uncovered);
-				newTest.setScore(rs.getInt("Points"));
+                        covered, uncovered, rs.getInt("Points"));
 				testList.add(newTest);
 			}
 		} catch (SQLException se) {

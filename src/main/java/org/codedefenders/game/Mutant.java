@@ -19,13 +19,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import difflib.Chunk;
 import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
 
+/**
+ * This class represents a mutation in a game class. These mutations are created
+ * by attackers in order to survive test cases.
+ *
+ * @see GameClass
+ * @see Test
+ */
 public class Mutant implements Serializable {
 
 	private static final Logger logger = LoggerFactory.getLogger(Mutant.class);
@@ -59,22 +71,43 @@ public class Mutant implements Serializable {
 
 	private int score; // multiplayer
 
+	/**
+	 * Identifier of the class this mutant is created from.
+	 * Of type {@link Integer}, because the classId can be {@code null}.
+	 */
+	private Integer classId;
+
 	private ArrayList<Integer> lines = null;
 	private transient ArrayList<String> description = null;
 	private transient Patch difference = null;
 
-	/**
-	 * Creates a mutant
-	 *
-	 * @param gameId
-	 * @param jFile
-	 * @param cFile
-	 * @param alive
-	 * @param playerId
-	 */
+    /**
+     * Creates a new Mutant with following attributes:
+     * <ul>
+     * <li><code>gameId -1</code></li>
+     * <li><code>playerId -1</code></li>
+     * <li><code>roundCreated -1</code></li>
+     * <li><code>score 0</code></li>
+     * </ul>
+     */
+	public Mutant(String javaFilePath, String classFilePath, String md5, Integer classId) {
+		this.javaFile = javaFilePath;
+		this.classFile = classFilePath;
+		this.alive = false;
+		this.gameId = -1;
+		this.playerId = -1;
+		this.roundCreated = -1;
+		this.score = 0;
+		this.md5 = md5;
+		this.classId = classId;
+	}
+
 	public Mutant(int gameId, String jFile, String cFile, boolean alive, int playerId) {
 		this.gameId = gameId;
-		this.roundCreated = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
+		final DuelGame id = DatabaseAccess.getGameForKey("ID", gameId);
+		if (id != null) {
+			this.roundCreated = id.getCurrentRound();
+		}
 		this.javaFile = jFile;
 		this.classFile = cFile;
 		this.alive = alive;
@@ -83,19 +116,6 @@ public class Mutant implements Serializable {
 		this.md5 = CodeValidator.getMD5FromFile(jFile); // TODO: This may be null
 	}
 
-	/**
-	 * Creates a mutant
-	 *
-	 * @param mid
-	 * @param gid
-	 * @param jFile
-	 * @param cFile
-	 * @param alive
-	 * @param equiv
-	 * @param rCreated
-	 * @param rKilled
-	 * @param playerId
-	 */
 	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId) {
 		this(gid, jFile, cFile, alive, playerId);
 		this.id = mid;
@@ -135,6 +155,18 @@ public class Mutant implements Serializable {
 		return classFile;
 	}
 
+	public String getJavaFile() {
+		return javaFile;
+	}
+
+	public int getRoundCreated() {
+		return roundCreated;
+	}
+
+	public String getMd5() {
+		return md5;
+	}
+
 	public String getDirectory() {
 		File file = new File(javaFile);
 		return file.getAbsoluteFile().getParent();
@@ -156,27 +188,27 @@ public class Mutant implements Serializable {
 		return score;
 	}
 
+	public Integer getClassId() {
+		return classId;
+	}
 
-
-	//
 	public void incrementScore(int score){
-		
 		if( score == 0 ){
 			logger.debug("Do not update mutant {} score by 0", getId());
 			return;
 		}
-		
+
 		String query = "UPDATE mutants SET Points = Points + ? WHERE Mutant_ID=? AND Alive=1;";
 		Connection conn = DB.getConnection();
 
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(score),
-						DB.getDBV(id)};
-				
+		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(score), DB.getDBV(id)
+		};
+
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-				
 		DB.executeUpdate(stmt, conn);
 	}
-	
+
 	@Deprecated
 	public void setScore(int score) {
 		this.score += score;
@@ -297,8 +329,13 @@ public class Mutant implements Serializable {
 
 	public Patch getDifferences() {
 		if (difference == null) {
-			int classId =
-					DatabaseAccess.getGameForKey("ID", gameId).getClassId();
+			int classId;
+			if (this.classId == null) {
+				classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
+			} else {
+				classId = this.classId;
+			}
+
 			GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
 			File sourceFile = new File(sut.getJavaFile());
@@ -314,7 +351,12 @@ public class Mutant implements Serializable {
 	}
 
 	public String getPatchString() {
-		int classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
+		int classId;
+		if (this.classId == null) {
+			classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
+		} else {
+			classId = this.classId;
+		}
 		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
 		File sourceFile = new File(sut.getJavaFile());
@@ -353,6 +395,7 @@ public class Mutant implements Serializable {
 	// Stores values of JavaFile, ClassFile, GameID, RoundCreated in DB. These will not change once input.
 	// Default values for Equivalent (ASSUMED_NO), Alive(1), RoundKilled(NULL) are assigned.
 	// Currently Mutant ID isnt set yet after insertion, if Mutant needs to be used straight away it needs a similar insert method to MultiplayerGame.
+	@Deprecated
 	public boolean insert() {
 		logger.info("Inserting mutant");
 		Connection conn = DB.getConnection();
@@ -382,14 +425,14 @@ public class Mutant implements Serializable {
 	// These values update when Mutants are suspected of being equivalent, go through an equivalence test, or are killed.
 	/*
 	 * Update a mutant ONLY if in the DB it is still alive. This should prevent zombie mutants. but does not prevent messing up the score.
-	 * 
+	 *
 	 */
 	@Deprecated
 	public boolean update() {
-		
+
 		// This should be blocking
 		Connection conn = DB.getConnection();
-		
+
 		// We cannot update killed mutants
 		String query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, NumberAiKillingTests=?, Points=? WHERE Mutant_ID=? AND Alive=1;";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(equivalent.name()),
@@ -399,10 +442,10 @@ public class Mutant implements Serializable {
 				DB.getDBV(score),
 				DB.getDBV(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		
+
 		return DB.executeUpdate(stmt, conn);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Mutant " + getId() + "; Alive:"+ isAlive() + "; Equivalent: " + getEquivalent() + " - " + getScore();
@@ -533,7 +576,7 @@ public class Mutant implements Serializable {
 			}
 		};
 	}
-	
+
 	// TODO Ideally this should have a timestamp ... we use the ID instead
 	// First created appears first
 	public static Comparator<Mutant> orderByIdAscending() {
