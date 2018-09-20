@@ -16,26 +16,38 @@
 				<input type="checkbox" name="prepareForSingle" value="prepare" style="margin-right:5px;">Generate mutants and tests for single-player mode? (It may take a while...)</input>
 				-->
 				<div>
-                    <span>Upload Class under Test</span>
+                    <h3>Upload Class under Test</h3>
                     <span class="file-select">
                         <input id="fileUploadCUT" name="fileUploadCUT" type="file" class="file-loading" accept=".java" required />
                     </span>
+					<br>
+					<span>The class used for games. Mutants are created from and tests are created for this class.</span>
 				</div>
 				<div>
-                    <span>Optional: Upload mutants as a <code>zip</code> file. Note that all files have to be called like the class under test.</span>
-                    <span class="file-select">
+					<h3>Upload Mutants (optional)</h3>
+					<span class="file-select">
                         <input id="fileUploadMutant" name="fileUploadMutant" type="file" class="file-loading" accept=".zip" />
                     </span>
+					<br>
+                    <span>
+                        Mutants uploaded with a class under test can be used to initialize games with existing mutants.
+                        Note that all mutants must have the same class name as the class under test and must be uploaded inside a <code>zip</code> file.
+					</span>
 				</div>
 				<div>
-					<span>Optional: Upload tests as a <code>zip</code> file.</span>
-                    <span class="file-select">
+					<h3>Upload Tests (optional)</h3>
+					<span class="file-select">
                         <input id="fileUploadTest" name="fileUploadTest" type="file" class="file-loading" accept=".zip" />
                     </span>
+					<br>
+                    <span>
+                        Tests uploaded with a class under test can be used to initialize games with existing tests.
+                        Note that all tests must be uploaded inside a <code>zip</code> file.
+                    </span>
 				</div>
-
+				<br>
                 <input id="mockingEnabled" type="checkbox" name="enableMocking" value="isMocking" style="margin-right:5px;">Enable Mocking for this class</input>
-
+				<br>
 				<span class="submit-button">
 					<input id="upload" type="submit" class="fileinput-upload-button" value="Upload" onClick="this.form.submit(); this.disabled=true; this.value='Uploading...';"/>
 				</span>
