@@ -152,7 +152,8 @@ public class Compiler {
         final Boolean success = task.call();
         try {
             // remove resulting CUT class file again.
-            Files.deleteIfExists(Paths.get(outDir, cutPath.getFileName().toString()));
+            logger.info("removing CUT class file again");
+            Files.deleteIfExists(Paths.get(outDir, cutPath.getFileName().toString().replace(".java", ".class")));
         } catch (IOException ignored) {
             if (success) {
                 logger.warn("Failed to remove CUT class file in test folder:{}", outDir);
