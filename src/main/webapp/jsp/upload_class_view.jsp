@@ -82,7 +82,7 @@
 				<tr>
 					<th class="col-sm-1 col-sm-offset-2">ID</th>
 					<th>Class name (alias)</th>
-					<th>Available tests/mutants</th>
+					<th>Available dependencies/tests/mutants</th>
 					<th>Mutation Difficulty</th>
 					<th>Testing Difficulty</th>
 				</tr>
@@ -120,7 +120,7 @@
 									</div>
 								</div>
 							</td>
-							<td><%=GameClassDAO.getMappedTestsForId(c.getId()).size()%>/<%=GameClassDAO.getMappedMutantsForId(c.getId()).size()%></td>
+							<td><%=GameClassDAO.getMappedDependenciesForId(c.getId()).size()%>/<%=GameClassDAO.getMappedTestsForId(c.getId()).size()%>/<%=GameClassDAO.getMappedMutantsForId(c.getId()).size()%></td>
 							<td><%=mutationDiff > 0 ? String.valueOf(mutationDiff) : ""%></td>
 							<td><%=testingDiff > 0 ? String.valueOf(testingDiff) : ""%></td>
 							<!--

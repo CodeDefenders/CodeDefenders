@@ -6,6 +6,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
@@ -15,6 +16,7 @@ import org.codedefenders.execution.Runner;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.model.Dependency;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.JavaFileObject;
@@ -92,6 +94,8 @@ public class UploadManager extends HttpServlet {
         final String cutDir;
         // Used to run tests against the CUT.
         final String cutJavaFilePath;
+        // flag whether upload is with dependencies or not
+        boolean withDependencies = false;
 
         // Get actual parameters, because of the upload component, I can't do
         // request.getParameter before fetching the file
@@ -174,6 +178,7 @@ public class UploadManager extends HttpServlet {
                         return;
                     }
                     dependenciesZipFile = new SimpleFile(fileName, fileContentBytes);
+                    withDependencies = true;
                     break;
                 }
                 case "fileUploadMutant": {
@@ -204,6 +209,7 @@ public class UploadManager extends HttpServlet {
             }
         }
 
+        final List<JavaFileObject> dependencies = new ArrayList<>();
         if (cutFile == null) {
             logger.error("Class upload failed. No class under test uploaded.");
             messages.add("Class upload failed. No class under test uploaded.");
@@ -253,8 +259,9 @@ public class UploadManager extends HttpServlet {
                 return;
             }
 
-            String classFilePath;
-            if (dependenciesZipFile == null) {
+            final String cutClassFilePath;
+            final List<JavaFileReferences> dependencyReferences = new LinkedList<>();
+            if (!withDependencies) {
                 try {
                     cutClassFilePath = Compiler.compileJavaFileForContent(cutJavaFilePath, fileContent);
                 } catch (CompileException e) {
@@ -275,17 +282,19 @@ public class UploadManager extends HttpServlet {
                     return;
                 }
 
-                final List<JavaFileObject> dependencies;
                 try {
                     final ZipFile zip = ZipFileUtils.createZip(zipFileContent);
-                    dependencies = ZipFileUtils.getFilesFromZip(zip, true);
+
+                    // The returned list contains the files, but without an actual file path, just names.
+                    dependencies.addAll(ZipFileUtils.getFilesFromZip(zip, true));
                 } catch (IOException e) {
                     logger.error("Class upload failed. Failed to extract dependencies ZIP file.");
                     messages.add("Class upload failed. Failed to extract dependencies ZIP file.");
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                     return;
                 }
-                for (final JavaFileObject dependencyFile : dependencies) {
+                for (int index = 0; index < dependencies.size(); index++) {
+                    final JavaFileObject dependencyFile = dependencies.get(index);
                     final Path path = Paths.get(dependencyFile.getName());
 
                     final String dependencyFileName = path.getFileName().toString();
@@ -304,14 +313,21 @@ public class UploadManager extends HttpServlet {
                         return;
                     }
 
+                    final String depJavaFilePath;
                     try {
-                        storeJavaFile(cutDir, dependencyFileName, dependencyFileContent);
+                        depJavaFilePath = storeJavaFile(cutDir, dependencyFileName, dependencyFileContent);
+                        final String depClassFilePath = depJavaFilePath.replace(".java", ".class");
+                        dependencyReferences.add(new JavaFileReferences(depJavaFilePath, depClassFilePath));
                     } catch (IOException e) {
                         logger.error("Class upload failed. Could not store java file " + dependencyFileName, e);
                         messages.add("Class upload failed. Internal error. Sorry about that!");
                         abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                         return;
                     }
+
+                    // Update the existing dependency file with the actually stored file path.
+                    // This is required for the compilation of mutants and tests.
+                    dependencies.set(index, new JavaFileObject(depJavaFilePath, dependencyFileContent));
                 }
 
                 try {
@@ -324,14 +340,6 @@ public class UploadManager extends HttpServlet {
                     return;
                 }
             }
-
-            if (true) {
-                // TODO Phil 20/09/18: remove again after successful implementation
-                logger.warn("Everything worked so far.");
-                abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
-                return;
-            }
-            // TODO Phil 20/09/18: store dependencies in database. If cutId is required, store them after storing CUT.
 
             String classQualifiedName;
             try {
@@ -354,11 +362,27 @@ public class UploadManager extends HttpServlet {
                 return;
             }
 
-            compiledClasses.add(new CompiledClass(CompileClassType.CUT, cutId, javaFilePath, classFilePath));
+            compiledClasses.add(new CompiledClass(CompileClassType.CUT, cutId));
+
+            if (withDependencies) {
+                for (JavaFileReferences dep : dependencyReferences) {
+                    final int depId;
+                    try {
+                        depId = DependencyDAO.storeDependency(new Dependency(cutId, dep.javaFile, dep.classFile));
+                    } catch (Exception e) {
+                        logger.error("Class upload failed. Could not store dependency class to database.");
+                        messages.add("Class upload failed. Internal error. Sorry about that!");
+                        abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                        return;
+                    }
+
+                    compiledClasses.add(new CompiledClass(CompileClassType.DEPENDENCY, depId));
+                }
+            }
         }
 
         if (mutantsZipFile != null) {
-            final boolean failed = addMutants(request, response, messages, compiledClasses, cutId, cutFileName, cutDir, mutantsZipFile);
+            final boolean failed = addMutants(request, response, messages, compiledClasses, cutId, cutFileName, cutDir, mutantsZipFile, dependencies);
             if (failed) {
                 // tests zip failed and abort method has been called.
                 return;
@@ -366,7 +390,7 @@ public class UploadManager extends HttpServlet {
         }
 
         if (testsZipFile != null) {
-            final boolean failed = addTests(request, response, messages, compiledClasses, cutId, cutDir, cutJavaFilePath, testsZipFile);
+            final boolean failed = addTests(request, response, messages, compiledClasses, cutId, cutDir, cutJavaFilePath, testsZipFile, dependencies);
             if (failed) {
                 // tests zip failed and abort method has been called.
                 return;
@@ -400,12 +424,16 @@ public class UploadManager extends HttpServlet {
      * @param cutFileName the file name of the class under test.
      * @param cutDir the directory in which the class under test lies.
      * @param mutantsZipFile the given zip file from which the mutants are added.
+     * @param dependencies dependencies required to compile the mutants.
      * @return {@code true} if addition fails, {@code fail} otherwise.
      * @throws IOException when aborting the request fails.
      */
     @SuppressWarnings("Duplicates")
     private boolean addMutants(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages,
-                               List<CompiledClass> compiledClasses, int cutId, String cutFileName, String cutDir, SimpleFile mutantsZipFile) throws IOException {
+                               List<CompiledClass> compiledClasses, int cutId, String cutFileName, String cutDir,
+                               SimpleFile mutantsZipFile, List<JavaFileObject> dependencies) throws IOException {
+        boolean withDependencies = !dependencies.isEmpty();
+
         final String zipFileName = mutantsZipFile.fileName;
         final byte[] zipFileContent = mutantsZipFile.fileContent;
 
@@ -464,14 +492,27 @@ public class UploadManager extends HttpServlet {
                 return true;
             }
             String classFilePath;
-            try {
-                classFilePath = Compiler.compileJavaFileForContent(javaFilePath, fileContent);
-            } catch (CompileException e) {
-                logger.error("Class upload failed. Could not compile mutant {}!\n\n{}", fileName, e.getMessage());
-                messages.add("Class upload failed. Could not compile mutant " + fileName + "!\n" + e.getMessage());
 
-                abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
-                return true;
+            if (!withDependencies) {
+                try {
+                    classFilePath = Compiler.compileJavaFileForContent(javaFilePath, fileContent);
+                } catch (CompileException e) {
+                    logger.error("Class upload failed. Could not compile mutant {}!\n\n{}", fileName, e.getMessage());
+                    messages.add("Class upload failed. Could not compile mutant " + fileName + "!\n" + e.getMessage());
+
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
+                    return true;
+                }
+            } else {
+                try {
+                    classFilePath = Compiler.compileJavaFileForContentWithDependencies(javaFilePath, fileContent, dependencies, true);
+                } catch (CompileException e) {
+                    logger.error("Class upload failed. Could not compile mutant {} with dependencies{}!\n\n{}", fileName, dependencies, e.getMessage());
+                    messages.add("Class upload failed. Could not compile mutant " + fileName + "!\n" + e.getMessage());
+
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
+                    return true;
+                }
             }
 
             Integer mutantId;
@@ -505,12 +546,17 @@ public class UploadManager extends HttpServlet {
      * @param cutDir the directory in which the class under test lies.
      * @param cutJavaFilePath the file path of the class under test.
      * @param testsZipFile the given zip file from which the tests are added.
+     * @param dependencies dependencies required to compile the tests.
      * @return {@code true} if addition fails, {@code fail} otherwise.
      * @throws IOException when aborting the request fails.
      */
     @SuppressWarnings("Duplicates")
     private boolean addTests(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages,
-                             List<CompiledClass> compiledClasses, int cutId, String cutDir, String cutJavaFilePath, SimpleFile testsZipFile) throws IOException {
+                             List<CompiledClass> compiledClasses, int cutId, String cutDir, String cutJavaFilePath,
+                             SimpleFile testsZipFile, List<JavaFileObject> dependencies) throws IOException {
+
+        // Class under test is a dependency for all tests
+        dependencies.add(new JavaFileObject(cutJavaFilePath));
 
         final String zipFileName = testsZipFile.fileName;
         final byte[] zipFileContent = testsZipFile.fileContent;
@@ -566,7 +612,7 @@ public class UploadManager extends HttpServlet {
             }
             String classFilePath;
             try {
-                classFilePath = Compiler.compileJavaTestFileForContent(javaFilePath, fileContent, cutJavaFilePath);
+                classFilePath = Compiler.compileJavaTestFileForContent(javaFilePath, fileContent, dependencies, true);
             } catch (CompileException e) {
                 logger.error("Class upload failed. Could not compile test {}!\n\n{}", fileName, e.getMessage());
                 messages.add("Class upload failed. Could not compile test " + fileName + "!\n" + e.getMessage());
@@ -628,8 +674,6 @@ public class UploadManager extends HttpServlet {
      */
     private String storeJavaFile(String folderPath, String fileName, String fileContent) throws IOException {
         final String filePath = folderPath + F_SEP + fileName;
-        logger.debug("storeJavaFile: folderPath={}", folderPath);
-        logger.debug("storeJavaFile: filePath={}", filePath);
         try {
             Files.createDirectories(Paths.get(folderPath));
             final Path path = Files.createFile(Paths.get(filePath));
@@ -666,12 +710,16 @@ public class UploadManager extends HttpServlet {
         logger.info("Aborting request...");
         if (cutDir != null) {
             final List<Integer> cuts = new LinkedList<>();
+            final List<Integer> dependencies = new LinkedList<>();
             final List<Integer> mutants = new LinkedList<>();
             final List<Integer> tests = new LinkedList<>();
             for (CompiledClass compiledClass : compiledClasses) {
                 switch (compiledClass.type) {
                     case CUT:
                         cuts.add(compiledClass.id);
+                        break;
+                    case DEPENDENCY:
+                        dependencies.add(compiledClass.id);
                         break;
                     case MUTANT:
                         mutants.add(compiledClass.id);
@@ -707,6 +755,7 @@ public class UploadManager extends HttpServlet {
 
             MutantDAO.removeMutantsForIds(mutants);
             TestDAO.removeTestsForIds(tests);
+            DependencyDAO.removeDependenciesForIds(dependencies);
             GameClassDAO.removeClassesForIds(cuts);
         }
 
@@ -745,6 +794,20 @@ public class UploadManager extends HttpServlet {
     }
 
     /**
+     * Container for paths to {@code .java} and {@code .class}
+     * files of a java class.
+     */
+    private class JavaFileReferences {
+        private String javaFile;
+        private String classFile;
+
+        JavaFileReferences(String javaFile, String classFile) {
+            this.javaFile = javaFile;
+            this.classFile = classFile;
+        }
+    }
+
+    /**
      * Wrapper class for classes, which have been compiled already.
      * They have a type {@link CompileClassType}, an {@code id} and
      * paths to {@code .java} and {@code .class} files.
@@ -761,6 +824,7 @@ public class UploadManager extends HttpServlet {
 
     private enum CompileClassType {
         CUT,
+        DEPENDENCY,
         MUTANT,
         TEST
     }
