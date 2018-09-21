@@ -13,8 +13,8 @@ import java.util.stream.Collectors;
 /**
  * This class offers static methods to execute Java code using the java {@link Runtime}.
  *
- * @see AntRunner
  * @author <a href=https://github.com/werli>Phil Werli<a/>
+ * @see AntRunner
  */
 public class Runner {
     private static Logger logger = LoggerFactory.getLogger(Runner.class);
@@ -22,10 +22,9 @@ public class Runner {
     /**
      * Executes a given test against a class (and if specified its dependencies).
      *
-     *
      * @param javaTestFilePath the file path to the test class.
-     * @param javaCutFilePath the file path to the
-     * @throws Exception
+     * @param javaCutFilePath  the file path to the
+     * @throws Exception when executing the java program fails.
      */
     public static void runTestAgainstClass(String javaTestFilePath, String javaCutFilePath) throws Exception {
         String testName = javaTestFilePath.substring(javaTestFilePath.lastIndexOf("/") + 1, javaTestFilePath.lastIndexOf("."));
