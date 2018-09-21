@@ -3,6 +3,7 @@ package org.codedefenders.database;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.model.Dependency;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -111,6 +112,41 @@ public class GameClassDAO {
             }
         } catch (SQLException e) {
             logger.error("Error during retrieval of mapped tests for classId:{}", classId);
+        } finally {
+            DB.cleanup(conn, stmt);
+        }
+
+        return testIds;
+    }
+
+    /**
+     * Return a {@link List} of all identifiers of {@link Dependency}s,
+     * which were uploaded together with a given class.
+     *
+     * @param classId the identifier of the given class
+     * @return a list of identifiers of dependencies
+     */
+    public static List<Integer> getMappedDependenciesForId(Integer classId) {
+        List<Integer> testIds = new LinkedList<>();
+
+        String query = "SELECT Dependency_ID FROM dependencies WHERE Class_ID = ?;";
+
+        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+
+        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
+        if (resultSet == null) {
+            return testIds;
+        }
+        try {
+            while (resultSet.next()) {
+                final int testId = resultSet.getInt("Dependency_ID");
+                testIds.add(testId);
+            }
+        } catch (SQLException e) {
+            logger.error("Error during retrieval of mapped dependency for classId:{}", classId);
         } finally {
             DB.cleanup(conn, stmt);
         }
