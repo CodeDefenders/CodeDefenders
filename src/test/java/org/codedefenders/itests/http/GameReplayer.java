@@ -95,8 +95,8 @@ public class GameReplayer {
 				System.out.println("GameReplayer.parse() FOUND ATTACKER " + userID);
 				actors.put(userID,
 						new HelperUser(
-								new User("Attacker" + userID, "test", "Attacker" + userID + "@test.com"),
-								org.codedefenders.itests.http.utils.WebClientFactory.getNewWebClient(), "localhost"));
+								new User("Attacker" + userID, User.encodePassword("test"), "Attacker" + userID + "@test.com"),
+								org.codedefenders.itests.http.utils.WebClientFactory.getNewWebClient(), "localhost", "test"));
 			}
 			System.out.println("GameReplayer.parse() Attack " + userID);
 			mutants.put(mutantID, userID);
@@ -123,8 +123,8 @@ public class GameReplayer {
 				if (!actors.containsKey(userID)) {
 					System.out.println("GameReplayer.parse() FOUND DEFENDER " + userID);
 					actors.put(userID,
-							new HelperUser(new User("Defender" + userID, "test", "Defender" + userID + "@test.com"),
-									org.codedefenders.itests.http.utils.WebClientFactory.getNewWebClient(), "localhost"));
+							new HelperUser(new User("Defender" + userID, User.encodePassword("test"), "Defender" + userID + "@test.com"),
+									org.codedefenders.itests.http.utils.WebClientFactory.getNewWebClient(), "localhost", "test"));
 				}
 			}
 		}
@@ -208,8 +208,8 @@ public class GameReplayer {
 	// Raise assertions ?
 	public void replay(int speedUp) throws FailingHttpStatusCodeException, IOException, InterruptedException {
 		// Create a game -> we need the game ID
-		User creatorUser = new User("creator", "test", "creator@test.com");
-		HelperUser creator = new HelperUser(creatorUser, WebClientFactory.getNewWebClient(), "localhost");
+		User creatorUser = new User("creator", User.encodePassword("test"), "creator@test.com");
+		HelperUser creator = new HelperUser(creatorUser, WebClientFactory.getNewWebClient(), "localhost", "test");
 
 		// This fails if the user exists ?
 		creator.doRegister();
