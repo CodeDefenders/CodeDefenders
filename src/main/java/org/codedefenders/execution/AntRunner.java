@@ -5,10 +5,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.GameClass;
-import org.codedefenders.game.multiplayer.CoverageGenerator;
-import org.codedefenders.game.multiplayer.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.CoverageGenerator;
+import org.codedefenders.game.multiplayer.LineCoverage;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,6 +114,7 @@ public class AntRunner {
 	 * @param t A {@link Test} object
 	 * @return A {@link TargetExecution} object
 	 */
+	@SuppressWarnings("Duplicates")
 	static TargetExecution testMutant(Mutant m, Test t) {
 		logger.info("Running test {} on mutant {}", t.getId(), m.getId());
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
@@ -143,6 +144,7 @@ public class AntRunner {
 		return newExec;
 	}
 
+	@SuppressWarnings("Duplicates")
 	static TargetExecution recompileTestAndTestMutant(Mutant m, Test t) {
 		logger.info("Running test {} on mutant {}", t.getId(), m.getId());
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
@@ -217,7 +219,7 @@ public class AntRunner {
 	 * @param cut Class under test
 	 * @return The path to the compiled CUT
 	 */
-	public static String compileCUT(GameClass cut) throws CutCompileException {
+	public static String compileCUT(GameClass cut) throws CompileException {
 		AntProcessResult result = runAntTarget("compile-cut", null, null, cut, null, forceLocalExecution);
 
 		logger.info("Compile New CUT, Compilation result: {}", result);
@@ -236,7 +238,7 @@ public class AntRunner {
 			// Otherwise the CUT failed to compile
 			String message = result.getCompilerOutput();
 			logger.error("Failed to compile uploaded CUT: {}", message);
-			throw new CutCompileException( message );
+			throw new CompileException(message);
 		}
 		return pathCompiledClassName;
 	}
@@ -264,7 +266,7 @@ public class AntRunner {
 			// Create and insert a new target execution recording successful compile, with no message to report, and return its ID
 			// Locate .class file
 			final String compiledClassName = cut.getBaseName() + JAVA_CLASS_EXT;
-			LinkedList<File> matchingFiles = (LinkedList<File>) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
+			final LinkedList<File> matchingFiles = new LinkedList<>(FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter()));
 			assert (! matchingFiles.isEmpty()): "if compilation was successful, .class file must exist";
 			String cFile = matchingFiles.get(0).getAbsolutePath();
 			int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gameID);
@@ -307,7 +309,7 @@ public class AntRunner {
 			// Create and insert a new target execution recording successful compile, with no message to report, and return its ID
 			// Locate .class file
 			final String compiledClassName = FilenameUtils.getBaseName(jFile) + JAVA_CLASS_EXT;
-			LinkedList<File> matchingFiles = (LinkedList<File>) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
+			final List<File> matchingFiles = new LinkedList<>(FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter()));
 			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
 			String cFile = matchingFiles.get(0).getAbsolutePath();
 			logger.info("Compiled test {}", compiledClassName);
@@ -374,16 +376,16 @@ public class AntRunner {
 		logger.info("Running Ant Target: {} with mFile: {} and tFile: {}", target, mutantDir, testDir);
 
 		ProcessBuilder pb = new ProcessBuilder();
-		Map env = pb.environment();
+		Map<String, String> env = pb.environment();
 		List<String> command = new ArrayList<>();
 
-		/**
+		/*
 		 * Clustered execution uses almost the same command than normal
 		 * execution. But it prefixes that with "srun". This assumes that the
 		 * code-defender working dir is on the NFS.
 		 */
 
-		if (clusterEnabled & !forcedLocally) {
+		if (clusterEnabled && !forcedLocally) {
 			logger.info("Clustered Execution");
 			if (clusterJavaHome != null) {
 				env.put("JAVA_HOME", clusterJavaHome);
