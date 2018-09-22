@@ -16,11 +16,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -248,30 +245,14 @@ public class Test {
 	public boolean update() {
 		logger.debug("Updating Test");
 		Connection conn = DB.getConnection();
-		StringBuilder linesCoveredString = new StringBuilder();
-		StringBuilder linesUncoveredString = new StringBuilder();
-		if (lineCoverage != null) {
-			for (int i : lineCoverage.getLinesCovered()) {
-				linesCoveredString.append(i).append(",");
-			}
-			for (int i : lineCoverage.getLinesUncovered()) {
-				linesUncoveredString.append(i).append(",");
-			}
-			if (linesCoveredString.length() > 0) {
-				linesCoveredString.deleteCharAt(linesCoveredString.length() - 1);
-//				linesCoveredString = new StringBuilder(linesCoveredString.substring(0, linesCoveredString.length() - 1));
-			}
-			if (linesUncoveredString.length() > 0) {
-				linesUncoveredString.deleteCharAt(linesUncoveredString.length() - 1);
-//				linesUncoveredString = new StringBuilder(linesUncoveredString.substring(0, linesUncoveredString.length() - 1));
-			}
-		}
-		//-1 for the left over comma
+		String linesCoveredString = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
+		String linesUncoveredString = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
+
 		String query = "UPDATE tests SET mutantsKilled=?, NumberAiMutantsKilled=?, Lines_Covered=?, Lines_Uncovered=?, Points = ? WHERE Test_ID=?;";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantsKilled),
 				DB.getDBV(aiMutantsKilled),
-				DB.getDBV(linesCoveredString.toString()),
-				DB.getDBV(linesUncoveredString.toString()),
+				DB.getDBV(linesCoveredString),
+				DB.getDBV(linesUncoveredString),
 				DB.getDBV(score),
 				DB.getDBV(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -351,4 +332,23 @@ public class Test {
 		this.lineCoverage = lineCoverage;
 	}
 
+	// First created appears first
+	public static Comparator<Test> orderByIdAscending() {
+		return new Comparator<Test>() {
+			@Override
+			public int compare(Test o1, Test o2) {
+				return o1.id - o2.id;
+			}
+		};
+	}
+
+	// Last created appears first
+	public static Comparator<Test> orderByIdDescending() {
+		return new Comparator<Test>() {
+			@Override
+			public int compare(Test o1, Test o2) {
+				return o2.id - o1.id;
+			}
+		};
+	}
 }

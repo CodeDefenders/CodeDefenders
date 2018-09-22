@@ -17,14 +17,10 @@ import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -64,7 +60,6 @@ public class Mutant implements Serializable {
 	private int roundKilled;
 
 	private int playerId;
-	private String playerName;
 
 	private transient int killedByAITests = 0; //How many times this mutant is killed
 	// by an AI test.
@@ -77,8 +72,8 @@ public class Mutant implements Serializable {
 	 */
 	private Integer classId;
 
-	private ArrayList<Integer> lines = null;
-	private transient ArrayList<String> description = null;
+	private List<Integer> lines = null;
+	private transient List<String> description = null;
 	private transient Patch difference = null;
 
     /**
@@ -102,11 +97,20 @@ public class Mutant implements Serializable {
 		this.classId = classId;
 	}
 
+	/**
+	 * Creates a mutant
+	 *
+	 * @param gameId
+	 * @param jFile
+	 * @param cFile
+	 * @param alive
+	 * @param playerId
+	 */
 	public Mutant(int gameId, String jFile, String cFile, boolean alive, int playerId) {
 		this.gameId = gameId;
-		final DuelGame id = DatabaseAccess.getGameForKey("ID", gameId);
-		if (id != null) {
-			this.roundCreated = id.getCurrentRound();
+		final DuelGame game = DatabaseAccess.getGameForKey("ID", gameId);
+		if (game != null) {
+			this.roundCreated = game.getCurrentRound();
 		}
 		this.javaFile = jFile;
 		this.classFile = cFile;
@@ -214,14 +218,6 @@ public class Mutant implements Serializable {
 		this.score += score;
 	}
 
-	public void setPlayerName(String username){
-		playerName = username;
-	}
-
-	public String getPlayerName(){
-		return playerName;
-	}
-
 	public boolean kill() {
 		return kill(equivalent);
 	}
@@ -327,15 +323,10 @@ public class Mutant implements Serializable {
 		return 0;
 	}
 
-	public Patch getDifferences() {
+	public synchronized Patch getDifferences() {
 		if (difference == null) {
-			int classId;
-			if (this.classId == null) {
-				classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
-			} else {
-				classId = this.classId;
-			}
-
+			int classId =
+					DatabaseAccess.getGameForKey("ID", gameId).getClassId();
 			GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
 			File sourceFile = new File(sut.getJavaFile());
@@ -359,11 +350,11 @@ public class Mutant implements Serializable {
 		}
 		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 
-		File sourceFile = new File(sut.getJavaFile());
-		File mutantFile = new File(javaFile);
+		Path sourceFile = Paths.get(sut.getJavaFile());
+		Path mutantFile = Paths.get(javaFile);
 
-		List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());
-		List<String> mutantLines = readLinesIfFileExist(mutantFile.toPath());
+		List<String> sutLines = readLinesIfFileExist(sourceFile);
+		List<String> mutantLines = readLinesIfFileExist(mutantFile);
 
 		Patch patch = DiffUtils.diff(sutLines, mutantLines);
 		List<String> unifiedPatches = DiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
@@ -386,9 +377,9 @@ public class Mutant implements Serializable {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();  // TODO handle properly
-		} finally {
-			return lines;
+			return null;
 		}
+		return lines;
 	}
 
 	// insert will run once after mutant creation.
@@ -475,12 +466,13 @@ public class Mutant implements Serializable {
 	 *
 	 * @return lines modified in the original class
 	 */
-	public ArrayList<Integer> getLines() {
+	public synchronized  List<Integer> getLines() {
 		if (lines != null) {
 			return lines;
 		}
-		lines = new ArrayList<>();
-		description = new ArrayList<>();
+
+		List<Integer> lines = new ArrayList<>();
+		List<String> description = new ArrayList<>();
 
 		Patch p = getDifferences();
 		for (Delta d : p.getDeltas()) {
@@ -509,10 +501,14 @@ public class Mutant implements Serializable {
 				description.add("Added " + desc + "\n");
 			}
 		}
+
+		this.lines = lines;
+		this.description = description;
+
 		return lines;
 	}
 
-	public List<String> getHTMLReadout() throws IOException {
+	public synchronized List<String> getHTMLReadout() throws IOException {
 		if (description != null) {
 			return description;
 		}
