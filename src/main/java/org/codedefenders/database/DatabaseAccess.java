@@ -1,21 +1,21 @@
 package org.codedefenders.database;
 
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
 import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
 import org.codedefenders.game.leaderboard.Entry;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.Test;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
 import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
@@ -25,7 +25,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 
@@ -898,14 +902,16 @@ public class DatabaseAccess {
 			// Load the MultiplayerGame Data with the provided ID.
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
-                String lcs = rs.getString("Lines_Covered");
-                String lucs = rs.getString("Lines_Uncovered");
+                String linesCovered = rs.getString("Lines_Covered");
+                String linesUncovered = rs.getString("Lines_Uncovered");
                 List<Integer> covered = new ArrayList<>();
                 List<Integer> uncovered = new ArrayList<>();
-                if(lcs != null)
-                    covered.addAll(Arrays.stream(lcs.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
-                if(lucs != null)
-                    uncovered.addAll(Arrays.stream(lucs.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
+				if (linesCovered != null && !linesCovered.isEmpty()) {
+					covered.addAll(Arrays.stream(linesCovered.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
+				}
+				if (linesUncovered != null && !linesUncovered.isEmpty()) {
+					uncovered.addAll(Arrays.stream(linesUncovered.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
+				}
 
                 Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
