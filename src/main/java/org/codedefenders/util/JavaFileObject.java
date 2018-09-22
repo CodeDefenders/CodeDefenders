@@ -75,4 +75,9 @@ public class JavaFileObject extends SimpleJavaFileObject {
     public String getContent() {
         return content;
     };
+
+    @Override
+    public String getName() {
+        return Paths.get(path).getFileName().toString();
+    }
 }

@@ -24,6 +24,16 @@
 					<span>The class used for games. Mutants are created from and tests are created for this class.</span>
 				</div>
 				<div>
+					<h3>Upload Dependencies (optional)</h3>
+					<span class="file-select">
+                        <input id="fileUploadDependency" name="fileUploadDependency" type="file" class="file-loading" accept=".zip" />
+                    </span>
+					<br>
+					<span>
+                        If the class under test has dependencies, upload them as inside a <code>zip</code> file.
+					</span>
+				</div>
+				<div>
 					<h3>Upload Mutants (optional)</h3>
 					<span class="file-select">
                         <input id="fileUploadMutant" name="fileUploadMutant" type="file" class="file-loading" accept=".zip" />
@@ -72,7 +82,7 @@
 				<tr>
 					<th class="col-sm-1 col-sm-offset-2">ID</th>
 					<th>Class name (alias)</th>
-					<th>Available tests/mutants</th>
+					<th>Available dependencies/tests/mutants</th>
 					<th>Mutation Difficulty</th>
 					<th>Testing Difficulty</th>
 				</tr>
@@ -110,7 +120,7 @@
 									</div>
 								</div>
 							</td>
-							<td><%=GameClassDAO.getMappedTestsForId(c.getId()).size()%>/<%=GameClassDAO.getMappedMutantsForId(c.getId()).size()%></td>
+							<td><%=GameClassDAO.getMappedDependenciesForId(c.getId()).size()%>/<%=GameClassDAO.getMappedTestsForId(c.getId()).size()%>/<%=GameClassDAO.getMappedMutantsForId(c.getId()).size()%></td>
 							<td><%=mutationDiff > 0 ? String.valueOf(mutationDiff) : ""%></td>
 							<td><%=testingDiff > 0 ? String.valueOf(testingDiff) : ""%></td>
 							<!--
