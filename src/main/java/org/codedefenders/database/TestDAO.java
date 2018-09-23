@@ -1,6 +1,7 @@
 package org.codedefenders.database;
 
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class handles the database logic for tests.
@@ -33,8 +35,17 @@ public class TestDAO {
         int playerId = test.getPlayerId();
         int score = test.getScore();
         Integer classId = test.getClassId();
+        LineCoverage lineCoverage = test.getLineCoverage();
 
-        String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points, Class_ID) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        String linesCovered = "";
+        String linesUncovered = "";
+
+        if (lineCoverage != null) {
+            linesCovered = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
+            linesUncovered = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
+        }
+
+        String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points, Class_ID, Lines_Covered, Lines_Uncovered) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
         DatabaseValue[] valueList = new DatabaseValue[]{
                 DB.getDBV(javaFile),
                 DB.getDBV(classFile),
@@ -42,7 +53,9 @@ public class TestDAO {
                 DB.getDBV(roundCreated),
                 DB.getDBV(playerId),
                 DB.getDBV(score),
-                (classId == null) ? null : DB.getDBV(classId)
+                (classId == null) ? null : DB.getDBV(classId),
+                DB.getDBV(linesCovered),
+                DB.getDBV(linesUncovered)
         };
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);

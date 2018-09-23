@@ -58,7 +58,7 @@ public class Test {
 	 * <li><code>score 0</code></li>
 	 * </ul>
 	 */
-	public Test(String javaFilePath, String classFilePath, int classId) {
+	public Test(String javaFilePath, String classFilePath, int classId, LineCoverage lineCoverage) {
 		this.javaFile = javaFilePath;
 		this.classFile = classFilePath;
 		this.gameId = -1;
@@ -66,7 +66,7 @@ public class Test {
 		this.roundCreated = -1;
 		this.score = 0;
 		this.classId = classId;
-		this.lineCoverage = new LineCoverage();
+		this.lineCoverage = lineCoverage;
 	}
 
 	public Test(int gameId, String javaFile, String classFile, int playerId) {

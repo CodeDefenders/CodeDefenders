@@ -52,6 +52,11 @@ public class Constants {
 
 	//public static String DATA_DIR    = F_SEP + "WEB-INF" + F_SEP + "data";
 	public static final String CUTS_DIR = DATA_DIR + F_SEP + "sources";
+	// dependencies, mutants and tests subdirectories for CUTs
+	public static final String CUTS_DEPENDENCY_DIR = "dependencies";
+	public static final String CUTS_MUTANTS_DIR = "mutants";
+	public static final String CUTS_TESTS_DIR = "tests";
+
 	// FIXME Phil: MUTANTS_DIR should be final.
 	public static String MUTANTS_DIR = DATA_DIR + F_SEP + "mutants";
 	public static final String TESTS_DIR = DATA_DIR + F_SEP + "tests";
