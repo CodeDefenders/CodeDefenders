@@ -103,6 +103,7 @@ public class Test {
 	public void incrementScore(int score) {
 		if (score == 0) {
 			// Why this is happening?
+			// Phil: ^ because the calculated score for this test so far is zero (e.g. no mutants in a game yet)
 			logger.warn("Do not increment score for test {} when score is zero", getId());
 			return;
 		}
@@ -119,9 +120,13 @@ public class Test {
 		logger.info("Increment score for {} by {}. Update? {} ", toString(), score, incremented);
 	}
 
-	@Deprecated
-	public void setScore(int s) {
-		score += s;
+	@Deprecated()
+	public void setScore(int store) {
+		score = store;
+	}
+
+	public void updateScore(int score) {
+		this.score += score;
 	}
 
 	public int getId() {
