@@ -7,15 +7,13 @@ import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
-import org.codedefenders.game.multiplayer.CoverageGenerator;
-import org.codedefenders.game.multiplayer.LineCoverage;
+import org.codedefenders.game.LineCoverage;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -192,7 +190,8 @@ public class AntRunner {
 		AntProcessResult result = runAntTarget("test-original", null, dir.getAbsolutePath(), cut, t.getFullyQualifiedClassName(), forceLocalExecution);
 
 		// add coverage information
-		t.setLineCoverage(getLinesCovered(t, cut));
+		final LineCoverage coverage = LineCoverageGenerator.generate(cut, t);
+		t.setLineCoverage(coverage);
 		t.update();
 
 		// record test execution
@@ -459,30 +458,6 @@ public class AntRunner {
 		logger.info("Executing Ant Command {} from directory {}", pb.command().toString(), buildFileDir);
 
 		return runAntProcess(pb);
-	}
-
-	/**
-	 * Executes a test against a mutant
-	 * @param t A {@link Test} object
-	 * @param c A {@link GameClass} object
-	 * @return A {@link TargetExecution} object
-	 */
-	private static LineCoverage getLinesCovered(Test t, GameClass c) {
-		CoverageGenerator cg = new CoverageGenerator(
-				new File(t.getDirectory()),
-				new File(Constants.CUTS_DIR + F_SEP + c.getAlias()));
-
-		try {
-			cg.create( c );
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-
-		LineCoverage lc = new LineCoverage();
-		lc.setLinesCovered(cg.getLinesCovered());
-		lc.setLinesUncovered(cg.getLinesUncovered());
-		return lc;
 	}
 
 	private static AntProcessResult runAntProcess(ProcessBuilder pb) {
