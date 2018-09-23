@@ -66,8 +66,7 @@ public class Constants {
 	public static final String LIB_HAMCREST = DATA_DIR + F_SEP + "lib" + F_SEP + "hamcrest-all-1.3.jar";
 	public static final String LIB_MOCKITO = DATA_DIR + F_SEP + "lib" + F_SEP + "mockito-all-1.9.5.jar";
 
-	public static final String TEST_CLASSPATH = "." + File.pathSeparatorChar + Constants.LIB_JUNIT +
-			File.pathSeparatorChar + Constants.LIB_HAMCREST + File.pathSeparatorChar + Constants.LIB_MOCKITO;
+	public static final String TEST_CLASSPATH = Constants.LIB_JUNIT + File.pathSeparatorChar + Constants.LIB_HAMCREST + File.pathSeparatorChar + Constants.LIB_MOCKITO;
     public static final String TEST_CLASSPATH_WITH_DIR = TEST_CLASSPATH + File.pathSeparatorChar + "%s";
 	public static final String TEST_CLASSPATH_WITH_2DIR = TEST_CLASSPATH_WITH_DIR + File.pathSeparatorChar + "%s";
 

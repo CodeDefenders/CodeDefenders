@@ -1,6 +1,5 @@
 package org.codedefenders.execution;
 
-import org.codedefenders.util.Constants;
 import org.codedefenders.util.JavaFileObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,9 @@ import java.util.List;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
+import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.F_SEP;
+import static org.codedefenders.util.Constants.TEST_CLASSPATH;
 
 /**
  * This class handles compilation of Java classes using the
@@ -107,7 +108,8 @@ public class Compiler {
      * gives an option to remove the generated {@code .class} files again.
      *
      * @param cleanUpDependencyClassFiles whether generated {@code .class} files of dependencies
-     *                                    are removed after compilation.
+     *                                    are removed after compilation. Otherwise they are moved to
+     *                                    {@code dependencies/}.
      * @see #compileJavaFileForContentWithDependencies(String, String, List)
      */
     public static String compileJavaFileForContentWithDependencies(String javaFilePath, String javaFileContent, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException {
@@ -133,7 +135,8 @@ public class Compiler {
      * gives an option to remove the generated {@code .class} files again.
      *
      * @param cleanUpDependencyClassFiles whether generated {@code .class} files of dependencies
-     *                                    are removed after compilation.
+     *                                    are removed after compilation. Otherwise they are moved to
+     *                                    {@code dependencies/}.
      * @see #compileJavaFileWithDependencies(String, List)
      */
     public static String compileJavaFileWithDependencies(String javaFilePath, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException {
@@ -163,6 +166,9 @@ public class Compiler {
         if (cleanUpDependencyClassFiles) {
             // Remove dependency .class files generated in outDir
             cleanUpDependencies(dependencies, outDir, success);
+        } else {
+            // Move dependency .class files generated to outDir/dependencies
+            moveDependencies(dependencies, outDir, success);
         }
         if (success) {
             return javaFile.getPath().replace(".java", ".class");
@@ -179,7 +185,7 @@ public class Compiler {
      * required for testing.
      *
      * @param javaTestFilePath Path to the {@code .java} test file.
-     * @param dependencies a list of java files required for compilation.
+     * @param dependencies     a list of java files required for compilation.
      * @return A path to the {@code .class} file.
      * @throws CompileException If an error during compilation occurs.
      */
@@ -210,7 +216,7 @@ public class Compiler {
      *
      * @param javaFilePath    Path to the {@code .java} test file.
      * @param javaFileContent Content of the {@code .java} test file.
-     * @param dependencies a list of java files required for compilation.
+     * @param dependencies    a list of java files required for compilation.
      * @return A path to the {@code .class} file.
      * @throws CompileException If an error during compilation occurs.
      */
@@ -236,7 +242,6 @@ public class Compiler {
     private static String compileJavaTestFile(JavaFileObject testFile, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException {
         final String outDir = Paths.get(testFile.getPath()).getParent().toString();
 
-        final String classPath = Constants.TEST_CLASSPATH;
         javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
 
         final StringWriter writer = new StringWriter();
@@ -246,7 +251,7 @@ public class Compiler {
         final List<String> options = Arrays.asList(
                 "-encoding", "UTF-8",
                 "-d", outDir,
-                "-classpath", classPath
+                "-classpath", TEST_CLASSPATH
         );
 
         final JavaCompiler.CompilationTask task = compiler.getTask(writer, null, null, options, null, compilationUnits);
@@ -272,7 +277,6 @@ public class Compiler {
      * @param logError     {@code true} if IOExceptions should be logged.
      */
     private static void cleanUpDependencies(List<JavaFileObject> dependencies, String directory, Boolean logError) {
-        // Remove dependency .class files generated in the directory
         for (JavaFileObject dependency : dependencies) {
             try {
                 final String path = directory + F_SEP + dependency.getName().replace(".java", ".class");
@@ -281,6 +285,29 @@ public class Compiler {
             } catch (IOException e) {
                 if (logError) {
                     logger.warn("Failed to remove dependency class file in folder:{}", directory);
+                }
+            }
+        }
+    }
+
+    /**
+     * Move generated {@code .class} files to {@code dependencies/} subdirectory for a given list of files.
+     *
+     * @param dependencies the {@code .java} files the {@code .class} were generated from
+     *                     and will be moved.
+     * @param directory    the directory the files were in.
+     * @param logError     {@code true} if IOExceptions should be logged.
+     */
+    private static void moveDependencies(List<JavaFileObject> dependencies, String directory, Boolean logError) {
+        for (JavaFileObject dependency : dependencies) {
+            try {
+                final String fileName = dependency.getName().replace(".java", ".class");
+                final String oldPath = directory + F_SEP + fileName;
+                final String newPath = directory + F_SEP + CUTS_DEPENDENCY_DIR + F_SEP + fileName;
+                Files.move(Paths.get(oldPath), Paths.get(newPath));
+            } catch (IOException e) {
+                if (logError) {
+                    logger.error("Failed to move dependency class.", e);
                 }
             }
         }

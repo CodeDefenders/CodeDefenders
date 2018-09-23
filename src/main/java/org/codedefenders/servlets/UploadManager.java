@@ -321,7 +321,8 @@ public class UploadManager extends HttpServlet {
 
                     final String depJavaFilePath;
                     try {
-                        depJavaFilePath = storeJavaFile(cutDir, dependencyFileName, dependencyFileContent);
+                        final String folderPath = String.join(F_SEP, cutDir, CUTS_DEPENDENCY_DIR);
+                        depJavaFilePath = storeJavaFile(folderPath, dependencyFileName, dependencyFileContent);
                         final String depClassFilePath = depJavaFilePath.replace(".java", ".class");
                         dependencyReferences.add(new JavaFileReferences(depJavaFilePath, depClassFilePath));
                     } catch (IOException e) {
