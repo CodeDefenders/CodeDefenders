@@ -893,15 +893,16 @@ public class DatabaseAccess {
 			// Load the MultiplayerGame Data with the provided ID.
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
-				String lcs = rs.getString("Lines_Covered");
-				String lucs = rs.getString("Lines_Uncovered");
+				String linesCovered = rs.getString("Lines_Covered");
+				String linesUncovered = rs.getString("Lines_Uncovered");
 				List<Integer> covered = new ArrayList<>();
 				List<Integer> uncovered = new ArrayList<>();
-				if(lcs != null && lcs.length() > 0)
-					covered.addAll(Arrays.stream(lcs.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
-				if(lucs != null && lcs.length() > 0)
-					uncovered.addAll(Arrays.stream(lucs.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
-
+				if (linesCovered != null && !linesCovered.isEmpty()) {
+					covered.addAll(Arrays.stream(linesCovered.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
+				}
+				if (linesUncovered != null && !linesUncovered.isEmpty()) {
+					uncovered.addAll(Arrays.stream(linesUncovered.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
+				}
 				Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
 						rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"), rs.getInt("Player_ID"),
