@@ -10,10 +10,12 @@ import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
+import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
-import org.codedefenders.execution.Runner;
+import org.codedefenders.execution.LineCoverageGenerator;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Dependency;
@@ -51,6 +53,9 @@ import javax.servlet.http.HttpSession;
 import javassist.ClassPool;
 import javassist.CtClass;
 
+import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
+import static org.codedefenders.util.Constants.CUTS_MUTANTS_DIR;
+import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
 import static org.codedefenders.util.Constants.F_SEP;
 
 /**
@@ -92,8 +97,8 @@ public class UploadManager extends HttpServlet {
         final String cutFileName;
         // The directory in which the CUT is saved in.
         final String cutDir;
-        // Used to run tests against the CUT.
-        final String cutJavaFilePath;
+        // Used to run calculate line coverage for tests
+        final GameClass cut;
         // flag whether upload is with dependencies or not
         boolean withDependencies = false;
 
@@ -250,6 +255,7 @@ public class UploadManager extends HttpServlet {
             }
 
             cutDir = Constants.CUTS_DIR + F_SEP + classAlias;
+            final String cutJavaFilePath;
             try {
                 cutJavaFilePath = storeJavaFile(cutDir, fileName, fileContent);
             } catch (IOException e) {
@@ -315,7 +321,8 @@ public class UploadManager extends HttpServlet {
 
                     final String depJavaFilePath;
                     try {
-                        depJavaFilePath = storeJavaFile(cutDir, dependencyFileName, dependencyFileContent);
+                        final String folderPath = String.join(F_SEP, cutDir, CUTS_DEPENDENCY_DIR);
+                        depJavaFilePath = storeJavaFile(folderPath, dependencyFileName, dependencyFileContent);
                         final String depClassFilePath = depJavaFilePath.replace(".java", ".class");
                         dependencyReferences.add(new JavaFileReferences(depJavaFilePath, depClassFilePath));
                     } catch (IOException e) {
@@ -352,7 +359,7 @@ public class UploadManager extends HttpServlet {
                 return;
             }
 
-            final GameClass cut = new GameClass(classQualifiedName, classAlias, cutJavaFilePath, cutClassFilePath, isMockingEnabled);
+            cut = new GameClass(classQualifiedName, classAlias, cutJavaFilePath, cutClassFilePath, isMockingEnabled);
             try {
                 cutId = GameClassDAO.storeClass(cut);
             } catch (Exception e) {
@@ -390,7 +397,7 @@ public class UploadManager extends HttpServlet {
         }
 
         if (testsZipFile != null) {
-            final boolean failed = addTests(request, response, messages, compiledClasses, cutId, cutDir, cutJavaFilePath, testsZipFile, dependencies);
+            final boolean failed = addTests(request, response, messages, compiledClasses, cutId, cutDir, cut, testsZipFile, dependencies);
             if (failed) {
                 // tests zip failed and abort method has been called.
                 return;
@@ -480,10 +487,10 @@ public class UploadManager extends HttpServlet {
                 return true;
             }
 
-            final String folderPath = cutDir + F_SEP + "mutants" + F_SEP + index;
 
             String javaFilePath;
             try {
+                final String folderPath = String.join(F_SEP, cutDir, CUTS_MUTANTS_DIR, String.valueOf(index));
                 javaFilePath = storeJavaFile(folderPath, fileName, fileContent);
             } catch (IOException e) {
                 logger.error("Class upload failed. Could not store mutant java file " + fileName, e);
@@ -544,7 +551,7 @@ public class UploadManager extends HttpServlet {
      *                        which need to get cleaned up once something fails.
      * @param cutId  the identifier of the class under test.
      * @param cutDir the directory in which the class under test lies.
-     * @param cutJavaFilePath the file path of the class under test.
+     * @param cut the class under test {@link GameClass} object.
      * @param testsZipFile the given zip file from which the tests are added.
      * @param dependencies dependencies required to compile the tests.
      * @return {@code true} if addition fails, {@code fail} otherwise.
@@ -552,11 +559,11 @@ public class UploadManager extends HttpServlet {
      */
     @SuppressWarnings("Duplicates")
     private boolean addTests(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages,
-                             List<CompiledClass> compiledClasses, int cutId, String cutDir, String cutJavaFilePath,
-                             SimpleFile testsZipFile, List<JavaFileObject> dependencies) throws IOException {
+                             List<CompiledClass> compiledClasses, int cutId, String cutDir, GameClass cut,
+                              SimpleFile testsZipFile, List<JavaFileObject> dependencies) throws IOException {
 
         // Class under test is a dependency for all tests
-        dependencies.add(new JavaFileObject(cutJavaFilePath));
+        dependencies.add(new JavaFileObject(cut.getJavaFile()));
 
         final String zipFileName = testsZipFile.fileName;
         final byte[] zipFileContent = testsZipFile.fileContent;
@@ -598,10 +605,9 @@ public class UploadManager extends HttpServlet {
                 return true;
             }
 
-            final String folderPath = cutDir + F_SEP + "tests" + F_SEP + index;
-
             String javaFilePath;
             try {
+                final String folderPath = String.join(F_SEP, cutDir, CUTS_TESTS_DIR, String.valueOf(index));
                 javaFilePath = storeJavaFile(folderPath, fileName, fileContent);
             } catch (IOException e) {
                 logger.error("Class upload failed. Could not store java file of test class " + fileName, e);
@@ -622,7 +628,11 @@ public class UploadManager extends HttpServlet {
             }
 
             try {
-                Runner.runTestAgainstClass(javaFilePath, cutJavaFilePath);
+                final String testDir = Paths.get(javaFilePath).getParent().toString();
+                final String qualifiedName = getFullyQualifiedName(classFilePath);
+
+                // This adds a jacoco.exec file to the testDir
+                AntRunner.testOriginal(cut, testDir, qualifiedName);
             } catch (Exception e) {
                 logger.error("Class upload failed. Test " + fileName + " failed", e);
                 messages.add("Class upload failed. Test " + fileName + " failed");
@@ -631,8 +641,12 @@ public class UploadManager extends HttpServlet {
                 return true;
             }
 
+            // LineCoverage#generate requires at least a dummy test object
+            final Test dummyTest = new Test(javaFilePath, null, -1, null);
+
             Integer testId;
-            final Test test = new Test(javaFilePath, classFilePath, cutId);
+            final LineCoverage lineCoverage = LineCoverageGenerator.generate(cut, dummyTest);
+            final Test test = new Test(javaFilePath, classFilePath, cutId, lineCoverage);
             try {
                 testId = TestDAO.storeTest(test);
             } catch (Exception e) {

@@ -5,7 +5,6 @@ import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.game.multiplayer.LineCoverage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +47,7 @@ public class Test {
 	private int mutantsKilled;
 	private int score;
 	private int aiMutantsKilled; // how many generated mutants this test killed.
-	private LineCoverage lineCoverage = new LineCoverage();
+	private LineCoverage lineCoverage;
 
 	/**
 	 * Creates a new Test with following attributes:
@@ -59,7 +58,7 @@ public class Test {
 	 * <li><code>score 0</code></li>
 	 * </ul>
 	 */
-	public Test(String javaFilePath, String classFilePath, int classId) {
+	public Test(String javaFilePath, String classFilePath, int classId, LineCoverage lineCoverage) {
 		this.javaFile = javaFilePath;
 		this.classFile = classFilePath;
 		this.gameId = -1;
@@ -67,6 +66,7 @@ public class Test {
 		this.roundCreated = -1;
 		this.score = 0;
 		this.classId = classId;
+		this.lineCoverage = lineCoverage;
 	}
 
 	public Test(int gameId, String javaFile, String classFile, int playerId) {
@@ -81,6 +81,7 @@ public class Test {
 		this.classFile = classFile;
 		this.playerId = playerId;
 		this.score = 0;
+		this.lineCoverage = new LineCoverage();
 	}
 
 	@Deprecated
@@ -96,13 +97,13 @@ public class Test {
 		this.roundCreated = roundCreated;
 		this.mutantsKilled = mutantsKilled;
 		this.score = score;
-		lineCoverage.setLinesCovered(linesCovered);
-		lineCoverage.setLinesUncovered(linesUncovered);
+		lineCoverage = new LineCoverage(linesCovered, linesUncovered);
 	}
 	// TODO Check that increment score does not consider mutants that were killed already
 	public void incrementScore(int score) {
 		if (score == 0) {
 			// Why this is happening?
+			// Phil: ^ because the calculated score for this test so far is zero (e.g. no mutants in a game yet)
 			logger.warn("Do not increment score for test {} when score is zero", getId());
 			return;
 		}
@@ -119,9 +120,13 @@ public class Test {
 		logger.info("Increment score for {} by {}. Update? {} ", toString(), score, incremented);
 	}
 
-	@Deprecated
-	public void setScore(int s) {
-		score += s;
+	@Deprecated()
+	public void setScore(int store) {
+		score = store;
+	}
+
+	public void updateScore(int score) {
+		this.score += score;
 	}
 
 	public int getId() {
@@ -245,16 +250,25 @@ public class Test {
 	public boolean update() {
 		logger.debug("Updating Test");
 		Connection conn = DB.getConnection();
-		String linesCoveredString = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
-		String linesUncoveredString = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
 
-		String query = "UPDATE tests SET mutantsKilled=?, NumberAiMutantsKilled=?, Lines_Covered=?, Lines_Uncovered=?, Points = ? WHERE Test_ID=?;";
+		String linesCoveredString = "";
+		String linesUncoveredString= "";
+
+		if (lineCoverage != null) {
+			linesCoveredString = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
+			linesUncoveredString = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
+		}
+
+
+		String query = "UPDATE tests SET mutantsKilled=?,NumberAiMutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantsKilled),
 				DB.getDBV(aiMutantsKilled),
 				DB.getDBV(linesCoveredString),
 				DB.getDBV(linesUncoveredString),
 				DB.getDBV(score),
-				DB.getDBV(id)};
+				DB.getDBV(id)
+		};
+
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		return DB.executeUpdate(stmt, conn);
 	}

@@ -153,11 +153,10 @@ public class MultiplayerGameManager extends HttpServlet {
 							MutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
 							if (mPending.getEquivalent().equals(PROVEN_NO)) {
 								logger.info("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
-								newTest.setScore(0); // score 2 points for proving a mutant non-equivalent
-								Event notif = new Event(-1, activeGame.getId(),
-										uid,
-										DatabaseAccess.getUser(uid)
-												.getUsername() +
+								// TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points added.
+								newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
+								Event notif = new Event(-1, activeGame.getId(), uid,
+										DatabaseAccess.getUser(uid) .getUsername() +
 												" killed mutant " + mPending.getId() +" in an equivalence duel.",
 										EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
 										new Timestamp(System.currentTimeMillis()));
