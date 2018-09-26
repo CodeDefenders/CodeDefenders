@@ -174,7 +174,5 @@
         </div> <!-- col-md6 newmut -->
     </div>
     </div>
-<script>
 <%@ include file="/jsp/multiplayer/game_highlighting.jsp" %>
-</script>
 <%@ include file="/jsp/multiplayer/footer_game.jsp" %>

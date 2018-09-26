@@ -180,7 +180,7 @@ public class GameSelectionManager extends HttpServlet {
                         if (eGame.getMode().equals(GameMode.UTESTING))
                             response.sendRedirect(contextPath+"/utesting");
                         else
-                            response.sendRedirect(contextPath+"/"+eGame.getClass().getSimpleName().toLowerCase().toLowerCase());
+                            response.sendRedirect(contextPath+"/"+eGame.getClass().getSimpleName().toLowerCase());
                     } else {
                         Redirect.redirectBack(request, response);
                     }

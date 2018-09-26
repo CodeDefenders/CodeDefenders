@@ -1,22 +1,14 @@
 <%@ page import="static org.codedefenders.game.GameState.ACTIVE" %>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.game.GameState" %>
-<%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Role" %>
-<%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.util.Constants" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="com.google.gson.Gson" %>
-<%@ page import="java.util.stream.Collectors" %>
 
 <% String pageTitle="Defending Class"; %>
-<%Gson gson = new Gson();%>
 
 <%@ include file="/jsp/header_game.jsp" %>
+
+<%-- TODO Set request attributes in the Servlet and redirect via RequestDispatcher --%>
 
 <%-- Set request attributes for the components. --%>
 <%
@@ -44,6 +36,12 @@
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
 	request.setAttribute("gameType", "DUEL");
+
+	/* game_highlighting */
+	request.setAttribute("codeDivSelector", "#cut-div");
+	// request.setAttribute("tests", game.getTests());
+	request.setAttribute("mutants", game.getMutants());
+	request.setAttribute("showEquivalenceButton", true);
 %>
 
 <%
@@ -67,9 +65,9 @@
 			<div class="modal-footer">
 				<button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
 			</div>
-		</div><!-- /.modal-content -->
-	</div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+		</div>
+	</div>
+</div>
 <%  } %>
 
 <div class="row-fluid">
@@ -83,7 +81,7 @@
 		<h3>Write a new JUnit test here
 			<% if (game.getState().equals(ACTIVE) && game.getActiveRole().equals(Role.DEFENDER)) {%>
 			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def" onClick="this.form.submit(); this.disabled=true; this.value='Defending...';">Defend!</button>
-			<%}%>
+			<% } %>
 		</h3>
 		<form id="def" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() %>" method="post">
 			<%@include file="game_components/test_editor.jsp"%>
@@ -105,70 +103,21 @@
 	</div>
 </div>
 
-<%
-	List<Test> tests = game.getTests();
-	HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<Integer, ArrayList<Test>>();
-
-	for (Test t : tests) {
-
-		for (Integer lc : t.getLineCoverage().getLinesCovered()) {
-			if (!linesCovered.containsKey(lc)) {
-				linesCovered.put(lc, new ArrayList<Test>());
-			}
-
-			linesCovered.get(lc).add(t);
-		}
-	}
-%>
+<%@include file="game_components/game_highlighting.jsp"%>
 
 <script>
-    testMap = {
-        <% for (Integer i : linesCovered.keySet()){ %>
-            <%= i %>: [ <%= linesCovered.get(i).stream().map(t -> Integer.toString(t.getId())).distinct().collect(Collectors.joining(",")) %> ],
-        <% } %>
-    };
-
-    highlightCoverage = function(){
-        highlightLine([<% for (Integer i : linesCovered.keySet()){%>
-            [<%=i%>, <%=((float)linesCovered.get(i).size() / (float) tests.size())%>],
-            <% } %>], COVERED_COLOR, "#cut-div");
-    };
-
-    getMutants = function(){
-        return JSON.parse("<%= gson.toJson(mutants).replace("\"", "\\\"") %>");
-    };
-
-    showMutants = function(){
-        mutantLine("#cut-div", "<%= game.getState().equals(ACTIVE) ? "true" : "false"%>");
-    };
-
-    var updateCUT = function(){
-        showMutants();
-        highlightCoverage();
-    };
-
-    editorSUT.on("viewportChange", function(){
-        updateCUT();
-    });
-    $(document).ready(function(){
-        updateCUT();
-    });
-
-    //inline due to bug in Chrome?
-    $(window).resize(function (e){setTimeout(updateCUT, 500);});
-
 	<% if (game.getActiveRole().equals(Role.ATTACKER)) {%>
-	function checkForUpdate(){
-		$.post('/play', {
-			formType: "whoseTurn",
-			gameID: <%= game.getId() %>
-		}, function(data){
-			if(data=="defender"){
-				window.location.reload();
-			}
-		},"text");
-	}
-	setInterval("checkForUpdate()", 10000);
+        function checkForUpdate(){
+            $.post('/play', {
+                formType: "whoseTurn",
+                gameID: <%= game.getId() %>
+            }, function(data){
+                if(data === "defender"){
+                    window.location.reload();
+                }
+            },"text");
+        }
+        setInterval("checkForUpdate()", 10000);
 	<% } %>
 
 	$('#finishedModal').modal('show');

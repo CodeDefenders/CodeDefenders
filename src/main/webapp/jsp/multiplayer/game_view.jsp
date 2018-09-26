@@ -259,8 +259,5 @@
     }
 %>
     </div>
-<script>
-<%@ include file="/jsp/multiplayer/game_highlighting.jsp" %>
-</script>
 <%@ include file="/jsp/game_notifications.jsp"%>
 <%@ include file="/jsp/multiplayer/footer_game.jsp" %>

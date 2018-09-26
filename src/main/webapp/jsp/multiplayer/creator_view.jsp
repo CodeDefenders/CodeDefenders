@@ -73,4 +73,6 @@
             $('#finishedModal').modal('show');
         </script>
     </div>
+
+    <%@ include file="/jsp/multiplayer/game_highlighting.jsp" %>
 </div>

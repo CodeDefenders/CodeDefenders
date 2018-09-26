@@ -223,15 +223,14 @@
         <%@include file="multiplayer/attacker_commons.jsp" %>
     </div>
 
+    <script type="text/javascript" src="js/game_highlighting.js"></script>
+
     <script>
         testMap = {
-        <% for (Integer i : linesCovered.keySet()){%>
-        <%= i%>:
-        [<%= linesCovered.get(i).stream().map(t -> Integer.toString(t.getId())).distinct().collect(Collectors.joining(","))%>],
-        <% } %>
-        }
-        ;
-
+            <% for (Integer i : linesCovered.keySet()){%>
+                <%= i%>: [<%= linesCovered.get(i).stream().map(t -> Integer.toString(t.getId())).distinct().collect(Collectors.joining(","))%>],
+            <% } %>
+        };
 
         highlightCoverage = function () {
             highlightLine([<% for (Integer i : linesCovered.keySet()){%>
@@ -266,19 +265,17 @@
 
 
         <% if (game.getActiveRole().equals(Role.DEFENDER)) {%>
-
-        function checkForUpdate() {
-            $.post('/play', {
-                formType: "whoseTurn",
-                gameID: <%= game.getId() %>
-            }, function (data) {
-                if (data == "attacker") {
-                    window.location.reload();
-                }
-            }, 'text');
-        }
-
-        setInterval("checkForUpdate()", 10000);
+            function checkForUpdate() {
+                $.post('/play', {
+                    formType: "whoseTurn",
+                    gameID: <%= game.getId() %>
+                }, function (data) {
+                    if (data == "attacker") {
+                        window.location.reload();
+                    }
+                }, 'text');
+            }
+            setInterval("checkForUpdate()", 10000);
         <% } %>
 
     </script>

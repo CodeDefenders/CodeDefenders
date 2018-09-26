@@ -101,6 +101,9 @@
                 }, interval)
             }
         </script>
+
+        <%@ include file="/jsp/multiplayer/game_highlighting.jsp" %>
+
         <% request.getSession().removeAttribute("lastMutant"); %>
     </div> <!-- col-md6 newmut -->
 </div>

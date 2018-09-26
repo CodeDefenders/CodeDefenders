@@ -20,6 +20,12 @@
 
 	/* test_carousel */
 	request.setAttribute("tests", game.getTests());
+
+	/* game_highlighting */
+	request.setAttribute("codeDivSelector", "#cut-div");
+	// request.setAttribute("tests", game.getTests());
+	request.setAttribute("mutants", game.getMutants());
+	request.setAttribute("showEquivalenceButton", true);
 %>
 
 <div class="ws-12">
@@ -73,6 +79,8 @@
         // TODO is this needed ?
 		$('#finishedModal').modal('show');
 	</script>
+
+<%@ include file="/jsp/game_components/game_highlighting.jsp" %>
 
 <% request.getSession().removeAttribute("lastTest"); %>
 
