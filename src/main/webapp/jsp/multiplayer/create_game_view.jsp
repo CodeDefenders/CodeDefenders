@@ -55,6 +55,24 @@
             </tr>
             -->
             <tr>
+                <td>With mutants?</td>
+                <td>
+                    <input type="checkbox" id="withMutants" name="withMutants"
+                           class="form-control" data-size="large" data-toggle="toggle" data-on="Yes" data-off="No"
+                           data-onstyle="primary" data-offstyle="">
+                </td>
+                <td>(If available)</td>
+            </tr>
+            <tr>
+                <td>With tests?</td>
+                <td>
+                    <input type="checkbox" id="withTests" name="withTests"
+                           class="form-control" data-size="large" data-toggle="toggle" data-on="Yes" data-off="No"
+                           data-onstyle="primary" data-offstyle="">
+                </td>
+                <td>(If available)</td>
+            </tr>
+            <tr>
                 <td>Level</td>
                 <td id="levelTd">
                     <input type="checkbox" id="level" name="level" class="form-control" data-size="large"

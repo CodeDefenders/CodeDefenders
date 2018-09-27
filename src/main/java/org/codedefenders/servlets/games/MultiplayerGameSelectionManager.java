@@ -1,10 +1,30 @@
 package org.codedefenders.servlets.games;
 
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.execution.MutationTester;
+import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.validation.CodeValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -17,195 +37,218 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
-import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.validation.CodeValidator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.codedefenders.util.Constants.*;
 
+/**
+ * This {@link HttpServlet} handles redirecting to multiplayer games for
+ * a given identifier and creation of Battleground games.
+ * <p>
+ * Serves on path: `/multiplayer/games`.
+ */
 public class MultiplayerGameSelectionManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameSelectionManager.class);
 
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		String contextPath = request.getContextPath();
-        try {
-            HttpSession session = request.getSession();
-            // Get their user id from the session.
-            int uid = (Integer) session.getAttribute("uid");
-            String sId = request.getParameter("id");
-            int gameId = Integer.parseInt(sId);
-            MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
-
-            if (mg != null) {
-                mg.notifyPlayers();
-                String redirect = contextPath + "/multiplayer/play?id=" + gameId;
-                if (request.getParameter("attacker") != null) {
-                    redirect += "&attacker=1";
-                } else if (request.getParameter("defender") != null) {
-                    redirect += "&defender=1";
-                }
-                response.sendRedirect(redirect);
-            } else {
-                // response.sendRedirect(contextPath+"/multiplayer/games/user");
-                response.sendRedirect(contextPath+"/games/user");
-            }
-
-        } catch (NumberFormatException nfe) {
-            // response.sendRedirect(contextPath + "/multiplayer/games/user");
+        final String gameIdString = request.getParameter("id");
+        if (gameIdString == null) {
+            logger.info("No gameId provided. Redirecting back to /games/user");
             response.sendRedirect(contextPath + "/games/user");
+            return;
+        }
+        int gameId;
+        try {
+            gameId = Integer.parseInt(gameIdString);
+        } catch (NumberFormatException e) {
+            logger.error("Failed to format parameter id", e);
+            response.sendRedirect(contextPath + "/games/user");
+            return;
+        }
+
+        MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
+        if (mg == null) {
+            logger.warn("Could not find requested game: {}", gameId);
+            response.sendRedirect(contextPath + "/games/user");
+        } else {
+            mg.notifyPlayers();
+            String redirect = contextPath + "/multiplayer/play?id=" + gameId;
+            if (request.getParameter("attacker") != null) {
+                redirect += "&attacker=1";
+            } else if (request.getParameter("defender") != null) {
+                redirect += "&defender=1";
+            }
+            response.sendRedirect(redirect);
         }
     }
 
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         HttpSession session = request.getSession();
         String contextPath = request.getContextPath();
         ArrayList<String> messages = new ArrayList<String>();
         session.setAttribute("messages", messages);
-            // Get their user id from the session.
-            int uid = (Integer) session.getAttribute("uid");
+        // Get their user id from the session.
+        int uid = (Integer) session.getAttribute("uid");
+
+        // Get the identifying information required to create a game from the submitted form.
+        final String action = request.getParameter("formType");
+        switch (action) {
+            case "createGame":
+                try {
+                    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+                    Validator validator = factory.getValidator();
+                    Set<ConstraintViolation<MultiplayerGame>> validationResults = new HashSet<>();
+
+                    /*
+                     * Since JSR 303 works on Beans, and we have String input
+                     * values, we need to manually run the validation for them
+                     */
+                    String startDate = new StringBuilder()
+                            .append(request.getParameter("start_dateTime"))
+                            .append(" ")
+                            .append(request.getParameter("start_hours"))
+                            .append(":")
+                            .append(request.getParameter("start_minutes"))
+                            .toString();
+
+                    validationResults.addAll(validator.validateValue(MultiplayerGame.class, "startDateTime", startDate));
+
+                    String finishDate = new StringBuilder()
+                            .append(request.getParameter("finish_dateTime"))
+                            .append(" ")
+                            .append(request.getParameter("finish_hours"))
+                            .append(":")
+                            .append(request.getParameter("finish_minutes"))
+                            .toString();
+                    validationResults.addAll(validator.validateValue(MultiplayerGame.class, "finishDateTime", finishDate));
 
 
-            // Get the identifying information required to create a game from the submitted form.
-            switch (request.getParameter("formType")) {
+//                  At this point, if there's validation errors, report them to the user and abort.
+                    if (!validationResults.isEmpty()) {
+                        for (ConstraintViolation<MultiplayerGame> violation : validationResults) {
+                            messages.add(violation.getMessage());
+                        }
+                        Redirect.redirectBack(request, response);
+                        return;
+                    }
 
-		case "createGame":
-			try {
-				ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-				Validator validator = factory.getValidator();
-				Set<ConstraintViolation<MultiplayerGame>> validationResults = new HashSet<ConstraintViolation<MultiplayerGame>>();
+                    int classId = Integer.parseInt(request.getParameter("class"));
+                    GameLevel level = request.getParameter("level") == null ? GameLevel.HARD : GameLevel.EASY;
+                    boolean withTests = request.getParameter("withTests") != null;
+                    boolean withMutants = request.getParameter("withMutants") != null;
+                    String lineCovGoal = request.getParameter("line_cov");
+                    String mutCovGoal = request.getParameter("mutant_cov");
+                    double lineCoverage = lineCovGoal == null ? 1.1 : Double.parseDouble(lineCovGoal);
+                    double mutantCoverage = mutCovGoal == null ? 1.1 : Double.parseDouble(mutCovGoal);
+                    boolean chatEnabled = request.getParameter("chatEnabled") != null;
+                    boolean markUncovered = request.getParameter("markUncovered") != null;
+                    final int minDefenders = Integer.parseInt(request.getParameter("minDefenders"));
+                    final int defenderLimit = Integer.parseInt(request.getParameter("defenderLimit"));
+                    final int minAttackers = Integer.parseInt(request.getParameter("minAttackers"));
+                    final int attackerLimit = Integer.parseInt(request.getParameter("attackerLimit"));
+                    final long startTime = new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(startDate).getTime();
+                    final long endTime = new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(finishDate).getTime();
+                    final int maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
+                    final CodeValidator.CodeValidatorLevel mutantValidatorLevel = CodeValidator.CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
 
-				/*
-				 * Since JSR 303 works on Beans, and we have String input
-				 * values, we need to manually run the validation for them
-				 */
+                    MultiplayerGame nGame = new MultiplayerGame(classId, uid, level, (float) lineCoverage,
+                            (float) mutantCoverage, 1f, 100, 100, defenderLimit,
+                            attackerLimit,
+                            minDefenders,
+                            minAttackers,
+                            startTime,
+                            endTime,
+                            GameState.CREATED.name(),
+                            maxAssertionsPerTest,
+                            chatEnabled,
+                            mutantValidatorLevel,
+                            markUncovered);
 
-				// Validate Start date and format
-				StringBuilder startDateSB = new StringBuilder(request.getParameter("start_dateTime"));
-				startDateSB.append(" ").append(request.getParameter("start_hours")).append(":")
-						.append(request.getParameter("start_minutes"));
+                    validationResults = validator.validate(nGame);
+                    if (!validationResults.isEmpty()) {
+                        for (ConstraintViolation<MultiplayerGame> violation : validationResults) {
+                            messages.add(violation.getMessage());
+                        }
+                        Redirect.redirectBack(request, response);
+                        break;
+                    }
 
-				validationResults.addAll(
-						validator.validateValue(MultiplayerGame.class, "startDateTime", startDateSB.toString()));
+                    if (nGame.insert()) {
+                        final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                        Event event = new Event(-1, nGame.getId(), uid, "Game Created",
+                                EventType.GAME_CREATED, EventStatus.GAME, timestamp);
+                        event.insert();
+                    }
 
-				// Validate Finish date and format
-				StringBuilder finishDateSB = new StringBuilder(request.getParameter("finish_dateTime"));
-				finishDateSB.append(" ").append(request.getParameter("finish_hours")).append(":")
-						.append(request.getParameter("finish_minutes"));
+                    if (withMutants) {
+                        nGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
 
-				validationResults.addAll(
-						validator.validateValue(MultiplayerGame.class, "finishDateTime", finishDateSB.toString()));
+                        final List<Mutant> mutantsToAdd = GameClassDAO.getMappedMutantsForClassId(classId);
+                        for (Mutant mutant : mutantsToAdd) {
+                            final String mutantCode = String.join("\n", Files.readAllLines(Paths.get(mutant.getJavaFile())));
+                            // GameManager#createMutant() compiles and stores the mutant
+                            GameManager.createMutant(nGame.getId(), classId, mutantCode, DUMMY_ATTACKER_USER_ID, "mp");
+                        }
+                    }
+                    if (withTests) {
+                        nGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
 
-				/*
-				 * At this point, if there's validation errors, report them to
-				 * the user.
-				 */
-				if (validationResults.size() > 0) {
-					for (ConstraintViolation<MultiplayerGame> violation : validationResults) {
-						messages.add(violation.getMessage());
-					}
-					// FIXME Is this correct ?
-					Redirect.redirectBack(request, response);
-					break;
-				}
+                        final List<Test> testsToAdd = GameClassDAO.getMappedTestsForClassId(classId);
+                        for (Test test : testsToAdd) {
+                            final String testCode = String.join("\n", Files.readAllLines(Paths.get(test.getJavaFile())));
+                            // GameManager#createTest() compiles, tests and stores the tests
+                            GameManager.createTest(nGame.getId(), classId, testCode, DUMMY_DEFENDER_USER_ID, "mp", maxAssertionsPerTest);
 
-				int classId = Integer.parseInt(request.getParameter("class"));
-				String lineCovGoal = request.getParameter("line_cov");
-				String mutCovGoal = request.getParameter("mutant_cov");
-				double lineCoverage = lineCovGoal == null ? 1.1 : Double.parseDouble(lineCovGoal);
-				double mutantCoverage = mutCovGoal == null ? 1.1 : Double.parseDouble(mutCovGoal);
-				GameLevel level = request.getParameter("level") == null ? GameLevel.HARD : GameLevel.EASY;
-				boolean chatEnabled = request.getParameter("chatEnabled") != null;
-				boolean markUncovered = request.getParameter("markUncovered") != null;
+                            MutationTester.runTestOnAllMultiplayerMutants(nGame, test, messages);
+                        }
+                    }
 
-				/*
-				 * TODO Once we validate input parameters we can instantiate the
-				 * MultiplayerGame and run a second validation on it, if
-				 * necessary
-				 */
-				// Create the game with supplied parameters and insert it in the
-				// database.
-				MultiplayerGame nGame = new MultiplayerGame(classId, uid, level, (float) lineCoverage,
-						(float) mutantCoverage, 1f, 100, 100, Integer.parseInt(request.getParameter("defenderLimit")),
-						Integer.parseInt(request.getParameter("attackerLimit")),
-						Integer.parseInt(request.getParameter("minDefenders")),
-						Integer.parseInt(request.getParameter("minAttackers")),
-						//
-						new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(startDateSB.toString()).getTime(),
-						// Long.parseLong(request.getParameter("startTime")),
-						new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(finishDateSB.toString()).getTime(),
-						// Long.parseLong(request.getParameter("finishTime")),
-						//
-						GameState.CREATED.name(), Integer.parseInt(request.getParameter("maxAssertionsPerTest")),
-						chatEnabled,
-						CodeValidator.CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel")),
-						markUncovered);
+                    // Redirect to admin interface
+                    if (request.getParameter("fromAdmin").equals("true")) {
+                        response.sendRedirect(contextPath + "/admin");
+                        return;
+                    }
+                    // Redirect to the game selection menu.
+                    response.sendRedirect(contextPath + "/multiplayer/games");
+                } catch (Throwable e) {
+                    logger.error("Unknown error during battleground creation.", e);
+                    messages.add("Invalid Request");
 
-				validationResults = validator.validate(nGame);
-				if (validationResults.size() > 0) {
-					for (ConstraintViolation<MultiplayerGame> violation : validationResults) {
-						messages.add(violation.getMessage());
-					}
-					// FIXME Is this correct ?
-					Redirect.redirectBack(request, response);
-					break;
-				}
-
-				if (nGame.insert()) {
-					Event event = new Event(-1, nGame.getId(), uid, "Game" + " Created", EventType.GAME_CREATED,
-							EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-					event.insert();
-				}
-
-				// rs.getInt("Defender_Limit"), rs.getInt("Attacker_Limit"),
-				// rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"),
-				// rs.getLong("Finish_Time"),
-				// rs.getString("State")
-
-				// Redirect to admin interface
-				if (request.getParameter("fromAdmin").equals("true")) {
-					response.sendRedirect(contextPath + "/admin");
-					break;
-				}
-				// Redirect to the game selection menu.
-				response.sendRedirect(contextPath + "/multiplayer/games");
-			} catch (Throwable e) {
-				e.printStackTrace();
-				// TODO: handle exception
-				messages.add("Invalid Request");
-				// FIXME Is this correct ?
-				Redirect.redirectBack(request, response);
-			}
-			break;
-                case "leaveGame":
-                    int gameId = Integer.parseInt(request.getParameter("game"));
-                    MultiplayerGame game = DatabaseAccess.getMultiplayerGame(gameId);
-                    if (game.removePlayer(uid)) {
-                        messages.add("Game " + gameId + " left");
-                        DatabaseAccess.removePlayerEventsForGame(gameId,
-                                uid);
-                        EventType notifType = EventType.GAME_PLAYER_LEFT;
-                        Event notif = new Event(-1, gameId, uid,
-                                "You successfully left" +
-                                " the game.",
-                                notifType, EventStatus.NEW,
-                                new Timestamp(System.currentTimeMillis()));
-                        notif.insert();
-                    } else {
-                        messages.add("An error occured while leaving game " +
-                                gameId);
-                    }// Redirect to the game selection menu.
-                    response.sendRedirect(contextPath+"/multiplayer/games");
-                    break;
-                default:
-                    System.err.println("Action not recognised");
+                    response.setStatus(400);
                     Redirect.redirectBack(request, response);
-                    break;
-            }
+                }
+                break;
+            case "leaveGame":
+                int gameId;
+                try {
+                    gameId = Integer.parseInt(request.getParameter("game"));
+                } catch (NumberFormatException e) {
+                    response.setStatus(400);
+                    Redirect.redirectBack(request, response);
+                    return;
+                }
+
+                MultiplayerGame game = DatabaseAccess.getMultiplayerGame(gameId);
+                if (game.removePlayer(uid)) {
+                    messages.add("Game " + gameId + " left");
+                    DatabaseAccess.removePlayerEventsForGame(gameId, uid);
+                    final EventType notifType = EventType.GAME_PLAYER_LEFT;
+                    final String message = "You successfully left the game.";
+                    final EventStatus eventStatus = EventStatus.NEW;
+                    final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                    Event notif = new Event(-1, gameId, uid, message, notifType, eventStatus, timestamp);
+                    notif.insert();
+                } else {
+                    messages.add("An error occured while leaving game " + gameId);
+                }
+                // Redirect to the game selection menu.
+                response.sendRedirect(contextPath + "/multiplayer/games");
+                break;
+            default:
+                logger.info("Action not recognised: {}", action);
+                Redirect.redirectBack(request, response);
+                break;
+        }
     }
 }

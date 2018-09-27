@@ -50,6 +50,10 @@ public class Constants {
 	// Configuration variable names
 	public static final String BLOCK_ATTACKER = "block.attacker";
 
+	// Dummy user IDs
+	public static final int DUMMY_ATTACKER_USER_ID = 3;
+	public static final int DUMMY_DEFENDER_USER_ID = 4;
+
 	//public static String DATA_DIR    = F_SEP + "WEB-INF" + F_SEP + "data";
 	public static final String CUTS_DIR = DATA_DIR + F_SEP + "sources";
 	// dependencies, mutants and tests subdirectories for CUTs

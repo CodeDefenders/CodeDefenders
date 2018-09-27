@@ -61,7 +61,7 @@ public class ZipFileUtils {
                 StringBuilder bob = new StringBuilder();
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    bob.append(line.trim()).append("\n");
+                    bob.append(line).append("\n");
                 }
 
                 final String content = bob.toString().trim();

@@ -887,7 +887,7 @@ public class DatabaseAccess {
 		return players;
 	}
 
-	private static List<Test> getTests(PreparedStatement stmt, Connection conn) {
+ 	static List<Test> getTests(PreparedStatement stmt, Connection conn) {
 		List<Test> testList = new ArrayList<>();
 		try {
 			// Load the MultiplayerGame Data with the provided ID.
@@ -912,10 +912,8 @@ public class DatabaseAccess {
 			}
 		} catch (SQLException se) {
 			logger.error("SQL exception caught", se);
-			return null;
 		} catch (Exception e) {
 			logger.error("Exception caught", e);
-			return null;
 		} finally {
 			DB.cleanup(conn, stmt);
 		}
