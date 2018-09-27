@@ -31,9 +31,8 @@ public class CheckDateValidator implements ConstraintValidator<CheckDateFormat, 
 				}
 			}
 			return false;
-		} else if (object instanceof Long) {
-			return true;
+		} else {
+			return object instanceof Long;
 		}
-		return false;
 	}
 }
