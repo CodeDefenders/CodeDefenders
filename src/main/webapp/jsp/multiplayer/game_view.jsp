@@ -232,7 +232,21 @@
 <div class="crow fly no-gutter up">
     <% switch (role){
         case ATTACKER:
-            %><%@ include file="/jsp/multiplayer/attacker_view.jsp" %><%
+            Mutant equiv = null;
+            for (Mutant m : mutantsPending) {
+                if (m.getPlayerId() == playerId &&  m.getEquivalent() == Mutant.Equivalence.PENDING_TEST) {
+                    equiv = m;
+                    request.setAttribute("equivMutant", equiv);
+                    break;
+                }
+            }
+
+            if (equiv == null) { %>
+                <%@ include file="/jsp/multiplayer/attacker_view.jsp" %>
+            <% } else { %>
+                <%@ include file="/jsp/multiplayer/equivalence_view.jsp" %>
+            <% }
+
             break;
         case DEFENDER:
             %><%@ include file="/jsp/multiplayer/defender_view.jsp" %><%

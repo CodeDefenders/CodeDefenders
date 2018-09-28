@@ -72,6 +72,7 @@
     editorSUT.on("viewportChange", function(){
         updateCUT();
     });
+
     $(document).ready(function(){
         updateCUT();
     });

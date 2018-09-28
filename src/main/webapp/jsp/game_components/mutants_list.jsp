@@ -24,6 +24,8 @@
         TODO find a better solution for this
 --%>
 
+<% { %>
+
 <%
     List<Mutant> mutantsAliveTODORENAME = (List<Mutant>) request.getAttribute("mutantsAlive");
     List<Mutant> mutantsKilledTODORENAME = (List<Mutant>) request.getAttribute("mutantsKilled");
@@ -33,8 +35,6 @@
     Boolean viewDiff = (Boolean) request.getAttribute("viewDiff");
     String gameType = (String) request.getAttribute("gameType");
 %>
-
-<% { %>
 
 <div class="tabs bg-minus-3" role="tablist">
     <div class="crow fly no-gutter down">
@@ -298,7 +298,7 @@
         } else {
             var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
                 lineNumbers: false,
-                mode: "diff",
+                mode: "text/x-diff",
                 readOnly: true /* onCursorActivity: null */
             });
             editorDiff.setSize("100%", 500);

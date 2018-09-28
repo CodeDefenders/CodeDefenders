@@ -16,28 +16,28 @@
 <div class="ws-12 up" id="mutants-div">
 	<%
 if (role == Role.ATTACKER) {
-    Mutant equiv = null;
+    Mutant equivTODORENAME = null;
 
     for (Mutant m : mutantsPending){
         if (m.getPlayerId() == playerId &&  m.getEquivalent() == Mutant.Equivalence.PENDING_TEST){
             renderMutants = false;
-            equiv = m;
+            equivTODORENAME = m;
 
             break;
         }
     }
 
-    if (equiv == null){
+    if (equivTODORENAME == null){
         renderMutants = true;
     }
 
     if (!renderMutants){
 
         %><div>
-			<h3>Mutant <%=equiv.getId() %> Claimed Equivalent</h3>
+			<h3>Mutant <%=equivTODORENAME.getId() %> Claimed Equivalent</h3>
 			<div class="nest crow fly" style="border: 5px dashed #f00; border-radius: 10px; width: 100%;">
 				<form id="equivalenceForm" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post">
-					<input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= equiv.getId() %>">
+					<input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= equivTODORENAME.getId() %>">
 					<input type="hidden" name="formType" value="resolveEquivalence">
 					<%
 									String mutTestCode;
@@ -46,13 +46,13 @@ if (role == Role.ATTACKER) {
 									if (mutPreviousTestCode != null) {
 										mutTestCode = mutPreviousTestCode;
 									} else {
-										String equivText = "// " + equiv.getPatchString().replace("\n", "\n// ").trim() + "\n";
+										String equivText = "// " + equivTODORENAME.getPatchString().replace("\n", "\n// ").trim() + "\n";
 										mutTestCode = equivText + game.getCUT().getTestTemplate();
 									}
 					%>
 					<pre><textarea id="mutantSut" name="test" cols="80" rows="30"><%= mutTestCode %></textarea></pre>
 							<!--btn-danger-->
-							<a onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');" href="<%=request.getContextPath() %>/multiplayer/play?acceptEquiv=<%= equiv.getId() %>"><button type="button" class="btn btn-danger btn-left">Accept Equivalence</button></a>
+							<a onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');" href="<%=request.getContextPath() %>/multiplayer/play?acceptEquiv=<%= equivTODORENAME.getId() %>"><button type="button" class="btn btn-danger btn-left">Accept Equivalence</button></a>
 							<button form="equivalenceForm" class="btn btn-primary btn-game btn-right" name="rejectEquivalent" type="submit">Submit Killing Test</button>
 					<div>
 						<p>Note: If the game finishes with this equivalence unsolved, you will lose points!</p>
@@ -60,7 +60,7 @@ if (role == Role.ATTACKER) {
 
 				</form>
 			</div>
-			<div class="w4"><p><%= equiv.getHTMLReadout() %></p></div>
+			<div class="w4"><p><%= equivTODORENAME.getHTMLReadout() %></p></div>
 			<script>
 				var mutantDuel = CodeMirror.fromTextArea(document.getElementById("mutantSut"), {
 					lineNumbers: true,

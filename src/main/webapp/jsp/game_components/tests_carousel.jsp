@@ -80,20 +80,16 @@
             </pre>
         </div>
 
-        <%
-            }
-            if (testsTODORENAME.isEmpty()) {
-        %>
+        <%  } %>
+
+        <% if (testsTODORENAME.isEmpty()) { %>
                 <div><p> There are currently no tests </p></div>
-        <%
-            }
-        %>
+        <% } %>
     </div>
 
     <script>
         var x = document.getElementsByClassName("utest");
-        var i;
-        for (i = 0; i < x.length; i++) {
+        for (var i = 0; i < x.length; i++) {
             CodeMirror.fromTextArea(x[i], {
                 lineNumbers: true,
                 matchBrackets: true,
