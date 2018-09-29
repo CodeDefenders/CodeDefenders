@@ -30,13 +30,13 @@
     request.setAttribute("markEquivalent", false);
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", "DUEL");
+    request.setAttribute("gameType", "PARTY");
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
     // request.setAttribute("tests", game.getTests());
     request.setAttribute("mutants", game.getMutants());
-    request.setAttribute("showEquivalenceButton", true);
+    request.setAttribute("showEquivalenceButton", false);
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());

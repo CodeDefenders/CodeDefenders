@@ -9,19 +9,24 @@
 <%--
     Adds highlighting of coverage (green lines) and mutants (gutter icons) to a CodeMirror editor.
 
-    @param Role role
-    @param String codeDivName
+    @param String codeDivSelector
+        Selector for the div that the CodeMirror editor is in.
+    @param Boolean showEquivalenceButtton
+        Show a button to flag a selected mutant as equivalent.
     @param List<Test> tests
+        The list of (valid) tests in the game.
     @param List<Mutant> mutants
+        The list of (valid) mutants in the game.
 --%>
 
 <% { %>
 
 <%
     String codeDivSelectorTODORENAME = (String) request.getAttribute("codeDivSelector");
-    Boolean showEquivalenceButton = (Boolean) request.getAttribute("showEquivalenceButton");
     List<Test> testsTODORENAME = (List<Test>) request.getAttribute("tests");
     List<Mutant> mutantsTODORENAME = (List<Mutant>) request.getAttribute("mutants") ;
+    Boolean showEquivalenceButton = (Boolean) request.getAttribute("showEquivalenceButton");
+    String gameType = (String) request.getAttribute("gameType");
 
     Gson gsonTODORENAME = new Gson();
 %>
@@ -61,7 +66,7 @@
     };
 
     showMutants = function(){
-        mutantLine("<%= codeDivSelectorTODORENAME %>", <%= showEquivalenceButton ? "true" : "false" %>);
+        mutantLine("<%= codeDivSelectorTODORENAME %>", <%= showEquivalenceButton ? "true" : "false" %>, <%= "'" + gameType + "'" %>);
     };
 
     var updateCUT = function(){

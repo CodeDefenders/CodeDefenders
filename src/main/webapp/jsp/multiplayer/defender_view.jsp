@@ -24,9 +24,9 @@
 	request.setAttribute("mutantsAlive", game.getAliveMutants());
 	request.setAttribute("mutantsKilled", game.getKilledMutants());
 	request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
-	request.setAttribute("markEquivalent", role == Role.DEFENDER);
+	request.setAttribute("markEquivalent", true);
 	request.setAttribute("markUncoveredEquivalent", game.isMarkUncovered());
-	request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY || role == Role.ATTACKER);
+	request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
 	request.setAttribute("gameType", "PARTY");
 
 	/* game_highlighting */
@@ -34,6 +34,7 @@
 	// request.setAttribute("tests", game.getTests());
 	request.setAttribute("mutants", game.getMutants());
 	request.setAttribute("showEquivalenceButton", true);
+	// request.setAttribute("gameType", "PARTY");
 
 	/* test_progressbar */
 	request.setAttribute("gameId", game.getId());
