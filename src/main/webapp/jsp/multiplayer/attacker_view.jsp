@@ -39,6 +39,7 @@
     request.setAttribute("gameId", game.getId());
 %>
 
+<!--<div class="row" style="padding: 0px 15px;"> TODO change to this after fixing the header -->
 <div class="row">
     <div class="col-md-6">
         <div id="mutants-div">

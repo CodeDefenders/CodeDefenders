@@ -36,6 +36,9 @@
 	request.setAttribute("showEquivalenceButton", true);
 	// request.setAttribute("gameType", "PARTY");
 
+	/* mutant_explanation */
+	request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
+
 	/* test_progressbar */
 	request.setAttribute("gameId", game.getId());
 %>

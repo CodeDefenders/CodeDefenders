@@ -57,10 +57,10 @@
 							<div class="modal-content">
 								<div class="modal-header">
 									<button type="button" class="close" data-dismiss="modal">&times;</button>
-									<h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
+									<h4 class="modal-title">Mutant <%= m.getId ()%> - Diff</h4>
 								</div>
 								<div class="modal-body">
-									<pre class="readonly-pre"><textarea class="mutdiff readonly-textarea" id="diff<%=m.getId()%>"><%=m.getPatchString()%></textarea></pre>
+									<pre class="readonly-pre"><textarea class="mutdiff readonly-textarea" id="diff<%=m.getId()%>" title="mutdiff"><%=m.getPatchString()%></textarea></pre>
 								</div>
 								<div class="modal-footer">
 									<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -71,12 +71,13 @@
 				</td>
 				<td>
 					<form id="equivalenceForm" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() %>" method="post">
-					<input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= m.getId() %>">
-					<input type="hidden" name="formType" value="resolveEquivalence">
-					<div class="btn-right">
-						<input class="btn btn-default" name="acceptEquivalent" type="submit" value="Accept Equivalent">
-						<input class="btn btn-primary" name="rejectEquivalent" type="submit" value="Submit Killing Test">							</div>
-				</form>
+                        <input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= m.getId() %>">
+                        <input type="hidden" name="formType" value="resolveEquivalence">
+                        <div class="btn-right">
+                            <input class="btn btn-default" name="acceptEquivalent" type="submit" value="Accept Equivalent">
+                            <input class="btn btn-primary" name="rejectEquivalent" type="submit" value="Submit Killing Test">
+                        </div>
+                    </form>
 				</td>
 			</tr>
 			<tr>

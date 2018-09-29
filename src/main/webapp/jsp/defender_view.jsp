@@ -7,8 +7,6 @@
 
 <% { %>
 
-<%-- TODO Set request attributes in the Servlet and redirect via RequestDispatcher? --%>
-
 <%-- Set request attributes for the components. --%>
 <%
 	/* class_viewer */
@@ -48,6 +46,9 @@
     int defenderScore = game.getDefenderScore();
 	request.setAttribute("win", defenderScore > attackerScore);
 	request.setAttribute("loss", attackerScore > defenderScore);
+
+    /* mutant_explanation */
+    request.setAttribute("mutantValidatorLevel", CodeValidatorLevel.MODERATE);
 
     /* test_progressbar */
     request.setAttribute("gameId", game.getId());

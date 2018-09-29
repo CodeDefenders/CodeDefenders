@@ -95,6 +95,7 @@ public class GameManager extends HttpServlet {
 				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.ATTACKER_VIEW_JSP);
 				dispatcher.forward(request, response);
 			} else {
+				request.setAttribute("equivMutant", equivMutants.get(0));
 				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.RESOLVE_EQUIVALENCE_JSP);
 				dispatcher.forward(request, response);
 			}

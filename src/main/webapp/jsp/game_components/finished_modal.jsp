@@ -3,8 +3,6 @@
 <%--
     Shows a modal, which indicates that a game is finished.
 
-    @param Boolean finished
-        Inidcates that the game is finished and the modal should be shown.
     @param Boolean win
         Indicates that the player won.
     @param Boolean loss
@@ -14,7 +12,6 @@
 <% { %>
 
 <%
-    Boolean finished = (Boolean) request.getAttribute("finished");
     Boolean win = (Boolean) request.getAttribute("win");
     Boolean loss = (Boolean) request.getAttribute("loss");
 %>

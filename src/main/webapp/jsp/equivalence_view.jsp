@@ -1,4 +1,10 @@
 <%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="org.codedefenders.game.GameState" %>
+
+<% String pageTitle="Resolve Equivalence"; %>
+<%@ include file="/jsp/header_game.jsp" %>
+
+<% { %>
 
 <%
     Mutant equivMutant = (Mutant) request.getAttribute("equivMutant");
@@ -29,19 +35,23 @@
     request.setAttribute("gameType", "PARTY");
 
     /* mutant_explanation */
-    request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
+    request.setAttribute("mutantValidatorLevel", CodeValidatorLevel.MODERATE);
 
     /* test_progressbar */
     request.setAttribute("gameId", game.getId());
 %>
 
-<div class="row">
+<% if (game.getState() == GameState.FINISHED) { %>
+    <%@include file="game_components/finished_modal.jsp"%>
+<% } %>
+
+<div class="row" style="padding: 0px 15px;">
     <div class="col-md-6" id="equivmut-div">
-        <%@include file="../game_components/test_progress_bar.jsp"%>
+        <%@include file="game_components/test_progress_bar.jsp"%>
         <h3>Mutant <%= equivMutant.getId() %> Claimed Equivalent</h3>
 
         <div style="border: 5px dashed #f00; border-radius: 10px; width: 100%; padding: 10px;">
-            <div>
+            <div class="w4">
                 <p><%= equivMutant.getHTMLReadout() %></p>
                 <a href="#" class="btn btn-default" id="btnMut" data-toggle="modal" data-target="#modalMut">View Diff</a>
 
@@ -80,29 +90,28 @@
                 </script>
             </div>
 
-            <form id="equivalenceForm" action="<%= request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() %>" method="post">
+            <form id="equivalenceForm" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() %>" method="post">
                 <input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= equivMutant.getId() %>">
                 <input type="hidden" name="formType" value="resolveEquivalence">
 
                 <h3>Not equivalent? Write a killing test here:</h3>
 
-                <%@include file="../game_components/test_editor.jsp"%>
+                <%@include file="game_components/test_editor.jsp"%>
 
-                <a onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');" href="<%=request.getContextPath() %>/multiplayer/play?acceptEquiv=<%= equivMutant.getId() %>"><button type="button" class="btn btn-danger btn-left">Accept Equivalence</button></a>
-                <button form="equivalenceForm" class="btn btn-primary btn-game btn-right" name="rejectEquivalent" type="submit" onclick="progressBar(); this.from.submit();">Submit Killing Test</button>
-
-                <div>
-                    Note: If the game finishes with this equivalence unsolved, you will lose points!
-                </div>
+                <button class="btn btn-danger btn-left" name="acceptEquivalent" type="submit" onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');">Accept Equivalence</button>
+                <button class="btn btn-primary btn-game btn-right" name="rejectEquivalent" type="submit" onclick="progressBar(); return true;">Submit Killing Test</button>
             </form>
         </div>
     </div>
 
     <div class="col-md-6" id="cut-div">
         <h3>Class Under Test</h3>
-        <%@include file="../game_components/class_viewer.jsp"%>
-        <%@include file="../game_components/game_highlighting.jsp"%>
-        <%@include file="../game_components/mutant_explanation.jsp"%>
+        <%@include file="game_components/class_viewer.jsp"%>
+        <%@include file="game_components/game_highlighting.jsp"%>
+        <%@include file="game_components/mutant_explanation.jsp"%>
     </div>
-
 </div>
+
+<% } %>
+
+<%@include file="/jsp/footer_game.jsp" %>
