@@ -8,7 +8,7 @@
 
     <h3>Classes</h3>
 
-    <table id="tableUsers"
+    <table id="tableClasses"
            class="table table-striped table-hover table-responsive">
         <thead>
             <tr>
@@ -106,7 +106,7 @@
         }
 
         $(document).ready(function() {
-            table = $('#tableUsers').DataTable({
+            table = $('#tableClasses').DataTable({
                 "ajax": {
                     "url": "<%=request.getContextPath() + Constants.API_ANALYTICS_CLASSES%>",
                     "dataSrc": "data"
