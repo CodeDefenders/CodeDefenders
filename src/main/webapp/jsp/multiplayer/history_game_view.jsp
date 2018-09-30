@@ -38,7 +38,6 @@
 <%
     /* class_viewer */
     request.setAttribute("classCode", game.getCUT().getAsString());
-    request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());

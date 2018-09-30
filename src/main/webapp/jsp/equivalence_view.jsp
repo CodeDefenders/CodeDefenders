@@ -14,7 +14,6 @@
 <%
     /* class_viewer */
     request.setAttribute("classCode", game.getCUT().getAsString());
-    request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
 
     /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
@@ -22,10 +21,9 @@
     if (previousTestCode != null) {
         request.setAttribute("testCode", previousTestCode);
     } else {
-        // String equivText = "// " + equivMutant.getPatchString().replace("\n", "\n// ").trim() + "\n";
-        // request.setAttribute("testCode", equivText + game.getCUT().getTestTemplate());
         request.setAttribute("testCode", game.getCUT().getTestTemplate());
     }
+    request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");

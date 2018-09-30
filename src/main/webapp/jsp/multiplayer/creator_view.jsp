@@ -4,7 +4,6 @@
 <%
 	/* class_viewer */
 	request.setAttribute("classCode", game.getCUT().getAsString());
-	request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
 
 	/* test_carousel */
 	request.setAttribute("tests", game.getTests());

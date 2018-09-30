@@ -11,7 +11,6 @@
 <%
 	/* class_viewer */
 	request.setAttribute("classCode", game.getCUT().getAsString());
-	request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
 
 	/* test_editor */
 	String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
@@ -21,6 +20,7 @@
 	} else {
 		request.setAttribute("testCode", game.getCUT().getTestTemplate());
 	}
+    request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
 
 	/* tests_carousel */
 	request.setAttribute("tests", game.getTests());
