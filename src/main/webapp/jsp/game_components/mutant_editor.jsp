@@ -13,9 +13,7 @@
     String mutantCode = (String) request.getAttribute("mutantCode");
 %>
 
-<pre style="margin-top: 10px;">
-    <textarea id="code" name="mutant" title="mutant" cols="80" rows="50"><%= mutantCode %></textarea>
-</pre>
+<pre style="margin-top: 10px;"><textarea id="code" name="mutant" title="mutant" cols="80" rows="50"><%= mutantCode %></textarea></pre>
 
 <script>
     autocompletelist = [];

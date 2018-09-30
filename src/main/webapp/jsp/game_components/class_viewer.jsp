@@ -13,9 +13,7 @@
     String classCode = (String) request.getAttribute("classCode");
 %>
 
-<pre class="readonly-pre">
-    <textarea class="readonly-textarea" id="sut" name="cut" title="cut" cols="80" rows="30"><%= classCode %></textarea>
-</pre>
+<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" title="cut" cols="80" rows="30"><%= classCode %></textarea></pre>
 
 <script>
     var editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {

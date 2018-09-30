@@ -1,5 +1,3 @@
-<%@ page import="org.codedefenders.util.Constants" %>
-
 <% { %>
 
 <%-- Set request attributes for the components. --%>

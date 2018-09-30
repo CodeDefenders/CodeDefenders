@@ -41,50 +41,30 @@
         <h3>Mutant <%= equivMutant.getId() %> Claimed Equivalent</h3>
 
         <div style="border: 5px dashed #f00; border-radius: 10px; width: 100%; padding: 10px;">
-            <div>
-                <p><%= equivMutant.getHTMLReadout() %></p>
-                <a href="#" class="btn btn-default" id="btnMut" data-toggle="modal" data-target="#modalMut">View Diff</a>
+            <p><%= equivMutant.getHTMLReadout() %></p>
+            <a class="btn btn-default" data-toggle="collapse" href="#diff-collapse">Show Diff</a>
+            <p></p>
+            <pre id="diff-collapse" class="readonly-pre collapse"><textarea id="diff" class="mutdiff readonly-textarea" title="mutdiff"><%= equivMutant.getPatchString() %></textarea></pre>
+            <script>
+                $('#diff-collapse').on('shown.bs.collapse', function() {
+                    var codeMirrorContainer = $(this).find(".CodeMirror")[0];
+                    if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+                        codeMirrorContainer.CodeMirror.refresh();
+                    } else {
+                        var showDiff = CodeMirror.fromTextArea(document.getElementById('diff'), {
+                            lineNumbers: false,
+                            mode: "text/x-diff",
+                            readOnly: true
+                        });
+                        showDiff.setSize("100%", 210);
+                    }
+                });
+            </script>
 
-                <div id="modalMut" class="modal fade" role="dialog">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Mutant <%= equivMutant.getId ()%> - Diff</h4>
-                            </div>
-                            <div class="modal-body">
-                            <pre class="readonly-pre">
-                                <textarea class="mutdiff readonly-textarea" id="diff" title="mutdiff"><%=equivMutant.getPatchString()%></textarea>
-                            </pre>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <script>
-                    $('#modalMut').on('shown.bs.modal', function() {
-                        var codeMirrorContainer = $(this).find(".CodeMirror")[0];
-                        if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-                            codeMirrorContainer.CodeMirror.refresh();
-                        } else {
-                            var showDiff = CodeMirror.fromTextArea(document.getElementById('diff'), {
-                                lineNumbers: false,
-                                mode: "text/x-diff",
-                                readOnly: true
-                            });
-                            showDiff.setSize("100%", 500);
-                        }
-                    });
-                </script>
-            </div>
-
+            <h3>Not equivalent? Write a killing test here:</h3>
             <form id="equivalenceForm" action="<%= request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() %>" method="post">
                 <input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= equivMutant.getId() %>">
                 <input type="hidden" name="formType" value="resolveEquivalence">
-
-                <h3>Not equivalent? Write a killing test here:</h3>
 
                 <%@include file="../game_components/test_editor.jsp"%>
 

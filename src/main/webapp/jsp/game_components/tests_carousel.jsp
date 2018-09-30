@@ -75,9 +75,7 @@
                 </li>
 
             </ul>
-            <pre class="readonly-pre">
-                <textarea class="utest" title="utest" cols="20" rows="10"><%= testCode %></textarea>
-            </pre>
+            <pre class="readonly-pre"><textarea class="utest" title="utest" cols="20" rows="10"><%= testCode %></textarea></pre>
         </div>
 
         <%  } %>
