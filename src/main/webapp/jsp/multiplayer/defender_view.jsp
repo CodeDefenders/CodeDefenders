@@ -43,7 +43,7 @@
 	request.setAttribute("gameId", game.getId());
 %>
 
-<!--<div class="row" style="padding: 0px 15px;"> TODO change to this after fixing the header -->
+<!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
 <div class="row">
 	<div class="col-md-6" id="cut-div">
 		<h3>Class Under Test</h3>
@@ -68,7 +68,7 @@
 	</div>
 </div>
 
-</div> <%-- TODO fix this div when fixing the header --%>
+</div> <%-- TODO move the whole div here after changing the header --%>
 
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6" id="mutants-div">

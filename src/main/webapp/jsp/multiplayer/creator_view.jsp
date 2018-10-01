@@ -28,7 +28,7 @@
 	request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 %>
 
-</div> <%-- TODO fix this div when fixing the header --%>
+</div> <%-- TODO move the whole div here after changing the header --%>
 
 <div class="admin-panel">
 	<h2>Admin</h2>

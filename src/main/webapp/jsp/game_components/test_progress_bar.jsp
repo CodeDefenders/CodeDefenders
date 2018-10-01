@@ -2,7 +2,8 @@
     Adds a JavaScript function progressBar() that inserts and updates a progressbar showing the status of the last
     submitted test. The progressbar is inserted after #logout. It reads the test status from /notifications.
 
-    @param Integer gameId The id of the game.
+    @param Integer gameId
+        The id of the game.
 --%>
 
 <% { %>

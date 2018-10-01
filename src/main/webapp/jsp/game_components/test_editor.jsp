@@ -7,8 +7,6 @@
         Enable autocompletions for Mockito methods.
 --%>
 
-<%-- TODO add parameter for the editor id and JS variable name --%>
-
 <% { %>
 
 <%

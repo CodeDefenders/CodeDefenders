@@ -5,8 +5,6 @@
         The test code to display.
 --%>
 
-<%-- TODO add parameter for the editor id and JS variable name --%>
-
 <% { %>
 
 <%

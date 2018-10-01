@@ -1,8 +1,11 @@
-<%@ page import="org.codedefenders.model.NotificationType" %><%--
-    Adds a JavaScript function progressBar() that inserts and updates a progressbar showing the status of the last
-    submitted test. The progressbar is inserted after #logout. It reads the test status from /notifications.
+<%@ page import="org.codedefenders.model.NotificationType" %>
 
-    @param Integer gameId The id of the game.
+<%--
+    Adds a JavaScript function progressBar() that inserts and updates a progressbar showing the status of the last
+    submitted mutant. The progressbar is inserted after #logout. It reads the mutant status from /notifications.
+
+    @param Integer gameId
+        The id of the game.
 --%>
 
 <% { %>
