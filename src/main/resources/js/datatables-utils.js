@@ -60,7 +60,7 @@ function dtValAndPerc(a, b, defaultValue, precision) {
  * Tables in child rows should have the class "table-child-details".
  */
 function setupChildRows(tableSelector, table, format) {
-    $('#tableUsers tbody').on('click', '.toggle-details', function () {
+    $(tableSelector + ' tbody').on('click', '.toggle-details', function () {
         var tr = $(this).closest('tr');
         var row = table.row(tr);
 
@@ -68,11 +68,11 @@ function setupChildRows(tableSelector, table, format) {
         if (row.child.isShown()) {
             row.child.hide();
             tr.removeClass('shown');
-            $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-right');
+            $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
         } else {
             row.child(format(row.data())).show();
             tr.addClass('shown');
-            $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-up');
+            $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
         }
     });
 
@@ -80,7 +80,7 @@ function setupChildRows(tableSelector, table, format) {
         $(this).toggleClass('shown');
         var shown = $(this).hasClass('shown');
 
-        $(this).find(".toggle-details-icon").toggleClass('glyphicon-chevron-right').toggleClass('glyphicon-chevron-up');
+        $(this).find(".toggle-details-icon").toggleClass('glyphicon-chevron-right').toggleClass('glyphicon-chevron-down');
 
         /* Show or hide all children of rows on this page. */
         $(tableSelector + ' tbody .toggle-details').each(function() {
@@ -90,11 +90,11 @@ function setupChildRows(tableSelector, table, format) {
             if (row.child.isShown() && !shown) {
                 row.child.hide();
                 tr.removeClass('shown');
-                $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-right');
+                $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
             } else if (!row.child.isShown() && shown){
                 row.child(format(row.data())).show();
                 tr.addClass('shown');
-                $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-up');
+                $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
             }
         });
     });

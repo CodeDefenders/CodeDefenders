@@ -10,26 +10,39 @@
     height: 20px;
 }
 
-/* Table row colors */
-/* Color the next tr the same color, so child rows will have the same color */
-.table-striped > tbody > .even {
-    background: #fdfdfd !important;
-}
-.table-striped > tbody > .even + tr {
-    background: #fdfdfd;
-}
-.table-striped > tbody > .odd {
-    background: #f8f8f8 !important;
-}
-.table-striped > tbody > .odd + tr {
-    background: #f8f8f8;
-}
-.table-hover > tbody > tr:hover > td {
-    background-color: #f3f3f3;
+
+
+/* Inherit row color to all child tables. */
+.table table > tbody > tr:nth-of-type(n) {
+    background-color: inherit;
 }
 
+/* Color rows by .odd/.even instead of :nth-of-type(2n+1). */
+.table-striped > tbody > .odd:nth-of-type(n) {
+    background: transparent;
+}
+.table-striped > tbody > .even:nth-of-type(n) {
+    background-color: #f4f4f4;
+}
+
+/* Color child table rows the same color as their leading row.
+   Use :nth-of-type(n) to increase CSS specificity. */
+.table-striped > tbody > .odd:nth-of-type(n) + tr:not(.odd):not(.even) {
+    background: transparent;
+}
+.table-striped > tbody > .even:nth-of-type(n) + tr:not(.odd):not(.even) {
+    background-color: #f4f4f4;
+}
+
+/* Darker color on hover. */
+.table-hover > tbody > tr:hover > td {
+    background-color: #f2f2f2;
+}
+
+
+
 /* Indent for row details */
-.indented {
+table .indented {
     margin-left: 50px;
 }
 
@@ -55,4 +68,3 @@
 .table-child-details > tbody > tr:last-child {
     border-bottom: none;
 }
-
