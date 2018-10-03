@@ -235,8 +235,8 @@ CREATE UNIQUE INDEX players_User_ID_Game_ID_uindex ON players (User_ID, Game_ID)
 
 INSERT INTO `players` (`ID`, `User_ID`, `Game_ID`)
 VALUES (-1, -1, -1),
-       (-2, -2, -1),
-       (-3, -3, -1);
+       ( 3,  3, -1),
+       ( 4,  4, -1);
 
 --
 -- Table structure for table `targetexecutions`
@@ -389,8 +389,8 @@ INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`)
 VALUES (1, 'Mutator', 'AI_ATTACKER_INACCESSIBLE', 'codedef_mutator@sheffield.ac.uk'),
        (2, 'TestGen', 'AI_DEFENDER_INACCESSIBLE', 'codedef_testgen@sheffield.ac.uk'),
        (-1, 'dummy_user', 'DUMMY_USER_INACCESSIBLE', 'user@dummy.com'),
-       (-2, 'dummy_attacker', 'DUMMY_ATTACKER_INACCESSIBLE', 'attacker@dummy.com'),
-       (-3, 'dummy_defender', 'DUMMY_DEFENDER_INACCESSIBLE', 'defender@dummy.com');
+       (3, 'System Attacker', 'DUMMY_ATTACKER_INACCESSIBLE', 'attacker@dummy.com'),
+       (4, 'System Defender', 'DUMMY_DEFENDER_INACCESSIBLE', 'defender@dummy.com');
 
 --
 -- Table structure for table `sessions`

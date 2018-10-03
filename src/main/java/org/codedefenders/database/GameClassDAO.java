@@ -56,7 +56,7 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of identifiers of mutants
      */
-    public static List<Integer> getMappedMutantsForId(Integer classId) {
+    public static List<Integer> getMappedMutantIdsForClassId(Integer classId) {
         List<Integer> mutantIds = new LinkedList<>();
 
         String query = "SELECT Mutant_ID FROM mutants WHERE Class_ID = ?;";
@@ -85,13 +85,57 @@ public class GameClassDAO {
     }
 
     /**
+     * Return a {@link List} of all {@link Mutant}s, which were uploaded
+     * together with a given class.
+     *
+     * @param classId the identifier of the given class
+     * @return a list of mutants
+     */
+    public static List<Mutant> getMappedMutantsForClassId(Integer classId) {
+        List<Mutant> mutants = new LinkedList<>();
+
+        String query = "SELECT * FROM mutants WHERE Class_ID = ?;";
+
+        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+
+        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
+        if (resultSet == null) {
+            return mutants;
+        }
+        try {
+            while (resultSet.next()) {
+                final int mutantId = resultSet.getInt("Mutant_ID");
+                final int gameId = resultSet.getInt("Game_ID");
+                final String javaFile = resultSet.getString("JavaFile");
+                final String classFile = resultSet.getString("ClassFile");
+                final boolean alive = resultSet.getInt("Alive") == 1;
+                final Mutant.Equivalence equivalence = Mutant.Equivalence.valueOf(resultSet.getString("Equivalent"));
+                final int roundCreated = resultSet.getInt("RoundCreated");
+                final int roundKilled = resultSet.getInt("RoundKilled");
+                final int playerId = resultSet.getInt("Player_ID");
+
+                mutants.add(new Mutant(mutantId, gameId, javaFile, classFile, alive, equivalence, roundCreated, roundKilled, playerId));
+            }
+        } catch (SQLException e) {
+            logger.error("Error during retrieval of mapped mutants for classId:{}", classId);
+        } finally {
+            DB.cleanup(conn, stmt);
+        }
+
+        return mutants;
+    }
+
+    /**
      * Return a {@link List} of all identifiers of {@link Test}s, which were uploaded
      * together with a given class.
      *
      * @param classId the identifier of the given class
      * @return a list of identifiers of tests
      */
-    public static List<Integer> getMappedTestsForId(Integer classId) {
+    public static List<Integer> getMappedTestIdsForClassId(Integer classId) {
         List<Integer> testIds = new LinkedList<>();
 
         String query = "SELECT Test_ID FROM tests WHERE Class_ID = ?;";
@@ -117,6 +161,27 @@ public class GameClassDAO {
         }
 
         return testIds;
+    }
+
+
+    /**
+     * Return a {@link List} of all {@link Test}s, which were uploaded
+     * together with a given class.
+     *
+     * @param classId the identifier of the given class
+     * @return a list of tests
+     */
+    public static List<Test> getMappedTestsForClassId(Integer classId) {
+        String query = "SELECT * FROM tests WHERE Class_ID = ?;";
+
+        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+
+        final List<Test> retrievedTests = DatabaseAccess.getTests(stmt, conn);
+
+        return new LinkedList<>(retrievedTests);
     }
 
     /**
