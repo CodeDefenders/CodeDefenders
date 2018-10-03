@@ -1,10 +1,14 @@
 package org.codedefenders.database;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 
 public class DB {
 
@@ -42,7 +46,8 @@ public class DB {
             stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             int count = 1;
             for (DatabaseValue val : values) {
-                switch (val.getType()) {
+                final DatabaseValue.Type type = val.getType();
+                switch (type) {
                     case BOOLEAN:
                         stmt.setBoolean(count++, val.getBoolVal());
                         break;
@@ -62,12 +67,16 @@ public class DB {
                         stmt.setTimestamp(count++, val.getTimestampVal());
                         break;
                     default:
-                        return null;
+                        final IllegalStateException illegalState =
+                                new IllegalStateException("Unknown database value type: " + type);
+                        logger.error("Failed to create prepared statement due to unknown database value type.", illegalState);
+                        throw illegalState;
                 }
             }
         } catch (SQLException se) {
             logger.error("SQLException while creating Prepared Statement for query\n\t" + query, se);
             DB.cleanup(conn, stmt);
+            return null;
         }
         return stmt;
     }

@@ -60,6 +60,7 @@ public class GameManager extends HttpServlet {
 	private static final Logger logger = LoggerFactory.getLogger(GameManager.class);
 
 	// Based on info provided, navigate to the correct view for the user
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
 		// Get the session information specific to the current user.
@@ -108,9 +109,10 @@ public class GameManager extends HttpServlet {
 	}
 
 	// Based on the data provided, update information for the game
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-		ArrayList<String> messages = new ArrayList<String>();
+		ArrayList<String> messages = new ArrayList<>();
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
 
@@ -464,7 +466,7 @@ public class GameManager extends HttpServlet {
 				TargetExecution.Target.COMPILE_TEST);
 
 		// If the test did not compile we short circuit here. We shall not return null
-		if (compileTestTarget == null || ( compileTestTarget != null && ! compileTestTarget.status.equals("SUCCESS"))) {
+		if (compileTestTarget == null || !compileTestTarget.status.equals("SUCCESS")) {
 			return newTest;
 		}
 		
@@ -483,5 +485,4 @@ public class GameManager extends HttpServlet {
 	public static Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException, CodeValidatorException {
 		return createTest(gid, cid, testText, ownerId, subDirectory, DEFAULT_NB_ASSERTIONS);
 	}
-
 }

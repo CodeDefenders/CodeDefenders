@@ -15,7 +15,7 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.game.multiplayer.LineCoverage;
+import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;

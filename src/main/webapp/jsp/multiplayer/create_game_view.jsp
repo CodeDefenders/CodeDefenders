@@ -14,7 +14,7 @@
     </p>
 </div>
 <%
-} else {
+        } else {
 %>
 <div id="creategame" class="container">
     <p>
@@ -22,9 +22,8 @@
     </p>
 </div>
 <%
-    }
-} else {
-
+        }
+    } else {
 %>
 <div id="creategame" class="container">
     <form id="create" action="<%=request.getContextPath() %>/multiplayer/games" method="post"
@@ -34,9 +33,8 @@
             <tr>
                 <td width="25%">Java Class</td>
                 <td id="classTd">
-                    <select id="class" name="class" class="form-control selectpicker" data-size="
-                    large">
-                        <% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
+                    <select selectpicker id="class" name="class" class="form-control" data-size="large">
+                        <% for (GameClass c : gameClasses) { %>
                         <option value="<%=c.getId()%>"><%=c.getAlias()%>
                         </option>
                         <%}%>
@@ -55,6 +53,22 @@
             </tr>
             -->
             <tr>
+                <td>Include predefined mutants (if available)</td>
+                <td>
+                    <input type="checkbox" id="withMutants" name="withMutants"
+                           class="form-control" data-size="large" data-toggle="toggle" data-on="Yes" data-off="No"
+                           data-onstyle="primary" data-offstyle="">
+                </td>
+            </tr>
+            <tr>
+                <td>Include predefined tests (if available)</td>
+                <td>
+                    <input type="checkbox" id="withTests" name="withTests"
+                           class="form-control" data-size="large" data-toggle="toggle" data-on="Yes" data-off="No"
+                           data-onstyle="primary" data-offstyle="">
+                </td>
+            </tr>
+            <tr>
                 <td>Level</td>
                 <td id="levelTd">
                     <input type="checkbox" id="level" name="level" class="form-control" data-size="large"
@@ -62,16 +76,6 @@
                            data-offstyle="warning">
                 </td>
             </tr>
-            <% /*
-				Integer.parseInt(request.getParameter("defenderLimit")),
-				Integer.parseInt(request.getParameter("attackerLimit")),
-                Integer.parseInt(request.getParameter("minDefenders")),
-                Integer.parseInt(request.getParameter("minAttackers")),
-                Long.parseLong(request.getParameter("finishTime")),
-                MultiplayerGame.State.CREATED.name());
-
-                */
-            %>
             <tr>
                 <td>Defenders</td>
                 <td class="crow fly" id="defendersTd">

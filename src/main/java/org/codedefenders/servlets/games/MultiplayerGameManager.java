@@ -1,20 +1,20 @@
 package org.codedefenders.servlets.games;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.util.Constants;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.execution.MutationTester;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
-import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.Role;
-import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Test;
-import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.validation.CodeValidatorException;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.util.Constants;
 import org.codedefenders.validation.CodeValidator;
+import org.codedefenders.validation.CodeValidatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +29,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
@@ -43,14 +45,13 @@ import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 
 public class MultiplayerGameManager extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameManager.class);
 
 	// Based on the data provided, update information for the game
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
 		ArrayList<String> messages = new ArrayList<String>();
@@ -153,11 +154,10 @@ public class MultiplayerGameManager extends HttpServlet {
 							MutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
 							if (mPending.getEquivalent().equals(PROVEN_NO)) {
 								logger.info("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
-								newTest.setScore(0); // score 2 points for proving a mutant non-equivalent
-								Event notif = new Event(-1, activeGame.getId(),
-										uid,
-										DatabaseAccess.getUser(uid)
-												.getUsername() +
+								// TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points added.
+								newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
+								Event notif = new Event(-1, activeGame.getId(), uid,
+										DatabaseAccess.getUser(uid) .getUsername() +
 												" killed mutant " + mPending.getId() +" in an equivalence duel.",
 										EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
 										new Timestamp(System.currentTimeMillis()));

@@ -3,6 +3,7 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.singleplayer.PrepareAI" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.database.GameClassDAO" %>
 <% String pageTitle=null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div>
@@ -10,19 +11,57 @@
 		<h2>Upload Class</h2>
 		<div id="divUpload" >
 			<form id="formUpload" action="<%=request.getContextPath() %>/upload" class="form-upload" method="post" enctype="multipart/form-data">
-				<input id="classAlias" name="classAlias" type="text" class="form-control" placeholder="Optional class alias" >
+				<input id="classAlias" name="classAlias" type="text" class="form-control" placeholder="Optional class alias, otherwise class name is used" >
 				<!--
 				<input type="checkbox" name="prepareForSingle" value="prepare" style="margin-right:5px;">Generate mutants and tests for single-player mode? (It may take a while...)</input>
 				-->
-				<span id="file-select">
-					<input id="fileUpload" name="fileUpload" type="file" class="file-loading" accept=".java" />
+				<div>
+                    <h3>Upload Class under Test</h3>
+                    <span class="file-select">
+                        <input id="fileUploadCUT" name="fileUploadCUT" type="file" class="file-loading" accept=".java" required />
+                    </span>
+					<br>
+					<span>The class used for games. Mutants are created from and tests are created for this class.</span>
+				</div>
+				<div>
+					<h3>Upload Dependencies (optional)</h3>
+					<span class="file-select">
+                        <input id="fileUploadDependency" name="fileUploadDependency" type="file" class="file-loading" accept=".zip" />
+                    </span>
+					<br>
+					<span>
+                        If the class under test has dependencies, upload them as inside a <code>zip</code> file.
+					</span>
+				</div>
+				<div>
+					<h3>Upload Mutants (optional)</h3>
+					<span class="file-select">
+                        <input id="fileUploadMutant" name="fileUploadMutant" type="file" class="file-loading" accept=".zip" />
+                    </span>
+					<br>
+                    <span>
+                        Mutants uploaded with a class under test can be used to initialize games with existing mutants.
+                        Note that all mutants must have the same class name as the class under test and must be uploaded inside a <code>zip</code> file.
+					</span>
+				</div>
+				<div>
+					<h3>Upload Tests (optional)</h3>
+					<span class="file-select">
+                        <input id="fileUploadTest" name="fileUploadTest" type="file" class="file-loading" accept=".zip" />
+                    </span>
+					<br>
+                    <span>
+                        Tests uploaded with a class under test can be used to initialize games with existing tests.
+                        Note that all tests must be uploaded inside a <code>zip</code> file.
+                    </span>
+				</div>
+				<br>
+                <input id="mockingEnabled" type="checkbox" name="enableMocking" value="isMocking" style="margin-right:5px;">Enable Mocking for this class</input>
+				<br>
+				<span class="submit-button">
+					<input id="upload" type="submit" class="fileinput-upload-button" value="Upload" onClick="this.form.submit(); this.disabled=true; this.value='Uploading...';"/>
 				</span>
-				<span id="mocking-enabled">
-					<input id="mockingEnabled" type="checkbox" name="enableMocking" value="isMocking" style="margin-right:5px;">Enable Mocking for this class</input>
-				</span>
-				<span id="submit-button">
-					<input id="upload" type="submit" text="Upload" class="fileinput-upload-button" value="Upload" onClick="this.form.submit(); this.disabled=true; this.value='Uploading...';" />
-				</span>
+
 				<input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
 			</form>
 		</div>
@@ -43,6 +82,7 @@
 				<tr>
 					<th class="col-sm-1 col-sm-offset-2">ID</th>
 					<th>Class name (alias)</th>
+					<th>Available dependencies/tests/mutants</th>
 					<th>Mutation Difficulty</th>
 					<th>Testing Difficulty</th>
 				</tr>
@@ -80,13 +120,14 @@
 									</div>
 								</div>
 							</td>
+							<td><%=GameClassDAO.getMappedDependenciesForId(c.getId()).size()%>/<%=GameClassDAO.getMappedTestIdsForClassId(c.getId()).size()%>/<%=GameClassDAO.getMappedMutantIdsForClassId(c.getId()).size()%></td>
 							<td><%=mutationDiff > 0 ? String.valueOf(mutationDiff) : ""%></td>
 							<td><%=testingDiff > 0 ? String.valueOf(testingDiff) : ""%></td>
 							<!--
 							<td>
 								<form id="aiPrepButton<%= c.getId() %>" action="<%=request.getContextPath() %>/ai_preparer" method="post" >
 									<button type="submit" class="btn btn-primary btn-game btn-right" form="aiPrepButton<%= c.getId() %>" onClick="this.form.submit(); this.disabled=true; this.value='Preparing...';"
-											<% if (PrepareAI.isPrepared(c)) { %> disabled <% } %>>
+											<% //if (PrepareAI.isPrepared(c)) { %> disabled <% //} %>>
 										Prepare AI
 									</button>
 									<input type="hidden" name="formType" value="runPrepareAi" />

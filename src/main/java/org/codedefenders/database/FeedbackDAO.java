@@ -52,6 +52,7 @@ public class FeedbackDAO {
 
 	public static boolean insertFeedback(int gid, int uid, List<Integer> ratingsList, FeedbackManager.FeedbackType[] feedbackTypes) {
 		String query = "INSERT INTO ratings VALUES ";
+		StringBuilder bob = new StringBuilder(query);
 		String queryValues = "(?, ?, ?, ?),";
 
 		if (ratingsList.size() > feedbackTypes.length || ratingsList.size() < 1)
@@ -65,14 +66,14 @@ public class FeedbackDAO {
 					DB.getDBV(feedbackTypes[i].name()),
 					DB.getDBV(boundedValue));
 			allValuesList = ListUtils.union(allValuesList, valueList);
-			query += queryValues;
+			bob.append(queryValues);
 		}
 
 		DatabaseValue[] databaseValues = new DatabaseValue[allValuesList.size()];
 		databaseValues = allValuesList.toArray(databaseValues);
 
 		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query.substring(0, query.length() - 1), databaseValues);
+		PreparedStatement stmt = DB.createPreparedStatement(conn, bob.substring(0, bob.length() - 1), databaseValues);
 		return DB.executeUpdate(stmt, conn);
 	}
 
@@ -90,12 +91,13 @@ public class FeedbackDAO {
 		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_FEEDBACK_QUERY, valueList);
 		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 		try {
-			if (rs == null || !rs.next())
+			if (rs == null || !rs.next()) {
 				return null;
+			}
 			rs.beforeFirst();
 			while (rs.next()) {
 				String typeString = rs.getString(2);
-				if (isValidFeedbackType(typeString, feedbackTypes)) {
+				if (Arrays.stream(feedbackTypes).anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
 					values[getFeedbackIndex(typeString, feedbackTypes)] = rs.getInt(1);
 				} else {
 					logger.warn("No such feedback type: " + typeString);
@@ -153,7 +155,7 @@ public class FeedbackDAO {
 			rs.beforeFirst();
 			while (rs.next()) {
 				String typeString = rs.getString(2);
-				if (isValidFeedbackType(typeString, feedbackTypes)) {
+				if (Arrays.stream(feedbackTypes).anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
 					values[getFeedbackIndex(typeString, feedbackTypes)] = rs.getDouble(1);
 				} else {
 					logger.warn("No such feedback type: " + typeString);
@@ -217,20 +219,15 @@ public class FeedbackDAO {
 		return 0;
 	}
 
-	private static boolean isValidFeedbackType(String typeName, FeedbackManager.FeedbackType[] feedbackTypes) {
-		return getFeedbackNames(feedbackTypes).contains(typeName);
-	}
-
 	private static int getFeedbackIndex(String typeName, FeedbackManager.FeedbackType[] feedbackTypes) {
-		return getFeedbackNames(feedbackTypes).indexOf(typeName);
-	}
-
-	private static List<String> getFeedbackNames(FeedbackManager.FeedbackType[] feedbackTypes) {
-		List<String> feedbackTypeNames = new ArrayList<>();
-		for (FeedbackManager.FeedbackType f : feedbackTypes) {
-			feedbackTypeNames.add(f.name());
+		int index = 0;
+		for (FeedbackManager.FeedbackType feedbackType : feedbackTypes) {
+			if (typeName.equals(feedbackType.name())) {
+				return index;
+			}
+			index++;
 		}
-		return feedbackTypeNames;
+		return -1;
 	}
 
 }

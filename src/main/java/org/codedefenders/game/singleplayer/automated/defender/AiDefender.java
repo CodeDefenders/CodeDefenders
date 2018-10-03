@@ -5,7 +5,7 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Role;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.game.multiplayer.LineCoverage;
+import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.singleplayer.AiPlayer;
 import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.codedefenders.game.singleplayer.PrepareAI;
