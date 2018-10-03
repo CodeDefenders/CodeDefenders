@@ -3,11 +3,11 @@ DELETE FROM players
 where User_ID IN (-2, -3);
 
 UPDATE users
-SET User_ID = 3
+SET User_ID = 3, Username = 'System Attacker'
 WHERE User_ID = -2;
 
 UPDATE users
-SET User_ID = 4
+SET User_ID = 4, Username = 'System Defender'
 WHERE User_ID = -3;
 
 INSERT INTO `players` (`ID`, `User_ID`, `Game_ID`, `Points`, `Role`, `Active`)

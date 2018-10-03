@@ -389,8 +389,8 @@ INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`)
 VALUES (1, 'Mutator', 'AI_ATTACKER_INACCESSIBLE', 'codedef_mutator@sheffield.ac.uk'),
        (2, 'TestGen', 'AI_DEFENDER_INACCESSIBLE', 'codedef_testgen@sheffield.ac.uk'),
        (-1, 'dummy_user', 'DUMMY_USER_INACCESSIBLE', 'user@dummy.com'),
-       (3, 'dummy_attacker', 'DUMMY_ATTACKER_INACCESSIBLE', 'attacker@dummy.com'),
-       (4, 'dummy_defender', 'DUMMY_DEFENDER_INACCESSIBLE', 'defender@dummy.com');
+       (3, 'System Attacker', 'DUMMY_ATTACKER_INACCESSIBLE', 'attacker@dummy.com'),
+       (4, 'System Defender', 'DUMMY_DEFENDER_INACCESSIBLE', 'defender@dummy.com');
 
 --
 -- Table structure for table `sessions`
