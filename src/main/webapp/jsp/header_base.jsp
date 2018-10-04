@@ -82,7 +82,6 @@
     <!-- MultiplayerGame -->
     <link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
     <link href="css/notification-style.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="js/game_highlighting.js"></script>
     <script type="text/javascript" src="js/messaging.js"></script>
 
     <!-- Upload page -->
@@ -137,7 +136,6 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="java.util.ArrayList" %>
-    <% DuelGame game = (DuelGame) session.getAttribute("game"); %>
 <div class="menu-top bg-grey bg-plus-4 text-white" style="padding-bottom:0px;">
     <div class="full-width">
         <div class="nest">
@@ -161,4 +159,4 @@
         <div class="bg-plus-3" style="padding:2px 0; margin-bottom: 0px; margin-top: 5px;"></div>
     </div>
 </div>
-<div  style="background-color: #fafafa; min-height: 90%; padding-bottom: 20px;">
+<div  style="background-color: #fafafa; min-height: 90%; padding-bottom: 20px;"/>

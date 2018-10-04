@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class FeedbackDAO {
 
@@ -87,7 +86,6 @@ public class FeedbackDAO {
 				DB.getDBV(uid)};
 		Integer[] values = new Integer[feedbackTypes.length];
 		Arrays.fill(values, -1);
-		final Stream<FeedbackManager.FeedbackType> types = Arrays.stream(feedbackTypes);
 
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_FEEDBACK_QUERY, valueList);
@@ -99,7 +97,7 @@ public class FeedbackDAO {
 			rs.beforeFirst();
 			while (rs.next()) {
 				String typeString = rs.getString(2);
-				if (types.anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
+				if (Arrays.stream(feedbackTypes).anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
 					values[getFeedbackIndex(typeString, feedbackTypes)] = rs.getInt(1);
 				} else {
 					logger.warn("No such feedback type: " + typeString);
@@ -147,7 +145,6 @@ public class FeedbackDAO {
 	public static double[] getAverageGameRatings(int gid) {
 		double[] values = new double[feedbackTypes.length];
 		Arrays.fill(values, -1);
-		final Stream<FeedbackManager.FeedbackType> types = Arrays.stream(feedbackTypes);
 
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_AVERAGE_GAME_RATINGS, DB.getDBV(gid));
@@ -158,7 +155,7 @@ public class FeedbackDAO {
 			rs.beforeFirst();
 			while (rs.next()) {
 				String typeString = rs.getString(2);
-				if (types.anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
+				if (Arrays.stream(feedbackTypes).anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
 					values[getFeedbackIndex(typeString, feedbackTypes)] = rs.getDouble(1);
 				} else {
 					logger.warn("No such feedback type: " + typeString);

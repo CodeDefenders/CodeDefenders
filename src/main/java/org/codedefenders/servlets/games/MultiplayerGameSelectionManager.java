@@ -210,7 +210,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                         return;
                     }
                     // Redirect to the game selection menu.
-                    response.sendRedirect(contextPath + "/multiplayer/games");
+                    response.sendRedirect(contextPath + "/games/user");
                 } catch (Throwable e) {
                     logger.error("Unknown error during battleground creation.", e);
                     messages.add("Invalid Request");
@@ -243,7 +243,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     messages.add("An error occured while leaving game " + gameId);
                 }
                 // Redirect to the game selection menu.
-                response.sendRedirect(contextPath + "/multiplayer/games");
+                response.sendRedirect(contextPath + "/games/user");
                 break;
             default:
                 logger.info("Action not recognised: {}", action);

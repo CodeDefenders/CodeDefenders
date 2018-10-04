@@ -83,7 +83,7 @@ public class GameManager extends HttpServlet {
 
 		// If the game is finished, redirect to the score page.
 		if (activeGame.getAttackerId() == uid) {
-			List<Mutant> equivMutants = activeGame.getMutantsMarkedEquivalent();
+			List<Mutant> equivMutants = activeGame.getMutantsMarkedEquivalentPending();
 			if (equivMutants.isEmpty()) {
 				logger.info("Redirecting to attacker page");
 				List<Mutant> aliveMutants = activeGame.getAliveMutants();
@@ -96,6 +96,7 @@ public class GameManager extends HttpServlet {
 				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.ATTACKER_VIEW_JSP);
 				dispatcher.forward(request, response);
 			} else {
+				request.setAttribute("equivMutant", equivMutants.get(0));
 				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.RESOLVE_EQUIVALENCE_JSP);
 				dispatcher.forward(request, response);
 			}
@@ -143,13 +144,13 @@ public class GameManager extends HttpServlet {
 						logger.warn("Swallow Exception", e);
 						messages.add(TEST_GENERIC_ERROR_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect(request.getContextPath()+"/play");
+						response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 						return;
 					}
 					if (newTest == null) {
 						messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect(request.getContextPath()+"/play");
+						response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 						return;
 					}
 
@@ -176,13 +177,13 @@ public class GameManager extends HttpServlet {
 									logger.info("Test {} failed to kill mutant {}", newTest.getId(), mutant.getId());
 									messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
 								}
-								response.sendRedirect(request.getContextPath()+"/play");
+								response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 								return;
 							} else {
 								activeGame.endRound();
 								activeGame.update();
 								messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
-								response.sendRedirect(request.getContextPath()+"/play");
+								response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 								return;
 							}
 						} else {
@@ -206,7 +207,7 @@ public class GameManager extends HttpServlet {
 						messages.add(MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 						activeGame.endRound();
 						activeGame.update();
-						response.sendRedirect(request.getContextPath()+"/play");
+						response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 						return;
 					}
 				}
@@ -334,7 +335,7 @@ public class GameManager extends HttpServlet {
 					logger.warn("Swallow Exception", e);
 					messages.add(TEST_GENERIC_ERROR_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect(request.getContextPath()+"/play");
+					response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 					return;
 				}
 
@@ -342,7 +343,7 @@ public class GameManager extends HttpServlet {
 				if (newTest == null) {
 					messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect(request.getContextPath()+"/play");
+					response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 					return;
 				}
 				logger.debug("New Test " + newTest.getId());
@@ -378,7 +379,7 @@ public class GameManager extends HttpServlet {
 				break;
 		}
 
-		response.sendRedirect(request.getContextPath()+"/play");//doGet(request, response);
+		response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());//doGet(request, response);
 	}
 
 	public static String getMutantValidityMessage(int cid, String mutatedCode, CodeValidator.CodeValidatorLevel codeValidatorLevel) throws IOException {

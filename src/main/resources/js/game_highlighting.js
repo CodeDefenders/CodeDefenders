@@ -168,7 +168,11 @@ var createPopupFunction = function(mutantType){
     };
 }
 
-var mutantLine = function (superDiv, showEquivalenceButton) {
+var mutantLine = function (superDiv, showEquivalenceButton, gameType) {
+    if (!gameType) {
+        gameType = "PARTY";
+    }
+
     if (!superDiv) {
         superDiv = "#cut-div";
     }
@@ -299,11 +303,25 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
         // }
         if (showEquivalenceButton && aliveMutants > 0) {
             // TODO How do we get the contextPath ? it might not be necessary if we use relative href
-            mutantDescriptions['alive'] += '<span class="action"><a href="javascript:' +
-                ' if(window.confirm(\'Flag line ' + lineNum + ' as' +
-                ' Equivalent?\')){window.location.href = \'multiplayer/play?equivLine=' + lineNum + '\';}">' +
-                '<span class="mutantCUTIcon mutantImageFlagAction"><span></span>' +
-                '</span> Claim Equivalence</a></span>';
+
+            if (gameType === "PARTY") {
+                mutantDescriptions['alive'] += '<span class="action"><a href="javascript:' +
+                    ' if(window.confirm(\'Flag line ' + lineNum + ' as' +
+                    ' Equivalent?\')){window.location.href = \'multiplayer/play?equivLine=' + lineNum + '\';}">' +
+                    '<span class="mutantCUTIcon mutantImageFlagAction"><span></span>' +
+                    '</span> Claim Equivalence</a></span>';
+            } else if (gameType === "DUEL") {
+                mutantDescriptions['alive'] += '' +
+                    '<br\>' +
+                    '<form id="equiv" action="duelgame" method="post" onsubmit="return window.confirm(\'This will mark mutant ' + mutant.id + ' as equivalent Are you sure?\');">' +
+                        '<input type="hidden" name="formType" value="claimEquivalent">' +
+                        '<input type="hidden" name="mutantId" value="' + mutant.id +  '">' +
+                        '<button type="submit"><span class="mutantCUTIcon mutantImageFlagAction">' +
+                            '<span></span></span> Claim Equivalence' +
+                        '</button>' +
+                    '</form>';
+            }
+
         }
         content += '</span>';
 
