@@ -127,6 +127,12 @@ public class UploadManager extends HttpServlet {
             switch (fieldName) {
                 case "classAlias":
                     classAlias = fieldValue;
+                    if (!validateAlias(classAlias)) {
+                        logger.error("Class upload failed. Provided alias '{}' contained whitespaces or special characters. Aborting.", classAlias);
+                        messages.add("Class upload failed. Alias must not contain whitespaces or special characters.");
+                        abortRequestAndCleanUp(request, response);
+                        return;
+                    }
                     break;
                 case "prepareForSingle":
                     // TODO Phil: legacy, will this be used in the future? (look TODO below)
@@ -416,6 +422,17 @@ public class UploadManager extends HttpServlet {
 //				}
 //			}
 
+    }
+
+    /**
+     * Checks whether a given alias is valid or not. A valid alias is at least one
+     * character long and has no special characters.
+     *
+     * @param alias the checked alias as a {@link String}
+     * @return {@code true} if the alias is valid, {@code false} otherwise.
+     */
+    private boolean validateAlias(String alias) {
+        return alias.matches("^[a-zA-Z0-9]*$");
     }
 
     /**
