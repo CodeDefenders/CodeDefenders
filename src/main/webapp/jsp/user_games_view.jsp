@@ -178,8 +178,8 @@
 					case CREATOR:
 						if (g.getState() == GameState.CREATED) {
 %>
-			<form id="adminStartBtn" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
-				<button type="submit" class="btn btn-sm btn-primary" id="startGame" form="adminStartBtn">
+			<form id="adminStartBtn-<%=g.getId()%>" action="<%=request.getContextPath() %>/multiplayergame" method="post">
+				<button type="submit" class="btn btn-sm btn-primary" id="startGame-<%=g.getId()%>" form="adminStartBtn-<%=g.getId()%>">
 					Start Game
 				</button>
 				<input type="hidden" name="formType" value="startGame">

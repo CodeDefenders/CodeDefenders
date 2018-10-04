@@ -12,6 +12,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.CodeValidator;
 import org.codedefenders.validation.CodeValidatorException;
@@ -50,37 +51,37 @@ public class MultiplayerGameManager extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameManager.class);
 
-	// Based on the data provided, update information for the game
+	@SuppressWarnings("Duplicates")
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
-		ArrayList<String> messages = new ArrayList<String>();
-		HttpSession session = request.getSession();
-		int uid = (Integer) session.getAttribute("uid");
-		// The following raises exception when playing around with curl, not sure it's a feature.
-		//		int gameId = (Integer) session.getAttribute("mpGameId");
-		// Why this must be set with the session from game_view.jsp ?
-		int gameId = -1;
-		if (session.getAttribute("mpGameId") != null) {
+		final ArrayList<String> messages = new ArrayList<>();
+		final HttpSession session = request.getSession();
+		session.setAttribute("messages", messages);
+		final int uid = (Integer) session.getAttribute("uid");
+		final int gameId;
+		if (request.getParameter("mpGameID") != null) {
+			gameId = Integer.parseInt(request.getParameter("mpGameID"));
+			session.setAttribute("mpGameId", gameId);
+		} else if (session.getAttribute("mpGameId") != null) {
 			gameId = (Integer) session.getAttribute("mpGameId");
-        } else if (request.getParameter("mpGameID") != null) {
-        	// During integration tests the session value is empty, but we car read it from the url as parameter
-            gameId = Integer.parseInt(request.getParameter("mpGameID"));
-            // Set this value in the session
-            session.setAttribute("mpGameId", gameId);
 		} else {
 			// TODO Not sure this is 100% right
 			logger.error("Problem setting gameID !");
 			response.setStatus(500);
+			Redirect.redirectBack(request, response);
 			return;
 		}
-		session.setAttribute("messages", messages);
+		final String contextPath = request.getContextPath();
+		final MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(gameId);
 
-		String contextPath = request.getContextPath();
+		if (activeGame == null) {
+			logger.error("Could not retrieve game from database for gameId: {}", gameId);
+			Redirect.redirectBack(request, response);
+			return;
+		}
 
-		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(gameId);
-
-		switch (request.getParameter("formType")) {
+		final String action = request.getParameter("formType");
+		switch (action) {
 			case "startGame": {
 				if (activeGame.getState().equals(GameState.CREATED)) {
 					logger.info("Starting multiplayer game {} (Setting state to ACTIVE)", activeGame.getId());
@@ -95,14 +96,17 @@ public class MultiplayerGameManager extends HttpServlet {
 					activeGame.setState(GameState.FINISHED);
 					activeGame.update();
 
-					response.sendRedirect(contextPath+"/multiplayer/games");
+					response.sendRedirect(contextPath + "/multiplayer/games");
 					return;
-				} else {
-					break;
 				}
+				break;
+			}
+			case "reset": {
+				session.removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+				break;
 			}
 			case "resolveEquivalence": {
-				if(!activeGame.getRole(uid).equals(Role.ATTACKER)) {
+				if (!activeGame.getRole(uid).equals(Role.ATTACKER)) {
 					messages.add("Can only resolve equivalence duels if you are an Attacker!");
 					break;
 				}
@@ -110,7 +114,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 				if (activeGame.getState().equals(GameState.FINISHED)) {
 					messages.add(String.format("Game %d has finished.", activeGame.getId()));
-					response.sendRedirect(contextPath+"/multiplayer/games");
+					response.sendRedirect(contextPath + "/multiplayer/games");
 				}
 
 				// Get the text submitted by the user.
@@ -118,8 +122,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 				// If it can be written to file and compiled, end turn. Otherwise, dont.
 
-				Test newTest = null;
-
+				Test newTest;
 				try {
 					newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp", activeGame.getMaxAssertionsPerTest());
 				} catch (CodeValidatorException cve) {
@@ -156,9 +159,8 @@ public class MultiplayerGameManager extends HttpServlet {
 								logger.info("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
 								// TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points added.
 								newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
-								Event notif = new Event(-1, activeGame.getId(), uid,
-										DatabaseAccess.getUser(uid) .getUsername() +
-												" killed mutant " + mPending.getId() +" in an equivalence duel.",
+								final String message = DatabaseAccess.getUser(uid).getUsername() + " killed mutant " + mPending.getId() + " in an equivalence duel.";
+								Event notif = new Event(-1, activeGame.getId(), uid, message,
 										EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
 										new Timestamp(System.currentTimeMillis()));
 								notif.insert();
@@ -170,13 +172,10 @@ public class MultiplayerGameManager extends HttpServlet {
 								if (mPending.getId() == currentEquivMutantID) {
 									// only kill the one mutant that was claimed
 									mPending.kill(ASSUMED_YES);
-									Event notif = new Event(-1, activeGame.getId(),
-											uid,
-											DatabaseAccess.getUser(uid)
-													.getUsername() + " lost " +
-													"an equivalence duel. " +
-													"Mutant " + mPending.getId() +" is assumed " +
-													"equivalent.",
+									final String message = DatabaseAccess.getUser(uid).getUsername() +
+											" lost an equivalence duel. Mutant " + mPending.getId() +
+											" is assumed equivalent.";
+									Event notif = new Event(-1, activeGame.getId(), uid, message,
 											EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
 											new Timestamp(System.currentTimeMillis()));
 									notif.insert();
@@ -214,17 +213,15 @@ public class MultiplayerGameManager extends HttpServlet {
 					messages.add(compileTestTarget.message);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 				}
+				break;
 			}
-			break;
-
-			case "createMutant":
-				if(!activeGame.getRole(uid).equals(Role.ATTACKER)) {
+			case "createMutant": {
+				if (!activeGame.getRole(uid).equals(Role.ATTACKER)) {
 					messages.add("Can only submit mutants if you are an Attacker!");
 					break;
 				}
 
 				if (activeGame.getState().equals(GameState.ACTIVE)) {
-
 					int attackerID = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, activeGame.getId());
 					// Get the text submitted by the user.
 					String mutantText = request.getParameter("mutant");
@@ -232,7 +229,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					// If the user has pending duels we cannot accept the mutant, but we keep it around
 					// so students do not lose mutants once the duel is solved.
 					if (GameManager.hasAttackerPendingMutantsInGame(activeGame.getId(), attackerID)
-						&& (session.getAttribute(Constants.BLOCK_ATTACKER) != null) && ((Boolean) session.getAttribute(Constants.BLOCK_ATTACKER))) {
+							&& (session.getAttribute(Constants.BLOCK_ATTACKER) != null) && ((Boolean) session.getAttribute(Constants.BLOCK_ATTACKER))) {
 						messages.add(Constants.ATTACKER_HAS_PENDING_DUELS);
 						// Keep the mutant code in the view for later
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
@@ -264,15 +261,10 @@ public class MultiplayerGameManager extends HttpServlet {
 					if (newMutant != null) {
 						TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 						if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
-							Event notif = new Event(-1, activeGame.getId(),
-									uid,
-									DatabaseAccess.getUser(uid)
-											.getUsername() + " created a " +
-											"mutant.",
-									EventType.ATTACKER_MUTANT_CREATED, EventStatus
-									.GAME,
-									new Timestamp(System.currentTimeMillis()
-											- 1000));
+							Event notif = new Event(-1, activeGame.getId(), uid,
+									DatabaseAccess.getUser(uid).getUsername() + " created a mutant.",
+									EventType.ATTACKER_MUTANT_CREATED, EventStatus.GAME,
+									new Timestamp(System.currentTimeMillis() - 1000));
 							notif.insert();
 							messages.add(MUTANT_COMPILED_MESSAGE);
 							MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
@@ -283,8 +275,9 @@ public class MultiplayerGameManager extends HttpServlet {
 
 						} else {
 							messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
-							if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty())
+							if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty()) {
 								messages.add(compileMutantTarget.message);
+							}
 							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
 						}
 					} else {
@@ -296,13 +289,9 @@ public class MultiplayerGameManager extends HttpServlet {
 					messages.add(GRACE_PERIOD_MESSAGE);
 				}
 				break;
-
-			case "reset":
-				session.removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-				break;
-
-			case "createTest":
-				if(!activeGame.getRole(uid).equals(Role.DEFENDER)) {
+			}
+			case "createTest": {
+				if (!activeGame.getRole(uid).equals(Role.DEFENDER)) {
 					messages.add("Can only submit tests if you are an Defender!");
 					break;
 				}
@@ -311,14 +300,13 @@ public class MultiplayerGameManager extends HttpServlet {
 					String testText = request.getParameter("test");
 
 					// If it can be written to file and compiled, end turn. Otherwise, dont.
-					Test newTest = null;
-
+					Test newTest;
 					try {
 						newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp", activeGame.getMaxAssertionsPerTest());
 					} catch (CodeValidatorException cve) {
 						messages.add(TEST_GENERIC_ERROR_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect(contextPath+"/multiplayer/play");
+						response.sendRedirect(contextPath + "/multiplayer/play");
 						return;
 					}
 
@@ -326,11 +314,11 @@ public class MultiplayerGameManager extends HttpServlet {
 					if (newTest == null) {
 						messages.add(String.format(TEST_INVALID_MESSAGE, activeGame.getMaxAssertionsPerTest()));
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect(contextPath+"/multiplayer/play");
+						response.sendRedirect(contextPath + "/multiplayer/play");
 						return;
 					}
 
-					logger.info("New Test " + newTest.getId() + " by user " + uid);
+					logger.info("New Test {} by user {}", newTest.getId(), uid);
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 					if (compileTestTarget.status.equals("SUCCESS")) {
@@ -338,40 +326,36 @@ public class MultiplayerGameManager extends HttpServlet {
 						if (testOriginalTarget.status.equals("SUCCESS")) {
 							messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 
-							Event notif = new Event(-1, activeGame.getId(),
-									uid,
-									DatabaseAccess.getUser(uid)
-											.getUsername() + " created a test",
+							Event notif = new Event(-1, activeGame.getId(), uid,
+									DatabaseAccess.getUser(uid).getUsername() + " created a test",
 									EventType.DEFENDER_TEST_CREATED, EventStatus.GAME,
 									new Timestamp(System.currentTimeMillis()));
 							notif.insert();
 
 							MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
 							activeGame.update();
-
 						} else {
 							// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
 							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
-							// TODO This might not prevent injection of malicious code !
-							messages.add(
-									StringEscapeUtils.escapeHtml(testOriginalTarget.message));
-							//
+							// TODO This might not prevent injection of malicious code!
+							messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
 							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 						}
 					} else {
 						messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
-						messages.add(
-								StringEscapeUtils.escapeHtml(
-										compileTestTarget.message));
+						messages.add(StringEscapeUtils.escapeHtml(compileTestTarget.message));
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
 					}
 				} else {
 					messages.add(GRACE_PERIOD_MESSAGE);
 				}
 				break;
+			}
+			default:
+				logger.info("Action not recognised: {}", action);
+				Redirect.redirectBack(request, response);
+				break;
 		}
-
-		response.sendRedirect(contextPath+"/multiplayer/play");//doGet(request, response);
+		response.sendRedirect(contextPath + "/multiplayer/play");
 	}
-
 }
