@@ -229,7 +229,7 @@ public class DoubleEquivalenceSubmissionTest {
 
 		public void startGame(int gameID) throws FailingHttpStatusCodeException, IOException {
 
-			WebRequest startGameRequest = new WebRequest(new URL("http://localhost:8080/multiplayer/move"),
+			WebRequest startGameRequest = new WebRequest(new URL("http://localhost:8080/multiplayergame"),
 					HttpMethod.POST);
 			// // Then we set the request parameters
 			startGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
@@ -260,7 +260,7 @@ public class DoubleEquivalenceSubmissionTest {
 		}
 
 		public void attack(int mpGameID, String mutant) throws FailingHttpStatusCodeException, IOException {
-			WebRequest attackRequest = new WebRequest(new URL("http://localhost:8080/multiplayer/move"),
+			WebRequest attackRequest = new WebRequest(new URL("http://localhost:8080/multiplayergame"),
 					HttpMethod.POST);
 			// // Then we set the request parameters
 			attackRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
@@ -272,20 +272,20 @@ public class DoubleEquivalenceSubmissionTest {
 			// --data-urlencode mutant@${mutant} \
 			// --cookie "${cookie}" --cookie-jar "${cookie}" \
 			// -w @curl-format.txt \
-			// -s ${CODE_DEFENDER_URL}/multiplayer/move
+			// -s ${CODE_DEFENDER_URL}/multiplayergame
 			browser.getPage(attackRequest);
 
 		}
 
 		public void defend(int mpGameID, String test) throws FailingHttpStatusCodeException, IOException {
-			WebRequest defendRequest = new WebRequest(new URL("http://localhost:8080/multiplayer/move"),
+			WebRequest defendRequest = new WebRequest(new URL("http://localhost:8080/multiplayergame"),
 					HttpMethod.POST);
 			// curl -X POST \
 			// --data "formType=createTest&mpGameID=${gameId}" \
 			// --data-urlencode test@${test} \
 			// --cookie "${cookie}" --cookie-jar "${cookie}" \
 			// -w @curl-format.txt \
-			// -s ${CODE_DEFENDER_URL}/multiplayer/move
+			// -s ${CODE_DEFENDER_URL}/multiplayergame
 			defendRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 					new NameValuePair("formType", "createTest"), new NameValuePair("mpGameID", "" + mpGameID),
 					// TODO Encoded somehow ?

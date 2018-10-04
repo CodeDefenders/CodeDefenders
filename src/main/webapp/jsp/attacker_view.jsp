@@ -99,7 +99,7 @@
 <script>
     <% if (game.getActiveRole().equals(Role.DEFENDER)) {%>
     function checkForUpdate() {
-        $.post('/play', {
+        $.post('/duelgame', {
             formType: "whoseTurn",
             gameID: <%= game.getId() %>
         }, function (data) {
