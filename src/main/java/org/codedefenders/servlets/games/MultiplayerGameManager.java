@@ -53,21 +53,16 @@ public class MultiplayerGameManager extends HttpServlet {
 	// Based on the data provided, update information for the game
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
-		ArrayList<String> messages = new ArrayList<String>();
-		HttpSession session = request.getSession();
-		int uid = (Integer) session.getAttribute("uid");
-		// The following raises exception when playing around with curl, not sure it's a feature.
-		//		int gameId = (Integer) session.getAttribute("mpGameId");
-		// Why this must be set with the session from game_view.jsp ?
-		int gameId = -1;
-		if (session.getAttribute("mpGameId") != null) {
+		final ArrayList<String> messages = new ArrayList<>();
+		final HttpSession session = request.getSession();
+		session.setAttribute("messages", messages);
+		final int uid = (Integer) session.getAttribute("uid");
+		final int gameId;
+		if (request.getParameter("mpGameID") != null) {
+			gameId = Integer.parseInt(request.getParameter("mpGameID"));
+			session.setAttribute("mpGameId", gameId);
+		} else if (session.getAttribute("mpGameId") != null) {
 			gameId = (Integer) session.getAttribute("mpGameId");
-        } else if (request.getParameter("mpGameID") != null) {
-        	// During integration tests the session value is empty, but we car read it from the url as parameter
-            gameId = Integer.parseInt(request.getParameter("mpGameID"));
-            // Set this value in the session
-            session.setAttribute("mpGameId", gameId);
 		} else {
 			// TODO Not sure this is 100% right
 			logger.error("Problem setting gameID !");
