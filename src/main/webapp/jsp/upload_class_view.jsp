@@ -11,7 +11,8 @@
 		<h2>Upload Class</h2>
 		<div id="divUpload" >
 			<form id="formUpload" action="<%=request.getContextPath() %>/upload" class="form-upload" method="post" enctype="multipart/form-data">
-				<input id="classAlias" name="classAlias" type="text" class="form-control" placeholder="Optional class alias, otherwise class name is used" >
+				<span class="label label-danger" id="invalid_alias" style="color: white;visibility: hidden">Name with no whitespaces or special characters.</span>
+				<input id="classAlias" onkeyup="validateAlias()" name="classAlias" type="text" class="form-control" placeholder="Optional class alias, otherwise class name is used" >
 				<!--
 				<input type="checkbox" name="prepareForSingle" value="prepare" style="margin-right:5px;">Generate mutants and tests for single-player mode? (It may take a while...)</input>
 				-->
@@ -63,6 +64,20 @@
 				</span>
 
 				<input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
+				<script>
+                    function validateAlias() {
+                        let classAlias = document.forms["formUpload"]["classAlias"].value;
+
+                        let regExp = new RegExp('^[a-zA-Z0-9]*$');
+                        if (regExp.test(classAlias)) {
+                            document.getElementById('invalid_alias').style.visibility = "hidden";
+                            document.getElementById('upload').disabled = false;
+                        } else {
+                            document.getElementById('invalid_alias').style.visibility = "visible";
+                            document.getElementById('upload').disabled = true;
+                        }
+                    }
+				</script>
 			</form>
 		</div>
 	</div>
