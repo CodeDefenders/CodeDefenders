@@ -32,6 +32,12 @@
     request.setAttribute("showEquivalenceButton", false);
     request.setAttribute("gameType", "PARTY");
 
+    /* finished_modal */
+    int attackerScore = game.getAttackerScore();
+    int defenderScore = game.getDefenderScore();
+    request.setAttribute("win", attackerScore > defenderScore);
+    request.setAttribute("loss", defenderScore > attackerScore);
+
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", CodeValidatorLevel.MODERATE);
 

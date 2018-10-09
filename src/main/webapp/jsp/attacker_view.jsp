@@ -39,8 +39,8 @@
     /* finished_modal */
     int attackerScore = game.getAttackerScore();
     int defenderScore = game.getDefenderScore();
-    request.setAttribute("win", defenderScore > attackerScore);
-    request.setAttribute("loss", attackerScore > defenderScore);
+    request.setAttribute("win", attackerScore > defenderScore);
+    request.setAttribute("loss", defenderScore > attackerScore);
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", CodeValidatorLevel.MODERATE);
