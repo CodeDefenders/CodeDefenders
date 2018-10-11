@@ -84,9 +84,14 @@
                             <li><a id="headerGamesHistory" href="<%=request.getContextPath() %>/games/history" style="width:100%;">History</a></li>
                         </ul>
                 </li>
-                <%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) { %>
+
+                <!-- old upload class button
+                <% // if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) { %>
                 <li style="float: none"><a id="headerUploadButton" class="text-white button tab-link bg-minus-1" href="games/upload" style="width:100%;">Upload Class</a></li>
-                <%}%>
+                <% // }%>
+                -->
+
+                <li style="float: none"><a id="puzzleOverview" class="text-white button tab-link bg-minus-1" href="<%=request.getContextPath() %>/jsp/puzzle_overview.jsp" style="width:100%;">Puzzles</a></li>
 
                 <li style="float: none"><a id="headerLeaderboardButton" class="text-white button tab-link bg-minus-1" href="leaderboards" style="width: 100%;">Leaderboard</a></li>
                 <li style="float: none"><a id="headerHelpButton" class="text-white button tab-link bg-minus-1" href="help" style="width:100%;">Help</a></li>
