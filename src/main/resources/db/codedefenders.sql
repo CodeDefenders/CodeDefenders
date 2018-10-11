@@ -90,6 +90,7 @@ CREATE TABLE `classes` (
   `Alias` varchar(50) NOT NULL,
   `AiPrepared` tinyint(1) DEFAULT '0',
   `RequireMocking` tinyint(1) DEFAULT '0',
+  `Puzzle` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Class_ID`),
   UNIQUE KEY `classes_Alias_uindex` (`Alias`)
 ) AUTO_INCREMENT=100;
@@ -274,6 +275,45 @@ CREATE TABLE `targetexecutions` (
   CONSTRAINT `targetexecutions_ibfk_2` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`)
 ) AUTO_INCREMENT=100;
 
+--
+-- Table structure for table `puzzle_levels`
+--
+
+DROP TABLE IF EXISTS `puzzle_levels`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `puzzle_levels` (
+  `Level_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Position` int(11) DEFAULT NULL,
+  `Name` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Description` varchar(1000) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`Level_ID`)
+) AUTO_INCREMENT=100;
+
+--
+-- Table structure for table `puzzles`
+--
+
+DROP TABLE IF EXISTS `puzzles`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `puzzles` (
+  `Puzzle_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Class_ID` int(11) NOT NULL,
+  `Active_Role` enum('ATTACKER','DEFENDER') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `Level_ID` int(11) DEFAULT NULL,
+  `Position` int(11) DEFAULT NULL,
+  `Title` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Description` varchar(1000) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Editable_Lines_Start` int(11) DEFAULT NULL,
+  `Editable_Lines_End` int(11) DEFAULT NULL,
+  `Difficulty` enum('EASY','HARD') COLLATE utf8mb4_unicode_ci DEFAULT 'HARD',
+  PRIMARY KEY (`Puzzle_ID`),
+  UNIQUE KEY `puzzles_level_index_unique` (`Level_ID`,`Position`),
+  KEY `puzzles_classes_Class_ID_fk` (`Class_ID`),
+  CONSTRAINT `puzzles_classes_Class_ID_fk` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `puzzles_puzzle_level_Level_fk` FOREIGN KEY (`Level_ID`) REFERENCES `puzzle_levels` (`Level_ID`) ON DELETE SET NULL ON UPDATE CASCADE
+) AUTO_INCREMENT=100;
 --
 -- Table structure for table `tests`
 --
