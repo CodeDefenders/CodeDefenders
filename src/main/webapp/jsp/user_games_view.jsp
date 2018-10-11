@@ -285,6 +285,7 @@
 	<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue()) { %>
 	<a id="createBattleground" class = "btn btn-primary" href="<%=request.getContextPath()%>/multiplayer/games/create">Create Battleground</a>
 	<a id="createDuel" class = "btn btn-primary" href="<%=request.getContextPath()%>/games/create">Create Duel</a>
+	<a id="headerUploadButton" class="btn btn-primary" href="games/upload">Upload Class</a>
 	<%}%>
 
 <%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue()) { %>
