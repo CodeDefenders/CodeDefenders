@@ -197,6 +197,24 @@
 	</servlet-mapping>
 
 	<servlet>
+		<servlet-name>puzzle_overview.jsp</servlet-name>
+		<jsp-file>/jsp/puzzle_overview.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>puzzle_overview.jsp</servlet-name>
+		<url-pattern>/puzzles</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>singleplayer_attacker_view.jsp</servlet-name>
+		<jsp-file>/jsp/singleplayer_attacker_view.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>singleplayer_attacker_view.jsp</servlet-name>
+		<url-pattern>/puzzles/attacker</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
 		<servlet-name>utesting</servlet-name>
 		<servlet-class>org.codedefenders.servlets.UnitTesting</servlet-class>
 	</servlet>

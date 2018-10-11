@@ -13,7 +13,7 @@
         <tr>
             <td>Statement Coverage</td>
             <td>
-                <a class="btn btn-xs" href="<%=request.getContextPath() %>/jsp/singleplayer_attacker_view.jsp">1</a>
+                <a class="btn btn-xs" href="<%=request.getContextPath() %>/puzzles/attacker">1</a>
                 <p class="glyphicon glyphicon-lock"></p>
                 <p class="glyphicon glyphicon-lock"></p>
                 <p class="glyphicon glyphicon-lock"></p>
