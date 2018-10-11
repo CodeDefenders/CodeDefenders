@@ -111,7 +111,7 @@
                 <% // }%>
                 -->
 
-                <li style="float: none"><a id="puzzleOverview" class="text-white button tab-link bg-minus-1" href="<%=request.getContextPath() %>/jsp/puzzle_overview.jsp" style="width:100%;">Puzzles</a></li>
+                <li style="float: none"><a id="puzzleOverview" class="text-white button tab-link bg-minus-1" href="<%=request.getContextPath() %>/puzzles" style="width:100%;">Puzzles</a></li>
 
                 <!-- link to puzzles overview
                 <li style="float: none"><a id="puzzleOverview" class="text-white button tab-link bg-minus-1" href="<%=request.getContextPath() %>/puzzles" style="width:100%;">Puzzles</a></li>
