@@ -298,6 +298,8 @@ CREATE TABLE `puzzles` (
   `Class_ID` int(11) NOT NULL,
   `Active_Role` enum('ATTACKER','DEFENDER') NOT NULL,
   `Level` enum('EASY','HARD') DEFAULT 'HARD',
+  `Max_Assertions` int(11) NOT NULL DEFAULT '2',
+  `Mutant_Validator_Level` enum('STRICT','MODERATE','RELAXED') NOT NULL DEFAULT 'MODERATE',
   `Editable_Lines_Start` int(11) DEFAULT NULL,
   `Editable_Lines_End` int(11) DEFAULT NULL,
   `Chapter_ID` int(11) DEFAULT NULL,

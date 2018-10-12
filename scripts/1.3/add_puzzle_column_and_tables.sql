@@ -15,7 +15,9 @@ CREATE TABLE puzzles
     Puzzle_ID INTEGER NOT NULL AUTO_INCREMENT,
     Class_ID INTEGER NOT NULL,
     Active_Role ENUM('ATTACKER', 'DEFENDER') NOT NULL,
-    Level ENUM('EASY', 'HARD') DEFAULT 'HARD',
+    Level ENUM('EASY', 'HARD') DEFAULT 'HARD' NOT NULL,
+    Max_Assertions INTEGER DEFAULT 2 NOT NULL ,
+    Mutant_Validator_Level ENUM('STRICT', 'MODERATE', 'RELAXED') DEFAULT 'MODERATE' NOT NULL,
     Editable_Lines_Start INTEGER DEFAULT NULL,
     Editable_Lines_End INTEGER DEFAULT NULL,
     Chapter_ID INTEGER DEFAULT NULL, -- Chapter (group of puzzles) this puzzle belongs to
