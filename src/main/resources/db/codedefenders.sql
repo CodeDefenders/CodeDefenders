@@ -283,8 +283,8 @@ DROP TABLE IF EXISTS `puzzle_chapters`;
 CREATE TABLE `puzzle_chapters` (
   `Chapter_ID` int(11) NOT NULL AUTO_INCREMENT,
   `Position` int(11) DEFAULT NULL,
-  `Title` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description` varchar(1000) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Title` varchar(100) DEFAULT NULL,
+  `Description` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`Chapter_ID`)
 ) AUTO_INCREMENT=100;
 
@@ -296,14 +296,14 @@ DROP TABLE IF EXISTS `puzzles`;
 CREATE TABLE `puzzles` (
   `Puzzle_ID` int(11) NOT NULL AUTO_INCREMENT,
   `Class_ID` int(11) NOT NULL,
-  `Active_Role` enum('ATTACKER','DEFENDER') COLLATE utf8mb4_unicode_ci NOT NULL,
-  `Level` enum('EASY','HARD') COLLATE utf8mb4_unicode_ci DEFAULT 'HARD',
+  `Active_Role` enum('ATTACKER','DEFENDER') NOT NULL,
+  `Level` enum('EASY','HARD') DEFAULT 'HARD',
   `Editable_Lines_Start` int(11) DEFAULT NULL,
   `Editable_Lines_End` int(11) DEFAULT NULL,
   `Chapter_ID` int(11) DEFAULT NULL,
   `Position` int(11) DEFAULT NULL,
-  `Title` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `Description` varchar(1000) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `Title` varchar(100) DEFAULT NULL,
+  `Description` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`Puzzle_ID`),
   UNIQUE KEY `puzzles_level_index_unique` (`Chapter_ID`,`Position`),
   KEY `puzzles_classes_Class_ID_fk` (`Class_ID`),
