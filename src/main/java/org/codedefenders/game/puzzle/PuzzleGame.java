@@ -42,7 +42,7 @@ public class PuzzleGame extends AbstractGame {
     /**
      * Validation level used to check submitted mutants.
      */
-    private CodeValidatorLevel codeValidatorLevel;
+    private CodeValidatorLevel mutantValidatorLevel;
 
     /**
      * The current round of the puzzle.
@@ -55,6 +55,11 @@ public class PuzzleGame extends AbstractGame {
      * The {@link Role} the player takes in the puzzle.
      */
     private Role activeRole;
+
+    /**
+     * The ID of the puzzle this is an instance of.
+     */
+    private int puzzleId;
 
     /**
      * The puzzle this is an instance of.
@@ -123,28 +128,29 @@ public class PuzzleGame extends AbstractGame {
         this.tests = null;
 
         /* Other game attributes */
-        this.maxAssertionsPerTest = 2;                          // TODO
-        this.codeValidatorLevel = CodeValidatorLevel.MODERATE;  // TODO
+        this.maxAssertionsPerTest = puzzle.getMaxAssertionsPerTest();
+        this.mutantValidatorLevel = puzzle.getMutantValidatorLevel();
         this.currentRound = 1;
         this.activeRole = puzzle.getActiveRole();
 
         /* Own attributes */
+        this.puzzleId = puzzle.getPuzzleId();
         this.puzzle = puzzle;
     }
 
     /**
      * Constructor for reading a puzzle game from the database.
      */
-    private PuzzleGame(Puzzle puzzle,
-                       int id,
-                       int classId,
-                       GameLevel level,
-                       int creatorId,
-                       int maxAssertionsPerTest,
-                       CodeValidatorLevel codeValidatorLevel,
-                       GameState state,
-                       int currentRound,
-                       Role activeRole) {
+    public PuzzleGame(int puzzleId,
+                      int id,
+                      int classId,
+                      GameLevel level,
+                      int creatorId,
+                      int maxAssertionsPerTest,
+                      CodeValidatorLevel mutantValidatorLevel,
+                      GameState state,
+                      int currentRound,
+                      Role activeRole) {
         /* AbstractGame attributes */
         this.classId = classId;
         this.creatorId = creatorId;
@@ -156,12 +162,13 @@ public class PuzzleGame extends AbstractGame {
 
         /* Other game attributes */
         this.maxAssertionsPerTest = maxAssertionsPerTest;
-        this.codeValidatorLevel = codeValidatorLevel;
+        this.mutantValidatorLevel = mutantValidatorLevel;
         this.currentRound = currentRound;
         this.activeRole = activeRole;
 
         /* Own attributes */
-        this.puzzle = puzzle;
+        this.puzzleId = puzzleId;
+        this.puzzle = null;
     }
 
     public List<Mutant> getPuzzleMutants() {
@@ -200,7 +207,8 @@ public class PuzzleGame extends AbstractGame {
 
     @Override
     public boolean insert() {
-        return PuzzleDAO.storePuzzleGame(this);
+        id = PuzzleDAO.storePuzzleGame(this);
+        return id != -1;
     }
 
     @Override
@@ -212,39 +220,30 @@ public class PuzzleGame extends AbstractGame {
         return maxAssertionsPerTest;
     }
 
-    public void setMaxAssertionsPerTest(int maxAssertionsPerTest) {
-        this.maxAssertionsPerTest = maxAssertionsPerTest;
-    }
-
-    public CodeValidatorLevel getCodeValidatorLevel() {
-        return codeValidatorLevel;
-    }
-
-    public void setCodeValidatorLevel(CodeValidatorLevel codeValidatorLevel) {
-        this.codeValidatorLevel = codeValidatorLevel;
+    public CodeValidatorLevel getMutantValidatorLevel() {
+        return mutantValidatorLevel;
     }
 
     public int getCurrentRound() {
         return currentRound;
     }
 
-    public void setCurrentRound(int currentRound) {
-        this.currentRound = currentRound;
-    }
-
     public Role getActiveRole() {
         return activeRole;
     }
 
-    public void setActiveRole(Role activeRole) {
-        this.activeRole = activeRole;
+    public int getPuzzleId() {
+        return puzzleId;
     }
 
     public Puzzle getPuzzle() {
+        if (puzzle == null) {
+            puzzle = PuzzleDAO.getPuzzleForId(puzzleId);
+        }
         return puzzle;
     }
 
-    public void setPuzzle(Puzzle puzzle) {
-        this.puzzle = puzzle;
+    public void setCurrentRound(int currentRound) {
+        this.currentRound = currentRound;
     }
 }

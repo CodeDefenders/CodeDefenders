@@ -1,7 +1,9 @@
 package org.codedefenders.game.puzzle;
 
+import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Role;
+import org.codedefenders.validation.CodeValidator.CodeValidatorLevel;
 
 /**
  * Represents the blueprint for a puzzle, which can be instantiated into a {@link PuzzleGame}.
@@ -30,6 +32,16 @@ public class Puzzle {
      * The {@link GameLevel} the puzzle is played on.
      */
     private GameLevel level;
+
+    /**
+     * Maximum number of allowed assertions per submitted test.
+     */
+    private int maxAssertionsPerTest;
+
+    /**
+     * Validation level used to check submitted mutants.
+     */
+    private CodeValidatorLevel mutantValidatorLevel;
 
     /**
      * First editable line of the class or test. Can be null.
@@ -62,11 +74,18 @@ public class Puzzle {
     private String description;
 
     /**
+     * The {@link PuzzleChapter} this puzzle belongs to.
+     */
+    private PuzzleChapter chapter;
+
+    /**
      * @param puzzleId ID of the chapter.
      * @param classId Class ID of the class the puzzle uses.
      *                The mutants and test for the puzzle come together with the class.
      * @param activeRole The {@link Role} the player takes in the puzzle.
      * @param level The {@link GameLevel} the puzzle is played on.
+     * @param mutantValidatorLevel Validation level used to check submitted mutants.
+     * @param maxAssertionsPerTest Maximum number of allowed assertions per submitted test.
      * @param editableLinesStart First editable line of the class or test. Can be null.
      * @param editableLinesEnd Last editable line of the class or test. Can be null.
      * @param chapterId ID of the chapter the puzzle belongs to. Can be null.
@@ -78,6 +97,8 @@ public class Puzzle {
                   int classId,
                   Role activeRole,
                   GameLevel level,
+                  int maxAssertionsPerTest,
+                  CodeValidatorLevel mutantValidatorLevel,
                   Integer editableLinesStart,
                   Integer editableLinesEnd,
                   Integer chapterId,
@@ -88,12 +109,15 @@ public class Puzzle {
         this.classId = classId;
         this.activeRole = activeRole;
         this.level = level;
+        this.maxAssertionsPerTest = maxAssertionsPerTest;
+        this.mutantValidatorLevel = mutantValidatorLevel;
         this.editableLinesStart = editableLinesStart;
         this.editableLinesEnd = editableLinesEnd;
         this.chapterId = chapterId;
         this.position = position;
         this.title = title;
         this.description = description;
+        this.chapter = null;
     }
 
     public int getPuzzleId() {
@@ -120,19 +144,59 @@ public class Puzzle {
         this.activeRole = activeRole;
     }
 
-    public int getChapterId() {
+    public GameLevel getLevel() {
+        return level;
+    }
+
+    public void setLevel(GameLevel level) {
+        this.level = level;
+    }
+
+    public int getMaxAssertionsPerTest() {
+        return maxAssertionsPerTest;
+    }
+
+    public void setMaxAssertionsPerTest(int maxAssertionsPerTest) {
+        this.maxAssertionsPerTest = maxAssertionsPerTest;
+    }
+
+    public CodeValidatorLevel getMutantValidatorLevel() {
+        return mutantValidatorLevel;
+    }
+
+    public void setMutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) {
+        this.mutantValidatorLevel = mutantValidatorLevel;
+    }
+
+    public Integer getEditableLinesStart() {
+        return editableLinesStart;
+    }
+
+    public void setEditableLinesStart(Integer editableLinesStart) {
+        this.editableLinesStart = editableLinesStart;
+    }
+
+    public Integer getEditableLinesEnd() {
+        return editableLinesEnd;
+    }
+
+    public void setEditableLinesEnd(Integer editableLinesEnd) {
+        this.editableLinesEnd = editableLinesEnd;
+    }
+
+    public Integer getChapterId() {
         return chapterId;
     }
 
-    public void setChapterId(int chapterId) {
+    public void setChapterId(Integer chapterId) {
         this.chapterId = chapterId;
     }
 
-    public int getPosition() {
+    public Integer getPosition() {
         return position;
     }
 
-    public void setPosition(int position) {
+    public void setPosition(Integer position) {
         this.position = position;
     }
 
@@ -152,27 +216,14 @@ public class Puzzle {
         this.description = description;
     }
 
-    public GameLevel getLevel() {
-        return level;
+    public PuzzleChapter getChapter() {
+        if (chapterId != null && chapter == null) {
+           chapter = PuzzleDAO.getPuzzleChapterForId(chapterId);
+        }
+        return chapter;
     }
 
-    public void setLevel(GameLevel level) {
-        this.level = level;
-    }
-
-    public int getEditableLinesStart() {
-        return editableLinesStart;
-    }
-
-    public void setEditableLinesStart(int editableLinesStart) {
-        this.editableLinesStart = editableLinesStart;
-    }
-
-    public int getEditableLinesEnd() {
-        return editableLinesEnd;
-    }
-
-    public void setEditableLinesEnd(int editableLinesEnd) {
-        this.editableLinesEnd = editableLinesEnd;
+    public void setChapter(PuzzleChapter chapter) {
+        this.chapter = chapter;
     }
 }

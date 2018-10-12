@@ -1,10 +1,13 @@
 package org.codedefenders.database;
 
 import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameMode;
+import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.validation.CodeValidator.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,8 +15,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * This class handles the database logic for puzzles.
@@ -27,41 +31,24 @@ public class PuzzleDAO {
 
     /**
      * Returns the {@link PuzzleChapter} for the given chapter ID.
-     * @param chapterId The chapter ID to get the {@link PuzzleChapter} for.
+     * @param chapterId The chapter ID.
      * @return The {@link PuzzleChapter} for the given chapter ID.
      */
-    public static PuzzleChapter getPuzzleChapter(int chapterId) {
+    public static PuzzleChapter getPuzzleChapterForId(int chapterId) {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM puzzle_chapters",
-                "WHERE Chapter_ID = ?",
-                "ORDER BY Position;"
+                "WHERE Chapter_ID = ?;"
         );
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(chapterId));
-
-        final ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        if (rs == null) {
-            return null;
-        }
-
-        try {
-            if (rs.next()) {
-                return getPuzzleChapterFromResultSet(rs);
-            }
-            return null;
-        } catch (SQLException e) {
-            logger.error("Caught exception while querying puzzles.", e);
-            return null;
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
+        return executeQueryReturnValue(query,
+                PuzzleDAO::getPuzzleChapterFromResultSet,
+                new DatabaseValue[]{ DB.getDBV(chapterId) });
     }
 
     /**
      * Returns a {@link List} of all {@link PuzzleChapter PuzzleChapters}.
-     * @return a {@link List} of all {@link PuzzleChapter PuzzleChapters}.
+     * @return A {@link List} of all {@link PuzzleChapter PuzzleChapters}.
      */
     public static List<PuzzleChapter> getPuzzleChapters() {
         String query = String.join("\n",
@@ -70,68 +57,31 @@ public class PuzzleDAO {
                 "ORDER BY Position;"
         );
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query);
-
-        final ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        if (rs == null) {
-            return null;
-        }
-
-        final List<PuzzleChapter> puzzleChapters = new LinkedList<>();
-
-        try {
-            while (rs.next()) {
-                puzzleChapters.add(getPuzzleChapterFromResultSet(rs));
-            }
-        } catch (SQLException e) {
-            logger.error("Caught exception while querying puzzles.", e);
-            return null;
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-
-        return puzzleChapters;
+        return executeQueryReturnList(query,
+                PuzzleDAO::getPuzzleChapterFromResultSet,
+                new DatabaseValue[]{});
     }
-
 
     /**
      * Returns the {@link Puzzle} for the given puzzle ID.
-     * @param puzzleId The puzzle ID to get the {@link Puzzle} for.
+     * @param puzzleId The puzzle ID.
      * @return The {@link Puzzle} for the given puzzle ID.
      */
-    public static Puzzle getPuzzle(int puzzleId) {
+    public static Puzzle getPuzzleForId(int puzzleId) {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM puzzles",
-                "WHERE Puzzle_ID = ?",
-                "ORDER BY Chapter_ID, Position;"
+                "WHERE Puzzle_ID = ?;"
         );
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(puzzleId));
-
-        final ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        if (rs == null) {
-            return null;
-        }
-
-        try {
-            if (rs.next()) {
-                return getPuzzleFromResultSet(rs);
-            }
-            return null;
-        } catch (SQLException e) {
-            logger.error("Caught exception while querying puzzles.", e);
-            return null;
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
+        return executeQueryReturnValue(query,
+                PuzzleDAO::getPuzzleFromResultSet,
+                new DatabaseValue[]{ DB.getDBV(puzzleId) });
     }
 
     /**
      * Returns a {@link List} of all {@link Puzzle Puzzles}.
-     * @return a {@link List} of all {@link Puzzle Puzzles}.
+     * @return A {@link List} of all {@link Puzzle Puzzles}.
      */
     public static List<Puzzle> getPuzzles() {
         String query = String.join("\n",
@@ -140,95 +90,281 @@ public class PuzzleDAO {
                 "ORDER BY Chapter_ID, Position;"
         );
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query);
+        return executeQueryReturnList(query,
+                PuzzleDAO::getPuzzleFromResultSet,
+                new DatabaseValue[]{});
+    }
 
-        final ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        if (rs == null) {
-            return null;
-        }
+    /**
+     * Returns a {@link List} of all {@link Puzzle Puzzles} in the given {@link PuzzleChapter}.
+     * @param chapterId The chapter ID.
+     * @return A {@link List} of all {@link Puzzle Puzzles} in the given {@link PuzzleChapter}.
+     */
+    public static List<Puzzle> getPuzzlesForChapterId(int chapterId) {
+        String query = String.join("\n",
+                "SELECT *",
+                "FROM puzzles",
+                "WHERE Chapter_ID = ?",
+                "ORDER BY Chapter_ID, Position;"
+        );
 
-        final List<Puzzle> puzzles = new LinkedList<>();
+        return executeQueryReturnList(query,
+                PuzzleDAO::getPuzzleFromResultSet,
+                new DatabaseValue[]{ DB.getDBV(chapterId) });
+    }
 
-        try {
-            while (rs.next()) {
-                puzzles.add(getPuzzleFromResultSet(rs));
-            }
-        } catch (SQLException e) {
-            logger.error("Caught exception while querying puzzles.", e);
-            return null;
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
+    /**
+     * Returns the {@link PuzzleGame} for the given game ID.
+     * @param gameId The game ID.
+     * @return The {@link PuzzleGame} for the given game ID.
+     */
+    public static PuzzleGame getPuzzleGameForId(int gameId) {
+        String query = String.join("\n",
+                "SELECT *",
+                "FROM games",
+                "WHERE Mode = " + GameMode.PUZZLE,
+                "  AND games.ID = ?;"
+        );
 
-        return puzzles;
+        return executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, new DatabaseValue[]{});
+    }
+
+    /**
+     * Returns the {@link PuzzleGame} that represents the latest try on the given puzzle by the given user.
+     * @param puzzleId The puzzle ID.
+     * @param userId The user ID.
+     * @return The {@link PuzzleGame} that represents the latest try on the given puzzle by the given user.
+     */
+    public static PuzzleGame getPuzzleGameForPuzzleAndUser(int puzzleId, int userId) {
+        String query = String.join("\n",
+                "SELECT *",
+                "FROM games",
+                "WHERE Mode = " + GameMode.PUZZLE,
+                "  AND games.Puzzle_ID = ?",
+                "  AND games.User_ID = ?",
+                "ORDER BY Timestamp DESC;"
+        );
+
+        return executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, new DatabaseValue[]{});
     }
 
     public static int getFailedSubmissions(int gameId) {
         throw new Error("not implemented");
     }
 
-    public static boolean storePuzzleGame(PuzzleGame game) {
-        throw new Error("not implemented");
+    /**
+     * Stores the given {@link PuzzleGame} in the database.
+     * @param game The {@link PuzzleGame}.
+     * @return The game ID of the stored game, or -1 if the insert failed.
+     */
+    public static int storePuzzleGame(PuzzleGame game) {
+        String query = String.join("\n",
+                "INSERT INTO games",
+
+                "(Class_ID,",
+                "Level,",
+                "Creator_ID,",
+                "MaxAssertionsPerTest,",
+                "MutantValidator,",
+                "State,",
+                "CurrentRound,",
+                "ActiveRole,",
+                "Mode,",
+                "Puzzle_ID)",
+
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PUZZLE', ?);"
+        );
+
+        DatabaseValue[] valueList = new DatabaseValue[] {
+                DB.getDBV(game.getClassId()),
+                DB.getDBV(game.getLevel().toString()),
+                DB.getDBV(game.getCreatorId()),
+                DB.getDBV(game.getMaxAssertionsPerTest()),
+                DB.getDBV(game.getMutantValidatorLevel().toString()),
+                DB.getDBV(game.getState().toString()),
+                DB.getDBV(game.getCurrentRound()),
+                DB.getDBV(game.getActiveRole().toString()),
+                DB.getDBV(game.getMode().toString()),
+                DB.getDBV(game.getPuzzleId()),
+        };
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        return DB.executeUpdateGetKeys(stmt, conn);
     }
 
+    /**
+     * Updates the given {@link PuzzleGame}'s values in the database.
+     * @param game The {@link PuzzleGame}.
+     * @return {@code true} if the update was successful, {@code false}a otherwise.
+     */
     public static boolean updatePuzzleGame(PuzzleGame game) {
-        throw new Error("not implemented");
-    }
+        String query = String.join("\n",
+                "INSERT INTO games",
 
-    public static boolean getPuzzleGame(int gameId) {
-        throw new Error("not implemented");
-    }
+                "SET Class_ID = ?,",
+                "    Level = ?,",
+                "    Creator_ID = ?,",
+                "    MaxAssertionsPerTest = ?,",
+                "    MutantValidator = ?,",
+                "    State = ?,",
+                "    CurrentRound = ?,",
+                "    ActiveRole = ?,",
+                "    Puzzle_ID = ?,",
 
-    public static boolean getPuzzleGame(int puzzleId, int uid) {
-        throw new Error("not implemented");
+                "WHERE Game_ID = ?;"
+        );
+
+        DatabaseValue[] valueList = new DatabaseValue[] {
+                DB.getDBV(game.getClassId()),
+                DB.getDBV(game.getLevel().toString()),
+                DB.getDBV(game.getCreatorId()),
+                DB.getDBV(game.getMaxAssertionsPerTest()),
+                DB.getDBV(game.getMutantValidatorLevel().toString()),
+                DB.getDBV(game.getState().toString()),
+                DB.getDBV(game.getCurrentRound()),
+                DB.getDBV(game.getActiveRole().toString()),
+                DB.getDBV(game.getPuzzleId()),
+                DB.getDBV(game.getId()),
+        };
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        return DB.executeUpdate(stmt, conn);
     }
 
     /**
      * Creates a {@link PuzzleChapter} from a {@link ResultSet}.
-     * @throws SQLException If a problem occurs with the {@link ResultSet}.
+     * @param rs The {@link ResultSet}.
+     * @return The created {@link PuzzleChapter}.
      */
-    private static PuzzleChapter getPuzzleChapterFromResultSet(ResultSet rs) throws SQLException {
-        int chapterId = rs.getInt("Chapter_ID");
+    private static PuzzleChapter getPuzzleChapterFromResultSet(ResultSet rs) {
+        try {
+            int chapterId = rs.getInt("Chapter_ID");
 
-        Integer position = rs.getInt("Position");
-        if (rs.wasNull()) position = null;
+            Integer position = rs.getInt("Position");
+            if (rs.wasNull()) position = null;
 
-        String title = rs.getString("Title");
-        String description = rs.getString("Description");
+            String title = rs.getString("Title");
+            String description = rs.getString("Description");
 
-        return new PuzzleChapter(chapterId, position, title, description);
+            return new PuzzleChapter(chapterId, position, title, description);
+        } catch (SQLException e) {
+            logger.error("Caught SQL exception while checking ResultSet.", e);
+            return null;
+        }
     }
 
     /**
      * Creates a {@link Puzzle} from a {@link ResultSet}.
-     * @throws SQLException If a problem occurs with the {@link ResultSet}.
+     * @param rs The {@link ResultSet}.
+     * @return The created {@link Puzzle}.
      */
-    private static Puzzle getPuzzleFromResultSet(ResultSet rs) throws SQLException {
-        int puzzleId = rs.getInt("Puzzle_ID");
-        int classId = rs.getInt("Class_ID");
-        Role activeRole = Role.valueOf(rs.getString("Active_Role"));
+    private static Puzzle getPuzzleFromResultSet(ResultSet rs) {
+        try {
+            int puzzleId = rs.getInt("Puzzle_ID");
+            int classId = rs.getInt("Class_ID");
+            Role activeRole = Role.valueOf(rs.getString("Active_Role"));
 
-        Integer chapterId = rs.getInt("Chapter_ID");
-        if (rs.wasNull()) chapterId = null;
+            Integer chapterId = rs.getInt("Chapter_ID");
+            if (rs.wasNull()) chapterId = null;
 
-        Integer position = rs.getInt("Position");
-        if (rs.wasNull()) position = null;
+            Integer position = rs.getInt("Position");
+            if (rs.wasNull()) position = null;
 
-        String title = rs.getString("Title");
-        String description = rs.getString("Description");
+            String title = rs.getString("Title");
+            String description = rs.getString("Description");
 
-        GameLevel level = null;
-        String levelString = rs.getString("Level");
-        if (!rs.wasNull()) level = GameLevel.valueOf(levelString);
+            GameLevel level = GameLevel.valueOf(rs.getString("Level"));
+            int maxAssertions = rs.getInt("Max_Assertions");
+            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf("Mutant_Validator_Level");
 
-        Integer editableLinesStart = rs.getInt("Editable_Lines_Start");
-        if (rs.wasNull()) editableLinesStart = null;
+            Integer editableLinesStart = rs.getInt("Editable_Lines_Start");
+            if (rs.wasNull()) editableLinesStart = null;
 
-        Integer editableLinesEnd = rs.getInt("Editable_Lines_End");
-        if (rs.wasNull()) editableLinesEnd = null;
+            Integer editableLinesEnd = rs.getInt("Editable_Lines_End");
+            if (rs.wasNull()) editableLinesEnd = null;
 
-        return new Puzzle(puzzleId, classId, activeRole, level,
-                editableLinesStart, editableLinesEnd, chapterId, position, title, description);
+            return new Puzzle(puzzleId, classId, activeRole, level, maxAssertions, mutantValidatorLevel,
+                    editableLinesStart, editableLinesEnd, chapterId, position, title, description);
+        } catch (SQLException e) {
+            logger.error("Caught SQL exception while checking ResultSet.", e);
+            return null;
+        }
+    }
+
+    /**
+     * Creates a {@link PuzzleGame} from a {@link ResultSet}.
+     * @param rs The {@link ResultSet}.
+     * @return The created {@link PuzzleGame}.
+     */
+    private static PuzzleGame getPuzzleGameFromResultSet(ResultSet rs) {
+        try {
+            int gameId = rs.getInt("Game_ID");
+            int classId = rs.getInt("Class_ID");
+            ;
+            GameLevel level = GameLevel.valueOf(rs.getString("Level"));
+            int creatorId = rs.getInt("Creator_ID");
+            int maxAssertionsPerTest = rs.getInt("MaxAssertionsPerTest");
+            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf("MutantValidator");
+            GameState state = GameState.valueOf(rs.getString("State"));
+            int currentRound = rs.getInt("CurrentRound");
+            Role activeRole = Role.valueOf(rs.getString("ActiveRole"));
+            int puzzleId = rs.getInt("Puzzle_ID");
+
+            return new PuzzleGame(puzzleId, gameId, classId, level, creatorId, maxAssertionsPerTest, mutantValidatorLevel,
+                    state, currentRound, activeRole);
+        } catch (SQLException e) {
+            logger.error("Caught SQL exception while checking ResultSet.", e);
+            return null;
+        }
+    }
+
+    /* TODO Add something like this to DB for the other DAOs to use? */
+    private static <T> T executeQueryReturnValue(String query, Function<ResultSet, T> mapFunction, DatabaseValue[] parameters) {
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, parameters);
+        if (stmt == null) return null;
+
+        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
+        if (resultSet == null) return null;
+
+        try {
+            if (resultSet.next()) {
+                return mapFunction.apply(resultSet);
+            }
+            return null;
+        } catch (SQLException e) {
+            logger.error("Caught SQL exception while checking ResultSet.", e);
+            return null;
+        } finally {
+            DB.cleanup(conn, stmt);
+        }
+    }
+
+    /* TODO Add something like this to DB for the other DAOs to use? */
+    private static <T> List<T> executeQueryReturnList(String query, Function<ResultSet, T> mapFunction, DatabaseValue[] parameters) {
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, parameters);
+        if (stmt == null) return null;
+
+        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
+        if (resultSet == null) return null;
+
+        List<T> values = new ArrayList<>();
+
+        try {
+            while (resultSet.next()) {
+                T value = mapFunction.apply(resultSet);
+                if (value == null) return null;
+                values.add(value);
+            }
+            return null;
+        } catch (SQLException e) {
+            logger.error("Caught SQL exception while checking ResultSet.", e);
+            return null;
+        } finally {
+            DB.cleanup(conn, stmt);
+        }
     }
 }
