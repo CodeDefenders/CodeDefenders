@@ -144,12 +144,16 @@ CREATE TABLE `games` (
   `RequiresValidation` tinyint(1) NOT NULL DEFAULT '0',
   `IsAIDummyGame` tinyint(1) NOT NULL DEFAULT '0',
   `HasKillMap` tinyint(1) NOT NULL DEFAULT '0',
+  `Puzzle_ID` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `fk_creatorId_idx` (`Creator_ID`),
   KEY `fk_className_idx` (`Class_ID`),
+  KEY `games_puzzles_Puzzle_ID_fk` (`Puzzle_ID`),
   CONSTRAINT `fk_classId` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_className` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `hasKillMap` CHECK (HasKillMap = 0 OR State = 'FINISHED'), -- only finished games can have a killmap
+  CONSTRAINT `games_puzzles_Puzzle_ID_fk` FOREIGN KEY (`Puzzle_ID`) REFERENCES `puzzles` (`Puzzle_ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) AUTO_INCREMENT=100;
 
 --
