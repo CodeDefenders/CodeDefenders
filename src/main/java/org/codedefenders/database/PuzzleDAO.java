@@ -7,7 +7,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
-import org.codedefenders.validation.CodeValidator.CodeValidatorLevel;
+import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +43,7 @@ public class PuzzleDAO {
 
         return executeQueryReturnValue(query,
                 PuzzleDAO::getPuzzleChapterFromResultSet,
-                new DatabaseValue[]{ DB.getDBV(chapterId) });
+                DB.getDBV(chapterId));
     }
 
     /**
@@ -58,8 +58,7 @@ public class PuzzleDAO {
         );
 
         return executeQueryReturnList(query,
-                PuzzleDAO::getPuzzleChapterFromResultSet,
-                new DatabaseValue[]{});
+                PuzzleDAO::getPuzzleChapterFromResultSet);
     }
 
     /**
@@ -76,7 +75,7 @@ public class PuzzleDAO {
 
         return executeQueryReturnValue(query,
                 PuzzleDAO::getPuzzleFromResultSet,
-                new DatabaseValue[]{ DB.getDBV(puzzleId) });
+                DB.getDBV(puzzleId));
     }
 
     /**
@@ -91,8 +90,7 @@ public class PuzzleDAO {
         );
 
         return executeQueryReturnList(query,
-                PuzzleDAO::getPuzzleFromResultSet,
-                new DatabaseValue[]{});
+                PuzzleDAO::getPuzzleFromResultSet);
     }
 
     /**
@@ -110,7 +108,7 @@ public class PuzzleDAO {
 
         return executeQueryReturnList(query,
                 PuzzleDAO::getPuzzleFromResultSet,
-                new DatabaseValue[]{ DB.getDBV(chapterId) });
+                DB.getDBV(chapterId));
     }
 
     /**
@@ -126,7 +124,9 @@ public class PuzzleDAO {
                 "  AND games.ID = ?;"
         );
 
-        return executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, new DatabaseValue[]{});
+        return executeQueryReturnValue(query,
+                PuzzleDAO::getPuzzleGameFromResultSet,
+                DB.getDBV(gameId));
     }
 
     /**
@@ -145,11 +145,9 @@ public class PuzzleDAO {
                 "ORDER BY Timestamp DESC;"
         );
 
-        return executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, new DatabaseValue[]{});
-    }
-
-    public static int getFailedSubmissions(int gameId) {
-        throw new Error("not implemented");
+        return executeQueryReturnValue(query,
+                PuzzleDAO::getPuzzleGameFromResultSet,
+                DB.getDBV(puzzleId), DB.getDBV(userId));
     }
 
     /**
@@ -277,7 +275,7 @@ public class PuzzleDAO {
 
             GameLevel level = GameLevel.valueOf(rs.getString("Level"));
             int maxAssertions = rs.getInt("Max_Assertions");
-            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf("Mutant_Validator_Level");
+            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("Mutant_Validator_Level"));
 
             Integer editableLinesStart = rs.getInt("Editable_Lines_Start");
             if (rs.wasNull()) editableLinesStart = null;
@@ -321,48 +319,71 @@ public class PuzzleDAO {
     }
 
     /* TODO Add something like this to DB for the other DAOs to use? */
-    private static <T> T executeQueryReturnValue(String query, Function<ResultSet, T> mapFunction, DatabaseValue[] parameters) {
+    /**
+     * Executes the given query with the given parameters, then uses the given function to extract the first value from
+     * the {@link ResultSet}.
+     * @param query The query.
+     * @param mapFunction A function, which takes the query's {@link ResultSet} as an argument, and uses it to construct
+     *                    a return value. The function must not advance the {@link ResultSet}. If the function can't
+     *                    construct the desired value from the {@link ResultSet}, it must return {@code null};
+     * @param parameters The parameters for the query.
+     * @param <T> The type of value to be queried.
+     * @return The first result of the query, computed by the given function.
+     */
+    private static <T> T executeQueryReturnValue(String query, Function<ResultSet, T> mapFunction,
+                                                 DatabaseValue... parameters) {
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, parameters);
-        if (stmt == null) return null;
-
-        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        if (resultSet == null) return null;
 
         try {
+            final ResultSet resultSet = stmt.executeQuery();
+
             if (resultSet.next()) {
                 return mapFunction.apply(resultSet);
             }
             return null;
+
         } catch (SQLException e) {
-            logger.error("Caught SQL exception while checking ResultSet.", e);
+            logger.error("Caught SQL exception while executing query.", e);
             return null;
+
         } finally {
             DB.cleanup(conn, stmt);
         }
     }
 
     /* TODO Add something like this to DB for the other DAOs to use? */
-    private static <T> List<T> executeQueryReturnList(String query, Function<ResultSet, T> mapFunction, DatabaseValue[] parameters) {
+    /**
+     * Executes the given query with the given parameters, then uses the given function to extract the values from
+     * the {@link ResultSet}.
+     * @param query The query.
+     * @param mapFunction A function, which takes the query's {@link ResultSet} as an argument, and uses it to construct
+     *                    a return value. The function must not advance the {@link ResultSet}. If the function can't
+     *                    construct the desired value from the {@link ResultSet}, it must return {@code null};
+     * @param parameters The parameters for the query.
+     * @param <T> The type of value to be queried.
+     * @return A list of the results of the query, computed by the given function.
+     */
+    private static <T> List<T> executeQueryReturnList(String query, Function<ResultSet, T> mapFunction,
+                                                      DatabaseValue... parameters) {
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, parameters);
-        if (stmt == null) return null;
-
-        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        if (resultSet == null) return null;
-
-        List<T> values = new ArrayList<>();
 
         try {
+            final ResultSet resultSet = stmt.executeQuery();
+            List<T> values = new ArrayList<>();
+
             while (resultSet.next()) {
                 T value = mapFunction.apply(resultSet);
                 if (value == null) return null;
                 values.add(value);
             }
-            return null;
+            return values;
+
         } catch (SQLException e) {
-            logger.error("Caught SQL exception while checking ResultSet.", e);
+            logger.error("Caught SQL exception while executing query.", e);
             return null;
+
         } finally {
             DB.cleanup(conn, stmt);
         }

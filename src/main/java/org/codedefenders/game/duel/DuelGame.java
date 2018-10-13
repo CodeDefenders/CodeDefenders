@@ -18,22 +18,19 @@
  */
 package org.codedefenders.game.duel;
 
+import org.codedefenders.database.DB;
+import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
-import org.codedefenders.game.Role;
-import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
 
 public class DuelGame extends AbstractGame {
 
@@ -165,13 +162,7 @@ public class DuelGame extends AbstractGame {
 	}
 
 	public boolean addPlayer(int userId, Role role) {
-		Connection conn = DB.getConnection();
-		String query = "INSERT INTO players (Game_ID, User_ID, Points, Role) VALUES (?, ?, 0, ?);";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(id),
-				DB.getDBV(userId),
-				DB.getDBV(role.toString())};
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		if (DB.executeUpdate(stmt, conn)) {
+		if (GameDAO.addPlayerToGame(id, userId, role)) {
 			if (role.equals(Role.ATTACKER))
 				attackerId = userId;
 			else

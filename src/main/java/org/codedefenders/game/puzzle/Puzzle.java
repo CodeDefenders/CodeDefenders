@@ -3,7 +3,7 @@ package org.codedefenders.game.puzzle;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Role;
-import org.codedefenders.validation.CodeValidator.CodeValidatorLevel;
+import org.codedefenders.validation.code.CodeValidatorLevel;
 
 /**
  * Represents the blueprint for a puzzle, which can be instantiated into a {@link PuzzleGame}.

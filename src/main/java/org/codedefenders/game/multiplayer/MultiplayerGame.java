@@ -22,6 +22,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
@@ -42,9 +43,15 @@ import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
-import static org.codedefenders.game.Mutant.Equivalence.*;
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
+import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 
 public class MultiplayerGame extends AbstractGame {
 
@@ -221,7 +228,7 @@ public class MultiplayerGame extends AbstractGame {
 
 	/**
 	 * This returns the ID of the Player not of the User
-	 * 
+	 *
 	 * @return
 	 */
 	public int[] getDefenderIds() {
@@ -230,7 +237,7 @@ public class MultiplayerGame extends AbstractGame {
 
 	/**
 	 * This returns the ID of the Player not of the User
-	 * 
+	 *
 	 * @return
 	 */
 	public int[] getAttackerIds() {
@@ -247,11 +254,7 @@ public class MultiplayerGame extends AbstractGame {
 
 	public boolean addPlayerForce(int userId, Role role){
 		if (state != GameState.FINISHED) {
-			Connection conn = DB.getConnection();
-			String query = "INSERT INTO players (Game_ID, User_ID, Points, Role) VALUES (?, ?, 0, ?) ON DUPLICATE KEY UPDATE Role=?, Active=TRUE;";
-			DatabaseValue[] valueList = {DB.getDBV(id), DB.getDBV(userId), DB.getDBV(role.toString()), DB.getDBV(role.toString())};
-			PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-			if (DB.executeUpdate(stmt, conn)) {
+			if (GameDAO.addPlayerToGame(id, userId, role)) {
 				User u = UserDAO.getUserById(userId);
 				EventType et = role.equals(Role.ATTACKER) ?
 						EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
