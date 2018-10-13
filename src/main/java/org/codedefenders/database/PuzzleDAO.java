@@ -170,7 +170,7 @@ public class PuzzleDAO {
                 "Mode,",
                 "Puzzle_ID)",
 
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'PUZZLE', ?);"
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         );
 
         DatabaseValue[] valueList = new DatabaseValue[] {
@@ -198,7 +198,7 @@ public class PuzzleDAO {
      */
     public static boolean updatePuzzleGame(PuzzleGame game) {
         String query = String.join("\n",
-                "INSERT INTO games",
+                "UPDATE games",
 
                 "SET Class_ID = ?,",
                 "    Level = ?,",
@@ -208,9 +208,9 @@ public class PuzzleDAO {
                 "    State = ?,",
                 "    CurrentRound = ?,",
                 "    ActiveRole = ?,",
-                "    Puzzle_ID = ?,",
+                "    Puzzle_ID = ?",
 
-                "WHERE Game_ID = ?;"
+                "WHERE ID = ?;"
         );
 
         DatabaseValue[] valueList = new DatabaseValue[] {
@@ -341,6 +341,7 @@ public class PuzzleDAO {
             if (resultSet.next()) {
                 return mapFunction.apply(resultSet);
             }
+            logger.warn("Query had no result.\n" + query);
             return null;
 
         } catch (SQLException e) {

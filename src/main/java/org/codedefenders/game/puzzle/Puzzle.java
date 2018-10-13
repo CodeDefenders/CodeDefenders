@@ -216,6 +216,11 @@ public class Puzzle {
         this.description = description;
     }
 
+    /**
+     * Returns the {@link PuzzleChapter} this puzzle belongs to. If the {@link PuzzleChapter} is requested for the first
+     * time for this instance, it will be queried from the database.
+     * @return The {@link PuzzleChapter} this puzzle belongs to.
+     */
     public PuzzleChapter getChapter() {
         if (chapterId != null && chapter == null) {
            chapter = PuzzleDAO.getPuzzleChapterForId(chapterId);

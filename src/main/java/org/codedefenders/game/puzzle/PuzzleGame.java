@@ -59,12 +59,12 @@ public class PuzzleGame extends AbstractGame {
     private Role activeRole;
 
     /**
-     * The ID of the puzzle this is an instance of.
+     * The ID of the {@link Puzzle} this is an instance of.
      */
     private int puzzleId;
 
     /**
-     * The puzzle this is an instance of.
+     * The {@link Puzzle} this is an instance of.
      */
     private Puzzle puzzle;
 
@@ -131,7 +131,7 @@ public class PuzzleGame extends AbstractGame {
                     return null;
                 }
 
-                MutationTester.runAllTestsOnMutant(game, mutant, new ArrayList<>());
+                MutationTester.runAllTestsOnMutant(game, createdMutant, new ArrayList<>());
             }
 
         } catch (IOException | CodeValidatorException e) {
@@ -277,7 +277,7 @@ public class PuzzleGame extends AbstractGame {
      * @return Rhe number of valid mutants and tests the player submitted in the game.
      */
     public int getInvalidSubmissionCount() {
-        return currentRound - getValidSubmissionCount();
+        return currentRound - getValidSubmissionCount() - 1;
     }
 
     public int getMaxAssertionsPerTest() {
@@ -301,8 +301,8 @@ public class PuzzleGame extends AbstractGame {
     }
 
     /**
-     * Returns the puzzle this is an instance of.
-     * If the puzzle is requested for the first time for this instance, it will be queried from the database.
+     * Returns the {@link Puzzle} this is an instance of. If the puzzle is requested for the first time for this
+     * instance, it will be queried from the database.
      * @return The puzzle this is an instance of.
      */
     public Puzzle getPuzzle() {
