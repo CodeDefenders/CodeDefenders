@@ -389,7 +389,7 @@ public class Mutant implements Serializable {
     }
 
 	// Not sure
-	public void computeDifferences() {
+	private void computeDifferences() {
 		GameClass sut = GameClassDAO.getClassForGameId(gameId);
 		if( sut == null ){
             // in this case gameId might have been -1 (upload)
