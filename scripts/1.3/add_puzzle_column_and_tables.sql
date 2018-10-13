@@ -30,4 +30,12 @@ CREATE TABLE puzzles
     CONSTRAINT puzzles_level_index_unique UNIQUE (Chapter_ID, Position)
 );
 
+/* Add "Puzzle" column to classes. */
 ALTER TABLE classes ADD Puzzle TINYINT(1) DEFAULT 0 NOT NULL;
+
+/* Add "Puzzle_ID" column to games. */
+ALTER TABLE games ADD Puzzle_ID INTEGER DEFAULT NULL;
+ALTER TABLE games ADD CONSTRAINT games_puzzles_Puzzle_ID_fk FOREIGN KEY (Puzzle_ID) REFERENCES puzzles (Puzzle_ID) ON DELETE CASCADE ON UPDATE CASCADE;
+
+/* Add "PUZZLE" mode to "Mode" column in games. */
+ALTER TABLE games MODIFY COLUMN Mode ENUM('SINGLE','DUEL','PARTY','UTESTING', 'PUZZLE') NOT NULL DEFAULT 'DUEL';
