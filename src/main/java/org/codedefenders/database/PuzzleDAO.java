@@ -238,13 +238,13 @@ public class PuzzleDAO {
      */
     private static PuzzleChapter getPuzzleChapterFromResultSet(ResultSet rs) {
         try {
-            int chapterId = rs.getInt("Chapter_ID");
+            int chapterId = rs.getInt("puzzle_chapters.Chapter_ID");
 
-            Integer position = rs.getInt("Position");
+            Integer position = rs.getInt("puzzle_chapters.Position");
             if (rs.wasNull()) position = null;
 
-            String title = rs.getString("Title");
-            String description = rs.getString("Description");
+            String title = rs.getString("puzzle_chapters.Title");
+            String description = rs.getString("puzzle_chapters.Description");
 
             return new PuzzleChapter(chapterId, position, title, description);
         } catch (SQLException e) {
@@ -260,27 +260,27 @@ public class PuzzleDAO {
      */
     private static Puzzle getPuzzleFromResultSet(ResultSet rs) {
         try {
-            int puzzleId = rs.getInt("Puzzle_ID");
-            int classId = rs.getInt("Class_ID");
-            Role activeRole = Role.valueOf(rs.getString("Active_Role"));
+            int puzzleId = rs.getInt("puzzles.Puzzle_ID");
+            int classId = rs.getInt("puzzles.Class_ID");
+            Role activeRole = Role.valueOf(rs.getString("puzzles.Active_Role"));
 
-            Integer chapterId = rs.getInt("Chapter_ID");
+            Integer chapterId = rs.getInt("puzzles.Chapter_ID");
             if (rs.wasNull()) chapterId = null;
 
-            Integer position = rs.getInt("Position");
+            Integer position = rs.getInt("puzzles.Position");
             if (rs.wasNull()) position = null;
 
-            String title = rs.getString("Title");
-            String description = rs.getString("Description");
+            String title = rs.getString("puzzles.Title");
+            String description = rs.getString("puzzles.Description");
 
-            GameLevel level = GameLevel.valueOf(rs.getString("Level"));
+            GameLevel level = GameLevel.valueOf(rs.getString("puzzles.Level"));
             int maxAssertions = rs.getInt("Max_Assertions");
-            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("Mutant_Validator_Level"));
+            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("puzzles.Mutant_Validator_Level"));
 
-            Integer editableLinesStart = rs.getInt("Editable_Lines_Start");
+            Integer editableLinesStart = rs.getInt("puzzles.Editable_Lines_Start");
             if (rs.wasNull()) editableLinesStart = null;
 
-            Integer editableLinesEnd = rs.getInt("Editable_Lines_End");
+            Integer editableLinesEnd = rs.getInt("puzzles.Editable_Lines_End");
             if (rs.wasNull()) editableLinesEnd = null;
 
             return new Puzzle(puzzleId, classId, activeRole, level, maxAssertions, mutantValidatorLevel,
@@ -298,17 +298,16 @@ public class PuzzleDAO {
      */
     private static PuzzleGame getPuzzleGameFromResultSet(ResultSet rs) {
         try {
-            int gameId = rs.getInt("ID");
-            int classId = rs.getInt("Class_ID");
-
-            GameLevel level = GameLevel.valueOf(rs.getString("Level"));
-            int creatorId = rs.getInt("Creator_ID");
-            int maxAssertionsPerTest = rs.getInt("MaxAssertionsPerTest");
-            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("MutantValidator"));
-            GameState state = GameState.valueOf(rs.getString("State"));
-            int currentRound = rs.getInt("CurrentRound");
-            Role activeRole = Role.valueOf(rs.getString("ActiveRole"));
-            int puzzleId = rs.getInt("Puzzle_ID");
+            int gameId = rs.getInt("games.ID");
+            int classId = rs.getInt("games.Class_ID");
+            GameLevel level = GameLevel.valueOf(rs.getString("games.Level"));
+            int creatorId = rs.getInt("games.Creator_ID");
+            int maxAssertionsPerTest = rs.getInt("games.MaxAssertionsPerTest");
+            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("games.MutantValidator"));
+            GameState state = GameState.valueOf(rs.getString("games.State"));
+            int currentRound = rs.getInt("games.CurrentRound");
+            Role activeRole = Role.valueOf(rs.getString("games.ActiveRole"));
+            int puzzleId = rs.getInt("games.Puzzle_ID");
 
             return new PuzzleGame(puzzleId, gameId, classId, level, creatorId, maxAssertionsPerTest, mutantValidatorLevel,
                     state, currentRound, activeRole);
