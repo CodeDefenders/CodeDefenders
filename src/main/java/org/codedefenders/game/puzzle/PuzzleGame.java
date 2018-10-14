@@ -160,6 +160,7 @@ public class PuzzleGame extends AbstractGame {
      */
     private PuzzleGame(Puzzle puzzle, int uid) {
         /* AbstractGame attributes */
+        this.id = 0; // ID will be set when inserting the game.
         this.classId = puzzle.getClassId();
         this.creatorId = uid;
         this.state = GameState.CREATED;
@@ -193,6 +194,7 @@ public class PuzzleGame extends AbstractGame {
                       int currentRound,
                       Role activeRole) {
         /* AbstractGame attributes */
+        this.id = id;
         this.classId = classId;
         this.creatorId = creatorId;
         this.state = state;
