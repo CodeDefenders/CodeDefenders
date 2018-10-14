@@ -343,7 +343,25 @@ public class DatabaseAccess {
 	 * @return
 	 */
 	public static List<DuelGame> getGamesForUser(int userId) {
-		String query = "SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State, g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" + "IFNULL(att.User_ID,0) AS Attacker_ID, IFNULL(def.User_ID,0) AS Defender_ID FROM games AS g LEFT JOIN players AS att ON g.ID=att.Game_ID  AND att.Role='ATTACKER' AND att.Active=TRUE\n" + "LEFT JOIN players AS def ON g.ID=def.Game_ID AND def.Role='DEFENDER' AND def.Active=TRUE WHERE g.Mode != 'PARTY' AND g.State!='FINISHED' AND (g.Creator_ID=? OR IFNULL(att.User_ID,0)=? OR IFNULL(def.User_ID,0)=?);";
+		String query = String.join("\n",
+				"SELECT games.*,",
+				"       IFNULL(att.User_ID,0) AS Attacker_ID,",
+				"       IFNULL(def.User_ID,0) AS Defender_ID",
+				"FROM games",
+				"LEFT JOIN players AS att",
+				"    ON games.ID = att.Game_ID",
+				"    AND att.Role = 'ATTACKER'",
+				"    AND att.Active = TRUE",
+				"LEFT JOIN players AS def",
+				"    ON games.ID = def.Game_ID",
+				"    AND def.Role='DEFENDER'",
+				"    AND def.Active = TRUE",
+				"WHERE games.Mode = 'DUEL'",
+				"  AND games.State != 'FINISHED'",
+				"  AND (games.Creator_ID = ?",
+				"    OR IFNULL(att.User_ID,0) = ?",
+				"    OR IFNULL(def.User_ID,0) = ?);"
+		);
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(userId),
 				DB.getDBV(userId),
 				DB.getDBV(userId)};
@@ -443,7 +461,22 @@ public class DatabaseAccess {
 	}
 
 	public static List<DuelGame> getOpenGames() {
-		String query = "SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," + "g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" + "IFNULL(att.User_ID,0) AS Attacker_ID, IFNULL(def.User_ID,0) AS Defender_ID\n" + "FROM games AS g\n" + "LEFT JOIN players AS att ON g.ID=att.Game_ID  AND att.Role='ATTACKER' AND att.Active=TRUE\n" + "LEFT JOIN players AS def ON g.ID=def.Game_ID AND def.Role='DEFENDER' AND def.Active=TRUE\n" + "WHERE g.Mode = 'DUEL' AND g.State = 'CREATED';";
+		String query = String.join("\n",
+				"SELECT games.*,",
+				"       IFNULL(att.User_ID,0) AS Attacker_ID,",
+				"       IFNULL(def.User_ID,0) AS Defender_ID",
+				"FROM games",
+				"LEFT JOIN players AS att",
+				"    ON games.ID=att.Game_ID",
+				"    AND att.Role='ATTACKER'",
+				"    AND att.Active=TRUE",
+				"LEFT JOIN players AS def",
+				"    ON games.ID=def.Game_ID",
+				"    AND def.Role='DEFENDER'",
+				"    AND def.Active=TRUE",
+				"WHERE games.Mode = 'DUEL'",
+				"  AND games.State = 'CREATED';"
+		);
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query);
 		return getGames(stmt, conn);

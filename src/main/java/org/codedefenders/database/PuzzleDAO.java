@@ -120,8 +120,8 @@ public class PuzzleDAO {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM games",
-                "WHERE Mode = " + GameMode.PUZZLE,
-                "  AND games.ID = ?;"
+                "WHERE Mode = 'PUZZLE'",
+                "  AND ID = ?;"
         );
 
         return executeQueryReturnValue(query,
@@ -139,9 +139,9 @@ public class PuzzleDAO {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM games",
-                "WHERE Mode = " + GameMode.PUZZLE,
-                "  AND games.Puzzle_ID = ?",
-                "  AND games.User_ID = ?",
+                "WHERE Mode = 'PUZZLE'",
+                "  AND Puzzle_ID = ?",
+                "  AND Creator_ID = ?",
                 "ORDER BY Timestamp DESC;"
         );
 
@@ -298,13 +298,13 @@ public class PuzzleDAO {
      */
     private static PuzzleGame getPuzzleGameFromResultSet(ResultSet rs) {
         try {
-            int gameId = rs.getInt("Game_ID");
+            int gameId = rs.getInt("ID");
             int classId = rs.getInt("Class_ID");
-            ;
+
             GameLevel level = GameLevel.valueOf(rs.getString("Level"));
             int creatorId = rs.getInt("Creator_ID");
             int maxAssertionsPerTest = rs.getInt("MaxAssertionsPerTest");
-            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf("MutantValidator");
+            CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("MutantValidator"));
             GameState state = GameState.valueOf(rs.getString("State"));
             int currentRound = rs.getInt("CurrentRound");
             Role activeRole = Role.valueOf(rs.getString("ActiveRole"));
