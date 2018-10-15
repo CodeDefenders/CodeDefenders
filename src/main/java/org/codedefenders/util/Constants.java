@@ -83,6 +83,11 @@ public class Constants {
 	public static final String CUTS_MUTANTS_DIR = "mutants";
 	public static final String CUTS_TESTS_DIR = "tests";
 
+	// Puzzle, Duel and Battleground mutant and test folders
+	public static final String MODE_PUZZLE_DIR = "puzzle";
+	public static final String MODE_DUEL_DIR = "sp";
+	public static final String MODE_BATTLEGROUND_DIR = "mp";
+
 	// FIXME Phil: MUTANTS_DIR should be final.
 	public static String MUTANTS_DIR = DATA_DIR + F_SEP + "mutants";
 	public static final String TESTS_DIR = DATA_DIR + F_SEP + "tests";
@@ -164,6 +169,7 @@ public class Constants {
 	// JSP
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_TEST = "previousTest";
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_MUTANT = "previousMutant";
+	public static final String SESSION_ATTRIBUTE_PUZZLE_GAME = "active_user_puzzle_game";
 
 	public static final String ATTACKER_HAS_PENDING_DUELS = "Sorry, your mutant cannot be accepted because you have pending equivalence duels !\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
 }

@@ -116,7 +116,7 @@ public class ParallelizeTest {
 			}
 		});
 	}
-	
+
 	// CUT
 	private MutationTester tester;
 
@@ -281,7 +281,7 @@ public class ParallelizeTest {
 		boolean playerAdded = activeGame.addPlayer(defender.getId(), Role.DEFENDER);
 		assumeTrue(playerAdded);
 		System.out.println("ParallelizeTest.setupTestBattlegroundUsing() Added defender " + defender.getId() );
-		
+
 		playerAdded = activeGame.addPlayer(attacker.getId(), Role.ATTACKER);
 		assumeTrue(playerAdded);
 		System.out.println("ParallelizeTest.setupTestBattlegroundUsing() Added attacker " + attacker.getId() );
@@ -296,9 +296,9 @@ public class ParallelizeTest {
 	@Test
 	public void testTestExecutionOrder() {
 		MultiplayerGame battlegroundGame = setupTestBattlegroundUsing("Lift");
-		
+
 		//
-		
+
 		int defenderID = UserDAO.getUserForPlayer( battlegroundGame.getDefenderIds()[0]).getId();
 		int attackerID =  UserDAO.getUserForPlayer( battlegroundGame.getAttackerIds()[0]).getId();
 		ArrayList<String> messages = new ArrayList<>();
@@ -327,7 +327,7 @@ public class ParallelizeTest {
 			assumeThat(battlegroundGame.getTests(true).size(), is(1));
 			// Append this for oracles and mocks
 			submittedTests.add( newTest );
-			
+
 
 			// Submit and execute a Test
 			testText = ""
@@ -350,7 +350,7 @@ public class ParallelizeTest {
 			assumeThat(battlegroundGame.getTests(true).size(), is(2));
 			// Append this for oracles and mocks
 			submittedTests.add( newTest );
-			
+
 			// Create the mutant from the patch
 			List<String> diff = Arrays.asList("--- null",
 					"+++ null",
@@ -364,37 +364,37 @@ public class ParallelizeTest {
 					" ",
 					"     public int getTopFloor() {"
 			);
-			
+
 			Patch patch = DiffUtils.parseUnifiedDiff(diff);
 			// Read the CUT code
 			List<String> origincalCode = Arrays.asList( battlegroundGame.getCUT().getAsString().split("\n") );
 			// Apply the patch
-			
+
 			List<String> mutantCode =(List<String>) DiffUtils.patch( origincalCode, patch);
 			String mutantText = String.join("\n", mutantCode);
-			
+
 			Mutant mutant = GameManager.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(),
 					mutantText, attackerID, "mp");
-			
+
 			// Mock the scheduler to return a random but known test distribution:
 			TestScheduler mockedTestScheduler = Mockito.mock( TestScheduler.class );
 			List<org.codedefenders.game.Test> randomSchedule = new RandomTestScheduler().scheduleTests( submittedTests );
 			Mockito.doReturn(randomSchedule).when(mockedTestScheduler)
 					.scheduleTests(
 							org.mockito.Matchers.anyList());
-			
+
 			// Do the execution
 			MutationTester.runAllTestsOnMutant(battlegroundGame, mutant, messages, mockedTestScheduler);
 
 			// Check that the test execution logged in the DB are in the same order
-			List<TargetExecution> executedTargets = new ArrayList<TargetExecution>(); 
+			List<TargetExecution> executedTargets = new ArrayList<TargetExecution>();
 			for( org.codedefenders.game.Test submittedTest : randomSchedule ){
 				executedTargets.add( TargetExecutionDAO.getTargetExecutionForPair(submittedTest.getId(), mutant.getId()));
 			}
-			
-			
-			
-			
+
+
+
+
 			// Ideal Solution: use verify static, problem MutationTester is the class under test AND the mocked class !
 //			 PowerMockito.verifyStatic(VerificationModeFactory.times(2));
 //			 // Since I am not sure the instances will be the same given the DB interaction I need to explicitly
@@ -412,7 +412,7 @@ public class ParallelizeTest {
 //							return false;
 //							}
 //						}
-//					 }), 
+//					 }),
 //					 Mockito.argThat(
 //					 new ArgumentMatcher<Mutant>() {
 //							@Override
@@ -425,8 +425,8 @@ public class ParallelizeTest {
 //								}
 //							}
 //						 }));
-//			 
-			 
+//
+
 		} catch (Exception e) {
 			assumeNoException(e);
 		}
@@ -447,21 +447,21 @@ public class ParallelizeTest {
 					Files.readAllBytes(
 							new File("src/test/resources/itests/tests/PassingTestLift" + i + ".java").toPath()),
 					Charset.defaultCharset());
-			GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, "mp");
+			GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 		}
 
 		// Schedule a test which kills the mutant - Where ? in the middle ?
 		String testText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/tests/KillingTestLift.java").toPath()),
 				Charset.defaultCharset());
-		GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, "mp");
+		GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 
 		// Read and Submit the mutants - No tests so far
 		String mutantText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
 				Charset.defaultCharset());
 		Mutant mutant = GameManager.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(), mutantText,
-				attackerID, "mp");
+				attackerID, Constants.MODE_BATTLEGROUND_DIR);
 
 		assertNotNull("Invalid mutant", mutant.getClassFile());
 

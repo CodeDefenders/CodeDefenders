@@ -250,7 +250,7 @@ public class ConsistencyTest {
 				Charset.defaultCharset());
 		//
 		Mutant mutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
-				attacker.getId(), "mp");
+				attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
 
 		// Generate the tests for the clients
 		String testText = new String(
@@ -260,7 +260,7 @@ public class ConsistencyTest {
 		List<org.codedefenders.game.Test> tests = new ArrayList<>();
 		for (final User defender : defenders) {
 			tests.add(GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(),
-					"mp"));
+					Constants.MODE_BATTLEGROUND_DIR));
 		}
 		System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + tests);
 		// List<org.codedefenders.game.Test> theTests = activeGame.getTests(true);

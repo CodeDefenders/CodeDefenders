@@ -107,7 +107,7 @@ public class UnitTesting extends HttpServlet {
 		String testText = request.getParameter("test");
 
 		// If it can be written to file and compiled, end turn. Otherwise, dont.
-		Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
+		Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, Constants.MODE_DUEL_DIR);
 		if (newTest == null) {
 			messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
 			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));

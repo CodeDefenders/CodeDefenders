@@ -209,7 +209,7 @@ public class ExecutionTest {
                 Charset.defaultCharset());
         // Do the mutant thingy
         Mutant mutant = GameManager.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(), mutantText,
-                attacker.getId(), "mp");
+                attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
         //
         MutationTester.runAllTestsOnMutant(multiplayerGame, mutant, messages);
 
