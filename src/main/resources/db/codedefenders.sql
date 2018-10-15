@@ -289,7 +289,8 @@ CREATE TABLE `puzzle_chapters` (
   `Position` int(11) DEFAULT NULL,
   `Title` varchar(100) DEFAULT NULL,
   `Description` varchar(1000) DEFAULT NULL,
-  PRIMARY KEY (`Chapter_ID`)
+  PRIMARY KEY (`Chapter_ID`),
+  UNIQUE KEY `puzzles_chapter_Position_unique` (`Position`)
 ) AUTO_INCREMENT=100;
 
 --
@@ -311,7 +312,7 @@ CREATE TABLE `puzzles` (
   `Title` varchar(100) DEFAULT NULL,
   `Description` varchar(1000) DEFAULT NULL,
   PRIMARY KEY (`Puzzle_ID`),
-  UNIQUE KEY `puzzles_level_index_unique` (`Chapter_ID`,`Position`),
+  UNIQUE KEY `puzzles_Chapter_ID_Position_unique` (`Chapter_ID`,`Position`),
   KEY `puzzles_classes_Class_ID_fk` (`Class_ID`),
   CONSTRAINT `puzzles_classes_Class_ID_fk` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `puzzles_puzzle_chapters_Level_fk` FOREIGN KEY (`Chapter_ID`) REFERENCES `puzzle_chapters` (`Chapter_ID`) ON DELETE SET NULL ON UPDATE CASCADE

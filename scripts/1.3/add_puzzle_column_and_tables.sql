@@ -7,7 +7,8 @@ CREATE TABLE puzzle_chapters
     Position INTEGER DEFAULT NULL, -- Index of the chapter in the puzzles list
     Title VARCHAR(100) DEFAULT NULL,
     Description VARCHAR(1000) DEFAULT NULL,
-    CONSTRAINT puzzle_chapters_pk PRIMARY KEY (Chapter_ID)
+    CONSTRAINT puzzle_chapters_pk PRIMARY KEY (Chapter_ID),
+    CONSTRAINT puzzles_chapter_Position_unique UNIQUE (Position)
 );
 
 CREATE TABLE puzzles
@@ -27,7 +28,7 @@ CREATE TABLE puzzles
     CONSTRAINT puzzles_pk PRIMARY KEY (Puzzle_ID),
     CONSTRAINT puzzles_classes_Class_ID_fk FOREIGN KEY (Class_ID) REFERENCES classes (Class_ID) ON DELETE CASCADE ON UPDATE CASCADE,
     CONSTRAINT puzzles_puzzle_chapters_Level_fk FOREIGN KEY (Chapter_ID) REFERENCES puzzle_chapters (Chapter_ID) ON DELETE SET NULL ON UPDATE CASCADE,
-    CONSTRAINT puzzles_level_index_unique UNIQUE (Chapter_ID, Position)
+    CONSTRAINT puzzles_Chapter_ID_Position_unique UNIQUE (Chapter_ID, Position)
 );
 
 /* Add "Puzzle" column to classes. */
