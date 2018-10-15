@@ -24,7 +24,6 @@ import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
-import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.scoring.Scorer;
 import org.codedefenders.model.Event;
@@ -53,6 +52,8 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 
+import static org.codedefenders.execution.TargetExecution.Status.ERROR;
+import static org.codedefenders.execution.TargetExecution.Status.FAIL;
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_NO;
 import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 import static org.codedefenders.util.Constants.MUTANT_ALIVE_1_MESSAGE;
@@ -99,7 +100,7 @@ public class MutationTester {
 			}
 
 		} catch (NamingException e) {
-			e.printStackTrace();
+			logger.error("Failed to Java environment variables.", e);
 		}
 	}
 
@@ -109,7 +110,7 @@ public class MutationTester {
 	// Inputs: The ID of the game to run mutation tests for
 	// Outputs: None
 
-	public static void runTestOnAllMutants(DuelGame game, Test test, ArrayList<String> messages) {
+	public static void runTestOnAllMutants(AbstractGame game, Test test, ArrayList<String> messages) {
 		int killed = 0;
 		List<Mutant> mutants = game.getAliveMutants();
 		for (Mutant mutant : mutants) {
@@ -274,7 +275,7 @@ public class MutationTester {
 	 * Execute all the tests registered for the defenders against the provided
 	 * mutant, using a the given TestScheduler for ordering the execution of
 	 * tests.
-	 * 
+	 *
 	 * @param game
 	 * @param mutant
 	 * @param messages
@@ -342,7 +343,7 @@ public class MutationTester {
                     if (hasTestkilledTheMutant) {
                         // This test killede the mutant...
                         messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
-                        
+
                         if (game instanceof MultiplayerGame) {
                             ArrayList<Mutant> mlist = new ArrayList<Mutant>();
                             mlist.add(mutant);
@@ -426,45 +427,33 @@ public class MutationTester {
         notif.insert();
     }
 
-	/**
-	 * Returns {@code true} iff {@code test} kills {@code mutant}.
-	 * 
-	 * @param test
-	 * @param mutant
-	 * @return
-	 */
-	public static boolean testVsMutant(Test test, Mutant mutant) {
-		// Check if the test vs mutant was already executed
-		TargetExecution executedTarget = TargetExecutionDAO.getTargetExecutionForPair(test.getId(), mutant.getId());
-
-		if (executedTarget == null) {
-			// Run the test against the mutant and get the result
-			executedTarget = AntRunner.testMutant(mutant, test);
+    /**
+     * Runs a test against a mutant.
+     *
+     * @param test
+     * @param mutant
+     * @return {@code true} if the test killed the mutant, {@code false} otherwise
+     */
+    private static boolean testVsMutant(Test test, Mutant mutant) {
+        if (TargetExecutionDAO.getTargetExecutionForPair(test.getId(), mutant.getId()) != null) {
+			logger.error("Execution result found for Mutant {} and Test {}.", mutant.getId(), test.getId());
+			return false;
 		}
+        final TargetExecution executedTarget = AntRunner.testMutant(mutant, test);
 
-		if (executedTarget == null) {
-			logger.error("No execution result found for (m: {},t: {})", mutant.getId(), test.getId());
-			// TODO Maybe an exception shall be thrown here?
+        // If the test did NOT pass, the mutant was detected and should be killed.
+		if (!executedTarget.status.equals(FAIL) && !executedTarget.status.equals(ERROR)) {
+			logger.debug("Test {} did not kill Mutant {}", test.getId(), mutant.getId());
+			return false;
+		}
+		if (!mutant.kill(ASSUMED_NO)) {
+			logger.info("Test {} would have killed Mutant {}, but Mutant {} was already dead!", test.getId(), mutant.getId(), mutant.getId());
 			return false;
 		}
 
-		// If the test did NOT pass, the mutant was detected and should be
-		// killed
-		if (executedTarget.status.equals(TargetExecution.Status.FAIL) || executedTarget.status.equals(TargetExecution.Status.ERROR)) {
-			// This returns true ONLY if the mutant in the DB is still alive
-			if (mutant.kill(ASSUMED_NO)) {
-				logger.info("Test {} kills Mutant {}", test.getId(), mutant.getId());
-				// Increment the score for the test
-				test.killMutant();
-			} else {
-				logger.info("Test {} would have killed Mutant {}, but Mutant {} was alredy dead!", test.getId(),
-						mutant.getId(), mutant.getId());
-			}
-			return true;
-		} else {
-			logger.debug("Test {} did not kill Mutant {}", test.getId(), mutant.getId());
-		}
-		return false;
+        logger.info("Test {} killed Mutant {}", test.getId(), mutant.getId());
+        test.killMutant();
+        return true;
 	}
 
     /**
@@ -485,7 +474,7 @@ public class MutationTester {
 
         // Kill the mutant if it was killed by the test or if it's marked
         // equivalent
-        if (executedTarget.status.equals(TargetExecution.Status.ERROR) || executedTarget.status.equals(TargetExecution.Status.FAIL)) {
+        if (executedTarget.status.equals(ERROR) || executedTarget.status.equals(FAIL)) {
             // If the test did NOT pass, the mutant was detected and is proven
             // to be non-equivalent
         	if (mutant.kill(PROVEN_NO)) {
