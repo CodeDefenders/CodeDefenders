@@ -47,8 +47,8 @@ public class PuzzleDAO {
     }
 
     /**
-     * Returns a {@link List} of all {@link PuzzleChapter PuzzleChapters}.
-     * @return A {@link List} of all {@link PuzzleChapter PuzzleChapters}.
+     * Returns a {@link List} of all {@link PuzzleChapter PuzzleChapters}, sorted by the position in the chapter list.
+     * @return A {@link List} of all {@link PuzzleChapter PuzzleChapters}, sorted by the position in the chapter list.
      */
     public static List<PuzzleChapter> getPuzzleChapters() {
         String query = String.join("\n",
@@ -79,8 +79,8 @@ public class PuzzleDAO {
     }
 
     /**
-     * Returns a {@link List} of all {@link Puzzle Puzzles}.
-     * @return A {@link List} of all {@link Puzzle Puzzles}.
+     * Returns a {@link List} of all {@link Puzzle Puzzles}, sorted by the chapter ID and position in the chapter.
+     * @return A {@link List} of all {@link Puzzle Puzzles}, sorted by the chapter ID and position in the chapter.
      */
     public static List<Puzzle> getPuzzles() {
         String query = String.join("\n",
@@ -94,16 +94,18 @@ public class PuzzleDAO {
     }
 
     /**
-     * Returns a {@link List} of all {@link Puzzle Puzzles} in the given {@link PuzzleChapter}.
+     * Returns a {@link List} of all {@link Puzzle Puzzles} in the given {@link PuzzleChapter}, sorted by the position
+     * in the chapter.
      * @param chapterId The chapter ID.
-     * @return A {@link List} of all {@link Puzzle Puzzles} in the given {@link PuzzleChapter}.
+     * @return A {@link List} of all {@link Puzzle Puzzles} in the given {@link PuzzleChapter}, sorted by the position
+     * in the chapter.
      */
     public static List<Puzzle> getPuzzlesForChapterId(int chapterId) {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM puzzles",
                 "WHERE Chapter_ID = ?",
-                "ORDER BY Chapter_ID, Position;"
+                "ORDER BY Position;"
         );
 
         return executeQueryReturnList(query,
@@ -135,7 +137,7 @@ public class PuzzleDAO {
      * @param userId The user ID.
      * @return The {@link PuzzleGame} that represents the latest try on the given puzzle by the given user.
      */
-    public static PuzzleGame getPuzzleGameForPuzzleAndUser(int puzzleId, int userId) {
+    public static PuzzleGame getLatestPuzzleGameForPuzzleAndUser(int puzzleId, int userId) {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM games",
@@ -146,6 +148,29 @@ public class PuzzleDAO {
         );
 
         return executeQueryReturnValue(query,
+                PuzzleDAO::getPuzzleGameFromResultSet,
+                DB.getDBV(puzzleId), DB.getDBV(userId));
+    }
+
+    /**
+     * Returns a {@link List} of {@link PuzzleGame PuzzleGames} that represents the tries on the given puzzle by the
+     * given user. The list is sorted by the the timestamp of the games.
+     * @param puzzleId The puzzle ID.
+     * @param userId The user ID.
+     * @return A {@link List} of {@link PuzzleGame PuzzleGames} that represents the tries on the given puzzle by the
+     * given user. The list is sorted by the the timestamp of the games.
+     */
+    public static List<PuzzleGame> getPuzzleGamesForPuzzleAndUser(int puzzleId, int userId) {
+        String query = String.join("\n",
+                "SELECT *",
+                "FROM games",
+                "WHERE Mode = 'PUZZLE'",
+                "  AND Puzzle_ID = ?",
+                "  AND Creator_ID = ?",
+                "ORDER BY Timestamp DESC;"
+        );
+
+        return executeQueryReturnList(query,
                 PuzzleDAO::getPuzzleGameFromResultSet,
                 DB.getDBV(puzzleId), DB.getDBV(userId));
     }
