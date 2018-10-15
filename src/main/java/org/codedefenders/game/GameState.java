@@ -22,5 +22,39 @@ package org.codedefenders.game;
  * Created by gordon on 20/02/2017.
  */
 public enum GameState {
-    CREATED, ACTIVE, FINISHED, GRACE_ONE, GRACE_TWO
+
+    /**
+     * The game / puzzle exists but is not ready to be played.
+     */
+    CREATED,
+
+    /**
+     * The game / puzzle is currently in progress.
+     */
+    ACTIVE,
+
+    /**
+     * The game is finished.
+     */
+    FINISHED,
+
+    /**
+     * The game is in the first grace period.
+     */
+    GRACE_ONE,
+
+    /**
+     * The game is in the second grace period.
+     */
+    GRACE_TWO,
+
+    /**
+     * The player solved the puzzle correctly.
+     */
+    SOLVED,
+
+    /**
+     * The player failed to solve the puzzle.
+     */
+    FAILED
 }
