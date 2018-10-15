@@ -197,24 +197,6 @@
 	</servlet-mapping>
 
 	<servlet>
-		<servlet-name>puzzle_overview.jsp</servlet-name>
-		<jsp-file>/jsp/puzzle_overview.jsp</jsp-file>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>puzzle_overview.jsp</servlet-name>
-		<url-pattern>/puzzles</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>singleplayer_attacker_view.jsp</servlet-name>
-		<jsp-file>/jsp/singleplayer_attacker_view.jsp</jsp-file>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>singleplayer_attacker_view.jsp</servlet-name>
-		<url-pattern>/puzzles/attacker</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
 		<servlet-name>utesting</servlet-name>
 		<servlet-class>org.codedefenders.servlets.UnitTesting</servlet-class>
 	</servlet>
@@ -279,6 +261,45 @@
 		<url-pattern>/logout</url-pattern>
 	</servlet-mapping>
 
+
+	<!-- Puzzle mode start-->
+	<servlet>
+		<servlet-name>puzzle_overview.jsp</servlet-name>
+		<jsp-file>/jsp/puzzle_overview.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>puzzle_overview.jsp</servlet-name>
+		<url-pattern>/puzzles</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>singleplayer_attacker_view.jsp</servlet-name>
+		<jsp-file>/jsp/singleplayer_attacker_view.jsp</jsp-file>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>singleplayer_attacker_view.jsp</servlet-name>
+		<url-pattern>/puzzles/attacker</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>puzzleGameManager</servlet-name>
+		<servlet-class>org.codedefenders.servlets.games.puzzle.PuzzleGameManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>puzzleGameManager</servlet-name>
+		<url-pattern>/puzzlegame</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>puzzleGameSelectionManager</servlet-name>
+		<servlet-class>org.codedefenders.servlets.games.puzzle.PuzzleGameSelectionManager</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>puzzleGameSelectionManager</servlet-name>
+		<url-pattern>/puzzle/games</url-pattern>
+	</servlet-mapping>
+
+	<!-- Puzzle mode end-->
 
 	<!-- multiplayer servlets -->
 	<servlet>
