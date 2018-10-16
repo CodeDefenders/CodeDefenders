@@ -1,3 +1,4 @@
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %><%--
 <%--
     Displays the test code in a CodeMirror textarea.
 
@@ -14,7 +15,7 @@
     Boolean mockingEnabled = (Boolean) request.getAttribute("mockingEnabled");
 %>
 
-<pre><textarea id="code" name="test" title="test" cols="80" rows="30"><%= testCode %></textarea></pre>
+<pre><textarea id="code" name="test" title="test" cols="80" rows="30"><%=StringEscapeUtils.escapeHtml(testCode)%></textarea></pre>
 
 <script>
     // If you make changes to the autocompletion, change it for an attacker too.
