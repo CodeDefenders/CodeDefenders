@@ -19,12 +19,18 @@
 %>
 
 <div class="slider single-item">
+
+    <% if (testsTODORENAME.isEmpty()) { %>
+    <div><p> There are currently no tests </p></div>
+    <% } %>
     <%
         for (Test test : testsTODORENAME) {
-            String testCode = String.join("\n", test.getHTMLReadout());
             User creator = DatabaseAccess.getUserFromPlayer(test.getPlayerId());
             final Set<Mutant> coveredMutants = test.getCoveredMutants();
             final Set<Mutant> killedMutants = test.getKilledMutants();
+            final String coveredMutantsIdString = coveredMutants.stream().map(mutant -> String.valueOf(mutant.getId())).collect(Collectors.joining(", "));
+            final String killedMuantsIdString = killedMutants.stream().map(mutant -> String.valueOf(mutant.getId())).collect(Collectors.joining(", "));
+
     %>
 
     <div class="container nowrap" style="overflow:hidden;white-space:nowrap;">
@@ -39,15 +45,16 @@
             </li>
             <li style=" display: inline-block;">
                 <% if(!coveredMutants.isEmpty()) { %>
-                    <a href="javascript:void(0);" data-toggle="tooltip" title="<%= coveredMutants.stream().map(mutant-> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>">Covered: <%= coveredMutants.size() %></a>
+                    <a href="javascript:void(0);" data-toggle="tooltip" title="<%=coveredMutantsIdString%>">Covered: <%=coveredMutants.size() %></a>
                 <% } else { %>
                     Covered: 0
                 <% } %>
                 &nbsp |
             </li>
             <li style=" display: inline-block;">
-                <% if(!killedMutants.isEmpty()) { %>
-                    <a href="javascript:void(0);" data-toggle="tooltip" title="<%= killedMutants.stream().map(mutant-> String.valueOf(mutant.getId())).collect(Collectors.joining(", ")) %>">Killed: <%= killedMutants.size() %></a>
+                <% if(!killedMutants.isEmpty()) {
+                %>
+                    <a href="javascript:void(0);" data-toggle="tooltip" title="<%= killedMuantsIdString %>">Killed: <%= killedMutants.size() %></a>
                 <% } else { %>
                     Killed: 0
                 <% } %>
@@ -58,14 +65,9 @@
             </li>
 
         </ul>
-        <pre class="readonly-pre"><textarea class="utest" title="utest" cols="20" rows="10"><%= testCode %></textarea></pre>
+        <pre class="readonly-pre"><textarea class="utest" title="utest" cols="20" rows="10"><%=StringEscapeUtils.escapeHtml(test.getAsString())%></textarea></pre>
     </div>
-
     <%  } %>
-
-    <% if (testsTODORENAME.isEmpty()) { %>
-            <div><p> There are currently no tests </p></div>
-    <% } %>
 </div>
 
 <script>

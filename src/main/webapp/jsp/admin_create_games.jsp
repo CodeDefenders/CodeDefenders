@@ -10,6 +10,7 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminCreateGames" %>
 <%@ page import="org.codedefenders.validation.CodeValidator" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
@@ -66,7 +67,7 @@
                     MultiplayerGame g = createdGames.get(i);
                     List<Integer> attackerIds = attackerIdsList.get(i);
                     List<Integer> defenderIds = defenderIdsList.get(i);
-                    GameClass CUT = g.getCUT();
+                    GameClass cut = g.getCUT();
 
             %>
             <tr id="<%="temp_games_"+i%>">
@@ -80,7 +81,7 @@
                 </td>
                 <td class="col-sm-2">
                     <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
-                        <%=CUT.getAlias()%>
+                        <%=cut.getAlias()%>
                     </a>
                     <div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;">
                         <div class="modal-dialog">
@@ -88,14 +89,16 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                    <h4 class="modal-title"><%=CUT.getAlias()%>
+                                    <h4 class="modal-title"><%=cut.getAlias()%>
                                     </h4>
                                 </div>
                                 <div class="modal-body">
-                                    <pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
-                                                                        id="sut<%=g.getId()%>" name="cut<%=g.getId()%>"
-                                                                        cols="80"
-                                                                        rows="30"><%=CUT.getAsString()%></textarea></pre>
+                                    <pre class="readonly-pre">
+                                        <textarea class="readonly-textarea classPreview"
+                                                  id="sut<%=g.getId()%>" name="cut<%=g.getId()%>" cols="80" rows="30">
+                                            <%=StringEscapeUtils.escapeHtml(cut.getAsString())%>
+                                        </textarea>
+                                    </pre>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

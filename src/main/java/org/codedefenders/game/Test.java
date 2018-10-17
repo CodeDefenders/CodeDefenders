@@ -8,14 +8,19 @@ import org.codedefenders.game.duel.DuelGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javassist.ClassPool;
@@ -205,23 +210,17 @@ public class Test {
 		return DatabaseAccess.getKilledMutantsForTestId(id);
 	}
 
-	public List<String> getHTMLReadout() {
-
-		File testFile = new File(javaFile);
-		List<String> testLines = new LinkedList<String>();
-
-		String line;
-
+	@SuppressWarnings("Duplicates")
+	public String getAsString() {
 		try {
-			BufferedReader in = new BufferedReader(new FileReader(testFile));
-			while ((line = in.readLine()) != null) {
-				testLines.add(line);
-			}
+			return String.join("\n", Files.readAllLines(Paths.get(javaFile)));
+		} catch (FileNotFoundException e) {
+			logger.error("Could not find file " + javaFile);
+			return "[File Not Found]";
 		} catch (IOException e) {
-			logger.error("Failed to read test class: ", e);
+			logger.error("Could not read file " + javaFile);
+			return "[File Not Readable]";
 		}
-
-		return testLines;
 	}
 
 

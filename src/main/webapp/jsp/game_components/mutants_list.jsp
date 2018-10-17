@@ -75,7 +75,7 @@
                             <% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
                             <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> (uid <%= creator.getId() %>)</h4>
                                 <% for (String change : m.getHTMLReadout()) { %>
-                                    <p><%=change%><p>
+                                    <p><%=StringEscapeUtils.escapeHtml(change)%><p>
                                 <% } %>
                             </td>
                             <td class="col-sm-1"></td>
@@ -128,7 +128,11 @@
                                                     <h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <pre class="readonly-pre"><textarea class="mutdiff" title="mutdiff" id="diff<%=m.getId()%>"><%=m.getPatchString()%></textarea></pre>
+                                                    <pre class="readonly-pre">
+                                                        <textarea class="mutdiff" title="mutdiff" id="diff<%=m.getId()%>">
+                                                            <%=StringEscapeUtils.escapeHtml(m.getPatchString())%>
+                                                        </textarea>
+                                                    </pre>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -176,7 +180,7 @@
                             <% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
                             <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> (uid <%= creator.getId() %>)</h4>
                                 <% for (String change : m.getHTMLReadout()) { %>
-                                    <p><%= change %><p>
+                                    <p><%=StringEscapeUtils.escapeHtml(change) %><p>
                                 <% } %>
                             </td>
                             <td class="col-sm-1"></td>
@@ -197,7 +201,11 @@
                                                 </div>
                                                 <div class="modal-body">
                                                     <p>Killed by Test <%= DatabaseAccess.getKillingTestIdForMutant(m.getId()) %></p>
-                                                    <pre class="readonly-pre"><textarea class="mutdiff" title="mutdiff" id="diff<%=m.getId()%>"><%=m.getPatchString()%></textarea></pre>
+                                                    <pre class="readonly-pre">
+                                                        <textarea class="mutdiff" title="mutdiff" id="diff<%=m.getId()%>">
+                                                            <%=StringEscapeUtils.escapeHtml(m.getPatchString())%>
+                                                        </textarea>
+                                                    </pre>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -245,7 +253,7 @@
                             <% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
                             <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> [UID: <%= creator.getId() %>]</h4>
                                 <% for (String change : m.getHTMLReadout()) { %>
-                                    <p><%= change %><p>
+                                    <p><%=StringEscapeUtils.escapeHtml(change) %><p>
                                 <% } %>
                             </td>
                             <td class="col-sm-1"></td>
@@ -265,7 +273,11 @@
                                                     <h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <pre class="readonly-pre"><textarea class="mutdiff" title="mutdiff" id="diff<%=m.getId()%>"><%=m.getPatchString()%></textarea></pre>
+                                                    <pre class="readonly-pre">
+                                                        <textarea class="mutdiff" title="mutdiff" id="diff<%=m.getId()%>">
+                                                            <%=StringEscapeUtils.escapeHtml(m.getPatchString())%>
+                                                        </textarea>
+                                                    </pre>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

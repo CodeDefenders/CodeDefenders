@@ -1,21 +1,21 @@
 package org.codedefenders.servlets.games;
 
+import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.execution.AntRunner;
-import org.codedefenders.util.Constants;
+import org.codedefenders.execution.MutationTester;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
-import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.Role;
-import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Test;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.validation.CodeValidatorException;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
+import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.validation.CodeValidator;
+import org.codedefenders.validation.CodeValidatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -385,8 +384,7 @@ public class GameManager extends HttpServlet {
 	public static String getMutantValidityMessage(int cid, String mutatedCode, CodeValidator.CodeValidatorLevel codeValidatorLevel) throws IOException {
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		File sourceFile = new File(classMutated.getJavaFile());
-		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
+		String sourceCode = classMutated.getAsString();
 
 		// is it an actual mutation?
 		String md5CUT = CodeValidator.getMD5FromText(sourceCode);

@@ -47,10 +47,10 @@
 </head>
 
 <body>
-<%@ page import="java.util.*" %>
+<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.game.duel.DuelGame" %>
-<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="java.util.ArrayList" %>
 <%@ page import="static org.codedefenders.game.GameState.FINISHED" %>
 <% DuelGame uTestingSession = (DuelGame) session.getAttribute("game"); %>
 
@@ -111,7 +111,11 @@
 <div class="row-fluid">
 	<div class="col-md-6" id="cut-div">
 		<h3>Class Under Test</h3>
-		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30"><%=uTestingSession.getCUT().getAsString()%></textarea></pre>
+		<pre class="readonly-pre">
+			<textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30">
+                <%=StringEscapeUtils.escapeHtml(uTestingSession.getCUT().getAsString())%>
+            </textarea>
+		</pre>
 	</div> <!-- col-md6 left -->
 	<div class="col-md-6" id="utest-div">
 		<h3> Write a new JUnit test here
@@ -141,16 +145,21 @@
 		<h3>JUnit tests </h3>
 		<div class="slider single-item">
 			<%
-				boolean isTests = false;
+				boolean hasTests = false;
 				for (Test t : uTestingSession.getTests()) {
-					isTests = true;
-					String tc = "";
-					for (String l : t.getHTMLReadout()) { tc += l + "\n"; }
+					hasTests = true;
 			%>
-			<div><h4>Test <%= t.getId() %></h4><pre class="readonly-pre"><textarea class="utest" cols="20" rows="10"><%=tc%></textarea></pre></div>
+			<div>
+				<h4>Test <%= t.getId() %></h4>
+				<pre class="readonly-pre">
+					<textarea class="utest" cols="20" rows="10">
+						<%=StringEscapeUtils.escapeHtml(t.getAsString())%>
+                    </textarea>
+                </pre>
+			</div>
 			<%
 				}
-				if (!isTests) {%>
+				if (!hasTests) {%>
 			<div><h3></h3><p> There are currently no tests </p></div>
 			<%}
 			%>
