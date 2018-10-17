@@ -229,33 +229,36 @@ public class GameClass {
 	}
 
 	public String getTestTemplate() {
-		StringBuilder sb = new StringBuilder();
-		if (!getPackage().isEmpty()) {
-			sb.append(String.format("package %s;%n", getPackage()));
-		} else {
-			sb.append(String.format("/* no package name */%n"));
+		final StringBuilder bob = new StringBuilder();
+		final String classPackage = getPackage();
+		if (!classPackage.isEmpty()) {
+			bob.append(String.format("package %s;\n", classPackage));
+//		} else {
+//			bob.append(String.format("/* no package name */%n"));
 		}
-		sb.append(String.format("%n"));
-		sb.append(String.format("import static org.junit.Assert.*;%n%n"));
+		bob.append("\n");
 
-		if (this.isMockingEnabled) {
-			sb.append(String.format("import static org.mockito.Mockito.*;%n%n"));
-		}
+		bob.append("import org.junit.*;\n");
 
-		sb.append(String.format("import org.junit.*;%n"));
-
-		// Additional import are already in the form of 'import X.Y.Z;\n'
 		for (String additionalImport : this.additionalImports) {
-			sb.append(additionalImport);
+		    // Additional import are already in the form of 'import X.Y.Z;\n'
+			bob.append(additionalImport); // no \n required
 		}
+		bob.append("\n");
 
-		sb.append(String.format("public class Test%s {%n", getBaseName()));
-		sb.append(String.format("%c@Test(timeout = 4000)%n", '\t'));
-		sb.append(String.format("%cpublic void test() throws Throwable {%n", '\t'));
-		sb.append(String.format("%c%c// test here!%n", '\t', '\t'));
-		sb.append(String.format("%c}%n", '\t'));
-		sb.append(String.format("}"));
-		return sb.toString();
+		bob.append("import static org.junit.Assert.*;\n");
+		if (this.isMockingEnabled) {
+			bob.append("import static org.mockito.Mockito.*;\n");
+		}
+		bob.append("\n");
+
+		bob.append(String.format("public class Test%s {\n", getBaseName()))
+				.append("    @Test(timeout = 4000)\n")
+				.append("    public void test() throws Throwable {\n")
+				.append("        // test here!\n")
+				.append("    }\n")
+				.append("}");
+		return bob.toString();
 	}
 
 	public String getHTMLEscapedTestTemplate() {
