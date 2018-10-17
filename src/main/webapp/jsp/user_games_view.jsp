@@ -1,4 +1,3 @@
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.AbstractGame" %>
 <%@ page import="org.codedefenders.game.GameMode" %>
@@ -100,12 +99,10 @@
 							<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
 						</div>
 						<div class="modal-body">
-							<pre class="readonly-pre">
-								<textarea class="readonly-textarea classPreview" id="sut<%=g.getId()%>"
-										  name="cut<%=g.getId()%>" cols="80" rows="30">
-									<%=StringEscapeUtils.escapeHtml(g.getCUT().getAsString())%>
-								</textarea>
-							</pre>
+							<pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
+																id="sut<%=g.getId()%>"
+																name="cut<%=g.getId()%>" cols="80"
+																rows="30"><%=g.getCUT().getAsHTMLEscapedString()%></textarea></pre>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -164,12 +161,10 @@
 							<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
 						</div>
 						<div class="modal-body">
-							<pre class="readonly-pre">
-								<textarea class="readonly-textarea classPreview" id="sut<%=g.getId()%>"
-										  name="cut<%=g.getId()%>" cols="80" rows="30">
-									<%=StringEscapeUtils.escapeHtml(g.getCUT().getAsString())%>
-                                </textarea>
-							</pre>
+							<pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
+																id="sut<%=g.getId()%>"
+																name="cut<%=g.getId()%>" cols="80"
+																rows="30"><%=g.getCUT().getAsHTMLEscapedString()%></textarea></pre>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -332,12 +327,10 @@
 								<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
 							</div>
 							<div class="modal-body classPreview">
-								<pre class="readonly-pre">
-									<textarea class="readonly-textarea" id="sut<%=g.getId()%>" name="cut<%=g.getId()%>"
-											  cols="80" rows="30">
-									<%=StringEscapeUtils.escapeHtml(g.getCUT().getAsString())%>
-								</textarea>
-								</pre>
+								<pre class="readonly-pre"><textarea
+										class="readonly-textarea" id="sut<%=g.getId()%>"
+										name="cut<%=g.getId()%>" cols="80"
+										rows="30"><%=g.getCUT().getAsHTMLEscapedString()%></textarea></pre>
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -383,12 +376,11 @@
 								<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
 							</div>
 							<div class="modal-body">
-							<pre class="readonly-pre">
-								<textarea class="readonly-textarea classPreview" id="sut<%=g.getId()%>"
-										  name="cut<%=g.getId()%>" cols="80" rows="30">
-								<%=StringEscapeUtils.escapeHtml(g.getCUT().getAsString())%>
-							</textarea>
-							</pre>
+                                <pre class="readonly-pre"><textarea
+										class="readonly-textarea classPreview"
+										id="sut<%=g.getId()%>"
+										name="cut<%=g.getId()%>" cols="80"
+										rows="30"><%=g.getCUT().getAsHTMLEscapedString()%></textarea></pre>
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

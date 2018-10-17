@@ -1,4 +1,4 @@
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %><%--
+<%--
     Displays the class code in a read-only CodeMirror textarea.
 
     @param String classCode
@@ -11,7 +11,7 @@
     String classCode = (String) request.getAttribute("classCode");
 %>
 
-<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" title="cut" cols="80" rows="30"><%=StringEscapeUtils.escapeHtml(classCode)%></textarea></pre>
+<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" title="cut" cols="80" rows="30"><%=classCode%></textarea></pre>
 
 <script>
     var editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {

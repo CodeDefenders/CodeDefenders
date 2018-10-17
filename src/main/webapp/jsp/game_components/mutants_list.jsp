@@ -75,7 +75,7 @@
                             <% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
                             <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> (uid <%= creator.getId() %>)</h4>
                                 <% for (String change : m.getHTMLReadout()) { %>
-                                    <p><%=StringEscapeUtils.escapeHtml(change)%><p>
+                                    <p><%=change%><p>
                                 <% } %>
                             </td>
                             <td class="col-sm-1"></td>
@@ -117,7 +117,8 @@
                                 <%  } %>
 
                                 <% if (viewDiff){ %>
-                                    <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
+                                <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>"
+                                   data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
                                     <div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
                                          style="z-index: 10000;">
                                         <div class="modal-dialog">
@@ -128,11 +129,9 @@
                                                     <h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <pre class="readonly-pre">
-                                                        <textarea class="mutdiff" title="mutdiff" id="diff<%=m.getId()%>">
-                                                            <%=StringEscapeUtils.escapeHtml(m.getPatchString())%>
-                                                        </textarea>
-                                                    </pre>
+                                                    <pre class="readonly-pre"><textarea
+                                                            class="mutdiff" title="mutdiff"
+                                                            id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea></pre>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -180,7 +179,7 @@
                             <% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
                             <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> (uid <%= creator.getId() %>)</h4>
                                 <% for (String change : m.getHTMLReadout()) { %>
-                                    <p><%=StringEscapeUtils.escapeHtml(change) %><p>
+                                    <p><%=change %><p>
                                 <% } %>
                             </td>
                             <td class="col-sm-1"></td>
@@ -200,12 +199,12 @@
                                                     <h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <p>Killed by Test <%= DatabaseAccess.getKillingTestIdForMutant(m.getId()) %></p>
-                                                    <pre class="readonly-pre">
-                                                        <textarea class="mutdiff" title="mutdiff" id="diff<%=m.getId()%>">
-                                                            <%=StringEscapeUtils.escapeHtml(m.getPatchString())%>
-                                                        </textarea>
-                                                    </pre>
+                                                    <p>Killed by
+                                                        Test <%=DatabaseAccess.getKillingTestIdForMutant(m.getId())%>
+                                                    </p>
+                                                    <pre class="readonly-pre"><textarea
+                                                            class="mutdiff" title="mutdiff"
+                                                            id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea></pre>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -253,7 +252,7 @@
                             <% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
                             <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> [UID: <%= creator.getId() %>]</h4>
                                 <% for (String change : m.getHTMLReadout()) { %>
-                                    <p><%=StringEscapeUtils.escapeHtml(change) %><p>
+                                    <p><%=change%><p>
                                 <% } %>
                             </td>
                             <td class="col-sm-1"></td>
@@ -273,11 +272,9 @@
                                                     <h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <pre class="readonly-pre">
-                                                        <textarea class="mutdiff" title="mutdiff" id="diff<%=m.getId()%>">
-                                                            <%=StringEscapeUtils.escapeHtml(m.getPatchString())%>
-                                                        </textarea>
-                                                    </pre>
+                                                    <pre class="readonly-pre"><textarea
+                                                            class="mutdiff" title="mutdiff"
+                                                            id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea></pre>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

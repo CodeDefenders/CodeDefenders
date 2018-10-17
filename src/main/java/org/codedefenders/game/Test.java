@@ -1,6 +1,7 @@
 package org.codedefenders.game;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
@@ -213,7 +214,7 @@ public class Test {
 	@SuppressWarnings("Duplicates")
 	public String getAsString() {
 		try {
-			return String.join("\n", Files.readAllLines(Paths.get(javaFile)));
+			return new String(Files.readAllBytes(Paths.get(javaFile)));
 		} catch (FileNotFoundException e) {
 			logger.error("Could not find file " + javaFile);
 			return "[File Not Found]";
@@ -221,6 +222,11 @@ public class Test {
 			logger.error("Could not read file " + javaFile);
 			return "[File Not Readable]";
 		}
+	}
+
+	@SuppressWarnings("Duplicates")
+	public String getAsHTMLEscapedString() {
+		return StringEscapeUtils.escapeHtml(getAsString());
 	}
 
 

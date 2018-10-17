@@ -6,7 +6,6 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminCreateGames" %>
 <%@ page import="java.util.List" %>
-<%@ page import="org.apache.commons.lang.StringEscapeUtils" %>
 
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
@@ -92,12 +91,10 @@
                                     </h4>
                                 </div>
                                 <div class="modal-body">
-                                    <pre class="readonly-pre">
-                                        <textarea class="readonly-textarea classPreview"
-                                                  id="sut<%=gid%>" name="cut<%=gid%>" cols="80" rows="30">
-                                            <%=StringEscapeUtils.escapeHtml(cut.getAsString())%>
-                                        </textarea>
-                                    </pre>
+                                    <pre class="readonly-pre"><textarea
+                                            class="readonly-textarea classPreview"
+                                            id="sut<%=gid%>" name="cut<%=gid%>" cols="80"
+                                            rows="30"><%=cut.getAsHTMLEscapedString()%></textarea></pre>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

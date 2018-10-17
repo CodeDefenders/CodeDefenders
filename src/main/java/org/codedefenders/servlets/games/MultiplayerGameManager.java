@@ -127,7 +127,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp", activeGame.getMaxAssertionsPerTest());
 				} catch (CodeValidatorException cve) {
 					messages.add(TEST_GENERIC_ERROR_MESSAGE);
-					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 					response.sendRedirect(contextPath+"/multiplayer/play");
 					return;
 				}
@@ -135,7 +135,7 @@ public class MultiplayerGameManager extends HttpServlet {
 				// If test is null, it compiled but codevalidator triggered
 				if (newTest == null) {
 					messages.add(String.format(TEST_INVALID_MESSAGE, activeGame.getMaxAssertionsPerTest()));
-					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 					response.sendRedirect(contextPath+"/multiplayer/play");
 					return;
 				}
@@ -205,13 +205,13 @@ public class MultiplayerGameManager extends HttpServlet {
 						logger.debug("testOriginalTarget: " + testOriginalTarget);
 						messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 						messages.add(testOriginalTarget.message);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 					}
 				} else {
 					logger.debug("compileTestTarget: " + compileTestTarget);
 					messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
 					messages.add(compileTestTarget.message);
-					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 				}
 				break;
 			}
@@ -232,7 +232,7 @@ public class MultiplayerGameManager extends HttpServlet {
 							&& (session.getAttribute(Constants.BLOCK_ATTACKER) != null) && ((Boolean) session.getAttribute(Constants.BLOCK_ATTACKER))) {
 						messages.add(Constants.ATTACKER_HAS_PENDING_DUELS);
 						// Keep the mutant code in the view for later
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
 						break;
 					}
 
@@ -254,7 +254,7 @@ public class MultiplayerGameManager extends HttpServlet {
 								&& existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
 							messages.add(existingMutantTarget.message);
 						}
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
 						break;
 					}
 					Mutant newMutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "mp");
@@ -278,11 +278,11 @@ public class MultiplayerGameManager extends HttpServlet {
 							if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty()) {
 								messages.add(compileMutantTarget.message);
 							}
-							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
 						}
 					} else {
 						messages.add(MUTANT_CREATION_ERROR_MESSAGE);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
 						logger.error("Error creating mutant. Game: {}, Class: {}, User: {}", activeGame.getId(), activeGame.getClassId(), uid, mutantText);
 					}
 				} else {
@@ -305,7 +305,7 @@ public class MultiplayerGameManager extends HttpServlet {
 						newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp", activeGame.getMaxAssertionsPerTest());
 					} catch (CodeValidatorException cve) {
 						messages.add(TEST_GENERIC_ERROR_MESSAGE);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 						response.sendRedirect(contextPath + "/multiplayer/play");
 						return;
 					}
@@ -313,7 +313,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					// If test is null, then test did compile but codevalidator triggered
 					if (newTest == null) {
 						messages.add(String.format(TEST_INVALID_MESSAGE, activeGame.getMaxAssertionsPerTest()));
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 						response.sendRedirect(contextPath + "/multiplayer/play");
 						return;
 					}
@@ -339,12 +339,12 @@ public class MultiplayerGameManager extends HttpServlet {
 							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 							// TODO This might not prevent injection of malicious code!
 							messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
-							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 						}
 					} else {
 						messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
 						messages.add(StringEscapeUtils.escapeHtml(compileTestTarget.message));
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 					}
 				} else {
 					messages.add(GRACE_PERIOD_MESSAGE);

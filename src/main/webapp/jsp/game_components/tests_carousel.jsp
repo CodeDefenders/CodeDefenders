@@ -1,9 +1,9 @@
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.model.User" %>
-<%@ page import="java.util.stream.Collectors" %>
-<%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="java.util.Set" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <%--
     Displays a list of tests in a one-item slider.
@@ -65,7 +65,8 @@
             </li>
 
         </ul>
-        <pre class="readonly-pre"><textarea class="utest" title="utest" cols="20" rows="10"><%=StringEscapeUtils.escapeHtml(test.getAsString())%></textarea></pre>
+        <pre class="readonly-pre"><textarea class="utest" title="utest" cols="20"
+                                            rows="10"><%=test.getAsHTMLEscapedString()%></textarea></pre>
     </div>
     <%  } %>
 </div>

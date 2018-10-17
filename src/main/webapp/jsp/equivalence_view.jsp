@@ -1,4 +1,3 @@
-<%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 
 <% String pageTitle="Resolve Equivalence"; %>
@@ -13,7 +12,7 @@
 <%-- Set request attributes for the components. --%>
 <%
     /* class_viewer */
-    request.setAttribute("classCode", game.getCUT().getAsString());
+    request.setAttribute("classCode", game.getCUT().getAsHTMLEscapedString());
 
     /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
@@ -55,14 +54,12 @@
         <h3>Mutant <%= equivMutant.getId() %> Claimed Equivalent</h3>
 
         <div style="border: 5px dashed #f00; border-radius: 10px; width: 100%; padding: 10px;">
-            <p><%=StringEscapeUtils.escapeHtml(String.join("\n", equivMutant.getHTMLReadout()))%></p>
+            <p><%=String.join("\n", equivMutant.getHTMLReadout())%></p>
             <a class="btn btn-default" data-toggle="collapse" href="#diff-collapse">Show Diff</a>
             <p></p>
-            <pre id="diff-collapse" class="readonly-pre collapse">
-                <textarea id="diff" class="mutdiff readonly-textarea" title="mutdiff">
-                    <%=StringEscapeUtils.escapeHtml(equivMutant.getPatchString()) %>
-                </textarea>
-            </pre>
+            <pre id="diff-collapse" class="readonly-pre collapse"><textarea
+                    id="diff" class="mutdiff readonly-textarea"
+                    title="mutdiff"><%=equivMutant.getHTMLEscapedPatchString()%></textarea></pre>
             <script>
                 $('#diff-collapse').on('shown.bs.collapse', function() {
                     var codeMirrorContainer = $(this).find(".CodeMirror")[0];

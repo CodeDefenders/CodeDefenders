@@ -37,7 +37,7 @@
 <%-- Set request attributes for the components. --%>
 <%
     /* class_viewer */
-    request.setAttribute("classCode", game.getCUT().getAsString());
+    request.setAttribute("classCode", game.getCUT().getAsHTMLEscapedString());
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());

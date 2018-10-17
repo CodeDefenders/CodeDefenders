@@ -17,6 +17,7 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.Range;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
@@ -128,7 +129,7 @@ public class GameClass {
     @SuppressWarnings("Duplicates")
 	public String getAsString() {
 		try {
-			return String.join("\n", Files.readAllLines(Paths.get(javaFile)));
+			return new String(Files.readAllBytes(Paths.get(javaFile)));
 		} catch (FileNotFoundException e) {
 			logger.error("Could not find file " + javaFile);
 			return "[File Not Found]";
@@ -136,6 +137,11 @@ public class GameClass {
 			logger.error("Could not read file " + javaFile);
 			return "[File Not Readable]";
 		}
+	}
+
+	@SuppressWarnings("Duplicates")
+	public String getAsHTMLEscapedString() {
+		return StringEscapeUtils.escapeHtml(getAsString());
 	}
 
 	@Deprecated
@@ -203,6 +209,10 @@ public class GameClass {
 		sb.append(String.format("%c}%n", '\t'));
 		sb.append(String.format("}"));
 		return sb.toString();
+	}
+
+	public String getHTMLEscapedTestTemplate() {
+		return StringEscapeUtils.escapeHtml(getTestTemplate());
 	}
 
 	/*

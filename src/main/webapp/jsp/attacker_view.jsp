@@ -14,7 +14,7 @@
     if (previousMutantCode != null) {
         request.setAttribute("mutantCode", previousMutantCode);
     } else {
-        request.setAttribute("mutantCode", game.getCUT().getAsString());
+        request.setAttribute("mutantCode", game.getCUT().getAsHTMLEscapedString());
     }
 
     /* tests_carousel */

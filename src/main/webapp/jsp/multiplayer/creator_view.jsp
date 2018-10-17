@@ -1,9 +1,10 @@
+<%@ page import="org.codedefenders.game.AbstractGame" %>
 <% { %>
 
 <%-- Set request attributes for the components. --%>
 <%
 	/* class_viewer */
-	request.setAttribute("classCode", game.getCUT().getAsString());
+	request.setAttribute("classCode", game.getCUT().getAsHTMLEscapedString());
 
 	/* test_carousel */
 	request.setAttribute("tests", game.getTests());

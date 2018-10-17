@@ -5,7 +5,7 @@
 <%-- Set request attributes for the components. --%>
 <%
 	/* class_viewer */
-	request.setAttribute("classCode", game.getCUT().getAsString());
+	request.setAttribute("classCode", game.getCUT().getAsHTMLEscapedString());
 
 	/* test_editor */
 	String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
@@ -13,7 +13,7 @@
 	if (previousTestCode != null) {
 		request.setAttribute("testCode", previousTestCode);
 	} else {
-		request.setAttribute("testCode", game.getCUT().getTestTemplate());
+		request.setAttribute("testCode", game.getCUT().getHTMLEscapedTestTemplate());
 	}
 	request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
 

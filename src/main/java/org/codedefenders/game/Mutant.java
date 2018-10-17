@@ -1,6 +1,7 @@
 package org.codedefenders.game;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.database.DB;
@@ -362,9 +363,13 @@ public class Mutant implements Serializable {
 		for (String s : unifiedPatches) {
 			if ("--- null".equals(s) || "+++ null".equals(s))
 				continue;
-			unifiedPatch.append(s + System.getProperty("line.separator"));
+			unifiedPatch.append(s).append(System.getProperty("line.separator"));
 		}
 		return unifiedPatch.toString();
+	}
+
+	public String getHTMLEscapedPatchString() {
+		return StringEscapeUtils.escapeHtml(getPatchString());
 	}
 
 	private List<String> readLinesIfFileExist(Path path) {
@@ -476,14 +481,13 @@ public class Mutant implements Serializable {
 
 		Patch p = getDifferences();
 		for (Delta d : p.getDeltas()) {
-			Chunk c = d.getOriginal();
-			Delta.TYPE t = d.getType();
+			Chunk chunk = d.getOriginal();
 			// position starts at 0 but code readout starts at 1
-			int firstLine = c.getPosition() + 1;
+			int firstLine = chunk.getPosition() + 1;
 			String desc = "line " + firstLine;
 			// was it one single line or several?
 			lines.add(firstLine);
-			int endLine = firstLine + c.getLines().size() - 1;
+			int endLine = firstLine + chunk.getLines().size() - 1;
 			if (endLine > firstLine) {
 				// if more than one line, report range of lines;
 				// may not be 100% accurate, but is all we have in the delta chunk
@@ -493,13 +497,21 @@ public class Mutant implements Serializable {
 				desc = String.format("lines %d-%d", firstLine, endLine);
 			}
 			// update mutant description
-			if (t == Delta.TYPE.CHANGE) {
-				description.add("Modified " + desc + "\n");
-			} else if (t == Delta.TYPE.DELETE) {
-				description.add("Removed " + desc + "\n");
-			} else {
-				description.add("Added " + desc + "\n");
+			String text;
+			switch (d.getType()) {
+				case CHANGE:
+					text = "Modified ";
+					break;
+				case DELETE:
+					text = "Removed ";
+					break;
+				case INSERT:
+					text = "Added ";
+					break;
+				default:
+					throw new IllegalStateException("Found unknown delta type " + d.getType());
 			}
+			description.add(StringEscapeUtils.escapeHtml(text + desc + "\n"));
 		}
 
 		this.lines = lines;
@@ -508,7 +520,7 @@ public class Mutant implements Serializable {
 		return lines;
 	}
 
-	public synchronized List<String> getHTMLReadout() throws IOException {
+	public synchronized List<String> getHTMLReadout() {
 		if (description != null) {
 			return description;
 		}
@@ -549,11 +561,7 @@ public class Mutant implements Serializable {
 	}
 
 	public void prepareForSerialise(boolean showDifferences) {
-		try {
-			getHTMLReadout();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+        getHTMLReadout();
 		getLines();
 		if (showDifferences)
 			getDifferences();
