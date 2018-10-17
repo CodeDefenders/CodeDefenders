@@ -45,6 +45,12 @@
         testClass.slice(8, testClass.length - 2);
         testClass = testClass.join("\n");
         var texts = [testClass, editorSUT.getValue()];
+        if (typeof classes !== 'undefined') {
+            Object.getOwnPropertyNames(classes).forEach(function(key) {
+                console.log("adding " + key + " to autocompletion");
+                texts.push(classes[key]);
+            });
+        }
 
         texts.forEach(function (text) {
             text = filterOutComments(text);

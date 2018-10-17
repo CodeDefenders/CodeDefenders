@@ -191,7 +191,7 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of identifiers of dependencies
      */
-    public static List<Integer> getMappedDependenciesForId(Integer classId) {
+    public static List<Integer> getMappedDependencyIdsForClassId(Integer classId) {
         List<Integer> testIds = new LinkedList<>();
 
         String query = "SELECT Dependency_ID FROM dependencies WHERE Class_ID = ?;";
@@ -207,8 +207,8 @@ public class GameClassDAO {
         }
         try {
             while (resultSet.next()) {
-                final int testId = resultSet.getInt("Dependency_ID");
-                testIds.add(testId);
+                final int id = resultSet.getInt("Dependency_ID");
+                testIds.add(id);
             }
         } catch (SQLException e) {
             logger.error("Error during retrieval of mapped dependency for classId:{}", classId);
@@ -217,6 +217,43 @@ public class GameClassDAO {
         }
 
         return testIds;
+    }
+
+    public static List<Dependency> getMappedDependenciesForClassId(Integer classId) {
+        List<Dependency> dependencies = new LinkedList<>();
+
+        String query = String.join(" ",
+                "SELECT",
+                "   Dependency_ID,",
+                "   JavaFile,",
+                "   ClassFile",
+                "FROM dependencies WHERE Class_ID = ?;"
+        );
+
+        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+
+        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
+        if (resultSet == null) {
+            return dependencies;
+        }
+        try {
+            while (resultSet.next()) {
+                final int id = resultSet.getInt("Dependency_ID");
+                final String javaFile = resultSet.getString("JavaFile");
+                final String classFile = resultSet.getString("ClassFile");
+                final Dependency dependency = new Dependency(id, classId, javaFile, classFile);
+                dependencies.add(dependency);
+            }
+        } catch (SQLException e) {
+            logger.error("Error during retrieval of mapped dependency for classId:{}", classId);
+        } finally {
+            DB.cleanup(conn, stmt);
+        }
+
+        return dependencies;
     }
 
     /**

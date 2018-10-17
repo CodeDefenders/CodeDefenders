@@ -137,7 +137,7 @@
 									</div>
 								</div>
 							</td>
-							<td><%=GameClassDAO.getMappedDependenciesForId(c.getId()).size()%>/<%=GameClassDAO.getMappedTestIdsForClassId(c.getId()).size()%>/<%=GameClassDAO.getMappedMutantIdsForClassId(c.getId()).size()%></td>
+							<td><%=GameClassDAO.getMappedDependencyIdsForClassId(c.getId()).size()%>/<%=GameClassDAO.getMappedTestIdsForClassId(c.getId()).size()%>/<%=GameClassDAO.getMappedMutantIdsForClassId(c.getId()).size()%></td>
 							<td><%=mutationDiff > 0 ? String.valueOf(mutationDiff) : ""%></td>
 							<td><%=testingDiff > 0 ? String.valueOf(testingDiff) : ""%></td>
 							<!--

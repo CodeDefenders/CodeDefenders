@@ -1,10 +1,26 @@
-<%@ page import="org.codedefenders.game.AbstractGame" %>
+<%@ page import="org.codedefenders.database.GameClassDAO" %>
+<%@ page import="org.codedefenders.model.Dependency" %>
+<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="java.nio.file.Files" %>
+<%@ page import="java.nio.file.Paths" %>
+<%@ page import="java.util.Map" %>
 <% { %>
 
 <%-- Set request attributes for the components. --%>
 <%
 	/* class_viewer */
+	request.setAttribute("className", game.getClassName());
 	request.setAttribute("classCode", game.getCUT().getAsHTMLEscapedString());
+	{
+		Map<String, String> dependencies = new HashMap<>();
+		for (Dependency dep : GameClassDAO.getMappedDependenciesForClassId(game.getClassId())) {
+			final String javaFile = dep.getJavaFile();
+			String depName = javaFile.substring(javaFile.lastIndexOf(Constants.F_SEP) + 1, javaFile.lastIndexOf("."));
+			String depContent = new String(Files.readAllBytes(Paths.get(javaFile)));
+			dependencies.put(depName, depContent);
+		}
+		request.setAttribute("dependencies", dependencies);
+	}
 
 	/* test_carousel */
 	request.setAttribute("tests", game.getTests());
@@ -35,7 +51,7 @@
 	<h2>Admin</h2>
 	<form id="adminEndBtn" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post" style="display: inline-block;">
 		<button type="submit" class="btn btn-primary btn-game btn-left" id="endGame" form="adminEndBtn"
-				<% if (!game.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>
+				<% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
 			End Game
 		</button>
 		<input type="hidden" name="formType" value="endGame">
@@ -43,7 +59,7 @@
 	</form>
 	<form id="adminStartBtn" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post" style="display: inline-block;">
 		<button type="submit" class="btn btn-primary btn-game" id="startGame" form="adminStartBtn"
-				<% if (!game.getState().equals(GameState.CREATED)) { %> disabled <% } %>>
+				<% if (game.getState() != GameState.CREATED) { %> disabled <% } %>>
 			Start Game
 		</button>
 		<input type="hidden" name="formType" value="startGame">
