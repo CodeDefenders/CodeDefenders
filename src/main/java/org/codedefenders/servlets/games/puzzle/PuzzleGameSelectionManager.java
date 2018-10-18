@@ -19,12 +19,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static org.codedefenders.servlets.util.GameServletUtils.Puzzle.getPuzzleGame;
-import static org.codedefenders.servlets.util.GameServletUtils.Puzzle.invalidateSessionPuzzleGameIfIdMatches;
 import static org.codedefenders.servlets.util.GameServletUtils.getGameId;
 import static org.codedefenders.util.Constants.PUZZLE_GAME_PATH;
 import static org.codedefenders.util.Constants.PUZZLE_OVERVIEW_PATH;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PUZZLE_GAME;
+import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
 
 /**
  * This {@link HttpServlet} handles management of {@link PuzzleGame}.
@@ -96,7 +94,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
             return;
         }
 
-        session.setAttribute(SESSION_ATTRIBUTE_PUZZLE_GAME, game);
+        request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
 
         String path = request.getContextPath() + PUZZLE_GAME_PATH + "?gameId=" + game.getId();
         request.getRequestDispatcher(path).forward(request, response);
@@ -125,7 +123,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
             return;
         }
 
-        final PuzzleGame game = getPuzzleGame(session, gameId);
+        final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
         if (game == null) {
             logger.error("Failed to retrieve puzzle game from database for gameId: {}.", gameId);
             response.setStatus(SC_BAD_REQUEST);
@@ -150,8 +148,6 @@ public class PuzzleGameSelectionManager extends HttpServlet {
         logger.info("User {} ended puzzle {} manually.", userId, game.getPuzzleId());
         game.setState(GameState.FAILED);
         game.update();
-
-        invalidateSessionPuzzleGameIfIdMatches(session, gameId);
 
         String path = request.getContextPath() + PUZZLE_OVERVIEW_PATH;
         request.getRequestDispatcher(path).forward(request, response);

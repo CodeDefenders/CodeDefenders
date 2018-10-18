@@ -32,7 +32,6 @@ import javax.servlet.http.HttpSession;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-import static org.codedefenders.servlets.util.GameServletUtils.Puzzle.getPuzzleGame;
 import static org.codedefenders.servlets.util.GameServletUtils.getGameId;
 import static org.codedefenders.util.Constants.MODE_PUZZLE_DIR;
 import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
@@ -44,7 +43,7 @@ import static org.codedefenders.util.Constants.PUZZLEGAME_ATTACKER_VIEW_JSP;
 import static org.codedefenders.util.Constants.PUZZLEGAME_DEFENDER_VIEW_JSP;
 import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
 import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PUZZLE_GAME;
+import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
@@ -77,7 +76,7 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        final PuzzleGame game = getPuzzleGame(session, gameId);
+        final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
         if (game == null) {
             logger.error("Cannot retrieve puzzle game page. Failed to retrieve puzzle game from database for gameId: {}.", gameId);
             response.setStatus(SC_BAD_REQUEST);
@@ -93,7 +92,7 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        session.setAttribute(SESSION_ATTRIBUTE_PUZZLE_GAME, game);
+        request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
 
         final Role role = game.getActiveRole();
         final String subPath;
@@ -164,7 +163,7 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        final PuzzleGame game = getPuzzleGame(session, gameId);
+        final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
         if (game == null) {
             logger.error("Failed to retrieve puzzle game from database for gameId: {}.", gameId);
             Redirect.redirectBack(request, response);
@@ -281,7 +280,7 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        final PuzzleGame game = getPuzzleGame(session, gameId);
+        final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
         if (game == null) {
             logger.error("Failed to retrieve puzzle game from database for gameId: {}. Aborting.", gameId);
             Redirect.redirectBack(request, response);
