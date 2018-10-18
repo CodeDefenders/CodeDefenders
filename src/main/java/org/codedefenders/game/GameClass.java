@@ -17,6 +17,7 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.Range;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
@@ -26,11 +27,11 @@ import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
@@ -125,9 +126,10 @@ public class GameClass {
 		this.alias = alias;
 	}
 
+    @SuppressWarnings("Duplicates")
 	public String getAsString() {
 		try {
-			return String.join("\n", Files.readAllLines(new File(javaFile).toPath()));
+			return new String(Files.readAllBytes(Paths.get(javaFile)));
 		} catch (FileNotFoundException e) {
 			logger.error("Could not find file " + javaFile);
 			return "[File Not Found]";
@@ -135,6 +137,11 @@ public class GameClass {
 			logger.error("Could not read file " + javaFile);
 			return "[File Not Readable]";
 		}
+	}
+
+	@SuppressWarnings("Duplicates")
+	public String getAsHTMLEscapedString() {
+		return StringEscapeUtils.escapeHtml(getAsString());
 	}
 
 	@Deprecated
@@ -204,6 +211,10 @@ public class GameClass {
 		return sb.toString();
 	}
 
+	public String getHTMLEscapedTestTemplate() {
+		return StringEscapeUtils.escapeHtml(getTestTemplate());
+	}
+
 	/*
 	 * We list all the NON-primitive imports here. We do not perform any
 	 * merging.
@@ -224,7 +235,7 @@ public class GameClass {
 
 		} catch (ParseException | IOException e) {
 			// If a java file is not provided, there's no import at all.
-			logger.warn("Swallow Exception" + e );
+			logger.error("Swallow Exception", e);
 		}
 		return additionalImports;
 	}
@@ -467,15 +478,6 @@ public class GameClass {
 	 */
 	public List<Integer> getLinesOfCompileTimeConstants() {
 		return linesOfCompileTimeConstants;
-	}
-
-	public boolean delete() {
-		logger.debug("Deleting class (ID={})", id);
-		// Attempt to update game info into database
-		Connection conn = DB.getConnection();
-		String query = "DELETE FROM classes WHERE Class_ID=?;";
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
-		return DB.executeUpdate(stmt, conn);
 	}
 
 	/**

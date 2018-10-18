@@ -1,9 +1,8 @@
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.database.FeedbackDAO" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.game.singleplayer.PrepareAI" %>
-<%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="java.util.List" %>
 <% String pageTitle=null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div>
@@ -126,7 +125,10 @@
 												<h4 class="modal-title"><%=c.getBaseName()%></h4>
 											</div>
 											<div class="modal-body">
-												<pre class="readonly-pre"><textarea class=	"readonly-textarea classPreview" id="sut<%=c.getId()%>" name="cut<%=c.getId()%>" cols="80" rows="30"><%=c.getAsString()%></textarea></pre>
+												<pre class="readonly-pre"><textarea
+														class="readonly-textarea classPreview" id="sut<%=c.getId()%>"
+														name="cut<%=c.getId()%>" cols="80"
+														rows="30"><%=c.getAsHTMLEscapedString()%></textarea></pre>
 											</div>
 											<div class="modal-footer">
 												<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

@@ -99,7 +99,10 @@
 							<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
 						</div>
 						<div class="modal-body">
-							<pre class="readonly-pre"><textarea class=	"readonly-textarea classPreview" id="sut<%=g.getId()%>" name="cut<%=g.getId()%>" cols="80" rows="30"><%=g.getCUT().getAsString()%></textarea></pre>
+							<pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
+																id="sut<%=g.getId()%>"
+																name="cut<%=g.getId()%>" cols="80"
+																rows="30"><%=g.getCUT().getAsHTMLEscapedString()%></textarea></pre>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -121,7 +124,7 @@
 					btnLabel = "Enter";
 				}
 %>
-			<form id="view" action="<%= request.getContextPath() %>/games" method="post">
+			<form id="enterGameForm" action="<%= request.getContextPath() %>/games" method="post">
 				<input type="hidden" name="formType" value="enterGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
 				<% if (uid == turnId ) {%>
@@ -158,7 +161,10 @@
 							<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
 						</div>
 						<div class="modal-body">
-							<pre class="readonly-pre"><textarea class=	"readonly-textarea classPreview" id="sut<%=g.getId()%>" name="cut<%=g.getId()%>" cols="80" rows="30"><%=g.getCUT().getAsString()%></textarea></pre>
+							<pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
+																id="sut<%=g.getId()%>"
+																name="cut<%=g.getId()%>" cols="80"
+																rows="30"><%=g.getCUT().getAsHTMLEscapedString()%></textarea></pre>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -321,7 +327,10 @@
 								<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
 							</div>
 							<div class="modal-body classPreview">
-								<pre class="readonly-pre"><textarea class=	"readonly-textarea" id="sut<%=g.getId()%>" name="cut<%=g.getId()%>" cols="80" rows="30"><%=g.getCUT().getAsString()%></textarea></pre>
+								<pre class="readonly-pre"><textarea
+										class="readonly-textarea" id="sut<%=g.getId()%>"
+										name="cut<%=g.getId()%>" cols="80"
+										rows="30"><%=g.getCUT().getAsHTMLEscapedString()%></textarea></pre>
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -336,7 +345,7 @@
 			<td class="col-sm-1"></td>
 			<td class="col-sm-1"></td>
 			<td class="col-sm-2">
-			<form id="view" action="<%=request.getContextPath() %>/games" method="post">
+			<form id="joinGameForm" action="<%=request.getContextPath() %>/games" method="post">
 					<input type="hidden" name="formType" value="joinGame">
 					<input type="hidden" name="game" value=<%=g.getId()%>>
 					<button type="submit" id="<%="duel-join-"+g.getId()%>" class="btn btn-primary btn-sm" value="Join Game">Join Game</button>
@@ -367,7 +376,11 @@
 								<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
 							</div>
 							<div class="modal-body">
-							<pre class="readonly-pre"><textarea class=	"readonly-textarea classPreview" id="sut<%=g.getId()%>" name="cut<%=g.getId()%>" cols="80" rows="30"><%=g.getCUT().getAsString()%></textarea></pre>
+                                <pre class="readonly-pre"><textarea
+										class="readonly-textarea classPreview"
+										id="sut<%=g.getId()%>"
+										name="cut<%=g.getId()%>" cols="80"
+										rows="30"><%=g.getCUT().getAsHTMLEscapedString()%></textarea></pre>
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>

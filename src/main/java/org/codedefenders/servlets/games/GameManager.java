@@ -1,21 +1,22 @@
 package org.codedefenders.servlets.games;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.execution.AntRunner;
-import org.codedefenders.util.Constants;
+import org.codedefenders.execution.MutationTester;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
-import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.Role;
-import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Test;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.validation.CodeValidatorException;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
+import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.validation.CodeValidator;
+import org.codedefenders.validation.CodeValidatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -143,13 +143,13 @@ public class GameManager extends HttpServlet {
 					} catch (CodeValidatorException e) {
 						logger.warn("Swallow Exception", e);
 						messages.add(TEST_GENERIC_ERROR_MESSAGE);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 						response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 						return;
 					}
 					if (newTest == null) {
 						messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 						response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 						return;
 					}
@@ -191,13 +191,13 @@ public class GameManager extends HttpServlet {
 							logger.debug("testOriginalTarget: " + testOriginalTarget);
 							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 							messages.add(testOriginalTarget.message);
-							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 						}
 					} else {
 						logger.debug("compileTestTarget: " + compileTestTarget);
 						messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
 						messages.add(compileTestTarget.message);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 					}
 				} else if (request.getParameter("acceptEquivalent") != null) { // If the user didnt want to supply a test
 					logger.info("Equivalence accepted for mutant {}", mutant.getId());
@@ -278,7 +278,7 @@ public class GameManager extends HttpServlet {
 							&& existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
 						messages.add(existingMutantTarget.message);
 					}
-					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
 					break;
 				}
 				Mutant newMutant = createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "sp");
@@ -312,11 +312,11 @@ public class GameManager extends HttpServlet {
 						messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
 						if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty())
 							messages.add(compileMutantTarget.message);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
 					}
 				} else {
 					messages.add(MUTANT_CREATION_ERROR_MESSAGE);
-					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
 					logger.error("Error creating mutant. Game: {}, Class: {}, User: {}", activeGame.getId(), activeGame.getClassId(), uid, mutantText);
 				}
 				break;
@@ -334,7 +334,7 @@ public class GameManager extends HttpServlet {
 				} catch (CodeValidatorException e) {
 					logger.warn("Swallow Exception", e);
 					messages.add(TEST_GENERIC_ERROR_MESSAGE);
-					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 					response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 					return;
 				}
@@ -342,7 +342,7 @@ public class GameManager extends HttpServlet {
 
 				if (newTest == null) {
 					messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
-					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 					response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 					return;
 				}
@@ -369,12 +369,12 @@ public class GameManager extends HttpServlet {
 						// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
 						messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 						messages.add(testOriginalTarget.message);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 					}
 				} else {
 					messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
 					messages.add(compileTestTarget.message);
-					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 				}
 				break;
 		}
@@ -385,8 +385,7 @@ public class GameManager extends HttpServlet {
 	public static String getMutantValidityMessage(int cid, String mutatedCode, CodeValidator.CodeValidatorLevel codeValidatorLevel) throws IOException {
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 
-		File sourceFile = new File(classMutated.getJavaFile());
-		String sourceCode = new String(Files.readAllBytes(sourceFile.toPath()));
+		String sourceCode = classMutated.getAsString();
 
 		// is it an actual mutation?
 		String md5CUT = CodeValidator.getMD5FromText(sourceCode);

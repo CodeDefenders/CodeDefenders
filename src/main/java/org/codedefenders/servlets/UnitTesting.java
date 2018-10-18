@@ -13,14 +13,15 @@ import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.execution.AntRunner;
-import org.codedefenders.util.Constants;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameState;
-import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Test;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +91,7 @@ public class UnitTesting extends HttpServlet {
 		Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
 		if (newTest == null) {
 			messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
-			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 			response.sendRedirect(request.getContextPath()+"/utesting");
 			return;
 		}
@@ -109,12 +110,12 @@ public class UnitTesting extends HttpServlet {
 				// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
 				messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 				messages.add(testOriginalTarget.message);
-				session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+				session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 			}
 		} else {
 			messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
 			messages.add(compileTestTarget.message);
-			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 		}
 		response.sendRedirect(request.getContextPath()+"/utesting");
 	}

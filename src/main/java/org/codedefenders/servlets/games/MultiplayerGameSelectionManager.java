@@ -186,7 +186,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
                         final List<Mutant> mutantsToAdd = GameClassDAO.getMappedMutantsForClassId(classId);
                         for (Mutant mutant : mutantsToAdd) {
-                            final String mutantCode = String.join("\n", Files.readAllLines(Paths.get(mutant.getJavaFile())));
+                            final String mutantCode = new String(Files.readAllBytes(Paths.get(mutant.getJavaFile())));
                             // GameManager#createMutant() compiles and stores the mutant
                             GameManager.createMutant(nGame.getId(), classId, mutantCode, DUMMY_ATTACKER_USER_ID, "mp");
                         }
@@ -196,7 +196,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
                         final List<Test> testsToAdd = GameClassDAO.getMappedTestsForClassId(classId);
                         for (Test test : testsToAdd) {
-                            final String testCode = String.join("\n", Files.readAllLines(Paths.get(test.getJavaFile())));
+                            final String testCode = new String(Files.readAllBytes(Paths.get(test.getJavaFile())));
                             // GameManager#createTest() compiles, tests and stores the tests
                             GameManager.createTest(nGame.getId(), classId, testCode, DUMMY_DEFENDER_USER_ID, "mp", maxAssertionsPerTest);
 

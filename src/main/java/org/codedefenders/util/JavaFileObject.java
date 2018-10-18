@@ -54,7 +54,7 @@ public class JavaFileObject extends SimpleJavaFileObject {
     @Override
     public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
         if (content == null) {
-            content = String.join("\n", Files.readAllLines(Paths.get(uri)));
+            content = new String(Files.readAllBytes(Paths.get(uri)));
         }
         return content;
     }
