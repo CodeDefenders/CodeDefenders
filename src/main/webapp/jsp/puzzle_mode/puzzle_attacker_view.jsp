@@ -46,29 +46,29 @@
     <div class="col-md-6">
         <div id="mutants-div">
             <h3>Mutants</h3>
-            <%@include file="game_components/mutants_list.jsp"%>
+            <%@include file="../game_components/mutants_list.jsp"%>
         </div>
 
         <% if (game.getLevel().equals(GameLevel.EASY)) { %>
         <div id="tests-div">
             <h3>JUnit tests</h3>
-            <%@include file="game_components/tests_carousel.jsp"%>
+            <%@include file="../game_components/tests_carousel.jsp"%>
         </div>
         <% } %>
     </div>
 
     <div class="col-md-6" id="cut-div">
-        <%@include file="game_components/mutant_progress_bar.jsp"%>
+        <%@include file="../game_components/mutant_progress_bar.jsp"%>
         <h3 style="margin-bottom: 0;">Create a mutant here</h3>
 
-        <form id="reset" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() + "/id=" + game.getId() %>" method="post">
+        <form id="reset" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post">
             <input type="hidden" name="formType" value="reset">
             <button class="btn btn-primary btn-warning btn-game btn-right" id="btnReset" style="margin-top: -40px; margin-right: 80px">
                 Reset
             </button>
         </form>
 
-        <form id="atk" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() + "/id=" + game.getId() %>" method="post">
+        <form id="atk" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post">
             <button type="submit" class="btn btn-primary btn-game btn-right" id="submitMutant" form="atk" onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';" style="margin-top: -50px"
                 <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                 Attack!
@@ -77,14 +77,14 @@
             <input type="hidden" name="formType" value="createMutant">
             <input type="hidden" name="gameID" value="<%= game.getId() %>">
 
-            <%@include file="game_components/mutant_editor.jsp"%>
-            <%@include file="game_components/game_highlighting.jsp" %>
+            <%@include file="../game_components/mutant_editor.jsp"%>
+            <%@include file="../game_components/game_highlighting.jsp" %>
         </form>
 
-        <%@include file="game_components/mutant_explanation.jsp"%>
+        <%@include file="../game_components/mutant_explanation.jsp"%>
     </div>
 </div>
 
-<%@include file="footer_game.jsp"%>
+<%@include file="../footer_game.jsp"%>
 
 <% } %>

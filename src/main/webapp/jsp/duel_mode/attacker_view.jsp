@@ -76,26 +76,26 @@
 %>
 
 <% if (game.getState() == GameState.FINISHED) { %>
-    <%@include file="game_components/finished_modal.jsp"%>
+    <%@include file="../game_components/finished_modal.jsp"%>
 <% } %>
 
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6">
         <div id="mutants-div">
             <h3>Mutants</h3>
-            <%@include file="game_components/mutants_list.jsp"%>
+            <%@include file="../game_components/mutants_list.jsp"%>
         </div>
 
         <% if (game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED)) { %>
             <div id="tests-div">
                 <h3>JUnit tests </h3>
-                <%@include file="game_components/tests_carousel.jsp"%>
+                <%@include file="../game_components/tests_carousel.jsp"%>
             </div>
         <% } %>
     </div>
 
     <div class="col-md-6" id="cut-div">
-        <%@include file="game_components/mutant_progress_bar.jsp"%>
+        <%@include file="../game_components/mutant_progress_bar.jsp"%>
         <h3 style="margin-bottom: 0;">Create a mutant here</h3>
 
         <form id="reset" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() %>" method="post">
@@ -114,11 +114,11 @@
             <input type="hidden" name="formType" value="createMutant">
             <input type="hidden" name="gameID" value="<%= game.getId() %>"/>
 
-            <%@include file="game_components/mutant_editor.jsp"%>
-            <%@include file="game_components/game_highlighting.jsp"%>
+            <%@include file="../game_components/mutant_editor.jsp"%>
+            <%@include file="../game_components/game_highlighting.jsp"%>
         </form>
 
-        <%@include file="game_components/mutant_explanation.jsp"%>
+        <%@include file="../game_components/mutant_explanation.jsp"%>
     </div>
 </div>
 

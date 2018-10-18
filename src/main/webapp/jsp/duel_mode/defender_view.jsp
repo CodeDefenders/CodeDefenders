@@ -82,19 +82,19 @@
 %>
 
 <% if (game.getState() == GameState.FINISHED) { %>
-    <%@include file="game_components/finished_modal.jsp"%>
+    <%@include file="../game_components/finished_modal.jsp"%>
 <% } %>
 
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6" id="cut-div">
         <h3>Class Under Test</h3>
-        <%@include file="game_components/class_viewer.jsp"%>
-        <%@include file="game_components/game_highlighting.jsp"%>
-        <%@include file="game_components/mutant_explanation.jsp"%>
+        <%@include file="../game_components/class_viewer.jsp"%>
+        <%@include file="../game_components/game_highlighting.jsp"%>
+        <%@include file="../game_components/mutant_explanation.jsp"%>
     </div>
 
     <div class="col-md-6" id="utest-div">
-        <%@include file="game_components/test_progress_bar.jsp"%>
+        <%@include file="../game_components/test_progress_bar.jsp"%>
         <h3>Write a new JUnit test here
             <button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def" onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
                     <% if (game.getState() != GameState.ACTIVE || game.getActiveRole() != Role.DEFENDER) { %> disabled <% } %>>
@@ -102,7 +102,7 @@
             </button>
         </h3>
         <form id="def" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() %>" method="post">
-            <%@include file="game_components/test_editor.jsp"%>
+            <%@include file="../game_components/test_editor.jsp"%>
             <input type="hidden" name="formType" value="createTest">
         </form>
     </div>
@@ -111,12 +111,12 @@
 <div class="row" style="padding: 0px 15px;">
 	<div class="col-md-6" id="submitted-div">
 		<h3>JUnit tests </h3>
-		<%@include file="game_components/tests_carousel.jsp"%>
+		<%@include file="../game_components/tests_carousel.jsp"%>
 	</div>
 
 	<div class="col-md-6" id="mutants-div">
 		<h3>Mutants</h3>
-        <%@include file="game_components/mutants_list.jsp"%>
+        <%@include file="../game_components/mutants_list.jsp"%>
 	</div>
 </div>
 
