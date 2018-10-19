@@ -1,5 +1,32 @@
 /*
- * Sets up clickable table cells to toggle child rows in a DataTable.
+ * Divide two numbers, or return a default value when dividing by zero.
+ */
+function dtDiv(a, b, defaultValue, precision) {
+    if (typeof defaultValue === 'undefined') defaultValue = 0;
+    if (typeof precision === 'undefined') precision = 2;
+
+    return b === 0 ? defaultValue : (a / b).toFixed(precision);
+}
+
+/*
+ * Divide two numbers and format the result as a percentage, or return a default value when dividing by zero.
+ */
+function dtPerc(a, b, defaultValue, precision) {
+    if (typeof defaultValue === 'undefined') defaultValue = '0%';
+    if (typeof precision === 'undefined') precision = 1;
+
+    return b === 0 ? defaultValue : ((a * 100 / b).toFixed(precision) + '%');
+}
+
+/*
+ * Return a string containing "a" and the percentage of "(a / b)" in parentheses.
+ */
+function dtValAndPerc(a, b, defaultValue, precision) {
+    return a + ' (' + dtPerc(a, b, defaultValue, precision) + ')';
+}
+
+/*
+ * Set up clickable table cells to toggle child rows in a DataTable.
  *
  * tableSelector:   A selector with which the table can be selected, e.g. "#tableUsers"
  * table:           The DataTables object associated with the table
@@ -32,8 +59,8 @@
  *
  * Tables in child rows should have the class "table-child-details".
  */
-var setupChildRows = function(tableSelector, table, format) {
-    $('#tableUsers tbody').on('click', '.toggle-details', function () {
+function setupChildRows(tableSelector, table, format) {
+    $(tableSelector + ' tbody').on('click', '.toggle-details', function () {
         var tr = $(this).closest('tr');
         var row = table.row(tr);
 
@@ -41,11 +68,11 @@ var setupChildRows = function(tableSelector, table, format) {
         if (row.child.isShown()) {
             row.child.hide();
             tr.removeClass('shown');
-            $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-right');
+            $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
         } else {
             row.child(format(row.data())).show();
             tr.addClass('shown');
-            $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-up');
+            $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
         }
     });
 
@@ -53,7 +80,7 @@ var setupChildRows = function(tableSelector, table, format) {
         $(this).toggleClass('shown');
         var shown = $(this).hasClass('shown');
 
-        $(this).find(".toggle-details-icon").toggleClass('glyphicon-chevron-right').toggleClass('glyphicon-chevron-up');
+        $(this).find(".toggle-details-icon").toggleClass('glyphicon-chevron-right').toggleClass('glyphicon-chevron-down');
 
         /* Show or hide all children of rows on this page. */
         $(tableSelector + ' tbody .toggle-details').each(function() {
@@ -63,11 +90,11 @@ var setupChildRows = function(tableSelector, table, format) {
             if (row.child.isShown() && !shown) {
                 row.child.hide();
                 tr.removeClass('shown');
-                $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-up').addClass('glyphicon-chevron-right');
+                $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
             } else if (!row.child.isShown() && shown){
                 row.child(format(row.data())).show();
                 tr.addClass('shown');
-                $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-up');
+                $(this).find(".toggle-details-icon").removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
             }
         });
     });

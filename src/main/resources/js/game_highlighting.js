@@ -168,7 +168,11 @@ var createPopupFunction = function(mutantType){
     };
 }
 
-var mutantLine = function (superDiv, showEquivalenceButton) {
+var mutantLine = function (superDiv, showEquivalenceButton, gameType) {
+    if (!gameType) {
+        gameType = "PARTY";
+    }
+
     if (!superDiv) {
         superDiv = "#cut-div";
     }
@@ -182,6 +186,8 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
     });
 
     $(".codedef-line-mutant").remove();
+
+    var codemirror = $(superDiv).find(".CodeMirror")[0].CodeMirror;
 
     for (var l in preparedMutants) {
         const lineNum = l;
@@ -252,35 +258,43 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
             mutantDescriptions['killed'] += "<p>+" + (killedMutants - MUTANT_SHOW_LIMIT) + " More</p>";
         }
 
-        var icon = '<div id="' + id + '" style="height: 20px; margin-left: 5px; float: left; margin-right: -25px; position: relative; z-index:2000;" class="codedef-line-mutant">';
+        var icon = '<div id="' + id + '" style="height: 18px; margin-left: -5px; float: left; margin-right: -25px; position: relative; z-index:2000;" class="codedef-line-mutant">';
 
         if (killedMutants > 0){
             icon += '<span class="mutantCUTImage mutantImageKilled"><span>' + killedMutants + '</span></span>';
+            codemirror.indentLine(lineNum-1, 1);
             // icon += '<img src="images/mutantKilled.png" alt="\' + quant + \' mutants on line \' + lineNum + \'" width="20" />';
         }
 
         if (equivalentMutants > 0){
+            codemirror.indentLine(lineNum-1, 1);
             icon += '<span class="mutantCUTImage mutantImageEquiv"><span>' + equivalentMutants + '</span></span>';
         }
 
         if (flaggedMutants > 0){
+            codemirror.indentLine(lineNum-1, 1);
             icon += '<span class="mutantCUTImage mutantImageFlagged"><span>' + flaggedMutants + '</span></span>';
         }
 
         if (aliveMutants > 0){
+            codemirror.indentLine(lineNum-1, 1);
             icon += '<span class="mutantCUTImage mutantImageAlive"><span>' + aliveMutants + '</span></span>';
         }
 
-        icon += '</div>'
+        icon += '</div>';
 
-        $(allLines[lineNum]).before(icon);
+        var htmlNode =document.createElement("span");
+        htmlNode.innerHTML = icon;
+        codemirror.addWidget({line:(lineNum-2), ch:-1}, htmlNode.firstChild);
 
-        var content = '<span id="mutationPopup">'
+
+
+        var content = '<span id="mutationPopup">';
 
         content += "<span" +
             " class='mutationInfoExpanded'>" +
             "<h5>Info</h5><p>Hover" +
-            " over for info</p></span>"
+            " over for info</p></span>";
 
         // if (aliveMutants > 0) {
         //     content += createAction("Alive Mutants", "mutantImageAlive", mutantDescriptions['alive'])
@@ -299,11 +313,25 @@ var mutantLine = function (superDiv, showEquivalenceButton) {
         // }
         if (showEquivalenceButton && aliveMutants > 0) {
             // TODO How do we get the contextPath ? it might not be necessary if we use relative href
-            mutantDescriptions['alive'] += '<span class="action"><a href="javascript:' +
-                ' if(window.confirm(\'Flag line ' + lineNum + ' as' +
-                ' Equivalent?\')){window.location.href = \'multiplayer/play?equivLine=' + lineNum + '\';}">' +
-                '<span class="mutantCUTIcon mutantImageFlagAction"><span></span>' +
-                '</span> Claim Equivalence</a></span>';
+
+            if (gameType === "PARTY") {
+                mutantDescriptions['alive'] += '<span class="action"><a href="javascript:' +
+                    ' if(window.confirm(\'Flag line ' + lineNum + ' as' +
+                    ' Equivalent?\')){window.location.href = \'multiplayer/play?equivLine=' + lineNum + '\';}">' +
+                    '<span class="mutantCUTIcon mutantImageFlagAction"><span></span>' +
+                    '</span> Claim Equivalence</a></span>';
+            } else if (gameType === "DUEL") {
+                mutantDescriptions['alive'] += '' +
+                    '<br\>' +
+                    '<form id="equiv" action="duelgame" method="post" onsubmit="return window.confirm(\'This will mark mutant ' + mutant.id + ' as equivalent Are you sure?\');">' +
+                        '<input type="hidden" name="formType" value="claimEquivalent">' +
+                        '<input type="hidden" name="mutantId" value="' + mutant.id +  '">' +
+                        '<button type="submit"><span class="mutantCUTIcon mutantImageFlagAction">' +
+                            '<span></span></span> Claim Equivalence' +
+                        '</button>' +
+                    '</form>';
+            }
+
         }
         content += '</span>';
 

@@ -1,8 +1,6 @@
 package org.codedefenders.game.multiplayer;
 
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
-import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
+import static org.codedefenders.game.Mutant.Equivalence.*;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.database.DB;
@@ -206,15 +203,6 @@ public class MultiplayerGame extends AbstractGame {
 		return format.format(date);
 	}
 
-	public List<Mutant> getMutantsMarkedEquivalent() {
-		return getMutants().stream().filter(mutant -> mutant.getEquivalent().equals(ASSUMED_YES) ||
-				mutant.getEquivalent().equals(DECLARED_YES)).collect(Collectors.toList());
-	}
-
-	public List<Mutant> getMutantsMarkedEquivalentPending() {
-		return getMutants().stream().filter(mutant -> mutant.getEquivalent().equals(PENDING_TEST)).collect(Collectors.toList());
-	}
-
 	public int[] getDefenderIds() {
 		return DatabaseAccess.getPlayersForMultiplayerGame(getId(), Role.DEFENDER);
 	}
@@ -328,6 +316,7 @@ public class MultiplayerGame extends AbstractGame {
 		HashMap<Integer, Integer> mutantsKilled = new HashMap<Integer, Integer>();
 		HashMap<Integer, Integer> mutantsEquiv = new HashMap<Integer, Integer>();
 
+		// TODO why not getMutants()
 		List<Mutant> allMutants = getAliveMutants();
 		allMutants.addAll(getKilledMutants());
 		allMutants.addAll(getMutantsMarkedEquivalent());

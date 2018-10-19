@@ -9,7 +9,6 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -109,13 +108,13 @@ public class AdminUserManagement extends HttpServlet {
 		String confirm_password = request.getParameter("confirm_password");
 
 		if (!password.equals(confirm_password))
-			return "Error! Passwords don't match!";
+			return "Passwords don't match";
 
 		if (!name.equals(u.getUsername()) && DatabaseAccess.getUserForName(name) != null)
 			return "Username " + name + " is already taken";
 
 		if (!email.equals(u.getEmail()) && DatabaseAccess.getUserForEmail(email) != null)
-			return "Email " + email + " is already in use!";
+			return "Email " + email + " is already in use";
 
 		if (!LoginManager.validEmailAddress(email))
 			return "Email Address is not valid";
@@ -124,13 +123,12 @@ public class AdminUserManagement extends HttpServlet {
 			// we don't want to encode the already encoded password from the DB
 			if (!LoginManager.validPassword(password))
 				return "Password is not valid";
-			BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-			password = passwordEncoder.encode(password);
+			u.setEncodedPassword(User.encodePassword(password));
 		}
 		u.setUsername(name);
 		u.setEmail(email);
 
-		if (!u.update(password))
+		if (!u.update())
 			return "Error trying to update info for user " + uid + "!";
 		return successMsg;
 	}
@@ -201,7 +199,7 @@ public class AdminUserManagement extends HttpServlet {
 			email = username + EMAIL_NOT_SPECIFIED_DOMAIN;
 		}
 
-		final User user = new User(username, password, email);
+		final User user = new User(username, User.encodePassword(password), email);
 		final boolean createSuccess = user.insert();
 
 		if (!createSuccess) {
@@ -236,9 +234,8 @@ public class AdminUserManagement extends HttpServlet {
 	private String resetUserPW(int uid) {
 
 		String newPassword = generatePW();
-		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-		if (AdminDAO.setUserPassword(uid, passwordEncoder.encode(newPassword))) {
+		if (AdminDAO.setUserPassword(uid, User.encodePassword(newPassword))) {
 			if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()) {
 				User u = DatabaseAccess.getUser(uid);
 				String msg = String.format(PASSWORD_RESET_MSG, u.getUsername(), newPassword);

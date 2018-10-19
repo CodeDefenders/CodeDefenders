@@ -133,8 +133,8 @@ public class UnkillableMutant {
 	@Test
 	public void testUnkillableMutant() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 		// // This test assumes an empty db !
-		User creatorUser = new User("creator", "test");
-		HelperUser creator = new HelperUser(creatorUser, WebClientFactory.getNewWebClient(), "localhost");
+		User creatorUser = new User("creator");
+		HelperUser creator = new HelperUser(creatorUser, WebClientFactory.getNewWebClient(), "localhost", "test");
 		creator.doLogin();
 		System.out.println("Creator Login");
 
@@ -149,8 +149,8 @@ public class UnkillableMutant {
 		//
 		creator.startGame(newGameId);
 		//
-		User attackerUser = new User("demoattacker", "test");
-		HelperUser attacker = new HelperUser(attackerUser, WebClientFactory.getNewWebClient(), "localhost");
+		User attackerUser = new User("demoattacker");
+		HelperUser attacker = new HelperUser(attackerUser, WebClientFactory.getNewWebClient(), "localhost", "test");
 		attacker.doLogin();
 		System.out.println("Attacker Login");
 		//
@@ -164,8 +164,8 @@ public class UnkillableMutant {
 						Charset.defaultCharset()));
 		System.out.println("Attacker attack in game " + newGameId);
 		//
-		User defenderUser = new User("demodefender", "test");
-		HelperUser defender = new HelperUser(defenderUser, WebClientFactory.getNewWebClient(), "localhost");
+		User defenderUser = new User("demodefender");
+		HelperUser defender = new HelperUser(defenderUser, WebClientFactory.getNewWebClient(), "localhost", "test");
 		defender.doLogin();
 		//
 		System.out.println("Defender Login");

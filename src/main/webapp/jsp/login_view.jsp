@@ -17,8 +17,8 @@
     <form action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
         <input type="hidden" name="formType" value="login">
         <h2 class="form-signin-heading">Sign in</h2>
-        <label for="inputUsername" class="sr-only">Username/Email</label>
-        <input type="text" id="inputUsername" name="username" class="form-control" placeholder="Username or Email"
+        <label for="inputUsername" class="sr-only">Username</label>
+        <input type="text" id="inputUsername" name="username" class="form-control" placeholder="Username"
                required autofocus>
         <label for="inputPassword" class="sr-only">Password</label>
         <input type="password" id="inputPassword" name="password" class="form-control" placeholder="Password" required>
@@ -156,7 +156,7 @@
                         <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email" required>
                         <label for="inputPassword" class="sr-only">Password</label>
                         <input type="password" id="inputPasswordCreate" name="password" class="form-control"
-                               onkeyup="validatePassword()" placeholder="Password" required minlength="<%=pwMinLength%>" maxlength="20">
+                               onkeyup="validatePassword()" placeholder="Password" required minlength="<%=pwMinLength%>">
                         <span class="label label-danger" id="pw_confirm_message_create" style="color: white;visibility: hidden">Passwords do not match!</span>
                         <label for="inputPassword" class="sr-only">Password</label>
                         <input type="password" id="inputConfirmPasswordCreate" name="confirm" class="form-control"

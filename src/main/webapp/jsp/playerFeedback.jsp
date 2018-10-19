@@ -162,8 +162,8 @@
 
                     <%
                         if (canSeePlayerFeedback) {
-                            int[] attackerIDs = mg.getAttackerIds();
-                            for (int pid : mg.getPlayerIds()) {
+                            int[] attackerIDs = game.getAttackerIds();
+                            for (int pid : game.getPlayerIds()) {
                                 User userFromPlayer = DatabaseAccess.getUserFromPlayer(pid);
                                 int userFromPlayerId = userFromPlayer.getId();
                                 String userName = userFromPlayer.getUsername();

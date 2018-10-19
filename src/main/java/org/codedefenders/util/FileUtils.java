@@ -1,5 +1,8 @@
 package org.codedefenders.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -14,6 +17,7 @@ import static org.codedefenders.util.Constants.*;
  * Some utility functions for files.
  */
 public class FileUtils {
+	private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
 	public static String createIndexXML(File dir, String fileName, String contents) throws IOException {
 		String path = dir.getAbsolutePath() + F_SEP + fileName + ".xml";
@@ -60,7 +64,7 @@ public class FileUtils {
 		return newDir;
 	}
 
-	public static boolean isParsable(String input){
+	private static boolean isParsable(String input){
 		boolean parsable = true;
 		try{
 			Integer.parseInt(input);
@@ -73,15 +77,15 @@ public class FileUtils {
 	public static List<String> readLines(Path path) {
 		List<String> lines = new ArrayList<>();
 		try {
-			if (Files.exists(path))
+			if (Files.exists(path)) {
 				lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-			else
-				System.out.println("File not found {}" + path);
+			} else {
+				logger.error("File not found {}. Returning empty lines", path);
+			}
 		} catch (IOException e) {
-			e.printStackTrace();  // TODO handle properly
-		} finally {
-			return lines;
+			logger.error("Error reading file.", e);
 		}
+		return lines;
 	}
 
 }

@@ -1,11 +1,7 @@
 package org.codedefenders.database;
 
-import org.codedefenders.api.analytics.UserDataDTO;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.GameMode;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Role;
+import org.codedefenders.execution.KillMap;
+import org.codedefenders.game.*;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -14,18 +10,13 @@ import org.codedefenders.game.leaderboard.Entry;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
-import org.codedefenders.game.Mutant;
 import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.Test;
 import org.codedefenders.model.User;
 import org.codedefenders.validation.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -89,7 +80,7 @@ public class DatabaseAccess {
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		try {
-            stmt.executeUpdate();
+			stmt.executeUpdate();
 		} catch (SQLException se) {
 			logger.error("SQL exception caught", se);
 			DB.cleanup(conn, stmt);
@@ -624,57 +615,30 @@ public class DatabaseAccess {
 	}
 
 	public static List<Mutant> getMutantsForGame(int gid) {
-		List<Mutant> mutList = new ArrayList<>();
-
-		String query = "SELECT mutants.*, users.Username FROM mutants LEFT " +
-				"JOIN players ON players.ID = mutants.Player_ID LEFT JOIN users ON players.User_ID = users.User_ID WHERE mutants.Game_ID=? AND mutants.ClassFile IS NOT NULL;";
+		String query = "SELECT * FROM mutants WHERE Game_ID=? AND ClassFile IS NOT NULL;";
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gid));
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-		try {
-			while (rs.next()) {
-				Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
-						rs.getString("JavaFile"), rs.getString("ClassFile"),
-						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
-						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
-				newMutant.setScore(rs.getInt("Points"));
-				newMutant.setPlayerName(rs.getString("Username"));
-				mutList.add(newMutant);
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-		return mutList;
+		return getMutants(stmt, conn);
 	}
 
 	public static List<Mutant> getMutantsForPlayer(int pid) {
-		List<Mutant> mutList = new ArrayList<>();
-
 		String query = "SELECT * FROM mutants WHERE Player_ID=? AND ClassFile IS NOT NULL;";
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(pid));
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-		try {
-			while (rs.next()) {
-				Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
-						rs.getString("JavaFile"), rs.getString("ClassFile"),
-						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
-						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
-				newMutant.setScore(rs.getInt("Points"));
-				mutList.add(newMutant);
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-		return mutList;
+		return getMutants(stmt, conn);
+	}
+
+	public static List<Mutant> getMutantsForClass(int classId) {
+		String query = String.join("\n",
+				"SELECT mutants.*",
+				"FROM mutants, games",
+				"WHERE mutants.Game_ID = games.ID",
+				"  AND games.Class_ID = ?",
+				"  AND mutants.ClassFile IS NOT NULL;"
+		);
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(classId));
+		return getMutants(stmt, conn);
 	}
 
 	public static Mutant getMutantFromDB(PreparedStatement stmt, Connection conn) {
@@ -852,9 +816,39 @@ public class DatabaseAccess {
 	 * @return Tests submitted by defenders which compiled and passed on CUT
 	 */
 	public static List<Test> getExecutableTests(int gameId, boolean defendersOnly) {
-		String query = "SELECT tests.* FROM tests\n" + "INNER JOIN targetexecutions ex on tests.Test_ID = ex.Test_ID\n" + (defendersOnly ? "INNER JOIN players pl on tests.Player_ID = pl.ID\n" : "") + "WHERE tests.Game_ID=? AND tests.ClassFile IS NOT NULL\n" + (defendersOnly ? "AND pl.Role='DEFENDER'\n" : "") + "AND ex.Target='TEST_ORIGINAL' AND ex.Status='SUCCESS';";
+		String query = String.join("\n",
+				"SELECT tests.* FROM tests",
+				 (defendersOnly ? "INNER JOIN players pl on tests.Player_ID = pl.ID" : ""),
+				 "WHERE tests.Game_ID=? AND tests.ClassFile IS NOT NULL",
+				 (defendersOnly ? "AND pl.Role='DEFENDER'" : ""),
+				 "  AND EXISTS (",
+				 "    SELECT * FROM targetexecutions ex",
+				 "    WHERE ex.Test_ID = tests.Test_ID",
+				 "      AND ex.Target='TEST_ORIGINAL'",
+				 "      AND ex.Status='SUCCESS'",
+				 "  );"
+		);
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
+		return getTests(stmt, conn);
+	}
+
+	public static List<Test> getExecutableTestsForClass(int classId) {
+		String query = String.join("\n",
+				"SELECT tests.*",
+				"FROM tests, games",
+				"WHERE tests.Game_ID = games.ID",
+				"  AND games.Class_ID = ?",
+				"  AND tests.ClassFile IS NOT NULL",
+				"  AND EXISTS (",
+				"    SELECT * FROM targetexecutions ex",
+				"    WHERE ex.Test_ID = tests.Test_ID",
+				"      AND ex.Target='TEST_ORIGINAL'",
+				"      AND ex.Status='SUCCESS'",
+				"  );"
+		);
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(classId));
 		return getTests(stmt, conn);
 	}
 
@@ -893,25 +887,26 @@ public class DatabaseAccess {
 		return players;
 	}
 
-	private static List<Test> getTests(PreparedStatement stmt, Connection conn) {
+ 	static List<Test> getTests(PreparedStatement stmt, Connection conn) {
 		List<Test> testList = new ArrayList<>();
 		try {
 			// Load the MultiplayerGame Data with the provided ID.
 			ResultSet rs = stmt.executeQuery();
 			while (rs.next()) {
-                String lcs = rs.getString("Lines_Covered");
-                String lucs = rs.getString("Lines_Uncovered");
-                List<Integer> covered = new ArrayList<>();
-                List<Integer> uncovered = new ArrayList<>();
-                if(lcs != null)
-                    covered.addAll(Arrays.stream(lcs.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
-                if(lucs != null)
-                    uncovered.addAll(Arrays.stream(lucs.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
-
-                Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"),
+				String linesCovered = rs.getString("Lines_Covered");
+				String linesUncovered = rs.getString("Lines_Uncovered");
+				List<Integer> covered = new ArrayList<>();
+				List<Integer> uncovered = new ArrayList<>();
+				if (linesCovered != null && !linesCovered.isEmpty()) {
+					covered.addAll(Arrays.stream(linesCovered.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
+				}
+				if (linesUncovered != null && !linesUncovered.isEmpty()) {
+					uncovered.addAll(Arrays.stream(linesUncovered.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
+				}
+				Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"),
 						rs.getString("JavaFile"), rs.getString("ClassFile"),
 						rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"), rs.getInt("Player_ID"),
-                        covered, uncovered);
+						covered, uncovered, rs.getInt("Points"));
 				newTest.setScore(rs.getInt("Points"));
 				testList.add(newTest);
 			}
@@ -923,6 +918,31 @@ public class DatabaseAccess {
 			DB.cleanup(conn, stmt);
 		}
 		return testList;
+	}
+
+	private static List<Mutant> getMutants(PreparedStatement stmt, Connection conn) {
+		List<Mutant> mutantsList = new ArrayList<>();
+		try {
+			// Load the MultiplayerGame Data with the provided ID.
+			ResultSet rs = stmt.executeQuery();
+			while (rs.next()) {
+				Mutant newMutant = new Mutant(rs.getInt("Mutant_ID"), rs.getInt("Game_ID"),
+						rs.getString("JavaFile"), rs.getString("ClassFile"),
+						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
+						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
+				newMutant.setScore(rs.getInt("Points"));
+				mutantsList.add(newMutant);
+			}
+		} catch (SQLException se) {
+			logger.error("SQL exception caught", se);
+			return null;
+		} catch (Exception e) {
+			logger.error("Exception caught", e);
+			return null;
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+		return mutantsList;
 	}
 
 	public static List<Entry> getLeaderboard() {
@@ -961,91 +981,6 @@ public class DatabaseAccess {
 		}
 		return leaderboard;
 	}
-
-	public static List<UserDataDTO> getAnalyticsUserData() {
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = null;
-
-		String query = String.join("\n",
-		" SELECT users.User_ID                AS ID,",
-		"       users.Username                AS Username,",
-        "       IFNULL(NrGamesPlayed,0)       AS GamesPlayed,",
-        "       IFNULL(AttackerScore,0)       AS AttackerScore,",
-        "       IFNULL(DefenderScore,0)       AS DefenderScore,",
-        "       IFNULL(AttackerScore,0)+IFNULL(DefenderScore,0) AS TotalScore,",
-		"       IFNULL(NrMutants,0)           AS MutantsSubmitted,",
-		"       IFNULL(NrMutantsAlive,0)      AS MutantsAlive,",
-		"       IFNULL(NrEquivalentMutants,0) AS MutantsEquivalent,",
-		"       IFNULL(NrTests,0)             AS TestsSubmitted,",
-		"       IFNULL(NrMutantsKilled,0)     AS MutantsKilled",
-
-		"FROM users",
-
-		"LEFT JOIN",
-		"(",
-		"  SELECT players.User_ID,",
-		"        COUNT(mutants.Mutant_ID) AS NrMutants,",
-		"        SUM(mutants.Alive) AS NrMutantsAlive,",
-		"        SUM(CASE WHEN mutants.Equivalent = 'DECLARED_YES' THEN 1 ELSE 0 END) AS NrEquivalentMutants,",
-		"        SUM(mutants.Points) AS AttackerScore",
-		"  FROM players, mutants",
-		"  WHERE players.ID = mutants.Player_ID",
-		"  GROUP BY players.User_ID",
-		")",
-		"AS attackers ON users.User_ID = attackers.User_ID",
-
-		"LEFT JOIN",
-		"(",
-		"  SELECT players.User_ID,",
-		"         COUNT(tests.Test_ID) AS NrTests,",
-		"         SUM(tests.Points) AS DefenderScore,",
-		"         SUM(tests.MutantsKilled) AS NrMutantsKilled",
-		"  FROM players, tests",
-		"  WHERE players.ID = tests.Player_ID",
-		"  GROUP BY players.User_ID",
-        ")",
-		"AS defenders ON users.User_ID = defenders.User_ID",
-
-		"LEFT JOIN",
-		"(",
-		"  SELECT players.User_ID,",
-		"         COUNT(*) AS NrGamesPlayed",
-		"  FROM players",
-		" GROUP BY players.User_ID",
-        ")",
-		"AS nr_games ON users.User_ID = nr_games.User_ID",
-
-		"WHERE users.User_ID > 2;");
-
-		List<UserDataDTO> userList = new ArrayList<>();
-		try {
-			stmt = DB.createPreparedStatement(conn, query);
-			ResultSet rs = stmt.executeQuery();
-			while (rs.next()) {
-				UserDataDTO u = new UserDataDTO();
-				u.setId(rs.getLong("ID"));
-				u.setUsername(rs.getString("Username"));
-				u.setAttackerScore(rs.getInt("AttackerScore"));
-				u.setDefenderScore(rs.getInt("DefenderScore"));
-				u.setTotalScore(rs.getInt("TotalScore"));
-				u.setGamesPlayed(rs.getInt("GamesPlayed"));
-				u.setMutantsSubmitted(rs.getInt("MutantsSubmitted"));
-				u.setMutantsAlive(rs.getInt("MutantsAlive"));
-				u.setMutantsEquivalent(rs.getInt("MutantsEquivalent"));
-				u.setTestsSubmitted(rs.getInt("TestsSubmitted"));
-				u.setMutantsKilled(rs.getInt("MutantsKilled"));
-				userList.add(u);
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-		return userList;
-	}
-
 	public static int getKillingTestIdForMutant(int mid) {
 		String query = "SELECT * FROM targetexecutions WHERE Target='TEST_MUTANT' AND Status!='SUCCESS' AND Mutant_ID=?;";
 		Connection conn = DB.getConnection();
@@ -1244,5 +1179,153 @@ public class DatabaseAccess {
 			DB.cleanup(conn, stmt);
 		}
 		return -1;
+	}
+
+	public static Boolean hasKillMap(int gameId) {
+		String query = String.join("\n",
+			"SELECT HasKillMap",
+			"FROM games",
+			"WHERE games.ID = ?"
+		);
+
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
+		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+
+		try {
+			if (rs.next()) {
+				return rs.getBoolean("HasKillMap");
+			}
+		} catch (SQLException e) {
+			logger.error("SQL exception caught", e);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+
+		return null;
+	}
+
+	public static boolean setHasKillMap(int gameId, boolean hasKillMap) {
+		String query = String.join("\n",
+			"UPDATE games",
+			"SET HasKillMap = ?",
+			"WHERE ID = ?;"
+		);
+
+		Connection conn = DB.getConnection();
+
+		DatabaseValue[] values = new DatabaseValue[]{
+			DB.getDBV(hasKillMap),
+			DB.getDBV(gameId)
+		};
+
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, values);
+
+		try {
+			return DB.executeUpdate(stmt, conn);
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+	}
+
+	public static List<KillMap.KillMapEntry> getKillMapEntries(PreparedStatement stmt, Connection conn, List<Test> tests, List<Mutant> mutants) {
+		try {
+			stmt.setFetchSize(Integer.MIN_VALUE);
+		} catch (SQLException e) {
+			logger.error("SQL Exception caught", e);
+			return null;
+		}
+
+		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+
+		List<KillMap.KillMapEntry> entries = new LinkedList<>();
+
+		/* Set up mapping from test id to test / mutant id to mutant. */
+		Map<Integer, Test> testMap = new HashMap<>();
+		Map<Integer, Mutant> mutantMap = new HashMap<>();
+		for (Test test : tests) { testMap.put(test.getId(), test); }
+		for (Mutant mutant : mutants) { mutantMap.put(mutant.getId(), mutant); }
+
+		try {
+			while (rs.next()) {
+				int testId = rs.getInt("Test_ID");
+				int mutantId = rs.getInt("Mutant_ID");
+				String status = rs.getString("Status");
+				entries.add(new KillMap.KillMapEntry(testMap.get(testId), mutantMap.get(mutantId), KillMap.KillMapEntry.Status.valueOf(status)));
+			}
+		} catch (SQLException e) {
+			logger.error("SQL exception caught", e);
+			return null;
+		} finally {
+			DB.cleanup(conn, stmt);
+		}
+
+		return entries;
+	}
+
+	public static List<KillMap.KillMapEntry> getKillMapEntriesForGame(int gameId) {
+		String query = String.join("\n",
+			"SELECT killmap.*",
+			"FROM killmap",
+			"WHERE killmap.Game_ID = ?"
+		);
+
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
+
+		List<Test> tests = DatabaseAccess.getTestsForGame(gameId);
+		List<Mutant> mutants = DatabaseAccess.getMutantsForGame(gameId);
+
+		return getKillMapEntries(stmt, conn, tests, mutants);
+	}
+
+	public static List<KillMap.KillMapEntry> getKillMapEntriesForClass(int classId) {
+		String query = String.join("\n",
+			"SELECT killmap.*",
+			"FROM killmap",
+			"WHERE killmap.Class_ID = ?"
+		);
+
+		Connection conn = DB.getConnection();
+		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(classId));
+
+		List<Test> tests = DatabaseAccess.getExecutableTestsForClass(classId);
+		List<Mutant> mutants = DatabaseAccess.getMutantsForClass(classId);
+
+		return getKillMapEntries(stmt, conn, tests, mutants);
+	}
+
+	public static boolean insertKillMapEntry(KillMap.KillMapEntry entry, int classId) {
+		String query = String.join("\n",
+			"INSERT INTO killmap (Class_ID,Game_ID,Test_ID,Mutant_ID,Status) VALUES (?,?,?,?,?)",
+			"ON DUPLICATE KEY UPDATE Status = VALUES(Status);"
+		);
+
+		Connection conn = DB.getConnection();
+
+		try {
+			PreparedStatement stmt = conn.prepareStatement(query);
+			stmt.setInt(1, classId);
+
+			if (entry.test.getGameId() == entry.mutant.getGameId()) {
+				stmt.setInt(2, entry.test.getGameId());
+			} else {
+				stmt.setNull(2, Types.INTEGER);
+			}
+
+			stmt.setInt(3, entry.test.getId());
+			stmt.setInt(4, entry.mutant.getId());
+			stmt.setString(5, entry.status.toString());
+
+
+			try {
+				return DB.executeUpdate(stmt, conn);
+			} finally {
+				DB.cleanup(conn, stmt);
+			}
+		} catch (SQLException e) {
+			logger.error("SQL exception caught", e);
+			return false;
+		}
 	}
 }

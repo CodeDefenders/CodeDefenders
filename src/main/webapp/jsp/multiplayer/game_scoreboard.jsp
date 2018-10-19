@@ -5,14 +5,14 @@
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%
 
-    HashMap mutantScores = mg.getMutantScores();
+    HashMap mutantScores = game.getMutantScores();
 
 
-    HashMap testScores = mg.getTestScores();
+    HashMap testScores = game.getTestScores();
 
-    int[] attackers = mg.getAttackerIds();
+    int[] attackers = game.getAttackerIds();
 
-    int[] defenders = mg.getDefenderIds();
+    int[] defenders = game.getDefenderIds();
 %>
 <div id="scoreboard" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
     <div class="modal-dialog">

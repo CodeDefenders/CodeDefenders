@@ -5,8 +5,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.GameClass;
-import org.codedefenders.game.multiplayer.CoverageGenerator;
-import org.codedefenders.game.multiplayer.LineCoverage;
+import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.util.Constants;
@@ -15,8 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +28,7 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 
 import static org.codedefenders.util.Constants.AI_DIR;
+import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.CUTS_DIR;
 import static org.codedefenders.util.Constants.F_SEP;
 import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
@@ -114,6 +114,7 @@ public class AntRunner {
 	 * @param t A {@link Test} object
 	 * @return A {@link TargetExecution} object
 	 */
+	@SuppressWarnings("Duplicates")
 	static TargetExecution testMutant(Mutant m, Test t) {
 		logger.info("Running test {} on mutant {}", t.getId(), m.getId());
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
@@ -143,6 +144,7 @@ public class AntRunner {
 		return newExec;
 	}
 
+	@SuppressWarnings("Duplicates")
 	static TargetExecution recompileTestAndTestMutant(Mutant m, Test t) {
 		logger.info("Running test {} on mutant {}", t.getId(), m.getId());
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
@@ -178,6 +180,17 @@ public class AntRunner {
 		return !(result.hasError() || result.hasFailure());
 	}
 
+	public static void testOriginal(GameClass cut, String testDir, String testClassName) throws Exception {
+		AntProcessResult result = runAntTarget("test-original", null, testDir, cut, testClassName, forceLocalExecution);
+
+		if (result.hasFailure() || result.hasError()) {
+			logger.error("Test {} failed to run against class under test", testClassName);
+			throw new Exception("Test failed to run against class under test.");
+		} else {
+		    logger.info("Successfully tested original ");
+		}
+	}
+
 	/**
 	 * Executes a test against the original code
 	 * @param dir Test directory
@@ -190,7 +203,8 @@ public class AntRunner {
 		AntProcessResult result = runAntTarget("test-original", null, dir.getAbsolutePath(), cut, t.getFullyQualifiedClassName(), forceLocalExecution);
 
 		// add coverage information
-		t.setLineCoverage(getLinesCovered(t, cut));
+		final LineCoverage coverage = LineCoverageGenerator.generate(cut, t);
+		t.setLineCoverage(coverage);
 		t.update();
 
 		// record test execution
@@ -217,7 +231,7 @@ public class AntRunner {
 	 * @param cut Class under test
 	 * @return The path to the compiled CUT
 	 */
-	public static String compileCUT(GameClass cut) throws CutCompileException {
+	public static String compileCUT(GameClass cut) throws CompileException {
 		AntProcessResult result = runAntTarget("compile-cut", null, null, cut, null, forceLocalExecution);
 
 		logger.info("Compile New CUT, Compilation result: {}", result);
@@ -236,7 +250,7 @@ public class AntRunner {
 			// Otherwise the CUT failed to compile
 			String message = result.getCompilerOutput();
 			logger.error("Failed to compile uploaded CUT: {}", message);
-			throw new CutCompileException( message );
+			throw new CompileException(message);
 		}
 		return pathCompiledClassName;
 	}
@@ -264,7 +278,7 @@ public class AntRunner {
 			// Create and insert a new target execution recording successful compile, with no message to report, and return its ID
 			// Locate .class file
 			final String compiledClassName = cut.getBaseName() + JAVA_CLASS_EXT;
-			LinkedList<File> matchingFiles = (LinkedList<File>) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
+			final LinkedList<File> matchingFiles = new LinkedList<>(FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter()));
 			assert (! matchingFiles.isEmpty()): "if compilation was successful, .class file must exist";
 			String cFile = matchingFiles.get(0).getAbsolutePath();
 			int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gameID);
@@ -307,7 +321,7 @@ public class AntRunner {
 			// Create and insert a new target execution recording successful compile, with no message to report, and return its ID
 			// Locate .class file
 			final String compiledClassName = FilenameUtils.getBaseName(jFile) + JAVA_CLASS_EXT;
-			LinkedList<File> matchingFiles = (LinkedList<File>) FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
+			final List<File> matchingFiles = new LinkedList<>(FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter()));
 			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
 			String cFile = matchingFiles.get(0).getAbsolutePath();
 			logger.info("Compiled test {}", compiledClassName);
@@ -374,22 +388,23 @@ public class AntRunner {
 		logger.info("Running Ant Target: {} with mFile: {} and tFile: {}", target, mutantDir, testDir);
 
 		ProcessBuilder pb = new ProcessBuilder();
-		Map env = pb.environment();
+		Map<String, String> env = pb.environment();
 		List<String> command = new ArrayList<>();
+		String cutDir = Paths.get(cut.getJavaFile()).getParent().toString();
 
-		/**
+		/*
 		 * Clustered execution uses almost the same command than normal
 		 * execution. But it prefixes that with "srun". This assumes that the
 		 * code-defender working dir is on the NFS.
 		 */
 
-		if (clusterEnabled & !forcedLocally) {
+		if (clusterEnabled && !forcedLocally) {
 			logger.info("Clustered Execution");
 			if (clusterJavaHome != null) {
 				env.put("JAVA_HOME", clusterJavaHome);
 			}
-			// Somehow ant requires the libs specified on the CLASSPATH env. Probably mocking lib and such shall be included as well.
-			env.put("CLASSPATH", "lib/hamcrest-all-1.3.jar"+File.pathSeparator+"lib/junit-4.12.jar"+File.pathSeparator+"lib/mockito-all-1.9.5.jar");
+
+			env.put("CLASSPATH", Constants.TEST_CLASSPATH);
 			//
 			command.add("srun");
 
@@ -425,11 +440,12 @@ public class AntRunner {
 		///
 		command.add("-Dmutant.file=" + mutantDir);
 		command.add("-Dtest.file=" + testDir);
-		command.add("-Dcut.dir=" + CUTS_DIR + F_SEP + cut.getAlias());
+		command.add("-Dcut.dir=" + cutDir);
 		command.add("-Dclassalias=" + cut.getAlias());
 		command.add("-Dclassbasename=" + cut.getBaseName());
 		command.add("-Dclassname=" + cut.getName());
 		command.add("-DtestClassname=" + testClassName);
+		command.add("-Dcuts.deps=" + cutDir + F_SEP + CUTS_DEPENDENCY_DIR);
 		//
 		if (mutantDir != null && testDir != null) {
 			String separator = F_SEP;
@@ -457,29 +473,6 @@ public class AntRunner {
 		logger.info("Executing Ant Command {} from directory {}", pb.command().toString(), buildFileDir);
 
 		return runAntProcess(pb);
-	}
-
-	/**
-	 * Executes a test against a mutant
-	 * @param t A {@link Test} object
-	 * @param c A {@link GameClass} object
-	 * @return A {@link TargetExecution} object
-	 */
-	private static LineCoverage getLinesCovered(Test t, GameClass c) {
-		CoverageGenerator cg = new CoverageGenerator(
-				new File(t.getDirectory()),
-				new File(Constants.CUTS_DIR + F_SEP + c.getAlias()));
-
-		try {
-			cg.create( c );
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		LineCoverage lc = new LineCoverage();
-		lc.setLinesCovered(cg.getLinesCovered());
-		lc.setLinesUncovered(cg.getLinesUncovered());
-		return lc;
 	}
 
 	private static AntProcessResult runAntProcess(ProcessBuilder pb) {

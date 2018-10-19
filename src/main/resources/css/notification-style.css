@@ -39,7 +39,7 @@
     min-width: 200px;
     font-family: 'Ubuntu', 'Open Sans', sans-serif;
     margin-top:0px;
-    margin-left: 3px;
+    margin-left: 30px;
     border: 2px solid lightgray;
 
 }
@@ -56,14 +56,13 @@
 }
 
 .mutantCUTImage, .CodeMirror .mutantCUTImage {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     background-size: contain;
     display: block;
     position: relative;
     float: left;
     display: flex;
-    margin-top: 0px;
 }
 
 .mutantCUTLegendDesc {

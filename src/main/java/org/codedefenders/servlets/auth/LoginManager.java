@@ -29,7 +29,6 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.EmailUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class LoginManager extends HttpServlet {
 
@@ -88,7 +87,7 @@ public class LoginManager extends HttpServlet {
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
 				} else {
-					User newUser = new User(username, password, email);
+					User newUser = new User(username, User.encodePassword(password), email);
 					if (newUser.insert()) {
 						HttpSession session = request.getSession();
 						session.setAttribute("uid", newUser.getId());
@@ -112,15 +111,14 @@ public class LoginManager extends HttpServlet {
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
 				} else {
-					String dbPassword = activeUser.getPassword();
-					BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+					String dbPassword = activeUser.getEncodedPassword();
 					boolean requireValidation = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.REQUIRE_MAIL_VALIDATION).getBoolValue();
 					if (requireValidation && !activeUser.isValidated()) {
 						messages.add("Account email is not validated.");
 						RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 						dispatcher.forward(request, response);
 					} else {
-						if (passwordEncoder.matches(password, dbPassword)) {
+						if (User.passwordMatches(password, dbPassword)) {
 						    if (activeUser.isActive()) {
 								HttpSession session = request.getSession();
 								// // Log user activity including the timestamp
@@ -185,7 +183,7 @@ public class LoginManager extends HttpServlet {
 						messages.add("Password not changed. Make sure it is valid.");
 					} else if (password.equals(confirm)) {
 						User user = DatabaseAccess.getUser(userId);
-						user.setPassword(password);
+						user.setEncodedPassword(User.encodePassword(password));
 						if (user.update()) {
 							DatabaseAccess.setPasswordResetSecret(user.getId(), null);
 							responseURL = request.getContextPath() + "/login";
@@ -295,7 +293,7 @@ public class LoginManager extends HttpServlet {
 	public static boolean validPassword(String password) {
 		// MIN_PASSWORD_LENGTH-10 alphanumeric characters (a-z, A-Z, 0-9) (no whitespaces)
 		int minLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();
-		String pattern = "^[a-zA-Z0-9]{" + minLength + ",20}$";
+		String pattern = "^[a-zA-Z0-9]{" + minLength + ",}$";
 		return password != null && password.matches(pattern);
 	}
 }

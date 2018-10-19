@@ -60,6 +60,7 @@ public class GameManager extends HttpServlet {
 	private static final Logger logger = LoggerFactory.getLogger(GameManager.class);
 
 	// Based on info provided, navigate to the correct view for the user
+	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
 		// Get the session information specific to the current user.
@@ -82,7 +83,7 @@ public class GameManager extends HttpServlet {
 
 		// If the game is finished, redirect to the score page.
 		if (activeGame.getAttackerId() == uid) {
-			List<Mutant> equivMutants = activeGame.getMutantsMarkedEquivalent();
+			List<Mutant> equivMutants = activeGame.getMutantsMarkedEquivalentPending();
 			if (equivMutants.isEmpty()) {
 				logger.info("Redirecting to attacker page");
 				List<Mutant> aliveMutants = activeGame.getAliveMutants();
@@ -95,6 +96,7 @@ public class GameManager extends HttpServlet {
 				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.ATTACKER_VIEW_JSP);
 				dispatcher.forward(request, response);
 			} else {
+				request.setAttribute("equivMutant", equivMutants.get(0));
 				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.RESOLVE_EQUIVALENCE_JSP);
 				dispatcher.forward(request, response);
 			}
@@ -107,9 +109,10 @@ public class GameManager extends HttpServlet {
 	}
 
 	// Based on the data provided, update information for the game
+	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-		ArrayList<String> messages = new ArrayList<String>();
+		ArrayList<String> messages = new ArrayList<>();
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
 
@@ -141,13 +144,13 @@ public class GameManager extends HttpServlet {
 						logger.warn("Swallow Exception", e);
 						messages.add(TEST_GENERIC_ERROR_MESSAGE);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect(request.getContextPath()+"/play");
+						response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 						return;
 					}
 					if (newTest == null) {
 						messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-						response.sendRedirect(request.getContextPath()+"/play");
+						response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 						return;
 					}
 
@@ -174,13 +177,13 @@ public class GameManager extends HttpServlet {
 									logger.info("Test {} failed to kill mutant {}", newTest.getId(), mutant.getId());
 									messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
 								}
-								response.sendRedirect(request.getContextPath()+"/play");
+								response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 								return;
 							} else {
 								activeGame.endRound();
 								activeGame.update();
 								messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
-								response.sendRedirect(request.getContextPath()+"/play");
+								response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 								return;
 							}
 						} else {
@@ -204,7 +207,7 @@ public class GameManager extends HttpServlet {
 						messages.add(MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 						activeGame.endRound();
 						activeGame.update();
-						response.sendRedirect(request.getContextPath()+"/play");
+						response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 						return;
 					}
 				}
@@ -332,7 +335,7 @@ public class GameManager extends HttpServlet {
 					logger.warn("Swallow Exception", e);
 					messages.add(TEST_GENERIC_ERROR_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect(request.getContextPath()+"/play");
+					response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 					return;
 				}
 
@@ -340,7 +343,7 @@ public class GameManager extends HttpServlet {
 				if (newTest == null) {
 					messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
-					response.sendRedirect(request.getContextPath()+"/play");
+					response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());
 					return;
 				}
 				logger.debug("New Test " + newTest.getId());
@@ -376,7 +379,7 @@ public class GameManager extends HttpServlet {
 				break;
 		}
 
-		response.sendRedirect(request.getContextPath()+"/play");//doGet(request, response);
+		response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());//doGet(request, response);
 	}
 
 	public static String getMutantValidityMessage(int cid, String mutatedCode, CodeValidator.CodeValidatorLevel codeValidatorLevel) throws IOException {
@@ -463,7 +466,7 @@ public class GameManager extends HttpServlet {
 				TargetExecution.Target.COMPILE_TEST);
 
 		// If the test did not compile we short circuit here. We shall not return null
-		if (compileTestTarget == null || ( compileTestTarget != null && ! compileTestTarget.status.equals("SUCCESS"))) {
+		if (compileTestTarget == null || !compileTestTarget.status.equals("SUCCESS")) {
 			return newTest;
 		}
 		
@@ -482,5 +485,4 @@ public class GameManager extends HttpServlet {
 	public static Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException, CodeValidatorException {
 		return createTest(gid, cid, testText, ownerId, subDirectory, DEFAULT_NB_ASSERTIONS);
 	}
-
 }

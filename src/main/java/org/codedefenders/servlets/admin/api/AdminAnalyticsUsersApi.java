@@ -11,6 +11,7 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang.time.DateUtils;
 import org.codedefenders.api.analytics.UserDataDTO;
+import org.codedefenders.database.ApiDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.servlets.util.Redirect;
 import org.slf4j.Logger;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,7 +39,24 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
      * The URL parameter {@code type} specifies the type of data to return:<br>
      * {@code type=json} will return JSON, {@code type=CSV} will return CSV.<br>
      * If {@code type} is not specified, JSON will be returned.
-     * <p></p>
+     */
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        String type = request.getParameter("type");
+        if (type == null) {
+            type = "json";
+        }
+
+        if (type.equalsIgnoreCase("json")) {
+            getJSON(request, response);
+        } else if (type.equalsIgnoreCase("csv")) {
+            getCSV(request, response);
+        } else {
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+        }
+    }
+
+    /**
+     * Returns a JSON file containing the user analytics data.<br>
      * The returned JSON will have the following format:<br>
      * <pre>
      * {
@@ -49,68 +68,64 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
      * }
      * </pre>
      */
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String type = request.getParameter("type");
-        if (type == null) {
-            type = "json";
-        }
+    private void getJSON(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
 
-        if (type.equalsIgnoreCase("csv")) {
-            response.setContentType("text/csv");
+        long timeStart = System.currentTimeMillis();
+        List<UserDataDTO> userData = ApiDAO.getAnalyticsUserData();
+        long timeEnd = System.currentTimeMillis();
 
-            List<UserDataDTO> users = DatabaseAccess.getAnalyticsUserData();
+        PrintWriter out = response.getWriter();
+        Gson gson = new Gson();
 
-            String[] header = new String[]{
-                "id",
-                "username",
-                "gamesPlayed",
-                "attackerScore",
-                "defenderScore",
-                "totalScore",
-                "mutantsSubmitted",
-                "mutantsAlive",
-                "mutantsEquivalent",
-                "testsSubmitted",
-                "mutantsKilled"
-            };
+        JsonObject root = new JsonObject();
+        root.add("timestamp", gson.toJsonTree(Instant.now().getEpochSecond()));
+        root.add("processingTime", gson.toJsonTree(timeEnd - timeStart));
+        root.add("data", gson.toJsonTree(userData));
 
-            PrintWriter out = response.getWriter();
-            CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(header));
+        out.print(gson.toJson(root));
+        out.flush();
+    }
 
-            for (UserDataDTO user : users) {
-                for(String column : header) {
-                    try {
-                        csvPrinter.print(PropertyUtils.getProperty(user, column));
-                    } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                        throw new RuntimeException(e);
-                    }
+    /**
+     * Returns a CSV file containing the user analytics data.
+     * The returned CSV will have a header.
+     */
+    private void getCSV(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("text/csv");
+
+        List<UserDataDTO> userData = ApiDAO.getAnalyticsUserData();
+
+        String[] columns = new String[]{
+            "id",
+            "username",
+            "gamesPlayed",
+            "attackerGamesPlayed",
+            "defenderGamesPlayed",
+            "attackerScore",
+            "defenderScore",
+            "mutantsSubmitted",
+            "mutantsAlive",
+            "mutantsEquivalent",
+            "testsSubmitted",
+            "mutantsKilled"
+        };
+
+        PrintWriter out = response.getWriter();
+        CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(columns));
+
+        for (UserDataDTO user : userData) {
+            for(String column : columns) {
+                try {
+                    csvPrinter.print(PropertyUtils.getProperty(user, column));
+                } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+                    throw new RuntimeException(e);
                 }
-                csvPrinter.println();
             }
-
-            csvPrinter.flush();
-
-        } else if (type.equalsIgnoreCase("json")) {
-            response.setContentType("application/json");
-
-            long timeStart = System.currentTimeMillis();
-            List<UserDataDTO> users = DatabaseAccess.getAnalyticsUserData();
-            long timeEnd = System.currentTimeMillis();
-
-            PrintWriter out = response.getWriter();
-            Gson gson = new Gson();
-
-            JsonObject root = new JsonObject();
-            root.add("timestamp", gson.toJsonTree(System.currentTimeMillis()));
-            root.add("processingTime", gson.toJsonTree(timeEnd - timeStart));
-            root.add("data", gson.toJsonTree(users));
-
-            out.print(gson.toJson(root));
-            out.flush();
-
-        } else {
-            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            csvPrinter.println();
         }
+
+        csvPrinter.flush();
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException { }

@@ -160,7 +160,7 @@ public class GameSelectionManager extends HttpServlet {
                         jGame.update();
                         // go to play view
                         session.setAttribute("gid", gameId);
-                        response.sendRedirect(contextPath+"/play");
+                        response.sendRedirect(contextPath+"/"+jGame.getClass().getSimpleName().toLowerCase());
                     }
                 } catch (Exception e) {
                     messages.add("There was a problem joining the game.");
@@ -180,7 +180,7 @@ public class GameSelectionManager extends HttpServlet {
                         if (eGame.getMode().equals(GameMode.UTESTING))
                             response.sendRedirect(contextPath+"/utesting");
                         else
-                            response.sendRedirect(contextPath+"/play");
+                            response.sendRedirect(contextPath+"/"+eGame.getClass().getSimpleName().toLowerCase());
                     } else {
                         Redirect.redirectBack(request, response);
                     }
