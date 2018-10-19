@@ -336,6 +336,14 @@ public class Mutant implements Serializable {
 			List<String> mutantLines =
 					readLinesIfFileExist(mutantFile.toPath());
 
+			for (int l = 0; l < sutLines.size(); l++){
+				sutLines.set(l, sutLines.get(l).replaceAll("\\s", ""));
+			}
+
+			for (int l = 0; l < mutantLines.size(); l++){
+				mutantLines.set(l, mutantLines.get(l).replaceAll("\\s", ""));
+			}
+
 			difference = DiffUtils.diff(sutLines, mutantLines);
 		}
 		return difference;

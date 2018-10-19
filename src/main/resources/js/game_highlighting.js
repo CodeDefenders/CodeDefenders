@@ -263,22 +263,17 @@ var mutantLine = function (superDiv, showEquivalenceButton, gameType) {
 
         if (killedMutants > 0){
             icon += '<span class="mutantCUTImage mutantImageKilled"><span>' + killedMutants + '</span></span>';
-            codemirror.indentLine(lineNum-1, 1);
-            // icon += '<img src="images/mutantKilled.png" alt="\' + quant + \' mutants on line \' + lineNum + \'" width="20" />';
         }
 
         if (equivalentMutants > 0){
-            codemirror.indentLine(lineNum-1, 1);
             icon += '<span class="mutantCUTImage mutantImageEquiv"><span>' + equivalentMutants + '</span></span>';
         }
 
         if (flaggedMutants > 0){
-            codemirror.indentLine(lineNum-1, 1);
             icon += '<span class="mutantCUTImage mutantImageFlagged"><span>' + flaggedMutants + '</span></span>';
         }
 
         if (aliveMutants > 0){
-            codemirror.indentLine(lineNum-1, 1);
             icon += '<span class="mutantCUTImage mutantImageAlive"><span>' + aliveMutants + '</span></span>';
         }
 
@@ -356,6 +351,33 @@ var mutantLine = function (superDiv, showEquivalenceButton, gameType) {
             }
         );
     }
+
+    //codemirror.setIndentUnit(4)
+
+    codemirror.setSelection({
+            'line':codemirror.firstLine(),
+            'ch':0,
+            'sticky':null
+        },{
+            'line':codemirror.lastLine(),
+            'ch':1,
+            'sticky':null
+        },
+        {scroll: false});
+
+    codemirror.execCommand("indentAuto")
+    codemirror.execCommand("indentMore")
+
+    codemirror.setSelection({
+            'line':0,
+            'ch':0,
+            'sticky':null
+        },{
+            'line':0,
+            'ch':0,
+            'sticky':null
+        },
+        {scroll: false});
 
     $(".mutantCUTImage.mutantImageAlive").hover(createPopupFunction('alive'), function(){});
     $(".mutantCUTImage.mutantImageKilled").hover(createPopupFunction('killed'), function(){});
