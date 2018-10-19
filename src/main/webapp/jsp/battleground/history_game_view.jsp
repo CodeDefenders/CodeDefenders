@@ -46,8 +46,8 @@
 
     MultiplayerGame game = DatabaseAccess.getMultiplayerGame(gameId);
 
-    if ((!game.getState().equals(GameState.FINISHED))) {
-        response.sendRedirect(request.getContextPath()+"/games/user");
+    if (game == null || game.getState() != GameState.FINISHED) {
+        response.sendRedirect(request.getContextPath() + "/games/user");
     }
 
     int uid = ((Integer) session.getAttribute("uid"));
@@ -87,10 +87,10 @@
     // request.setAttribute("gameType", "PARTY");
 %>
 
-<%@ include file="/jsp/multiplayer/header_game.jsp" %>
+<%@ include file="/jsp/battleground/header_game.jsp" %>
 <%@ include file="/jsp/scoring_tooltip.jsp" %>
 <%@ include file="/jsp/playerFeedback.jsp" %>
-<%@ include file="/jsp/multiplayer/game_scoreboard.jsp" %>
+<%@ include file="/jsp/battleground/game_scoreboard.jsp" %>
 
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6">
@@ -115,4 +115,4 @@
 
 <% } %>
 
-<%@ include file="/jsp/multiplayer/footer_game.jsp" %>
+<%@ include file="/jsp/battleground/footer_game.jsp" %>

@@ -295,7 +295,7 @@
 
 	<servlet>
 		<servlet-name>multiplayerGameUser</servlet-name>
-		<jsp-file>/jsp/multiplayer/user_games_view.jsp</jsp-file>	</servlet>
+		<jsp-file>/jsp/battleground/user_games_view.jsp</jsp-file>	</servlet>
 	<servlet-mapping>
 		<servlet-name>multiplayerGameUser</servlet-name>
 		<url-pattern>/multiplayer/games/user</url-pattern>
@@ -303,7 +303,7 @@
 
 	<servlet>
 		<servlet-name>multiplayerGame</servlet-name>
-		<jsp-file>/jsp/multiplayer/game_view.jsp</jsp-file>	</servlet>
+		<jsp-file>/jsp/battleground/game_view.jsp</jsp-file>	</servlet>
 	<servlet-mapping>
 		<servlet-name>multiplayerGame</servlet-name>
 		<url-pattern>/multiplayer/play</url-pattern>
@@ -311,7 +311,7 @@
 
 	<servlet>
 		<servlet-name>multiplayerHistoryGame</servlet-name>
-		<jsp-file>/jsp/multiplayer/history_game_view.jsp</jsp-file>	</servlet>
+		<jsp-file>/jsp/battleground/history_game_view.jsp</jsp-file>	</servlet>
 	<servlet-mapping>
 		<servlet-name>multiplayerHistoryGame</servlet-name>
 		<url-pattern>/multiplayer/history</url-pattern>
@@ -319,7 +319,7 @@
 
 	<servlet>
 		<servlet-name>multiplayerGameView</servlet-name>
-		<jsp-file>/jsp/multiplayer/create_game_view.jsp</jsp-file>
+		<jsp-file>/jsp/battleground/create_game_view.jsp</jsp-file>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>multiplayerGameView</servlet-name>
