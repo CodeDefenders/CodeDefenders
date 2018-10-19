@@ -6,6 +6,9 @@
 <% String pageTitle = "Attacking Class"; %>
 <%@ include file="/jsp/header_main.jsp"%>
 
+</div></div></div></div></div>
+<div class="game-container">
+
 <% { %>
 
 <%-- Set request attributes for the components. --%>
@@ -46,7 +49,7 @@
 %>
 
 
-<div class="row">
+<div class="row" style="padding: 0px 15px;">
     <div class="col-md-6">
         <div id="mutants-div">
             <h3>Mutants</h3>
