@@ -111,14 +111,17 @@ public class Constants {
 	public static final String GRACE_PERIOD_MESSAGE = "Game is now in grace period.";
 
 	public static final String LOGIN_VIEW_JSP = "jsp" + F_SEP + "login_view.jsp";
-	public static final String RESOLVE_EQUIVALENCE_JSP = "jsp" + F_SEP + "equivalence_view.jsp";
-	public static final String ATTACKER_VIEW_JSP = "jsp" + F_SEP + "attacker_view.jsp";
-	public static final String DEFENDER_VIEW_JSP = "jsp" + F_SEP + "defender_view.jsp";
-	public static final String PUZZLEGAME_VIEW_JSP = "/jsp" + F_SEP + "puzzlegame.jsp";
-	public static final String PUZZLEGAME_ATTACKER_VIEW_JSP = "/jsp" + F_SEP + "singleplayer_attacker_view.jsp";
-	public static final String PUZZLEGAME_DEFENDER_VIEW_JSP = "/jsp" + F_SEP + "singleplayer_defender_view.jsp";
 	public static final String SCORE_VIEW_JSP = "jsp" + F_SEP + "score_view.jsp";
 	public static final String UTESTING_VIEW_JSP = "jsp" + F_SEP + "utesting_view.jsp";
+
+	public static final String DUEL_RESOLVE_EQUIVALENCE_JSP = "jsp/duel/equivalence_view.jsp";
+	public static final String DUEL_ATTACKER_VIEW_JSP = "jsp/duel/attacker_view.jsp";
+	public static final String DUEL_DEFENDER_VIEW_JSP = "jsp/duel/defender_view.jsp";
+
+	public static final String PUZZLE_OVERVIEW_PATH = "/puzzles";
+	public static final String PUZZLE_GAME_PATH = "/puzzlegame";
+	public static final String PUZZLE_GAME_SELECTION_PATH = "/puzzle/games";
+
 	public static final String ADMIN_USER_JSP = "/jsp" + F_SEP + "admin_user_mgmt.jsp";
 	public static final String ADMIN_GAMES_JSP = "/jsp" + F_SEP + "admin_create_games.jsp";
 	public static final String ADMIN_SETTINGS_JSP = "/jsp" + F_SEP + "admin_system_settings.jsp";
@@ -128,10 +131,6 @@ public class Constants {
 	public static final String ADMIN_ANALYTICS_KILLMAP_JSP = "/jsp" + F_SEP + "admin_analytics_killmaps.jsp";
 
 	public static final String NOTIFICATIONS = "/notifications";
-
-	public static final String PUZZLE_OVERVIEW_PATH = "/puzzles";
-	public static final String PUZZLE_GAME_PATH = "/puzzlegame";
-	public static final String PUZZLE_GAME_SELECTION_PATH = "/puzzle/games";
 
 	public static final String ADMIN_ANALYTICS_USERS = "/admin/analytics/users";
 	public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";
@@ -173,7 +172,7 @@ public class Constants {
 	public static final String MUTANT_SUBMITTED_MESSAGE = "Mutant submitted, may the force be with it.";
 	public static final String MUTANT_ALIVE_1_MESSAGE = "Cool, your mutant survived its first test.";
 	public static final String MUTANT_ALIVE_N_MESSAGE = "Awesome, your mutant survived %d tests!"; // number of tests that covered mutant
-	// JSP
+
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_TEST = "previousTest";
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_MUTANT = "previousMutant";
 

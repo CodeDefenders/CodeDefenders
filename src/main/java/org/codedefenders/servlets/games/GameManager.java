@@ -122,16 +122,16 @@ public class GameManager extends HttpServlet {
 					activeGame.update();
 				}
 				// If no mutants needed to be proved non-equivalent, direct to the Attacker Page.
-				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.ATTACKER_VIEW_JSP);
+				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.DUEL_ATTACKER_VIEW_JSP);
 				dispatcher.forward(request, response);
 			} else {
 				request.setAttribute("equivMutant", equivMutants.get(0));
-				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.RESOLVE_EQUIVALENCE_JSP);
+				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.DUEL_RESOLVE_EQUIVALENCE_JSP);
 				dispatcher.forward(request, response);
 			}
 		} else {
 			// Direct to the Defender Page.
-			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.DEFENDER_VIEW_JSP);
+			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.DUEL_DEFENDER_VIEW_JSP);
 			dispatcher.forward(request, response);
 		}// else
 //		Redirect.redirectBack(request, response);
@@ -411,7 +411,8 @@ public class GameManager extends HttpServlet {
 		response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());//doGet(request, response);
 	}
 
-	static Mutant existingMutant(int gid, String mutatedCode) throws IOException {
+	// TODO Phil 13/12/18: extract to utility class
+	public static Mutant existingMutant(int gid, String mutatedCode) throws IOException {
 		String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
 
 		// return the mutant in the game with same MD5 if it exists; return null otherwise

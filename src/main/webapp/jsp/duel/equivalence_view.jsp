@@ -68,12 +68,12 @@
 %>
 
 <% if (game.getState() == GameState.FINISHED) { %>
-    <%@include file="game_components/finished_modal.jsp"%>
+    <%@include file="../game_components/finished_modal.jsp"%>
 <% } %>
 
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6" id="equivmut-div">
-        <%@include file="game_components/test_progress_bar.jsp"%>
+        <%@include file="../game_components/test_progress_bar.jsp"%>
         <h3>Mutant <%= equivMutant.getId() %> Claimed Equivalent</h3>
 
         <div style="border: 5px dashed #f00; border-radius: 10px; width: 100%; padding: 10px;">
@@ -104,7 +104,7 @@
                 <input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= equivMutant.getId() %>">
                 <input type="hidden" name="formType" value="resolveEquivalence">
 
-                <%@include file="game_components/test_editor.jsp"%>
+                <%@include file="../game_components/test_editor.jsp"%>
 
                 <button class="btn btn-danger btn-left" name="acceptEquivalent" type="submit" onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');">Accept Equivalence</button>
                 <button class="btn btn-primary btn-game btn-right" name="rejectEquivalent" type="submit" onclick="progressBar(); return true;">Submit Killing Test</button>
@@ -114,9 +114,9 @@
 
     <div class="col-md-6" id="cut-div">
         <h3>Class Under Test</h3>
-        <%@include file="game_components/class_viewer.jsp"%>
-        <%@include file="game_components/game_highlighting.jsp"%>
-        <%@include file="game_components/mutant_explanation.jsp"%>
+        <%@include file="../game_components/class_viewer.jsp"%>
+        <%@include file="../game_components/game_highlighting.jsp"%>
+        <%@include file="../game_components/mutant_explanation.jsp"%>
     </div>
 </div>
 

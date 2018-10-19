@@ -171,7 +171,7 @@
 
 	<servlet>
 		<servlet-name>create_game_view.jsp</servlet-name>
-		<jsp-file>/jsp/create_game_view.jsp</jsp-file>
+		<jsp-file>/jsp/duel/create_game_view.jsp</jsp-file>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>create_game_view.jsp</servlet-name>

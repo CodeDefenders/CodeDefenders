@@ -1,8 +1,8 @@
 package org.codedefenders.servlets.games.puzzle;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.PuzzleDAO;
+import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameMode;
@@ -15,8 +15,10 @@ import org.codedefenders.game.puzzle.solving.MutantSolvingStrategy;
 import org.codedefenders.game.puzzle.solving.TestSolvingStrategy;
 import org.codedefenders.servlets.games.GameManager;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.validation.CodeValidator;
-import org.codedefenders.validation.CodeValidatorException;
+import org.codedefenders.validation.code.CodeValidator;
+import org.codedefenders.validation.code.CodeValidatorException;
+import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,12 +40,11 @@ import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
 import static org.codedefenders.util.Constants.PUZZLEGAME_ATTACKER_VIEW_JSP;
 import static org.codedefenders.util.Constants.PUZZLEGAME_DEFENDER_VIEW_JSP;
+import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
 import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
 import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
-import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
@@ -215,8 +216,8 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        final TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
-        if (!compileTestTarget.status.equals("SUCCESS")) {
+        final TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+        if (!compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
             messages.add(StringEscapeUtils.escapeHtml(compileTestTarget.message));
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -224,8 +225,8 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        final TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
-        if (!testOriginalTarget.status.equals("SUCCESS")) {
+        final TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+        if (!testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
             messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
             messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -313,23 +314,23 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        final CodeValidator.CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
+        final CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
 
         final ArrayList<String> messages = new ArrayList<>();
         session.setAttribute("messages", messages);
 
-        final String validityMessage = GameManager.getMutantValidityMessage(game.getClassId(), mutantText, mutantValidatorLevel);
-        if (!validityMessage.equals(MUTANT_VALIDATION_SUCCESS_MESSAGE)) {
+        ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getAsString(), mutantText, mutantValidatorLevel);
+        if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
             // Mutant is either the same as the CUT or it contains invalid code
-            messages.add(validityMessage);
+            messages.add(validationMessage.get());
             Redirect.redirectBack(request, response);
             return;
         }
         final Mutant existingMutant = GameManager.existingMutant(gameId, mutantText);
         if (existingMutant != null) {
             messages.add(MUTANT_DUPLICATED_MESSAGE);
-            TargetExecution existingMutantTarget = DatabaseAccess.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
-            if (existingMutantTarget != null && !existingMutantTarget.status.equals("SUCCESS")
+            TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
+            if (existingMutantTarget != null && !existingMutantTarget.status.equals(TargetExecution.Status.SUCCESS)
                     && existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
                 messages.add(existingMutantTarget.message);
             }
@@ -346,8 +347,8 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        final TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
-        if (compileMutantTarget == null || !compileMutantTarget.status.equals("SUCCESS")) {
+        final TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
+        if (compileMutantTarget == null || !compileMutantTarget.status.equals(TargetExecution.Status.SUCCESS)) {
             messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
             if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty()) {
                 messages.add(compileMutantTarget.message);
