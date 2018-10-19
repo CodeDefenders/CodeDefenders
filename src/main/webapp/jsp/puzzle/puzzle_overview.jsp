@@ -33,16 +33,8 @@
         <tr>
             <td>Statement Coverage</td>
             <td>
-                <form method="post" action="${pageContext.request.contextPath}/puzzle/games">
-                    <input type="hidden" name="formType" value="createGame">
-                    <input type="hidden" name="puzzleId" value="1">
-                    <button type="submit" class="btn btn-xs" >Defender view</button>
-                </form>
-                <form method="post" action="${pageContext.request.contextPath}/puzzle/games">
-                    <input type="hidden" name="formType" value="createGame">
-                    <input type="hidden" name="puzzleId" value="2">
-                    <button type="submit" class="btn btn-xs" >Attacker view</button>
-                </form>
+                <a class="btn btn-xs" href="${pageContext.request.contextPath}/puzzlegame?puzzleId=1">1</a>
+                <a class="btn btn-xs" href="${pageContext.request.contextPath}/puzzlegame?puzzleId=2">2</a>
                 <p class="glyphicon glyphicon-lock"></p>
                 <p class="glyphicon glyphicon-lock"></p>
             </td>

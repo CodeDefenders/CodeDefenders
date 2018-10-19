@@ -35,6 +35,7 @@ import javax.servlet.http.HttpSession;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.codedefenders.servlets.util.GameServletUtils.getGameId;
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
 import static org.codedefenders.util.Constants.MODE_PUZZLE_DIR;
 import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
@@ -68,26 +69,39 @@ public class PuzzleGameManager extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final HttpSession session = request.getSession();
+        final int userId = ((Integer) session.getAttribute("uid"));
+
+        final PuzzleGame game;
 
         final Integer gameId = getGameId(request);
-        if (gameId == null) {
-            logger.error("Cannot retrieve puzzle game page. Failed to retrieve gameId from request.");
-            response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
-            return;
-        }
+        boolean fromGameId = gameId != null; // else from puzzleId
+        if (fromGameId) {
+            game = PuzzleDAO.getPuzzleGameForId(gameId);
 
-        final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
-        if (game == null) {
-            logger.error("Cannot retrieve puzzle game page. Failed to retrieve puzzle game from database for gameId: {}.", gameId);
-            response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
-            return;
-        }
+            if (game == null) {
+                logger.error("Cannot retrieve puzzle game page. Failed to retrieve puzzle game from database for gameId: {}.", gameId);
+                response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
+                return;
+            }
+            if (game.getCreatorId() != userId) {
+                logger.error("Cannot retrieve puzzle game page. User {} is not creator of the requested game: {}.", userId, gameId);
+                response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
+                return;
+            }
+        } else {
+            final Integer puzzleId = getIntParameter(request, "puzzleId");
+            if (puzzleId == null) {
+                logger.error("Cannot retrieve puzzle game page. Failed to retrieve gameId and puzzleId from request.");
+                response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
+                return;
+            }
+            game = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, userId);
 
-        final int userId = ((Integer) session.getAttribute("uid"));
-        if (game.getCreatorId() != userId) {
-            logger.error("Cannot retrieve puzzle game page. User {} is not creator of the requested game: {}.", userId, gameId);
-            response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
-            return;
+            if (game == null) {
+                logger.info("Failed to retrieve puzzle game from database. Creating game for puzzleId {} and userId {}", puzzleId, userId);
+                PuzzleGameSelectionManager.createGame(request, response);
+                return;
+            }
         }
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
@@ -146,7 +160,7 @@ public class PuzzleGameManager extends HttpServlet {
      * @throws IOException when redirecting fails.
      */
     @SuppressWarnings("Duplicates")
-    private void createTest(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+    private static void createTest(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
         final int userId = ((Integer) session.getAttribute("uid"));
         final Integer gameId = getGameId(request);
         if (gameId == null) {
@@ -263,7 +277,7 @@ public class PuzzleGameManager extends HttpServlet {
      * @param session  the session of the requesting user.
      * @throws IOException when redirecting fails.
      */
-    private void createMutant(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+    private static void createMutant(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
         final int userId = ((Integer) session.getAttribute("uid"));
         final Integer gameId = getGameId(request);
         if (gameId == null) {

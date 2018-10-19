@@ -73,7 +73,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
      * @param response the response to the request.
      * @throws IOException when redirecting fails.
      */
-    private void createGame(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    static void createGame(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final HttpSession session = request.getSession();
         final int userId = ((Integer) session.getAttribute("uid"));
 
@@ -118,7 +118,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
      * @param response the response to the request.
      * @throws IOException when redirecting fails.
      */
-    private void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    private static void endGame(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final HttpSession session = request.getSession();
         final int userId = ((Integer) session.getAttribute("uid"));
 
