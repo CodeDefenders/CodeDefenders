@@ -11,12 +11,12 @@ import java.util.List;
  */
 public class CoverageScorer extends Scorer {
     @Override
-    protected int scoreTest(MultiplayerGame g, Test t, List<Mutant> killed) {
-        return (g.getDefenderValue() + killed.size()) * t.getLineCoverage().getLinesCovered().size();
+    protected int scoreTest(MultiplayerGame game, Test test, List<Mutant> killedMutants) {
+        return (game.getDefenderValue() + killedMutants.size()) * test.getLineCoverage().getLinesCovered().size();
     }
 
     @Override
-    protected int scoreMutant(MultiplayerGame g, Mutant m, List<Test> passed) {
-        return (g.getAttackerValue() + passed.size());
+    protected int scoreMutant(MultiplayerGame game, Mutant mutant, List<Test> passedTests) {
+        return (game.getAttackerValue() + passedTests.size());
     }
 }

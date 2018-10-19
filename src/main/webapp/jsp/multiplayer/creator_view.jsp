@@ -1,76 +1,74 @@
+<% { %>
+
+<%-- Set request attributes for the components. --%>
 <%
-    codeDivName = "cut-div";
+	/* class_viewer */
+	request.setAttribute("classCode", game.getCUT().getAsString());
+
+	/* test_carousel */
+	request.setAttribute("tests", game.getTests());
+
+	/* mutants_list */
+	request.setAttribute("mutantsAlive", game.getAliveMutants());
+	request.setAttribute("mutantsKilled", game.getKilledMutants());
+	request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
+	request.setAttribute("markEquivalent", false);
+	request.setAttribute("markUncoveredEquivalent", false);
+	request.setAttribute("viewDiff", true);
+	request.setAttribute("gameType", "PARTY");
+
+	/* game_highlighting */
+	request.setAttribute("codeDivSelector", "#cut-div");
+	// request.setAttribute("tests", game.getTests());
+	request.setAttribute("mutants", game.getMutants());
+	request.setAttribute("showEquivalenceButton", false);
+	// request.setAttribute("gameType", "PARTY");
+
+	/* mutant_explanation */
+	request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 %>
-<div class="crow">
-    <div class="w-45 up">
-    <%@include file="/jsp/multiplayer/game_mutants.jsp"%>
-    <%@include file="/jsp/multiplayer/game_unit_tests.jsp"%>
-    </div>
-    <div class="w-55"  id="cut-div">
 
-        <h2>Class Under Test</h2>
-		<pre class="readonly-pre"><textarea class="readonly-textarea" id="sut" name="cut" cols="80" rows="30">
-<%=mg.getCUT().getAsString()%>
-		</textarea></pre>
+</div> <%-- TODO move the whole div here after changing the header --%>
 
-        <div class="admin-panel">
-            <h2>Admin</h2>
-            <form id="adminEndBtn" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
-
-                    <button type="submit" class="btn btn-primary btn-game btn-right" id="endGame" form="adminEndBtn"
-                            <% if (!mg.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>
-                        End Game
-                    </button>
-                    <input type="hidden" name="formType" value="endGame">
-                    <input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
-            </form>
-            <form id="adminStartBtn" action="<%=request.getContextPath() %>/multiplayer/move" method="post">
-                    <button type="submit" class="btn btn-primary btn-game btn-right" id="startGame" form="adminStartBtn"
-                            <% if (!mg.getState().equals(GameState.CREATED)) { %> disabled <% } %>>
-                        Start Game
-                    </button>
-                    <input type="hidden" name="formType" value="startGame">
-                    <input type="hidden" name="mpGameID" value="<%= mg.getId() %>" />
-            </form>
-        </div>
-    </div>
-    <div>
-        <script>
-            var editorSUT = CodeMirror.fromTextArea(document.getElementById("sut"), {
-                lineNumbers: true,
-                matchBrackets: true,
-                mode: "text/x-java",
-                readOnly: true
-            });
-            editorSUT.setSize("100%", 500);
-
-            /* Submitted tests */
-            var x = document.getElementsByClassName("utest");
-            var i;
-            for (i = 0; i < x.length; i++) {
-                CodeMirror.fromTextArea(x[i], {
-                    lineNumbers: true,
-                    matchBrackets: true,
-                    mode: "text/x-java",
-                    readOnly: true
-                });
-            }
-            /* Mutants diffs */
-            $('.modal').on('shown.bs.modal', function() {
-                var codeMirrorContainer = $(this).find(".CodeMirror")[0];
-                if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-                    codeMirrorContainer.CodeMirror.refresh();
-                } else {
-                    var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
-                        lineNumbers: false,
-                        mode: "diff",
-                        readOnly: true /* onCursorActivity: null */
-                    });
-                    editorDiff.setSize("100%", 500);
-                }
-            });
-
-            $('#finishedModal').modal('show');
-        </script>
-    </div>
+<div class="admin-panel">
+	<h2>Admin</h2>
+	<form id="adminEndBtn" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post" style="display: inline-block;">
+		<button type="submit" class="btn btn-primary btn-game btn-left" id="endGame" form="adminEndBtn"
+				<% if (!game.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>
+			End Game
+		</button>
+		<input type="hidden" name="formType" value="endGame">
+		<input type="hidden" name="mpGameID" value="<%= game.getId() %>" />
+	</form>
+	<form id="adminStartBtn" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post" style="display: inline-block;">
+		<button type="submit" class="btn btn-primary btn-game" id="startGame" form="adminStartBtn"
+				<% if (!game.getState().equals(GameState.CREATED)) { %> disabled <% } %>>
+			Start Game
+		</button>
+		<input type="hidden" name="formType" value="startGame">
+		<input type="hidden" name="mpGameID" value="<%= game.getId() %>" />
+	</form>
 </div>
+
+<div class="row" style="padding: 0px 15px;">
+	<div class="col-md-6">
+		<div id="mutants-div">
+			<h3>Existing Mutants</h3>
+			<%@include file="../game_components/mutants_list.jsp"%>
+		</div>
+
+		<div id="tests-div">
+			<h3>JUnit tests </h3>
+			<%@include file="../game_components/tests_carousel.jsp"%>
+		</div>
+	</div>
+
+	<div class="col-md-6" id="cut-div">
+		<h3>Class Under Test</h3>
+		<%@include file="../game_components/class_viewer.jsp"%>
+		<%@ include file="../game_components/game_highlighting.jsp" %>
+		<%@include file="../game_components/mutant_explanation.jsp"%>
+	</div>
+</div>
+
+<% } %>

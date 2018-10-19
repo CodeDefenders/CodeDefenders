@@ -1,31 +1,33 @@
 package org.codedefenders.game.scoring;
 
+import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.game.Mutant;
 
 import java.util.List;
 
 /**
- * Created by thoma on 23/06/2016.
+ * This class offers an interface for Scoring classes, which calculate the scores of a mutant or test.
+ * <p>
+ * This class also offers static methods, which call the {@link SizeScorer} implementation.
  */
 public abstract class Scorer {
 
-    private static Scorer scorer = new SizeScorer();
+    protected abstract int scoreTest(MultiplayerGame game, Test test, List<Mutant> killedMutants);
 
-    protected abstract int scoreTest(MultiplayerGame g, Test t, List<Mutant> killed);
+    protected abstract int scoreMutant(MultiplayerGame game, Mutant mutant, List<Test> passedTests);
 
-    protected abstract int scoreMutant(MultiplayerGame g, Mutant m, List<Test> passed);
-
-    public static int score(MultiplayerGame g, Test t, List<Mutant> killed){
-        return scorer.scoreTest(g, t, killed);
+    /**
+     * Calls {@link SizeScorer#score(MultiplayerGame, Test, List)} for a new {@link SizeScorer} instance.
+     */
+    public static int score(MultiplayerGame game, Test test, List<Mutant> killedMutants) {
+        return new SizeScorer().scoreTest(game, test, killedMutants);
     }
 
-    public static void setScorer(Scorer s){
-        scorer = s;
-    }
-
-    public static int score(MultiplayerGame g, Mutant m, List<Test> passed){
-        return scorer.scoreMutant(g, m, passed);
+    /**
+     * Calls {@link SizeScorer#score(MultiplayerGame, Mutant, List)} for a new {@link SizeScorer} instance.
+     */
+    public static int score(MultiplayerGame game, Mutant mutant, List<Test> passedTests) {
+        return new SizeScorer().scoreMutant(game, mutant, passedTests);
     }
 }

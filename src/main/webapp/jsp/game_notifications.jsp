@@ -154,7 +154,7 @@
 </script>
 
 
-<%if(mg.isChatEnabled()) {%>
+<%if(game.isChatEnabled()) {%>
 <div id="game-notification-bar" class="min<%
 if (role.equals(Role.CREATOR)) { %> creator<% } %>">
 <a id="notification-show-bar"><span>(<span

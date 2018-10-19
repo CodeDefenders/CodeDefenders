@@ -1,5 +1,6 @@
 package org.codedefenders.util;
 
+import java.io.File;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -13,7 +14,7 @@ public class Constants {
 
 	public static final String F_SEP = System.getProperty("file.separator");
 
-	public static String DATA_DIR;
+	public static final String DATA_DIR;
 
 	static {
 		// First check the Web abb context
@@ -47,13 +48,32 @@ public class Constants {
 	}
 
 	// Configuration variable names
-	public static String BLOCK_ATTACKER = "block.attacker";
+	public static final String BLOCK_ATTACKER = "block.attacker";
+
+	// Dummy user IDs
+	public static final int DUMMY_ATTACKER_USER_ID = 3;
+	public static final int DUMMY_DEFENDER_USER_ID = 4;
 
 	//public static String DATA_DIR    = F_SEP + "WEB-INF" + F_SEP + "data";
-	public static String CUTS_DIR = DATA_DIR + F_SEP + "sources";
+	public static final String CUTS_DIR = DATA_DIR + F_SEP + "sources";
+	// dependencies, mutants and tests subdirectories for CUTs
+	public static final String CUTS_DEPENDENCY_DIR = "dependencies";
+	public static final String CUTS_MUTANTS_DIR = "mutants";
+	public static final String CUTS_TESTS_DIR = "tests";
+
+	// FIXME Phil: MUTANTS_DIR should be final.
 	public static String MUTANTS_DIR = DATA_DIR + F_SEP + "mutants";
-	public static String TESTS_DIR = DATA_DIR + F_SEP + "tests";
-	public static String AI_DIR = DATA_DIR + F_SEP + "ai";
+	public static final String TESTS_DIR = DATA_DIR + F_SEP + "tests";
+	public static final String AI_DIR = DATA_DIR + F_SEP + "ai";
+
+	public static final String LIB_JUNIT = DATA_DIR + F_SEP + "lib" + F_SEP + "junit-4.12.jar";
+	public static final String LIB_HAMCREST = DATA_DIR + F_SEP + "lib" + F_SEP + "hamcrest-all-1.3.jar";
+	public static final String LIB_MOCKITO = DATA_DIR + F_SEP + "lib" + F_SEP + "mockito-all-1.9.5.jar";
+
+	public static final String TEST_CLASSPATH = Constants.LIB_JUNIT + File.pathSeparatorChar + Constants.LIB_HAMCREST + File.pathSeparatorChar + Constants.LIB_MOCKITO;
+    public static final String TEST_CLASSPATH_WITH_DIR = TEST_CLASSPATH + File.pathSeparatorChar + "%s";
+	public static final String TEST_CLASSPATH_WITH_2DIR = TEST_CLASSPATH_WITH_DIR + File.pathSeparatorChar + "%s";
+
 
 	public static final String TEST_PREFIX = "Test";
 	public static final String JAVA_SOURCE_EXT = ".java";
@@ -64,7 +84,7 @@ public class Constants {
 	public static final String GRACE_PERIOD_MESSAGE = "Game is now in grace period.";
 
 	public static final String LOGIN_VIEW_JSP = "jsp" + F_SEP + "login_view.jsp";
-	public static final String RESOLVE_EQUIVALENCE_JSP = "jsp" + F_SEP + "resolve_equivalence.jsp";
+	public static final String RESOLVE_EQUIVALENCE_JSP = "jsp" + F_SEP + "equivalence_view.jsp";
 	public static final String ATTACKER_VIEW_JSP = "jsp" + F_SEP + "attacker_view.jsp";
 	public static final String DEFENDER_VIEW_JSP = "jsp" + F_SEP + "defender_view.jsp";
 	public static final String SCORE_VIEW_JSP = "jsp" + F_SEP + "score_view.jsp";
@@ -74,6 +94,10 @@ public class Constants {
 	public static final String ADMIN_SETTINGS_JSP = "/jsp" + F_SEP + "admin_system_settings.jsp";
 	public static final String ADMIN_MONITOR_JSP = "/jsp" + F_SEP + "admin_monitor_games.jsp";
 	public static final String ADMIN_ANALYTICS_USERS_JSP = "/jsp" + F_SEP + "admin_analytics_users.jsp";
+	public static final String ADMIN_ANALYTICS_CLASSES_JSP = "/jsp" + F_SEP + "admin_analytics_classes.jsp";
+
+	public static final String ADMIN_ANALYTICS_USERS = "/admin/analytics/users";
+	public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";
 
 	// Messages
 	public static final String WINNER_MESSAGE = "You won!";
@@ -126,4 +150,5 @@ public class Constants {
 	public static final String ATTACKER_HAS_PENDING_DUELS = "Sorry, your mutant cannot be accepted because you have pending equivalence duels !\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
 
 	public static final String API_ANALYTICS_USERS = "/api/users";
+	public static final String API_ANALYTICS_CLASSES = "/api/classes";
 }

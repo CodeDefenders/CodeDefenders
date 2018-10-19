@@ -40,7 +40,8 @@
     <li class="<%=active(activePage,"adminAnalytics")%> dropdown">
         <a id="adminAnalytics" class="dropdown-toggle" data-toggle="dropdown" href="#">Analytics&#160&#160<span class="glyphicon glyphicon-menu-hamburger"></span></a>
         <ul class="dropdown-menu">
-            <li><a id="adminAnalyticsUsers" href="<%=request.getContextPath()%>/admin/analytics/users">Users</a></li>
+            <li><a id="adminAnalyticsUsers" href="<%=request.getContextPath() + Constants.ADMIN_ANALYTICS_USERS%>">Users</a></li>
+            <li><a id="adminAnalyticsClasses" href="<%=request.getContextPath() + Constants.ADMIN_ANALYTICS_CLASSES%>">Classes</a></li>
         </ul>
     </li>
 </ul>

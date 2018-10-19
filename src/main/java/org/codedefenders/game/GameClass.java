@@ -26,21 +26,25 @@ import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
+/**
+ * This class represents a class under test. Games will be played with this class by
+ * modifying it or creating test cases for it.
+ */
 public class GameClass {
 
 	private static final Logger logger = LoggerFactory.getLogger(GameClass.class);
@@ -53,14 +57,14 @@ public class GameClass {
 
 	private boolean isMockingEnabled = false;
 
-	private Set<String> additionalImports = new HashSet<String>();
+	private Set<String> additionalImports = new HashSet<>();
 	// Store begin and end line which corresponds to uncoverable non-initializad fields
-	private List<Integer> linesOfCompileTimeConstants= new ArrayList<>();
+	private List<Integer> linesOfCompileTimeConstants = new ArrayList<>();
 	private List<Integer> linesOfNonCoverableCode = new ArrayList<>();
 
 	private List<Range<Integer>> linesOfMethods = new ArrayList<>();
 	private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
-	private List<Range<Integer>>  linesOfClosingBrackets = new ArrayList<>();
+	private List<Range<Integer>> linesOfClosingBrackets = new ArrayList<>();
 
 	public GameClass(int id, String name, String alias, String jFile, String cFile, boolean isMockingEnabled) {
 		this(name, alias, jFile, cFile, isMockingEnabled);
@@ -73,18 +77,13 @@ public class GameClass {
 		this.javaFile = jFile;
 		this.classFile = cFile;
 		this.isMockingEnabled = isMockingEnabled;
+
 		this.additionalImports.addAll(includeAdditionalImportsFromCUT());
-		//
 		this.linesOfCompileTimeConstants.addAll(getCompileTimeConstants());
-		//
 		this.linesOfNonCoverableCode.addAll(getLinesOfNonInitializedFields());
-		//
 		this.linesOfNonCoverableCode.addAll(getLinesOfCompileTimeConstants());
-		//
 		this.linesOfNonCoverableCode.addAll(getLinesOfMethodSignatures());
-		//
 		this.linesOfNonCoverableCode.addAll(getUnreachableClosingBracketsForIfStatements());
-		//
 	}
 
 	// FIXME
@@ -127,27 +126,18 @@ public class GameClass {
 	}
 
 	public String getAsString() {
-		InputStream resourceContent = null;
-		String result = "";
 		try {
-			resourceContent = new FileInputStream(javaFile);
-			BufferedReader is = new BufferedReader(new InputStreamReader(resourceContent));
-			String line;
-			while ((line = is.readLine()) != null) {
-				result += line + "\n";
-			}
-
+			return String.join("\n", Files.readAllLines(new File(javaFile).toPath()));
 		} catch (FileNotFoundException e) {
-			result = "[File Not Found]";
 			logger.error("Could not find file " + javaFile);
+			return "[File Not Found]";
 		} catch (IOException e) {
-			result = "[File Not Readable]";
 			logger.error("Could not read file " + javaFile);
+			return "[File Not Readable]";
 		}
-		return result;
-
 	}
 
+	@Deprecated
 	public boolean insert() {
 		logger.debug("Inserting class (Name={}, Alias={}, JavaFile={}, ClassFile={}, RequireMocking={})", name, alias, javaFile, classFile, isMockingEnabled);
 		// Attempt to insert game info into database
@@ -168,6 +158,7 @@ public class GameClass {
 		return false;
 	}
 
+	@Deprecated
 	public boolean update() {
 		logger.debug("Updating class (Name={}, Alias={}, JavaFile={}, ClassFile={}, RequireMocking={})", name, alias, javaFile, classFile, isMockingEnabled);
 		// Attempt to update game info into database
@@ -185,10 +176,11 @@ public class GameClass {
 
 	public String getTestTemplate() {
 		StringBuilder sb = new StringBuilder();
-		if (!getPackage().isEmpty())
+		if (!getPackage().isEmpty()) {
 			sb.append(String.format("package %s;%n", getPackage()));
-		else
+		} else {
 			sb.append(String.format("/* no package name */%n"));
+		}
 		sb.append(String.format("%n"));
 		sb.append(String.format("import static org.junit.Assert.*;%n%n"));
 
@@ -511,14 +503,9 @@ public class GameClass {
 	}
 
 	public List<Integer> getLineOfClosingBracketFor(Integer coveredLine) {
-		List<Integer> lines = new ArrayList<Integer>();
-		for( Range<Integer> r : linesOfClosingBrackets){
-			if( r.contains( coveredLine ) ){
-				lines.add( r.getMaximum() );
-			}
-		}
-
-		return lines;
+		return linesOfClosingBrackets.stream()
+				.filter(integerRange -> integerRange.contains(coveredLine))
+				.map(Range::getMaximum)
+				.collect(Collectors.toList());
 	}
-
 }

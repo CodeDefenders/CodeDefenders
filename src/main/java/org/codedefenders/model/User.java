@@ -16,27 +16,31 @@ public class User {
 
 	private int id;
 	private String username;
-	private String password;
+	private String encodedPassword;
 	private String email;
 	private boolean validated;
 	private boolean active;
 
-	public User(String username, String password) {
-		this(username, password, "");
+	public User(String username) {
+		this(username, User.encodePassword(""));
 	}
 
-	public User(String username, String password, String email) {
-		this(0, username, password, email);
+	public User(String username, String encodedPassword) {
+		this(username, encodedPassword, "");
 	}
 
-	public User(int id, String username, String password, String email) {
-		this(id, username, password, email, false, true);
+	public User(String username, String encodedPassword, String email) {
+		this(0, username, encodedPassword, email);
 	}
 
-	public User(int id, String username, String password, String email, boolean validated, boolean active) {
+	public User(int id, String username, String encodedPassword, String email) {
+		this(id, username, encodedPassword, email, false, true);
+	}
+
+	public User(int id, String username, String encodedPassword, String email, boolean validated, boolean active) {
 		this.id = id;
 		this.username = username;
-		this.password = password;
+		this.encodedPassword = encodedPassword;
 		this.email = email.toLowerCase();
 		this.validated = validated;
 		this.active = active;
@@ -46,20 +50,17 @@ public class User {
 		DatabaseValue[] valueList;
 		String query;
 		Connection conn = DB.getConnection();
-		logger.debug("Calling BCryptPasswordEncoder.encode");
-		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		String safePassword = passwordEncoder.encode(password);
 
 		if (id <= 0) {
 			query = "INSERT INTO users (Username, Password, Email) VALUES (?, ?, ?);";
 			valueList = new DatabaseValue[]{DB.getDBV(username),
-					DB.getDBV(safePassword),
+					DB.getDBV(encodedPassword),
 					DB.getDBV(email)};
 		} else {
 			query = "INSERT INTO users (User_ID, Username, Password, Email) VALUES (?, ?, ?, ?);";
 			valueList = new DatabaseValue[]{DB.getDBV(id),
 					DB.getDBV(username),
-					DB.getDBV(safePassword),
+					DB.getDBV(encodedPassword),
 					DB.getDBV(email)};
 		}
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -72,8 +73,7 @@ public class User {
 		}
 	}
 
-
-	public boolean update(String encodedPassword) {
+	public boolean update() {
 		DatabaseValue[] valueList;
 		Connection conn = DB.getConnection();
 
@@ -86,13 +86,6 @@ public class User {
 				DB.getDBV(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		return DB.executeUpdate(stmt, conn);
-	}
-
-
-	public boolean update() {
-		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		String safePassword = passwordEncoder.encode(password);
-		return update(safePassword);
 	}
 
 	public boolean isValidated() {
@@ -115,12 +108,12 @@ public class User {
 		this.username = username;
 	}
 
-	public String getPassword() {
-		return password;
+	public String getEncodedPassword() {
+		return encodedPassword;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setEncodedPassword(String encodedPassword) {
+		this.encodedPassword = encodedPassword;
 	}
 
 	public String getEmail() {
@@ -148,6 +141,14 @@ public class User {
 
 		return "<span style='color: " + color + "'>@" + getUsername() +
 				"</span>";
+	}
+
+	public static String encodePassword(String password) {
+		return new BCryptPasswordEncoder().encode(password);
+	}
+
+	public static boolean passwordMatches(String rawPassword, String encodedPassword) {
+		return new BCryptPasswordEncoder().matches(rawPassword, encodedPassword);
 	}
 
 }

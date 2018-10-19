@@ -1,4 +1,4 @@
-<% pageTitle = "Game " + mg.getId();
+<% pageTitle = "Game " + game.getId();
 %>
 <%@ include file="/jsp/header_main.jsp" %>
 </div></div></div></div></div>
@@ -10,13 +10,15 @@
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="static org.codedefenders.game.GameState.ACTIVE" %>
+
 <div class="game-container">
 <nav class="nest" style="width: 90%; margin-left: auto; margin-right: auto;">
     <div class="crow fly">
         <div style="text-align: left">
-            <h3><%= role %>::<%= mg.getState().toString() %></h3>
+
+            <h3><%= role %>::<%= game.getState().toString() %></h3>
         </div>
-        <div style="text-align: center"><h1><%= mg.getCUT().getName() %></h1></div>
+        <div style="text-align: center"><h1><%= game.getCUT().getName() %></h1></div>
         <div>
             <a href="#" class="btn btn-diff" id="btnScoringTooltip" data-toggle="modal" data-target="#scoringTooltip"
                style="color: black; font-size: 18px; padding: 5px;">

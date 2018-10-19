@@ -164,10 +164,12 @@ public class DoubleEquivalenceSubmissionTest {
 
 	class HelperUser {
 		private User user;
+		private String password;
 		private WebClient browser;
 
-		public HelperUser(User user) {
+		public HelperUser(User user, String password) {
 			this.user = user;
+			this.password = password;
 			this.browser = WebClientFactory.getNewWebClient();
 		}
 
@@ -176,7 +178,7 @@ public class DoubleEquivalenceSubmissionTest {
 			// // Then we set the request parameters
 			loginRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 					new NameValuePair("formType", "login"), new NameValuePair("username", user.getUsername()),
-					new NameValuePair("password", user.getPassword()), }));
+					new NameValuePair("password", password), }));
 			// Finally, we can get the page
 			HtmlPage retunToGamePage = browser.getPage(loginRequest);
 		}
@@ -227,7 +229,7 @@ public class DoubleEquivalenceSubmissionTest {
 
 		public void startGame(int gameID) throws FailingHttpStatusCodeException, IOException {
 
-			WebRequest startGameRequest = new WebRequest(new URL("http://localhost:8080/multiplayer/move"),
+			WebRequest startGameRequest = new WebRequest(new URL("http://localhost:8080/multiplayergame"),
 					HttpMethod.POST);
 			// // Then we set the request parameters
 			startGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
@@ -258,7 +260,7 @@ public class DoubleEquivalenceSubmissionTest {
 		}
 
 		public void attack(int mpGameID, String mutant) throws FailingHttpStatusCodeException, IOException {
-			WebRequest attackRequest = new WebRequest(new URL("http://localhost:8080/multiplayer/move"),
+			WebRequest attackRequest = new WebRequest(new URL("http://localhost:8080/multiplayergame"),
 					HttpMethod.POST);
 			// // Then we set the request parameters
 			attackRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
@@ -270,20 +272,20 @@ public class DoubleEquivalenceSubmissionTest {
 			// --data-urlencode mutant@${mutant} \
 			// --cookie "${cookie}" --cookie-jar "${cookie}" \
 			// -w @curl-format.txt \
-			// -s ${CODE_DEFENDER_URL}/multiplayer/move
+			// -s ${CODE_DEFENDER_URL}/multiplayergame
 			browser.getPage(attackRequest);
 
 		}
 
 		public void defend(int mpGameID, String test) throws FailingHttpStatusCodeException, IOException {
-			WebRequest defendRequest = new WebRequest(new URL("http://localhost:8080/multiplayer/move"),
+			WebRequest defendRequest = new WebRequest(new URL("http://localhost:8080/multiplayergame"),
 					HttpMethod.POST);
 			// curl -X POST \
 			// --data "formType=createTest&mpGameID=${gameId}" \
 			// --data-urlencode test@${test} \
 			// --cookie "${cookie}" --cookie-jar "${cookie}" \
 			// -w @curl-format.txt \
-			// -s ${CODE_DEFENDER_URL}/multiplayer/move
+			// -s ${CODE_DEFENDER_URL}/multiplayergame
 			defendRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 					new NameValuePair("formType", "createTest"), new NameValuePair("mpGameID", "" + mpGameID),
 					// TODO Encoded somehow ?
@@ -366,8 +368,8 @@ public class DoubleEquivalenceSubmissionTest {
 	@Ignore
 	@Test
 	public void doubleSubmissionTest() throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-		User creatorUser = new User("creator", "test");
-		HelperUser creator = new HelperUser(creatorUser);
+		User creatorUser = new User("creator");
+		HelperUser creator = new HelperUser(creatorUser, "test");
 		creator.doLogin();
 		System.out.println("Creator Login");
 		//
@@ -376,16 +378,16 @@ public class DoubleEquivalenceSubmissionTest {
 		//
 		creator.startGame(newGameId);
 		//
-		User attackerUser = new User("demoattacker", "test");
-		HelperUser attacker = new HelperUser(attackerUser);
+		User attackerUser = new User("demoattacker");
+		HelperUser attacker = new HelperUser(attackerUser, "test");
 		attacker.doLogin();
 		System.out.println("Attacker Login");
 		//
 		attacker.joinOpenGame(newGameId, true);
 		System.out.println("Attacker Join game " + newGameId);
 		//
-		User defenderUser = new User("demodefender", "test");
-		HelperUser defender = new HelperUser(defenderUser);
+		User defenderUser = new User("demodefender");
+		HelperUser defender = new HelperUser(defenderUser, "test");
 		defender.doLogin();
 		//
 		System.out.println("Defender Login");
@@ -394,8 +396,8 @@ public class DoubleEquivalenceSubmissionTest {
 		//
 		System.out.println("Defender Join game " + newGameId);
 		//
-		User defender2User = new User("demodefender2", "test");
-		HelperUser defender2 = new HelperUser(defender2User);
+		User defender2User = new User("demodefender");
+		HelperUser defender2 = new HelperUser(defender2User, "test");
 		defender2.doLogin();
 		//
 		System.out.println("Defender 2 Login");

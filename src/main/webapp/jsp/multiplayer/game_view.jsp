@@ -20,8 +20,8 @@
         gameId = 0;
         redirectToGames = true;
     }
-    MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
-    if (mg == null){
+    MultiplayerGame game = DatabaseAccess.getMultiplayerGame(gameId);
+    if (game == null){
         logger.error(String.format("Could not find multiplayer game %d", gameId));
         redirectToGames = true;
     }
@@ -56,14 +56,14 @@
 	boolean renderMutants = true;
 	boolean redirect = false;
 	String codeDivName = "cut-div"; // used
-	Role role = mg.getRole(uid);
+	Role role = game.getRole(uid);
 	HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<>();
 
-    if ((mg.getState().equals(GameState.CREATED) || mg.getState().equals(GameState.FINISHED)) && (!role.equals(Role.CREATOR))) {
+    if ((game.getState().equals(GameState.CREATED) || game.getState().equals(GameState.FINISHED)) && (!role.equals(Role.CREATOR))) {
         response.sendRedirect(request.getContextPath()+"/games/user");
     }
 
-    List<Test> tests = mg.getTests(true); // get executable defenders' tests
+    List<Test> tests = game.getTests(true); // get executable defenders' tests
 
     // compute line coverage information
     for (Test t : tests) {
@@ -83,18 +83,18 @@
 
     int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
 
-    List<Mutant> mutants = mg.getMutants();
+    List<Mutant> mutants = game.getMutants();
 
     for (Mutant m : mutants){
         m.getLines();
     }
 
-    List<Mutant> mutantsAlive = mg.getAliveMutants();
+    List<Mutant> mutantsAlive = game.getAliveMutants();
 
-    List<Mutant> mutantsPending = mg.getMutantsMarkedEquivalentPending();
+    List<Mutant> mutantsPending = game.getMutantsMarkedEquivalentPending();
 
     if (role.equals(Role.DEFENDER) && (request.getParameter("equivLine") != null || request.getParameter("equivLines") != null) &&
-            (mg.getState().equals(GameState.ACTIVE) || mg.getState().equals(GameState.GRACE_ONE))){
+            (game.getState().equals(GameState.ACTIVE) || game.getState().equals(GameState.GRACE_ONE))){
         try {
             List<Integer> equivLines = new ArrayList<Integer>();
             if( request.getParameter("equivLine") != null ){
@@ -108,7 +108,7 @@
             int nClaimed = 0;
             boolean noneCovered = true;
             for (Integer equivLine : equivLines) {
-				if (mg.isLineCovered(equivLine)) {
+				if (game.isLineCovered(equivLine)) {
 					noneCovered = false;
 					for (Mutant m : mutantsAlive) {
 						if (m.getLines().contains(equivLine)) {
@@ -118,7 +118,7 @@
 
 							User mutantOwner = DatabaseAccess.getUserFromPlayer(m.getPlayerId());
 
-							Event notifEquivFlag = new Event(-1, mg.getId(), mutantOwner.getId(),
+							Event notifEquivFlag = new Event(-1, game.getId(), mutantOwner.getId(),
 									"One or more of your mutants is flagged equivalent.",
 									EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
 									new Timestamp(System.currentTimeMillis()));
@@ -131,7 +131,7 @@
 				}
 			}
 
-			if (noneCovered && !mg.isMarkUncovered()) {
+			if (noneCovered && !game.isMarkUncovered()) {
 				// equivLine is not covered, possible iff passed directly as url argument
 				messages.add(MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
 				response.sendRedirect(request.getContextPath() + "/multiplayer/play");
@@ -141,7 +141,7 @@
 			if (nClaimed >= 1) {
 				String flaggingChatMessage = DatabaseAccess.getUser(uid).getUsername() + " flagged "
 						+ nClaimed + " mutant" + (nClaimed == 1 ? "" : "s") + " as equivalent.";
-				Event notifMutant = new Event(-1, mg.getId(), uid, flaggingChatMessage,
+				Event notifMutant = new Event(-1, game.getId(), uid, flaggingChatMessage,
 						EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
 						new Timestamp(System.currentTimeMillis()));
 
@@ -168,7 +168,7 @@
 
                     User eventUser = DatabaseAccess.getUser(uid);
 
-                    Event notifEquiv = new Event(-1, mg.getId(),
+                    Event notifEquiv = new Event(-1, game.getId(),
                             uid,
                             eventUser.getUsername() +
                                     " accepts that their mutant " + m.getId() + " is equivalent.",
@@ -182,7 +182,7 @@
         } catch (NumberFormatException e){}
     }
 
-    List<Mutant> mutantsEquiv =  mg.getMutantsMarkedEquivalent();
+    List<Mutant> mutantsEquiv =  game.getMutantsMarkedEquivalent();
     Map<Integer, List<Mutant>> mutantLines = new HashMap<>();
     Map<Integer, List<Mutant>> mutantEquivPending = new HashMap<>();
     Map<Integer, List<Mutant>> mutantKilledLines = new HashMap<>();
@@ -214,7 +214,7 @@
 
     mutantsAlive.addAll(mutantsPending);
 
-    List<Mutant> mutantsKilled = mg.getKilledMutants();
+    List<Mutant> mutantsKilled = game.getKilledMutants();
 
     for (Mutant m : mutantsKilled) {
         for (int line : m.getLines()){
@@ -232,7 +232,21 @@
 <div class="crow fly no-gutter up">
     <% switch (role){
         case ATTACKER:
-            %><%@ include file="/jsp/multiplayer/attacker_view.jsp" %><%
+            Mutant equiv = null;
+            for (Mutant m : mutantsPending) {
+                if (m.getPlayerId() == playerId &&  m.getEquivalent() == Mutant.Equivalence.PENDING_TEST) {
+                    equiv = m;
+                    request.setAttribute("equivMutant", equiv);
+                    break;
+                }
+            }
+
+            if (equiv == null) { %>
+                <%@ include file="/jsp/multiplayer/attacker_view.jsp" %>
+            <% } else { %>
+                <%@ include file="/jsp/multiplayer/equivalence_view.jsp" %>
+            <% }
+
             break;
         case DEFENDER:
             %><%@ include file="/jsp/multiplayer/defender_view.jsp" %><%
@@ -242,10 +256,10 @@
             break;
         default:
             if (request.getParameter("defender") != null){
-                mg.addPlayer(uid, Role.DEFENDER);
+                game.addPlayer(uid, Role.DEFENDER);
                 %><meta http-equiv="refresh" content="1" /><%
             } else if (request.getParameter("attacker") != null){
-                mg.addPlayer(uid, Role.ATTACKER);
+                game.addPlayer(uid, Role.ATTACKER);
                 %><meta http-equiv="refresh" content="1" /><%
             } else {
                 // response.sendRedirect(request.getContextPath()+"/multiplayer/games/user");
@@ -259,8 +273,5 @@
     }
 %>
     </div>
-<script>
-<%@ include file="/jsp/multiplayer/game_highlighting.jsp" %>
-</script>
 <%@ include file="/jsp/game_notifications.jsp"%>
 <%@ include file="/jsp/multiplayer/footer_game.jsp" %>

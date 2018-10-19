@@ -100,18 +100,6 @@ public class DuelGame extends AbstractGame {
 		activeRole = role;
 	}
 
-	// TODO: Why is this different in the MultiplayerGame?
-	public List<Mutant> getMutantsMarkedEquivalent() {
-		List<Mutant> equivMutants = new ArrayList<>();
-		for (Mutant m : getMutants()) {
-			if (m.isAlive() && m.getEquivalent().equals(PENDING_TEST)) {
-				equivMutants.add(m);
-			}
-		}
-		return equivMutants;
-	}
-
-
 	public int getAttackerScore() {
 		int totalScore = 0;
 

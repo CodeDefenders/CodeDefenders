@@ -167,14 +167,14 @@ public class ParallelizeTest {
 
 	@Test
 	public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException {
-		User observer = new User("observer", "password", "demo@observer.com");
+		User observer = new User("observer", User.encodePassword("password"), "demo@observer.com");
 		observer.insert();
 		//
 		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Observer " + observer.getId());
-		User attacker = new User("demoattacker", "password", "demo@attacker.com");
+		User attacker = new User("demoattacker", User.encodePassword("password"), "demo@attacker.com");
 		attacker.insert();
 		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Attacker " + attacker.getId());
-		User defender = new User("demodefender", "password", "demo@defender.com");
+		User defender = new User("demodefender", User.encodePassword("password"), "demo@defender.com");
 		defender.insert();
 		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Defender " + defender.getId());
 		//

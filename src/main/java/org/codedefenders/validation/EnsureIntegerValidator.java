@@ -14,7 +14,6 @@ public class EnsureIntegerValidator implements ConstraintValidator<EnsureInteger
 
 	@Override
 	public boolean isValid(Object value, ConstraintValidatorContext context) {
-		System.out.println("EnsureIntegerValidator.isValid() Validing " + value + " context " + context);
 		if (value == null) {
 			return false;
 		} else if (value instanceof String) {

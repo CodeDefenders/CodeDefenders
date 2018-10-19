@@ -4,9 +4,10 @@ public class UserDataDTO {
     private long id;
     private String username;
     private int gamesPlayed;
+    private int attackerGamesPlayed;
+    private int defenderGamesPlayed;
     private int attackerScore;
     private int defenderScore;
-    private int totalScore;
     private int mutantsSubmitted;
     private int mutantsAlive;
     private int mutantsEquivalent;
@@ -37,6 +38,22 @@ public class UserDataDTO {
         this.gamesPlayed = gamesPlayed;
     }
 
+    public int getAttackerGamesPlayed() {
+        return attackerGamesPlayed;
+    }
+
+    public void setAttackerGamesPlayed(int attackerGamesPlayed) {
+        this.attackerGamesPlayed = attackerGamesPlayed;
+    }
+
+    public int getDefenderGamesPlayed() {
+        return defenderGamesPlayed;
+    }
+
+    public void setDefenderGamesPlayed(int defenderGamesPlayed) {
+        this.defenderGamesPlayed = defenderGamesPlayed;
+    }
+
     public int getAttackerScore() {
         return attackerScore;
     }
@@ -51,14 +68,6 @@ public class UserDataDTO {
 
     public void setDefenderScore(int defenderScore) {
         this.defenderScore = defenderScore;
-    }
-
-    public int getTotalScore() {
-        return totalScore;
-    }
-
-    public void setTotalScore(int totalScore) {
-        this.totalScore = totalScore;
     }
 
     public int getMutantsSubmitted() {

@@ -2,7 +2,6 @@ package org.codedefenders.itests.http.utils;
 
 import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
 import com.gargoylesoftware.htmlunit.HttpMethod;
-import com.gargoylesoftware.htmlunit.TextPage;
 import com.gargoylesoftware.htmlunit.WebClient;
 import com.gargoylesoftware.htmlunit.WebRequest;
 import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
@@ -31,11 +30,13 @@ public class HelperUser {
 	private User user;
 	private WebClient browser;
 	private String codedefendersHome;
+	private String password;
 
-	public HelperUser(User user, WebClient browser, String codedefendersHome) {
+	public HelperUser(User user, WebClient browser, String codedefendersHome, String password) {
 		this.user = user;
 		this.browser = browser;
 		this.codedefendersHome = codedefendersHome;
+		this.password = password;
 	}
 
 	public User getUser() {
@@ -47,8 +48,8 @@ public class HelperUser {
 		WebRequest registerRequest = new WebRequest(new URL(codedefendersHome + "/login"), HttpMethod.POST);
 		registerRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 				new NameValuePair("formType", "create"), new NameValuePair("username", user.getUsername()),
-				new NameValuePair("email", user.getEmail()), new NameValuePair("password", user.getPassword()),
-				new NameValuePair("confirm", user.getPassword()), }));
+				new NameValuePair("email", user.getEmail()), new NameValuePair("password", password),
+				new NameValuePair("confirm", password), }));
 		return browser.getPage(registerRequest);
 
 	}
@@ -58,7 +59,7 @@ public class HelperUser {
 		// // Then we set the request parameters
 		loginRequest.setRequestParameters(Arrays.asList(new NameValuePair[] { new NameValuePair("formType", "login"),
 				new NameValuePair("username", user.getUsername()),
-				new NameValuePair("password", user.getPassword()), }));
+				new NameValuePair("password", password), }));
 		// Finally, we can get the page
 		HtmlPage retunToGamePage = browser.getPage(loginRequest);
 	}
@@ -168,7 +169,7 @@ public class HelperUser {
 
 	public HtmlPage startGame(int gameID) throws FailingHttpStatusCodeException, IOException {
 
-		WebRequest startGameRequest = new WebRequest(new URL(codedefendersHome + "/multiplayer/move"), HttpMethod.POST);
+		WebRequest startGameRequest = new WebRequest(new URL(codedefendersHome + "/multiplayergame"), HttpMethod.POST);
 		// // Then we set the request parameters
 		startGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 				new NameValuePair("formType", "startGame"), new NameValuePair("mpGameID", "" + gameID) }));
@@ -207,7 +208,7 @@ public class HelperUser {
 	}
 
 	public void attack(int mpGameID, String mutant) throws FailingHttpStatusCodeException, IOException {
-		WebRequest attackRequest = new WebRequest(new URL(codedefendersHome + "/multiplayer/move"), HttpMethod.POST);
+		WebRequest attackRequest = new WebRequest(new URL(codedefendersHome + "/multiplayergame"), HttpMethod.POST);
 		// // Then we set the request parameters
 		attackRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 				new NameValuePair("formType", "createMutant"), new NameValuePair("mpGameID", "" + mpGameID),
@@ -218,19 +219,19 @@ public class HelperUser {
 		// --data-urlencode mutant@${mutant} \
 		// --cookie "${cookie}" --cookie-jar "${cookie}" \
 		// -w @curl-format.txt \
-		// -s ${CODE_DEFENDER_URL}/multiplayer/move
+		// -s ${CODE_DEFENDER_URL}/multiplayergame
 		browser.getPage(attackRequest);
 
 	}
 
 	public void defend(int mpGameID, String test) throws FailingHttpStatusCodeException, IOException {
-		WebRequest defendRequest = new WebRequest(new URL(codedefendersHome + "/multiplayer/move"), HttpMethod.POST);
+		WebRequest defendRequest = new WebRequest(new URL(codedefendersHome + "/multiplayergame"), HttpMethod.POST);
 		// curl -X POST \
 		// --data "formType=createTest&mpGameID=${gameId}" \
 		// --data-urlencode test@${test} \
 		// --cookie "${cookie}" --cookie-jar "${cookie}" \
 		// -w @curl-format.txt \
-		// -s ${CODE_DEFENDER_URL}/multiplayer/move
+		// -s ${CODE_DEFENDER_URL}/multiplayergame
 		defendRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 				new NameValuePair("formType", "createTest"), new NameValuePair("mpGameID", "" + mpGameID),
 				// TODO Encoded somehow ?

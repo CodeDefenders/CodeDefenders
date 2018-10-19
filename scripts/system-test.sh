@@ -115,7 +115,7 @@ curl -X POST \
 --data-urlencode mutant@${mutant} \
 --cookie "${cookie}" --cookie-jar "${cookie}" \
 -w @curl-format.txt \
--s ${CODE_DEFENDER_URL}/multiplayer/move
+-s ${CODE_DEFENDER_URL}/multiplayergame
 
 
 }
@@ -132,7 +132,7 @@ curl -X POST \
 --data-urlencode test@${test} \
 --cookie "${cookie}" --cookie-jar "${cookie}" \
 -w @curl-format.txt \
--s ${CODE_DEFENDER_URL}/multiplayer/move
+-s ${CODE_DEFENDER_URL}/multiplayergame
 }
 
 # This runs in background and produce a log which says for each request how long it was the total response time
