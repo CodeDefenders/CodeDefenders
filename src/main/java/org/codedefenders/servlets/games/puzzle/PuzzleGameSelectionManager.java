@@ -6,7 +6,7 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +20,8 @@ import javax.servlet.http.HttpSession;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.codedefenders.servlets.util.GameServletUtils.getGameId;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
 import static org.codedefenders.util.Constants.PUZZLE_GAME_PATH;
 import static org.codedefenders.util.Constants.PUZZLE_OVERVIEW_PATH;
 import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
@@ -29,7 +31,7 @@ import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
  * <p>
  * Offers {@code POST} request handling for creating and ending a given game.
  * <p>
- * Serves under {@code /puzzles/game}.
+ * Serves under {@code /puzzle/games}.
  *
  * @author <a href=https://github.com/werli>Phil Werli<a/>
  * @see PuzzleGameManager
@@ -37,6 +39,11 @@ import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
  */
 public class PuzzleGameSelectionManager extends HttpServlet {
     private static Logger logger = LoggerFactory.getLogger(PuzzleGameSelectionManager.class);
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -70,7 +77,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
         final HttpSession session = request.getSession();
         final int userId = ((Integer) session.getAttribute("uid"));
 
-        final Integer puzzleId = ServletUtils.getIntParameter(request, "puzzle");
+        final Integer puzzleId = getIntParameter(request, "puzzleId");
         if (puzzleId == null) {
             logger.error("Failed to retrieve puzzleId from request.");
             response.setStatus(SC_BAD_REQUEST);
@@ -96,8 +103,8 @@ public class PuzzleGameSelectionManager extends HttpServlet {
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
 
-        String path = request.getContextPath() + PUZZLE_GAME_PATH + "?gameId=" + game.getId();
-        request.getRequestDispatcher(path).forward(request, response);
+        String path = ctx(request) + PUZZLE_GAME_PATH + "?gameId=" + game.getId();
+        response.sendRedirect(path);
     }
 
     /**
@@ -149,7 +156,6 @@ public class PuzzleGameSelectionManager extends HttpServlet {
         game.setState(GameState.FAILED);
         game.update();
 
-        String path = request.getContextPath() + PUZZLE_OVERVIEW_PATH;
-        request.getRequestDispatcher(path).forward(request, response);
+        response.sendRedirect(ctx(request) + PUZZLE_OVERVIEW_PATH);
     }
 }

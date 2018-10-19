@@ -263,23 +263,32 @@
 
 
 	<!-- Puzzle mode start-->
-	<servlet>
-		<servlet-name>puzzleGameManager</servlet-name>
-		<servlet-class>org.codedefenders.servlets.games.puzzle.PuzzleGameManager</servlet-class>
-	</servlet>
 	<servlet-mapping>
-		<servlet-name>puzzleGameManager</servlet-name>
+		<servlet-name>PuzzleOverview</servlet-name>
+		<url-pattern>/puzzles</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>PuzzleOverview</servlet-name>
+		<servlet-class>org.codedefenders.servlets.games.puzzle.PuzzleOverview</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>PuzzleGame</servlet-name>
 		<url-pattern>/puzzlegame</url-pattern>
 	</servlet-mapping>
-
 	<servlet>
-		<servlet-name>puzzleGameSelectionManager</servlet-name>
-		<servlet-class>org.codedefenders.servlets.games.puzzle.PuzzleGameSelectionManager</servlet-class>
+		<servlet-name>PuzzleGame</servlet-name>
+		<servlet-class>org.codedefenders.servlets.games.puzzle.PuzzleGameManager</servlet-class>
 	</servlet>
+
 	<servlet-mapping>
-		<servlet-name>puzzleGameSelectionManager</servlet-name>
+		<servlet-name>PuzzleGameSelection</servlet-name>
 		<url-pattern>/puzzle/games</url-pattern>
 	</servlet-mapping>
+	<servlet>
+		<servlet-name>PuzzleGameSelection</servlet-name>
+		<servlet-class>org.codedefenders.servlets.games.puzzle.PuzzleGameSelectionManager</servlet-class>
+	</servlet>
 
 	<!-- Puzzle mode end-->
 

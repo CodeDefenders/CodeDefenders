@@ -118,9 +118,9 @@ public class Constants {
 	public static final String DUEL_ATTACKER_VIEW_JSP = "jsp/duel/attacker_view.jsp";
 	public static final String DUEL_DEFENDER_VIEW_JSP = "jsp/duel/defender_view.jsp";
 
-	public static final String PUZZLE_OVERVIEW_PATH = "/puzzles";
-	public static final String PUZZLE_GAME_PATH = "/puzzlegame";
-	public static final String PUZZLE_GAME_SELECTION_PATH = "/puzzle/games";
+	public static final String PUZZLE_OVERVIEW_VIEW_JSP = "/jsp/puzzle/puzzle_overview.jsp";
+	public static final String PUZZLE_GAME_ATTACKER_VIEW_JSP = "/jsp/puzzle/puzzle_attacker_view.jsp";
+	public static final String PUZZLE_GAME_DEFENDER_VIEW_JSP = "/jsp/puzzle/puzzle_defender_view.jsp";
 
 	public static final String ADMIN_USER_JSP = "/jsp" + F_SEP + "admin_user_mgmt.jsp";
 	public static final String ADMIN_GAMES_JSP = "/jsp" + F_SEP + "admin_create_games.jsp";
@@ -131,6 +131,10 @@ public class Constants {
 	public static final String ADMIN_ANALYTICS_KILLMAP_JSP = "/jsp" + F_SEP + "admin_analytics_killmaps.jsp";
 
 	public static final String NOTIFICATIONS = "/notifications";
+
+    public static final String PUZZLE_OVERVIEW_PATH = "/puzzles";
+    public static final String PUZZLE_GAME_PATH = "/puzzlegame";
+    public static final String PUZZLE_GAME_SELECTION_PATH = "/puzzle/games";
 
 	public static final String ADMIN_ANALYTICS_USERS = "/admin/analytics/users";
 	public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";

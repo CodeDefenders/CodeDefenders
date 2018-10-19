@@ -15,6 +15,7 @@ import org.codedefenders.game.puzzle.solving.MutantSolvingStrategy;
 import org.codedefenders.game.puzzle.solving.TestSolvingStrategy;
 import org.codedefenders.servlets.games.GameManager;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -32,16 +33,15 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
-import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static org.codedefenders.servlets.util.GameServletUtils.getGameId;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.util.Constants.MODE_PUZZLE_DIR;
 import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
-import static org.codedefenders.util.Constants.PUZZLEGAME_ATTACKER_VIEW_JSP;
-import static org.codedefenders.util.Constants.PUZZLEGAME_DEFENDER_VIEW_JSP;
+import static org.codedefenders.util.Constants.PUZZLE_GAME_ATTACKER_VIEW_JSP;
+import static org.codedefenders.util.Constants.PUZZLE_GAME_DEFENDER_VIEW_JSP;
 import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
 import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
 import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
@@ -72,47 +72,38 @@ public class PuzzleGameManager extends HttpServlet {
         final Integer gameId = getGameId(request);
         if (gameId == null) {
             logger.error("Cannot retrieve puzzle game page. Failed to retrieve gameId from request.");
-            response.setStatus(SC_BAD_REQUEST);
-            Redirect.redirectBack(request, response);
+            response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
             return;
         }
 
         final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
         if (game == null) {
             logger.error("Cannot retrieve puzzle game page. Failed to retrieve puzzle game from database for gameId: {}.", gameId);
-            response.setStatus(SC_BAD_REQUEST);
-            Redirect.redirectBack(request, response);
+            response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
             return;
         }
 
         final int userId = ((Integer) session.getAttribute("uid"));
         if (game.getCreatorId() != userId) {
             logger.error("Cannot retrieve puzzle game page. User {} is not creator of the requested game: {}.", userId, gameId);
-            response.setStatus(SC_FORBIDDEN);
-            Redirect.redirectBack(request, response);
+            response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
             return;
         }
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
 
         final Role role = game.getActiveRole();
-        final String subPath;
         switch (role) {
             case ATTACKER:
-                subPath = PUZZLEGAME_ATTACKER_VIEW_JSP;
+                request.getRequestDispatcher(PUZZLE_GAME_ATTACKER_VIEW_JSP).forward(request, response);
                 break;
             case DEFENDER:
-                subPath = PUZZLEGAME_DEFENDER_VIEW_JSP;
+                request.getRequestDispatcher(PUZZLE_GAME_DEFENDER_VIEW_JSP).forward(request, response);
                 break;
             default:
                 logger.error("Trying to enter puzzle game with illegal role {}", role);
-                response.setStatus(SC_INTERNAL_SERVER_ERROR);
-                Redirect.redirectBack(request, response);
-                return;
+                response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
         }
-
-        final String path = request.getContextPath() + subPath + "?gameId=" + gameId;
-        request.getRequestDispatcher(path).forward(request, response);
     }
 
     @Override
@@ -122,6 +113,7 @@ public class PuzzleGameManager extends HttpServlet {
         switch (action) {
             case "reset":
                 session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+                session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST);
                 Redirect.redirectBack(request, response);
                 break;
             case "createTest":

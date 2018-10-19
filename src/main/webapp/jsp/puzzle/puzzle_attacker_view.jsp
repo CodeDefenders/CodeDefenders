@@ -1,5 +1,7 @@
-<%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
+<%@ page import="java.util.LinkedList" %>
+<%@ page import="static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME" %>
+<%@ page import="static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT" %>
 
 <% String pageTitle = "Attacking Class"; %>
 <%@ include file="/jsp/header_main.jsp"%>
@@ -7,15 +9,15 @@
 <% { %>
 
 <%-- Set request attributes for the components. --%>
-<%  PuzzleGame game = (PuzzleGame) request.getAttribute("game");
+<%  PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
     /* mutant_editor */
-    String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+    String previousMutantCode = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+    request.getSession().removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
     if (previousMutantCode != null) {
         request.setAttribute("mutantCode", previousMutantCode);
     } else {
-        request.setAttribute("mutantCode", game.getCUT().getAsString());
+        request.setAttribute("mutantCode", game.getCUT().getAsHTMLEscapedString());
     }
 
     /* tests_carousel */
@@ -24,8 +26,10 @@
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());
     request.setAttribute("mutantsKilled", game.getKilledMutants());
+    request.setAttribute("mutantsEquivalent", new LinkedList<Mutant>());
+    request.setAttribute("markEquivalent", false);
     request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", "SINGLE");
+    request.setAttribute("gameType", "PUZZLE");
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
@@ -49,7 +53,7 @@
             <%@include file="../game_components/mutants_list.jsp"%>
         </div>
 
-        <% if (game.getLevel().equals(GameLevel.EASY)) { %>
+        <% if (game.getLevel() == GameLevel.EASY) { %>
         <div id="tests-div">
             <h3>JUnit tests</h3>
             <%@include file="../game_components/tests_carousel.jsp"%>

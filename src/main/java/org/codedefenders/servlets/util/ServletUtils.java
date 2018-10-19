@@ -13,6 +13,18 @@ public final class ServletUtils {
     }
 
     /**
+     * Returns the context path a of a given {@link HttpServletRequest}.
+     * <p>
+     * {@code ctx(request)} can be used as a shorter version of {@code request.getContextPath()}
+     *
+     * @param request the request the context is retrieved from.
+     * @return the application context.
+     */
+    public static String ctx(HttpServletRequest request) {
+        return request.getContextPath();
+    }
+
+    /**
      * Extracts a given URL parameter from a given request.
      * <p>
      * If the parameter is no valid integer value, the method returns {@code null}.
