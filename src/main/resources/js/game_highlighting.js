@@ -120,30 +120,23 @@ var createAction = function(label, classType, contents){
 };
 
 var prepareMutantDetail = function(mutant){
-    return  '<p><span class="left">' + mutant.playerName + '</span>' +
+    return  '<p><span class="left">' + mutant.creatorName + '</span>' +
         '<span class="central">' + mutant.id + '</span>' +
         '<span class="right">' + mutant.score + '</span></p>';
 };
 
 var prepareDeadMutantDetail = function(mutant){
-    retval =  '<p><span class="left">' + mutant.playerName + '</span>' +
-        '<span class="central">' + mutant.id + '</span>';
+    retval =  '<p><span class="left" style="width: 33%;">' + mutant.creatorName + '</span>' +
+        '<span class="central" style="width: 18%;">' + mutant.id + '</span>';
     if(mutant.coveredBy.length == 0) {
-        retval += '<span class="central"> - </span>';
+        retval += '<span class="central" style="width: 24%;"> - </span>';
     } else if(mutant.coveredBy.length <= MUTANT_SHOW_LIMIT) {
-        retval += '<span class="central">' + mutant.coveredBy + '</span>';
+        retval += '<span class="central" style="width: 24%;">' + mutant.coveredBy + '</span>';
     } else {
-        retval += '<span class="central">' + mutant.coveredBy.slice(0, MUTANT_SHOW_LIMIT) + ' ...</span>';
+        retval += '<span class="central" style="width: 24%;">' + mutant.coveredBy.slice(0, MUTANT_SHOW_LIMIT) + ' ...</span>';
     }
-    retval += '<span class="right">' + mutant.score + '</span></p>';
+    retval += '<span class="right" style="width: 18%;">' + mutant.score + '</span></p>';
     return retval;
-};
-
-var prepareDeadMutantDetail = function(mutant){
-    return '<p><span class="left" style="width: 33%;">' + mutant.playerName + '</span>' +
-        '<span class="central" style="width: 18%;">' + mutant.id + '</span>' +
-        '<span class="central" style="width: 24%;">' + mutant.killingTestId + '</span>' +
-        '<span class="right" style="width: 18%;">' + mutant.score + '</span></p>';
 };
 
 var prepareMutantHeading = function(title){
@@ -365,8 +358,9 @@ var mutantLine = function (superDiv, showEquivalenceButton, gameType) {
         },
         {scroll: false});
 
-    codemirror.execCommand("indentAuto")
-    codemirror.execCommand("indentMore")
+    codemirror.execCommand("indentAuto");
+    codemirror.execCommand("indentMore");
+    codemirror.execCommand("indentMore");
 
     codemirror.setSelection({
             'line':0,

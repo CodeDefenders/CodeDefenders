@@ -45,6 +45,9 @@ public class Mutant implements Serializable {
 	private transient String md5;
 	private transient String classFile;
 
+    private String creatorName;
+	private int creatorId;
+
 	private boolean alive = true;
 
 	private int killingTestId = 0;
@@ -131,6 +134,22 @@ public class Mutant implements Serializable {
 
 		score = 0;
 	}
+
+    public String getCreatorName() {
+        return creatorName;
+    }
+
+    public void setCreatorName(String creatorName) {
+        this.creatorName = creatorName;
+    }
+
+    public int getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(int creatorId) {
+        this.creatorId = creatorId;
+    }
 
 	public int getId() {
 		return id;
