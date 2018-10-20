@@ -175,6 +175,29 @@ public class PuzzleDAO {
                 DB.getDBV(puzzleId), DB.getDBV(userId));
     }
 
+
+    /**
+     * Returns a {@link List} of the active {@link PuzzleGame PuzzleGames} played by the given user.
+     * The list is sorted by the the timestamp of the games.
+     * @param userId The user ID.
+     * @return A {@link List} of the active {@link PuzzleGame PuzzleGames} played by the given user.
+     * The list is sorted by the the timestamp of the games.
+     */
+    public static List<PuzzleGame> getActivePuzzleGamesForUser(int userId) {
+        String query = String.join("\n",
+                "SELECT *",
+                "FROM games",
+                "WHERE Mode = 'PUZZLE'",
+                "  AND State = 'ACTIVE'",
+                "  AND Creator_ID = ?",
+                "ORDER BY Timestamp DESC;"
+        );
+
+        return executeQueryReturnList(query,
+                PuzzleDAO::getPuzzleGameFromResultSet,
+                DB.getDBV(userId));
+    }
+
     /**
      * Stores the given {@link PuzzleGame} in the database.
      * @param game The {@link PuzzleGame}.
