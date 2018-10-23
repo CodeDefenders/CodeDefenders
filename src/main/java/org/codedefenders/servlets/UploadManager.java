@@ -282,6 +282,12 @@ public class UploadManager extends HttpServlet {
 
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                     return;
+                } catch (IllegalStateException e) {
+                    logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
+                    messages.add("Class upload failed. Internal error. Sorry about that!");
+
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                    return;
                 }
             } else {
                 final String zipFileName = dependenciesZipFile.fileName;
@@ -348,6 +354,12 @@ public class UploadManager extends HttpServlet {
                 } catch (CompileException e) {
                     logger.error("Class upload failed. Could not compile {}!\n\n{}", fileName, e.getMessage());
                     messages.add("Class upload failed. Could not compile " + fileName + "!\n" + e.getMessage());
+
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                    return;
+                } catch (IllegalStateException e) {
+                    logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
+                    messages.add("Class upload failed. Internal error. Sorry about that!");
 
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                     return;
@@ -526,6 +538,12 @@ public class UploadManager extends HttpServlet {
 
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
                     return true;
+                } catch (IllegalStateException e) {
+                    logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
+                    messages.add("Class upload failed. Internal error. Sorry about that!");
+
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses,javaFilePath);
+                    return true;
                 }
             } else {
                 try {
@@ -535,6 +553,12 @@ public class UploadManager extends HttpServlet {
                     messages.add("Class upload failed. Could not compile mutant " + fileName + "!\n" + e.getMessage());
 
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
+                    return true;
+                } catch (IllegalStateException e) {
+                    logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
+                    messages.add("Class upload failed. Internal error. Sorry about that!");
+
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses,javaFilePath);
                     return true;
                 }
             }
@@ -642,6 +666,12 @@ public class UploadManager extends HttpServlet {
 
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
                 return true;
+            } catch (IllegalStateException e) {
+                logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
+                messages.add("Class upload failed. Internal error. Sorry about that!");
+
+                abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
+                return true;
             }
 
             try {
@@ -738,7 +768,7 @@ public class UploadManager extends HttpServlet {
      */
     private static void abortRequestAndCleanUp(HttpServletRequest request, HttpServletResponse response, String cutDir,
                                                List<CompiledClass> compiledClasses, String... files) throws IOException {
-        logger.info("Aborting request...");
+        logger.debug("Aborting request...");
         if (cutDir != null) {
             final List<Integer> cuts = new LinkedList<>();
             final List<Integer> dependencies = new LinkedList<>();
@@ -791,7 +821,7 @@ public class UploadManager extends HttpServlet {
         }
 
         Redirect.redirectBack(request, response);
-        logger.info("Aborting request...done");
+        logger.debug("Aborting request...done");
     }
 
     /**
@@ -804,9 +834,9 @@ public class UploadManager extends HttpServlet {
      * @throws IOException When an error during redirecting occurs.
      */
     private static void abortRequestAndCleanUp(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        logger.info("Aborting request without removing files...");
+        logger.debug("Aborting request without removing files...");
         Redirect.redirectBack(request, response);
-        logger.info("Aborting request without removing files...done");
+        logger.debug("Aborting request without removing files...done");
     }
 
     /**

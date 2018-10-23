@@ -1,7 +1,7 @@
 package org.codedefenders.util;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -26,7 +26,7 @@ public class JavaFileObject extends SimpleJavaFileObject {
      * @param path File path.
      */
     public JavaFileObject(String path) {
-        super(URI.create("file:///" + path), javax.tools.JavaFileObject.Kind.SOURCE);
+        super(new File(path).toURI(), javax.tools.JavaFileObject.Kind.SOURCE);
         this.path = path;
         this.content = null;
     }
@@ -38,7 +38,7 @@ public class JavaFileObject extends SimpleJavaFileObject {
      * @param content File content.
      */
     public JavaFileObject(String path, String content) {
-        super(URI.create("file:///" + path), javax.tools.JavaFileObject.Kind.SOURCE);
+        super(new File(path).toURI(), javax.tools.JavaFileObject.Kind.SOURCE);
         this.path = path;
         this.content = content;
     }
@@ -54,7 +54,7 @@ public class JavaFileObject extends SimpleJavaFileObject {
     @Override
     public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
         if (content == null) {
-            content = new String(Files.readAllBytes(Paths.get(uri)));
+            content = new String(Files.readAllBytes(Paths.get(this.uri)));
         }
         return content;
     }
@@ -78,6 +78,6 @@ public class JavaFileObject extends SimpleJavaFileObject {
 
     @Override
     public String getName() {
-        return Paths.get(path).getFileName().toString();
+        return Paths.get(this.uri).getFileName().toString();
     }
 }

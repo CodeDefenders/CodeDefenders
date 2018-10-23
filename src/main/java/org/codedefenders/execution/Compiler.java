@@ -43,7 +43,7 @@ public class Compiler {
      * @return A path to the {@code .class} file.
      * @throws CompileException If an error during compilation occurs.
      */
-    public static String compileJavaFile(String javaFilePath) throws CompileException {
+    public static String compileJavaFile(String javaFilePath) throws CompileException, IllegalStateException {
         return compileJavaFile(new JavaFileObject(javaFilePath));
     }
 
@@ -56,7 +56,7 @@ public class Compiler {
      * @return A path to the {@code .class} file.
      * @throws CompileException If an error during compilation occurs.
      */
-    public static String compileJavaFileForContent(String javaFilePath, String javaFileContent) throws CompileException {
+    public static String compileJavaFileForContent(String javaFilePath, String javaFileContent) throws CompileException, IllegalStateException {
         return compileJavaFile(new JavaFileObject(javaFilePath, javaFileContent));
     }
 
@@ -67,9 +67,12 @@ public class Compiler {
      * {@code javac} requires no options, but here, somehow the standard tomcat directory
      * is used, so the option {@code -d} is required.
      */
-    private static String compileJavaFile(JavaFileObject javaFile) throws CompileException {
+    private static String compileJavaFile(JavaFileObject javaFile) throws CompileException, IllegalStateException {
         final String outDir = Paths.get(javaFile.getPath()).getParent().toString();
         javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            throw new IllegalStateException("Platform provided no java compiler.");
+        }
 
         final StringWriter writer = new StringWriter();
         final List<? extends javax.tools.JavaFileObject> compilationUnits = Arrays.asList(javaFile);
@@ -99,7 +102,7 @@ public class Compiler {
      * @return A path to the {@code .class} file of the compiled given java file.
      * @throws CompileException If an error during compilation occurs.
      */
-    public static String compileJavaFileForContentWithDependencies(String javaFilePath, String javaFileContent, List<JavaFileObject> dependencies) throws CompileException {
+    public static String compileJavaFileForContentWithDependencies(String javaFilePath, String javaFileContent, List<JavaFileObject> dependencies) throws CompileException, IllegalStateException {
         return compileJavaFileWithDependencies(new JavaFileObject(javaFilePath, javaFileContent), dependencies, false);
     }
 
@@ -112,7 +115,7 @@ public class Compiler {
      *                                    {@code dependencies/}.
      * @see #compileJavaFileForContentWithDependencies(String, String, List)
      */
-    public static String compileJavaFileForContentWithDependencies(String javaFilePath, String javaFileContent, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException {
+    public static String compileJavaFileForContentWithDependencies(String javaFilePath, String javaFileContent, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
         return compileJavaFileWithDependencies(new JavaFileObject(javaFilePath, javaFileContent), dependencies, cleanUpDependencyClassFiles);
     }
 
@@ -126,7 +129,7 @@ public class Compiler {
      * @return A path to the {@code .class} file of the compiled given java file.
      * @throws CompileException If an error during compilation occurs.
      */
-    public static String compileJavaFileWithDependencies(String javaFilePath, List<JavaFileObject> dependencies) throws CompileException {
+    public static String compileJavaFileWithDependencies(String javaFilePath, List<JavaFileObject> dependencies) throws CompileException, IllegalStateException {
         return compileJavaFileWithDependencies(new JavaFileObject(javaFilePath), dependencies, false);
     }
 
@@ -139,7 +142,7 @@ public class Compiler {
      *                                    {@code dependencies/}.
      * @see #compileJavaFileWithDependencies(String, List)
      */
-    public static String compileJavaFileWithDependencies(String javaFilePath, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException {
+    public static String compileJavaFileWithDependencies(String javaFilePath, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
         return compileJavaFileWithDependencies(new JavaFileObject(javaFilePath), dependencies, cleanUpDependencyClassFiles);
     }
 
@@ -147,9 +150,13 @@ public class Compiler {
      * Similar to {@link #compileJavaFile(JavaFileObject)}, but the {@code dependency} parameter
      * is added to the compilation units.
      */
-    private static String compileJavaFileWithDependencies(JavaFileObject javaFile, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException {
+    private static String compileJavaFileWithDependencies(JavaFileObject javaFile, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
         final String outDir = Paths.get(javaFile.getPath()).getParent().toString();
         javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            throw new IllegalStateException("Platform provided no java compiler.");
+        }
+
         final StringWriter writer = new StringWriter();
 
         final List<javax.tools.JavaFileObject> compilationUnits = new LinkedList<>(dependencies);
@@ -189,7 +196,7 @@ public class Compiler {
      * @return A path to the {@code .class} file.
      * @throws CompileException If an error during compilation occurs.
      */
-    public static String compileJavaTestFile(String javaTestFilePath, List<JavaFileObject> dependencies) throws CompileException {
+    public static String compileJavaTestFile(String javaTestFilePath, List<JavaFileObject> dependencies) throws CompileException, IllegalStateException {
         return compileJavaTestFile(new JavaFileObject(javaTestFilePath), dependencies, false);
     }
 
@@ -201,7 +208,7 @@ public class Compiler {
      *                                    are removed after compilation.
      * @see #compileJavaFileWithDependencies(String, List)
      */
-    public static String compileJavaTestFile(String javaTestFilePath, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException {
+    public static String compileJavaTestFile(String javaTestFilePath, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
         return compileJavaTestFile(new JavaFileObject(javaTestFilePath), dependencies, cleanUpDependencyClassFiles);
     }
 
@@ -220,7 +227,7 @@ public class Compiler {
      * @return A path to the {@code .class} file.
      * @throws CompileException If an error during compilation occurs.
      */
-    public static String compileJavaTestFileForContent(String javaFilePath, String javaFileContent, List<JavaFileObject> dependencies) throws CompileException {
+    public static String compileJavaTestFileForContent(String javaFilePath, String javaFileContent, List<JavaFileObject> dependencies) throws CompileException, IllegalStateException {
         return compileJavaTestFile(new JavaFileObject(javaFilePath, javaFileContent), dependencies, false);
     }
 
@@ -231,7 +238,7 @@ public class Compiler {
      * @param cleanUpDependencyClassFiles whether generated {@code .class} files of dependencies
      *                                    are removed after compilation.
      */
-    public static String compileJavaTestFileForContent(String javaFilePath, String javaFileContent, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException {
+    public static String compileJavaTestFileForContent(String javaFilePath, String javaFileContent, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
         return compileJavaTestFile(new JavaFileObject(javaFilePath, javaFileContent), dependencies, cleanUpDependencyClassFiles);
     }
 
@@ -239,10 +246,13 @@ public class Compiler {
      * Just like {@link #compileJavaFileWithDependencies(JavaFileObject, List, boolean)},
      * but includes JUnit, Hamcrest and Mockito libraries required for running the tests.
      */
-    private static String compileJavaTestFile(JavaFileObject testFile, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException {
+    private static String compileJavaTestFile(JavaFileObject testFile, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
         final String outDir = Paths.get(testFile.getPath()).getParent().toString();
 
         javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            throw new IllegalStateException("Platform provided no java compiler.");
+        }
 
         final StringWriter writer = new StringWriter();
         final List<javax.tools.JavaFileObject> compilationUnits = new LinkedList<>(dependencies);
