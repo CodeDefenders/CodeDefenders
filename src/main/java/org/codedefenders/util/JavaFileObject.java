@@ -54,7 +54,7 @@ public class JavaFileObject extends SimpleJavaFileObject {
     @Override
     public CharSequence getCharContent(boolean ignoreEncodingErrors) throws IOException {
         if (content == null) {
-            content = new String(Files.readAllBytes(Paths.get(uri)));
+            content = new String(Files.readAllBytes(Paths.get(this.uri)));
         }
         return content;
     }
@@ -78,6 +78,6 @@ public class JavaFileObject extends SimpleJavaFileObject {
 
     @Override
     public String getName() {
-        return Paths.get(path).getFileName().toString();
+        return Paths.get(this.uri).getFileName().toString();
     }
 }
