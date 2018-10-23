@@ -7,10 +7,14 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.BiPredicate;
 
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
@@ -67,6 +71,7 @@ public class Compiler {
      * {@code javac} requires no options, but here, somehow the standard tomcat directory
      * is used, so the option {@code -d} is required.
      */
+    @SuppressWarnings("Duplicates")
     private static String compileJavaFile(JavaFileObject javaFile) throws CompileException, IllegalStateException {
         final String outDir = Paths.get(javaFile.getPath()).getParent().toString();
         javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -85,7 +90,11 @@ public class Compiler {
 
         final Boolean success = task.call();
         if (success) {
-            return javaFile.getPath().replace(".java", ".class");
+            try {
+                return getClassPath(javaFile);
+            } catch (IOException e) {
+                throw new CompileException(e);
+            }
         } else {
             throw new CompileException(writer.toString());
         }
@@ -150,6 +159,7 @@ public class Compiler {
      * Similar to {@link #compileJavaFile(JavaFileObject)}, but the {@code dependency} parameter
      * is added to the compilation units.
      */
+    @SuppressWarnings("Duplicates")
     private static String compileJavaFileWithDependencies(JavaFileObject javaFile, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
         final String outDir = Paths.get(javaFile.getPath()).getParent().toString();
         javax.tools.JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -178,7 +188,11 @@ public class Compiler {
             moveDependencies(dependencies, outDir, success);
         }
         if (success) {
-            return javaFile.getPath().replace(".java", ".class");
+            try {
+                return getClassPath(javaFile);
+            } catch (IOException e) {
+                throw new CompileException(e);
+            }
         } else {
             throw new CompileException(writer.toString());
         }
@@ -246,6 +260,7 @@ public class Compiler {
      * Just like {@link #compileJavaFileWithDependencies(JavaFileObject, List, boolean)},
      * but includes JUnit, Hamcrest and Mockito libraries required for running the tests.
      */
+    @SuppressWarnings("Duplicates")
     private static String compileJavaTestFile(JavaFileObject testFile, List<JavaFileObject> dependencies, boolean cleanUpDependencyClassFiles) throws CompileException, IllegalStateException {
         final String outDir = Paths.get(testFile.getPath()).getParent().toString();
 
@@ -271,7 +286,11 @@ public class Compiler {
             cleanUpDependencies(dependencies, outDir, success);
         }
         if (success) {
-            return testFile.getPath().replace(".java", ".class");
+            try {
+                return getClassPath(testFile);
+            } catch (IOException e) {
+                throw new CompileException(e);
+            }
         } else {
             throw new CompileException(writer.toString());
         }
@@ -321,5 +340,26 @@ public class Compiler {
                 }
             }
         }
+    }
+
+    /**
+     * Retrieves the {@code .class} file for a given {@link JavaFileObject}
+     * by looking through sub folders and matching file names.
+     *
+     * @param javaFile the given java file as a {@link JavaFileObject}.
+     * @return the path to the {@code .class} of the given java file as a {@link String}.
+     * @throws IOException when finding files goes wrong.
+     */
+    private static String getClassPath(JavaFileObject javaFile) throws IOException {
+        final Path startDirectory = Paths.get(javaFile.getPath()).getParent();
+
+        final String targetName = javaFile.getName().replace(".java", ".class");
+        final BiPredicate<Path, BasicFileAttributes> matcher = (path, attr) -> path.getFileName().toString().equals(targetName);
+
+        final Optional<Path> first = Files.find(startDirectory, 200, matcher).findFirst();
+        if (first.isPresent()) {
+            return first.get().toAbsolutePath().toString();
+        }
+        return javaFile.getPath().replace(".java", ".class");
     }
 }
