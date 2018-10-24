@@ -614,16 +614,11 @@ public class DatabaseAccess {
 		return gameList;
 	}
 
-	private static String leftJoinPlayers(){
-		return 	String.join("\n",
-				"LEFT JOIN players ON players.ID=mutants.Player_ID ",
-				"LEFT JOIN users ON players.User_ID = users.User_ID ");
-	}
-
 	public static List<Mutant> getMutantsForGame(int gid) {
 		String query = String.join("\n",
 				"SELECT * FROM mutants ",
-				leftJoinPlayers(),
+				"LEFT JOIN players ON players.ID=mutants.Player_ID ",
+				"LEFT JOIN users ON players.User_ID = users.User_ID ",
 				"WHERE mutants.Game_ID=? AND mutants.ClassFile IS NOT NULL;");
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gid));
@@ -633,7 +628,8 @@ public class DatabaseAccess {
 	public static List<Mutant> getMutantsForPlayer(int pid) {
 		String query = String.join("\n",
 				"SELECT * FROM mutants ",
-				leftJoinPlayers(),
+				"LEFT JOIN players ON players.ID=mutants.Player_ID ",
+				"LEFT JOIN users ON players.User_ID = users.User_ID ",
 				"WHERE mutants.Player_ID=? AND mutants.ClassFile IS NOT NULL;");
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(pid));
@@ -644,7 +640,8 @@ public class DatabaseAccess {
 		String query = String.join("\n",
 				"SELECT mutants.*",
 				"FROM mutants, games",
-				leftJoinPlayers(),
+				"LEFT JOIN players ON players.ID=mutants.Player_ID ",
+				"LEFT JOIN users ON players.User_ID = users.User_ID ",
 				"WHERE mutants.Game_ID = games.ID",
 				"  AND games.Class_ID = ?",
 				"  AND mutants.ClassFile IS NOT NULL;"
@@ -677,7 +674,8 @@ public class DatabaseAccess {
 	public static Mutant getMutant(DuelGame game, int mutantID) {
 		String query = String.join("\n",
 				"SELECT * FROM mutants ",
-				leftJoinPlayers(),
+				"LEFT JOIN players ON players.ID=mutants.Player_ID ",
+				"LEFT JOIN users ON players.User_ID = users.User_ID ",
 				"WHERE mutants.Mutant_ID=? AND mutants.Game_ID=?;");
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantID),
 				DB.getDBV(game.getId())};
@@ -689,8 +687,9 @@ public class DatabaseAccess {
 	public static Mutant getMutant(int gameId, String md5) {
 		String query = String.join("\n",
 				"SELECT * FROM mutants ",
-						leftJoinPlayers(),
-						"WHERE mutants.Game_ID=? AND mutants.MD5=?;");
+				"LEFT JOIN players ON players.ID=mutants.Player_ID ",
+				"LEFT JOIN users ON players.User_ID = users.User_ID ",
+				"WHERE mutants.Game_ID=? AND mutants.MD5=?;");
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(gameId),
 				DB.getDBV(md5)};
 		Connection conn = DB.getConnection();

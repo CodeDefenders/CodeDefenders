@@ -34,6 +34,7 @@
 	// request.setAttribute("tests", game.getTests());
 	request.setAttribute("mutants", game.getMutants());
 	request.setAttribute("showEquivalenceButton", true);
+	// request.setAttribute("markUncoveredEquivalent", game.isMarkUncovered());
 	// request.setAttribute("gameType", "PARTY");
 
 	/* mutant_explanation */

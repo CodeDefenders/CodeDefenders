@@ -18,7 +18,8 @@
         lineNumbers: true,
         matchBrackets: true,
         mode: "text/x-java",
-        readOnly: true
+        readOnly: true,
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
     });
     editorSUT.setSize("100%", 500);
 </script>

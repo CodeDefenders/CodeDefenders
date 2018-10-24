@@ -34,6 +34,7 @@
     // request.setAttribute("tests", game.getTests());
     request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
+    // request.setAttribute("markUncoveredEquivalent", false);
     // request.setAttribute("gameType", "DUEL");
 
     /* finished_modal */

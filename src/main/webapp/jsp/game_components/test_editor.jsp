@@ -97,7 +97,8 @@
         autoCloseBrackets: true,
         styleActiveLine: true,
         extraKeys: {"Ctrl-Space": "autocomplete"},
-        keyMap: "default"
+        keyMap: "default",
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
     });
 
     editorTest.on('beforeChange',function(cm,change) {
