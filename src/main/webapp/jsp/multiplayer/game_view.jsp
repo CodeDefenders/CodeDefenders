@@ -61,6 +61,7 @@
 
     if ((game.getState().equals(GameState.CREATED) || game.getState().equals(GameState.FINISHED)) && (!role.equals(Role.CREATOR))) {
         response.sendRedirect(request.getContextPath()+"/games/user");
+        return;
     }
 
     List<Test> tests = game.getTests(true); // get executable defenders' tests
@@ -154,6 +155,7 @@
 							(nClaimed == 1 ? "" : 's'));
 			messages.add(flaggingMessage);
 			response.sendRedirect(request.getContextPath() + "/multiplayer/play");
+            return;
         } catch (NumberFormatException e){}
 
     } else if (role.equals(Role.ATTACKER) && request.getParameter("acceptEquiv") != null){
@@ -177,6 +179,7 @@
                     notifEquiv.insert();
 
                     response.sendRedirect(request.getContextPath()+"/multiplayer/play");
+                    return;
                 }
             }
         } catch (NumberFormatException e){}
