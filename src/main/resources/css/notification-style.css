@@ -175,3 +175,41 @@
 #game-notification-bar a:hover{
     cursor: pointer;
 }
+
+.mutantCUTImage, .CodeMirror .mutantCUTImage {
+    width: 18px;
+    height: 18px;
+    background-size: contain;
+    display: block;
+    position: relative;
+    float: left;
+    display: flex;
+}
+
+.mutantCUTLegendDesc {
+    text-align: left;
+    float: left;
+    font-weight: bold;
+    font-family: 'Ubuntu', 'Open Sans', sans-serif;
+    margin: 0 8px 0 2px;
+}
+
+.mutantImageAlive, .CodeMirror .mutantImageAlive {
+    background-image: url('../images/mutant.png');
+}
+
+.mutantImageEquiv, .CodeMirror .mutantImageEquiv {
+    background-image: url('../images/mutantEquiv.png');
+}
+
+.mutantImageFlagged, .CodeMirror .mutantImageFlagged {
+    background-image: url('../images/mutantFlagged.png');
+}
+
+.mutantImageKilled, .CodeMirror .mutantImageKilled {
+    background-image: url('../images/mutantKilled.png');
+}
+
+.mutantImageFlagAction, .CodeMirror .mutantImageFlagAction {
+    background-image: url('../images/flag.png');
+}
