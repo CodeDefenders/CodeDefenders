@@ -1,6 +1,7 @@
 /* Icons ================================================== */
 .mutant-icons {
     margin-left: 3px;
+    display: inline-block;
 }
 .mutant-icon {
     display: inline-block;
@@ -10,6 +11,7 @@
     height: 18px;
     max-width: 18px;
     max-height: 18px;
+    display: inline-block;
 }
 .mutant-icon-count {
     /* Font */
