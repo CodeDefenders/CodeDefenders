@@ -10,6 +10,16 @@
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
 	<version>1.3-SNAPSHOT</version>
+	<url>http://www.code-defenders.org/</url>
+	<inceptionYear>2016</inceptionYear>
+
+	<licenses>
+          <license>
+            <name> GNU General Public License (GPL), version 3</name>
+            <url>http://www.gnu.org/licenses/gpl-3.0.en.html</url>
+            <distribution>repo</distribution>
+          </license>
+	</licenses>
 
 	<build>
 		<filters>
@@ -161,8 +171,37 @@
 					<contextReloadable>true</contextReloadable>
 				</configuration>
 			</plugin>
-
+			<plugin>
+			  <groupId>com.mycila</groupId>
+			  <artifactId>license-maven-plugin</artifactId>
+			  <version>3.0</version>
+			  <configuration>
+			    <header>src/etc/header.txt</header>
+			    <useDefaultExcludes>true</useDefaultExcludes>
+			    <properties>
+                              <year>2016-2018</year>
+			    </properties>
+			    <excludes>
+                              <exclude>LICENSE.txt</exclude>
+                              <exclude>README.md</exclude>
+                              <exclude>**/.idea/**</exclude>
+                              <exclude>**/*.js</exclude>
+                              <exclude>**/*.css</exclude>
+                              <exclude>**/*.jsp</exclude>
+                              <exclude>**/*.txt</exclude>
+                              <exclude>**/*.ts</exclude>
+                              <exclude>**/*.</exclude>
+                              <exclude>**/*.html</exclude>
+                              <exclude>**/*.sql</exclude>
+                              <exclude>**/*.xml</exclude>
+                              <exclude>docker/**</exclude>
+			      <exclude>config.properties</exclude>
+			      <exclude>src/test/resources/**</exclude>
+			    </excludes>
+			  </configuration>
+			</plugin>
 		</plugins>
+
 		<finalName>${project.artifactId}</finalName>
 	</build>
 
