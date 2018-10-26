@@ -171,11 +171,16 @@
         %>
     </div>
     <script>
-        <%-- Without the hideAfterRendering class attribute the editor is only rendered
-             when the editor is displayed and actively clicked on.--%>
+        // Please don't blame me.
+
+        // Without the hideAfterRendering class attribute the editor is only rendered
+        // when the editor is displayed and actively clicked on
         $('.hideAfterRendering').each(function () {
             $(this).removeClass('active')
         });
+
+        // This button somehow moved 5px, so it's fixed back again
+        document.getElementById("btnReset").style.marginTop = "-35px";
     </script>
 </div>
 
