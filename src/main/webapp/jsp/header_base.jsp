@@ -78,7 +78,6 @@
     <link href="css/datatables-override.css" rel="stylesheet" type="text/css" />
 
 
-
     <!-- MultiplayerGame -->
     <link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
     <link href="css/notification-style.css" rel="stylesheet" type="text/css" />
@@ -86,6 +85,8 @@
 
     <!-- Upload page -->
     <link href="css/uploadcut.css" rel="stylesheet" type="text/css" />
+
+    <link href="css/game_highlighting.css" rel="stylesheet" type="text/css" />
 
     <script>
         $(document).ready(function() {

@@ -38,7 +38,8 @@
 	request.setAttribute("codeDivSelector", "#cut-div");
 	// request.setAttribute("tests", game.getTests());
 	request.setAttribute("mutants", game.getMutants());
-	request.setAttribute("showEquivalenceButton", true);
+	request.setAttribute("showEquivalenceButton", game.getState() == GameState.ACTIVE);
+    // request.setAttribute("markUncoveredEquivalent", false);
     // request.setAttribute("gameType", "DUEL");
 
 	/* finished_modal */

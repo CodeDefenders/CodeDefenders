@@ -72,8 +72,7 @@
                         for (Mutant m : sortedMutants) {
                     %>
                         <tr>
-                            <% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
-                            <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> (uid <%= creator.getId() %>)</h4>
+                            <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= m.getCreatorName() %> (uid <%= m.getCreatorId() %>)</h4>
                                 <% for (String change : m.getHTMLReadout()) { %>
                                     <p><%=change%><p>
                                 <% } %>
@@ -176,8 +175,7 @@
                         for (Mutant m : sortedKilledMutants) {
                     %>
                         <tr>
-                            <% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
-                            <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> (uid <%= creator.getId() %>)</h4>
+                            <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= m.getCreatorName() %> (uid <%= m.getCreatorId() %>)</h4>
                                 <% for (String change : m.getHTMLReadout()) { %>
                                     <p><%=change %><p>
                                 <% } %>
@@ -249,8 +247,7 @@
                         for (Mutant m : sortedMutantsEquiv) {
                     %>
                         <tr>
-                            <% User creator = DatabaseAccess.getUserFromPlayer(m.getPlayerId()); %>
-                            <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= creator.getUsername() %> [UID: <%= creator.getId() %>]</h4>
+                            <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= m.getCreatorName() %> [UID: <%= m.getCreatorId() %>]</h4>
                                 <% for (String change : m.getHTMLReadout()) { %>
                                     <p><%=change%><p>
                                 <% } %>

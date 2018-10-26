@@ -615,14 +615,22 @@ public class DatabaseAccess {
 	}
 
 	public static List<Mutant> getMutantsForGame(int gid) {
-		String query = "SELECT * FROM mutants WHERE Game_ID=? AND ClassFile IS NOT NULL;";
+		String query = String.join("\n",
+				"SELECT * FROM mutants ",
+				"LEFT JOIN players ON players.ID=mutants.Player_ID ",
+				"LEFT JOIN users ON players.User_ID = users.User_ID ",
+				"WHERE mutants.Game_ID=? AND mutants.ClassFile IS NOT NULL;");
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gid));
 		return getMutants(stmt, conn);
 	}
 
 	public static List<Mutant> getMutantsForPlayer(int pid) {
-		String query = "SELECT * FROM mutants WHERE Player_ID=? AND ClassFile IS NOT NULL;";
+		String query = String.join("\n",
+				"SELECT * FROM mutants ",
+				"LEFT JOIN players ON players.ID=mutants.Player_ID ",
+				"LEFT JOIN users ON players.User_ID = users.User_ID ",
+				"WHERE mutants.Player_ID=? AND mutants.ClassFile IS NOT NULL;");
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(pid));
 		return getMutants(stmt, conn);
@@ -632,6 +640,8 @@ public class DatabaseAccess {
 		String query = String.join("\n",
 				"SELECT mutants.*",
 				"FROM mutants, games",
+				"LEFT JOIN players ON players.ID=mutants.Player_ID ",
+				"LEFT JOIN users ON players.User_ID = users.User_ID ",
 				"WHERE mutants.Game_ID = games.ID",
 				"  AND games.Class_ID = ?",
 				"  AND mutants.ClassFile IS NOT NULL;"
@@ -662,7 +672,11 @@ public class DatabaseAccess {
 	}
 
 	public static Mutant getMutant(DuelGame game, int mutantID) {
-		String query = "SELECT * FROM mutants WHERE Mutant_ID=? AND Game_ID=?;";
+		String query = String.join("\n",
+				"SELECT * FROM mutants ",
+				"LEFT JOIN players ON players.ID=mutants.Player_ID ",
+				"LEFT JOIN users ON players.User_ID = users.User_ID ",
+				"WHERE mutants.Mutant_ID=? AND mutants.Game_ID=?;");
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantID),
 				DB.getDBV(game.getId())};
 		Connection conn = DB.getConnection();
@@ -671,7 +685,11 @@ public class DatabaseAccess {
 	}
 
 	public static Mutant getMutant(int gameId, String md5) {
-		String query = "SELECT * FROM mutants WHERE Game_ID=? AND MD5=?;";
+		String query = String.join("\n",
+				"SELECT * FROM mutants ",
+				"LEFT JOIN players ON players.ID=mutants.Player_ID ",
+				"LEFT JOIN users ON players.User_ID = users.User_ID ",
+				"WHERE mutants.Game_ID=? AND mutants.MD5=?;");
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(gameId),
 				DB.getDBV(md5)};
 		Connection conn = DB.getConnection();
@@ -931,6 +949,18 @@ public class DatabaseAccess {
 						rs.getBoolean("Alive"), Mutant.Equivalence.valueOf(rs.getString("Equivalent")),
 						rs.getInt("RoundCreated"), rs.getInt("RoundKilled"), rs.getInt("Player_ID"));
 				newMutant.setScore(rs.getInt("Points"));
+
+				try {
+					String username = rs.getString("users.Username");
+					int userId = rs.getInt("users.User_ID");
+
+					newMutant.setCreatorName(username);
+					newMutant.setCreatorId(userId);
+
+				} catch (SQLException e2){
+					// Username/ID cannot be retrieved from query (Join wasn't included in query)
+				}
+
 				mutantsList.add(newMutant);
 			}
 		} catch (SQLException se) {

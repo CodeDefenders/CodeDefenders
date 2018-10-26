@@ -46,6 +46,9 @@ public class Mutant implements Serializable {
 	private transient String md5;
 	private transient String classFile;
 
+    private String creatorName;
+	private int creatorId;
+
 	private boolean alive = true;
 
 	private int killingTestId = 0;
@@ -132,6 +135,22 @@ public class Mutant implements Serializable {
 
 		score = 0;
 	}
+
+    public String getCreatorName() {
+        return creatorName;
+    }
+
+    public void setCreatorName(String creatorName) {
+        this.creatorName = creatorName;
+    }
+
+    public int getCreatorId() {
+        return creatorId;
+    }
+
+    public void setCreatorId(int creatorId) {
+        this.creatorId = creatorId;
+    }
 
 	public int getId() {
 		return id;
@@ -336,6 +355,14 @@ public class Mutant implements Serializable {
 			List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());
 			List<String> mutantLines =
 					readLinesIfFileExist(mutantFile.toPath());
+
+			for (int l = 0; l < sutLines.size(); l++){
+				sutLines.set(l, sutLines.get(l).replaceAll("\\s", ""));
+			}
+
+			for (int l = 0; l < mutantLines.size(); l++){
+				mutantLines.set(l, mutantLines.get(l).replaceAll("\\s", ""));
+			}
 
 			difference = DiffUtils.diff(sutLines, mutantLines);
 		}

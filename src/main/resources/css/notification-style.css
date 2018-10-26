@@ -4,10 +4,6 @@
     position:absolute;
 }
 
-#mutationPopup .arrow {
-    border-style: solid;
-}
-
 .left-arrow {
     border-width: 10px 15px 10px 0px;
     margin-left: -15px;
@@ -23,208 +19,6 @@
     content: "";
     border-color: transparent white transparent transparent;
     margin-top: -8px;
-}
-
-
-.CodeMirror #mutationPopup {
-    border-radius: 5px;
-    color: #fff;
-    background-color: #fff;
-    position: absolute;
-    min-height: 25px;
-    z-index:200009;
-    text-align: center;
-    vertical-align: middle;
-    padding: 0px;
-    min-width: 200px;
-    font-family: 'Ubuntu', 'Open Sans', sans-serif;
-    margin-top:0px;
-    margin-left: 3px;
-    border: 2px solid lightgray;
-
-}
-
-.CodeMirror #mutationPopup .title {
-    background-color: #323232;
-    padding: 3px;
-    color: #fff;
-    font-size: 0.8em;
-    float: left;
-    width: 25%;
-    border: 1px solid black;
-    font-family: 'Ubuntu', 'Open Sans', sans-serif;
-}
-
-.mutantCUTImage, .CodeMirror .mutantCUTImage {
-    width: 20px;
-    height: 20px;
-    background-size: contain;
-    display: block;
-    position: relative;
-    float: left;
-    display: flex;
-    margin-top: 0px;
-}
-
-.mutantCUTLegendDesc {
-    text-align: left;
-    float: left;
-    font-weight: bold;
-    font-family: 'Ubuntu', 'Open Sans', sans-serif;
-    margin: 0 8px 0 2px;
-}
-
-.mutantCUTImage span, .CodeMirror .mutantCUTImage span {
-    width: 14px;
-    height: 14px;
-    font-size: 0.8em;
-    text-align: center;
-    color: #FFF;
-    display: block;
-    float: left;
-    margin-right:-4px;
-    margin-left:13px;
-    margin-top:-4px;
-    background-color: #F00;
-    border-radius: 7px;
-    z-index:20001;
-    font-weight: bold;
-    font-family: 'Ubuntu', 'Open Sans', sans-serif;
-}
-
-.mutantImageAlive, .CodeMirror .mutantImageAlive {
-    background-image: url('../images/mutant.png');
-}
-
-.mutantImageEquiv, .CodeMirror .mutantImageEquiv {
-    background-image: url('../images/mutantEquiv.png');
-}
-
-.mutantImageFlagged, .CodeMirror .mutantImageFlagged {
-    background-image: url('../images/mutantFlagged.png');
-}
-
-.mutantImageKilled, .CodeMirror .mutantImageKilled {
-    background-image: url('../images/mutantKilled.png');
-}
-
-.mutantImageFlagAction, .CodeMirror .mutantImageFlagAction {
-    background-image: url('../images/flag.png');
-}
-
-.mutantCUTImage span, .CodeMirror .mutantCUTIcon {
-    width: 20px;
-    height: 20px;
-    background-size: contain;
-    float: left;
-}
-
-.CodeMirror #mutationPopup .mutationInfoExpanded {
-    float:left;
-    margin-left:0px;
-    width: 250px;
-    border: 2px solid lightgray;
-    color: black;
-    display: block;
-}
-
-.CodeMirror #mutationPopup .mutationInfoExpanded h5 {
-    margin: 0px;
-    padding: 5px;
-}
-
-.CodeMirror #mutationPopup .mutationInfoExpanded p .header {
-    text-decoration: underline;
-}
-
-.CodeMirror #mutationPopup .mutationInfoExpanded p {
-    width: 100%;
-    clear: both;
-    margin: 0px;
-    padding: 3px;
-}
-
-.CodeMirror #mutationPopup .mutationInfoExpanded p .left {
-    float:left;
-    text-align: left;
-    width: 40%;
-    overflow: hidden;
-    white-space:nowrap;
-    text-overflow:ellipsis;
-}
-
-.CodeMirror #mutationPopup .mutationInfoExpanded p .central {
-    float: left;
-    text-align: center;
-    width: 29%;
-    overflow: hidden;
-    white-space:nowrap;
-    text-overflow:ellipsis;
-}
-
-.CodeMirror #mutationPopup .mutationInfoExpanded p .right {
-    float:right;
-    text-align: right;
-    width: 29%;
-    overflow: hidden;
-    white-space:nowrap;
-    text-overflow:ellipsis;
-}
-
-.CodeMirror #mutationPopup .action {
-    margin: 0px;
-    color: #fff;
-    text-align: left;
-    width: 100%;
-    float:left;
-    display: flex;
-    font-family: 'Ubuntu', 'Open Sans', sans-serif;
-}
-
-.CodeMirror #mutationPopup .action a {
-    color: black;
-    width: 100%;
-    text-align: left;
-    overflow: hidden;
-    padding: 4px;
-    border-bottom: white 1px solid;
-    border-top: white 1px solid;
-}
-
-.CodeMirror #mutationPopup .action a span {
-    float: left;
-    margin-left: 2px;
-}
-
-.CodeMirror #mutationPopup .action a:hover {
-    text-decoration: none;
-    border-bottom: grey 1px solid;
-    border-top: grey 1px solid;
-    background-color: #dcdcdc;
-}
-.CodeMirror #mutationPopup .summary {
-    color: #fff;
-    float: left;
-    width: 25%;
-    z-index: 20002;
-    position:relative;
-    padding: 3px;
-    font-size: 0.8em;
-    border: 1px solid black;
-    border-left: none;
-    font-family: 'Ubuntu', 'Open Sans', sans-serif;
-}
-
-.CodeMirror #mutationPopup .mutantsAlive {
-    background-color: #F00;
-}
-
-.CodeMirror #mutationPopup .mutantsEquiv {
-    background-color: #c841dd;
-}
-
-.CodeMirror #mutationPopup .mutantsKilled {
-    background-color: #090;
 }
 
 .game-notifications, .game-notifications.min {
@@ -380,4 +174,42 @@
 
 #game-notification-bar a:hover{
     cursor: pointer;
+}
+
+.mutantCUTImage, .CodeMirror .mutantCUTImage {
+    width: 18px;
+    height: 18px;
+    background-size: contain;
+    display: block;
+    position: relative;
+    float: left;
+    display: flex;
+}
+
+.mutantCUTLegendDesc {
+    text-align: left;
+    float: left;
+    font-weight: bold;
+    font-family: 'Ubuntu', 'Open Sans', sans-serif;
+    margin: 0 8px 0 2px;
+}
+
+.mutantImageAlive, .CodeMirror .mutantImageAlive {
+    background-image: url('../images/mutant.png');
+}
+
+.mutantImageEquiv, .CodeMirror .mutantImageEquiv {
+    background-image: url('../images/mutantEquiv.png');
+}
+
+.mutantImageFlagged, .CodeMirror .mutantImageFlagged {
+    background-image: url('../images/mutantFlagged.png');
+}
+
+.mutantImageKilled, .CodeMirror .mutantImageKilled {
+    background-image: url('../images/mutantKilled.png');
+}
+
+.mutantImageFlagAction, .CodeMirror .mutantImageFlagAction {
+    background-image: url('../images/flag.png');
 }

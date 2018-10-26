@@ -26,7 +26,7 @@
         var wordRegex = /[a-zA-Z][a-zA-Z0-9]*/gm;
         var set = new Set();
 
-        var texts = [editorSUT.getValue()];
+        var texts = [editorMutant.getValue()];
 
         texts.forEach(function (text) {
             text = filterOutComments(text);
@@ -71,7 +71,7 @@
         });
     };
 
-    var editorSUT = CodeMirror.fromTextArea(document.getElementById("code"), {
+    var editorMutant = CodeMirror.fromTextArea(document.getElementById("code"), {
         lineNumbers: true,
         indentUnit: 4,
         smartIndent: true,
@@ -81,15 +81,16 @@
         autoCloseBrackets: true,
         styleActiveLine: true,
         extraKeys: {"Ctrl-Space": "autocomplete"},
-        keyMap: "default"
+        keyMap: "default",
+        gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
     });
 
-    editorSUT.setSize("100%", 500);
+    editorMutant.setSize("100%", 500);
 
-    editorSUT.on('focus', function () {
+    editorMutant.on('focus', function () {
         updateAutocompleteList();
     });
-    editorSUT.on('keyHandled', function (cm, name, event) {
+    editorMutant.on('keyHandled', function (cm, name, event) {
         // 9 == Tab, 13 == Enter
         if ([9, 13].includes(event.keyCode)) {
             updateAutocompleteList();
