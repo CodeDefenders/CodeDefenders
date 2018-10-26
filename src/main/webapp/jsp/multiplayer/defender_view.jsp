@@ -5,7 +5,10 @@
 <%-- Set request attributes for the components. --%>
 <%
 	/* class_viewer */
-	request.setAttribute("classCode", game.getCUT().getAsHTMLEscapedString());
+	final GameClass cut = game.getCUT();
+	request.setAttribute("className", cut.getBaseName());
+	request.setAttribute("classCode", cut.getAsHTMLEscapedString());
+	request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
 	/* test_editor */
 	String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);

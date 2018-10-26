@@ -7,11 +7,14 @@
     /* mutant_editor */
     String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+    final GameClass cut = game.getCUT();
     if (previousMutantCode != null) {
         request.setAttribute("mutantCode", previousMutantCode);
     } else {
-        request.setAttribute("mutantCode", game.getCUT().getAsHTMLEscapedString());
+        request.setAttribute("mutantCode", cut.getAsHTMLEscapedString());
     }
+    request.setAttribute("mutantName", cut.getBaseName());
+    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
     /* tests_carousel */
     request.setAttribute("tests", game.getTests());
@@ -63,6 +66,7 @@
         <form id="reset" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() %>" method="post">
             <input type="hidden" name="formType" value="reset">
             <button class="btn btn-primary btn-warning btn-game btn-right" id="btnReset" style="margin-top: -40px; margin-right: 80px">
+                <%--TODO wtf why is this button suddently a little upper. literally 5px--%>
                 Reset
             </button>
         </form>

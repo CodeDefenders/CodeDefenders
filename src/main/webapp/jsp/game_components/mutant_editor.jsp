@@ -8,11 +8,10 @@
 <% { %>
 
 <%
-    String mutantCode = (String) request.getAttribute("mutantCode");
+    final String mutantCode = (String) request.getAttribute("mutantCode");
+    final String mutantName = (String) request.getAttribute("mutantName");
+    final Map<String, String> dependencies = (Map<String, String>) request.getAttribute("dependencies");
 %>
-<pre style="margin-top: 10px;"><textarea id="code" name="mutant" title="mutant" cols="80"
-                                             rows="50"><%=mutantCode%></textarea></pre>
-
 <script>
     autocompletelist = [];
 
@@ -27,6 +26,11 @@
         var set = new Set();
 
         var texts = [editorMutant.getValue()];
+        if (typeof autocompletedClasses !== 'undefined') {
+            Object.getOwnPropertyNames(autocompletedClasses).forEach(function(key) {
+                texts.push(autocompletedClasses[key]);
+            });
+        }
 
         texts.forEach(function (text) {
             text = filterOutComments(text);
@@ -43,7 +47,6 @@
 
         autocompleteList = Array.from(set);
     };
-
     CodeMirror.commands.autocomplete = function (cm) {
         cm.showHint({
             hint: function (editor) {
@@ -71,6 +74,15 @@
         });
     };
 
+</script>
+
+<%
+    if (dependencies.isEmpty()) { // no dependencies -> no tabs
+%>
+<pre style="margin-top: 10px;"><textarea id="code" name="mutant" title="mutant" cols="80"
+                                         rows="50"><%=mutantCode%></textarea></pre>
+
+<script>
     var editorMutant = CodeMirror.fromTextArea(document.getElementById("code"), {
         lineNumbers: true,
         indentUnit: 4,
@@ -86,7 +98,96 @@
     });
 
     editorMutant.setSize("100%", 500);
+</script>
 
+<%
+    } else { // dependencies exist -> tab system
+%>
+<div>
+    <ul class="nav nav-tabs" style="margin-top: 15px">
+        <li role="presentation" class="active"><a href="#<%=mutantName%>" aria-controls="<%=mutantName%>" role="tab" data-toggle="tab"><%=mutantName%></a></li>
+        <%
+            for (String depName : dependencies.keySet()) {
+        %>
+        <li role="presentation"><a href="#<%=depName%>" aria-controls="<%=depName%>" role="tab" data-toggle="tab"><%=depName%></a></li>
+        <%
+            }
+        %>
+    </ul>
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="<%=mutantName%>" data-toggle="tab">
+            <pre><textarea id="code" name="mutant" title="mutant" cols="80"
+                                                     rows="50"><%=mutantCode%></textarea></pre>
+            <script>
+                var editorMutant = CodeMirror.fromTextArea(document.getElementById("code"), {
+                    lineNumbers: true,
+                    indentUnit: 4,
+                    smartIndent: true,
+                    indentWithTabs: true,
+                    matchBrackets: true,
+                    mode: "text/x-java",
+                    autoCloseBrackets: true,
+                    styleActiveLine: true,
+                    extraKeys: {"Ctrl-Space": "autocomplete"},
+                    keyMap: "default",
+                    gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
+                });
+
+                editorMutant.setSize("100%", 500);
+
+                autocompletedClasses = {
+                    '<%=mutantName%>': editorMutant.getTextArea().value
+                }
+            </script>
+        </div>
+        <%
+            for (Map.Entry<String, String> dependency : dependencies.entrySet()) {
+                String depName = dependency.getKey();
+                String depCode = dependency.getValue();
+        %>
+        <div role="tabpanel" class="tab-pane active hideAfterRendering" id="<%=depName%>" data-toggle="tab">
+            <pre class="readonly-pre"><textarea class="readonly-textarea" id="text-<%=depName%>"
+                                                name="text-<%=depName%>"
+                                                title="text-<%=depName%>" cols="80"
+                                                rows="30"><%=depCode%></textarea></pre>
+            <script>
+                let editor<%=depName%> = CodeMirror.fromTextArea(document.getElementById("text-<%=depName%>"), {
+                    lineNumbers: true,
+                    matchBrackets: true,
+                    mode: "text/x-java",
+                    readOnly: true
+                });
+                editor<%=depName%>.setSize("100%", 500); // next to the test editor the cm editor would be too big
+                editor<%=depName%>.refresh();
+
+                Object.assign(autocompletedClasses, {
+                    '<%=depName%>': editor<%=depName%>.getTextArea().value
+                });
+            </script>
+        </div>
+        <%
+            }
+        %>
+    </div>
+    <script>
+        // Please don't blame me.
+
+        // Without the hideAfterRendering class attribute the editor is only rendered
+        // when the editor is displayed and actively clicked on
+        $('.hideAfterRendering').each(function () {
+            $(this).removeClass('active')
+        });
+
+        // This button somehow moved 5px, so it's fixed back again
+        document.getElementById("btnReset").style.marginTop = "-35px";
+    </script>
+</div>
+
+<%
+    }
+%>
+<script>
     editorMutant.on('focus', function () {
         updateAutocompleteList();
     });
@@ -97,5 +198,6 @@
         }
     });
 </script>
-
-<% } %>
+<%
+}
+%>

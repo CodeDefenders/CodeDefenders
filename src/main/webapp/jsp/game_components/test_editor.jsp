@@ -42,9 +42,15 @@
         var set = new Set(testMethods);
 
         var testClass = editorTest.getValue().split("\n");
+        // TODO replace with read-only lines
         testClass.slice(8, testClass.length - 2);
         testClass = testClass.join("\n");
-        var texts = [testClass, editorSUT.getValue()];
+        var texts = [testClass];
+        if (typeof autocompletedClasses !== 'undefined') {
+            Object.getOwnPropertyNames(autocompletedClasses).forEach(function(key) {
+                texts.push(autocompletedClasses[key]);
+            });
+        }
 
         texts.forEach(function (text) {
             text = filterOutComments(text);
@@ -104,6 +110,7 @@
     editorTest.on('beforeChange',function(cm,change) {
         var text = cm.getValue();
         var lines = text.split(/\r|\r\n|\n/);
+        // TODO check auto complete lines above
         var readOnlyLines = [0,1,2,3,4,5,6,7];
         var readOnlyLinesEnd = [lines.length-1,lines.length-2];
         if ( ~readOnlyLines.indexOf(change.from.line) || ~readOnlyLinesEnd.indexOf(change.to.line)) {

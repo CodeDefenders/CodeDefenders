@@ -1,10 +1,12 @@
-<%@ page import="org.codedefenders.game.AbstractGame" %>
 <% { %>
 
 <%-- Set request attributes for the components. --%>
 <%
 	/* class_viewer */
-	request.setAttribute("classCode", game.getCUT().getAsHTMLEscapedString());
+	final GameClass cut = game.getCUT();
+	request.setAttribute("className", cut.getBaseName());
+	request.setAttribute("classCode", cut.getAsHTMLEscapedString());
+	request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
 	/* test_carousel */
 	request.setAttribute("tests", game.getTests());
@@ -35,7 +37,7 @@
 	<h2>Admin</h2>
 	<form id="adminEndBtn" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post" style="display: inline-block;">
 		<button type="submit" class="btn btn-primary btn-game btn-left" id="endGame" form="adminEndBtn"
-				<% if (!game.getState().equals(GameState.ACTIVE)) { %> disabled <% } %>>
+				<% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
 			End Game
 		</button>
 		<input type="hidden" name="formType" value="endGame">
@@ -43,7 +45,7 @@
 	</form>
 	<form id="adminStartBtn" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post" style="display: inline-block;">
 		<button type="submit" class="btn btn-primary btn-game" id="startGame" form="adminStartBtn"
-				<% if (!game.getState().equals(GameState.CREATED)) { %> disabled <% } %>>
+				<% if (game.getState() != GameState.CREATED) { %> disabled <% } %>>
 			Start Game
 		</button>
 		<input type="hidden" name="formType" value="startGame">
