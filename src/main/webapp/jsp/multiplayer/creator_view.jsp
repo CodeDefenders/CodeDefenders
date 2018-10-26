@@ -1,26 +1,12 @@
-<%@ page import="org.codedefenders.database.GameClassDAO" %>
-<%@ page import="org.codedefenders.model.Dependency" %>
-<%@ page import="org.codedefenders.util.Constants" %>
-<%@ page import="java.nio.file.Files" %>
-<%@ page import="java.nio.file.Paths" %>
-<%@ page import="java.util.Map" %>
 <% { %>
 
 <%-- Set request attributes for the components. --%>
 <%
 	/* class_viewer */
-	request.setAttribute("className", game.getClassName());
-	request.setAttribute("classCode", game.getCUT().getAsHTMLEscapedString());
-	{
-		Map<String, String> dependencies = new HashMap<>();
-		for (Dependency dep : GameClassDAO.getMappedDependenciesForClassId(game.getClassId())) {
-			final String javaFile = dep.getJavaFile();
-			String depName = javaFile.substring(javaFile.lastIndexOf(Constants.F_SEP) + 1, javaFile.lastIndexOf("."));
-			String depContent = new String(Files.readAllBytes(Paths.get(javaFile)));
-			dependencies.put(depName, depContent);
-		}
-		request.setAttribute("dependencies", dependencies);
-	}
+	final GameClass cut = game.getCUT();
+	request.setAttribute("className", cut.getBaseName());
+	request.setAttribute("classCode", cut.getAsHTMLEscapedString());
+	request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
 	/* test_carousel */
 	request.setAttribute("tests", game.getTests());

@@ -11,11 +11,14 @@
     /* mutant_editor */
     String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+    final GameClass cut = game.getCUT();
     if (previousMutantCode != null) {
         request.setAttribute("mutantCode", previousMutantCode);
     } else {
-        request.setAttribute("mutantCode", game.getCUT().getAsHTMLEscapedString());
+        request.setAttribute("mutantCode", cut.getAsHTMLEscapedString());
     }
+    request.setAttribute("mutantName", cut.getBaseName());
+    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
     /* tests_carousel */
     request.setAttribute("tests", game.getTests());

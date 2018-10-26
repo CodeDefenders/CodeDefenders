@@ -22,8 +22,11 @@ import org.apache.commons.lang3.Range;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.singleplayer.NoDummyGameException;
+import org.codedefenders.model.Dependency;
+import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,8 +38,10 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -142,6 +147,30 @@ public class GameClass {
 	@SuppressWarnings("Duplicates")
 	public String getAsHTMLEscapedString() {
 		return StringEscapeUtils.escapeHtml(getAsString());
+	}
+
+	/**
+	 * Returns a mapping of dependency class names and its HTML escaped class content.
+	 */
+	public Map<String, String> getHTMLEscapedDependencyCode() {
+	    // FIXME Phil 26/10/18: make this nicer
+		final Map<String, String> dependencies = new HashMap<>();
+		for (Dependency dep : GameClassDAO.getMappedDependenciesForClassId(id)) {
+			final String javaFile = dep.getJavaFile();
+			String depName = javaFile.substring(javaFile.lastIndexOf(Constants.F_SEP) + 1, javaFile.lastIndexOf("."));
+			String depContent;
+			try {
+				depContent = new String(Files.readAllBytes(Paths.get(javaFile)));
+			} catch (FileNotFoundException e) {
+				logger.error("Could not find file " + javaFile);
+				depContent = "[File Not Found]";
+			} catch (IOException e) {
+				logger.error("Could not read file " + javaFile);
+				depContent = "[File Not Readable]";
+			}
+			dependencies.put(depName, depContent);
+		}
+		return dependencies;
 	}
 
 	@Deprecated
