@@ -18,12 +18,10 @@
  */
 package org.codedefenders.systemtests;
 
-import static org.junit.Assert.fail;
-
-import java.net.URL;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
+import com.palantir.docker.compose.DockerComposeRule;
+import com.palantir.docker.compose.configuration.DockerComposeFiles;
+import com.palantir.docker.compose.connection.DockerPort;
+import com.palantir.docker.compose.connection.waiting.HealthChecks;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -39,14 +37,12 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.LocalFileDetector;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
-import com.palantir.docker.compose.DockerComposeRule;
-import com.palantir.docker.compose.configuration.DockerComposeFiles;
-import com.palantir.docker.compose.connection.DockerPort;
-import com.palantir.docker.compose.connection.waiting.HealthChecks;
-import com.spotify.docker.client.DefaultDockerClient;
-import com.spotify.docker.client.DockerClient;
-import com.spotify.docker.client.LogStream;
-import com.spotify.docker.client.messages.ExecCreation;
+import java.net.URL;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+
+import static org.junit.Assert.fail;
 
 /**
  * 
@@ -137,11 +133,11 @@ public class UploadUncompilableClassTest {
 		driver.findElement(By.linkText("upload a class under test")).click();
 
 		// Do not click this, otherwise it will open the local file window
-		// driver.findElement(By.id("fileUpload")).click();
+		// driver.findElement(By.id("fileUploadCUT")).click();
 
 		// THIS ACTION IS TRIGGERED FROM WITHIN THE SELENIUM CONTAINER, that's
 		// why we need to mount this local folder to it !!!
-		driver.findElement(By.id("fileUpload")).sendKeys("/sources/Uncompilable/Uncompilable.java");
+		driver.findElement(By.id("fileUploadCUT")).sendKeys("/sources/Uncompilable/Uncompilable.java");
 
 		driver.findElement(By.xpath("//input[@value='Upload']")).click();
 

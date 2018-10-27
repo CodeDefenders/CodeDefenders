@@ -21,7 +21,9 @@ package org.codedefenders.systemtests;
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.configuration.DockerComposeFiles;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
-import org.junit.*;
+
+import org.junit.ClassRule;
+import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.openqa.selenium.By;
 import org.openqa.selenium.remote.LocalFileDetector;
@@ -29,7 +31,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 /**
  * System test that uploads a valid class and three invalid classes.
@@ -65,9 +66,9 @@ public class UploadClassesTest extends AbstractEmptyDBSystemTest {
 	    setLocalFileDetectorAndLogin();
 
         driver.findElement(By.id("headerUploadButton")).click();
-        driver.findElement(By.id("fileUpload")).click();
-        driver.findElement(By.id("fileUpload")).clear();
-        driver.findElement(By.id("fileUpload")).sendKeys("/sources/UploadTest/Valid.java");
+        driver.findElement(By.id("fileUploadCUT")).click();
+        driver.findElement(By.id("fileUploadCUT")).clear();
+        driver.findElement(By.id("fileUploadCUT")).sendKeys("/sources/UploadTest/Valid.java");
         driver.findElement(By.id("upload")).click();
         driver.findElement(By.id("headerUploadButton")).click();
 
@@ -83,9 +84,9 @@ public class UploadClassesTest extends AbstractEmptyDBSystemTest {
 		setLocalFileDetectorAndLogin();
 
 		driver.findElement(By.id("headerUploadButton")).click();
-		driver.findElement(By.id("fileUpload")).click();
-		driver.findElement(By.id("fileUpload")).clear();
-		driver.findElement(By.id("fileUpload")).sendKeys("/sources/UploadTest/InvalidExtension.jav");
+		driver.findElement(By.id("fileUploadCUT")).click();
+		driver.findElement(By.id("fileUploadCUT")).clear();
+		driver.findElement(By.id("fileUploadCUT")).sendKeys("/sources/UploadTest/InvalidExtension.jav");
 		driver.findElement(By.id("upload")).click();
 		driver.findElement(By.id("headerUploadButton")).click();
 
@@ -101,9 +102,9 @@ public class UploadClassesTest extends AbstractEmptyDBSystemTest {
 		setLocalFileDetectorAndLogin();
 
 		driver.findElement(By.id("headerUploadButton")).click();
-		driver.findElement(By.id("fileUpload")).click();
-		driver.findElement(By.id("fileUpload")).clear();
-		driver.findElement(By.id("fileUpload")).sendKeys("/sources/UploadTest/NonJava.java");
+		driver.findElement(By.id("fileUploadCUT")).click();
+		driver.findElement(By.id("fileUploadCUT")).clear();
+		driver.findElement(By.id("fileUploadCUT")).sendKeys("/sources/UploadTest/NonJava.java");
 		driver.findElement(By.id("upload")).click();
 		driver.findElement(By.id("headerUploadButton")).click();
 
@@ -119,9 +120,9 @@ public class UploadClassesTest extends AbstractEmptyDBSystemTest {
 	    setLocalFileDetectorAndLogin();
 
 		driver.findElement(By.id("headerUploadButton")).click();
-		driver.findElement(By.id("fileUpload")).click();
-		driver.findElement(By.id("fileUpload")).clear();
-		driver.findElement(By.id("fileUpload")).sendKeys("/sources/UploadTest/SyntaxErrors.java");
+		driver.findElement(By.id("fileUploadCUT")).click();
+		driver.findElement(By.id("fileUploadCUT")).clear();
+		driver.findElement(By.id("fileUploadCUT")).sendKeys("/sources/UploadTest/SyntaxErrors.java");
 		driver.findElement(By.id("upload")).click();
 		driver.findElement(By.id("headerUploadButton")).click();
 
