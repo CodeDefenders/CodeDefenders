@@ -85,18 +85,19 @@
                                 <%
                                     if (markEquivalent
                                         && m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
-                                        && (markUncoveredEquivalent || m.isCovered())) {
+                                        && (markUncoveredEquivalent || m.isCovered())
+                                        && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID) {
                                         if ("PARTY".equals(gameType)) {
                                             if (m.getLines().size() > 1) {
                                 %>
                                                 <a href="<%= request.getContextPath() %>/multiplayer/play?equivLines=<%=m.getLines().toString().replaceAll(", ", ",") %>"
                                                    class="btn btn-default btn-diff"
-                                                   onclick="return confirm('This will mark all mutants on lines <%= m.getLines() %> as equivalent. Are you sure?');">
+                                                   onclick="return confirm('This will mark all player-created mutants on lines <%= m.getLines() %> as equivalent. Are you sure?');">
                                                     Claim Equivalent</a>
                                                 <% } else { %>
                                                 <a  href="<%= request.getContextPath() %>/multiplayer/play?equivLine=<%= m.getLines().get(0) %>"
                                                    class="btn btn-default btn-diff"
-                                                   onclick="return confirm('This will mark all mutants on line <%= m.getLines().get(0) %> as equivalent. Are you sure?');">
+                                                   onclick="return confirm('This will mark all player-created mutants on line <%= m.getLines().get(0) %> as equivalent. Are you sure?');">
                                                     Claim Equivalent</a>
                                 <%
                                             }
