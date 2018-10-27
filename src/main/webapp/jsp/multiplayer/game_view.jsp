@@ -132,7 +132,7 @@
 				if (game.isLineCovered(equivLine)) {
 					noneCovered = false;
 					for (Mutant m : mutantsAlive) {
-						if (m.getLines().contains(equivLine)) {
+						if (m.getLines().contains(equivLine) && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID) {
 							m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
 							// BAD
 							m.update();

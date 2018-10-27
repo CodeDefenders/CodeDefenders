@@ -291,7 +291,7 @@
                 if (status === MutantStatus.alive <%=markUncoveredEquivalent ? "" : "&& coverageOnLine.get(line)"%>) {
                     <% if (gameType.equals("PARTY")) { %>
                         button =
-                           `<form onsubmit="if (window.confirm('This will mark all mutants on line ` + line + ` as equivalent. Are you sure?')) { window.location.href = \'multiplayer/play?equivLine=` + line + `\'; } return false;">
+                           `<form onsubmit="if (window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')) { window.location.href = \'multiplayer/play?equivLine=` + line + `\'; } return false;">
                                 <button class="btn btn-danger btn-sm" style="width: 100%;">
                                     <img src="<%=request.getContextPath()%>/images/flag.png" class="mutant-icon-image"/> Claim Equivalent
                                 </button>
