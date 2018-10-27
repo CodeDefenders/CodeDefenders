@@ -1,3 +1,5 @@
-selenium: 
-  volumes:
-    - "./data/sources:/sources"
+version: '3'
+services:
+  selenium: 
+    volumes:
+      - ./data/sources:/sources
