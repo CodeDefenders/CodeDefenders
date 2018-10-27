@@ -23,41 +23,49 @@
 					<br>
 					<span>The class used for games. Mutants are created from and tests are created for this class.</span>
 				</div>
-				<div>
-					<h3>Upload Dependencies (optional)</h3>
-					<span class="file-select">
-                        <input id="fileUploadDependency" name="fileUploadDependency" type="file" class="file-loading" accept=".zip" />
-                    </span>
-					<br>
-					<span>
-                        If the class under test has dependencies, upload them as inside a <code>zip</code> file.
-					</span>
-				</div>
-				<div>
-					<h3>Upload Mutants (optional)</h3>
-					<span class="file-select">
-                        <input id="fileUploadMutant" name="fileUploadMutant" type="file" class="file-loading" accept=".zip" />
-                    </span>
-					<br>
-                    <span>
-                        Mutants uploaded with a class under test can be used to initialize games with existing mutants.
-                        Note that all mutants must have the same class name as the class under test and must be uploaded inside a <code>zip</code> file.
-					</span>
-				</div>
-				<div>
-					<h3>Upload Tests (optional)</h3>
-					<span class="file-select">
-                        <input id="fileUploadTest" name="fileUploadTest" type="file" class="file-loading" accept=".zip" />
-                    </span>
-					<br>
-                    <span>
-                        Tests uploaded with a class under test can be used to initialize games with existing tests.
-                        Note that all tests must be uploaded inside a <code>zip</code> file.
-                    </span>
-				</div>
-				<br>
-                <input id="mockingEnabled" type="checkbox" name="enableMocking" value="isMocking" style="margin-right:5px;">Enable Mocking for this class</input>
-				<br>
+
+				<button class="btn btn-light" type="button" data-toggle="collapse" data-target="#collapseAdvanced" aria-expanded="false" aria-controls="collapseExample">
+					Advanced upload options...
+				</button>
+            <span class="border border-primary">
+                    <div class="collapse" id="collapseAdvanced">
+                        <div>
+                            <h3>Upload Dependencies (optional)</h3>
+                            <span class="file-select">
+                                <input id="fileUploadDependency" name="fileUploadDependency" type="file" class="file-loading" accept=".zip" />
+                            </span>
+                            <br>
+                            <span>
+                                If the class under test has dependencies, upload them as inside a <code>zip</code> file.
+                            </span>
+                        </div>
+                        <div>
+                            <h3>Upload Mutants (optional)</h3>
+                            <span class="file-select">
+                                <input id="fileUploadMutant" name="fileUploadMutant" type="file" class="file-loading" accept=".zip" />
+                            </span>
+                            <br>
+                            <span>
+                                Mutants uploaded with a class under test can be used to initialize games with existing mutants.
+                                Note that all mutants must have the same class name as the class under test and must be uploaded inside a <code>zip</code> file.
+                            </span>
+                        </div>
+                        <div>
+                            <h3>Upload Tests (optional)</h3>
+                            <span class="file-select">
+                                <input id="fileUploadTest" name="fileUploadTest" type="file" class="file-loading" accept=".zip" />
+                            </span>
+                            <br>
+                            <span>
+                                Tests uploaded with a class under test can be used to initialize games with existing tests.
+                                Note that all tests must be uploaded inside a <code>zip</code> file.
+                            </span>
+                        </div>
+                        <br>
+                        <input id="mockingEnabled" type="checkbox" name="enableMocking" value="isMocking" style="margin-right:5px;">Enable Mocking for this class</input>
+                        <br>
+                    </div>
+                </span>
 				<span class="submit-button">
 					<input id="upload" type="submit" class="fileinput-upload-button" value="Upload" onClick="this.form.submit(); this.disabled=true; this.value='Uploading...';"/>
 				</span>
