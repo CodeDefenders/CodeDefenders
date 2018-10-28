@@ -26,7 +26,7 @@ import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.validation.CodeValidator;
+import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,6 +130,7 @@ public class Mutant implements Serializable {
 	 */
 	public Mutant(int gameId, String jFile, String cFile, boolean alive, int playerId) {
 		this.gameId = gameId;
+		// FIXME: Why is this limited to a duel game?
 		final DuelGame game = DatabaseAccess.getGameForKey("ID", gameId);
 		if (game != null) {
 			this.roundCreated = game.getCurrentRound();

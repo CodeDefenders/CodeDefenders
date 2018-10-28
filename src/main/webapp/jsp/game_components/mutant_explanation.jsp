@@ -18,7 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.validation.CodeValidator.CodeValidatorLevel" %>
+<%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 
 <%--

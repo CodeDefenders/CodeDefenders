@@ -41,7 +41,8 @@ import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.FeedbackManager;
-import org.codedefenders.validation.CodeValidator;
+import org.codedefenders.validation.code.CodeValidator;
+import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -88,7 +89,7 @@ public class RunnerTest {
 		cut1 = new GameClass("MyClass", "", "", "");
 		cut2 = new GameClass("", "AliasForClass2", "", "");
 		multiplayerGame = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.CREATED.name(), false, 5, true, CodeValidator.CodeValidatorLevel.MODERATE, false);
+				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.CREATED.name(), false, 5, true, CodeValidatorLevel.MODERATE, false);
 	}
 
 	// This will re-create the same DB from scratch every time... is this really
@@ -198,14 +199,14 @@ public class RunnerTest {
 
 		MultiplayerGame mg2 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
 				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true,
-				CodeValidator.CodeValidatorLevel.MODERATE, false);
+				CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg2.insert());
 		assumeTrue(mg2.addPlayer(user1.getId(), Role.DEFENDER));
 		assertTrue(mg2.update());
 		
 		MultiplayerGame mg3 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
 				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true,
-				CodeValidator.CodeValidatorLevel.MODERATE, false);
+				CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg3.insert());
 		
 		assumeTrue(mg3.addPlayer(user1.getId(), Role.DEFENDER));
@@ -214,7 +215,7 @@ public class RunnerTest {
 
 		MultiplayerGame mg4 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
 				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.FINISHED.name(), false, 2, true,
-				CodeValidator.CodeValidatorLevel.MODERATE, false);
+				CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg4.insert());
 		
 		// TODO Why is 0

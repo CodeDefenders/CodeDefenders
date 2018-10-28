@@ -34,7 +34,7 @@ import java.util.zip.ZipFile;
  * This class offers static utility classes for creating and
  * reading {@code .zip} files.
  *
- * @author <a href=https://github.com/werli>Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli<a/>
  */
 public class ZipFileUtils {
 

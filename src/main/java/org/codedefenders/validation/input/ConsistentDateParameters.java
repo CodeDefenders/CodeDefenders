@@ -16,8 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.validation;
-
+package org.codedefenders.validation.input;
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -26,16 +26,16 @@ import java.lang.annotation.Target;
 import javax.validation.Constraint;
 import javax.validation.Payload;
 
-//  https://stackoverflow.com/questions/19537664/how-to-validate-number-string-as-digit-with-hibernate
-@Constraint(validatedBy = EnsureIntegerValidator.class)
-@Target({ ElementType.FIELD, ElementType.PARAMETER })
+@Constraint(validatedBy = ConsistentDateParameterValidator.class)
+@Target({ ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EnsureInteger {
-
-	String message() default "Not an integer";
-
-	Class<?>[] groups() default {};
-
-	Class<? extends Payload>[] payload() default {};
-
+@Documented
+public @interface ConsistentDateParameters {
+ 
+    String message() default
+      "End date must be after begin date and both must be in the future";
+ 
+    Class<?>[] groups() default {};
+ 
+    Class<? extends Payload>[] payload() default {};
 }

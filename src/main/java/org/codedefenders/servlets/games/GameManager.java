@@ -33,8 +33,10 @@ import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
-import org.codedefenders.validation.CodeValidator;
-import org.codedefenders.validation.CodeValidatorException;
+import org.codedefenders.validation.code.CodeValidator;
+import org.codedefenders.validation.code.CodeValidatorException;
+import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -71,7 +75,7 @@ import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
-import static org.codedefenders.validation.CodeValidator.DEFAULT_NB_ASSERTIONS;
+import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
 
 public class GameManager extends HttpServlet {
 
@@ -280,11 +284,11 @@ public class GameManager extends HttpServlet {
 				String mutantText = request.getParameter("mutant");
 
 				// Duels are always 'strict'
-				String validityMessage = getMutantValidityMessage(activeGame.getClassId(), mutantText, CodeValidator.CodeValidatorLevel.STRICT);
-				if (!validityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE)) {
+				ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(activeGame.getCUT().getAsString(), mutantText, CodeValidatorLevel.STRICT);
+				if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
 					// Mutant is either the same as the CUT or it contains invalid code
 					// Do not restore mutated code
-					messages.add(validityMessage);
+					messages.add(validationMessage.get());
 					break;
 				}
 				Mutant existingMutant = existingMutant(activeGame.getId(), mutantText);
@@ -400,14 +404,6 @@ public class GameManager extends HttpServlet {
 		response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());//doGet(request, response);
 	}
 
-	static String getMutantValidityMessage(int cid, String mutatedCode, CodeValidator.CodeValidatorLevel codeValidatorLevel) throws IOException {
-		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
-
-		String sourceCode = classMutated.getAsString();
-
-		return CodeValidator.getValidationMessage(sourceCode, mutatedCode, codeValidatorLevel);
-	}
-
 	static Mutant existingMutant(int gid, String mutatedCode) throws IOException {
 		String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
 
@@ -480,7 +476,8 @@ public class GameManager extends HttpServlet {
 		}
 		
 		// Validate code or short circuit here
-		if (!CodeValidator.validTestCode(javaFile, maxNumberOfAssertions)) {
+		final String testCode = new String(Files.readAllBytes(Paths.get(javaFile)));
+		if (!CodeValidator.validateTestCode(testCode, maxNumberOfAssertions)) {
 			return null;
 		}
 

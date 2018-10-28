@@ -18,8 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.validation.CodeValidator" %>
-<%@ page import="static org.codedefenders.validation.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
+<%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
+<%@ page import="static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
 <% String pageTitle = "Create Battleground"; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <%
@@ -437,8 +437,8 @@
                 <td id="mutantValidatorLevelTd">
                     <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
                             data-size="medium">
-                        <%for (CodeValidator.CodeValidatorLevel cvl : CodeValidator.CodeValidatorLevel.values()) {%>
-                        <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidator.CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
+                        <%for (CodeValidatorLevel cvl : CodeValidatorLevel.values()) {%>
+                        <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
                             <%=cvl.name().toLowerCase()%>
                         </option>
                         <%}%>

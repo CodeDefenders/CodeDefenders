@@ -117,6 +117,9 @@ public class Constants {
 	public static final String ADMIN_ANALYTICS_USERS = "/admin/analytics/users";
 	public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";
 
+	public static final String API_ANALYTICS_USERS = "/api/users";
+	public static final String API_ANALYTICS_CLASSES = "/api/classes";
+
 	// Messages
 	public static final String WINNER_MESSAGE = "You won!";
 	public static final String LOSER_MESSAGE = "You lost!";
@@ -140,15 +143,6 @@ public class Constants {
 	public static final String MUTANT_ACCEPTED_EQUIVALENT_MESSAGE = "The mutant was accepted as equivalent.";
 	public static final String MUTANT_UNCOMPILABLE_MESSAGE = "Your mutant failed to compile. Try again.";
 
-	public static final String MUTANT_VALIDATION_SUCCESS_MESSAGE = "Your mutant complies with our rules.";
-	public static final String MUTANT_VALIDATION_LINES_MESSAGE = "Invalid mutant, sorry! Removing or adding lines is not allowed.";
-	public static final String MUTANT_VALIDATION_MODIFIER_MESSAGE = "Invalid mutant, sorry! Changing modifiers such as 'static' or 'public' is not allowed.";
-	public static final String MUTANT_VALIDATION_COMMENT_MESSAGE = "Invalid mutant, sorry! Adding or modifying comments is not allowed.";
-	public static final String MUTANT_VALIDATION_LOGIC_MESSAGE = "Invalid mutant, sorry! Your mutant contains new logical operations";
-	public static final String MUTANT_VALIDATION_OPERATORS_MESSAGE = "Invalid mutant, sorry! Your mutant contains prohibited operations such as bitshifts, ternary operators, added comments or multiple statments per line.";
-	public static final String MUTANT_VALIDATION_CALLS_MESSAGE = "Your mutant contains calls to System.*, Random.* or new control structures.\n\nShame on you!";
-	public static final String MUTANT_VALIDATION_IDENTICAL_MESSAGE = "Invalid mutant, sorry! Your mutant is identical to the CUT";
-
 	public static final String MUTANT_INVALID_MESSAGE = "Invalid mutant, sorry! Your mutant is identical to the CUT or it contains invalid code (ifs, loops, or new logical ops.)";
 	public static final String MUTANT_CREATION_ERROR_MESSAGE = "Oops! Something went wrong and the mutant was not created.";
 	public static final String MUTANT_DUPLICATED_MESSAGE = "Sorry, your mutant already exists in this game!";
@@ -163,10 +157,5 @@ public class Constants {
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_TEST = "previousTest";
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_MUTANT = "previousMutant";
 
-	public static final String MUTANT_VALIDATION_METHOD_SIGNATURE_MESSAGE = "Invalid mutant, sorry! Your mutant changes one or more method signatures or field names or import statements";
-
 	public static final String ATTACKER_HAS_PENDING_DUELS = "Sorry, your mutant cannot be accepted because you have pending equivalence duels !\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
-
-	public static final String API_ANALYTICS_USERS = "/api/users";
-	public static final String API_ANALYTICS_CLASSES = "/api/classes";
 }

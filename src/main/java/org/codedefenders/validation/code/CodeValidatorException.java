@@ -16,25 +16,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders.validation;
+package org.codedefenders.validation.code;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+public class CodeValidatorException extends Exception {
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
+    private static final long serialVersionUID = -4526964014168540391L;
 
-@Constraint(validatedBy = EnsureFloatValidator.class)
-@Target({ ElementType.FIELD, ElementType.PARAMETER })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface EnsureFloat {
+    public CodeValidatorException() {
+        super();
+    }
 
-	String message() default "Not a float";
+    public CodeValidatorException(String message) {
+        super(message);
+    }
 
-	Class<?>[] groups() default {};
-
-	Class<? extends Payload>[] payload() default {};
+    public CodeValidatorException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }

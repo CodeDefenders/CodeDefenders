@@ -30,7 +30,7 @@ import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.model.User;
-import org.codedefenders.validation.CodeValidator;
+import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -618,7 +618,7 @@ public class DatabaseAccess {
 						rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),
 						rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"),
 						rs.getInt("MaxAssertionsPerTest"),rs.getBoolean("ChatEnabled"),
-						CodeValidator.CodeValidatorLevel.valueOf(rs.getString("MutantValidator")), rs.getBoolean("MarkUncovered"));
+						CodeValidatorLevel.valueOf(rs.getString("MutantValidator")), rs.getBoolean("MarkUncovered"));
 				mg.setId(rs.getInt("ID"));
 				gameList.add(mg);
 			}

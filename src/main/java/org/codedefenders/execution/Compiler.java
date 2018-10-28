@@ -50,7 +50,7 @@ import static org.codedefenders.util.Constants.TEST_CLASSPATH;
  * <p>
  * Test cases can also be compiled, but require a reference to the tested class.
  *
- * @author <a href=https://github.com/werli>Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli<a/>
  * @see CompileException
  * @see JavaFileObject
  */
