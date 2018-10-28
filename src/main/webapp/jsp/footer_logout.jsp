@@ -34,6 +34,46 @@
 		<div class="row-fluid">
 			<ul class="papercite_bibliography">
 				<li>
+					<a href="papers/SIGCSE19_Course.pdf" title='Download PDF'>
+						<img src='images/pdf.png' alt="[PDF]"/>
+					</a>
+					Gordon Fraser, Alessio Gambi, Marvin Kreis and Jos&eacute; Miguel Rojas.
+					<span class="paper_title">&#8220;Gamifying a Software Testing Course with Code Defenders,&#8221;</span>
+					In <span class="paper_venue">Proc. of the ACM Technical Symposium on Computer Science Education (SIGCSE)</span>, ACM, 2017.
+					<a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('sigcse19_bibtex'));">[Bibtex]</a>
+					<div id="sigcse19_bibtex" class="bibtex_hide" >
+	<pre class="tex"><code>@inproceedings{ICSE_SEET2017_CodeDefenders,
+		author = {Gordon Fraser and Alessio Gambi and Marvin Kreis and Jos{\'e} Miguel Rojas},
+		title = {Gamifying a Software Testing Course with Code Defenders},
+		booktitle = {Proc. of the ACM Technical Symposium on Computer Science Education (SIGCSE)},
+		series = {SIGCSE'19},
+		publisher = {ACM},
+		note = {To appear},
+		year = {2019}
+	}</code></pre>
+					</div>
+				</li>
+				<li>
+					<a href="papers/ECSEE18_Course.pdf" title='Download PDF'>
+						<img src='images/pdf.png' alt="[PDF]"/>
+					</a>
+					Gordon Fraser, Alessio Gambi, Jos&eacute; Miguel Rojas.
+					<span class="paper_title">&#8220;A Preliminary Report on Gamifying a Software Testing Course with the Code Defenders Testing Game,&#8221;</span>
+					In <span class="paper_venue">Proc. of The European Conference of Software Engineering Education</span>, ACM, 2018.
+					<a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('ecsee18_course'));">[Bibtex]</a>
+					<div id="ecsee18_course" class="bibtex_hide" >
+	<pre class="tex"><code>@inproceedings{ECSEE2018_CodeDefenders,
+		author = {Gordon Fraser and Alessio Gambi and Jos{\'e} Miguel Rojas},
+		title = {A Preliminary Report on Gamifying a Software Testing Course with the Code Defenders Testing Game},
+		booktitle = {Proc. of The European Conference of Software Engineering Education (ECSEE) 2018},
+		series = {ECSEE'18},
+		pages = {50--54},
+		publisher = {ACM},
+		year = {2018}
+	}</code></pre>
+					</div>
+				</li>
+				<li>
 					<a href="papers/ICSE17_Education.pdf" title='Download PDF'>
 						<img src='images/pdf.png' alt="[PDF]"/>
 					</a>
