@@ -25,7 +25,7 @@ import org.codedefenders.game.GameClass;
  * with a {@link GameClass}. The class under test its uploaded with
  * is referenced by the {@link #classId} field.
  *
- * @author <a href=https://github.com/werli>Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli<a/>
  */
 public class Dependency {
     private int id;

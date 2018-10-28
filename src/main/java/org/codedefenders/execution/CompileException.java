@@ -21,7 +21,7 @@ package org.codedefenders.execution;
 /**
  * This exception marks general errors during compiling.
  *
- * @author <a href=https://github.com/werli>Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli<a/>
  */
 public class CompileException extends Exception {
     public CompileException() {

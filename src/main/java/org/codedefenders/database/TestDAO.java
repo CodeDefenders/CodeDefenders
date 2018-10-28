@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 /**
  * This class handles the database logic for tests.
  *
- * @author <a href=https://github.com/werli>Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli<a/>
  * @see Test
  */
 public class TestDAO {
