@@ -400,30 +400,22 @@ public class GameManager extends HttpServlet {
 		response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());//doGet(request, response);
 	}
 
-	public static String getMutantValidityMessage(int cid, String mutatedCode, CodeValidator.CodeValidatorLevel codeValidatorLevel) throws IOException {
+	static String getMutantValidityMessage(int cid, String mutatedCode, CodeValidator.CodeValidatorLevel codeValidatorLevel) throws IOException {
 		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
 
 		String sourceCode = classMutated.getAsString();
 
-		// is it an actual mutation?
-		String md5CUT = CodeValidator.getMD5FromText(sourceCode);
-		String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
-
-		// mutant is valid only if it differs from CUT and does not contain forbidden constructs
-		if (md5CUT.equals(md5Mutant))
-			return Constants.MUTANT_VALIDATION_IDENTICAL_MESSAGE;
-
 		return CodeValidator.getValidationMessage(sourceCode, mutatedCode, codeValidatorLevel);
 	}
 
-	public static Mutant existingMutant(int gid, String mutatedCode) throws IOException {
+	static Mutant existingMutant(int gid, String mutatedCode) throws IOException {
 		String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
 
 		// return the mutant in the game with same MD5 if it exists; return null otherwise
 		return DatabaseAccess.getMutant(gid, md5Mutant);
 	}
 
-	public static boolean hasAttackerPendingMutantsInGame(int gid, int attackerId){
+	static boolean hasAttackerPendingMutantsInGame(int gid, int attackerId){
 		for( Mutant m : DatabaseAccess.getMutantsForGame(gid) ){
 			if (m.getPlayerId() == attackerId &&  m.getEquivalent() == Mutant.Equivalence.PENDING_TEST){
 				return true;

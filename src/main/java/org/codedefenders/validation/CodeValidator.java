@@ -91,10 +91,16 @@ public class CodeValidator {
 	// This validation pipeline should use the Chain-of-Responsibility design pattern
 	public static String getValidationMessage(String originalCode, String mutatedCode, CodeValidatorLevel level) {
 
-		// if only string literals were changed
-		if (onlyLiteralsChanged(originalCode, mutatedCode)) {
-			return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
+		// Literally identical?
+		if (originalCode.equals(mutatedCode)) {
+			return Constants.MUTANT_VALIDATION_IDENTICAL_MESSAGE;
 		}
+
+
+        // if only string literals were changed
+        if (onlyLiteralsChanged(originalCode, mutatedCode)) {
+            return Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE;
+        }
 
 		// If the mutants contains changes to method signatures, mark it as not valid
 		if (level.equals(CodeValidatorLevel.STRICT)) {
