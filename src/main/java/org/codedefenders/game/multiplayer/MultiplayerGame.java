@@ -18,18 +18,6 @@
  */
 package org.codedefenders.game.multiplayer;
 
-import static org.codedefenders.game.Mutant.Equivalence.*;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Timestamp;
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
@@ -45,8 +33,21 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
-import org.codedefenders.validation.CheckDateFormat;
-import org.codedefenders.validation.CodeValidator;
+import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.input.CheckDateFormat;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Timestamp;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
 
 public class MultiplayerGame extends AbstractGame {
 
@@ -68,7 +69,7 @@ public class MultiplayerGame extends AbstractGame {
 	private boolean requiresValidation;
 	private int maxAssertionsPerTest;
 	private boolean chatEnabled;
-	private CodeValidator.CodeValidatorLevel mutantValidatorLevel;
+	private CodeValidatorLevel mutantValidatorLevel;
 	private boolean markUncovered;
 
 	public MultiplayerGame(int classId, int creatorId, GameLevel level,
@@ -76,7 +77,7 @@ public class MultiplayerGame extends AbstractGame {
 						   int defenderValue, int attackerValue, int defenderLimit,
 						   int attackerLimit, int minDefenders, int minAttackers,
 						   long startDateTime, long finishDateTime, String status, int maxAssertionsPerTest,
-						   boolean chatEnabled, CodeValidator.CodeValidatorLevel mutantValidatorLevel, boolean markUncovered) {
+						   boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel, boolean markUncovered) {
 		this(classId, creatorId, level, lineCoverage, mutantCoverage, prize, defenderValue, attackerValue, defenderLimit, attackerLimit,
 				minDefenders, minAttackers, startDateTime, finishDateTime, status, false, maxAssertionsPerTest,
 				chatEnabled, mutantValidatorLevel, markUncovered);
@@ -87,7 +88,7 @@ public class MultiplayerGame extends AbstractGame {
 						   int defenderValue, int attackerValue, int defenderLimit,
 						   int attackerLimit, int minDefenders, int minAttackers,
 						   long startDateTime, long finishDateTime, String status, boolean requiresValidation,
-						   int maxAssertionsPerTest, boolean chatEnabled, CodeValidator.CodeValidatorLevel mutantValidatorLevel,
+						   int maxAssertionsPerTest, boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
 						   boolean markUncovered) {
 		this.classId = classId;
 		this.creatorId = creatorId;
@@ -188,7 +189,7 @@ public class MultiplayerGame extends AbstractGame {
 		return markUncovered;
 	}
 
-	public CodeValidator.CodeValidatorLevel getMutantValidatorLevel(){
+	public CodeValidatorLevel getMutantValidatorLevel(){
 		return mutantValidatorLevel;
 	}
 

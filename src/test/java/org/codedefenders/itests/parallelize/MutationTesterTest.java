@@ -18,9 +18,9 @@
  */
 package org.codedefenders.itests.parallelize;
 
-import org.codedefenders.execution.MutationTester;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -32,8 +32,7 @@ import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManager;
 import org.codedefenders.util.Constants;
-import org.codedefenders.validation.CodeValidatorException;
-import org.junit.After;
+import org.codedefenders.validation.code.CodeValidatorException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -47,6 +46,8 @@ import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -89,6 +90,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ DatabaseConnection.class }) // , MutationTester.class })
 public class MutationTesterTest {
+	private static Logger logger = LoggerFactory.getLogger(MutationTesterTest.class);
 
 	// PowerMock does not work with @ClassRule !!
 	// This really should be only per class, not per test... in each test we can
@@ -109,7 +111,6 @@ public class MutationTesterTest {
 		//
 
 		codedefendersHome = Files.createTempDirectory("integration-tests").toFile();
-		// TODO Will this remove all the files ?
 		codedefendersHome.deleteOnExit();
 	}
 
@@ -201,11 +202,6 @@ public class MutationTesterTest {
 
 	}
 
-	@After
-	public void deleteTemporaryFiles() {
-		// TODO ?
-	}
-
 	private static Runnable defend(MultiplayerGame activeGame, String testFile, User defender,
 			ArrayList<String> messages) {
 		return new Runnable() {
@@ -225,14 +221,10 @@ public class MutationTesterTest {
 					activeGame.update();
 					System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + ": "
 							+ messages.get(messages.size() - 1));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (CodeValidatorException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+				} catch (IOException | CodeValidatorException e) {
+					logger.error(e.getMessage());
 				}
-			}
+            }
 		};
 	}
 
@@ -254,8 +246,7 @@ public class MutationTesterTest {
 					System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + ": "
 							+ messages.get(messages.size() - 1));
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+					logger.error(e.getMessage());
 				}
 
 			}

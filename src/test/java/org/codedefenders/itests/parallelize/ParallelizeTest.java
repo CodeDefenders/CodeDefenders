@@ -18,9 +18,9 @@
  */
 package org.codedefenders.itests.parallelize;
 
-import org.codedefenders.execution.MutationTester;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -32,8 +32,7 @@ import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManager;
 import org.codedefenders.util.Constants;
-import org.codedefenders.validation.CodeValidatorException;
-import org.junit.After;
+import org.codedefenders.validation.code.CodeValidatorException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -88,7 +87,6 @@ public class ParallelizeTest {
 	@BeforeClass
 	public static void setupEnvironment() throws IOException {
 		codedefendersHome = Files.createTempDirectory("integration-tests").toFile();
-		// TODO Will this remove all the files ?
 		codedefendersHome.deleteOnExit();
 	}
 
@@ -178,11 +176,6 @@ public class ParallelizeTest {
 
 	}
 
-	@After
-	public void deleteTemporaryFiles() {
-		// TODO ?
-	}
-
 	@Test
 	public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException {
 		User observer = new User("observer", User.encodePassword("password"), "demo@observer.com");
@@ -198,7 +191,6 @@ public class ParallelizeTest {
 		//
 		//
 		// Upload the Class Under test - Maybe better use Classloader
-		// TODO Work only on Linux/Mac
 		File cutFolder = new File(Constants.CUTS_DIR, "Lift");
 		cutFolder.mkdirs();
 		File jFile = new File(cutFolder, "Lift.java");

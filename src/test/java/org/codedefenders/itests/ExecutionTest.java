@@ -30,7 +30,7 @@ import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManager;
 import org.codedefenders.util.Constants;
-import org.codedefenders.validation.CodeValidatorException;
+import org.codedefenders.validation.code.CodeValidatorException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -76,7 +76,6 @@ public class ExecutionTest {
     @BeforeClass
     public static void setupEnvironment() throws IOException {
         codedefendersHome = Files.createTempDirectory("integration-tests").toFile();
-        // TODO Will this remove all the files ?
         codedefendersHome.deleteOnExit();
     }
 

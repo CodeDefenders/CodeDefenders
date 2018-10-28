@@ -28,8 +28,8 @@
 <%@ page import="org.codedefenders.game.leaderboard.Entry" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminCreateGames" %>
-<%@ page import="org.codedefenders.validation.CodeValidator" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
@@ -722,8 +722,8 @@
                 </label>
                 <select id="mutantValidatorLevel" name="mutantValidatorLevel" class="form-control selectpicker"
                         data-size="medium">
-                    <%for (CodeValidator.CodeValidatorLevel cvl : CodeValidator.CodeValidatorLevel.values()) {%>
-                    <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidator.CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
+                    <%for (CodeValidatorLevel cvl : CodeValidatorLevel.values()) {%>
+                    <option value=<%=cvl.name()%> <%=cvl.equals(CodeValidatorLevel.MODERATE) ? "selected" : ""%>>
                         <%=cvl.name().toLowerCase()%>
                     </option>
                     <%}%>

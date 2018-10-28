@@ -28,7 +28,7 @@ import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.validation.CodeValidator;
+import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -75,7 +75,7 @@ public class AdminCreateGames extends HttpServlet {
     boolean chatEnabled;
     boolean markUncovered;
     int maxAssertionsPerTest;
-    CodeValidator.CodeValidatorLevel mutantValidatorLevel;
+    CodeValidatorLevel mutantValidatorLevel;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP).forward(request, response);
@@ -226,7 +226,7 @@ public class AdminCreateGames extends HttpServlet {
 			startTime = Long.parseLong(request.getParameter("startTime"));
 			finishTime = Long.parseLong(request.getParameter("finishTime"));
 			maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
-			mutantValidatorLevel = CodeValidator.CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
+			mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
 			chatEnabled = request.getParameter("chatEnabled") != null;
 			markUncovered = request.getParameter("markUncovered") != null;
 		} catch (Exception e) {
@@ -361,7 +361,7 @@ public class AdminCreateGames extends HttpServlet {
     private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame,
                                                      int cutID, int creatorID, GameLevel level, GameState state,
                                                      long startTime, long finishTime, int maxAssertionsPerTest,
-                                                     boolean chatEnabled, CodeValidator.CodeValidatorLevel mutantValidatorLevel,
+                                                     boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
                                                      boolean markUncovered) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {

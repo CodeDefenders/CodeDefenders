@@ -65,7 +65,7 @@ import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
-import static org.codedefenders.validation.CodeValidator.DEFAULT_NB_ASSERTIONS;
+import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
 
 public class UnitTesting extends HttpServlet {
 

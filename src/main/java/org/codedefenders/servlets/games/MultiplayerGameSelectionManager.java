@@ -31,7 +31,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.validation.CodeValidator;
+import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,7 +168,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     final long startTime = new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(startDate).getTime();
                     final long endTime = new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(finishDate).getTime();
                     final int maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
-                    final CodeValidator.CodeValidatorLevel mutantValidatorLevel = CodeValidator.CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
+                    final CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
 
                     MultiplayerGame nGame = new MultiplayerGame(classId, uid, level, (float) lineCoverage,
                             (float) mutantCoverage, 1f, 100, 100, defenderLimit,

@@ -32,8 +32,10 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
-import org.codedefenders.validation.CodeValidator;
-import org.codedefenders.validation.CodeValidatorException;
+import org.codedefenders.validation.code.CodeValidator;
+import org.codedefenders.validation.code.CodeValidatorException;
+import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -254,13 +256,13 @@ public class MultiplayerGameManager extends HttpServlet {
 						break;
 					}
 
-					CodeValidator.CodeValidatorLevel codeValidatorLevel = activeGame.getMutantValidatorLevel();
+					CodeValidatorLevel codeValidatorLevel = activeGame.getMutantValidatorLevel();
 
-					String validityMessage = GameManager.getMutantValidityMessage(activeGame.getClassId(), mutantText, codeValidatorLevel);
+					ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(activeGame.getCUT().getAsString(), mutantText, codeValidatorLevel);
 
-					if (!validityMessage.equals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE)) {
+					if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
 						// Mutant is either the same as the CUT or it contains invalid code
-						messages.add(validityMessage);
+						messages.add(validationMessage.get());
 						break;
 					}
 					Mutant existingMutant = GameManager.existingMutant(activeGame.getId(), mutantText);

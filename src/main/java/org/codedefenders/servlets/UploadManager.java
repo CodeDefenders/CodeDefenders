@@ -41,7 +41,7 @@ import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.JavaFileObject;
 import org.codedefenders.util.ZipFileUtils;
-import org.codedefenders.validation.CodeValidator;
+import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
