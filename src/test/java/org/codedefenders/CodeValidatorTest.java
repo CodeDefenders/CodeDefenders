@@ -18,10 +18,7 @@
  */
 package org.codedefenders;
 
-import org.apache.commons.io.FileUtils;
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.servlets.games.GameManager;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.CodeValidator;
 import org.codedefenders.validation.CodeValidatorException;
@@ -30,7 +27,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
@@ -42,16 +38,11 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 
 import static org.codedefenders.validation.CodeValidator.CodeValidatorLevel;
-import static org.codedefenders.validation.CodeValidator.getValidationMessage;
 import static org.codedefenders.validation.CodeValidator.validMutant;
 import static org.codedefenders.validation.CodeValidator.validTestCode;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Jose Rojas
@@ -68,143 +59,93 @@ public class CodeValidatorTest {
 	@Test
 	public void testMakingStringLiteralsDoesNotTriggersValidation() throws IOException{
 		String originalCode = "" + "\n" +
-"	public final String[] getValues(String name) {" + "\n" +
-"	    List<String> result = new ArrayList<String>();" + "\n" +
-"	    for (Fieldable field : fields) {" + "\n" +
-"	      if (field.name().equals(name) && (!field.isBinary()))" + "\n" +
-"	        result.add(field.stringValue());" + "\n" +
-"	    }" + "\n" +
-"" + "\n" +
-"	    if (result.size() == 0)" + "\n" +
-"	      return NO_STRINGS;" + "\n" +
-"" + "\n" +
-"	    return result.toArray(new String[result.size()]);" + "\n" +
-"	  }";
+				"	public final String[] getValues(String name) {" + "\n" +
+				"	    List<String> result = new ArrayList<String>();" + "\n" +
+				"	    for (Fieldable field : fields) {" + "\n" +
+				"	      if (field.name().equals(name) && (!field.isBinary()))" + "\n" +
+				"	        result.add(field.stringValue());" + "\n" +
+				"	    }" + "\n" +
+				"" + "\n" +
+				"	    if (result.size() == 0)" + "\n" +
+				"	      return NO_STRINGS;" + "\n" +
+				"" + "\n" +
+				"	    return result.toArray(new String[result.size()]);" + "\n" +
+				"	  }";
 
 		String mutatedCode = "" + "\n" +
-"	public final String[] getValues(String name) {" + "\n" +
-"	    List<String> result = new ArrayList<String>();" + "\n" +
-"	    for (Fieldable field : fields) {" + "\n" +
+				"	public final String[] getValues(String name) {" + "\n" +
+				"	    List<String> result = new ArrayList<String>();" + "\n" +
+				"	    for (Fieldable field : fields) {" + "\n" +
 // The following line is changed !
-"	      if (field.name().equals(\"name\") && (!field.isBinary()))" + "\n" +
+				"	      if (field.name().equals(\"name\") && (!field.isBinary()))" + "\n" +
 //
-"	        result.add(field.stringValue());" + "\n" +
-"	    }" + "\n" +
-"" + "\n" +
-"	    if (result.size() == 0)" + "\n" +
-"	      return NO_STRINGS;" + "\n" +
-"" + "\n" +
-"	    return result.toArray(new String[result.size()]);" + "\n" +
-"	  }";
+				"	        result.add(field.stringValue());" + "\n" +
+				"	    }" + "\n" +
+				"" + "\n" +
+				"	    if (result.size() == 0)" + "\n" +
+				"	      return NO_STRINGS;" + "\n" +
+				"" + "\n" +
+				"	    return result.toArray(new String[result.size()]);" + "\n" +
+				"	  }";
 
-		File tmpFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(tmpFile, originalCode);
-
-		// Mock the class provide a temmp sourceFile with original content in it
-		GameClass mockedGameClass = mock(GameClass.class);
-
-		when(mockedGameClass.getJavaFile()).thenReturn(tmpFile.getPath());
-
-		PowerMockito.mockStatic(DatabaseAccess.class);
-		when(DatabaseAccess.getClassForKey(anyString(), anyInt())).thenReturn(mockedGameClass);
-
-		String validityMessage = GameManager.getMutantValidityMessage(1, mutatedCode, codeValidatorLevel);
-
+		String validityMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode, codeValidatorLevel);
 		assertEquals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE, validityMessage);
 	}
 
-	// TODO Validation should be checked at the game interface level !
 	@Test
-	public void testSameStringsShouldTriggerValidation() throws IOException{
-		String originalCode = "@Override\n"+ 
-"  public final String toString() {\n"+
-"    StringBuilder buffer = new StringBuilder();\n"+
-"    buffer.append(\"Document<\");\n"+
-"    for (int i = 0; i < fields.size(); i++) {\n"+
-"      Fieldable field = fields.get(i);\n"+
-"      buffer.append(field.toString());\n"+
-"      if (i != fields.size()-1)\n"+
-"        buffer.append(\" \");\n"+
-"    }\n"+
-"    buffer.append(\">\");\n"+
-"    return buffer.toString();\n"+
-"  }";
-		
-		String mutatedCode = "@Override\n"+ 
-				"  public final String toString() {\n"+
-				"    StringBuilder buffer = new StringBuilder();\n"+
-				"    buffer.append(\"Document<\");\n"+
-				"    for (int i = 0; i < fields.size(); i++) {\n"+
-				"      Fieldable field = fields.get(i);\n"+
-				"      buffer.append(field.toString());\n"+
-				"      if (i != fields.size()-1)\n"+
-				"        buffer.append(\" \");\n"+
-				"    }\n"+
-				"    buffer.append(\">\");\n"+
-				"    return buffer.toString();\n"+
+	public void testSameStringsShouldTriggerValidation() throws IOException {
+		String code = "@Override\n" +
+				"  public final String toString() {\n" +
+				"    StringBuilder buffer = new StringBuilder();\n" +
+				"    buffer.append(\"Document<\");\n" +
+				"    for (int i = 0; i < fields.size(); i++) {\n" +
+				"      Fieldable field = fields.get(i);\n" +
+				"      buffer.append(field.toString());\n" +
+				"      if (i != fields.size()-1)\n" +
+				"        buffer.append(\" \");\n" +
+				"    }\n" +
+				"    buffer.append(\">\");\n" +
+				"    return buffer.toString();\n" +
 				"  }";
 
-		File tmpFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(tmpFile, originalCode);
-		
-		// Mock the class provide a temmp sourceFile with original content in it
-		GameClass mockedGameClass = mock(GameClass.class); //new GameClass(1, "name", "name", "jFile", "cFile", true);
-		
-		when(mockedGameClass.getJavaFile()).thenReturn( tmpFile.getPath() );
-		
-		PowerMockito.mockStatic(DatabaseAccess.class);
-		when(DatabaseAccess.getClassForKey(anyString(), anyInt())).thenReturn( mockedGameClass );
-		
-		String validityMessage = GameManager.getMutantValidityMessage(1, originalCode, codeValidatorLevel);
+		String validityMessage = CodeValidator.getValidationMessage(code, code, codeValidatorLevel);
 		assertEquals(Constants.MUTANT_VALIDATION_IDENTICAL_MESSAGE, validityMessage);
 	}
-	
+
 	@Test
-	public void testAddSpaceToStringsShouldNotTriggerValidation() throws IOException{
-		String originalCode = "@Override\n"+ 
-"  public final String toString() {\n"+
-"    StringBuilder buffer = new StringBuilder();\n"+
-"    buffer.append(\"Document<\");\n"+
-"    for (int i = 0; i < fields.size(); i++) {\n"+
-"      Fieldable field = fields.get(i);\n"+
-"      buffer.append(field.toString());\n"+
-"      if (i != fields.size()-1)\n"+
-"        buffer.append(\" \");\n"+
-"    }\n"+
-"    buffer.append(\">\");\n"+
-"    return buffer.toString();\n"+
-"  }";
-		
-		String mutatedCode = "@Override\n"+ 
-				"  public final String toString() {\n"+
-				"    StringBuilder buffer = new StringBuilder();\n"+
-				// This is the mutated line !
-				"    buffer.append(\"Document< \");\n"+
-				//
-				"    for (int i = 0; i < fields.size(); i++) {\n"+
-				"      Fieldable field = fields.get(i);\n"+
-				"      buffer.append(field.toString());\n"+
-				"      if (i != fields.size()-1)\n"+
-				"        buffer.append(\" \");\n"+
-				"    }\n"+
-				"    buffer.append(\">\");\n"+
-				"    return buffer.toString();\n"+
+	public void testAddSpaceToStringsShouldNotTriggerValidation() throws IOException {
+		String originalCode = "@Override\n" +
+				"  public final String toString() {\n" +
+				"    StringBuilder buffer = new StringBuilder();\n" +
+				"    buffer.append(\"Document<\");\n" +
+				"    for (int i = 0; i < fields.size(); i++) {\n" +
+				"      Fieldable field = fields.get(i);\n" +
+				"      buffer.append(field.toString());\n" +
+				"      if (i != fields.size()-1)\n" +
+				"        buffer.append(\" \");\n" +
+				"    }\n" +
+				"    buffer.append(\">\");\n" +
+				"    return buffer.toString();\n" +
 				"  }";
 
-		File tmpFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(tmpFile, originalCode);
-		
-		// Mock the class provide a temmp sourceFile with original content in it
-		GameClass mockedGameClass = mock(GameClass.class); //new GameClass(1, "name", "name", "jFile", "cFile", true);
-		
-		when(mockedGameClass.getJavaFile()).thenReturn( tmpFile.getPath() );
-		
-		PowerMockito.mockStatic(DatabaseAccess.class);
-		when(DatabaseAccess.getClassForKey(anyString(), anyInt())).thenReturn( mockedGameClass );
-		
-		String validityMessage = GameManager.getMutantValidityMessage(1, mutatedCode, codeValidatorLevel);
-		assertEquals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE, validityMessage);
+		String mutatedCode = "@Override\n" +
+				"  public final String toString() {\n" +
+				"    StringBuilder buffer = new StringBuilder();\n" +
+				// This is the mutated line !
+				"    buffer.append(\"Document< \");\n" +
+				//
+				"    for (int i = 0; i < fields.size(); i++) {\n" +
+				"      Fieldable field = fields.get(i);\n" +
+				"      buffer.append(field.toString());\n" +
+				"      if (i != fields.size()-1)\n" +
+				"        buffer.append(\" \");\n" +
+				"    }\n" +
+				"    buffer.append(\">\");\n" +
+				"    return buffer.toString();\n" +
+				"  }";
 
+		String validityMessage = CodeValidator.getValidationMessage(originalCode, mutatedCode, codeValidatorLevel);
+		assertEquals(Constants.MUTANT_VALIDATION_SUCCESS_MESSAGE, validityMessage);
 	}
 	
 	@Test
@@ -452,7 +393,6 @@ public class CodeValidatorTest {
 		String mutatedCode = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
 				Charset.defaultCharset());
-		System.out.println(getValidationMessage(originalCode, mutatedCode, codeValidatorLevel));
 		assertTrue("Line added, mutant is valid", validMutant(originalCode, mutatedCode, codeValidatorLevel));
 	}
 
@@ -561,7 +501,7 @@ public class CodeValidatorTest {
 
 	}
 
-	@Ignore //TODO figure out if this is worth the effort if it can't be achieved with line-by-line matching
+//	@Ignore //TODO figure out if this is worth the effort if it can't be achieved with line-by-line matching
 	@Test
 	public void testLiterals() throws Exception {
 		assertTrue(validMutant("format(\"first\", \"second\", \"third\");", "format(\"\", \"sec\", \"third\");", codeValidatorLevel));
