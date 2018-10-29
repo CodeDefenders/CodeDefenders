@@ -32,6 +32,7 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.stmt.BlockStmt;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+import org.codedefenders.game.Mutant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,12 +114,29 @@ public class CodeValidator {
 
 	// This validation pipeline should use the Chain-of-Responsibility design pattern
 	public static ValidationMessage validateMutantGetMessage(String originalCode, String mutatedCode, CodeValidatorLevel level) {
-		// Literally identical?
+
+		// Literally identical
 		if (originalCode.equals(mutatedCode)) {
 			return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
 		}
 
-        // if only string literals were changed
+		// Identical line by line by removing spaces
+		String[] originalTokens = originalCode.split("\n");
+		String[] mutatedTokens = mutatedCode.split("\n");
+		boolean valid = false;
+		if( originalTokens.length == mutatedTokens.length ){ // Same amount of line
+			for( int i = 0; i < originalTokens.length; i++){
+				if( ! originalTokens[i].replaceAll( Mutant.regex, "").equals( mutatedTokens[i].replaceAll( Mutant.regex,""))){
+					valid = true;
+					break;
+				}
+			}
+			//
+			if( ! valid)
+				return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
+		}
+
+		// if only string literals were changed
         if (onlyLiteralsChanged(originalCode, mutatedCode)) {
             return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
         }
