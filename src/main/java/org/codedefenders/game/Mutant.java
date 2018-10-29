@@ -362,6 +362,9 @@ public class Mutant implements Serializable {
 		return 0;
 	}
 
+	// https://stackoverflow.com/questions/9577930/regular-expression-to-select-all-whitespace-that-isnt-in-quotes
+	public static String regex = "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
+
 	public synchronized Patch getDifferences() {
 		if (difference == null) {
 			int classId =
@@ -376,11 +379,11 @@ public class Mutant implements Serializable {
 					readLinesIfFileExist(mutantFile.toPath());
 
 			for (int l = 0; l < sutLines.size(); l++){
-				sutLines.set(l, sutLines.get(l).replaceAll("\\s", ""));
+				sutLines.set(l, sutLines.get(l).replaceAll( regex , ""));
 			}
 
 			for (int l = 0; l < mutantLines.size(); l++){
-				mutantLines.set(l, mutantLines.get(l).replaceAll("\\s", ""));
+				mutantLines.set(l, mutantLines.get(l).replaceAll( regex , ""));
 			}
 
 			difference = DiffUtils.diff(sutLines, mutantLines);
@@ -622,7 +625,20 @@ public class Mutant implements Serializable {
 		return new Comparator<Mutant>() {
 			@Override
 			public int compare(Mutant o1, Mutant o2) {
-				return ((Integer) Collections.min( o1.getLines() ) ) - ((Integer) Collections.min( o2.getLines() ));
+				List<Integer> lines1 = o1.getLines();
+				List<Integer> lines2 = o2.getLines();
+
+				if (lines1.isEmpty()) {
+					if (lines2.isEmpty()) {
+						return 0;
+					} else {
+						return -1;
+					}
+				} else if (lines2.isEmpty()) {
+					return 1;
+				}
+
+				return Collections.min(lines1) - Collections.min(lines2);
 			}
 		};
 	}

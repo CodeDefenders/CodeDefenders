@@ -111,6 +111,39 @@ public class CodeValidatorTest {
 	}
 
 	@Test
+	public void testSpacesNotInStringsShouldTriggerValidation() throws IOException {
+		String code = "@Override\n" +
+				"  public final String toString() {\n" +
+				"    StringBuilder buffer = new StringBuilder();\n" +
+				"    buffer.append(\"Document<\");\n" +
+				"    for (int i = 0; i < fields.size(); i++) {\n" +
+				"      Fieldable field = fields.get(i);\n" +
+				"      buffer.append(field.toString());\n" +
+				"      if (i != fields.size()-1)\n" +
+				"        buffer.append(\" \");\n" +
+				"    }\n" +
+				"    buffer.append(\">\");\n" +
+				"    return buffer.toString();\n" +
+				"  }";
+
+		String mutatedCode = "@Override\n" +
+				"  public final String toString() {\n" +
+				"    StringBuilder buffer = new StringBuilder();\n" +
+				"    buffer.append(\"Document<\");    \n" + // Add random spaces here
+				"    for (int i = 0; i < fields.size(); i++) {\n" +
+				"      Fieldable field = fields.get(i);\n" +
+				"      buffer.append(field.toString());\n" +
+				"      if (i != fields.size()-1)\n" +
+				"        buffer.append(\" \");\n" +
+				"    }\n" +
+				"    buffer.append(\">\");\n" +
+				"    return buffer.toString();\n" +
+				"  }";
+
+		assertEquals(MUTANT_VALIDATION_IDENTICAL, validateMutantGetMessage(code, mutatedCode, codeValidatorLevel));
+	}
+
+	@Test
 	public void testAddSpaceToStringsShouldNotTriggerValidation() throws IOException {
 		String originalCode = "@Override\n" +
 				"  public final String toString() {\n" +

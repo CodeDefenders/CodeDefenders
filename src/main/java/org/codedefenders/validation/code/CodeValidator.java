@@ -32,6 +32,7 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.stmt.BlockStmt;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+import org.codedefenders.game.Mutant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,12 +114,18 @@ public class CodeValidator {
 
 	// This validation pipeline should use the Chain-of-Responsibility design pattern
 	public static ValidationMessage validateMutantGetMessage(String originalCode, String mutatedCode, CodeValidatorLevel level) {
-		// Literally identical?
+
+		// Literally identical
 		if (originalCode.equals(mutatedCode)) {
 			return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
 		}
 
-        // if only string literals were changed
+		// Identical line by line by removing spaces
+		if (onlyWhitespacesChanged(originalCode, mutatedCode)) {
+			return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
+		}
+
+		// if only string literals were changed
         if (onlyLiteralsChanged(originalCode, mutatedCode)) {
             return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
         }
@@ -294,6 +301,20 @@ public class CodeValidator {
 			s = s.substring(0, index_first_occ - 1) + s.substring(index_second_occ + 2);
 		}
 		return s;
+	}
+
+	private static boolean onlyWhitespacesChanged(String originalCode, String mutatedCode) {
+		String[] originalTokens = originalCode.split("\n");
+		String[] mutatedTokens = mutatedCode.split("\n");
+		if (originalTokens.length == mutatedTokens.length) {
+			for (int i = 0; i < originalTokens.length; i++) {
+				// TODO 29/10/18: Extract Mutant.regex somewhere else. This isn't mutant specific.
+				if (!originalTokens[i].replaceAll(Mutant.regex, "").equals(mutatedTokens[i].replaceAll(Mutant.regex, ""))) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	private static boolean onlyLiteralsChanged(String orig, String muta) { //FIXME this will not work if a string contains \"
