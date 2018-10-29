@@ -362,6 +362,9 @@ public class Mutant implements Serializable {
 		return 0;
 	}
 
+	// https://stackoverflow.com/questions/9577930/regular-expression-to-select-all-whitespace-that-isnt-in-quotes
+	private static String regex = "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
+
 	public synchronized Patch getDifferences() {
 		if (difference == null) {
 			int classId =
@@ -376,11 +379,11 @@ public class Mutant implements Serializable {
 					readLinesIfFileExist(mutantFile.toPath());
 
 			for (int l = 0; l < sutLines.size(); l++){
-				sutLines.set(l, sutLines.get(l).replaceAll("\\s", ""));
+				sutLines.set(l, sutLines.get(l).replaceAll( regex , ""));
 			}
 
 			for (int l = 0; l < mutantLines.size(); l++){
-				mutantLines.set(l, mutantLines.get(l).replaceAll("\\s", ""));
+				mutantLines.set(l, mutantLines.get(l).replaceAll( regex , ""));
 			}
 
 			difference = DiffUtils.diff(sutLines, mutantLines);

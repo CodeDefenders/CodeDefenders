@@ -101,7 +101,7 @@ public class MutantTest {
 			System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d);
 		}
 	}
-	
+
 	@org.junit.Test
 	public void testGetLinesForChangeMutlipleLines() throws IOException{
 		String originalCode = 
@@ -397,8 +397,62 @@ public class MutantTest {
 		for (Delta d : p.getDeltas()) {
 			System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d);
 		}
+	}
+
+	@org.junit.Test
+	public void testGetLinesForEmptySpaces() throws IOException{
+		String originalCode = "public String toString(int doubleLength) {" + "\n"
+				+ "StringBuffer temp = new StringBuffer();"+ "\n"
+				+ "temp.append(trim(real, doubleLength));" + "\n"
+				+ "if(imag < 0.0) {" + "temp.append(\" - \");"+ "\n"
+				+ "temp.append(trim(-imag, doubleLength));" + "\n"
+				+ "temp.append(\" i\");" + "} else {"+ "\n"
+				+ "temp.append(\" + \");" + "\n"
+				+ "temp.append(trim(imag, doubleLength));"+ "\n"
+				+ "temp.append(\" i\");" + "\n"
+				+ "}"+ "\n"
+				+ "return temp.toString();}";
+
+		String mutantCode = "public String toString(int doubleLength) {" + "\n"
+				+ "StringBuffer temp = new StringBuffer();"+ "\n"
+				+ "temp.append(trim(real, doubleLength));" + "\n"
+				+ "if(imag < 0.0) {" + "temp.append(\" - \");"+ "\n"
+				+ "temp.append(trim(-imag, doubleLength));" + "\n"
+				+ "temp.append(\" i   \");" + "} else {"+ "\n"
+				+ "temp.append(\" + \");" + "\n"
+				+ "temp.append(trim(imag, doubleLength));"+ "\n"
+				+ "temp.append(\" i\");" + "\n"
+				+ "}"+ "\n"
+				+ "return temp.toString();}";
 		
+		File cutJavaFile = temporaryFolder.newFile();
+		FileUtils.writeStringToFile(cutJavaFile, originalCode);
+		//
+		File mutantJavaFile = temporaryFolder.newFile();
+		FileUtils.writeStringToFile(mutantJavaFile , mutantCode);
+
+		GameClass mockedGameClass = mock(GameClass.class);
+		DuelGame mockedDualGame = mock(DuelGame.class);
+		//
+		when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
+
+		PowerMockito.mockStatic(DatabaseAccess.class);
+		when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn( mockedDualGame);
+		when(mockedDualGame.getClassId()).thenReturn(1);
+		when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn( mockedGameClass );
+		//
+		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
+		//
+		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
+		Patch p = m.getDifferences();
+
+		assertEquals(1, p.getDeltas().size());
+//		assertEquals(Arrays.asList(7), m.getLines());
+
+		for (Delta d : p.getDeltas()) {
+			System.out.println("MutantTest.testGetLinesForInsertionMutant() " + d);
+		}
 	}
 
 }
