@@ -121,19 +121,8 @@ public class CodeValidator {
 		}
 
 		// Identical line by line by removing spaces
-		String[] originalTokens = originalCode.split("\n");
-		String[] mutatedTokens = mutatedCode.split("\n");
-		boolean valid = false;
-		if( originalTokens.length == mutatedTokens.length ){ // Same amount of line
-			for( int i = 0; i < originalTokens.length; i++){
-				if( ! originalTokens[i].replaceAll( Mutant.regex, "").equals( mutatedTokens[i].replaceAll( Mutant.regex,""))){
-					valid = true;
-					break;
-				}
-			}
-			//
-			if( ! valid)
-				return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
+		if (onlyWhitespacesChanged(originalCode, mutatedCode)) {
+			return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
 		}
 
 		// if only string literals were changed
@@ -312,6 +301,20 @@ public class CodeValidator {
 			s = s.substring(0, index_first_occ - 1) + s.substring(index_second_occ + 2);
 		}
 		return s;
+	}
+
+	private static boolean onlyWhitespacesChanged(String originalCode, String mutatedCode) {
+		String[] originalTokens = originalCode.split("\n");
+		String[] mutatedTokens = mutatedCode.split("\n");
+		if (originalTokens.length == mutatedTokens.length) {
+			for (int i = 0; i < originalTokens.length; i++) {
+				// TODO 29/10/18: Extract Mutant.regex somewhere else. This isn't mutant specific.
+				if (!originalTokens[i].replaceAll(Mutant.regex, "").equals(mutatedTokens[i].replaceAll(Mutant.regex, ""))) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 	private static boolean onlyLiteralsChanged(String orig, String muta) { //FIXME this will not work if a string contains \"
