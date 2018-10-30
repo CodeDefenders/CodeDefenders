@@ -140,8 +140,7 @@ public class CodeValidator {
 		} catch (ParseException | IOException e) {
 			// At this point the syntax of original code and the mutant is broken and the compiler will spot the same error
 			// so we return a mutant valid message to allow the request processing to move forward
-//			logger.debug("Error parsing code: {}", e.getMessage());
-//			return ValidationMessage.MUTANT_VALIDATION_FAILED;
+			logger.debug("Error parsing code: {}", e.getMessage());
 			return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
 		}
 
