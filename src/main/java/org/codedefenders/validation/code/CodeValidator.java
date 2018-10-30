@@ -153,6 +153,11 @@ public class CodeValidator {
 				}
 		}
 
+		// Use AST to check for equivalence of CUT
+		if( originalCU.equals( mutatedCU ) ){
+			return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
+		}
+		
 		// line-level diff
 		List<List<?>> originalLines = getOriginalLines(originalCode, mutatedCode);
 		List<List<?>> changedLines = getChangedLines(originalCode, mutatedCode);

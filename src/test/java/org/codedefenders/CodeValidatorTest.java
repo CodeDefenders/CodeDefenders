@@ -144,6 +144,43 @@ public class CodeValidatorTest {
 
 		assertEquals(MUTANT_VALIDATION_IDENTICAL, validateMutantGetMessage(code, mutatedCode, codeValidatorLevel));
 	}
+	
+	@Test
+	public void testAddingNewEmptyLinesOrLineBreakingShouldTriggerValidation() throws IOException {
+		String originalCode = "public class Test{\n" +
+				"  public final String toString() {\n" +
+				"    StringBuilder buffer = new StringBuilder();\n" +
+				"    buffer.append(\"Document<\");\n" +
+				"    for (int i = 0; i < fields.size(); i++) {\n" +
+				"      Fieldable field = fields.get(i);\n" +
+				"      buffer.append(field.toString());\n" +
+				"      if (i != fields.size()-1)\n" +
+				"        buffer.append(\" \");\n" +
+				"    }\n" +
+				"    buffer.append(\">\");\n" +
+				"    return buffer.toString();\n" +
+				"  }"
+				+ "}";
+
+		String mutatedCode = "public class "
+				+ "\n\t" // This is the modification: THE TAB \t is the trigger ... adding simply \n wont show the problem
+				+ "Test{\n" +
+				"  public final String toString() {\n" +
+				"    StringBuilder buffer = new StringBuilder();\n" +
+				"    buffer.append(\"Document<\");\n" +
+				"    for (int i = 0; i < fields.size(); i++) {\n" +
+				"      Fieldable field = fields.get(i);\n" +
+				"      buffer.append(field.toString());\n" +
+				"      if (i != fields.size()-1)\n" +
+				"        buffer.append(\" \");\n" +
+				"    }\n" +
+				"    buffer.append(\">\");\n" +
+				"    return buffer.toString();\n" +
+				"  }"
+				+ "}";
+
+		assertEquals(MUTANT_VALIDATION_IDENTICAL, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+	}
 
 	@Test
 	public void testAddSpaceToStringsShouldNotTriggerValidation() throws IOException {
