@@ -29,6 +29,7 @@ import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.stmt.BlockStmt;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
@@ -130,21 +131,24 @@ public class CodeValidator {
             return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
         }
 
+		// NOTE: there might be problem in parsing?
+		final CompilationUnit originalCU;
+		final CompilationUnit mutatedCU;
+		try {
+			originalCU = getCompilationUnitFromText(originalCode);
+			mutatedCU = getCompilationUnitFromText(mutatedCode);
+		} catch (ParseException | IOException e) {
+			logger.debug("Error parsing code: {}", e.getMessage());
+			return ValidationMessage.MUTANT_VALIDATION_FAILED;
+		}
+
 		// If the mutants contains changes to method signatures, mark it as not valid
 		if (level == CodeValidatorLevel.STRICT) {
-			try {
-				CompilationUnit originalCU = getCompilationUnitFromText(originalCode);
-				CompilationUnit mutatedCU = getCompilationUnitFromText(mutatedCode);
 				if (mutantChangesMethodSignatures(originalCU, mutatedCU)
 						|| mutantChangesFieldNames(originalCU, mutatedCU)
 						|| mutantChangesImportStatements(originalCU, mutatedCU)) {
                     return ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
 				}
-			} catch (ParseException | IOException e) {
-				logger.debug("Error parsing code: {}", e.getMessage());
-				// The current behaviour is to ignore this error, since it
-				// is not a violation of these constraints
-			}
 		}
 
 		// line-level diff
@@ -152,7 +156,7 @@ public class CodeValidator {
 		List<List<?>> changedLines = getChangedLines(originalCode, mutatedCode);
 		assert (originalLines.size() == changedLines.size());
 
-		if (level != CodeValidatorLevel.RELAXED && containsModifiedComments(originalLines, changedLines)) {
+		if (level != CodeValidatorLevel.RELAXED && containsModifiedComments(originalCU, mutatedCU)) {
             return ValidationMessage.MUTANT_VALIDATION_COMMENT;
 		}
 
@@ -193,6 +197,23 @@ public class CodeValidator {
         }
 
 		return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+	}
+
+	private static boolean containsModifiedComments(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+		// We assume getAllContainedComments() preserves the order of comments
+		Comment[] originalComments = originalCU.getAllContainedComments().toArray(new Comment[] {});
+		Comment[] mutatedComments = mutatedCU.getAllContainedComments().toArray(new Comment[] {});
+		if (originalComments.length != mutatedComments.length) {
+			// added comments triggers validation
+			return true;
+		}
+		for (int i = 0; i < originalComments.length; i++) {
+			if (!originalComments[i].equals(mutatedComments[i])) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	public static String getMD5FromText(String code) {
@@ -253,47 +274,6 @@ public class CodeValidator {
 						.anyMatch(operator -> diff.text.contains(operator)));
 	}
 
-	private static boolean containsModifiedComments(List<List<?>> orig, List<List<?>> muta) {
-		Iterator<List<?>> it1 = orig.iterator();
-		Iterator<List<?>> it2 = muta.iterator();
-		while (it1.hasNext() && it2.hasNext()) {
-			final String originalLine = it1.next().toString();
-			final String mutantLine = it2.next().toString();
-
-			if (containsModifiedComments(originalLine, mutantLine)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static boolean containsModifiedComments(String orig, String muta) {
-		String[] commentTokens = {"//", "/*", "*/"};
-		for (String ct : commentTokens) {
-			if (muta.contains(ct) ^ orig.contains(ct))
-				return true;
-		}
-		if (orig.contains("//")) {
-			String commentTokensOrig = orig.substring(orig.indexOf("//"));
-			String commentTokensMuta = muta.substring(muta.indexOf("//"));
-			if (!commentTokensMuta.equals(commentTokensOrig)) {
-				return true;
-			}
-		}
-		if (orig.contains("/*")) {
-			int commentTokensOrigLimit = orig.contains("*/") ? orig.indexOf("*/") : orig.length();
-			int commentTokensMutaLimit = muta.contains("*/") ? muta.indexOf("*/") : muta.length();
-
-			String commentTokensOrig = orig.substring(orig.indexOf("/*"), commentTokensOrigLimit);
-			String commentTokensMuta = orig.substring(muta.indexOf("/*"), commentTokensMutaLimit);
-			//noinspection RedundantIfStatement
-			if (!commentTokensMuta.equals(commentTokensOrig)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	private static String removeQuoted(String s, String quotationMark) {
 		while (s.contains(quotationMark)) {
 			int index_first_occ = s.indexOf(quotationMark);
@@ -313,8 +293,11 @@ public class CodeValidator {
 					return false;
 				}
 			}
+			// Same amount of lines but all the lines are equals
+			return true;
 		}
-		return true;
+		// Adding a line (possibly empty) does not count as changing only white spaces
+		return false;
 	}
 
 	private static boolean onlyLiteralsChanged(String orig, String muta) { //FIXME this will not work if a string contains \"
