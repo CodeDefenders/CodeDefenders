@@ -9,6 +9,9 @@ package org.codedefenders.validation.code;
  * @author <a href="https://github.com/werli">Phil Werli<a/>
  */
 public enum ValidationMessage {
+	// Generic error message.
+	MUTANT_VALIDATION_FAILED("Invalid mutant. Your mutant does not comply with our rules."),
+
     MUTANT_VALIDATION_SUCCESS("Your mutant complies with our rules."),
     MUTANT_VALIDATION_LINES("Invalid mutant, sorry! Removing or adding lines is not allowed."),
     MUTANT_VALIDATION_MODIFIER("Invalid mutant, sorry! Changing modifiers such as 'static' or 'public' is not allowed."),
