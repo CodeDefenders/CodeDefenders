@@ -79,6 +79,21 @@
 	Role role = game.getRole(uid);
 	HashMap<Integer, ArrayList<Test>> linesCovered = new HashMap<>();
 
+	if (role == Role.NONE) {
+        if (request.getParameter("defender") != null) {
+            if (game.addPlayer(uid, Role.DEFENDER)) {
+                role = Role.DEFENDER;
+            }
+        } else if (request.getParameter("attacker") != null) {
+            if (game.addPlayer(uid, Role.ATTACKER)) {
+                role = Role.ATTACKER;
+            }
+        } else {
+            response.sendRedirect(request.getContextPath() + "/games/user");
+            return;
+        }
+    }
+
     if ((game.getState().equals(GameState.CREATED) || game.getState().equals(GameState.FINISHED)) && (!role.equals(Role.CREATOR))) {
         response.sendRedirect(request.getContextPath()+"/games/user");
         return;
@@ -176,7 +191,9 @@
 			messages.add(flaggingMessage);
 			response.sendRedirect(request.getContextPath() + "/multiplayer/play");
             return;
-        } catch (NumberFormatException e){}
+        } catch (NumberFormatException e) {
+            logger.error("Can't parse equivalent line numbers", e);
+        }
 
     } else if (role.equals(Role.ATTACKER) && request.getParameter("acceptEquiv") != null){
         try {
@@ -202,7 +219,9 @@
                     return;
                 }
             }
-        } catch (NumberFormatException e){}
+        } catch (NumberFormatException e){
+            logger.error("Can't parse mutant ID", e);
+        }
     }
 
     List<Mutant> mutantsEquiv =  game.getMutantsMarkedEquivalent();
@@ -278,21 +297,8 @@
             %><%@ include file="/jsp/multiplayer/creator_view.jsp" %><%
             break;
         default:
-            if (request.getParameter("defender") != null){
-                game.addPlayer(uid, Role.DEFENDER);
-                %><meta http-equiv="refresh" content="1" /><%
-            } else if (request.getParameter("attacker") != null){
-                game.addPlayer(uid, Role.ATTACKER);
-                %><meta http-equiv="refresh" content="1" /><%
-            } else {
-                // response.sendRedirect(request.getContextPath()+"/multiplayer/games/user");
-                response.sendRedirect(request.getContextPath()+"/games/user");
-                break;
-            }
-            %>
-            <p>Joining Game...</p>
-<%
-            break;
+            response.sendRedirect(request.getContextPath()+"/games/user");
+            return;
     }
 %>
     </div>
