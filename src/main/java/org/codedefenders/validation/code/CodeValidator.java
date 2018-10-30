@@ -132,8 +132,8 @@ public class CodeValidator {
         }
 
 		// NOTE: there might be problem in parsing?
-		CompilationUnit originalCU = null;
-		CompilationUnit mutatedCU = null;
+		final CompilationUnit originalCU;
+		final CompilationUnit mutatedCU;
 		try {
 			originalCU = getCompilationUnitFromText(originalCode);
 			mutatedCU = getCompilationUnitFromText(mutatedCode);
@@ -142,14 +142,7 @@ public class CodeValidator {
 			return ValidationMessage.MUTANT_VALIDATION_FAILED;
 		}
 
-		// Defensive programming ?
-		if (originalCU == null || mutatedCU == null) {
-			logger.debug("Error parsing code: one or more null compilation units.");
-			return ValidationMessage.MUTANT_VALIDATION_FAILED;
-		}
-
-		// If the mutants contains changes to method signatures, mark it as not
-		// valid
+		// If the mutants contains changes to method signatures, mark it as not valid
 		if (level == CodeValidatorLevel.STRICT) {
 				if (mutantChangesMethodSignatures(originalCU, mutatedCU)
 						|| mutantChangesFieldNames(originalCU, mutatedCU)
@@ -207,18 +200,15 @@ public class CodeValidator {
 	}
 
 	private static boolean containsModifiedComments(CompilationUnit originalCU, CompilationUnit mutatedCU) {
-		// Compare the comments tokens by position to avoid "replacing one
-		// comment with another"
-		// THIS ASSUMES getAllContainedComments preserves the order of
-		// appeareance of comments
+		// We assume getAllContainedComments() preserves the order of comments
 		Comment[] originalComments = originalCU.getAllContainedComments().toArray(new Comment[] {});
 		Comment[] mutatedComments = mutatedCU.getAllContainedComments().toArray(new Comment[] {});
 		if (originalComments.length != mutatedComments.length) {
-			// A comment added or removed triggers the validation
+			// added comments triggers validation
 			return true;
 		}
 		for (int i = 0; i < originalComments.length; i++) {
-			if ( ! originalComments[i].equals(mutatedComments[i])) {
+			if (!originalComments[i].equals(mutatedComments[i])) {
 				return true;
 			}
 		}
@@ -282,47 +272,6 @@ public class CodeValidator {
 				.anyMatch(diff -> Arrays
 						.stream(PROHIBITED_MODIFIER_CHANGES)
 						.anyMatch(operator -> diff.text.contains(operator)));
-	}
-
-	private static boolean containsModifiedComments(List<List<?>> orig, List<List<?>> muta) {
-		Iterator<List<?>> it1 = orig.iterator();
-		Iterator<List<?>> it2 = muta.iterator();
-		while (it1.hasNext() && it2.hasNext()) {
-			final String originalLine = it1.next().toString();
-			final String mutantLine = it2.next().toString();
-
-			if (containsModifiedComments(originalLine, mutantLine)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private static boolean containsModifiedComments(String orig, String muta) {
-		String[] commentTokens = {"//", "/*", "*/"};
-		for (String ct : commentTokens) {
-			if (muta.contains(ct) ^ orig.contains(ct))
-				return true;
-		}
-		if (orig.contains("//")) {
-			String commentTokensOrig = orig.substring(orig.indexOf("//"));
-			String commentTokensMuta = muta.substring(muta.indexOf("//"));
-			if (!commentTokensMuta.equals(commentTokensOrig)) {
-				return true;
-			}
-		}
-		if (orig.contains("/*")) {
-			int commentTokensOrigLimit = orig.contains("*/") ? orig.indexOf("*/") : orig.length();
-			int commentTokensMutaLimit = muta.contains("*/") ? muta.indexOf("*/") : muta.length();
-
-			String commentTokensOrig = orig.substring(orig.indexOf("/*"), commentTokensOrigLimit);
-			String commentTokensMuta = orig.substring(muta.indexOf("/*"), commentTokensMutaLimit);
-			//noinspection RedundantIfStatement
-			if (!commentTokensMuta.equals(commentTokensOrig)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private static String removeQuoted(String s, String quotationMark) {
