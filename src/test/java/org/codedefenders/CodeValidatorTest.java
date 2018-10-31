@@ -18,6 +18,25 @@
  */
 package org.codedefenders;
 
+import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
+import static org.codedefenders.validation.code.CodeValidator.getMD5FromText;
+import static org.codedefenders.validation.code.CodeValidator.validateMutantGetMessage;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_COMMENT;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorException;
@@ -30,21 +49,6 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
-import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
-import static org.codedefenders.validation.code.CodeValidator.validateMutantGetMessage;
-import static org.codedefenders.validation.code.ValidationMessage.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({DatabaseAccess.class})
 public class CodeValidatorTest {
@@ -54,6 +58,59 @@ public class CodeValidatorTest {
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+	@Test
+	public void mutantAfterSlashShouldNotTriggerValidation(){
+		String originalCode = ""
+				+ "/**" + "\n"
+				+ "* Some Java Doc" + "\n"
+				+ "**/" + "\n"
+				+ 	" public class \n\t Test{"+ "\n"
+				+ "/*" + "\n"
+				+ "* Some Comment" + "\n"
+				+ "*/" + "\n"
+				+ "public Complex pow(Complex p) { " + "\n" 
+		        +"double a = real, b = imag, c = p.real, d = p.imag;" + "\n" 
+		        +"double ns = a * a + b * b;" + "\n" 
+		        +"double dArg = d / 2;" + "\n" 
+		        +"double cArg = c * arg();" + "\n" 
+		        +"double dDenom = Math.pow(Math.E, d * arg());" + "\n" 
+		        +"double newReal = Math.pow(ns, c / 2) / dDenom * (Math.cos(dArg) * Math.cos(cArg) * Math.log(ns) - Math.sin(dArg) * Math.sin(cArg) * Math.log(ns));" + "\n" 
+		        +"double newImag = Math.pow(ns, c / 2) / dDenom * (Math.cos(dArg) * Math.sin(cArg) * Math.log(ns) + Math.sin(dArg) * Math.cos(cArg) * Math.log(ns));" + "\n" 
+		        +"return new Complex(newReal, newImag);" + "\n"
+		        + "}"
+		        + "}";
+		
+		String mutatedCode = ""
+				+ "/**" + "\n"
+				+ "* Some Java Doc" + "\n"
+				+ "**/" + "\n"
+				+ 	" public class Test{"+ "\n"
+				+ "/*" + "\n"
+				+ "* Some Comment" + "\n"
+				+ "*/" + "\n"
+				+ "public Complex pow(Complex p) { " + "\n" 
+		        +"double a = real, b = imag, c = p.real, d = p.imag;" + "\n" 
+		        +"double ns = a * a + b * b;" + "\n" 
+		        +"double dArg = d / 5;" + "\n" // Here's the mutation 
+		        +"double cArg = c * arg();" + "\n" 
+		        +"double dDenom = Math.pow(Math.E, d * arg());" + "\n" 
+		        +"double newReal = Math.pow(ns, c / 2) / dDenom * (Math.cos(dArg) * Math.cos(cArg) * Math.log(ns) - Math.sin(dArg) * Math.sin(cArg) * Math.log(ns));" + "\n" 
+		        +"double newImag = Math.pow(ns, c / 2) / dDenom * (Math.cos(dArg) * Math.sin(cArg) * Math.log(ns) + Math.sin(dArg) * Math.cos(cArg) * Math.log(ns));" + "\n" 
+		        +"return new Complex(newReal, newImag);" + "\n"
+		        + "}"
+		        + "}"; 
+		
+		assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+		
+		assertNotEquals("The MD5 is the same", getMD5FromText(originalCode), getMD5FromText(mutatedCode));
+
+	        
+	}
+	
+//	
+
+	
+	
 	@Test
 	public void testMakingStringLiteralsDoesNotTriggersValidation() throws IOException{
 		String originalCode = "" + "\n" +
@@ -496,7 +553,8 @@ public class CodeValidatorTest {
 
 	@Test
 	public void testInValidMutant3() {
-		String originalCode = "public class Test{" + "\n"
+		String originalCode = ""
+				+ "public class Test{" + "\n"
 				+ " public void test(){" + "\n"
 				+ "int x = 0;" + "\n"
 				+ "}"
@@ -512,47 +570,118 @@ public class CodeValidatorTest {
 
 	@Test
 	public void testInvalidMutant1() {
-		String orig = "int x = 0;";
-		String mutant = "int x = 0; if (x>0) {return false;}";
+		String orig = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "int x = 0;" + "\n"
+				+ "}"
+				+ "}";
+		
+		String mutant = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "int x = 0; if (x>0) {return false;}"+ "\n"
+				+ "}"
+				+ "}";
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
 	public void testInvalidMutant2() {
-		String orig = "int x = 0;";
-		String mutant = "int x = 0; while (x>0) {return false;}";
+		String orig = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "int x = 0;"+ "\n"
+				+ "}"
+				+ "}";
+		String mutant = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "int x = 0; while (x>0) {return false;}"+ "\n"
+				+ "}"
+				+ "}";
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
 	public void testInvalidMutantContainsIf() {
-		String orig = "if (x >= 0) return 1; else return -x;";
-		String mutant = "if (x >= 0) if (x >= 0) { return 1; } else return -x;";
+		String orig = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "if (x >= 0) return 1; else return -x;"+ "\n"
+				+ "}"
+				+ "}";
+		String mutant = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "if (x >= 0) if (x >= 0) { return 1; } else return -x;"+ "\n"
+				+ "}"
+				+ "}";
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
 	public void testInvalidMutantContainsSystemCall() {
-		String orig = "if (x >= 0) return 1; else return -x;";
-		String mutant = "if (x >= 0) { System.currentTimeMillis(); return x; } else return -x;";
+		String orig = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "if (x >= 0) return 1; else return -x;"+ "\n"
+				+ "}"
+				+ "}";
+		String mutant = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "if (x >= 0) { System.currentTimeMillis(); return x; } else return -x;"+ "\n"
+				+ "}"
+				+ "}";
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(orig, mutant, codeValidatorLevel));
 
-		orig = "highestFloor = 10;";
-		mutant = "highestFloor = java.util.Random().nextInt();";
+		orig = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "highestFloor = 10;"+ "\n"
+				+ "}"
+				+ "}";
+		mutant = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "highestFloor = java.util.Random().nextInt();"+ "\n"
+				+ "}"
+				+ "}";
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
 	public void testInvalidMutantWithTernaryOperator1() {
-		String orig = "x = 1;";
-		String mutant = "x = x == 0 ? 1 : 0;";
+		String orig = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "x = 1;"+ "\n"
+				+ "}"
+				+ "}";
+		String mutant = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "x = x == 0 ? 1 : 0;"+ "\n"
+				+ "}"
+				+ "}";
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(orig, mutant, codeValidatorLevel));
 	}
 
 	@Test
 	public void testInvalidMutantWithTernaryOperator2() {
-		String orig = "currentFloor--;";
-		String mutant = "currentFloor = currentFloor + currentFloor % 8 == 0 ? (-1) : 0;";
+		String orig = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "currentFloor--;"+ "\n"
+				+ "}"
+				+ "}";
+		String mutant = ""
+				+ "public class Test{" + "\n"
+				+ " public void test(){" + "\n"
+				+ "currentFloor = currentFloor + currentFloor % 8 == 0 ? (-1) : 0;"+ "\n"
+				+ "}"
+				+ "}";
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(orig, mutant, codeValidatorLevel));
 	}
 
@@ -580,31 +709,152 @@ public class CodeValidatorTest {
 
 	@Test
 	public void testBitshifts() throws Exception {
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("r.num = r.num;", "r.num = r.num | ((r.num & (1 << 29)) << 1);", codeValidatorLevel));
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("r.num = r.num;", "r.num = r.num << 1+344;", codeValidatorLevel));
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(
+				"public class Test { public test(){ r.num = r.num;}}",
+				"public class Test { public test(){ r.num = r.num | ((r.num & (1 << 29)) << 1);}} ", codeValidatorLevel));
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(
+				"public class Test { public test(){ r.num = r.num;}}", 
+				"public class Test { public test(){ r.num = r.num << 1+344;}}", codeValidatorLevel));
 	}
 
 	@Test
 	public void testClassSignatureChange() throws Exception {
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {", "public final class Rational  {", codeValidatorLevel));
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("class Rational  {", "public class Rational  {", codeValidatorLevel));
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("class Rational  {", "final class Rational  {", codeValidatorLevel));
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {", "class Rational  {", codeValidatorLevel));
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {", "protected class Rational  {", codeValidatorLevel));
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("final class Rational  {", "class Rational  {", codeValidatorLevel));
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS, 
+				validateMutantGetMessage(
+						"public class Rational  {}",
+						"public final class Rational  {}", codeValidatorLevel));
+		
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS,
+				validateMutantGetMessage(
+						"class Rational  {}",
+						"public class Rational  {}", codeValidatorLevel));
+
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS, 
+				validateMutantGetMessage(
+						"class Rational  {}",
+						"final class Rational  {}", codeValidatorLevel));
+		
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS,
+				validateMutantGetMessage(
+						"public class Rational  {}",
+						"class Rational  {}", codeValidatorLevel));
+		
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS,
+				validateMutantGetMessage(
+						"public class Rational  {}",
+						"protected class Rational  {}", codeValidatorLevel));
+		
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS,
+				validateMutantGetMessage(
+						"final class Rational  {}",
+						"class Rational  {}", codeValidatorLevel));
 	}
 
 	@Test
 	public void testLiterals() throws Exception {
-		assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("format(\"first\", \"second\", \"third\");", "format(\"\", \"sec\", \"third\");", codeValidatorLevel));
-		assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("String s = \"\";", "String s = \" \";", codeValidatorLevel));
-		assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("String s = \"stringval\";", "String s = \"stringval \";", codeValidatorLevel));
+		assertEquals(MUTANT_VALIDATION_SUCCESS,
+				validateMutantGetMessage(
+						""
+						+ "public class Test {"
+						+ "public test(){"
+						+ "format(\"first\", \"second\", \"third\");"
+						+ "}"
+						+ "}",
+						""
+						+ "public class Test {"
+						+ "public test(){"
+						+ "format(\"\", \"sec\", \"third\");"
+						+ "}"
+						+ "}", codeValidatorLevel));
+		
+		assertEquals(MUTANT_VALIDATION_SUCCESS,
+				validateMutantGetMessage(
+						""
+						+ "public class Test {"
+						+ "public test(){"
+						+ "String s = \"\";"
+						+ "}"
+						+ "}", 
+						""
+						+ "public class Test {"
+						+ "public test(){"			
+						+ "String s = \" \";"
+						+ "}"
+						+ "}", codeValidatorLevel));
+		
+		assertEquals(MUTANT_VALIDATION_SUCCESS,
+					validateMutantGetMessage(
+							""
+							+ "public class Test {"
+							+ "public test(){"
+							+ "String s = \"stringval\";"
+							+ "}"
+							+ "}",
+							""
+							+ "public class Test {"
+							+ "public test(){"
+							+ "String s = \"stringval \";"
+							+ "}"
+							+ "}", codeValidatorLevel));
+		
 		for (String p : CodeValidator.PROHIBITED_BITWISE_OPERATORS) {
-			assertEquals(p + " in a String should be valid", MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("String s = \"\";", "String s = \"" + p + "\";", codeValidatorLevel));
+			assertEquals(p + " in a String should be valid", MUTANT_VALIDATION_SUCCESS,
+					validateMutantGetMessage(
+							""
+							+ "public class Test {"
+							+ "public test(){"
+							+ "String s = \"\";"
+							+ "}"
+							+ "}",
+							""
+							+ "public class Test {"
+							+ "public test(){"
+							+ "String s = \"" + p + "\";"
+							+ "}"
+							+ "}", codeValidatorLevel));
 		}
-		assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("String s = \"\";", "String s = \";?{} <<\";", codeValidatorLevel));
-		assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("String s = \"\";", "String s = \"public final protected\";", codeValidatorLevel));
-		assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("Char c = \'c\';", "Char c = \';\';", codeValidatorLevel));
+
+		assertEquals(MUTANT_VALIDATION_SUCCESS, 
+				validateMutantGetMessage(""
+						+ "public class Test {"
+						+ "public test(){"
+						+ "String s = \"\";"
+						+ "}"
+						+ "}",
+						""
+						+ "public class Test {"
+						+ "public test(){"
+						+ "String s = \";?{} <<\";"
+						+ "}"
+						+ "}", codeValidatorLevel));
+		
+		
+		assertEquals(MUTANT_VALIDATION_SUCCESS, 
+				validateMutantGetMessage(
+						""
+						+ "public class Test {"
+						+ "public test(){"
+						+ "String s = \"\";",
+						""
+						+ "public class Test {"
+						+ "public test(){"
+						+ "String s = \"public final protected\";"
+						+ "}"
+						+ "}", codeValidatorLevel));
+		
+		assertEquals(MUTANT_VALIDATION_SUCCESS, 
+				validateMutantGetMessage(""
+						+ "public class Test {"
+						+ "public test(){"
+						+ "Char c = \'c\';"
+						+ "}"
+						+ "}",
+						""
+						+ "public class Test {"
+						+ "public test(){"
+						+ "Char c = \';\';"
+						+ "}"
+						+ "}", codeValidatorLevel));
 	}
 
 	// TODO Ideally this should be split in several test cases each addressing a specific modification
@@ -675,15 +925,25 @@ public class CodeValidatorTest {
 				+ "}";
 		assertNotEquals("added multiline comment", MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
 
-		originalCode = "public class Test{"+ "\n"
+	}
+	
+	@Test
+	public void testModifiedCommentInNewLineAfterUnchangedComment(){
+		String originalCode = ""
+				+ "public class Test{"+ "\n"
 				+ "public void test(){"+ "\n"
-				+ "String s = \"\"//comment\nfoo; // comment\nfoo1" + "\n"
+				+ "String s = \"\"; //comment"+ "\n"
+				+ "int foo; // comment"+ "\n"
+				+ "int foo1;" + "\n"
 				+ "if(x > 0) \n\t return x; //x is positive" + "\n"
 				+ "}" + "\n"
 				+ "}";
-		mutatedCode = "public class Test{"+ "\n"
+		String mutatedCode = ""
+				+ "public class Test{"+ "\n"
 				+ "public void test(){"+ "\n"
-				+ "String s = \"\"; //comment\nfoo//new comment" + "\n"
+				+ "String s = \"\"; //comment\n"
+				+ "int foo; //new comment" + "\n" 
+				+ "int foo1;" + "\n"
 				+ "if(x > 0) \n\t return x; //x is positive" + "\n"
 				+ "}" + "\n"
 				+ "}";
@@ -815,9 +1075,33 @@ public class CodeValidatorTest {
 
 	@Test
 	public void testInvalidMutantWithChangedAccess(){
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public void test() {", "void test() {", codeValidatorLevel));
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public void test() {", "protected void test() {", codeValidatorLevel));
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public void test() {", "private void test() {", codeValidatorLevel));
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS,
+				validateMutantGetMessage(""
+						+ "public class Test {"
+						+ "public void test() {}"
+						+ "}",
+						""
+						+ "public class Test {"
+						+ "void test() {}"
+						+ "}", codeValidatorLevel));
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS, 
+				validateMutantGetMessage(""
+						+ "public class Test {"
+						+ "public void test() {}"
+						+ "}", 
+						""
+						+ "public class Test {"
+						+ "protected void test() {}"
+						+ "}", codeValidatorLevel));
+		assertNotEquals(MUTANT_VALIDATION_SUCCESS,
+				validateMutantGetMessage(""
+						+ "public class Test {"
+						+ "public void test() {}"
+						+ "}",
+						""
+						+ "public class Test {"
+						+ "private void test() {}"
+						+ "}", codeValidatorLevel));
 	}
 
 	@Test
