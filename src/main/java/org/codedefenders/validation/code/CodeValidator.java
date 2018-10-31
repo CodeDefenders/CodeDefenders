@@ -18,25 +18,6 @@
  */
 package org.codedefenders.validation.code;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseException;
-import com.github.javaparser.TokenMgrError;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.ConstructorDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.comments.Comment;
-import com.github.javaparser.ast.stmt.BlockStmt;
-
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-import org.codedefenders.game.Mutant;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,6 +35,25 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+import org.codedefenders.game.Mutant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseException;
+import com.github.javaparser.TokenMgrError;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.stmt.BlockStmt;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -224,8 +224,16 @@ public class CodeValidator {
 	}
 
 	public static String getMD5FromText(String code) {
-		String codeWithoutComments = getCodeWithoutComments(code);
-		return org.apache.commons.codec.digest.DigestUtils.md5Hex(codeWithoutComments);
+		// Parse the code and output the string without the comment.
+		// This string should be already normalized
+		try {
+			return org.apache.commons.codec.digest.DigestUtils
+					.md5Hex(getCompilationUnitFromText(code).toStringWithoutComments());
+		} catch (ParseException | IOException e) {
+			// Ignore this
+		}
+		// if the code does not compile there's no point to try to remove the comments
+		return org.apache.commons.codec.digest.DigestUtils.md5Hex(code);
 	}
 
 	private static List<DiffMatchPatch.Diff> tokenDiff(String orig, String mutated) {
@@ -465,20 +473,6 @@ public class CodeValidator {
 		try (InputStream inputStream = new ByteArrayInputStream(code.getBytes())) {
 			return JavaParser.parse(inputStream);
 		}
-	}
-
-	/**
-	 * Removes Comments (of both varieties) and Whitespaces from java source code.
-	 */
-	private static String getCodeWithoutComments(String code) {
-		StreamTokenizer st = new StreamTokenizer(new StringReader(code));
-		st.slashSlashComments(true);
-		st.slashStarComments(true);
-		st.quoteChar('"');
-		// Trim each token instead of generally removing why spaces in the string representation of this List
-		String partialString = getTokens(st).toString();
-		// Why do we need to remove spaces, I understand
-		return partialString;//.replaceAll("\\s+", "");
 	}
 
 	private static List<Delta> getDeltas(String original, String changed) {
