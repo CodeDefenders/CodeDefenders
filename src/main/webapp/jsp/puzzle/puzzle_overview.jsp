@@ -39,7 +39,7 @@
                 <p class="glyphicon glyphicon-lock"></p>
             </td>
             <td>
-                <p class="glyphicon glyphicon-lock"></p>
+                <a class="btn btn-xs" href="${pageContext.request.contextPath}/puzzlegame?puzzleId=3">3</a>
                 <p class="glyphicon glyphicon-lock"></p>
                 <p class="glyphicon glyphicon-lock"></p>
                 <p class="glyphicon glyphicon-lock"></p>
