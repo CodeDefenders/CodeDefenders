@@ -59,7 +59,7 @@
 					</a>
 					Gordon Fraser, Alessio Gambi, Jos&eacute; Miguel Rojas.
 					<span class="paper_title">&#8220;A Preliminary Report on Gamifying a Software Testing Course with the Code Defenders Testing Game,&#8221;</span>
-					In <span class="paper_venue">Proc. of The European Conference of Software Engineering Education</span>, ACM, 2018.
+					In <span class="paper_venue">Proc. of The European Conference of Software Engineering Education</span>, pp. 50-54, ACM, 2018.
 					<a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('ecsee18_course'));">[Bibtex]</a>
 					<div id="ecsee18_course" class="bibtex_hide" >
 	<pre class="tex"><code>@inproceedings{ECSEE2018_CodeDefenders,
@@ -79,7 +79,7 @@
 					</a>
 					Benjamin Clegg, Jos&eacute; Miguel Rojas, Gordon Fraser.
 					<span class="paper_title">&#8220;Teaching Software Testing Concepts Using a Mutation Testing Game,&#8221;</span>
-					In <span class="paper_venue">Proc. of the International Conference on Software Engineering: Software Engineering and Education Track (ICSE-SEET)</span>, IEEE Press, 2017.
+					In <span class="paper_venue">Proc. of the International Conference on Software Engineering: Software Engineering and Education Track (ICSE-SEET)</span>, pp. 33-36, IEEE Press, 2017.
 					<a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('icse17_edu_bibtex'));">[Bibtex]</a>
 					<div id="icse17_edu_bibtex" class="bibtex_hide" >
 	<pre class="tex"><code>@inproceedings{ICSE_SEET2017_CodeDefenders,
@@ -99,7 +99,7 @@
 					</a>
 					Jos&eacute; Miguel Rojas, Thomas White, Benjamin Clegg and Gordon Fraser.
 					<span class="paper_title">&#8220;Code Defenders: Crowdsourcing Effective Tests and Subtle Mutants with a Mutation Testing Game,&#8221;</span>
-					In <span class="paper_venue">Proc. of the International Conference on Software Engineering (ICSE)</span>, IEEE, 2017.
+					In <span class="paper_venue">Proc. of the International Conference on Software Engineering (ICSE)</span>, pp. 677-688, IEEE, 2017.
 					<a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('icse17_bibtex'));">[Bibtex]</a>
 					<div id="icse17_bibtex" class="bibtex_hide" >
 	<pre class="tex"><code>@inproceedings{ICSE2017_CodeDefenders,
@@ -154,7 +154,7 @@
 					</a>
 					Jos&eacute; Miguel Rojas and Gordon Fraser.
 					<span class="paper_title">&#8220;Code Defenders: A Mutation Testing Game,&#8221;</span>
-					In <span class="paper_venue">Proc. of The 11th International Workshop on Mutation Analysis</span>,  2016.
+					In <span class="paper_venue">Proc. of The 11th International Workshop on Mutation Analysis</span>, pp. 162-167, IEEE, 2016.
 					<a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('mutation16_bibtex'));">[Bibtex]</a>
 					<div id="mutation16_bibtex" class="bibtex_hide" >
 	<pre class="tex"><code>@inproceedings{Mutation16_CodeDefenders,
@@ -163,7 +163,7 @@
 		booktitle = {Proc. of The 11th International Workshop on Mutation Analysis},
 		year = {2016},
 		publisher = {IEEE},
-		note = {To appear}
+		pages = {162--167}
 	}</code></pre>
 					</div>
 				</li>
