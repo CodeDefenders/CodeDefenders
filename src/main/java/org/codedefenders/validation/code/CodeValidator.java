@@ -214,8 +214,9 @@ public class CodeValidator {
 			// added comments triggers validation
 			return true;
 		}
+		// We cannot use equality here because inserting empty lines will change the lineStart attribute of the Comment node.
 		for (int i = 0; i < originalComments.length; i++) {
-			if (!originalComments[i].equals(mutatedComments[i])) {
+			if (!originalComments[i].toString().equals(mutatedComments[i].toString())) {
 				return true;
 			}
 		}
