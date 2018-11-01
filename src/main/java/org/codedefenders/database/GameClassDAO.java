@@ -56,14 +56,16 @@ public class GameClassDAO {
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
         final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        if (resultSet == null) {
-            return false;
-        }
         try {
+            if (resultSet == null) {
+                return false;
+            }
             return resultSet.first();
         } catch (SQLException e) {
             logger.error("Error while retrieving classes for alias.", e);
             return false;
+        } finally {
+            DB.cleanup(conn, stmt);
         }
     }
 
@@ -85,10 +87,10 @@ public class GameClassDAO {
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
         final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        if (resultSet == null) {
-            return mutantIds;
-        }
         try {
+            if (resultSet == null) {
+                return mutantIds;
+            }
             while (resultSet.next()) {
                 final int mutantId = resultSet.getInt("Mutant_ID");
                 mutantIds.add(mutantId);
@@ -120,10 +122,10 @@ public class GameClassDAO {
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
         final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        if (resultSet == null) {
-            return mutants;
-        }
         try {
+            if (resultSet == null) {
+                return mutants;
+            }
             while (resultSet.next()) {
                 final int mutantId = resultSet.getInt("Mutant_ID");
                 final int gameId = resultSet.getInt("Game_ID");
@@ -164,10 +166,10 @@ public class GameClassDAO {
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
         final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        if (resultSet == null) {
-            return testIds;
-        }
         try {
+            if (resultSet == null) {
+                return testIds;
+            }
             while (resultSet.next()) {
                 final int testId = resultSet.getInt("Test_ID");
                 testIds.add(testId);
@@ -220,10 +222,10 @@ public class GameClassDAO {
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
         final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        if (resultSet == null) {
-            return testIds;
-        }
         try {
+            if (resultSet == null) {
+                return testIds;
+            }
             while (resultSet.next()) {
                 final int id = resultSet.getInt("Dependency_ID");
                 testIds.add(id);
@@ -254,10 +256,10 @@ public class GameClassDAO {
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
         final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        if (resultSet == null) {
-            return dependencies;
-        }
         try {
+            if (resultSet == null) {
+                return dependencies;
+            }
             while (resultSet.next()) {
                 final int id = resultSet.getInt("Dependency_ID");
                 final String javaFile = resultSet.getString("JavaFile");
@@ -291,7 +293,6 @@ public class GameClassDAO {
 
         String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile, RequireMocking) VALUES (?, ?, ?, ?, ?);";
         DatabaseValue[] valueList = new DatabaseValue[]{
-
                 DB.getDBV(name),
                 DB.getDBV(alias),
                 DB.getDBV(javaFile),
