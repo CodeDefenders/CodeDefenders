@@ -328,11 +328,9 @@
             }
         };
 
-        $(document).ready(() => {
-            const codeMirror = $('<%=codeDivSelector%>').find('.CodeMirror')[0].CodeMirror;
-            highlightCoverage(codeMirror);
-            highlightMutants(codeMirror);
-        });
+        const codeMirror = $('<%=codeDivSelector%>').find('.CodeMirror')[0].CodeMirror;
+        highlightCoverage(codeMirror);
+        highlightMutants(codeMirror);
     }());
 </script>
 
