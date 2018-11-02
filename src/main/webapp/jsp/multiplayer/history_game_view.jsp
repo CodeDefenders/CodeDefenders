@@ -65,8 +65,9 @@
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 
-    /* test_carousel */
+    /* tests_carousel */
     request.setAttribute("tests", game.getTests());
+    request.setAttribute("mutants", game.getMutants());
 
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());

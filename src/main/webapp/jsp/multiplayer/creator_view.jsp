@@ -28,8 +28,9 @@
 	request.setAttribute("classCode", cut.getAsHTMLEscapedString());
 	request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
-	/* test_carousel */
+	/* tests_carousel */
 	request.setAttribute("tests", game.getTests());
+	request.setAttribute("mutants", game.getMutants());
 
 	/* mutants_list */
 	request.setAttribute("mutantsAlive", game.getAliveMutants());

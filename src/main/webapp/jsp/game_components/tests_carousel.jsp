@@ -36,6 +36,7 @@
 
 <%
     List<Test> testsTODORENAME = (List<Test>) request.getAttribute("tests");
+    List<Mutant> mutantsTODORENAME = (List<Mutant>) request.getAttribute("mutants");
 %>
 
 <div class="slider single-item">
@@ -46,7 +47,7 @@
     <%
         for (Test test : testsTODORENAME) {
             User creator = DatabaseAccess.getUserFromPlayer(test.getPlayerId());
-            final Set<Mutant> coveredMutants = test.getCoveredMutants();
+            final Set<Mutant> coveredMutants = test.getCoveredMutants(mutantsTODORENAME);
             final Set<Mutant> killedMutants = test.getKilledMutants();
             final String coveredMutantsIdString = coveredMutants.stream().map(mutant -> String.valueOf(mutant.getId())).collect(Collectors.joining(", "));
             final String killedMuantsIdString = killedMutants.stream().map(mutant -> String.valueOf(mutant.getId())).collect(Collectors.joining(", "));

@@ -38,6 +38,7 @@
 
     /* tests_carousel */
     request.setAttribute("tests", game.getTests());
+    request.setAttribute("mutants", game.getMutants());
 
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());

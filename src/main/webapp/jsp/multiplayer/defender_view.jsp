@@ -40,8 +40,9 @@
 	}
 	request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
 
-	/* test_carousel */
+	/* tests_carousel */
 	request.setAttribute("tests", game.getTests());
+	request.setAttribute("mutants", game.getMutants());
 
 	/* mutants_list */
 	request.setAttribute("mutantsAlive", game.getAliveMutants());
@@ -72,7 +73,7 @@
 	<div class="col-md-6" id="cut-div">
 		<h3>Class Under Test</h3>
 		<%@include file="../game_components/class_viewer.jsp"%>
-		<%@ include file="../game_components/game_highlighting.jsp" %>
+		<%@include file="../game_components/game_highlighting.jsp" %>
 		<%@include file="../game_components/mutant_explanation.jsp"%>
 	</div>
 
