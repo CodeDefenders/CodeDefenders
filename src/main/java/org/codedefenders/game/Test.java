@@ -212,11 +212,11 @@ public class Test {
 		return CollectionUtils.containsAny(lineCoverage.getLinesCovered(), mutant.getLines());
 	}
 
-	public Set<Mutant> getCoveredMutants() {
+	public Set<Mutant> getCoveredMutants(List<Mutant> mutants) {
 		List<Integer> coverage = lineCoverage.getLinesCovered();
 		Set<Mutant> coveredMutants = new TreeSet<>(Mutant.orderByIdAscending());
 
-		for(Mutant m : DatabaseAccess.getMutantsForGame(gameId)) {
+		for(Mutant m : mutants) {
 			if(CollectionUtils.containsAny(coverage, m.getLines())) {
 				coveredMutants.add(m);
 			}
