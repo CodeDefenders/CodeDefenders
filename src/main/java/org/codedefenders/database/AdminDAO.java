@@ -38,7 +38,7 @@ public class AdminDAO {
     private static final Logger logger = LoggerFactory.getLogger(AdminDAO.class);
     private static final String UNASSIGNED_USERS_QUERY =
             "SELECT DISTINCT\n" +
-                    "  users.*,\n" +
+                    "  users.*\n" +
                     "FROM\n" +
                     "  users\n" +
                     "WHERE users.User_ID > 2 AND users.User_ID NOT IN (\n" +
