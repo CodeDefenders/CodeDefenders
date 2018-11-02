@@ -155,7 +155,7 @@ public class AdminDAO {
                     "      FROM players PD LEFT JOIN tests T ON PD.id = T.Player_ID\n" +
                     "      GROUP BY PD.user_id)\n" +
                     "       AS Defender ON U.user_id = Defender.user_id) AS totalScore ON totalScore.User_ID = users.User_ID\n" +
-                    "WHERE users.User_ID > 2 AND users.User_ID NOT IN (\n" +
+                    "WHERE users.User_ID > 4 AND users.User_ID NOT IN (\n" +
                     "  SELECT DISTINCT players.User_ID\n" +
                     "  FROM (players\n" +
                     "    INNER JOIN games ON players.Game_ID = games.ID)\n" +
