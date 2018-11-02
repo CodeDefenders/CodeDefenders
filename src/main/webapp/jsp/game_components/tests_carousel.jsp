@@ -61,7 +61,7 @@
                 &nbsp |
             </li>
             <li style=" display: inline-block;">
-                Creator: <%= creator.getUsername() %> (uid <%= creator.getId() %>)
+                <%= creator.getUsername() %> (uid <%= creator.getId() %>)
                 &nbsp |
             </li>
             <li style=" display: inline-block;">
