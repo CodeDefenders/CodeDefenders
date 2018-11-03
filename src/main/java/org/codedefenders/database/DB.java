@@ -114,7 +114,7 @@ public class DB {
     /*
     * Does not clean up!
      */
-    public static ResultSet executeQueryReturnRS(Connection conn, PreparedStatement stmt) {
+    static ResultSet executeQueryReturnRS(Connection conn, PreparedStatement stmt) {
         try {
             stmt.executeQuery();
             return stmt.getResultSet();
@@ -134,17 +134,6 @@ public class DB {
             DB.cleanup(conn, stmt);
         }
         return false;
-    }
-
-    public static ResultSet executeQuery(PreparedStatement stmt, Connection conn) {
-        try {
-            return stmt.executeQuery();
-        } catch (SQLException e) {
-            logger.error("SQLException while executing Query for statement\n\t" + stmt, e);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-        return null;
     }
 
     public static int executeUpdateGetKeys(PreparedStatement stmt, Connection conn) {

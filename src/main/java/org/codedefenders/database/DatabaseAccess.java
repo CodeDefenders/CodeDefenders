@@ -63,13 +63,12 @@ public class DatabaseAccess {
 	public static int getInt(PreparedStatement stmt, String att, Connection conn) {
 		int n = -1;
 		try {
-			ResultSet rs = stmt.executeQuery();
+			final ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 			if (rs.next()) {
 				n = rs.getInt(att);
 			}
 		} catch (SQLException se) {
 			logger.error("SQL exception caught", se);
-			DB.cleanup(conn, stmt);
 		} catch (Exception e) {
 			logger.error("Exception caught", e);
 		} finally {
@@ -276,7 +275,6 @@ public class DatabaseAccess {
 			}
 		} catch (SQLException se) {
 			logger.error("SQL exception caught", se);
-			DB.cleanup(conn, stmt);
 		} catch (Exception e) {
 			logger.error("Exception caught", e);
 		} finally {
@@ -520,9 +518,9 @@ public class DatabaseAccess {
 				DB.getDBV(gameId)};
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 
 		try {
+			ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 			while (rs.next()) {
 				if (rs.getInt("Creator_ID") == userId) {
 					role = Role.CREATOR;
@@ -530,6 +528,7 @@ public class DatabaseAccess {
 					try {
 						role = Role.valueOf(rs.getString("Role"));
 					} catch (NullPointerException | SQLException e) {
+						logger.info("Failed to retrieve role for user {} in game {}.", userId, gameId);
 					}
 				}
 			}
@@ -721,8 +720,8 @@ public class DatabaseAccess {
 		String query = "SELECT * FROM usedaitests WHERE Game_ID=?;";
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(g.getId()));
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 		try {
+			ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 			while (rs.next()) {
 				testList.add(rs.getInt("Value"));
 			}
@@ -747,9 +746,9 @@ public class DatabaseAccess {
 		String query = "SELECT * FROM equivalences WHERE Mutant_ID=?;";
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(m.getId()));
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 		int id = -1;
 		try {
+			ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 			while (rs.next()) {
 				id = rs.getInt("Defender_ID");
 			}
@@ -765,9 +764,9 @@ public class DatabaseAccess {
 		String query = "SELECT * FROM players WHERE ID=?;";
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(playerId));
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 		int points = 0;
 		try {
+			ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 			while (rs.next()) {
 				points = rs.getInt("Points");
 			}
@@ -805,8 +804,8 @@ public class DatabaseAccess {
 		String query = "SELECT * FROM usedaimutants WHERE Game_ID=?;";
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(g.getId()));
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 		try {
+			ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 			while (rs.next()) {
 				mutantList.add(rs.getInt("Value"));
 			}
@@ -905,8 +904,8 @@ public class DatabaseAccess {
 		// Load the MultiplayerGame Data with the provided ID.
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 		try {
+			ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 			List<Integer> atks = new ArrayList<>();
 			while (rs.next()) {
 				atks.add(rs.getInt("ID"));
@@ -1021,7 +1020,6 @@ public class DatabaseAccess {
 			}
 		} catch (SQLException se) {
 			logger.error("SQL exception caught", se);
-			DB.cleanup(conn, stmt);
 		} catch (Exception e) {
 			logger.error("Exception caught", e);
 		} finally {
@@ -1091,7 +1089,6 @@ public class DatabaseAccess {
 			}
 		} catch (SQLException se) {
 			logger.error("SQL exception caught", se);
-			DB.cleanup(conn, stmt);
 		} catch (Exception e) {
 			logger.error("Exception caught", e);
 		} finally {
@@ -1111,7 +1108,6 @@ public class DatabaseAccess {
 			}
 		} catch (SQLException se) {
 			logger.error("SQL exception caught", se);
-			DB.cleanup(conn, stmt);
 		} catch (Exception e) {
 			logger.error("Exception caught", e);
 		} finally {
@@ -1154,7 +1150,8 @@ public class DatabaseAccess {
 		};
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		try (ResultSet rs = stmt.executeQuery()){
+		try {
+			ResultSet rs = stmt.executeQuery();
 			if (rs.next()) {
 				return rs.getInt(1);
 			}
@@ -1216,8 +1213,8 @@ public class DatabaseAccess {
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(pwResetSecret)};
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 		try {
+			ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 			if (rs.next()) {
 				return rs.getInt(1);
 			}
@@ -1238,9 +1235,8 @@ public class DatabaseAccess {
 
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-
 		try {
+			ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
 			if (rs.next()) {
 				return rs.getBoolean("HasKillMap");
 			}
@@ -1284,8 +1280,6 @@ public class DatabaseAccess {
 			return null;
 		}
 
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-
 		List<KillMap.KillMapEntry> entries = new LinkedList<>();
 
 		/* Set up mapping from test id to test / mutant id to mutant. */
@@ -1295,6 +1289,8 @@ public class DatabaseAccess {
 		for (Mutant mutant : mutants) { mutantMap.put(mutant.getId(), mutant); }
 
 		try {
+			ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
+
 			while (rs.next()) {
 				int testId = rs.getInt("Test_ID");
 				int mutantId = rs.getInt("Mutant_ID");
@@ -1366,11 +1362,7 @@ public class DatabaseAccess {
 			stmt.setString(5, entry.status.toString());
 
 
-			try {
-				return DB.executeUpdate(stmt, conn);
-			} finally {
-				DB.cleanup(conn, stmt);
-			}
+            return DB.executeUpdate(stmt, conn);
 		} catch (SQLException e) {
 			logger.error("SQL exception caught", e);
 			return false;
