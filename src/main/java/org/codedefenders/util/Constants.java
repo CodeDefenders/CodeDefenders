@@ -114,6 +114,8 @@ public class Constants {
 	public static final String ADMIN_ANALYTICS_USERS_JSP = "/jsp" + F_SEP + "admin_analytics_users.jsp";
 	public static final String ADMIN_ANALYTICS_CLASSES_JSP = "/jsp" + F_SEP + "admin_analytics_classes.jsp";
 
+	public static final String NOTIFICATIONS = "/notifications";
+
 	public static final String ADMIN_ANALYTICS_USERS = "/admin/analytics/users";
 	public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";
 

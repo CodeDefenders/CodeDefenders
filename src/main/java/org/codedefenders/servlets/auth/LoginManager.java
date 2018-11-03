@@ -146,18 +146,39 @@ public class LoginManager extends HttpServlet {
 								//
 								storeApplicationDataInSession(session);
 
+								// Default redirect page: Home
+								String defaultRedirectTarget = request.getContextPath() + "/games";
+								String redirectTarget = defaultRedirectTarget;
+
 								Object from = session.getAttribute("loginFrom");
 								if (from != null && !((String) from).endsWith(".ico")
 										&& !((String) from).endsWith(".css")
 										&& !((String) from).endsWith(".js")) {
-									if (((String) from).startsWith(request.getContextPath())) {
-										response.sendRedirect((String) from);
-									} else {
-										response.sendRedirect(request.getContextPath() + "/" + (String) from);
+
+									redirectTarget = (String) from;
+
+									// Not sure why this is necessary
+									if ( ! redirectTarget.startsWith(request.getContextPath())) {
+										redirectTarget = request.getContextPath() + "/" + redirectTarget;
 									}
-								} else
-									response.sendRedirect(request.getContextPath() + "/games");
-							} else {
+
+									//  #140: after a POST to login we get a 302 to notifications
+									// This is the only place where we do a redirect to a target from a variable.
+									// So we avoid to redirect to notifications
+									if( redirectTarget.contains( Constants.NOTIFICATIONS ) ){
+										// Clean up the session to avoid possible recursion
+										session.removeAttribute("loginFrom");
+										// Reset to redirect target
+										redirectTarget = defaultRedirectTarget;
+										// TODO Enable more data collection about this request
+										logger.warn("Resetting Redirect target to default !");
+									}
+								}
+
+								// Do the actual redirect
+								response.sendRedirect( redirectTarget );
+
+						    } else {
 								messages.add("Your account is inactive, login is only possible with an active account.");
 								RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 								dispatcher.forward(request, response);
