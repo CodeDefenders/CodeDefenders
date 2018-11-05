@@ -46,11 +46,6 @@
                     } else {
                         address.parentElement.style.border = '0px';
                     }
-                    if (password.value === "") {
-                        password.parentElement.style.border = "1px solid red";
-                    } else {
-                        password.parentElement.style.border ='0px';
-                    }
 
                     if (smtpHost.value === "") {
                         smtpHost.parentElement.style.border = "1px solid red";
@@ -64,7 +59,7 @@
                         smtpPort.parentElement.style.border ='0px';
                     }
 
-                    return address.value !== "" && password.value !== "" && smtpHost.value !== "" && smtpPort.value !== 0;
+                    return address.value !== "" && smtpHost.value !== "" && smtpPort.value !== 0;
                 } else {
                     address.parentElement.style.border = '0px';
                     password.parentElement.style.border ='0px';
