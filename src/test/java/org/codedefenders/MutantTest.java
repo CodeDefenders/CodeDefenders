@@ -25,12 +25,16 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
+
+import javax.management.relation.RoleInfo;
 
 import org.apache.commons.io.FileUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.duel.DuelGame;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
@@ -39,7 +43,9 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 import difflib.Delta;
+import difflib.DiffUtils;
 import difflib.Patch;
+import difflib.PatchFailedException;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({DatabaseAccess.class})
@@ -47,7 +53,38 @@ public class MutantTest {
 	
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
-	
+
+	@org.junit.Test
+	public void testApplyPatch() throws IOException, PatchFailedException {
+
+		List<String> originalCode = Arrays.asList(new String[] { "public class Lift {", "private int topFloor;",
+				"private int currentFloor = 0; // default", "private int capacity = 10;    // default",
+				"private int numRiders = 0;    // default", "public Lift(int highestFloor) { ",
+				"topFloor = highestFloor;", "}", "}" });
+
+		List<String> mutantCode = Arrays.asList(new String[] { "public class Lift {", "private int topFloor;",
+				"private int currentFloor = 0; // default", "private int capacity = 10;    // default",
+				"private int numRiders = 0;    // default", "public Lift(int highestFloor) { topFloor = highestFloor;", // Here's
+																														// the
+																														// change
+				"topFloor = highestFloor;", "}", "}" });
+
+		// generating diff information.
+		Patch thePatch = DiffUtils.diff(originalCode, mutantCode);
+		List<String> unifiedPatches = DiffUtils.generateUnifiedDiff(null, null, originalCode, thePatch, 3);
+		System.out.println("MutantTest.testApplyPatch() " + unifiedPatches);
+		List<String> diff = Arrays.asList(new String[] { "--- null", "+++ null", "@@ -3,7 +3,7 @@",
+				" private int currentFloor = 0; // default", " private int capacity = 10;    // default",
+				" private int numRiders = 0;    // default", "-public Lift(int highestFloor) { ",
+				"+public Lift(int highestFloor) { topFloor = highestFloor;", " topFloor = highestFloor;", " }", " }" });
+
+		Patch patch = DiffUtils.parseUnifiedDiff(diff);
+
+		// Reapply the patch
+		List<String> patchedCode = (List<String>) DiffUtils.patch(originalCode, patch);
+		assertEquals(mutantCode, patchedCode);
+	}
+
 	@org.junit.Test
 	public void testGetLinesForChangeSingleLine() throws IOException{
 		String originalCode = "public class Lift {"+ "\n"
