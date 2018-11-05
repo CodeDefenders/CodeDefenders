@@ -344,7 +344,8 @@ public class AntRunner {
 			String cFile = matchingFiles.get(0).getAbsolutePath();
 			logger.info("Compiled test {}", compiledClassName);
 			Test newTest = new Test(gameID, jFile, cFile, playerId);
-			newTest.insert();
+			boolean inserted = newTest.insert();
+			assert ( inserted ); // if compilation was successful, .class file must exist
 			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);
 			newExec.insert();
 			return newTest;
