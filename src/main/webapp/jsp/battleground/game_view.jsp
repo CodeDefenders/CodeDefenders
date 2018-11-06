@@ -53,7 +53,7 @@
 %>
 
 <% String pageTitle="In Game"; %>
-<%@ page import="org.codedefenders.database.*" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Role" %>
@@ -291,7 +291,10 @@
 
             break;
         case DEFENDER:
-            %><%@ include file="/jsp/battleground/defender_view.jsp" %><%
+            %><%@ include file="/jsp/battleground/defender_view.jsp" %>
+            <%@include file="/jsp/game_components/defender_intention_collector.jsp" %>
+
+            <%
             break;
         case CREATOR:
             %><%@ include file="/jsp/battleground/creator_view.jsp" %><%

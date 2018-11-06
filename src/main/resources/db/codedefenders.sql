@@ -346,6 +346,16 @@ CREATE TABLE `tests` (
   CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) AUTO_INCREMENT=100;
 
+DROP TABLE IF EXISTS `intention`;
+CREATE TABLE `intention` (
+  `Intention_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Test_ID` int(11) NOT NULL,
+  `Game_ID` int(11) NOT NULL,
+  `Target_Mutants` longtext,
+  `Target_Lines` longtext,
+   PRIMARY KEY (`Intention_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
 --
 -- Mapping between test and the class the test is uploaded together with
 --

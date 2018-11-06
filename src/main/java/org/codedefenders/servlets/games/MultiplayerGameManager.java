@@ -26,6 +26,7 @@ import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.KillMap.KillMapJob;
 import org.codedefenders.execution.KillMap.KillMapJob.Type;
+import org.codedefenders.database.IntentionDAO;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
@@ -36,6 +37,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.Intention;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidator;
@@ -365,6 +367,15 @@ public class MultiplayerGameManager extends HttpServlet {
 
                 logger.info("New Test {} by user {}", newTest.getId(), uid);
                 TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+
+                try {
+                    Intention intention = new Intention(
+                            Intention.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_lines")),
+                            Intention.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_mutants")));
+                    IntentionDAO.storeIntentionForTest(newTest, intention);
+                } catch (Exception e) {
+                    logger.error("Cannot store intention to database {}", e);
+                }
 
 				if (!compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 					messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
