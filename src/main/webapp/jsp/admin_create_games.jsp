@@ -41,6 +41,7 @@
         <input type="hidden" name="formType" value="insertGames"/>
         <h3>Staged Games</h3>
         <%
+			List<MultiplayerGame> availableGames = AdminDAO.getAvailableGames();
             List<MultiplayerGame> createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
             List<List<Integer>> attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE);
             List<List<Integer>> defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE);
@@ -166,6 +167,44 @@
                                     <span class="glyphicon glyphicon-trash"></span>
                                 </button>
                             </td>
+                            <%-- ------------------ --%>
+                            <td style="padding-top:3px; padding-bottom:3px; ">
+                            <%-- create the select and fill it with the available games except the current one --%>
+								<div id="<%="game_"+id%>" style="max-width: 150px; float: left;">
+									<select name="<%="game_" + id%>" class="form-control selectpicker" data-size="small" id="game">
+										<%-- List created games --%>
+										<% for (MultiplayerGame availableGame : availableGames) { %>
+											<option value="<%=availableGame.getId()%>"><%=String.valueOf(availableGame.getId()) + ": " + availableGame.getCUT().getAlias()%>
+											</option>
+										<% } %>
+										<%-- List the staged games --%>
+										<% if (createdGames != null) {
+												for (int gameIndex = 0; gameIndex < createdGames.size(); ++gameIndex) {
+													// Do not list the current game in the select
+													if( gameIndex == i ) { continue; }
+													String classAlias = createdGames.get(gameIndex).getCUT().getAlias();
+										%>
+											<option style="color:gray" value=<%="T" + String.valueOf(gameIndex)%>><%="T" + String.valueOf(gameIndex) + ": " + classAlias%>
+											</option>
+										<%
+												}
+											}
+										%>
+									</select>
+								</div>
+							<%-- Create the select for the role --%>
+								<div id="<%="role_"+id%>" style="float: left; max-width: 120px; margin-left:2px">
+									<select name="<%="role_" + id%>" class="form-control selectpicker" data-size="small" id="role">
+										<option value="<%=Role.ATTACKER%>">Attacker</option>
+										<option value="<%=Role.DEFENDER%>">Defender</option>
+									</select>
+								</div>
+							<%-- Create the button to move it --%>
+								<button name="tempGameUserMoveToButton" class="btn btn-sm btn-primary" type="submit" value="<%="move_player_"+id+"_from_game_T"+i%>" name="userListButton" style="margin: 2px; float:left">
+									<span class="glyphicon glyphicon-plus"></span>
+								</button>
+							</td>
+                            <%-- ------------------ --%>
                         </tr>
                         <% } %>
                     </table>
@@ -209,7 +248,6 @@
             <tbody>
 
             <%
-                List<MultiplayerGame> availableGames = AdminDAO.getAvailableGames();
                 createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
                 List<List<String>> unassignedUsersInfo = AdminCreateGames.getUnassignedUsers(attackerIdsList, defenderIdsList);
                 if (unassignedUsersInfo.isEmpty()) {
