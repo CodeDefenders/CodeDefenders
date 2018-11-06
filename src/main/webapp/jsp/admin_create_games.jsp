@@ -200,7 +200,9 @@
 									</select>
 								</div>
 							<%-- Create the button to move it --%>
-								<button name="tempGameUserMoveToButton" class="btn btn-sm btn-primary" type="submit" value="<%="move_player_"+id+"_from_game_T"+i%>" name="userListButton" style="margin: 2px; float:left">
+								<button name="tempGameUserMoveToButton" class="btn btn-sm btn-primary" type="submit" value="<%="move_player_"+id+"_from_game_T"+i%>" name="userListButton" style="margin: 2px; float:left"
+								<% if( createdGames.size() + availableGames.size() == 1 ) {%> disabled="true" <% }%>
+								>
 									<span class="glyphicon glyphicon-plus"></span>
 								</button>
 							</td>
