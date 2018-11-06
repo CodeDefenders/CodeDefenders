@@ -196,8 +196,11 @@ public class AdminCreateGames extends HttpServlet {
 
 		// Remove the user. No need to check for creator or wrong user here
 		if (isTempGame) {
-			userList.remove(new Integer( removedUserId ) );
-			messages.add("Removed user " + removedUserId + " from game " + gidString);
+			if(userList.remove(new Integer( removedUserId ))){
+				messages.add("Removed user " + removedUserId + " from game " + gidString);
+			}else {
+				messages.add("ERROR trying to remove user " + removedUserId + " from game " + gidString);
+			}
 		} else {
 			if (mg.removePlayer(removedUserId)) {
 				messages.add("Removed user " + removedUserId + " from game " + gidString);
