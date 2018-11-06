@@ -112,18 +112,13 @@ public class AdminCreateGames extends HttpServlet {
 		String gameAndUserMoveToId = request.getParameter("tempGameUserMoveToButton");
 
 		if (gameAndUserMoveToId != null) {
-			// TODO Check parameter settings
-			// move_player_"+id+"_from_game_T"+i
 			int userId = Integer.valueOf(request.getParameter("tempGameUserMoveToButton").split("_")[2]);
 			String targetGameIdString = request.getParameter("game_" + userId);
 			String currentGameIdString = request.getParameter("tempGameUserMoveToButton").split("_")[5];
-
 			Role role = Role.valueOf(request.getParameter("role_" + userId));
-			// Associate player X to game W as role K
-			// TODO Note that there no rollback in place at the moment, if any
-			// of the two fails state might be inconsistent
+			// If any of this fail state of staged games will be inconsistent
+			removePlayerFromGame(session, messages, userId, currentGameIdString);
 			associatePlayerToGameWithRole(session, messages, userId, targetGameIdString, role);
-			removePlayerFromGame(session, messages, userId, currentGameIdString, role);
 		} else if (gameAndUserRemoveId != null || gameAndUserSwitchId != null ) {
 			// admin is removing user  from temp game or switching their role or
 			Boolean switchUser = gameAndUserSwitchId != null;
@@ -177,8 +172,8 @@ public class AdminCreateGames extends HttpServlet {
 		response.sendRedirect(request.getContextPath() + "/admin");
 	}
 
-	private void removePlayerFromGame(HttpSession session, ArrayList<String> messages, int removedUserId, String gidString, Role role) {
-		int gid;
+	private void removePlayerFromGame(HttpSession session, ArrayList<String> messages, int removedUserId, String gidString) {
+		Integer gid;
 		List<Integer> userList = new ArrayList<>();
 		boolean isTempGame = gidString.startsWith("T");
 
@@ -187,10 +182,13 @@ public class AdminCreateGames extends HttpServlet {
 			createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
 			gid = Integer.parseInt(gidString.substring(1));
 			mg = createdGames.get(gid);
-			userList = (role.equals(Role.ATTACKER) ?
-					(List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE) :
-					(List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE))
-					.get(gid);
+			// My current role matters not the one I will play in the next game !
+			// So return the list that contains me...
+			userList = (
+					((List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE)).get( gid ).contains( new Integer(removedUserId) )
+					? (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE)
+					: (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE))
+							.get(gid);
 		} else {
 			gid = Integer.parseInt(gidString);
 			mg = DatabaseAccess.getMultiplayerGame(gid);
