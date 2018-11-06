@@ -291,7 +291,10 @@
 
             break;
         case DEFENDER:
-            %><%@ include file="/jsp/multiplayer/defender_view.jsp" %><%
+            %><%@ include file="/jsp/multiplayer/defender_view.jsp" %>
+            <%@include file="/jsp/game_components/defender_intention_collector.jsp" %>
+            
+            <%
             break;
         case CREATOR:
             %><%@ include file="/jsp/multiplayer/creator_view.jsp" %><%
