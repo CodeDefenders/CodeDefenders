@@ -168,6 +168,9 @@
                                 </button>
                             </td>
                             <%-- ------------------ --%>
+                            <%-- Show moving to game UI only if there's more than 1 game --%>
+                            <%-- ------------------ --%>
+                            <% if( createdGames.size() + availableGames.size() > 1 ) {%>
                             <td style="padding-top:3px; padding-bottom:3px; ">
                             <%-- create the select and fill it with the available games except the current one --%>
 								<div id="<%="game_"+id%>" style="max-width: 150px; float: left;">
@@ -195,12 +198,11 @@
 							<%-- Keep the role of the user also in the target game --%>
 								<input type="hidden" name="<%="role_" + id%>" value="<%= (attackerIds.contains(new Integer(id))) ? Role.ATTACKER : Role.DEFENDER %>"/>
 							<%-- Create the button to move it --%>
-								<button name="tempGameUserMoveToButton" class="btn btn-sm btn-primary" type="submit" value="<%="move_player_"+id+"_from_game_T"+i%>" name="userListButton" style="margin: 2px; float:left"
-								<% if( createdGames.size() + availableGames.size() == 1 ) {%> disabled="true" <% }%>
-								>
+								<button name="tempGameUserMoveToButton" class="btn btn-sm btn-primary" type="submit" value="<%="move_player_"+id+"_from_game_T"+i%>" name="userListButton" style="margin: 2px; float:left">
 									<span class="glyphicon glyphicon-plus"></span>
 								</button>
 							</td>
+							<% }%>
                             <%-- ------------------ --%>
                         </tr>
                         <% } %>
