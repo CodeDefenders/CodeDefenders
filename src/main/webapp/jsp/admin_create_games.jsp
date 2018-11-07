@@ -192,13 +192,8 @@
 										%>
 									</select>
 								</div>
-							<%-- Create the select for the role --%>
-								<div id="<%="role_"+id%>" style="float: left; max-width: 120px; margin-left:2px">
-									<select name="<%="role_" + id%>" class="form-control selectpicker" data-size="small" id="role">
-										<option value="<%=Role.ATTACKER%>">Attacker</option>
-										<option value="<%=Role.DEFENDER%>">Defender</option>
-									</select>
-								</div>
+							<%-- Keep the role of the user also in the target game --%>
+								<input type="hidden" name="<%="role_" + id%>" value="<%= (attackerIds.contains(new Integer(id))) ? Role.ATTACKER : Role.DEFENDER %>"/>
 							<%-- Create the button to move it --%>
 								<button name="tempGameUserMoveToButton" class="btn btn-sm btn-primary" type="submit" value="<%="move_player_"+id+"_from_game_T"+i%>" name="userListButton" style="margin: 2px; float:left"
 								<% if( createdGames.size() + availableGames.size() == 1 ) {%> disabled="true" <% }%>
