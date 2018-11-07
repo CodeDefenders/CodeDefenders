@@ -147,9 +147,7 @@
                     <%List<List<String>> playersInfo = AdminDAO.getPlayersInfo(gid);
                 if(!playersInfo.isEmpty()){%>
             <tr id="playersTableActive" hidden>
-                <th></th>
-                <th></th>
-                <th></th>
+                <th colspan="3">Game Score</th>
                 <th style="border-bottom: 1px solid black">Name</th>
                 <th style="border-bottom: 1px solid black">Submissions</th>
                 <th style="border-bottom: 1px solid black">Last Action</th>
@@ -160,6 +158,21 @@
             </tr>
             <%
                 }
+                boolean firstAttacker = true;
+                boolean firstDefender = true;
+
+                // Compute the cumulative sum of each role score. Not sure if this is how is done in the scoreboard
+                int gameScoreAttack = 0;
+                int gameScoreDefense = 0;
+
+                for (List<String> playerInfo : playersInfo) {
+					if( Role.ATTACKER.equals( Role.valueOf(playerInfo.get(2)) ) ){
+						gameScoreAttack = gameScoreAttack + Integer.parseInt(playerInfo.get(4));
+					} else if (Role.DEFENDER.equals( Role.valueOf(playerInfo.get(2)) ) ){
+						gameScoreDefense = gameScoreDefense + Integer.parseInt(playerInfo.get(4));
+					}
+				}
+
                 for (List<String> playerInfo : playersInfo) {
                     int pid = Integer.parseInt(playerInfo.get(0));
                     String userName = playerInfo.get(1);
@@ -173,9 +186,18 @@
             %>
             <tr style="height: 3px;" id="playersTableActive" hidden></tr>
             <tr id="playersTableActive" hidden>
+            <%	if ( firstAttacker && role.equals( Role.ATTACKER ) ) {%>
+                <td colspan = "3"><%= gameScoreAttack %></td>
+            <%	firstAttacker = false;
+				}
+				else if ( firstDefender && role.equals( Role.DEFENDER ) ) {%>
+                <td colspan = "3"><%= gameScoreDefense %></td>
+            <%  firstDefender = false;
+                } else { %>
                 <td></td>
                 <td></td>
                 <td></td>
+            <%  } %>
                 <td style="background: <%= color %>; border-top-left-radius: 7px;border-bottom-left-radius: 7px;">
                     <%= userName %>
                 </td>
