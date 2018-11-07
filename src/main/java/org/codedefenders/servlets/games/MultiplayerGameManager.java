@@ -344,13 +344,8 @@ public class MultiplayerGameManager extends HttpServlet {
 					logger.info("New Test {} by user {}", newTest.getId(), uid);
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-					try {
-						Intention intention = new Intention(
-						Intention.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_lines")),
-						Intention.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_mutants")));
-						IntentionDAO.storeIntentionForTest(newTest, intention);
-					} catch (Exception e) {
-						logger.error("Cannot store intention to database {}", e);
+					if( activeGame.isDeclareCoveredLines() || activeGame.isDeclareKilledMutants() ){
+						collectDefenderIntentions(newTest, request);
 					}
 
 					if (compileTestTarget.status.equals("SUCCESS")) {
@@ -389,5 +384,27 @@ public class MultiplayerGameManager extends HttpServlet {
 				break;
 		}
 		response.sendRedirect(contextPath + "/multiplayer/play");
+	}
+
+	private void collectDefenderIntentions(Test newTest, HttpServletRequest request) {
+		// Process parameters
+		try {
+
+			Set<Integer> selectedLines = new HashSet<>();
+			Set<Integer> selectedMutants = new HashSet<>();
+
+			if (request.getParameter("selected_lines") != null) {
+				selectedLines.addAll(
+						Intention.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_lines")));
+			}
+			if (request.getParameter("selected_mutants") != null) {
+				selectedMutants.addAll(Intention
+						.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_mutants")));
+			}
+			Intention intention = new Intention(selectedLines, selectedMutants);
+			IntentionDAO.storeIntentionForTest(newTest, intention);
+		} catch (Exception e) {
+			logger.error("Cannot store intention to database {}", e);
+		}
 	}
 }
