@@ -68,12 +68,12 @@
                 <th>Level</th>
                 <th>Starting</th>
                 <th>Finishing</th>
-                <th>Players
+                <th class="col-md-6">Players
                     <div class="row">
-                        <div class="col-sm-2">Name</div>
-                        <div class="col-sm-4">Last Role</div>
-                        <div class="col-sm-3">Score</div>
-                        <a id="togglePlayersCreated" class="btn btn-sm btn-default">
+                        <div class="col-sm-2" style="padding-top: 10px">Name</div>
+                        <div class="col-sm-3" style="padding-top: 10px">Last Role</div>
+                        <div class="col-sm-1" style="padding-top: 10px">Score</div>
+                        <a id="togglePlayersCreated" class="btn btn-sm btn-default" style="float: right">
                             <span id = "togglePlayersCreatedSpan" class="glyphicon glyphicon-alert"></span>
                         </a>
                     </div>
@@ -99,7 +99,7 @@
                 </td>
                 <td><%=i%>
                 </td>
-                <td class="col-sm-2">
+                <td>
                     <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
                         <%=cut.getAlias()%>
                     </a>
@@ -127,11 +127,11 @@
                 </td>
                 <td><%= g.getLevel().name() %>
                 </td>
-                <td class="col-sm-2"><%= g.getStartDateTime() %>
+                <td><%= g.getStartDateTime() %>
                 </td>
-                <td class="col-sm-2"><%= g.getFinishDateTime() %>
+                <td><%= g.getFinishDateTime() %>
                 </td>
-                <td class="col-sm-4">
+                <td>
                     <div id="playersTableHidden" style="color: lightgray;"> (hidden)</div>
                     <table id="playersTableCreated" hidden>
                         <%
@@ -145,13 +145,13 @@
                                 String color = attackerIds.contains(id) ? "#edcece" : "#ced6ed";
                         %>
                         <tr style="background: <%= color %>">
-                            <td class="col-sm-1"><%= userName %>
+                            <td class="col-md-2"><%= userName %>
                             </td>
-                            <td class="col-sm-1"><%= lastRole %>
+                            <td class="col-md-3"><%= lastRole %>
                             </td>
-                            <td class="col-sm-1"><%= totalScore %>
+                            <td class="col-md-1"><%= totalScore %>
                             </td>
-                            <td>
+                            <td class="col-md-1">
                                 <button class="btn btn-sm btn-primary"
                                         value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
                                         id="<%="switch_player_"+id+"_game_"+i%>"
@@ -159,7 +159,7 @@
                                     <span class="glyphicon glyphicon-transfer"></span>
                                 </button>
                             </td>
-                            <td>
+                            <td class="col-md-1">
                                 <button class="btn btn-sm btn-danger"
                                         value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
                                         id="<%="remove_player_"+id+"_game_"+i%>"
@@ -171,10 +171,10 @@
                             <%-- Show moving to game UI only if there's more than 1 game --%>
                             <%-- ------------------ --%>
                             <% if( createdGames.size() + availableGames.size() > 1 ) {%>
-                            <td style="padding-top:3px; padding-bottom:3px; ">
+                            <td class="col-md-3" style="padding-top:3px; padding-bottom:3px;">
                             <%-- create the select and fill it with the available games except the current one --%>
-								<div id="<%="game_"+id%>" style="max-width: 150px; float: left;">
-									<select name="<%="game_" + id%>" class="form-control selectpicker" data-size="small" id="game">
+								<div id="<%="game_"+id%>" style="max-width: 100px; float: left;">
+									<select name="<%="game_" + id%>" class="form-control selectpicker" data-size="small" id="game" style="float: right">
 										<%-- List created games --%>
 										<% for (MultiplayerGame availableGame : availableGames) { %>
 											<option value="<%=availableGame.getId()%>"><%=String.valueOf(availableGame.getId()) + ": " + availableGame.getCUT().getAlias()%>
@@ -194,14 +194,17 @@
 											}
 										%>
 									</select>
+
 								</div>
 							<%-- Keep the role of the user also in the target game --%>
 								<input type="hidden" name="<%="role_" + id%>" value="<%= (attackerIds.contains(new Integer(id))) ? Role.ATTACKER : Role.DEFENDER %>"/>
-							<%-- Create the button to move it --%>
-								<button name="tempGameUserMoveToButton" class="btn btn-sm btn-primary" type="submit" value="<%="move_player_"+id+"_from_game_T"+i%>" name="userListButton" style="margin: 2px; float:left">
-									<span class="glyphicon glyphicon-arrow-right"></span>
-								</button>
 							</td>
+                            <%-- Create the button to move it --%>
+                            <td class="col-md-1">
+                                <button name="tempGameUserMoveToButton" class="btn btn-sm btn-primary" type="submit" value="<%="move_player_"+id+"_from_game_T"+i%>" name="userListButton" style="margin: 2px; float:left">
+                                    <span class="glyphicon glyphicon-arrow-right"></span>
+                                </button>
+                            </td>
 							<% }%>
                             <%-- ------------------ --%>
                         </tr>
