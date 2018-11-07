@@ -617,7 +617,10 @@ public class DatabaseAccess {
 						rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),
 						rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"),
 						rs.getInt("MaxAssertionsPerTest"),rs.getBoolean("ChatEnabled"),
-						CodeValidatorLevel.valueOf(rs.getString("MutantValidator")), rs.getBoolean("MarkUncovered"));
+						CodeValidatorLevel.valueOf(rs.getString("MutantValidator")), rs.getBoolean("MarkUncovered"),
+						//
+						rs.getBoolean("DeclareCoveredLines"),rs.getBoolean("DeclareKilledMutants")
+						);
 				mg.setId(rs.getInt("ID"));
 				gameList.add(mg);
 			}

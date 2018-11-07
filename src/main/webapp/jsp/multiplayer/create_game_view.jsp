@@ -473,6 +473,24 @@
                            data-onstyle="primary" data-offstyle="" checked>
                 </td>
             </tr>
+
+            <tr>
+                <td>Enable Capturing Defender Intention for Coverage</td>
+                <td>
+                    <input type="checkbox" id="declareCoveredLines" name="declareCoveredLines"
+                           class="form-control" data-size="large" data-toggle="toggle" data-on="Yes" data-off="No"
+                           data-onstyle="primary" data-offstyle="">
+                </td>
+            </tr>
+            <tr>
+                <td>Enable Capturing Defender Intention for Mutants</td>
+                <td>
+                    <input type="checkbox" id="declareKilledMutants" name="declareKilledMutants"
+                           class="form-control" data-size="large" data-toggle="toggle" data-on="Yes" data-off="No"
+                           data-onstyle="primary" data-offstyle="">
+                </td>
+            </tr>
+
             <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
             <tr>
                 <td/>
