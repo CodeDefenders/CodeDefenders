@@ -345,7 +345,50 @@ public class MultiplayerGameManager extends HttpServlet {
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 					if( activeGame.isDeclareCoveredLines() || activeGame.isDeclareKilledMutants() ){
-						collectDefenderIntentions(newTest, request);
+
+						Set<Integer> selectedLines = new HashSet<>();
+						Set<Integer> selectedMutants = new HashSet<>();
+
+						if (request.getParameter("selected_lines") != null) {
+							selectedLines.addAll(
+									Intention.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_lines")));
+						}
+
+						if (request.getParameter("selected_mutants") != null) {
+							selectedMutants.addAll(Intention
+									.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_mutants")));
+						}
+
+						// Validate Intentions to avoid tweaks with the UI
+						boolean validatedCoveredLines = true;
+						boolean validatedKilledMutants = true;
+						StringBuffer validationMessage = new StringBuffer();
+						validationMessage.append("Cheeky! You cannot submit a test without specifing");
+
+						if( selectedLines.isEmpty() && activeGame.isDeclareCoveredLines() ){
+							validatedCoveredLines = false;
+							validationMessage.append(" a line to cover");
+						}
+
+						if( selectedMutants.isEmpty() && activeGame.isDeclareKilledMutants()) {
+							validatedKilledMutants = false;
+
+							if( selectedLines.isEmpty() && activeGame.isDeclareCoveredLines() ){
+								validationMessage.append(" or");
+							}
+
+							validationMessage.append(" a mutant to kill");
+						}
+						validationMessage.append(".");
+
+						if( validatedCoveredLines && validatedKilledMutants ){
+							collectDefenderIntentions(newTest, selectedLines, selectedMutants);
+						} else {
+							messages.add(validationMessage.toString());
+							// Keep the test around
+							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+							response.sendRedirect(contextPath + "/multiplayer/play");
+						}
 					}
 
 					if (compileTestTarget.status.equals("SUCCESS")) {
@@ -386,21 +429,9 @@ public class MultiplayerGameManager extends HttpServlet {
 		response.sendRedirect(contextPath + "/multiplayer/play");
 	}
 
-	private void collectDefenderIntentions(Test newTest, HttpServletRequest request) {
+	private void collectDefenderIntentions(Test newTest, Set<Integer> selectedLines, Set<Integer> selectedMutants) {
 		// Process parameters
 		try {
-
-			Set<Integer> selectedLines = new HashSet<>();
-			Set<Integer> selectedMutants = new HashSet<>();
-
-			if (request.getParameter("selected_lines") != null) {
-				selectedLines.addAll(
-						Intention.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_lines")));
-			}
-			if (request.getParameter("selected_mutants") != null) {
-				selectedMutants.addAll(Intention
-						.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_mutants")));
-			}
 			Intention intention = new Intention(selectedLines, selectedMutants);
 			IntentionDAO.storeIntentionForTest(newTest, intention);
 		} catch (Exception e) {
