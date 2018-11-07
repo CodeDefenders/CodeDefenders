@@ -32,10 +32,18 @@ toggleDefend();
 var theForm = document.getElementById('def');
 
 var parent = document.getElementById('utest-div');
-var conn = document.createElement('div');
+var container = document.createElement('div');
+container.setAttribute("style", "width: 100%");
+// Put the container before the form
+parent.insertBefore(container, theForm);
+
+var theTable = document.createElement("TABLE");
+theTable.setAttribute("id", "intention-table");
+container.appendChild(theTable)
 
 <%-- Handling Line Coverage --%>
 <% if(game.isDeclareCoveredLines()) {%>
+
 function selectLine(lineNumber){
 	if( sLines.has(lineNumber)){
 		sLines.delete(lineNumber);
@@ -55,19 +63,40 @@ input.setAttribute("value", "");
 //append to form element that you want .
 theForm.appendChild(input);
 
+// update the UI by adding a row to the "intention-table"
+// https://stackoverflow.com/questions/18333427/how-to-insert-row-in-html-table-body-in-javascript
+// Insert a row in the table at the last row
+var newRow = theTable.insertRow();
+// Insert a cell in the row
+var newCell  = newRow.insertCell();
+// Write the HTML inside the cell
+newCell.innerHTML='<strong>Selected Lines:</strong>';
+newCell.setAttribute("style", "width: 25%;  height: 40px;")
 
-conn.appendChild(document.createTextNode("Selected Lines:"));
+//Insert another cell in the row
+var newCell  = newRow.insertCell();
 var selected_lines =  document.createElement('div');
 selected_lines.setAttribute("id", "selectedLinesDiv");
 selected_lines.innerText=""
-conn.appendChild(selected_lines);
+newCell.appendChild(selected_lines);
 
 <!-- Update Code Mirror to enable line selection -->
 var editor = document.querySelector('#sut').nextSibling.CodeMirror;
+/* function isEmpty(obj) {
+    for (var n in obj) if (obj.hasOwnProperty(n) && obj[n]) return false;
+    return true;
+  } */
 
 editor.on("gutterClick", function(cm, n) {
   var info = cm.lineInfo(n);
-  cm.setGutterMarker(n, "CodeMirror-linenumbers", info.gutterMarkers ? null : makeMarker());
+  var markers = info.gutterMarkers || (info.gutterMarkers = {});
+  var value = markers["CodeMirror-linenumbers"]; 
+  if (value != null) {
+	  cm.setGutterMarker(n, "CodeMirror-linenumbers", null);	  
+  } else {
+	  cm.setGutterMarker(n, "CodeMirror-linenumbers", makeMarker());
+  }
+  // 
   selectLine(n+1);
 });
 
@@ -78,6 +107,11 @@ function makeMarker() {
   return marker;
 }
 
+// Resize original code mirror
+var testCode = document.querySelector('#code').nextSibling;
+var newHeight = testCode.style.height.replace("px","");
+newHeight=newHeight-40;
+testCode.style.height=newHeight+"px";
 <% }%>
 
 <%-- Handling Killing Mutants --%>
@@ -105,13 +139,18 @@ input.setAttribute("value", "");
 //append to form element that you want .
 theForm.appendChild(input);
 
-conn.appendChild(document.createTextNode("Selected Mutants:"));
+var newRow = theTable.insertRow();
+//Insert a cell in the row
+var newCell  = newRow.insertCell();
+//Write the HTML inside the cell
+newCell.innerHTML='<strong>Selected Mutants:</strong>';
+newCell.setAttribute("style", "width: 25%;  height: 40px;")
+//Insert another cell in the row
+var newCell  = newRow.insertCell();
 var selected_mutants =  document.createElement('div');
 selected_mutants.setAttribute("id", "selectedMutantsDiv");
 selected_mutants.innerText=""
-conn.appendChild(selected_mutants);
-
-parent.insertBefore(conn, theForm);
+newCell.appendChild(selected_mutants);
 
 <!-- Add a checkbox for each alive mutant. Note that the table might not be there -->
 
@@ -127,15 +166,20 @@ if( table != null ){
 		checkbox.setAttribute("id", "checkbox_"+i);
 		// Do I need to set id and value ?
 		cell.appendChild(checkbox);
-		var label = document.createElement("label");
-		label.setAttribute("for", "checkbox_"+i);
-		label.innerHTML="Select this mutant as target"
+		var label = document.createTextNode("Target this mutant");
 		cell.appendChild(label);
 		checkbox.onclick = function fun(){
 			selectMutant( i, this );
 		}
 	}
 }
+
+// Resize the original code mirror
+var testCode = document.querySelector('#code').nextSibling;
+var newHeight = testCode.style.height.replace("px","");
+newHeight=newHeight-40;
+testCode.style.height=newHeight+"px";
+
 
 <% }%>
 
