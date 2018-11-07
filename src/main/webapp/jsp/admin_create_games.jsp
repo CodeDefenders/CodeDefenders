@@ -316,7 +316,7 @@
                         </select>
                     </div>
                     <button class="btn btn-sm btn-primary" type="submit" value="<%=uid%>" name="userListButton"
-                            style="margin: 2px; float:left"
+                            style="margin: 2px; float:right"
                             id="<%="add_"+uid%>"
                             <%=availableGames.isEmpty() && (createdGames == null || createdGames.isEmpty()) ? "disabled" : ""%>>
                         <span class="glyphicon glyphicon-plus"></span>
