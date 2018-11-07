@@ -77,6 +77,9 @@ public class AdminCreateGames extends HttpServlet {
     int maxAssertionsPerTest;
     CodeValidatorLevel mutantValidatorLevel;
 
+    boolean declareCoveredLines;
+    boolean declareKilledMutants;
+
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP).forward(request, response);
     }
@@ -229,6 +232,9 @@ public class AdminCreateGames extends HttpServlet {
 			mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
 			chatEnabled = request.getParameter("chatEnabled") != null;
 			markUncovered = request.getParameter("markUncovered") != null;
+
+			declareCoveredLines = request.getParameter("declareCoveredLines") != null;
+            declareKilledMutants = request.getParameter("declareKilledMutants") != null;
 		} catch (Exception e) {
 			messages.add("There was a problem with the form.");
 			response.sendRedirect(request.getContextPath() + "/admin");
@@ -300,7 +306,7 @@ public class AdminCreateGames extends HttpServlet {
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
                  cutID, currentUserID, gamesLevel, gamesState,
                 startTime, finishTime, maxAssertionsPerTest, chatEnabled,
-                mutantValidatorLevel, markUncovered);
+                mutantValidatorLevel, markUncovered, declareCoveredLines, declareKilledMutants);
 
         if (teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_DESCENDING) || teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_SHUFFLED)) {
             Collections.sort(attackerIDs, new ReverseDefenderScoreComparator());
@@ -362,13 +368,16 @@ public class AdminCreateGames extends HttpServlet {
                                                      int cutID, int creatorID, GameLevel level, GameState state,
                                                      long startTime, long finishTime, int maxAssertionsPerTest,
                                                      boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
-                                                     boolean markUncovered) {
+                                                     boolean markUncovered, //
+                                                     boolean declareCoveredLines, boolean declareKilledMutants
+                                                     ) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
             MultiplayerGame multiplayerGame = new MultiplayerGame(cutID, creatorID, level, (float) 1, (float) 1,
                     (float) 1, 10, 4, 0,
                     0, 0, 0, startTime,
-                    finishTime, state.name(), false, maxAssertionsPerTest, chatEnabled, mutantValidatorLevel, markUncovered);
+                    finishTime, state.name(), false, maxAssertionsPerTest, chatEnabled, mutantValidatorLevel, markUncovered,
+                    declareCoveredLines, declareKilledMutants);
             gameList.add(multiplayerGame);
         }
         return gameList;

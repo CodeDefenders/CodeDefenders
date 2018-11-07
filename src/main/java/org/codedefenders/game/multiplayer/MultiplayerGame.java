@@ -97,7 +97,7 @@ public class MultiplayerGame extends AbstractGame {
 			   int maxAssertionsPerTest, boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
 			   boolean markUncovered) {
 		this(classId, creatorId, level, lineCoverage, mutantCoverage, prize, defenderValue, attackerValue, defenderLimit, attackerLimit,
-				minDefenders, minAttackers, startDateTime, finishDateTime, status, false, maxAssertionsPerTest,
+				minDefenders, minAttackers, startDateTime, finishDateTime, status, requiresValidation, maxAssertionsPerTest,
 				chatEnabled, mutantValidatorLevel, markUncovered, false, false);
 	}
 
