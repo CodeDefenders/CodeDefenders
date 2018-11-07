@@ -241,7 +241,7 @@
                 <th>Last Role</th>
                 <th>Total Score</th>
                 <th>Last Login</th>
-                <th>Add to existing Game</th>
+                <th class="col-md-4">Add to existing Game</th>
             </tr>
             </thead>
             <tbody>
