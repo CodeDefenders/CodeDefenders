@@ -76,15 +76,33 @@ public class MultiplayerGame extends AbstractGame {
 	private CodeValidatorLevel mutantValidatorLevel;
 	private boolean markUncovered;
 
+	private boolean declareCoveredLines;
+	private boolean declareKilledMutants;
+
 	public MultiplayerGame(int classId, int creatorId, GameLevel level,
 						   float lineCoverage, float mutantCoverage, float prize,
 						   int defenderValue, int attackerValue, int defenderLimit,
 						   int attackerLimit, int minDefenders, int minAttackers,
 						   long startDateTime, long finishDateTime, String status, int maxAssertionsPerTest,
 						   boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel, boolean markUncovered) {
+
+		this(classId, creatorId, level, lineCoverage, mutantCoverage, prize, defenderValue, attackerValue, defenderLimit, attackerLimit,
+				minDefenders, minAttackers, startDateTime, finishDateTime, status,
+				false, // requiresValidation
+				maxAssertionsPerTest,
+				chatEnabled, mutantValidatorLevel, markUncovered);
+	}
+
+	public MultiplayerGame(int classId, int creatorId, GameLevel level,
+			   float lineCoverage, float mutantCoverage, float prize,
+			   int defenderValue, int attackerValue, int defenderLimit,
+			   int attackerLimit, int minDefenders, int minAttackers,
+			   long startDateTime, long finishDateTime, String status, boolean requiresValidation,
+			   int maxAssertionsPerTest, boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
+			   boolean markUncovered) {
 		this(classId, creatorId, level, lineCoverage, mutantCoverage, prize, defenderValue, attackerValue, defenderLimit, attackerLimit,
 				minDefenders, minAttackers, startDateTime, finishDateTime, status, false, maxAssertionsPerTest,
-				chatEnabled, mutantValidatorLevel, markUncovered);
+				chatEnabled, mutantValidatorLevel, markUncovered, false, false);
 	}
 
 	public MultiplayerGame(int classId, int creatorId, GameLevel level,
@@ -93,7 +111,7 @@ public class MultiplayerGame extends AbstractGame {
 						   int attackerLimit, int minDefenders, int minAttackers,
 						   long startDateTime, long finishDateTime, String status, boolean requiresValidation,
 						   int maxAssertionsPerTest, boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
-						   boolean markUncovered) {
+						   boolean markUncovered, boolean declareCoveredLines, boolean declareKilledMutants) {
 		this.classId = classId;
 		this.creatorId = creatorId;
 		this.level = level;
@@ -115,6 +133,9 @@ public class MultiplayerGame extends AbstractGame {
 		this.chatEnabled = chatEnabled;
 		this.mutantValidatorLevel = mutantValidatorLevel;
 		this.markUncovered = markUncovered;
+
+		this.declareCoveredLines = declareCoveredLines;
+		this.declareKilledMutants = declareKilledMutants;
 	}
 
 	public int getAttackerLimit() {
@@ -195,6 +216,14 @@ public class MultiplayerGame extends AbstractGame {
 
 	public CodeValidatorLevel getMutantValidatorLevel(){
 		return mutantValidatorLevel;
+	}
+
+	public boolean isDeclareCoveredLines() {
+		return declareCoveredLines;
+	}
+
+	public boolean isDeclareKilledMutants() {
+		return declareKilledMutants;
 	}
 
 	/**
@@ -306,8 +335,10 @@ public class MultiplayerGame extends AbstractGame {
 		String query = "INSERT INTO games " +
 				"(Class_ID, Level, Prize, Defender_Value, Attacker_Value, Coverage_Goal, Mutant_Goal, Creator_ID, " +
 				"Attackers_Needed, Defenders_Needed, Attackers_Limit, Defenders_Limit, Start_Time, Finish_Time, State, Mode," +
-				"MaxAssertionsPerTest, ChatEnabled, MutantValidator, MarkUncovered) VALUES " +
-				"(?, ?, ?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?, ?, ?, 'PARTY',?,?,?,?);";
+				"MaxAssertionsPerTest, ChatEnabled, MutantValidator, MarkUncovered,"
+			  + "DeclareCoveredLines, DeclareKilledMutants) VALUES " +
+				"(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'PARTY',?,?,?,?,"
+			  + "?,?);";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId), DB.getDBV(level.name()),
 				DB.getDBV(prize), DB.getDBV(defenderValue), DB.getDBV(attackerValue),
 				DB.getDBV(lineCoverage), DB.getDBV(mutantCoverage), DB.getDBV(creatorId),
@@ -315,7 +346,10 @@ public class MultiplayerGame extends AbstractGame {
 				DB.getDBV(defenderLimit), DB.getDBV(new Timestamp(startDateTime)),
 				DB.getDBV(new Timestamp(finishDateTime)), DB.getDBV(state.name()),
 				DB.getDBV(maxAssertionsPerTest), DB.getDBV(chatEnabled), DB.getDBV(mutantValidatorLevel.name()),
-				DB.getDBV(markUncovered)};
+				DB.getDBV(markUncovered),
+				//
+				DB.getDBV(declareCoveredLines),DB.getDBV(declareKilledMutants)
+		};
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		int res = DB.executeUpdateGetKeys(stmt, conn);

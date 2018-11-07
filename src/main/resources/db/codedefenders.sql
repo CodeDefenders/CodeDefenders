@@ -144,6 +144,8 @@ CREATE TABLE `games` (
   `RequiresValidation` tinyint(1) NOT NULL DEFAULT '0',
   `IsAIDummyGame` tinyint(1) NOT NULL DEFAULT '0',
   `HasKillMap` tinyint(1) NOT NULL DEFAULT '0',
+  `DeclareCoveredLines` tinyint(1) NOT NULL DEFAULT '0',
+  `DeclareKilledMutants` tinyint(1) NOT NULL DEFAULT '0',
   `Puzzle_ID` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `fk_creatorId_idx` (`Creator_ID`),

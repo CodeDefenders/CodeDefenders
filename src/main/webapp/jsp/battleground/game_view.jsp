@@ -292,9 +292,10 @@
             break;
         case DEFENDER:
             %><%@ include file="/jsp/battleground/defender_view.jsp" %>
-            <%@include file="/jsp/game_components/defender_intention_collector.jsp" %>
+            <% if(game.isDeclareCoveredLines() || game.isDeclareKilledMutants() ) {%>
+				<%@include file="/jsp/game_components/defender_intention_collector.jsp" %>
 
-            <%
+            <%}
             break;
         case CREATOR:
             %><%@ include file="/jsp/battleground/creator_view.jsp" %><%

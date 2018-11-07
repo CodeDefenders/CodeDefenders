@@ -1,12 +1,87 @@
-<script>
+<%--
 
+    Copyright (C) 2016-2018 Code Defenders contributors
+
+    This file is part of Code Defenders.
+
+    Code Defenders is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or (at
+    your option) any later version.
+
+    Code Defenders is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+
+--%>
+<%-- This jsp assumes that the availability of a MultiplayerGame variable named game --%>
+<script>
 var sMutants = new Set();
 var sLines = new Set();
 
 function toggleDefend(){
-document.getElementById("submitTest").disabled = sMutants.size == 0 && sLines.size == 0 ;
+   document.getElementById("submitTest").disabled = <% if(game.isDeclareCoveredLines()) {%> sLines.size == 0 <% } else {%> true <% } %> && <% if(game.isDeclareKilledMutants() ) {%> sMutants.size == 0 <% } else {%> true <% } %>;
 }
+
 toggleDefend();
+
+var theForm = document.getElementById('def');
+
+var parent = document.getElementById('utest-div');
+var conn = document.createElement('div');
+
+<%-- Handling Line Coverage --%>
+<% if(game.isDeclareCoveredLines()) {%>
+function selectLine(lineNumber){
+	if( sLines.has(lineNumber)){
+		sLines.delete(lineNumber);
+	} else {
+		sLines.add(lineNumber);
+	}
+	selected_lines.innerText=Array.from(sLines).join(",");
+	document.getElementById("selected_lines").value = selected_lines.innerText;
+	toggleDefend();
+}
+
+var input = document.createElement("input");
+input.setAttribute("type", "hidden");
+input.setAttribute("id", "selected_lines");
+input.setAttribute("name", "selected_lines");
+input.setAttribute("value", "");
+//append to form element that you want .
+theForm.appendChild(input);
+
+
+conn.appendChild(document.createTextNode("Selected Lines:"));
+var selected_lines =  document.createElement('div');
+selected_lines.setAttribute("id", "selectedLinesDiv");
+selected_lines.innerText=""
+conn.appendChild(selected_lines);
+
+<!-- Update Code Mirror to enable line selection -->
+var editor = document.querySelector('#sut').nextSibling.CodeMirror;
+
+editor.on("gutterClick", function(cm, n) {
+  var info = cm.lineInfo(n);
+  cm.setGutterMarker(n, "CodeMirror-linenumbers", info.gutterMarkers ? null : makeMarker());
+  selectLine(n+1);
+});
+
+function makeMarker() {
+  var marker = document.createElement("div");
+  marker.style.color = "#822";
+  marker.innerHTML = "x";
+  return marker;
+}
+
+<% }%>
+
+<%-- Handling Killing Mutants --%>
+<% if(game.isDeclareKilledMutants() ) {%>
 
 function selectMutant(mutantCheckboxRow, mutantCheckbox){
 	var table = document.getElementById("alive-mutants");
@@ -22,49 +97,13 @@ function selectMutant(mutantCheckboxRow, mutantCheckbox){
 	toggleDefend();
 }
 
-function selectLine(lineNumber){
-	if( sLines.has(lineNumber)){
-		sLines.delete(lineNumber);
-	} else {
-		sLines.add(lineNumber);
-	}
-	selected_lines.innerText=Array.from(sLines).join(",");
-	document.getElementById("selected_lines").value = selected_lines.innerText;
-	toggleDefend();
-}
-
-
-var theForm = document.getElementById('def');
-
-var input = document.createElement("input");
-input.setAttribute("type", "hidden");
-input.setAttribute("id", "selected_lines");
-input.setAttribute("name", "selected_lines");
-input.setAttribute("value", "");
-
-//append to form element that you want .
-theForm.appendChild(input);
-
 var input = document.createElement("input");
 input.setAttribute("type", "hidden");
 input.setAttribute("id", "selected_mutants");
 input.setAttribute("name", "selected_mutants");
 input.setAttribute("value", "");
-
 //append to form element that you want .
 theForm.appendChild(input);
-
-<!-- Update UI -->
-var parent = document.getElementById('utest-div');
-
-var conn = document.createElement('div');
-
-conn.appendChild(document.createTextNode("Selected Lines:"));
-var selected_lines =  document.createElement('div');
-selected_lines.setAttribute("id", "selectedLinesDiv");
-selected_lines.innerText=""
-conn.appendChild(selected_lines);
-
 
 conn.appendChild(document.createTextNode("Selected Mutants:"));
 var selected_mutants =  document.createElement('div');
@@ -98,21 +137,6 @@ if( table != null ){
 	}
 }
 
-<!-- Update Code Mirror to select lines as target -->
-<!-- TODO Maybe use the breakpoint stuff to visualize them -->
+<% }%>
 
-var editor = document.querySelector('#sut').nextSibling.CodeMirror;
-
-editor.on("gutterClick", function(cm, n) {
-  var info = cm.lineInfo(n);
-  cm.setGutterMarker(n, "CodeMirror-linenumbers", info.gutterMarkers ? null : makeMarker());
-  selectLine(n+1);
-});
-
-function makeMarker() {
-  var marker = document.createElement("div");
-  marker.style.color = "#822";
-  marker.innerHTML = "x";
-  return marker;
-}
 </script>
