@@ -20,13 +20,13 @@ package org.codedefenders.servlets.games;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.IntentionDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.KillMap.KillMapJob;
 import org.codedefenders.execution.KillMap.KillMapJob.Type;
-import org.codedefenders.database.IntentionDAO;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
@@ -50,7 +50,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -368,13 +370,8 @@ public class MultiplayerGameManager extends HttpServlet {
                 logger.info("New Test {} by user {}", newTest.getId(), uid);
                 TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-                try {
-                    Intention intention = new Intention(
-                            Intention.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_lines")),
-                            Intention.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_mutants")));
-                    IntentionDAO.storeIntentionForTest(newTest, intention);
-                } catch (Exception e) {
-                    logger.error("Cannot store intention to database {}", e);
+                if( activeGame.isDeclareCoveredLines() || activeGame.isDeclareKilledMutants() ){
+                    collectDefenderIntentions(newTest, request);
                 }
 
 				if (!compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
@@ -393,20 +390,20 @@ public class MultiplayerGameManager extends HttpServlet {
                     session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 					response.sendRedirect(contextPath + "/multiplayer/play");
 					return;
-                }
+				}
 
-                messages.add(TEST_PASSED_ON_CUT_MESSAGE);
+				messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 
-                // Include Test Smells in the messages back to user
-                includeDetectTestSmellsInMessages(newTest, messages);
+				// Include Test Smells in the messages back to user
+				includeDetectTestSmellsInMessages(newTest, messages);
 
 				final String message = UserDAO.getUserById(uid).getUsername() + " created a test";
 				final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 				final Event notif = new Event(-1, activeGame.getId(), uid, message, EventType.DEFENDER_TEST_CREATED, EventStatus.GAME, timestamp);
-                notif.insert();
+				notif.insert();
 
-                MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
-                activeGame.update();
+				MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
+				activeGame.update();
 				break;
 			}
 			default:
@@ -415,6 +412,30 @@ public class MultiplayerGameManager extends HttpServlet {
 				break;
 		}
 		response.sendRedirect(contextPath + "/multiplayer/play");
+	}
+
+	private void collectDefenderIntentions(Test newTest, HttpServletRequest request) {
+		// Process parameters
+		try {
+
+			Set<Integer> selectedLines = new HashSet<>();
+			Set<Integer> selectedMutants = new HashSet<>();
+
+			final String selected_lines = request.getParameter("selected_lines");
+			if (selected_lines != null) {
+				Set<Integer> selectedLineSet = Intention.parseIntentionFromCommaSeparatedValueString(selected_lines);
+				selectedLines.addAll(selectedLineSet);
+			}
+			final String selected_mutants = request.getParameter("selected_mutants");
+			if (selected_mutants != null) {
+				Set<Integer> selectedMutantSet = Intention.parseIntentionFromCommaSeparatedValueString(selected_mutants);
+				selectedMutants.addAll(selectedMutantSet);
+			}
+			Intention intention = new Intention(selectedLines, selectedMutants);
+			IntentionDAO.storeIntentionForTest(newTest, intention);
+		} catch (Exception e) {
+			logger.error("Cannot store intention to database {}", e);
+		}
 	}
 
 	private void includeDetectTestSmellsInMessages(Test newTest, ArrayList<String> messages) {
