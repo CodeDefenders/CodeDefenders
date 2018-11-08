@@ -61,16 +61,16 @@
             <h3>Write a new JUnit test here</h3>
 
             <form id="def"
-                  action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() + "?gameId=" + game.getId()%>"
+                  action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>"
                   method="post">
                 <button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
                         onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
-                        <% if (game.getState() != GameState.CREATED) { %> disabled <% } %>>
+                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                     Defend!
                 </button>
 
                 <input type="hidden" name="formType" value="createTest">
-                <input type="hidden" name="gameID" value="<%= game.getId() %>">
+                <input type="hidden" name="gameId" value="<%= game.getId() %>">
 
                 <%@include file="../game_components/test_editor.jsp" %>
             </form>

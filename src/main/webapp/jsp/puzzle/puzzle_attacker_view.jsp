@@ -75,14 +75,14 @@
             </button>
         </form>
 
-        <form id="atk" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() + "?gameId=" + game.getId()%>" method="post">
+        <form id="atk" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post">
             <button type="submit" class="btn btn-primary btn-game btn-right" id="submitMutant" form="atk" onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';" style="margin-top: -50px"
                 <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                 Attack!
             </button>
 
             <input type="hidden" name="formType" value="createMutant">
-            <input type="hidden" name="gameID" value="<%= game.getId() %>">
+            <input type="hidden" name="gameId" value="<%= game.getId() %>">
 
             <%@include file="../game_components/mutant_editor.jsp"%>
             <%@include file="../game_components/game_highlighting.jsp" %>
