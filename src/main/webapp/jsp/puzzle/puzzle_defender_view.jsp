@@ -23,6 +23,7 @@
     } else {
         request.setAttribute("testCode", game.getCUT().getTestTemplate());
     }
+    request.setAttribute("mockingEnabled", false);
 
     /* tests_carousel */
     request.setAttribute("tests", game.getTests());
