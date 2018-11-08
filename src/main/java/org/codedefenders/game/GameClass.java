@@ -115,7 +115,7 @@ public class GameClass {
 		this(name, alias, jFile, cFile, false);
 		this.id = id;
 	}
-	
+
 	public GameClass(String name, String alias, String jFile, String cFile) {
 		this(name, alias, jFile, cFile, false);
 	}
@@ -232,11 +232,8 @@ public class GameClass {
 		final StringBuilder bob = new StringBuilder();
 		final String classPackage = getPackage();
 		if (!classPackage.isEmpty()) {
-			bob.append(String.format("package %s;\n", classPackage));
-//		} else {
-//			bob.append(String.format("/* no package name */%n"));
+			bob.append(String.format("package %s;\n\n", classPackage));
 		}
-		bob.append("\n");
 
 		bob.append("import org.junit.*;\n");
 
@@ -265,10 +262,25 @@ public class GameClass {
 		return StringEscapeUtils.escapeHtml(getTestTemplate());
 	}
 
+    /**
+     * @return the first editable line of this class test template.
+     * @see #getTestTemplate()
+     */
+    public Integer getTestTemplateFirstEditLine() {
+        int out = 8 + this.additionalImports.size();
+        if (!getPackage().isEmpty()) {
+            out+= 2;
+        }
+        if (this.isMockingEnabled) {
+            out++;
+        }
+        return out;
+    }
+
 	/*
 	 * We list all the NON-primitive imports here. We do not perform any
 	 * merging.
-	 * 
+	 *
 	 * (using *)
 	 */
 	private Set<String> includeAdditionalImportsFromCUT() {
@@ -278,7 +290,7 @@ public class GameClass {
 			// parse the file
 			cu = JavaParser.parse(in);
 
-			// Extract the import declarations from the CUT and add them to additionaImports 
+			// Extract the import declarations from the CUT and add them to additionaImports
 			for(ImportDeclaration declaredImport : cu.getImports()){
 				additionalImports.add( declaredImport.toStringWithoutComments() );
 			}
