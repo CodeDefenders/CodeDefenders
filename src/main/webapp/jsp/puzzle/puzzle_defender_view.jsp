@@ -51,25 +51,27 @@
         <div class="col-md-6" id="cut-div">
             <h3>Class Under Test</h3>
             <%@include file="../game_components/class_viewer.jsp" %>
-            <%@include file="../game_components/game_highlighting.jsp" %>
+            <%@include file="../game_components/game_highlighting.jsp"%>
             <%@include file="../game_components/mutant_explanation.jsp" %>
         </div>
 
         <div class="col-md-6" id="ut-div">
             <%@include file="../game_components/test_progress_bar.jsp" %>
-            <h3>Write a new JUnit test here
+            <h3>Write a new JUnit test here</h3>
+
+            <form id="def"
+                  action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() + "?gameId=" + game.getId()%>"
+                  method="post">
                 <button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
                         onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
                         <% if (game.getState() != GameState.CREATED) { %> disabled <% } %>>
                     Defend!
                 </button>
-            </h3>
-            <form id="def"
-                  action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() + "?gameId=" + game.getPuzzleId()%>"
-                  method="post">
-                <%@include file="../game_components/test_editor.jsp" %>
+
                 <input type="hidden" name="formType" value="createTest">
-                <input type="hidden" name="gameID" value="<%= game.getId() %>"/>
+                <input type="hidden" name="gameID" value="<%= game.getId() %>">
+
+                <%@include file="../game_components/test_editor.jsp" %>
             </form>
         </div>
     </div>
