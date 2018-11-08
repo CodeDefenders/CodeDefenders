@@ -38,7 +38,7 @@
     filterOutComments = function (text) {
         var blockCommentRegex = /\/\*(.|\s)*?\*\//gm;
         var lineCommentRegex = /\/\/.*(\r\n|\r|\n)/g;
-        return text.replace(blockCommentRegex, "").replace(lineCommentRegex, "")
+        return text.replace(lineCommentRegex, "").replace(blockCommentRegex, "");
     };
 
     updateAutocompleteList = function () {
