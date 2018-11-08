@@ -41,6 +41,7 @@
         <input type="hidden" name="formType" value="insertGames"/>
         <h3>Staged Games</h3>
         <%
+			List<MultiplayerGame> availableGames = AdminDAO.getAvailableGames();
             List<MultiplayerGame> createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
             List<List<Integer>> attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE);
             List<List<Integer>> defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE);
@@ -67,12 +68,12 @@
                 <th>Level</th>
                 <th>Starting</th>
                 <th>Finishing</th>
-                <th>Players
+                <th class="col-md-6">Players
                     <div class="row">
-                        <div class="col-sm-2">Name</div>
-                        <div class="col-sm-4">Last Role</div>
-                        <div class="col-sm-3">Score</div>
-                        <a id="togglePlayersCreated" class="btn btn-sm btn-default">
+                        <div class="col-sm-2" style="padding-top: 10px">Name</div>
+                        <div class="col-sm-3" style="padding-top: 10px">Last Role</div>
+                        <div class="col-sm-1" style="padding-top: 10px">Score</div>
+                        <a id="togglePlayersCreated" class="btn btn-sm btn-default" style="float: right">
                             <span id = "togglePlayersCreatedSpan" class="glyphicon glyphicon-alert"></span>
                         </a>
                     </div>
@@ -98,7 +99,7 @@
                 </td>
                 <td><%=i%>
                 </td>
-                <td class="col-sm-2">
+                <td>
                     <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
                         <%=cut.getAlias()%>
                     </a>
@@ -126,11 +127,11 @@
                 </td>
                 <td><%= g.getLevel().name() %>
                 </td>
-                <td class="col-sm-2"><%= g.getStartDateTime() %>
+                <td><%= g.getStartDateTime() %>
                 </td>
-                <td class="col-sm-2"><%= g.getFinishDateTime() %>
+                <td><%= g.getFinishDateTime() %>
                 </td>
-                <td class="col-sm-4">
+                <td>
                     <div id="playersTableHidden" style="color: lightgray;"> (hidden)</div>
                     <table id="playersTableCreated" hidden>
                         <%
@@ -144,13 +145,13 @@
                                 String color = attackerIds.contains(id) ? "#edcece" : "#ced6ed";
                         %>
                         <tr style="background: <%= color %>">
-                            <td class="col-sm-1"><%= userName %>
+                            <td class="col-md-2"><%= userName %>
                             </td>
-                            <td class="col-sm-1"><%= lastRole %>
+                            <td class="col-md-3"><%= lastRole %>
                             </td>
-                            <td class="col-sm-1"><%= totalScore %>
+                            <td class="col-md-1"><%= totalScore %>
                             </td>
-                            <td>
+                            <td class="col-md-1">
                                 <button class="btn btn-sm btn-primary"
                                         value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
                                         id="<%="switch_player_"+id+"_game_"+i%>"
@@ -158,7 +159,7 @@
                                     <span class="glyphicon glyphicon-transfer"></span>
                                 </button>
                             </td>
-                            <td>
+                            <td class="col-md-1">
                                 <button class="btn btn-sm btn-danger"
                                         value="<%=String.valueOf(i) + "-" + String.valueOf(id)%>"
                                         id="<%="remove_player_"+id+"_game_"+i%>"
@@ -166,6 +167,46 @@
                                     <span class="glyphicon glyphicon-trash"></span>
                                 </button>
                             </td>
+                            <%-- ------------------ --%>
+                            <%-- Show moving to game UI only if there's more than 1 game --%>
+                            <%-- ------------------ --%>
+                            <% if( createdGames.size() + availableGames.size() > 1 ) {%>
+                            <td class="col-md-3" style="padding-top:3px; padding-bottom:3px;">
+                            <%-- create the select and fill it with the available games except the current one --%>
+								<div id="<%="game_"+id%>" style="max-width: 100px; float: left;">
+									<select name="<%="game_" + id%>" class="form-control selectpicker" data-size="small" id="game" style="float: right">
+										<%-- List created games --%>
+										<% for (MultiplayerGame availableGame : availableGames) { %>
+											<option value="<%=availableGame.getId()%>"><%=String.valueOf(availableGame.getId()) + ": " + availableGame.getCUT().getAlias()%>
+											</option>
+										<% } %>
+										<%-- List the staged games --%>
+										<% if (createdGames != null) {
+												for (int gameIndex = 0; gameIndex < createdGames.size(); ++gameIndex) {
+													// Do not list the current game in the select
+													if( gameIndex == i ) { continue; }
+													String classAlias = createdGames.get(gameIndex).getCUT().getAlias();
+										%>
+											<option style="color:gray" value=<%="T" + String.valueOf(gameIndex)%>><%="T" + String.valueOf(gameIndex) + ": " + classAlias%>
+											</option>
+										<%
+												}
+											}
+										%>
+									</select>
+
+								</div>
+							<%-- Keep the role of the user also in the target game --%>
+								<input type="hidden" name="<%="role_" + id%>" value="<%= (attackerIds.contains(new Integer(id))) ? Role.ATTACKER : Role.DEFENDER %>"/>
+							</td>
+                            <%-- Create the button to move it --%>
+                            <td class="col-md-1">
+                                <button name="tempGameUserMoveToButton" class="btn btn-sm btn-primary" type="submit" value="<%="move_player_"+id+"_from_game_T"+i%>" name="userListButton" style="margin: 2px; float:left">
+                                    <span class="glyphicon glyphicon-arrow-right"></span>
+                                </button>
+                            </td>
+							<% }%>
+                            <%-- ------------------ --%>
                         </tr>
                         <% } %>
                     </table>
@@ -203,13 +244,12 @@
                 <th>Last Role</th>
                 <th>Total Score</th>
                 <th>Last Login</th>
-                <th>Add to existing Game</th>
+                <th class="col-md-4">Add to existing Game</th>
             </tr>
             </thead>
             <tbody>
 
             <%
-                List<MultiplayerGame> availableGames = AdminDAO.getAvailableGames();
                 createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
                 List<List<String>> unassignedUsersInfo = AdminCreateGames.getUnassignedUsers(attackerIdsList, defenderIdsList);
                 if (unassignedUsersInfo.isEmpty()) {
@@ -279,7 +319,7 @@
                         </select>
                     </div>
                     <button class="btn btn-sm btn-primary" type="submit" value="<%=uid%>" name="userListButton"
-                            style="margin: 2px; float:left"
+                            style="margin: 2px; float:right"
                             id="<%="add_"+uid%>"
                             <%=availableGames.isEmpty() && (createdGames == null || createdGames.isEmpty()) ? "disabled" : ""%>>
                         <span class="glyphicon glyphicon-plus"></span>
