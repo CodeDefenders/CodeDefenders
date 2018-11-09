@@ -25,6 +25,9 @@
         The test code to display.
     @param Boolean mockingEnabled
         Enable autocompletions for Mockito methods.
+    @param Integer startEditLine
+        Start of editable lines. If {@code null}, the code can
+        be modified from the start.
 --%>
 
 <% { %>
@@ -32,11 +35,24 @@
 <%
     String testCode = (String) request.getAttribute("testCode");
     Boolean mockingEnabled = (Boolean) request.getAttribute("mockingEnabled");
+
+    Integer startEditLine = (Integer) request.getAttribute("startEditLine");
+    if (startEditLine == null) {
+        startEditLine = 0;
+    }
 %>
 
 <pre><textarea id="code" name="test" title="test" cols="80" rows="30"><%=testCode%></textarea></pre>
 
 <script>
+    let startEditLine = <%=startEditLine%> ;
+    let readOnlyLinesStart = Array.from(new Array(startEditLine - 1).keys());
+
+    let getReadOnlyLinesEnd = function(lines) {
+        // Test editor permits only last two lines
+        return [lines.length - 2, lines.length - 1];
+    };
+
     // If you make changes to the autocompletion, change it for an attacker too.
     testMethods = ["assertArrayEquals", "assertEquals", "assertTrue", "assertFalse", "assertNull",
         "assertNotNull", "assertSame", "assertNotSame", "fail"];
@@ -56,15 +72,14 @@
         return text.replace(commentRegex, "");
     };
 
-    updateAutocompleteList = function () {
-        var wordRegex = /[a-zA-Z][a-zA-Z0-9]*/gm;
-        var set = new Set(testMethods);
+    let updateAutocompleteList = function () {
+        let wordRegex = /[a-zA-Z][a-zA-Z0-9]*/gm;
+        let set = new Set(testMethods);
 
-        var testClass = editorTest.getValue().split("\n");
-        // TODO replace with read-only lines
-        testClass.slice(8, testClass.length - 2);
+        let testClass = editorTest.getValue().split("\n");
+        testClass.slice(startEditLine, testClass.length - 2);
         testClass = testClass.join("\n");
-        var texts = [testClass];
+        let texts = [testClass];
         if (typeof autocompletedClasses !== 'undefined') {
             Object.getOwnPropertyNames(autocompletedClasses).forEach(function(key) {
                 texts.push(autocompletedClasses[key]);
@@ -73,7 +88,7 @@
 
         texts.forEach(function (text) {
             text = filterOutComments(text);
-            var m;
+            let m;
             while ((m = wordRegex.exec(text)) !== null) {
                 if (m.index === wordRegex.lastIndex) {
                     wordRegex.lastIndex++;
@@ -89,17 +104,17 @@
     CodeMirror.commands.autocomplete = function (cm) {
         cm.showHint({
             hint: function (editor) {
-                var reg = /[a-zA-Z][a-zA-Z0-9]*/;
+                let reg = /[a-zA-Z][a-zA-Z0-9]*/;
 
-                var list = autocompleteList;
-                var cursor = editor.getCursor();
-                var currentLine = editor.getLine(cursor.line);
-                var start = cursor.ch;
-                var end = start;
+                let list = autocompleteList;
+                let cursor = editor.getCursor();
+                let currentLine = editor.getLine(cursor.line);
+                let start = cursor.ch;
+                let end = start;
                 while (end < currentLine.length && reg.test(currentLine.charAt(end))) ++end;
                 while (start && reg.test(currentLine.charAt(start - 1))) --start;
-                var curWord = start !== end && currentLine.slice(start, end);
-                var regex = new RegExp('^' + curWord, 'i');
+                let curWord = start !== end && currentLine.slice(start, end);
+                let regex = new RegExp('^' + curWord, 'i');
 
                 return {
                     list: (!curWord ? list : list.filter(function (item) {
@@ -112,7 +127,7 @@
         });
     };
 
-    var editorTest = CodeMirror.fromTextArea(document.getElementById("code"), {
+    let editorTest = CodeMirror.fromTextArea(document.getElementById("code"), {
         lineNumbers: true,
         indentUnit: 4,
         smartIndent: true,
@@ -126,13 +141,12 @@
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
     });
 
-    editorTest.on('beforeChange',function(cm,change) {
-        var text = cm.getValue();
-        var lines = text.split(/\r|\r\n|\n/);
-        // TODO check auto complete lines above
-        var readOnlyLines = [0,1,2,3,4,5,6,7];
-        var readOnlyLinesEnd = [lines.length-1,lines.length-2];
-        if ( ~readOnlyLines.indexOf(change.from.line) || ~readOnlyLinesEnd.indexOf(change.to.line)) {
+    editorTest.on('beforeChange', function (cm, change) {
+        let text = cm.getValue();
+        let lines = text.split(/\r|\r\n|\n/);
+
+        let readOnlyLinesEnd = getReadOnlyLinesEnd(lines);
+        if (~readOnlyLinesStart.indexOf(change.from.line) || ~readOnlyLinesEnd.indexOf(change.to.line)) {
             change.cancel();
         }
     });

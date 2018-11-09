@@ -24,9 +24,12 @@
     Displays the class code for a class under test and its dependencies in a read-only CodeMirror textarea.
 
     @param String classCode
-        The source code of the class to display.
+        The source code of the class to display, but not {@code null}.
+    @param String className
+        The class name of the CUT, but not {@code null}.
     @param Map<String, String> dependencies
-        The source code of the dependencies to display.
+        A mapping between a class name and the content of the CUT dependencies.
+        Can be empty, but must not be {@code null}.
 --%>
 
 <%

@@ -36,9 +36,10 @@
 	if (previousTestCode != null) {
 		request.setAttribute("testCode", previousTestCode);
 	} else {
-		request.setAttribute("testCode", game.getCUT().getHTMLEscapedTestTemplate());
+		request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
 	}
-	request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
+	request.setAttribute("mockingEnabled", cut.isMockingEnabled());
+	request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
 
 	/* tests_carousel */
 	request.setAttribute("tests", game.getTests());
