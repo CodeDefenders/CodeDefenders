@@ -25,51 +25,51 @@ public class MutationTesterUtilities {
 
     public static Runnable attack(MultiplayerGame activeGame, String mutantFile, User attacker,
                                   ArrayList<String> messages, Logger logger) throws IOException {
-		return new Runnable() {
-			@Override
-			public void run() {
-				try {
-					String mutantText = new String(Files.readAllBytes(new File(mutantFile).toPath()),
-							Charset.defaultCharset());
-					Mutant mutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
-							attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
-					System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + " with "
-							+ mutant.getId());
-					MutationTester.runAllTestsOnMutant(activeGame, mutant, messages);
-					activeGame.update();
-					System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + ": "
-							+ messages.get(messages.size() - 1));
-				} catch (IOException e) {
-					logger.error(e.getMessage());
-				}
+        return new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String mutantText = new String(Files.readAllBytes(new File(mutantFile).toPath()),
+                            Charset.defaultCharset());
+                    Mutant mutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
+                            attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
+                    System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + " with "
+                            + mutant.getId());
+                    MutationTester.runAllTestsOnMutant(activeGame, mutant, messages);
+                    activeGame.update();
+                    System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + ": "
+                            + messages.get(messages.size() - 1));
+                } catch (IOException e) {
+                    logger.error(e.getMessage());
+                }
 
-			}
-		};
-	}
+            }
+        };
+    }
 
     public static Runnable defend(MultiplayerGame activeGame, String testFile, User defender,
                                   ArrayList<String> messages, Logger logger) {
-		return new Runnable() {
-			@Override
-			public void run() {
-				try {
-					// Compile and test original
-					String testText;
-					testText = new String(Files.readAllBytes(new File(testFile).toPath()), Charset.defaultCharset());
-					org.codedefenders.game.Test newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(),
-							testText, defender.getId(), Constants.MODE_BATTLEGROUND_DIR);
+        return new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // Compile and test original
+                    String testText;
+                    testText = new String(Files.readAllBytes(new File(testFile).toPath()), Charset.defaultCharset());
+                    org.codedefenders.game.Test newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(),
+                            testText, defender.getId(), Constants.MODE_BATTLEGROUND_DIR);
 
-					System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + " with "
-							+ newTest.getId());
-					MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
-					activeGame.update();
-					System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + ": "
-							+ messages.get(messages.size() - 1));
-				} catch (IOException | CodeValidatorException e) {
-					logger.error(e.getMessage());
-				}
+                    System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + " with "
+                            + newTest.getId());
+                    MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
+                    activeGame.update();
+                    System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + ": "
+                            + messages.get(messages.size() - 1));
+                } catch (IOException | CodeValidatorException e) {
+                    logger.error(e.getMessage());
+                }
             }
-		};
-	}
+        };
+    }
 
 }
