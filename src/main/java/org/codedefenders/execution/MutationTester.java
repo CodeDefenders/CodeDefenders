@@ -33,14 +33,11 @@ import org.codedefenders.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.emory.mathcs.backport.java.util.Collections;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
