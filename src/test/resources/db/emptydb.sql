@@ -1,3 +1,8 @@
+-- MySQL dump 10.13  Distrib 5.7.9, for Win64 (x86_64)
+--
+-- ------------------------------------------------------
+-- Server version	5.7.11-log
+
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
@@ -8,11 +13,6 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
--- DROP DATABASE IF EXISTS `codedefenders`;
--- CREATE DATABASE codedefenders;
--- USE codedefenders;
-
 
 DROP TABLE IF EXISTS `settings`;
 CREATE TABLE settings
@@ -30,7 +30,7 @@ INSERT INTO settings (name, type, STRING_VALUE, INT_VALUE, BOOL_VALUE) VALUES
   ('CLASS_UPLOAD', 'BOOL_VALUE', NULL, NULL, TRUE),
   ('GAME_CREATION', 'BOOL_VALUE', NULL, NULL, TRUE),
   ('REQUIRE_MAIL_VALIDATION', 'BOOL_VALUE', NULL, NULL, FALSE),
-  ('SITE_NOTICE', 'STRING_VALUE', 'please add a site notice', NULL, NULL),
+  ('SITE_NOTICE', 'STRING_VALUE', '', NULL, NULL),
   ('PASSWORD_RESET_SECRET_LIFESPAN', 'INT_VALUE', NULL, 12, NULL),
   ('MIN_PASSWORD_LENGTH', 'INT_VALUE', NULL, 8, NULL),
   ('CONNECTION_POOL_CONNECTIONS', 'INT_VALUE', NULL, 20, NULL),
@@ -42,6 +42,9 @@ INSERT INTO settings (name, type, STRING_VALUE, INT_VALUE, BOOL_VALUE) VALUES
   ('DEBUG_MODE', 'BOOL_VALUE', NULL, NULL, FALSE),
   ('EMAIL_PASSWORD', 'STRING_VALUE', '', NULL, NULL);
 
+--
+-- Table structure for table `ratings`
+--
 
 DROP TABLE IF EXISTS `ratings`;
 CREATE TABLE ratings
@@ -80,6 +83,21 @@ CREATE UNIQUE INDEX classes_Alias_uindex ON classes (Alias);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table 'dependencies'
+--
+DROP TABLE IF EXISTS `dependencies`;
+CREATE TABLE `dependencies` (
+  `Dependency_ID` int(11)      NOT NULL AUTO_INCREMENT,
+  `Class_ID`      int(11)      NOT NULL,
+  `JavaFile`      varchar(255) NOT NULL,
+  `ClassFile`     varchar(255) NOT NULL,
+  PRIMARY KEY (`Dependency_ID`),
+  CONSTRAINT `fk_classId_dependencies` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+
+--
 -- Table structure for table `games`
 --
 
@@ -89,7 +107,7 @@ DROP TABLE IF EXISTS `games`;
 CREATE TABLE `games` (
   `ID` int(11) NOT NULL AUTO_INCREMENT,
   `Class_ID` int(11) DEFAULT NULL,
-  `Level` enum('EASY','MEDIUM','HARD') DEFAULT NULL,
+  `Level` enum('EASY','MEDIUM','HARD') DEFAULT 'HARD',
   `Timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `Creator_ID` int(11) DEFAULT NULL,
   `Prize` int(11) DEFAULT NULL,
@@ -114,13 +132,43 @@ CREATE TABLE `games` (
   `Mode` enum('SINGLE','DUEL','PARTY','UTESTING') NOT NULL DEFAULT 'DUEL',
   `RequiresValidation` TINYINT(1) DEFAULT '0' NOT NULL,
   `IsAIDummyGame` TINYINT(1) DEFAULT '0' NOT NULL,
+  `HasKillMap` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`),
   KEY `fk_creatorId_idx` (`Creator_ID`),
   KEY `fk_className_idx` (`Class_ID`),
-  CONSTRAINT `fk_classId` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `fk_className` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE NO ACTION
+  CONSTRAINT `fk_classId` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_className` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `hasKillMap` CHECK (HasKillMap = 0 OR State = 'FINISHED') -- only finished games can have a killmap
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+# Dummy game for upload of tests and mutants together with a class
+INSERT INTO games (ID, State)
+VALUES (-1, 'FINISHED');
+
+--
+-- Table structure for table `killmap`
+--
+
+DROP TABLE IF EXISTS `killmap`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `killmap` (
+  `Class_ID` int(11) NOT NULL,
+  `Game_ID` int(11) DEFAULT NULL,
+  `Test_ID` int(11) NOT NULL,
+  `Mutant_ID` int(11) NOT NULL,
+  `Status` enum('KILL','NO_KILL','NO_COVERAGE','ERROR','UNKNOWN') COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`Test_ID`,`Mutant_ID`),
+  KEY `fk_killmap_classId` (`Class_ID`),
+  KEY `fk_killmap_gameId` (`Game_ID`),
+  KEY `fk_killmap_mutantId` (`Mutant_ID`),
+  CONSTRAINT `fk_killmap_classId` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_killmap_gameId` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_killmap_mutantId` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_killmap_testId` FOREIGN KEY (`Test_ID`) REFERENCES `tests` (`Test_ID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -144,13 +192,15 @@ CREATE TABLE `mutants` (
   `NumberAiKillingTests` int(11) DEFAULT '0', /* If an original ai mutant, killcount. Number of killing tests in game otherwise. */
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Points` int(11) DEFAULT '0',
+  `Class_ID` int(11) DEFAULT NULL, -- If Game_ID is -1, the mutant was uploaded together with referenced class
   PRIMARY KEY (`Mutant_ID`),
   KEY `fk_gameId_idx` (`Game_ID`),
   KEY `fk_playerId_idx` (`Player_ID`),
-  CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION
+  CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_classId_muts` FOREIGN KEY (`Class_ID`) REFERENCES classes (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=125 DEFAULT CHARSET=utf8;
-CREATE UNIQUE INDEX mutants_Game_ID_MD5_index ON mutants (Game_ID, MD5);
+CREATE UNIQUE INDEX mutants_Game_ID_Class_ID_MD5_index ON mutants (Game_ID, Class_ID, MD5);
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -170,11 +220,23 @@ CREATE TABLE `players` (
   PRIMARY KEY (`ID`),
   KEY `fk_userId_players_idx` (`User_ID`),
   KEY `fk_gameId_players_idx` (`Game_ID`),
-  CONSTRAINT `fk_gameId_players` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `fk_userId_players` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE NO ACTION
+  CONSTRAINT `fk_gameId_players` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_userId_players` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
 CREATE UNIQUE INDEX players_User_ID_Game_ID_uindex ON players (User_ID, Game_ID);
 /*!40101 SET character_set_client = @saved_cs_client */;
+
+
+--
+-- Dummy player for upload of tests and mutants together with a class
+-- Dummy player attacker (for mutants) and dummy player defender (for tests)
+-- All are added under the `users` table.
+--
+
+INSERT INTO `players` (`ID`, `User_ID`, `Game_ID`)
+VALUES (-1, -1, -1),
+       ( 3,  3, -1),
+       ( 4,  4, -1);
 
 --
 -- Table structure for table `targetexecutions`
@@ -219,12 +281,14 @@ CREATE TABLE `tests` (
   `Lines_Covered` longtext,
   `Lines_Uncovered` longtext,
   `Points` int(11) DEFAULT '0',
+  `Class_ID` int(11) DEFAULT NULL, -- If Game_ID is -1, the test was uploaded together with referenced class
   PRIMARY KEY (`Test_ID`),
   KEY `fk_playerId_idx` (`Player_ID`),
   KEY `fk_gameId_tests_idx` (`Game_ID`),
   KEY `fk_playerId_tests_idx` (`Player_ID`),
-  CONSTRAINT `fk_gameId_tests` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION
+  CONSTRAINT `fk_gameId_tests` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_classId_tests` FOREIGN KEY (`Class_ID`) REFERENCES classes (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -241,7 +305,7 @@ CREATE TABLE `usedaimutants` (
   `Game_ID` int(11) NOT NULL,
   PRIMARY KEY (`UsedMutant_ID`),
   KEY `fk_gameId_ai_mutants_idx` (`Game_ID`),
-  CONSTRAINT `fk_gameId_ai_mutants` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION
+  CONSTRAINT `fk_gameId_ai_mutants` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -258,7 +322,7 @@ CREATE TABLE `usedaitests` (
   `Game_ID` int(11) NOT NULL,
   PRIMARY KEY (`UsedTest_ID`),
   KEY `fk_gameId_ai_test_idx` (`Game_ID`),
-  CONSTRAINT `fk_gameId_ai_test` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION
+  CONSTRAINT `fk_gameId_ai_test` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -288,6 +352,7 @@ CREATE TABLE `users` (
   `Password` char(60) NOT NULL,
   `Email` varchar(254) NOT NULL,
   `Validated` TINYINT(1) DEFAULT '0' NOT NULL,
+  `Active` TINYINT(1) DEFAULT '1' NOT NULL,
   pw_reset_timestamp TIMESTAMP DEFAULT NULL  NULL,
   pw_reset_secret VARCHAR(254) DEFAULT NULL  NULL,
   PRIMARY KEY (`User_ID`)
@@ -296,8 +361,8 @@ CREATE UNIQUE INDEX users_email_index ON users (Email);
 CREATE UNIQUE INDEX users_pw_reset_secret_uindex ON users (pw_reset_secret);
 DELIMITER $$
 CREATE TRIGGER ins_users
-  BEFORE INSERT ON `users`
-  FOR EACH ROW BEGIN
+BEFORE INSERT ON `users`
+FOR EACH ROW BEGIN
   IF (NEW.Email IN (SELECT * FROM registeredEmails)) THEN
     SET NEW.Validated = TRUE;
   END IF;
@@ -315,6 +380,19 @@ DELIMITER ;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 --
+-- Automated attacker and defender
+-- Dummy user for upload of tests and mutants together with a class
+-- Dummy attacker (for mutants) and dummy defender (for tests)
+--
+
+INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`)
+VALUES (1, 'Mutator', 'AI_ATTACKER_INACCESSIBLE', 'codedef_mutator@sheffield.ac.uk'),
+       (2, 'TestGen', 'AI_DEFENDER_INACCESSIBLE', 'codedef_testgen@sheffield.ac.uk'),
+       (-1, 'dummy_user', 'DUMMY_USER_INACCESSIBLE', 'user@dummy.com'),
+       (3, 'System Attacker', 'DUMMY_ATTACKER_INACCESSIBLE', 'attacker@dummy.com'),
+       (4, 'System Defender', 'DUMMY_DEFENDER_INACCESSIBLE', 'defender@dummy.com');
+
+--
 -- Table structure for table `sessions`
 --
 
@@ -327,7 +405,7 @@ CREATE TABLE `sessions` (
   `IP_Address` varchar(320) NOT NULL,
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`Session_ID`),
-  CONSTRAINT `fk_userId_sessions` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE CASCADE ON UPDATE NO ACTION
+  CONSTRAINT `fk_userId_sessions` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -342,8 +420,8 @@ CREATE TABLE `equivalences` (
   UNIQUE KEY `ID_UNIQUE` (`ID`),
   KEY `fk_equiv_def_idx` (`Defender_ID`),
   KEY `fk_equiv_mutant_idx` (`Mutant_ID`),
-  CONSTRAINT `fk_equiv_def` FOREIGN KEY (`Defender_ID`) REFERENCES `players` (`ID`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `fk_equiv_mutant` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE CASCADE ON UPDATE NO ACTION
+  CONSTRAINT `fk_equiv_def` FOREIGN KEY (`Defender_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_equiv_mutant` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 
 --
@@ -462,13 +540,6 @@ AS
     LEFT JOIN view_attackers ON U.user_id = view_attackers.user_id
     LEFT JOIN view_defenders ON U.user_id = view_defenders.user_id
   WHERE U.user_id > 2; -- Ignore automated players
-
---
--- Automated attacker and defender
---
-
-INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`) VALUES (1, 'Mutator', 'AI_ATTACKER_INACCESSIBLE', 'codedef_mutator@sheffield.ac.uk');
-INSERT INTO `users` (`User_ID`, `Username`, `Password`, `Email`) VALUES (2, 'TestGen', 'AI_DEFENDER_INACCESSIBLE', 'codedef_testgen@sheffield.ac.uk');
 
 -- Event to activate multiplayer game
 SET @@global.event_scheduler = 1;

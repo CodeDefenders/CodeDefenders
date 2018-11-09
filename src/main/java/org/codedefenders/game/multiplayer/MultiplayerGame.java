@@ -222,10 +222,20 @@ public class MultiplayerGame extends AbstractGame {
 		return format.format(date);
 	}
 
+	/**
+	 * This returns the ID of the Player not of the User
+	 * 
+	 * @return
+	 */
 	public int[] getDefenderIds() {
 		return DatabaseAccess.getPlayersForMultiplayerGame(getId(), Role.DEFENDER);
 	}
 
+	/**
+	 * This returns the ID of the Player not of the User
+	 * 
+	 * @return
+	 */
 	public int[] getAttackerIds() {
 		return DatabaseAccess.getPlayersForMultiplayerGame(getId(), Role.ATTACKER);
 	}
