@@ -71,6 +71,7 @@ EOF
 
 # The front end is build using docker multi-stage build. It might take a while
 docker build \
+	--build-arg RELEASE_VERSION="v${CURRENT_VERSION}" \
         --build-arg GIT_COMMIT="${CURRENT_GIT_COMMIT}" \
         --build-arg RELEASE_DATE="${TODAY}" \
         --build-arg gitlab_username="${GITLAB_USERNAME}" \

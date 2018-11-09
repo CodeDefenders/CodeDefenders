@@ -5,9 +5,12 @@
 ############################################################################################################################
 
 FROM alpine/git AS git
+ARG RELEASE_VERSION
 WORKDIR /
-RUN git clone --depth 1 https://github.com/CodeDefenders/CodeDefenders.git
+RUN git clone https://github.com/CodeDefenders/CodeDefenders.git
 WORKDIR /CodeDefenders
+# Checkout the right tag
+RUN git checkout ${RELEASE_VERSION}
 # Collect label values to file since we cannot tag containers from within Docker
 RUN  echo "export GIT_COMMIT=$(git rev-parse HEAD)" > .git-data && \
      echo "export GIT_DATE=\"$(git log -1 --format=%cd)\"" >> .git-data

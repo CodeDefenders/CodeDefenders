@@ -66,10 +66,9 @@
         return readOnlyLines;
     };
 
-    let filterOutComments = function (text) {
-        let blockCommentRegex = /\/\*(.|\s)*?\*\//gm;
-        let lineCommentRegex = /\/\/.*(\r\n|\r|\n)/g;
-        return text.replace(blockCommentRegex, "").replace(lineCommentRegex, "")
+    filterOutComments = function (text) {
+        var commentRegex = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
+        return text.replace(commentRegex, "");
     };
 
     let updateAutocompleteList = function () {
