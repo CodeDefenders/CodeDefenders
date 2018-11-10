@@ -21,10 +21,11 @@
 <%-- This jsp assumes that the availability of a MultiplayerGame variable named game --%>
 <script>
 var sMutants = new Set();
-var sLines = new Set();
+var sLine = null; // Primary Target
+
 
 function toggleDefend(){
-   document.getElementById("submitTest").disabled = <% if(game.isDeclareCoveredLines()) {%> sLines.size == 0 <% } else {%> true <% } %> && <% if(game.isDeclareKilledMutants() ) {%> sMutants.size == 0 <% } else {%> true <% } %>;
+	document.getElementById("submitTest").disabled = <% if(game.isDeclareCoveredLines()) {%> sLine == null  <% } else {%> true <% } %> && <% if(game.isDeclareKilledMutants() ) {%> sMutants.size == 0 <% } else {%> true <% } %>;
 }
 
 toggleDefend();
@@ -45,12 +46,13 @@ container.appendChild(theTable)
 <% if(game.isDeclareCoveredLines()) {%>
 
 function selectLine(lineNumber){
-	if( sLines.has(lineNumber)){
-		sLines.delete(lineNumber);
+	if( sLine == lineNumber ){
+		sLine = null;
+		selected_lines.innerText="<no line selected>";
 	} else {
-		sLines.add(lineNumber);
+		sLine = lineNumber;
+		selected_lines.innerText=sLine;
 	}
-	selected_lines.innerText=Array.from(sLines).join(",");
 	document.getElementById("selected_lines").value = selected_lines.innerText;
 	toggleDefend();
 }
@@ -77,7 +79,7 @@ newCell.setAttribute("style", "width: 25%;  height: 40px;")
 var newCell  = newRow.insertCell();
 var selected_lines =  document.createElement('div');
 selected_lines.setAttribute("id", "selectedLinesDiv");
-selected_lines.innerText=""
+selected_lines.innerText="<no line selected>";
 newCell.appendChild(selected_lines);
 
 <!-- Update Code Mirror to enable line selection -->
@@ -88,6 +90,13 @@ var editor = document.querySelector('#sut').nextSibling.CodeMirror;
   } */
 
 editor.on("gutterClick", function(cm, n) {
+  if( sLine != null ){
+		if( sLine != n + 1) {
+			// DeSelect the previously selected line if any
+			cm.setGutterMarker(sLine - 1, "CodeMirror-linenumbers", null);
+  		}
+  }
+  // Toogle the new one
   var info = cm.lineInfo(n);
   var markers = info.gutterMarkers || (info.gutterMarkers = {});
   var value = markers["CodeMirror-linenumbers"]; 
