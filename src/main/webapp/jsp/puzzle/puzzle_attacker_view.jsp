@@ -2,6 +2,7 @@
 <%@ page import="java.util.LinkedList" %>
 <%@ page import="static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME" %>
 <%@ page import="static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT" %>
+<%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
 
 <% String pageTitle = "Attacking Class"; %>
 <%@ include file="/jsp/header_main.jsp"%>
@@ -14,14 +15,19 @@
 <%-- Set request attributes for the components. --%>
 <%  PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
+    final GameClass cut = game.getCUT();
+    final Puzzle puzzle = game.getPuzzle();
+
     /* mutant_editor */
     String previousMutantCode = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
     request.getSession().removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
     if (previousMutantCode != null) {
         request.setAttribute("mutantCode", previousMutantCode);
     } else {
-        request.setAttribute("mutantCode", game.getCUT().getAsHTMLEscapedString());
+        request.setAttribute("mutantCode", cut.getAsHTMLEscapedString());
     }
+    request.setAttribute("startEditLine", puzzle.getEditableLinesStart());
+    request.setAttribute("endEditLine", puzzle.getEditableLinesEnd());
 
     /* tests_carousel */
     request.setAttribute("tests", game.getTests());
@@ -32,7 +38,7 @@
     request.setAttribute("mutantsEquivalent", new LinkedList<Mutant>());
     request.setAttribute("markEquivalent", false);
     request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", "PUZZLE");
+    request.setAttribute("gameType", GameMode.PUZZLE.name());
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");

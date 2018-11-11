@@ -1,6 +1,8 @@
-<%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
 <%@ page import="static org.codedefenders.util.Constants.*" %>
-<%@ page import="org.codedefenders.game.*" %>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
+<%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 
 <% String pageTitle = "Defending Class"; %>
 <%@ include file="/jsp/header_main.jsp" %>
@@ -12,8 +14,10 @@
 <%-- Set request attributes for the components. --%>
 <% PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
+    final GameClass cut = game.getCUT();
+
     /* class_viewer */
-    request.setAttribute("classCode", game.getCUT().getAsHTMLEscapedString());
+    request.setAttribute("classCode", cut.getAsHTMLEscapedString());
 
     /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
@@ -21,9 +25,10 @@
     if (previousTestCode != null) {
         request.setAttribute("testCode", previousTestCode);
     } else {
-        request.setAttribute("testCode", game.getCUT().getTestTemplate());
+        request.setAttribute("testCode", cut.getTestTemplate());
     }
     request.setAttribute("mockingEnabled", false);
+//    request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine()); FIXME include after merging with master.
 
     /* tests_carousel */
     request.setAttribute("tests", game.getTests());
@@ -34,7 +39,7 @@
     request.setAttribute("mutantsEquivalent", new LinkedList<Mutant>());
     request.setAttribute("markEquivalent", false);
     request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", "PUZZLE");
+    request.setAttribute("gameType", GameMode.PUZZLE.name());
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
