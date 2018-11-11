@@ -304,7 +304,7 @@
 %>
     </div>
 <%
-if(game.isDeclareCoveredLines() || game.isDeclareKilledMutants() ) {
+if(game.isCapturePlayersIntention() ) {
 	if( Role.DEFENDER.equals(role)) {
 %>
 <%@ include file="/jsp/game_components/defender_intention_collector.jsp" %>

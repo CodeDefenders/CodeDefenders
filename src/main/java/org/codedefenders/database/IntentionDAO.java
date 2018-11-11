@@ -11,8 +11,8 @@ import org.codedefenders.model.DefenderIntention;
 public class IntentionDAO {
 	
 	final private static String defender_query = 
-			"INSERT INTO intention (Test_ID, Game_ID, Target_Mutants, Target_Lines) "
-			+ "VALUES (?, ?, ?, ?);";
+			"INSERT INTO intention (Test_ID, Game_ID, Target_Lines) "
+			+ "VALUES (?, ?, ?);";
 	
 	final private static String attacker_query = 
 			"INSERT INTO intention (Mutant_ID, Game_ID, Target_Mutant_Type) "
@@ -46,7 +46,6 @@ public class IntentionDAO {
         DatabaseValue[] valueList = new DatabaseValue[]{
                 DB.getDBV(testId),
                 DB.getDBV(gameId),
-                DB.getDBV(targetMutants),
                 DB.getDBV(targetLines),
         };
         Connection conn = DB.getConnection();

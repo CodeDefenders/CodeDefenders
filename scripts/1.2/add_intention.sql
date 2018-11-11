@@ -13,5 +13,4 @@ CREATE TABLE `intention` (
 
 -- Include per Game configuration
 ALTER TABLE games
-ADD COLUMN DeclareCoveredLines TINYINT(1) NOT NULL DEFAULT 0,
-ADD COLUMN DeclareKilledMutants TINYINT(1) NOT NULL DEFAULT 0;
+ADD COLUMN CapturePlayersIntention TINYINT(1) NOT NULL DEFAULT 0;

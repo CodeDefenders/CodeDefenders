@@ -297,7 +297,7 @@ public class MultiplayerGameManager extends HttpServlet {
 							MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
 							activeGame.update();
 							
-							if( activeGame.isDeclareCoveredLines() || activeGame.isDeclareKilledMutants() ){
+							if( activeGame.isCapturePlayersIntention() ){
 								AttackerIntention intention = AttackerIntention.fromString(request.getParameter("attacker_intention"));
 								// This parameter is required !
 								if ( intention == null) {
@@ -361,7 +361,7 @@ public class MultiplayerGameManager extends HttpServlet {
 					logger.info("New Test {} by user {}", newTest.getId(), uid);
 					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-					if( activeGame.isDeclareCoveredLines() || activeGame.isDeclareKilledMutants() ){
+					if( activeGame.isCapturePlayersIntention() ){
 
 						Set<Integer> selectedLines = new HashSet<>();
 						Set<Integer> selectedMutants = new HashSet<>();
@@ -382,20 +382,20 @@ public class MultiplayerGameManager extends HttpServlet {
 						StringBuffer validationMessage = new StringBuffer();
 						validationMessage.append("Cheeky! You cannot submit a test without specifing");
 
-						if( selectedLines.isEmpty() && activeGame.isDeclareCoveredLines() ){
+						if( selectedLines.isEmpty() && activeGame.isCapturePlayersIntention() ){
 							validatedCoveredLines = false;
 							validationMessage.append(" a line to cover");
 						}
-
-						if( selectedMutants.isEmpty() && activeGame.isDeclareKilledMutants()) {
-							validatedKilledMutants = false;
-
-							if( selectedLines.isEmpty() && activeGame.isDeclareCoveredLines() ){
-								validationMessage.append(" or");
-							}
-
-							validationMessage.append(" a mutant to kill");
-						}
+//
+//						if( selectedMutants.isEmpty() && activeGame.isDeclareKilledMutants()) {
+//							validatedKilledMutants = false;
+//
+//							if( selectedLines.isEmpty() && activeGame.isCapturePlayersIntention() ){
+//								validationMessage.append(" or");
+//							}
+//
+//							validationMessage.append(" a mutant to kill");
+//						}
 						validationMessage.append(".");
 
 						if( validatedCoveredLines && validatedKilledMutants ){
