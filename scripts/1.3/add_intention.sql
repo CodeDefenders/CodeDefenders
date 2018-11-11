@@ -2,10 +2,12 @@
 DROP TABLE IF EXISTS `intention`;
 CREATE TABLE `intention` (
   `Intention_ID` int(11) NOT NULL AUTO_INCREMENT,
-  `Test_ID` int(11) NOT NULL,
+  `Test_ID` int(11),
+  `Mutant_ID` int(11),
   `Game_ID` int(11) NOT NULL,
   `Target_Mutants` longtext,
   `Target_Lines` longtext,
+  `Target_Mutant_Type` longtext,
    PRIMARY KEY (`Intention_ID`)
 ) AUTO_INCREMENT=1
 

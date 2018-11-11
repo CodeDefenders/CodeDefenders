@@ -18,8 +18,10 @@
  */
 package org.codedefenders.database;
 
+import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
-import org.codedefenders.model.Intention;
+import org.codedefenders.model.AttackerIntention;
+import org.codedefenders.model.DefenderIntention;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,22 +29,24 @@ import java.sql.PreparedStatement;
 /**
  * This class handles the database logic for player intentions.
  *
- * @see Intention
+ * @see AttackerIntention
+ * @see DefenderIntention
  */
 public class IntentionDAO {
 
     /**
-     * Stores a given {@link Intention} in the database.
+     * Stores a given {@link DefenderIntention} in the database.
      * <p>
      * For context information, the associated {@link Test} of the intention
      * is provided as well.
      *
      * @param test      the given test as a {@link Test}.
-     * @param intention the given intention as an {@link Intention}.
+     * @param intention the given intention as an {@link DefenderIntention}.
      * @return the generated identifier of the intention as an {@code int}.
      * @throws Exception If storing the intention was not successful.
      */
-    public static int storeIntentionForTest(Test test, Intention intention) throws Exception {
+    public static int storeIntentionForTest(Test test, DefenderIntention intention) throws Exception {
+
         // Contextual Information Test and Game
         Integer testId = test.getId();
         Integer gameId = test.getGameId();
@@ -76,16 +80,50 @@ public class IntentionDAO {
                 DB.getDBV(targetMutants),
                 DB.getDBV(targetLines),
         };
-        Connection conn = DB.getConnection();
 
+        Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
         final int result = DB.executeUpdateGetKeys(stmt, conn);
         if (result != -1) {
             return result;
         } else {
-            throw new Exception("Could not store intention to database.");
+            throw new Exception("Could not store defender intention to database.");
         }
     }
 
-}
+    /**
+     * Stores a given {@link AttackerIntention} in the database.
+     * <p>
+     * For context information, the associated {@link Test} of the intention
+     * is provided as well.
+     *
+     * @param mutant      the given mutant as a {@link Mutant}.
+     * @param intention the given intention as an {@link AttackerIntention}.
+     * @return the generated identifier of the intention as an {@code int}.
+     * @throws Exception If storing the intention was not successful.
+     */
+    public static int storeIntentionForMutant(Mutant mutant, DefenderIntention intention) throws Exception {
+        final String query = String.join("\n",
+                "INSERT INTO intention (Mutant_ID, Game_ID, Target_Mutant_Type)",
+                "VALUES (?,?,?);"
+        );
+
+        DatabaseValue[] valueList = new DatabaseValue[]{
+                DB.getDBV(mutant.getId()),
+                DB.getDBV(mutant.getGameId()),
+                DB.getDBV(intention.toString()),
+
+        };
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+
+        final int result = DB.executeUpdateGetKeys(stmt, conn);
+        if (result != -1) {
+            return result;
+        } else {
+            throw new Exception("Could not store attacker intention to database.");
+        }
+
+    }
