@@ -25,7 +25,7 @@ var sLine = null; // Primary Target
 
 
 function toggleDefend(){
-	document.getElementById("submitTest").disabled = <% if(game.isDeclareCoveredLines()) {%> sLine == null  <% } else {%> true <% } %> && <% if(game.isDeclareKilledMutants() ) {%> sMutants.size == 0 <% } else {%> true <% } %>;
+	document.getElementById("submitTest").disabled = <% if(game.isCapturePlayersIntention()) {%> sLine == null  <% } else {%> true <% }%>;
 }
 
 toggleDefend();
@@ -43,7 +43,7 @@ theTable.setAttribute("id", "intention-table");
 container.appendChild(theTable)
 
 <%-- Handling Line Coverage --%>
-<% if(game.isDeclareCoveredLines()) {%>
+<% if(game.isCapturePlayersIntention()) {%>
 
 function selectLine(lineNumber){
 	if( sLine == lineNumber ){
@@ -124,7 +124,8 @@ testCode.style.height=newHeight+"px";
 <% }%>
 
 <%-- Handling Killing Mutants --%>
-<% if(game.isDeclareKilledMutants() ) {%>
+<%-- Currently Disabled --%>
+<%-- if(game.isDeclareKilledMutants() ) {
 
 function selectMutant(mutantCheckboxRow, mutantCheckbox){
 	var table = document.getElementById("alive-mutants");
@@ -191,5 +192,6 @@ testCode.style.height=newHeight+"px";
 
 
 <% }%>
+--%>
 
 </script>

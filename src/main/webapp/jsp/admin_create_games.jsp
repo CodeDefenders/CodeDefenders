@@ -801,20 +801,13 @@
 			<div class="col-sm-1">
 			</div>
             <div class="col-sm-2">
-				<label class="label-normal" title="Enable Capturing Defender Intention for Coverage"
-                       for="declareCoveredLines">
-                    Call Covered Lines
-                </label>
-            <input type="checkbox" id="declareCoveredLines" name="declareCoveredLines"
-                       class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
-                       data-onstyle="primary" data-offstyle="">
             </div>
             <div class="col-sm-2">
-                <label class="label-normal" title="Enable Capturing Defender Intention for Mutants"
-                       for="declareKilledMutants">
-                    Call Killed Mutants
+                <label class="label-normal" title="Enable Capturing Player Intention"
+                       for="capturePlayersIntention">
+                    Capture Players Intention
                 </label>
-                <input type="checkbox" id="declareKilledMutants" name="declareKilledMutants"
+                <input type="checkbox" id="capturePlayersIntention" name="capturePlayersIntention"
                        class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
                        data-onstyle="primary" data-offstyle="">
             </div>

@@ -537,8 +537,7 @@ public class DatabaseAccess {
 						rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"),
 						rs.getInt("MaxAssertionsPerTest"),rs.getBoolean("ChatEnabled"),
 						CodeValidatorLevel.valueOf(rs.getString("MutantValidator")), rs.getBoolean("MarkUncovered"),
-						//
-						rs.getBoolean("DeclareCoveredLines"),rs.getBoolean("DeclareKilledMutants")
+						rs.getBoolean("CapturePlayersIntention")
 						);
 				mg.setId(rs.getInt("ID"));
 				gameList.add(mg);

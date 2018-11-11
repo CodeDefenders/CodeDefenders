@@ -70,14 +70,13 @@ public class IntentionDAO {
         String targetLines = targetLinesAsCSV.toString();
 
         final String query = String.join("\n",
-                "INSERT INTO intention (Test_ID, Game_ID, Target_Mutants, Target_Lines)",
+                "INSERT INTO intention (Test_ID, Game_ID, Target_Lines)",
                 "VALUES (?, ?, ?, ?);"
         );
 
         DatabaseValue[] valueList = new DatabaseValue[]{
                 DB.getDBV(testId),
                 DB.getDBV(gameId),
-                DB.getDBV(targetMutants),
                 DB.getDBV(targetLines),
         };
 
@@ -103,7 +102,7 @@ public class IntentionDAO {
      * @return the generated identifier of the intention as an {@code int}.
      * @throws Exception If storing the intention was not successful.
      */
-    public static int storeIntentionForMutant(Mutant mutant, DefenderIntention intention) throws Exception {
+    public static int storeIntentionForMutant(Mutant mutant, AttackerIntention intention) throws Exception {
         final String query = String.join("\n",
                 "INSERT INTO intention (Mutant_ID, Game_ID, Target_Mutant_Type)",
                 "VALUES (?,?,?);"
@@ -113,7 +112,6 @@ public class IntentionDAO {
                 DB.getDBV(mutant.getId()),
                 DB.getDBV(mutant.getGameId()),
                 DB.getDBV(intention.toString()),
-
         };
 
         Connection conn = DB.getConnection();
@@ -125,5 +123,5 @@ public class IntentionDAO {
         } else {
             throw new Exception("Could not store attacker intention to database.");
         }
-
     }
+}
