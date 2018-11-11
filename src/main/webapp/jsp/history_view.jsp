@@ -105,7 +105,6 @@
             List<MultiplayerGame> mgames = DatabaseAccess.getFinishedMultiplayerGamesForUser(uid);
             if (!mgames.isEmpty()) {
                 for (MultiplayerGame g : mgames) {
-                    Role role = g.getRole(uid);
         %>
 
         <tr id="<%="game_"+g.getId()%>">

@@ -101,14 +101,14 @@
 				if (atkName == null) {atkName = "Empty";}
 				if (defName == null) {defName = "Empty";}
 
-%>
+				final GameClass cut = g.getCUT();%>
 	<tr id="<%="game-"+g.getId()%>">
 		<td class="col-sm-1"><%= g.getId() %></td>
 		<td class="col-sm-1">Duel</td>
 		<td class="col-sm-1"></td>
 		<td class="col-sm-1">
 			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
-				<%=g.getCUT().getAlias()%>
+				<%=cut.getAlias()%>
 			</a>
 			<div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;" >
 				<div class="modal-dialog">
@@ -116,13 +116,13 @@
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
+							<h4 class="modal-title"><%=cut.getAlias()%></h4>
 						</div>
 						<div class="modal-body">
 							<pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
 																id="sut<%=g.getId()%>"
 																name="cut<%=g.getId()%>" cols="80"
-																rows="30"><%=g.getCUT().getAsHTMLEscapedString()%></textarea></pre>
+																rows="30"><%=cut.getAsHTMLEscapedString()%></textarea></pre>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -165,26 +165,26 @@
 /****************************************************************************************************************************************/
 				MultiplayerGame g = (MultiplayerGame) ag;
 				Role role = g.getRole(uid);
-%>
+                final GameClass cut = g.getCUT();%>
 	<tr id="<%="game-"+g.getId()%>">
 		<td class="col-sm-1"><%= g.getId() %></td>
 		<td class="col-sm-1">Multiplayer</td>
 		<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
 		<td class="col-sm-2">
-			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>"><%=g.getCUT().getAlias()%></a>
+			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>"><%=cut.getAlias()%></a>
 			<div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;" >
 				<div class="modal-dialog">
 					<!-- Modal content-->
 					<div class="modal-content">
 						<div class="modal-header">
 							<button type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
+							<h4 class="modal-title"><%=cut.getAlias()%></h4>
 						</div>
 						<div class="modal-body">
 							<pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
 																id="sut<%=g.getId()%>"
 																name="cut<%=g.getId()%>" cols="80"
-																rows="30"><%=g.getCUT().getAsHTMLEscapedString()%></textarea></pre>
+																rows="30"><%=cut.getAsHTMLEscapedString()%></textarea></pre>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -328,7 +328,7 @@
 
 				if (atkName == null) {atkName = "Empty";}
 				if (defName == null) {defName = "Empty";}
-		%>
+				final GameClass cut = g.getCUT();%>
 
 		<tr id="<%="game-"+g.getId()%>">
 			<td class="col-sm-1"><%= g.getId() %></td>
@@ -336,7 +336,7 @@
 			<td class="col-sm-1"></td>
 			<td class="col-sm-2">
 				<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
-					<%=g.getCUT().getAlias()%>
+					<%=cut.getAlias()%>
 				</a>
 				<div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;" >
 					<div class="modal-dialog">
@@ -344,13 +344,13 @@
 						<div class="modal-content">
 							<div class="modal-header">
 								<button type="button" class="close" data-dismiss="modal">&times;</button>
-								<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
+								<h4 class="modal-title"><%=cut.getAlias()%></h4>
 							</div>
 							<div class="modal-body classPreview">
 								<pre class="readonly-pre"><textarea
 										class="readonly-textarea" id="sut<%=g.getId()%>"
 										name="cut<%=g.getId()%>" cols="80"
-										rows="30"><%=g.getCUT().getAsHTMLEscapedString()%></textarea></pre>
+										rows="30"><%=cut.getAsHTMLEscapedString()%></textarea></pre>
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -378,14 +378,14 @@
 /****************************************************************************************************************************************/
 				MultiplayerGame g = (MultiplayerGame) ag;
 				Role role = g.getRole(uid);
-%>
+                final GameClass cut = g.getCUT();%>
 		<tr id="<%="game-"+g.getId()%>">
 			<td class="col-sm-1"><%= g.getId() %></td>
 			<td class="col-sm-1">Multiplayer</td>
 			<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
 			<td class="col-sm-2">
 				<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
-					<%=g.getCUT().getAlias()%>
+					<%=cut.getAlias()%>
 				</a>
 				<div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;" >
 					<div class="modal-dialog">
@@ -393,14 +393,14 @@
 						<div class="modal-content">
 							<div class="modal-header">
 								<button type="button" class="close" data-dismiss="modal">&times;</button>
-								<h4 class="modal-title"><%=g.getCUT().getAlias()%></h4>
+								<h4 class="modal-title"><%=cut.getAlias()%></h4>
 							</div>
 							<div class="modal-body">
                                 <pre class="readonly-pre"><textarea
 										class="readonly-textarea classPreview"
 										id="sut<%=g.getId()%>"
 										name="cut<%=g.getId()%>" cols="80"
-										rows="30"><%=g.getCUT().getAsHTMLEscapedString()%></textarea></pre>
+										rows="30"><%=cut.getAsHTMLEscapedString()%></textarea></pre>
 							</div>
 							<div class="modal-footer">
 								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
