@@ -22,6 +22,9 @@ public enum ValidationMessage {
     MUTANT_VALIDATION_IDENTICAL("Invalid mutant, sorry! Your mutant is identical to the CUT"),
     MUTANT_VALIDATION_METHOD_SIGNATURE("Invalid mutant, sorry! Your mutant changes one or more method signatures or field names or import statements"),
 
+    // Probably a better label required
+    MUTANT_MISSING_INTENTION("Invalid mutant. You must declare your intention."),
+    
     MUTATION_CLASS_DECLARATION("Invalid mutation contains class declaration."),
     MUTATION_METHOD_DECLARATION("Invalid mutation contains method declaration."),
     MUTATION_SYSTEM_USE("Invalid mutation contains System uses"),
@@ -34,6 +37,7 @@ public enum ValidationMessage {
     MUTATION_SYSTEM_CALL("Invalid mutation contains a call to System.*"),
     MUTATION_SYSTEM_DECLARATION("Invalid mutation contains variable declaration using System.*");
 
+	
     private String message;
 
     ValidationMessage(String message) {

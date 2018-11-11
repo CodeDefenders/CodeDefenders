@@ -28,10 +28,11 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.Intention;
+import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidator;
@@ -281,6 +282,8 @@ public class MultiplayerGameManager extends HttpServlet {
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
 						break;
 					}
+					
+					
 					Mutant newMutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "mp");
 					if (newMutant != null) {
 						TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
@@ -293,6 +296,18 @@ public class MultiplayerGameManager extends HttpServlet {
 							messages.add(MUTANT_COMPILED_MESSAGE);
 							MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
 							activeGame.update();
+							
+							if( activeGame.isDeclareCoveredLines() || activeGame.isDeclareKilledMutants() ){
+								AttackerIntention intention = AttackerIntention.fromString(request.getParameter("attacker_intention"));
+								// This parameter is required !
+								if ( intention == null) {
+									messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.toString());
+									session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+								} else {
+									collectAttackerIntentions(newMutant, intention);
+								}
+							}
+							
 
 							// Clean the mutated code only if mutant is accepted
 							session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
@@ -353,11 +368,11 @@ public class MultiplayerGameManager extends HttpServlet {
 
 						if (request.getParameter("selected_lines") != null) {
 							selectedLines.addAll(
-									Intention.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_lines")));
+									DefenderIntention.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_lines")));
 						}
 
 						if (request.getParameter("selected_mutants") != null) {
-							selectedMutants.addAll(Intention
+							selectedMutants.addAll(DefenderIntention
 									.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_mutants")));
 						}
 
@@ -434,8 +449,16 @@ public class MultiplayerGameManager extends HttpServlet {
 	private void collectDefenderIntentions(Test newTest, Set<Integer> selectedLines, Set<Integer> selectedMutants) {
 		// Process parameters
 		try {
-			Intention intention = new Intention(selectedLines, selectedMutants);
+			DefenderIntention intention = new DefenderIntention(selectedLines, selectedMutants);
 			IntentionDAO.storeIntentionForTest(newTest, intention);
+		} catch (Exception e) {
+			logger.error("Cannot store intention to database {}", e);
+		}
+	}
+	
+	private void collectAttackerIntentions(Mutant newMutant, AttackerIntention intention) {
+		try {
+			IntentionDAO.storeIntentionForMutant(newMutant, intention);
 		} catch (Exception e) {
 			logger.error("Cannot store intention to database {}", e);
 		}

@@ -5,12 +5,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Intention {
+public class DefenderIntention {
 
 	private Set<Integer> lines = new HashSet<>();
 	private Set<Integer> mutants = new HashSet<>();
 	
-	public Intention(Set<Integer> lines, Set<Integer> mutants) {
+	public DefenderIntention(Set<Integer> lines, Set<Integer> mutants) {
 		this.lines = lines;
 		this.mutants = mutants;
 	}
@@ -37,7 +37,7 @@ public class Intention {
 	
 	@Override
 	public String toString() {
-		return "Intention :" + "\n"
+		return "DefenderIntention :" + "\n"
 				+ "\tLines: " + lines + "\n"
 				+ "\tMutants:" + mutants; 
 	}
