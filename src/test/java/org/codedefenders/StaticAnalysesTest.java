@@ -65,7 +65,7 @@ public class StaticAnalysesTest {
 		GameClass gc = new GameClass("Lift", "Lift", "src/test/resources/itests/sources/Lift/Lift.java",
 				"src/test/resources/itests/sources/Lift/Lift.class");
 
-		String testTemplate = gc.getTestTemplate();
+		String testTemplate = gc.getHTMLEscapedTestTemplate();
 		assertThat(testTemplate,
 				allOf(containsString("import static org.junit.Assert.*;"), containsString("import org.junit.*;")));
 		// We need -1 to get rid of the last token
@@ -79,7 +79,7 @@ public class StaticAnalysesTest {
 				"src/test/resources/itests/sources/XmlElement/XmlElement.java",
 				"src/test/resources/itests/sources/XmlElement/XmlElement.class");
 
-		String testTemplate = gc.getTestTemplate();
+		String testTemplate = gc.getHTMLEscapedTestTemplate();
 
 		assertThat(testTemplate,
 				allOf(containsString("import static org.junit.Assert.*;"), containsString("import org.junit.*;"),

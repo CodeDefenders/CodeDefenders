@@ -228,7 +228,16 @@ public class GameClass {
 		return DB.executeUpdate(stmt, conn);
 	}
 
-	public String getTestTemplate() {
+	/**
+	 * Generates and returns a template for a JUnit test.
+	 *
+	 * Be aware that this template is not HTML escaped.
+	 * Please use {@link #getHTMLEscapedTestTemplate()}.
+	 *
+	 * @return template for a JUnit test as a {@link String}.
+	 * @see #getHTMLEscapedTestTemplate()
+	 */
+	private String getTestTemplate() {
 		final StringBuilder bob = new StringBuilder();
 		final String classPackage = getPackage();
 		if (!classPackage.isEmpty()) {
@@ -258,6 +267,9 @@ public class GameClass {
 		return bob.toString();
 	}
 
+	/**
+	 * @return a HTML escaped test template for a Junit Test as a {@link String}.
+	 */
 	public String getHTMLEscapedTestTemplate() {
 		return StringEscapeUtils.escapeHtml(getTestTemplate());
 	}
