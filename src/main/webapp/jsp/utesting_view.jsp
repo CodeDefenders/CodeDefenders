@@ -71,6 +71,7 @@
 <%@ page import="org.codedefenders.game.duel.DuelGame" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="static org.codedefenders.game.GameState.FINISHED" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
 <% DuelGame uTestingSession = (DuelGame) session.getAttribute("game"); %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -129,14 +130,16 @@
 <div class="row-fluid">
     <h3> No unit testing session available at the moment. </h3>
 </div>
-<% } else { %>
+<% } else {
+    final GameClass cut = uTestingSession.getCUT();
+%>
 
 <div class="row-fluid">
     <div class="col-md-6" id="cut-div">
         <h3>Class Under Test</h3>
         <pre class="readonly-pre"><textarea
                 class="readonly-textarea" id="sut" name="cut" cols="80"
-                rows="30"><%=uTestingSession.getCUT().getAsHTMLEscapedString()%></textarea></pre>
+                rows="30"><%=cut.getAsHTMLEscapedString()%></textarea></pre>
     </div> <!-- col-md6 left -->
     <div class="col-md-6" id="utest-div">
         <h3> Write a new JUnit test here
@@ -154,7 +157,7 @@
                 if (previousTestCode != null) {
                     testCode = previousTestCode;
                 } else
-                    testCode = uTestingSession.getCUT().getTestTemplate();
+                    testCode = cut.getHTMLEscapedTestTemplate();
             %>
             <pre><textarea id="code" name="test" cols="80" rows="30"><%=testCode%></textarea></pre>
         </form>

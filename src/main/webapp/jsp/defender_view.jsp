@@ -41,7 +41,7 @@
 	if (previousTestCode != null) {
 		request.setAttribute("testCode", previousTestCode);
 	} else {
-		request.setAttribute("testCode", cut.getTestTemplate());
+		request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
 	}
     request.setAttribute("mockingEnabled", cut.isMockingEnabled());
     request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
