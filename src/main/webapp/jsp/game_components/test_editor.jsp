@@ -26,7 +26,7 @@
     @param Boolean mockingEnabled
         Enable autocompletions for Mockito methods.
     @param Integer startEditLine
-        Start of editable lines. If {@code null}, the code can
+        Start of editable lines. If smaller than one or {@code null}, the code can
         be modified from the start.
 --%>
 
@@ -37,8 +37,8 @@
     Boolean mockingEnabled = (Boolean) request.getAttribute("mockingEnabled");
 
     Integer startEditLine = (Integer) request.getAttribute("startEditLine");
-    if (startEditLine == null) {
-        startEditLine = 0;
+    if (startEditLine == null || startEditLine < 1) {
+        startEditLine = 1;
     }
 %>
 
@@ -68,7 +68,7 @@
     var autocompleteList = [];
 
     filterOutComments = function(text) {
-        var commentRegex = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
+        let commentRegex = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
         return text.replace(commentRegex, "");
     };
 

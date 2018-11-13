@@ -29,11 +29,11 @@
         A mapping between a class name and the content of the CUT dependencies.
         Can be empty, but must not be {@code null}.
     @param Integer startEditLine
-        Start of editable lines. If {@code null}, the code can
+        Start of editable lines. If smaller than one or {@code null}, the code can
         be modified from the start.
     @param Integer endEditLine
         End of editable lines in the orginial mutant.
-        If {@code null}, the code can be modified until the end.
+        If smaller than one or {@code null}, the code can be modified until the end.
 --%>
 
 <% { %>
@@ -44,10 +44,13 @@
     final Map<String, String> dependencies = (Map<String, String>) request.getAttribute("dependencies");
 
     Integer startEditLine = (Integer) request.getAttribute("startEditLine");
-    if (startEditLine == null) {
-        startEditLine = 0;
+    if (startEditLine == null || startEditLine < 1) {
+        startEditLine = 1;
     }
     Integer endEditLine = (Integer) request.getAttribute("endEditLine");
+    if (endEditLine != null && (endEditLine < 1 || endEditLine < startEditLine)) {
+        endEditLine = null;
+    }
 %>
 <script>
     let startEditLine = <%=startEditLine%> ;
@@ -60,14 +63,27 @@
             return [];
         }
         let readOnlyLines = [];
-        for (let i = 1; i < endEditLine; i++) {
-            readOnlyLines.push(lines.length - i);
+
+        // You don't want the end line to be editable even when a user removes above lines.
+        // So the endEditLine isn't a static hard limit, but an indicator that
+        // totalLines - endEditLine many lines from the bottom are read only.
+        for (let i = 1; i <= getReadOnlyBottomNumber(lines); i++) {
+            readOnlyLines.push(lines.length - i)
         }
         return readOnlyLines;
     };
 
+    let numberOfReadOnlyLinesFromBottom = null;
+    let getReadOnlyBottomNumber = function(lines) {
+        if (endEditLine != null && numberOfReadOnlyLinesFromBottom == null) {
+            numberOfReadOnlyLinesFromBottom = lines.length - endEditLine;
+        }
+        return numberOfReadOnlyLinesFromBottom;
+
+    };
+
     filterOutComments = function (text) {
-        var commentRegex = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
+        let commentRegex = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
         return text.replace(commentRegex, "");
     };
 
