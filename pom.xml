@@ -29,6 +29,22 @@
 		</filters>
 
 		<plugins>
+			<!-- Execute the installer within maven without the need of packaging a jar for it -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>org.codedefenders.installer.Installer</mainClass>
+				</configuration>
+			</plugin>
 			<!-- Fails if the ${config.properties} file does not exists -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -391,6 +407,19 @@
 			<version>0.1</version>
 		</dependency>
 
+		<!-- Installer -->
+		<dependency>
+			<groupId>com.lexicalscope.jewelcli</groupId>
+			<artifactId>jewelcli</artifactId>
+			<version>0.8.9</version>
+		</dependency>
+		
+		<dependency>
+    		<groupId>org.apache.tomcat</groupId>
+    		<artifactId>tomcat-catalina</artifactId>
+    		<version>9.0.13</version>
+		</dependency>
+		
 		<!-- Server side validation -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
