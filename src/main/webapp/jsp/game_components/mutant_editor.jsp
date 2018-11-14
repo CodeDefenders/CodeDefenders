@@ -152,12 +152,14 @@
         lineNumbers: true,
         indentUnit: 4,
         smartIndent: true,
-        indentWithTabs: true,
         matchBrackets: true,
         mode: "text/x-java",
         autoCloseBrackets: true,
         styleActiveLine: true,
-        extraKeys: {"Ctrl-Space": "autocomplete"},
+        extraKeys: {
+            "Ctrl-Space": "autocomplete",
+            "Tab": "insertSoftTab"
+        },
         keyMap: "default",
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
     });
@@ -199,12 +201,14 @@
                     lineNumbers: true,
                     indentUnit: 4,
                     smartIndent: true,
-                    indentWithTabs: true,
                     matchBrackets: true,
                     mode: "text/x-java",
                     autoCloseBrackets: true,
                     styleActiveLine: true,
-                    extraKeys: {"Ctrl-Space": "autocomplete"},
+                    extraKeys: {
+                        "Ctrl-Space": "autocomplete",
+                        "Tab": "insertSoftTab"
+                    },
                     keyMap: "default",
                     gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
                 });
