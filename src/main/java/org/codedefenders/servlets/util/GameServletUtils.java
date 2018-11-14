@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 /**
  * This class offers static methods, which offer functionality useful for {@link HttpServlet}
- * implementations which manage game
+ * implementations which manage games.
  *
  * @author <a href=https://github.com/werli>Phil Werli<a/>
  * @see GameManager

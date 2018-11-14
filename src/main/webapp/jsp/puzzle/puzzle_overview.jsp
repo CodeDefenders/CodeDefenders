@@ -18,79 +18,81 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.game.puzzle.PuzzleChapter" %>
+<%@ page import="org.codedefenders.model.PuzzleChapterEntry" %>
+<%@ page import="org.codedefenders.model.PuzzleEntry" %>
 <% String pageTitle = null; %>
 
-<%@ include file="/jsp/header_main.jsp" %>
+<%--
+    Displays all puzzles for a user. Puzzles may link to active puzzle games
+    or are locked for the logged in user.
 
+    @param SortedSet<PuzzleChapterEntry> puzzleChapterEntries
+        A set of puzzle chapters, which contains chapter information and all
+        associated puzzles. The set is sorted ascendingly on puzzle chapters position.
+        Associated puzzles are sorted on the puzzle identifier.
+
+--%>
+
+<%@ include file="/jsp/header_main.jsp"
+%>
+<%
+{
+    SortedSet<PuzzleChapterEntry> puzzleChapterEntries = (SortedSet<PuzzleChapterEntry>) request.getAttribute("puzzleChapterEntries");
+%>
+
+<%
+    if (puzzleChapterEntries.isEmpty()) {
+%>
+<span>No puzzles yet</span>
+<%-- TODO improve view if no puzzles available --%>
+<%
+    } else { //
+%>
 <div class="w-100">
     <h2 class="full-width page-title">Puzzles</h2>
     <table id="puzzles" class="table table-striped table-hover table-responsive table-paragraphs games-table">
         <tr>
             <th>Lecture</th>
-            <th>Attacking Levels</th>
-            <th>Defending Levels</th>
+            <th>Levels</th>
         </tr>
         <tr>
-            <td>Statement Coverage</td>
+            <%
+                for (PuzzleChapterEntry puzzleChapterEntry : puzzleChapterEntries) {
+                    final PuzzleChapter chapter = puzzleChapterEntry.getChapter();
+
+            %>
+            <td><%=chapter.getTitle()%></td>
+            <%-- TODO add chapter description, maybe as a modal --%>
+            <%--<td><%=chapter.getDescription()%></td>--%>
             <td>
-                <a class="btn btn-xs" href="${pageContext.request.contextPath}/puzzlegame?puzzleId=1">1</a>
-                <a class="btn btn-xs" href="${pageContext.request.contextPath}/puzzlegame?puzzleId=2">2</a>
+                <%
+                    for (PuzzleEntry puzzleEntry : puzzleChapterEntry.getPuzzleEntries()) {
+                        if (puzzleEntry.getType() == PuzzleEntry.Type.GAME || !puzzleEntry.isLocked()) {
+                            final int puzzleId = puzzleEntry.getPuzzleId();
+                            final String title = puzzleEntry.getPuzzle().getTitle();
+                %>
+                <a class="btn btn-xs"
+                   href="${pageContext.request.contextPath}/puzzlegame?puzzleId=<%=puzzleId%>"><%=title%></a>
+                <%--TODO add puzzle description, maybe as a modal--%>
+                <%
+                        } else { // Locked puzzle
+                %>
                 <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-            </td>
-            <td>
-                <a class="btn btn-xs" href="${pageContext.request.contextPath}/puzzlegame?puzzleId=3">3</a>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-            </td>
-        </tr>
-        <tr>
-            <td>Branch Coverage</td>
-            <td>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-            </td>
-            <td>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-            </td>
-        </tr>
-        <tr>
-            <td>Testing Loops</td>
-            <td>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-            </td>
-            <td>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
+                <%
+                        }
+                    }
+                %>
             </td>
         </tr>
-        <tr>
-            <td>Boundary Value Testing</td>
-            <td>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-            </td>
-            <td>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-                <p class="glyphicon glyphicon-lock"></p>
-            </td>
-        </tr>
+        <%
+            }
+        %>
     </table>
 </div>
 
+<%
+    }
+}
+%>
 <%@include file="../footer.jsp" %>

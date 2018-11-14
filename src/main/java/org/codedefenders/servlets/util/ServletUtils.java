@@ -25,6 +25,21 @@ public final class ServletUtils {
     }
 
     /**
+     * Extracts the user from the current {@link javax.servlet.http.HttpSession} of the given request.
+     *
+     * @param request the request, which the session is extracted from.
+     * @return a valid integer extracted from the session of the request.
+     * @throws IllegalStateException if no user can be extracted from the session.
+     */
+    public static int userId(HttpServletRequest request) {
+        final Integer userId = (Integer) request.getSession().getAttribute("uid");
+        if (userId == null) {
+            throw new IllegalStateException("Could not retrieve userId from session.");
+        }
+        return userId;
+    }
+
+    /**
      * Extracts a given URL parameter from a given request.
      * <p>
      * If the parameter is no valid integer value, the method returns {@code null}.
