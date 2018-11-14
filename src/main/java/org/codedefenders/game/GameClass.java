@@ -20,6 +20,7 @@ package org.codedefenders.game;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
+import com.github.javaparser.TokenMgrError;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
@@ -307,7 +308,7 @@ public class GameClass {
 				additionalImports.add( declaredImport.toStringWithoutComments() );
 			}
 
-		} catch (ParseException | IOException e) {
+		} catch (ParseException | IOException | TokenMgrError e) {
 			// If a java file is not provided, there's no import at all.
 			logger.error("Swallow Exception", e);
 		}
@@ -404,7 +405,7 @@ public class GameClass {
 
 			}
 
-		} catch (ParseException | IOException e) {
+		} catch (ParseException | IOException | TokenMgrError e) {
 			logger.warn("Swallow exception" + e);
 		}
 		return nonInitializedFieldsLines;
@@ -459,7 +460,7 @@ public class GameClass {
 
 			}
 
-		} catch (ParseException | IOException e) {
+		} catch (ParseException | IOException | TokenMgrError e) {
 			logger.warn("Swallow exception" + e);
 		}
 
@@ -503,7 +504,7 @@ public class GameClass {
 					}
 				}
 			}.visit(JavaParser.parse(in), null);
-		} catch (ParseException | IOException e) {
+		} catch (ParseException | IOException | TokenMgrError e) {
 			logger.warn("Swallow exception" + e);
 		}
 		Collections.sort(lines);
