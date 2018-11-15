@@ -155,10 +155,7 @@ public class DB {
     public static DatabaseValue getDBV(float v) {
         return new DatabaseValue(v);
     }
-    /**
-     * Returns the compilable {@link Mutant Mutants} from the games played on the given class.
-     * @see DB#executeQueryReturnList(String, DB.RSMapper, DatabaseValue...)
-     */
+
     public static DatabaseValue getDBV(Timestamp v) {
         return new DatabaseValue(v);
     }
@@ -189,7 +186,7 @@ public class DB {
      * @param <T> The type of value to be queried.
      * @return The first result of the query, or {@code null} if the query had no result.
      * @throws UncheckedSQLException If a {@link SQLException} is thrown while executing the query
-     *                             or advancing the {@link ResultSet}.
+     *                               or advancing the {@link ResultSet}.
      * @throws SQLMappingException If there is something wrong with the query result, and the result can not properly be
      *                             extracted from it.
      * @see RSMapper
@@ -199,6 +196,27 @@ public class DB {
 
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, params);
+
+        return executeQueryReturnValue(query, conn, stmt, mapper);
+    }
+
+    /**
+     * Executes a database query, then uses a mapper function to extract the first value from the query result.
+     * Cleans up the database connection and statement afterwards.
+     * @param query The query. This parameter is only used for error-logging and is entirely optional.
+     * @param conn The database connection.
+     * @param stmt THe prepared database statement.
+     * @param mapper The mapper function.
+     * @param <T> The type of value to be queried.
+     * @return The first result of the query, or {@code null} if the query had no result.
+     * @throws UncheckedSQLException If a {@link SQLException} is thrown while executing the query
+     *                               or advancing the {@link ResultSet}.
+     * @throws SQLMappingException If there is something wrong with the query result, and the result can not properly be
+     *                             extracted from it.
+     * @see RSMapper
+     */
+    public static <T> T executeQueryReturnValue(String query, Connection conn, PreparedStatement stmt,
+            RSMapper<T> mapper) throws UncheckedSQLException, SQLMappingException {
 
         try {
             ResultSet resultSet = stmt.executeQuery();
@@ -230,7 +248,7 @@ public class DB {
      * @param <T> The type of value to be queried.
      * @return The results of the query, as a {@link List}. Will never be null.
      * @throws UncheckedSQLException If a {@link SQLException} is thrown while executing the query
-     *                             or advancing the {@link ResultSet}.
+     *                               or advancing the {@link ResultSet}.
      * @throws SQLMappingException If there is something wrong with the query result, and the result can not properly be
      *                             extracted from it.
      * @see RSMapper
@@ -240,6 +258,27 @@ public class DB {
 
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, params);
+
+        return executeQueryReturnList(query, conn, stmt, mapper);
+    }
+
+    /**
+     * Executes a database query, then uses a mapper function to extract the values from the query result.
+     * Cleans up the database connection and statement afterwards.
+     * @param query The query. This parameter is only used for error-logging and is entirely optional.
+     * @param conn The database connection.
+     * @param stmt THe prepared database statement.
+     * @param mapper The mapper function.
+     * @param <T> The type of value to be queried.
+     * @return The results of the query, as a {@link List}. Will never be null.
+     * @throws UncheckedSQLException If a {@link SQLException} is thrown while executing the query
+     *                               or advancing the {@link ResultSet}.
+     * @throws SQLMappingException If there is something wrong with the query result, and the result can not properly be
+     *                             extracted from it.
+     * @see RSMapper
+     */
+    public static <T> List<T> executeQueryReturnList(String query, Connection conn, PreparedStatement stmt,
+            RSMapper<T> mapper) throws UncheckedSQLException, SQLMappingException {
 
         try {
             ResultSet resultSet = stmt.executeQuery();
