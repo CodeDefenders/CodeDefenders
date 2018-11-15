@@ -36,18 +36,6 @@ public class AdminDAO {
 
     public static final String TIMESTAMP_NEVER = "never";
     private static final Logger logger = LoggerFactory.getLogger(AdminDAO.class);
-    private static final String UNASSIGNED_USERS_QUERY =
-            "SELECT DISTINCT\n" +
-                    "  users.*\n" +
-                    "FROM\n" +
-                    "  users\n" +
-                    "WHERE users.User_ID > 2 AND users.User_ID NOT IN (\n" +
-                    "  SELECT DISTINCT players.User_ID\n" +
-                    "  FROM (players\n" +
-                    "    INNER JOIN games ON players.Game_ID = games.ID)\n" +
-                    "  WHERE (State = 'ACTIVE' OR State = 'CREATED') AND Finish_Time > NOW() AND Role IN ('ATTACKER', 'DEFENDER') AND Active = TRUE\n" +
-                    ")\n" +
-                    "ORDER BY Username, User_ID;";
     private static final String AVAILABLE_GAMES_QUERY =
             "SELECT *\n" +
                     "FROM\n" +
@@ -63,22 +51,6 @@ public class AdminDAO {
             "SELECT *\n" +
                     "FROM games\n" +
                     "WHERE Mode = 'PARTY' AND (State = 'ACTIVE' OR State = 'CREATED') AND Creator_ID = ?;";
-
-    private static final String LAST_ROLE_QUERY =
-            "SELECT\n" +
-                    "  players.User_ID,\n" +
-                    "  Game_ID,\n" +
-                    "  Role\n" +
-                    "FROM users\n" +
-                    "  INNER JOIN players ON users.User_ID = players.User_ID\n" +
-                    "  INNER JOIN games ON players.Game_ID = games.ID\n" +
-                    "  INNER JOIN\n" +
-                    "  (SELECT\n" +
-                    "     players.User_ID,\n" +
-                    "     max(players.Game_ID) AS latestGame\n" +
-                    "   FROM players\n" +
-                    "   GROUP BY players.User_ID) AS lg ON lg.User_ID = players.User_ID AND lg.latestGame = games.ID\n" +
-                    "WHERE lg.User_ID=?;";
 
     public static final String USER_SCORE_QUERY =
             "SELECT\n" +
@@ -302,32 +274,6 @@ public class AdminDAO {
     private static final String GET_SETTING = "SELECT *\n" +
             "FROM settings WHERE settings.name = ?;";
 
-    public static List<User> getUsers(String query) {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query);
-        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-
-        List<User> activeUsers = new ArrayList<User>();
-        try {
-            while (rs.next()) {
-                User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"), rs.getBoolean("Active"));
-                userRecord.setId(rs.getInt("User_ID"));
-                activeUsers.add(userRecord);
-            }
-        } catch (SQLException se) {
-            logger.error("SQL exception caught", se);
-        } catch (Exception e) {
-            logger.error("Exception caught", e);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-        return activeUsers;
-    }
-
-    public static List<User> getUnassignedUsers() {
-        return getUsers(UNASSIGNED_USERS_QUERY);
-    }
-
     public static List<MultiplayerGame> getGamesFromRS(ResultSet rs, Connection conn, PreparedStatement stmt) {
         List<MultiplayerGame> gamesList = new ArrayList<MultiplayerGame>();
         try {
@@ -375,50 +321,18 @@ public class AdminDAO {
         return getGamesFromRS(rs, conn, stmt);
     }
 
-
-    public static Role getLastRole(int uid) {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, LAST_ROLE_QUERY, DB.getDBV(uid));
-        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        try {
-            if (rs.next()) {
-                return Role.valueOf(rs.getString(3));
-            }
-        } catch (SQLException se) {
-            logger.error("SQL exception caught", se);
-        } catch (Exception e) {
-            logger.error("Exception caught", e);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-        return null;
-    }
-
     public static Entry getScore(int userID) {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, USER_SCORE_QUERY, DB.getDBV(userID));
-        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        try {
-            if (rs.next()) {
-                Entry p = new Entry();
-                p.setUsername(rs.getString("username"));
-                p.setMutantsSubmitted(rs.getInt("NMutants"));
-                p.setAttackerScore(rs.getInt("AScore"));
-                p.setTestsSubmitted(rs.getInt("NTests"));
-                p.setDefenderScore(rs.getInt("DScore"));
-                p.setMutantsKilled(rs.getInt("NKilled"));
-                p.setTotalPoints(rs.getInt("TotalScore"));
-                return p;
-            }
-        } catch (SQLException se) {
-            logger.error("SQL exception caught", se);
-            DB.cleanup(conn, stmt);
-        } catch (Exception e) {
-            logger.error("Exception caught", e);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-        return null;
+        return DB.executeQueryReturnValue(USER_SCORE_QUERY, rs -> {
+            Entry p = new Entry();
+            p.setUsername(rs.getString("username"));
+            p.setMutantsSubmitted(rs.getInt("NMutants"));
+            p.setAttackerScore(rs.getInt("AScore"));
+            p.setTestsSubmitted(rs.getInt("NTests"));
+            p.setDefenderScore(rs.getInt("DScore"));
+            p.setMutantsKilled(rs.getInt("NKilled"));
+            p.setTotalPoints(rs.getInt("TotalScore"));
+            return p;
+        });
     }
 
     public static boolean deletePlayerTest(int pid) {
@@ -455,69 +369,38 @@ public class AdminDAO {
         return DB.executeUpdate(stmt, conn);
     }
 
+    private static List<String> userInfoFromRS(ResultSet rs) throws SQLException {
+        List<String> userInfo = new ArrayList<>();
+        userInfo.add(String.valueOf(rs.getInt("User_ID")));
+        userInfo.add(rs.getString("Username"));
+        userInfo.add(rs.getString("Email"));
+        Timestamp ts = rs.getTimestamp("lastLogin");
+        userInfo.add(ts == null ? "-- never --" : ts.toString().substring(0, ts.toString().length() - 5));
+        userInfo.add(rs.getString("lastRole"));
+        userInfo.add(String.valueOf(rs.getInt("TotalScore")));
+        return userInfo;
+    }
+
     public static List<List<String>> getUnassignedUsersInfo() {
-        return getUsersInfo(UNASSIGNED_USERS_INFO_QUERY);
+        return DB.executeQueryReturnList(UNASSIGNED_USERS_INFO_QUERY, AdminDAO::userInfoFromRS);
     }
 
     public static List<List<String>> getAllUsersInfo() {
-        return getUsersInfo(USERS_INFO_QUERY);
+        return DB.executeQueryReturnList(USERS_INFO_QUERY, AdminDAO::userInfoFromRS);
     }
 
-
-    private static List<List<String>> getUsersInfo(String query) {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query);
-        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-
-        List<List<String>> unassignedUsers = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                List<String> userInfo = new ArrayList<>();
-                userInfo.add(String.valueOf(rs.getInt("User_ID")));
-                userInfo.add(rs.getString("Username"));
-                userInfo.add(rs.getString("Email"));
-                Timestamp ts = rs.getTimestamp("lastLogin");
-                userInfo.add(ts == null ? "-- never --" : ts.toString().substring(0, ts.toString().length() - 5));
-                userInfo.add(rs.getString("lastRole"));
-                userInfo.add(String.valueOf(rs.getInt("TotalScore")));
-                unassignedUsers.add(userInfo);
-            }
-        } catch (SQLException se) {
-            logger.error("SQL exception caught", se);
-        } catch (Exception e) {
-            logger.error("Exception caught", e);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-        return unassignedUsers;
-    }
-
-    public static List<List<String>> getPlayersInfo(int gid) {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, PLAYERS_INFO_QUERY, DB.getDBV(gid));
-        long start = System.currentTimeMillis();
-        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        List<List<String>> players = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                List<String> playerInfo = new ArrayList<>();
-                playerInfo.add(String.valueOf(rs.getInt("ID")));
-                playerInfo.add(rs.getString("Username"));
-                playerInfo.add(rs.getString("Role"));
-                Timestamp ts = rs.getTimestamp("lastSubmission");
-                playerInfo.add(ts == null ? TIMESTAMP_NEVER : "" + ts.getTime());
-                playerInfo.add(String.valueOf(rs.getInt("TotalScore")));
-                playerInfo.add(String.valueOf(rs.getInt("nbSubmissions")));
-                players.add(playerInfo);
-            }
-        } catch (SQLException se) {
-            logger.error("SQL exception caught", se);
-        } catch (Exception e) {
-            logger.error("Exception caught", e);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-        return players;
+    public static List<List<String>> getPlayersInfo(int gameId) {
+        return DB.executeQueryReturnList(PLAYERS_INFO_QUERY, rs -> {
+            List<String> playerInfo = new ArrayList<>();
+            playerInfo.add(String.valueOf(rs.getInt("ID")));
+            playerInfo.add(rs.getString("Username"));
+            playerInfo.add(rs.getString("Role"));
+            Timestamp ts = rs.getTimestamp("lastSubmission");
+            playerInfo.add(ts == null ? TIMESTAMP_NEVER : "" + ts.getTime());
+            playerInfo.add(String.valueOf(rs.getInt("TotalScore")));
+            playerInfo.add(String.valueOf(rs.getInt("nbSubmissions")));
+            return playerInfo;
+        }, DB.getDBV(gameId));
     }
 
     public static boolean setUserPassword(int uid, String password) {
@@ -533,13 +416,6 @@ public class AdminDAO {
         return DB.executeUpdate(stmt, conn);
         // this does not work as foreign keys are not deleted (recommended: update w/ ON DELETE CASCADE)
     }
-
-    public static List<AdminSystemSettings.SettingsDTO> getSystemSettings(){
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, GET_ALL_SETTINGS);
-        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        return getSettings(rs, conn, stmt);
-	}
 
     public static boolean updateSystemSetting(AdminSystemSettings.SettingsDTO setting) {
         Connection conn = DB.getConnection();
@@ -560,44 +436,30 @@ public class AdminDAO {
         return DB.executeUpdate(stmt, conn);
     }
 
-    private static List<AdminSystemSettings.SettingsDTO> getSettings(ResultSet rs, Connection conn, PreparedStatement stmt) {
-        List<AdminSystemSettings.SettingsDTO> settings = new ArrayList<>();
-        try {
-            while (rs.next()) {
-                AdminSystemSettings.SettingsDTO setting = null;
-                AdminSystemSettings.SETTING_NAME name = AdminSystemSettings.SETTING_NAME.valueOf(rs.getString("name"));
-                AdminSystemSettings.SETTING_TYPE settingType = AdminSystemSettings.SETTING_TYPE.valueOf(rs.getString("type"));
-                switch (settingType) {
-                    case STRING_VALUE:
-                        setting = new AdminSystemSettings.SettingsDTO(name, rs.getString(settingType.name()));
-                        break;
-                    case INT_VALUE:
-                        setting = new AdminSystemSettings.SettingsDTO(name,rs.getInt(settingType.name()));
-                        break;
-                    case BOOL_VALUE:
-                        setting = new AdminSystemSettings.SettingsDTO(name,rs.getBoolean(settingType.name()));
-                        break;
-                }
-                settings.add(setting);
-            }
-        } catch (SQLException se) {
-            logger.error("SQL exception caught", se);
-        } catch (Exception e) {
-            logger.error("Exception caught", e);
-        } finally {
-            DB.cleanup(conn, stmt);
+    private static AdminSystemSettings.SettingsDTO settingFromRS(ResultSet rs) throws SQLException {
+        AdminSystemSettings.SETTING_NAME name = AdminSystemSettings.SETTING_NAME.valueOf(rs.getString("name"));
+        AdminSystemSettings.SETTING_TYPE settingType = AdminSystemSettings.SETTING_TYPE.valueOf(rs.getString("type"));
+        switch (settingType) {
+            case STRING_VALUE:
+                return new AdminSystemSettings.SettingsDTO(name, rs.getString(settingType.name()));
+            case INT_VALUE:
+                return new AdminSystemSettings.SettingsDTO(name,rs.getInt(settingType.name()));
+            case BOOL_VALUE:
+                return new AdminSystemSettings.SettingsDTO(name,rs.getBoolean(settingType.name()));
+            default:
+                return null;
         }
-        return settings;
+    }
+
+    public static List<AdminSystemSettings.SettingsDTO> getSystemSettings(){
+        return DB.executeQueryReturnList(GET_ALL_SETTINGS, AdminDAO::settingFromRS);
     }
 
     public static AdminSystemSettings.SettingsDTO getSystemSetting(AdminSystemSettings.SETTING_NAME name){
-        Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_SETTING, DB.getDBV(name.name()));
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-		return getSettings(rs, conn, stmt).get(0);
+        return DB.executeQueryReturnValue(GET_SETTING, AdminDAO::settingFromRS, DB.getDBV(name.name()));
     }
 
-
+    // TODO this is just used to initialize the connection pool, we should probably make more specific methods for that
 	public static AdminSystemSettings.SettingsDTO getSystemSettingInt(AdminSystemSettings.SETTING_NAME name, Connection conn) throws SQLException {
 		PreparedStatement stmt = conn.prepareStatement(GET_SETTING);
 		stmt.setString(1, name.name());

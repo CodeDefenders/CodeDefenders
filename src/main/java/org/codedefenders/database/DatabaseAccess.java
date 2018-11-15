@@ -18,7 +18,6 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.execution.KillMap;
 import org.codedefenders.game.*;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.model.Event;
@@ -29,7 +28,6 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
 import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.model.User;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -345,79 +343,6 @@ public class DatabaseAccess {
 			DB.cleanup(conn, stmt);
 		}
 		return classList;
-	}
-
-	public static List<User> getAllUsers() {
-		List<User> uList = new ArrayList<>();
-		String query = "SELECT * FROM users";
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query);
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-		try {
-			while (rs.next()) {
-				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"), rs.getBoolean("Active"));
-				uList.add(userRecord);
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-			DB.cleanup(conn, stmt);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-		return uList;
-	}
-
-	public static User getUser(int uid) {
-		return getUserForKey("User_ID", uid);
-	}
-
-	public static User getUserForEmail(String email) {
-		String query = "SELECT * FROM users WHERE Email=?;";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(email)};
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		return getUserFromDB(stmt, conn);
-	}
-
-	public static User getUserForName(String username) {
-		String query = "SELECT * FROM users WHERE Username=?;";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(username)};
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		return getUserFromDB(stmt, conn);
-	}
-
-	public static User getUserFromPlayer(int playerId) {
-		String query = "SELECT * FROM users AS u " + "LEFT JOIN players AS p ON p.User_ID=u.User_ID " + "WHERE p.ID=?;";
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(playerId));
-		return getUserFromDB(stmt, conn);
-	}
-
-	public static User getUserForKey(String keyName, int id) {
-		String query = "SELECT * FROM users WHERE " + keyName + "=?;";
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
-		return getUserFromDB(stmt, conn);
-	}
-
-	private static User getUserFromDB(PreparedStatement stmt, Connection conn) {
-		try {
-			ResultSet rs = stmt.executeQuery();
-			if (rs.next()) {
-				User userRecord = new User(rs.getInt("User_ID"), rs.getString("Username"), rs.getString("Password"), rs.getString("Email"), rs.getBoolean("Validated"), rs.getBoolean("Active"));
-				return userRecord;
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-		return null;
 	}
 
 	public static DuelGame getGameForKey(String keyName, int id) {
@@ -986,9 +911,9 @@ public class DatabaseAccess {
 		String query = "SELECT User_ID\n" +
 				"FROM users\n" +
 				"WHERE TIMESTAMPDIFF(HOUR, pw_reset_timestamp, CURRENT_TIMESTAMP) < (SELECT INT_VALUE\n" +
-				"                                                                                          FROM settings\n" +
-				"                                                                                          WHERE name =\n" +
-				"                                                                                                'PASSWORD_RESET_SECRET_LIFESPAN')\n" +
+				"                                                                    FROM settings\n" +
+				"                                                                    WHERE name =\n" +
+				"                                                                    'PASSWORD_RESET_SECRET_LIFESPAN')\n" +
 				"      AND\n" +
 				"      pw_reset_secret = ?;";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(pwResetSecret)};
@@ -1005,148 +930,5 @@ public class DatabaseAccess {
 			DB.cleanup(conn, stmt);
 		}
 		return -1;
-	}
-
-	public static Boolean hasKillMap(int gameId) {
-		String query = String.join("\n",
-			"SELECT HasKillMap",
-			"FROM games",
-			"WHERE games.ID = ?"
-		);
-
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
-		try {
-			ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-			if (rs.next()) {
-				return rs.getBoolean("HasKillMap");
-			}
-		} catch (SQLException e) {
-			logger.error("SQL exception caught", e);
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-
-		return null;
-	}
-
-	public static boolean setHasKillMap(int gameId, boolean hasKillMap) {
-		String query = String.join("\n",
-			"UPDATE games",
-			"SET HasKillMap = ?",
-			"WHERE ID = ?;"
-		);
-
-		Connection conn = DB.getConnection();
-
-		DatabaseValue[] values = new DatabaseValue[]{
-			DB.getDBV(hasKillMap),
-			DB.getDBV(gameId)
-		};
-
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, values);
-
-		try {
-			return DB.executeUpdate(stmt, conn);
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-	}
-
-	public static List<KillMap.KillMapEntry> getKillMapEntries(PreparedStatement stmt, Connection conn, List<Test> tests, List<Mutant> mutants) {
-		try {
-			stmt.setFetchSize(Integer.MIN_VALUE);
-		} catch (SQLException e) {
-			logger.error("SQL Exception caught", e);
-			return null;
-		}
-
-		List<KillMap.KillMapEntry> entries = new LinkedList<>();
-
-		/* Set up mapping from test id to test / mutant id to mutant. */
-		Map<Integer, Test> testMap = new HashMap<>();
-		Map<Integer, Mutant> mutantMap = new HashMap<>();
-		for (Test test : tests) { testMap.put(test.getId(), test); }
-		for (Mutant mutant : mutants) { mutantMap.put(mutant.getId(), mutant); }
-
-		try {
-			ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-
-			while (rs.next()) {
-				int testId = rs.getInt("Test_ID");
-				int mutantId = rs.getInt("Mutant_ID");
-				String status = rs.getString("Status");
-				entries.add(new KillMap.KillMapEntry(testMap.get(testId), mutantMap.get(mutantId), KillMap.KillMapEntry.Status.valueOf(status)));
-			}
-		} catch (SQLException e) {
-			logger.error("SQL exception caught", e);
-			return null;
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-
-		return entries;
-	}
-
-	public static List<KillMap.KillMapEntry> getKillMapEntriesForGame(int gameId) {
-		String query = String.join("\n",
-			"SELECT killmap.*",
-			"FROM killmap",
-			"WHERE killmap.Game_ID = ?"
-		);
-
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
-
-		List<Test> tests = TestDAO.getValidTestsForGame(gameId, false);
-		List<Mutant> mutants = MutantDAO.getValidMutantsForGame(gameId);
-
-		return getKillMapEntries(stmt, conn, tests, mutants);
-	}
-
-	public static List<KillMap.KillMapEntry> getKillMapEntriesForClass(int classId) {
-		String query = String.join("\n",
-			"SELECT killmap.*",
-			"FROM killmap",
-			"WHERE killmap.Class_ID = ?"
-		);
-
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(classId));
-
-		List<Test> tests = TestDAO.getValidTestsForClass(classId);
-		List<Mutant> mutants = MutantDAO.getValidMutantsForClass(classId);
-
-		return getKillMapEntries(stmt, conn, tests, mutants);
-	}
-
-	public static boolean insertKillMapEntry(KillMap.KillMapEntry entry, int classId) {
-		String query = String.join("\n",
-			"INSERT INTO killmap (Class_ID,Game_ID,Test_ID,Mutant_ID,Status) VALUES (?,?,?,?,?)",
-			"ON DUPLICATE KEY UPDATE Status = VALUES(Status);"
-		);
-
-		Connection conn = DB.getConnection();
-
-		try {
-			PreparedStatement stmt = conn.prepareStatement(query);
-			stmt.setInt(1, classId);
-
-			if (entry.test.getGameId() == entry.mutant.getGameId()) {
-				stmt.setInt(2, entry.test.getGameId());
-			} else {
-				stmt.setNull(2, Types.INTEGER);
-			}
-
-			stmt.setInt(3, entry.test.getId());
-			stmt.setInt(4, entry.mutant.getId());
-			stmt.setString(5, entry.status.toString());
-
-
-            return DB.executeUpdate(stmt, conn);
-		} catch (SQLException e) {
-			logger.error("SQL exception caught", e);
-			return false;
-		}
 	}
 }

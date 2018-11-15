@@ -211,7 +211,6 @@ public class DB {
                 }
             }
 
-            logger.warn("Query had no result. Query was:\n" + query);
             return null;
 
         } catch (SQLException e) {
@@ -260,9 +259,6 @@ public class DB {
                 }
             }
 
-            if (values.isEmpty()) {
-                logger.warn("Query had no result. Query was:\n" + query);
-            }
             return values;
 
         } catch (SQLException e) {

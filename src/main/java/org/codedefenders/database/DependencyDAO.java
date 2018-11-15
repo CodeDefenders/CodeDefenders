@@ -22,6 +22,8 @@ import org.codedefenders.model.Dependency;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -31,6 +33,14 @@ import java.util.List;
  * @see Dependency
  */
 public class DependencyDAO {
+
+    public static Dependency dependencyFromRS(ResultSet rs, int classId) throws SQLException {
+        final int id = rs.getInt("Dependency_ID");
+        final String javaFile = rs.getString("JavaFile");
+        final String classFile = rs.getString("ClassFile");
+        return new Dependency(id, classId, javaFile, classFile);
+    }
+
     /**
      * Stores a given {@link Dependency} in the database.
      *
