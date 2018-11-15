@@ -20,6 +20,7 @@ package org.codedefenders.execution;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.slf4j.Logger;
@@ -245,7 +246,7 @@ public class KillMap {
         /* Synchronized, so only one killmap can be computed at a time. */
         synchronized (KillMap.class) {
             List<Test> tests = DatabaseAccess.getExecutableTestsForClass(classId);
-            List<Mutant> mutants = DatabaseAccess.getMutantsForClass(classId);
+            List<Mutant> mutants = MutantDAO.getValidMutantsForClass(classId);
             List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForClass(classId);
 
             logger.info(String.format("Computing killmap for class %d: %d tests, %d mutants, %d entries provided",

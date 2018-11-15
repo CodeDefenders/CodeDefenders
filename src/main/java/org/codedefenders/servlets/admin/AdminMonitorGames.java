@@ -20,6 +20,7 @@ package org.codedefenders.servlets.admin;
 
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
@@ -134,7 +135,7 @@ public class AdminMonitorGames extends HttpServlet {
             if (t.getPlayerId() == pid)
                 AdminDAO.deleteTestTargetExecutions(t.getId());
         }
-        for (Mutant m : DatabaseAccess.getMutantsForGame(gid)) {
+        for (Mutant m : MutantDAO.getValidMutantsForGame(gid)) {
             if (m.getPlayerId() == pid)
                 AdminDAO.deleteMutantTargetExecutions(m.getId());
         }

@@ -235,6 +235,7 @@ public class Mutant implements Serializable {
 		return classId;
 	}
 
+	// TODO why does incrementScore update the DB entry, shouldn't this be done with update()
 	public void incrementScore(int score){
 		if( score == 0 ){
 			logger.debug("Do not update mutant {} score by 0", getId());
@@ -252,9 +253,8 @@ public class Mutant implements Serializable {
 		DB.executeUpdate(stmt, conn);
 	}
 
-	@Deprecated
 	public void setScore(int score) {
-		this.score += score;
+		this.score = score;
 	}
 
 	public boolean kill() {
@@ -468,10 +468,6 @@ public class Mutant implements Serializable {
 	// update will run when changes to a mutant are made.
 	// Updates values of Equivalent, Alive, RoundKilled.
 	// These values update when Mutants are suspected of being equivalent, go through an equivalence test, or are killed.
-	/*
-	 * Update a mutant ONLY if in the DB it is still alive. This should prevent zombie mutants. but does not prevent messing up the score.
-	 *
-	 */
 	@Deprecated
 	public boolean update() {
 

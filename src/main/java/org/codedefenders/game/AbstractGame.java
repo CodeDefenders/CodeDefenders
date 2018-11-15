@@ -19,6 +19,7 @@
 package org.codedefenders.game;
 
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
@@ -127,7 +128,7 @@ public abstract class AbstractGame {
 
 	public List<Mutant> getMutants() {
 		if (mutants == null){
-			mutants = DatabaseAccess.getMutantsForGame(id);
+			mutants = MutantDAO.getValidMutantsForGame(id);
 		}
 		return mutants;
 	}

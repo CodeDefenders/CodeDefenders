@@ -21,11 +21,8 @@ package org.codedefenders.itests;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.lang3.ArrayUtils;
+import org.codedefenders.database.*;
 import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.database.ConnectionPool;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.DatabaseConnection;
-import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -280,8 +277,8 @@ public class RunnerTest {
 		assertTrue(mutant1.insert());
 		assertTrue(mutant2.insert());
 		Mutant[] ml = { mutant1, mutant2 };
-		assertTrue(Arrays.equals(DatabaseAccess.getMutantsForPlayer(pid).toArray(), ml));
-		assertTrue(Arrays.equals(DatabaseAccess.getMutantsForGame(multiplayerGame.getId()).toArray(), ml));
+		assertTrue(Arrays.equals(MutantDAO.getValidMutantsForPlayer(pid).toArray(), ml));
+		assertTrue(Arrays.equals(MutantDAO.getValidMutantsForGame(multiplayerGame.getId()).toArray(), ml));
 	}
 
 	@Test
@@ -341,7 +338,7 @@ public class RunnerTest {
 		assertFalse(mutant1.update());
 		//
 
-		Mutant storedMutant = DatabaseAccess.getMutantById( mutant1.getId() );
+		Mutant storedMutant = MutantDAO.getMutantById( mutant1.getId() );
 		assertEquals("Score does not match", score, storedMutant.getScore());
 		//
 		assertEquals(mutant1, storedMutant);
