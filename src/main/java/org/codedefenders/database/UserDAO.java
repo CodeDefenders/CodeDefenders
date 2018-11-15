@@ -30,16 +30,25 @@ public class UserDAO {
         return new User(userId, userName, password, email, validated, active);
     }
 
+    /**
+     * Returns the user for the given user id.
+     */
     public static User getUserById(int userId) {
         String query = "SELECT * FROM users WHERE User_ID = ?;";
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DB.getDBV(userId));
     }
 
+    /**
+     * Returns the user with the given name.
+     */
     public static User getUserByName(String name) {
         String query = "SELECT * FROM users WHERE Username=?;";
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DB.getDBV(name));
     }
 
+    /**
+     * Returns the user with the given email.
+     */
     public static User getUserByEmail(String email) {
         String query = "SELECT * FROM users WHERE Email = ?;";
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DB.getDBV(email));
@@ -54,11 +63,18 @@ public class UserDAO {
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DB.getDBV(playerId));
     }
 
+    /**
+     * Returns a list of all users (including dummy / system users).
+     */
     public static List<User> getUsers() {
         String query = "SELECT * FROM users";
         return DB.executeQueryReturnList(query, UserDAO::userFromRS);
     }
 
+    /**
+     * Returns a list of real users (not including dummy / system users), which are not taking part in a currently
+     * active game.
+     */
     public static List<User> getUnassignedUsers() {
         String query = String.join("\n",
                 "SELECT DISTINCT users.*",
@@ -78,6 +94,9 @@ public class UserDAO {
         return DB.executeQueryReturnList(query, UserDAO::userFromRS);
     }
 
+    /**
+     * Returns the last rose the user with the given id had in any game.
+     */
     public static Role getLastRoleOfUser(int userId) {
         String query = String.join("\n",
                 "SELECT players.Role",

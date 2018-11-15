@@ -12,9 +12,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class handles the database logic for killmaps.
+ * @see KillMap
+ */
 public class KillmapDAO {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseAccess.class);
 
+    /**
+     * Returns if the given game already has a computed killmap.
+     */
     public static Boolean hasKillMap(int gameId) {
         String query = String.join("\n",
                 "SELECT HasKillMap",
@@ -38,6 +45,9 @@ public class KillmapDAO {
         return null;
     }
 
+    /**
+     * Sets a flag that indicates if the given game has a computed killmap.
+     */
     public static boolean setHasKillMap(int gameId, boolean hasKillMap) {
         String query = String.join("\n",
                 "UPDATE games",
@@ -61,6 +71,9 @@ public class KillmapDAO {
         }
     }
 
+    /**
+     * Helper method to retrieve killmap entries from the database.
+     */
     public static List<KillMap.KillMapEntry> getKillMapEntries(PreparedStatement stmt, Connection conn, List<Test> tests, List<Mutant> mutants) {
         try {
             stmt.setFetchSize(Integer.MIN_VALUE);
@@ -96,6 +109,9 @@ public class KillmapDAO {
         return entries;
     }
 
+    /**
+     * Returns the killmap entries for the given game.
+     */
     public static List<KillMap.KillMapEntry> getKillMapEntriesForGame(int gameId) {
         String query = String.join("\n",
                 "SELECT killmap.*",
@@ -112,6 +128,9 @@ public class KillmapDAO {
         return getKillMapEntries(stmt, conn, tests, mutants);
     }
 
+    /**
+     * Returns the killmap entries for the given class.
+     */
     public static List<KillMap.KillMapEntry> getKillMapEntriesForClass(int classId) {
         String query = String.join("\n",
                 "SELECT killmap.*",
@@ -128,6 +147,9 @@ public class KillmapDAO {
         return getKillMapEntries(stmt, conn, tests, mutants);
     }
 
+    /**
+     * Inserts a killmap entry into the database.
+     */
     public static boolean insertKillMapEntry(KillMap.KillMapEntry entry, int classId) {
         String query = String.join("\n",
                 "INSERT INTO killmap (Class_ID,Game_ID,Test_ID,Mutant_ID,Status) VALUES (?,?,?,?,?)",

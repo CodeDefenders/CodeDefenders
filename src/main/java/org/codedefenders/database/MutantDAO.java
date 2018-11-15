@@ -74,7 +74,6 @@ public class MutantDAO {
 
     /**
      * Returns the {@link Mutant} for the given mutant id.
-     * @see DB#executeQueryReturnValue(String, RSMapper, DatabaseValue...)
      */
     public static Mutant getMutantById(int mutantId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
@@ -87,7 +86,6 @@ public class MutantDAO {
 
     /**
      * Returns the {@link Mutant} with the given md5 sum from the given game.
-     * @see DB#executeQueryReturnValue(String, RSMapper, DatabaseValue...)
      */
     public static Mutant getMutantByGameAndMd5(int gameId, String md5) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
@@ -100,7 +98,6 @@ public class MutantDAO {
 
     /**
      * Returns the compilable {@link Mutant Mutants} from the given game.
-     * @see DB#executeQueryReturnList(String, RSMapper, DatabaseValue...)
      */
     public static List<Mutant> getValidMutantsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
@@ -114,7 +111,6 @@ public class MutantDAO {
 
     /**
      * Returns the compilable {@link Mutant Mutants} from the games played on the given class.
-     * @see DB#executeQueryReturnList(String, RSMapper, DatabaseValue...)
      */
     public static List<Mutant> getValidMutantsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
@@ -130,7 +126,6 @@ public class MutantDAO {
 
     /**
      * Returns the compilable {@link Mutant Mutants} submitted by the given player.
-     * @see DB#executeQueryReturnList(String, RSMapper, DatabaseValue...)
      */
     public static List<Mutant> getValidMutantsForPlayer(int playerId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",

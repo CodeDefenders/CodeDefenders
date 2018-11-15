@@ -83,7 +83,6 @@ public class TestDAO {
 
     /**
      * Returns the {@link Test} for the given test id.
-     * @see DB#executeQueryReturnValue(String, RSMapper, DatabaseValue...)
      */
     public static Test getTestById(int testId) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM tests WHERE Test_ID = ?;";
@@ -92,7 +91,6 @@ public class TestDAO {
 
     /**
      * Returns the {@link Test Tests} from the given game.
-     * @see DB#executeQueryReturnList(String, RSMapper, DatabaseValue...)
      */
     public static List<Test> getTestsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM tests WHERE Game_ID = ?;";
@@ -103,7 +101,6 @@ public class TestDAO {
      * Returns the valid {@link Test Tests} from the given game.
      * Valid tests are compilable and do not fail when executed against the original class.
      * @param defendersOnly If {@code true}, only return tests that were written by defenders.
-     * @see DB#executeQueryReturnList(String, RSMapper, DatabaseValue...)
      */
     public static List<Test> getValidTestsForGame(int gameId, boolean defendersOnly) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
@@ -124,7 +121,6 @@ public class TestDAO {
     /**
      * Returns the valid {@link Test Tests} from the games played on the given class.
      * Valid tests are compilable and do not fail when executed against the original class.
-     * @see DB#executeQueryReturnList(String, RSMapper, DatabaseValue...)
      */
     public static List<Test> getValidTestsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
