@@ -81,7 +81,7 @@ public class MutantDAO {
                 "SELECT * FROM mutants ",
                 "LEFT JOIN players ON players.ID = mutants.Player_ID ",
                 "LEFT JOIN users ON players.User_ID = users.User_ID ",
-                "WHERE mutant.Mutant_ID = ?;");
+                "WHERE mutants.Mutant_ID = ?;");
         return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DB.getDBV(mutantId));
     }
 
