@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @SuppressWarnings("ALL")
@@ -748,62 +747,6 @@ public class DatabaseAccess {
 		return DB.executeUpdateGetKeys(stmt, conn) > -1;
 	}
 
-	public static List<Test> getTestsForGame(int gid) {
-		String query = "SELECT * FROM tests WHERE Game_ID=?;";
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gid));
-		return getTests(stmt, conn);
-	}
-
-	public static Test getTestForId(int tid) {
-		String query = "SELECT * FROM tests WHERE Test_ID=?;";
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(tid));
-		return getTests(stmt, conn).get(0);
-	}
-
-	/**
-	 * @param gameId
-	 * @param defendersOnly
-	 * @return Tests submitted by defenders which compiled and passed on CUT
-	 */
-	public static List<Test> getExecutableTests(int gameId, boolean defendersOnly) {
-		String query = String.join("\n",
-				"SELECT tests.* FROM tests",
-				 (defendersOnly ? "INNER JOIN players pl on tests.Player_ID = pl.ID" : ""),
-				 "WHERE tests.Game_ID=? AND tests.ClassFile IS NOT NULL",
-				 (defendersOnly ? "AND pl.Role='DEFENDER'" : ""),
-				 "  AND EXISTS (",
-				 "    SELECT * FROM targetexecutions ex",
-				 "    WHERE ex.Test_ID = tests.Test_ID",
-				 "      AND ex.Target='TEST_ORIGINAL'",
-				 "      AND ex.Status='SUCCESS'",
-				 "  );"
-		);
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
-		return getTests(stmt, conn);
-	}
-
-	public static List<Test> getExecutableTestsForClass(int classId) {
-		String query = String.join("\n",
-				"SELECT tests.*",
-				"FROM tests, games",
-				"WHERE tests.Game_ID = games.ID",
-				"  AND games.Class_ID = ?",
-				"  AND tests.ClassFile IS NOT NULL",
-				"  AND EXISTS (",
-				"    SELECT * FROM targetexecutions ex",
-				"    WHERE ex.Test_ID = tests.Test_ID",
-				"      AND ex.Target='TEST_ORIGINAL'",
-				"      AND ex.Status='SUCCESS'",
-				"  );"
-		);
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(classId));
-		return getTests(stmt, conn);
-	}
-
 	public static int getPlayerIdForMultiplayerGame(int userId, int gameId) {
 		String query = "SELECT * FROM players AS p " + "WHERE p.User_ID = ? AND p.Game_ID = ?";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(userId),
@@ -837,39 +780,6 @@ public class DatabaseAccess {
 			DB.cleanup(conn, stmt);
 		}
 		return players;
-	}
-
- 	static List<Test> getTests(PreparedStatement stmt, Connection conn) {
-		List<Test> testList = new ArrayList<>();
-		try {
-			// Load the MultiplayerGame Data with the provided ID.
-			ResultSet rs = stmt.executeQuery();
-			while (rs.next()) {
-				String linesCovered = rs.getString("Lines_Covered");
-				String linesUncovered = rs.getString("Lines_Uncovered");
-				List<Integer> covered = new ArrayList<>();
-				List<Integer> uncovered = new ArrayList<>();
-				if (linesCovered != null && !linesCovered.isEmpty()) {
-					covered.addAll(Arrays.stream(linesCovered.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
-				}
-				if (linesUncovered != null && !linesUncovered.isEmpty()) {
-					uncovered.addAll(Arrays.stream(linesUncovered.split(",")).map(Integer::parseInt).collect(Collectors.toList()));
-				}
-				Test newTest = new Test(rs.getInt("Test_ID"), rs.getInt("Game_ID"),
-						rs.getString("JavaFile"), rs.getString("ClassFile"),
-						rs.getInt("RoundCreated"), rs.getInt("MutantsKilled"), rs.getInt("Player_ID"),
-						covered, uncovered, rs.getInt("Points"));
-				newTest.setScore(rs.getInt("Points"));
-				testList.add(newTest);
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-		return testList;
 	}
 
 	public static List<Entry> getLeaderboard() {
@@ -1188,7 +1098,7 @@ public class DatabaseAccess {
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
 
-		List<Test> tests = DatabaseAccess.getTestsForGame(gameId);
+		List<Test> tests = TestDAO.getValidTestsForGame(gameId, false);
 		List<Mutant> mutants = MutantDAO.getValidMutantsForGame(gameId);
 
 		return getKillMapEntries(stmt, conn, tests, mutants);
@@ -1204,7 +1114,7 @@ public class DatabaseAccess {
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(classId));
 
-		List<Test> tests = DatabaseAccess.getExecutableTestsForClass(classId);
+		List<Test> tests = TestDAO.getValidTestsForClass(classId);
 		List<Mutant> mutants = MutantDAO.getValidMutantsForClass(classId);
 
 		return getKillMapEntries(stmt, conn, tests, mutants);

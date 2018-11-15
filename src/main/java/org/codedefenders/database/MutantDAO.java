@@ -129,7 +129,7 @@ public class MutantDAO {
     }
 
     /**
-     * Returns the compilable {@link Mutant Mutants} written by the given player.
+     * Returns the compilable {@link Mutant Mutants} submitted by the given player.
      * @see DB#executeQueryReturnList(String, RSMapper, DatabaseValue...)
      */
     public static List<Mutant> getValidMutantsForPlayer(int playerId) throws UncheckedSQLException, SQLMappingException {

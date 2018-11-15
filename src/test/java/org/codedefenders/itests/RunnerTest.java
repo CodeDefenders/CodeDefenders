@@ -361,7 +361,7 @@ public class RunnerTest {
 		test.setPlayerId(pid);
 
 		assertTrue(test.insert());
-		org.codedefenders.game.Test testFromDB = DatabaseAccess.getTestForId(test.getId());
+		org.codedefenders.game.Test testFromDB = TestDAO.getTestById(test.getId());
 		assertEquals(testFromDB.getJavaFile(), test.getJavaFile());
 		assertEquals(testFromDB.getClassFile(), test.getClassFile());
 		assertEquals(testFromDB.getGameId(), test.getGameId());
@@ -373,7 +373,7 @@ public class RunnerTest {
 		test.setAiMutantsKilled(23);
 		assertTrue(test.update());
 
-		testFromDB = DatabaseAccess.getTestForId(test.getId());
+		testFromDB = TestDAO.getTestById(test.getId());
 		assertEquals(testFromDB.getScore(), test.getScore());
 		assertEquals(testFromDB.getAiMutantsKilled(), test.getAiMutantsKilled());
 		assertEquals(testFromDB.getLineCoverage().getLinesCovered(), test.getLineCoverage().getLinesCovered());

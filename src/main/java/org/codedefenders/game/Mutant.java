@@ -25,6 +25,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
@@ -288,7 +289,7 @@ public class Mutant implements Serializable {
 	}
 
 	public boolean isCovered() {
-		List<Test> tests = DatabaseAccess.getExecutableTests(gameId, true);
+		List<Test> tests = TestDAO.getValidTestsForGame(gameId, true);
 		for (Test t : tests) {
 			if (CollectionUtils.containsAny(t.getLineCoverage().getLinesCovered(), getLines()))
 				return true;
@@ -299,7 +300,7 @@ public class Mutant implements Serializable {
 	public Set<Test> getCoveringTests() {
 		Set<Test> coveringTests = new LinkedHashSet<>();
 
-		for(Test t : DatabaseAccess.getTestsForGame(gameId)) {
+		for(Test t : TestDAO.getValidTestsForGame(gameId, false)) {
 			if(t.isMutantCovered(this)) {
 				coveringTests.add(t);
 			}

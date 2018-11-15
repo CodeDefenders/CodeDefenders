@@ -18,6 +18,7 @@
  */
 package org.codedefenders.database;
 
+import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Test;
@@ -26,6 +27,10 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +42,106 @@ import java.util.stream.Collectors;
  */
 public class TestDAO {
     private static final Logger logger = LoggerFactory.getLogger(TestDAO.class);
+
+    /**
+     * Constructs a test from a {@link ResultSet} entry.
+     * @param rs The {@link ResultSet}.
+     * @return The constructed test.
+     * @see RSMapper
+     */
+    public static Test testFromRS(ResultSet rs) throws SQLException {
+        int testId = rs.getInt("Test_ID");
+        int gameId = rs.getInt("Game_ID");
+        String javaFile = rs.getString("JavaFile");
+        String classFile = rs.getString("ClassFile");
+        int roundCreated = rs.getInt("RoundCreated");
+        int mutantsKilled = rs.getInt("MutantsKilled");
+        int playerId = rs.getInt("Player_ID");
+        int points = rs.getInt("Points");
+        String linesCoveredString = rs.getString("Lines_Covered");
+        String linesUncoveredString = rs.getString("Lines_Uncovered");
+
+        List<Integer> linesCovered = new ArrayList<>();
+        if (linesCoveredString != null && !linesCoveredString.isEmpty()) {
+            linesCovered.addAll(
+                    Arrays.stream(linesCoveredString.split(","))
+                        .map(Integer::parseInt)
+                        .collect(Collectors.toList()));
+        }
+
+        List<Integer> linesUncovered = new ArrayList<>();
+        if (linesUncoveredString != null && !linesUncoveredString.isEmpty()) {
+            linesUncovered.addAll(
+                    Arrays.stream(linesUncoveredString.split(","))
+                        .map(Integer::parseInt)
+                        .collect(Collectors.toList()));
+        }
+
+        return new Test(testId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId, linesCovered,
+                linesUncovered, points);
+    }
+
+    /**
+     * Returns the {@link Test} for the given test id.
+     * @see DB#executeQueryReturnValue(String, RSMapper, DatabaseValue...)
+     */
+    public static Test getTestById(int testId) throws UncheckedSQLException, SQLMappingException {
+        String query = "SELECT * FROM tests WHERE Test_ID = ?;";
+        return DB.executeQueryReturnValue(query, TestDAO::testFromRS, DB.getDBV(testId));
+    }
+
+    /**
+     * Returns the {@link Test Tests} from the given game.
+     * @see DB#executeQueryReturnList(String, RSMapper, DatabaseValue...)
+     */
+    public static List<Test> getTestsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
+        String query = "SELECT * FROM tests WHERE Game_ID = ?;";
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(gameId));
+    }
+
+    /**
+     * Returns the valid {@link Test Tests} from the given game.
+     * Valid tests are compilable and do not fail when executed against the original class.
+     * @param defendersOnly If {@code true}, only return tests that were written by defenders.
+     * @see DB#executeQueryReturnList(String, RSMapper, DatabaseValue...)
+     */
+    public static List<Test> getValidTestsForGame(int gameId, boolean defendersOnly) throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "SELECT tests.* FROM tests",
+                (defendersOnly ? "INNER JOIN players pl on tests.Player_ID = pl.ID" : ""),
+                "WHERE tests.Game_ID=? AND tests.ClassFile IS NOT NULL",
+                (defendersOnly ? "AND pl.Role='DEFENDER'" : ""),
+                "  AND EXISTS (",
+                "    SELECT * FROM targetexecutions ex",
+                "    WHERE ex.Test_ID = tests.Test_ID",
+                "      AND ex.Target='TEST_ORIGINAL'",
+                "      AND ex.Status='SUCCESS'",
+                "  );"
+        );
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(gameId));
+    }
+
+    /**
+     * Returns the valid {@link Test Tests} from the games played on the given class.
+     * Valid tests are compilable and do not fail when executed against the original class.
+     * @see DB#executeQueryReturnList(String, RSMapper, DatabaseValue...)
+     */
+    public static List<Test> getValidTestsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "SELECT tests.*",
+                "FROM tests, games",
+                "WHERE tests.Game_ID = games.ID",
+                "  AND games.Class_ID = ?",
+                "  AND tests.ClassFile IS NOT NULL",
+                "  AND EXISTS (",
+                "    SELECT * FROM targetexecutions ex",
+                "    WHERE ex.Test_ID = tests.Test_ID",
+                "      AND ex.Target='TEST_ORIGINAL'",
+                "      AND ex.Status='SUCCESS'",
+                "  );"
+        );
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(classId));
+    }
 
     /**
      * Stores a given {@link Test} in the database.

@@ -21,6 +21,7 @@ package org.codedefenders.execution;
 import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.slf4j.Logger;
@@ -29,15 +30,12 @@ import org.slf4j.LoggerFactory;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 
-import javax.mail.Message;
 import javax.naming.*;
-import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 import static org.codedefenders.execution.KillMap.KillMapEntry.Status.*;
 
@@ -245,7 +243,7 @@ public class KillMap {
     public static KillMap forClass(int classId, boolean recalculate) throws InterruptedException, ExecutionException {
         /* Synchronized, so only one killmap can be computed at a time. */
         synchronized (KillMap.class) {
-            List<Test> tests = DatabaseAccess.getExecutableTestsForClass(classId);
+            List<Test> tests = TestDAO.getValidTestsForClass(classId);
             List<Mutant> mutants = MutantDAO.getValidMutantsForClass(classId);
             List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForClass(classId);
 

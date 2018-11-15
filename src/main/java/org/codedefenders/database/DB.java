@@ -155,7 +155,10 @@ public class DB {
     public static DatabaseValue getDBV(float v) {
         return new DatabaseValue(v);
     }
-
+    /**
+     * Returns the compilable {@link Mutant Mutants} from the games played on the given class.
+     * @see DB#executeQueryReturnList(String, DB.RSMapper, DatabaseValue...)
+     */
     public static DatabaseValue getDBV(Timestamp v) {
         return new DatabaseValue(v);
     }

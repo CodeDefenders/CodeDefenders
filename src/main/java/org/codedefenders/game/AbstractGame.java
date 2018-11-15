@@ -20,6 +20,7 @@ package org.codedefenders.game;
 
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
@@ -121,7 +122,7 @@ public abstract class AbstractGame {
 
 	public List<Test> getTests(boolean defendersOnly) {
 		if (tests == null) {
-			tests = DatabaseAccess.getExecutableTests(this.id, defendersOnly);
+			tests = TestDAO.getValidTestsForGame(this.id, defendersOnly);
 		}
 		return tests;
 	}

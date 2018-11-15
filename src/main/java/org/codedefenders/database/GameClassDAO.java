@@ -183,7 +183,6 @@ public class GameClassDAO {
         return testIds;
     }
 
-
     /**
      * Return a {@link List} of all {@link Test}s, which were uploaded
      * together with a given class.
@@ -191,17 +190,9 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of tests
      */
-    public static List<Test> getMappedTestsForClassId(Integer classId) {
+    public static List<Test> getMappedTestsForClassId(Integer classId) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM tests WHERE Class_ID = ?;";
-
-        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
-
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        final List<Test> retrievedTests = DatabaseAccess.getTests(stmt, conn);
-
-        return new LinkedList<>(retrievedTests);
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(classId));
     }
 
     /**
