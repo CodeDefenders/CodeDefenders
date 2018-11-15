@@ -18,9 +18,9 @@
  */
 package org.codedefenders.model;
 
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -189,7 +189,7 @@ public class Event {
 
 	public User getUser() {
 		if (user == null) {
-			user = DatabaseAccess.getUser(userId);
+			user = UserDAO.getUserById(userId);
 		}
 
 		return user;

@@ -30,6 +30,7 @@ pageTitle = null;
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="org.codedefenders.database.UserDAO" %>
 <% DuelGame game = (DuelGame) session.getAttribute("game"); %>
 
 <div class="game-container"><h2 class="full-width page-title" style="text-align: center"><%= pTitle %></h2>
@@ -56,8 +57,8 @@ pageTitle = null;
             }
 
             String loggedName = (String) request.getSession().getAttribute("username");
-            String atkName = DatabaseAccess.getUserForKey("User_ID", game.getAttackerId()).getUsername();
-            String defName = DatabaseAccess.getUserForKey("User_ID", game.getDefenderId()).getUsername();
+            String atkName = UserDAO.getUserById(game.getAttackerId()).getUsername();
+            String defName = UserDAO.getUserById(game.getDefenderId()).getUsername();
             if (atkName.equals(loggedName))
                 atkName = "you";
             else

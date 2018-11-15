@@ -120,7 +120,7 @@ public class RunnerTest {
 	@Test
 	public void testInsertUser() throws Exception {
 		assertTrue(user1.insert());
-		User userFromDB = DatabaseAccess.getUser(user1.getId());
+		User userFromDB = UserDAO.getUserById(user1.getId());
 		assertEquals(user1.getId(), userFromDB.getId());
 		assertEquals(user1.getUsername(), userFromDB.getUsername());
 		assertEquals(user1.getEmail(), userFromDB.getEmail());
@@ -141,7 +141,7 @@ public class RunnerTest {
 		user1.setEmail(user1.getEmail() + "_new");
 
 		assertTrue(user1.update());
-		User userFromDB = DatabaseAccess.getUser(user1.getId());
+		User userFromDB = UserDAO.getUserById(user1.getId());
 		assertEquals(user1.getId(), userFromDB.getId());
 		assertEquals(user1.getUsername(), userFromDB.getUsername());
 		assertEquals(user1.getEmail(), userFromDB.getEmail());
@@ -246,7 +246,7 @@ public class RunnerTest {
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
 		int playerID = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
 		assertTrue(playerID > 0);
-		assertEquals(DatabaseAccess.getUserFromPlayer(playerID).getId(), user1.getId());
+		assertEquals(UserDAO.getUserForPlayer(playerID).getId(), user1.getId());
 		assertTrue(DatabaseAccess.getPlayersForMultiplayerGame(multiplayerGame.getId(), Role.DEFENDER).length > 0);
 		assertEquals(DatabaseAccess.getPlayerPoints(playerID), 0);
 		DatabaseAccess.increasePlayerPoints(13, playerID);

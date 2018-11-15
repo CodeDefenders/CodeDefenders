@@ -26,6 +26,7 @@
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="org.codedefenders.servlets.FeedbackManager" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="org.codedefenders.database.UserDAO" %>
 <div id="playerFeedback" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
 
     <style>
@@ -184,7 +185,7 @@
                         if (canSeePlayerFeedback) {
                             int[] attackerIDs = game.getAttackerIds();
                             for (int pid : game.getPlayerIds()) {
-                                User userFromPlayer = DatabaseAccess.getUserFromPlayer(pid);
+                                User userFromPlayer = UserDAO.getUserForPlayer(pid);
                                 int userFromPlayerId = userFromPlayer.getId();
                                 String userName = userFromPlayer.getUsername();
 

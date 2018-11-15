@@ -18,10 +18,7 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.*;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
@@ -74,7 +71,7 @@ public class AdminMonitorGames extends HttpServlet {
 		if (playerToRemoveIdGameIdString != null || playerToSwitchIdGameIdString != null) { // admin is removing user from temp game
 			int playerToRemoveId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[0]);
 			int gameToRemoveFromId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[1]);
-			int userId = DatabaseAccess.getUserFromPlayer(playerToRemoveId).getId();
+			int userId = UserDAO.getUserForPlayer(playerToRemoveId).getId();
 			if (!deletePlayer(playerToRemoveId, gameToRemoveFromId))
 				messages.add("Deleting player " + playerToRemoveId + " failed! \n Please check the logs!");
 			else if (switchUser) {

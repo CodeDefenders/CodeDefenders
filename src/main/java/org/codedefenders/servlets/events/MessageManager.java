@@ -19,6 +19,7 @@
 package org.codedefenders.servlets.events;
 
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -90,7 +91,7 @@ public class MessageManager extends HttpServlet {
                 }
             }
             final EventStatus status = EventStatus.GAME;
-            final User user = DatabaseAccess.getUser(userId);
+            final User user = UserDAO.getUserById(userId);
             final String chatMessage = request.getParameter("message");
             final String message = user.getUsername() + ": " + chatMessage;
             final Timestamp timestamp = new Timestamp(System.currentTimeMillis());

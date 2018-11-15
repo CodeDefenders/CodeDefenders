@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets.admin;
 
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.util.Constants;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -301,7 +302,7 @@ public class AdminCreateGames extends HttpServlet {
 		if (userNameListString != null) {
 			for (String uName : userNameListString.split(USER_NAME_LIST_DELIMITER)) {
 				if (uName.length() > 0) {
-					User u = DatabaseAccess.getUserForName(uName);
+					User u = UserDAO.getUserByName(uName);
 					if (u == null)
 						messages.add("No user with name or email \'" + uName + "\'!");
 					else if (!selectedUserIDs.contains(u.getId()))
@@ -397,7 +398,7 @@ public class AdminCreateGames extends HttpServlet {
     private static List<Integer> getUsersByLastRole(List<Integer> userIDs, Role role) {
         List<Integer> userList = new ArrayList<>();
         for (int uid : userIDs) {
-            Role lastRole = AdminDAO.getLastRole(uid);
+            Role lastRole = UserDAO.getLastRoleOfUser(uid);
             if (lastRole != null && lastRole.equals(role)) {
                 userList.add(uid);
             }
@@ -495,7 +496,7 @@ public class AdminCreateGames extends HttpServlet {
     }
 
     private static List<Integer> getUnassignedUserIds(List<List<Integer>> attackerIdsLists, List<List<Integer>> defenderIdsLists) {
-        List<User> unassignedUsersFromDB = AdminDAO.getUnassignedUsers();
+        List<User> unassignedUsersFromDB = UserDAO.getUnassignedUsers();
         List<Integer> defenderIds = new ArrayList<>();
         List<Integer> attackerIds = new ArrayList<>();
         List<Integer> unassignedUserIds = new ArrayList<>();

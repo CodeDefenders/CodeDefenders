@@ -47,6 +47,7 @@ import javax.naming.spi.InitialContextFactory;
 
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.RandomTestScheduler;
 import org.codedefenders.execution.TargetExecution;
@@ -297,8 +298,8 @@ public class ParallelizeTest {
 		
 		//
 		
-		int defenderID = DatabaseAccess.getUserFromPlayer( battlegroundGame.getDefenderIds()[0]).getId();
-		int attackerID =  DatabaseAccess.getUserFromPlayer( battlegroundGame.getAttackerIds()[0]).getId();
+		int defenderID = UserDAO.getUserForPlayer( battlegroundGame.getDefenderIds()[0]).getId();
+		int attackerID =  UserDAO.getUserForPlayer( battlegroundGame.getAttackerIds()[0]).getId();
 		ArrayList<String> messages = new ArrayList<>();
 
 		List<org.codedefenders.game.Test> submittedTests = new ArrayList<>();

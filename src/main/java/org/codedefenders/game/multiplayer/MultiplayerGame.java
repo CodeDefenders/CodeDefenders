@@ -22,6 +22,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
@@ -255,7 +256,7 @@ public class MultiplayerGame extends AbstractGame {
 			DatabaseValue[] valueList = {DB.getDBV(id), DB.getDBV(userId), DB.getDBV(role.toString()), DB.getDBV(role.toString())};
 			PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 			if (DB.executeUpdate(stmt, conn)) {
-				User u = DatabaseAccess.getUser(userId);
+				User u = UserDAO.getUserById(userId);
 				EventType et = role.equals(Role.ATTACKER) ?
 						EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
 				Event e = new Event(-1, id, userId, u.getUsername() + " joined the game as " +
@@ -290,7 +291,7 @@ public class MultiplayerGame extends AbstractGame {
 	}
 
 	private boolean canJoinGame(int userId, Role role) {
-		if (!requiresValidation || DatabaseAccess.getUserForKey("User_ID", userId).isValidated()) {
+		if (!requiresValidation || UserDAO.getUserById(userId).isValidated()) {
 			if (role.equals(Role.ATTACKER))
 				return (attackerLimit == 0 || getAttackerIds().length < attackerLimit);
 			else
@@ -552,7 +553,7 @@ public class MultiplayerGame extends AbstractGame {
 
 		for (int attacker : getAttackerIds()) {
 			Event notif = new Event(-1, id,
-					DatabaseAccess.getUserFromPlayer(attacker).getId(),
+					UserDAO.getUserForPlayer(attacker).getId(),
 					message,
 					et, EventStatus.NEW,
 					new Timestamp(System.currentTimeMillis()));
@@ -563,7 +564,7 @@ public class MultiplayerGame extends AbstractGame {
 	public void notifyDefenders(String message, EventType et) {
 		for (int defender : getDefenderIds()) {
 			Event notif = new Event(-1, id,
-					DatabaseAccess.getUserFromPlayer(defender).getId(),
+					UserDAO.getUserForPlayer(defender).getId(),
 					message,
 					et, EventStatus.NEW,
 					new Timestamp(System.currentTimeMillis()));

@@ -19,6 +19,7 @@
 package org.codedefenders.execution;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.model.Event;
@@ -139,7 +140,7 @@ public class MutationTester {
 		List<Mutant> killedMutants = new ArrayList<Mutant>();
 
 		// Acquire and release the connection
-		User u = DatabaseAccess.getUserFromPlayer(test.getPlayerId());
+		User u = UserDAO.getUserForPlayer(test.getPlayerId());
 
 		if (parallelize) {
 			// Fork and Join parallelization
@@ -284,7 +285,7 @@ public class MutationTester {
 		// Schedule the executable tests submitted by the defenders only (true)
 		List<Test> tests = scheduler.scheduleTests( game.getTests(true) ) ;
 
-		User u = DatabaseAccess.getUserFromPlayer(mutant.getPlayerId());
+		User u = UserDAO.getUserForPlayer(mutant.getPlayerId());
 
 		if (parallelize) {
 			final Map<Test, FutureTask<Boolean>> tasks = new HashMap<Test, FutureTask<Boolean>>();
@@ -347,7 +348,7 @@ public class MutationTester {
 						}
 
                         Event notif = new Event(-1, game.getId(),
-                                DatabaseAccess.getUserFromPlayer(test.getPlayerId()).getId(),
+                                UserDAO.getUserForPlayer(test.getPlayerId()).getId(),
                                 u.getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT,
                                 EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                         notif.insert();
@@ -383,7 +384,7 @@ public class MutationTester {
 					}
 
                     Event notif = new Event(-1, game.getId(),
-                            DatabaseAccess.getUserFromPlayer(test.getPlayerId()).getId(),
+                            UserDAO.getUserForPlayer(test.getPlayerId()).getId(),
                             u.getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT,
                             EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
                     notif.insert();

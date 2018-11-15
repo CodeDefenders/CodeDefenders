@@ -41,6 +41,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.Constants;
@@ -96,11 +97,11 @@ public class LoginManager extends HttpServlet {
 					messages.add("Could not create user. Password entries did not match.");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
-				} else if (DatabaseAccess.getUserForName(username) != null) {
+				} else if (UserDAO.getUserByName(username) != null) {
 					messages.add("Could not create user. Username is already taken.");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
-				} else if (DatabaseAccess.getUserForEmail(email) != null) {
+				} else if (UserDAO.getUserByEmail(email) != null) {
 					messages.add("Could not create user. Email has already been used. You can reset your password.");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
 					dispatcher.forward(request, response);
@@ -123,7 +124,7 @@ public class LoginManager extends HttpServlet {
 				}
 				break;
 			case "login":
-				User activeUser = DatabaseAccess.getUserForName(username);
+				User activeUser = UserDAO.getUserByName(username);
 				if (activeUser == null) {
 					messages.add("Username not found or password incorrect.");
 					RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.LOGIN_VIEW_JSP);
@@ -195,7 +196,7 @@ public class LoginManager extends HttpServlet {
 				email = request.getParameter("accountEmail");
 				username = request.getParameter("accountUsername");
 				User u;
-				if ((u = DatabaseAccess.getUserForEmail(email)) != null && u.getUsername().equals(username) &&
+				if ((u = UserDAO.getUserByEmail(email)) != null && u.getUsername().equals(username) &&
 						u.getEmail().equals(email)) {
 					String resetPwSecret = generatePasswordResetSecret();
 					setPasswordResetSecret(u.getId(), resetPwSecret);
@@ -221,7 +222,7 @@ public class LoginManager extends HttpServlet {
 					if (!(validPassword(password))) {
 						messages.add("Password not changed. Make sure it is valid.");
 					} else if (password.equals(confirm)) {
-						User user = DatabaseAccess.getUser(userId);
+						User user = UserDAO.getUserById(userId);
 						user.setEncodedPassword(User.encodePassword(password));
 						if (user.update()) {
 							DatabaseAccess.setPasswordResetSecret(user.getId(), null);

@@ -21,6 +21,7 @@ package org.codedefenders.servlets.events;
 import com.google.gson.Gson;
 
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
@@ -181,7 +182,7 @@ public class NotificationsHandler extends HttpServlet {
 			session.setAttribute("lastMsg", lastMsg);
 		}
 
-		final String username = DatabaseAccess.getUser(userId).getUsername();
+		final String username = UserDAO.getUserById(userId).getUsername();
 		for (Event e : events) {
 			e.setCurrentUserName("@" + username);
 			e.parse(e.getEventStatus() == EventStatus.GAME);
@@ -234,7 +235,7 @@ public class NotificationsHandler extends HttpServlet {
 		final Role role = DatabaseAccess.getRole(userId, gameId);
 		final ArrayList<Event> events = new ArrayList<>(DatabaseAccess.getNewEventsForGame(gameId, timestamp, role));
 
-		final String username = DatabaseAccess.getUser(userId).getUsername();
+		final String username = UserDAO.getUserById(userId).getUsername();
 		for (Event e : events) {
 			e.setCurrentUserName("@" + username);
 			e.parse(e.getEventStatus() == EventStatus.GAME);
@@ -269,7 +270,7 @@ public class NotificationsHandler extends HttpServlet {
 			return;
 		}
 
-		final String username = DatabaseAccess.getUser(userId).getUsername();
+		final String username = UserDAO.getUserById(userId).getUsername();
 		// DatabaseAccess#getNewEventsForUser(int, long) never returns null, so no need for extra check
 		final List<Event> events = DatabaseAccess.getNewEventsForUser(userId, timestamp)
 				.stream()

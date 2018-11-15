@@ -20,7 +20,7 @@ package org.codedefenders.servlets.admin;
 
 import org.apache.commons.lang.math.IntRange;
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
 import org.codedefenders.servlets.auth.LoginManager;
 import org.codedefenders.util.Constants;
@@ -118,7 +118,7 @@ public class AdminUserManagement extends HttpServlet {
 	}
 
 	private String editUser(String uid, HttpServletRequest request, String successMsg) {
-		User u = DatabaseAccess.getUser(Integer.parseInt(uid));
+		User u = UserDAO.getUserById(Integer.parseInt(uid));
 		if (u == null)
 			return "Error. User " + uid + " cannot be retrieved from database.";
 
@@ -130,10 +130,10 @@ public class AdminUserManagement extends HttpServlet {
 		if (!password.equals(confirm_password))
 			return "Passwords don't match";
 
-		if (!name.equals(u.getUsername()) && DatabaseAccess.getUserForName(name) != null)
+		if (!name.equals(u.getUsername()) && UserDAO.getUserByName(name) != null)
 			return "Username " + name + " is already taken";
 
-		if (!email.equals(u.getEmail()) && DatabaseAccess.getUserForEmail(email) != null)
+		if (!email.equals(u.getEmail()) && UserDAO.getUserByEmail(email) != null)
 			return "Email " + email + " is already in use";
 
 		if (!LoginManager.validEmailAddress(email))
@@ -207,7 +207,7 @@ public class AdminUserManagement extends HttpServlet {
 		}
 
 		final String username = credentials[0].trim();
-		if (DatabaseAccess.getUserForName(username) != null) {
+		if (UserDAO.getUserByName(username) != null) {
 		    logger.info("Failed to create user. Username already in use:" + username);
 			messages.add("Username '" + username + "' already in use.");
 			return;
@@ -230,7 +230,7 @@ public class AdminUserManagement extends HttpServlet {
 		final boolean hasMail = credentials.length == 3;
 		if (hasMail) {
 			email = credentials[2].trim();
-			if (DatabaseAccess.getUserForEmail(email) != null) {
+			if (UserDAO.getUserByEmail(email) != null) {
 				logger.info("Failed to create user. Email address already in use:" + email);
 				messages.add("Email '" + email + "' already in use.");
 				return;
@@ -276,7 +276,7 @@ public class AdminUserManagement extends HttpServlet {
 
 		if (AdminDAO.setUserPassword(uid, User.encodePassword(newPassword))) {
 			if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue()) {
-				User u = DatabaseAccess.getUser(uid);
+				User u = UserDAO.getUserById(uid);
 				String msg = String.format(PASSWORD_RESET_MSG, u.getUsername(), newPassword);
 				EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg);
 			}
