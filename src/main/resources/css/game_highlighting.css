@@ -1,4 +1,5 @@
-/* Icons ================================================== */
+/* Icons
+-------------------------------------------------- */
 .mutant-icons {
     margin-left: 3px;
     display: inline-block;
@@ -33,7 +34,8 @@
     left: 3px;
 }
 
-/* Popup ================================================== */
+/* Mutant Popovers
+-------------------------------------------------- */
 .mutant-popover-body > table {
     font-size: 14px;
 }
@@ -48,7 +50,8 @@
     max-width: 100%;
 }
 
-/* Coverage ================================================== */
+/* Coverage Colors
+-------------------------------------------------- */
 .coverage-0 { background-color: rgba(153, 255, 153, 0.00); }
 .coverage-1 { background-color: rgba(153, 255, 153, 0.01); }
 .coverage-2 { background-color: rgba(153, 255, 153, 0.02); }

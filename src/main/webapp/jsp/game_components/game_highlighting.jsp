@@ -86,7 +86,7 @@
         const markUncoveredEquivalent = Boolean(<%=markUncoveredEquivalent%>);
         const gameType = '<%=gameType%>';
 
-        const MutantStatus = {
+        const MutantStatuses = {
             ALIVE: 'ALIVE',
             KILLED: 'KILLED',
             FLAGGED: 'FLAGGED',
@@ -100,11 +100,12 @@
             EQUIVALENT: 'Equivalent Mutants'
         };
 
-        const MutantIcons = {
+        const Icons = {
             ALIVE: '<%=request.getContextPath()%>/images/mutant.png',
             KILLED: '<%=request.getContextPath()%>/images/mutantKilled.png',
             FLAGGED: '<%=request.getContextPath()%>/images/mutantFlagged.png',
-            EQUIVALENT: '<%=request.getContextPath()%>/images/mutantEquiv.png'
+            EQUIVALENT: '<%=request.getContextPath()%>/images/mutantEquiv.png',
+            FLAG: '<%=request.getContextPath()%>/images/flag.png'
         };
 
         const GameTypes = {
@@ -127,15 +128,15 @@
         /**
          * Creates the HTML element that displays the mutant icons for one line.
          * @param {number} line The line number (starting at 1).
-         * @param {List<Mutant>} mutantsOnLine The mutants that modify the line.
-         * @return {HTMLDivElement} The mutant icons.
+         * @param {List<object>} mutantsOnLine The mutants that modify the line.
+         * @return {HTMLElement} The mutant icons.
          */
         const createMutantIcons = function (line, mutantsOnLine) {
 
             /* Split the mutants list by the mutant status.
              * {ALIVE: [...], KILLED: [...], ...} */
             const sortedMutants = {};
-            for (const mutantStatus in MutantStatus) {
+            for (const mutantStatus in MutantStatuses) {
                 const mutantsInCategory = mutantsOnLine.filter(m => m.status === mutantStatus);
                 if (mutantsInCategory.length > 0) {
                     sortedMutants[mutantStatus] = mutantsInCategory;
@@ -148,7 +149,7 @@
                 /* Must be in one line, because it's in a pre.
                    Can't use template strings because JSP's EL syntax overrides it. */
                 icons.push('<div class="mutant-icon" mutant-status="' + mutantStatus + '"  mutant-line="' + line + '">' +
-                               '<img class="mutant-icon-image" src="' + MutantIcons[mutantStatus] + '">' +
+                               '<img class="mutant-icon-image" src="' + Icons[mutantStatus] + '">' +
                                '<span class="mutant-icon-count">' + sortedMutants[mutantStatus].length + '</span>' +
                            '</div>');
             }
@@ -162,9 +163,9 @@
 
         /**
          * Adds a trigger to the mutant icons, which opens the popover and closes all other open popovers.
-         * @param {HTMLDivElement} mutantIcons The mutant icons.
+         * @param {HTMLElement} mutantIcons The mutant icons.
          */
-        const addPopoverTrigger = function (mutantIcons) {
+        const addPopoverTriggerToMutantIcons = function (mutantIcons) {
             $(mutantIcons).find('.mutant-icon').popover({
                 /* Append to body instead of the element itself, so that the icons don't overlap modals. */
                 container: document.body,
@@ -206,14 +207,14 @@
             const status = $(this).attr('mutant-status');
             const line = Number($(this).attr('mutant-line'));
 
-            return '<img src="' + MutantIcons[status] + '" class="mutant-icon-image"> '
+            return '<img src="' + Icons[status] + '" class="mutant-icon-image"> '
                 + MutantNames[status] + ' (Line ' + line + ')';
         };
 
         /**
          * Creates the body for a popover.
          * "this" will point to the ".mutant-icon" div.
-         * @returns {HTMLDivElement} The popover body.
+         * @returns {HTMLElement} The popover body.
          */
         const createPopoverContent = function () {
             const status = $(this).attr('mutant-status');
@@ -254,7 +255,7 @@
             /* Create the button if it is supposed to be shown. */
             let button = '';
             if (showEquivalenceButton
-                && status === MutantStatus.ALIVE
+                && status === MutantStatuses.ALIVE
                 && (markUncoveredEquivalent || testIdsPerLine.get(line))) {
                 button = createEquivalenceButton(line, mutantsOnLine);
             }
@@ -276,7 +277,7 @@
             if (gameType === GameTypes.PARTY) {
                 return `<form onsubmit="if (window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')) { window.location.href = \'multiplayer/play?equivLine=` + line + `\'; } return false;">
                             <button class="btn btn-danger btn-sm" style="width: 100%;">
-                                <img src="<%=request.getContextPath()%>/images/flag.png" class="mutant-icon-image"/> Claim Equivalent
+                                <img src="` + Icons.FLAG + `" class="mutant-icon-image"/> Claim Equivalent
                             </button>
                         </form>`;
             } else if (gameType === GameTypes.DUEL) {
@@ -284,7 +285,7 @@
                             <input type="hidden" name="formType" value="claimEquivalent">
                             <input type="hidden" name="mutantId" value="` + mutantsOnLine[0].id + `">
                             <button class="btn btn-danger btn-sm" style="width: 100%;">
-                                <img src="<%=request.getContextPath()%>/images/flag.png" class="mutant-icon-image"/> Claim Equivalent
+                                <img src="` + Icons.FLAG + `" class="mutant-icon-image"/> Claim Equivalent
                             </button>
                         </form>`;
             } else {
@@ -294,7 +295,7 @@
 
         /**
          * Highlights coverage on the given CodeMirror instance.
-         * @param {object} codeMirror The CodeMirror instace.
+         * @param {object} codeMirror The CodeMirror instance.
          */
         const highlightCoverage = function (codeMirror) {
             for (const [line, testIds] of testIdsPerLine) {
@@ -305,20 +306,76 @@
 
         /**
          * Displays mutant icons on the given CodeMirror instance.
-         * @param {object} codeMirror The CodeMirror instace.
+         * @param {object} codeMirror The CodeMirror instance.
          */
         const highlightMutants = function (codeMirror) {
             for (const [line, mutantIds] of mutantIdsPerLine) {
                 const mutantsOnLine = mutantIds.map(id => mutants.get(id));
                 const marker = createMutantIcons(line, mutantsOnLine);
-                addPopoverTrigger(marker);
+                addPopoverTriggerToMutantIcons(marker);
                 codeMirror.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', marker);
             }
         };
 
+        <%--
+        /**
+         * Completely removes the coverage highlighting on the given CodeMirror instance.
+         * If any lines were added and deleted in the editor, then clearing and re-applying the highlighting will
+         * place the highlighting onto the wrong lines.
+         * @param {object} codeMirror The CodeMirror instance.
+         */
+        const clearCoverage = function (codeMirror) {
+            codeMirror.eachLine(line => {
+                if (line.bgClass) {
+                    /* Match all coverage classes. */
+                    const coverageMatches = line.bgClass.match(/coverage-\d+/g);
+                    if (coverageMatches !== null) {
+                        for (const match of coverageMatches) {
+                            codeMirror.removeLineClass(line, 'background', match);
+                        }
+                    }
+                }
+            });
+        };
+
+        /**
+         * Completely removes the mutant icons on the given CodeMirror instance.
+         * If any lines were added and deleted in the editor, then clearing and re-applying the highlighting will
+         * place the highlighting onto the wrong lines.
+         * @param {object} codeMirror The CodeMirror instance.
+         */
+        const clearMutants = function (codeMirror) {
+            codeMirror.clearGutter('CodeMirror-mutantIcons');
+        };
+        --%>
+
+        /**
+         * Hides the mutant icons on the given CodeMirror instance.
+         * The mutant icons are only hidden, and not cleared. They can be shown hidden and shown again correctly even if
+         * lines were added or deleted in the editor.
+         * @param {object} codeMirror The CodeMirror instance.
+         */
+        const hideMutants = function (codeMirror) {
+            $(codeMirror.getWrapperElement()).find('.mutant-icons').hide();
+        };
+
+        /**
+         * Shows the mutant icons on the given CodeMirror instance.
+         * @param {object} codeMirror The CodeMirror instance.
+         */
+        const showMutants = function (codeMirror) {
+            $(codeMirror.getWrapperElement()).find('.mutant-icons').show();
+        };
+
         const codeMirror = $('<%=codeDivSelector%>').find('.CodeMirror')[0].CodeMirror;
-        highlightCoverage(codeMirror);
-        highlightMutants(codeMirror);
+        codeMirror.highlightCoverage = function () { highlightCoverage(this) };
+        codeMirror.highlightMutants = function () { highlightMutants(this) };
+        codeMirror.clearCoverage = function () { clearCoverage(this) };
+        codeMirror.clearMutants = function () { clearMutants(this) };
+        codeMirror.hideMutants = function () { hideMutants(this) };
+        codeMirror.showMutants = function () { showMutants(this) };
+        codeMirror.highlightCoverage();
+        codeMirror.highlightMutants();
     }());
 </script>
 
