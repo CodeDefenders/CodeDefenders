@@ -102,7 +102,8 @@ public class TestDAO {
      * Valid tests are compilable and do not fail when executed against the original class.
      * @param defendersOnly If {@code true}, only return tests that were written by defenders.
      */
-    public static List<Test> getValidTestsForGame(int gameId, boolean defendersOnly) throws UncheckedSQLException, SQLMappingException {
+    public static List<Test> getValidTestsForGame(int gameId, boolean defendersOnly)
+            throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT tests.* FROM tests",
                 (defendersOnly ? "INNER JOIN players pl on tests.Player_ID = pl.ID" : ""),

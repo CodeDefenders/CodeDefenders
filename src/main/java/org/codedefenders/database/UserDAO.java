@@ -33,7 +33,7 @@ public class UserDAO {
     /**
      * Returns the user for the given user id.
      */
-    public static User getUserById(int userId) {
+    public static User getUserById(int userId) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users WHERE User_ID = ?;";
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DB.getDBV(userId));
     }
@@ -41,7 +41,7 @@ public class UserDAO {
     /**
      * Returns the user with the given name.
      */
-    public static User getUserByName(String name) {
+    public static User getUserByName(String name) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users WHERE Username=?;";
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DB.getDBV(name));
     }
@@ -49,12 +49,12 @@ public class UserDAO {
     /**
      * Returns the user with the given email.
      */
-    public static User getUserByEmail(String email) {
+    public static User getUserByEmail(String email) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users WHERE Email = ?;";
         return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DB.getDBV(email));
     }
 
-    public static User getUserForPlayer(int playerId) {
+    public static User getUserForPlayer(int playerId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT users.*",
                 "FROM users, players",
@@ -66,7 +66,7 @@ public class UserDAO {
     /**
      * Returns a list of all users (including dummy / system users).
      */
-    public static List<User> getUsers() {
+    public static List<User> getUsers() throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users";
         return DB.executeQueryReturnList(query, UserDAO::userFromRS);
     }
@@ -75,7 +75,7 @@ public class UserDAO {
      * Returns a list of real users (not including dummy / system users), which are not taking part in a currently
      * active game.
      */
-    public static List<User> getUnassignedUsers() {
+    public static List<User> getUnassignedUsers() throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT DISTINCT users.*",
                 "FROM users",
@@ -97,7 +97,7 @@ public class UserDAO {
     /**
      * Returns the last rose the user with the given id had in any game.
      */
-    public static Role getLastRoleOfUser(int userId) {
+    public static Role getLastRoleOfUser(int userId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT players.Role",
                 "FROM players",

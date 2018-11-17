@@ -100,7 +100,8 @@ public class FeedbackDAO {
 		return insertFeedback(gid, uid, ratingsList, feedbackTypes);
 	}
 
-	public static Integer[] getFeedbackValues(int gid, int uid, FeedbackManager.FeedbackType[] feedbackTypes) {
+	public static Integer[] getFeedbackValues(int gid, int uid, FeedbackManager.FeedbackType[] feedbackTypes)
+			throws UncheckedSQLException, SQLMappingException {
 		Integer[] values = new Integer[feedbackTypes.length];
 		Arrays.fill(values, -1);
 
@@ -150,7 +151,7 @@ public class FeedbackDAO {
 		return getFeedbackValues(gid, uid) == null;
 	}
 
-	public static double[] getAverageGameRatings(int gameId) {
+	public static double[] getAverageGameRatings(int gameId) throws UncheckedSQLException, SQLMappingException {
 		double[] values = new double[feedbackTypes.length];
 		Arrays.fill(values, -1);
 
@@ -170,7 +171,8 @@ public class FeedbackDAO {
 		return values;
 	}
 
-	private static List<Double> getAverageClassDifficultyRatings(FeedbackManager.FeedbackType feedbackType) {
+	private static List<Double> getAverageClassDifficultyRatings(FeedbackManager.FeedbackType feedbackType)
+			throws UncheckedSQLException, SQLMappingException {
 		List<Double> rv = DB.executeQueryReturnList(GET_AVERAGE_CLASS_DIFFICULTIES, rs -> rs.getDouble(1),
 				DB.getDBV(feedbackType.name()));
 		if (rv.isEmpty()) {
@@ -187,7 +189,7 @@ public class FeedbackDAO {
 		return getAverageClassDifficultyRatings(FeedbackManager.FeedbackType.CUT_TEST_DIFFICULTY);
 	}
 
-	public static int getNBFeedbacksForGame(int gameId) {
+	public static int getNBFeedbacksForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
 	    return DB.executeQueryReturnValue(GET_NB_FEEDBACKS_FOR_GAME, rs -> rs.getInt(1), DB.getDBV(gameId));
 	}
 

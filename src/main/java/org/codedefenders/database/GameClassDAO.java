@@ -47,7 +47,7 @@ public class GameClassDAO {
      * @param alias the alias that is checked.
      * @return {@code true} if alias does not exist, {@code false} otherwise.
      */
-    public static boolean classNotExistsForAlias(String alias) {
+    public static boolean classNotExistsForAlias(String alias) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM classes WHERE Alias = ?";
         Boolean rv = DB.executeQueryReturnValue(query, rs -> true, DB.getDBV(alias));
         return rv != null;
@@ -60,7 +60,8 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of identifiers of mutants
      */
-    public static List<Integer> getMappedMutantIdsForClassId(Integer classId) {
+    public static List<Integer> getMappedMutantIdsForClassId(Integer classId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT Mutant_ID FROM mutants WHERE Class_ID = ?;";
         return DB.executeQueryReturnList(query, rs -> rs.getInt("Mutant_ID"), DB.getDBV(classId));
     }
@@ -72,7 +73,8 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of mutants
      */
-    public static List<Mutant> getMappedMutantsForClassId(Integer classId) {
+    public static List<Mutant> getMappedMutantsForClassId(Integer classId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM mutants WHERE Class_ID = ?;";
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS ,DB.getDBV(classId));
     }
@@ -84,7 +86,8 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of identifiers of tests
      */
-    public static List<Integer> getMappedTestIdsForClassId(Integer classId) {
+    public static List<Integer> getMappedTestIdsForClassId(Integer classId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT Test_ID FROM tests WHERE Class_ID = ?;";
         return DB.executeQueryReturnList(query, rs -> rs.getInt("Test_ID") ,DB.getDBV(classId));
     }
@@ -108,12 +111,21 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of identifiers of dependencies
      */
-    public static List<Integer> getMappedDependencyIdsForClassId(Integer classId) {
+    public static List<Integer> getMappedDependencyIdsForClassId(Integer classId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT Dependency_ID FROM dependencies WHERE Class_ID = ?;";
         return DB.executeQueryReturnList(query, rs -> rs.getInt("Dependency_ID"), DB.getDBV(classId));
     }
 
-    public static List<Dependency> getMappedDependenciesForClassId(Integer classId) {
+    /**
+     * Return a {@link List} of all {@link Dependency}s,
+     * which were uploaded together with a given class.
+     *
+     * @param classId the identifier of the given class
+     * @return a list of identifiers of dependencies
+     */
+    public static List<Dependency> getMappedDependenciesForClassId(Integer classId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT",
                 "   Dependency_ID,",

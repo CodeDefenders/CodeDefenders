@@ -21,14 +21,10 @@ package org.codedefenders.database;
 import org.codedefenders.api.analytics.ClassDataDTO;
 import org.codedefenders.api.analytics.UserDataDTO;
 import org.codedefenders.servlets.FeedbackManager.FeedbackType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
 public class ApiDAO {
-    private static final Logger logger = LoggerFactory.getLogger(ApiDAO.class);
-
     private static final  String GET_ANALYTICS_USER_DATA_QUERY = String.join("\n",
         " SELECT users.User_ID                    AS ID,",
         "       users.Username                    AS Username,",
@@ -209,7 +205,7 @@ public class ApiDAO {
         "    GROUP BY feedback_inner.Class_ID",
         "  ) AS feedback ON feedback.Class_ID = classes.Class_ID;");
 
-    public static List<UserDataDTO> getAnalyticsUserData() {
+    public static List<UserDataDTO> getAnalyticsUserData() throws UncheckedSQLException, SQLMappingException {
         return DB.executeQueryReturnList(GET_ANALYTICS_USER_DATA_QUERY, rs -> {
             UserDataDTO u = new UserDataDTO();
             u.setId(rs.getLong("ID"));
@@ -228,7 +224,7 @@ public class ApiDAO {
         });
     }
 
-    public static List<ClassDataDTO> getAnalyticsClassData() {
+    public static List<ClassDataDTO> getAnalyticsClassData() throws UncheckedSQLException, SQLMappingException {
         return DB.executeQueryReturnList(GET_ANALYTICS_CLASS_DATA_QUERY, rs -> {
             ClassDataDTO c = new ClassDataDTO();
             c.setId(rs.getLong("ID"));

@@ -197,13 +197,12 @@ public class DB {
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, params);
 
-        return executeQueryReturnValue(query, conn, stmt, mapper);
+        return executeQueryReturnValue(conn, stmt, mapper);
     }
 
     /**
      * Executes a database query, then uses a mapper function to extract the first value from the query result.
      * Cleans up the database connection and statement afterwards.
-     * @param query The query. This parameter is only used for error-logging and is entirely optional.
      * @param conn The database connection.
      * @param stmt THe prepared database statement.
      * @param mapper The mapper function.
@@ -215,8 +214,8 @@ public class DB {
      *                             extracted from it.
      * @see RSMapper
      */
-    public static <T> T executeQueryReturnValue(String query, Connection conn, PreparedStatement stmt,
-            RSMapper<T> mapper) throws UncheckedSQLException, SQLMappingException {
+    public static <T> T executeQueryReturnValue(Connection conn, PreparedStatement stmt, RSMapper<T> mapper)
+            throws UncheckedSQLException, SQLMappingException {
 
         try {
             ResultSet resultSet = stmt.executeQuery();
@@ -225,14 +224,16 @@ public class DB {
                 try {
                     return mapper.extractResultFrom(resultSet);
                 } catch (Exception e){
-                    throw new SQLMappingException("Exception while handling result set. Query was:\n" + query, e);
+                    logger.error("Exception while handling result set.", e);
+                    throw new SQLMappingException("Exception while handling result set.", e);
                 }
             }
 
             return null;
 
         } catch (SQLException e) {
-            throw new UncheckedSQLException("SQL exception while executing query. Query was:\n" + query, e);
+            logger.error("SQL exception while executing query.", e);
+            throw new UncheckedSQLException("SQL exception while executing query.", e);
 
         } finally {
             DB.cleanup(conn, stmt);
@@ -259,13 +260,12 @@ public class DB {
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, params);
 
-        return executeQueryReturnList(query, conn, stmt, mapper);
+        return executeQueryReturnList(conn, stmt, mapper);
     }
 
     /**
      * Executes a database query, then uses a mapper function to extract the values from the query result.
      * Cleans up the database connection and statement afterwards.
-     * @param query The query. This parameter is only used for error-logging and is entirely optional.
      * @param conn The database connection.
      * @param stmt THe prepared database statement.
      * @param mapper The mapper function.
@@ -277,8 +277,8 @@ public class DB {
      *                             extracted from it.
      * @see RSMapper
      */
-    public static <T> List<T> executeQueryReturnList(String query, Connection conn, PreparedStatement stmt,
-            RSMapper<T> mapper) throws UncheckedSQLException, SQLMappingException {
+    public static <T> List<T> executeQueryReturnList(Connection conn, PreparedStatement stmt, RSMapper<T> mapper)
+            throws UncheckedSQLException, SQLMappingException {
 
         try {
             ResultSet resultSet = stmt.executeQuery();
@@ -290,7 +290,8 @@ public class DB {
                 try {
                     value = mapper.extractResultFrom(resultSet);
                 } catch (Exception e){
-                    throw new SQLMappingException("Exception while handling result set. Query was:\n" + query, e);
+                    logger.error("Exception while handling result set.", e);
+                    throw new SQLMappingException("Exception while handling result set.", e);
                 }
 
                 if (value != null) {
@@ -301,7 +302,8 @@ public class DB {
             return values;
 
         } catch (SQLException e) {
-            throw new UncheckedSQLException("SQL exception while executing query. Query was:\n" + query, e);
+            logger.error("SQL exception while executing query.", e);
+            throw new UncheckedSQLException("SQL exception while executing query.", e);
 
         } finally {
             DB.cleanup(conn, stmt);

@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,27 +21,12 @@ public class KillmapDAO {
     /**
      * Returns if the given game already has a computed killmap.
      */
-    public static Boolean hasKillMap(int gameId) {
+    public static Boolean hasKillMap(int gameId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT HasKillMap",
                 "FROM games",
-                "WHERE games.ID = ?"
-        );
-
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
-        try {
-            ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-            if (rs.next()) {
-                return rs.getBoolean("HasKillMap");
-            }
-        } catch (SQLException e) {
-            logger.error("SQL exception caught", e);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-
-        return null;
+                "WHERE games.ID = ?");
+        return DB.executeQueryReturnValue(query, rs -> rs.getBoolean("HasKillMap"), DB.getDBV(gameId));
     }
 
     /**
@@ -52,15 +36,13 @@ public class KillmapDAO {
         String query = String.join("\n",
                 "UPDATE games",
                 "SET HasKillMap = ?",
-                "WHERE ID = ?;"
-        );
+                "WHERE ID = ?;");
 
         Connection conn = DB.getConnection();
 
         DatabaseValue[] values = new DatabaseValue[]{
                 DB.getDBV(hasKillMap),
-                DB.getDBV(gameId)
-        };
+                DB.getDBV(gameId)};
 
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, values);
 
@@ -74,15 +56,14 @@ public class KillmapDAO {
     /**
      * Helper method to retrieve killmap entries from the database.
      */
-    public static List<KillMap.KillMapEntry> getKillMapEntries(PreparedStatement stmt, Connection conn, List<Test> tests, List<Mutant> mutants) {
+    public static List<KillMap.KillMapEntry> getKillMapEntries(PreparedStatement stmt, Connection conn,
+           List<Test> tests, List<Mutant> mutants) throws UncheckedSQLException, SQLMappingException {
         try {
             stmt.setFetchSize(Integer.MIN_VALUE);
         } catch (SQLException e) {
-            logger.error("SQL Exception caught", e);
-            return null;
+            logger.error("Caught SQL exception while trying to set fetch size.", e);
+            throw new UncheckedSQLException("Caught SQL exception while trying to set fetch size.", e);
         }
-
-        List<KillMap.KillMapEntry> entries = new LinkedList<>();
 
         /* Set up mapping from test id to test / mutant id to mutant. */
         Map<Integer, Test> testMap = new HashMap<>();
@@ -90,23 +71,12 @@ public class KillmapDAO {
         for (Test test : tests) { testMap.put(test.getId(), test); }
         for (Mutant mutant : mutants) { mutantMap.put(mutant.getId(), mutant); }
 
-        try {
-            ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-
-            while (rs.next()) {
-                int testId = rs.getInt("Test_ID");
-                int mutantId = rs.getInt("Mutant_ID");
-                String status = rs.getString("Status");
-                entries.add(new KillMap.KillMapEntry(testMap.get(testId), mutantMap.get(mutantId), KillMap.KillMapEntry.Status.valueOf(status)));
-            }
-        } catch (SQLException e) {
-            logger.error("SQL exception caught", e);
-            return null;
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-
-        return entries;
+        return DB.executeQueryReturnList(conn, stmt, rs -> {
+            int testId = rs.getInt("Test_ID");
+            int mutantId = rs.getInt("Mutant_ID");
+            String status = rs.getString("Status");
+            return new KillMap.KillMapEntry(testMap.get(testId), mutantMap.get(mutantId), KillMap.KillMapEntry.Status.valueOf(status));
+        });
     }
 
     /**
@@ -116,8 +86,7 @@ public class KillmapDAO {
         String query = String.join("\n",
                 "SELECT killmap.*",
                 "FROM killmap",
-                "WHERE killmap.Game_ID = ?"
-        );
+                "WHERE killmap.Game_ID = ?");
 
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
@@ -135,8 +104,7 @@ public class KillmapDAO {
         String query = String.join("\n",
                 "SELECT killmap.*",
                 "FROM killmap",
-                "WHERE killmap.Class_ID = ?"
-        );
+                "WHERE killmap.Class_ID = ?");
 
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(classId));
@@ -153,8 +121,7 @@ public class KillmapDAO {
     public static boolean insertKillMapEntry(KillMap.KillMapEntry entry, int classId) {
         String query = String.join("\n",
                 "INSERT INTO killmap (Class_ID,Game_ID,Test_ID,Mutant_ID,Status) VALUES (?,?,?,?,?)",
-                "ON DUPLICATE KEY UPDATE Status = VALUES(Status);"
-        );
+                "ON DUPLICATE KEY UPDATE Status = VALUES(Status);");
 
         Connection conn = DB.getConnection();
 

@@ -321,7 +321,7 @@ public class AdminDAO {
         return getGamesFromRS(rs, conn, stmt);
     }
 
-    public static Entry getScore(int userID) {
+    public static Entry getScore(int userID) throws UncheckedSQLException, SQLMappingException {
         return DB.executeQueryReturnValue(USER_SCORE_QUERY, rs -> {
             Entry p = new Entry();
             p.setUsername(rs.getString("username"));
@@ -381,15 +381,15 @@ public class AdminDAO {
         return userInfo;
     }
 
-    public static List<List<String>> getUnassignedUsersInfo() {
+    public static List<List<String>> getUnassignedUsersInfo() throws UncheckedSQLException, SQLMappingException {
         return DB.executeQueryReturnList(UNASSIGNED_USERS_INFO_QUERY, AdminDAO::userInfoFromRS);
     }
 
-    public static List<List<String>> getAllUsersInfo() {
+    public static List<List<String>> getAllUsersInfo() throws UncheckedSQLException, SQLMappingException {
         return DB.executeQueryReturnList(USERS_INFO_QUERY, AdminDAO::userInfoFromRS);
     }
 
-    public static List<List<String>> getPlayersInfo(int gameId) {
+    public static List<List<String>> getPlayersInfo(int gameId) throws UncheckedSQLException, SQLMappingException {
         return DB.executeQueryReturnList(PLAYERS_INFO_QUERY, rs -> {
             List<String> playerInfo = new ArrayList<>();
             playerInfo.add(String.valueOf(rs.getInt("ID")));
@@ -451,11 +451,13 @@ public class AdminDAO {
         }
     }
 
-    public static List<AdminSystemSettings.SettingsDTO> getSystemSettings(){
+    public static List<AdminSystemSettings.SettingsDTO> getSystemSettings()
+            throws UncheckedSQLException, SQLMappingException {
         return DB.executeQueryReturnList(GET_ALL_SETTINGS, AdminDAO::settingFromRS);
     }
 
-    public static AdminSystemSettings.SettingsDTO getSystemSetting(AdminSystemSettings.SETTING_NAME name){
+    public static AdminSystemSettings.SettingsDTO getSystemSetting(AdminSystemSettings.SETTING_NAME name)
+            throws UncheckedSQLException, SQLMappingException {
         return DB.executeQueryReturnValue(GET_SETTING, AdminDAO::settingFromRS, DB.getDBV(name.name()));
     }
 
