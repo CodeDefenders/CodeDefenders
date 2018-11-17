@@ -19,12 +19,10 @@
 
 --%>
 <%@ page import="org.codedefenders.game.Test" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.stream.Collectors" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
-<%@ page import="org.codedefenders.game.Mutant.Equivalence" %>
+<%@ page import="com.google.gson.Gson" %>
+<%@ page import="com.google.gson.GsonBuilder" %>
 
 <%--
     Adds highlighting of coverage (green lines) and mutants (gutter icons) to a CodeMirror editor.
@@ -54,10 +52,6 @@
     The CSS is located in game_highlighting.css.
 --%>
 
-<%--
-    TODO This implementation not very pretty and will be refactored in game-highlighting-rework-2.
---%>
-
 <% { %>
 
 <%
@@ -70,116 +64,39 @@
 %>
 
 <%
-    /* Map each line to the tests that cover it. */
-    Map<Integer, List<Test>> testsOnLine = new HashMap<>();
-    for (Test test : testsTODORENAME) {
-        for (Integer line : test.getLineCoverage().getLinesCovered().stream().distinct().collect(Collectors.toList())) {
-            List<Test> list = testsOnLine.computeIfAbsent(line, key -> new ArrayList<>());
-            list.add(test);
-        }
-    }
-
-    /* Map each line to the mutants on it. */
-    Map<Integer, List<Mutant>> mutantsOnLine = new HashMap<>();
-    for (Mutant mutant : mutantsTODORENAME) {
-        for (Integer line : mutant.getLines()) {
-            List<Mutant> list = mutantsOnLine.computeIfAbsent(line, key -> new ArrayList<>());
-            list.add(mutant);
-        }
-    }
-
-    int numTests = testsTODORENAME.size();
-
-    /* Build a javascript map that maps lines to the percentage of tests that cover it. */
-    StringBuilder jsTests = new StringBuilder();
-    jsTests.append("["); // outer list
-    for (Map.Entry<Integer, List<Test>> entry : testsOnLine.entrySet()) {
-        jsTests.append("[") // element
-               .append(entry.getKey())
-               .append(",")
-               .append((entry.getValue().size() * 100) / numTests)
-               .append("],"); // element
-    }
-    jsTests.append("]"); // outer list
-
-    /*
-     * Build a javascript map that maps lines to the mutants on the line.
-     * Mutants are represented as
-     * {
-     *    id: number,
-     *    status: 'alive' | 'killed' | 'flagged' | 'equivalent',
-     *    creatorName: string,
-     *    points: number
-     * }
-     */
-    StringBuilder jsMutants = new StringBuilder();
-    jsMutants.append("["); // outer list
-    for (Map.Entry<Integer, List<Mutant>> entry : mutantsOnLine.entrySet()) {
-        jsMutants.append("[") // element
-                 .append(entry.getKey())
-                 .append(",");
-
-        jsMutants.append("["); // inner list
-        for (Mutant mutant : entry.getValue()) {
-            Mutant.Equivalence eq = mutant.getEquivalent();
-            String status;
-            if (eq == Equivalence.DECLARED_YES || eq == Equivalence.ASSUMED_YES) {
-                status = "equivalent";
-            } else if (eq == Equivalence.PENDING_TEST) {
-                status = "flagged";
-            } else if (mutant.isAlive()) {
-                status = "alive";
-            } else {
-                status = "killed";
-            }
-
-            jsMutants.append("{")
-                     .append("id:")
-                     .append(mutant.getId())
-                     .append(",status:")
-                     .append("'")
-                     .append(status)
-                     .append("',")
-                     .append("creatorName:")
-                     .append("'")
-                     .append(mutant.getCreatorName())
-                     .append("',")
-                     .append("points:")
-                     .append(mutant.getScore())
-                     .append("},");
-        }
-        jsMutants.append("]"); // inner list
-
-        jsMutants.append("],"); // element
-    }
-    jsMutants.append("]"); // outer list
+    GameHighlightingDTO gh = new GameHighlightingDTO(mutantsTODORENAME, testsTODORENAME);
+    Gson gson = new GsonBuilder().registerTypeAdapter(Map.class, new GameHighlightingDTO.MapSerializer()).create();
+    String ghString = gson.toJson(gh);
 %>
 
 <script>
     /* Wrap in a function so it has it's own scope. */
     (function () {
-        const mutantsOnLine = new Map(<%=jsMutants%>);
-        const coverageOnLine = new Map(<%=jsTests%>);
+        const gh_data = JSON.parse(`<%=ghString%>`);
+        const mutantIdsPerLine = new Map(gh_data.mutantIdsPerLine);
+        const testIdsPerLine = new Map(gh_data.testIdsPerLine);
+        const mutants = new Map(gh_data.mutants);
+        const tests = new Map(gh_data.tests);
 
         const MutantStatus = {
-            alive: 'alive',
-            killed: 'killed',
-            flagged: 'flagged',
-            equivalent: 'equivalent'
+            ALIVE: 'ALIVE',
+            KILLED: 'KILLED',
+            FLAGGED: 'FLAGGED',
+            EQUIVALENT: 'EQUIVALENT'
         };
 
         const MutantNames = {
-            alive: 'Alive Mutants',
-            killed: 'Killed Mutants',
-            flagged: 'Flagged Mutants',
-            equivalent: 'Equivalent Mutants'
+            ALIVE: 'Alive Mutants',
+            KILLED: 'Killed Mutants',
+            FLAGGED: 'Flagged Mutants',
+            EQUIVALENT: 'Equivalent Mutants'
         };
 
         const MutantIcons = {
-            alive: '<%=request.getContextPath()%>/images/mutant.png',
-            killed: '<%=request.getContextPath()%>/images/mutantKilled.png',
-            flagged: '<%=request.getContextPath()%>/images/mutantFlagged.png',
-            equivalent: '<%=request.getContextPath()%>/images/mutantEquiv.png'
+            ALIVE: '<%=request.getContextPath()%>/images/mutant.png',
+            KILLED: '<%=request.getContextPath()%>/images/mutantKilled.png',
+            FLAGGED: '<%=request.getContextPath()%>/images/mutantFlagged.png',
+            EQUIVALENT: '<%=request.getContextPath()%>/images/mutantEquiv.png'
         };
 
         /*
@@ -190,11 +107,11 @@
         const addTimeout = (callback, time) => timeouts.push(setTimeout(callback, time));
         const clearTimeouts = () => { timeouts = timeouts.filter(clearTimeout); };
 
-        const createMutantIcons = function (line, mutants) {
+        const createMutantIcons = function (line, mutantsOnLine) {
             const sortedMutants = {};
             for (const mutantStatus in MutantStatus) {
-                const mutantsInCategory = mutants.filter(m => m.status === mutantStatus);
-                if (mutantsInCategory.length) {
+                const mutantsInCategory = mutantsOnLine.filter(m => m.status === mutantStatus);
+                if (mutantsInCategory.length > 0) {
                     sortedMutants[mutantStatus] = mutantsInCategory;
                 }
             }
@@ -203,7 +120,7 @@
             for (const mutantStatus in sortedMutants) {
                 const numMutants = sortedMutants[mutantStatus].length;
                 /* Must be in one line, because it's in a pre. */
-                icons += '<div class="mutant-icon" mutant-status="' + mutantStatus + '"  mutant-line="' + line + '"><img src="' + MutantIcons[mutantStatus] + '" class="mutant-icon-image"><span class="mutant-icon-count">' + numMutants + '</span></div>';
+                icons += '<div class="mutant-icon" mutant-status="' + mutantStatus + '"  mutant-line="' + line +'"><img src="' + MutantIcons[mutantStatus] + '" class="mutant-icon-image"><span class="mutant-icon-count">' + numMutants + '</span></div>';
             }
 
             const marker = document.createElement('div');
@@ -255,24 +172,26 @@
         const getPopoverContent = function () {
             const line = Number($(this).attr('mutant-line'));
             const status = $(this).attr('mutant-status');
-            const mutants = mutantsOnLine.get(line).filter(mutant => mutant.status === status);
+            const mutantsOnLine = mutantIdsPerLine.get(line)
+                .map(id => mutants.get(id))
+                .filter(mutant => mutant.status === status);
 
             const head =
                 `<thead>
                      <tr>
                          <td>Creator</td>
                          <td align="right">ID</td>
-                         <td align="right">Points</td>
+                         <td align="right">Score</td>
                      </tr>
                  </thead>`;
 
             const rows = [];
-            for (const mutant of mutants) {
+            for (const mutant of mutantsOnLine) {
                 rows.push(
                     `<tr>
                          <td>` + mutant.creatorName + `</td>
                          <td align="right">` + mutant.id + `</td>
-                         <td align="right">` + mutant.points + `</td>
+                         <td align="right">` + mutant.score + `</td>
                      </tr>`
                 );
             }
@@ -298,9 +217,9 @@
                             </form>`;
                     <% } else if (gameType.equals("DUEL")) { %>
                         button =
-                            `<form id="equiv" action="duelgame" method="post" onsubmit="return window.confirm('This will mark mutant ` + mutants[0].id + ` as equivalent. Are you sure?')">
+                            `<form id="equiv" action="duelgame" method="post" onsubmit="return window.confirm('This will mark mutant ` + mutantsOnLine[0].id + ` as equivalent. Are you sure?')">
                                 <input type="hidden" name="formType" value="claimEquivalent">
-                                <input type="hidden" name="mutantId" value="` + mutants[0].id + `">
+                                <input type="hidden" name="mutantId" value="` + mutantsOnLine[0].id + `">
                                 <button class="btn btn-danger btn-sm" style="width: 100%;">
                                     <img src="<%=request.getContextPath()%>/images/flag.png" class="mutant-icon-image"/> Claim Equivalent
                                 </button>
@@ -317,14 +236,16 @@
         };
 
         const highlightCoverage = function (codeMirror) {
-            for (const [line, percentage] of coverageOnLine) {
-                codeMirror.addLineClass(line - 1, 'background', 'coverage-' + percentage);
+            for (const [line, testIds] of testIdsPerLine) {
+                const coveragePercent = (testIds.length * 100 / tests.size).toFixed(0);
+                codeMirror.addLineClass(line - 1, 'background', 'coverage-' + coveragePercent);
             }
         };
 
         const highlightMutants = function (codeMirror) {
-            for (const [line, mutants] of mutantsOnLine) {
-                codeMirror.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', createMutantIcons(line, mutants));
+            for (const [line, mutantIds] of mutantIdsPerLine) {
+                const mutantsOnLine = mutantIds.map(id => mutants.get(id));
+                codeMirror.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', createMutantIcons(line, mutantsOnLine));
             }
         };
 

@@ -29,7 +29,6 @@ public class ClassDataDTO {
     private int mutantsSubmitted;
     private int mutantsAlive;
     private int mutantsEquivalent;
-
     private ClassRatings ratings;
 
     public long getId() {
