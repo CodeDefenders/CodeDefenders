@@ -18,8 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.game.Test" %>
+
 <%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="com.google.gson.GsonBuilder" %>
@@ -72,11 +73,18 @@
 <script>
     /* Wrap in a function so it has it's own scope. */
     (function () {
+
+        /* Game highlighting data. */
         const gh_data = JSON.parse(`<%=ghString%>`);
         const mutantIdsPerLine = new Map(gh_data.mutantIdsPerLine);
         const testIdsPerLine = new Map(gh_data.testIdsPerLine);
         const mutants = new Map(gh_data.mutants);
         const tests = new Map(gh_data.tests);
+
+        /* Game highlighting settings. */
+        const showEquivalenceButton = Boolean(<%=showEquivalenceButton%>);
+        const markUncoveredEquivalent = Boolean(<%=markUncoveredEquivalent%>);
+        const gameType = '<%=gameType%>';
 
         const MutantStatus = {
             ALIVE: 'ALIVE',
@@ -99,15 +107,33 @@
             EQUIVALENT: '<%=request.getContextPath()%>/images/mutantEquiv.png'
         };
 
+        const GameTypes = {
+            PARTY: 'PARTY',
+            DUEL: 'DUEL'
+        };
+
         /*
          * We use timeouts to hide the pop-over after the icon or pop-over is not hovered for a certain time.
          * These timeouts are saved, so they can be cleared when pop-overs are forced to hide.
          */
         let timeouts = [];
-        const addTimeout = (callback, time) => timeouts.push(setTimeout(callback, time));
-        const clearTimeouts = () => { timeouts = timeouts.filter(clearTimeout); };
+        const addTimeout = function (callback, time) {
+            timeouts.push(setTimeout(callback, time));
+        };
+        const clearTimeouts = function () {
+            timeouts = timeouts.filter(clearTimeout);
+        };
 
+        /**
+         * Creates the HTML element that displays the mutant icons for one line.
+         * @param {number} line The line number (starting at 1).
+         * @param {List<Mutant>} mutantsOnLine The mutants that modify the line.
+         * @return {HTMLDivElement} The mutant icons.
+         */
         const createMutantIcons = function (line, mutantsOnLine) {
+
+            /* Split the mutants list by the mutant status.
+             * {ALIVE: [...], KILLED: [...], ...} */
             const sortedMutants = {};
             for (const mutantStatus in MutantStatus) {
                 const mutantsInCategory = mutantsOnLine.filter(m => m.status === mutantStatus);
@@ -116,25 +142,37 @@
                 }
             }
 
-            let icons = '';
+            /* Create the icons for each mutant type on the line. */
+            let icons = [];
             for (const mutantStatus in sortedMutants) {
-                const numMutants = sortedMutants[mutantStatus].length;
-                /* Must be in one line, because it's in a pre. */
-                icons += '<div class="mutant-icon" mutant-status="' + mutantStatus + '"  mutant-line="' + line +'"><img src="' + MutantIcons[mutantStatus] + '" class="mutant-icon-image"><span class="mutant-icon-count">' + numMutants + '</span></div>';
+                /* Must be in one line, because it's in a pre.
+                   Can't use template strings because JSP's EL syntax overrides it. */
+                icons.push('<div class="mutant-icon" mutant-status="' + mutantStatus + '"  mutant-line="' + line + '">' +
+                               '<img class="mutant-icon-image" src="' + MutantIcons[mutantStatus] + '">' +
+                               '<span class="mutant-icon-count">' + sortedMutants[mutantStatus].length + '</span>' +
+                           '</div>');
             }
+            const mutantIcons = document.createElement('div');
+            mutantIcons.classList.add('mutant-icons');
+            mutantIcons.innerHTML = icons.join("");
 
-            const marker = document.createElement('div');
-            marker.classList.add('mutant-icons');
-            marker.innerHTML = icons;
+            return mutantIcons;
+        };
 
-            $(marker).find('.mutant-icon').popover({
+
+        /**
+         * Adds a trigger to the mutant icons, which opens the popover and closes all other open popovers.
+         * @param {HTMLDivElement} mutantIcons The mutant icons.
+         */
+        const addPopoverTrigger = function (mutantIcons) {
+            $(mutantIcons).find('.mutant-icon').popover({
                 /* Append to body instead of the element itself, so that the icons don't overlap modals. */
                 container: document.body,
                 placement: 'right',
                 trigger: 'manual',
                 html: true,
-                title: getPopoverTitle,
-                content: getPopoverContent
+                title: createPopoverTitle,
+                content: createPopoverContent
             }).on('mouseenter', function () {
                 clearTimeouts();
 
@@ -157,21 +195,30 @@
                     $(this).popover('hide');
                 }, 500);
             });
-
-            return marker;
         };
 
-        const getPopoverTitle = function () {
+        /**
+         * Creates the title for a popover.
+         * "this" will point to the ".mutant-icon" div.
+         * @returns {string} The popover title.
+         */
+        const createPopoverTitle = function () {
             const status = $(this).attr('mutant-status');
-            const line = $(this).attr('mutant-line');
+            const line = Number($(this).attr('mutant-line'));
 
             return '<img src="' + MutantIcons[status] + '" class="mutant-icon-image"> '
                 + MutantNames[status] + ' (Line ' + line + ')';
         };
 
-        const getPopoverContent = function () {
-            const line = Number($(this).attr('mutant-line'));
+        /**
+         * Creates the body for a popover.
+         * "this" will point to the ".mutant-icon" div.
+         * @returns {HTMLDivElement} The popover body.
+         */
+        const createPopoverContent = function () {
             const status = $(this).attr('mutant-status');
+            const line = Number($(this).attr('mutant-line'));
+
             const mutantsOnLine = mutantIdsPerLine.get(line)
                 .map(id => mutants.get(id))
                 .filter(mutant => mutant.status === status);
@@ -204,29 +251,13 @@
                     `</tbody>
                  </table>`;
 
+            /* Create the button if it is supposed to be shown. */
             let button = '';
-
-            <% if (showEquivalenceButton) { %>
-                if (status === MutantStatus.alive <%=markUncoveredEquivalent ? "" : "&& coverageOnLine.get(line)"%>) {
-                    <% if (gameType.equals("PARTY")) { %>
-                        button =
-                           `<form onsubmit="if (window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')) { window.location.href = \'multiplayer/play?equivLine=` + line + `\'; } return false;">
-                                <button class="btn btn-danger btn-sm" style="width: 100%;">
-                                    <img src="<%=request.getContextPath()%>/images/flag.png" class="mutant-icon-image"/> Claim Equivalent
-                                </button>
-                            </form>`;
-                    <% } else if (gameType.equals("DUEL")) { %>
-                        button =
-                            `<form id="equiv" action="duelgame" method="post" onsubmit="return window.confirm('This will mark mutant ` + mutantsOnLine[0].id + ` as equivalent. Are you sure?')">
-                                <input type="hidden" name="formType" value="claimEquivalent">
-                                <input type="hidden" name="mutantId" value="` + mutantsOnLine[0].id + `">
-                                <button class="btn btn-danger btn-sm" style="width: 100%;">
-                                    <img src="<%=request.getContextPath()%>/images/flag.png" class="mutant-icon-image"/> Claim Equivalent
-                                </button>
-                             </form>`;
-                    <% } %>
-                }
-            <% } %>
+            if (showEquivalenceButton
+                && status === MutantStatus.ALIVE
+                && (markUncoveredEquivalent || testIdsPerLine.get(line))) {
+                button = createEquivalenceButton(line, mutantsOnLine);
+            }
 
             const content = document.createElement('div');
             content.classList.add('mutant-popover-body');
@@ -235,6 +266,36 @@
             return content;
         };
 
+        /**
+         * Creates the button with which to flag mutants as equivalent.
+         * @param line The line number.
+         * @param mutantsOnLine The muitants on the line.
+         * @return {string} The equivalence button.
+         */
+        const createEquivalenceButton = function (line, mutantsOnLine) {
+            if (gameType === GameTypes.PARTY) {
+                return `<form onsubmit="if (window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')) { window.location.href = \'multiplayer/play?equivLine=` + line + `\'; } return false;">
+                            <button class="btn btn-danger btn-sm" style="width: 100%;">
+                                <img src="<%=request.getContextPath()%>/images/flag.png" class="mutant-icon-image"/> Claim Equivalent
+                            </button>
+                        </form>`;
+            } else if (gameType === GameTypes.DUEL) {
+                return `<form id="equiv" action="duelgame" method="post" onsubmit="return window.confirm('This will mark mutant ` + mutantsOnLine[0].id + ` as equivalent. Are you sure?')">
+                            <input type="hidden" name="formType" value="claimEquivalent">
+                            <input type="hidden" name="mutantId" value="` + mutantsOnLine[0].id + `">
+                            <button class="btn btn-danger btn-sm" style="width: 100%;">
+                                <img src="<%=request.getContextPath()%>/images/flag.png" class="mutant-icon-image"/> Claim Equivalent
+                            </button>
+                        </form>`;
+            } else {
+                console.error('Unknown game type for equivalence button: ' + gameType);
+            }
+        };
+
+        /**
+         * Highlights coverage on the given CodeMirror instance.
+         * @param {object} codeMirror The CodeMirror instace.
+         */
         const highlightCoverage = function (codeMirror) {
             for (const [line, testIds] of testIdsPerLine) {
                 const coveragePercent = (testIds.length * 100 / tests.size).toFixed(0);
@@ -242,10 +303,16 @@
             }
         };
 
+        /**
+         * Displays mutant icons on the given CodeMirror instance.
+         * @param {object} codeMirror The CodeMirror instace.
+         */
         const highlightMutants = function (codeMirror) {
             for (const [line, mutantIds] of mutantIdsPerLine) {
                 const mutantsOnLine = mutantIds.map(id => mutants.get(id));
-                codeMirror.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', createMutantIcons(line, mutantsOnLine));
+                const marker = createMutantIcons(line, mutantsOnLine);
+                addPopoverTrigger(marker);
+                codeMirror.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', marker);
             }
         };
 
