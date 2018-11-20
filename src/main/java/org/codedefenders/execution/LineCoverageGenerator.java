@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashSet;
@@ -74,16 +75,30 @@ public class LineCoverageGenerator {
         // In memory data store for execution data
         final ExecutionDataStore executionDataStore = execFileLoader.getExecutionDataStore();
 
-        final String classFile = gameClass.getClassFile();
-
+        /*
+         *  Classes with inner classes corresponds to multiple files on the file system
+         *  But inside the db they are not reported. So we need to look into the folder
+         */
         final CoverageBuilder coverageBuilder = new CoverageBuilder();
         final Analyzer analyzer = new Analyzer(executionDataStore, coverageBuilder);
-        try {
-            analyzer.analyzeClass(new ClassReader(new FileInputStream(classFile)));
-        } catch (IOException e) {
-            logger.error("Failed to analyze file: " + classFile + ". Returning empty LineCoverage.", e);
-            return new LineCoverage();
-        }
+//        final String classFile = gameClass.getClassFile();
+
+        final File classFileFolder = new File(gameClass.getClassFile()).getParentFile();
+        // List all the .class files in this folder. Not sure if FilenameFilter is thread safe so I instantiate a new one every time. 
+		for (File classFile : classFileFolder.listFiles(new FilenameFilter() {
+
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.endsWith(".class");
+			}
+		})) {
+			try {
+				analyzer.analyzeClass(new ClassReader(new FileInputStream(classFile)));
+			} catch (IOException e) {
+				logger.error("Failed to analyze file: " + classFile + ". Returning empty LineCoverage.", e);
+				return new LineCoverage();
+			}
+		}
 
         final List<Integer> linesCovered = new LinkedList<>();
         final List<Integer> linesUncovered = new LinkedList<>();
