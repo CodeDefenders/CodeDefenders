@@ -23,37 +23,42 @@
 var sMutants = new Set();
 var sLine = null; // Primary Target
 
+var codeOriginalDisplay= document.querySelector('#code').parentNode.style.display;
+
+// Include a DIV for the alternative text
+var theForm = document.getElementById('def');
+var parent = document.getElementById('utest-div');
+var container = document.createElement('div');
+container.setAttribute("style", "text-align: center;");
+container.innerHTML='<h4 style="margin-top: 50px">Select a target line from the Class Under Test to enable test editor</h4>'
+// Hide the div
+container.style.display = "none";
+// Put the container before the form
+parent.insertBefore(container, theForm);
 
 function toggleDefend(){
-	document.getElementById("submitTest").disabled = <% if(game.isCapturePlayersIntention()) {%> sLine == null  <% } else {%> true <% }%>;
+	if( sLine == null ){
+		// When no lines are selected hide code mirror and display the alternative text instead
+		document.getElementById('submitTest').disabled = true;
+		document.querySelector('#code').parentNode.style.display = "none";
+		container.style.display = "block";
+	} else {
+		// Use the whatever display value was there
+		document.getElementById('submitTest').disabled = false;
+		document.querySelector('#code').parentNode.style.display = codeOriginalDisplay;
+		container.style.display = "none";
+	}
 }
 
 toggleDefend();
 
-var theForm = document.getElementById('def');
-
-var parent = document.getElementById('utest-div');
-var container = document.createElement('div');
-container.setAttribute("style", "width: 100%");
-// Put the container before the form
-parent.insertBefore(container, theForm);
-
-var theTable = document.createElement("TABLE");
-theTable.setAttribute("id", "intention-table");
-container.appendChild(theTable)
-
-<%-- Handling Line Coverage --%>
-<% if(game.isCapturePlayersIntention()) {%>
-
 function selectLine(lineNumber){
 	if( sLine == lineNumber ){
 		sLine = null;
-		selected_lines.innerText="<no line selected>";
 	} else {
 		sLine = lineNumber;
-		selected_lines.innerText=sLine;
 	}
-	document.getElementById("selected_lines").value = selected_lines.innerText;
+	// Update UI
 	toggleDefend();
 }
 
@@ -65,24 +70,7 @@ input.setAttribute("value", "");
 //append to form element that you want .
 theForm.appendChild(input);
 
-// update the UI by adding a row to the "intention-table"
-// https://stackoverflow.com/questions/18333427/how-to-insert-row-in-html-table-body-in-javascript
-// Insert a row in the table at the last row
-var newRow = theTable.insertRow();
-// Insert a cell in the row
-var newCell  = newRow.insertCell();
-// Write the HTML inside the cell
-newCell.innerHTML='<strong>Selected Lines:</strong>';
-newCell.setAttribute("style", "width: 25%;  height: 40px;")
-
-//Insert another cell in the row
-var newCell  = newRow.insertCell();
-var selected_lines =  document.createElement('div');
-selected_lines.setAttribute("id", "selectedLinesDiv");
-selected_lines.innerText="<no line selected>";
-newCell.appendChild(selected_lines);
-
-<!-- Update Code Mirror to enable line selection -->
+<!-- Update Left Code Mirror to enable line selection on gutter -->
 var editor = document.querySelector('#sut').nextSibling.CodeMirror;
 /* function isEmpty(obj) {
     for (var n in obj) if (obj.hasOwnProperty(n) && obj[n]) return false;
@@ -115,83 +103,5 @@ function makeMarker() {
   marker.innerHTML = "x";
   return marker;
 }
-
-// Resize original code mirror
-var testCode = document.querySelector('#code').nextSibling;
-var newHeight = testCode.style.height.replace("px","");
-newHeight=newHeight-40;
-testCode.style.height=newHeight+"px";
-<% }%>
-
-<%-- Handling Killing Mutants --%>
-<%-- Currently Disabled --%>
-<%-- if(game.isDeclareKilledMutants() ) {
-
-function selectMutant(mutantCheckboxRow, mutantCheckbox){
-	var table = document.getElementById("alive-mutants");
-	var mutantID = table.rows[mutantCheckboxRow].cells[0].innerText.split(' ')[1];
-	// Update the label with that
-	if( mutantCheckbox.checked ){
-		sMutants.add(mutantID);
-	} else {
-		sMutants.delete(mutantID);
-	}
-	selected_mutants.innerText=Array.from(sMutants).join(",");
-	document.getElementById("selected_mutants").value = selected_mutants.innerText;
-	toggleDefend();
-}
-
-var input = document.createElement("input");
-input.setAttribute("type", "hidden");
-input.setAttribute("id", "selected_mutants");
-input.setAttribute("name", "selected_mutants");
-input.setAttribute("value", "");
-//append to form element that you want .
-theForm.appendChild(input);
-
-var newRow = theTable.insertRow();
-//Insert a cell in the row
-var newCell  = newRow.insertCell();
-//Write the HTML inside the cell
-newCell.innerHTML='<strong>Selected Mutants:</strong>';
-newCell.setAttribute("style", "width: 25%;  height: 40px;")
-//Insert another cell in the row
-var newCell  = newRow.insertCell();
-var selected_mutants =  document.createElement('div');
-selected_mutants.setAttribute("id", "selectedMutantsDiv");
-selected_mutants.innerText=""
-newCell.appendChild(selected_mutants);
-
-<!-- Add a checkbox for each alive mutant. Note that the table might not be there -->
-
-var table = document.getElementById("alive-mutants");
-
-if( table != null ){
-	<!-- Note the use of "let" instead of "var" -->
-	for (let i = 0, row; row = table.rows[i]; i++) {
-		// Take Cell #3
-		var cell = row.cells[2];
-		var checkbox = document.createElement("input");
-		checkbox.setAttribute("type", "checkbox");
-		checkbox.setAttribute("id", "checkbox_"+i);
-		// Do I need to set id and value ?
-		cell.appendChild(checkbox);
-		var label = document.createTextNode("Target this mutant");
-		cell.appendChild(label);
-		checkbox.onclick = function fun(){
-			selectMutant( i, this );
-		}
-	}
-}
-
-// Resize the original code mirror
-var testCode = document.querySelector('#code').nextSibling;
-var newHeight = testCode.style.height.replace("px","");
-newHeight=newHeight-40;
-testCode.style.height=newHeight+"px";
-
-
-<% }%>
---%>
 
 </script>
