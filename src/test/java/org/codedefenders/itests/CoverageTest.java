@@ -215,7 +215,7 @@ public class CoverageTest {
 		//
 		System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + ": "
 				+ messages.get(messages.size() - 1));
-		Assert.assertEquals(Constants.TEST_KILLED_ONE_MESSAGE, messages.get(messages.size() - 1));
+		Assert.assertEquals(Constants.TEST_KILLED_LAST_MESSAGE, messages.get(messages.size() - 1));
 
 	}
 }
