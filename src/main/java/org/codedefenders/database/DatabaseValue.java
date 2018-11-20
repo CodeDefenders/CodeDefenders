@@ -19,71 +19,77 @@
 package org.codedefenders.database;
 
 import java.sql.Timestamp;
+import java.sql.Types;
 
-public class DatabaseValue {
-    private Integer intVal;
-    private Long longVal;
-    private String stringVal;
+/**
+ * This class represents values which can be inserted into a SQL database.
+ * <p>
+ * Instances have a type and a value, which can be {@code null},
+ * if a SQL {@code NULL} value is represented.
+ */
+public class DatabaseValue<T> {
     private Type type;
-    private float floatVal;
-    private Timestamp timestampVal;
-    private Boolean boolVal;
+    private T value;
 
-    public enum Type {
-        LONG, INT, STRING, FLOAT, TIMESTAMP, BOOLEAN
+    DatabaseValue(T value) {
+        this.type = Type.get(value);
+        this.value = value;
     }
 
-    DatabaseValue(String v) {
-        this.type = Type.STRING;
-        stringVal = v;
-    }
-
-    DatabaseValue(float v) {
-        this.type = Type.FLOAT;
-        floatVal = v;
-    }
-
-    DatabaseValue(Timestamp v) {
-        this.type = Type.TIMESTAMP;
-        timestampVal = v;
-    }
-
-    DatabaseValue(int v) {
-        this.type = Type.INT;
-        intVal = v;
-    }
-
-    DatabaseValue(boolean v) {
-        this.type = Type.BOOLEAN;
-        boolVal = v;
-    }
-
-    DatabaseValue(Long v) {
-        this.type = Type.LONG;
-        longVal = v;
-    }
-
-	Boolean getBoolVal() {
-		return this.boolVal;
-	}
-
+    /**
+     * @return the {@link Type} enum instance of this {@link DatabaseValue}.
+     */
     public Type getType() {
-        return this.type;
+        return type;
     }
 
-    String getStringVal() {
-        return this.stringVal;
+    /**
+     * Retrieves the typed value of this {@link DatabaseValue}, or {@code null}.
+     *
+     * @return a typed value or {@code null}.
+     */
+    public T getValue() {
+        return value;
     }
 
-    Integer getIntVal() {
-        return this.intVal;
+    enum Type {
+        NULL(Types.NULL, Void.class),
+        INT(Types.INTEGER, Integer.class),
+        LONG(Types.BIGINT, Long.class),
+        FLOAT(Types.FLOAT, Float.class),
+        STRING(Types.VARCHAR, String.class),
+        TIMESTAMP(Types.TIMESTAMP, Timestamp.class),
+        BOOLEAN(Types.BOOLEAN, Boolean.class);
+
+        int typeValue;
+        Class<?> clazz;
+
+        Type(int typeValue, Class clazz) {
+            this.typeValue = typeValue;
+            this.clazz = clazz;
+        }
+
+        static Type get(Object value) {
+            if (value == null) {
+                return NULL;
+            }
+            final Class<?> clazz = value.getClass();
+            if (INT.clazz == clazz) {
+                return INT;
+            } else if (LONG.clazz == clazz) {
+                return LONG;
+            } else if (FLOAT.clazz == clazz) {
+                return FLOAT;
+            } else if (STRING.clazz == clazz) {
+                return STRING;
+            } else if (TIMESTAMP.clazz == clazz) {
+                return TIMESTAMP;
+            } else if (BOOLEAN.clazz == clazz) {
+                return BOOLEAN;
+            } else {
+                throw new IllegalArgumentException("Tried to create database value for class " + clazz.getName() +
+                        ", which is not supported!");
+            }
+        }
     }
-
-    Long getLongVal() {
-        return this.longVal;
-    }
-
-    Float getFloatVal() {return this.floatVal;}
-
-    Timestamp getTimestampVal() {return this.timestampVal;}
 }

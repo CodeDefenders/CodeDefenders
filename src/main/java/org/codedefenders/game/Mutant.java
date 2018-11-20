@@ -26,7 +26,6 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
-import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.util.MutantUtils;
@@ -35,15 +34,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -151,7 +152,7 @@ public class Mutant implements Serializable {
 		this.md5 = CodeValidator.getMD5FromFile(jFile); // TODO: This may be null
 	}
 
-	public Mutant(int mid, int classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId) {
+	public Mutant(int mid, Integer classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId) {
 		this(gid, classId, jFile, cFile, alive, playerId);
 		this.id = mid;
 		this.equivalent = equiv;
