@@ -158,7 +158,7 @@
                 "order": [[ 1, "asc" ]]
             });
 
-            setupChildRows("#tableUsers", table, format);
+            setupChildRows("#tableClasses", table, format);
         });
     </script>
 

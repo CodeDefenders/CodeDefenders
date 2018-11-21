@@ -28,6 +28,7 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.database.UserDAO" %>
 <% String pageTitle= null ; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <%
@@ -86,11 +87,11 @@
 				defName = null;
 
 				if (g.getAttackerId() != 0) {
-					atkName = DatabaseAccess.getUserForKey("User_ID", g.getAttackerId()).getUsername();
+					atkName = UserDAO.getUserById(g.getAttackerId()).getUsername();
 				}
 
 				if (g.getDefenderId() != 0) {
-					defName = DatabaseAccess.getUserForKey("User_ID", g.getDefenderId()).getUsername();
+					defName = UserDAO.getUserById(g.getDefenderId()).getUsername();
 				}
 
 				int turnId = g.getAttackerId();
@@ -169,7 +170,7 @@
 	<tr id="<%="game-"+g.getId()%>">
 		<td class="col-sm-1"><%= g.getId() %></td>
 		<td class="col-sm-1">Multiplayer</td>
-		<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
+		<td class="col-sm-1"><%= UserDAO.getUserById(g.getCreatorId()).getUsername() %></td>
 		<td class="col-sm-2">
 			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>"><%=cut.getAlias()%></a>
 			<div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;" >
@@ -321,8 +322,8 @@
 				// User is already playing this game
 				if ((atkId == uid)||(defId == uid)) {continue;}
 
-				if (atkId != 0) {atkName = DatabaseAccess.getUserForKey("User_ID", atkId).getUsername();}
-				if (defId != 0) {defName = DatabaseAccess.getUserForKey("User_ID", defId).getUsername();}
+				if (atkId != 0) {atkName = UserDAO.getUserById(atkId).getUsername();}
+				if (defId != 0) {defName = UserDAO.getUserById(defId).getUsername();}
 
 				if ((atkName != null)&&(defName != null)) {continue;}
 
@@ -382,7 +383,7 @@
 		<tr id="<%="game-"+g.getId()%>">
 			<td class="col-sm-1"><%= g.getId() %></td>
 			<td class="col-sm-1">Multiplayer</td>
-			<td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
+			<td class="col-sm-1"><%= UserDAO.getUserById(g.getCreatorId()).getUsername() %></td>
 			<td class="col-sm-2">
 				<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
 					<%=cut.getAlias()%>

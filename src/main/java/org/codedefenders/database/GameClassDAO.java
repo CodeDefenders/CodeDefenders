@@ -47,26 +47,10 @@ public class GameClassDAO {
      * @param alias the alias that is checked.
      * @return {@code true} if alias does not exist, {@code false} otherwise.
      */
-    public static boolean classNotExistsForAlias(String alias) {
+    public static boolean classNotExistsForAlias(String alias) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM classes WHERE Alias = ?";
-
-        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(alias)};
-
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        try {
-            if (resultSet == null) {
-                return false;
-            }
-            return resultSet.first();
-        } catch (SQLException e) {
-            logger.error("Error while retrieving classes for alias.", e);
-            return false;
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
+        Boolean rv = DB.executeQueryReturnValue(query, rs -> true, DB.getDBV(alias));
+        return rv != null;
     }
 
     /**
@@ -76,32 +60,10 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of identifiers of mutants
      */
-    public static List<Integer> getMappedMutantIdsForClassId(Integer classId) {
-        List<Integer> mutantIds = new LinkedList<>();
-
+    public static List<Integer> getMappedMutantIdsForClassId(Integer classId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT Mutant_ID FROM mutants WHERE Class_ID = ?;";
-
-        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
-
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        try {
-            if (resultSet == null) {
-                return mutantIds;
-            }
-            while (resultSet.next()) {
-                final int mutantId = resultSet.getInt("Mutant_ID");
-                mutantIds.add(mutantId);
-            }
-        } catch (SQLException e) {
-            logger.error("Error during retrieval of mapped mutants for classId:{}", classId);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-
-        return mutantIds;
+        return DB.executeQueryReturnList(query, rs -> rs.getInt("Mutant_ID"), DB.getDBV(classId));
     }
 
     /**
@@ -111,41 +73,10 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of mutants
      */
-    public static List<Mutant> getMappedMutantsForClassId(Integer classId) {
-        List<Mutant> mutants = new LinkedList<>();
-
+    public static List<Mutant> getMappedMutantsForClassId(Integer classId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM mutants WHERE Class_ID = ?;";
-
-        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
-
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        try {
-            if (resultSet == null) {
-                return mutants;
-            }
-            while (resultSet.next()) {
-                final int mutantId = resultSet.getInt("Mutant_ID");
-                final int gameId = resultSet.getInt("Game_ID");
-                final String javaFile = resultSet.getString("JavaFile");
-                final String classFile = resultSet.getString("ClassFile");
-                final boolean alive = resultSet.getInt("Alive") == 1;
-                final Mutant.Equivalence equivalence = Mutant.Equivalence.valueOf(resultSet.getString("Equivalent"));
-                final int roundCreated = resultSet.getInt("RoundCreated");
-                final int roundKilled = resultSet.getInt("RoundKilled");
-                final int playerId = resultSet.getInt("Player_ID");
-
-                mutants.add(new Mutant(mutantId, gameId, javaFile, classFile, alive, equivalence, roundCreated, roundKilled, playerId));
-            }
-        } catch (SQLException e) {
-            logger.error("Error during retrieval of mapped mutants for classId:{}", classId);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-
-        return mutants;
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS ,DB.getDBV(classId));
     }
 
     /**
@@ -155,34 +86,11 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of identifiers of tests
      */
-    public static List<Integer> getMappedTestIdsForClassId(Integer classId) {
-        List<Integer> testIds = new LinkedList<>();
-
+    public static List<Integer> getMappedTestIdsForClassId(Integer classId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT Test_ID FROM tests WHERE Class_ID = ?;";
-
-        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
-
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        try {
-            if (resultSet == null) {
-                return testIds;
-            }
-            while (resultSet.next()) {
-                final int testId = resultSet.getInt("Test_ID");
-                testIds.add(testId);
-            }
-        } catch (SQLException e) {
-            logger.error("Error during retrieval of mapped tests for classId:{}", classId);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-
-        return testIds;
+        return DB.executeQueryReturnList(query, rs -> rs.getInt("Test_ID") ,DB.getDBV(classId));
     }
-
 
     /**
      * Return a {@link List} of all {@link Test}s, which were uploaded
@@ -191,17 +99,9 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of tests
      */
-    public static List<Test> getMappedTestsForClassId(Integer classId) {
+    public static List<Test> getMappedTestsForClassId(Integer classId) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM tests WHERE Class_ID = ?;";
-
-        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
-
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        final List<Test> retrievedTests = DatabaseAccess.getTests(stmt, conn);
-
-        return new LinkedList<>(retrievedTests);
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(classId));
     }
 
     /**
@@ -211,69 +111,28 @@ public class GameClassDAO {
      * @param classId the identifier of the given class
      * @return a list of identifiers of dependencies
      */
-    public static List<Integer> getMappedDependencyIdsForClassId(Integer classId) {
-        List<Integer> testIds = new LinkedList<>();
-
+    public static List<Integer> getMappedDependencyIdsForClassId(Integer classId)
+            throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT Dependency_ID FROM dependencies WHERE Class_ID = ?;";
-
-        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
-
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        try {
-            if (resultSet == null) {
-                return testIds;
-            }
-            while (resultSet.next()) {
-                final int id = resultSet.getInt("Dependency_ID");
-                testIds.add(id);
-            }
-        } catch (SQLException e) {
-            logger.error("Error during retrieval of mapped dependency for classId:{}", classId);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-
-        return testIds;
+        return DB.executeQueryReturnList(query, rs -> rs.getInt("Dependency_ID"), DB.getDBV(classId));
     }
 
-    public static List<Dependency> getMappedDependenciesForClassId(Integer classId) {
-        List<Dependency> dependencies = new LinkedList<>();
-
-        String query = String.join(" ",
+    /**
+     * Return a {@link List} of all {@link Dependency}s,
+     * which were uploaded together with a given class.
+     *
+     * @param classId the identifier of the given class
+     * @return a list of identifiers of dependencies
+     */
+    public static List<Dependency> getMappedDependenciesForClassId(Integer classId)
+            throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
                 "SELECT",
                 "   Dependency_ID,",
                 "   JavaFile,",
                 "   ClassFile",
-                "FROM dependencies WHERE Class_ID = ?;"
-        );
-
-        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId)};
-
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        final ResultSet resultSet = DB.executeQueryReturnRS(conn, stmt);
-        try {
-            if (resultSet == null) {
-                return dependencies;
-            }
-            while (resultSet.next()) {
-                final int id = resultSet.getInt("Dependency_ID");
-                final String javaFile = resultSet.getString("JavaFile");
-                final String classFile = resultSet.getString("ClassFile");
-                final Dependency dependency = new Dependency(id, classId, javaFile, classFile);
-                dependencies.add(dependency);
-            }
-        } catch (SQLException e) {
-            logger.error("Error during retrieval of mapped dependency for classId:{}", classId);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-
-        return dependencies;
+                "FROM dependencies WHERE Class_ID = ?;");
+        return DB.executeQueryReturnList(query, rs -> DependencyDAO.dependencyFromRS(rs, classId), DB.getDBV(classId));
     }
 
     /**

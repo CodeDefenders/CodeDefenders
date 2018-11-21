@@ -20,9 +20,7 @@ package org.codedefenders.game;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.*;
 import org.codedefenders.game.duel.DuelGame;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -203,7 +201,7 @@ public class Test {
 		boolean updated = DB.executeUpdate(stmt, conn);
 
 		// Eventually update the kill count from the DB
-		mutantsKilled = DatabaseAccess.getTestForId(getId()).getMutantsKilled();
+		mutantsKilled = TestDAO.getTestById(getId()).getMutantsKilled();
 		
 		logger.info("Test {} new killcount is {}. Was updated ? {} ", toString(), mutantsKilled, updated);
 	}

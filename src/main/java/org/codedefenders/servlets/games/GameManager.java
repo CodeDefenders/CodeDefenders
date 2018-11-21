@@ -20,6 +20,7 @@ package org.codedefenders.servlets.games;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
@@ -237,7 +238,7 @@ public class GameManager extends HttpServlet {
 			case "claimEquivalent":
 				if (request.getParameter("mutantId") != null) {
 					int mutantId = Integer.parseInt(request.getParameter("mutantId"));
-					Mutant mutantClaimed = DatabaseAccess.getMutant(activeGame, mutantId);
+					Mutant mutantClaimed = MutantDAO.getMutantById(mutantId);
 					if (activeGame.getMode().equals(GameMode.SINGLE)) {
 						// TODO: Why is this not handled in the single player game but here?
 						//Singleplayer - use automatic system.
@@ -408,11 +409,11 @@ public class GameManager extends HttpServlet {
 		String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
 
 		// return the mutant in the game with same MD5 if it exists; return null otherwise
-		return DatabaseAccess.getMutant(gid, md5Mutant);
+		return MutantDAO.getMutantByGameAndMd5(gid, md5Mutant);
 	}
 
 	static boolean hasAttackerPendingMutantsInGame(int gid, int attackerId){
-		for( Mutant m : DatabaseAccess.getMutantsForGame(gid) ){
+		for (Mutant m : MutantDAO.getValidMutantsForGame(gid)) {
 			if (m.getPlayerId() == attackerId &&  m.getEquivalent() == Mutant.Equivalence.PENDING_TEST){
 				return true;
 			}

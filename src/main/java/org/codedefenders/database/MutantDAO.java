@@ -18,13 +18,17 @@
  */
 package org.codedefenders.database;
 
+import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Mutant.Equivalence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 /**
@@ -35,6 +39,103 @@ import java.util.List;
  */
 public class MutantDAO {
     private static final Logger logger = LoggerFactory.getLogger(MutantDAO.class);
+
+    /**
+     * Constructs a mutant from a {@link ResultSet} entry.
+     * @param rs The {@link ResultSet}.
+     * @return The constructed mutant.
+     * @see RSMapper
+     */
+    public static Mutant mutantFromRS(ResultSet rs) throws SQLException {
+        int mutantId = rs.getInt("Mutant_ID");
+        int gameId = rs.getInt("Game_ID");
+        String javaFile = rs.getString("JavaFile");
+        String classFile = rs.getString("ClassFile");
+        boolean alive = rs.getBoolean("Alive");
+        Equivalence equiv = Equivalence.valueOf(rs.getString("Equivalent"));
+        int roundCreated = rs.getInt("RoundCreated");
+        int roundKilled = rs.getInt("RoundKilled");
+        int playerId = rs.getInt("Player_ID");
+        int points = rs.getInt("Points");
+
+        Mutant mutant = new Mutant(mutantId, gameId, javaFile, classFile, alive, equiv, roundCreated,
+                                   roundKilled, playerId);
+        mutant.setScore(points);
+
+        try {
+            String username = rs.getString("Username");
+            int userId = rs.getInt("User_ID");
+            mutant.setCreatorName(username);
+            mutant.setCreatorId(userId);
+        } catch (SQLException e){ /* Username/User_ID cannot be retrieved from query (no join). */ }
+
+        return mutant;
+    }
+
+    /**
+     * Returns the {@link Mutant} for the given mutant id.
+     */
+    public static Mutant getMutantById(int mutantId) throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "SELECT * FROM mutants ",
+                "LEFT JOIN players ON players.ID = mutants.Player_ID ",
+                "LEFT JOIN users ON players.User_ID = users.User_ID ",
+                "WHERE mutants.Mutant_ID = ?;");
+        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DB.getDBV(mutantId));
+    }
+
+    /**
+     * Returns the {@link Mutant} with the given md5 sum from the given game.
+     */
+    public static Mutant getMutantByGameAndMd5(int gameId, String md5) throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "SELECT * FROM mutants ",
+                "LEFT JOIN players ON players.ID=mutants.Player_ID ",
+                "LEFT JOIN users ON players.User_ID = users.User_ID ",
+                "WHERE mutants.Game_ID = ? AND mutants.MD5 = ?;");
+        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DB.getDBV(gameId), DB.getDBV(md5));
+    }
+
+    /**
+     * Returns the compilable {@link Mutant Mutants} from the given game.
+     */
+    public static List<Mutant> getValidMutantsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "SELECT * FROM mutants ",
+                "LEFT JOIN players ON players.ID = mutants.Player_ID ",
+                "LEFT JOIN users ON players.User_ID = users.User_ID ",
+                "WHERE mutants.Game_ID = ?",
+                "  AND mutants.ClassFile IS NOT NULL;");
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(gameId));
+    }
+
+    /**
+     * Returns the compilable {@link Mutant Mutants} from the games played on the given class.
+     */
+    public static List<Mutant> getValidMutantsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "SELECT mutants.*",
+                "FROM mutants, games",
+                "LEFT JOIN players ON players.ID=mutants.Player_ID ",
+                "LEFT JOIN users ON players.User_ID = users.User_ID ",
+                "WHERE mutants.Game_ID = games.ID",
+                "  AND games.Class_ID = ?",
+                "  AND mutants.ClassFile IS NOT NULL;");
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(classId));
+    }
+
+    /**
+     * Returns the compilable {@link Mutant Mutants} submitted by the given player.
+     */
+    public static List<Mutant> getValidMutantsForPlayer(int playerId) throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "SELECT * FROM mutants ",
+                "LEFT JOIN players ON players.ID=mutants.Player_ID ",
+                "LEFT JOIN users ON players.User_ID = users.User_ID ",
+                "WHERE mutants.Game_ID = ?",
+                "  AND mutants.ClassFile IS NOT NULL;");
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(playerId));
+    }
 
     /**
      * Stores a given {@link Mutant} in the database.

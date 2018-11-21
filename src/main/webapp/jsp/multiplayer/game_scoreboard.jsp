@@ -70,7 +70,7 @@
                         if (i == -1){
                             continue;
                         }
-                        User aUser = DatabaseAccess.getUserFromPlayer(i);
+                        User aUser = UserDAO.getUserForPlayer(i);
                         total = 0;
                         int counter = 0;
                         %>
@@ -147,7 +147,7 @@
                             if (i == -1){
                                 continue;
                             }
-                            User dUser = DatabaseAccess.getUserFromPlayer(i);
+                            User dUser = UserDAO.getUserForPlayer(i);
                             total = 0;
                     %>
                     <tr class="defender"><td>

@@ -20,6 +20,7 @@ package org.codedefenders.servlets.games;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
@@ -179,7 +180,7 @@ public class MultiplayerGameManager extends HttpServlet {
 								logger.info("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
 								// TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points added.
 								newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
-								final String message = DatabaseAccess.getUser(uid).getUsername() + " killed mutant " + mPending.getId() + " in an equivalence duel.";
+								final String message = UserDAO.getUserById(uid).getUsername() + " killed mutant " + mPending.getId() + " in an equivalence duel.";
 								Event notif = new Event(-1, activeGame.getId(), uid, message,
 										EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
 										new Timestamp(System.currentTimeMillis()));
@@ -192,7 +193,7 @@ public class MultiplayerGameManager extends HttpServlet {
 								if (mPending.getId() == currentEquivMutantID) {
 									// only kill the one mutant that was claimed
 									mPending.kill(ASSUMED_YES);
-									final String message = DatabaseAccess.getUser(uid).getUsername() +
+									final String message = UserDAO.getUserById(uid).getUsername() +
 											" lost an equivalence duel. Mutant " + mPending.getId() +
 											" is assumed equivalent.";
 									Event notif = new Event(-1, activeGame.getId(), uid, message,
@@ -282,7 +283,7 @@ public class MultiplayerGameManager extends HttpServlet {
 						TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 						if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
 							Event notif = new Event(-1, activeGame.getId(), uid,
-									DatabaseAccess.getUser(uid).getUsername() + " created a mutant.",
+									UserDAO.getUserById(uid).getUsername() + " created a mutant.",
 									EventType.ATTACKER_MUTANT_CREATED, EventStatus.GAME,
 									new Timestamp(System.currentTimeMillis() - 1000));
 							notif.insert();
@@ -347,7 +348,7 @@ public class MultiplayerGameManager extends HttpServlet {
 							messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 
 							Event notif = new Event(-1, activeGame.getId(), uid,
-									DatabaseAccess.getUser(uid).getUsername() + " created a test",
+									UserDAO.getUserById(uid).getUsername() + " created a test",
 									EventType.DEFENDER_TEST_CREATED, EventStatus.GAME,
 									new Timestamp(System.currentTimeMillis()));
 							notif.insert();

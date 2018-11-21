@@ -21,11 +21,8 @@ package org.codedefenders.itests;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.lang3.ArrayUtils;
+import org.codedefenders.database.*;
 import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.database.ConnectionPool;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.DatabaseConnection;
-import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -123,7 +120,7 @@ public class RunnerTest {
 	@Test
 	public void testInsertUser() throws Exception {
 		assertTrue(user1.insert());
-		User userFromDB = DatabaseAccess.getUser(user1.getId());
+		User userFromDB = UserDAO.getUserById(user1.getId());
 		assertEquals(user1.getId(), userFromDB.getId());
 		assertEquals(user1.getUsername(), userFromDB.getUsername());
 		assertEquals(user1.getEmail(), userFromDB.getEmail());
@@ -144,7 +141,7 @@ public class RunnerTest {
 		user1.setEmail(user1.getEmail() + "_new");
 
 		assertTrue(user1.update());
-		User userFromDB = DatabaseAccess.getUser(user1.getId());
+		User userFromDB = UserDAO.getUserById(user1.getId());
 		assertEquals(user1.getId(), userFromDB.getId());
 		assertEquals(user1.getUsername(), userFromDB.getUsername());
 		assertEquals(user1.getEmail(), userFromDB.getEmail());
@@ -249,7 +246,7 @@ public class RunnerTest {
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
 		int playerID = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
 		assertTrue(playerID > 0);
-		assertEquals(DatabaseAccess.getUserFromPlayer(playerID).getId(), user1.getId());
+		assertEquals(UserDAO.getUserForPlayer(playerID).getId(), user1.getId());
 		assertTrue(DatabaseAccess.getPlayersForMultiplayerGame(multiplayerGame.getId(), Role.DEFENDER).length > 0);
 		assertEquals(DatabaseAccess.getPlayerPoints(playerID), 0);
 		DatabaseAccess.increasePlayerPoints(13, playerID);
@@ -280,8 +277,8 @@ public class RunnerTest {
 		assertTrue(mutant1.insert());
 		assertTrue(mutant2.insert());
 		Mutant[] ml = { mutant1, mutant2 };
-		assertTrue(Arrays.equals(DatabaseAccess.getMutantsForPlayer(pid).toArray(), ml));
-		assertTrue(Arrays.equals(DatabaseAccess.getMutantsForGame(multiplayerGame.getId()).toArray(), ml));
+		assertTrue(Arrays.equals(MutantDAO.getValidMutantsForPlayer(pid).toArray(), ml));
+		assertTrue(Arrays.equals(MutantDAO.getValidMutantsForGame(multiplayerGame.getId()).toArray(), ml));
 	}
 
 	@Test
@@ -341,7 +338,7 @@ public class RunnerTest {
 		assertFalse(mutant1.update());
 		//
 
-		Mutant storedMutant = DatabaseAccess.getMutantById( mutant1.getId() );
+		Mutant storedMutant = MutantDAO.getMutantById( mutant1.getId() );
 		assertEquals("Score does not match", score, storedMutant.getScore());
 		//
 		assertEquals(mutant1, storedMutant);
@@ -364,7 +361,7 @@ public class RunnerTest {
 		test.setPlayerId(pid);
 
 		assertTrue(test.insert());
-		org.codedefenders.game.Test testFromDB = DatabaseAccess.getTestForId(test.getId());
+		org.codedefenders.game.Test testFromDB = TestDAO.getTestById(test.getId());
 		assertEquals(testFromDB.getJavaFile(), test.getJavaFile());
 		assertEquals(testFromDB.getClassFile(), test.getClassFile());
 		assertEquals(testFromDB.getGameId(), test.getGameId());
@@ -376,7 +373,7 @@ public class RunnerTest {
 		test.setAiMutantsKilled(23);
 		assertTrue(test.update());
 
-		testFromDB = DatabaseAccess.getTestForId(test.getId());
+		testFromDB = TestDAO.getTestById(test.getId());
 		assertEquals(testFromDB.getScore(), test.getScore());
 		assertEquals(testFromDB.getAiMutantsKilled(), test.getAiMutantsKilled());
 		assertEquals(testFromDB.getLineCoverage().getLinesCovered(), test.getLineCoverage().getLinesCovered());
