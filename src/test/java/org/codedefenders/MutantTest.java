@@ -27,14 +27,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.management.relation.RoleInfo;
-
 import org.apache.commons.io.FileUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.duel.DuelGame;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;

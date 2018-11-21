@@ -48,8 +48,9 @@ public class DatabaseTest {
 			QueryRunner qr = new QueryRunner();
 			List<String> results = qr.query(conn, "SELECT * FROM classes;", new ColumnListHandler<String>());
 			assertEquals(0, results.size());
-
-			results = qr.query(conn, "SELECT * FROM games;", new ColumnListHandler<String>());
+			
+			// There's no active games of type Multiplayer
+			results = qr.query(conn, "SELECT * FROM games WHERE ID <> -1;", new ColumnListHandler<String>());
 			assertEquals(0, results.size());
 
 			results = qr.query(conn, "SELECT * FROM mutants;", new ColumnListHandler<String>());
