@@ -109,11 +109,11 @@
             </li>
             <li style=" display: inline-block;">
                 Smells:
-                <a class="validatorLevelTag btn <%=smellColor %>"
-                	data-container="body" data-html="true" data-toggle="popover" data-trigger="focus"
-                	data-placement="top" title="This test smells of:" 
-                	data-content="<%=smellHtmlList %>"
-                	data-original-title=""><%=smellLevel %></a>
+                <a class="validatorLevelTag btn <%=smellColor %>" data-container="body" data-html="true"
+                    <%if( ! smellList.isEmpty() ){ %>
+                       data-toggle="popover"
+                    <% } %>
+                   data-trigger="focus" data-placement="top" title="This test smells of:"  data-content="<%=smellHtmlList %>" data-original-title=""><%=smellLevel %></a>
             </li>
 
         </ul>
