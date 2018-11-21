@@ -595,5 +595,9 @@
 				<enabled>false</enabled>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>Local Repository</id>
+			<url>file://${basedir}/local-repo</url>
+		</repository>
 	</repositories>
 </project>
