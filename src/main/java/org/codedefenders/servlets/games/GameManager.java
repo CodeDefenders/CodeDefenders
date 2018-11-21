@@ -21,6 +21,7 @@ package org.codedefenders.servlets.games;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
@@ -41,42 +42,8 @@ import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import static org.codedefenders.util.Constants.F_SEP;
-import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
-import static org.codedefenders.util.Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_CLAIMED_EQUIVALENT_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
-import static org.codedefenders.util.Constants.TESTS_DIR;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
-import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
+import testsmell.TestFile;
+import testsmell.TestSmellDetector;
 
 public class GameManager extends HttpServlet {
 
@@ -485,7 +452,18 @@ public class GameManager extends HttpServlet {
 		// Eventually check the test actually passes when applied to the original code.
 		if (compileTestTarget.status.equals("SUCCESS")) {
 			AntRunner.testOriginal(newTestDir, newTest);
+			try {
+				// Detect test smell and store them to DB
+				TestSmellDetector testSmellDetector = TestSmellDetector.createTestSmellDetector();
+				TestFile testFile = new TestFile("", newTest.getJavaFile(), classUnderTest.getJavaFile());
+				testSmellDetector.detectSmells(testFile);
+				TestSmellsDAO.storeSmell(newTest, testFile);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+
 		return newTest;
 	}
 

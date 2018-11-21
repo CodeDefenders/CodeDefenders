@@ -379,6 +379,12 @@
 	</profiles>
 
 	<dependencies>
+		<!-- Test Smell Detector -->
+		<dependency>
+			<groupId>edu.rit.se.testsmells</groupId>
+			<artifactId>TestSmellDetector</artifactId>
+			<version>0.1</version>
+		</dependency>
 
 		<!-- Server side validation -->
 		<dependency>
