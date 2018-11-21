@@ -61,15 +61,15 @@
             String smellLevel = "Good";
             String smellColor = "btn-success";
 
-            if(smellList.size() > 1 ){
+            if(smellList.size() >= 1 ){
             	smellLevel = "Fishy";
                 smellColor = "btn-warning";
             }
-			if(smellList.size() > 3 ){
+			if(smellList.size() >= 3 ){
 				smellLevel = "Bad";
                 smellColor = "btn-danger";
             }
-			if(smellList.size() > 5 ){
+			if(smellList.size() >= 5 ){
 				smellLevel = "A lot";
                 smellColor = "btn-dark";
 
