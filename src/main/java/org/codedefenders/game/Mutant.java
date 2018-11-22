@@ -579,13 +579,9 @@ public class Mutant implements Serializable {
 	}
 
 	public synchronized List<String> getHTMLReadout() {
-		if (description != null) {
+		if (description == null) {
 			computeLinesAndDescription();
-			return description;
 		}
-		// for efficiency, getLines actually create the list of messages
-		getLines();
-
 		return description;
 	}
 
