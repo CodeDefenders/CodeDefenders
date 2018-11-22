@@ -18,6 +18,11 @@
  */
 package org.codedefenders.database;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.commons.lang.StringUtils;
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
@@ -57,10 +62,14 @@ public class MutantDAO {
         int roundKilled = rs.getInt("RoundKilled");
         int playerId = rs.getInt("Player_ID");
         int points = rs.getInt("Points");
+        //
+        List<Integer> mutatedLines = Stream.of(rs.getString("MutatedLines").split(",")).map(Integer::parseInt).collect(Collectors.toList());
 
         Mutant mutant = new Mutant(mutantId, gameId, javaFile, classFile, alive, equiv, roundCreated,
                                    roundKilled, playerId);
         mutant.setScore(points);
+        //
+        mutant.setLines( mutatedLines );
 
         try {
             String username = rs.getString("Username");
@@ -154,8 +163,11 @@ public class MutantDAO {
         int score = mutant.getScore();
         String md5 = mutant.getMd5();
         Integer classId = mutant.getClassId();
+        List<Integer> mutatedLines = mutant.getLines();
 
-        String query = "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5, Class_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5, Class_ID, MutatedLines)"
+        		+ " VALUES "
+        		+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         DatabaseValue[] valueList = new DatabaseValue[]{
                 DB.getDBV(javaFile),
                 DB.getDBV(classFile),
@@ -165,7 +177,8 @@ public class MutantDAO {
                 DB.getDBV(playerId),
                 DB.getDBV(score),
                 DB.getDBV(md5),
-                (classId == null) ? null : DB.getDBV(classId)
+                (classId == null) ? DB.getDBV("NULL") : DB.getDBV(classId),
+                DB.getDBV(StringUtils.join( mutatedLines, ","))
         };
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
