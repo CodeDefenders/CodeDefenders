@@ -24,18 +24,18 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.management.relation.RoleInfo;
-
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.duel.DuelGame;
-import org.junit.Assert;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -85,6 +85,13 @@ public class MutantTest {
 		assertEquals(mutantCode, patchedCode);
 	}
 
+	@Test
+	public void exploratoryTest(){
+		List<Integer> mutatedLines = new ArrayList<>();
+		String s = StringUtils.join( mutatedLines, ",");
+		System.out.println("MutantTest.exploratoryTest() " + s);
+		
+	}
 	@org.junit.Test
 	public void testGetLinesForChangeSingleLine() throws IOException{
 		String originalCode = "public class Lift {"+ "\n"
