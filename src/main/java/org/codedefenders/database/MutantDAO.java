@@ -69,10 +69,13 @@ public class MutantDAO {
                 roundKilled, playerId);
         mutant.setScore(points);
         // since mutated lines can be null
-        if (rs.getString("MutatedLines") != null) {
-            List<Integer> mutatedLines = Stream.of(rs.getString("MutatedLines").split(",")).map(Integer::parseInt).collect(Collectors.toList());
+        final String mutatedLines = rs.getString("MutatedLines");
+        if (mutatedLines != null) {
+            List<Integer> mutatedLinesList = Stream.of(mutatedLines.split(","))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
             // force write
-            mutant.setLines(mutatedLines);
+            mutant.setLines(mutatedLinesList);
         }
         try {
             String username = rs.getString("Username");
@@ -167,7 +170,7 @@ public class MutantDAO {
                 "SELECT * FROM mutants ",
                 "LEFT JOIN players ON players.ID=mutants.Player_ID ",
                 "LEFT JOIN users ON players.User_ID = users.User_ID ",
-                "WHERE mutants.Game_ID = ?",
+                "WHERE mutants.Player_ID = ?",
                 "  AND mutants.ClassFile IS NOT NULL;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(playerId));
     }
@@ -189,7 +192,7 @@ public class MutantDAO {
         int score = mutant.getScore();
         String md5 = mutant.getMd5();
         Integer classId = mutant.getClassId();
-        List<Integer> mutatedLines = mutant.getLines();
+        String mutatedLinesString = StringUtils.join(mutant.getLines(), ",");
 
         String query = "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5, Class_ID, MutatedLines)"
                 + " VALUES "
@@ -203,10 +206,8 @@ public class MutantDAO {
                 DB.getDBV(playerId),
                 DB.getDBV(score),
                 DB.getDBV(md5),
-                // TODO Phil: Fix this
-                DB.getDBV(classId)
-                (classId == null) ? DB.getDBV("NULL") : DB.getDBV(classId),
-                DB.getDBV(StringUtils.join(mutatedLines, ","))
+                DB.getDBV(classId),
+                DB.getDBV(mutatedLinesString)
         };
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);

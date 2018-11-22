@@ -20,12 +20,12 @@ package org.codedefenders.game;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.util.MutantUtils;
@@ -136,7 +136,7 @@ public class Mutant implements Serializable {
 	 * @param alive
 	 * @param playerId
 	 */
-	public Mutant(int gameId, int classId,  String jFile, String cFile, boolean alive, int playerId) {
+	public Mutant(int gameId, Integer classId,  String jFile, String cFile, boolean alive, int playerId) {
 		this.gameId = gameId;
 		this.classId = classId;
 		// FIXME: Why is this limited to a duel game?
@@ -386,13 +386,13 @@ public class Mutant implements Serializable {
 
 	// Not sure
 	public void computeDifferences() {
-		GameClass sut = DatabaseAccess.getClassForGame(gameId); 
+		GameClass sut = DatabaseAccess.getClassForGame(gameId);
 		if( sut == null ){
             // in this case gameId might have been -1 (upload)
             // so we try to reload the sut
             sut = DatabaseAccess.getClassForKey("Class_ID", getClassId());
         }
-		
+
 		File sourceFile = new File(sut.getJavaFile());
 		File mutantFile = new File(javaFile);
 
@@ -439,36 +439,13 @@ public class Mutant implements Serializable {
 		return StringEscapeUtils.escapeHtml(getPatchString());
 	}
 
-	/*
-	 * insert will run once after mutant creation. Stores values of JavaFile,
-	 * ClassFile, GameID, RoundCreated in DB. These will not change once input.
-	 * 
-	 * This is also the moment we compute lines and descriptions
-	 * 
-	 * Currently Mutant ID isnt set yet after insertion, if Mutant needs to be
-	 * used straight away it needs a similar insert method to MultiplayerGame.
-	 * Default values for Equivalent (ASSUMED_NO), Alive(1), RoundKilled(NULL)
-	 * are assigned.
-	 */
-	@Deprecated
 	public boolean insert() {
-		logger.info("Inserting mutant");
-		Connection conn = DB.getConnection();
-		String jFileDB = DatabaseAccess.addSlashes(javaFile);
-		String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
-		String query = "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5, MutatedLines)"
-				+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
-		DatabaseValue[] valueList = new DatabaseValue[] { DB.getDBV(jFileDB), DB.getDBV(cFileDB), DB.getDBV(gameId),
-				DB.getDBV(roundCreated), DB.getDBV(sqlAlive()), DB.getDBV(playerId), DB.getDBV(score), DB.getDBV(md5),
-				// Include the mutate lines
-				DB.getDBV(StringUtils.join(getLines(), ",")) };
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		int res = DB.executeUpdateGetKeys(stmt, conn);
-		if (res > -1) {
-			this.id = res;
+		try {
+			this.id = MutantDAO.storeMutant(this);
 			return true;
+		} catch (Exception e) {
+		    return false;
 		}
-		return false;
 	}
 
 	// update will run when changes to a mutant are made.
@@ -570,7 +547,7 @@ public class Mutant implements Serializable {
 			}
 			description.add(StringEscapeUtils.escapeHtml(text + desc + "\n"));
 		}
-		
+
 		setLines( mutatedLines );
 	}
 
