@@ -27,6 +27,7 @@ import org.apache.commons.dbutils.DbUtils;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.codedefenders.rules.DatabaseRule;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -39,6 +40,7 @@ public class DatabaseTest {
 	@Rule
 	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
 
+	@Ignore
 	@Test
 	public void testCleanDB() throws Exception {
 		// Get a new connection from the rule 

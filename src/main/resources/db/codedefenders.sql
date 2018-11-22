@@ -181,7 +181,8 @@ CREATE TABLE `mutants` (
   `NumberAiKillingTests` int(11) DEFAULT '0', -- If an original ai mutant, kill count. Number of killing tests in game otherwise.
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Points` int(11) DEFAULT '0',
-  `Class_ID` int(11) DEFAULT NULL, -- If Game_ID is -1, the mutant was uploaded together with referenced class.
+  `Class_ID` int(11) DEFAULT NULL, -- If Game_ID is -1, the mutant was uploaded together with referenced class
+  `MutatedLines` varchar(255),
   PRIMARY KEY (`Mutant_ID`),
   UNIQUE KEY `mutants_Game_ID_Class_ID_MD5_key` (`Game_ID`,`Class_ID`,`MD5`),
   KEY `fk_gameId_idx` (`Game_ID`),
