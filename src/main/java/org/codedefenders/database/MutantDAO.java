@@ -62,15 +62,14 @@ public class MutantDAO {
         int roundKilled = rs.getInt("RoundKilled");
         int playerId = rs.getInt("Player_ID");
         int points = rs.getInt("Points");
-        //
-        List<Integer> mutatedLines = Stream.of(rs.getString("MutatedLines").split(",")).map(Integer::parseInt).collect(Collectors.toList());
-
-        Mutant mutant = new Mutant(mutantId, gameId, javaFile, classFile, alive, equiv, roundCreated,
-                                   roundKilled, playerId);
+        Mutant mutant = new Mutant(mutantId, gameId, javaFile, classFile, alive, equiv, roundCreated, roundKilled, playerId);
         mutant.setScore(points);
-        //
-        mutant.setLines( mutatedLines );
-
+        // since mutated lines can be null
+        if( rs.getString("MutatedLines") != null ){
+            List<Integer> mutatedLines = Stream.of(rs.getString("MutatedLines").split(",")).map(Integer::parseInt).collect(Collectors.toList());
+            // force write
+            mutant.setLines( mutatedLines );
+        }
         try {
             String username = rs.getString("Username");
             int userId = rs.getInt("User_ID");
