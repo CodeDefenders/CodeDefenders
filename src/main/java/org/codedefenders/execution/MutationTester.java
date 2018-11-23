@@ -318,7 +318,13 @@ public class MutationTester {
             }
 
             // Wait for the result. Check by the order defined by the scheduler.
-            for (Test test : tests ) { 
+            for (Test test : tests ) {
+                // Why this happens ?
+                if (! tasks.containsKey(test)) {
+                    logger.debug("Tasks does not contain " + test.getId() );
+                    continue;
+                }
+
                 Future<Boolean> task = tasks.get(test);
                 logger.debug("MutationTester.runAllTestsOnMutant() Checking task " + task + ". Done: "
                         + task.isDone() + ". Cancelled: " + task.isCancelled());
@@ -359,8 +365,8 @@ public class MutationTester {
                     }
                 } catch (InterruptedException | ExecutionException e) {
                     System.out.println(
-                            "MutationTester.runAllTestsOnMutant() ERROR While waiting results for task " + task);
-                    e.printStackTrace();
+                            "MutationTester.runAllTestsOnMutant() ERROR While waiting results for task " + e.getMessage() );
+//                    e.printStackTrace();
                 }
             }
 

@@ -360,7 +360,7 @@ public class RunnerTest {
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
 
 		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
-		test = new org.codedefenders.game.Test(99, multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10, pid);
+		test = new org.codedefenders.game.Test(99, cut1.getId(), multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10, pid);
 		test.setPlayerId(pid);
 
 		assertTrue(test.insert());
@@ -413,7 +413,7 @@ public class RunnerTest {
 
 		//
 		int pidDefender = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
-		test = new org.codedefenders.game.Test(99, multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10,
+		test = new org.codedefenders.game.Test(99, cut1.getId(), multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10,
 				pidDefender);
 		test.setPlayerId(pidDefender);
 		assumeTrue(test.insert());

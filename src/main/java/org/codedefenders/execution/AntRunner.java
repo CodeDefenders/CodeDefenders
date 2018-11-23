@@ -346,7 +346,7 @@ public class AntRunner {
 			assert (! matchingFiles.isEmpty()); // if compilation was successful, .class file must exist
 			String cFile = matchingFiles.get(0).getAbsolutePath();
 			logger.info("Compiled test {}", compiledClassName);
-			Test newTest = new Test(gameID, jFile, cFile, playerId);
+			Test newTest = new Test(cut.getId(), gameID, jFile, cFile, playerId);
 			boolean inserted = newTest.insert();
 			assert ( inserted ); // if compilation was successful, .class file must exist
 			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);
@@ -357,7 +357,7 @@ public class AntRunner {
 			// New target execution recording failed compile, providing the return messages from the ant javac task
 			String message = result.getCompilerOutput();
 			logger.error("Failed to compile test {}: {}", jFile, message);
-			Test newTest = new Test(gameID, jFile, null, playerId);
+			Test newTest = new Test(cut.getId(), gameID, jFile, null, playerId);
 			newTest.insert();
 			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "FAIL", message);
 			newExec.insert();

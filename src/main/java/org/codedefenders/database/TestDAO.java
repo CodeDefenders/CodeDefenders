@@ -52,6 +52,7 @@ public class TestDAO {
     public static Test testFromRS(ResultSet rs) throws SQLException {
         int testId = rs.getInt("Test_ID");
         int gameId = rs.getInt("Game_ID");
+        int classId = rs.getInt("Class_ID");
         String javaFile = rs.getString("JavaFile");
         String classFile = rs.getString("ClassFile");
         int roundCreated = rs.getInt("RoundCreated");
@@ -77,7 +78,7 @@ public class TestDAO {
                         .collect(Collectors.toList()));
         }
 
-        return new Test(testId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId, linesCovered,
+        return new Test(testId, classId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId, linesCovered,
                 linesUncovered, points);
     }
 
@@ -101,9 +102,13 @@ public class TestDAO {
      * Returns the valid {@link Test Tests} from the given game.
      * Valid tests are compilable and do not fail when executed against the original class.
      * @param defendersOnly If {@code true}, only return tests that were written by defenders.
+     * 
+     * Include also the tests uploaded by the System Defender
      */
     public static List<Test> getValidTestsForGame(int gameId, boolean defendersOnly)
             throws UncheckedSQLException, SQLMappingException {
+        List<Test> result = new ArrayList<>();
+        
         String query = String.join("\n",
                 "SELECT tests.* FROM tests",
                 (defendersOnly ? "INNER JOIN players pl on tests.Player_ID = pl.ID" : ""),
@@ -116,14 +121,33 @@ public class TestDAO {
                 "      AND ex.Status='SUCCESS'",
                 "  );"
         );
-        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(gameId));
+        result.addAll( DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(gameId)));
+        
+        String systemDefenderQuery = String.join("\n", 
+                "SELECT tests.*",
+                "FROM tests",
+                "INNER JOIN players pl on tests.Player_ID = pl.ID",
+                "INNER JOIN users u on u.User_ID = pl.User_ID",
+                "WHERE tests.Game_ID=?",
+                "AND tests.ClassFile IS NOT NULL",
+                "AND u.User_ID = 4;"
+         );
+        
+        result.addAll( DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, DB.getDBV(gameId)));
+        
+        return result;
     }
 
+    
     /**
      * Returns the valid {@link Test Tests} from the games played on the given class.
      * Valid tests are compilable and do not fail when executed against the original class.
+     * 
+     * Include also the tests from the System Defender
      */
     public static List<Test> getValidTestsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
+        List<Test> result = new ArrayList<>();
+        
         String query = String.join("\n",
                 "SELECT tests.*",
                 "FROM tests, games",
@@ -137,7 +161,20 @@ public class TestDAO {
                 "      AND ex.Status='SUCCESS'",
                 "  );"
         );
-        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(classId));
+        result.addAll( DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(classId)) );
+        
+        // Include also those tests uploaded, i.e, player_id = -1
+        String systemDefenderQuery = String.join("\n", 
+                "SELECT tests.*",
+                "FROM tests",
+                "WHERE tests.Class_ID = ?",
+                "AND tests.Player_ID=-1",
+                "AND tests.ClassFile IS NOT NULL;"
+         );
+        
+        result.addAll( DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, DB.getDBV(classId)) );
+        
+        return result; 
     }
 
     /**
@@ -252,4 +289,5 @@ public class TestDAO {
 
         return DB.executeUpdate(stmt, conn);
     }
+
 }

@@ -193,7 +193,7 @@ public class ExecutionTest {
         // Observer creates a new MP game
         //
         MultiplayerGame multiplayerGame = new MultiplayerGame(cut.getId(), observer.getId(), GameLevel.HARD, (float) 1,
-                (float) 1, (float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true, null, false);
+                (float) 1, (float) 1, 10, 4, 4, 4, 0, 0, System.currentTimeMillis() - 1000 * 3600, System.currentTimeMillis() + 1000 * 3600, GameState.ACTIVE.name(), false, 2, true, null, false);
         multiplayerGame.insert();
         // Attacker and Defender join the game.
         multiplayerGame.addPlayer(defender.getId(), Role.DEFENDER);
