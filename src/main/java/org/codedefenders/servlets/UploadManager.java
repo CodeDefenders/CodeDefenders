@@ -62,6 +62,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
@@ -92,6 +94,7 @@ public class UploadManager extends HttpServlet {
     );
 
     private ServletFileUpload servletFileUpload;
+
     // Enable minimal testing
     void setServletFileUpload(ServletFileUpload servletFileUpload){
         this.servletFileUpload=servletFileUpload;
@@ -259,7 +262,6 @@ public class UploadManager extends HttpServlet {
         } else {
             final String fileName = cutFile.fileName;
             final String fileContent = new String(cutFile.fileContent, Charset.forName("UTF-8")).trim();
-
             if (!fileName.endsWith(".java")) {
                 logger.error("Class upload failed. Given file {} was not a .java file.", fileName);
                 messages.add("Class upload failed. The class under test must be a .java file.");
@@ -455,6 +457,7 @@ public class UploadManager extends HttpServlet {
         messages.add("Class upload successful.");
         logger.info("Class upload of {} was successful", cutFileName);
 
+        // TODO Somehow the tests and mutants are not related to the class ?!
         // At this point if there's test and mutants we shall run them against each other.
         // Since this is not happening in the context of a game we shall do it manually.
         List<Mutant> mutants = new ArrayList<>();
@@ -468,27 +471,24 @@ public class UploadManager extends HttpServlet {
         }
         
         try {
-            // TODO Are the tests and mutants linked to this class?
-            System.out.println("UploadManager.doPost() Computing Kill Map for class " + cutId );
-            // Custom Killmaps are not store in the DB for whatever reason, while we need that !
-            KillMap killMap = KillMap.forCustom(tests, mutants, cutId, new ArrayList<KillMapEntry>(), true, 
+            // Custom Killmaps are not store in the DB for whatever reason,
+            // while we need that !
+            // Since gameID = -1, DAOs cannot find the class linked to this
+            // game, hence its if, which is needed instead inside mutants and
+            // tests
+            KillMap killMap = KillMap.forCustom(tests, mutants, cutId, new ArrayList<KillMapEntry>(), true,
                     // Since this is required. Make a default one.
                     new BiFunction<Test, Mutant, Boolean>() {
-                
-                @Override
-                public Boolean apply(Test t, Mutant u) {
-                    return true;
-                }
-            } );
+                        @Override
+                        public Boolean apply(Test t, Mutant u) {
+                            return true;
+                        }
+                    });
             for( KillMapEntry entry : killMap.getEntries()){
-                System.out.println("UploadManager.doPost() Storing : M " + entry.mutant + ", S " + entry.status + ", T " + entry.test );
                 KillmapDAO.insertKillMapEntry(entry, cutId);
             }
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            // TODO Auto-generated catch block
+        } catch (InterruptedException | ExecutionException e) {
+            // TODO Shall we abort the update for this ?!
             e.printStackTrace();
         } 
 
@@ -501,7 +501,6 @@ public class UploadManager extends HttpServlet {
 //					messages.add("Preparation of AI for class failed, please prepare the class again, or try a different class.");
 //				}
 //			}
-
     }
 
     /**
