@@ -80,17 +80,15 @@ public class RunnerTest {
 	public void createEntities() {
 		user1 = new User("FREE_USERNAME", User.encodePassword("TEST_PASSWORD"), "TESTMAIL@TEST.TEST");
 		user2 = new User("FREE_USERNAME2", User.encodePassword("TEST_PASSWORD2"), "TESTMAIL@TEST.TEST2");
-		//
-		creator = new User(4, "FREE_USERNAME3", User.encodePassword("TEST_PASSWORD3"), "TESTMAIL@TEST.TEST3");
+		// Why this has to have 4 as ID?
+		creator = new User("FREE_USERNAME3", User.encodePassword("TEST_PASSWORD3"), "TESTMAIL@TEST.TEST3");
 		//
 		cut1 = new GameClass("MyClass", "", "", "");
 		cut2 = new GameClass("", "AliasForClass2", "", "");
-		multiplayerGame = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.CREATED.name(), false, 5, true, CodeValidatorLevel.MODERATE, false);
 	}
 
 	// This will re-create the same DB from scratch every time... is this really
-	// necessary ?!
+	// necessary ?! THIS IS NOT ACTUALLY THE CASE. I SUSPECT THAT THE RULE CREATES ONLY ONCE THE DB
 	@Rule
 	DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
 
@@ -195,14 +193,23 @@ public class RunnerTest {
 		assumeTrue(dg1.insert());
 
 		MultiplayerGame mg2 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true,
+				(float) 1, 10, 4, 4, 4, 0, 0,
+				//
+				System.currentTimeMillis() - 1000 * 3600,
+				System.currentTimeMillis() + 1000 * 3600,
+				//
+				GameState.ACTIVE.name(), false, 2, true,
 				CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg2.insert());
 		assumeTrue(mg2.addPlayer(user1.getId(), Role.DEFENDER));
 		assertTrue(mg2.update());
 		
 		MultiplayerGame mg3 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true,
+				(float) 1, 10, 4, 4, 4, 0, 0, //
+				System.currentTimeMillis() - 1000 * 3600,
+				System.currentTimeMillis() + 1000 * 3600,
+				//
+				GameState.ACTIVE.name(), false, 2, true,
 				CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg3.insert());
 		
@@ -211,7 +218,11 @@ public class RunnerTest {
 		assumeTrue(mg3.update());
 
 		MultiplayerGame mg4 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.FINISHED.name(), false, 2, true,
+				(float) 1, 10, 4, 4, 4, 0, 0, //
+				System.currentTimeMillis() - 1000 * 3600,
+				System.currentTimeMillis() + 1000 * 3600,
+				//
+				GameState.FINISHED.name(), false, 2, true,
 				CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg4.insert());
 		
@@ -321,9 +332,19 @@ public class RunnerTest {
 		assumeTrue(user1.insert());
 		assumeTrue(cut2.insert());
 
+
+		// Creator must be there already
+		multiplayerGame = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
+				(float) 1, 10, 4, 4, 4, 0, 0, 
+				//
+				System.currentTimeMillis() - 1000 * 3600,
+				System.currentTimeMillis() + 1000 * 3600,
+				// 
+				GameState.CREATED.name(), false, 5, true, CodeValidatorLevel.MODERATE, false);
+		// Why this ?
 		Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
 		// multiplayerGame.classId = cut2.getId();
-
+		
 		assertTrue(multiplayerGame.insert());
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 

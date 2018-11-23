@@ -20,11 +20,13 @@ package org.codedefenders.game;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.validation.code.CodeValidator;
@@ -95,6 +97,7 @@ public class Mutant implements Serializable {
 	 */
 	private Integer classId;
 
+	// Computed on the fly if not read in the db
 	private List<Integer> lines = null;
 	private transient List<String> description = null;
 	private transient Patch difference = null;
@@ -370,7 +373,7 @@ public class Mutant implements Serializable {
 	// https://stackoverflow.com/questions/9577930/regular-expression-to-select-all-whitespace-that-isnt-in-quotes
 	public static String regex = "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
 
-	public synchronized Patch getDifferences() {
+	public Patch getDifferences() {
 		if (difference == null) {
             int classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
             GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
@@ -382,21 +385,26 @@ public class Mutant implements Serializable {
 			File sourceFile = new File(sut.getJavaFile());
 			File mutantFile = new File(javaFile);
 
-			List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());
-			List<String> mutantLines =
-					readLinesIfFileExist(mutantFile.toPath());
+	// Not sure
+	public void computeDifferences() {
+		int classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
+		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+		
+		File sourceFile = new File(sut.getJavaFile());
+		File mutantFile = new File(javaFile);
 
-			for (int l = 0; l < sutLines.size(); l++){
-				sutLines.set(l, sutLines.get(l).replaceAll( regex , ""));
-			}
+		List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());
+		List<String> mutantLines = readLinesIfFileExist(mutantFile.toPath());
 
-			for (int l = 0; l < mutantLines.size(); l++){
-				mutantLines.set(l, mutantLines.get(l).replaceAll( regex , ""));
-			}
-
-			difference = DiffUtils.diff(sutLines, mutantLines);
+		for (int l = 0; l < sutLines.size(); l++) {
+			sutLines.set(l, sutLines.get(l).replaceAll(regex, ""));
 		}
-		return difference;
+
+		for (int l = 0; l < mutantLines.size(); l++) {
+			mutantLines.set(l, mutantLines.get(l).replaceAll(regex, ""));
+		}
+
+		difference = DiffUtils.diff(sutLines, mutantLines);
 	}
 
 	public String getPatchString() {
@@ -444,26 +452,29 @@ public class Mutant implements Serializable {
 		return lines;
 	}
 
-	// insert will run once after mutant creation.
-	// Stores values of JavaFile, ClassFile, GameID, RoundCreated in DB. These will not change once input.
-	// Default values for Equivalent (ASSUMED_NO), Alive(1), RoundKilled(NULL) are assigned.
-	// Currently Mutant ID isnt set yet after insertion, if Mutant needs to be used straight away it needs a similar insert method to MultiplayerGame.
+	/*
+	 * insert will run once after mutant creation. Stores values of JavaFile,
+	 * ClassFile, GameID, RoundCreated in DB. These will not change once input.
+	 * 
+	 * This is also the moment we compute lines and descriptions
+	 * 
+	 * Currently Mutant ID isnt set yet after insertion, if Mutant needs to be
+	 * used straight away it needs a similar insert method to MultiplayerGame.
+	 * Default values for Equivalent (ASSUMED_NO), Alive(1), RoundKilled(NULL)
+	 * are assigned.
+	 */
 	@Deprecated
 	public boolean insert() {
 		logger.info("Inserting mutant");
 		Connection conn = DB.getConnection();
 		String jFileDB = DatabaseAccess.addSlashes(javaFile);
 		String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
-		String query = "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5)" +
-				" VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(jFileDB),
-				DB.getDBV(cFileDB),
-				DB.getDBV(gameId),
-				DB.getDBV(roundCreated),
-				DB.getDBV(sqlAlive()),
-				DB.getDBV(playerId),
-				DB.getDBV(score),
-				DB.getDBV(md5)};
+		String query = "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5, MutatedLines)"
+				+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+		DatabaseValue[] valueList = new DatabaseValue[] { DB.getDBV(jFileDB), DB.getDBV(cFileDB), DB.getDBV(gameId),
+				DB.getDBV(roundCreated), DB.getDBV(sqlAlive()), DB.getDBV(playerId), DB.getDBV(score), DB.getDBV(md5),
+				// Include the mutate lines
+				DB.getDBV(StringUtils.join(getLines(), ",")) };
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		int res = DB.executeUpdateGetKeys(stmt, conn);
 		if (res > -1) {
@@ -516,6 +527,14 @@ public class Mutant implements Serializable {
 		killedByAITests++;
 	}
 
+	// Does this every get called if mutant is not stored to DB ?
+	public List<Integer> getLines() {
+		if (lines == null) {
+			computeLinesAndDescription();
+		}
+		return lines;
+	}
+
 	/**
 	 * Identify lines in the original source code that have been modified
 	 * by a mutation.
@@ -524,13 +543,10 @@ public class Mutant implements Serializable {
 	 *
 	 * @return lines modified in the original class
 	 */
-	public synchronized  List<Integer> getLines() {
-		if (lines != null) {
-			return lines;
-		}
-
-		List<Integer> lines = new ArrayList<>();
-		List<String> description = new ArrayList<>();
+	public void computeLinesAndDescription() {
+		// This workflow is not really nice...
+		List<Integer> mutatedLines = new ArrayList<Integer>();
+		description = new ArrayList<String>();
 
 		Patch p = getDifferences();
 		for (Delta d : p.getDeltas()) {
@@ -539,47 +555,42 @@ public class Mutant implements Serializable {
 			int firstLine = chunk.getPosition() + 1;
 			String desc = "line " + firstLine;
 			// was it one single line or several?
-			lines.add(firstLine);
+			mutatedLines.add(firstLine);
 			int endLine = firstLine + chunk.getLines().size() - 1;
 			if (endLine > firstLine) {
 				// if more than one line, report range of lines;
-				// may not be 100% accurate, but is all we have in the delta chunk
+				// may not be 100% accurate, but is all we have in the delta
+				// chunk
 				for (int l = firstLine + 1; l <= endLine; l++) {
-					lines.add(l);
+					mutatedLines.add(l);
 				}
 				desc = String.format("lines %d-%d", firstLine, endLine);
 			}
 			// update mutant description
 			String text;
 			switch (d.getType()) {
-				case CHANGE:
-					text = "Modified ";
-					break;
-				case DELETE:
-					text = "Removed ";
-					break;
-				case INSERT:
-					text = "Added ";
-					break;
-				default:
-					throw new IllegalStateException("Found unknown delta type " + d.getType());
+			case CHANGE:
+				text = "Modified ";
+				break;
+			case DELETE:
+				text = "Removed ";
+				break;
+			case INSERT:
+				text = "Added ";
+				break;
+			default:
+				throw new IllegalStateException("Found unknown delta type " + d.getType());
 			}
 			description.add(StringEscapeUtils.escapeHtml(text + desc + "\n"));
 		}
-
-		this.lines = lines;
-		this.description = description;
-
-		return lines;
+		
+		setLines( mutatedLines );
 	}
 
 	public synchronized List<String> getHTMLReadout() {
-		if (description != null) {
-			return description;
+		if (description == null) {
+			computeLinesAndDescription();
 		}
-		// for efficiency, getLines actually create the list of messages
-		getLines();
-
 		return description;
 	}
 
@@ -666,5 +677,9 @@ public class Mutant implements Serializable {
 				return o2.id - o1.id;
 			}
 		};
+	}
+
+	public void setLines(List<Integer> mutatedLines) {
+		this.lines = mutatedLines;
 	}
 }
