@@ -228,6 +228,7 @@
 						} else {
 %>
 			Joined as Attacker
+			<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue()) { %>
 			<form id="attLeave" action="<%= request.getContextPath() %>/multiplayer/games" method="post">
 				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
@@ -235,6 +236,7 @@
 					Leave
 				</button>
 			</form>
+			<% } %>
 <%
 						}
 					break;
@@ -247,6 +249,7 @@
 						} else {
 %>
 			Joined as Defender
+			<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue()) { %>
 			<form id="defLeave" action="<%= request.getContextPath() %>/multiplayer/games" method="post">
 				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
@@ -254,6 +257,7 @@
 					Leave
 				</button>
 			</form>
+			<% } %>
 <%
 						}
 					break;
@@ -283,7 +287,7 @@
 	<a id="createDuel" class = "btn btn-primary" href="<%=request.getContextPath()%>/games/create">Create Duel</a>
 	<%}%>
 
-
+<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue()) { %>
 <h2 class="full-width page-title">Open Games</h2>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
@@ -439,6 +443,7 @@
 	} // Closes ELSE
 %>
 	</table>
+	<%}%>
 
 	<script>
 		$(document).ready(function() {
