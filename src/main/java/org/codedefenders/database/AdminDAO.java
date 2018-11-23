@@ -322,17 +322,21 @@ public class AdminDAO {
     }
 
     public static Entry getScore(int userID) throws UncheckedSQLException, SQLMappingException {
-        return DB.executeQueryReturnValue(USER_SCORE_QUERY, rs -> {
-            Entry p = new Entry();
-            p.setUsername(rs.getString("username"));
-            p.setMutantsSubmitted(rs.getInt("NMutants"));
-            p.setAttackerScore(rs.getInt("AScore"));
-            p.setTestsSubmitted(rs.getInt("NTests"));
-            p.setDefenderScore(rs.getInt("DScore"));
-            p.setMutantsKilled(rs.getInt("NKilled"));
-            p.setTotalPoints(rs.getInt("TotalScore"));
-            return p;
-        });
+        return DB.executeQueryReturnValue(USER_SCORE_QUERY,
+                // Mapper
+                rs -> {
+                    Entry p = new Entry();
+                    p.setUsername(rs.getString("username"));
+                    p.setMutantsSubmitted(rs.getInt("NMutants"));
+                    p.setAttackerScore(rs.getInt("AScore"));
+                    p.setTestsSubmitted(rs.getInt("NTests"));
+                    p.setDefenderScore(rs.getInt("DScore"));
+                    p.setMutantsKilled(rs.getInt("NKilled"));
+                    p.setTotalPoints(rs.getInt("TotalScore"));
+                    return p;
+                },
+                // Must pass the userID in
+                new DatabaseValue[] { DB.getDBV(userID) });
     }
 
     public static boolean deletePlayerTest(int pid) {
