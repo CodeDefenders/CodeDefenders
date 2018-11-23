@@ -225,5 +225,7 @@ public class UploadManagerTest {
         // Force the class to use the mocked one
         uploadManager.setServletFileUpload(fileUpload);
         uploadManager.doPost(request, mockedResponse);
+        
+        // Here make the various assertions ? Or simply query the KillMapDao
     }
 }
