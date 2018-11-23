@@ -400,13 +400,13 @@ public class Mutant implements Serializable {
 	}
 
 	public String getPatchString() {
-		int classId;
-		if (this.classId == null) {
-			classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
-		} else {
-			classId = this.classId;
-		}
-		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+	    int classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
+	    GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+	    if( sut == null ){
+	        // in this case gameId might have been -1 (upload)
+	        // so we try to reload the sut
+	        sut = DatabaseAccess.getClassForKey("Class_ID", getClassId());
+	    }
 
 		Path sourceFile = Paths.get(sut.getJavaFile());
 		Path mutantFile = Paths.get(javaFile);
