@@ -136,6 +136,9 @@ public class AntRunner {
 	static TargetExecution testMutant(Mutant m, Test t) {
 		logger.info("Running test {} on mutant {}", t.getId(), m.getId());
 		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
+		if( cut == null ){
+		    cut = DatabaseAccess.getClassForKey("Class_ID", m.getClassId());
+		}
 
 		// Check if this mutant requires a test recompilation
 		AntProcessResult result = null;
@@ -300,7 +303,7 @@ public class AntRunner {
 			assert (! matchingFiles.isEmpty()): "if compilation was successful, .class file must exist";
 			String cFile = matchingFiles.get(0).getAbsolutePath();
 			int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gameID);
-			newMutant = new Mutant(gameID, jFile, cFile, true, playerId);
+			newMutant = new Mutant(gameID, cut.getId(), jFile, cFile, true, playerId);
 			newMutant.insert();
 			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "SUCCESS", null);
 			newExec.insert();
@@ -310,7 +313,7 @@ public class AntRunner {
 			String message = result.getCompilerOutput();
 			logger.error("Failed to compile mutant {}: {}", jFile, message);
 			int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gameID);
-			newMutant = new Mutant(gameID, jFile, null, false, playerId);
+			newMutant = new Mutant(gameID, cut.getId(), jFile, null, false, playerId);
 			newMutant.insert();
 			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "FAIL", message);
 			newExec.insert();

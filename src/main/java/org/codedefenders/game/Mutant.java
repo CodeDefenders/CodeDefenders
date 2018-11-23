@@ -129,8 +129,9 @@ public class Mutant implements Serializable {
 	 * @param alive
 	 * @param playerId
 	 */
-	public Mutant(int gameId, String jFile, String cFile, boolean alive, int playerId) {
+	public Mutant(int gameId, int classId,  String jFile, String cFile, boolean alive, int playerId) {
 		this.gameId = gameId;
+		this.classId = classId;
 		// FIXME: Why is this limited to a duel game?
 		final DuelGame game = DatabaseAccess.getGameForKey("ID", gameId);
 		if (game != null) {
@@ -144,8 +145,8 @@ public class Mutant implements Serializable {
 		this.md5 = CodeValidator.getMD5FromFile(jFile); // TODO: This may be null
 	}
 
-	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId) {
-		this(gid, jFile, cFile, alive, playerId);
+	public Mutant(int mid, int classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId) {
+		this(gid, classId, jFile, cFile, alive, playerId);
 		this.id = mid;
 		this.equivalent = equiv;
 		this.roundCreated = rCreated;
@@ -310,7 +311,11 @@ public class Mutant implements Serializable {
 	}
 
 	public boolean doesRequireRecompilation() {
+	    // dummy game with id = -1 has null class, and this check cannot be implemented...
 		GameClass cut = DatabaseAccess.getClassForGame(gameId);
+		if(  cut == null ){
+		    cut = DatabaseAccess.getClassForKey("Class_ID", classId);
+		}
 		return CollectionUtils.containsAny(cut.getLinesOfCompileTimeConstants(), getLines());
 	}
 
@@ -357,7 +362,6 @@ public class Mutant implements Serializable {
 				// claimed, rejected, test killed it
 				return 0;
 			}
-
 		}
 		logger.info("Mutant " + getId() + " contributes 0 defender points (alive or non-compilable)");
 		return 0;
@@ -368,9 +372,12 @@ public class Mutant implements Serializable {
 
 	public synchronized Patch getDifferences() {
 		if (difference == null) {
-			int classId =
-					DatabaseAccess.getGameForKey("ID", gameId).getClassId();
-			GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+            int classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
+            GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+            // During upload classId is null for gameId = -1
+            if (sut == null) {
+                sut = DatabaseAccess.getClassForKey("Class_ID", this.classId);
+            }
 
 			File sourceFile = new File(sut.getJavaFile());
 			File mutantFile = new File(javaFile);

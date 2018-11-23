@@ -57,8 +57,10 @@ public class MutantDAO {
         int roundKilled = rs.getInt("RoundKilled");
         int playerId = rs.getInt("Player_ID");
         int points = rs.getInt("Points");
+        // This was missing ... What if this is missing?
+        int classId = rs.getInt("Class_ID");
 
-        Mutant mutant = new Mutant(mutantId, gameId, javaFile, classFile, alive, equiv, roundCreated,
+        Mutant mutant = new Mutant(mutantId, classId, gameId, javaFile, classFile, alive, equiv, roundCreated,
                                    roundKilled, playerId);
         mutant.setScore(points);
 
