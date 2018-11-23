@@ -26,11 +26,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
+import org.codedefenders.execution.KillMap;
+import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.execution.LineCoverageGenerator;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
@@ -88,6 +91,11 @@ public class UploadManager extends HttpServlet {
             "Test.java"
     );
 
+    private ServletFileUpload servletFileUpload;
+    // Enable minimal testing
+    void setServletFileUpload(ServletFileUpload servletFileUpload){
+        this.servletFileUpload=servletFileUpload;
+    }
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect(request.getContextPath() + "/games/upload");
@@ -124,7 +132,11 @@ public class UploadManager extends HttpServlet {
         // request.getParameter before fetching the file
         List<FileItem> items;
         try {
-            items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
+            if( servletFileUpload == null ){
+                items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
+            }else {
+                items = servletFileUpload.parseRequest(request);
+            }
         } catch (FileUploadException e) {
             logger.error("Failed to upload class. Failed to get file upload parameters.", e);
             Redirect.redirectBack(request, response);
@@ -440,9 +452,47 @@ public class UploadManager extends HttpServlet {
             }
         }
 
-        Redirect.redirectBack(request, response);
         messages.add("Class upload successful.");
         logger.info("Class upload of {} was successful", cutFileName);
+
+        // At this point if there's test and mutants we shall run them against each other.
+        // Since this is not happening in the context of a game we shall do it manually.
+        List<Mutant> mutants = new ArrayList<>();
+        List<Test> tests = new ArrayList<>();
+        for( CompiledClass compiledClass : compiledClasses ){
+        	if( CompileClassType.MUTANT.equals( compiledClass.type ) ){
+        		mutants.add( MutantDAO.getMutantById( compiledClass.id ) );
+        	} else if (CompileClassType.TEST.equals( compiledClass.type ) ){
+        		tests.add( TestDAO.getTestById( compiledClass.id ) );
+        	}
+        }
+        
+        try {
+            // TODO Are the tests and mutants linked to this class?
+            System.out.println("UploadManager.doPost() Computing Kill Map for class " + cutId );
+            // Custom Killmaps are not store in the DB for whatever reason, while we need that !
+            KillMap killMap = KillMap.forCustom(tests, mutants, cutId, new ArrayList<KillMapEntry>(), true, 
+                    // Since this is required. Make a default one.
+                    new BiFunction<Test, Mutant, Boolean>() {
+                
+                @Override
+                public Boolean apply(Test t, Mutant u) {
+                    return true;
+                }
+            } );
+            for( KillMapEntry entry : killMap.getEntries()){
+                System.out.println("UploadManager.doPost() Storing : M " + entry.mutant + ", S " + entry.status + ", T " + entry.test );
+                KillmapDAO.insertKillMapEntry(entry, cutId);
+            }
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } 
+
+        Redirect.redirectBack(request, response);
 
         // TODO Phil: Will this be used in the future? Looks like legacy code.
 //			if (shouldPrepareAI) {
