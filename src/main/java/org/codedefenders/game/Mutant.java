@@ -384,6 +384,11 @@ public class Mutant implements Serializable {
 	public void computeDifferences() {
 		int classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
 		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+		if( sut == null ){
+            // in this case gameId might have been -1 (upload)
+            // so we try to reload the sut
+            sut = DatabaseAccess.getClassForKey("Class_ID", getClassId());
+        }
 		
 		File sourceFile = new File(sut.getJavaFile());
 		File mutantFile = new File(javaFile);
