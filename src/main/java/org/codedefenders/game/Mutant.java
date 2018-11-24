@@ -373,17 +373,12 @@ public class Mutant implements Serializable {
 	// https://stackoverflow.com/questions/9577930/regular-expression-to-select-all-whitespace-that-isnt-in-quotes
 	public static String regex = "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
 
-	public Patch getDifferences() {
-		if (difference == null) {
-            int classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
-            GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
-            // During upload classId is null for gameId = -1
-            if (sut == null) {
-                sut = DatabaseAccess.getClassForKey("Class_ID", this.classId);
-            }
-
-			File sourceFile = new File(sut.getJavaFile());
-			File mutantFile = new File(javaFile);
+    public Patch getDifferences() {
+        if (difference == null) {
+            computeDifferences();
+        }
+        return difference;
+    }
 
 	// Not sure
 	public void computeDifferences() {
