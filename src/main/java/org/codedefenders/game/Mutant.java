@@ -382,8 +382,7 @@ public class Mutant implements Serializable {
 
 	// Not sure
 	public void computeDifferences() {
-		int classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
-		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+		GameClass sut = DatabaseAccess.getClassForGame(gameId); 
 		if( sut == null ){
             // in this case gameId might have been -1 (upload)
             // so we try to reload the sut
@@ -408,8 +407,7 @@ public class Mutant implements Serializable {
 	}
 
 	public String getPatchString() {
-	    int classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
-	    GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+	    GameClass sut = DatabaseAccess.getClassForGame(gameId);
 	    if( sut == null ){
 	        // in this case gameId might have been -1 (upload)
 	        // so we try to reload the sut
