@@ -134,7 +134,7 @@ public class MutantTest {
 		//
 		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
 		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+		Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
 
@@ -192,7 +192,7 @@ public class MutantTest {
 		//
 		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
 		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+		Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 	
 		Patch p = m.getDifferences();
 		
@@ -246,7 +246,7 @@ public class MutantTest {
 //		
 
 		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+		Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
 		
@@ -300,7 +300,7 @@ public class MutantTest {
 //		
 
 		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+		Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
 		
@@ -356,7 +356,7 @@ public class MutantTest {
 //		
 
 		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+		Mutant m = new Mutant(1,mockedGameClass.getId(),  mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
 		
@@ -428,7 +428,7 @@ public class MutantTest {
 //		
 
 		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+		Mutant m = new Mutant(1,mockedGameClass.getId(),  mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getLines());
 		System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getHTMLReadout());
@@ -487,7 +487,7 @@ public class MutantTest {
 		//
 		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
 		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+		Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
 
@@ -543,7 +543,7 @@ public class MutantTest {
 		//
 		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
 		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+		Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 
 		Patch p = m.getDifferences();
 

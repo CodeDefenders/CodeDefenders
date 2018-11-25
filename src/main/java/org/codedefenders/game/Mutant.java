@@ -132,8 +132,9 @@ public class Mutant implements Serializable {
 	 * @param alive
 	 * @param playerId
 	 */
-	public Mutant(int gameId, String jFile, String cFile, boolean alive, int playerId) {
+	public Mutant(int gameId, int classId,  String jFile, String cFile, boolean alive, int playerId) {
 		this.gameId = gameId;
+		this.classId = classId;
 		// FIXME: Why is this limited to a duel game?
 		final DuelGame game = DatabaseAccess.getGameForKey("ID", gameId);
 		if (game != null) {
@@ -147,8 +148,8 @@ public class Mutant implements Serializable {
 		this.md5 = CodeValidator.getMD5FromFile(jFile); // TODO: This may be null
 	}
 
-	public Mutant(int mid, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId) {
-		this(gid, jFile, cFile, alive, playerId);
+	public Mutant(int mid, int classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId) {
+		this(gid, classId, jFile, cFile, alive, playerId);
 		this.id = mid;
 		this.equivalent = equiv;
 		this.roundCreated = rCreated;
@@ -313,7 +314,11 @@ public class Mutant implements Serializable {
 	}
 
 	public boolean doesRequireRecompilation() {
+	    // dummy game with id = -1 has null class, and this check cannot be implemented...
 		GameClass cut = DatabaseAccess.getClassForGame(gameId);
+		if(  cut == null ){
+		    cut = DatabaseAccess.getClassForKey("Class_ID", classId);
+		}
 		return CollectionUtils.containsAny(cut.getLinesOfCompileTimeConstants(), getLines());
 	}
 
@@ -360,7 +365,6 @@ public class Mutant implements Serializable {
 				// claimed, rejected, test killed it
 				return 0;
 			}
-
 		}
 		logger.info("Mutant " + getId() + " contributes 0 defender points (alive or non-compilable)");
 		return 0;
@@ -369,17 +373,21 @@ public class Mutant implements Serializable {
 	// https://stackoverflow.com/questions/9577930/regular-expression-to-select-all-whitespace-that-isnt-in-quotes
 	public static String regex = "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
 
-	public Patch getDifferences() {
-		if (difference == null) {
-			computeDifferences();
-		}
-		return difference;
-	}
+    public Patch getDifferences() {
+        if (difference == null) {
+            computeDifferences();
+        }
+        return difference;
+    }
 
 	// Not sure
 	public void computeDifferences() {
-		int classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
-		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+		GameClass sut = DatabaseAccess.getClassForGame(gameId); 
+		if( sut == null ){
+            // in this case gameId might have been -1 (upload)
+            // so we try to reload the sut
+            sut = DatabaseAccess.getClassForKey("Class_ID", getClassId());
+        }
 		
 		File sourceFile = new File(sut.getJavaFile());
 		File mutantFile = new File(javaFile);
@@ -399,13 +407,12 @@ public class Mutant implements Serializable {
 	}
 
 	public String getPatchString() {
-		int classId;
-		if (this.classId == null) {
-			classId = DatabaseAccess.getGameForKey("ID", gameId).getClassId();
-		} else {
-			classId = this.classId;
-		}
-		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+	    GameClass sut = DatabaseAccess.getClassForGame(gameId);
+	    if( sut == null ){
+	        // in this case gameId might have been -1 (upload)
+	        // so we try to reload the sut
+	        sut = DatabaseAccess.getClassForKey("Class_ID", getClassId());
+	    }
 
 		Path sourceFile = Paths.get(sut.getJavaFile());
 		Path mutantFile = Paths.get(javaFile);

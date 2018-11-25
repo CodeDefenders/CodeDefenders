@@ -186,7 +186,7 @@ public class AiDefender extends AiPlayer {
 			String jFile = origT.getJavaFile();
 			String cFile = origT.getClassFile();
 			int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ID, game.getId());
-			Test t = new Test(game.getId(), jFile, cFile, playerId);
+			Test t = new Test(cut.getId(), game.getId(), jFile, cFile, playerId);
 			t.insert();
 			t.update();
 			TargetExecution newExec = new TargetExecution(t.getId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);

@@ -26,11 +26,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
+import org.codedefenders.execution.KillMap;
+import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.execution.LineCoverageGenerator;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
@@ -59,6 +62,8 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
@@ -88,6 +93,12 @@ public class UploadManager extends HttpServlet {
             "Test.java"
     );
 
+    private ServletFileUpload servletFileUpload;
+
+    // Enable minimal testing
+    void setServletFileUpload(ServletFileUpload servletFileUpload){
+        this.servletFileUpload=servletFileUpload;
+    }
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect(request.getContextPath() + "/games/upload");
@@ -124,7 +135,11 @@ public class UploadManager extends HttpServlet {
         // request.getParameter before fetching the file
         List<FileItem> items;
         try {
-            items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
+            if( servletFileUpload == null ){
+                items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
+            }else {
+                items = servletFileUpload.parseRequest(request);
+            }
         } catch (FileUploadException e) {
             logger.error("Failed to upload class. Failed to get file upload parameters.", e);
             Redirect.redirectBack(request, response);
@@ -247,7 +262,6 @@ public class UploadManager extends HttpServlet {
         } else {
             final String fileName = cutFile.fileName;
             final String fileContent = new String(cutFile.fileContent, Charset.forName("UTF-8")).trim();
-
             if (!fileName.endsWith(".java")) {
                 logger.error("Class upload failed. Given file {} was not a .java file.", fileName);
                 messages.add("Class upload failed. The class under test must be a .java file.");
@@ -440,9 +454,45 @@ public class UploadManager extends HttpServlet {
             }
         }
 
-        Redirect.redirectBack(request, response);
         messages.add("Class upload successful.");
         logger.info("Class upload of {} was successful", cutFileName);
+
+        // TODO Somehow the tests and mutants are not related to the class ?!
+        // At this point if there's test and mutants we shall run them against each other.
+        // Since this is not happening in the context of a game we shall do it manually.
+        List<Mutant> mutants = new ArrayList<>();
+        List<Test> tests = new ArrayList<>();
+        for( CompiledClass compiledClass : compiledClasses ){
+        	if( CompileClassType.MUTANT.equals( compiledClass.type ) ){
+        		mutants.add( MutantDAO.getMutantById( compiledClass.id ) );
+        	} else if (CompileClassType.TEST.equals( compiledClass.type ) ){
+        		tests.add( TestDAO.getTestById( compiledClass.id ) );
+        	}
+        }
+        
+        try {
+            // Custom Killmaps are not store in the DB for whatever reason,
+            // while we need that !
+            // Since gameID = -1, DAOs cannot find the class linked to this
+            // game, hence its if, which is needed instead inside mutants and
+            // tests
+            KillMap killMap = KillMap.forCustom(tests, mutants, cutId, new ArrayList<KillMapEntry>(), true,
+                    // Since this is required. Make a default one.
+                    new BiFunction<Test, Mutant, Boolean>() {
+                        @Override
+                        public Boolean apply(Test t, Mutant u) {
+                            return true;
+                        }
+                    });
+            for( KillMapEntry entry : killMap.getEntries()){
+                KillmapDAO.insertKillMapEntry(entry, cutId);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            // TODO Shall we abort the update for this ?!
+            e.printStackTrace();
+        } 
+
+        Redirect.redirectBack(request, response);
 
         // TODO Phil: Will this be used in the future? Looks like legacy code.
 //			if (shouldPrepareAI) {
@@ -451,7 +501,6 @@ public class UploadManager extends HttpServlet {
 //					messages.add("Preparation of AI for class failed, please prepare the class again, or try a different class.");
 //				}
 //			}
-
     }
 
     /**

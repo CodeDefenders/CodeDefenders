@@ -281,9 +281,10 @@ public class RunnerTest {
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
 		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
-		mutant1 = new Mutant(99, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+		int cutID = -10;
+		mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
-		Mutant mutant2 = new Mutant(100, multiplayerGame.getId(), "TEST_J_FILE2", "TEST_C_FILE2", false,
+		Mutant mutant2 = new Mutant(100, cutID, multiplayerGame.getId(), "TEST_J_FILE2", "TEST_C_FILE2", false,
 				Mutant.Equivalence.ASSUMED_YES, 2, 2, pid);
 		assertTrue(mutant1.insert());
 		assertTrue(mutant2.insert());
@@ -309,7 +310,8 @@ public class RunnerTest {
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
 		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
-		Mutant mutant1 = new Mutant(99, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+		int cutID = -10;
+        Mutant mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
 
 		assertTrue(mutant1.insert());
@@ -347,7 +349,8 @@ public class RunnerTest {
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
 		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
-		Mutant mutant1 = new Mutant(99, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+		int cutID = -10;
+        Mutant mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
 
 		assertTrue(mutant1.insert());
@@ -378,7 +381,7 @@ public class RunnerTest {
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
 
 		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
-		test = new org.codedefenders.game.Test(99, multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10, pid);
+		test = new org.codedefenders.game.Test(99, cut1.getId(), multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10, pid);
 		test.setPlayerId(pid);
 
 		assertTrue(test.insert());
@@ -431,7 +434,7 @@ public class RunnerTest {
 
 		//
 		int pidDefender = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
-		test = new org.codedefenders.game.Test(99, multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10,
+		test = new org.codedefenders.game.Test(99, cut1.getId(), multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10,
 				pidDefender);
 		test.setPlayerId(pidDefender);
 		assumeTrue(test.insert());
@@ -443,7 +446,8 @@ public class RunnerTest {
 
 		//
 		int pidAttacker = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
-		Mutant mutant1 = new Mutant(999, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+		int cutID = -10;
+        Mutant mutant1 = new Mutant(999,  cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pidAttacker);
 		assertTrue(mutant1.insert());
 

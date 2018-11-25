@@ -91,7 +91,8 @@ public class Test {
 		this.lineCoverage = lineCoverage;
 	}
 
-	public Test(int gameId, String javaFile, String classFile, int playerId) {
+	public Test(int classId, int gameId, String javaFile, String classFile, int playerId) {
+	    this.classId = classId;
 		this.gameId = gameId;
         DuelGame g = DatabaseAccess.getGameForKey("ID", gameId);
         if (g != null) {
@@ -107,13 +108,13 @@ public class Test {
 	}
 
 	@Deprecated
-	public Test(int testId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled, int playerId) {
-		this(testId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId, Collections.emptyList(), Collections.emptyList(), 0);
+	public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled, int playerId) {
+		this(testId, classId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId, Collections.emptyList(), Collections.emptyList(), 0);
 	}
 
-	public Test(int testId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled,
+	public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled,
 				int playerId, List<Integer> linesCovered, List<Integer> linesUncovered, int score) {
-		this(gameId, javaFile, classFile, playerId);
+		this(classId, gameId, javaFile, classFile, playerId);
 
 		this.id = testId;
 		this.roundCreated = roundCreated;
@@ -252,18 +253,20 @@ public class Test {
 		String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
 
 		Connection conn = DB.getConnection();
-		String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points) VALUES (?, ?, ?, ?, ?, ?);";
+		String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points, Class_ID) VALUES (?, ?, ?, ?, ?, ?, ?);";
 		DatabaseValue[] valueList = new DatabaseValue[]{
 				DB.getDBV(jFileDB),
 				DB.getDBV(cFileDB),
 				DB.getDBV(gameId),
 				DB.getDBV(roundCreated),
 				DB.getDBV(playerId),
-				DB.getDBV(score)
+				DB.getDBV(score),
+				DB.getDBV(classId),
 		};
 
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		this.id = DB.executeUpdateGetKeys(stmt, conn);
+
 		return this.id > 0;
 	}
 

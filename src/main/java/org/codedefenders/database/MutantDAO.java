@@ -34,6 +34,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -62,7 +63,11 @@ public class MutantDAO {
         int roundKilled = rs.getInt("RoundKilled");
         int playerId = rs.getInt("Player_ID");
         int points = rs.getInt("Points");
-        Mutant mutant = new Mutant(mutantId, gameId, javaFile, classFile, alive, equiv, roundCreated, roundKilled, playerId);
+        // This was missing ... What if this is missing?
+        int classId = rs.getInt("Class_ID");
+
+        Mutant mutant = new Mutant(mutantId, classId, gameId, javaFile, classFile, alive, equiv, roundCreated,
+                                   roundKilled, playerId);
         mutant.setScore(points);
         // since mutated lines can be null
         if( rs.getString("MutatedLines") != null ){
@@ -119,17 +124,41 @@ public class MutantDAO {
 
     /**
      * Returns the compilable {@link Mutant Mutants} from the games played on the given class.
+     * 
      */
     public static List<Mutant> getValidMutantsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
-        String query = String.join("\n",
-                "SELECT mutants.*",
+        List<Mutant> result = new ArrayList<>();
+
+        // This query is broken:
+//        String query = String.join("\n",
+//                "SELECT mutants.*",
+//                "FROM mutants, games",
+//                "LEFT JOIN players ON players.ID=mutants.Player_ID ",
+//                "LEFT JOIN users ON players.User_ID = users.User_ID ",
+//                "WHERE mutants.Game_ID = games.ID",
+//                "  AND games.Class_ID = ?",
+//                "  AND mutants.ClassFile IS NOT NULL;");
+
+        String query = String.join("\n", 
+                "SELECT mutants.*", 
                 "FROM mutants, games",
-                "LEFT JOIN players ON players.ID=mutants.Player_ID ",
-                "LEFT JOIN users ON players.User_ID = users.User_ID ",
                 "WHERE mutants.Game_ID = games.ID",
-                "  AND games.Class_ID = ?",
+                "  AND games.Class_ID = ?", 
                 "  AND mutants.ClassFile IS NOT NULL;");
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(classId));
+
+        result.addAll( DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(classId)) );
+        
+        // Include also those mutants created during the upload. Player = -1
+        String systemAttackerQuery = String.join("\n",
+                "SELECT mutants.*",
+                "FROM mutants",
+                "WHERE mutants.Class_ID = ? ",
+                "AND mutants.Player_ID = -1",
+                "AND mutants.ClassFile IS NOT NULL;");
+        
+        result.addAll( DB.executeQueryReturnList(systemAttackerQuery, MutantDAO::mutantFromRS, DB.getDBV(classId)) );
+        
+        return result;
     }
 
     /**
@@ -254,4 +283,5 @@ public class MutantDAO {
 
         return DB.executeUpdate(stmt, conn);
     }
+
 }
