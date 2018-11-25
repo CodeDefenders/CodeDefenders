@@ -42,13 +42,9 @@ import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.*;
 
 public class MultiplayerGame extends AbstractGame {
 
@@ -345,6 +341,8 @@ public class MultiplayerGame extends AbstractGame {
 		HashMap<Integer, Integer> mutantsAlive = new HashMap<Integer, Integer>();
 		HashMap<Integer, Integer> mutantsKilled = new HashMap<Integer, Integer>();
 		HashMap<Integer, Integer> mutantsEquiv = new HashMap<Integer, Integer>();
+		HashMap<Integer, Integer> mutantsChallenged = new HashMap<Integer, Integer>();
+		HashMap<Integer, Integer> duelsWon = new HashMap<Integer, Integer>();
 
 		// TODO why not getMutants()
 		List<Mutant> allMutants = getAliveMutants();
@@ -357,7 +355,9 @@ public class MultiplayerGame extends AbstractGame {
 			mutantScores.put(-1, new PlayerScore(-1));
 			mutantsAlive.put(-1, 0);
 			mutantsEquiv.put(-1, 0);
+			mutantsChallenged.put(-1, 0);
 			mutantsKilled.put(-1, 0);
+			duelsWon.put(-1, 0);
 		}
 
 		for (Mutant mm : allMutants) {
@@ -366,7 +366,9 @@ public class MultiplayerGame extends AbstractGame {
 				mutantScores.put(mm.getPlayerId(), new PlayerScore(mm.getPlayerId()));
 				mutantsAlive.put(mm.getPlayerId(), 0);
 				mutantsEquiv.put(mm.getPlayerId(), 0);
+				mutantsChallenged.put(mm.getPlayerId(), 0);
 				mutantsKilled.put(mm.getPlayerId(), 0);
+				duelsWon.put(mm.getPlayerId(), 0);
 			}
 
 			PlayerScore ps = mutantScores.get(mm.getPlayerId());
@@ -385,16 +387,26 @@ public class MultiplayerGame extends AbstractGame {
 				//This includes mutants marked equivalent
 				mutantsAlive.put(mm.getPlayerId(), mutantsAlive.get(mm.getPlayerId()) + 1);
 				mutantsAlive.put(-1, mutantsAlive.get(-1) + 1);
+				if(mm.getEquivalent().equals(PENDING_TEST)) {
+					mutantsChallenged.put(mm.getPlayerId(), mutantsChallenged.get(mm.getPlayerId()) + 1);
+					mutantsChallenged.put(-1, mutantsChallenged.get(-1) + 1);
+				}
 			} else {
 				mutantsKilled.put(mm.getPlayerId(), mutantsKilled.get(mm.getPlayerId()) + 1);
 				mutantsKilled.put(-1, mutantsKilled.get(-1) + 1);
+				if(mm.getEquivalent().equals(PROVEN_NO)) {
+					duelsWon.put(mm.getPlayerId(), duelsWon.get(mm.getPlayerId()) + 1);
+					duelsWon.put(-1, duelsWon.get(-1) + 1);
+				}
 			}
 
 		}
 
 		for (int i : mutantsKilled.keySet()) {
 			PlayerScore ps = mutantScores.get(i);
-			ps.setAdditionalInformation(mutantsAlive.get(i) + " / " + mutantsKilled.get(i) + " / " + mutantsEquiv.get((i)));
+			ps.setMutantKillInformation(mutantsAlive.get(i) + " / " + mutantsKilled.get(i) + " / " + mutantsEquiv.get((i)));
+			ps.setDuelInformation(duelsWon.get(i) + " / " + mutantsEquiv.get(i) + " / " + mutantsChallenged.get((i)));
+
 		}
 
 		return mutantScores;
@@ -402,14 +414,25 @@ public class MultiplayerGame extends AbstractGame {
 
 	public HashMap<Integer, PlayerScore> getTestScores() {
 		HashMap<Integer, PlayerScore> testScores = new HashMap<Integer, PlayerScore>();
-		HashMap<Integer, Integer> mutantsKilled = new HashMap<Integer, Integer>();
+		HashMap<Integer, Integer> mutantsKilled  = new HashMap<Integer, Integer>();
+
+		HashMap<Integer, Integer> challengesOpen = new HashMap<Integer, Integer>();
+		HashMap<Integer, Integer> challengesWon  = new HashMap<Integer, Integer>();
+		HashMap<Integer, Integer> challengesLost = new HashMap<Integer, Integer>();
+
 		int defendersTeamId = -1;
 		testScores.put(defendersTeamId, new PlayerScore(defendersTeamId));
 		mutantsKilled.put(defendersTeamId, 0);
+		challengesOpen.put(defendersTeamId, 0);
+		challengesWon.put(defendersTeamId, 0);
+		challengesLost.put(defendersTeamId, 0);
 
 		for (int defenderId : getDefenderIds()) {
 			testScores.put(defenderId, new PlayerScore(defenderId));
 			mutantsKilled.put(defenderId, 0);
+			challengesOpen.put(defenderId, 0);
+			challengesWon.put(defenderId, 0);
+			challengesLost.put(defenderId, 0);
 		}
 
 		int[] attackers = getAttackerIds();
@@ -431,7 +454,6 @@ public class MultiplayerGame extends AbstractGame {
 			ts.increaseTotalScore(test.getScore());
 
 			mutantsKilled.put(test.getPlayerId(), mutantsKilled.get(test.getPlayerId()) + test.getMutantsKilled());
-
 			mutantsKilled.put(teamKey, mutantsKilled.get(teamKey) + test.getMutantsKilled());
 
 		}
@@ -450,9 +472,33 @@ public class MultiplayerGame extends AbstractGame {
 			ts.increaseTotalScore(playerScore);
 		}
 
+		for(Mutant m : getKilledMutants()) {
+			if(!m.getEquivalent().equals(PROVEN_NO))
+				continue;
+
+			int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
+			challengesLost.put(defenderId, challengesLost.get(defenderId) + 1);
+			challengesLost.put(defendersTeamId, challengesLost.get(defendersTeamId) + 1);
+		}
+		for(Mutant m : getMutantsMarkedEquivalent()) {
+			int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
+			challengesWon.put(defenderId, challengesWon.get(defenderId) + 1);
+			challengesWon.put(defendersTeamId, challengesWon.get(defendersTeamId) + 1);
+		}
+		for(Mutant m : getMutantsMarkedEquivalentPending()) {
+			int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
+			challengesOpen.put(defenderId, challengesOpen.get(defenderId) + 1);
+			challengesOpen.put(defendersTeamId, challengesOpen.get(defendersTeamId) + 1);
+		}
+
+		for(int playerId : testScores.keySet()) {
+			testScores.get(playerId).setDuelInformation(challengesWon.get(playerId) + " / " + challengesLost.get(playerId) + " / " + challengesOpen.get((playerId)));
+		}
+		testScores.get(defendersTeamId).setDuelInformation(challengesWon.get(defendersTeamId) + " / " + challengesLost.get(defendersTeamId) + " / " + challengesOpen.get((defendersTeamId)));
+
 		for (int i : mutantsKilled.keySet()) {
 			PlayerScore ps = testScores.get(i);
-			ps.setAdditionalInformation("" + mutantsKilled.get(i));
+			ps.setMutantKillInformation("" + mutantsKilled.get(i));
 		}
 
 		return testScores;
