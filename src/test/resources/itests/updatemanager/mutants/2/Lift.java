@@ -55,9 +55,10 @@ public class Lift {
     public void call(int floor) {
         if (floor >= 0 && floor <= topFloor) {
             while (floor != currentFloor) {
-                if (floor > currentFloor)
+                if (floor > currentFloor) {
                     goUp();
-                else
+                    ++capacity;
+                } else
                     goDown();
             }
         }

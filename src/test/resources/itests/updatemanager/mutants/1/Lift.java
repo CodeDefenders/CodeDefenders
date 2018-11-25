@@ -36,7 +36,7 @@ public class Lift {
 
     public void addRiders(int numEntering) {
         if (numRiders + numEntering <= capacity) {
-            numRiders = numRiders + numEntering;
+            numRiders = numRiders + --numEntering;
         } else {
             numRiders = capacity;
         }
