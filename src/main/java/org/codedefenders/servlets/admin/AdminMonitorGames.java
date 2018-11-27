@@ -111,7 +111,12 @@ public class AdminMonitorGames extends HttpServlet {
 					mg.setState(newState);
 					if (!mg.update()) {
 						messages.add(errorMessage);
-					}
+                    } else {
+                        // Schedule the killmap
+                        if (GameState.FINISHED.equals(newState)) {
+                            KillmapDAO.enqueueJob(gameId);
+                        }
+                    }
 				}
 			} else {
 				GameState newState = request.getParameter("games_btn").equals("Start Games") ? GameState.ACTIVE : GameState.FINISHED;
@@ -120,7 +125,12 @@ public class AdminMonitorGames extends HttpServlet {
 					mg.setState(newState);
 					if (!mg.update()) {
 						messages.add("ERROR trying to start or stop game " + String.valueOf(gameId));
-					}
+                    } else {
+                        // Schedule the killmap
+                        if (GameState.FINISHED.equals(newState)) {
+                            KillmapDAO.enqueueJob(Integer.parseInt(gameId));
+                        }
+                    }
 				}
 			}
 		}

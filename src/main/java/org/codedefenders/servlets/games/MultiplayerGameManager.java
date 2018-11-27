@@ -20,6 +20,7 @@ package org.codedefenders.servlets.games;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
@@ -115,7 +116,10 @@ public class MultiplayerGameManager extends HttpServlet {
 				if (activeGame.getState().equals(GameState.ACTIVE)) {
 					logger.info("Ending multiplayer game {} (Setting state to FINISHED)", activeGame.getId());
 					activeGame.setState(GameState.FINISHED);
-					activeGame.update();
+					boolean updated = activeGame.update();
+					if( updated ){
+					    KillmapDAO.enqueueJob( activeGame.getId() );
+					}
 
 					response.sendRedirect(contextPath + "/multiplayer/games");
 					return;
