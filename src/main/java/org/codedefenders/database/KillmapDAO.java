@@ -146,4 +146,60 @@ public class KillmapDAO {
             return false;
         }
     }
+
+    /**
+     * Return a list of pending killmap jobs ordered by timestamp 
+     * @return
+     */
+    public static List<Integer> getPendingJobs() {
+        String query = String.join("\n",
+                "SELECT Game_ID",
+                "FROM killmapjob",
+                "ORDER BY Timestamp ASC;");
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query);
+
+        return DB.executeQueryReturnList(conn, stmt, rs -> {
+            int gameId = rs.getInt("Game_ID");
+            return new Integer(gameId);
+        });
+        
+    }
+
+    public static boolean enqueueJob(int gameId) {
+        // TODO Shall we double check that the game id exist?
+        // Job ID and Timestamp shall be automatically filled by the DBMS
+        String query = String.join("\n",
+                "INSERT INTO killmapjob (Game_ID)",
+                "VALUES (?)");
+        Connection conn = DB.getConnection();
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, gameId);
+            return DB.executeUpdate(stmt, conn);
+        } catch (SQLException e) {
+            logger.error("SQL exception caught", e);
+            return false;
+        }
+        
+    }
+
+    public static boolean removeJob(int gameId) {
+        String query = String.join("\n",
+                "DELETE FROM killmapjob ",
+                "WHERE Game_ID = ?");
+        Connection conn = DB.getConnection();
+
+        try {
+            PreparedStatement stmt = conn.prepareStatement(query);
+            stmt.setInt(1, gameId);
+            return DB.executeUpdate(stmt, conn);
+        } catch (SQLException e) {
+            logger.error("SQL exception caught", e);
+            return false;
+        }
+        
+    }
 }
