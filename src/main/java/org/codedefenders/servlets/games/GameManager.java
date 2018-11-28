@@ -34,6 +34,7 @@ import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
+import org.codedefenders.util.MutantUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -421,32 +422,38 @@ public class GameManager extends HttpServlet {
 		return false;
 	}
 
-	public static Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
-		// Mutant is assumed valid here
+    public static Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
+        // Mutant is assumed valid here
 
-		GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
-		String classMutatedBaseName = classMutated.getBaseName();
+        GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
+        String classMutatedBaseName = classMutated.getBaseName();
 
-		// Setup folder the files will go in
-		File newMutantDir = FileUtils.getNextSubDir(Constants.MUTANTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
+        // Setup folder the files will go in
+        File newMutantDir = FileUtils
+                .getNextSubDir(Constants.MUTANTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId);
 
-		logger.info("NewMutantDir: {}", newMutantDir.getAbsolutePath());
-		logger.info("Class Mutated: {} (basename: {})", classMutated.getName(), classMutatedBaseName);
+        logger.info("NewMutantDir: {}", newMutantDir.getAbsolutePath());
+        logger.info("Class Mutated: {} (basename: {})", classMutated.getName(), classMutatedBaseName);
 
-		// Write the Mutant String into a java file
-		String mutantFileName = newMutantDir + F_SEP + classMutatedBaseName + JAVA_SOURCE_EXT;
-		File mutantFile = new File(mutantFileName);
-		FileWriter fw = new FileWriter(mutantFile);
-		BufferedWriter bw = new BufferedWriter(fw);
-		bw.write(mutatedCode);
-		bw.close();
+        String mutantFileName = newMutantDir + F_SEP + classMutatedBaseName + JAVA_SOURCE_EXT;
 
-		// sanity check
-		assert CodeValidator.getMD5FromText(mutatedCode).equals(CodeValidator.getMD5FromFile(mutantFileName)) : "MD5 hashes differ between code as text and code from new file";
+        // We do not use a class with static methods to favor parallelism...
+        MutantUtils mutantUtils = new MutantUtils();
+        // Read from FS
+        List<String> originalCode = mutantUtils.readLinesIfFileExist( Paths.get( classMutated.getJavaFile() ) );
+        // Remove invalid diffs, like inserting blank lines
+        String cleanedMutatedCode = mutantUtils.cleanUpMutatedCode( String.join("\n", originalCode), mutatedCode);
+        // Write the Mutant String into a java file
+        mutantUtils.storeMutantToFile(mutantFileName, cleanedMutatedCode);
 
-		// Compile the mutant and add it to the game if possible; otherwise, TODO: delete these files created?
-		return AntRunner.compileMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
-	}
+        // sanity check
+        assert CodeValidator.getMD5FromText(cleanedMutatedCode).equals(CodeValidator
+                .getMD5FromFile(mutantFileName)) : "MD5 hashes differ between code as text and code from new file";
+
+        // Compile the mutant and add it to the game if possible; otherwise,
+        // TODO: delete these files created?
+        return AntRunner.compileMutant(newMutantDir, mutantFileName, gid, classMutated, ownerId);
+    }
 
 	/**
 	 * @param gid
