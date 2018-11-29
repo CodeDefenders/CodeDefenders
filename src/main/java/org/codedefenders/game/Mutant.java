@@ -29,6 +29,7 @@ import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.util.MutantUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +71,8 @@ public class Mutant implements Serializable {
     private String creatorName;
 	private int creatorId;
 
+	// Every mutant has its own
+	private MutantUtils mutantUtils = new MutantUtils();
 	private boolean alive = true;
 
 	private int killingTestId = 0;
@@ -392,8 +395,8 @@ public class Mutant implements Serializable {
 		File sourceFile = new File(sut.getJavaFile());
 		File mutantFile = new File(javaFile);
 
-		List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());
-		List<String> mutantLines = readLinesIfFileExist(mutantFile.toPath());
+		List<String> sutLines = mutantUtils.readLinesIfFileExist(sourceFile.toPath());
+		List<String> mutantLines = mutantUtils.readLinesIfFileExist(mutantFile.toPath());
 
 		for (int l = 0; l < sutLines.size(); l++) {
 			sutLines.set(l, sutLines.get(l).replaceAll(regex, ""));
@@ -417,8 +420,8 @@ public class Mutant implements Serializable {
 		Path sourceFile = Paths.get(sut.getJavaFile());
 		Path mutantFile = Paths.get(javaFile);
 
-		List<String> sutLines = readLinesIfFileExist(sourceFile);
-		List<String> mutantLines = readLinesIfFileExist(mutantFile);
+		List<String> sutLines = mutantUtils.readLinesIfFileExist(sourceFile);
+		List<String> mutantLines = mutantUtils.readLinesIfFileExist(mutantFile);
 
 		Patch patch = DiffUtils.diff(sutLines, mutantLines);
 		List<String> unifiedPatches = DiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
@@ -433,21 +436,6 @@ public class Mutant implements Serializable {
 
 	public String getHTMLEscapedPatchString() {
 		return StringEscapeUtils.escapeHtml(getPatchString());
-	}
-
-	private List<String> readLinesIfFileExist(Path path) {
-		List<String> lines = new ArrayList<>();
-		try {
-			if (Files.exists(path))
-				lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-			else {
-				logger.error("File not found {}", path);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();  // TODO handle properly
-			return null;
-		}
-		return lines;
 	}
 
 	/*
