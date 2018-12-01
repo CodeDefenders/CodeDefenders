@@ -19,6 +19,9 @@
 
 --%>
 <%@ page import="org.codedefenders.execution.KillMapProcessor"%>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings"%>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO"%>
+
 <%
     String pageTitle = null;
 %>
@@ -36,22 +39,38 @@
 	<h3>KillMaps</h3>
 	<h4>Status</h4>
 	<%-- Use this as starting point to provide more fine grained details and controls: --%>
-	<p> Pending Kill Map Jobs: <%= killMapProcessor.getPendingJobs().size() %></p>
+	<p>
+		Pending Kill Map Jobs:
+		<%= killMapProcessor.getPendingJobs().size() %></p>
 	<h4>Settings</h4>
 	<div class="full-width">
 		<form id="killmapProcessor" name="killmapProcessor"
 			action="admin/analytics/killmaps" method="post">
-			<div class="input-group" id="killmap-processor">
+
+			<%
+			    for (AdminSystemSettings.SettingsDTO setting : AdminDAO.getSystemSettings()) {
+			        if( ! AdminSystemSettings.SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.equals( setting.getName())){
+			            continue;
+			        }
+			        String readableName = setting.getName().name().toLowerCase().replace("_", " ");
+			        String explanation = setting.getName().toString();
+			        switch (setting.getType()) {
+			        case BOOL_VALUE:
+			%>
+			<div class="input-group" id="<%="group_"+setting.getName().name()%>">
 				<span class="input-group-addon"
-					style="width: 250px; text-align: left;"
-					title="Automatic KillMap Computation">Automatic KillMap
-					Computation </span> 
-				<input type="checkbox" id="enabled" name="enabled"
-					class="form-control" data-size="medium" data-toggle="toggle"
-					data-on="Enabled" data-off="Disabled" data-onstyle="primary"
-					data-offstyle=""
-					<%= (killMapProcessor.isEnabled()) ? "checked" : ""%>>
+					style="width: 250px; text-align: left;" title="<%=explanation%>"><%=readableName%>
+				</span> <input type="checkbox" id="<%=setting.getName().name()%>"
+					name="<%=setting.getName().name()%>" class="form-control"
+					data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
+					data-onstyle="primary" data-offstyle=""
+					<%=setting.getBoolValue() ? "checked" : ""%>>
 			</div>
+            <%
+                         break;
+                    }
+			   }
+		    %>
 			<br>
 			<button type="submit" class="btn btn-primary" name="saveSettingsBtn"
 				id="saveSettingsBtn">Save</button>

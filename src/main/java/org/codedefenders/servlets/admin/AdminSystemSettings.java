@@ -136,7 +136,13 @@ public class AdminSystemSettings extends HttpServlet {
 			public String toString() {
 				return "Turn on certain debugging features such as detailed debug prints for javax.mail";
 			}
-		}
+		},
+		AUTOMATIC_KILLMAP_COMPUTATION {
+            @Override
+            public String toString() {
+                return "Turn on the automatic killmaps computation";
+            }
+        }
 	}
 
 	public enum SETTING_TYPE {
@@ -229,7 +235,8 @@ public class AdminSystemSettings extends HttpServlet {
 		response.sendRedirect(responsePath);
 	}
 
-	private void updateSystemSettings(HttpServletRequest request, ArrayList<String> messages) {
+	// TODO Those methods should be factored into a class and exposed for reuse
+	public void updateSystemSettings(HttpServletRequest request, ArrayList<String> messages) {
 		List<SettingsDTO> settings = AdminDAO.getSystemSettings();
 
 		boolean success = true;

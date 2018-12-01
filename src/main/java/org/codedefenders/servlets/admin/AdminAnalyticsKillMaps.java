@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
@@ -51,25 +52,37 @@ public class AdminAnalyticsKillMaps extends HttpServlet {
         // TODO This shall be a call done by an admin user.
         // But I guess there's no way to check this...
         HttpSession session = request.getSession();
+        ArrayList<String> messages = new ArrayList<String>();
         // Get their user id from the session.
         int currentUserID = (Integer) session.getAttribute("uid");
-        String valueString = request.getParameter("enabled");
+
+        String valueString = request
+                .getParameter(AdminSystemSettings.SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.name());
+
         ServletContext context = getServletContext();
         KillMapProcessor killMapProcessor = (KillMapProcessor) context.getAttribute(KillMapProcessor.NAME);
         if (valueString != null && !killMapProcessor.isEnabled()) {
             // This means enable
             logger.info("User {} enabled Killmap Processor", currentUserID);
             killMapProcessor.setEnabled(true);
+            /*
+             * Store the setting into the DB. We use the code which is already
+             * in place under the assumption that we do not need to pass the
+             * entire set of configurations to update one entry
+             */
+            (new AdminSystemSettings()).updateSystemSettings(request, messages);
+
         } else if (valueString == null && killMapProcessor.isEnabled()) {
             // This means disable
             logger.info("User {} disabled Killmap Processor", currentUserID);
             killMapProcessor.setEnabled(false);
+            // Store the setting into the DB. We use the code which is already
+            // in place
+            (new AdminSystemSettings()).updateSystemSettings(request, messages);
+
         } else {
             logger.debug("Invalid request from user {}", currentUserID);
         }
-
-        ArrayList<String> messages = new ArrayList<String>();
-        messages.add(DEFAULT_MESSAGE);
         session.setAttribute("messages", messages);
 
         // Show again the same page as rendered by the JSP

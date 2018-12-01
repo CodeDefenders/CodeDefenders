@@ -72,8 +72,12 @@
         <input type="hidden" name="formType" value="saveSettings">
 
         <% for (AdminSystemSettings.SettingsDTO setting : AdminDAO.getSystemSettings()) {
+            if( AdminSystemSettings.SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.equals( setting.getName())){
+                continue; // Do not show Killmap Setting here
+            }
             String readableName = setting.getName().name().toLowerCase().replace("_", " ");
             String explanation = setting.getName().toString();
+
             switch (setting.getType()) {
                 case STRING_VALUE:
                     if (setting.getName().equals(AdminSystemSettings.SETTING_NAME.SITE_NOTICE)) {%>

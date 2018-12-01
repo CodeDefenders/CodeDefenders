@@ -11,9 +11,11 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -112,6 +114,20 @@ public class KillMapProcessor implements ServletContextListener {
          * this thread dies for whatever reason the killmap computation will die
          * as well
          */
+
+        // Read the setting for this service from the DB
+        for (AdminSystemSettings.SettingsDTO setting : AdminDAO.getSystemSettings()) {
+            if (!AdminSystemSettings.SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.equals(setting.getName())) {
+                continue;
+            }
+            // Avoid future problems
+            if (AdminSystemSettings.SETTING_TYPE.BOOL_VALUE.equals(setting.getType())) {
+                logger.info("Initial conf from the DB:" + setting.getBoolValue());
+                this.setEnabled(setting.getBoolValue());
+                break;
+            }
+        }
+
         executor = Executors.newScheduledThreadPool(1);
         logger.info("KillMapProcessor Started ");
         executor.scheduleWithFixedDelay(new KillMapJob(), INITIAL_DELAY_VALUE, EXECUTION_DELAY_VALUE,
