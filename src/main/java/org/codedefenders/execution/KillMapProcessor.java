@@ -73,7 +73,17 @@ public class KillMapProcessor implements ServletContextListener {
                 KillMap.KillMapJob theJob = gamesToProcess.get(0);
                 switch ( theJob.getType() ) {
                 case CLASS:
-                    logger.warn("PER CLASS JOB NOT YET IMPLEMENTED");
+                    try{
+                        KillMap.forClass(theJob.getReference(), DO_NOT_RECALCULATE);
+                    } catch (InterruptedException | ExecutionException e) {
+                        logger.warn("Killmap computation failed!", e);
+                    } catch (Throwable e) {
+                        logger.warn("Killmap computation failed!", e);
+                    } finally {
+                        // If the job fails and we leave it in the database,
+                        // we risk to create an infinite loop. So we remove it everytime !
+                        KillmapDAO.removeJob(theJob);
+                    }
                     break;
                 case GAME:
                     try {
@@ -85,19 +95,15 @@ public class KillMapProcessor implements ServletContextListener {
                         KillMap.forGame(game, DO_NOT_RECALCULATE);
                         logger.info("Killmap for game " + game.getId() + ". Remove job from DB");
                         // At this point we can remove the job from the DB
-                        KillmapDAO.removeJob(theJob);
                     } catch (InterruptedException | ExecutionException e) {
-                        // TODO If the job fails and we leave it, we risk to create
-                        // a loop !
                         logger.warn("Killmap computation failed!", e);
                     } catch (Throwable e) {
-                        // TODO: handle exception ?
                         logger.warn("Killmap computation failed!", e);
+                    } finally {
+                        // If the job fails and we leave it in the database,
+                        // we risk to create an infinite loop. So we remove it everytime !
+                        KillmapDAO.removeJob(theJob);
                     }
-                    
-                default:
-                    // Do nothing
-                    return;
                 }
                 
             }
