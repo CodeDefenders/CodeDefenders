@@ -19,28 +19,61 @@
 package org.codedefenders.servlets.admin;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AdminAnalyticsKillMaps extends HttpServlet {
-	private static final Logger logger = LoggerFactory.getLogger(AdminAnalyticsKillMaps.class);
+    private static final long serialVersionUID = 4237104046949774958L;
 
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		request.getRequestDispatcher(Constants.ADMIN_ANALYTICS_KILLMAP_JSP).forward(request, response);
-	}
+    private static final Logger logger = LoggerFactory.getLogger(AdminAnalyticsKillMaps.class);
 
-	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-	    // TODO Access the KillMap computation service and call the stop method.
-	    // Maybe this can be configured using the app context
-	    // TODO This might require to wrap this into a background object instead of accessing it as Static Object !!
-	}
+    private final static String DEFAULT_MESSAGE = "Settings saved.";
+
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        request.getRequestDispatcher(Constants.ADMIN_ANALYTICS_KILLMAP_JSP).forward(request, response);
+    }
+
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        // Validate user requests
+        // TODO This shall be a call done by an admin user.
+        // But I guess there's no way to check this...
+        HttpSession session = request.getSession();
+        // Get their user id from the session.
+        int currentUserID = (Integer) session.getAttribute("uid");
+        String valueString = request.getParameter("enabled");
+        ServletContext context = getServletContext();
+        KillMapProcessor killMapProcessor = (KillMapProcessor) context.getAttribute(KillMapProcessor.NAME);
+        if (valueString != null && !killMapProcessor.isEnabled()) {
+            // This means enable
+            logger.info("User {} enabled Killmap Processor", currentUserID);
+            killMapProcessor.setEnabled(true);
+        } else if (valueString == null && killMapProcessor.isEnabled()) {
+            // This means disable
+            logger.info("User {} disabled Killmap Processor", currentUserID);
+            killMapProcessor.setEnabled(false);
+        } else {
+            logger.debug("Invalid request from user {}", currentUserID);
+        }
+
+        ArrayList<String> messages = new ArrayList<String>();
+        messages.add(DEFAULT_MESSAGE);
+        session.setAttribute("messages", messages);
+
+        // Show again the same page as rendered by the JSP
+        request.getRequestDispatcher(Constants.ADMIN_ANALYTICS_KILLMAP_JSP).forward(request, response);
+
+    }
 }

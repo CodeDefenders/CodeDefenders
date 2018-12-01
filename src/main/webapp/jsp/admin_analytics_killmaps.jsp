@@ -18,14 +18,44 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<% String pageTitle = null; %>
-<%@ include file="/jsp/header_main.jsp" %>
+<%@ page import="org.codedefenders.execution.KillMapProcessor"%>
+<%
+    String pageTitle = null;
+%>
+<%@ include file="/jsp/header_main.jsp"%>
 
 <div class="full-width">
-    <% request.setAttribute("adminActivePage", "adminAnalytics"); %>
-    <%@ include file="/jsp/admin_navigation.jsp" %>
+	<%
+    request.setAttribute("adminActivePage", "adminAnalytics");
+	   
+    KillMapProcessor killMapProcessor = (KillMapProcessor) getServletContext().getAttribute(KillMapProcessor.NAME);
+    
+	%>
+	<%@ include file="/jsp/admin_navigation.jsp"%>
 
-    <h3>KillMaps</h3>
-
+	<h3>KillMaps</h3>
+	<h4>Status</h4>
+	<%-- Use this as starting point to provide more fine grained details and controls: --%>
+	<p> Pending Kill Map Jobs: <%= killMapProcessor.getPendingJobs().size() %></p>
+	<h4>Settings</h4>
+	<div class="full-width">
+		<form id="killmapProcessor" name="killmapProcessor"
+			action="admin/analytics/killmaps" method="post">
+			<div class="input-group" id="killmap-processor">
+				<span class="input-group-addon"
+					style="width: 250px; text-align: left;"
+					title="Automatic KillMap Computation">Automatic KillMap
+					Computation </span> 
+				<input type="checkbox" id="enabled" name="enabled"
+					class="form-control" data-size="medium" data-toggle="toggle"
+					data-on="Enabled" data-off="Disabled" data-onstyle="primary"
+					data-offstyle=""
+					<%= (killMapProcessor.isEnabled()) ? "checked" : ""%>>
+			</div>
+			<br>
+			<button type="submit" class="btn btn-primary" name="saveSettingsBtn"
+				id="saveSettingsBtn">Save</button>
+		</form>
+	</div>
 </div>
-<%@ include file="/jsp/footer.jsp" %>
+<%@ include file="/jsp/footer.jsp"%>

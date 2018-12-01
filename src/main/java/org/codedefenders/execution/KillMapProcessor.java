@@ -6,6 +6,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
@@ -22,6 +23,9 @@ import org.slf4j.LoggerFactory;
  * killmap to be computed, and processes them one at the time. Results are then
  * stored to killmap, and the job is removed from the database
  * 
+ * TODO We should need to decouple the actual processor from the context
+ * listener for better testing.
+ * 
  * @author gambi
  *
  */
@@ -37,10 +41,21 @@ public class KillMapProcessor implements ServletContextListener {
     private static final int EXECUTION_DELAY_VALUE = 10;
     private static final TimeUnit EXECUTION_DELAY_UNIT = TimeUnit.SECONDS;
 
+    // Ref name
+    public static final String NAME = "KILLMAP_PROCESSOR";
+
+    // This is reset everytime we re-deploy the app.
+    // We make it easy: instead of stopping and restarting the executor, we
+    // simply skip the job if the processor is disabled
+    private static boolean isEnabled = true;
+
     private class KillMapJob implements Runnable {
 
         @Override
         public void run() {
+            if (!isEnabled) {
+                return;
+            }
             // Retrieve a kill map job from the DB and execute it
             boolean recalculate = true;
             // Retrieve all of them to have a partial count, but execute only
@@ -72,6 +87,24 @@ public class KillMapProcessor implements ServletContextListener {
     public KillMapProcessor() {
     }
 
+    public boolean isEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean isEnabled) {
+        KillMapProcessor.isEnabled = isEnabled;
+    }
+
+    /**
+     * Return the ID of the games for which there's a pending killmap
+     * computation
+     * 
+     * @return
+     */
+    public List<Integer> getPendingJobs() {
+        return KillmapDAO.getPendingJobs();
+    }
+
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         /*
@@ -83,11 +116,19 @@ public class KillMapProcessor implements ServletContextListener {
         logger.info("KillMapProcessor Started ");
         executor.scheduleWithFixedDelay(new KillMapJob(), INITIAL_DELAY_VALUE, EXECUTION_DELAY_VALUE,
                 EXECUTION_DELAY_UNIT);
+
+        ServletContext context = sce.getServletContext();
+        // This smells fishy, probably we need to pass the actual Processor once
+        // we factor it out from the listener
+        context.setAttribute(NAME, this);
+        logger.info("KillMapProcessor registered in context as {} ", NAME);
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
         try {
+            sce.getServletContext().removeAttribute(NAME);
+
             logger.info("KillMapProcessor Shutting down");
             // Cancel pending jobs
             executor.shutdownNow();
