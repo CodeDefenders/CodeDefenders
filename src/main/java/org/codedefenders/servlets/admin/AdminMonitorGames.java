@@ -18,15 +18,6 @@
  */
 package org.codedefenders.servlets.admin;
 
-import org.codedefenders.database.*;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Role;
-import org.codedefenders.game.Test;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.util.Constants;
-
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -35,6 +26,22 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.execution.KillMap.KillMapJob;
+import org.codedefenders.execution.KillMap.KillMapJob.Type;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.util.Constants;
 
 public class AdminMonitorGames extends HttpServlet {
 
@@ -114,7 +121,7 @@ public class AdminMonitorGames extends HttpServlet {
                     } else {
                         // Schedule the killmap
                         if (GameState.FINISHED.equals(newState)) {
-                            KillmapDAO.enqueueJob(gameId);
+                            KillmapDAO.enqueueJob( new KillMapJob(Type.GAME, gameId));
                         }
                     }
 				}
@@ -128,7 +135,7 @@ public class AdminMonitorGames extends HttpServlet {
                     } else {
                         // Schedule the killmap
                         if (GameState.FINISHED.equals(newState)) {
-                            KillmapDAO.enqueueJob(Integer.parseInt(gameId));
+                            KillmapDAO.enqueueJob( new KillMapJob(Type.GAME, Integer.parseInt(gameId)));
                         }
                     }
 				}

@@ -24,6 +24,8 @@ import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.execution.KillMap.KillMapJob;
+import org.codedefenders.execution.KillMap.KillMapJob.Type;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
@@ -118,9 +120,8 @@ public class MultiplayerGameManager extends HttpServlet {
 					activeGame.setState(GameState.FINISHED);
 					boolean updated = activeGame.update();
 					if( updated ){
-					    KillmapDAO.enqueueJob( activeGame.getId() );
+					    KillmapDAO.enqueueJob( new KillMapJob(Type.GAME, activeGame.getId() ));
 					}
-
 					response.sendRedirect(contextPath + "/multiplayer/games");
 					return;
 				}

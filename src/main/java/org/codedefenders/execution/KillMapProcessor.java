@@ -50,6 +50,9 @@ public class KillMapProcessor implements ServletContextListener {
     // We make it easy: instead of stopping and restarting the executor, we
     // simply skip the job if the processor is disabled
     private static boolean isEnabled = true;
+    // Make it easy to understand the parameter of KillmapDAO methods
+    private static boolean DO_NOT_RECALCULATE = false;
+    private static boolean RECALCULATE = true;
 
     private class KillMapJob implements Runnable {
 
@@ -58,30 +61,45 @@ public class KillMapProcessor implements ServletContextListener {
             if (!isEnabled) {
                 return;
             }
-            // Retrieve a kill map job from the DB and execute it
-            boolean recalculate = true;
             // Retrieve all of them to have a partial count, but execute only
             // the first
-            List<Integer> gamesToProcess = KillmapDAO.getPendingJobs();
+            List<KillMap.KillMapJob> gamesToProcess = KillmapDAO.getPendingJobs();
             if (gamesToProcess.isEmpty()) {
                 logger.debug("No killmap computation to process");
+//                KillMap.forGame(game, DO_NOT_RECALCULATE);
                 return;
             } else {
-                try {
-                    MultiplayerGame game = DatabaseAccess.getMultiplayerGame(gamesToProcess.get(0));
-                    logger.info("Computing killmap for game " + game.getId());
-                    KillMap.forGame(game, recalculate);
-                    logger.info("Killmap for game " + game.getId() + ". Remove job from DB");
-                    // At this point we can remove the job from the DB
-                    KillmapDAO.removeJob(game.getId());
-                } catch (InterruptedException | ExecutionException e) {
-                    // TODO If the job fails and we leave it, we risk to create
-                    // a loop !
-                    logger.warn("Killmap computation failed!", e);
-                } catch (Throwable e) {
-                    // TODO: handle exception ?
-                    logger.warn("Killmap computation failed!", e);
+                
+                KillMap.KillMapJob theJob = gamesToProcess.get(0);
+                switch ( theJob.getType() ) {
+                case CLASS:
+                    logger.warn("PER CLASS JOB NOT YET IMPLEMENTED");
+                    break;
+                case GAME:
+                    try {
+                        MultiplayerGame game = DatabaseAccess.getMultiplayerGame( theJob.getReference() );
+                        
+                        assert game.getId() == theJob.getReference().intValue();
+                                
+                        logger.info("Computing killmap for game " + game.getId());
+                        KillMap.forGame(game, DO_NOT_RECALCULATE);
+                        logger.info("Killmap for game " + game.getId() + ". Remove job from DB");
+                        // At this point we can remove the job from the DB
+                        KillmapDAO.removeJob(theJob);
+                    } catch (InterruptedException | ExecutionException e) {
+                        // TODO If the job fails and we leave it, we risk to create
+                        // a loop !
+                        logger.warn("Killmap computation failed!", e);
+                    } catch (Throwable e) {
+                        // TODO: handle exception ?
+                        logger.warn("Killmap computation failed!", e);
+                    }
+                    
+                default:
+                    // Do nothing
+                    return;
                 }
+                
             }
         }
     }
@@ -98,12 +116,12 @@ public class KillMapProcessor implements ServletContextListener {
     }
 
     /**
-     * Return the ID of the games for which there's a pending killmap
+     * Return the ID of the games or classes for which there's a pending killmap
      * computation
      * 
      * @return
      */
-    public List<Integer> getPendingJobs() {
+    public List<KillMap.KillMapJob> getPendingJobs() {
         return KillmapDAO.getPendingJobs();
     }
 

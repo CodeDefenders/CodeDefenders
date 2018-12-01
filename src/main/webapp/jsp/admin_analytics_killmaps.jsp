@@ -18,6 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.execution.KillMap"%>
+<%@ page import="org.codedefenders.execution.KillMap.KillMapJob"%>
+<%@ page import="org.codedefenders.execution.KillMap.KillMapJob.Type"%>
 <%@ page import="org.codedefenders.execution.KillMapProcessor"%>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings"%>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO"%>
@@ -32,6 +35,18 @@
     request.setAttribute("adminActivePage", "adminAnalytics");
 	   
     KillMapProcessor killMapProcessor = (KillMapProcessor) getServletContext().getAttribute(KillMapProcessor.NAME);
+    int gamePendingJobs = 0;
+    int classPendingJobs = 0;
+    for( KillMap.KillMapJob pendingJob : killMapProcessor.getPendingJobs() ){
+        switch (pendingJob.getType()) {
+        case CLASS:
+            classPendingJobs += 1;
+            break;
+        case GAME:
+            gamePendingJobs += 1;
+            break;
+        }
+    }
     
 	%>
 	<%@ include file="/jsp/admin_navigation.jsp"%>
@@ -40,8 +55,20 @@
 	<h4>Status</h4>
 	<%-- Use this as starting point to provide more fine grained details and controls: --%>
 	<p>
-		Pending Kill Map Jobs:
-		<%= killMapProcessor.getPendingJobs().size() %></p>
+		Pending KillMap Jobs for Games:
+		<%= gamePendingJobs %>
+		</p>
+	<p>
+        Pending KillMap Jobs for Classes:
+        <%= classPendingJobs %>
+        </p>
+
+	<h4>Submit KillMap Jobs</h4>
+	<div class="full-width">
+		<form id="killmapProcessor" name="killmapProcessor"
+			action="admin/analytics/killmaps" method="post"></form>
+	</div>
+
 	<h4>Settings</h4>
 	<div class="full-width">
 		<form id="killmapProcessor" name="killmapProcessor"

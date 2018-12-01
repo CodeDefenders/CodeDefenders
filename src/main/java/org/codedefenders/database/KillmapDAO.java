@@ -145,34 +145,56 @@ public class KillmapDAO {
     /**
      * Return a list of pending killmap jobs ordered by timestamp 
      */
-    public static List<Integer> getPendingJobs() {
+    public static List<KillMap.KillMapJob> getPendingJobs() {
         String query = String.join("\n",
-                "SELECT Game_ID",
+                "SELECT *",
                 "FROM killmapjob",
                 "ORDER BY Timestamp ASC;");
 
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("Game_ID"));
+        return DB.executeQueryReturnList(query, rs -> {
+            int gameId = rs.getInt("Game_ID");
+            int classId = rs.getInt("Class_ID");
+            // if SQL NULL then int is 0
+            KillMap.KillMapJob.Type type = (classId != 0) ? KillMap.KillMapJob.Type.CLASS :KillMap.KillMapJob.Type.GAME;
+            int reference = (classId != 0) ? classId : gameId;
+            return new KillMap.KillMapJob(type, reference);
+        });
     }
 
-    public static boolean enqueueJob(int gameId) {
-        // TODO Shall we double check that the game id exist?
-        // Job ID and Timestamp shall be automatically filled by the DBMS
-        String query = String.join("\n",
-                "INSERT INTO killmapjob (Game_ID)",
-                "VALUES (?)");
+    public static boolean enqueueJob(KillMap.KillMapJob theJob) {
+        String query = "";
+        switch (theJob.getType()) {
+        case CLASS:
+            query = String.join("\n", "INSERT INTO killmapjob (Class_ID)", "VALUES (?)");
+            break;
+        case GAME:
+            query = String.join("\n", "INSERT INTO killmapjob (Game_ID)", "VALUES (?)");
+            break;
+        default:
+            logger.warn("Unknonw type of Killmap Job !");
+            return false;
+        }
 
         Connection conn = DB.getConnection();
-        PreparedStatement stmt =  DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(theJob.getReference()));
         return DB.executeUpdate(stmt, conn);
     }
 
-    public static boolean removeJob(int gameId) {
-        String query = String.join("\n",
-                "DELETE FROM killmapjob ",
-                "WHERE Game_ID = ?");
-
+    public static boolean removeJob(KillMap.KillMapJob theJob) {
+        String query = "";
+        switch (theJob.getType()) {
+        case CLASS:
+            query = String.join("\n", "DELETE FROM killmapjob ", "WHERE Class_ID = ?");
+            break;
+        case GAME:
+            query = String.join("\n", "DELETE FROM killmapjob ", "WHERE Game_ID = ?");
+            break;
+        default:
+            logger.warn("Unknonw type of Killmap Job !");
+            return false;
+        }
         Connection conn = DB.getConnection();
-        PreparedStatement stmt =  DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(theJob.getReference()));
         return DB.executeUpdate(stmt, conn);
     }
 }
