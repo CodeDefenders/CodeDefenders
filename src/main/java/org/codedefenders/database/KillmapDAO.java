@@ -39,12 +39,7 @@ public class KillmapDAO {
                 "WHERE ID = ?;");
 
         Connection conn = DB.getConnection();
-
-        DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(hasKillMap),
-                DB.getDBV(gameId)};
-
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, values);
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(hasKillMap), DB.getDBV(gameId));
 
         try {
             return DB.executeUpdate(stmt, conn);
@@ -149,7 +144,6 @@ public class KillmapDAO {
 
     /**
      * Return a list of pending killmap jobs ordered by timestamp 
-     * @return
      */
     public static List<Integer> getPendingJobs() {
         String query = String.join("\n",
@@ -157,14 +151,7 @@ public class KillmapDAO {
                 "FROM killmapjob",
                 "ORDER BY Timestamp ASC;");
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query);
-
-        return DB.executeQueryReturnList(conn, stmt, rs -> {
-            int gameId = rs.getInt("Game_ID");
-            return new Integer(gameId);
-        });
-        
+        return DB.executeQueryReturnList(query, rs -> rs.getInt("Game_ID"));
     }
 
     public static boolean enqueueJob(int gameId) {
@@ -173,33 +160,19 @@ public class KillmapDAO {
         String query = String.join("\n",
                 "INSERT INTO killmapjob (Game_ID)",
                 "VALUES (?)");
-        Connection conn = DB.getConnection();
 
-        try {
-            PreparedStatement stmt = conn.prepareStatement(query);
-            stmt.setInt(1, gameId);
-            return DB.executeUpdate(stmt, conn);
-        } catch (SQLException e) {
-            logger.error("SQL exception caught", e);
-            return false;
-        }
-        
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt =  DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
+        return DB.executeUpdate(stmt, conn);
     }
 
     public static boolean removeJob(int gameId) {
         String query = String.join("\n",
                 "DELETE FROM killmapjob ",
                 "WHERE Game_ID = ?");
-        Connection conn = DB.getConnection();
 
-        try {
-            PreparedStatement stmt = conn.prepareStatement(query);
-            stmt.setInt(1, gameId);
-            return DB.executeUpdate(stmt, conn);
-        } catch (SQLException e) {
-            logger.error("SQL exception caught", e);
-            return false;
-        }
-        
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt =  DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
+        return DB.executeUpdate(stmt, conn);
     }
 }
