@@ -63,16 +63,57 @@
         <%= classPendingJobs %>
         </p>
 
-	<h4>Submit KillMap Jobs</h4>
+	<h4>Submit KillMap Jobs for Classes</h4>
 	<div class="full-width">
-		<form id="killmapProcessor" name="killmapProcessor"
-			action="admin/analytics/killmaps" method="post"></form>
+		<form id="killmapJobSubmission" name="killmapJobSubmission"
+			action="admin/analytics/killmaps" method="post">
+		<%-- For each class in the DB gives the possibility to create the killmap. Additional data might be shown as well as in the Classes Analytics
+		but I cannot figure out how data are provided there ...--%>
+		    
+            <input type="hidden" name="formType" value="submitKillMapClassJob">
+            
+    <table id="tableClasses"
+           class="table table-striped table-hover table-responsive">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Alias</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+                <%
+                for (GameClass cut : DatabaseAccess.getAllClasses()) {
+                    // Probably we should avoid listing here puzzle games classes
+                %>
+                <tr>
+                    <td><%= cut.getId() %></td>
+                    <td><%= cut.getName() %></td>
+                    <td><%= cut.getAlias() %></td>
+                    <td>
+                        <button type="submit"
+                            id="<%= cut.getId() %>" name="classID" value="<%= cut.getId() %>"
+                            class="btn btn-primary"  aria-label="Submit a job for this class" id="saveSettingsBtn">
+                            <span class="glyphicon glyphicon-send" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                </tr>
+                <%
+                }
+                %>
+		</tbody>
+    </table>	
+    
+			
+	   </form>
 	</div>
 
 	<h4>Settings</h4>
 	<div class="full-width">
-		<form id="killmapProcessor" name="killmapProcessor"
+		<form id="killmapProcessorSettings" name="killmapProcessorSettings"
 			action="admin/analytics/killmaps" method="post">
+			<input type="hidden" name="formType" value="updateSettings">
 
 			<%
 			    for (AdminSystemSettings.SettingsDTO setting : AdminDAO.getSystemSettings()) {

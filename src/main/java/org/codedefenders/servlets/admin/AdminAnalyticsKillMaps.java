@@ -29,6 +29,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.execution.KillMap.KillMapJob;
+import org.codedefenders.execution.KillMap.KillMapJob.Type;
 import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
@@ -51,6 +55,39 @@ public class AdminAnalyticsKillMaps extends HttpServlet {
         // Validate user requests
         // TODO This shall be a call done by an admin user.
         // But I guess there's no way to check this...
+
+        String formType = request.getParameter("formType");
+        switch (formType) {
+        case "submitKillMapClassJob":
+            submitKillMapClassJob(request);
+            break;
+        case "updateSettings":
+            updateSettings(request);
+            break;
+        }
+        request.getRequestDispatcher(Constants.ADMIN_ANALYTICS_KILLMAP_JSP).forward(request, response);
+    }
+
+    private void submitKillMapClassJob(HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        ArrayList<String> messages = new ArrayList<String>();
+        String cID = request.getParameter("classID");
+
+        try {
+            // Validate the input ?
+            int classID = Integer.parseInt(cID);
+            DatabaseAccess.getClassForKey("Class_ID", classID);
+            KillmapDAO.enqueueJob(new KillMapJob(Type.CLASS, classID));
+            messages.add("Submitted Job for Class " + classID);
+        } catch (NumberFormatException e) {
+            messages.add("Invalid parameter " + cID);
+        } catch (Throwable e) {
+            messages.add("Invalid request !");
+        }
+        session.setAttribute("messages", messages);
+    }
+
+    private void updateSettings(HttpServletRequest request) {
         HttpSession session = request.getSession();
         ArrayList<String> messages = new ArrayList<String>();
         // Get their user id from the session.
@@ -84,9 +121,6 @@ public class AdminAnalyticsKillMaps extends HttpServlet {
             logger.debug("Invalid request from user {}", currentUserID);
         }
         session.setAttribute("messages", messages);
-
-        // Show again the same page as rendered by the JSP
-        request.getRequestDispatcher(Constants.ADMIN_ANALYTICS_KILLMAP_JSP).forward(request, response);
 
     }
 }
