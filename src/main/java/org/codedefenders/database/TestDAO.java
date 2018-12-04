@@ -31,6 +31,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -180,6 +181,9 @@ public class TestDAO {
     /**
      * Stores a given {@link Test} in the database.
      *
+     * This method does not update the given test object.
+     * Use {@link Test#insert()} instead.
+     *
      * @param test the given test as a {@link Test}.
      * @throws Exception If storing the test was not successful.
      * @return the generated identifier of the test as an {@code int}.
@@ -232,11 +236,14 @@ public class TestDAO {
      * @param classId the identifier of the class.
      * @return {@code true} whether storing the mapping was successful, {@code false} otherwise.
      */
-    public static boolean mapTestToClass(Integer testId, Integer classId) {
-        String query = "UPDATE tests SET Class_ID = ? WHERE Test_ID = ?";
+    public static boolean mapTestToClass(int testId, int classId) {
+        String query = String.join("\n",
+                "INSERT INTO test_uploaded_with_class (Test_ID, Class_ID)",
+                "VALUES (?, ?);"
+        );
         DatabaseValue[] valueList = new DatabaseValue[]{
-                DB.getDBV(classId),
-                DB.getDBV(testId)
+                DB.getDBV(testId),
+                DB.getDBV(classId)
         };
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -251,7 +258,10 @@ public class TestDAO {
      * @return {@code true} for successful removal, {@code false} otherwise.
      */
     public static boolean removeTestForId(Integer id) {
-        String query = "DELETE FROM tests WHERE Test_ID = ?;";
+        String query = String.join("\n",
+                "DELETE FROM tests WHERE Test_ID = ?;",
+                "DELETE FROM test_uploaded_with_class WHERE Test_ID = ?;"
+        );
         DatabaseValue[] valueList = new DatabaseValue[]{
                 DB.getDBV(id),
         };
@@ -280,8 +290,15 @@ public class TestDAO {
         bob.append("?);");
 
         final String range = bob.toString();
-        String query = "DELETE FROM tests WHERE Test_ID in " + range;
+        String query = String.join("\n",
+                "DELETE FROM tests WHERE Test_ID in ",
+                range,
+                "DELETE FROM test_uploaded_with_class WHERE Test_ID in ",
+                range
+        );
 
+        // Hack to make sure all values are listed in both 'ranges'.
+        tests.addAll(new LinkedList<>(tests));
         DatabaseValue[] valueList = tests.stream().map(DB::getDBV).toArray(DatabaseValue[]::new);
 
         Connection conn = DB.getConnection();

@@ -31,6 +31,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -178,6 +179,9 @@ public class MutantDAO {
     /**
      * Stores a given {@link Mutant} in the database.
      *
+     * This method does not update the given mutant object.
+     * Use {@link Mutant#insert()} instead.
+     *
      * @param mutant the given mutant as a {@link Mutant}.
      * @return the generated identifier of the mutant as an {@code int}.
      * @throws Exception If storing the mutant was not successful.
@@ -186,17 +190,18 @@ public class MutantDAO {
         String javaFile = DatabaseAccess.addSlashes(mutant.getJavaFile());
         String classFile = DatabaseAccess.addSlashes(mutant.getClassFile());
         int gameId = mutant.getGameId();
+        int classId = mutant.getClassId();
         int roundCreated = mutant.getRoundCreated();
         int sqlAlive = mutant.sqlAlive();
         int playerId = mutant.getPlayerId();
         int score = mutant.getScore();
         String md5 = mutant.getMd5();
-        Integer classId = mutant.getClassId();
         String mutatedLinesString = StringUtils.join(mutant.getLines(), ",");
 
-        String query = "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5, Class_ID, MutatedLines)"
-                + " VALUES "
-                + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = String.join("\n",
+                "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5, Class_ID, MutatedLines)",
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+        );
         DatabaseValue[] valueList = new DatabaseValue[]{
                 DB.getDBV(javaFile),
                 DB.getDBV(classFile),
@@ -227,11 +232,14 @@ public class MutantDAO {
      * @param classId  the identifier of the class.
      * @return {@code true} whether storing the mapping was successful, {@code false} otherwise.
      */
-    public static boolean mapMutantToClass(Integer mutantId, Integer classId) {
-        String query = "UPDATE mutants SET Class_ID = ? WHERE Mutant_ID = ?";
+    public static boolean mapMutantToClass(int mutantId, int classId) {
+        String query = String.join("\n",
+                "INSERT INTO mutant_uploaded_with_class (Mutant_ID, Class_ID)",
+                "VALUES (?, ?);"
+        );
         DatabaseValue[] valueList = new DatabaseValue[]{
-                DB.getDBV(classId),
-                DB.getDBV(mutantId)
+                DB.getDBV(mutantId),
+                DB.getDBV(classId)
         };
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -246,7 +254,10 @@ public class MutantDAO {
      * @return {@code true} for successful removal, {@code false} otherwise.
      */
     public static boolean removeMutantForId(Integer id) {
-        String query = "DELETE FROM mutants WHERE Mutant_ID = ?;";
+        String query = String.join("\n",
+                "DELETE FROM mutants WHERE Mutant_ID = ?;",
+                "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID = ?"
+        );
         DatabaseValue[] valueList = new DatabaseValue[]{
                 DB.getDBV(id),
         };
@@ -275,8 +286,15 @@ public class MutantDAO {
         bob.append("?);");
 
         final String range = bob.toString();
-        String query = "DELETE FROM mutants WHERE Mutant_ID in " + range;
+        String query = String.join("\n",
+                "DELETE FROM mutants WHERE Mutant_ID in ",
+                range,
+                "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID in ",
+                range
+        );
 
+        // Hack to make sure all values are listed in both 'ranges'.
+        mutants.addAll(new LinkedList<>(mutants));
         DatabaseValue[] valueList = mutants.stream().map(DB::getDBV).toArray(DatabaseValue[]::new);
 
         Connection conn = DB.getConnection();
