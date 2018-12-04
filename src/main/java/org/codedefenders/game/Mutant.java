@@ -64,6 +64,7 @@ public class Mutant implements Serializable {
 
 	private int id;
 	private int gameId;
+	private int classId;
 
 	private transient String javaFile;
 	private transient String md5;
@@ -95,12 +96,6 @@ public class Mutant implements Serializable {
 
 	private int score; // multiplayer
 
-	/**
-	 * Identifier of the class this mutant is created from.
-	 * Of type {@link Integer}, because the classId can be {@code null}.
-	 */
-	private Integer classId;
-
 	// Computed on the fly if not read in the db
 	private List<Integer> lines = null;
 	private transient List<String> description = null;
@@ -115,7 +110,7 @@ public class Mutant implements Serializable {
      * <li><code>score 0</code></li>
      * </ul>
      */
-	public Mutant(String javaFilePath, String classFilePath, String md5, Integer classId) {
+	public Mutant(String javaFilePath, String classFilePath, String md5, int classId) {
 		this.javaFile = javaFilePath;
 		this.classFile = classFilePath;
 		this.alive = false;
@@ -136,7 +131,7 @@ public class Mutant implements Serializable {
 	 * @param alive
 	 * @param playerId
 	 */
-	public Mutant(int gameId, Integer classId,  String jFile, String cFile, boolean alive, int playerId) {
+	public Mutant(int gameId, int classId,  String jFile, String cFile, boolean alive, int playerId) {
 		this.gameId = gameId;
 		this.classId = classId;
 		// FIXME: Why is this limited to a duel game?
@@ -152,7 +147,7 @@ public class Mutant implements Serializable {
 		this.md5 = CodeValidator.getMD5FromFile(jFile); // TODO: This may be null
 	}
 
-	public Mutant(int mid, Integer classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId) {
+	public Mutant(int mid, int classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId) {
 		this(gid, classId, jFile, cFile, alive, playerId);
 		this.id = mid;
 		this.equivalent = equiv;
@@ -240,7 +235,7 @@ public class Mutant implements Serializable {
 		return score;
 	}
 
-	public Integer getClassId() {
+	public int getClassId() {
 		return classId;
 	}
 

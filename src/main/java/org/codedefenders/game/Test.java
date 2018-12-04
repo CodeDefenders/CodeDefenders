@@ -56,14 +56,9 @@ public class Test {
 	private int id;
 	private int playerId;
 	private int gameId;
+	private int classId;
 	private String javaFile;
 	private String classFile;
-
-	/**
-	 * Identifier of the class this test is created for.
-	 * Of type {@link Integer}, because the classId can be {@code null}.
-	 */
-	private Integer classId;
 
 	private int roundCreated;
 	private int mutantsKilled;
@@ -247,27 +242,13 @@ public class Test {
 	}
 
 
-	@Deprecated
 	public boolean insert() {
-		String jFileDB = DatabaseAccess.addSlashes(javaFile);
-		String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
-
-		Connection conn = DB.getConnection();
-		String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points, Class_ID) VALUES (?, ?, ?, ?, ?, ?, ?);";
-		DatabaseValue[] valueList = new DatabaseValue[]{
-				DB.getDBV(jFileDB),
-				DB.getDBV(cFileDB),
-				DB.getDBV(gameId),
-				DB.getDBV(roundCreated),
-				DB.getDBV(playerId),
-				DB.getDBV(score),
-				DB.getDBV(classId),
-		};
-
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		this.id = DB.executeUpdateGetKeys(stmt, conn);
-
-		return this.id > 0;
+		try {
+			this.id = TestDAO.storeTest(this);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	@Deprecated
@@ -356,7 +337,7 @@ public class Test {
 		return score;
 	}
 
-	public Integer getClassId() {
+	public int getClassId() {
 		return classId;
 	}
 

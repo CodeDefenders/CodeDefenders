@@ -27,9 +27,6 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -62,7 +59,11 @@ public class GameClassDAO {
      */
     public static List<Integer> getMappedMutantIdsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
-        String query = "SELECT Mutant_ID FROM mutants WHERE Class_ID = ?;";
+        final String query = String.join("\n",
+                "SELECT Mutant_ID",
+                "FROM mutant_uploaded_with_class",
+                "WHERE Class_ID = ?"
+        );
         return DB.executeQueryReturnList(query, rs -> rs.getInt("Mutant_ID"), DB.getDBV(classId));
     }
 
@@ -75,8 +76,13 @@ public class GameClassDAO {
      */
     public static List<Mutant> getMappedMutantsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
-        String query = "SELECT * FROM mutants WHERE Class_ID = ?;";
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS ,DB.getDBV(classId));
+        final String query = String.join("\n",
+                "SELECT mutants.*",
+                "FROM mutants, mutant_uploaded_with_class up",
+                "WHERE up.Class_ID = ?",
+                "   AND up.Mutant_ID = mutants.Mutant_ID"
+        );
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(classId));
     }
 
     /**
@@ -88,8 +94,12 @@ public class GameClassDAO {
      */
     public static List<Integer> getMappedTestIdsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
-        String query = "SELECT Test_ID FROM tests WHERE Class_ID = ?;";
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("Test_ID") ,DB.getDBV(classId));
+        final String query = String.join("\n",
+                "SELECT Test_ID",
+                "FROM test_uploaded_with_class",
+                "WHERE Class_ID = ?"
+        );
+        return DB.executeQueryReturnList(query, rs -> rs.getInt("Test_ID"), DB.getDBV(classId));
     }
 
     /**
@@ -100,7 +110,12 @@ public class GameClassDAO {
      * @return a list of tests
      */
     public static List<Test> getMappedTestsForClassId(Integer classId) throws UncheckedSQLException, SQLMappingException {
-        String query = "SELECT * FROM tests WHERE Class_ID = ?;";
+        final String query = String.join("\n",
+                "SELECT tests.*",
+                "FROM tests, test_uploaded_with_class up",
+                "WHERE up.Class_ID = ?",
+                "   AND up.Test_ID = tests.Test_ID"
+                );
         return DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(classId));
     }
 
