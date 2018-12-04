@@ -18,10 +18,6 @@
  */
 package org.codedefenders.database;
 
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.commons.lang.StringUtils;
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
@@ -36,6 +32,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class handles the database logic for mutants.
@@ -48,6 +46,7 @@ public class MutantDAO {
 
     /**
      * Constructs a mutant from a {@link ResultSet} entry.
+     *
      * @param rs The {@link ResultSet}.
      * @return The constructed mutant.
      * @see RSMapper
@@ -63,24 +62,27 @@ public class MutantDAO {
         int roundKilled = rs.getInt("RoundKilled");
         int playerId = rs.getInt("Player_ID");
         int points = rs.getInt("Points");
-        // This was missing ... What if this is missing?
-        int classId = rs.getInt("Class_ID");
+        Integer classId = rs.getInt("Class_ID");
+        if (rs.wasNull()) classId = null;
 
         Mutant mutant = new Mutant(mutantId, classId, gameId, javaFile, classFile, alive, equiv, roundCreated,
-                                   roundKilled, playerId);
+                roundKilled, playerId);
         mutant.setScore(points);
         // since mutated lines can be null
-        if( rs.getString("MutatedLines") != null ){
-            List<Integer> mutatedLines = Stream.of(rs.getString("MutatedLines").split(",")).map(Integer::parseInt).collect(Collectors.toList());
+        final String mutatedLines = rs.getString("MutatedLines");
+        if (mutatedLines != null) {
+            List<Integer> mutatedLinesList = Stream.of(mutatedLines.split(","))
+                    .map(Integer::parseInt)
+                    .collect(Collectors.toList());
             // force write
-            mutant.setLines( mutatedLines );
+            mutant.setLines(mutatedLinesList);
         }
         try {
             String username = rs.getString("Username");
             int userId = rs.getInt("User_ID");
             mutant.setCreatorName(username);
             mutant.setCreatorId(userId);
-        } catch (SQLException e){ /* Username/User_ID cannot be retrieved from query (no join). */ }
+        } catch (SQLException e) { /* Username/User_ID cannot be retrieved from query (no join). */ }
 
         return mutant;
     }
@@ -124,7 +126,6 @@ public class MutantDAO {
 
     /**
      * Returns the compilable {@link Mutant Mutants} from the games played on the given class.
-     * 
      */
     public static List<Mutant> getValidMutantsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
         List<Mutant> result = new ArrayList<>();
@@ -139,15 +140,15 @@ public class MutantDAO {
 //                "  AND games.Class_ID = ?",
 //                "  AND mutants.ClassFile IS NOT NULL;");
 
-        String query = String.join("\n", 
-                "SELECT mutants.*", 
+        String query = String.join("\n",
+                "SELECT mutants.*",
                 "FROM mutants, games",
                 "WHERE mutants.Game_ID = games.ID",
-                "  AND games.Class_ID = ?", 
+                "  AND games.Class_ID = ?",
                 "  AND mutants.ClassFile IS NOT NULL;");
 
-        result.addAll( DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(classId)) );
-        
+        result.addAll(DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(classId)));
+
         // Include also those mutants created during the upload. Player = -1
         String systemAttackerQuery = String.join("\n",
                 "SELECT mutants.*",
@@ -155,9 +156,9 @@ public class MutantDAO {
                 "WHERE mutants.Class_ID = ? ",
                 "AND mutants.Player_ID = -1",
                 "AND mutants.ClassFile IS NOT NULL;");
-        
-        result.addAll( DB.executeQueryReturnList(systemAttackerQuery, MutantDAO::mutantFromRS, DB.getDBV(classId)) );
-        
+
+        result.addAll(DB.executeQueryReturnList(systemAttackerQuery, MutantDAO::mutantFromRS, DB.getDBV(classId)));
+
         return result;
     }
 
@@ -169,7 +170,7 @@ public class MutantDAO {
                 "SELECT * FROM mutants ",
                 "LEFT JOIN players ON players.ID=mutants.Player_ID ",
                 "LEFT JOIN users ON players.User_ID = users.User_ID ",
-                "WHERE mutants.Game_ID = ?",
+                "WHERE mutants.Player_ID = ?",
                 "  AND mutants.ClassFile IS NOT NULL;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(playerId));
     }
@@ -178,8 +179,8 @@ public class MutantDAO {
      * Stores a given {@link Mutant} in the database.
      *
      * @param mutant the given mutant as a {@link Mutant}.
-     * @throws Exception If storing the mutant was not successful.
      * @return the generated identifier of the mutant as an {@code int}.
+     * @throws Exception If storing the mutant was not successful.
      */
     public static int storeMutant(Mutant mutant) throws Exception {
         String javaFile = DatabaseAccess.addSlashes(mutant.getJavaFile());
@@ -191,11 +192,11 @@ public class MutantDAO {
         int score = mutant.getScore();
         String md5 = mutant.getMd5();
         Integer classId = mutant.getClassId();
-        List<Integer> mutatedLines = mutant.getLines();
+        String mutatedLinesString = StringUtils.join(mutant.getLines(), ",");
 
         String query = "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5, Class_ID, MutatedLines)"
-        		+ " VALUES "
-        		+ "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
+                + " VALUES "
+                + "(?, ?, ?, ?, ?, ?, ?, ?, ?, ?);";
         DatabaseValue[] valueList = new DatabaseValue[]{
                 DB.getDBV(javaFile),
                 DB.getDBV(classFile),
@@ -205,8 +206,8 @@ public class MutantDAO {
                 DB.getDBV(playerId),
                 DB.getDBV(score),
                 DB.getDBV(md5),
-                (classId == null) ? DB.getDBV("NULL") : DB.getDBV(classId),
-                DB.getDBV(StringUtils.join( mutatedLines, ","))
+                DB.getDBV(classId),
+                DB.getDBV(mutatedLinesString)
         };
         Connection conn = DB.getConnection();
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -223,7 +224,7 @@ public class MutantDAO {
      * Stores a mapping between a {@link Mutant} and a {@link GameClass} in the database.
      *
      * @param mutantId the identifier of the mutant.
-     * @param classId the identifier of the class.
+     * @param classId  the identifier of the class.
      * @return {@code true} whether storing the mapping was successful, {@code false} otherwise.
      */
     public static boolean mapMutantToClass(Integer mutantId, Integer classId) {
@@ -283,5 +284,4 @@ public class MutantDAO {
 
         return DB.executeUpdate(stmt, conn);
     }
-
 }

@@ -210,7 +210,7 @@ public class TestDAO {
                 DB.getDBV(roundCreated),
                 DB.getDBV(playerId),
                 DB.getDBV(score),
-                (classId == null) ? null : DB.getDBV(classId),
+                DB.getDBV(classId),
                 DB.getDBV(linesCovered),
                 DB.getDBV(linesUncovered)
         };
