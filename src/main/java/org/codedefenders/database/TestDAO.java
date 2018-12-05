@@ -54,6 +54,10 @@ public class TestDAO {
         int testId = rs.getInt("Test_ID");
         int gameId = rs.getInt("Game_ID");
         int classId = rs.getInt("Class_ID");
+        // before 1.3.2, mutants didn't have a mandatory classId attribute
+        if (rs.wasNull()) {
+            classId = -1;
+        }
         String javaFile = rs.getString("JavaFile");
         String classFile = rs.getString("ClassFile");
         int roundCreated = rs.getInt("RoundCreated");
@@ -195,7 +199,7 @@ public class TestDAO {
         int roundCreated = test.getRoundCreated();
         int playerId = test.getPlayerId();
         int score = test.getScore();
-        Integer classId = test.getClassId();
+        int classId = test.getClassId();
         LineCoverage lineCoverage = test.getLineCoverage();
 
         String linesCovered = "";

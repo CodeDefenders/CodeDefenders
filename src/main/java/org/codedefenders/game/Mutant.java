@@ -385,7 +385,7 @@ public class Mutant implements Serializable {
 		if( sut == null ){
             // in this case gameId might have been -1 (upload)
             // so we try to reload the sut
-            sut = DatabaseAccess.getClassForKey("Class_ID", getClassId());
+            sut = DatabaseAccess.getClassForKey("Class_ID", classId);
         }
 
 		assert sut != null;
@@ -412,7 +412,7 @@ public class Mutant implements Serializable {
 	    if( sut == null ){
 	        // in this case gameId might have been -1 (upload)
 	        // so we try to reload the sut
-	        sut = DatabaseAccess.getClassForKey("Class_ID", getClassId());
+	        sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 	    }
 
 		Path sourceFile = Paths.get(sut.getJavaFile());

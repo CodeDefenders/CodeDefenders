@@ -55,6 +55,11 @@ public class MutantDAO {
     public static Mutant mutantFromRS(ResultSet rs) throws SQLException {
         int mutantId = rs.getInt("Mutant_ID");
         int gameId = rs.getInt("Game_ID");
+        int classId = rs.getInt("Class_ID");
+        // before 1.3.2, mutants didn't have a mandatory classId attribute
+        if (rs.wasNull()) {
+            classId = -1;
+        }
         String javaFile = rs.getString("JavaFile");
         String classFile = rs.getString("ClassFile");
         boolean alive = rs.getBoolean("Alive");
@@ -63,8 +68,6 @@ public class MutantDAO {
         int roundKilled = rs.getInt("RoundKilled");
         int playerId = rs.getInt("Player_ID");
         int points = rs.getInt("Points");
-        Integer classId = rs.getInt("Class_ID");
-        if (rs.wasNull()) classId = null;
 
         Mutant mutant = new Mutant(mutantId, classId, gameId, javaFile, classFile, alive, equiv, roundCreated,
                 roundKilled, playerId);
