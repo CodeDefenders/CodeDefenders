@@ -39,7 +39,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * This {@link HttpServlet} handles uploading and storing new chat messages. Chat
- * messages are stored as {@link Event}s.
+ * messages are stored as {@link Event Events}.
  * <p>
  * Serves on path: `/messages/send`.
  */

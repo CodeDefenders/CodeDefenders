@@ -131,7 +131,7 @@ public class Compiler {
      *
      * @param javaFilePath    Path to the {@code .java} file.
      * @param javaFileContent Content of the {@code .java} file.
-     * @param dependencies    a list of {@link JavaFileObject}s, which the given java file is compiled together
+     * @param dependencies    a list of {@link JavaFileObject JavaFileObjects}, which the given java file is compiled together
      *                        with. All these files must be in the same folder as the given java file.
      * @return A path to the {@code .class} file of the compiled given java file.
      * @throws CompileException If an error during compilation occurs.
@@ -158,7 +158,7 @@ public class Compiler {
      * The compiled class is stored in the same directory the specified java file lies.
      *
      * @param javaFilePath Path to the {@code .java} file.
-     * @param dependencies a list of {@link JavaFileObject}s, which the given java file is compiled together
+     * @param dependencies a list of {@link JavaFileObject JavaFileObjects}, which the given java file is compiled together
      *                     with. All these files must be in the same folder as the given java file.
      * @return A path to the {@code .class} file of the compiled given java file.
      * @throws CompileException If an error during compilation occurs.
