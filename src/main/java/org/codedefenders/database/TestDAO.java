@@ -35,6 +35,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
+
 /**
  * This class handles the database logic for tests.
  *
@@ -46,6 +48,7 @@ public class TestDAO {
 
     /**
      * Constructs a test from a {@link ResultSet} entry.
+     *
      * @param rs The {@link ResultSet}.
      * @return The constructed test.
      * @see RSMapper
@@ -54,6 +57,10 @@ public class TestDAO {
         int testId = rs.getInt("Test_ID");
         int gameId = rs.getInt("Game_ID");
         int classId = rs.getInt("Class_ID");
+        // before 1.3.2, mutants didn't have a mandatory classId attribute
+        if (rs.wasNull()) {
+            classId = -1;
+        }
         String javaFile = rs.getString("JavaFile");
         String classFile = rs.getString("ClassFile");
         int roundCreated = rs.getInt("RoundCreated");
@@ -65,22 +72,20 @@ public class TestDAO {
 
         List<Integer> linesCovered = new ArrayList<>();
         if (linesCoveredString != null && !linesCoveredString.isEmpty()) {
-            linesCovered.addAll(
-                    Arrays.stream(linesCoveredString.split(","))
-                        .map(Integer::parseInt)
-                        .collect(Collectors.toList()));
+            linesCovered.addAll(Arrays.stream(linesCoveredString.split(","))
+                            .map(Integer::parseInt)
+                            .collect(Collectors.toList()));
         }
 
         List<Integer> linesUncovered = new ArrayList<>();
         if (linesUncoveredString != null && !linesUncoveredString.isEmpty()) {
-            linesUncovered.addAll(
-                    Arrays.stream(linesUncoveredString.split(","))
-                        .map(Integer::parseInt)
-                        .collect(Collectors.toList()));
+            linesUncovered.addAll(Arrays.stream(linesUncoveredString.split(","))
+                            .map(Integer::parseInt)
+                            .collect(Collectors.toList()));
         }
 
-        return new Test(testId, classId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId, linesCovered,
-                linesUncovered, points);
+        return new Test(testId, classId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId,
+                linesCovered, linesUncovered, points);
     }
 
     /**
@@ -102,14 +107,17 @@ public class TestDAO {
     /**
      * Returns the valid {@link Test Tests} from the given game.
      * Valid tests are compilable and do not fail when executed against the original class.
+     *
+     * @param gameId the identifier of the given game.
      * @param defendersOnly If {@code true}, only return tests that were written by defenders.
-     * 
-     * Include also the tests uploaded by the System Defender
+     *                      <p>
+     *                      Include also the tests uploaded by the System Defender
+     * @return a {@link List} of valid tests for the given game.
      */
     public static List<Test> getValidTestsForGame(int gameId, boolean defendersOnly)
             throws UncheckedSQLException, SQLMappingException {
         List<Test> result = new ArrayList<>();
-        
+
         String query = String.join("\n",
                 "SELECT tests.* FROM tests",
                 (defendersOnly ? "INNER JOIN players pl on tests.Player_ID = pl.ID" : ""),
@@ -122,33 +130,40 @@ public class TestDAO {
                 "      AND ex.Status='SUCCESS'",
                 "  );"
         );
-        result.addAll( DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(gameId)));
-        
-        String systemDefenderQuery = String.join("\n", 
+        result.addAll(DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(gameId)));
+
+        String systemDefenderQuery = String.join("\n",
                 "SELECT tests.*",
                 "FROM tests",
                 "INNER JOIN players pl on tests.Player_ID = pl.ID",
                 "INNER JOIN users u on u.User_ID = pl.User_ID",
-                "WHERE tests.Game_ID=?",
-                "AND tests.ClassFile IS NOT NULL",
-                "AND u.User_ID = 4;"
-         );
-        
-        result.addAll( DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, DB.getDBV(gameId)));
-        
+                "WHERE tests.Game_ID = ?",
+                "  AND tests.ClassFile IS NOT NULL",
+                "  AND u.User_ID = ?;"
+        );
+
+        DatabaseValue[] valueList = new DatabaseValue[]{
+                DB.getDBV(gameId),
+                DB.getDBV(DUMMY_DEFENDER_USER_ID)
+        };
+
+        result.addAll(DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, valueList));
+
         return result;
     }
 
-    
     /**
      * Returns the valid {@link Test Tests} from the games played on the given class.
      * Valid tests are compilable and do not fail when executed against the original class.
-     * 
+     * <p>
      * Include also the tests from the System Defender
+     *
+     * @param classId the identifier of the given class.
+     * @return a {@link List} of valid tests for the given class.
      */
     public static List<Test> getValidTestsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
         List<Test> result = new ArrayList<>();
-        
+
         String query = String.join("\n",
                 "SELECT tests.*",
                 "FROM tests, games",
@@ -162,31 +177,31 @@ public class TestDAO {
                 "      AND ex.Status='SUCCESS'",
                 "  );"
         );
-        result.addAll( DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(classId)) );
-        
+        result.addAll(DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(classId)));
+
         // Include also those tests uploaded, i.e, player_id = -1
-        String systemDefenderQuery = String.join("\n", 
+        String systemDefenderQuery = String.join("\n",
                 "SELECT tests.*",
-                "FROM tests",
-                "WHERE tests.Class_ID = ?",
-                "AND tests.Player_ID=-1",
-                "AND tests.ClassFile IS NOT NULL;"
-         );
-        
-        result.addAll( DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, DB.getDBV(classId)) );
-        
-        return result; 
+                "FROM tests, test_uploaded_with_class up",
+                "WHERE tests.Test_ID = up.Test_ID",
+                "  AND up.Class_ID = ?",
+                "  AND tests.ClassFile IS NOT NULL;"
+        );
+
+        result.addAll(DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, DB.getDBV(classId)));
+
+        return result;
     }
 
     /**
      * Stores a given {@link Test} in the database.
-     *
+     * <p>
      * This method does not update the given test object.
      * Use {@link Test#insert()} instead.
      *
      * @param test the given test as a {@link Test}.
-     * @throws Exception If storing the test was not successful.
      * @return the generated identifier of the test as an {@code int}.
+     * @throws Exception If storing the test was not successful.
      */
     public static int storeTest(Test test) throws Exception {
         String javaFile = DatabaseAccess.addSlashes(test.getJavaFile());
@@ -195,7 +210,7 @@ public class TestDAO {
         int roundCreated = test.getRoundCreated();
         int playerId = test.getPlayerId();
         int score = test.getScore();
-        Integer classId = test.getClassId();
+        int classId = test.getClassId();
         LineCoverage lineCoverage = test.getLineCoverage();
 
         String linesCovered = "";
@@ -232,7 +247,7 @@ public class TestDAO {
     /**
      * Stores a mapping between a {@link Test} and a {@link GameClass} in the database.
      *
-     * @param testId the identifier of the test.
+     * @param testId  the identifier of the test.
      * @param classId the identifier of the class.
      * @return {@code true} whether storing the mapping was successful, {@code false} otherwise.
      */
@@ -262,12 +277,9 @@ public class TestDAO {
                 "DELETE FROM tests WHERE Test_ID = ?;",
                 "DELETE FROM test_uploaded_with_class WHERE Test_ID = ?;"
         );
-        DatabaseValue[] valueList = new DatabaseValue[]{
-                DB.getDBV(id),
-        };
 
         Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
 
         return DB.executeUpdate(stmt, conn);
     }
@@ -306,5 +318,4 @@ public class TestDAO {
 
         return DB.executeUpdate(stmt, conn);
     }
-
 }

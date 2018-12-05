@@ -20,8 +20,12 @@ package org.codedefenders.game;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.*;
+import org.codedefenders.database.DB;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,8 +82,8 @@ public class Test {
 	public Test(String javaFilePath, String classFilePath, int classId, LineCoverage lineCoverage) {
 		this.javaFile = javaFilePath;
 		this.classFile = classFilePath;
-		this.gameId = -1;
-		this.playerId = -1;
+		this.gameId = Constants.DUMMY_GAME_ID;
+		this.playerId = Constants.DUMMY_CREATOR_USER_ID;
 		this.roundCreated = -1;
 		this.score = 0;
 		this.classId = classId;
@@ -171,7 +175,6 @@ public class Test {
 			return 0;
 		}
 	}
-
 
 	public String getDirectory() {
 		File file = new File(javaFile);
@@ -353,21 +356,11 @@ public class Test {
 
 	// First created appears first
 	public static Comparator<Test> orderByIdAscending() {
-		return new Comparator<Test>() {
-			@Override
-			public int compare(Test o1, Test o2) {
-				return o1.id - o2.id;
-			}
-		};
+		return (o1, o2) -> o1.id - o2.id;
 	}
 
 	// Last created appears first
 	public static Comparator<Test> orderByIdDescending() {
-		return new Comparator<Test>() {
-			@Override
-			public int compare(Test o1, Test o2) {
-				return o2.id - o1.id;
-			}
-		};
+		return (o1, o2) -> o2.id - o1.id;
 	}
 }

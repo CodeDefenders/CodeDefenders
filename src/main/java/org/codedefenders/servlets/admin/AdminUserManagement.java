@@ -45,7 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- * This {@link HttpServlet} handles admin requests for managing {@link User}s.
+ * This {@link HttpServlet} handles admin requests for managing {@link User Users}.
  * <p>
  * Serves on path: `/admin/users`.
  */

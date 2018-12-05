@@ -51,7 +51,7 @@ public class GameClassDAO {
     }
 
     /**
-     * Return a {@link List} of all identifiers of {@link Mutant}s, which were uploaded
+     * Return a {@link List} of all identifiers of {@link Mutant Mutants}, which were uploaded
      * together with a given class.
      *
      * @param classId the identifier of the given class
@@ -68,7 +68,7 @@ public class GameClassDAO {
     }
 
     /**
-     * Return a {@link List} of all {@link Mutant}s, which were uploaded
+     * Return a {@link List} of all {@link Mutant Mutants}, which were uploaded
      * together with a given class.
      *
      * @param classId the identifier of the given class
@@ -86,7 +86,7 @@ public class GameClassDAO {
     }
 
     /**
-     * Return a {@link List} of all identifiers of {@link Test}s, which were uploaded
+     * Return a {@link List} of all identifiers of {@link Test Tests}, which were uploaded
      * together with a given class.
      *
      * @param classId the identifier of the given class
@@ -103,7 +103,7 @@ public class GameClassDAO {
     }
 
     /**
-     * Return a {@link List} of all {@link Test}s, which were uploaded
+     * Return a {@link List} of all {@link Test Tests}, which were uploaded
      * together with a given class.
      *
      * @param classId the identifier of the given class
@@ -120,7 +120,7 @@ public class GameClassDAO {
     }
 
     /**
-     * Return a {@link List} of all identifiers of {@link Dependency}s,
+     * Return a {@link List} of all identifiers of {@link Dependency Dependencies},
      * which were uploaded together with a given class.
      *
      * @param classId the identifier of the given class
@@ -133,7 +133,7 @@ public class GameClassDAO {
     }
 
     /**
-     * Return a {@link List} of all {@link Dependency}s,
+     * Return a {@link List} of all {@link Dependency Dependencies},
      * which were uploaded together with a given class.
      *
      * @param classId the identifier of the given class

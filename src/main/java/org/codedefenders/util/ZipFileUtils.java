@@ -53,7 +53,7 @@ public class ZipFileUtils {
     }
 
     /**
-     * Extracts a {@link List} of {@link JavaFileObject}s from a
+     * Extracts a {@link List} of {@link JavaFileObject JavaFileObjects} from a
      * given zip file by mapping the file name and the file content.
      *
      * @param zipFile        a {@link ZipFile} object from which the files are read.

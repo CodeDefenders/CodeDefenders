@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * This class contains information about how many lines of a {@link GameClass} was
  * covered not or covered by a {@link Test}. Covered and uncovered lines are stored
- * in {@link List}s. Both lists can't be {@code null}.
+ * in {@link List Lists}. Both lists can't be {@code null}.
  * <p>
  * Note that no {@link GameClass} or {@link Test} reference is stored.
  * <p>
