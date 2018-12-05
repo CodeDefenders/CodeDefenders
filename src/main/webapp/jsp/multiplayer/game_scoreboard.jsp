@@ -94,9 +94,9 @@
                             <td>
                                 <!-- Equivalence duels -->
                                 <%
-                                    if (mutantScores.containsKey(-1) && mutantScores.get(-1) != null){
+                                    if (mutantScores.containsKey(i) && mutantScores.get(i) != null){
                                 %>
-                                <%= ((PlayerScore)mutantScores.get(-1)).getDuelInformation() %>
+                                <%= ((PlayerScore)mutantScores.get(i)).getDuelInformation() %>
                                 <% } else { %>
                                 0 / 0 / 0
                                 <% } %>
@@ -189,9 +189,9 @@
                         <td>
                             <!-- Equivalence duels -->
                             <%
-                                if (testScores.containsKey(-1) && testScores.get(-1) != null){
+                                if (testScores.containsKey(i) && testScores.get(i) != null){
                             %>
-                            <%= ((PlayerScore)testScores.get(-1)).getDuelInformation() %>
+                            <%= ((PlayerScore)testScores.get(i)).getDuelInformation() %>
                             <% } else { %>
                             0 / 0 / 0
                             <% } %>
