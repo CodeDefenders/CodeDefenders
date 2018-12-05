@@ -388,6 +388,8 @@ public class Mutant implements Serializable {
             sut = DatabaseAccess.getClassForKey("Class_ID", getClassId());
         }
 
+		assert sut != null;
+
 		File sourceFile = new File(sut.getJavaFile());
 		File mutantFile = new File(javaFile);
 
