@@ -19,8 +19,6 @@
 
 --%>
 <%@ page import="org.apache.commons.collections.ListUtils" %>
-<%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.game.GameState" %>
@@ -30,6 +28,7 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminCreateGames" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
+<%@ page import="org.codedefenders.database.*" %>
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
@@ -137,9 +136,9 @@
                         <%
                             List<Integer> attackerAndDefenderIds = ListUtils.union(attackerIds, defenderIds);
                             for (int id : attackerAndDefenderIds) {
-                                String userName = DatabaseAccess.getUser(id).getUsername();
+                                String userName = UserDAO.getUserById(id).getUsername();
                                 //Timestamp ts = AdminDAO.getLastLogin(aid);
-                                Role lastRole = AdminDAO.getLastRole(id);
+                                Role lastRole = UserDAO.getLastRoleOfUser(id);
                                 Entry score = AdminDAO.getScore(id);
                                 int totalScore = score.getTotalPoints();
                                 String color = attackerIds.contains(id) ? "#edcece" : "#ced6ed";

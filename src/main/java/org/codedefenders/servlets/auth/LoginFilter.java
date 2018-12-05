@@ -18,7 +18,7 @@
  */
 package org.codedefenders.servlets.auth;
 
-import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
 
 import java.io.IOException;
@@ -51,7 +51,7 @@ public class LoginFilter implements Filter {
 			Integer uid = (Integer) session.getAttribute("uid");
 
 			if (uid != null) {
-				User user = DatabaseAccess.getUser(uid);
+				User user = UserDAO.getUserById(uid);
 				if (user != null && user.isActive()) {
 					chain.doFilter(request, response);
 				} else {

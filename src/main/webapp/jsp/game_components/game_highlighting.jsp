@@ -18,13 +18,12 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.game.Test" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.HashMap" %>
+
 <%@ page import="java.util.List" %>
-<%@ page import="java.util.stream.Collectors" %>
+<%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
-<%@ page import="org.codedefenders.game.Mutant.Equivalence" %>
+<%@ page import="com.google.gson.Gson" %>
+<%@ page import="com.google.gson.GsonBuilder" %>
 
 <%--
     Adds highlighting of coverage (green lines) and mutants (gutter icons) to a CodeMirror editor.
@@ -54,10 +53,6 @@
     The CSS is located in game_highlighting.css.
 --%>
 
-<%--
-    TODO This implementation not very pretty and will be refactored in game-highlighting-rework-2.
---%>
-
 <% { %>
 
 <%
@@ -70,116 +65,52 @@
 %>
 
 <%
-    /* Map each line to the tests that cover it. */
-    Map<Integer, List<Test>> testsOnLine = new HashMap<>();
-    for (Test test : testsTODORENAME) {
-        for (Integer line : test.getLineCoverage().getLinesCovered().stream().distinct().collect(Collectors.toList())) {
-            List<Test> list = testsOnLine.computeIfAbsent(line, key -> new ArrayList<>());
-            list.add(test);
-        }
-    }
-
-    /* Map each line to the mutants on it. */
-    Map<Integer, List<Mutant>> mutantsOnLine = new HashMap<>();
-    for (Mutant mutant : mutantsTODORENAME) {
-        for (Integer line : mutant.getLines()) {
-            List<Mutant> list = mutantsOnLine.computeIfAbsent(line, key -> new ArrayList<>());
-            list.add(mutant);
-        }
-    }
-
-    int numTests = testsTODORENAME.size();
-
-    /* Build a javascript map that maps lines to the percentage of tests that cover it. */
-    StringBuilder jsTests = new StringBuilder();
-    jsTests.append("["); // outer list
-    for (Map.Entry<Integer, List<Test>> entry : testsOnLine.entrySet()) {
-        jsTests.append("[") // element
-               .append(entry.getKey())
-               .append(",")
-               .append((entry.getValue().size() * 100) / numTests)
-               .append("],"); // element
-    }
-    jsTests.append("]"); // outer list
-
-    /*
-     * Build a javascript map that maps lines to the mutants on the line.
-     * Mutants are represented as
-     * {
-     *    id: number,
-     *    status: 'alive' | 'killed' | 'flagged' | 'equivalent',
-     *    creatorName: string,
-     *    points: number
-     * }
-     */
-    StringBuilder jsMutants = new StringBuilder();
-    jsMutants.append("["); // outer list
-    for (Map.Entry<Integer, List<Mutant>> entry : mutantsOnLine.entrySet()) {
-        jsMutants.append("[") // element
-                 .append(entry.getKey())
-                 .append(",");
-
-        jsMutants.append("["); // inner list
-        for (Mutant mutant : entry.getValue()) {
-            Mutant.Equivalence eq = mutant.getEquivalent();
-            String status;
-            if (eq == Equivalence.DECLARED_YES || eq == Equivalence.ASSUMED_YES) {
-                status = "equivalent";
-            } else if (eq == Equivalence.PENDING_TEST) {
-                status = "flagged";
-            } else if (mutant.isAlive()) {
-                status = "alive";
-            } else {
-                status = "killed";
-            }
-
-            jsMutants.append("{")
-                     .append("id:")
-                     .append(mutant.getId())
-                     .append(",status:")
-                     .append("'")
-                     .append(status)
-                     .append("',")
-                     .append("creatorName:")
-                     .append("'")
-                     .append(mutant.getCreatorName())
-                     .append("',")
-                     .append("points:")
-                     .append(mutant.getScore())
-                     .append("},");
-        }
-        jsMutants.append("]"); // inner list
-
-        jsMutants.append("],"); // element
-    }
-    jsMutants.append("]"); // outer list
+    GameHighlightingDTO gh = new GameHighlightingDTO(mutantsTODORENAME, testsTODORENAME);
+    Gson gson = new GsonBuilder().registerTypeAdapter(Map.class, new GameHighlightingDTO.MapSerializer()).create();
+    String ghString = gson.toJson(gh);
 %>
 
 <script>
     /* Wrap in a function so it has it's own scope. */
     (function () {
-        const mutantsOnLine = new Map(<%=jsMutants%>);
-        const coverageOnLine = new Map(<%=jsTests%>);
 
-        const MutantStatus = {
-            alive: 'alive',
-            killed: 'killed',
-            flagged: 'flagged',
-            equivalent: 'equivalent'
+        /* Game highlighting data. */
+        const gh_data = JSON.parse(`<%=ghString%>`);
+        const mutantIdsPerLine = new Map(gh_data.mutantIdsPerLine);
+        const testIdsPerLine = new Map(gh_data.testIdsPerLine);
+        const mutants = new Map(gh_data.mutants);
+        const tests = new Map(gh_data.tests);
+
+        /* Game highlighting settings. */
+        const showEquivalenceButton = Boolean(<%=showEquivalenceButton%>);
+        const markUncoveredEquivalent = Boolean(<%=markUncoveredEquivalent%>);
+        const gameType = '<%=gameType%>';
+
+        const MutantStatuses = {
+            ALIVE: 'ALIVE',
+            KILLED: 'KILLED',
+            FLAGGED: 'FLAGGED',
+            EQUIVALENT: 'EQUIVALENT'
         };
 
         const MutantNames = {
-            alive: 'Alive Mutants',
-            killed: 'Killed Mutants',
-            flagged: 'Flagged Mutants',
-            equivalent: 'Equivalent Mutants'
+            ALIVE: 'Alive Mutants',
+            KILLED: 'Killed Mutants',
+            FLAGGED: 'Flagged Mutants',
+            EQUIVALENT: 'Equivalent Mutants'
         };
 
-        const MutantIcons = {
-            alive: '<%=request.getContextPath()%>/images/mutant.png',
-            killed: '<%=request.getContextPath()%>/images/mutantKilled.png',
-            flagged: '<%=request.getContextPath()%>/images/mutantFlagged.png',
-            equivalent: '<%=request.getContextPath()%>/images/mutantEquiv.png'
+        const Icons = {
+            ALIVE: '<%=request.getContextPath()%>/images/mutant.png',
+            KILLED: '<%=request.getContextPath()%>/images/mutantKilled.png',
+            FLAGGED: '<%=request.getContextPath()%>/images/mutantFlagged.png',
+            EQUIVALENT: '<%=request.getContextPath()%>/images/mutantEquiv.png',
+            FLAG: '<%=request.getContextPath()%>/images/flag.png'
+        };
+
+        const GameTypes = {
+            PARTY: 'PARTY',
+            DUEL: 'DUEL'
         };
 
         /*
@@ -187,37 +118,62 @@
          * These timeouts are saved, so they can be cleared when pop-overs are forced to hide.
          */
         let timeouts = [];
-        const addTimeout = (callback, time) => timeouts.push(setTimeout(callback, time));
-        const clearTimeouts = () => { timeouts = timeouts.filter(clearTimeout); };
+        const addTimeout = function (callback, time) {
+            timeouts.push(setTimeout(callback, time));
+        };
+        const clearTimeouts = function () {
+            timeouts = timeouts.filter(clearTimeout);
+        };
 
-        const createMutantIcons = function (line, mutants) {
+        /**
+         * Creates the HTML element that displays the mutant icons for one line.
+         * @param {number} line The line number (starting at 1).
+         * @param {List<object>} mutantsOnLine The mutants that modify the line.
+         * @return {HTMLElement} The mutant icons.
+         */
+        const createMutantIcons = function (line, mutantsOnLine) {
+
+            /* Split the mutants list by the mutant status.
+             * {ALIVE: [...], KILLED: [...], ...} */
             const sortedMutants = {};
-            for (const mutantStatus in MutantStatus) {
-                const mutantsInCategory = mutants.filter(m => m.status === mutantStatus);
-                if (mutantsInCategory.length) {
+            for (const mutantStatus in MutantStatuses) {
+                const mutantsInCategory = mutantsOnLine.filter(m => m.status === mutantStatus);
+                if (mutantsInCategory.length > 0) {
                     sortedMutants[mutantStatus] = mutantsInCategory;
                 }
             }
 
-            let icons = '';
+            /* Create the icons for each mutant type on the line. */
+            let icons = [];
             for (const mutantStatus in sortedMutants) {
-                const numMutants = sortedMutants[mutantStatus].length;
-                /* Must be in one line, because it's in a pre. */
-                icons += '<div class="mutant-icon" mutant-status="' + mutantStatus + '"  mutant-line="' + line + '"><img src="' + MutantIcons[mutantStatus] + '" class="mutant-icon-image"><span class="mutant-icon-count">' + numMutants + '</span></div>';
+                /* Must be in one line, because it's in a pre.
+                   Can't use template strings because JSP's EL syntax overrides it. */
+                icons.push('<div class="mutant-icon" mutant-status="' + mutantStatus + '"  mutant-line="' + line + '">' +
+                               '<img class="mutant-icon-image" src="' + Icons[mutantStatus] + '">' +
+                               '<span class="mutant-icon-count">' + sortedMutants[mutantStatus].length + '</span>' +
+                           '</div>');
             }
+            const mutantIcons = document.createElement('div');
+            mutantIcons.classList.add('mutant-icons');
+            mutantIcons.innerHTML = icons.join("");
 
-            const marker = document.createElement('div');
-            marker.classList.add('mutant-icons');
-            marker.innerHTML = icons;
+            return mutantIcons;
+        };
 
-            $(marker).find('.mutant-icon').popover({
+
+        /**
+         * Adds a trigger to the mutant icons, which opens the popover and closes all other open popovers.
+         * @param {HTMLElement} mutantIcons The mutant icons.
+         */
+        const addPopoverTriggerToMutantIcons = function (mutantIcons) {
+            $(mutantIcons).find('.mutant-icon').popover({
                 /* Append to body instead of the element itself, so that the icons don't overlap modals. */
                 container: document.body,
                 placement: 'right',
                 trigger: 'manual',
                 html: true,
-                title: getPopoverTitle,
-                content: getPopoverContent
+                title: createPopoverTitle,
+                content: createPopoverContent
             }).on('mouseenter', function () {
                 clearTimeouts();
 
@@ -240,39 +196,50 @@
                     $(this).popover('hide');
                 }, 500);
             });
-
-            return marker;
         };
 
-        const getPopoverTitle = function () {
+        /**
+         * Creates the title for a popover.
+         * "this" will point to the ".mutant-icon" div.
+         * @returns {string} The popover title.
+         */
+        const createPopoverTitle = function () {
             const status = $(this).attr('mutant-status');
-            const line = $(this).attr('mutant-line');
+            const line = Number($(this).attr('mutant-line'));
 
-            return '<img src="' + MutantIcons[status] + '" class="mutant-icon-image"> '
+            return '<img src="' + Icons[status] + '" class="mutant-icon-image"> '
                 + MutantNames[status] + ' (Line ' + line + ')';
         };
 
-        const getPopoverContent = function () {
-            const line = Number($(this).attr('mutant-line'));
+        /**
+         * Creates the body for a popover.
+         * "this" will point to the ".mutant-icon" div.
+         * @returns {HTMLElement} The popover body.
+         */
+        const createPopoverContent = function () {
             const status = $(this).attr('mutant-status');
-            const mutants = mutantsOnLine.get(line).filter(mutant => mutant.status === status);
+            const line = Number($(this).attr('mutant-line'));
+
+            const mutantsOnLine = mutantIdsPerLine.get(line)
+                .map(id => mutants.get(id))
+                .filter(mutant => mutant.status === status);
 
             const head =
                 `<thead>
                      <tr>
                          <td>Creator</td>
                          <td align="right">ID</td>
-                         <td align="right">Points</td>
+                         <td align="right">Score</td>
                      </tr>
                  </thead>`;
 
             const rows = [];
-            for (const mutant of mutants) {
+            for (const mutant of mutantsOnLine) {
                 rows.push(
                     `<tr>
                          <td>` + mutant.creatorName + `</td>
                          <td align="right">` + mutant.id + `</td>
-                         <td align="right">` + mutant.points + `</td>
+                         <td align="right">` + mutant.score + `</td>
                      </tr>`
                 );
             }
@@ -285,29 +252,13 @@
                     `</tbody>
                  </table>`;
 
+            /* Create the button if it is supposed to be shown. */
             let button = '';
-
-            <% if (showEquivalenceButton) { %>
-                if (status === MutantStatus.alive <%=markUncoveredEquivalent ? "" : "&& coverageOnLine.get(line)"%>) {
-                    <% if (gameType.equals("PARTY")) { %>
-                        button =
-                           `<form onsubmit="if (window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')) { window.location.href = \'multiplayer/play?equivLine=` + line + `\'; } return false;">
-                                <button class="btn btn-danger btn-sm" style="width: 100%;">
-                                    <img src="<%=request.getContextPath()%>/images/flag.png" class="mutant-icon-image"/> Claim Equivalent
-                                </button>
-                            </form>`;
-                    <% } else if (gameType.equals("DUEL")) { %>
-                        button =
-                            `<form id="equiv" action="duelgame" method="post" onsubmit="return window.confirm('This will mark mutant ` + mutants[0].id + ` as equivalent. Are you sure?')">
-                                <input type="hidden" name="formType" value="claimEquivalent">
-                                <input type="hidden" name="mutantId" value="` + mutants[0].id + `">
-                                <button class="btn btn-danger btn-sm" style="width: 100%;">
-                                    <img src="<%=request.getContextPath()%>/images/flag.png" class="mutant-icon-image"/> Claim Equivalent
-                                </button>
-                             </form>`;
-                    <% } %>
-                }
-            <% } %>
+            if (showEquivalenceButton
+                && status === MutantStatuses.ALIVE
+                && (markUncoveredEquivalent || testIdsPerLine.get(line))) {
+                button = createEquivalenceButton(line, mutantsOnLine);
+            }
 
             const content = document.createElement('div');
             content.classList.add('mutant-popover-body');
@@ -316,21 +267,115 @@
             return content;
         };
 
-        const highlightCoverage = function (codeMirror) {
-            for (const [line, percentage] of coverageOnLine) {
-                codeMirror.addLineClass(line - 1, 'background', 'coverage-' + percentage);
+        /**
+         * Creates the button with which to flag mutants as equivalent.
+         * @param line The line number.
+         * @param mutantsOnLine The muitants on the line.
+         * @return {string} The equivalence button.
+         */
+        const createEquivalenceButton = function (line, mutantsOnLine) {
+            if (gameType === GameTypes.PARTY) {
+                return `<form onsubmit="if (window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')) { window.location.href = \'multiplayer/play?equivLine=` + line + `\'; } return false;">
+                            <button class="btn btn-danger btn-sm" style="width: 100%;">
+                                <img src="` + Icons.FLAG + `" class="mutant-icon-image"/> Claim Equivalent
+                            </button>
+                        </form>`;
+            } else if (gameType === GameTypes.DUEL) {
+                return `<form id="equiv" action="duelgame" method="post" onsubmit="return window.confirm('This will mark mutant ` + mutantsOnLine[0].id + ` as equivalent. Are you sure?')">
+                            <input type="hidden" name="formType" value="claimEquivalent">
+                            <input type="hidden" name="mutantId" value="` + mutantsOnLine[0].id + `">
+                            <button class="btn btn-danger btn-sm" style="width: 100%;">
+                                <img src="` + Icons.FLAG + `" class="mutant-icon-image"/> Claim Equivalent
+                            </button>
+                        </form>`;
+            } else {
+                console.error('Unknown game type for equivalence button: ' + gameType);
             }
         };
 
-        const highlightMutants = function (codeMirror) {
-            for (const [line, mutants] of mutantsOnLine) {
-                codeMirror.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', createMutantIcons(line, mutants));
+        /**
+         * Highlights coverage on the given CodeMirror instance.
+         * @param {object} codeMirror The CodeMirror instance.
+         */
+        const highlightCoverage = function (codeMirror) {
+            for (const [line, testIds] of testIdsPerLine) {
+                const coveragePercent = (testIds.length * 100 / tests.size).toFixed(0);
+                codeMirror.addLineClass(line - 1, 'background', 'coverage-' + coveragePercent);
             }
+        };
+
+        /**
+         * Displays mutant icons on the given CodeMirror instance.
+         * @param {object} codeMirror The CodeMirror instance.
+         */
+        const highlightMutants = function (codeMirror) {
+            for (const [line, mutantIds] of mutantIdsPerLine) {
+                const mutantsOnLine = mutantIds.map(id => mutants.get(id));
+                const marker = createMutantIcons(line, mutantsOnLine);
+                addPopoverTriggerToMutantIcons(marker);
+                codeMirror.setGutterMarker(line - 1, 'CodeMirror-mutantIcons', marker);
+            }
+        };
+
+        <%--
+        /**
+         * Completely removes the coverage highlighting on the given CodeMirror instance.
+         * If any lines were added and deleted in the editor, then clearing and re-applying the highlighting will
+         * place the highlighting onto the wrong lines.
+         * @param {object} codeMirror The CodeMirror instance.
+         */
+        const clearCoverage = function (codeMirror) {
+            codeMirror.eachLine(line => {
+                if (line.bgClass) {
+                    /* Match all coverage classes. */
+                    const coverageMatches = line.bgClass.match(/coverage-\d+/g);
+                    if (coverageMatches !== null) {
+                        for (const match of coverageMatches) {
+                            codeMirror.removeLineClass(line, 'background', match);
+                        }
+                    }
+                }
+            });
+        };
+
+        /**
+         * Completely removes the mutant icons on the given CodeMirror instance.
+         * If any lines were added and deleted in the editor, then clearing and re-applying the highlighting will
+         * place the highlighting onto the wrong lines.
+         * @param {object} codeMirror The CodeMirror instance.
+         */
+        const clearMutants = function (codeMirror) {
+            codeMirror.clearGutter('CodeMirror-mutantIcons');
+        };
+        --%>
+
+        /**
+         * Hides the mutant icons on the given CodeMirror instance.
+         * The mutant icons are only hidden, and not cleared. They can be shown hidden and shown again correctly even if
+         * lines were added or deleted in the editor.
+         * @param {object} codeMirror The CodeMirror instance.
+         */
+        const hideMutants = function (codeMirror) {
+            $(codeMirror.getWrapperElement()).find('.mutant-icons').hide();
+        };
+
+        /**
+         * Shows the mutant icons on the given CodeMirror instance.
+         * @param {object} codeMirror The CodeMirror instance.
+         */
+        const showMutants = function (codeMirror) {
+            $(codeMirror.getWrapperElement()).find('.mutant-icons').show();
         };
 
         const codeMirror = $('<%=codeDivSelector%>').find('.CodeMirror')[0].CodeMirror;
-        highlightCoverage(codeMirror);
-        highlightMutants(codeMirror);
+        codeMirror.highlightCoverage = function () { highlightCoverage(this) };
+        codeMirror.highlightMutants = function () { highlightMutants(this) };
+        codeMirror.clearCoverage = function () { clearCoverage(this) };
+        codeMirror.clearMutants = function () { clearMutants(this) };
+        codeMirror.hideMutants = function () { hideMutants(this) };
+        codeMirror.showMutants = function () { showMutants(this) };
+        codeMirror.highlightCoverage();
+        codeMirror.highlightMutants();
     }());
 </script>
 

@@ -21,6 +21,7 @@ package org.codedefenders.servlets.events;
 import com.google.gson.Gson;
 
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.Event;
@@ -46,7 +47,7 @@ import javax.servlet.http.HttpSession;
  * This {@link HttpServlet} handles notification requests. Notifications are logged and
  * stored server side. Clients request their most recent notifications.
  * <p>
- * In this servlet, all {@link NotificationType}s are handled.
+ * In this servlet, all {@link NotificationType NotificationTypes} are handled.
  * <p>
  * Serves on path: `/notifications`.
  */
@@ -153,7 +154,7 @@ public class NotificationsHandler extends HttpServlet {
      * <ul>
      *     <li><code>gameId</code></li>
      * </ul>
-	 * If parameters are valid, responds with a JSON list of most recent {@link Event}s.
+	 * If parameters are valid, responds with a JSON list of most recent {@link Event Events}.
      */
 	@SuppressWarnings("Duplicates")
 	private void handlePushEventRequest(HttpSession session, HttpServletRequest request, HttpServletResponse response, int userId) throws IOException {
@@ -181,7 +182,7 @@ public class NotificationsHandler extends HttpServlet {
 			session.setAttribute("lastMsg", lastMsg);
 		}
 
-		final String username = DatabaseAccess.getUser(userId).getUsername();
+		final String username = UserDAO.getUserById(userId).getUsername();
 		for (Event e : events) {
 			e.setCurrentUserName("@" + username);
 			e.parse(e.getEventStatus() == EventStatus.GAME);
@@ -198,7 +199,7 @@ public class NotificationsHandler extends HttpServlet {
 	 *     <li><code>gameId</code></li>
 	 *     <li><code>timestamp</code></li>
 	 * </ul>
-     * If parameters are valid, responds with a JSON list of most recent game {@link Event}s.
+     * If parameters are valid, responds with a JSON list of most recent game {@link Event Events}.
 	 */
 	@SuppressWarnings("Duplicates")
 	private void handleGameEventRequest(HttpServletRequest request, HttpServletResponse response, int userId) throws IOException {
@@ -234,7 +235,7 @@ public class NotificationsHandler extends HttpServlet {
 		final Role role = DatabaseAccess.getRole(userId, gameId);
 		final ArrayList<Event> events = new ArrayList<>(DatabaseAccess.getNewEventsForGame(gameId, timestamp, role));
 
-		final String username = DatabaseAccess.getUser(userId).getUsername();
+		final String username = UserDAO.getUserById(userId).getUsername();
 		for (Event e : events) {
 			e.setCurrentUserName("@" + username);
 			e.parse(e.getEventStatus() == EventStatus.GAME);
@@ -250,7 +251,7 @@ public class NotificationsHandler extends HttpServlet {
 	 * <ul>
 	 *     <li><code>timestamp</code></li>
 	 * </ul>
-	 * If parameters are valid, responds with a JSON list of most recent user {@link Event}s.
+	 * If parameters are valid, responds with a JSON list of most recent user {@link Event Events}.
 	 */
 	@SuppressWarnings("Duplicates")
 	private void handleUserEventRequest(HttpServletRequest request, HttpServletResponse response, int userId) throws IOException {
@@ -269,7 +270,7 @@ public class NotificationsHandler extends HttpServlet {
 			return;
 		}
 
-		final String username = DatabaseAccess.getUser(userId).getUsername();
+		final String username = UserDAO.getUserById(userId).getUsername();
 		// DatabaseAccess#getNewEventsForUser(int, long) never returns null, so no need for extra check
 		final List<Event> events = DatabaseAccess.getNewEventsForUser(userId, timestamp)
 				.stream()

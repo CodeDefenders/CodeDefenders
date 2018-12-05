@@ -59,6 +59,12 @@ public class AdminSystemSettings extends HttpServlet {
 				return "Show or hide the link for Game Creation.";
 			}
 		},
+		GAME_JOINING {
+			@Override
+			public String toString() {
+				return "Show or hide links to join/leave games.";
+			}
+		},
 		REQUIRE_MAIL_VALIDATION {
 			@Override
 			public String toString() {

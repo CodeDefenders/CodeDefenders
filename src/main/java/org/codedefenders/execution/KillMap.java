@@ -19,7 +19,9 @@
 package org.codedefenders.execution;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
 import org.slf4j.Logger;
@@ -28,22 +30,19 @@ import org.slf4j.LoggerFactory;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 
-import javax.mail.Message;
 import javax.naming.*;
-import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 import static org.codedefenders.execution.KillMap.KillMapEntry.Status.*;
 
 /**
  * Maps tests to their killed mutants in a finished game.
  * Killmaps are computed and saved to the DB on the first time they are requested. This may take a long time.
- * {@link DatabaseAccess#hasKillMap(int)}  can be used to check if a game's killmap has already beeen computed before.
+ * {@link KillmapDAO#hasKillMap(int)}  can be used to check if a game's killmap has already beeen computed before.
  * <p/>
  * Only one killmap can be computed at a time. Further request are queued via {@code synchronized}.
  * This is mostly to prevent multiple calculations of the same killmap at once, e.g. by accidentally refreshing a page.
@@ -185,7 +184,7 @@ public class KillMap {
     /**
      * Returns the killmap for the given finished game.
      * This operation is blocking and may take a long time,
-     * {@link DatabaseAccess#hasKillMap(int)} can be used to check if a game's killmap has already beeen computed before.
+     * {@link KillmapDAO#hasKillMap(int)} can be used to check if a game's killmap has already beeen computed before.
      *
      * @param game The finished game to get the killmap for.
      * @param recalculate Recalculate the whole killmap, even if it was already calculated before.
@@ -196,22 +195,22 @@ public class KillMap {
         if (game.getState() != GameState.FINISHED) {
             throw new IllegalArgumentException("Game must be finished.");
 
-        } else if (!recalculate && DatabaseAccess.hasKillMap(game.getId())) {
+        } else if (!recalculate && KillmapDAO.hasKillMap(game.getId())) {
             List<Test> tests = game.getTests();
             List<Mutant> mutants = game.getMutants();
-            List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForGame(game.getId());
+            List<KillMapEntry> entries = KillmapDAO.getKillMapEntriesForGame(game.getId());
             return new KillMap(tests, mutants, game.getClassId(), entries, NO_FILTER);
 
         } else {
             /* Synchronized, so only one killmap can be computed at a time. */
             synchronized (KillMap.class) {
                 /* If killmap was calculated in the mean time, just return the already computed killmap. */
-                if (recalculate || !DatabaseAccess.hasKillMap(game.getId())) {
-                    DatabaseAccess.setHasKillMap(game.getId(), false);
+                if (recalculate || !KillmapDAO.hasKillMap(game.getId())) {
+                    KillmapDAO.setHasKillMap(game.getId(), false);
 
                     List<Test> tests = game.getTests();
                     List<Mutant> mutants = game.getMutants();
-                    List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForGame(game.getId());
+                    List<KillMapEntry> entries = KillmapDAO.getKillMapEntriesForGame(game.getId());
 
                     logger.info(String.format("Computing killmap for game %d: %d tests, %d mutants, %d entries provided",
                             game.getId(), tests.size(), mutants.size(), entries.size()));
@@ -219,13 +218,13 @@ public class KillMap {
                     KillMap killmap = new KillMap(tests, mutants, game.getClassId(), entries, NO_FILTER);
                     killmap.compute(recalculate, NO_FILTER);
 
-                    DatabaseAccess.setHasKillMap(game.getId(), true);
+                    KillmapDAO.setHasKillMap(game.getId(), true);
                     return killmap;
 
                 } else {
                     List<Test> tests = game.getTests();
                     List<Mutant> mutants = game.getMutants();
-                    List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForGame(game.getId());
+                    List<KillMapEntry> entries = KillmapDAO.getKillMapEntriesForGame(game.getId());
                     return new KillMap(tests, mutants, game.getClassId(), entries, NO_FILTER);
                 }
             }
@@ -236,7 +235,7 @@ public class KillMap {
      * Returns the killmap for the given class.
      * This operation is blocking and may take a long time,
      *
-     * @param game The class to get the killmap for.
+     * @param classId The class to get the killmap for.
      * @param recalculate Recalculate the whole killmap, even if it was already calculated before.
      * @throws InterruptedException If the computation is interrupted.
      * @throws ExecutionException If an error occured during an execution.
@@ -244,9 +243,9 @@ public class KillMap {
     public static KillMap forClass(int classId, boolean recalculate) throws InterruptedException, ExecutionException {
         /* Synchronized, so only one killmap can be computed at a time. */
         synchronized (KillMap.class) {
-            List<Test> tests = DatabaseAccess.getExecutableTestsForClass(classId);
-            List<Mutant> mutants = DatabaseAccess.getMutantsForClass(classId);
-            List<KillMapEntry> entries = DatabaseAccess.getKillMapEntriesForClass(classId);
+            List<Test> tests = TestDAO.getValidTestsForClass(classId);
+            List<Mutant> mutants = MutantDAO.getValidMutantsForClass(classId);
+            List<KillMapEntry> entries = KillmapDAO.getKillMapEntriesForClass(classId);
 
             logger.info(String.format("Computing killmap for class %d: %d tests, %d mutants, %d entries provided",
                     classId, tests.size(), mutants.size(), entries.size()));
@@ -410,7 +409,7 @@ public class KillMap {
                 entry = new KillMapEntry(test, mutant, status);
             }
 
-            if (!DatabaseAccess.insertKillMapEntry(entry, classId)) {
+            if (!KillmapDAO.insertKillMapEntry(entry, classId)) {
                 logger.error("An error occured while inserting killmap entry into the DB: " + entry);
             }
 

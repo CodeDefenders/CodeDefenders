@@ -46,7 +46,7 @@
     <% } %>
     <%
         for (Test test : testsTODORENAME) {
-            User creator = DatabaseAccess.getUserFromPlayer(test.getPlayerId());
+            User creator = UserDAO.getUserForPlayer(test.getPlayerId());
             final Set<Mutant> coveredMutants = test.getCoveredMutants(mutantsTODORENAME);
             final Set<Mutant> killedMutants = test.getKilledMutants();
             final String coveredMutantsIdString = coveredMutants.stream().map(mutant -> String.valueOf(mutant.getId())).collect(Collectors.joining(", "));

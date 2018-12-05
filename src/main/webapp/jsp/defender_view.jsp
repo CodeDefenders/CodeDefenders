@@ -41,9 +41,10 @@
 	if (previousTestCode != null) {
 		request.setAttribute("testCode", previousTestCode);
 	} else {
-		request.setAttribute("testCode", game.getCUT().getTestTemplate());
+		request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
 	}
-    request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
+    request.setAttribute("mockingEnabled", cut.isMockingEnabled());
+    request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
 
 	/* tests_carousel */
 	request.setAttribute("tests", game.getTests());
@@ -53,6 +54,7 @@
     request.setAttribute("mutantsAlive", game.getAliveMutants());
     request.setAttribute("mutantsKilled", game.getKilledMutants());
     request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
+    request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
 	request.setAttribute("markEquivalent", true);
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);

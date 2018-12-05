@@ -21,19 +21,10 @@ package org.codedefenders.database;
 import org.codedefenders.api.analytics.ClassDataDTO;
 import org.codedefenders.api.analytics.UserDataDTO;
 import org.codedefenders.servlets.FeedbackManager.FeedbackType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ApiDAO {
-    private static final Logger logger = LoggerFactory.getLogger(ApiDAO.class);
-
     private static final  String GET_ANALYTICS_USER_DATA_QUERY = String.join("\n",
         " SELECT users.User_ID                    AS ID,",
         "       users.Username                    AS Username,",
@@ -214,91 +205,60 @@ public class ApiDAO {
         "    GROUP BY feedback_inner.Class_ID",
         "  ) AS feedback ON feedback.Class_ID = classes.Class_ID;");
 
-    public static List<UserDataDTO> getAnalyticsUserData() {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = null;
-
-        List<UserDataDTO> userList = new ArrayList<>();
-        try {
-            stmt = DB.createPreparedStatement(conn, GET_ANALYTICS_USER_DATA_QUERY);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                UserDataDTO u = new UserDataDTO();
-                u.setId(rs.getLong("ID"));
-                u.setUsername(rs.getString("Username"));
-                u.setAttackerScore(rs.getInt("AttackerScore"));
-                u.setDefenderScore(rs.getInt("DefenderScore"));
-                u.setGamesPlayed(rs.getInt("GamesPlayed"));
-                u.setAttackerGamesPlayed(rs.getInt("AttackerGamesPlayed"));
-                u.setDefenderGamesPlayed(rs.getInt("DefenderGamesPlayed"));
-                u.setMutantsSubmitted(rs.getInt("MutantsSubmitted"));
-                u.setMutantsAlive(rs.getInt("MutantsAlive"));
-                u.setMutantsEquivalent(rs.getInt("MutantsEquivalent"));
-                u.setTestsSubmitted(rs.getInt("TestsSubmitted"));
-                u.setMutantsKilled(rs.getInt("MutantsKilled"));
-                userList.add(u);
-            }
-        } catch (SQLException se) {
-            logger.error("SQL exception caught", se);
-        } catch (Exception e) {
-            logger.error("Exception caught", e);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-        return userList;
+    public static List<UserDataDTO> getAnalyticsUserData() throws UncheckedSQLException, SQLMappingException {
+        return DB.executeQueryReturnList(GET_ANALYTICS_USER_DATA_QUERY, rs -> {
+            UserDataDTO u = new UserDataDTO();
+            u.setId(rs.getLong("ID"));
+            u.setUsername(rs.getString("Username"));
+            u.setAttackerScore(rs.getInt("AttackerScore"));
+            u.setDefenderScore(rs.getInt("DefenderScore"));
+            u.setGamesPlayed(rs.getInt("GamesPlayed"));
+            u.setAttackerGamesPlayed(rs.getInt("AttackerGamesPlayed"));
+            u.setDefenderGamesPlayed(rs.getInt("DefenderGamesPlayed"));
+            u.setMutantsSubmitted(rs.getInt("MutantsSubmitted"));
+            u.setMutantsAlive(rs.getInt("MutantsAlive"));
+            u.setMutantsEquivalent(rs.getInt("MutantsEquivalent"));
+            u.setTestsSubmitted(rs.getInt("TestsSubmitted"));
+            u.setMutantsKilled(rs.getInt("MutantsKilled"));
+            return u;
+        });
     }
 
-    public static List<ClassDataDTO> getAnalyticsClassData() {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = null;
+    public static List<ClassDataDTO> getAnalyticsClassData() throws UncheckedSQLException, SQLMappingException {
+        return DB.executeQueryReturnList(GET_ANALYTICS_CLASS_DATA_QUERY, rs -> {
+            ClassDataDTO c = new ClassDataDTO();
+            c.setId(rs.getLong("ID"));
+            c.setClassname(rs.getString("Classname"));
+            c.setNrGames(rs.getInt("NrGames"));
+            c.setAttackerWins(rs.getInt("AttackerWins"));
+            c.setDefenderWins(rs.getInt("DefenderWins"));
+            c.setNrPlayers(rs.getInt("NrPlayers"));
+            c.setTestsSubmitted(rs.getInt("TestsSubmitted"));
+            c.setMutantsSubmitted(rs.getInt("MutantsSubmitted"));
+            c.setMutantsAlive(rs.getInt("MutantsAlive"));
+            c.setMutantsEquivalent(rs.getInt("MutantsEquivalent"));
 
-        List<ClassDataDTO> classList = new ArrayList<>();
-        try {
-            stmt = DB.createPreparedStatement(conn, GET_ANALYTICS_CLASS_DATA_QUERY);
-            ResultSet rs = stmt.executeQuery();
-            while (rs.next()) {
-                ClassDataDTO c = new ClassDataDTO();
-                c.setId(rs.getLong("ID"));
-                c.setClassname(rs.getString("Classname"));
-                c.setNrGames(rs.getInt("NrGames"));
-                c.setAttackerWins(rs.getInt("AttackerWins"));
-                c.setDefenderWins(rs.getInt("DefenderWins"));
-                c.setNrPlayers(rs.getInt("NrPlayers"));
-                c.setTestsSubmitted(rs.getInt("TestsSubmitted"));
-                c.setMutantsSubmitted(rs.getInt("MutantsSubmitted"));
-                c.setMutantsAlive(rs.getInt("MutantsAlive"));
-                c.setMutantsEquivalent(rs.getInt("MutantsEquivalent"));
+            ClassDataDTO.ClassRatings ratings = new ClassDataDTO.ClassRatings();
+            ClassDataDTO.ClassRating rating;
 
-                ClassDataDTO.ClassRatings ratings = new ClassDataDTO.ClassRatings();
-                ClassDataDTO.ClassRating rating;
+            rating = new ClassDataDTO.ClassRating();
+            rating.setCount(rs.getInt("ratings_CutMutationDifficulty_count"));
+            rating.setSum(rs.getInt("ratings_CutMutationDifficulty_sum"));
+            ratings.setCutMutationDifficulty(rating);
 
-                rating = new ClassDataDTO.ClassRating();
-                rating.setCount(rs.getInt("ratings_CutMutationDifficulty_count"));
-                rating.setSum(rs.getInt("ratings_CutMutationDifficulty_sum"));
-                ratings.setCutMutationDifficulty(rating);
+            rating = new ClassDataDTO.ClassRating();
+            rating.setCount(rs.getInt("ratings_CutTestDifficulty_count"));
+            rating.setSum(rs.getInt("ratings_CutTestDifficulty_sum"));
+            ratings.setCutTestDifficulty(rating);
 
-                rating = new ClassDataDTO.ClassRating();
-                rating.setCount(rs.getInt("ratings_CutTestDifficulty_count"));
-                rating.setSum(rs.getInt("ratings_CutTestDifficulty_sum"));
-                ratings.setCutTestDifficulty(rating);
+            rating = new ClassDataDTO.ClassRating();
+            rating.setCount(rs.getInt("ratings_GameEngaging_count"));
+            rating.setSum(rs.getInt("ratings_GameEngaging_sum"));
+            ratings.setGameEngaging(rating);
 
-                rating = new ClassDataDTO.ClassRating();
-                rating.setCount(rs.getInt("ratings_GameEngaging_count"));
-                rating.setSum(rs.getInt("ratings_GameEngaging_sum"));
-                ratings.setGameEngaging(rating);
-
-                c.setRatings(ratings);
-
-                classList.add(c);
-            }
-        } catch (SQLException se) {
-            logger.error("SQL exception caught", se);
-        } catch (Exception e) {
-            logger.error("Exception caught", e);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-        return classList;
+            c.setRatings(ratings);
+            return c;
+        });
     }
 
 }

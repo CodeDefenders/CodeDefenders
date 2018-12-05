@@ -20,6 +20,7 @@ package org.codedefenders.game;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
+import com.github.javaparser.TokenMgrError;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.BodyDeclaration;
@@ -115,7 +116,7 @@ public class GameClass {
 		this(name, alias, jFile, cFile, false);
 		this.id = id;
 	}
-	
+
 	public GameClass(String name, String alias, String jFile, String cFile) {
 		this(name, alias, jFile, cFile, false);
 	}
@@ -228,44 +229,71 @@ public class GameClass {
 		return DB.executeUpdate(stmt, conn);
 	}
 
-	public String getTestTemplate() {
-		StringBuilder sb = new StringBuilder();
-		if (!getPackage().isEmpty()) {
-			sb.append(String.format("package %s;%n", getPackage()));
-		} else {
-			sb.append(String.format("/* no package name */%n"));
+	/**
+	 * Generates and returns a template for a JUnit test.
+	 *
+	 * Be aware that this template is not HTML escaped.
+	 * Please use {@link #getHTMLEscapedTestTemplate()}.
+	 *
+	 * @return template for a JUnit test as a {@link String}.
+	 * @see #getHTMLEscapedTestTemplate()
+	 */
+	private String getTestTemplate() {
+		final StringBuilder bob = new StringBuilder();
+		final String classPackage = getPackage();
+		if (!classPackage.isEmpty()) {
+			bob.append(String.format("package %s;\n\n", classPackage));
 		}
-		sb.append(String.format("%n"));
-		sb.append(String.format("import static org.junit.Assert.*;%n%n"));
 
-		if (this.isMockingEnabled) {
-			sb.append(String.format("import static org.mockito.Mockito.*;%n%n"));
-		}
+		bob.append("import org.junit.*;\n");
 
-		sb.append(String.format("import org.junit.*;%n"));
-
-		// Additional import are already in the form of 'import X.Y.Z;\n'
 		for (String additionalImport : this.additionalImports) {
-			sb.append(additionalImport);
+		    // Additional import are already in the form of 'import X.Y.Z;\n'
+			bob.append(additionalImport); // no \n required
 		}
+		bob.append("\n");
 
-		sb.append(String.format("public class Test%s {%n", getBaseName()));
-		sb.append(String.format("%c@Test(timeout = 4000)%n", '\t'));
-		sb.append(String.format("%cpublic void test() throws Throwable {%n", '\t'));
-		sb.append(String.format("%c%c// test here!%n", '\t', '\t'));
-		sb.append(String.format("%c}%n", '\t'));
-		sb.append(String.format("}"));
-		return sb.toString();
+		bob.append("import static org.junit.Assert.*;\n");
+		if (this.isMockingEnabled) {
+			bob.append("import static org.mockito.Mockito.*;\n");
+		}
+		bob.append("\n");
+
+		bob.append(String.format("public class Test%s {\n", getBaseName()))
+				.append("    @Test(timeout = 4000)\n")
+				.append("    public void test() throws Throwable {\n")
+				.append("        // test here!\n")
+				.append("    }\n")
+				.append("}");
+		return bob.toString();
 	}
 
+	/**
+	 * @return a HTML escaped test template for a Junit Test as a {@link String}.
+	 */
 	public String getHTMLEscapedTestTemplate() {
 		return StringEscapeUtils.escapeHtml(getTestTemplate());
 	}
 
+    /**
+     * @return the first editable line of this class test template.
+     * @see #getTestTemplate()
+     */
+    public Integer getTestTemplateFirstEditLine() {
+        int out = 8 + this.additionalImports.size();
+        if (!getPackage().isEmpty()) {
+            out+= 2;
+        }
+        if (this.isMockingEnabled) {
+            out++;
+        }
+        return out;
+    }
+
 	/*
 	 * We list all the NON-primitive imports here. We do not perform any
 	 * merging.
-	 * 
+	 *
 	 * (using *)
 	 */
 	private Set<String> includeAdditionalImportsFromCUT() {
@@ -275,14 +303,14 @@ public class GameClass {
 			// parse the file
 			cu = JavaParser.parse(in);
 
-			// Extract the import declarations from the CUT and add them to additionaImports 
+			// Extract the import declarations from the CUT and add them to additionaImports
 			for(ImportDeclaration declaredImport : cu.getImports()){
 				additionalImports.add( declaredImport.toStringWithoutComments() );
 			}
 
-		} catch (ParseException | IOException e) {
+		} catch (ParseException | IOException | TokenMgrError e) {
 			// If a java file is not provided, there's no import at all.
-			logger.error("Swallow Exception", e);
+			logger.warn("Swallow Exception: " + e.getMessage() );
 		}
 		return additionalImports;
 	}
@@ -377,7 +405,7 @@ public class GameClass {
 
 			}
 
-		} catch (ParseException | IOException e) {
+		} catch (ParseException | IOException | TokenMgrError e) {
 			logger.warn("Swallow exception" + e);
 		}
 		return nonInitializedFieldsLines;
@@ -432,7 +460,7 @@ public class GameClass {
 
 			}
 
-		} catch (ParseException | IOException e) {
+		} catch (ParseException | IOException | TokenMgrError e) {
 			logger.warn("Swallow exception" + e);
 		}
 
@@ -476,7 +504,7 @@ public class GameClass {
 					}
 				}
 			}.visit(JavaParser.parse(in), null);
-		} catch (ParseException | IOException e) {
+		} catch (ParseException | IOException | TokenMgrError e) {
 			logger.warn("Swallow exception" + e);
 		}
 		Collections.sort(lines);

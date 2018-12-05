@@ -33,7 +33,7 @@ public class AutomaticImportTest {
 		GameClass gc = new GameClass("Lift", "Lift", "src/test/resources/itests/sources/Lift/Lift.java",
 				"src/test/resources/itests/sources/Lift/Lift.class", true);
 
-		String testTemplate = gc.getTestTemplate();
+		String testTemplate = gc.getHTMLEscapedTestTemplate();
 		assertThat(testTemplate, containsString("import static org.mockito.Mockito.*;"));
 	}
 
@@ -42,7 +42,7 @@ public class AutomaticImportTest {
 		GameClass gc = new GameClass("Lift", "Lift", "src/test/resources/itests/sources/Lift/Lift.java",
 				"src/test/resources/itests/sources/Lift/Lift.class", false);
 
-		String testTemplate = gc.getTestTemplate();
+		String testTemplate = gc.getHTMLEscapedTestTemplate();
 		assertThat(testTemplate, not(containsString("import static org.mockito.Mockito.*;")));
 	}
 
@@ -52,7 +52,7 @@ public class AutomaticImportTest {
 				"src/test/resources/itests/sources/Lift/Lift.class",
 				true); // Including mocking
 
-		String testTemplate = gc.getTestTemplate();
+		String testTemplate = gc.getHTMLEscapedTestTemplate();
 		assertThat(testTemplate,
 				allOf(
 						containsString("import static org.mockito.Mockito.*;"),
@@ -71,7 +71,7 @@ public class AutomaticImportTest {
 				"src/test/resources/itests/sources/XmlElement/XmlElement.class",
 				true); // Including mocking
 
-		String testTemplate = gc.getTestTemplate();
+		String testTemplate = gc.getHTMLEscapedTestTemplate();
 
 		assertThat(testTemplate,
 				allOf(

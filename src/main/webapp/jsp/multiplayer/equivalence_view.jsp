@@ -38,9 +38,9 @@
     if (previousTestCode != null) {
         request.setAttribute("testCode", previousTestCode);
     } else {
-        request.setAttribute("testCode", game.getCUT().getTestTemplate());
+        request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
     }
-    request.setAttribute("mockingEnabled", game.getCUT().isMockingEnabled());
+    request.setAttribute("mockingEnabled", cut.isMockingEnabled());
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");

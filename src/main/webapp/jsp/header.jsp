@@ -147,7 +147,7 @@
 	request.getSession().removeAttribute("messages");
 	if (messages != null && ! messages.isEmpty()) {
 %>
-<div class="alert alert-info" id="messages-div">
+<div class="alert alert-info" id="messages-div" style="width: 98.9vw">
     <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a><br />
     <%
         boolean fadeOut = true;

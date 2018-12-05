@@ -49,6 +49,7 @@
 <%
     List<Mutant> mutantsAliveTODORENAME = (List<Mutant>) request.getAttribute("mutantsAlive");
     List<Mutant> mutantsKilledTODORENAME = (List<Mutant>) request.getAttribute("mutantsKilled");
+    List<Mutant> mutantsMarkedEquivalentTODORENAME = (List<Mutant>) request.getAttribute("mutantsMarkedEquivalent");
     List<Mutant> mutantsEquivalentTODORENAME = (List<Mutant>) request.getAttribute("mutantsEquivalent");
     Boolean markEquivalent = (Boolean) request.getAttribute("markEquivalent");
     Boolean markUncoveredEquivalent = (Boolean) request.getAttribute("markUncoveredEquivalent");
@@ -64,6 +65,10 @@
 
         <div>
             <a class="tab-link button text-black" href="#mutkilledtab" role="tab" data-toggle="tab">Killed(<%= mutantsKilledTODORENAME.size() %>)</a>
+        </div>
+
+        <div>
+            <a class="tab-link button text-black" href="#mutmarkedequivtab" role="tab" data-toggle="tab">Flagged(<%= mutantsMarkedEquivalentTODORENAME.size() %>)</a>
         </div>
 
         <div>
@@ -243,6 +248,74 @@
                         No mutants killed.
                     </div>
                 </div>
+            <% } %>
+        </div>
+
+        <div class="tab-pane fade" id="mutmarkedequivtab">
+            <% if (! mutantsMarkedEquivalentTODORENAME.isEmpty()) { %>
+            <table id="killed-mutants" class="mutant-table display dataTable table table-striped table-responsive table-paragraphs bg-white">
+                <thead>  <%-- needed for datatable apparently --%>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </thead>
+
+                <tbody>
+
+                <%
+                    // Sorting mutants
+                    List<Mutant> sortedKilledMutants = new ArrayList<>(mutantsMarkedEquivalentTODORENAME);
+                    sortedKilledMutants.sort(Mutant.sortByLineNumberAscending());
+                    for (Mutant m : sortedKilledMutants) {
+                %>
+                <tr>
+                    <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= m.getCreatorName() %> (uid <%= m.getCreatorId() %>)</h4>
+                        <% for (String change : m.getHTMLReadout()) { %>
+                        <p><%=change %><p>
+                                <% } %>
+                    </td>
+                    <td class="col-sm-1"></td>
+                    <td class="col-sm-1">
+                        <h4>points: <%=m.getScore()%></h4>
+                    </td>
+                    <td class="col-sm-1">
+                        <% if (viewDiff){ %>
+                        <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
+                        <div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
+                             style="z-index: 10000;">
+                            <div class="modal-dialog">
+                                <!-- Modal content-->
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                                    <pre class="readonly-pre"><textarea
+                                                            class="mutdiff" title="mutdiff"
+                                                            id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea></pre>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% } %>
+                    </td>
+                </tr>
+                <% } %>
+                </tbody>
+            </table>
+            <% } else {%>
+            <div class="panel panel-default" style="background: white">
+                <div class="panel-body" style="    color: gray;    text-align: center;">
+                    No mutants killed.
+                </div>
+            </div>
             <% } %>
         </div>
 

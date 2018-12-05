@@ -34,12 +34,14 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 /**
  * This class offers a static method {@link #generate(GameClass, Test)}, which
@@ -74,16 +76,36 @@ public class LineCoverageGenerator {
         // In memory data store for execution data
         final ExecutionDataStore executionDataStore = execFileLoader.getExecutionDataStore();
 
-        final String classFile = gameClass.getClassFile();
+		final CoverageBuilder coverageBuilder = new CoverageBuilder();
+		final Analyzer analyzer = new Analyzer(executionDataStore, coverageBuilder);
 
-        final CoverageBuilder coverageBuilder = new CoverageBuilder();
-        final Analyzer analyzer = new Analyzer(executionDataStore, coverageBuilder);
-        try {
-            analyzer.analyzeClass(new ClassReader(new FileInputStream(classFile)));
-        } catch (IOException e) {
-            logger.error("Failed to analyze file: " + classFile + ". Returning empty LineCoverage.", e);
-            return new LineCoverage();
-        }
+		/*
+		 * Classes with inner classes corresponds to multiple files on the file
+		 * system But inside the db they are not reported. So we need to look
+		 * into the folder
+		 */
+		final File classFileFolder = new File(gameClass.getClassFile()).getParentFile();
+		// List all the .class files in this folder. Not sure if FilenameFilter
+		// is thread safe so I instantiate a new one every time.
+		for (File classFile : classFileFolder.listFiles(new FilenameFilter() {
+
+			// XXX Probably the alias would work the same
+			private final String regex = new File(gameClass.getClassFile()).getName().split("\\.")[0] + "\\$?.*"
+					+ "\\.class";
+			private final Pattern innerClassPatter = Pattern.compile(regex);
+
+			@Override
+			public boolean accept(File dir, String name) {
+				return innerClassPatter.matcher(name).matches();
+			}
+		})) {
+			try {
+				analyzer.analyzeClass(new ClassReader(new FileInputStream(classFile)));
+			} catch (IOException e) {
+				logger.error("Failed to analyze file: " + classFile + ". Returning empty LineCoverage.", e);
+				return new LineCoverage();
+			}
+		}
 
         final List<Integer> linesCovered = new LinkedList<>();
         final List<Integer> linesUncovered = new LinkedList<>();

@@ -27,12 +27,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DB {
-
     private static ConnectionPool connPool = ConnectionPool.getInstanceOf();
     private static final Logger logger = LoggerFactory.getLogger(DB.class);
 
+    // TODO Why throw a StorageException here (make NoMoreConnectionsException a RuntimeException?)
     public synchronized static Connection getConnection() {
         try {
             return connPool.getDBConnection();
@@ -47,72 +49,48 @@ public class DB {
             if (stmt != null) {
                 stmt.close();
             }
-        } catch (SQLException se2) {
-            logger.error("SQL exception while closing statement!", se2);
+        } catch (SQLException se) {
+            logger.error("SQL exception while closing statement!", se);
         }
         connPool.releaseDBConnection(conn);
     }
 
-    public static PreparedStatement createPreparedStatement(Connection conn, String query, DatabaseValue value) {
-        DatabaseValue[] databaseValues = {value};
-        return createPreparedStatement(conn, query, databaseValues);
-    }
-
-    public static PreparedStatement createPreparedStatement(Connection conn, String query, DatabaseValue[] values) {
+    public static PreparedStatement createPreparedStatement(Connection conn, String query, DatabaseValue... values) {
         PreparedStatement stmt = null;
         try {
             stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             int count = 1;
-            for (DatabaseValue val : values) {
-                final DatabaseValue.Type type = val.getType();
+            for (DatabaseValue value : values) {
+                final DatabaseValue.Type type = value.getType();
                 switch (type) {
+                    case NULL:
+                        stmt.setNull(count++, type.typeValue);
+                        break;
                     case BOOLEAN:
-                        stmt.setBoolean(count++, val.getBoolVal());
-                        break;
                     case INT:
-                        stmt.setInt(count++, val.getIntVal());
-                        break;
                     case STRING:
-                        stmt.setString(count++, val.getStringVal());
-                        break;
                     case LONG:
-                        stmt.setLong(count++, val.getLongVal());
-                        break;
                     case FLOAT:
-                        stmt.setFloat(count++, val.getFloatVal());
-                        break;
                     case TIMESTAMP:
-                        stmt.setTimestamp(count++, val.getTimestampVal());
+                        stmt.setObject(count++, value.getValue(), type.typeValue);
                         break;
                     default:
-                        final IllegalStateException illegalState =
-                                new IllegalStateException("Unknown database value type: " + type);
-                        logger.error("Failed to create prepared statement due to unknown database value type.", illegalState);
-                        throw illegalState;
+                        final IllegalArgumentException e =
+                                new IllegalArgumentException("Unknown database value type: " + type);
+                        logger.error("Failed to create prepared statement due to unknown database value type.", e);
+                        throw e;
                 }
             }
         } catch (SQLException se) {
-            logger.error("SQLException while creating Prepared Statement for query\n\t" + query, se);
+            logger.error("SQLException while creating prepared statement. Query was:\n\t" + query, se);
             DB.cleanup(conn, stmt);
-            return null;
+            throw new UncheckedSQLException(se);
         }
         return stmt;
     }
-
-    public static PreparedStatement createPreparedStatement(Connection conn, String query) {
-        PreparedStatement stmt = null;
-        try {
-            stmt = conn.prepareStatement(query);
-        } catch (SQLException se) {
-            logger.error("SQLException while creating Statement for query\n\t" + query, se);
-            DB.cleanup(conn, stmt);
-        }
-        return stmt;
-    }
-
 
     /*
-    * Does not clean up!
+     * Does not clean up!
      */
     static ResultSet executeQueryReturnRS(Connection conn, PreparedStatement stmt) {
         try {
@@ -152,31 +130,215 @@ public class DB {
         return -1;
     }
 
-    public static DatabaseValue getDBV(String v) {
-        return new DatabaseValue(v);
+    /**
+     * Creates a typed {@link DatabaseValue} for a given integer value.
+     * The given integer value can be {@code null}.
+     *
+     * @param value the given value as a {@link Integer}, can be {@code null}.
+     * @return a database value for a given integer.
+     */
+    public static DatabaseValue getDBV(Integer value) {
+        return new DatabaseValue<>(value);
     }
 
-    public static DatabaseValue getDBV(int v) {
-        return new DatabaseValue(v);
+    /**
+     * Creates a typed {@link DatabaseValue} for a given long value.
+     * The given long value can be {@code null}.
+     *
+     * @param value the given value as a {@link Long}, can be {@code null}.
+     * @return a database value for a given long.
+     */
+    public static DatabaseValue getDBV(Long value) {
+        return new DatabaseValue<>(value);
     }
 
-    public static DatabaseValue getDBV(boolean v) {
-        return new DatabaseValue(v);
+    /**
+     * Creates a typed {@link DatabaseValue} for a given float value.
+     * The given float value can be {@code null}.
+     *
+     * @param value the given value as a {@link Float}, can be {@code null}.
+     * @return a database value for a given float.
+     */
+    public static DatabaseValue getDBV(Float value) {
+        return new DatabaseValue<>(value);
     }
 
-    /*
-    * Caution: Explicitly cast to Long or value will be converted to float
-    */
-    public static DatabaseValue getDBV(float v) {
-        return new DatabaseValue(v);
+    /**
+     * Creates a typed {@link DatabaseValue} for a given string value.
+     * The given string value can be {@code null}.
+     *
+     * @param value the given value as a {@link String}, can be {@code null}.
+     * @return a database value for a given string.
+     */
+    public static DatabaseValue getDBV(String value) {
+        return new DatabaseValue<>(value);
     }
 
-    public static DatabaseValue getDBV(Timestamp v) {
-        return new DatabaseValue(v);
+    /**
+     * Creates a typed {@link DatabaseValue} for a given timestamp.
+     * The given timestamp can be {@code null}.
+     *
+     * @param value the given value as a {@link java.sql.Timestamp}, can be {@code null}.
+     * @return a database value for a given timestamp.
+     */
+    public static DatabaseValue getDBV(Timestamp value) {
+        return new DatabaseValue<>(value);
     }
 
-    public static DatabaseValue getDBV(Long v) {
-        return new DatabaseValue(v);
+    /**
+     * Creates a typed {@link DatabaseValue} for a given boolean value.
+     * The given boolean value can be {@code null}.
+     *
+     * @param value the given value as a {@link Boolean}, can be {@code null}.
+     * @return a database value for a given boolean.
+     */
+    public static DatabaseValue getDBV(Boolean value) {
+        return new DatabaseValue<>(value);
     }
 
+    /**
+     * Provides a way to extract the query result from a {@link ResultSet} entry.
+     * The implementation must not advance the {@link ResultSet}. It can return {@code null} to skip an entry.
+     * If it throws any {@link Exception}, the query will fail with a {@link SQLMappingException}.
+     * If something is wrong with the query result, and the result can not properly be extracted from it,
+     * the implementation should throw a {@link SQLMappingException}.
+     * @param <T> The class to convert {@link ResultSet} entries to.
+     */
+    @FunctionalInterface
+    public interface RSMapper<T> {
+        T extractResultFrom(ResultSet rs) throws SQLException, Exception;
+    }
+
+    /**
+     * Executes a database query, then uses a mapper function to extract the first value from the query result.
+     * Cleans up the database connection and statement afterwards.
+     * @param query The query.
+     * @param mapper The mapper function.
+     * @param params The parameters for the query.
+     * @param <T> The type of value to be queried.
+     * @return The first result of the query, or {@code null} if the query had no result.
+     * @throws UncheckedSQLException If a {@link SQLException} is thrown while executing the query
+     *                               or advancing the {@link ResultSet}.
+     * @throws SQLMappingException If there is something wrong with the query result, and the result can not properly be
+     *                             extracted from it.
+     * @see RSMapper
+     */
+    public static <T> T executeQueryReturnValue(String query, RSMapper<T> mapper, DatabaseValue... params)
+        throws UncheckedSQLException, SQLMappingException {
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, params);
+
+        return executeQueryReturnValue(conn, stmt, mapper);
+    }
+
+    /**
+     * Executes a database query, then uses a mapper function to extract the first value from the query result.
+     * Cleans up the database connection and statement afterwards.
+     * @param conn The database connection.
+     * @param stmt THe prepared database statement.
+     * @param mapper The mapper function.
+     * @param <T> The type of value to be queried.
+     * @return The first result of the query, or {@code null} if the query had no result.
+     * @throws UncheckedSQLException If a {@link SQLException} is thrown while executing the query
+     *                               or advancing the {@link ResultSet}.
+     * @throws SQLMappingException If there is something wrong with the query result, and the result can not properly be
+     *                             extracted from it.
+     * @see RSMapper
+     */
+    public static <T> T executeQueryReturnValue(Connection conn, PreparedStatement stmt, RSMapper<T> mapper)
+            throws UncheckedSQLException, SQLMappingException {
+
+        try {
+            ResultSet resultSet = stmt.executeQuery();
+
+            if (resultSet.next()) {
+                try {
+                    return mapper.extractResultFrom(resultSet);
+                } catch (Exception e){
+                    logger.error("Exception while handling result set.", e);
+                    throw new SQLMappingException("Exception while handling result set.", e);
+                }
+            }
+
+            return null;
+
+        } catch (SQLException e) {
+            logger.error("SQL exception while executing query.", e);
+            throw new UncheckedSQLException("SQL exception while executing query.", e);
+
+        } finally {
+            DB.cleanup(conn, stmt);
+        }
+    }
+
+    /**
+     * Executes a database query, then uses a mapper function to extract the values from the query result.
+     * Cleans up the database connection and statement afterwards.
+     * @param query The query.
+     * @param mapper The mapper function.
+     * @param params The parameters for the query.
+     * @param <T> The type of value to be queried.
+     * @return The results of the query, as a {@link List}. Will never be null.
+     * @throws UncheckedSQLException If a {@link SQLException} is thrown while executing the query
+     *                               or advancing the {@link ResultSet}.
+     * @throws SQLMappingException If there is something wrong with the query result, and the result can not properly be
+     *                             extracted from it.
+     * @see RSMapper
+     */
+    public static <T> List<T> executeQueryReturnList(String query, RSMapper<T> mapper, DatabaseValue... params)
+        throws UncheckedSQLException, SQLMappingException {
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, params);
+
+        return executeQueryReturnList(conn, stmt, mapper);
+    }
+
+    /**
+     * Executes a database query, then uses a mapper function to extract the values from the query result.
+     * Cleans up the database connection and statement afterwards.
+     * @param conn The database connection.
+     * @param stmt THe prepared database statement.
+     * @param mapper The mapper function.
+     * @param <T> The type of value to be queried.
+     * @return The results of the query, as a {@link List}. Will never be null.
+     * @throws UncheckedSQLException If a {@link SQLException} is thrown while executing the query
+     *                               or advancing the {@link ResultSet}.
+     * @throws SQLMappingException If there is something wrong with the query result, and the result can not properly be
+     *                             extracted from it.
+     * @see RSMapper
+     */
+    public static <T> List<T> executeQueryReturnList(Connection conn, PreparedStatement stmt, RSMapper<T> mapper)
+            throws UncheckedSQLException, SQLMappingException {
+
+        try {
+            ResultSet resultSet = stmt.executeQuery();
+            List<T> values = new ArrayList<>(resultSet.getFetchSize());
+
+            while (resultSet.next()) {
+                T value;
+
+                try {
+                    value = mapper.extractResultFrom(resultSet);
+                } catch (Exception e){
+                    logger.error("Exception while handling result set.", e);
+                    throw new SQLMappingException("Exception while handling result set.", e);
+                }
+
+                if (value != null) {
+                    values.add(value);
+                }
+            }
+
+            return values;
+
+        } catch (SQLException e) {
+            logger.error("SQL exception while executing query.", e);
+            throw new UncheckedSQLException("SQL exception while executing query.", e);
+
+        } finally {
+            DB.cleanup(conn, stmt);
+        }
+    }
 }

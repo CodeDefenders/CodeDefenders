@@ -18,14 +18,13 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminCreateGames" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.database.*" %>
 
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
@@ -123,7 +122,7 @@
                         </div>
                     </div>
                 </td>
-                <td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %>
+                <td class="col-sm-1"><%= UserDAO.getUserById(g.getCreatorId()).getUsername() %>
                 </td>
                 <td class="col-sm-1"><%int attackers = g.getAttackerIds().length; %><%=attackers %> of
                         <%=g.getMinAttackers()%>&ndash;<%=g.getAttackerLimit()%>

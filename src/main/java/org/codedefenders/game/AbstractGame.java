@@ -19,11 +19,12 @@
 package org.codedefenders.game;
 
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
 import org.codedefenders.model.Event;
-import org.codedefenders.database.DatabaseAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.codedefenders.game.Mutant.Equivalence.*;
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_NO;
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
+import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 
 /**
  * Abstract class for games of different modes.
@@ -42,6 +47,9 @@ import static org.codedefenders.game.Mutant.Equivalence.*;
  */
 public abstract class AbstractGame {
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractGame.class);
+
+	protected GameClass cut;
+
 	protected int id;
 	protected int classId;
 	protected int creatorId;
@@ -51,6 +59,7 @@ public abstract class AbstractGame {
 
 	protected ArrayList<Event> events;
 	protected List<Mutant> mutants;
+	protected List<Test> tests;
 
 	public abstract boolean addPlayer(int userId, Role role);
 
@@ -67,10 +76,6 @@ public abstract class AbstractGame {
 		return classId;
 	}
 
-	public String getClassName() {
-		return DatabaseAccess.getClassForKey("Class_ID", classId).getName();
-	}
-
 	public ArrayList<Event> getEvents(){
 		if (events == null){
 			events = DatabaseAccess.getEventsForGame(getId());
@@ -79,7 +84,10 @@ public abstract class AbstractGame {
 	}
 
 	public GameClass getCUT() {
-		return DatabaseAccess.getClassForKey("Class_ID", classId);
+		if (cut == null) {
+			cut = DatabaseAccess.getClassForKey("Class_ID", classId);
+		}
+		return cut;
 	}
 
 	public int getCreatorId() {
@@ -113,13 +121,15 @@ public abstract class AbstractGame {
 	}
 
 	public List<Test> getTests(boolean defendersOnly) {
-		return DatabaseAccess.getExecutableTests(this.id, defendersOnly);
+		if (tests == null) {
+			tests = TestDAO.getValidTestsForGame(this.id, defendersOnly);
+		}
+		return tests;
 	}
 
 	public List<Mutant> getMutants() {
-		// This ensures we're only querying the db once for mutants
 		if (mutants == null){
-			mutants = DatabaseAccess.getMutantsForGame(id);
+			mutants = MutantDAO.getValidMutantsForGame(id);
 		}
 		return mutants;
 	}
@@ -131,18 +141,26 @@ public abstract class AbstractGame {
 	}
 
 	public List<Mutant> getKilledMutants() {
-		return getMutants().stream().filter(mutant -> !mutant.isAlive() &&
-				(mutant.getEquivalent().equals(ASSUMED_NO) || mutant.getEquivalent().equals(PROVEN_NO)) &&
-				(mutant.getClassFile() != null)).collect(Collectors.toList());
+		return getMutants()
+				.stream()
+				.filter(mutant -> !mutant.isAlive()
+						&& (mutant.getEquivalent().equals(ASSUMED_NO)
+						|| mutant.getEquivalent().equals(PROVEN_NO)) && (mutant.getClassFile() != null))
+				.collect(Collectors.toList());
 	}
 
 	public List<Mutant> getMutantsMarkedEquivalent() {
-		return getMutants().stream().filter(mutant -> mutant.getEquivalent().equals(ASSUMED_YES) ||
-				mutant.getEquivalent().equals(DECLARED_YES)).collect(Collectors.toList());
+		return getMutants()
+				.stream()
+				.filter(mutant -> mutant.getEquivalent().equals(ASSUMED_YES) || mutant.getEquivalent().equals(DECLARED_YES))
+				.collect(Collectors.toList());
 	}
 
 	public List<Mutant> getMutantsMarkedEquivalentPending() {
-		return getMutants().stream().filter(mutant -> mutant.getEquivalent().equals(PENDING_TEST)).collect(Collectors.toList());
+		return getMutants()
+				.stream()
+				.filter(mutant -> mutant.getEquivalent().equals(PENDING_TEST))
+				.collect(Collectors.toList());
 	}
 
 	public Mutant getMutantByID(int mutantID) {

@@ -20,7 +20,7 @@
 --%>
 <%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.database.*" %>
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.List" %>
 <% String pageTitle = null; %>
@@ -33,7 +33,7 @@
     <%
         String editUser = request.getParameter("editUser");
         if (editUser != null && editUser.length() > 0 && StringUtils.isNumeric(editUser)) {
-            User u = DatabaseAccess.getUser(Integer.parseInt(editUser));
+            User u = UserDAO.getUserById(Integer.parseInt(editUser));
             if (u != null) {
     %>
     <h3>Edit Info for User <%=u.getId()%>
