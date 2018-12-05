@@ -28,6 +28,7 @@ import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.util.Constants;
 import org.codedefenders.util.MutantUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
@@ -114,8 +115,8 @@ public class Mutant implements Serializable {
 		this.javaFile = javaFilePath;
 		this.classFile = classFilePath;
 		this.alive = false;
-		this.gameId = -1;
-		this.playerId = -1;
+		this.gameId = Constants.DUMMY_GAME_ID;
+		this.playerId = Constants.DUMMY_CREATOR_USER_ID;
 		this.roundCreated = -1;
 		this.score = 0;
 		this.md5 = md5;
@@ -598,46 +599,33 @@ public class Mutant implements Serializable {
 	 * This comparators place first mutants that modify lines at the top of the file.
 	 */
 	public static Comparator<Mutant> sortByLineNumberAscending() {
-		return new Comparator<Mutant>() {
-			@Override
-			public int compare(Mutant o1, Mutant o2) {
-				List<Integer> lines1 = o1.getLines();
-				List<Integer> lines2 = o2.getLines();
+		return (o1, o2) -> {
+			List<Integer> lines1 = o1.getLines();
+			List<Integer> lines2 = o2.getLines();
 
-				if (lines1.isEmpty()) {
-					if (lines2.isEmpty()) {
-						return 0;
-					} else {
-						return -1;
-					}
-				} else if (lines2.isEmpty()) {
-					return 1;
+			if (lines1.isEmpty()) {
+				if (lines2.isEmpty()) {
+					return 0;
+				} else {
+					return -1;
 				}
-
-				return Collections.min(lines1) - Collections.min(lines2);
+			} else if (lines2.isEmpty()) {
+				return 1;
 			}
+
+			return Collections.min(lines1) - Collections.min(lines2);
 		};
 	}
 
 	// TODO Ideally this should have a timestamp ... we use the ID instead
 	// First created appears first
 	public static Comparator<Mutant> orderByIdAscending() {
-		return new Comparator<Mutant>() {
-			@Override
-			public int compare(Mutant o1, Mutant o2) {
-				return o1.id - o2.id;
-			}
-		};
+		return (o1, o2) -> o1.id - o2.id;
 	}
 
 	// Last created appears first
 	public static Comparator<Mutant> orderByIdDescending() {
-		return new Comparator<Mutant>() {
-			@Override
-			public int compare(Mutant o1, Mutant o2) {
-				return o2.id - o1.id;
-			}
-		};
+		return (o1, o2) -> o2.id - o1.id;
 	}
 
 	public void setLines(List<Integer> mutatedLines) {

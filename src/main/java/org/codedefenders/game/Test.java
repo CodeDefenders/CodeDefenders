@@ -20,8 +20,12 @@ package org.codedefenders.game;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.*;
+import org.codedefenders.database.DB;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,8 +82,8 @@ public class Test {
 	public Test(String javaFilePath, String classFilePath, int classId, LineCoverage lineCoverage) {
 		this.javaFile = javaFilePath;
 		this.classFile = classFilePath;
-		this.gameId = -1;
-		this.playerId = -1;
+		this.gameId = Constants.DUMMY_GAME_ID;
+		this.playerId = Constants.DUMMY_CREATOR_USER_ID;
 		this.roundCreated = -1;
 		this.score = 0;
 		this.classId = classId;

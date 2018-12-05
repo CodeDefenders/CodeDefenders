@@ -134,16 +134,6 @@ public class MutantDAO {
     public static List<Mutant> getValidMutantsForClass(int classId) throws UncheckedSQLException, SQLMappingException {
         List<Mutant> result = new ArrayList<>();
 
-        // This query is broken:
-//        String query = String.join("\n",
-//                "SELECT mutants.*",
-//                "FROM mutants, games",
-//                "LEFT JOIN players ON players.ID=mutants.Player_ID ",
-//                "LEFT JOIN users ON players.User_ID = users.User_ID ",
-//                "WHERE mutants.Game_ID = games.ID",
-//                "  AND games.Class_ID = ?",
-//                "  AND mutants.ClassFile IS NOT NULL;");
-
         String query = String.join("\n",
                 "SELECT mutants.*",
                 "FROM mutants, games",
@@ -156,10 +146,10 @@ public class MutantDAO {
         // Include also those mutants created during the upload. Player = -1
         String systemAttackerQuery = String.join("\n",
                 "SELECT mutants.*",
-                "FROM mutants",
-                "WHERE mutants.Class_ID = ? ",
-                "AND mutants.Player_ID = -1",
-                "AND mutants.ClassFile IS NOT NULL;");
+                "FROM mutants, mutant_uploaded_with_class up",
+                "WHERE mutants.Mutant_ID = up.Mutant_ID",
+                "  AND mutants.Class_ID = ?",
+                "  AND mutants.ClassFile IS NOT NULL;");
 
         result.addAll(DB.executeQueryReturnList(systemAttackerQuery, MutantDAO::mutantFromRS, DB.getDBV(classId)));
 
@@ -181,7 +171,7 @@ public class MutantDAO {
 
     /**
      * Stores a given {@link Mutant} in the database.
-     *
+     * <p>
      * This method does not update the given mutant object.
      * Use {@link Mutant#insert()} instead.
      *
@@ -261,12 +251,9 @@ public class MutantDAO {
                 "DELETE FROM mutants WHERE Mutant_ID = ?;",
                 "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID = ?"
         );
-        DatabaseValue[] valueList = new DatabaseValue[]{
-                DB.getDBV(id),
-        };
 
         Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
 
         return DB.executeUpdate(stmt, conn);
     }
