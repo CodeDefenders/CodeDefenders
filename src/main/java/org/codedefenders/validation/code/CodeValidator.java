@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.velocity.exception.ParseErrorException;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.game.Mutant;
 import org.slf4j.Logger;
@@ -43,10 +44,9 @@ import org.slf4j.LoggerFactory;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseException;
-import com.github.javaparser.TokenMgrError;
+import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.body.BodyDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -54,6 +54,7 @@ import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -137,7 +138,7 @@ public class CodeValidator {
 		try {
 			originalCU = getCompilationUnitFromText(originalCode);
 			mutatedCU = getCompilationUnitFromText(mutatedCode);
-		} catch (ParseException | IOException e) {
+		} catch ( IOException | ParseException e) {
 			// At this point the syntax of original code and the mutant is broken and the compiler will spot the same error
 			// so we return a mutant valid message to allow the request processing to move forward
 			logger.debug("Error parsing code: {}", e.getMessage());
@@ -229,8 +230,8 @@ public class CodeValidator {
 		// This string should be already normalized
 		try {
 			return org.apache.commons.codec.digest.DigestUtils
-					.md5Hex(getCompilationUnitFromText(code).toStringWithoutComments());
-		} catch (ParseException | IOException e) {
+					.md5Hex(getCompilationUnitFromText(code).toString( new PrettyPrinterConfiguration().setPrintComments(false)));
+		} catch ( IOException | ParseException e) {
 			// Ignore this
 		}
 		// if the code does not compile there's no point to try to remove the comments
@@ -325,7 +326,7 @@ public class CodeValidator {
 	private static Set<String> extractMethodSignaturesByType(TypeDeclaration td) {
 		Set<String> methodSignatures = new HashSet<>();
 		// Method signatures in the class including constructors
-		for (BodyDeclaration bd : td.getMembers()) {
+		for (Object bd : td.getMembers()) {
 			if (bd instanceof MethodDeclaration) {
 				methodSignatures.add(((MethodDeclaration) bd).getDeclarationAsString());
 			} else if (bd instanceof ConstructorDeclaration) {
@@ -339,19 +340,28 @@ public class CodeValidator {
 	}
 
 	private static Set<String> extractImportStatements(CompilationUnit cu) {
-		return cu.getImports()
-				.stream()
-				.map(ImportDeclaration::toStringWithoutComments)
-				.collect(Collectors.toSet());
+		final PrettyPrinterConfiguration p = new PrettyPrinterConfiguration().setPrintComments( false );
+		Set<String> result = new HashSet<>();
+		for( ImportDeclaration id : cu.getImports() ){
+			result.add( id.toString( p ) );
+		}
+		return result;
+		// I have no idea on how to use stream with map and paramenters
+//		return cu.getImports()
+//				.stream()
+//				.map(ImportDeclaration::toString(p))
+//				.collect(Collectors.toSet());
 	}
 
+	// TODO Maybe we should replace this with a visitor instead ?
 	private static Set<String> extractFieldNamesByType(TypeDeclaration td) {
 		Set<String> fieldNames = new HashSet<>();
+		
 		// Method signatures in the class including constructors
-		for (BodyDeclaration bd : td.getMembers()) {
+		for ( Object bd : td.getMembers()) {
 			if (bd instanceof FieldDeclaration) {
 				for (VariableDeclarator vd : ((FieldDeclaration) bd).getVariables()) {
-					fieldNames.add(vd.getId().getName());
+					fieldNames.add(vd.getNameAsString());
 				}
 			} else if (bd instanceof TypeDeclaration) {
 				fieldNames.addAll(extractFieldNamesByType((TypeDeclaration) bd));
@@ -409,7 +419,7 @@ public class CodeValidator {
             if (!visitor.isValid()) {
                 return visitor.getMessage();
             }
-		} catch (ParseException | TokenMgrError ignored) {
+		} catch ( ParseProblemException ignored) {
 			// TODO: Why is ignoring this acceptable?
 			// Phil: I don't know, but otherwise some tests would fail, since they cannot be parsed.
 		}
@@ -472,7 +482,11 @@ public class CodeValidator {
 
 	private static CompilationUnit getCompilationUnitFromText(String code) throws ParseException, IOException {
 		try (InputStream inputStream = new ByteArrayInputStream(code.getBytes())) {
-			return JavaParser.parse(inputStream);
+			try {
+				return JavaParser.parse(inputStream);
+			} catch (ParseProblemException error) {
+				throw new ParseException(error.getMessage());
+			}
 		}
 	}
 

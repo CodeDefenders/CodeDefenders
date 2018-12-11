@@ -53,6 +53,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({DatabaseAccess.class})
 public class CodeValidatorTest {
 
+	// TODO Bad practice to have variables here...
 	private CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.STRICT;
 
 	@Rule
@@ -717,6 +718,7 @@ public class CodeValidatorTest {
 				"public class Test { public test(){ r.num = r.num << 1+344;}}", codeValidatorLevel));
 	}
 
+	// Test smell too many assertions
 	@Test
 	public void testClassSignatureChange() throws Exception {
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS, 
@@ -738,16 +740,19 @@ public class CodeValidatorTest {
 				validateMutantGetMessage(
 						"public class Rational  {}",
 						"class Rational  {}", codeValidatorLevel));
-		
-		assertNotEquals(MUTANT_VALIDATION_SUCCESS,
-				validateMutantGetMessage(
-						"public class Rational  {}",
-						"protected class Rational  {}", codeValidatorLevel));
-		
+
 		assertNotEquals(MUTANT_VALIDATION_SUCCESS,
 				validateMutantGetMessage(
 						"final class Rational  {}",
 						"class Rational  {}", codeValidatorLevel));
+	}
+	
+	@Test
+	public void testInnerClassProtected(){
+				assertNotEquals(MUTANT_VALIDATION_SUCCESS,
+						validateMutantGetMessage(
+								"public class Outer{ public class Rational  {}}",
+								"public class Outer{ protected class Rational  {}}", CodeValidatorLevel.STRICT));
 	}
 
 	@Test
@@ -971,10 +976,15 @@ public class CodeValidatorTest {
 		assertEquals("changed code in new line after unchanged comment", MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
 		
 	}
+
+	// THIS IS BAD PRACTICE! Cannot really tell what those tests do !
 	@Test
 	public void testModerateLevel() throws Exception {
-		checkModerateRelaxations(CodeValidatorLevel.STRICT);
 		checkModerateRelaxations(CodeValidatorLevel.MODERATE);
+	}
+	@Test
+	public void testStrictLevel() throws Exception {
+		checkModerateRelaxations(CodeValidatorLevel.STRICT);
 	}
 
 	//bitshifts and signature changes are valid with a moderate validator
@@ -995,7 +1005,8 @@ public class CodeValidatorTest {
 			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("class Rational  {}", "public class Rational  {}", level));
 			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("class Rational  {}", "final class Rational  {}", level));
 			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {}", "class Rational  {}", level));
-			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {}", "protected class Rational  {}", level));
+
+			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Outer { public class Rational  {}}", "public class Outer { protected class Rational  {}}", level));
 			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("final class Rational  {}", "class Rational  {}", level));
 
 			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  { public void test(){ r.num = r.num; }}", "public class Rational  { public void test(){ r.num = r.num | ((r.num & (1 << 29)) << 1); }}", level));

@@ -62,7 +62,7 @@
                 </span>
                 </div>
                 <table class="scoreboard">
-                    <tr class="attacker header"><th>Attackers</th><th>Mutants</th><th>Alive / Killed / Equivalent</th><th>Total Points</th></tr>
+                    <tr class="attacker header"><th>Attackers</th><th>Mutants</th><th>Alive / Killed / Equivalent</th><th>Duels Won/Lost/Ongoing</th></th><th>Total Points</th></tr>
                     <%
                     int total = 0;
                     for (int index = 0; index < attackers.length; index++){
@@ -70,7 +70,7 @@
                         if (i == -1){
                             continue;
                         }
-                        User aUser = DatabaseAccess.getUserFromPlayer(i);
+                        User aUser = UserDAO.getUserForPlayer(i);
                         total = 0;
                         int counter = 0;
                         %>
@@ -86,9 +86,19 @@
                             <td>
                                 <%
                                     if (mutantScores.containsKey(i) && mutantScores.get(i) != null){%>
-                                <%= ((PlayerScore)mutantScores.get(i)).getAdditionalInformation() %>
+                                <%= ((PlayerScore)mutantScores.get(i)).getMutantKillInformation() %>
                                 <% } else { %>
                                     0 / 0 / 0
+                                <% } %>
+                            </td>
+                            <td>
+                                <!-- Equivalence duels -->
+                                <%
+                                    if (mutantScores.containsKey(i) && mutantScores.get(i) != null){
+                                %>
+                                <%= ((PlayerScore)mutantScores.get(i)).getDuelInformation() %>
+                                <% } else { %>
+                                0 / 0 / 0
                                 <% } %>
                             </td>
                             <td>
@@ -122,9 +132,19 @@
                         <td>
                             <%
                                 if (mutantScores.containsKey(-1) && mutantScores.get(-1) != null){%>
-                            <%= ((PlayerScore)mutantScores.get(-1)).getAdditionalInformation() %>
+                            <%= ((PlayerScore)mutantScores.get(-1)).getMutantKillInformation() %>
                             <% } else { %>
                             0 / 0 / 0
+                            <% } %>
+                        </td>
+                        <td>
+                            <!-- Equivalence duels -->
+                            <%
+                                if (mutantScores.containsKey(-1) && mutantScores.get(-1) != null){
+                            %>
+                                <%= ((PlayerScore)mutantScores.get(-1)).getDuelInformation() %>
+                            <% } else { %>
+                                0 / 0 / 0
                             <% } %>
                         </td>
                         <td>
@@ -140,14 +160,14 @@
                             <%= total %>
                         </td>
                     </tr>
-                    <tr class="defender header"><th>Defenders</th><th>Tests</th><th>Mutants Killed</th><th>Total Points</th></tr>
+                    <tr class="defender header"><th>Defenders</th><th>Tests</th><th>Mutants Killed</th><th>Duels Won/Lost/Ongoing</th><th>Total Points</th></tr>
                     <%
                         for (int index = 0; index < defenders.length; index++){
                             int i = defenders[index];
                             if (i == -1){
                                 continue;
                             }
-                            User dUser = DatabaseAccess.getUserFromPlayer(i);
+                            User dUser = UserDAO.getUserForPlayer(i);
                             total = 0;
                     %>
                     <tr class="defender"><td>
@@ -162,9 +182,20 @@
                         <td><%
                             if (testScores.containsKey(i) && testScores.get(i) != null){
                                     total += ((PlayerScore)testScores.get(i)).getTotalScore(); %>
-                            <%= ((PlayerScore)testScores.get(i)).getAdditionalInformation()%>
+                            <%= ((PlayerScore)testScores.get(i)).getMutantKillInformation()%>
                             <% } else { %>
-                            0 <% } %></td>
+                            0 <% } %>
+                        </td>
+                        <td>
+                            <!-- Equivalence duels -->
+                            <%
+                                if (testScores.containsKey(i) && testScores.get(i) != null){
+                            %>
+                            <%= ((PlayerScore)testScores.get(i)).getDuelInformation() %>
+                            <% } else { %>
+                            0 / 0 / 0
+                            <% } %>
+                        </td>
                         <td>
                             <%= total %>
                         </td>
@@ -174,7 +205,7 @@
                         total = 0;
 
                         if (defenders.length == 0){
-                            %><tr class="defender"><td colspan="4"></td></tr><%
+                            %><tr class="defender"><td colspan="5"></td></tr><%
                         }
                     %>
                     <tr class="defender header"><td>
@@ -189,9 +220,20 @@
                         <td><%
                             if (testScores.containsKey(-1) && testScores.get(-1) != null){
                                 total += ((PlayerScore)testScores.get(-1)).getTotalScore(); %>
-                            <%= ((PlayerScore)testScores.get(-1)).getAdditionalInformation()%>
+                            <%= ((PlayerScore)testScores.get(-1)).getMutantKillInformation()%>
                             <% } else { %>
-                            0 <% } %></td>
+                            0 <% } %>
+                        </td>
+                        <td>
+                            <!-- Equivalence duels -->
+                            <%
+                                if (testScores.containsKey(-1) && testScores.get(-1) != null){
+                            %>
+                            <%= ((PlayerScore)testScores.get(-1)).getDuelInformation() %>
+                            <% } else { %>
+                            0 / 0 / 0
+                            <% } %>
+                        </td>
                         <td>
                             <%= total %>
                         </td>

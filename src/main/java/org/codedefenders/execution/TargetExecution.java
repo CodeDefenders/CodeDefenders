@@ -68,7 +68,7 @@ public class TargetExecution {
 			if (testId == 0) {
 				logger.warn("- No testId");
 				if (mutantId == 0) {
-					System.out.println("- No mutantId");
+					logger.debug("- No mutantId");
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Target, Status, Message) VALUES (?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setString(1, target.name());
 					pstmt.setString(2, status);
@@ -82,7 +82,7 @@ public class TargetExecution {
 				}
 			} else {
 				if (mutantId == 0) {
-					System.out.println("- No mutantId");
+					logger.debug("- No mutantId");
 					pstmt = conn.prepareStatement("INSERT INTO targetexecutions (Test_ID, Target, Status, Message) VALUES (?, ?, ?, ?);", new String[]{"TargetExecution_ID"});
 					pstmt.setInt(1, testId);
 					pstmt.setString(2, target.name());

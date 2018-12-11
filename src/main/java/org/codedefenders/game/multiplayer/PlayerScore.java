@@ -22,7 +22,9 @@ public class PlayerScore {
     private int playerId;
     private int totalScore;
     private int quantity;
-    private String additionalInformation;
+    private String mutantKillInformation;
+
+    private String duelInformation;
 
     public PlayerScore(int playerId) {
         this.playerId = playerId;
@@ -31,15 +33,23 @@ public class PlayerScore {
     }
 
     public String toString() {
-        return playerId + ": " + totalScore + ", " + quantity + "," + additionalInformation;
+        return playerId + ": " + totalScore + ", " + quantity + "," + mutantKillInformation + "," + duelInformation;
     }
 
-    public String getAdditionalInformation() {
-        return additionalInformation;
+    public String getMutantKillInformation() {
+        return mutantKillInformation;
     }
 
-    public void setAdditionalInformation(String additionalInformation) {
-        this.additionalInformation = additionalInformation;
+    public void setMutantKillInformation(String mutantKillInformation) {
+        this.mutantKillInformation = mutantKillInformation;
+    }
+
+    public String getDuelInformation() {
+        return duelInformation;
+    }
+
+    public void setDuelInformation(String duelInformation) {
+        this.duelInformation = duelInformation;
     }
 
     public int getPlayerId() {

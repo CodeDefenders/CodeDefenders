@@ -18,9 +18,40 @@
  */
 package org.codedefenders.itests.parallelize;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeNoException;
+import static org.junit.Assume.assumeThat;
+import static org.junit.Assume.assumeTrue;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
+
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.MutationTester;
+import org.codedefenders.execution.RandomTestScheduler;
+import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.execution.TestScheduler;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -33,6 +64,7 @@ import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManager;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorException;
+import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -40,6 +72,7 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -47,31 +80,13 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.spi.InitialContextFactory;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
+import difflib.DiffUtils;
+import difflib.Patch;
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({DatabaseConnection.class}) // , MutationTester.class })
+@PrepareForTest({ DatabaseConnection.class, MutationTester.class}) // , MutationTester.class })
 public class ParallelizeTest {
 
 	// PowerMock does not work with @ClassRule !!
@@ -100,7 +115,7 @@ public class ParallelizeTest {
 			}
 		});
 	}
-
+	
 	// CUT
 	private MutationTester tester;
 
@@ -176,51 +191,254 @@ public class ParallelizeTest {
 
 	}
 
+	private User createAndInsertUserInDBWithDefaultCredentials(String name) {
+		User newUser = new User(name, User.encodePassword("password"), "demo@" + name + ".org");
+		boolean inserted = newUser.insert();
+		assumeTrue(inserted);
+		return newUser;
+	}
+
+	// This assumes standard layout
+	private GameClass updateCUTAndStoreInDB(String name) {
+		try {
+			// Upload the Class Under test - Maybe better use Classloader
+			// Where is this store eventually?
+			File cutFolder = new File(Constants.CUTS_DIR, name);
+			cutFolder.mkdirs();
+			File jFile = new File(cutFolder, name + ".java");
+			File cFile = new File(cutFolder, name + ".class");
+
+			Files.copy(Paths.get("src/test/resources/itests/sources/" + name + "/" + name + ".java"),
+					new FileOutputStream(jFile));
+			Files.copy(Paths.get("src/test/resources/itests/sources/" + name + "/" + name + ".class"),
+					new FileOutputStream(cFile));
+
+			///
+			GameClass cut = new GameClass("Lift", "Lift", jFile.getAbsolutePath(), cFile.getAbsolutePath());
+			//
+			System.out.println("ParallelizeTest.updateCUTAndStoreInDB() Storing CUT to " + jFile.getAbsolutePath());
+			//
+			boolean inserted = cut.insert();
+			assumeTrue(inserted);
+			return cut;
+
+		} catch (Exception e) {
+			assumeNoException(e);
+		}
+		return null;
+	}
+
+	private MultiplayerGame createStandardBattlegroundStartItAndStoreInDB(GameClass cut, User creator) {
+		//
+		int classId = cut.getId();
+		int creatorId = creator.getId();
+		GameLevel level = GameLevel.HARD;
+		float lineCoverage = (float) 1;
+		float mutantCoverage = (float) 1;
+		float prize = (float) 1;
+		int defenderValue = 1;
+		int attackerValue = 1;
+		int defenderLimit = 2;
+		int attackerLimit = 2;
+		int minDefenders = 1;
+		int minAttackers = 1;
+		long startDateTime = new Timestamp(System.currentTimeMillis() - 10000).getTime();
+		//
+		long finishDateTime = new Timestamp(System.currentTimeMillis() + 24 * 60 * 60 * 100 * 1000).getTime();
+
+		String status = GameState.ACTIVE.name();
+		int maxAssertionsPerTest = 2;
+		boolean chatEnabled = false;
+		CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
+		boolean markUncovered = false;
+
+		MultiplayerGame multiplayerGame = new MultiplayerGame(classId, creatorId, level, lineCoverage, mutantCoverage,
+				prize, defenderValue, attackerValue, defenderLimit, attackerLimit, minDefenders, minAttackers,
+				startDateTime, finishDateTime, status, maxAssertionsPerTest, chatEnabled, mutantValidatorLevel,
+				markUncovered);
+		// Store to db
+		boolean inserted = multiplayerGame.insert();
+		assumeTrue(inserted);
+
+		// Check that the game really started?
+		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(multiplayerGame.getId());
+		assumeThat(multiplayerGame.getId(), is(activeGame.getId()));
+
+		return activeGame;
+	}
+
+	private MultiplayerGame setupTestBattlegroundUsing(String cutName) {
+		User observer = createAndInsertUserInDBWithDefaultCredentials("observer");
+		User defender = createAndInsertUserInDBWithDefaultCredentials("demodefender");
+		User attacker = createAndInsertUserInDBWithDefaultCredentials("demoattacker");
+
+		GameClass cut = updateCUTAndStoreInDB(cutName);
+
+		MultiplayerGame activeGame = createStandardBattlegroundStartItAndStoreInDB(cut, observer);
+		// Attacker and Defender must join the game.
+		// Those calls update also the DB
+		boolean playerAdded = activeGame.addPlayer(defender.getId(), Role.DEFENDER);
+		assumeTrue(playerAdded);
+		System.out.println("ParallelizeTest.setupTestBattlegroundUsing() Added defender " + defender.getId() );
+		
+		playerAdded = activeGame.addPlayer(attacker.getId(), Role.ATTACKER);
+		assumeTrue(playerAdded);
+		System.out.println("ParallelizeTest.setupTestBattlegroundUsing() Added attacker " + attacker.getId() );
+		//
+		return activeGame;
+	}
+
+	/*
+	 * Create few tests with no mutant, then create a mutant and check that the
+	 * tests are executed in the corrected order
+	 */
+	@Test
+	public void testTestExecutionOrder() {
+		MultiplayerGame battlegroundGame = setupTestBattlegroundUsing("Lift");
+		
+		//
+		
+		int defenderID = UserDAO.getUserForPlayer( battlegroundGame.getDefenderIds()[0]).getId();
+		int attackerID =  UserDAO.getUserForPlayer( battlegroundGame.getAttackerIds()[0]).getId();
+		ArrayList<String> messages = new ArrayList<>();
+
+		List<org.codedefenders.game.Test> submittedTests = new ArrayList<>();
+		try {
+			// Submit and execute a Test
+			String testText = ""
+					+ "/* no package name */" + "\n"
+					+"" + "\n"
+					+"import static org.junit.Assert.*;" + "\n"
+					+"" + "\n"
+					+"import org.junit.*;" + "\n"
+					+"public class TestLift {" + "\n"
+					+"	@Test(timeout = 4000)" + "\n"
+					+"	public void test() throws Throwable {" + "\n"
+					+"		// test here!" + "\n"
+					+"		Lift l = new Lift(10,10);" + "\n"
+					+"		assertEquals(10, l.getTopFloor());" + "\n"
+					+"" + "\n"
+					+"	}" + "\n"
+					+"}";
+
+			org.codedefenders.game.Test newTest = GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, "mp");
+			MutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
+			assumeThat(battlegroundGame.getTests(true).size(), is(1));
+			// Append this for oracles and mocks
+			submittedTests.add( newTest );
+			
+
+			// Submit and execute a Test
+			testText = ""
+					+ "/* no package name */" + "\n"
+					+"" + "\n"
+					+"import static org.junit.Assert.*;" + "\n"
+					+"" + "\n"
+					+"import org.junit.*;" + "\n"
+					+"public class TestLift {" + "\n"
+					+"	@Test(timeout = 4000)" + "\n"
+					+"	public void test() throws Throwable {" + "\n"
+					+"		// test here!" + "\n"
+					+"		Lift l = new Lift(10,10);" + "\n"
+					+"		assertEquals(10, l.getCapacity());"+ "\n"
+					+"" + "\n"
+					+"	}" + "\n"
+					+"}";
+			newTest = GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, "mp");
+			MutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
+			assumeThat(battlegroundGame.getTests(true).size(), is(2));
+			// Append this for oracles and mocks
+			submittedTests.add( newTest );
+			
+			// Create the mutant from the patch
+			List<String> diff = Arrays.asList( new String[]{
+					"--- null",
+					"+++ null",
+					"@@ -11,7 +11,7 @@",
+					" ",
+					"     public Lift(int highestFloor, int maxRiders) {",
+					"         this(highestFloor);",
+					"-        capacity = maxRiders;",
+					"+        capacity = 0;",
+					"     }",
+					" ",
+					"     public int getTopFloor() {"
+			});
+			
+			Patch patch = DiffUtils.parseUnifiedDiff(diff);
+			// Read the CUT code
+			List<String> origincalCode = Arrays.asList( battlegroundGame.getCUT().getAsString().split("\n") );
+			// Apply the patch
+			
+			List<String> mutantCode =(List<String>) DiffUtils.patch( origincalCode, patch);
+			String mutantText = String.join("\n", mutantCode);
+			
+			Mutant mutant = GameManager.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(),
+					mutantText, attackerID, "mp");
+			
+			// Mock the scheduler to return a random but known test distribution:
+			TestScheduler mockedTestScheduler = Mockito.mock( TestScheduler.class );
+			List<org.codedefenders.game.Test> randomSchedule = new RandomTestScheduler().scheduleTests( submittedTests );
+			Mockito.doReturn(randomSchedule).when(mockedTestScheduler)
+					.scheduleTests(
+							org.mockito.Matchers.anyList());
+			
+			// Do the execution
+			MutationTester.runAllTestsOnMutant(battlegroundGame, mutant, messages, mockedTestScheduler);
+
+			// Check that the test execution logged in the DB are in the same order
+			List<TargetExecution> executedTargets = new ArrayList<TargetExecution>(); 
+			for( org.codedefenders.game.Test submittedTest : randomSchedule ){
+				executedTargets.add( DatabaseAccess.getTargetExecutionForPair(submittedTest.getId(), mutant.getId()));
+			}
+			
+			
+			
+			
+			// Ideal Solution: use verify static, problem MutationTester is the class under test AND the mocked class !
+//			 PowerMockito.verifyStatic(VerificationModeFactory.times(2));
+//			 // Since I am not sure the instances will be the same given the DB interaction I need to explicitly
+//			 // check the content of the elements
+//			 MutationTester.testVsMutant(
+//					 Mockito.argThat(
+//					 // Match test by ID
+//					 new ArgumentMatcher<org.codedefenders.game.Test>() {
+//						@Override
+//						public boolean matches(Object argument) {
+//							if( argument instanceof org.codedefenders.game.Test){
+//								System.out.println("matching " + ((org.codedefenders.game.Test) argument).getId() + " with " + randomSchedule.get(0).getId());
+//								return ((org.codedefenders.game.Test) argument).getId() == randomSchedule.get(0).getId();
+//							} else {
+//							return false;
+//							}
+//						}
+//					 }), 
+//					 Mockito.argThat(
+//					 new ArgumentMatcher<Mutant>() {
+//							@Override
+//							public boolean matches(Object argument) {
+//								if( argument instanceof Mutant){
+//									System.out.println("matching " + ((Mutant) argument).getId() + " with " + mutant.getId());
+//									return ((Mutant) argument).getId() == mutant.getId();
+//								} else {
+//								return false;
+//								}
+//							}
+//						 }));
+//			 
+			 
+		} catch (Exception e) {
+			assumeNoException(e);
+		}
+
+	}
+
 	@Test
 	public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException {
-		User observer = new User("observer", User.encodePassword("password"), "demo@observer.com");
-		observer.insert();
-		//
-		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Observer " + observer.getId());
-		User attacker = new User("demoattacker", User.encodePassword("password"), "demo@attacker.com");
-		attacker.insert();
-		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Attacker " + attacker.getId());
-		User defender = new User("demodefender", User.encodePassword("password"), "demo@defender.com");
-		defender.insert();
-		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Defender " + defender.getId());
-		//
-		//
-		// Upload the Class Under test - Maybe better use Classloader
-		File cutFolder = new File(Constants.CUTS_DIR, "Lift");
-		cutFolder.mkdirs();
-		File jFile = new File(cutFolder, "Lift.java");
-		File cFile = new File(cutFolder, "Lift.class");
 
-		Files.copy(Paths.get("src/test/resources/itests/sources/Lift/Lift.java"), new FileOutputStream(jFile));
-		Files.copy(Paths.get("src/test/resources/itests/sources/Lift/Lift.class"), new FileOutputStream(cFile));
-
-		///
-		GameClass cut = new GameClass("Lift", "Lift", jFile.getAbsolutePath(), cFile.getAbsolutePath());
-		cut.insert();
-		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Cut " + cut.getId());
-
-		//
-		MultiplayerGame multiplayerGame = new MultiplayerGame(cut.getId(), observer.getId(), GameLevel.HARD, (float) 1,
-				(float) 1, (float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true, null, false);
-		// Store to db
-		multiplayerGame.insert();
-
-		// Attacker and Defender must join the game. Those calls update also the
-		// db
-		multiplayerGame.addPlayer(defender.getId(), Role.DEFENDER);
-		multiplayerGame.addPlayer(attacker.getId(), Role.ATTACKER);
-
-		//
-		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Game " + multiplayerGame.getId());
-		//
-		//
-		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(multiplayerGame.getId());
-		assertEquals("Cannot find the right active game", multiplayerGame.getId(), activeGame.getId());
+		MultiplayerGame battlegroundGame = setupTestBattlegroundUsing("Lift");
+		int defenderID = battlegroundGame.getDefenderIds()[0];
+		int attackerID = battlegroundGame.getAttackerIds()[0];
 
 		// Read and submit some test- This will call AntRunner
 		// Are those saved to DB ?!
@@ -229,28 +447,21 @@ public class ParallelizeTest {
 					Files.readAllBytes(
 							new File("src/test/resources/itests/tests/PassingTestLift" + i + ".java").toPath()),
 					Charset.defaultCharset());
-			GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(), "mp");
+			GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, "mp");
 		}
-		// List<org.codedefenders.game.Test> tests = activeGame.getTests(true); //
-		// executable
-		// tests
-		// submitted
-		// by
-		// Assertion roulette ?
-		// assertEquals("Missing input test from defender!", 4, tests.size());
 
 		// Schedule a test which kills the mutant - Where ? in the middle ?
 		String testText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/tests/KillingTestLift.java").toPath()),
 				Charset.defaultCharset());
-		GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(), "mp");
+		GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, "mp");
 
 		// Read and Submit the mutants - No tests so far
 		String mutantText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
 				Charset.defaultCharset());
-		Mutant mutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
-				attacker.getId(), "mp");
+		Mutant mutant = GameManager.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(), mutantText,
+				attackerID, "mp");
 
 		assertNotNull("Invalid mutant", mutant.getClassFile());
 
@@ -258,7 +469,7 @@ public class ParallelizeTest {
 		// TODO Mock the AntRunner... an interface would make things a lot
 		// easier !
 		// Finally invoke the method.... For the moment this invokes AntRunner
-		MutationTester.runAllTestsOnMutant(activeGame, mutant, messages);
+		MutationTester.runAllTestsOnMutant(battlegroundGame, mutant, messages);
 
 		// assertMutant is killed !
 		assertFalse("Mutant not killed", mutant.isAlive());

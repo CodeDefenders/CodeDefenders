@@ -18,36 +18,6 @@
  */
 package org.codedefenders.game;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseException;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.ImportDeclaration;
-import com.github.javaparser.ast.body.BodyDeclaration;
-import com.github.javaparser.ast.body.ConstructorDeclaration;
-import com.github.javaparser.ast.body.FieldDeclaration;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.ModifierSet;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.body.VariableDeclarator;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.IfStmt;
-import com.github.javaparser.ast.stmt.Statement;
-import com.github.javaparser.ast.type.PrimitiveType;
-import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.Range;
-import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.DatabaseValue;
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.game.singleplayer.NoDummyGameException;
-import org.codedefenders.model.Dependency;
-import org.codedefenders.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -62,6 +32,34 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.Range;
+import org.codedefenders.database.DB;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.game.singleplayer.NoDummyGameException;
+import org.codedefenders.model.Dependency;
+import org.codedefenders.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.ImportDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.type.PrimitiveType;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
+import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
@@ -115,7 +113,7 @@ public class GameClass {
 		this(name, alias, jFile, cFile, false);
 		this.id = id;
 	}
-	
+
 	public GameClass(String name, String alias, String jFile, String cFile) {
 		this(name, alias, jFile, cFile, false);
 	}
@@ -228,44 +226,71 @@ public class GameClass {
 		return DB.executeUpdate(stmt, conn);
 	}
 
-	public String getTestTemplate() {
-		StringBuilder sb = new StringBuilder();
-		if (!getPackage().isEmpty()) {
-			sb.append(String.format("package %s;%n", getPackage()));
-		} else {
-			sb.append(String.format("/* no package name */%n"));
+	/**
+	 * Generates and returns a template for a JUnit test.
+	 *
+	 * Be aware that this template is not HTML escaped.
+	 * Please use {@link #getHTMLEscapedTestTemplate()}.
+	 *
+	 * @return template for a JUnit test as a {@link String}.
+	 * @see #getHTMLEscapedTestTemplate()
+	 */
+	private String getTestTemplate() {
+		final StringBuilder bob = new StringBuilder();
+		final String classPackage = getPackage();
+		if (!classPackage.isEmpty()) {
+			bob.append(String.format("package %s;\n\n", classPackage));
 		}
-		sb.append(String.format("%n"));
-		sb.append(String.format("import static org.junit.Assert.*;%n%n"));
 
-		if (this.isMockingEnabled) {
-			sb.append(String.format("import static org.mockito.Mockito.*;%n%n"));
-		}
+		bob.append("import org.junit.*;\n");
 
-		sb.append(String.format("import org.junit.*;%n"));
-
-		// Additional import are already in the form of 'import X.Y.Z;\n'
 		for (String additionalImport : this.additionalImports) {
-			sb.append(additionalImport);
+		    // Additional import are already in the form of 'import X.Y.Z;\n'
+			bob.append(additionalImport); // no \n required
 		}
+		bob.append("\n");
 
-		sb.append(String.format("public class Test%s {%n", getBaseName()));
-		sb.append(String.format("%c@Test(timeout = 4000)%n", '\t'));
-		sb.append(String.format("%cpublic void test() throws Throwable {%n", '\t'));
-		sb.append(String.format("%c%c// test here!%n", '\t', '\t'));
-		sb.append(String.format("%c}%n", '\t'));
-		sb.append(String.format("}"));
-		return sb.toString();
+		bob.append("import static org.junit.Assert.*;\n");
+		if (this.isMockingEnabled) {
+			bob.append("import static org.mockito.Mockito.*;\n");
+		}
+		bob.append("\n");
+
+		bob.append(String.format("public class Test%s {\n", getBaseName()))
+				.append("    @Test(timeout = 4000)\n")
+				.append("    public void test() throws Throwable {\n")
+				.append("        // test here!\n")
+				.append("    }\n")
+				.append("}");
+		return bob.toString();
 	}
 
+	/**
+	 * @return a HTML escaped test template for a Junit Test as a {@link String}.
+	 */
 	public String getHTMLEscapedTestTemplate() {
 		return StringEscapeUtils.escapeHtml(getTestTemplate());
 	}
 
+    /**
+     * @return the first editable line of this class test template.
+     * @see #getTestTemplate()
+     */
+    public Integer getTestTemplateFirstEditLine() {
+        int out = 8 + this.additionalImports.size();
+        if (!getPackage().isEmpty()) {
+            out+= 2;
+        }
+        if (this.isMockingEnabled) {
+            out++;
+        }
+        return out;
+    }
+
 	/*
 	 * We list all the NON-primitive imports here. We do not perform any
 	 * merging.
-	 * 
+	 *
 	 * (using *)
 	 */
 	private Set<String> includeAdditionalImportsFromCUT() {
@@ -275,14 +300,14 @@ public class GameClass {
 			// parse the file
 			cu = JavaParser.parse(in);
 
-			// Extract the import declarations from the CUT and add them to additionaImports 
+			// Extract the import declarations from the CUT and add them to additionaImports
 			for(ImportDeclaration declaredImport : cu.getImports()){
-				additionalImports.add( declaredImport.toStringWithoutComments() );
+				additionalImports.add( declaredImport.toString(new PrettyPrinterConfiguration().setPrintComments(false)) );
 			}
 
-		} catch (ParseException | IOException e) {
+		} catch (IOException e) {
 			// If a java file is not provided, there's no import at all.
-			logger.error("Swallow Exception", e);
+			logger.warn("Swallow Exception: " + e.getMessage() );
 		}
 		return additionalImports;
 	}
@@ -318,12 +343,12 @@ public class GameClass {
 
 	private List<Integer> findNonInitializedFieldsByType(TypeDeclaration type) {
 		List<Integer> nonInitializedFieldsLines = new ArrayList<>();
-		for (BodyDeclaration bd : type.getMembers()) {
+		for (Object bd : type.getMembers()) {
 			if (bd instanceof FieldDeclaration) {
 				FieldDeclaration f = (FieldDeclaration) bd;
 				for (VariableDeclarator v : f.getVariables()) {
-					if (v.getInit() == null) {
-						for( int line = v.getBeginLine(); line <= v.getEndLine(); line++){
+					if (! v.getInitializer().isPresent() ) {
+						for( int line = v.getBegin().get().line; line <= v.getEnd().get().line; line++){
 							nonInitializedFieldsLines.add( line );
 						}
 					}
@@ -337,14 +362,14 @@ public class GameClass {
 	// for the moment primitive and string types declared as final are considered compile-time constants.
 	private List<Integer> findCompileTimeConstantsByType(TypeDeclaration type) {
 		List<Integer> compileTimeConstants = new ArrayList<>();
-		for (BodyDeclaration bd : type.getMembers()) {
+		for (Object bd : type.getMembers()) {
 			if (bd instanceof FieldDeclaration) {
 				FieldDeclaration f = (FieldDeclaration) bd;
-				if ( ( f.getType() instanceof PrimitiveType ) || ("String".equals( f.getType().toString()))) {
-					if ((f.getModifiers() & ModifierSet.FINAL) != 0) {
+				if ( ( f.getCommonType() instanceof PrimitiveType ) || ("String".equals( f.getElementType().asString()))) {
+					if (f.isFinal() ) {
 						for (VariableDeclarator v : f.getVariables()) {
 							logger.debug("Found compile-time constant " + v );
-							for( int line = v.getBeginLine(); line <= v.getEndLine(); line++ )
+							for( int line = v.getBegin().get().line; line <= v.getEnd().get().line; line++ )
 							compileTimeConstants.add(line);
 						}
 					}
@@ -369,7 +394,7 @@ public class GameClass {
 				nonInitializedFieldsLines.addAll(findNonInitializedFieldsByType(td));
 
 				// We look for FieldDeclaration inside inner classes
-				for (BodyDeclaration bd : td.getMembers()) {
+				for (Object bd : td.getMembers()) {
 					if (bd instanceof TypeDeclaration) {
 						nonInitializedFieldsLines.addAll(findNonInitializedFieldsByType((TypeDeclaration) bd));
 					}
@@ -377,7 +402,7 @@ public class GameClass {
 
 			}
 
-		} catch (ParseException | IOException e) {
+		} catch ( IOException e) {
 			logger.warn("Swallow exception" + e);
 		}
 		return nonInitializedFieldsLines;
@@ -397,7 +422,7 @@ public class GameClass {
 				compileTimeConstantsLine.addAll(findCompileTimeConstantsByType(td));
 
 				// We look for FieldDeclaration inside inner classes
-				for (BodyDeclaration bd : td.getMembers()) {
+				for (Object bd : td.getMembers()) {
 					if (bd instanceof TypeDeclaration) {
 						compileTimeConstantsLine.addAll(findCompileTimeConstantsByType((TypeDeclaration) bd));
 					}
@@ -405,7 +430,7 @@ public class GameClass {
 
 			}
 
-		} catch (ParseException | IOException e) {
+		} catch ( IOException e) {
 			logger.warn("Swallow exception" + e);
 		}
 		return compileTimeConstantsLine;
@@ -424,7 +449,7 @@ public class GameClass {
 				methodSignatures.addAll(findMethodSignaturesByType(td));
 
 				// We look for FieldDeclaration inside inner classes
-				for (BodyDeclaration bd : td.getMembers()) {
+				for (Object bd : td.getMembers()) {
 					if (bd instanceof TypeDeclaration) {
 						methodSignatures.addAll(findMethodSignaturesByType((TypeDeclaration) bd));
 					}
@@ -432,7 +457,7 @@ public class GameClass {
 
 			}
 
-		} catch (ParseException | IOException e) {
+		} catch ( IOException e) {
 			logger.warn("Swallow exception" + e);
 		}
 
@@ -451,11 +476,11 @@ public class GameClass {
 				public void visit(IfStmt ifStmt, Object arg) {
 					super.visit(ifStmt, arg);
 					Statement then = ifStmt.getThenStmt();
-					Statement elze = ifStmt.getElseStmt();
+					Statement elze = ifStmt.getElseStmt().orElse(null);
 					// There might be plenty of empty lines
 					if( then instanceof BlockStmt ) {
 
-						List<Statement> thenBlockStmts = ((BlockStmt) then).getStmts();
+						List<Statement> thenBlockStmts = ((BlockStmt) then).getStatements();
 						if( elze == null ){
 							/*
 							 * This takes only the non-coverable one, meaning
@@ -463,20 +488,20 @@ public class GameClass {
 							 * is not considered here because it is should be already
 							 * considered
 							 */
-							if( thenBlockStmts.size() > 0 && ( thenBlockStmts.get( thenBlockStmts.size() - 1).getEndLine() < ifStmt.getEndLine())){
+							if( thenBlockStmts.size() > 0 && ( thenBlockStmts.get( thenBlockStmts.size() - 1).getEnd().get().line < ifStmt.getEnd().get().line)){
 								// Add the range
-								linesOfClosingBrackets.add( Range.between( then.getBeginLine(), ifStmt.getEndLine()));
-								lines.add( ifStmt.getEndLine() );
+								linesOfClosingBrackets.add( Range.between( then.getBegin().get().line, ifStmt.getEnd().get().line));
+								lines.add( ifStmt.getEnd().get().line );
 							}
 						}else {
 								// Add the range
-								linesOfClosingBrackets.add( Range.between( then.getBeginLine(), elze.getBeginLine()));
-								lines.add( elze.getBeginLine() );
+								linesOfClosingBrackets.add( Range.between( then.getBegin().get().line, elze.getBegin().get().line));
+								lines.add( elze.getBegin().get().line );
 						}
 					}
 				}
 			}.visit(JavaParser.parse(in), null);
-		} catch (ParseException | IOException e) {
+		} catch ( IOException  e) {
 			logger.warn("Swallow exception" + e);
 		}
 		Collections.sort(lines);
@@ -485,31 +510,32 @@ public class GameClass {
 
 	private List<Integer> findMethodSignaturesByType(TypeDeclaration type) {
 		List<Integer> methodSignatureLines = new ArrayList<>();
-		for (BodyDeclaration bd : type.getMembers()) {
+		for (Object bd : type.getMembers()) {
 			if (bd instanceof MethodDeclaration) {
 				MethodDeclaration md = (MethodDeclaration) bd;
-				// Note that md.getEndLine() returns the last line of the
+				// Note that md.getEnd().get().line returns the last line of the
 				// method, not of the signature
-				if (md.getBody() == null)
+				if (! md.getBody().isPresent())
 					continue;
-				// Also note that interfaces have no body !
-				for (int line = md.getBeginLine(); line <= md.getBody().getBeginLine(); line++) {
+				
+				// Since a signature might span over different lines we need to get to its body and take its beginning  
+				// Also note that interfaces have no body ! So this might fail !
+				for (int line = md.getBegin().get().line; line <= md.getBody().get().getBegin().get().line; line++) {
 					methodSignatureLines.add(line);
 				}
-
-				linesOfMethodSignatures.add( Range.between(md.getBeginLine(), md.getBody().getBeginLine()));
-				linesOfMethods.add( Range.between(md.getBeginLine(), md.getEndLine()));
+				// TODO Is get End the same as get the body of this method.getEnd().getLine?
+				linesOfMethodSignatures.add( Range.between(md.getBegin().get().line, md.getBody().get().getBegin().get().line));
+				// The whole method: signature + body 
+				linesOfMethods.add( Range.between(md.getBegin().get().line, md.getEnd().get().line));
 			} else if (bd instanceof ConstructorDeclaration) {
 				ConstructorDeclaration cd = (ConstructorDeclaration) bd;
-				// System.out.println("GameClass.findMethodSignaturesByType()
-				// Found " + cd.getDeclarationAsString() + " "
-				// + cd.getBeginLine() + " - " + cd.getbo());
-				for (int line = cd.getBeginLine(); line <= cd.getBlock().getBeginLine(); line++) {
+				// A constructor HAS always a body !
+				for (int line = cd.getBegin().get().line; line <= cd.getBody().getBegin().get().line; line++) {
 					methodSignatureLines.add(line);
 				}
 
-				linesOfMethodSignatures.add( Range.between(cd.getBeginLine(), cd.getBlock().getBeginLine()));
-				linesOfMethods.add( Range.between(cd.getBeginLine(), cd.getEndLine()));
+				linesOfMethodSignatures.add( Range.between(cd.getBegin().get().line, cd.getEnd().get().line));
+				linesOfMethods.add( Range.between(cd.getBegin().get().line, cd.getEnd().get().line));
 			}
 		}
 		return methodSignatureLines;

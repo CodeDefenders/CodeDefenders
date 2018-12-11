@@ -18,31 +18,15 @@
  */
 package org.codedefenders.servlets;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParseException;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.DoStmt;
-import com.github.javaparser.ast.stmt.ForStmt;
-import com.github.javaparser.ast.stmt.ForeachStmt;
-import com.github.javaparser.ast.stmt.IfStmt;
-import com.github.javaparser.ast.stmt.WhileStmt;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.execution.AntRunner;
-import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Test;
-import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.codedefenders.util.Constants.DATA_DIR;
+import static org.codedefenders.util.Constants.F_SEP;
+import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
+import static org.codedefenders.util.Constants.TESTS_DIR;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
+import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -57,15 +41,30 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static org.codedefenders.util.Constants.DATA_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
-import static org.codedefenders.util.Constants.TESTS_DIR;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
-import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.execution.AntRunner;
+import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.DoStmt;
+import com.github.javaparser.ast.stmt.ForStmt;
+import com.github.javaparser.ast.stmt.ForeachStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.WhileStmt;
 
 public class UnitTesting extends HttpServlet {
 
@@ -80,11 +79,11 @@ public class UnitTesting extends HttpServlet {
 		Object ogid = session.getAttribute("gid");
 		DuelGame activeGame;
 		if (ogid == null) {
-			System.out.println("Getting active unit testing session for user " + uid);
+			logger.debug("Getting active unit testing session for user " + uid);
 			activeGame = DatabaseAccess.getActiveUnitTestingSession(uid);
 		} else {
 			int gid = (Integer) ogid;
-			System.out.println("Getting game " + gid + " for " + uid);
+			logger.debug("Getting game " + gid + " for " + uid);
 			activeGame = DatabaseAccess.getGameForKey("ID", gid);
 		}
 		session.setAttribute("game", activeGame);
@@ -113,7 +112,7 @@ public class UnitTesting extends HttpServlet {
 			response.sendRedirect(request.getContextPath()+"/utesting");
 			return;
 		}
-		System.out.println("New Test " + newTest.getId());
+		logger.debug("New Test " + newTest.getId());
 		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget.status.equals("SUCCESS")) {
@@ -180,30 +179,28 @@ public class UnitTesting extends HttpServlet {
 			cu = JavaParser.parse(in);
 			// prints the resulting compilation unit to default system output
 			if (cu.getTypes().size() != 1) {
-				System.out.println("Invalid test suite contains more than one type declaration.");
+				logger.debug("Invalid test suite contains more than one type declaration.");
 				return false;
 			}
 			TypeDeclaration clazz = cu.getTypes().get(0);
 			if (clazz.getMembers().size() != 1) {
-				System.out.println("Invalid test suite contains more than one method.");
+				logger.debug("Invalid test suite contains more than one method.");
 				return false;
 			}
 			MethodDeclaration test = (MethodDeclaration)clazz.getMembers().get(0);
-			BlockStmt testBody = test.getBody();
-			for (Node node : testBody.getChildrenNodes()) {
+			BlockStmt testBody = test.getBody().get();
+			for (Node node : testBody.getChildNodes()) {
 				if (node instanceof ForeachStmt
 						|| node instanceof IfStmt
 						|| node instanceof ForStmt
 						|| node instanceof WhileStmt
 						|| node instanceof DoStmt) {
-					System.out.println("Invalid test contains " + node.getClass().getSimpleName() + " statement");
+					logger.debug("Invalid test contains " + node.getClass().getSimpleName() + " statement");
 					return false;
 				}
 			}
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (ParseException e) {
-			e.printStackTrace();
+			logger.error("Found error: ", e);
 		} finally {
 			in.close();
 		}

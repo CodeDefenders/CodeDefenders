@@ -24,6 +24,7 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.database.UserDAO" %>
 <% String pageTitle="Game History"; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div>
@@ -53,8 +54,8 @@
                 for (DuelGame g : games) {
                     atkId = g.getAttackerId();
                     defId = g.getDefenderId();
-                    User attacker = DatabaseAccess.getUserForKey("User_ID", atkId);
-                    User defender = DatabaseAccess.getUserForKey("User_ID", defId);
+                    User attacker = UserDAO.getUserById(atkId);
+                    User defender = UserDAO.getUserById(defId);
                     atkName = attacker == null ? "-" : attacker.getUsername();
                     defName = defender == null ? "-" : defender.getUsername();
         %>
@@ -105,13 +106,12 @@
             List<MultiplayerGame> mgames = DatabaseAccess.getFinishedMultiplayerGamesForUser(uid);
             if (!mgames.isEmpty()) {
                 for (MultiplayerGame g : mgames) {
-                    Role role = g.getRole(uid);
         %>
 
         <tr id="<%="game_"+g.getId()%>">
             <td class="col-sm-2"><%= g.getId() %></td>
             <td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
-            <td class="col-sm-2"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td>
+            <td class="col-sm-2"><%= UserDAO.getUserById(g.getCreatorId()).getUsername() %></td>
             <td class="col-sm-1"><%= g.getAttackerIds().length %></td>
             <td class="col-sm-1"><%= g.getDefenderIds().length %></td>
             <td class="col-sm-2"><%= g.getLevel().name() %></td>

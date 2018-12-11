@@ -23,7 +23,9 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,14 +60,9 @@ public class Test {
 	private int id;
 	private int playerId;
 	private int gameId;
+	private int classId;
 	private String javaFile;
 	private String classFile;
-
-	/**
-	 * Identifier of the class this test is created for.
-	 * Of type {@link Integer}, because the classId can be {@code null}.
-	 */
-	private Integer classId;
 
 	private int roundCreated;
 	private int mutantsKilled;
@@ -85,15 +82,16 @@ public class Test {
 	public Test(String javaFilePath, String classFilePath, int classId, LineCoverage lineCoverage) {
 		this.javaFile = javaFilePath;
 		this.classFile = classFilePath;
-		this.gameId = -1;
-		this.playerId = -1;
+		this.gameId = Constants.DUMMY_GAME_ID;
+		this.playerId = Constants.DUMMY_CREATOR_USER_ID;
 		this.roundCreated = -1;
 		this.score = 0;
 		this.classId = classId;
 		this.lineCoverage = lineCoverage;
 	}
 
-	public Test(int gameId, String javaFile, String classFile, int playerId) {
+	public Test(int classId, int gameId, String javaFile, String classFile, int playerId) {
+	    this.classId = classId;
 		this.gameId = gameId;
         DuelGame g = DatabaseAccess.getGameForKey("ID", gameId);
         if (g != null) {
@@ -109,13 +107,13 @@ public class Test {
 	}
 
 	@Deprecated
-	public Test(int testId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled, int playerId) {
-		this(testId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId, Collections.emptyList(), Collections.emptyList(), 0);
+	public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled, int playerId) {
+		this(testId, classId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId, Collections.emptyList(), Collections.emptyList(), 0);
 	}
 
-	public Test(int testId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled,
+	public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled,
 				int playerId, List<Integer> linesCovered, List<Integer> linesUncovered, int score) {
-		this(gameId, javaFile, classFile, playerId);
+		this(classId, gameId, javaFile, classFile, playerId);
 
 		this.id = testId;
 		this.roundCreated = roundCreated;
@@ -178,7 +176,6 @@ public class Test {
 		}
 	}
 
-
 	public String getDirectory() {
 		File file = new File(javaFile);
 		return file.getAbsoluteFile().getParent();
@@ -203,7 +200,7 @@ public class Test {
 		boolean updated = DB.executeUpdate(stmt, conn);
 
 		// Eventually update the kill count from the DB
-		mutantsKilled = DatabaseAccess.getTestForId(getId()).getMutantsKilled();
+		mutantsKilled = TestDAO.getTestById(getId()).getMutantsKilled();
 		
 		logger.info("Test {} new killcount is {}. Was updated ? {} ", toString(), mutantsKilled, updated);
 	}
@@ -248,25 +245,13 @@ public class Test {
 	}
 
 
-	@Deprecated
 	public boolean insert() {
-		String jFileDB = DatabaseAccess.addSlashes(javaFile);
-		String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
-
-		Connection conn = DB.getConnection();
-		String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points) VALUES (?, ?, ?, ?, ?, ?);";
-		DatabaseValue[] valueList = new DatabaseValue[]{
-				DB.getDBV(jFileDB),
-				DB.getDBV(cFileDB),
-				DB.getDBV(gameId),
-				DB.getDBV(roundCreated),
-				DB.getDBV(playerId),
-				DB.getDBV(score)
-		};
-
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		this.id = DB.executeUpdateGetKeys(stmt, conn);
-		return this.id > 0;
+		try {
+			this.id = TestDAO.storeTest(this);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 
 	@Deprecated
@@ -355,7 +340,7 @@ public class Test {
 		return score;
 	}
 
-	public Integer getClassId() {
+	public int getClassId() {
 		return classId;
 	}
 
@@ -371,21 +356,11 @@ public class Test {
 
 	// First created appears first
 	public static Comparator<Test> orderByIdAscending() {
-		return new Comparator<Test>() {
-			@Override
-			public int compare(Test o1, Test o2) {
-				return o1.id - o2.id;
-			}
-		};
+		return (o1, o2) -> o1.id - o2.id;
 	}
 
 	// Last created appears first
 	public static Comparator<Test> orderByIdDescending() {
-		return new Comparator<Test>() {
-			@Override
-			public int compare(Test o1, Test o2) {
-				return o2.id - o1.id;
-			}
-		};
+		return (o1, o2) -> o2.id - o1.id;
 	}
 }

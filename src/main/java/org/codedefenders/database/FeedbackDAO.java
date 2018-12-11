@@ -30,6 +30,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public class FeedbackDAO {
 
@@ -99,33 +100,23 @@ public class FeedbackDAO {
 		return insertFeedback(gid, uid, ratingsList, feedbackTypes);
 	}
 
-	public static Integer[] getFeedbackValues(int gid, int uid, FeedbackManager.FeedbackType[] feedbackTypes) {
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(gid),
-				DB.getDBV(uid)};
+	public static Integer[] getFeedbackValues(int gid, int uid, FeedbackManager.FeedbackType[] feedbackTypes)
+			throws UncheckedSQLException, SQLMappingException {
 		Integer[] values = new Integer[feedbackTypes.length];
 		Arrays.fill(values, -1);
 
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_FEEDBACK_QUERY, valueList);
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-		try {
-			if (rs == null || !rs.next()) {
-				return null;
+		List<Boolean> result = DB.executeQueryReturnList(GET_FEEDBACK_QUERY, rs -> {
+			String typeString = rs.getString(2);
+			if (Arrays.stream(feedbackTypes).anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
+				values[getFeedbackIndex(typeString, feedbackTypes)] = rs.getInt(1);
+			} else {
+				logger.warn("No such feedback type: " + typeString);
 			}
-			rs.beforeFirst();
-			while (rs.next()) {
-				String typeString = rs.getString(2);
-				if (Arrays.stream(feedbackTypes).anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
-					values[getFeedbackIndex(typeString, feedbackTypes)] = rs.getInt(1);
-				} else {
-					logger.warn("No such feedback type: " + typeString);
-				}
-			}
-		} catch (SQLException e) {
-			logger.error("SQLException while parsing result set for statement\n\t", stmt);
-			e.printStackTrace();
-		} finally {
-			DB.cleanup(conn, stmt);
+			return true;
+		}, DB.getDBV(gid), DB.getDBV(uid));
+
+		if (result.isEmpty()) {
+			return null;
 		}
 		return values;
 	}
@@ -160,54 +151,34 @@ public class FeedbackDAO {
 		return getFeedbackValues(gid, uid) == null;
 	}
 
-	public static double[] getAverageGameRatings(int gid) {
+	public static double[] getAverageGameRatings(int gameId) throws UncheckedSQLException, SQLMappingException {
 		double[] values = new double[feedbackTypes.length];
 		Arrays.fill(values, -1);
 
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_AVERAGE_GAME_RATINGS, DB.getDBV(gid));
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-		try {
-			if (rs == null || !rs.next())
-				return null;
-			rs.beforeFirst();
-			while (rs.next()) {
-				String typeString = rs.getString(2);
-				if (Arrays.stream(feedbackTypes).anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
-					values[getFeedbackIndex(typeString, feedbackTypes)] = rs.getDouble(1);
-				} else {
-					logger.warn("No such feedback type: " + typeString);
-				}
+		List<Boolean> result = DB.executeQueryReturnList(GET_AVERAGE_GAME_RATINGS, rs -> {
+			String typeString = rs.getString(2);
+			if (Arrays.stream(feedbackTypes).anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
+				values[getFeedbackIndex(typeString, feedbackTypes)] = rs.getDouble(1);
+			} else {
+				logger.warn("No such feedback type: " + typeString);
 			}
-		} catch (SQLException e) {
-			logger.error("SQLException while parsing result set for statement\n\t", stmt);
-			e.printStackTrace();
-		} finally {
-			DB.cleanup(conn, stmt);
+			return true;
+		}, DB.getDBV(gameId));
+
+		if (result.isEmpty()) {
+			return null;
 		}
 		return values;
 	}
 
-	private static List<Double> getAverageClassDifficultyRatings(FeedbackManager.FeedbackType feedbackType) {
-		List<Double> values = new ArrayList<>();
-
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_AVERAGE_CLASS_DIFFICULTIES, DB.getDBV(feedbackType.name()));
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-		try {
-			if (rs == null || !rs.next())
-				return null;
-			rs.beforeFirst();
-			while (rs.next()) {
-				values.add(rs.getDouble(1));
-			}
-		} catch (SQLException e) {
-			logger.error("SQLException while parsing result set for statement\n\t", stmt);
-			e.printStackTrace();
-		} finally {
-			DB.cleanup(conn, stmt);
+	private static List<Double> getAverageClassDifficultyRatings(FeedbackManager.FeedbackType feedbackType)
+			throws UncheckedSQLException, SQLMappingException {
+		List<Double> rv = DB.executeQueryReturnList(GET_AVERAGE_CLASS_DIFFICULTIES, rs -> rs.getDouble(1),
+				DB.getDBV(feedbackType.name()));
+		if (rv.isEmpty()) {
+			return null;
 		}
-		return values;
+		return rv;
 	}
 
 	public static List<Double> getAverageMutationDifficulties() {
@@ -218,23 +189,8 @@ public class FeedbackDAO {
 		return getAverageClassDifficultyRatings(FeedbackManager.FeedbackType.CUT_TEST_DIFFICULTY);
 	}
 
-	public static int getNBFeedbacksForGame(int gid) {
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, GET_NB_FEEDBACKS_FOR_GAME, DB.getDBV(gid));
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-		try {
-			if (rs == null)
-				return 0;
-			if (rs.next()) {
-				return rs.getInt(1);
-			}
-		} catch (SQLException e) {
-			logger.error("SQLException while parsing result set for statement\n\t", stmt);
-			e.printStackTrace();
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-		return 0;
+	public static int getNBFeedbacksForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
+	    return DB.executeQueryReturnValue(GET_NB_FEEDBACKS_FOR_GAME, rs -> rs.getInt(1), DB.getDBV(gameId));
 	}
 
 	private static int getFeedbackIndex(String typeName, FeedbackManager.FeedbackType[] feedbackTypes) {

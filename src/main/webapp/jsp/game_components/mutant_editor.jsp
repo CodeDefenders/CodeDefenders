@@ -21,8 +21,19 @@
 <%--
     Displays the mutant code in a CodeMirror textarea.
 
-    @param String testCode
-        The test code to display.
+    @param String mutantCode
+        The mutant code to display, but not {@code null}.
+    @param String mutantName
+        The class name of the mutant, but not {@code null}.
+    @param Map<String, String> dependencies
+        A mapping between a class name and the content of the CUT dependencies.
+        Can be empty, but must not be {@code null}.
+    @param Integer startEditLine
+        Start of editable lines. If smaller than one or {@code null}, the code can
+        be modified from the start.
+    @param Integer endEditLine
+        End of editable lines in the orginial mutant.
+        If smaller than one or {@code null}, the code can be modified until the end.
 --%>
 
 <% { %>
@@ -31,21 +42,56 @@
     final String mutantCode = (String) request.getAttribute("mutantCode");
     final String mutantName = (String) request.getAttribute("mutantName");
     final Map<String, String> dependencies = (Map<String, String>) request.getAttribute("dependencies");
+
+    Integer startEditLine = (Integer) request.getAttribute("startEditLine");
+    if (startEditLine == null || startEditLine < 1) {
+        startEditLine = 1;
+    }
+    Integer endEditLine = (Integer) request.getAttribute("endEditLine");
+    if (endEditLine != null && (endEditLine < 1 || endEditLine < startEditLine)) {
+        endEditLine = null;
+    }
 %>
 <script>
-    autocompletelist = [];
+    let startEditLine = <%=startEditLine%> ;
+    let readOnlyLinesStart = Array.from(new Array(startEditLine - 1).keys());
 
-    filterOutComments = function (text) {
-        var blockCommentRegex = /\/\*(.|\s)*?\*\//gm;
-        var lineCommentRegex = /\/\/.*(\r\n|\r|\n)/g;
-        return text.replace(blockCommentRegex, "").replace(lineCommentRegex, "")
+    let endEditLine = <%=endEditLine%>;
+
+    let getReadOnlyLinesEnd = function(lines) {
+        if (endEditLine == null) {
+            return [];
+        }
+        let readOnlyLines = [];
+
+        // You don't want the end line to be editable even when a user removes above lines.
+        // So the endEditLine isn't a static hard limit, but an indicator that
+        // totalLines - endEditLine many lines from the bottom are read only.
+        for (let i = 1; i <= getReadOnlyBottomNumber(lines); i++) {
+            readOnlyLines.push(lines.length - i)
+        }
+        return readOnlyLines;
     };
 
-    updateAutocompleteList = function () {
-        var wordRegex = /[a-zA-Z][a-zA-Z0-9]*/gm;
-        var set = new Set();
+    let numberOfReadOnlyLinesFromBottom = null;
+    let getReadOnlyBottomNumber = function(lines) {
+        if (endEditLine != null && numberOfReadOnlyLinesFromBottom == null) {
+            numberOfReadOnlyLinesFromBottom = lines.length - endEditLine;
+        }
+        return numberOfReadOnlyLinesFromBottom;
 
-        var texts = [editorMutant.getValue()];
+    };
+
+    filterOutComments = function (text) {
+        let commentRegex = /(\/\*([\s\S]*?)\*\/)|(\/\/(.*)$)/gm;
+        return text.replace(commentRegex, "");
+    };
+
+    let updateAutocompleteList = function () {
+        let wordRegex = /[a-zA-Z][a-zA-Z0-9]*/gm;
+        let set = new Set();
+
+        let texts = [editorMutant.getValue()];
         if (typeof autocompletedClasses !== 'undefined') {
             Object.getOwnPropertyNames(autocompletedClasses).forEach(function(key) {
                 texts.push(autocompletedClasses[key]);
@@ -54,7 +100,7 @@
 
         texts.forEach(function (text) {
             text = filterOutComments(text);
-            var m;
+            let m;
             while ((m = wordRegex.exec(text)) !== null) {
                 if (m.index === wordRegex.lastIndex) {
                     wordRegex.lastIndex++;
@@ -70,26 +116,25 @@
     CodeMirror.commands.autocomplete = function (cm) {
         cm.showHint({
             hint: function (editor) {
-                var reg = /[a-zA-Z][a-zA-Z0-9]*/;
+                let reg = /[a-zA-Z][a-zA-Z0-9]*/;
 
-                var list = !autocompleteList ? [] : autocompleteList;
-                var cursor = editor.getCursor();
-                var currentLine = editor.getLine(cursor.line);
-                var start = cursor.ch;
-                var end = start;
+                let list = !autocompleteList ? [] : autocompleteList;
+                let cursor = editor.getCursor();
+                let currentLine = editor.getLine(cursor.line);
+                let start = cursor.ch;
+                let end = start;
                 while (end < currentLine.length && reg.test(currentLine.charAt(end))) ++end;
                 while (start && reg.test(currentLine.charAt(start - 1))) --start;
-                var curWord = start != end && currentLine.slice(start, end);
-                var regex = new RegExp('^' + curWord, 'i');
-                var result = {
+                let curWord = start != end && currentLine.slice(start, end);
+                let regex = new RegExp('^' + curWord, 'i');
+
+                return {
                     list: (!curWord ? list : list.filter(function (item) {
                         return item.match(regex);
                     })).sort(),
                     from: CodeMirror.Pos(cursor.line, start),
                     to: CodeMirror.Pos(cursor.line, end)
                 };
-
-                return result;
             }
         });
     };
@@ -103,21 +148,33 @@
                                          rows="50"><%=mutantCode%></textarea></pre>
 
 <script>
-    var editorMutant = CodeMirror.fromTextArea(document.getElementById("code"), {
+    let editorMutant = CodeMirror.fromTextArea(document.getElementById("code"), {
         lineNumbers: true,
         indentUnit: 4,
         smartIndent: true,
-        indentWithTabs: true,
         matchBrackets: true,
         mode: "text/x-java",
         autoCloseBrackets: true,
         styleActiveLine: true,
-        extraKeys: {"Ctrl-Space": "autocomplete"},
+        extraKeys: {
+            "Ctrl-Space": "autocomplete",
+            "Tab": "insertSoftTab"
+        },
         keyMap: "default",
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
     });
 
     editorMutant.setSize("100%", 500);
+
+    editorMutant.on('beforeChange', function (cm, change) {
+        let text = cm.getValue();
+        let lines = text.split(/\r|\r\n|\n/);
+
+        let readOnlyLinesEnd = getReadOnlyLinesEnd(lines);
+        if (~readOnlyLinesStart.indexOf(change.from.line) || ~readOnlyLinesEnd.indexOf(change.to.line)) {
+            change.cancel();
+        }
+    });
 </script>
 
 <%
@@ -140,21 +197,33 @@
             <pre><textarea id="code" name="mutant" title="mutant" cols="80"
                                                      rows="50"><%=mutantCode%></textarea></pre>
             <script>
-                var editorMutant = CodeMirror.fromTextArea(document.getElementById("code"), {
+                let editorMutant = CodeMirror.fromTextArea(document.getElementById("code"), {
                     lineNumbers: true,
                     indentUnit: 4,
                     smartIndent: true,
-                    indentWithTabs: true,
                     matchBrackets: true,
                     mode: "text/x-java",
                     autoCloseBrackets: true,
                     styleActiveLine: true,
-                    extraKeys: {"Ctrl-Space": "autocomplete"},
+                    extraKeys: {
+                        "Ctrl-Space": "autocomplete",
+                        "Tab": "insertSoftTab"
+                    },
                     keyMap: "default",
                     gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
                 });
 
                 editorMutant.setSize("100%", 500);
+
+                editorMutant.on('beforeChange', function (cm, change) {
+                    let text = cm.getValue();
+                    let lines = text.split(/\r|\r\n|\n/);
+
+                    let readOnlyLinesEnd = getReadOnlyLinesEnd(lines);
+                    if (~readOnlyLinesStart.indexOf(change.from.line) || ~readOnlyLinesEnd.indexOf(change.to.line)) {
+                        change.cancel();
+                    }
+                });
 
                 autocompletedClasses = {
                     '<%=mutantName%>': editorMutant.getTextArea().value

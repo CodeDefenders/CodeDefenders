@@ -53,7 +53,7 @@
 %>
 
 <% String pageTitle="In Game"; %>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.database.*" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Role" %>
@@ -152,7 +152,7 @@
 							// BAD
 							m.update();
 
-							User mutantOwner = DatabaseAccess.getUserFromPlayer(m.getPlayerId());
+							User mutantOwner = UserDAO.getUserForPlayer(m.getPlayerId());
 
 							Event notifEquivFlag = new Event(-1, game.getId(), mutantOwner.getId(),
 									"One or more of your mutants is flagged equivalent.",
@@ -175,7 +175,7 @@
 			}
 
 			if (nClaimed >= 1) {
-				String flaggingChatMessage = DatabaseAccess.getUser(uid).getUsername() + " flagged "
+				String flaggingChatMessage = UserDAO.getUserById(uid).getUsername() + " flagged "
 						+ nClaimed + " mutant" + (nClaimed == 1 ? "" : "s") + " as equivalent.";
 				Event notifMutant = new Event(-1, game.getId(), uid, flaggingChatMessage,
 						EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
@@ -205,7 +205,7 @@
                     DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
                     messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
 
-                    User eventUser = DatabaseAccess.getUser(uid);
+                    User eventUser = UserDAO.getUserById(uid);
 
                     Event notifEquiv = new Event(-1, game.getId(),
                             uid,
