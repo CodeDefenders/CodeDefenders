@@ -68,7 +68,11 @@ public class Constants {
 	// Configuration variable names
 	public static final String BLOCK_ATTACKER = "block.attacker";
 
+	// Dummy game
+	public static final int DUMMY_GAME_ID = -1;
+
 	// Dummy user IDs
+	public static final int DUMMY_CREATOR_USER_ID = -1;
 	public static final int DUMMY_ATTACKER_USER_ID = 3;
 	public static final int DUMMY_DEFENDER_USER_ID = 4;
 

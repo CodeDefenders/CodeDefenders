@@ -20,7 +20,6 @@ package org.codedefenders.game;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.database.DB;
@@ -29,20 +28,24 @@ import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.MutantUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import difflib.Chunk;
 import difflib.Delta;
@@ -62,6 +65,7 @@ public class Mutant implements Serializable {
 
 	private int id;
 	private int gameId;
+	private int classId;
 
 	private transient String javaFile;
 	private transient String md5;
@@ -70,6 +74,8 @@ public class Mutant implements Serializable {
     private String creatorName;
 	private int creatorId;
 
+	// Every mutant has its own
+	private MutantUtils mutantUtils = new MutantUtils();
 	private boolean alive = true;
 
 	private int killingTestId = 0;
@@ -91,12 +97,6 @@ public class Mutant implements Serializable {
 
 	private int score; // multiplayer
 
-	/**
-	 * Identifier of the class this mutant is created from.
-	 * Of type {@link Integer}, because the classId can be {@code null}.
-	 */
-	private Integer classId;
-
 	// Computed on the fly if not read in the db
 	private List<Integer> lines = null;
 	private transient List<String> description = null;
@@ -111,12 +111,12 @@ public class Mutant implements Serializable {
      * <li><code>score 0</code></li>
      * </ul>
      */
-	public Mutant(String javaFilePath, String classFilePath, String md5, Integer classId) {
+	public Mutant(String javaFilePath, String classFilePath, String md5, int classId) {
 		this.javaFile = javaFilePath;
 		this.classFile = classFilePath;
 		this.alive = false;
-		this.gameId = -1;
-		this.playerId = -1;
+		this.gameId = Constants.DUMMY_GAME_ID;
+		this.playerId = Constants.DUMMY_CREATOR_USER_ID;
 		this.roundCreated = -1;
 		this.score = 0;
 		this.md5 = md5;
@@ -236,7 +236,7 @@ public class Mutant implements Serializable {
 		return score;
 	}
 
-	public Integer getClassId() {
+	public int getClassId() {
 		return classId;
 	}
 
@@ -382,18 +382,20 @@ public class Mutant implements Serializable {
 
 	// Not sure
 	public void computeDifferences() {
-		GameClass sut = DatabaseAccess.getClassForGame(gameId); 
+		GameClass sut = DatabaseAccess.getClassForGame(gameId);
 		if( sut == null ){
             // in this case gameId might have been -1 (upload)
             // so we try to reload the sut
-            sut = DatabaseAccess.getClassForKey("Class_ID", getClassId());
+            sut = DatabaseAccess.getClassForKey("Class_ID", classId);
         }
-		
+
+		assert sut != null;
+
 		File sourceFile = new File(sut.getJavaFile());
 		File mutantFile = new File(javaFile);
 
-		List<String> sutLines = readLinesIfFileExist(sourceFile.toPath());
-		List<String> mutantLines = readLinesIfFileExist(mutantFile.toPath());
+		List<String> sutLines = mutantUtils.readLinesIfFileExist(sourceFile.toPath());
+		List<String> mutantLines = mutantUtils.readLinesIfFileExist(mutantFile.toPath());
 
 		for (int l = 0; l < sutLines.size(); l++) {
 			sutLines.set(l, sutLines.get(l).replaceAll(regex, ""));
@@ -411,14 +413,14 @@ public class Mutant implements Serializable {
 	    if( sut == null ){
 	        // in this case gameId might have been -1 (upload)
 	        // so we try to reload the sut
-	        sut = DatabaseAccess.getClassForKey("Class_ID", getClassId());
+	        sut = DatabaseAccess.getClassForKey("Class_ID", classId);
 	    }
 
 		Path sourceFile = Paths.get(sut.getJavaFile());
 		Path mutantFile = Paths.get(javaFile);
 
-		List<String> sutLines = readLinesIfFileExist(sourceFile);
-		List<String> mutantLines = readLinesIfFileExist(mutantFile);
+		List<String> sutLines = mutantUtils.readLinesIfFileExist(sourceFile);
+		List<String> mutantLines = mutantUtils.readLinesIfFileExist(mutantFile);
 
 		Patch patch = DiffUtils.diff(sutLines, mutantLines);
 		List<String> unifiedPatches = DiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
@@ -435,51 +437,13 @@ public class Mutant implements Serializable {
 		return StringEscapeUtils.escapeHtml(getPatchString());
 	}
 
-	private List<String> readLinesIfFileExist(Path path) {
-		List<String> lines = new ArrayList<>();
-		try {
-			if (Files.exists(path))
-				lines = Files.readAllLines(path, StandardCharsets.UTF_8);
-			else {
-				logger.error("File not found {}", path);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();  // TODO handle properly
-			return null;
-		}
-		return lines;
-	}
-
-	/*
-	 * insert will run once after mutant creation. Stores values of JavaFile,
-	 * ClassFile, GameID, RoundCreated in DB. These will not change once input.
-	 * 
-	 * This is also the moment we compute lines and descriptions
-	 * 
-	 * Currently Mutant ID isnt set yet after insertion, if Mutant needs to be
-	 * used straight away it needs a similar insert method to MultiplayerGame.
-	 * Default values for Equivalent (ASSUMED_NO), Alive(1), RoundKilled(NULL)
-	 * are assigned.
-	 */
-	@Deprecated
 	public boolean insert() {
-		logger.info("Inserting mutant");
-		Connection conn = DB.getConnection();
-		String jFileDB = DatabaseAccess.addSlashes(javaFile);
-		String cFileDB = classFile == null ? null : DatabaseAccess.addSlashes(classFile);
-		String query = "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5, MutatedLines)"
-				+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
-		DatabaseValue[] valueList = new DatabaseValue[] { DB.getDBV(jFileDB), DB.getDBV(cFileDB), DB.getDBV(gameId),
-				DB.getDBV(roundCreated), DB.getDBV(sqlAlive()), DB.getDBV(playerId), DB.getDBV(score), DB.getDBV(md5),
-				// Include the mutate lines
-				DB.getDBV(StringUtils.join(getLines(), ",")) };
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		int res = DB.executeUpdateGetKeys(stmt, conn);
-		if (res > -1) {
-			this.id = res;
+		try {
+			this.id = MutantDAO.storeMutant(this);
 			return true;
+		} catch (Exception e) {
+		    return false;
 		}
-		return false;
 	}
 
 	// update will run when changes to a mutant are made.
@@ -581,7 +545,7 @@ public class Mutant implements Serializable {
 			}
 			description.add(StringEscapeUtils.escapeHtml(text + desc + "\n"));
 		}
-		
+
 		setLines( mutatedLines );
 	}
 
@@ -635,46 +599,33 @@ public class Mutant implements Serializable {
 	 * This comparators place first mutants that modify lines at the top of the file.
 	 */
 	public static Comparator<Mutant> sortByLineNumberAscending() {
-		return new Comparator<Mutant>() {
-			@Override
-			public int compare(Mutant o1, Mutant o2) {
-				List<Integer> lines1 = o1.getLines();
-				List<Integer> lines2 = o2.getLines();
+		return (o1, o2) -> {
+			List<Integer> lines1 = o1.getLines();
+			List<Integer> lines2 = o2.getLines();
 
-				if (lines1.isEmpty()) {
-					if (lines2.isEmpty()) {
-						return 0;
-					} else {
-						return -1;
-					}
-				} else if (lines2.isEmpty()) {
-					return 1;
+			if (lines1.isEmpty()) {
+				if (lines2.isEmpty()) {
+					return 0;
+				} else {
+					return -1;
 				}
-
-				return Collections.min(lines1) - Collections.min(lines2);
+			} else if (lines2.isEmpty()) {
+				return 1;
 			}
+
+			return Collections.min(lines1) - Collections.min(lines2);
 		};
 	}
 
 	// TODO Ideally this should have a timestamp ... we use the ID instead
 	// First created appears first
 	public static Comparator<Mutant> orderByIdAscending() {
-		return new Comparator<Mutant>() {
-			@Override
-			public int compare(Mutant o1, Mutant o2) {
-				return o1.id - o2.id;
-			}
-		};
+		return (o1, o2) -> o1.id - o2.id;
 	}
 
 	// Last created appears first
 	public static Comparator<Mutant> orderByIdDescending() {
-		return new Comparator<Mutant>() {
-			@Override
-			public int compare(Mutant o1, Mutant o2) {
-				return o2.id - o1.id;
-			}
-		};
+		return (o1, o2) -> o2.id - o1.id;
 	}
 
 	public void setLines(List<Integer> mutatedLines) {

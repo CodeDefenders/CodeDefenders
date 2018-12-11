@@ -211,32 +211,30 @@
                                 <h4>points: <%=m.getScore()%></h4>
                             </td>
                             <td class="col-sm-1">
-                                <% if (viewDiff){ %>
-                                    <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
-                                    <div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
-                                         style="z-index: 10000;">
-                                        <div class="modal-dialog">
-                                            <!-- Modal content-->
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                    <h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <p>Killed by
-                                                        Test <%=DatabaseAccess.getKillingTestIdForMutant(m.getId())%>
-                                                    </p>
-                                                    <pre class="readonly-pre"><textarea
-                                                            class="mutdiff" title="mutdiff"
-                                                            id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea></pre>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                </div>
+                                <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
+                                <div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
+                                     style="z-index: 10000;">
+                                    <div class="modal-dialog">
+                                        <!-- Modal content-->
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                <h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p>Killed by
+                                                    Test <%=DatabaseAccess.getKillingTestIdForMutant(m.getId())%>
+                                                </p>
+                                                <pre class="readonly-pre"><textarea
+                                                        class="mutdiff" title="mutdiff"
+                                                        id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea></pre>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                             </div>
                                         </div>
                                     </div>
-                                <% } %>
+                                </div>
                             </td>
                         </tr>
                     <% } %>
@@ -351,29 +349,27 @@
                                 <h4>points: <%=m.getScore()%></h4>
                             </td>
                             <td class="col-sm-1">
-                                <% if (viewDiff){ %>
-                                    <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
-                                    <div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
-                                         style="z-index: 10000;">
-                                        <div class="modal-dialog">
-                                            <!-- Modal content-->
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                    <h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
-                                                </div>
-                                                <div class="modal-body">
+                                <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
+                                <div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
+                                     style="z-index: 10000;">
+                                    <div class="modal-dialog">
+                                        <!-- Modal content-->
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                <h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
+                                            </div>
+                                            <div class="modal-body">
                                                     <pre class="readonly-pre"><textarea
                                                             class="mutdiff" title="mutdiff"
                                                             id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea></pre>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                                             </div>
                                         </div>
                                     </div>
-                                <% } %>
+                                </div>
                             </td>
                         </tr>
                     <% } %>

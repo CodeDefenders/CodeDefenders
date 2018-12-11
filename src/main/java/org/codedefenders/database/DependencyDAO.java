@@ -56,7 +56,7 @@ public class DependencyDAO {
      * @throws Exception If storing the dependency was not successful.
      */
     public static int storeDependency(Dependency dependency) throws Exception {
-        Integer classId = dependency.getClassId();
+        int classId = dependency.getClassId();
         String javaFile = DatabaseAccess.addSlashes(dependency.getJavaFile());
         String classFile = DatabaseAccess.addSlashes(dependency.getClassFile());
 

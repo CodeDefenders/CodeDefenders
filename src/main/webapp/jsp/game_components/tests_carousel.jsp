@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="org.apache.commons.lang.StringUtils"%>
+<%@page import="org.codedefenders.database.TestSmellsDAO"%>
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
@@ -51,7 +53,27 @@
             final Set<Mutant> killedMutants = test.getKilledMutants();
             final String coveredMutantsIdString = coveredMutants.stream().map(mutant -> String.valueOf(mutant.getId())).collect(Collectors.joining(", "));
             final String killedMuantsIdString = killedMutants.stream().map(mutant -> String.valueOf(mutant.getId())).collect(Collectors.joining(", "));
+            
+            // Get the smells for this test
+            final List<String> smellList = TestSmellsDAO.getDetectedTestSmellsFor( test );
+            final String smellHtmlList = StringUtils.join(smellList, "</br>");
+            // Compute the smell level
+            String smellLevel = "Good";
+            String smellColor = "btn-success";
 
+            if(smellList.size() >= 1 ){
+            	smellLevel = "Fishy";
+                smellColor = "btn-warning";
+            }
+			if(smellList.size() >= 3 ){
+				smellLevel = "Bad";
+                smellColor = "btn-danger";
+            }
+			if(smellList.size() >= 5 ){
+				smellLevel = "A lot";
+                smellColor = "btn-dark";
+
+            }
     %>
 
     <div class="container nowrap" style="overflow:hidden;white-space:nowrap;">
@@ -83,6 +105,15 @@
             </li>
             <li style=" display: inline-block;">
                 Points: <%= test.getScore() %>
+                &nbsp |
+            </li>
+            <li style=" display: inline-block;">
+                Smells:
+                <a class="validatorLevelTag btn <%=smellColor %>" data-container="body" data-html="true"
+                    <%if( ! smellList.isEmpty() ){ %>
+                       data-toggle="popover"
+                    <% } %>
+                   data-trigger="focus" data-placement="top" title="This test smells of:"  data-content="<%=smellHtmlList %>" data-original-title=""><%=smellLevel %></a>
             </li>
 
         </ul>
@@ -103,5 +134,14 @@
         });
     }
 </script>
+<%-- Activate the popover thingy --%>
+<script>
+$(function () {
+	  $('[data-toggle="popover"]').popover({
+		  trigger: 'focus'
+	  })
+})
 
+</script>
 <% } %>
+

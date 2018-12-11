@@ -18,19 +18,22 @@
  */
 package org.codedefenders.itests;
 
-import org.apache.commons.dbutils.QueryRunner;
-import org.apache.commons.dbutils.handlers.ColumnListHandler;
 import org.apache.commons.lang3.ArrayUtils;
-import org.codedefenders.database.*;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.database.FeedbackDAO;
+import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
+import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -63,9 +66,7 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 
 /**
@@ -74,23 +75,27 @@ import static org.junit.Assume.assumeTrue;
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ DatabaseConnection.class, CodeValidator.class })
-public class RunnerTest {
+public class DatabaseTest {
+    private static long START_TIME = (int) 1e15;
+	private static long END_TIME = (int) 1e30;
 
 	@Before // BeforeClass has to be static...
 	public void createEntities() {
 		user1 = new User("FREE_USERNAME", User.encodePassword("TEST_PASSWORD"), "TESTMAIL@TEST.TEST");
 		user2 = new User("FREE_USERNAME2", User.encodePassword("TEST_PASSWORD2"), "TESTMAIL@TEST.TEST2");
-		// Why this has to have 4 as ID?
-		creator = new User("FREE_USERNAME3", User.encodePassword("TEST_PASSWORD3"), "TESTMAIL@TEST.TEST3");
-		//
-		cut1 = new GameClass("MyClass", "", "", "");
-		cut2 = new GameClass("", "AliasForClass2", "", "");
+
+		creator = new User(20000, "FREE_USERNAME3", User.encodePassword("TEST_PASSWORD3"), "TESTMAIL@TEST.TEST3");
+
+		cut1 = new GameClass(22345678, "MyClass", "", "", "");
+		cut2 = new GameClass(34865,"", "AliasForClass2", "", "");
+		multiplayerGame = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
+				(float) 1, 10, 4, 4, 4, 0, 0, START_TIME, END_TIME, GameState.CREATED.name(), false, 5, true, CodeValidatorLevel.MODERATE, false);
 	}
 
 	// This will re-create the same DB from scratch every time... is this really
 	// necessary ?! THIS IS NOT ACTUALLY THE CASE. I SUSPECT THAT THE RULE CREATES ONLY ONCE THE DB
 	@Rule
-	DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
+	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
 
 	@Before
 	public void mockDBConnections() throws Exception {
@@ -193,23 +198,14 @@ public class RunnerTest {
 		assumeTrue(dg1.insert());
 
 		MultiplayerGame mg2 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0,
-				//
-				System.currentTimeMillis() - 1000 * 3600,
-				System.currentTimeMillis() + 1000 * 3600,
-				//
-				GameState.ACTIVE.name(), false, 2, true,
+				(float) 1, 10, 4, 4, 4, 0, 0, START_TIME, END_TIME, GameState.ACTIVE.name(), false, 2, true,
 				CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg2.insert());
 		assumeTrue(mg2.addPlayer(user1.getId(), Role.DEFENDER));
 		assertTrue(mg2.update());
 		
 		MultiplayerGame mg3 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, //
-				System.currentTimeMillis() - 1000 * 3600,
-				System.currentTimeMillis() + 1000 * 3600,
-				//
-				GameState.ACTIVE.name(), false, 2, true,
+				(float) 1, 10, 4, 4, 4, 0, 0, START_TIME, END_TIME, GameState.ACTIVE.name(), false, 2, true,
 				CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg3.insert());
 		
@@ -218,11 +214,7 @@ public class RunnerTest {
 		assumeTrue(mg3.update());
 
 		MultiplayerGame mg4 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, //
-				System.currentTimeMillis() - 1000 * 3600,
-				System.currentTimeMillis() + 1000 * 3600,
-				//
-				GameState.FINISHED.name(), false, 2, true,
+				(float) 1, 10, 4, 4, 4, 0, 0, START_TIME, END_TIME, GameState.FINISHED.name(), false, 2, true,
 				CodeValidatorLevel.MODERATE, false);
 		assumeTrue(mg4.insert());
 		
@@ -280,17 +272,18 @@ public class RunnerTest {
 		assertTrue(multiplayerGame.insert());
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
-		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		int gid = multiplayerGame.getId();
+		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), gid);
 		int cutID = -10;
 		mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
-		Mutant mutant2 = new Mutant(100, cutID, multiplayerGame.getId(), "TEST_J_FILE2", "TEST_C_FILE2", false,
+		Mutant mutant2 = new Mutant(100, cutID, gid, "TEST_J_FILE2", "TEST_C_FILE2", false,
 				Mutant.Equivalence.ASSUMED_YES, 2, 2, pid);
 		assertTrue(mutant1.insert());
 		assertTrue(mutant2.insert());
 		Mutant[] ml = { mutant1, mutant2 };
 		assertTrue(Arrays.equals(MutantDAO.getValidMutantsForPlayer(pid).toArray(), ml));
-		assertTrue(Arrays.equals(MutantDAO.getValidMutantsForGame(multiplayerGame.getId()).toArray(), ml));
+		assertTrue(Arrays.equals(MutantDAO.getValidMutantsForGame(gid).toArray(), ml));
 	}
 
 	@Test
@@ -335,16 +328,16 @@ public class RunnerTest {
 
 		// Creator must be there already
 		multiplayerGame = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, 
+				(float) 1, 10, 4, 4, 4, 0, 0,
 				//
 				System.currentTimeMillis() - 1000 * 3600,
 				System.currentTimeMillis() + 1000 * 3600,
-				// 
+				//
 				GameState.CREATED.name(), false, 5, true, CodeValidatorLevel.MODERATE, false);
 		// Why this ?
 		Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
 		// multiplayerGame.classId = cut2.getId();
-		
+
 		assertTrue(multiplayerGame.insert());
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
@@ -477,44 +470,6 @@ public class RunnerTest {
 		assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), 0, Role.DEFENDER).size(), 1);
 		assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), 0, Role.ATTACKER).size(), 2);
 		assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), (int) 1E20, Role.ATTACKER).size(), 0);
-	}
-
-	/**
-	 * Requests as many connections as the CP can give and checks if requesting
-	 * one more works after releasing a connection and fails after that. Also checks
-	 * if number of connections is as expected.
-	 *
-	 * @throws ConnectionPool.NoMoreConnectionsException
-	 */
-	@Test
-	public void testConnectionPool() throws SQLException, ConnectionPool.NoMoreConnectionsException {
-		int nbConnectionsBefore = getNbConnections();
-
-		int dbNumberOfConnections = ConnectionPool.getInstanceOf().getNbConnections();
-		ConnectionPool connectionPool = ConnectionPool.getInstanceOf();
-		Connection lastConn = null;
-		for (int i = 0; i < dbNumberOfConnections; ++i) {
-			lastConn = connectionPool.getDBConnection();
-		}
-		connectionPool.releaseDBConnection(lastConn);
-		assertNotNull("releasing didn't work", connectionPool.getDBConnection());
-
-		try {
-			connectionPool.getDBConnection();
-			fail();
-		} catch (ConnectionPool.NoMoreConnectionsException e) {
-
-		}
-
-		assertEquals(nbConnectionsBefore + ConnectionPool.getInstanceOf().getNbConnections(), getNbConnections());
-	}
-
-	private int getNbConnections() throws SQLException {
-		Connection conn = db.getConnection();
-		QueryRunner qr = new QueryRunner();
-		int nbConnections = Math.toIntExact(qr.query(conn, "SELECT COUNT(*) FROM information_schema.PROCESSLIST;", new ColumnListHandler<Long>()).get(0));
-		conn.close();
-		return nbConnections;
 	}
 
 	@Test

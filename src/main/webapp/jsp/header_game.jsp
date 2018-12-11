@@ -66,7 +66,7 @@ pageTitle = null;
         %>
 
     <div class="row">
-            <ul class="nav navbar-nav" aria-label="Vehicle Models Available:">
+            <ul class="nav navbar-nav">
                 <li class="navbar-text">Game ID<br><%= game.getId() %></li>
                 <li class="navbar-text">Score<br>ATK (<%= atkName %>): <%= game.getAttackerScore() %> | DEF (<%= defName %>): <%= game.getDefenderScore() %></li>
                 <li class="navbar-text">Round<br><%= game.getCurrentRound() %> of <%= game.getFinalRound() %></li>

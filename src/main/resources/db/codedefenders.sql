@@ -6,11 +6,6 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-
-
---
--- Table structure for table `settings`
---
 DROP TABLE IF EXISTS `killmapjob`;
 
 CREATE TABLE killmapjob
@@ -22,7 +17,16 @@ CREATE TABLE killmapjob
   PRIMARY KEY (`ID`)
 ) AUTO_INCREMENT=1;
 
+DROP TABLE IF EXISTS `test_smell`;
+CREATE TABLE test_smell (
+	`test_ID` int(11),
+	`smell_name` VARCHAR(500),
+	PRIMARY KEY (test_ID, smell_name) 
+);
 
+--
+-- Table structure for table `settings`
+--
 DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings` (
   `name` varchar(50) NOT NULL,
@@ -187,6 +191,7 @@ CREATE TABLE `mutants` (
   `ClassFile` varchar(255) DEFAULT NULL,
   `Alive` tinyint(1) NOT NULL DEFAULT '1',
   `Game_ID` int(11) NOT NULL,
+  `Class_ID` int(11) DEFAULT NULL,
   `RoundCreated` int(11) NOT NULL,
   `RoundKilled` int(11) DEFAULT NULL,
   `Equivalent` enum('ASSUMED_NO','PENDING_TEST','DECLARED_YES','ASSUMED_YES','PROVEN_NO') NOT NULL DEFAULT 'ASSUMED_NO',
@@ -194,7 +199,6 @@ CREATE TABLE `mutants` (
   `NumberAiKillingTests` int(11) DEFAULT '0', -- If an original ai mutant, kill count. Number of killing tests in game otherwise.
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Points` int(11) DEFAULT '0',
-  `Class_ID` int(11) DEFAULT NULL, -- If Game_ID is -1, the mutant was uploaded together with referenced class
   `MutatedLines` varchar(255),
   PRIMARY KEY (`Mutant_ID`),
   UNIQUE KEY `mutants_Game_ID_Class_ID_MD5_key` (`Game_ID`,`Class_ID`,`MD5`),
@@ -205,6 +209,19 @@ CREATE TABLE `mutants` (
   CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) AUTO_INCREMENT=100;
+
+--
+-- Mapping between mutants and the class the mutant is uploaded together with
+--
+
+DROP TABLE IF EXISTS `mutant_uploaded_with_class`;
+CREATE TABLE `mutant_uploaded_with_class` (
+  `Class_ID` int(11),
+  `Mutant_ID`  int(11),
+  PRIMARY KEY (`Class_ID`, `Mutant_ID`),
+  FOREIGN KEY (`Class_ID`) REFERENCES classes (`Class_ID`),
+  FOREIGN KEY (`Mutant_ID`) REFERENCES mutants (`Mutant_ID`)
+);
 
 --
 -- Table structure for table `players`
@@ -265,6 +282,7 @@ DROP TABLE IF EXISTS `tests`;
 CREATE TABLE `tests` (
   `Test_ID` int(11) NOT NULL AUTO_INCREMENT,
   `Game_ID` int(11) NOT NULL,
+  `Class_ID` int(11) DEFAULT NULL,
   `JavaFile` varchar(255) NOT NULL,
   `ClassFile` varchar(255) DEFAULT NULL,
   `RoundCreated` int(11) NOT NULL,
@@ -275,7 +293,6 @@ CREATE TABLE `tests` (
   `Lines_Covered` longtext,
   `Lines_Uncovered` longtext,
   `Points` int(11) DEFAULT '0',
-  `Class_ID` int(11) DEFAULT NULL, -- If Game_ID is -1, the test was uploaded together with referenced class.
   PRIMARY KEY (`Test_ID`),
   KEY `fk_playerId_idx` (`Player_ID`),
   KEY `fk_gameId_tests_idx` (`Game_ID`),
@@ -286,6 +303,18 @@ CREATE TABLE `tests` (
   CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) AUTO_INCREMENT=100;
 
+--
+-- Mapping between test and the class the test is uploaded together with
+--
+
+DROP TABLE IF EXISTS `test_uploaded_with_class`;
+CREATE TABLE `test_uploaded_with_class` (
+  `Class_ID` int(11),
+  `Test_ID`  int(11),
+  PRIMARY KEY (`Class_ID`, `Test_ID`),
+  FOREIGN KEY (`Class_ID`) REFERENCES classes (`Class_ID`),
+  FOREIGN KEY (`Test_ID`) REFERENCES tests (`Test_ID`)
+);
 --
 -- Table structure for table `usedaimutants`
 --

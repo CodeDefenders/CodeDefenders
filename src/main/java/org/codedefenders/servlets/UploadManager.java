@@ -63,7 +63,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
@@ -457,40 +456,27 @@ public class UploadManager extends HttpServlet {
         messages.add("Class upload successful.");
         logger.info("Class upload of {} was successful", cutFileName);
 
-        // TODO Somehow the tests and mutants are not related to the class ?!
         // At this point if there's test and mutants we shall run them against each other.
         // Since this is not happening in the context of a game we shall do it manually.
-        List<Mutant> mutants = new ArrayList<>();
-        List<Test> tests = new ArrayList<>();
-        for( CompiledClass compiledClass : compiledClasses ){
-        	if( CompileClassType.MUTANT.equals( compiledClass.type ) ){
-        		mutants.add( MutantDAO.getMutantById( compiledClass.id ) );
-        	} else if (CompileClassType.TEST.equals( compiledClass.type ) ){
-        		tests.add( TestDAO.getTestById( compiledClass.id ) );
-        	}
-        }
-        
+        List<Mutant> mutants = GameClassDAO.getMappedMutantsForClassId(cutId);
+        List<Test> tests = GameClassDAO.getMappedTestsForClassId(cutId);
+
         try {
             // Custom Killmaps are not store in the DB for whatever reason,
             // while we need that !
             // Since gameID = -1, DAOs cannot find the class linked to this
             // game, hence its if, which is needed instead inside mutants and
             // tests
-            KillMap killMap = KillMap.forCustom(tests, mutants, cutId, new ArrayList<KillMapEntry>(), true,
+            KillMap killMap = KillMap.forCustom(tests, mutants, cutId, new ArrayList<>(), true,
                     // Since this is required. Make a default one.
-                    new BiFunction<Test, Mutant, Boolean>() {
-                        @Override
-                        public Boolean apply(Test t, Mutant u) {
-                            return true;
-                        }
-                    });
-            for( KillMapEntry entry : killMap.getEntries()){
+                    (t, u) -> true);
+            for (KillMapEntry entry : killMap.getEntries()) {
+                // TODO Phil 04/12/18: Batch insert instead of insert in a for loop
                 KillmapDAO.insertKillMapEntry(entry, cutId);
             }
         } catch (InterruptedException | ExecutionException e) {
-            // TODO Shall we abort the update for this ?!
-            e.printStackTrace();
-        } 
+            logger.error("Could error while calculating killmap for successfully uploaded class.", e);
+        }
 
         Redirect.redirectBack(request, response);
 
@@ -630,11 +616,12 @@ public class UploadManager extends HttpServlet {
                 }
             }
 
-            Integer mutantId;
+            int mutantId;
             final String md5 = CodeValidator.getMD5FromText(fileContent);
             final Mutant mutant = new Mutant(javaFilePath, classFilePath, md5, cutId);
             try {
                 mutantId = MutantDAO.storeMutant(mutant);
+                MutantDAO.mapMutantToClass(mutantId, cutId);
             } catch (Exception e) {
                 logger.error("Class upload with mutant failed. Could not store mutant to database.");
                 messages.add("Class upload failed. Seems like you uploaded two identical mutants.");
@@ -758,11 +745,12 @@ public class UploadManager extends HttpServlet {
             // LineCoverage#generate requires at least a dummy test object
             final Test dummyTest = new Test(javaFilePath, null, -1, null);
 
-            Integer testId;
+            int testId;
             final LineCoverage lineCoverage = LineCoverageGenerator.generate(cut, dummyTest);
             final Test test = new Test(javaFilePath, classFilePath, cutId, lineCoverage);
             try {
                 testId = TestDAO.storeTest(test);
+                TestDAO.mapTestToClass(testId, cutId);
             } catch (Exception e) {
                 logger.error("Class upload with mutant failed. Could not store test to database.");
                 messages.add("Class upload failed. Internal error. Sorry about that!");
