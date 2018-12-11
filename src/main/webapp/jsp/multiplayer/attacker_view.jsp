@@ -44,6 +44,7 @@
     request.setAttribute("mutantsAlive", game.getAliveMutants());
     request.setAttribute("mutantsKilled", game.getKilledMutants());
     request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
+    request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
     request.setAttribute("markEquivalent", false);
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);

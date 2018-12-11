@@ -16,9 +16,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
  */
-package org.codedefenders;
+package org.codedefenders.database;
 
-import org.codedefenders.database.DatabaseAccess;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;

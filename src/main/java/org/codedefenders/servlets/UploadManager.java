@@ -26,11 +26,14 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
+import org.codedefenders.execution.KillMap;
+import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.execution.LineCoverageGenerator;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
@@ -59,6 +62,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
@@ -88,6 +92,12 @@ public class UploadManager extends HttpServlet {
             "Test.java"
     );
 
+    private ServletFileUpload servletFileUpload;
+
+    // Enable minimal testing
+    void setServletFileUpload(ServletFileUpload servletFileUpload){
+        this.servletFileUpload=servletFileUpload;
+    }
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         response.sendRedirect(request.getContextPath() + "/games/upload");
@@ -124,7 +134,11 @@ public class UploadManager extends HttpServlet {
         // request.getParameter before fetching the file
         List<FileItem> items;
         try {
-            items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
+            if( servletFileUpload == null ){
+                items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
+            }else {
+                items = servletFileUpload.parseRequest(request);
+            }
         } catch (FileUploadException e) {
             logger.error("Failed to upload class. Failed to get file upload parameters.", e);
             Redirect.redirectBack(request, response);
@@ -247,7 +261,6 @@ public class UploadManager extends HttpServlet {
         } else {
             final String fileName = cutFile.fileName;
             final String fileContent = new String(cutFile.fileContent, Charset.forName("UTF-8")).trim();
-
             if (!fileName.endsWith(".java")) {
                 logger.error("Class upload failed. Given file {} was not a .java file.", fileName);
                 messages.add("Class upload failed. The class under test must be a .java file.");
@@ -440,9 +453,32 @@ public class UploadManager extends HttpServlet {
             }
         }
 
-        Redirect.redirectBack(request, response);
         messages.add("Class upload successful.");
         logger.info("Class upload of {} was successful", cutFileName);
+
+        // At this point if there's test and mutants we shall run them against each other.
+        // Since this is not happening in the context of a game we shall do it manually.
+        List<Mutant> mutants = GameClassDAO.getMappedMutantsForClassId(cutId);
+        List<Test> tests = GameClassDAO.getMappedTestsForClassId(cutId);
+
+        try {
+            // Custom Killmaps are not store in the DB for whatever reason,
+            // while we need that !
+            // Since gameID = -1, DAOs cannot find the class linked to this
+            // game, hence its if, which is needed instead inside mutants and
+            // tests
+            KillMap killMap = KillMap.forCustom(tests, mutants, cutId, new ArrayList<>(), true,
+                    // Since this is required. Make a default one.
+                    (t, u) -> true);
+            for (KillMapEntry entry : killMap.getEntries()) {
+                // TODO Phil 04/12/18: Batch insert instead of insert in a for loop
+                KillmapDAO.insertKillMapEntry(entry, cutId);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Could error while calculating killmap for successfully uploaded class.", e);
+        }
+
+        Redirect.redirectBack(request, response);
 
         // TODO Phil: Will this be used in the future? Looks like legacy code.
 //			if (shouldPrepareAI) {
@@ -451,7 +487,6 @@ public class UploadManager extends HttpServlet {
 //					messages.add("Preparation of AI for class failed, please prepare the class again, or try a different class.");
 //				}
 //			}
-
     }
 
     /**
@@ -581,11 +616,12 @@ public class UploadManager extends HttpServlet {
                 }
             }
 
-            Integer mutantId;
+            int mutantId;
             final String md5 = CodeValidator.getMD5FromText(fileContent);
             final Mutant mutant = new Mutant(javaFilePath, classFilePath, md5, cutId);
             try {
                 mutantId = MutantDAO.storeMutant(mutant);
+                MutantDAO.mapMutantToClass(mutantId, cutId);
             } catch (Exception e) {
                 logger.error("Class upload with mutant failed. Could not store mutant to database.");
                 messages.add("Class upload failed. Seems like you uploaded two identical mutants.");
@@ -709,11 +745,12 @@ public class UploadManager extends HttpServlet {
             // LineCoverage#generate requires at least a dummy test object
             final Test dummyTest = new Test(javaFilePath, null, -1, null);
 
-            Integer testId;
+            int testId;
             final LineCoverage lineCoverage = LineCoverageGenerator.generate(cut, dummyTest);
             final Test test = new Test(javaFilePath, classFilePath, cutId, lineCoverage);
             try {
                 testId = TestDAO.storeTest(test);
+                TestDAO.mapTestToClass(testId, cutId);
             } catch (Exception e) {
                 logger.error("Class upload with mutant failed. Could not store test to database.");
                 messages.add("Class upload failed. Internal error. Sorry about that!");

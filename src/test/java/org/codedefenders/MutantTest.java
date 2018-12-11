@@ -24,15 +24,18 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.duel.DuelGame;
 import org.junit.Rule;
+import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
@@ -82,6 +85,13 @@ public class MutantTest {
 		assertEquals(mutantCode, patchedCode);
 	}
 
+	@Test
+	public void exploratoryTest(){
+		List<Integer> mutatedLines = new ArrayList<>();
+		String s = StringUtils.join( mutatedLines, ",");
+		System.out.println("MutantTest.exploratoryTest() " + s);
+		
+	}
 	@org.junit.Test
 	public void testGetLinesForChangeSingleLine() throws IOException{
 		String originalCode = "public class Lift {"+ "\n"
@@ -109,24 +119,30 @@ public class MutantTest {
 		File cutJavaFile = temporaryFolder.newFile();
 		FileUtils.writeStringToFile(cutJavaFile, originalCode);
 		//
-		File mutantJavaFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(mutantJavaFile , mutantCode);
-		
-		GameClass mockedGameClass = mock(GameClass.class);
-		DuelGame mockedDualGame = mock(DuelGame.class);
-		//
-		when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
+        File mutantJavaFile = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
-		PowerMockito.mockStatic(DatabaseAccess.class);
-		when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn( mockedDualGame);
-		when(mockedDualGame.getClassId()).thenReturn(1);
-		when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn( mockedGameClass );
-		//
-		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
-		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
-		
-		Patch p = m.getDifferences();
+        GameClass mockedGameClass = mock(GameClass.class);
+        DuelGame mockedDualGame = mock(DuelGame.class);
+
+        int mockedClassID = 1;
+        int mockedGameID = 1;
+
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
+        when(mockedGameClass.getId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+
+        PowerMockito.mockStatic(DatabaseAccess.class);
+        when(DatabaseAccess.getGameForKey("ID", mockedGameID)).thenReturn(mockedDualGame);
+        when(mockedDualGame.getClassId()).thenReturn(1);
+        when(DatabaseAccess.getClassForKey("Class_ID", mockedClassID)).thenReturn(mockedGameClass);
+        //
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
+        //
+        Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+
+        Patch p = m.getDifferences();
 
 		assertEquals(1, p.getDeltas().size());
 		assertEquals(Arrays.asList(7), m.getLines());
@@ -172,8 +188,14 @@ public class MutantTest {
 		
 		GameClass mockedGameClass = mock(GameClass.class);
 		DuelGame mockedDualGame = mock(DuelGame.class);
-		//
-		when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
+
+		int mockedClassID = 1;
+        int mockedGameID = 1;
+
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
+        when(mockedGameClass.getId() ).thenReturn( mockedClassID );
+        when(mockedDualGame.getClassId()).thenReturn( mockedClassID );
+        when(mockedDualGame.getId()).thenReturn( mockedGameID );
 
 		PowerMockito.mockStatic(DatabaseAccess.class);
 		when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn( mockedDualGame);
@@ -182,7 +204,7 @@ public class MutantTest {
 		//
 		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
 		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+		Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 	
 		Patch p = m.getDifferences();
 		
@@ -215,28 +237,32 @@ public class MutantTest {
 				+ "topFloor = highestFloor;"+ "\n"
 				+ "}"+ "\n"
 				+ "}";
-		
-		File cutJavaFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(cutJavaFile, originalCode);
-		//
-		File mutantJavaFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(mutantJavaFile , mutantCode);
-		
-		GameClass mockedGameClass = mock(GameClass.class);
-		DuelGame mockedDualGame = mock(DuelGame.class);
-		//
-		when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
 
-		PowerMockito.mockStatic(DatabaseAccess.class);
-		when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn( mockedDualGame);
-		when(mockedDualGame.getClassId()).thenReturn(1);
-		when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn( mockedGameClass );
-		//
-		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
-//		
+        File cutJavaFile = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        //
+        File mutantJavaFile = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
-		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+        GameClass mockedGameClass = mock(GameClass.class);
+        DuelGame mockedDualGame = mock(DuelGame.class);
+
+        int mockedClassID = 1;
+        int mockedGameID = 1;
+
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
+        when(mockedGameClass.getId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+
+        PowerMockito.mockStatic(DatabaseAccess.class);
+        when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
+        when(mockedDualGame.getClassId()).thenReturn(1);
+        when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn(mockedGameClass);
+        //
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
+        //
+		Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
 		
@@ -269,28 +295,32 @@ public class MutantTest {
 				+ "topFloor = highestFloor;"+ "\n"
 				+ "}"+ "\n"
 				+ "}";
-		
-		File cutJavaFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(cutJavaFile, originalCode);
-		//
-		File mutantJavaFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(mutantJavaFile , mutantCode);
-		
-		GameClass mockedGameClass = mock(GameClass.class);
-		DuelGame mockedDualGame = mock(DuelGame.class);
-		//
-		when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
 
-		PowerMockito.mockStatic(DatabaseAccess.class);
-		when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn( mockedDualGame);
-		when(mockedDualGame.getClassId()).thenReturn(1);
-		when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn( mockedGameClass );
-		//
-		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
-//		
+        File cutJavaFile = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        //
+        File mutantJavaFile = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
-		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+        GameClass mockedGameClass = mock(GameClass.class);
+        DuelGame mockedDualGame = mock(DuelGame.class);
+
+        int mockedClassID = 1;
+        int mockedGameID = 1;
+
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
+        when(mockedGameClass.getId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+
+        PowerMockito.mockStatic(DatabaseAccess.class);
+        when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
+        when(mockedDualGame.getClassId()).thenReturn(1);
+        when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn(mockedGameClass);
+        //
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
+        //
+		Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
 		
@@ -325,28 +355,31 @@ public class MutantTest {
 				+ "topFloor = highestFloor + 1;"+ "\n" // 10 - Insert
 				+ "}"+ "\n"
 				+ "}";
-		
-		File cutJavaFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(cutJavaFile, originalCode);
-		//
-		File mutantJavaFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(mutantJavaFile , mutantCode);
-		
-		GameClass mockedGameClass = mock(GameClass.class);
-		DuelGame mockedDualGame = mock(DuelGame.class);
-		//
-		when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
 
-		PowerMockito.mockStatic(DatabaseAccess.class);
-		when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn( mockedDualGame);
-		when(mockedDualGame.getClassId()).thenReturn(1);
-		when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn( mockedGameClass );
-		//
-		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
-//		
+        File cutJavaFile = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        //
+        File mutantJavaFile = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
-		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+        GameClass mockedGameClass = mock(GameClass.class);
+        DuelGame mockedDualGame = mock(DuelGame.class);
+
+        int mockedClassID = 1;
+        int mockedGameID = 1;
+
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
+        when(mockedGameClass.getId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+
+        PowerMockito.mockStatic(DatabaseAccess.class);
+        when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
+        when(DatabaseAccess.getClassForKey("Class_ID", mockedClassID)).thenReturn(mockedGameClass);
+        //
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
+        //
+		Mutant m = new Mutant(1,mockedGameClass.getId(),  mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
 		
@@ -397,28 +430,32 @@ public class MutantTest {
 				+ "capacity = maxRiders;"+ "\n"
 				+ "}"+ "\n"
 				+ "}";
-		
-		File cutJavaFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(cutJavaFile, originalCode);
-		//
-		File mutantJavaFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(mutantJavaFile , mutantCode);
-		
-		GameClass mockedGameClass = mock(GameClass.class);
-		DuelGame mockedDualGame = mock(DuelGame.class);
-		//
-		when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
 
-		PowerMockito.mockStatic(DatabaseAccess.class);
-		when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn( mockedDualGame);
-		when(mockedDualGame.getClassId()).thenReturn(1);
-		when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn( mockedGameClass );
-		//
-		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
-//		
+        File cutJavaFile = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        //
+        File mutantJavaFile = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
-		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+        GameClass mockedGameClass = mock(GameClass.class);
+        DuelGame mockedDualGame = mock(DuelGame.class);
+
+        int mockedClassID = 1;
+        int mockedGameID = 1;
+
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
+        when(mockedGameClass.getId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+
+        PowerMockito.mockStatic(DatabaseAccess.class);
+        when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
+        when(mockedDualGame.getClassId()).thenReturn(1);
+        when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn(mockedGameClass);
+        //
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
+        //
+        Mutant m = new Mutant(1,mockedGameClass.getId(),  mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getLines());
 		System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getHTMLReadout());
@@ -458,26 +495,32 @@ public class MutantTest {
 				+ "temp.append(\" i\");" + "\n"
 				+ "}"+ "\n"
 				+ "return temp.toString();}";
-		
-		File cutJavaFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(cutJavaFile, originalCode);
-		//
-		File mutantJavaFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(mutantJavaFile , mutantCode);
 
-		GameClass mockedGameClass = mock(GameClass.class);
-		DuelGame mockedDualGame = mock(DuelGame.class);
-		//
-		when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
+        File cutJavaFile = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        //
+        File mutantJavaFile = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
-		PowerMockito.mockStatic(DatabaseAccess.class);
-		when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn( mockedDualGame);
-		when(mockedDualGame.getClassId()).thenReturn(1);
-		when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn( mockedGameClass );
-		//
-		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
-		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+        GameClass mockedGameClass = mock(GameClass.class);
+        DuelGame mockedDualGame = mock(DuelGame.class);
+
+        int mockedClassID = 1;
+        int mockedGameID = 1;
+
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
+        when(mockedGameClass.getId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+
+        PowerMockito.mockStatic(DatabaseAccess.class);
+        when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
+        when(mockedDualGame.getClassId()).thenReturn(1);
+        when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn(mockedGameClass);
+        //
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
+        //
+        Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
 
@@ -515,25 +558,31 @@ public class MutantTest {
 				+ "}"+ "\n"
 				+ "return temp.toString();}";
 
-		File cutJavaFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(cutJavaFile, originalCode);
-		//
-		File mutantJavaFile = temporaryFolder.newFile();
-		FileUtils.writeStringToFile(mutantJavaFile , mutantCode);
+        File cutJavaFile = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(cutJavaFile, originalCode);
+        //
+        File mutantJavaFile = temporaryFolder.newFile();
+        FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
-		GameClass mockedGameClass = mock(GameClass.class);
-		DuelGame mockedDualGame = mock(DuelGame.class);
-		//
-		when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
+        GameClass mockedGameClass = mock(GameClass.class);
+        DuelGame mockedDualGame = mock(DuelGame.class);
 
-		PowerMockito.mockStatic(DatabaseAccess.class);
-		when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn( mockedDualGame);
-		when(mockedDualGame.getClassId()).thenReturn(1);
-		when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn( mockedGameClass );
-		//
-		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
-		//
-		Mutant m = new Mutant(1, mutantJavaFile.getAbsolutePath(), null, true, 1);
+        int mockedClassID = 1;
+        int mockedGameID = 1;
+
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
+        when(mockedGameClass.getId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+
+        PowerMockito.mockStatic(DatabaseAccess.class);
+        when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
+        when(mockedDualGame.getClassId()).thenReturn(1);
+        when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn(mockedGameClass);
+        //
+        when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
+        //
+        Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 
 		Patch p = m.getDifferences();
 

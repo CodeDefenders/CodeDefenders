@@ -56,6 +56,7 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -83,6 +84,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 
+@Ignore // Test is broken, game232 data are no where..
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ DatabaseConnection.class }) // , MutationTester.class })
@@ -242,7 +244,12 @@ public class MutationTesterTest {
 		// Cut " + cut.getId());
 		//
 		MultiplayerGame multiplayerGame = new MultiplayerGame(cut.getId(), observer.getId(), GameLevel.HARD, (float) 1,
-				(float) 1, (float) 1, 10, 4, 4, 4, 0, 0, (int) 1e5, (int) 1E30, GameState.ACTIVE.name(), false, 2, true, null, false);
+				(float) 1, (float) 1, 10, 4, 4, 4, 0, 0, 
+				//
+				System.currentTimeMillis() - 1000 * 3600,
+				System.currentTimeMillis() + 1000 * 3600,
+				// 
+				GameState.ACTIVE.name(), false, 2, true, null, false);
 		multiplayerGame.insert();
 		//
 		// // Attacker and Defender must join the game. Those calls update also

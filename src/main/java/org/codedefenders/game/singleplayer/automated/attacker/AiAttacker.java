@@ -144,7 +144,7 @@ public class AiAttacker extends AiPlayer {
 		String jFile = origM.getSourceFile();
 		String cFile = origM.getClassFile();
 		int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ID, game.getId());
-		Mutant m = new Mutant(game.getId(), jFile, cFile, true, playerId);
+		Mutant m = new Mutant(game.getId(), cut.getId(), jFile, cFile, true, playerId);
 		m.insert();
 		m.update();
 

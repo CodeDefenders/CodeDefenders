@@ -47,7 +47,7 @@ import javax.servlet.http.HttpSession;
  * This {@link HttpServlet} handles notification requests. Notifications are logged and
  * stored server side. Clients request their most recent notifications.
  * <p>
- * In this servlet, all {@link NotificationType}s are handled.
+ * In this servlet, all {@link NotificationType NotificationTypes} are handled.
  * <p>
  * Serves on path: `/notifications`.
  */
@@ -154,7 +154,7 @@ public class NotificationsHandler extends HttpServlet {
      * <ul>
      *     <li><code>gameId</code></li>
      * </ul>
-	 * If parameters are valid, responds with a JSON list of most recent {@link Event}s.
+	 * If parameters are valid, responds with a JSON list of most recent {@link Event Events}.
      */
 	@SuppressWarnings("Duplicates")
 	private void handlePushEventRequest(HttpSession session, HttpServletRequest request, HttpServletResponse response, int userId) throws IOException {
@@ -199,7 +199,7 @@ public class NotificationsHandler extends HttpServlet {
 	 *     <li><code>gameId</code></li>
 	 *     <li><code>timestamp</code></li>
 	 * </ul>
-     * If parameters are valid, responds with a JSON list of most recent game {@link Event}s.
+     * If parameters are valid, responds with a JSON list of most recent game {@link Event Events}.
 	 */
 	@SuppressWarnings("Duplicates")
 	private void handleGameEventRequest(HttpServletRequest request, HttpServletResponse response, int userId) throws IOException {
@@ -251,7 +251,7 @@ public class NotificationsHandler extends HttpServlet {
 	 * <ul>
 	 *     <li><code>timestamp</code></li>
 	 * </ul>
-	 * If parameters are valid, responds with a JSON list of most recent user {@link Event}s.
+	 * If parameters are valid, responds with a JSON list of most recent user {@link Event Events}.
 	 */
 	@SuppressWarnings("Duplicates")
 	private void handleUserEventRequest(HttpServletRequest request, HttpServletResponse response, int userId) throws IOException {
