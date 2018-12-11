@@ -19,8 +19,10 @@
 package org.codedefenders.servlets.games;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.UserDAO;
+import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
@@ -347,6 +349,9 @@ public class MultiplayerGameManager extends HttpServlet {
 						if (testOriginalTarget.status.equals("SUCCESS")) {
 							messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 
+							// Include Test Smells in the messages back to user
+							includeDetectTestSmellsInMessages(newTest, messages);
+
 							Event notif = new Event(-1, activeGame.getId(), uid,
 									UserDAO.getUserById(uid).getUsername() + " created a test",
 									EventType.DEFENDER_TEST_CREATED, EventStatus.GAME,
@@ -378,5 +383,17 @@ public class MultiplayerGameManager extends HttpServlet {
 				break;
 		}
 		response.sendRedirect(contextPath + "/multiplayer/play");
+	}
+
+	private void includeDetectTestSmellsInMessages(Test newTest, ArrayList<String> messages) {
+		List<String> detectedTestSmells = TestSmellsDAO.getDetectedTestSmellsFor(newTest);
+		if (!detectedTestSmells.isEmpty()) {
+			if (detectedTestSmells.size() == 1) {
+				messages.add("Your test has the following smell: " + detectedTestSmells.get(0));
+			} else {
+				String join = StringUtils.join(detectedTestSmells, ", ");
+				messages.add("Your test has the following smells: " + join);
+			}
+		}
 	}
 }

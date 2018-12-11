@@ -18,6 +18,14 @@
  */
 package org.codedefenders.validation.code;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Stream;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -35,15 +43,8 @@ import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
-import com.github.javaparser.ast.visitor.ModifierVisitorAdapter;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Stream;
+import com.github.javaparser.ast.visitor.ModifierVisitor;
+import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
 /**
  * This class checks test code and checks whether the code is valid or not.
@@ -62,7 +63,10 @@ import java.util.stream.Stream;
  * @author gambi
  * @author <a href="https://github.com/werli">Phil Werli<a/>
  */
-class TestCodeVisitor extends ModifierVisitorAdapter<Void> {
+
+// TODO Why we need a Modifier visitor if we DO NOT modify the class we are visiting...
+
+class TestCodeVisitor extends ModifierVisitor<Void> {
     private static final Logger logger = LoggerFactory.getLogger(TestCodeVisitor.class);
 //  we can use TypeSolver for the visit to implement a fine grain security mechanism
 
@@ -132,7 +136,7 @@ class TestCodeVisitor extends ModifierVisitorAdapter<Void> {
         if (!isValid) {
             return stmt;
         }
-        String stringStmt = stmt.toStringWithoutComments();
+        String stringStmt = stmt.toString( new PrettyPrinterConfiguration().setPrintComments(false));
         for (String prohibited : CodeValidator.PROHIBITED_CALLS) {
             // This might be a bit too strict... We shall use typeSolver otherwise.
             if (stringStmt.contains(prohibited)) {
@@ -142,12 +146,12 @@ class TestCodeVisitor extends ModifierVisitorAdapter<Void> {
             }
         }
         stmtCount++;
-        return super.visit(stmt, args);
+        return (Node) super.visit(stmt, args);
     }
 
     @Override
     public Node visit(NameExpr stmt, Void args) {
-        final String name = stmt.getName();
+        final String name = stmt.getNameAsString();
         if (name.equals("System") || name.equals("Random") || name.equals("Thread")) {
             messages.add("Invalid test contains System/Random/Thread uses");
             isValid = false;
@@ -204,6 +208,7 @@ class TestCodeVisitor extends ModifierVisitorAdapter<Void> {
         return stmt;
     }
 
+    // TODO I am not sure assert and Assert shall be trated the same way...
     @Override
     public Node visit(AssertStmt stmt, Void args) {
         stmtCount++;
@@ -225,10 +230,10 @@ class TestCodeVisitor extends ModifierVisitorAdapter<Void> {
             messages.add("There is a call to System/Random.*");
             isValid = false;
         }
-
+        // This is missing assertThat and all the other assertMethods ?
         final boolean anyMatch = Arrays.stream(new String[]{"assertEquals", "assertTrue", "assertFalse", "assertNull",
-                "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals"})
-                .anyMatch(s -> stmt.getName().equals(s));
+                "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals", "assertThat"})
+                .anyMatch(s -> stmt.getNameAsString().equals(s));
         if (anyMatch) {
             if (assertionCount++ > maxNumberOfAssertions) {
                 isValid = false;
@@ -245,8 +250,8 @@ class TestCodeVisitor extends ModifierVisitorAdapter<Void> {
             return stmt;
         }
         super.visit(stmt, args);
-        if (stmt.getInit() != null && (stmt.getInit().toString().startsWith("System.*") || stmt.getInit().toString().startsWith("Random.*") ||
-                stmt.getInit().toString().contains("Thread"))) {
+        if (stmt.getInitializer() != null && (stmt.getInitializer().toString().startsWith("System.*") || stmt.getInitializer().toString().startsWith("Random.*") ||
+                stmt.getInitializer().toString().contains("Thread"))) {
             messages.add("There is a variable declaration using Thread/System/Random.*");
             isValid = false;
         }
@@ -259,7 +264,7 @@ class TestCodeVisitor extends ModifierVisitorAdapter<Void> {
             return stmt;
         }
         final BinaryExpr.Operator operator = stmt.getOperator();
-        if (operator == BinaryExpr.Operator.and || operator == BinaryExpr.Operator.or) {
+        if (operator == BinaryExpr.Operator.AND || operator == BinaryExpr.Operator.OR) {
             isValid = false;
         }
         return stmt;
@@ -271,7 +276,7 @@ class TestCodeVisitor extends ModifierVisitorAdapter<Void> {
             return expr;
         }
         final AssignExpr.Operator operator = expr.getOperator();
-        if (operator != null && (Stream.of(AssignExpr.Operator.and, AssignExpr.Operator.or, AssignExpr.Operator.xor)
+        if (operator != null && (Stream.of(AssignExpr.Operator.AND, AssignExpr.Operator.OR, AssignExpr.Operator.XOR)
                 .anyMatch(op -> operator == op))) {
             isValid = false;
         }

@@ -6,11 +6,12 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
-
-
---
--- Table structure for table `settings`
---
+DROP TABLE IF EXISTS `test_smell`;
+CREATE TABLE test_smell (
+	`test_ID` int(11),
+	`smell_name` VARCHAR(500),
+	PRIMARY KEY (test_ID, smell_name) 
+);
 
 DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings` (

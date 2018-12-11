@@ -21,6 +21,7 @@ package org.codedefenders.servlets.games;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
@@ -78,6 +79,10 @@ import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
+
+import org.codedefenders.database.TestSmellsDAO;
+import testsmell.TestFile;
+import testsmell.TestSmellDetector;
 
 public class GameManager extends HttpServlet {
 
@@ -492,7 +497,18 @@ public class GameManager extends HttpServlet {
 		// Eventually check the test actually passes when applied to the original code.
 		if (compileTestTarget.status.equals("SUCCESS")) {
 			AntRunner.testOriginal(newTestDir, newTest);
+			try {
+				// Detect test smell and store them to DB
+				TestSmellDetector testSmellDetector = TestSmellDetector.createTestSmellDetector();
+				TestFile testFile = new TestFile("", newTest.getJavaFile(), classUnderTest.getJavaFile());
+				testSmellDetector.detectSmells(testFile);
+				TestSmellsDAO.storeSmell(newTest, testFile);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
+
 		return newTest;
 	}
 

@@ -18,16 +18,22 @@
  */
 package org.codedefenders.validation.code;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
-import com.github.javaparser.ast.stmt.*;
-import com.github.javaparser.ast.visitor.ModifierVisitorAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.github.javaparser.ast.stmt.DoStmt;
+import com.github.javaparser.ast.stmt.ForStmt;
+import com.github.javaparser.ast.stmt.ForeachStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.SwitchStmt;
+import com.github.javaparser.ast.stmt.WhileStmt;
+import com.github.javaparser.ast.visitor.ModifierVisitor;
 
 /**
  * This class checks mutant code and checks whether the code is valid or not.
@@ -46,7 +52,7 @@ if (!visitor.isValid()) {
  * @author Jose Rojas
  * @author <a href="https://github.com/werli">Phil Werli<a/>
  */
-class MutationVisitor extends ModifierVisitorAdapter<Void> {
+class MutationVisitor extends ModifierVisitor<Void> {
 	private static final Logger logger = LoggerFactory.getLogger(MutationVisitor.class);
 
 	private final CodeValidatorLevel level;
@@ -94,7 +100,7 @@ class MutationVisitor extends ModifierVisitorAdapter<Void> {
 			return stmt;
 		}
 		super.visit(stmt, args);
-		if (stmt.getName().equals("System")) {
+		if (stmt.getNameAsString().equals("System")) {
 			this.message = ValidationMessage.MUTATION_SYSTEM_USE;
 			isValid = false;
 		}
@@ -204,7 +210,7 @@ class MutationVisitor extends ModifierVisitorAdapter<Void> {
 			return stmt;
 		}
 		super.visit(stmt, args);
-		if (stmt.getInit() != null && stmt.getInit().toString().startsWith("System.*")) {
+		if (stmt.getInitializer() != null && stmt.getInitializer().toString().startsWith("System.*")) {
 			this.message = ValidationMessage.MUTATION_SYSTEM_DECLARATION;
 			isValid = false;
 		}
