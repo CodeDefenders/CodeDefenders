@@ -62,6 +62,7 @@
         <ul class="dropdown-menu">
             <li><a id="adminAnalyticsUsers" href="<%=request.getContextPath() + Constants.ADMIN_ANALYTICS_USERS%>">Users</a></li>
             <li><a id="adminAnalyticsClasses" href="<%=request.getContextPath() + Constants.ADMIN_ANALYTICS_CLASSES%>">Classes</a></li>
+            <li><a id="adminAnalyticsKillmaps" href="<%=request.getContextPath() + Constants.ADMIN_ANALYTICS_KILLMAPS%>">KillMaps</a></li>
         </ul>
     </li>
 </ul>

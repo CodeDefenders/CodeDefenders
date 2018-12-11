@@ -416,6 +416,30 @@ public class KillMap {
             return entry;
         }
     }
+    /**
+     * Represents a job for computing a killmap
+     */
+    public static class KillMapJob {
+        public static enum Type {
+            CLASS, GAME;
+        }
+
+        private Type type;
+        private Integer reference;
+
+        public KillMapJob(Type type, Integer reference) {
+            this.type = type;
+            this.reference = reference;
+        }
+
+        public Type getType() {
+            return type;
+        }
+
+        public Integer getReference() {
+            return reference;
+        }
+    }
 
     /**
      * Represents a result of executing a test against a mutant.

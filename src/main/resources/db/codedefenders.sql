@@ -6,6 +6,17 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+DROP TABLE IF EXISTS `killmapjob`;
+
+CREATE TABLE killmapjob
+(
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Game_ID` int(11),
+  `Class_ID` int(11),
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ID`)
+) AUTO_INCREMENT=1;
+
 DROP TABLE IF EXISTS `test_smell`;
 CREATE TABLE test_smell (
 	`test_ID` int(11),
@@ -13,6 +24,9 @@ CREATE TABLE test_smell (
 	PRIMARY KEY (test_ID, smell_name) 
 );
 
+--
+-- Table structure for table `settings`
+--
 DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings` (
   `name` varchar(50) NOT NULL,
@@ -44,7 +58,8 @@ INSERT INTO settings (name, type, STRING_VALUE, INT_VALUE, BOOL_VALUE) VALUES
   ('EMAIL_ADDRESS', 'STRING_VALUE', '', NULL, NULL),
   ('EMAILS_ENABLED', 'BOOL_VALUE', NULL, NULL, FALSE),
   ('DEBUG_MODE', 'BOOL_VALUE', NULL, NULL, FALSE),
-  ('EMAIL_PASSWORD', 'STRING_VALUE', '', NULL, NULL);
+  ('EMAIL_PASSWORD', 'STRING_VALUE', '', NULL, NULL),
+  ('AUTOMATIC_KILLMAP_COMPUTATION', 'BOOL_VALUE', NULL, NULL, FALSE);
 
 --
 -- Table structure for table `ratings`
