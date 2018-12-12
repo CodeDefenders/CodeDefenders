@@ -67,6 +67,13 @@ public class DatabaseAccess {
 		return s;
 	}
 
+	public static String addSlashes(String s) {
+		if (s == null) {
+			return null;
+		}
+		return s.replaceAll("\\\\", "\\\\\\\\");
+	}
+
 	public static int getInt(PreparedStatement stmt, String att, Connection conn) {
 		int n = -1;
 		try {
@@ -196,10 +203,6 @@ public class DatabaseAccess {
 			throw e;
 		}
 		return getGameForKey("ID", gID);
-	}
-
-	public static String addSlashes(String s) {
-		return s.replaceAll("\\\\", "\\\\\\\\");
 	}
 
 	public static int getNumAiMutantsKilledByTest(int tId) {
