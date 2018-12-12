@@ -19,6 +19,7 @@
 package org.codedefenders.game;
 
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
@@ -85,7 +86,7 @@ public abstract class AbstractGame {
 
 	public GameClass getCUT() {
 		if (cut == null) {
-			cut = DatabaseAccess.getClassForKey("Class_ID", classId);
+			cut = GameClassDAO.getClassForId(classId);
 		}
 		return cut;
 	}

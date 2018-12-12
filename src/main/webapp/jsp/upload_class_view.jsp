@@ -18,10 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.database.FeedbackDAO" %>
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="java.util.List" %>
 <% String pageTitle=null; %>
 <%@ include file="/jsp/header_main.jsp" %>
@@ -115,7 +113,7 @@
 		-->
 		<div id="classList" >
 			<%
-				List<GameClass> gameClasses = DatabaseAccess.getAllClasses();
+				List<GameClass> gameClasses = GameClassDAO.getAllClasses();
 				List<Double> avgMutationDifficulties = FeedbackDAO.getAverageMutationDifficulties();
 				List<Double> avgTestDifficulties = FeedbackDAO.getAverageTestDifficulties();
 			%>

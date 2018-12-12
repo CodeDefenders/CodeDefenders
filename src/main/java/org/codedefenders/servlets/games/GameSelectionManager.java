@@ -18,11 +18,12 @@
  */
 package org.codedefenders.servlets.games;
 
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.singleplayer.PrepareAI;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
@@ -99,12 +100,12 @@ public class GameSelectionManager extends HttpServlet {
                     }
                     */
 
-                    if (classId != 0 && DatabaseAccess.getClassForKey("Class_ID", classId) != null) {
+                    if (classId != 0 && GameClassDAO.getClassForId(classId) != null) {
                         //Valid class selected.
 
                         if (mode.equals(GameMode.SINGLE)) {
                             //Create singleplayer game.
-                            if (PrepareAI.isPrepared(DatabaseAccess.getClassForKey("Class_ID", classId))) {
+                            if (PrepareAI.isPrepared(GameClassDAO.getClassForId(classId))) {
                                 SinglePlayerGame nGame = new SinglePlayerGame(classId, uid, rounds, role, level);
                                 nGame.insert();
                                 if (role.equals(Role.ATTACKER)) {

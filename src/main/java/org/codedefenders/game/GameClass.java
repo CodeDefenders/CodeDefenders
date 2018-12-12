@@ -18,34 +18,6 @@
  */
 package org.codedefenders.game;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang3.Range;
-import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.DatabaseValue;
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.game.singleplayer.NoDummyGameException;
-import org.codedefenders.model.Dependency;
-import org.codedefenders.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
@@ -60,6 +32,31 @@ import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang3.Range;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.game.singleplayer.NoDummyGameException;
+import org.codedefenders.model.Dependency;
+import org.codedefenders.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import edu.emory.mathcs.backport.java.util.Collections;
 
@@ -189,41 +186,14 @@ public class GameClass {
 		return dependencies;
 	}
 
-	@Deprecated
 	public boolean insert() {
-		logger.debug("Inserting class (Name={}, Alias={}, JavaFile={}, ClassFile={}, RequireMocking={})", name, alias, javaFile, classFile, isMockingEnabled);
-		// Attempt to insert game info into database
-		Connection conn = DB.getConnection();
-		String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile, RequireMocking) VALUES (?, ?, ?, ?, ?);";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(name),
-				DB.getDBV(alias),
-				DB.getDBV(javaFile),
-				DB.getDBV(classFile),
-				DB.getDBV(isMockingEnabled)};
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		int res = DB.executeUpdateGetKeys(stmt, conn);
-		if (res > -1) {
-			this.id = res;
-			logger.debug("Inserted CUT with ID: " + this.id);
+		try {
+			this.id = GameClassDAO.storeClass(this);
 			return true;
+		} catch (UncheckedSQLException e) {
+			logger.error("Failed to store test to database.", e);
+			return false;
 		}
-		return false;
-	}
-
-	@Deprecated
-	public boolean update() {
-		logger.debug("Updating class (Name={}, Alias={}, JavaFile={}, ClassFile={}, RequireMocking={})", name, alias, javaFile, classFile, isMockingEnabled);
-		// Attempt to update game info into database
-		Connection conn = DB.getConnection();
-		String query = "UPDATE classes SET Name=?, Alias=?, JavaFile=?, ClassFile=?, RequireMocking=? WHERE Class_ID=?;";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(name),
-				DB.getDBV(alias),
-				DB.getDBV(javaFile),
-				DB.getDBV(classFile),
-				DB.getDBV(isMockingEnabled),
-				DB.getDBV(id)};
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		return DB.executeUpdate(stmt, conn);
 	}
 
 	/**

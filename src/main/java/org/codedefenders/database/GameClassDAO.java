@@ -18,6 +18,7 @@
  */
 package org.codedefenders.database;
 
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -27,7 +28,18 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
+
+import static org.codedefenders.database.DB.RSMapper;
+import static org.codedefenders.database.DB.createPreparedStatement;
+import static org.codedefenders.database.DB.executeQueryReturnList;
+import static org.codedefenders.database.DB.executeQueryReturnValue;
+import static org.codedefenders.database.DB.executeUpdate;
+import static org.codedefenders.database.DB.executeUpdateGetKeys;
+import static org.codedefenders.database.DB.getConnection;
+import static org.codedefenders.database.DB.getDBV;
 
 /**
  * This class handles the database logic for Java classes.
@@ -39,6 +51,66 @@ public class GameClassDAO {
     private static final Logger logger = LoggerFactory.getLogger(GameClassDAO.class);
 
     /**
+     * Constructs a game class from a {@link ResultSet} entry.
+     *
+     * @param rs The {@link ResultSet}.
+     * @return The constructed game class.
+     * @see RSMapper
+     */
+    public static GameClass gameClassFromRS(ResultSet rs) throws SQLException {
+        int classId = rs.getInt("Class_ID");
+        String name = rs.getString("Name");
+        String alias = rs.getString("Alias");
+        String javaFile = rs.getString("JavaFile");
+        String classFile = rs.getString("ClassFile");
+        boolean requireMocking = rs.getBoolean("RequireMocking");
+
+        return new GameClass(classId , name, alias, javaFile, classFile, requireMocking);
+    }
+
+
+    /**
+     * Retrieves a game class for a given identifier.
+     *
+     * @param classId the given identifier.
+     * @return a {@link GameClass} instance, or {@code null}.
+     */
+    public static GameClass getClassForId(int classId) {
+        String query = "SELECT * FROM classes WHERE Class_ID = ?;";
+
+        return executeQueryReturnValue(query, GameClassDAO::gameClassFromRS, getDBV(classId));
+    }
+
+    /**
+     * Retrieves a game class for a given identifier of a {@link AbstractGame Game}.
+     *
+     * @param gameId the given game identifier.
+     * @return a {@link GameClass} instance, or {@code null}.
+     */
+    public static GameClass getClassForGameId(int gameId) {
+        String query = String.join("\n",
+                "SELECT classes.*",
+                "FROM classes",
+                "INNER JOIN games",
+                "  ON classes.Class_ID = games.Class_ID",
+                "WHERE games.ID=?;"
+        );
+        return executeQueryReturnValue(query, GameClassDAO::gameClassFromRS, getDBV(gameId));
+    }
+
+    /**
+     * Retrieves all game classes in a {@link List}. If no game classes
+     * are found, the list is empty, but not {@link null}.
+     *
+     * @return all game classes.
+     */
+    public static List<GameClass> getAllClasses() {
+        String query = "SELECT * FROM classes;";
+
+        return executeQueryReturnList(query, GameClassDAO::gameClassFromRS);
+    }
+
+    /**
      * Checks for a given alias whether a class with this alias do not yet exist.
      *
      * @param alias the alias that is checked.
@@ -46,7 +118,7 @@ public class GameClassDAO {
      */
     public static boolean classNotExistsForAlias(String alias) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM classes WHERE Alias = ?";
-        Boolean rv = DB.executeQueryReturnValue(query, rs -> true, DB.getDBV(alias));
+        Boolean rv = executeQueryReturnValue(query, rs -> true, getDBV(alias));
         return rv != null;
     }
 
@@ -64,7 +136,7 @@ public class GameClassDAO {
                 "FROM mutant_uploaded_with_class",
                 "WHERE Class_ID = ?"
         );
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("Mutant_ID"), DB.getDBV(classId));
+        return executeQueryReturnList(query, rs -> rs.getInt("Mutant_ID"), getDBV(classId));
     }
 
     /**
@@ -82,7 +154,7 @@ public class GameClassDAO {
                 "WHERE up.Class_ID = ?",
                 "   AND up.Mutant_ID = mutants.Mutant_ID"
         );
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(classId));
+        return executeQueryReturnList(query, MutantDAO::mutantFromRS, getDBV(classId));
     }
 
     /**
@@ -99,7 +171,7 @@ public class GameClassDAO {
                 "FROM test_uploaded_with_class",
                 "WHERE Class_ID = ?"
         );
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("Test_ID"), DB.getDBV(classId));
+        return executeQueryReturnList(query, rs -> rs.getInt("Test_ID"), getDBV(classId));
     }
 
     /**
@@ -116,7 +188,7 @@ public class GameClassDAO {
                 "WHERE up.Class_ID = ?",
                 "   AND up.Test_ID = tests.Test_ID"
                 );
-        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(classId));
+        return executeQueryReturnList(query, TestDAO::testFromRS, getDBV(classId));
     }
 
     /**
@@ -129,7 +201,7 @@ public class GameClassDAO {
     public static List<Integer> getMappedDependencyIdsForClassId(Integer classId)
             throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT Dependency_ID FROM dependencies WHERE Class_ID = ?;";
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("Dependency_ID"), DB.getDBV(classId));
+        return executeQueryReturnList(query, rs -> rs.getInt("Dependency_ID"), getDBV(classId));
     }
 
     /**
@@ -147,7 +219,7 @@ public class GameClassDAO {
                 "   JavaFile,",
                 "   ClassFile",
                 "FROM dependencies WHERE Class_ID = ?;");
-        return DB.executeQueryReturnList(query, rs -> DependencyDAO.dependencyFromRS(rs, classId), DB.getDBV(classId));
+        return executeQueryReturnList(query, rs -> DependencyDAO.dependencyFromRS(rs, classId), getDBV(classId));
     }
 
     /**
@@ -156,9 +228,9 @@ public class GameClassDAO {
      *
      * @param cut the given class as a {@link GameClass}.
      * @return An identifier as an integer value.
-     * @throws Exception If storing the class was not successful.
+     * @throws UncheckedSQLException If storing the class was not successful.
      */
-    public static int storeClass(GameClass cut) throws Exception {
+    public static int storeClass(GameClass cut) throws UncheckedSQLException {
         String name = cut.getName();
         String alias = cut.getAlias();
         String javaFile = DatabaseAccess.addSlashes(cut.getJavaFile());
@@ -167,21 +239,21 @@ public class GameClassDAO {
 
         String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile, RequireMocking) VALUES (?, ?, ?, ?, ?);";
         DatabaseValue[] valueList = new DatabaseValue[]{
-                DB.getDBV(name),
-                DB.getDBV(alias),
-                DB.getDBV(javaFile),
-                DB.getDBV(classFile),
-                DB.getDBV(isMockingEnabled)};
+                getDBV(name),
+                getDBV(alias),
+                getDBV(javaFile),
+                getDBV(classFile),
+                getDBV(isMockingEnabled)};
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        Connection conn = getConnection();
+        PreparedStatement stmt = createPreparedStatement(conn, query, valueList);
 
-        final int result = DB.executeUpdateGetKeys(stmt, conn);
+        final int result = executeUpdateGetKeys(stmt, conn);
         if (result != -1) {
             logger.debug("Successfully stored class in database[Name={}, Alias={}].", cut.getName(), cut.getAlias());
             return result;
         } else {
-            throw new Exception("Could not store class to database.");
+            throw new UncheckedSQLException("Could not store class to database.");
         }
     }
 
@@ -193,12 +265,12 @@ public class GameClassDAO {
      */
     public static boolean removeClassForId(Integer id) {
         String query = "DELETE FROM classes WHERE Class_ID = ?;";
-        DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(id)};
+        DatabaseValue[] valueList = new DatabaseValue[]{getDBV(id)};
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        Connection conn = getConnection();
+        PreparedStatement stmt = createPreparedStatement(conn, query, valueList);
 
-        return DB.executeUpdate(stmt, conn);
+        return executeUpdate(stmt, conn);
 
     }
 
@@ -222,9 +294,9 @@ public class GameClassDAO {
         String query = bob.toString();
         DatabaseValue[] valueList = classes.stream().map(DB::getDBV).toArray(DatabaseValue[]::new);
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        Connection conn = getConnection();
+        PreparedStatement stmt = createPreparedStatement(conn, query, valueList);
 
-        return DB.executeUpdate(stmt, conn);
+        return executeUpdate(stmt, conn);
     }
 }

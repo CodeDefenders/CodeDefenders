@@ -22,6 +22,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
@@ -118,7 +119,7 @@ public class AntRunner {
 	/////
 
 	public static boolean testKillsMutant(Mutant m, Test t) {
-		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
+		GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
 
 		AntProcessResult result = runAntTarget("test-mutant", m.getDirectory(), t.getDirectory(), cut, t.getFullyQualifiedClassName());
 
@@ -135,9 +136,9 @@ public class AntRunner {
 	@SuppressWarnings("Duplicates")
 	static TargetExecution testMutant(Mutant m, Test t) {
 		logger.info("Running test {} on mutant {}", t.getId(), m.getId());
-		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
+		GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
 		if( cut == null ){
-		    cut = DatabaseAccess.getClassForKey("Class_ID", m.getClassId());
+		    cut = GameClassDAO.getClassForId(m.getClassId());
 		}
 
 		// Check if this mutant requires a test recompilation
@@ -168,7 +169,7 @@ public class AntRunner {
 	@SuppressWarnings("Duplicates")
 	static TargetExecution recompileTestAndTestMutant(Mutant m, Test t) {
 		logger.info("Running test {} on mutant {}", t.getId(), m.getId());
-		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
+		GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
 
 		AntProcessResult result = runAntTarget("recompile-test-mutant", m.getDirectory(), t.getDirectory(), cut, t.getFullyQualifiedClassName());
 
@@ -191,7 +192,7 @@ public class AntRunner {
 
 	public static boolean potentialEquivalent(Mutant m) {
 		logger.info("Checking if mutant {} is potentially equivalent.", m.getId());
-		GameClass cut = DatabaseAccess.getClassForGame(m.getGameId());
+		GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
 		String suiteDir = AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias();
 
 		// TODO: is this actually executing a whole test suite?
@@ -219,7 +220,7 @@ public class AntRunner {
 	 * @return A {@link TargetExecution} object
 	 */
 	public static TargetExecution testOriginal(File dir, Test t) {
-		GameClass cut = DatabaseAccess.getClassForGame(t.getGameId());
+		GameClass cut = GameClassDAO.getClassForGameId(t.getGameId());
 
 		AntProcessResult result = runAntTarget("test-original", null, dir.getAbsolutePath(), cut, t.getFullyQualifiedClassName(), forceLocalExecution);
 
