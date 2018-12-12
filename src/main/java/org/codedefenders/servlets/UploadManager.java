@@ -29,6 +29,7 @@ import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
@@ -751,7 +752,7 @@ public class UploadManager extends HttpServlet {
             try {
                 testId = TestDAO.storeTest(test);
                 TestDAO.mapTestToClass(testId, cutId);
-            } catch (Exception e) {
+            } catch (UncheckedSQLException e) {
                 logger.error("Class upload with mutant failed. Could not store test to database.");
                 messages.add("Class upload failed. Internal error. Sorry about that!");
 

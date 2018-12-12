@@ -19,16 +19,14 @@
 
 --%>
 <%@ page import="org.apache.commons.collections.ListUtils" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.database.GameClassDAO" %>
+<%@ page import="org.codedefenders.database.UserDAO" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.game.GameState" %>
-<%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.leaderboard.Entry" %>
-<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminCreateGames" %>
-<%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
-<%@ page import="org.codedefenders.database.*" %>
+<%@ page import="java.util.List" %>
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
@@ -355,7 +353,7 @@
             <div class="col-sm-2" id="cutDiv">
                 <label for="cut_select" class="label-normal">CUT</label>
                 <select name="class" class="form-control selectpicker" data-size="large" id="cut_select">
-                    <% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
+                    <% for (GameClass c : GameClassDAO.getAllClasses()) { %>
                     <option value="<%=c.getId()%>"><%=c.getAlias()%>
                     </option>
                     <%}%>

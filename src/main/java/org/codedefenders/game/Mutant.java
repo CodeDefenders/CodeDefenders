@@ -25,11 +25,12 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.util.Constants;
-import org.codedefenders.util.MutantUtils;
+import org.codedefenders.util.FileUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,8 @@ import difflib.Patch;
 public class Mutant implements Serializable {
 
 	private static final Logger logger = LoggerFactory.getLogger(Mutant.class);
+	// https://stackoverflow.com/questions/9577930/regular-expression-to-select-all-whitespace-that-isnt-in-quotes
+	public static String regex = "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
 
 	private int id;
 	private int gameId;
@@ -74,9 +77,7 @@ public class Mutant implements Serializable {
     private String creatorName;
 	private int creatorId;
 
-	// Every mutant has its own
-	private MutantUtils mutantUtils = new MutantUtils();
-	private boolean alive = true;
+	private boolean alive;
 
 	private int killingTestId = 0;
 
@@ -92,8 +93,11 @@ public class Mutant implements Serializable {
 
 	private int playerId;
 
-	private transient int killedByAITests = 0; //How many times this mutant is killed
-	// by an AI test.
+	/**
+	 * Indicates how many times this mutant is
+	 * killed by an AI test.
+	 */
+	private transient int killedByAITests = 0;
 
 	private int score; // multiplayer
 
@@ -158,6 +162,11 @@ public class Mutant implements Serializable {
 			this.killingTestId = DatabaseAccess.getKillingTestIdForMutant(id);
 
 		score = 0;
+	}
+
+	public Mutant(int mid, int classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId, String md5) {
+		this(mid, classId, gid, jFile, cFile, alive, equiv, rCreated, rKilled, playerId);
+		this.md5 = md5;
 	}
 
     public String getCreatorName() {
@@ -241,6 +250,7 @@ public class Mutant implements Serializable {
 	}
 
 	// TODO why does incrementScore update the DB entry, shouldn't this be done with update()
+	// TODO Phil 12/12/18: extract database logic to MutantDAO
 	public void incrementScore(int score){
 		if( score == 0 ){
 			logger.debug("Do not update mutant {} score by 0", getId());
@@ -266,6 +276,7 @@ public class Mutant implements Serializable {
 		return kill(equivalent);
 	}
 
+	// TODO Phil 12/12/18: extract database logic to MutantDAO
 	public boolean kill(Equivalence equivalent) {
 		alive = false;
 		roundKilled = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
@@ -315,9 +326,9 @@ public class Mutant implements Serializable {
 
 	public boolean doesRequireRecompilation() {
 	    // dummy game with id = -1 has null class, and this check cannot be implemented...
-		GameClass cut = DatabaseAccess.getClassForGame(gameId);
+		GameClass cut = GameClassDAO.getClassForGameId(gameId);
 		if(  cut == null ){
-		    cut = DatabaseAccess.getClassForKey("Class_ID", classId);
+		    cut = GameClassDAO.getClassForId(classId);
 		}
 		return CollectionUtils.containsAny(cut.getLinesOfCompileTimeConstants(), getLines());
 	}
@@ -370,9 +381,6 @@ public class Mutant implements Serializable {
 		return 0;
 	}
 
-	// https://stackoverflow.com/questions/9577930/regular-expression-to-select-all-whitespace-that-isnt-in-quotes
-	public static String regex = "\\s+(?=((\\\\[\\\\\"]|[^\\\\\"])*\"(\\\\[\\\\\"]|[^\\\\\"])*\")*(\\\\[\\\\\"]|[^\\\\\"])*$)";
-
     public Patch getDifferences() {
         if (difference == null) {
             computeDifferences();
@@ -382,11 +390,11 @@ public class Mutant implements Serializable {
 
 	// Not sure
 	public void computeDifferences() {
-		GameClass sut = DatabaseAccess.getClassForGame(gameId);
+		GameClass sut = GameClassDAO.getClassForGameId(gameId);
 		if( sut == null ){
             // in this case gameId might have been -1 (upload)
             // so we try to reload the sut
-            sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+            sut = GameClassDAO.getClassForId(classId);
         }
 
 		assert sut != null;
@@ -394,8 +402,8 @@ public class Mutant implements Serializable {
 		File sourceFile = new File(sut.getJavaFile());
 		File mutantFile = new File(javaFile);
 
-		List<String> sutLines = mutantUtils.readLinesIfFileExist(sourceFile.toPath());
-		List<String> mutantLines = mutantUtils.readLinesIfFileExist(mutantFile.toPath());
+        List<String> sutLines = FileUtils.readLines(sourceFile.toPath());
+        List<String> mutantLines = FileUtils.readLines(mutantFile.toPath());
 
 		for (int l = 0; l < sutLines.size(); l++) {
 			sutLines.set(l, sutLines.get(l).replaceAll(regex, ""));
@@ -409,18 +417,18 @@ public class Mutant implements Serializable {
 	}
 
 	public String getPatchString() {
-	    GameClass sut = DatabaseAccess.getClassForGame(gameId);
+	    GameClass sut = GameClassDAO.getClassForGameId(gameId);
 	    if( sut == null ){
 	        // in this case gameId might have been -1 (upload)
 	        // so we try to reload the sut
-	        sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+	        sut = GameClassDAO.getClassForId(classId);
 	    }
 
 		Path sourceFile = Paths.get(sut.getJavaFile());
 		Path mutantFile = Paths.get(javaFile);
 
-		List<String> sutLines = mutantUtils.readLinesIfFileExist(sourceFile);
-		List<String> mutantLines = mutantUtils.readLinesIfFileExist(mutantFile);
+        List<String> sutLines = FileUtils.readLines(sourceFile);
+        List<String> mutantLines = FileUtils.readLines(mutantFile);
 
 		Patch patch = DiffUtils.diff(sutLines, mutantLines);
 		List<String> unifiedPatches = DiffUtils.generateUnifiedDiff(null, null, sutLines, patch, 3);
@@ -442,6 +450,7 @@ public class Mutant implements Serializable {
 			this.id = MutantDAO.storeMutant(this);
 			return true;
 		} catch (Exception e) {
+			logger.error("Inserting mutants resulted in error.", e);
 		    return false;
 		}
 	}

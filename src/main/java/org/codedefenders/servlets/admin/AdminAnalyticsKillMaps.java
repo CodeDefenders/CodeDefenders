@@ -18,6 +18,15 @@
  */
 package org.codedefenders.servlets.admin;
 
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.execution.KillMap.KillMapJob;
+import org.codedefenders.execution.KillMap.KillMapJob.Type;
+import org.codedefenders.execution.KillMapProcessor;
+import org.codedefenders.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -27,16 +36,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.execution.KillMap.KillMapJob;
-import org.codedefenders.execution.KillMap.KillMapJob.Type;
-import org.codedefenders.execution.KillMapProcessor;
-import org.codedefenders.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AdminAnalyticsKillMaps extends HttpServlet {
     private static final long serialVersionUID = 4237104046949774958L;
@@ -58,12 +57,12 @@ public class AdminAnalyticsKillMaps extends HttpServlet {
 
         String formType = request.getParameter("formType");
         switch (formType) {
-        case "submitKillMapClassJob":
-            submitKillMapClassJob(request);
-            break;
-        case "updateSettings":
-            updateSettings(request);
-            break;
+            case "submitKillMapClassJob":
+                submitKillMapClassJob(request);
+                break;
+            case "updateSettings":
+                updateSettings(request);
+                break;
         }
         request.getRequestDispatcher(Constants.ADMIN_ANALYTICS_KILLMAP_JSP).forward(request, response);
     }
@@ -76,7 +75,7 @@ public class AdminAnalyticsKillMaps extends HttpServlet {
         try {
             // Validate the input ?
             int classID = Integer.parseInt(cID);
-            DatabaseAccess.getClassForKey("Class_ID", classID);
+            GameClassDAO.getClassForId(classID);
             KillmapDAO.enqueueJob(new KillMapJob(Type.CLASS, classID));
             messages.add("Submitted Job for Class " + classID);
         } catch (NumberFormatException e) {

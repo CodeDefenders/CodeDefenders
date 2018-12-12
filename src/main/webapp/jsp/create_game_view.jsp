@@ -18,8 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.database.GameClassDAO" %>
 <% String pageTitle="Duel Creation"; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
@@ -33,7 +32,7 @@
 				<td>Java Class</td>
 				<td id="classTd">
 					<select id="class" name="class" class="form-control selectpicker" data-size="large" >
-						<% for (GameClass c : DatabaseAccess.getAllClasses()) { %>
+						<% for (GameClass c : GameClassDAO.getAllClasses()) { %>
 						<option value="<%=c.getId()%>"><%=c.getAlias()%></option>
 						<%}%>
 					</select>

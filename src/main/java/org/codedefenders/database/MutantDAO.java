@@ -23,8 +23,6 @@ import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -43,8 +41,6 @@ import java.util.stream.Stream;
  * @see Mutant
  */
 public class MutantDAO {
-    private static final Logger logger = LoggerFactory.getLogger(MutantDAO.class);
-
     /**
      * Constructs a mutant from a {@link ResultSet} entry.
      *
@@ -68,13 +64,14 @@ public class MutantDAO {
         int roundKilled = rs.getInt("RoundKilled");
         int playerId = rs.getInt("Player_ID");
         int points = rs.getInt("Points");
+        String md5 = rs.getString("MD5");
 
         Mutant mutant = new Mutant(mutantId, classId, gameId, javaFile, classFile, alive, equiv, roundCreated,
-                roundKilled, playerId);
+                roundKilled, playerId, md5);
         mutant.setScore(points);
         // since mutated lines can be null
         final String mutatedLines = rs.getString("MutatedLines");
-        if (mutatedLines != null) {
+        if (mutatedLines != null && !mutatedLines.isEmpty()) {
             List<Integer> mutatedLinesList = Stream.of(mutatedLines.split(","))
                     .map(Integer::parseInt)
                     .collect(Collectors.toList());
@@ -185,6 +182,7 @@ public class MutantDAO {
         int gameId = mutant.getGameId();
         int classId = mutant.getClassId();
         int roundCreated = mutant.getRoundCreated();
+        Equivalence equivalent = mutant.getEquivalent() == null ? Equivalence.ASSUMED_NO : mutant.getEquivalent();
         int sqlAlive = mutant.sqlAlive();
         int playerId = mutant.getPlayerId();
         int score = mutant.getScore();
@@ -192,14 +190,15 @@ public class MutantDAO {
         String mutatedLinesString = StringUtils.join(mutant.getLines(), ",");
 
         String query = String.join("\n",
-                "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Alive, Player_ID, Points, MD5, Class_ID, MutatedLines)",
-                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+                "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Equivalent, Alive, Player_ID, Points, MD5, Class_ID, MutatedLines)",
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         );
         DatabaseValue[] valueList = new DatabaseValue[]{
                 DB.getDBV(javaFile),
                 DB.getDBV(classFile),
                 DB.getDBV(gameId),
                 DB.getDBV(roundCreated),
+                DB.getDBV(equivalent.name()),
                 DB.getDBV(sqlAlive),
                 DB.getDBV(playerId),
                 DB.getDBV(score),
