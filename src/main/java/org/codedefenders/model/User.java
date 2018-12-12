@@ -65,6 +65,7 @@ public class User {
 	}
 
 	public boolean insert() {
+		// TODO Phil 12/12/18: Update this like Test#insert() to use DAO insert method but update identifier
 		DatabaseValue[] valueList;
 		String query;
 		Connection conn = DB.getConnection();
