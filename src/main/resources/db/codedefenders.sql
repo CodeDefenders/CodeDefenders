@@ -19,9 +19,9 @@ CREATE TABLE killmapjob
 
 DROP TABLE IF EXISTS `test_smell`;
 CREATE TABLE test_smell (
-	`test_ID` int(11),
+	`Test_ID` int(11),
 	`smell_name` VARCHAR(500),
-	PRIMARY KEY (test_ID, smell_name) 
+	PRIMARY KEY (Test_ID, smell_name)
 );
 
 --
