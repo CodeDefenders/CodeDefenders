@@ -20,6 +20,7 @@ package org.codedefenders.servlets.games;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
@@ -428,7 +429,7 @@ public class GameManager extends HttpServlet {
     public static Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
         // Mutant is assumed valid here
 
-        GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
+        GameClass classMutated = GameClassDAO.getClassForId(cid);
         String classMutatedBaseName = classMutated.getBaseName();
 
         // Setup folder the files will go in
@@ -443,7 +444,7 @@ public class GameManager extends HttpServlet {
         // We do not use a class with static methods to favor parallelism...
         MutantUtils mutantUtils = new MutantUtils();
         // Read from FS
-        List<String> originalCode = mutantUtils.readLinesIfFileExist( Paths.get( classMutated.getJavaFile() ) );
+		List<String> originalCode = FileUtils.readLines(Paths.get(classMutated.getJavaFile()));
         // Remove invalid diffs, like inserting blank lines
         String cleanedMutatedCode = mutantUtils.cleanUpMutatedCode( String.join("\n", originalCode), mutatedCode);
         // Write the Mutant String into a java file
@@ -469,8 +470,7 @@ public class GameManager extends HttpServlet {
 	 * @throws CodeValidatorException
 	 */
 	public static Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory, int maxNumberOfAssertions) throws IOException, CodeValidatorException {
-
-		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
+		GameClass classUnderTest = GameClassDAO.getClassForId(cid);
 
 		File newTestDir = FileUtils.getNextSubDir(TESTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId + F_SEP + "original");
 

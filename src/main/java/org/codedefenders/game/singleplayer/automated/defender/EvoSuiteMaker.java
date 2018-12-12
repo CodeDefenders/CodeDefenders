@@ -18,6 +18,10 @@
  */
 package org.codedefenders.game.singleplayer.automated.defender;
 
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.execution.AntRunner;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.execution.AntRunner;
@@ -46,7 +50,7 @@ public class EvoSuiteMaker {
 
 	public EvoSuiteMaker(int classId, DuelGame dummyGame) {
 		cId = classId;
-		cut = DatabaseAccess.getClassForKey("Class_ID", cId);
+		cut = GameClassDAO.getClassForId(cId);
 		dGame = dummyGame;
 	}
 

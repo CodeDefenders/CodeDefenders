@@ -20,7 +20,6 @@
 --%>
 <%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="org.codedefenders.database.TestSmellsDAO"%>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.model.User" %>
@@ -53,9 +52,9 @@
             final Set<Mutant> killedMutants = test.getKilledMutants();
             final String coveredMutantsIdString = coveredMutants.stream().map(mutant -> String.valueOf(mutant.getId())).collect(Collectors.joining(", "));
             final String killedMuantsIdString = killedMutants.stream().map(mutant -> String.valueOf(mutant.getId())).collect(Collectors.joining(", "));
-            
+
             // Get the smells for this test
-            final List<String> smellList = TestSmellsDAO.getDetectedTestSmellsFor( test );
+            final List<String> smellList = TestSmellsDAO.getDetectedTestSmellsForTest( test );
             final String smellHtmlList = StringUtils.join(smellList, "</br>");
             // Compute the smell level
             String smellLevel = "Good";

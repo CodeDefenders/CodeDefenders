@@ -19,7 +19,6 @@
 package org.codedefenders.servlets.games;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.commons.lang.StringUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -392,12 +391,12 @@ public class MultiplayerGameManager extends HttpServlet {
 	}
 
 	private void includeDetectTestSmellsInMessages(Test newTest, ArrayList<String> messages) {
-		List<String> detectedTestSmells = TestSmellsDAO.getDetectedTestSmellsFor(newTest);
+		List<String> detectedTestSmells = TestSmellsDAO.getDetectedTestSmellsForTest(newTest);
 		if (!detectedTestSmells.isEmpty()) {
 			if (detectedTestSmells.size() == 1) {
 				messages.add("Your test has the following smell: " + detectedTestSmells.get(0));
 			} else {
-				String join = StringUtils.join(detectedTestSmells, ", ");
+				String join = String.join(", ", detectedTestSmells);
 				messages.add("Your test has the following smells: " + join);
 			}
 		}
