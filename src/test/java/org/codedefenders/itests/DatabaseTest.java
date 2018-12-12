@@ -23,6 +23,7 @@ import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.TargetExecution;
@@ -446,9 +447,9 @@ public class DatabaseTest {
 
 		// Leave the ID in the constructor
 		TargetExecution te = new TargetExecution(1, test.getId(), mutant1.getId(),
-				TargetExecution.Target.TEST_EQUIVALENCE, "SUCCESS", "msg", "1995-03-27 12:08:00");
+				TargetExecution.Target.TEST_EQUIVALENCE, TargetExecution.Status.SUCCESS, "msg", Timestamp.valueOf("1995-03-27 12:08:00"));
 		assertTrue(te.insert());
-		TargetExecution teFromDB = DatabaseAccess.getTargetExecutionForPair(test.getId(), mutant1.getId());
+		TargetExecution teFromDB = TargetExecutionDAO.getTargetExecutionForPair(test.getId(), mutant1.getId());
 		assertEquals(te.message, teFromDB.message);
 		assertEquals(te.status, teFromDB.status);
 		assertEquals(te.target, teFromDB.target);

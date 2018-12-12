@@ -18,24 +18,28 @@
  */
 package org.codedefenders.game.singleplayer.automated.defender;
 
+import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.execution.AntRunner;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.Role;
 import org.codedefenders.execution.MutationTester;
-import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.singleplayer.AiPlayer;
 import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.codedefenders.game.singleplayer.PrepareAI;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -189,7 +193,7 @@ public class AiDefender extends AiPlayer {
 			Test t = new Test(cut.getId(), game.getId(), jFile, cFile, playerId);
 			t.insert();
 			t.update();
-			TargetExecution newExec = new TargetExecution(t.getId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);
+			TargetExecution newExec = new TargetExecution(t.getId(), 0, TargetExecution.Target.COMPILE_TEST, TargetExecution.Status.SUCCESS, null);
 			newExec.insert();
 			MutationTester.runTestOnAllMutants(game, t, messages);
 			DatabaseAccess.setAiTestAsUsed(origTestNum, game);
