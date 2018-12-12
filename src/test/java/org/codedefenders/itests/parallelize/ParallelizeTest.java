@@ -18,35 +18,9 @@
  */
 package org.codedefenders.itests.parallelize;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assume.assumeNoException;
-import static org.junit.Assume.assumeThat;
-import static org.junit.Assume.assumeTrue;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.spi.InitialContextFactory;
-
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.RandomTestScheduler;
@@ -80,9 +54,36 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.List;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
+
 import difflib.DiffUtils;
 import difflib.Patch;
-import edu.emory.mathcs.backport.java.util.Arrays;
+
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assume.assumeNoException;
+import static org.junit.Assume.assumeThat;
+import static org.junit.Assume.assumeTrue;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
@@ -351,8 +352,7 @@ public class ParallelizeTest {
 			submittedTests.add( newTest );
 			
 			// Create the mutant from the patch
-			List<String> diff = Arrays.asList( new String[]{
-					"--- null",
+			List<String> diff = Arrays.asList("--- null",
 					"+++ null",
 					"@@ -11,7 +11,7 @@",
 					" ",
@@ -363,7 +363,7 @@ public class ParallelizeTest {
 					"     }",
 					" ",
 					"     public int getTopFloor() {"
-			});
+			);
 			
 			Patch patch = DiffUtils.parseUnifiedDiff(diff);
 			// Read the CUT code
@@ -389,7 +389,7 @@ public class ParallelizeTest {
 			// Check that the test execution logged in the DB are in the same order
 			List<TargetExecution> executedTargets = new ArrayList<TargetExecution>(); 
 			for( org.codedefenders.game.Test submittedTest : randomSchedule ){
-				executedTargets.add( DatabaseAccess.getTargetExecutionForPair(submittedTest.getId(), mutant.getId()));
+				executedTargets.add( TargetExecutionDAO.getTargetExecutionForPair(submittedTest.getId(), mutant.getId()));
 			}
 			
 			

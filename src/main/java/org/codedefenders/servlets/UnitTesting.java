@@ -32,6 +32,7 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.TargetExecution;
@@ -114,18 +115,18 @@ public class UnitTesting extends HttpServlet {
 			return;
 		}
 		logger.debug("New Test " + newTest.getId());
-		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+		TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-		if (compileTestTarget.status.equals("SUCCESS")) {
-			TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
-			if (testOriginalTarget.status.equals("SUCCESS")) {
+		if (compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+			TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+			if (testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 				messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 				activeGame.endRound();
 				activeGame.update();
 				if (activeGame.getState().equals(GameState.FINISHED))
 					messages.add("Great! Unit testing goal achieved. Session finished.");
 			} else {
-				// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
+				// testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
 				messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 				messages.add(testOriginalTarget.message);
 				session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
@@ -161,9 +162,9 @@ public class UnitTesting extends HttpServlet {
 
 		// Check the test actually passes when applied to the original code.
 		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
-		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+		TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
+		if (compileTestTarget != null && compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 			AntRunner.testOriginal(newTestDir, newTest);
 		}
 		return newTest;

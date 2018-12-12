@@ -153,14 +153,14 @@ public class AntRunner {
 
 		if (result.hasFailure()) {
 			// The test failed, i.e., it detected the mutant
-			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "FAIL", null);
+			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.FAIL, null);
 		} else if (result.hasError()) {
 			// The test is in error, interpreted also as detecting the mutant
 			String message = result.getErrorMessage();
-			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "ERROR", message);
+			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.ERROR, message);
 		} else {
 			// The test passed, i.e., it did not detect the mutant
-			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "SUCCESS", null);
+			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.SUCCESS, null);
 		}
 		newExec.insert();
 		return newExec;
@@ -177,14 +177,14 @@ public class AntRunner {
 
 		if (result.hasFailure()) {
 			// The test failed, i.e., it detected the mutant
-			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "FAIL", null);
+			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.FAIL, null);
 		} else if (result.hasError()) {
 			// The test is in error, interpreted also as detecting the mutant
 			String message = result.getErrorMessage();
-			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "ERROR", message);
+			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.ERROR, message);
 		} else {
 			// The test passed, i.e., it did not detect the mutant
-			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, "SUCCESS", null);
+			newExec = new TargetExecution(t.getId(), m.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.SUCCESS, null);
 		}
 		newExec.insert();
 		return newExec;
@@ -230,16 +230,16 @@ public class AntRunner {
 		t.update();
 
 		// record test execution
-		String status;
+		TargetExecution.Status status;
 		String message;
 		if (result.hasFailure()) {
-			status = "FAIL";
+			status = TargetExecution.Status.FAIL;
 			message = result.getJUnitMessage();
 		} else if (result.hasError()) {
-			status = "ERROR";
+			status = TargetExecution.Status.ERROR;
 			message = result.getErrorMessage();
 		} else {
-			status = "SUCCESS";
+			status = TargetExecution.Status.SUCCESS;
 			message = null;
 		}
 		TargetExecution testExecution = new TargetExecution(t.getId(), 0, TargetExecution.Target.TEST_ORIGINAL, status, message);
@@ -306,7 +306,7 @@ public class AntRunner {
 			int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gameID);
 			newMutant = new Mutant(gameID, cut.getId(), jFile, cFile, true, playerId);
 			newMutant.insert();
-			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "SUCCESS", null);
+			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.SUCCESS, null);
 			newExec.insert();
 		} else {
 			// The mutant failed to compile
@@ -316,7 +316,7 @@ public class AntRunner {
 			int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gameID);
 			newMutant = new Mutant(gameID, cut.getId(), jFile, null, false, playerId);
 			newMutant.insert();
-			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, "FAIL", message);
+			TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.FAIL, message);
 			newExec.insert();
 		}
 		return newMutant;
@@ -350,7 +350,7 @@ public class AntRunner {
 			Test newTest = new Test(cut.getId(), gameID, jFile, cFile, playerId);
 			boolean inserted = newTest.insert();
 			assert ( inserted ); // if compilation was successful, .class file must exist
-			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "SUCCESS", null);
+			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, TargetExecution.Status.SUCCESS, null);
 			newExec.insert();
 			return newTest;
 		} else {
@@ -360,7 +360,7 @@ public class AntRunner {
 			logger.error("Failed to compile test {}: {}", jFile, message);
 			Test newTest = new Test(cut.getId(), gameID, jFile, null, playerId);
 			newTest.insert();
-			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, "FAIL", message);
+			TargetExecution newExec = new TargetExecution(newTest.getId(), 0, TargetExecution.Target.COMPILE_TEST, TargetExecution.Status.FAIL, message);
 			newExec.insert();
 			return newTest;
 		}

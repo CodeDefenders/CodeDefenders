@@ -23,8 +23,12 @@ import org.codedefenders.execution.AntRunner;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 
@@ -68,9 +72,9 @@ public class EvoSuiteMaker {
 						F_SEP + cut.getAlias());
 				String jFile = FileUtils.createJavaFile(newTestDir, cut.getBaseName(), t);
 				Test newTest = AntRunner.compileTest(newTestDir, jFile, dGame.getId(), cut, AiDefender.ID);
-				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+				TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-				if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
+				if (compileTestTarget != null && compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 					AntRunner.testOriginal(newTestDir, newTest);
 					validTests.add(newTest);
 				}

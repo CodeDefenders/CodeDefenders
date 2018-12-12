@@ -21,6 +21,7 @@ package org.codedefenders.servlets.games;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.KillMap.KillMapJob;
@@ -168,11 +169,11 @@ public class MultiplayerGameManager extends HttpServlet {
 				}
 
 				logger.info("Executing Action resolveEquivalence for mutant {} and test {}", currentEquivMutantID, newTest.getId());
-				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+				TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-				if (compileTestTarget.status.equals("SUCCESS")) {
-					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
-					if (testOriginalTarget.status.equals("SUCCESS")) {
+				if (compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+					TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+					if (testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 						logger.info("Test {} passed on the CUT", newTest.getId());
 
 						// Instead of running equivalence on only one mutant, let's try with all mutants pending resolution
@@ -228,7 +229,7 @@ public class MultiplayerGameManager extends HttpServlet {
 						response.sendRedirect(contextPath+"/multiplayer/play");
 						return;
 					} else {
-						//  (testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
+						//  (testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
 						logger.debug("testOriginalTarget: " + testOriginalTarget);
 						messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 						messages.add(testOriginalTarget.message);
@@ -275,9 +276,9 @@ public class MultiplayerGameManager extends HttpServlet {
 					Mutant existingMutant = GameManager.existingMutant(activeGame.getId(), mutantText);
 					if (existingMutant != null) {
 						messages.add(MUTANT_DUPLICATED_MESSAGE);
-						TargetExecution existingMutantTarget = DatabaseAccess.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
+						TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
 						if (existingMutantTarget != null
-								&& !existingMutantTarget.status.equals("SUCCESS")
+								&& !existingMutantTarget.status.equals(TargetExecution.Status.SUCCESS)
 								&& existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
 							messages.add(existingMutantTarget.message);
 						}
@@ -286,8 +287,8 @@ public class MultiplayerGameManager extends HttpServlet {
 					}
 					Mutant newMutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "mp");
 					if (newMutant != null) {
-						TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
-						if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
+						TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
+						if (compileMutantTarget != null && compileMutantTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 							Event notif = new Event(-1, activeGame.getId(), uid,
 									UserDAO.getUserById(uid).getUsername() + " created a mutant.",
 									EventType.ATTACKER_MUTANT_CREATED, EventStatus.GAME,
@@ -346,11 +347,11 @@ public class MultiplayerGameManager extends HttpServlet {
 					}
 
 					logger.info("New Test {} by user {}", newTest.getId(), uid);
-					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+					TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-					if (compileTestTarget.status.equals("SUCCESS")) {
-						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
-						if (testOriginalTarget.status.equals("SUCCESS")) {
+					if (compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+						TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+						if (testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 							messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 
 							// Include Test Smells in the messages back to user
@@ -365,7 +366,7 @@ public class MultiplayerGameManager extends HttpServlet {
 							MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
 							activeGame.update();
 						} else {
-							// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
+							// testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
 							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 							// TODO This might not prevent injection of malicious code!
 							messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));

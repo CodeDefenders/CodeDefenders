@@ -22,6 +22,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.MutationTester;
@@ -181,11 +182,11 @@ public class GameManager extends HttpServlet {
 						return;
 					}
 
-					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+					TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-					if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
-						if (testOriginalTarget.status.equals("SUCCESS")) {
+					if (compileTestTarget != null && compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+						TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+						if (testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 							logger.info(TEST_PASSED_ON_CUT_MESSAGE);
 							if (mutant.isAlive() && mutant.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)) {
 								// TODO: Allow multiple trials?
@@ -214,7 +215,7 @@ public class GameManager extends HttpServlet {
 								return;
 							}
 						} else {
-							//  (testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
+							//  (testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
 							logger.debug("testOriginalTarget: " + testOriginalTarget);
 							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 							messages.add(testOriginalTarget.message);
@@ -299,9 +300,9 @@ public class GameManager extends HttpServlet {
 				Mutant existingMutant = existingMutant(activeGame.getId(), mutantText);
 				if (existingMutant != null) {
 					messages.add(MUTANT_DUPLICATED_MESSAGE);
-					TargetExecution existingMutantTarget = DatabaseAccess.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
+					TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
 					if (existingMutantTarget != null
-							&& !existingMutantTarget.status.equals("SUCCESS")
+							&& !existingMutantTarget.status.equals(TargetExecution.Status.SUCCESS)
 							&& existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
 						messages.add(existingMutantTarget.message);
 					}
@@ -310,8 +311,8 @@ public class GameManager extends HttpServlet {
 				}
 				Mutant newMutant = createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "sp");
 				if (newMutant != null) {
-					TargetExecution compileMutantTarget = DatabaseAccess.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
-					if (compileMutantTarget != null && compileMutantTarget.status.equals("SUCCESS")) {
+					TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
+					if (compileMutantTarget != null && compileMutantTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 						messages.add(MUTANT_COMPILED_MESSAGE);
 						MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
 
@@ -374,11 +375,11 @@ public class GameManager extends HttpServlet {
 					return;
 				}
 				logger.debug("New Test " + newTest.getId());
-				TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+				TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-				if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
-					TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
-					if (testOriginalTarget.status.equals("SUCCESS")) {
+				if (compileTestTarget != null && compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+					TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+					if (testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 						messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 						MutationTester.runTestOnAllMutants(activeGame, newTest, messages);
 						activeGame.endTurn();
@@ -393,7 +394,7 @@ public class GameManager extends HttpServlet {
 							}
 						}
 					} else {
-						// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
+						// testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
 						messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 						messages.add(testOriginalTarget.message);
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
@@ -477,11 +478,11 @@ public class GameManager extends HttpServlet {
 
 		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
 
-		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest,
+		TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest,
 				TargetExecution.Target.COMPILE_TEST);
 
 		// If the test did not compile we short circuit here. We shall not return null
-		if (compileTestTarget == null || !compileTestTarget.status.equals("SUCCESS")) {
+		if (compileTestTarget == null || !compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 			return newTest;
 		}
 		
@@ -492,7 +493,7 @@ public class GameManager extends HttpServlet {
 		}
 
 		// Eventually check the test actually passes when applied to the original code.
-		if (compileTestTarget.status.equals("SUCCESS")) {
+		if (compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 			AntRunner.testOriginal(newTestDir, newTest);
 			try {
 				// Detect test smell and store them to DB

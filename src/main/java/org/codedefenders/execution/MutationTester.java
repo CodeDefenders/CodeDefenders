@@ -19,17 +19,17 @@
 package org.codedefenders.execution;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.UserDAO;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.scoring.Scorer;
-import org.codedefenders.game.Test;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +53,8 @@ import javax.naming.NameClassPair;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_NO;
+import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 import static org.codedefenders.util.Constants.MUTANT_ALIVE_1_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_ALIVE_N_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_KILLED_BY_TEST_MESSAGE;
@@ -62,8 +64,6 @@ import static org.codedefenders.util.Constants.TEST_KILLED_N_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_ONE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_ZERO_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_NO;
-import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 
 // Class that handles compilation and testing by creating a Process with the relevant ant target
 public class MutationTester {
@@ -435,7 +435,7 @@ public class MutationTester {
 	 */
 	public static boolean testVsMutant(Test test, Mutant mutant) {
 		// Check if the test vs mutant was already executed
-		TargetExecution executedTarget = DatabaseAccess.getTargetExecutionForPair(test.getId(), mutant.getId());
+		TargetExecution executedTarget = TargetExecutionDAO.getTargetExecutionForPair(test.getId(), mutant.getId());
 
 		if (executedTarget == null) {
 			// Run the test against the mutant and get the result
@@ -450,7 +450,7 @@ public class MutationTester {
 
 		// If the test did NOT pass, the mutant was detected and should be
 		// killed
-		if (executedTarget.status.equals("FAIL") || executedTarget.status.equals("ERROR")) {
+		if (executedTarget.status.equals(TargetExecution.Status.FAIL) || executedTarget.status.equals(TargetExecution.Status.ERROR)) {
 			// This returns true ONLY if the mutant in the DB is still alive
 			if (mutant.kill(ASSUMED_NO)) {
 				logger.info("Test {} kills Mutant {}", test.getId(), mutant.getId());
@@ -485,7 +485,7 @@ public class MutationTester {
 
         // Kill the mutant if it was killed by the test or if it's marked
         // equivalent
-        if (executedTarget.status.equals("ERROR") || executedTarget.status.equals("FAIL")) {
+        if (executedTarget.status.equals(TargetExecution.Status.ERROR) || executedTarget.status.equals(TargetExecution.Status.FAIL)) {
             // If the test did NOT pass, the mutant was detected and is proven
             // to be non-equivalent
         	if (mutant.kill(PROVEN_NO)) {
