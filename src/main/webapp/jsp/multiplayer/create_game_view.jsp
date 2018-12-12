@@ -18,12 +18,13 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
+<%@ page import="org.codedefenders.database.GameClassDAO" %>
 <%@ page import="static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
+<%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <% String pageTitle = "Create Battleground"; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <%
-    List<GameClass> gameClasses = DatabaseAccess.getAllClasses();
+    List<GameClass> gameClasses = GameClassDAO.getAllClasses();
     if (gameClasses.isEmpty()) {
         if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) {
 %>

@@ -18,19 +18,10 @@
  */
 package org.codedefenders;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.duel.DuelGame;
@@ -42,10 +33,20 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
 import difflib.PatchFailedException;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({DatabaseAccess.class})
@@ -136,7 +137,7 @@ public class MutantTest {
         PowerMockito.mockStatic(DatabaseAccess.class);
         when(DatabaseAccess.getGameForKey("ID", mockedGameID)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
-        when(DatabaseAccess.getClassForKey("Class_ID", mockedClassID)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
@@ -200,7 +201,7 @@ public class MutantTest {
 		PowerMockito.mockStatic(DatabaseAccess.class);
 		when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn( mockedDualGame);
 		when(mockedDualGame.getClassId()).thenReturn(1);
-		when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn( mockedGameClass );
+		when(GameClassDAO.getClassForId(1)).thenReturn( mockedGameClass );
 		//
 		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
 		//
@@ -258,7 +259,7 @@ public class MutantTest {
         PowerMockito.mockStatic(DatabaseAccess.class);
         when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
-        when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(1)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
@@ -316,7 +317,7 @@ public class MutantTest {
         PowerMockito.mockStatic(DatabaseAccess.class);
         when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
-        when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(1)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
@@ -375,7 +376,7 @@ public class MutantTest {
 
         PowerMockito.mockStatic(DatabaseAccess.class);
         when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
-        when(DatabaseAccess.getClassForKey("Class_ID", mockedClassID)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
@@ -394,7 +395,7 @@ public class MutantTest {
 	public void testGetLinesForInsertionMutantOnDisjointLines() throws IOException{
 //		int classId =
 //				DatabaseAccess.getGameForKey("ID", gameId).getClassId();
-//		GameClass sut = DatabaseAccess.getClassForKey("Class_ID", classId);
+//		GameClass sut = DatabaseAccess.getClassForId(classId);
 		
 		// Mock the class provide a temmp sourceFile with original content in it
 		String originalCode = "public class Lift {"+ "\n"
@@ -451,7 +452,7 @@ public class MutantTest {
         PowerMockito.mockStatic(DatabaseAccess.class);
         when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
-        when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(1)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
@@ -516,7 +517,7 @@ public class MutantTest {
         PowerMockito.mockStatic(DatabaseAccess.class);
         when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
-        when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(1)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
@@ -578,7 +579,7 @@ public class MutantTest {
         PowerMockito.mockStatic(DatabaseAccess.class);
         when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
-        when(DatabaseAccess.getClassForKey("Class_ID", 1)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(1)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //

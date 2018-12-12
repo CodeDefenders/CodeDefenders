@@ -20,6 +20,7 @@ package org.codedefenders.servlets.games;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.AntRunner;
@@ -43,9 +44,7 @@ import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -58,6 +57,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import testsmell.TestFile;
+import testsmell.TestSmellDetector;
 
 import static org.codedefenders.util.Constants.F_SEP;
 import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
@@ -79,10 +81,6 @@ import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
-
-import org.codedefenders.database.TestSmellsDAO;
-import testsmell.TestFile;
-import testsmell.TestSmellDetector;
 
 public class GameManager extends HttpServlet {
 
@@ -430,7 +428,7 @@ public class GameManager extends HttpServlet {
     public static Mutant createMutant(int gid, int cid, String mutatedCode, int ownerId, String subDirectory) throws IOException {
         // Mutant is assumed valid here
 
-        GameClass classMutated = DatabaseAccess.getClassForKey("Class_ID", cid);
+        GameClass classMutated = GameClassDAO.getClassForId(cid);
         String classMutatedBaseName = classMutated.getBaseName();
 
         // Setup folder the files will go in
@@ -445,7 +443,7 @@ public class GameManager extends HttpServlet {
         // We do not use a class with static methods to favor parallelism...
         MutantUtils mutantUtils = new MutantUtils();
         // Read from FS
-        List<String> originalCode = mutantUtils.readLinesIfFileExist( Paths.get( classMutated.getJavaFile() ) );
+		List<String> originalCode = FileUtils.readLines(Paths.get(classMutated.getJavaFile()));
         // Remove invalid diffs, like inserting blank lines
         String cleanedMutatedCode = mutantUtils.cleanUpMutatedCode( String.join("\n", originalCode), mutatedCode);
         // Write the Mutant String into a java file
@@ -471,8 +469,7 @@ public class GameManager extends HttpServlet {
 	 * @throws CodeValidatorException
 	 */
 	public static Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory, int maxNumberOfAssertions) throws IOException, CodeValidatorException {
-
-		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
+		GameClass classUnderTest = GameClassDAO.getClassForId(cid);
 
 		File newTestDir = FileUtils.getNextSubDir(TESTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId + F_SEP + "original");
 
