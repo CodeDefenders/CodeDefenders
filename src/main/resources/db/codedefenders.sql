@@ -21,7 +21,7 @@ DROP TABLE IF EXISTS `test_smell`;
 CREATE TABLE test_smell (
 	`test_ID` int(11),
 	`smell_name` VARCHAR(500),
-	PRIMARY KEY (test_ID, smell_name) 
+	PRIMARY KEY (test_ID, smell_name)
 );
 
 --
@@ -411,6 +411,25 @@ CREATE TABLE `sessions` (
   PRIMARY KEY (`Session_ID`),
   KEY `fk_userId_sessions` (`User_ID`),
   CONSTRAINT `fk_userId_sessions` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) AUTO_INCREMENT=100;
+
+--
+-- Table structure for table `equivalences`
+--
+
+DROP TABLE IF EXISTS `equivalences`;
+CREATE TABLE `equivalences` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Mutant_ID` int(11) DEFAULT NULL,
+  `Defender_ID` int(11) DEFAULT NULL,
+  `Mutant_Points` int(11) DEFAULT '0',
+  `Expired` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
+  KEY `fk_equiv_def_idx` (`Defender_ID`),
+  KEY `fk_equiv_mutant_idx` (`Mutant_ID`),
+  CONSTRAINT `fk_equiv_def` FOREIGN KEY (`Defender_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_equiv_mutant` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) AUTO_INCREMENT=100;
 
 --
