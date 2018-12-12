@@ -18,22 +18,34 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.game.*;
+import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameMode;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
 import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
 import org.codedefenders.game.leaderboard.Entry;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
-import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 @SuppressWarnings("ALL")
@@ -56,6 +68,12 @@ public class DatabaseAccess {
 		return s;
 	}
 
+	public static String addSlashes(String s) {
+		if (s == null) {
+			return null;
+		}
+		return s.replaceAll("\\\\", "\\\\\\\\");
+	}
 
 	public static int getInt(PreparedStatement stmt, String att, Connection conn) {
 		int n = -1;
@@ -186,10 +204,6 @@ public class DatabaseAccess {
 			throw e;
 		}
 		return getGameForKey("ID", gID);
-	}
-
-	public static String addSlashes(String s) {
-		return s.replaceAll("\\\\", "\\\\\\\\");
 	}
 
 	public static int getNumAiMutantsKilledByTest(int tId) {
@@ -665,7 +679,8 @@ public class DatabaseAccess {
 	 */
 	public static boolean setAiMutantAsUsed(int mutantNumber, DuelGame g) {
 		String query = "INSERT INTO usedaimutants (Value, Game_ID) VALUES (?, ?);";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantNumber),
+		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(mutantNumber),
 				DB.getDBV(g.getId())};
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -674,7 +689,8 @@ public class DatabaseAccess {
 
 	public static int getPlayerIdForMultiplayerGame(int userId, int gameId) {
 		String query = "SELECT * FROM players AS p " + "WHERE p.User_ID = ? AND p.Game_ID = ?";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(userId),
+		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(userId),
 				DB.getDBV(gameId)};
 		Connection conn = DB.getConnection();
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -684,7 +700,8 @@ public class DatabaseAccess {
 	public static int[] getPlayersForMultiplayerGame(int gameId, Role role) {
 		int[] players = new int[0];
 		String query = "SELECT * FROM players WHERE Game_ID = ? AND Role=? AND Active=TRUE;";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(gameId),
+		DatabaseValue[] valueList = new DatabaseValue[]{
+				DB.getDBV(gameId),
 				DB.getDBV(role.toString())};
 		// Load the MultiplayerGame Data with the provided ID.
 		Connection conn = DB.getConnection();
