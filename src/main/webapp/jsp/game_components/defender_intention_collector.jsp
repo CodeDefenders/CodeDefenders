@@ -36,21 +36,24 @@ container.style.display = "none";
 // Put the container before the form
 parent.insertBefore(container, theForm);
 
-function toggleDefend(){
-	if( sLine == null ){
+function toggleDefend() {
+	var input = document.getElementById('selected_lines');
+	if( sLine == null ) {
 		// When no lines are selected hide code mirror and display the alternative text instead
 		document.getElementById('submitTest').disabled = true;
 		document.querySelector('#code').parentNode.style.display = "none";
 		container.style.display = "block";
+		// Update the value of the hidden field
+		input.setAttribute("value", "");
 	} else {
 		// Use the whatever display value was there
 		document.getElementById('submitTest').disabled = false;
 		document.querySelector('#code').parentNode.style.display = codeOriginalDisplay;
 		container.style.display = "none";
+		// Update the value of the hidden field
+		input.setAttribute("value", sLine);
 	}
 }
-
-toggleDefend();
 
 function selectLine(lineNumber){
 	if( sLine == lineNumber ){
@@ -103,5 +106,8 @@ function makeMarker() {
   marker.innerHTML = "x";
   return marker;
 }
+
+// Trigger the logic that updates the UI at last
+toggleDefend();
 
 </script>
