@@ -360,56 +360,71 @@ public class MultiplayerGameManager extends HttpServlet {
 						return;
 					}
 
-					// At this point the test is valid. If there's any target/intention we store it as well.
-					logger.info("New Test {} by user {}", newTest.getId(), uid);
-					TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
-
-					if( activeGame.isCapturePlayersIntention() ){
-
-						Set<Integer> selectedLines = new HashSet<>();
-						Set<Integer> selectedMutants = new HashSet<>();
-
-						if (request.getParameter("selected_lines") != null) {
-							selectedLines.addAll(
-									DefenderIntention.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_lines")));
-						}
-
-						if (request.getParameter("selected_mutants") != null) {
-							selectedMutants.addAll(DefenderIntention
-									.parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_mutants")));
-						}
-
-						// Validate Intentions to avoid tweaks with the UI
-						boolean validatedCoveredLines = true;
-						boolean validatedKilledMutants = true;
-						StringBuffer validationMessage = new StringBuffer();
-						validationMessage.append("Cheeky! You cannot submit a test without specifing");
-
-						if( selectedLines.isEmpty() && activeGame.isCapturePlayersIntention() ){
-							validatedCoveredLines = false;
-							validationMessage.append(" a line to cover");
-						}
-//
-//						if( selectedMutants.isEmpty() && activeGame.isDeclareKilledMutants()) {
-//							validatedKilledMutants = false;
-//
-//							if( selectedLines.isEmpty() && activeGame.isCapturePlayersIntention() ){
-//								validationMessage.append(" or");
-//							}
-//
-//							validationMessage.append(" a mutant to kill");
-//						}
-						validationMessage.append(".");
-
-						if( validatedCoveredLines && validatedKilledMutants ){
-							collectDefenderIntentions(newTest, selectedLines, selectedMutants);
-						} else {
-							messages.add(validationMessage.toString());
-							// Keep the test around
-							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-							response.sendRedirect(contextPath + "/multiplayer/play");
-						}
-					}
+                    /*
+                     * Validation of Players Intention: if intentions must be
+                     * collected but none are specified in the user request we fail
+                     * the request, but keep the test code in the session
+                     */
+					Set<Integer> selectedLines = new HashSet<>();
+                    Set<Integer> selectedMutants = new HashSet<>();
+    
+                    // are not present we fail the request
+                    if (activeGame.isCapturePlayersIntention()) {
+                        // Validate Intentions to avoid tweaks with the UI
+                        boolean validatedCoveredLines = true;
+//                        boolean validatedKilledMutants = true;
+    
+                        // Prepare the validation message
+                        StringBuffer validationMessage = new StringBuffer();
+                        validationMessage.append("Cheeky! You cannot submit a test without specifing");
+    
+                        if (request.getParameter("selected_lines") != null) {
+                            selectedLines.addAll(DefenderIntention
+                                    .parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_lines")));
+                        }
+    
+                        if (selectedLines.isEmpty()) {
+                            validatedCoveredLines = false;
+                            validationMessage.append(" a line to cover");
+                        }
+                        // NOTE: We consider only covering lines at the moment
+                        // if (request.getParameter("selected_mutants") != null) {
+                        // selectedMutants.addAll(DefenderIntention
+                        // .parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_mutants")));
+                        // }
+                        // if( selectedMutants.isEmpty() &&
+                        // activeGame.isDeclareKilledMutants()) {
+                        // validatedKilledMutants = false;
+                        //
+                        // if( selectedLines.isEmpty() &&
+                        // activeGame.isCapturePlayersIntention() ){
+                        // validationMessage.append(" or");
+                        // }
+                        //
+                        // validationMessage.append(" a mutant to kill");
+                        // }
+                        validationMessage.append(".");
+    
+                        if (!validatedCoveredLines ) { // || !validatedKilledMutants
+                            messages.add(validationMessage.toString());
+                            // Keep the test around
+                            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                            response.sendRedirect(contextPath + "/multiplayer/play");
+                            // Early return if validation fail.
+                            return;
+                        }
+                        
+                    }
+    
+                    // At this point the test is valid. If there's any
+                    // target/intention we store it as well.
+                    logger.info("New Test {} by user {}", newTest.getId(), uid);
+                    TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest,
+                            TargetExecution.Target.COMPILE_TEST);
+    
+                    if (activeGame.isCapturePlayersIntention()) {
+                        collectDefenderIntentions(newTest, selectedLines, selectedMutants);
+                    }
 
 					if (compileTestTarget.status.equals("SUCCESS")) {
 						TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
