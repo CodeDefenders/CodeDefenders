@@ -173,6 +173,11 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     final int maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
                     final CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
 
+                    boolean capturePlayersIntention = request.getParameter("capturePlayersIntention") != null;
+
+                    // TODO Not sure what it does, but this was false by default
+                    boolean requiresValidation = false;
+
                     MultiplayerGame nGame = new MultiplayerGame(classId, uid, level, (float) lineCoverage,
                             (float) mutantCoverage, 1f, 100, 100, defenderLimit,
                             attackerLimit,
@@ -181,10 +186,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                             startTime,
                             endTime,
                             GameState.CREATED.name(),
+                            requiresValidation,
                             maxAssertionsPerTest,
                             chatEnabled,
                             mutantValidatorLevel,
-                            markUncovered);
+                            markUncovered,
+                            capturePlayersIntention);
 
                     validationResults = validator.validate(nGame);
                     if (!validationResults.isEmpty()) {

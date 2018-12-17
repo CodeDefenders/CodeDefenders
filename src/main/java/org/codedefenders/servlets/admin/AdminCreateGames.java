@@ -45,6 +45,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.game.multiplayer.PlayerScore;
+import org.codedefenders.model.User;
+import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.util.Constants;
+import org.codedefenders.validation.code.CodeValidatorLevel;
+
 import edu.emory.mathcs.backport.java.util.Collections;
 
 public class AdminCreateGames extends HttpServlet {
@@ -77,6 +89,8 @@ public class AdminCreateGames extends HttpServlet {
     boolean markUncovered;
     int maxAssertionsPerTest;
     CodeValidatorLevel mutantValidatorLevel;
+
+    boolean capturePlayersIntention;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP).forward(request, response);
@@ -285,6 +299,8 @@ public class AdminCreateGames extends HttpServlet {
 			mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
 			chatEnabled = request.getParameter("chatEnabled") != null;
 			markUncovered = request.getParameter("markUncovered") != null;
+
+			capturePlayersIntention = request.getParameter("capturePlayersIntention") != null;
 		} catch (Exception e) {
 			messages.add("There was a problem with the form.");
 			response.sendRedirect(request.getContextPath() + "/admin");
@@ -356,7 +372,7 @@ public class AdminCreateGames extends HttpServlet {
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
                  cutID, currentUserID, gamesLevel, gamesState,
                 startTime, finishTime, maxAssertionsPerTest, chatEnabled,
-                mutantValidatorLevel, markUncovered);
+                mutantValidatorLevel, markUncovered, capturePlayersIntention);
 
         if (teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_DESCENDING) || teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_SHUFFLED)) {
             Collections.sort(attackerIDs, new ReverseDefenderScoreComparator());
@@ -418,13 +434,16 @@ public class AdminCreateGames extends HttpServlet {
                                                      int cutID, int creatorID, GameLevel level, GameState state,
                                                      long startTime, long finishTime, int maxAssertionsPerTest,
                                                      boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
-                                                     boolean markUncovered) {
+                                                     boolean markUncovered, //
+                                                     boolean capturePlayersIntention
+                                                     ) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
             MultiplayerGame multiplayerGame = new MultiplayerGame(cutID, creatorID, level, (float) 1, (float) 1,
                     (float) 1, 10, 4, 0,
                     0, 0, 0, startTime,
-                    finishTime, state.name(), false, maxAssertionsPerTest, chatEnabled, mutantValidatorLevel, markUncovered);
+                    finishTime, state.name(), false, maxAssertionsPerTest, chatEnabled, mutantValidatorLevel, markUncovered,
+                    capturePlayersIntention);
             gameList.add(multiplayerGame);
         }
         return gameList;

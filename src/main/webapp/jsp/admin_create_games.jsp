@@ -795,6 +795,25 @@
                        id="maxAssertionsPerTest" min=1 required/>
             </div>
         </div>
+        <div class="row">
+			<div class="col-sm-2">
+			</div>
+			<div class="col-sm-1">
+			</div>
+            <div class="col-sm-2">
+            </div>
+            <div class="col-sm-2">
+                <label class="label-normal" title="Enable Capturing Player Intention"
+                       for="capturePlayersIntention">
+                    Capture Players Intention
+                </label>
+                <input type="checkbox" id="capturePlayersIntention" name="capturePlayersIntention"
+                       class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
+                       data-onstyle="primary" data-offstyle="">
+            </div>
+            <div class="col-sm-1">
+            </div>
+        </div>
         <br>
         <div class="row">
             <div class="col-sm-5">

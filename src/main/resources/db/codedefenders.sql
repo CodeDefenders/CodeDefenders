@@ -143,6 +143,7 @@ CREATE TABLE `games` (
   `RequiresValidation` tinyint(1) NOT NULL DEFAULT '0',
   `IsAIDummyGame` tinyint(1) NOT NULL DEFAULT '0',
   `HasKillMap` tinyint(1) NOT NULL DEFAULT '0',
+  `CapturePlayersIntention` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`),
   KEY `fk_creatorId_idx` (`Creator_ID`),
   KEY `fk_className_idx` (`Class_ID`),
@@ -306,6 +307,18 @@ CREATE TABLE `tests` (
 --
 -- Mapping between test and the class the test is uploaded together with
 --
+
+DROP TABLE IF EXISTS `intention`;
+CREATE TABLE `intention` (
+  `Intention_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Test_ID` int(11),
+  `Mutant_ID` int(11),
+  `Game_ID` int(11) NOT NULL,
+  `Target_Mutants` longtext,
+  `Target_Lines` longtext,
+  `Target_Mutant_Type` longtext,
+   PRIMARY KEY (`Intention_ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 DROP TABLE IF EXISTS `test_uploaded_with_class`;
 CREATE TABLE `test_uploaded_with_class` (

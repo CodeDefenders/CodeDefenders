@@ -20,6 +20,8 @@ package org.codedefenders.servlets.games;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.IntentionDAO;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
@@ -33,9 +35,11 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidator;
@@ -48,7 +52,9 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -285,6 +291,8 @@ public class MultiplayerGameManager extends HttpServlet {
 						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
 						break;
 					}
+					
+					
 					Mutant newMutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "mp");
 					if (newMutant != null) {
 						TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
@@ -297,6 +305,18 @@ public class MultiplayerGameManager extends HttpServlet {
 							messages.add(MUTANT_COMPILED_MESSAGE);
 							MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
 							activeGame.update();
+							
+							if( activeGame.isCapturePlayersIntention() ){
+								AttackerIntention intention = AttackerIntention.fromString(request.getParameter("attacker_intention"));
+								// This parameter is required !
+								if ( intention == null) {
+									messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.toString());
+									session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+								} else {
+									collectAttackerIntentions(newMutant, intention);
+								}
+							}
+							
 
 							// Clean the mutated code only if mutant is accepted
 							session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
@@ -345,9 +365,71 @@ public class MultiplayerGameManager extends HttpServlet {
 						response.sendRedirect(contextPath + "/multiplayer/play");
 						return;
 					}
-
+					
+                    /*
+                     * Validation of Players Intention: if intentions must be
+                     * collected but none are specified in the user request we fail
+                     * the request, but keep the test code in the session
+                     */
+					Set<Integer> selectedLines = new HashSet<>();
+                    Set<Integer> selectedMutants = new HashSet<>();
+    
+                    // are not present we fail the request
+                    if (activeGame.isCapturePlayersIntention()) {
+                        // Validate Intentions to avoid tweaks with the UI
+                        boolean validatedCoveredLines = true;
+//                        boolean validatedKilledMutants = true;
+    
+                        // Prepare the validation message
+                        StringBuffer validationMessage = new StringBuffer();
+                        validationMessage.append("Cheeky! You cannot submit a test without specifing");
+    
+                        if (request.getParameter("selected_lines") != null) {
+                            selectedLines.addAll(DefenderIntention
+                                    .parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_lines")));
+                        }
+    
+                        if (selectedLines.isEmpty()) {
+                            validatedCoveredLines = false;
+                            validationMessage.append(" a line to cover");
+                        }
+                        // NOTE: We consider only covering lines at the moment
+                        // if (request.getParameter("selected_mutants") != null) {
+                        // selectedMutants.addAll(DefenderIntention
+                        // .parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_mutants")));
+                        // }
+                        // if( selectedMutants.isEmpty() &&
+                        // activeGame.isDeclareKilledMutants()) {
+                        // validatedKilledMutants = false;
+                        //
+                        // if( selectedLines.isEmpty() &&
+                        // activeGame.isCapturePlayersIntention() ){
+                        // validationMessage.append(" or");
+                        // }
+                        //
+                        // validationMessage.append(" a mutant to kill");
+                        // }
+                        validationMessage.append(".");
+    
+                        if (!validatedCoveredLines ) { // || !validatedKilledMutants
+                            messages.add(validationMessage.toString());
+                            // Keep the test around
+                            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                            response.sendRedirect(contextPath + "/multiplayer/play");
+                            // Early return if validation fail.
+                            return;
+                        }
+                        
+                    }
+    
+                    // At this point the test is valid. If there's any
+                    // target/intention we store it as well.
 					logger.info("New Test {} by user {}", newTest.getId(), uid);
 					TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+    
+                    if (activeGame.isCapturePlayersIntention()) {
+                        collectDefenderIntentions(newTest, selectedLines, selectedMutants);
+                    }
 
 					if (compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 						TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
@@ -388,6 +470,24 @@ public class MultiplayerGameManager extends HttpServlet {
 				break;
 		}
 		response.sendRedirect(contextPath + "/multiplayer/play");
+	}
+
+	private void collectDefenderIntentions(Test newTest, Set<Integer> selectedLines, Set<Integer> selectedMutants) {
+		// Process parameters
+		try {
+			DefenderIntention intention = new DefenderIntention(selectedLines, selectedMutants);
+			IntentionDAO.storeIntentionForTest(newTest, intention);
+		} catch (Exception e) {
+			logger.error("Cannot store intention to database {}", e);
+		}
+	}
+	
+	private void collectAttackerIntentions(Mutant newMutant, AttackerIntention intention) {
+		try {
+			IntentionDAO.storeIntentionForMutant(newMutant, intention);
+		} catch (Exception e) {
+			logger.error("Cannot store intention to database {}", e);
+		}
 	}
 
 	private void includeDetectTestSmellsInMessages(Test newTest, ArrayList<String> messages) {

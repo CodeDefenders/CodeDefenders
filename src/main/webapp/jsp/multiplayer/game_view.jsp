@@ -285,10 +285,11 @@
 
             if (equiv == null) { %>
                 <%@ include file="/jsp/multiplayer/attacker_view.jsp" %>
+    		
             <% } else { %>
                 <%@ include file="/jsp/multiplayer/equivalence_view.jsp" %>
             <% }
-
+            
             break;
         case DEFENDER:
             %><%@ include file="/jsp/multiplayer/defender_view.jsp" %><%
@@ -302,5 +303,18 @@
     }
 %>
     </div>
+<%
+if(game.isCapturePlayersIntention() ) {
+	if( Role.DEFENDER.equals(role)) {
+%>
+<%@ include file="/jsp/game_components/defender_intention_collector.jsp" %>
+<%
+	} else if( Role.ATTACKER.equals(role)) {
+%>
+<%@ include file="/jsp/game_components/attacker_intention_collector.jsp" %>
+<%  
+	}     
+} 
+%>
 <%@ include file="/jsp/game_notifications.jsp"%>
 <%@ include file="/jsp/multiplayer/footer_game.jsp" %>
