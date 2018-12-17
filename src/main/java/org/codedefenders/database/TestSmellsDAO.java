@@ -18,16 +18,14 @@
  */
 package org.codedefenders.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
 import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
 
 import testsmell.AbstractSmell;
 import testsmell.TestFile;
@@ -39,58 +37,53 @@ import testsmell.smell.ExceptionCatchingThrowing;
  * @author gambi
  */
 public class TestSmellsDAO {
-	private static final Logger logger = LoggerFactory.getLogger(TestSmellsDAO.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestSmellsDAO.class);
 
-	final static String insertSmellsBatchQuery = "INSERT INTO test_smell (test_ID, smell_name) VALUES (?, ?);";
+    private final static String filterSmell = new ExceptionCatchingThrowing().getSmellName();
 
-	final static String getSmellsQuery = "SELECT smell_name FROM test_smell WHERE test_ID = ?;";
+    /**
+     * Stores all test smells of a test to the database.
+     *
+     * @param test the given test as a {@link Test}.
+     * @param testFile a container for all test smells.
+     * @throws UncheckedSQLException If storing test smells was not successful.
+     */
+    public static void storeSmell(final Test test, final TestFile testFile) throws UncheckedSQLException {
+        try {
+            String query = String.join("\n",
+                    "INSERT INTO test_smell (Test_ID, smell_name)",
+                    "VALUES (?, ?);"
+            );
+            Connection conn = DB.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query);
 
-	final static String filterSmell = new ExceptionCatchingThrowing().getSmellName();
+            for (AbstractSmell smell : testFile.getTestSmells()) {
+                if (smell.getHasSmell() && !filterSmell.equals(smell.getSmellName())) {
+                    stmt.setInt(1, test.getId());
+                    stmt.setString(2, smell.getSmellName());
+                    stmt.addBatch();
+                }
+            }
 
-	// This is not optimized. We shall use transactions, and batch insert
-	// instead.
-	public static void storeSmell(final Test newTest, final TestFile testFile) throws Exception {
-		try {
+            stmt.executeBatch(); // Execute every 1000 items.
+        } catch (SQLException e) {
+            logger.warn("Cannot store smell to database ", e);
+            throw new UncheckedSQLException("Could not store test smell to database.");
+        }
+    }
 
-			Connection conn = DB.getConnection();
-			// We cannot use the available machinery to store a batch of
-			// insert...
-			PreparedStatement stmt = conn.prepareStatement(insertSmellsBatchQuery);
-
-			for (AbstractSmell smell : testFile.getTestSmells()) {
-				if (smell.getHasSmell() && !filterSmell.equals(smell.getSmellName())) {
-					// Add smell to batch
-					stmt.setInt(1, newTest.getId());
-					stmt.setString(2, smell.getSmellName());
-					stmt.addBatch();
-				}
-			}
-
-			stmt.executeBatch(); // Execute every 1000 items.
-		} catch (SQLException e) {
-			logger.warn("Cannot store smell to databsed ", e);
-			throw new Exception("Could not store test smell to database.");
-		}
-	}
-
-	public static List<String> getDetectedTestSmellsFor(Test newTest) {
-		Connection conn = DB.getConnection();
-		DatabaseValue[] valueList = new DatabaseValue[] { DB.getDBV(newTest.getId()) };
-		PreparedStatement stmt = DB.createPreparedStatement(conn, getSmellsQuery, valueList);
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-
-		List<String> detectedTestSmells = new ArrayList<String>();
-		try {
-			while (rs.next()) {
-				detectedTestSmells.add(rs.getString("smell_name"));
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-		return detectedTestSmells;
-	}
+    /**
+     * Retrieves and returns a {@link List} of test smells for a given test.
+     *
+     * @param test the given test the smells are retrieved for.
+     * @return A list of all tests smells for a given test.
+     */
+    public static List<String> getDetectedTestSmellsForTest(Test test) {
+        String query = String.join("\n",
+                "SELECT smell_name",
+                "FROM test_smell",
+                "WHERE Test_ID = ?;"
+        );
+        return DB.executeQueryReturnList(query, rs -> rs.getString("smell_name"), DB.getDBV(test.getId()));
+    }
 }

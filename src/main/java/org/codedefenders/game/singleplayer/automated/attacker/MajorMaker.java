@@ -19,7 +19,7 @@
 package org.codedefenders.game.singleplayer.automated.attacker;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
@@ -51,7 +51,7 @@ public class MajorMaker {
 
 	public MajorMaker(int classId, DuelGame dummyGame) {
 		cId = classId;
-		cut = DatabaseAccess.getClassForKey("Class_ID", cId);
+		cut = GameClassDAO.getClassForId(cId);
 		dGame = dummyGame;
 	}
 

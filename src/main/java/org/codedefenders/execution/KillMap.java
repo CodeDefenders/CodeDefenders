@@ -24,20 +24,31 @@ import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
-
-import javax.naming.*;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 
-import static org.codedefenders.execution.KillMap.KillMapEntry.Status.*;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import static org.codedefenders.execution.KillMap.KillMapEntry.Status.KILL;
+import static org.codedefenders.execution.KillMap.KillMapEntry.Status.NO_KILL;
+import static org.codedefenders.execution.KillMap.KillMapEntry.Status.UNKNOWN;
 
 /**
  * Maps tests to their killed mutants in a finished game.
@@ -400,10 +411,18 @@ public class KillMap {
                 KillMapEntry.Status status;
 
                 switch (executedTarget.status) {
-                    case "FAIL":    status = KILL;      break;
-                    case "SUCCESS": status = NO_KILL;   break;
-                    case "ERROR":   status = ERROR;     break;
-                    default:        status = UNKNOWN;   break;
+                    case FAIL:
+                        status = KILL;
+                        break;
+                    case SUCCESS:
+                        status = NO_KILL;
+                        break;
+                    case ERROR:
+                        status = KillMapEntry.Status.ERROR;
+                        break;
+                    default:
+                        status = UNKNOWN;
+                        break;
                 }
 
                 entry = new KillMapEntry(test, mutant, status);
@@ -414,6 +433,30 @@ public class KillMap {
             }
 
             return entry;
+        }
+    }
+    /**
+     * Represents a job for computing a killmap
+     */
+    public static class KillMapJob {
+        public static enum Type {
+            CLASS, GAME;
+        }
+
+        private Type type;
+        private Integer reference;
+
+        public KillMapJob(Type type, Integer reference) {
+            this.type = type;
+            this.reference = reference;
+        }
+
+        public Type getType() {
+            return type;
+        }
+
+        public Integer getReference() {
+            return reference;
         }
     }
 

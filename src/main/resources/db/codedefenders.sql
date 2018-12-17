@@ -6,13 +6,27 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+DROP TABLE IF EXISTS `killmapjob`;
+
+CREATE TABLE killmapjob
+(
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Game_ID` int(11),
+  `Class_ID` int(11),
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ID`)
+) AUTO_INCREMENT=1;
+
 DROP TABLE IF EXISTS `test_smell`;
 CREATE TABLE test_smell (
-	`test_ID` int(11),
+	`Test_ID` int(11),
 	`smell_name` VARCHAR(500),
-	PRIMARY KEY (test_ID, smell_name) 
+	PRIMARY KEY (Test_ID, smell_name)
 );
 
+--
+-- Table structure for table `settings`
+--
 DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings` (
   `name` varchar(50) NOT NULL,
@@ -44,7 +58,8 @@ INSERT INTO settings (name, type, STRING_VALUE, INT_VALUE, BOOL_VALUE) VALUES
   ('EMAIL_ADDRESS', 'STRING_VALUE', '', NULL, NULL),
   ('EMAILS_ENABLED', 'BOOL_VALUE', NULL, NULL, FALSE),
   ('DEBUG_MODE', 'BOOL_VALUE', NULL, NULL, FALSE),
-  ('EMAIL_PASSWORD', 'STRING_VALUE', '', NULL, NULL);
+  ('EMAIL_PASSWORD', 'STRING_VALUE', '', NULL, NULL),
+  ('AUTOMATIC_KILLMAP_COMPUTATION', 'BOOL_VALUE', NULL, NULL, FALSE);
 
 --
 -- Table structure for table `ratings`
@@ -409,6 +424,25 @@ CREATE TABLE `sessions` (
   PRIMARY KEY (`Session_ID`),
   KEY `fk_userId_sessions` (`User_ID`),
   CONSTRAINT `fk_userId_sessions` FOREIGN KEY (`User_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) AUTO_INCREMENT=100;
+
+--
+-- Table structure for table `equivalences`
+--
+
+DROP TABLE IF EXISTS `equivalences`;
+CREATE TABLE `equivalences` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Mutant_ID` int(11) DEFAULT NULL,
+  `Defender_ID` int(11) DEFAULT NULL,
+  `Mutant_Points` int(11) DEFAULT '0',
+  `Expired` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
+  KEY `fk_equiv_def_idx` (`Defender_ID`),
+  KEY `fk_equiv_mutant_idx` (`Mutant_ID`),
+  CONSTRAINT `fk_equiv_def` FOREIGN KEY (`Defender_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_equiv_mutant` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) AUTO_INCREMENT=100;
 
 --

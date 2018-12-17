@@ -18,15 +18,32 @@
  */
 package org.codedefenders.servlets;
 
-import static org.codedefenders.util.Constants.DATA_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
-import static org.codedefenders.util.Constants.TESTS_DIR;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
-import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.DoStmt;
+import com.github.javaparser.ast.stmt.ForStmt;
+import com.github.javaparser.ast.stmt.ForeachStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.stmt.WhileStmt;
+
+import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.execution.AntRunner;
+import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,30 +58,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.execution.AntRunner;
-import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Test;
-import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ast.CompilationUnit;
-import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.body.TypeDeclaration;
-import com.github.javaparser.ast.stmt.BlockStmt;
-import com.github.javaparser.ast.stmt.DoStmt;
-import com.github.javaparser.ast.stmt.ForStmt;
-import com.github.javaparser.ast.stmt.ForeachStmt;
-import com.github.javaparser.ast.stmt.IfStmt;
-import com.github.javaparser.ast.stmt.WhileStmt;
+import static org.codedefenders.util.Constants.DATA_DIR;
+import static org.codedefenders.util.Constants.F_SEP;
+import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
+import static org.codedefenders.util.Constants.TESTS_DIR;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
+import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
 
 public class UnitTesting extends HttpServlet {
 
@@ -113,18 +115,18 @@ public class UnitTesting extends HttpServlet {
 			return;
 		}
 		logger.debug("New Test " + newTest.getId());
-		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+		TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-		if (compileTestTarget.status.equals("SUCCESS")) {
-			TargetExecution testOriginalTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
-			if (testOriginalTarget.status.equals("SUCCESS")) {
+		if (compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+			TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+			if (testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 				messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 				activeGame.endRound();
 				activeGame.update();
 				if (activeGame.getState().equals(GameState.FINISHED))
 					messages.add("Great! Unit testing goal achieved. Session finished.");
 			} else {
-				// testOriginalTarget.state.equals("FAIL") || testOriginalTarget.state.equals("ERROR")
+				// testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
 				messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
 				messages.add(testOriginalTarget.message);
 				session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
@@ -148,8 +150,7 @@ public class UnitTesting extends HttpServlet {
 	 * @throws IOException
 	 */
 	public Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
-
-		GameClass classUnderTest = DatabaseAccess.getClassForKey("Class_ID", cid);
+		GameClass classUnderTest = GameClassDAO.getClassForId(cid);
 
 		File newTestDir = FileUtils.getNextSubDir(getServletContext().getRealPath(DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + TESTS_DIR + F_SEP + ownerId));
 
@@ -161,9 +162,9 @@ public class UnitTesting extends HttpServlet {
 
 		// Check the test actually passes when applied to the original code.
 		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
-		TargetExecution compileTestTarget = DatabaseAccess.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+		TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-		if (compileTestTarget != null && compileTestTarget.status.equals("SUCCESS")) {
+		if (compileTestTarget != null && compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 			AntRunner.testOriginal(newTestDir, newTest);
 		}
 		return newTest;

@@ -19,16 +19,17 @@
 package org.codedefenders.game.singleplayer;
 
 import org.apache.commons.io.FileUtils;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
 import org.codedefenders.game.singleplayer.automated.attacker.AiAttacker;
 import org.codedefenders.game.singleplayer.automated.attacker.MajorMaker;
 import org.codedefenders.game.singleplayer.automated.defender.AiDefender;
 import org.codedefenders.game.singleplayer.automated.defender.EvoSuiteMaker;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
 
 import java.io.File;
 import java.io.IOException;
@@ -50,7 +51,7 @@ public class PrepareAI {
 		dummyGame.addPlayer(AiAttacker.ID, Role.ATTACKER);
 		dummyGame.addPlayer(AiDefender.ID, Role.DEFENDER);
 
-		GameClass cut = DatabaseAccess.getClassForKey("Class_ID", classId);
+		GameClass cut = GameClassDAO.getClassForId(classId);
 
 		//Generate tests.
 		EvoSuiteMaker esMake = new EvoSuiteMaker(classId, dummyGame);

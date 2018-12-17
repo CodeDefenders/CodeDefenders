@@ -24,6 +24,7 @@ import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
@@ -244,12 +245,12 @@ public class Test {
 		return StringEscapeUtils.escapeHtml(getAsString());
 	}
 
-
 	public boolean insert() {
 		try {
 			this.id = TestDAO.storeTest(this);
 			return true;
-		} catch (Exception e) {
+		} catch (UncheckedSQLException e) {
+			logger.error("Failed to store test to database.", e);
 			return false;
 		}
 	}
@@ -266,7 +267,6 @@ public class Test {
 			linesCoveredString = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
 			linesUncoveredString = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
 		}
-
 
 		String query = "UPDATE tests SET mutantsKilled=?,NumberAiMutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
 		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantsKilled),

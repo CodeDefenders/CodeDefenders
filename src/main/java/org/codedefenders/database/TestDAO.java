@@ -201,9 +201,9 @@ public class TestDAO {
      *
      * @param test the given test as a {@link Test}.
      * @return the generated identifier of the test as an {@code int}.
-     * @throws Exception If storing the test was not successful.
+     * @throws UncheckedSQLException If storing the test was not successful.
      */
-    public static int storeTest(Test test) throws Exception {
+    public static int storeTest(Test test) throws UncheckedSQLException {
         String javaFile = DatabaseAccess.addSlashes(test.getJavaFile());
         String classFile = DatabaseAccess.addSlashes(test.getClassFile());
         int gameId = test.getGameId();
@@ -240,7 +240,7 @@ public class TestDAO {
         if (result != -1) {
             return result;
         } else {
-            throw new Exception("Could not store test to database.");
+            throw new UncheckedSQLException("Could not store test to database.");
         }
     }
 

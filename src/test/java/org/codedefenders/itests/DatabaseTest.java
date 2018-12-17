@@ -22,7 +22,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.FeedbackDAO;
+import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.TargetExecution;
@@ -153,13 +155,13 @@ public class DatabaseTest {
 
 	@Test
 	public void testInsertClasses() throws Exception {
-		assertEquals(0, DatabaseAccess.getAllClasses().size());
+		assertEquals(0, GameClassDAO.getAllClasses().size());
 
 		assertTrue("Should have inserted class", cut1.insert());
-		assertEquals(1, DatabaseAccess.getAllClasses().size());
+		assertEquals(1, GameClassDAO.getAllClasses().size());
 
 		assertTrue("Should have inserted class", cut2.insert());
-		assertEquals(2, DatabaseAccess.getAllClasses().size());
+		assertEquals(2, GameClassDAO.getAllClasses().size());
 		PowerMockito.verifyStatic();
 	}
 
@@ -274,7 +276,7 @@ public class DatabaseTest {
 
 		int gid = multiplayerGame.getId();
 		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), gid);
-		int cutID = -10;
+		int cutID = cut2.getId();
 		mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
 		Mutant mutant2 = new Mutant(100, cutID, gid, "TEST_J_FILE2", "TEST_C_FILE2", false,
@@ -303,7 +305,7 @@ public class DatabaseTest {
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
 		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
-		int cutID = -10;
+		int cutID = cut2.getId();
         Mutant mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
 
@@ -342,7 +344,7 @@ public class DatabaseTest {
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
 		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
-		int cutID = -10;
+		int cutID = cut2.getId();
         Mutant mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
 
@@ -439,16 +441,17 @@ public class DatabaseTest {
 
 		//
 		int pidAttacker = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
-		int cutID = -10;
+		int cutID = cut1.getId();
+
         Mutant mutant1 = new Mutant(999,  cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pidAttacker);
 		assertTrue(mutant1.insert());
 
 		// Leave the ID in the constructor
 		TargetExecution te = new TargetExecution(1, test.getId(), mutant1.getId(),
-				TargetExecution.Target.TEST_EQUIVALENCE, "SUCCESS", "msg", "1995-03-27 12:08:00");
+				TargetExecution.Target.TEST_EQUIVALENCE, TargetExecution.Status.SUCCESS, "msg", Timestamp.valueOf("1995-03-27 12:08:00"));
 		assertTrue(te.insert());
-		TargetExecution teFromDB = DatabaseAccess.getTargetExecutionForPair(test.getId(), mutant1.getId());
+		TargetExecution teFromDB = TargetExecutionDAO.getTargetExecutionForPair(test.getId(), mutant1.getId());
 		assertEquals(te.message, teFromDB.message);
 		assertEquals(te.status, teFromDB.status);
 		assertEquals(te.target, teFromDB.target);
