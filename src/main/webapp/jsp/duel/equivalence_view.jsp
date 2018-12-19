@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.game.GameMode" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 
 <% String pageTitle="Resolve Equivalence"; %>
@@ -52,7 +53,7 @@
     request.setAttribute("tests", game.getTests());
     request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
-    request.setAttribute("gameType", "PARTY");
+    request.setAttribute("gameType", GameMode.PARTY);
 
     /* finished_modal */
     int attackerScore = game.getAttackerScore();

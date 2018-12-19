@@ -24,10 +24,12 @@
 
 <%-- Set request attributes for the components. --%>
 <%
-    /* mutant_editor */
     String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+
     final GameClass cut = game.getCUT();
+
+    /* mutant_editor */
     if (previousMutantCode != null) {
         request.setAttribute("mutantCode", previousMutantCode);
     } else {
@@ -48,15 +50,15 @@
     request.setAttribute("markEquivalent", false);
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", "PARTY");
+    request.setAttribute("gameType", GameMode.PARTY);
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#newmut-div");
     // request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
+//    request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("markUncoveredEquivalent", false);
-    // request.setAttribute("gameType", "PARTY");
+    // request.setAttribute("gameType", GameMode.PARTY);
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());

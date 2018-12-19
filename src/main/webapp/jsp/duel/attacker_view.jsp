@@ -18,8 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.util.Constants" %>
-<%@ page import="org.codedefenders.game.*" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
+<%@ page import="org.codedefenders.game.GameState" %>
 
 <% String pageTitle = "Attacking Class"; %>
 <%@ include file="/jsp/header_game.jsp" %>
@@ -31,7 +32,9 @@
     /* mutant_editor */
     String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+
     final GameClass cut = game.getCUT();
+
     if (previousMutantCode != null) {
         request.setAttribute("mutantCode", previousMutantCode);
     } else {
@@ -52,15 +55,15 @@
     request.setAttribute("markEquivalent", false);
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", "DUEL");
+    request.setAttribute("gameType", GameMode.DUEL);
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
     // request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
+//    request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("markUncoveredEquivalent", false);
-    // request.setAttribute("gameType", "DUEL");
+    // request.setAttribute("gameType", GameMode.DUEL);
 
     /* finished_modal */
     int attackerScore = game.getAttackerScore();

@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 
@@ -58,7 +57,7 @@
 	request.setAttribute("markEquivalent", true);
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
-	request.setAttribute("gameType", "DUEL");
+	request.setAttribute("gameType", GameMode.DUEL);
 
 	/* game_highlighting */
 	request.setAttribute("codeDivSelector", "#cut-div");
@@ -66,7 +65,7 @@
 	request.setAttribute("mutants", game.getMutants());
 	request.setAttribute("showEquivalenceButton", game.getState() == GameState.ACTIVE);
     // request.setAttribute("markUncoveredEquivalent", false);
-    // request.setAttribute("gameType", "DUEL");
+    // request.setAttribute("gameType", GameMode.DUEL);
 
 	/* finished_modal */
     int attackerScore = game.getAttackerScore();

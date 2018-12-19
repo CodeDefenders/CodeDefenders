@@ -1,8 +1,32 @@
-<%@ page import="org.codedefenders.game.GameMode" %>
-<%@ page import="static org.codedefenders.util.Constants.*" %>
-<%@ page import="org.codedefenders.game.GameState" %>
-<%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
+<%--
+    Copyright (C) 2016-2018 Code Defenders contributors
+
+    This file is part of Code Defenders.
+
+    Code Defenders is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or (at
+    your option) any later version.
+
+    Code Defenders is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+
+--%>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
+<%@ page import="static org.codedefenders.util.Constants.*" %>
+
+<%--
+    Puzzle game view for a defender. Retrieves the given puzzle game
+    from the request and calls the required game components.
+
+    @param PuzzleGame Constants#REQUEST_ATTRIBUTE_PUZZLE_GAME
+        The puzzle game to be displayed.
+--%>
 
 <% String pageTitle = "Defending Class"; %>
 <%@ include file="/jsp/header_main.jsp" %>
@@ -12,12 +36,15 @@
 <% { %>
 
 <%-- Set request attributes for the components. --%>
-<% PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
+<%
+    PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
     final GameClass cut = game.getCUT();
 
     /* class_viewer */
+    request.setAttribute("className", cut.getBaseName());
     request.setAttribute("classCode", cut.getAsHTMLEscapedString());
+    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
     /* test_editor */
     String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
@@ -25,26 +52,32 @@
     if (previousTestCode != null) {
         request.setAttribute("testCode", previousTestCode);
     } else {
-        request.setAttribute("testCode", cut.getTestTemplate());
+        request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
     }
     request.setAttribute("mockingEnabled", false);
-//    request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine()); FIXME include after merging with master.
+    request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
 
     /* tests_carousel */
     request.setAttribute("tests", game.getTests());
+//    request.setAttribute("mutants", game.getMutants());
 
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());
     request.setAttribute("mutantsKilled", game.getKilledMutants());
     request.setAttribute("mutantsEquivalent", new LinkedList<Mutant>());
+    request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
     request.setAttribute("markEquivalent", false);
+    request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", GameMode.PUZZLE.name());
+    request.setAttribute("gameType", GameMode.PUZZLE);
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
+    // request.setAttribute("tests", game.getTests());
     request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", true);
+    // request.setAttribute("markUncoveredEquivalent", game.isMarkUncovered());
+    // request.setAttribute("gameType", GameMode.PUZZLE);
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", CodeValidatorLevel.MODERATE);

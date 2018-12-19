@@ -328,7 +328,6 @@ public class MultiplayerGameManager extends HttpServlet {
 
                 // Clean the mutated code only if mutant is accepted
                 session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-                response.sendRedirect(contextPath + "/multiplayer/play");
 				break;
 			}
 			case "createTest": {

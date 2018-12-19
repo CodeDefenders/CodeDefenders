@@ -19,11 +19,11 @@
 
 --%>
 
-<%@ page import="java.util.List" %>
-<%@ page import="org.codedefenders.game.Test" %>
-<%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="com.google.gson.GsonBuilder" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="java.util.List" %>
 
 <%--
     Adds highlighting of coverage (green lines) and mutants (gutter icons) to a CodeMirror editor.
@@ -61,7 +61,7 @@
     List<Mutant> mutantsTODORENAME = (List<Mutant>) request.getAttribute("mutants") ;
     Boolean showEquivalenceButton = (Boolean) request.getAttribute("showEquivalenceButton");
     Boolean markUncoveredEquivalent = (Boolean) request.getAttribute("markUncoveredEquivalent");
-    String gameType = (String) request.getAttribute("gameType");
+    GameMode gameType = (GameMode) request.getAttribute("gameType");
 %>
 
 <%
@@ -84,7 +84,7 @@
         /* Game highlighting settings. */
         const showEquivalenceButton = Boolean(<%=showEquivalenceButton%>);
         const markUncoveredEquivalent = Boolean(<%=markUncoveredEquivalent%>);
-        const gameType = '<%=gameType%>';
+        const gameType = '<%=gameType.name()%>';
 
         const MutantStatuses = {
             ALIVE: 'ALIVE',

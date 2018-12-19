@@ -119,8 +119,8 @@ public class Constants {
 	public static final String DUEL_DEFENDER_VIEW_JSP = "jsp/duel/defender_view.jsp";
 
 	public static final String PUZZLE_OVERVIEW_VIEW_JSP = "/jsp/puzzle/puzzle_overview.jsp";
-	public static final String PUZZLE_GAME_ATTACKER_VIEW_JSP = "/jsp/puzzle/puzzle_attacker_view.jsp";
-	public static final String PUZZLE_GAME_DEFENDER_VIEW_JSP = "/jsp/puzzle/puzzle_defender_view.jsp";
+	public static final String PUZZLE_GAME_ATTACKER_VIEW_JSP = "/jsp/puzzle/attacker_view.jsp";
+	public static final String PUZZLE_GAME_DEFENDER_VIEW_JSP = "/jsp/puzzle/defender_view.jsp";
 
 	public static final String ADMIN_USER_JSP = "/jsp" + F_SEP + "admin_user_mgmt.jsp";
 	public static final String ADMIN_GAMES_JSP = "/jsp" + F_SEP + "admin_create_games.jsp";

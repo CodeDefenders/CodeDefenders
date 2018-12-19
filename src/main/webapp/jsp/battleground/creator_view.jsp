@@ -40,14 +40,14 @@
 	request.setAttribute("markEquivalent", false);
 	request.setAttribute("markUncoveredEquivalent", false);
 	request.setAttribute("viewDiff", true);
-	request.setAttribute("gameType", "PARTY");
+	request.setAttribute("gameType", GameMode.PARTY);
 
 	/* game_highlighting */
 	request.setAttribute("codeDivSelector", "#cut-div");
 	// request.setAttribute("tests", game.getTests());
 	request.setAttribute("mutants", game.getMutants());
 	request.setAttribute("showEquivalenceButton", false);
-	// request.setAttribute("gameType", "PARTY");
+	// request.setAttribute("gameType", GameMode.PARTY);
 
 	/* mutant_explanation */
 	request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());

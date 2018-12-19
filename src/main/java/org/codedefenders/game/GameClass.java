@@ -553,4 +553,9 @@ public class GameClass {
 				.map(Range::getMaximum)
 				.collect(Collectors.toList());
 	}
+
+	@Override
+	public String toString() {
+		return "[id=" + id + ",name=" + name + ",alias=" + alias + "]";
+	}
 }

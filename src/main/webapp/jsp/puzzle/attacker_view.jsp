@@ -1,9 +1,35 @@
+<%--
+    Copyright (C) 2016-2018 Code Defenders contributors
+
+    This file is part of Code Defenders.
+
+    Code Defenders is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or (at
+    your option) any later version.
+
+    Code Defenders is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+
+--%>
+<%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
-<%@ page import="java.util.LinkedList" %>
 <%@ page import="static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME" %>
 <%@ page import="static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT" %>
-<%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
+<%@ page import="java.util.LinkedList" %>
 
+<%--
+    Puzzle game view for a attacker. Retrieves the given puzzle game
+    from the request and calls the required game components.
+
+    @param PuzzleGame Constants#REQUEST_ATTRIBUTE_PUZZLE_GAME
+        The puzzle game to be displayed.
+--%>
 <% String pageTitle = "Attacking Class"; %>
 <%@ include file="/jsp/header_main.jsp"%>
 
@@ -26,6 +52,9 @@
     } else {
         request.setAttribute("mutantCode", cut.getAsHTMLEscapedString());
     }
+    request.setAttribute("mutantName", cut.getBaseName());
+    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
+
     request.setAttribute("startEditLine", puzzle.getEditableLinesStart());
     request.setAttribute("endEditLine", puzzle.getEditableLinesEnd());
 
@@ -36,14 +65,19 @@
     request.setAttribute("mutantsAlive", game.getAliveMutants());
     request.setAttribute("mutantsKilled", game.getKilledMutants());
     request.setAttribute("mutantsEquivalent", new LinkedList<Mutant>());
+    request.setAttribute("mutantsMarkedEquivalent", new LinkedList<Mutant>());
     request.setAttribute("markEquivalent", false);
+    request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", GameMode.PUZZLE.name());
+    request.setAttribute("gameType", GameMode.PUZZLE);
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
+    // request.setAttribute("tests", game.getTests());
     request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
+    // request.setAttribute("markUncoveredEquivalent", false);
+    // request.setAttribute("gameType", GameMode.PUZZLE);
 
     /* finished_modal TODO */
 

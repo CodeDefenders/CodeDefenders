@@ -19,10 +19,13 @@
 
 --%>
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
-<%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="org.codedefenders.model.User" %>
-<%@ page import="org.codedefenders.game.*" %>
+<%@ page import="java.util.List" %>
 
 <%--
     Displays three tabs with a list of alive, killed and equivalent mutants respectively.
@@ -39,7 +42,7 @@
         The list of killed Mutants to display.
     @param List<Mutant> mutantsEquivalent
         The list of equivalent Mutants to display.
-    @param String gameType
+    @param GameMode gameType
         Type of the game. Used for the "Claim Equivalent" URLs and dialog message.
         TODO find a better solution for this
 --%>
@@ -54,7 +57,7 @@
     Boolean markEquivalent = (Boolean) request.getAttribute("markEquivalent");
     Boolean markUncoveredEquivalent = (Boolean) request.getAttribute("markUncoveredEquivalent");
     Boolean viewDiff = (Boolean) request.getAttribute("viewDiff");
-    String gameType = (String) request.getAttribute("gameType");
+    GameMode gameType = (GameMode) request.getAttribute("gameType");
 %>
 
 <div class="tabs bg-minus-3" role="tablist">
@@ -112,7 +115,7 @@
                                         && m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
                                         && (markUncoveredEquivalent || m.isCovered())
                                         && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID) {
-                                        if ("PARTY".equals(gameType)) {
+                                        if (gameType == GameMode.PARTY) {
                                             if (m.getLines().size() > 1) {
                                 %>
                                                 <a href="<%= request.getContextPath() %>/multiplayer/play?equivLines=<%=m.getLines().toString().replaceAll(", ", ",") %>"
@@ -126,7 +129,7 @@
                                                     Claim Equivalent</a>
                                 <%
                                             }
-                                        } else if ("DUEL".equals(gameType)) {
+                                        } else if (gameType == GameMode.DUEL) {
                                 %>
                                             <form id="equiv" action="<%=request.getContextPath() %>/duelgame" method="post" onsubmit="return confirm('This will mark mutant <%= m.getId() %> as equivalent. Are you sure?');">
                                                 <input type="hidden" name="formType" value="claimEquivalent">

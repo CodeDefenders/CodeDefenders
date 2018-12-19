@@ -175,4 +175,9 @@ public abstract class AbstractGame {
 	public Role getRole(int userId){
 		return DatabaseAccess.getRole(userId, getId());
 	}
+
+	@Override
+	public String toString() {
+		return "[id=" + id + ",classId=" + classId + ",state=" + state + ",mode=" + mode + "]";
+	}
 }
