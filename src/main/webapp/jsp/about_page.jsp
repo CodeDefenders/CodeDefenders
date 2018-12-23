@@ -48,7 +48,7 @@
                 if (version==null) {
                     Properties prop = new Properties();
                     try {
-                        prop.load(getServletContext().getResourceAsStream("/META-INF/MANIFEST.MF"));
+                        prop.load(request.getServletContext().getResourceAsStream("/META-INF/MANIFEST.MF"));
                         version = prop.getProperty("Implementation-Version");
                     } catch (IOException e) {
                         // Ignore -- if we have no version, then we show no version section

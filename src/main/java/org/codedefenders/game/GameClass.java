@@ -191,7 +191,7 @@ public class GameClass {
 			this.id = GameClassDAO.storeClass(this);
 			return true;
 		} catch (UncheckedSQLException e) {
-			logger.error("Failed to store test to database.", e);
+			logger.error("Failed to store game class to database.", e);
 			return false;
 		}
 	}

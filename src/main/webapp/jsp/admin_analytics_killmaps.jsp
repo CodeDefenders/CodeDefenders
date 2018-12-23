@@ -24,6 +24,7 @@
 <%@ page import="org.codedefenders.execution.KillMapProcessor"%>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings"%>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO"%>
+<%@ page import="org.codedefenders.database.GameClassDAO" %>
 
 <%
     String pageTitle = null;
@@ -34,7 +35,7 @@
 	<%
     request.setAttribute("adminActivePage", "adminAnalytics");
 	   
-    KillMapProcessor killMapProcessor = (KillMapProcessor) getServletContext().getAttribute(KillMapProcessor.NAME);
+    KillMapProcessor killMapProcessor = (KillMapProcessor) request.getServletContext().getAttribute(KillMapProcessor.NAME);
     int gamePendingJobs = 0;
     int classPendingJobs = 0;
     for( KillMap.KillMapJob pendingJob : killMapProcessor.getPendingJobs() ){
@@ -84,7 +85,7 @@
         </thead>
         <tbody>
                 <%
-                for (GameClass cut : DatabaseAccess.getAllClasses()) {
+                for (GameClass cut : GameClassDAO.getAllClasses()) {
                     // Probably we should avoid listing here puzzle games classes
                 %>
                 <tr>

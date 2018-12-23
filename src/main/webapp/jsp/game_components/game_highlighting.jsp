@@ -21,6 +21,7 @@
 
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="com.google.gson.GsonBuilder" %>
+<%@ page import="org.codedefenders.game.GameHighlightingDTO" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="java.util.List" %>

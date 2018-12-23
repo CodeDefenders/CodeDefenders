@@ -110,7 +110,6 @@ public class Constants {
 	public static final String GRACE_PERIOD_MESSAGE = "Game is now in grace period.";
 
 	public static final String LOGIN_VIEW_JSP = "jsp" + F_SEP + "login_view.jsp";
-	public static final String SCORE_VIEW_JSP = "jsp" + F_SEP + "score_view.jsp";
 	public static final String UTESTING_VIEW_JSP = "jsp" + F_SEP + "utesting_view.jsp";
 
 	public static final String DUEL_RESOLVE_EQUIVALENCE_JSP = "jsp/duel/equivalence_view.jsp";
