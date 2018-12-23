@@ -46,6 +46,7 @@ import org.codedefenders.servlets.FeedbackManager;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -399,6 +400,7 @@ public class DatabaseTest {
 		assertEquals(testFromDB.getLineCoverage().getLinesUncovered(), test.getLineCoverage().getLinesUncovered());
 	}
 
+	@Ignore
 	@Test
 	public void testEquivalences() throws Exception {
 

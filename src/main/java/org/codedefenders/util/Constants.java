@@ -88,8 +88,7 @@ public class Constants {
 	public static final String MODE_DUEL_DIR = "sp";
 	public static final String MODE_BATTLEGROUND_DIR = "mp";
 
-	// FIXME Phil: MUTANTS_DIR should be final.
-	public static String MUTANTS_DIR = DATA_DIR + F_SEP + "mutants";
+	public static final String MUTANTS_DIR = DATA_DIR + F_SEP + "mutants";
 	public static final String TESTS_DIR = DATA_DIR + F_SEP + "tests";
 	public static final String AI_DIR = DATA_DIR + F_SEP + "ai";
 

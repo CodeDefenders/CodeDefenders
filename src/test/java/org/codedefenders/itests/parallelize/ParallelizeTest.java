@@ -322,7 +322,7 @@ public class ParallelizeTest {
 					+"	}" + "\n"
 					+"}";
 
-			org.codedefenders.game.Test newTest = GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, "mp");
+			org.codedefenders.game.Test newTest = GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 			MutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
 			assumeThat(battlegroundGame.getTests(true).size(), is(1));
 			// Append this for oracles and mocks
@@ -345,7 +345,7 @@ public class ParallelizeTest {
 					+"" + "\n"
 					+"	}" + "\n"
 					+"}";
-			newTest = GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, "mp");
+			newTest = GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 			MutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
 			assumeThat(battlegroundGame.getTests(true).size(), is(2));
 			// Append this for oracles and mocks
@@ -374,7 +374,7 @@ public class ParallelizeTest {
 			String mutantText = String.join("\n", mutantCode);
 
 			Mutant mutant = GameManager.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(),
-					mutantText, attackerID, "mp");
+					mutantText, attackerID, Constants.MODE_BATTLEGROUND_DIR);
 
 			// Mock the scheduler to return a random but known test distribution:
 			TestScheduler mockedTestScheduler = Mockito.mock( TestScheduler.class );

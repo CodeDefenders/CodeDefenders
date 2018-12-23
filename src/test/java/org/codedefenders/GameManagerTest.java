@@ -19,71 +19,21 @@
 package org.codedefenders;
 
 import org.codedefenders.game.GameClass;
-import org.codedefenders.servlets.auth.LoginManager;
-import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import static org.codedefenders.util.Constants.MUTANTS_DIR;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 
 /**
  * @author Jose Rojas
  */
 public class GameManagerTest {
-
-	String originalMutantsDir;
-
-	@Before
-	public void setUp() {
-		originalMutantsDir = Constants.MUTANTS_DIR;
-		Constants.MUTANTS_DIR = org.apache.commons.io.FileUtils.getTempDirectoryPath();
-		File folder = new File(MUTANTS_DIR);
-		folder.mkdir();
-	}
-
-	@After
-	public void tearDown() {
-		File folder = new File(MUTANTS_DIR);
-		folder.delete();
-		Constants.MUTANTS_DIR = originalMutantsDir;
-	}
-
-	@Test @Ignore
-	public void testServlet() throws Exception {
-		HttpServletRequest request = mock(HttpServletRequest.class);
-		HttpServletResponse response = mock(HttpServletResponse.class);
-
-		when(request.getParameter("username")).thenReturn("jose");
-		when(request.getParameter("password")).thenReturn("jose");
-		PrintWriter writer = new PrintWriter("somefile.txt");
-		when(response.getWriter()).thenReturn(writer);
-
-		new LoginManager().doPost(request, response);
-
-		verify(request, atLeast(1)).getParameter("username"); // only if you want to verify username was called...
-		writer.flush(); // it may not have been flushed yet...
-		assertTrue(org.apache.commons.io.FileUtils.readFileToString(new File("somefile.txt"), "UTF-8")
-				.contains("My Expected String"));
-	}
-
 	@Test
 	public void testGetNextSubDirEmpty() throws IOException {
 		File folder = getCleanTmpGameDir(1);

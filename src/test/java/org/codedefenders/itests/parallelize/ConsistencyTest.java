@@ -33,6 +33,7 @@ import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManager;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorException;
+import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -71,6 +72,7 @@ import javax.naming.spi.InitialContextFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
@@ -192,10 +194,10 @@ public class ConsistencyTest {
 		User observer = new User("observer", User.encodePassword("password"), "demo@observer.com");
 		observer.insert();
 		//
-		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Observer " + observer.getId());
+		System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Observer " + observer.getId());
 		User attacker = new User("demoattacker", User.encodePassword("password"), "demo@attacker.com");
 		attacker.insert();
-		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Attacker" + attacker.getId());
+		System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Attacker" + attacker.getId());
 		//
 		// Create 3 defenders
 		//
@@ -203,7 +205,7 @@ public class ConsistencyTest {
 		for (int i = 0; i < defenders.length; i++) {
 			defenders[i] = new User("demodefender" + i, User.encodePassword("password"), "demo"+i+"@defender.com");
 			defenders[i].insert();
-			System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Defender " + defenders[i].getId());
+			System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Defender " + defenders[i].getId());
 		}
 
 		// Upload the Class Under test - Maybe better use Classloader
@@ -218,7 +220,7 @@ public class ConsistencyTest {
 		///
 		GameClass cut = new GameClass("Lift", "Lift", jFile.getAbsolutePath(), cFile.getAbsolutePath());
 		cut.insert();
-		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Cut " + cut.getId());
+		System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Cut " + cut.getId());
 
 		//
 		MultiplayerGame multiplayerGame = new MultiplayerGame(cut.getId(), observer.getId(), GameLevel.HARD, (float) 1,
@@ -227,7 +229,7 @@ public class ConsistencyTest {
 				System.currentTimeMillis() - 1000 * 3600,
 				System.currentTimeMillis() + 1000 * 3600,
 				//
-				GameState.ACTIVE.name(), false, 2, true, null, false);
+				GameState.ACTIVE.name(), false, 2, true, CodeValidatorLevel.STRICT, false);
 		// Store to db
 		multiplayerGame.insert();
 
@@ -239,7 +241,7 @@ public class ConsistencyTest {
 			multiplayerGame.addPlayer(defender.getId(), Role.DEFENDER);
 		}
 
-		System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant() Game " + multiplayerGame.getId());
+		System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Game " + multiplayerGame.getId());
 
 		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(multiplayerGame.getId());
 		assertEquals("Cannot find the right active game", multiplayerGame.getId(), activeGame.getId());
@@ -248,7 +250,6 @@ public class ConsistencyTest {
 		String mutantText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
 				Charset.defaultCharset());
-		//
 		Mutant mutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
 				attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
 
@@ -287,6 +288,7 @@ public class ConsistencyTest {
 
 		// Refresh the state of the mutant... since there's no refresh method, we reload the object from the DB
 		mutant = activeGame.getMutantByID(mutant.getId());
+		assertNotNull(mutant);
 		
 		// assertMutant is killed !
 		assertFalse("Mutant not killed", mutant.isAlive());

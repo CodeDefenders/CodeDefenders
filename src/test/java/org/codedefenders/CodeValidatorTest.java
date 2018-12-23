@@ -18,25 +18,6 @@
  */
 package org.codedefenders;
 
-import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
-import static org.codedefenders.validation.code.CodeValidator.getMD5FromText;
-import static org.codedefenders.validation.code.CodeValidator.validateMutantGetMessage;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_COMMENT;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
-import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_SUCCESS;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorException;
@@ -49,12 +30,30 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
+import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
+import static org.codedefenders.validation.code.CodeValidator.getMD5FromText;
+import static org.codedefenders.validation.code.CodeValidator.validateMutantGetMessage;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_COMMENT;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({DatabaseAccess.class})
 public class CodeValidatorTest {
 
-	// TODO Bad practice to have variables here...
-	private CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.STRICT;
+	private static final CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.STRICT;
 
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
@@ -104,13 +103,7 @@ public class CodeValidatorTest {
 		assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
 		
 		assertNotEquals("The MD5 is the same", getMD5FromText(originalCode), getMD5FromText(mutatedCode));
-
-	        
 	}
-	
-//	
-
-	
 	
 	@Test
 	public void testMakingStringLiteralsDoesNotTriggersValidation() throws IOException{
