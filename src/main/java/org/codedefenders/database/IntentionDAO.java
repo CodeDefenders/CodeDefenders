@@ -25,6 +25,7 @@ import org.codedefenders.model.DefenderIntention;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.util.stream.Collectors;
 
 /**
  * This class handles the database logic for player intentions.
@@ -46,32 +47,14 @@ public class IntentionDAO {
      * @throws Exception If storing the intention was not successful.
      */
     public static int storeIntentionForTest(Test test, DefenderIntention intention) throws Exception {
+        int testId = test.getId();
+        int gameId = test.getGameId();
 
-        // Contextual Information Test and Game
-        Integer testId = test.getId();
-        Integer gameId = test.getGameId();
-
-        StringBuilder targetMutantsAsCSV = new StringBuilder();
-        for (Integer integer : intention.getMutants()) {
-            targetMutantsAsCSV.append(integer).append(",");
-        }
-        if (targetMutantsAsCSV.length() > 0) {
-            targetMutantsAsCSV.reverse().deleteCharAt(0).reverse();
-        }
-        String targetMutants = targetMutantsAsCSV.toString();
-
-        StringBuilder targetLinesAsCSV = new StringBuilder();
-        for (Integer integer : intention.getLines()) {
-            targetLinesAsCSV.append(integer).append(",");
-        }
-        if (targetLinesAsCSV.length() > 0) {
-            targetLinesAsCSV.reverse().deleteCharAt(0).reverse();
-        }
-        String targetLines = targetLinesAsCSV.toString();
+        final String targetLines = intention.getLines().stream().map(String::valueOf).collect(Collectors.joining(","));
 
         final String query = String.join("\n",
                 "INSERT INTO intention (Test_ID, Game_ID, Target_Lines)",
-                "VALUES (?, ?, ?, ?);"
+                "VALUES (?,?,?);"
         );
 
         DatabaseValue[] valueList = new DatabaseValue[]{

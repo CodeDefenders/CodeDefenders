@@ -482,7 +482,7 @@ public class MultiplayerGameManager extends HttpServlet {
 			DefenderIntention intention = new DefenderIntention(selectedLines, selectedMutants);
 			IntentionDAO.storeIntentionForTest(newTest, intention);
 		} catch (Exception e) {
-			logger.error("Cannot store intention to database {}", e);
+			logger.error("Cannot store intention to database.", e);
 		}
 	}
 
@@ -490,7 +490,7 @@ public class MultiplayerGameManager extends HttpServlet {
 		try {
 			IntentionDAO.storeIntentionForMutant(newMutant, intention);
 		} catch (Exception e) {
-			logger.error("Cannot store intention to database {}", e);
+			logger.error("Cannot store intention to database.", e);
 		}
 	}
 
