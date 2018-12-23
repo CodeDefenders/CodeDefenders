@@ -477,11 +477,6 @@ public class Mutant implements Serializable {
 		return DB.executeUpdate(stmt, conn);
 	}
 
-	@Override
-	public String toString() {
-		return "Mutant " + getId() + "; Alive:"+ isAlive() + "; Equivalent: " + getEquivalent() + " - " + getScore();
-	}
-
 	public void setTimesKilledAi(int count) {
 		killedByAITests = count;
 	}
@@ -639,5 +634,10 @@ public class Mutant implements Serializable {
 
 	public void setLines(List<Integer> mutatedLines) {
 		this.lines = mutatedLines;
+	}
+
+	@Override
+	public String toString() {
+		return "[mutantId=" + getId() + ",alive="+ isAlive() + ",equivalent=" + getEquivalent() + ",score=" + getScore() + "]";
 	}
 }

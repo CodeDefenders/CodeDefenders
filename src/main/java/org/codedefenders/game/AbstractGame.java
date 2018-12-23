@@ -178,6 +178,6 @@ public abstract class AbstractGame {
 
 	@Override
 	public String toString() {
-		return "[id=" + id + ",classId=" + classId + ",state=" + state + ",mode=" + mode + "]";
+		return "[gameId=" + id + ",classId=" + classId + ",state=" + state + ",mode=" + mode + "]";
 	}
 }
