@@ -18,22 +18,25 @@
  */
 package org.codedefenders.servlets.admin;
 
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.UserDAO;
-import org.codedefenders.util.Constants;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
-import org.codedefenders.model.User;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
+import org.codedefenders.model.User;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -45,9 +48,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import edu.emory.mathcs.backport.java.util.Collections;
-
 public class AdminCreateGames extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(AdminCreateGames.class);
 
     public enum RoleAssignmentMethod {RANDOM, OPPOSITE}
 
@@ -73,12 +75,12 @@ public class AdminCreateGames extends HttpServlet {
     private List<List<Integer>> attackerIdsList;
     private List<List<Integer>> defenderIdsList;
     private MultiplayerGame mg;
-    boolean chatEnabled;
-    boolean markUncovered;
-    int maxAssertionsPerTest;
-    CodeValidatorLevel mutantValidatorLevel;
+    private boolean chatEnabled;
+    private boolean markUncovered;
+    private int maxAssertionsPerTest;
+    private CodeValidatorLevel mutantValidatorLevel;
 
-    boolean capturePlayersIntention;
+    private boolean capturePlayersIntention;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP).forward(request, response);
@@ -89,11 +91,11 @@ public class AdminCreateGames extends HttpServlet {
         HttpSession session = request.getSession();
         // Get their user id from the session.
         currentUserID = (Integer) session.getAttribute("uid");
-        ArrayList<String> messages = new ArrayList<String>();
+        ArrayList<String> messages = new ArrayList<>();
         session.setAttribute("messages", messages);
 
-        switch (request.getParameter("formType")) {
-
+        final String action = request.getParameter("formType");
+        switch (action) {
             case "createGame":
                 createGame(response, request, messages, session);
                 break;
@@ -101,7 +103,7 @@ public class AdminCreateGames extends HttpServlet {
                 insertGame(response, request, messages, session);
                 break;
             default:
-                System.err.println("Action not recognised");
+                logger.error("Action not recognised:{}", action);
                 Redirect.redirectBack(request, response);
                 break;
         }
@@ -124,7 +126,7 @@ public class AdminCreateGames extends HttpServlet {
 			associatePlayerToGameWithRole(session, messages, userId, targetGameIdString, role);
 		} else if (gameAndUserRemoveId != null || gameAndUserSwitchId != null ) {
 			// admin is removing user  from temp game or switching their role or
-			Boolean switchUser = gameAndUserSwitchId != null;
+			boolean switchUser = gameAndUserSwitchId != null;
 			String gameAndUserId = switchUser ? gameAndUserSwitchId : gameAndUserRemoveId;
 			int gameToRemoveFromId = Integer.parseInt(gameAndUserId.split("-")[0]);
 			Integer userToRemoveId = Integer.parseInt(gameAndUserId.split("-")[1]);
@@ -187,11 +189,11 @@ public class AdminCreateGames extends HttpServlet {
 			mg = createdGames.get(gid);
 			// My current role matters not the one I will play in the next game !
 			// So return the list that contains me...
-			userList = (
-					((List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE)).get( gid ).contains( new Integer(removedUserId) )
-					? (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE)
-					: (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE))
-							.get(gid);
+            userList = (
+                    ((List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE)).get(gid).contains(new Integer(removedUserId))
+                            ? (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE)
+                            : (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE))
+                    .get(gid);
 		} else {
 			gid = Integer.parseInt(gidString);
 			mg = DatabaseAccess.getMultiplayerGame(gid);
@@ -223,17 +225,16 @@ public class AdminCreateGames extends HttpServlet {
 			createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
 			gid = Integer.parseInt(gidString.substring(1));
 			mg = createdGames.get(gid);
-			userList = (role.equals(Role.ATTACKER) ?
-					(List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE) :
-					(List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE))
-					.get(gid);
+            if (role.equals(Role.ATTACKER))
+                userList = ((List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE)).get(gid);
+            else
+                userList = ((List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE)).get(gid);
 		} else {
 			gid = Integer.parseInt(gidString);
 			mg = DatabaseAccess.getMultiplayerGame(gid);
 		}
 		if (mg.getCreatorId() == addedUserId) {
-			messages.add("Cannot add user " + addedUserId + " to game " + String.valueOf(gid) +
-					" because they are it's creator.");
+			messages.add("Cannot add user " + addedUserId + " to game " + String.valueOf(gid) + " because they are it's creator.");
 		} else {
 			if (isTempGame) {
 				userList.add(addedUserId);
@@ -242,8 +243,7 @@ public class AdminCreateGames extends HttpServlet {
 				if (mg.addPlayer(addedUserId, role)) {
 					messages.add("Added user " + addedUserId + " to game " + gidString + " as " + role);
 				} else {
-					messages.add("ERROR trying to add user " + addedUserId + " to game " +
-							gidString + " as " + role);
+					messages.add("ERROR trying to add user " + addedUserId + " to game " + gidString + " as " + role);
 				}
 			}
 		}
@@ -393,8 +393,8 @@ public class AdminCreateGames extends HttpServlet {
     class ReverseDefenderScoreComparator implements Comparator<Integer> {
         @Override
         public int compare(Integer o1, Integer o2) {
-            Integer score1 = AdminDAO.getScore(o1).getDefenderScore();
-            Integer score2 = AdminDAO.getScore(o2).getDefenderScore();
+            int score1 = AdminDAO.getScore(o1).getDefenderScore();
+            int score2 = AdminDAO.getScore(o2).getDefenderScore();
             return (-1) * Integer.compare(score1, score2);
         }
     }
@@ -457,8 +457,8 @@ public class AdminCreateGames extends HttpServlet {
         return playerList;
     }
 
-    public static List<List<Integer>> getUserLists(List<MultiplayerGame> createdGames, List<Integer> userIds,
-                                                   int nbUsersPerGame) {
+    private static List<List<Integer>> getUserLists(List<MultiplayerGame> createdGames, List<Integer> userIds,
+                                                    int nbUsersPerGame) {
         List<List<Integer>> userLists = new ArrayList<>();
         for (MultiplayerGame mg : createdGames) {
             userLists.add(fillGame(userIds, nbUsersPerGame));
