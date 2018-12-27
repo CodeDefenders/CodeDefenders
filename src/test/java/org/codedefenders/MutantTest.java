@@ -25,6 +25,7 @@ import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.rules.DatabaseRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -49,35 +50,36 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({DatabaseAccess.class})
+@PrepareForTest({DatabaseAccess.class, GameClassDAO.class})
 public class MutantTest {
-	
+
+	@Rule
+	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
+
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	@org.junit.Test
 	public void testApplyPatch() throws IOException, PatchFailedException {
 
-		List<String> originalCode = Arrays.asList(new String[] { "public class Lift {", "private int topFloor;",
+		List<String> originalCode = Arrays.asList("public class Lift {", "private int topFloor;",
 				"private int currentFloor = 0; // default", "private int capacity = 10;    // default",
 				"private int numRiders = 0;    // default", "public Lift(int highestFloor) { ",
-				"topFloor = highestFloor;", "}", "}" });
+				"topFloor = highestFloor;", "}", "}");
 
-		List<String> mutantCode = Arrays.asList(new String[] { "public class Lift {", "private int topFloor;",
+		List<String> mutantCode = Arrays.asList("public class Lift {", "private int topFloor;",
 				"private int currentFloor = 0; // default", "private int capacity = 10;    // default",
-				"private int numRiders = 0;    // default", "public Lift(int highestFloor) { topFloor = highestFloor;", // Here's
-																														// the
-																														// change
-				"topFloor = highestFloor;", "}", "}" });
+				"private int numRiders = 0;    // default", "public Lift(int highestFloor) { topFloor = highestFloor;", // Here's the change
+				"topFloor = highestFloor;", "}", "}");
 
 		// generating diff information.
 		Patch thePatch = DiffUtils.diff(originalCode, mutantCode);
 		List<String> unifiedPatches = DiffUtils.generateUnifiedDiff(null, null, originalCode, thePatch, 3);
 		System.out.println("MutantTest.testApplyPatch() " + unifiedPatches);
-		List<String> diff = Arrays.asList(new String[] { "--- null", "+++ null", "@@ -3,7 +3,7 @@",
+		List<String> diff = Arrays.asList("--- null", "+++ null", "@@ -3,7 +3,7 @@",
 				" private int currentFloor = 0; // default", " private int capacity = 10;    // default",
 				" private int numRiders = 0;    // default", "-public Lift(int highestFloor) { ",
-				"+public Lift(int highestFloor) { topFloor = highestFloor;", " topFloor = highestFloor;", " }", " }" });
+				"+public Lift(int highestFloor) { topFloor = highestFloor;", " topFloor = highestFloor;", " }", " }");
 
 		Patch patch = DiffUtils.parseUnifiedDiff(diff);
 
@@ -93,7 +95,7 @@ public class MutantTest {
 		System.out.println("MutantTest.exploratoryTest() " + s);
 		
 	}
-	@org.junit.Test
+	@Test
 	public void testGetLinesForChangeSingleLine() throws IOException{
 		String originalCode = "public class Lift {"+ "\n"
 				+ "private int topFloor;"+ "\n"
@@ -137,11 +139,12 @@ public class MutantTest {
         PowerMockito.mockStatic(DatabaseAccess.class);
         when(DatabaseAccess.getGameForKey("ID", mockedGameID)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
+		PowerMockito.mockStatic(GameClassDAO.class);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+        Mutant m = new Mutant(mockedGameID, mockedClassID, mutantJavaFile.getAbsolutePath(), null, true, 1);
 
         Patch p = m.getDifferences();
 
@@ -153,8 +156,8 @@ public class MutantTest {
 		}
 	}
 
-	@org.junit.Test
-	public void testGetLinesForChangeMutlipleLines() throws IOException{
+	@Test
+	public void testGetLinesForChangeMultipleLines() throws IOException{
 		String originalCode = 
 				"public class Lift {"+ "\n"
 				+ "private int topFloor;"+ "\n"
@@ -199,13 +202,14 @@ public class MutantTest {
         when(mockedDualGame.getId()).thenReturn( mockedGameID );
 
 		PowerMockito.mockStatic(DatabaseAccess.class);
+		PowerMockito.mockStatic(GameClassDAO.class);
 		when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn( mockedDualGame);
 		when(mockedDualGame.getClassId()).thenReturn(1);
-		when(GameClassDAO.getClassForId(1)).thenReturn( mockedGameClass );
+		when(GameClassDAO.getClassForId(mockedClassID)).thenReturn( mockedGameClass );
 		//
 		when( mockedGameClass.getJavaFile()).thenReturn( cutJavaFile.getAbsolutePath() );
 		//
-		Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+		Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 	
 		Patch p = m.getDifferences();
 		
@@ -214,7 +218,7 @@ public class MutantTest {
 	}
 	
 	
-	@org.junit.Test
+	@Test
 	public void testGetLinesForInsertSingeLine() throws IOException{
 		String originalCode = "public class Lift {"+ "\n"
 				+ "private int topFloor;"+ "\n"
@@ -257,13 +261,14 @@ public class MutantTest {
         when(mockedDualGame.getId()).thenReturn(mockedGameID);
 
         PowerMockito.mockStatic(DatabaseAccess.class);
+		PowerMockito.mockStatic(GameClassDAO.class);
         when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(1)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-		Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+		Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
 		
@@ -271,7 +276,7 @@ public class MutantTest {
 		assertEquals(Arrays.asList(9), m.getLines());
 	}
 	
-	@org.junit.Test
+	@Test
 	public void testGetLinesForInsertMultipleLines() throws IOException{
 		String originalCode = "public class Lift {"+ "\n"
 				+ "private int topFloor;"+ "\n"
@@ -315,13 +320,14 @@ public class MutantTest {
         when(mockedDualGame.getId()).thenReturn(mockedGameID);
 
         PowerMockito.mockStatic(DatabaseAccess.class);
+		PowerMockito.mockStatic(GameClassDAO.class);
         when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(1)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-		Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+		Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
 		
@@ -331,7 +337,7 @@ public class MutantTest {
 		System.out.println("MutantTest.testGetLinesForInsertMultipleLines()" + m.getHTMLReadout() );
 	}
 	
-	@org.junit.Test
+	@Test
 	public void testGetLinesForChangeLineAndInsertMultipleLines() throws IOException{
 		String originalCode = "public class Lift {"+ "\n"
 				+ "private int topFloor;"+ "\n"
@@ -375,12 +381,13 @@ public class MutantTest {
         when(mockedDualGame.getId()).thenReturn(mockedGameID);
 
         PowerMockito.mockStatic(DatabaseAccess.class);
+		PowerMockito.mockStatic(GameClassDAO.class);
         when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-		Mutant m = new Mutant(1,mockedGameClass.getId(),  mutantJavaFile.getAbsolutePath(), null, true, 1);
+		Mutant m = new Mutant(mockedGameID,mockedGameClass.getId(),  mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
 		
@@ -391,7 +398,7 @@ public class MutantTest {
 		System.out.println("MutantTest.testGetLinesForInsertMultipleLines()" + m.getHTMLReadout() );
 	}
 	
-	@org.junit.Test
+	@Test
 	public void testGetLinesForInsertionMutantOnDisjointLines() throws IOException{
 //		int classId =
 //				DatabaseAccess.getGameForKey("ID", gameId).getClassId();
@@ -450,13 +457,14 @@ public class MutantTest {
         when(mockedDualGame.getId()).thenReturn(mockedGameID);
 
         PowerMockito.mockStatic(DatabaseAccess.class);
+		PowerMockito.mockStatic(GameClassDAO.class);
         when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(1)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(1,mockedGameClass.getId(),  mutantJavaFile.getAbsolutePath(), null, true, 1);
+        Mutant m = new Mutant(mockedGameID,mockedGameClass.getId(),  mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getLines());
 		System.out.println("MutantTest.testGetLinesForInsertionMutant() Lines " + m.getHTMLReadout());
@@ -471,7 +479,7 @@ public class MutantTest {
 		}
 	}
 
-	@org.junit.Test
+	@Test
 	public void testGetLinesForEmptySpaces() throws IOException{
 		String originalCode = "public String toString(int doubleLength) {" + "\n"
 				+ "StringBuffer temp = new StringBuffer();"+ "\n"
@@ -515,13 +523,14 @@ public class MutantTest {
         when(mockedDualGame.getId()).thenReturn(mockedGameID);
 
         PowerMockito.mockStatic(DatabaseAccess.class);
+		PowerMockito.mockStatic(GameClassDAO.class);
         when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(1)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 		
 		Patch p = m.getDifferences();
 
@@ -533,7 +542,7 @@ public class MutantTest {
 		}
 	}
 
-	@org.junit.Test
+	@Test
 	public void testGetLinesForEmptySpacesOutsideStrings() throws IOException{
 		String originalCode = "public String toString(int doubleLength) {" + "\n"
 				+ "StringBuffer temp = new StringBuffer();"+ "\n"
@@ -577,13 +586,14 @@ public class MutantTest {
         when(mockedDualGame.getId()).thenReturn(mockedGameID);
 
         PowerMockito.mockStatic(DatabaseAccess.class);
+		PowerMockito.mockStatic(GameClassDAO.class);
         when(DatabaseAccess.getGameForKey("ID", 1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
-        when(GameClassDAO.getClassForId(1)).thenReturn(mockedGameClass);
+        when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
-        Mutant m = new Mutant(1, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
+        Mutant m = new Mutant(mockedGameID, mockedGameClass.getId(), mutantJavaFile.getAbsolutePath(), null, true, 1);
 
 		Patch p = m.getDifferences();
 

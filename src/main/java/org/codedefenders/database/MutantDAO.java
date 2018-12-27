@@ -291,4 +291,21 @@ public class MutantDAO {
 
         return DB.executeUpdate(stmt, conn);
     }
+
+    /**
+     * Returns the class ID for the given mutant.
+     *
+     * @param mutantId The mutant ID of the mutant.
+     * @return The class ID for the given mutant.
+     */
+    public static Integer getClassIdForMutant(int mutantId) {
+        String query = String.join("\n",
+                "SELECT games.Class_ID",
+                "FROM mutants, games",
+                "WHERE mutants.Mutant_ID = ?",
+                "  AND mutants.Game_ID = games.ID;"
+        );
+
+        return DB.executeQueryReturnValue(query, res -> res.getInt("Class_ID"), DB.getDBV(mutantId));
+    }
 }

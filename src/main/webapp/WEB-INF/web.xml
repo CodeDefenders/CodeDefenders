@@ -171,7 +171,7 @@
 
 	<servlet>
 		<servlet-name>create_game_view.jsp</servlet-name>
-		<jsp-file>/jsp/create_game_view.jsp</jsp-file>
+		<jsp-file>/jsp/duel/create_game_view.jsp</jsp-file>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>create_game_view.jsp</servlet-name>
@@ -194,24 +194,6 @@
 	<servlet-mapping>
 		<servlet-name>history_view.jsp</servlet-name>
 		<url-pattern>/games/history</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>puzzle_overview.jsp</servlet-name>
-		<jsp-file>/jsp/puzzle_overview.jsp</jsp-file>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>puzzle_overview.jsp</servlet-name>
-		<url-pattern>/puzzles</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>singleplayer_attacker_view.jsp</servlet-name>
-		<jsp-file>/jsp/singleplayer_attacker_view.jsp</jsp-file>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>singleplayer_attacker_view.jsp</servlet-name>
-		<url-pattern>/puzzles/attacker</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -280,6 +262,36 @@
 	</servlet-mapping>
 
 
+	<!-- Puzzle mode start-->
+	<servlet-mapping>
+		<servlet-name>PuzzleOverview</servlet-name>
+		<url-pattern>/puzzles</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>PuzzleOverview</servlet-name>
+		<servlet-class>org.codedefenders.servlets.games.puzzle.PuzzleOverview</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>PuzzleGame</servlet-name>
+		<url-pattern>/puzzlegame</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>PuzzleGame</servlet-name>
+		<servlet-class>org.codedefenders.servlets.games.puzzle.PuzzleGameManager</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>PuzzleGameSelection</servlet-name>
+		<url-pattern>/puzzle/games</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>PuzzleGameSelection</servlet-name>
+		<servlet-class>org.codedefenders.servlets.games.puzzle.PuzzleGameSelectionManager</servlet-class>
+	</servlet>
+
+	<!-- Puzzle mode end-->
+
 	<!-- multiplayer servlets -->
 	<servlet>
 		<servlet-name>multiplayerGameSelectionManager</servlet-name>
@@ -292,7 +304,7 @@
 
 	<servlet>
 		<servlet-name>multiplayerGameUser</servlet-name>
-		<jsp-file>/jsp/multiplayer/user_games_view.jsp</jsp-file>	</servlet>
+		<jsp-file>/jsp/battleground/user_games_view.jsp</jsp-file>	</servlet>
 	<servlet-mapping>
 		<servlet-name>multiplayerGameUser</servlet-name>
 		<url-pattern>/multiplayer/games/user</url-pattern>
@@ -300,7 +312,7 @@
 
 	<servlet>
 		<servlet-name>multiplayerGame</servlet-name>
-		<jsp-file>/jsp/multiplayer/game_view.jsp</jsp-file>	</servlet>
+		<jsp-file>/jsp/battleground/game_view.jsp</jsp-file>	</servlet>
 	<servlet-mapping>
 		<servlet-name>multiplayerGame</servlet-name>
 		<url-pattern>/multiplayer/play</url-pattern>
@@ -308,7 +320,7 @@
 
 	<servlet>
 		<servlet-name>multiplayerHistoryGame</servlet-name>
-		<jsp-file>/jsp/multiplayer/history_game_view.jsp</jsp-file>	</servlet>
+		<jsp-file>/jsp/battleground/history_game_view.jsp</jsp-file>	</servlet>
 	<servlet-mapping>
 		<servlet-name>multiplayerHistoryGame</servlet-name>
 		<url-pattern>/multiplayer/history</url-pattern>
@@ -316,7 +328,7 @@
 
 	<servlet>
 		<servlet-name>multiplayerGameView</servlet-name>
-		<jsp-file>/jsp/multiplayer/create_game_view.jsp</jsp-file>
+		<jsp-file>/jsp/battleground/create_game_view.jsp</jsp-file>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>multiplayerGameView</servlet-name>

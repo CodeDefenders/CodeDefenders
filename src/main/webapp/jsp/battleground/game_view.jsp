@@ -53,7 +53,7 @@
 %>
 
 <% String pageTitle="In Game"; %>
-<%@ page import="org.codedefenders.database.*" %>
+<%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Role" %>
@@ -112,7 +112,7 @@
     }
 
 %>
-<%@ include file="/jsp/multiplayer/header_game.jsp" %>
+<%@ include file="/jsp/battleground/header_game.jsp" %>
 <%
     messages = new ArrayList<>();
     session.setAttribute("messages", messages);
@@ -270,7 +270,7 @@
 %>
 <%@ include file="/jsp/scoring_tooltip.jsp" %>
 <%@ include file="/jsp/playerFeedback.jsp" %>
-    <%@ include file="/jsp/multiplayer/game_scoreboard.jsp" %>
+    <%@ include file="/jsp/battleground/game_scoreboard.jsp" %>
 <div class="crow fly no-gutter up">
     <% switch (role){
         case ATTACKER:
@@ -284,18 +284,18 @@
             }
 
             if (equiv == null) { %>
-                <%@ include file="/jsp/multiplayer/attacker_view.jsp" %>
-    		
+                <%@ include file="/jsp/battleground/attacker_view.jsp" %>
             <% } else { %>
-                <%@ include file="/jsp/multiplayer/equivalence_view.jsp" %>
+                <%@ include file="/jsp/battleground/equivalence_view.jsp" %>
             <% }
-            
+
             break;
         case DEFENDER:
-            %><%@ include file="/jsp/multiplayer/defender_view.jsp" %><%
+            %><%@ include file="/jsp/battleground/defender_view.jsp" %>
+            <%
             break;
         case CREATOR:
-            %><%@ include file="/jsp/multiplayer/creator_view.jsp" %><%
+            %><%@ include file="/jsp/battleground/creator_view.jsp" %><%
             break;
         default:
             response.sendRedirect(request.getContextPath()+"/games/user");
@@ -312,9 +312,9 @@ if(game.isCapturePlayersIntention() ) {
 	} else if( Role.ATTACKER.equals(role)) {
 %>
 <%@ include file="/jsp/game_components/attacker_intention_collector.jsp" %>
-<%  
-	}     
-} 
+<%
+	}
+}
 %>
 <%@ include file="/jsp/game_notifications.jsp"%>
-<%@ include file="/jsp/multiplayer/footer_game.jsp" %>
+<%@ include file="/jsp/battleground/footer_game.jsp" %>

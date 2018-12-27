@@ -18,9 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.GameState" %>
-<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 
 <% { %>
 
@@ -46,8 +44,8 @@
 
     MultiplayerGame game = DatabaseAccess.getMultiplayerGame(gameId);
 
-    if ((!game.getState().equals(GameState.FINISHED))) {
-        response.sendRedirect(request.getContextPath()+"/games/user");
+    if (game == null || game.getState() != GameState.FINISHED) {
+        response.sendRedirect(request.getContextPath() + "/games/user");
     }
 
     int uid = ((Integer) session.getAttribute("uid"));
@@ -77,20 +75,20 @@
     request.setAttribute("markEquivalent", false);
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", "PARTY");
+    request.setAttribute("gameType", GameMode.PARTY);
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
     // request.setAttribute("tests", game.getTests());
     request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
-    // request.setAttribute("gameType", "PARTY");
+    // request.setAttribute("gameType", GameMode.PARTY);
 %>
 
-<%@ include file="/jsp/multiplayer/header_game.jsp" %>
+<%@ include file="/jsp/battleground/header_game.jsp" %>
 <%@ include file="/jsp/scoring_tooltip.jsp" %>
 <%@ include file="/jsp/playerFeedback.jsp" %>
-<%@ include file="/jsp/multiplayer/game_scoreboard.jsp" %>
+<%@ include file="/jsp/battleground/game_scoreboard.jsp" %>
 
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6">
@@ -115,4 +113,4 @@
 
 <% } %>
 
-<%@ include file="/jsp/multiplayer/footer_game.jsp" %>
+<%@ include file="/jsp/battleground/footer_game.jsp" %>

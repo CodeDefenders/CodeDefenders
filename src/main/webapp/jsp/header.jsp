@@ -113,6 +113,10 @@
                 <li style="float: none"><a id="puzzleOverview" class="text-white button tab-link bg-minus-1" href="<%=request.getContextPath() %>/puzzles" style="width:100%;">Puzzles</a></li>
                 -->
 
+                <!-- link to puzzles overview
+                <li style="float: none"><a id="puzzleOverview" class="text-white button tab-link bg-minus-1" href="<%=request.getContextPath() %>/puzzles" style="width:100%;">Puzzles</a></li>
+                -->
+
                 <li style="float: none"><a id="headerLeaderboardButton" class="text-white button tab-link bg-minus-1" href="leaderboards" style="width: 100%;">Leaderboard</a></li>
                 <li style="float: none"><a id="headerHelpButton" class="text-white button tab-link bg-minus-1" href="help" style="width:100%;">Help</a></li>
                 <li style="float: none; white-space: nowrap;" class="dropdown"><a

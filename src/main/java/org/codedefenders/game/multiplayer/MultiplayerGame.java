@@ -18,23 +18,11 @@
  */
 package org.codedefenders.game.multiplayer;
 
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Timestamp;
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
@@ -55,9 +43,15 @@ import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
-import static org.codedefenders.game.Mutant.Equivalence.*;
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.DECLARED_YES;
+import static org.codedefenders.game.Mutant.Equivalence.PENDING_TEST;
+import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 
 public class MultiplayerGame extends AbstractGame {
 
@@ -99,12 +93,12 @@ public class MultiplayerGame extends AbstractGame {
 	}
 
 	public MultiplayerGame(int classId, int creatorId, GameLevel level,
-			   float lineCoverage, float mutantCoverage, float prize,
-			   int defenderValue, int attackerValue, int defenderLimit,
-			   int attackerLimit, int minDefenders, int minAttackers,
-			   long startDateTime, long finishDateTime, String status, boolean requiresValidation,
-			   int maxAssertionsPerTest, boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
-			   boolean markUncovered) {
+						   float lineCoverage, float mutantCoverage, float prize,
+						   int defenderValue, int attackerValue, int defenderLimit,
+						   int attackerLimit, int minDefenders, int minAttackers,
+						   long startDateTime, long finishDateTime, String status, boolean requiresValidation,
+						   int maxAssertionsPerTest, boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
+						   boolean markUncovered) {
 		this(classId, creatorId, level, lineCoverage, mutantCoverage, prize, defenderValue, attackerValue, defenderLimit, attackerLimit,
 				minDefenders, minAttackers, startDateTime, finishDateTime, status, requiresValidation, maxAssertionsPerTest,
 				chatEnabled, mutantValidatorLevel, markUncovered, false);
@@ -257,7 +251,7 @@ public class MultiplayerGame extends AbstractGame {
 
 	/**
 	 * This returns the ID of the Player not of the User
-	 * 
+	 *
 	 * @return
 	 */
 	public int[] getDefenderIds() {
@@ -266,7 +260,7 @@ public class MultiplayerGame extends AbstractGame {
 
 	/**
 	 * This returns the ID of the Player not of the User
-	 * 
+	 *
 	 * @return
 	 */
 	public int[] getAttackerIds() {
@@ -281,33 +275,30 @@ public class MultiplayerGame extends AbstractGame {
 		return canJoinGame(userId, role) && addPlayerForce(userId, role);
 	}
 
-	public boolean addPlayerForce(int userId, Role role){
-		if (state != GameState.FINISHED) {
-			Connection conn = DB.getConnection();
-			String query = "INSERT INTO players (Game_ID, User_ID, Points, Role) VALUES (?, ?, 0, ?) ON DUPLICATE KEY UPDATE Role=?, Active=TRUE;";
-			DatabaseValue[] valueList = {DB.getDBV(id), DB.getDBV(userId), DB.getDBV(role.toString()), DB.getDBV(role.toString())};
-			PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-			if (DB.executeUpdate(stmt, conn)) {
-				User u = UserDAO.getUserById(userId);
-				EventType et = role.equals(Role.ATTACKER) ?
-						EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
-				Event e = new Event(-1, id, userId, u.getUsername() + " joined the game as " +
-						"" + role,
-						et, EventStatus.GAME,
-						new Timestamp(System.currentTimeMillis()));
-				e.insert();
-				EventType notifType = role.equals(Role.ATTACKER) ?
-						EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
-				Event notif = new Event(-1, id, userId, "You joined a game " +
-						"as " +
-						"" + role,
-						notifType, EventStatus.NEW,
-						new Timestamp(System.currentTimeMillis()));
-				notif.insert();
-				return true;
-			}
+	public boolean addPlayerForce(int userId, Role role) {
+		if (state == GameState.FINISHED) {
+			return false;
 		}
-		return false;
+		if (!GameDAO.addPlayerToGame(id, userId, role)) {
+			return false;
+		}
+		User u = UserDAO.getUserById(userId);
+		EventType et = role.equals(Role.ATTACKER) ? EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
+		final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+		Event e = new Event(-1, id, userId, u.getUsername() + " joined the game as " + role,
+				et, EventStatus.GAME,
+				timestamp);
+		e.insert();
+
+		EventType notifType = role.equals(Role.ATTACKER) ?
+				EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
+		Event notif = new Event(-1, id, userId, "You joined a game as " + role,
+				notifType, EventStatus.NEW,
+				timestamp);
+		notif.insert();
+
+		return true;
 	}
 
 
@@ -454,12 +445,12 @@ public class MultiplayerGame extends AbstractGame {
 	}
 
 	public HashMap<Integer, PlayerScore> getTestScores() {
-		HashMap<Integer, PlayerScore> testScores = new HashMap<Integer, PlayerScore>();
-		HashMap<Integer, Integer> mutantsKilled  = new HashMap<Integer, Integer>();
+		HashMap<Integer, PlayerScore> testScores = new HashMap<>();
+		HashMap<Integer, Integer> mutantsKilled  = new HashMap<>();
 
-		HashMap<Integer, Integer> challengesOpen = new HashMap<Integer, Integer>();
-		HashMap<Integer, Integer> challengesWon  = new HashMap<Integer, Integer>();
-		HashMap<Integer, Integer> challengesLost = new HashMap<Integer, Integer>();
+		HashMap<Integer, Integer> challengesOpen = new HashMap<>();
+		HashMap<Integer, Integer> challengesWon  = new HashMap<>();
+		HashMap<Integer, Integer> challengesLost = new HashMap<>();
 
 		int defendersTeamId = -1;
 		testScores.put(defendersTeamId, new PlayerScore(defendersTeamId));
@@ -513,26 +504,26 @@ public class MultiplayerGame extends AbstractGame {
 			ts.increaseTotalScore(playerScore);
 		}
 
-		for(Mutant m : getKilledMutants()) {
-			if(!m.getEquivalent().equals(PROVEN_NO))
+		for (Mutant m : getKilledMutants()) {
+			if (!m.getEquivalent().equals(PROVEN_NO))
 				continue;
 
 			int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
 			challengesLost.put(defenderId, challengesLost.get(defenderId) + 1);
 			challengesLost.put(defendersTeamId, challengesLost.get(defendersTeamId) + 1);
 		}
-		for(Mutant m : getMutantsMarkedEquivalent()) {
+		for (Mutant m : getMutantsMarkedEquivalent()) {
 			int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
 			challengesWon.put(defenderId, challengesWon.get(defenderId) + 1);
 			challengesWon.put(defendersTeamId, challengesWon.get(defendersTeamId) + 1);
 		}
-		for(Mutant m : getMutantsMarkedEquivalentPending()) {
+		for (Mutant m : getMutantsMarkedEquivalentPending()) {
 			int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
 			challengesOpen.put(defenderId, challengesOpen.get(defenderId) + 1);
 			challengesOpen.put(defendersTeamId, challengesOpen.get(defendersTeamId) + 1);
 		}
 
-		for(int playerId : testScores.keySet()) {
+		for (int playerId : testScores.keySet()) {
 			testScores.get(playerId).setDuelInformation(challengesWon.get(playerId) + " / " + challengesLost.get(playerId) + " / " + challengesOpen.get((playerId)));
 		}
 		testScores.get(defendersTeamId).setDuelInformation(challengesWon.get(defendersTeamId) + " / " + challengesLost.get(defendersTeamId) + " / " + challengesOpen.get((defendersTeamId)));
@@ -545,7 +536,7 @@ public class MultiplayerGame extends AbstractGame {
 		return testScores;
 	}
 
-	public int getAttackerTeamScore() {
+	private int getAttackerTeamScore() {
 		int totalScore = 0;
 
 		for (Mutant m : getMutants())
@@ -554,7 +545,7 @@ public class MultiplayerGame extends AbstractGame {
 		return totalScore;
 	}
 
-	public int getDefenderTeamScore() {
+	private int getDefenderTeamScore() {
 		int totalScore = 0;
 
 		for (Test t : getTests(true))
@@ -577,16 +568,12 @@ public class MultiplayerGame extends AbstractGame {
 	public void notifyPlayers() {
 		ArrayList<Event> events = getEvents();
 
-		EventType e = null;
-
 		switch (state) {
 			case ACTIVE:
 				if (!listContainsEvent(events, EventType.GAME_STARTED)) {
 					EventType et = EventType.GAME_STARTED;
-					notifyAttackers("Game has started. Attack now!",
-							et);
-					notifyDefenders("Game has started. Defend now!",
-							et);
+					notifyAttackers("Game has started. Attack now!", et);
+					notifyDefenders("Game has started. Defend now!", et);
 					notifyCreator("Your game as started!", et);
 					notifyGame("The game has started!", et);
 				}
@@ -594,10 +581,8 @@ public class MultiplayerGame extends AbstractGame {
 			case GRACE_ONE:
 				if (!listContainsEvent(events, EventType.GAME_GRACE_ONE)) {
 					EventType et = EventType.GAME_GRACE_ONE;
-					notifyAttackers("A game has entered Grace One.",
-							et);
-					notifyDefenders("A game has entered Grace One.",
-							et);
+					notifyAttackers("A game has entered Grace One.", et);
+					notifyDefenders("A game has entered Grace One.", et);
 					notifyCreator("Your game has entered Grace One", et);
 					notifyGame("The game as entered Grace Period One", et);
 				}
@@ -605,10 +590,8 @@ public class MultiplayerGame extends AbstractGame {
 			case GRACE_TWO:
 				if (!listContainsEvent(events, EventType.GAME_GRACE_TWO)) {
 					EventType et = EventType.GAME_GRACE_TWO;
-					notifyAttackers("A game has entered Grace Two.",
-							et);
-					notifyDefenders("A game has entered Grace Two.",
-							et);
+					notifyAttackers("A game has entered Grace Two.", et);
+					notifyDefenders("A game has entered Grace Two.", et);
 					notifyCreator("Your game has entered Grace Two", et);
 					notifyGame("The game as entered Grace Period Two", et);
 				}
@@ -616,10 +599,8 @@ public class MultiplayerGame extends AbstractGame {
 			case FINISHED:
 				if (!listContainsEvent(events, EventType.GAME_FINISHED)) {
 					EventType et = EventType.GAME_FINISHED;
-					notifyAttackers("A game has finised.",
-							et);
-					notifyDefenders("A game has finished.",
-							et);
+					notifyAttackers("A game has finised.", et);
+					notifyDefenders("A game has finished.", et);
 					notifyCreator("Your game has finished.", et);
 					notifyGame("The game has ended.", et);
 				}
@@ -636,7 +617,7 @@ public class MultiplayerGame extends AbstractGame {
 		return false;
 	}
 
-	public void notifyAttackers(String message, EventType et) {
+	private void notifyAttackers(String message, EventType et) {
 
 		for (int attacker : getAttackerIds()) {
 			Event notif = new Event(-1, id,
@@ -648,7 +629,7 @@ public class MultiplayerGame extends AbstractGame {
 		}
 	}
 
-	public void notifyDefenders(String message, EventType et) {
+	private void notifyDefenders(String message, EventType et) {
 		for (int defender : getDefenderIds()) {
 			Event notif = new Event(-1, id,
 					UserDAO.getUserForPlayer(defender).getId(),
@@ -659,21 +640,20 @@ public class MultiplayerGame extends AbstractGame {
 		}
 	}
 
-	public void notifyCreator(String message, EventType et) {
+	private void notifyCreator(String message, EventType et) {
 		//Event for game log: started
 		Event notif = new Event(-1, id,
-				getCreatorId(),
+				creatorId,
 				message,
 				et, EventStatus.NEW,
 				new Timestamp(System.currentTimeMillis()));
 		notif.insert();
 	}
 
-	public void notifyGame(String message, EventType et) {
-
+	private void notifyGame(String message, EventType et) {
 		//Event for game log: started
 		Event notif = new Event(-1, id,
-				getCreatorId(),
+				creatorId,
 				message,
 				et, EventStatus.GAME,
 				new Timestamp(System.currentTimeMillis()));

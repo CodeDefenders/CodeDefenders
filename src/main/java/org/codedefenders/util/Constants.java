@@ -83,8 +83,12 @@ public class Constants {
 	public static final String CUTS_MUTANTS_DIR = "mutants";
 	public static final String CUTS_TESTS_DIR = "tests";
 
-	// FIXME Phil: MUTANTS_DIR should be final.
-	public static String MUTANTS_DIR = DATA_DIR + F_SEP + "mutants";
+	// Puzzle, Duel and Battleground mutant and test folders
+	public static final String MODE_PUZZLE_DIR = "puzzle";
+	public static final String MODE_DUEL_DIR = "sp";
+	public static final String MODE_BATTLEGROUND_DIR = "mp";
+
+	public static final String MUTANTS_DIR = DATA_DIR + F_SEP + "mutants";
 	public static final String TESTS_DIR = DATA_DIR + F_SEP + "tests";
 	public static final String AI_DIR = DATA_DIR + F_SEP + "ai";
 
@@ -106,11 +110,16 @@ public class Constants {
 	public static final String GRACE_PERIOD_MESSAGE = "Game is now in grace period.";
 
 	public static final String LOGIN_VIEW_JSP = "jsp" + F_SEP + "login_view.jsp";
-	public static final String RESOLVE_EQUIVALENCE_JSP = "jsp" + F_SEP + "equivalence_view.jsp";
-	public static final String ATTACKER_VIEW_JSP = "jsp" + F_SEP + "attacker_view.jsp";
-	public static final String DEFENDER_VIEW_JSP = "jsp" + F_SEP + "defender_view.jsp";
-	public static final String SCORE_VIEW_JSP = "jsp" + F_SEP + "score_view.jsp";
 	public static final String UTESTING_VIEW_JSP = "jsp" + F_SEP + "utesting_view.jsp";
+
+	public static final String DUEL_RESOLVE_EQUIVALENCE_JSP = "jsp/duel/equivalence_view.jsp";
+	public static final String DUEL_ATTACKER_VIEW_JSP = "jsp/duel/attacker_view.jsp";
+	public static final String DUEL_DEFENDER_VIEW_JSP = "jsp/duel/defender_view.jsp";
+
+	public static final String PUZZLE_OVERVIEW_VIEW_JSP = "/jsp/puzzle/puzzle_overview.jsp";
+	public static final String PUZZLE_GAME_ATTACKER_VIEW_JSP = "/jsp/puzzle/attacker_view.jsp";
+	public static final String PUZZLE_GAME_DEFENDER_VIEW_JSP = "/jsp/puzzle/defender_view.jsp";
+
 	public static final String ADMIN_USER_JSP = "/jsp" + F_SEP + "admin_user_mgmt.jsp";
 	public static final String ADMIN_GAMES_JSP = "/jsp" + F_SEP + "admin_create_games.jsp";
 	public static final String ADMIN_SETTINGS_JSP = "/jsp" + F_SEP + "admin_system_settings.jsp";
@@ -120,6 +129,10 @@ public class Constants {
 	public static final String ADMIN_ANALYTICS_KILLMAP_JSP = "/jsp" + F_SEP + "admin_analytics_killmaps.jsp";
 
 	public static final String NOTIFICATIONS = "/notifications";
+
+    public static final String PUZZLE_OVERVIEW_PATH = "/puzzles";
+    public static final String PUZZLE_GAME_PATH = "/puzzlegame";
+    public static final String PUZZLE_GAME_SELECTION_PATH = "/puzzle/games";
 
 	public static final String ADMIN_ANALYTICS_USERS = "/admin/analytics/users";
 	public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";
@@ -161,9 +174,12 @@ public class Constants {
 	public static final String MUTANT_SUBMITTED_MESSAGE = "Mutant submitted, may the force be with it.";
 	public static final String MUTANT_ALIVE_1_MESSAGE = "Cool, your mutant survived its first test.";
 	public static final String MUTANT_ALIVE_N_MESSAGE = "Awesome, your mutant survived %d tests!"; // number of tests that covered mutant
-	// JSP
+
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_TEST = "previousTest";
 	public static final String SESSION_ATTRIBUTE_PREVIOUS_MUTANT = "previousMutant";
+
+	// Request attributes
+	public static final String REQUEST_ATTRIBUTE_PUZZLE_GAME = "active_user_puzzle_game";
 
 	public static final String ATTACKER_HAS_PENDING_DUELS = "Sorry, your mutant cannot be accepted because you have pending equivalence duels !\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
 }

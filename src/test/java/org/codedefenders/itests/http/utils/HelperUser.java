@@ -53,7 +53,7 @@ public class HelperUser {
 	public HelperUser(User user, WebClient browser, String codedefendersHome, String password) {
 		this.user = user;
 		this.browser = browser;
-		this.codedefendersHome = codedefendersHome;
+		this.codedefendersHome = "http://" + codedefendersHome;
 		this.password = password;
 	}
 
@@ -64,10 +64,12 @@ public class HelperUser {
 	// This send the post only !
 	public HtmlPage doRegister() throws FailingHttpStatusCodeException, IOException {
 		WebRequest registerRequest = new WebRequest(new URL(codedefendersHome + "/login"), HttpMethod.POST);
-		registerRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
-				new NameValuePair("formType", "create"), new NameValuePair("username", user.getUsername()),
-				new NameValuePair("email", user.getEmail()), new NameValuePair("password", password),
-				new NameValuePair("confirm", password), }));
+		registerRequest.setRequestParameters(Arrays.asList(
+				new NameValuePair("formType", "create"),
+				new NameValuePair("username", user.getUsername()),
+				new NameValuePair("email", user.getEmail()),
+				new NameValuePair("password", password),
+				new NameValuePair("confirm", password)));
 		return browser.getPage(registerRequest);
 
 	}
@@ -75,9 +77,10 @@ public class HelperUser {
 	public void doLogin() throws FailingHttpStatusCodeException, IOException {
 		WebRequest loginRequest = new WebRequest(new URL(codedefendersHome + "/login"), HttpMethod.POST);
 		// // Then we set the request parameters
-		loginRequest.setRequestParameters(Arrays.asList(new NameValuePair[] { new NameValuePair("formType", "login"),
+		loginRequest.setRequestParameters(Arrays.asList(
+				new NameValuePair("formType", "login"),
 				new NameValuePair("username", user.getUsername()),
-				new NameValuePair("password", password), }));
+				new NameValuePair("password", password)));
 		// Finally, we can get the page
 		HtmlPage retunToGamePage = browser.getPage(loginRequest);
 	}
@@ -106,19 +109,20 @@ public class HelperUser {
 
 		WebRequest createGameRequest = new WebRequest(new URL(codedefendersHome + "/multiplayer/games"),
 				HttpMethod.POST);
-		createGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
-				new NameValuePair("formType", "createGame"), //
-				new NameValuePair("class", "" + classID), //
+		createGameRequest.setRequestParameters(Arrays.asList(
+				new NameValuePair("formType", "createGame"),
+				new NameValuePair("class", "" + classID),
 				new NameValuePair("level",  ""+ isHardGame), // TODO What happens id this is false? Of shall we omit that in that case?
-				new NameValuePair("minDefenders", "" + minDefenders), new NameValuePair("defenderLimit", ""+maxDefenders),
-				new NameValuePair("minAttackers", ""+ minAttackers), new NameValuePair("attackerLimit", ""+maxAttackers),
+				new NameValuePair("minDefenders", "" + minDefenders),
+				new NameValuePair("defenderLimit", ""+maxDefenders),
+				new NameValuePair("minAttackers", ""+ minAttackers),
+				new NameValuePair("attackerLimit", ""+maxAttackers),
 				new NameValuePair("startTime", "" + (System.currentTimeMillis() - 24 * 60 * 60 * 1000)),
 				new NameValuePair("finishTime", "" + (System.currentTimeMillis() + 24 * 60 * 60 * 1000)),
 				new NameValuePair("maxAssertionsPerTest", ""+maxAssertionsPerTest),
-				new NameValuePair("mutantValidatorLevel", ""+mutantValidatorLevel), // 0 - 1 - 2 
+				new NameValuePair("mutantValidatorLevel", ""+mutantValidatorLevel), // 0 - 1 - 2
 				new NameValuePair("markUncovered", "" + isMarkUncovered ),
-				new NameValuePair("chatEnabled", ""+isChatEnabled)
-		}));
+				new NameValuePair("chatEnabled", ""+isChatEnabled)));
 
 		gameUsers = browser.getPage(createGameRequest);
 		// Reload the game page
@@ -350,9 +354,10 @@ public class HelperUser {
 		}
 
 		HtmlForm form = (HtmlForm) uploadPage.getElementById("formUpload");
+		Assert.assertNotNull(form);
 		form.setActionAttribute(codedefendersHome + "/upload");
-		form.getInputByName("fileUpload").setValueAttribute(file.getAbsolutePath());
-		form.<HtmlFileInput>getInputByName("fileUpload").setContentType("image/png");// optional
+		form.getInputByName("fileUploadCUT").setValueAttribute(file.getAbsolutePath());
+		form.<HtmlFileInput>getInputByName("fileUploadCUT").setContentType("image/png");// optional
 
 		((HtmlSubmitInput) uploadPage.getFirstByXPath("//*[@id='submit-button']/input")).click();
 

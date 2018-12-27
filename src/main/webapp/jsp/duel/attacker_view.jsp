@@ -18,8 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.util.Constants" %>
-<%@ page import="org.codedefenders.game.*" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
+<%@ page import="org.codedefenders.game.GameState" %>
 
 <% String pageTitle = "Attacking Class"; %>
 <%@ include file="/jsp/header_game.jsp" %>
@@ -31,7 +32,9 @@
     /* mutant_editor */
     String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+
     final GameClass cut = game.getCUT();
+
     if (previousMutantCode != null) {
         request.setAttribute("mutantCode", previousMutantCode);
     } else {
@@ -52,15 +55,15 @@
     request.setAttribute("markEquivalent", false);
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
-    request.setAttribute("gameType", "DUEL");
+    request.setAttribute("gameType", GameMode.DUEL);
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
     // request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
+//    request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("markUncoveredEquivalent", false);
-    // request.setAttribute("gameType", "DUEL");
+    // request.setAttribute("gameType", GameMode.DUEL);
 
     /* finished_modal */
     int attackerScore = game.getAttackerScore();
@@ -76,26 +79,26 @@
 %>
 
 <% if (game.getState() == GameState.FINISHED) { %>
-    <%@include file="game_components/finished_modal.jsp"%>
+    <%@include file="../game_components/finished_modal.jsp"%>
 <% } %>
 
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6">
         <div id="mutants-div">
             <h3>Mutants</h3>
-            <%@include file="game_components/mutants_list.jsp"%>
+            <%@include file="../game_components/mutants_list.jsp"%>
         </div>
 
         <% if (game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED)) { %>
             <div id="tests-div">
                 <h3>JUnit tests </h3>
-                <%@include file="game_components/tests_carousel.jsp"%>
+                <%@include file="../game_components/tests_carousel.jsp"%>
             </div>
         <% } %>
     </div>
 
     <div class="col-md-6" id="cut-div">
-        <%@include file="game_components/mutant_progress_bar.jsp"%>
+        <%@include file="../game_components/mutant_progress_bar.jsp"%>
         <h3 style="margin-bottom: 0;">Create a mutant here</h3>
 
         <form id="reset" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() %>" method="post">
@@ -114,11 +117,11 @@
             <input type="hidden" name="formType" value="createMutant">
             <input type="hidden" name="gameID" value="<%= game.getId() %>"/>
 
-            <%@include file="game_components/mutant_editor.jsp"%>
-            <%@include file="game_components/game_highlighting.jsp"%>
+            <%@include file="../game_components/mutant_editor.jsp"%>
+            <%@include file="../game_components/game_highlighting.jsp"%>
         </form>
 
-        <%@include file="game_components/mutant_explanation.jsp"%>
+        <%@include file="../game_components/mutant_explanation.jsp"%>
     </div>
 </div>
 

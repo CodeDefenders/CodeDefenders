@@ -191,7 +191,7 @@ public class GameClass {
 			this.id = GameClassDAO.storeClass(this);
 			return true;
 		} catch (UncheckedSQLException e) {
-			logger.error("Failed to store test to database.", e);
+			logger.error("Failed to store game class to database.", e);
 			return false;
 		}
 	}
@@ -552,5 +552,10 @@ public class GameClass {
 				.filter(integerRange -> integerRange.contains(coveredLine))
 				.map(Range::getMaximum)
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public String toString() {
+		return "[id=" + id + ",name=" + name + ",alias=" + alias + "]";
 	}
 }

@@ -1,25 +1,5 @@
 package org.codedefenders.itests;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.spi.InitialContextFactory;
-
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.GameClass;
@@ -47,6 +27,25 @@ import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
@@ -156,15 +155,10 @@ public class CoverageTest {
 		cutFolder.mkdirs();
 		File jFile = new File(cutFolder, "ClassWithPrivateInnerClass.java");
 		File cFile = new File(cutFolder, "ClassWithPrivateInnerClass.class");
-		
 
-		Files.copy(
-				Paths.get(
-						"src/test/resources/itests/sources/ClassWithPrivateInnerClass/ClassWithPrivateInnerClass.java"),
+		Files.copy(Paths.get("src/test/resources/itests/sources/ClassWithPrivateInnerClass/ClassWithPrivateInnerClass.java"),
 				new FileOutputStream(jFile));
-		Files.copy(
-				Paths.get(
-						"src/test/resources/itests/sources/ClassWithPrivateInnerClass/ClassWithPrivateInnerClass.class"),
+		Files.copy( Paths.get("src/test/resources/itests/sources/ClassWithPrivateInnerClass/ClassWithPrivateInnerClass.class"),
 				new FileOutputStream(cFile));
 		
 		// Also "compile" and copy the inner class
@@ -198,7 +192,7 @@ public class CoverageTest {
 				Charset.defaultCharset());
 		// Do the mutant thingy
 		Mutant mutant = GameManager.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(), mutantText,
-				attacker.getId(), "mp");
+				attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
 		//
 		MutationTester.runAllTestsOnMutant(multiplayerGame, mutant, messages);
 		// Probably I need to store the mutant ?
@@ -209,12 +203,11 @@ public class CoverageTest {
 		// Compile and test original
 		String testText = new String(Files.readAllBytes(new File("src/test/resources/itests/tests/ClassWithPrivateInnerClass/TestClassWithPrivateInnerClass.java").toPath()), Charset.defaultCharset());
 		org.codedefenders.game.Test newTest = GameManager.createTest(multiplayerGame.getId(), multiplayerGame.getClassId(),
-				testText, defender.getId(), "mp");
+				testText, defender.getId(), Constants.MODE_BATTLEGROUND_DIR);
 		MutationTester.runTestOnAllMultiplayerMutants(multiplayerGame, newTest, messages);
 		multiplayerGame.update();
 		//
-		System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + ": "
-				+ messages.get(messages.size() - 1));
+		System.out.println("MutationTesterTest.defend() " + defender.getId() + ": " + messages.get(messages.size() - 1));
 		Assert.assertEquals(Constants.TEST_KILLED_LAST_MESSAGE, messages.get(messages.size() - 1));
 
 	}

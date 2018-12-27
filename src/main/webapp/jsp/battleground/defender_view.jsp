@@ -53,7 +53,7 @@
 	request.setAttribute("markEquivalent", true);
 	request.setAttribute("markUncoveredEquivalent", game.isMarkUncovered());
 	request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
-	request.setAttribute("gameType", "PARTY");
+	request.setAttribute("gameType", GameMode.PARTY);
 
 	/* game_highlighting */
 	request.setAttribute("codeDivSelector", "#cut-div");
@@ -61,7 +61,7 @@
 	request.setAttribute("mutants", game.getMutants());
 	request.setAttribute("showEquivalenceButton", true);
 	// request.setAttribute("markUncoveredEquivalent", game.isMarkUncovered());
-	// request.setAttribute("gameType", "PARTY");
+	// request.setAttribute("gameType", GameMode.PARTY);
 
 	/* mutant_explanation */
 	request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());

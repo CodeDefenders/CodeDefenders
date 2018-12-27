@@ -18,8 +18,23 @@
  */
 package org.codedefenders.servlets.games;
 
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.execution.KillMap.KillMapEntry;
+import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -42,23 +57,8 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.execution.KillMap.KillMapEntry;
-import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Role;
-import org.codedefenders.game.Test;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
-import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 /**
  * This {@link HttpServlet} handles redirecting to multiplayer games for
@@ -71,7 +71,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		String contextPath = request.getContextPath();
+        String contextPath = request.getContextPath();
         final String gameIdString = request.getParameter("id");
         if (gameIdString == null) {
             logger.info("No gameId provided. Redirecting back to /games/user");
@@ -144,7 +144,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                             .toString();
                     validationResults.addAll(validator.validateValue(MultiplayerGame.class, "finishDateTime", finishDate));
 
-
 //                  At this point, if there's validation errors, report them to the user and abort.
                     if (!validationResults.isEmpty()) {
                         for (ConstraintViolation<MultiplayerGame> violation : validationResults) {
@@ -215,84 +214,76 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     List<Test> uploadedTests = GameClassDAO.getMappedTestsForClassId(classId);
                     //
                     ListIterator<Test> iter = uploadedTests.listIterator();
-                    while(iter.hasNext()){
+                    while (iter.hasNext()) {
                         Test test = iter.next();
-                        if( test.getPlayerId() != -1 ){
+                        if (test.getPlayerId() != -1) {
                             iter.remove();
                         }
                     }
-                    
-                    // 
+
+                    //
                     // Always add system player to send mutants and tests at runtime!
                     nGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
                     nGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
-                    
+
                     // this mutant map links the uploaded mutants and the once generated from them here
                     // This implements bookkeeping for killmap
-                    Map<Mutant,Mutant> mutantMap = new HashMap<>();
-                    Map<Test,Test> testMap = new HashMap<>();
-                    
+                    Map<Mutant, Mutant> mutantMap = new HashMap<>();
+                    Map<Test, Test> testMap = new HashMap<>();
+
                     // Register Valid Mutants.
-                    if ( withMutants ) {
+                    if (withMutants) {
                         // Validate uploaded mutants from the list
                         // TODO
-                        // Link the mutants to the game 
+                        // Link the mutants to the game
                         for (Mutant mutant : uploadedMutants) {
 //                          final String mutantCode = new String(Files.readAllBytes();
-                          Mutant newMutant = new Mutant(nGame.getId(), classId, 
-                                      mutant.getJavaFile(),
-                                      mutant.getClassFile(),
-                                      // Alive be default
-                                      true, 
-                                      //
-                                      DUMMY_ATTACKER_USER_ID);
-                          // insert this into the DB and link the mutant to the game
-                          newMutant.insert();
-                          // BookKeeping
-                          mutantMap.put(mutant, newMutant);
-                      }
+                            Mutant newMutant = new Mutant(nGame.getId(), classId,
+                                    mutant.getJavaFile(),
+                                    mutant.getClassFile(),
+                                    // Alive be default
+                                    true,
+                                    //
+                                    DUMMY_ATTACKER_USER_ID);
+                            // insert this into the DB and link the mutant to the game
+                            newMutant.insert();
+                            // BookKeeping
+                            mutantMap.put(mutant, newMutant);
+                        }
                     }
                     // Register Valid Tests
                     if (withTests) {
                         // Validate the tests from the list
-                        // TODO 
-                        for(Test test : uploadedTests ){
+                        // TODO
+                        for (Test test : uploadedTests) {
                             // At this point we need to fill in all the details
                             Test newTest = new Test(-1, classId, nGame.getId(), test.getJavaFile(),
-                                    test.getClassFile(), 0, 0, DUMMY_DEFENDER_USER_ID, test.getLineCoverage().getLinesCovered(), 
+                                    test.getClassFile(), 0, 0, DUMMY_DEFENDER_USER_ID, test.getLineCoverage().getLinesCovered(),
                                     test.getLineCoverage().getLinesUncovered(), 0);
-                            // Insert basic details and assign id
                             newTest.insert();
-                            // Insert all the other info
-                            newTest.update();
-                            //
                             testMap.put(test, newTest);
                         }
                     }
-                    
-                    if( withMutants && withTests){
-                        List<KillMapEntry> killmap = KillmapDAO.getKillMapEntriesForClass( classId );
+
+                    if (withMutants && withTests) {
+                        List<KillMapEntry> killmap = KillmapDAO.getKillMapEntriesForClass(classId);
                         // Filter the killmap and keep only the one created during the upload ...
-                        
+
                         for (Mutant uploadedMutant : uploadedMutants) {
                             boolean alive = true;
-                            for( Test uploadedTest : uploadedTests ){
+                            for (Test uploadedTest : uploadedTests) {
                                 // Does the test kill the mutant?
-                                for(KillMapEntry entry : killmap){
-                                    if( entry.mutant.getId() == uploadedMutant.getId() &&
-                                            entry.test.getId() == uploadedTest.getId() && 
-                                            entry.status.equals( KillMapEntry.Status.KILL)){
-                                    
-                                        System.out.println(
-                                            "MultiplayerGameSelectionManager.doPost() test " + uploadedTest.getId() + "("+ testMap.get(uploadedTest).getId() +")"
-                                                    + " kills mutant " + uploadedMutant.getId() + "(" + mutantMap.get(uploadedMutant).getId() +")");
+                                for (KillMapEntry entry : killmap) {
+                                    if (entry.mutant.getId() == uploadedMutant.getId() &&
+                                            entry.test.getId() == uploadedTest.getId() &&
+                                            entry.status.equals(KillMapEntry.Status.KILL)) {
                                         // This also update the DB
-                                        mutantMap.get( uploadedMutant).kill();
+                                        mutantMap.get(uploadedMutant).kill();
                                         alive = false;
                                         break;
-                                    } 
+                                    }
                                 }
-                                if ( ! alive ){
+                                if (!alive) {
                                     break;
                                 }
                             }

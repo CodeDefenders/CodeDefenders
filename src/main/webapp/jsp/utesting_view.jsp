@@ -152,8 +152,8 @@
         <form id="def" action="<%=request.getContextPath() %>/utesting" method="post">
             <%
                 String testCode;
-                String previousTestCode = (String) request.getSession().getAttribute("previousTest");
-                request.getSession().removeAttribute("previousTest");
+                String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
+                request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
                 if (previousTestCode != null) {
                     testCode = previousTestCode;
                 } else

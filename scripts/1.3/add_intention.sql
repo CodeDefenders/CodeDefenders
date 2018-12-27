@@ -9,7 +9,7 @@ CREATE TABLE `intention` (
   `Target_Lines` longtext,
   `Target_Mutant_Type` longtext,
    PRIMARY KEY (`Intention_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) AUTO_INCREMENT=1
 
 -- Include per Game configuration
 ALTER TABLE games

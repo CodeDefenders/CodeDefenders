@@ -363,4 +363,9 @@ public class Test {
 	public static Comparator<Test> orderByIdDescending() {
 		return (o1, o2) -> o2.id - o1.id;
 	}
+
+	@Override
+	public String toString() {
+		return "[testId=" + id + ",classId="+ classId + ",mutantsKilled=" + mutantsKilled + ",score=" + score + "]";
+	}
 }

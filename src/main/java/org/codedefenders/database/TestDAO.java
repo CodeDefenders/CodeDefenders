@@ -208,6 +208,7 @@ public class TestDAO {
         String classFile = DatabaseAccess.addSlashes(test.getClassFile());
         int gameId = test.getGameId();
         int roundCreated = test.getRoundCreated();
+        int mutantsKilled = test.getMutantsKilled();
         int playerId = test.getPlayerId();
         int score = test.getScore();
         int classId = test.getClassId();
@@ -221,12 +222,13 @@ public class TestDAO {
             linesUncovered = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
         }
 
-        String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, Player_ID, Points, Class_ID, Lines_Covered, Lines_Uncovered) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, MutantsKilled, Player_ID, Points, Class_ID, Lines_Covered, Lines_Uncovered) VALUES (?,?,?,?,?,?,?,?,?,?);";
         DatabaseValue[] valueList = new DatabaseValue[]{
                 DB.getDBV(javaFile),
                 DB.getDBV(classFile),
                 DB.getDBV(gameId),
                 DB.getDBV(roundCreated),
+                DB.getDBV(mutantsKilled),
                 DB.getDBV(playerId),
                 DB.getDBV(score),
                 DB.getDBV(classId),

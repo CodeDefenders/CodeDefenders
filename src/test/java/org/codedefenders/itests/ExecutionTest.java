@@ -18,8 +18,8 @@
  */
 package org.codedefenders.itests;
 
-import org.codedefenders.execution.MutationTester;
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -31,6 +31,7 @@ import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManager;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorException;
+import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -196,7 +197,7 @@ public class ExecutionTest {
                 (float) 1, (float) 1, 10, 4, 4, 4, 0, 0, // 
                 System.currentTimeMillis() - 1000 * 3600, // Start time
                 System.currentTimeMillis() + 1000 * 3600, // End time
-                GameState.ACTIVE.name(), false, 2, true, null, false);
+                GameState.ACTIVE.name(), false, 2, true, CodeValidatorLevel.STRICT, false);
         multiplayerGame.insert();
         System.out.println("ExecutionTest.testMutant9559() CREATED GAME " + multiplayerGame.getId() );
         // Attacker and Defender join the game.
@@ -209,7 +210,7 @@ public class ExecutionTest {
                 Charset.defaultCharset());
         // Do the mutant thingy
         Mutant mutant = GameManager.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(), mutantText,
-                attacker.getId(), "mp");
+                attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
         //
         MutationTester.runAllTestsOnMutant(multiplayerGame, mutant, messages);
 

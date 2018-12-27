@@ -90,6 +90,7 @@ CREATE TABLE `classes` (
   `Alias` varchar(50) NOT NULL,
   `AiPrepared` tinyint(1) DEFAULT '0',
   `RequireMocking` tinyint(1) DEFAULT '0',
+  `Puzzle` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Class_ID`),
   UNIQUE KEY `classes_Alias_uindex` (`Alias`)
 ) AUTO_INCREMENT=100;
@@ -135,21 +136,25 @@ CREATE TABLE `games` (
   `ChatEnabled` tinyint(1) DEFAULT '1',
   `Attackers_Limit` int(11) DEFAULT '0',
   `Defenders_Limit` int(11) DEFAULT '0',
-  `State` enum('CREATED','ACTIVE','FINISHED','GRACE_ONE','GRACE_TWO') DEFAULT 'CREATED',
+  `State` enum('CREATED','ACTIVE','FINISHED','GRACE_ONE','GRACE_TWO','SOLVED','FAILED') DEFAULT 'CREATED',
   `CurrentRound` tinyint(4) NOT NULL DEFAULT '1',
   `FinalRound` tinyint(4) NOT NULL DEFAULT '5',
   `ActiveRole` enum('ATTACKER','DEFENDER') NOT NULL DEFAULT 'ATTACKER',
-  `Mode` enum('SINGLE','DUEL','PARTY','UTESTING') NOT NULL DEFAULT 'DUEL',
+  `Mode` enum('SINGLE','DUEL','PARTY','UTESTING','PUZZLE') NOT NULL DEFAULT 'DUEL',
   `RequiresValidation` tinyint(1) NOT NULL DEFAULT '0',
   `IsAIDummyGame` tinyint(1) NOT NULL DEFAULT '0',
   `HasKillMap` tinyint(1) NOT NULL DEFAULT '0',
   `CapturePlayersIntention` tinyint(1) NOT NULL DEFAULT '0',
+  `Puzzle_ID` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `fk_creatorId_idx` (`Creator_ID`),
   KEY `fk_className_idx` (`Class_ID`),
+  KEY `games_puzzles_Puzzle_ID_fk` (`Puzzle_ID`),
   CONSTRAINT `fk_classId` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_className` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `hasKillMap` CHECK (HasKillMap = 0 OR State = 'FINISHED'), -- only finished games can have a killmap
+  CONSTRAINT `games_puzzles_Puzzle_ID_fk` FOREIGN KEY (`Puzzle_ID`) REFERENCES `puzzles` (`Puzzle_ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) AUTO_INCREMENT=100;
 
 --
@@ -276,6 +281,44 @@ CREATE TABLE `targetexecutions` (
 ) AUTO_INCREMENT=100;
 
 --
+-- Table structure for table `puzzle_chapters`
+--
+
+DROP TABLE IF EXISTS `puzzle_chapters`;
+CREATE TABLE `puzzle_chapters` (
+  `Chapter_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Position` int(11) DEFAULT NULL,
+  `Title` varchar(100) DEFAULT NULL,
+  `Description` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`Chapter_ID`),
+  UNIQUE KEY `puzzles_chapter_Position_unique` (`Position`)
+) AUTO_INCREMENT=100;
+
+--
+-- Table structure for table `puzzles`
+--
+
+DROP TABLE IF EXISTS `puzzles`;
+CREATE TABLE `puzzles` (
+  `Puzzle_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Class_ID` int(11) NOT NULL,
+  `Active_Role` enum('ATTACKER','DEFENDER') NOT NULL,
+  `Level` enum('EASY','HARD') DEFAULT 'HARD',
+  `Max_Assertions` int(11) NOT NULL DEFAULT '2',
+  `Mutant_Validator_Level` enum('STRICT','MODERATE','RELAXED') NOT NULL DEFAULT 'MODERATE',
+  `Editable_Lines_Start` int(11) DEFAULT NULL,
+  `Editable_Lines_End` int(11) DEFAULT NULL,
+  `Chapter_ID` int(11) DEFAULT NULL,
+  `Position` int(11) DEFAULT NULL,
+  `Title` varchar(100) DEFAULT NULL,
+  `Description` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`Puzzle_ID`),
+  UNIQUE KEY `puzzles_Chapter_ID_Position_unique` (`Chapter_ID`,`Position`),
+  KEY `puzzles_classes_Class_ID_fk` (`Class_ID`),
+  CONSTRAINT `puzzles_classes_Class_ID_fk` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `puzzles_puzzle_chapters_Level_fk` FOREIGN KEY (`Chapter_ID`) REFERENCES `puzzle_chapters` (`Chapter_ID`) ON DELETE SET NULL ON UPDATE CASCADE
+) AUTO_INCREMENT=100;
+--
 -- Table structure for table `tests`
 --
 
@@ -304,10 +347,6 @@ CREATE TABLE `tests` (
   CONSTRAINT `fk_playerId_tests` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) AUTO_INCREMENT=100;
 
---
--- Mapping between test and the class the test is uploaded together with
---
-
 DROP TABLE IF EXISTS `intention`;
 CREATE TABLE `intention` (
   `Intention_ID` int(11) NOT NULL AUTO_INCREMENT,
@@ -318,7 +357,11 @@ CREATE TABLE `intention` (
   `Target_Lines` longtext,
   `Target_Mutant_Type` longtext,
    PRIMARY KEY (`Intention_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) AUTO_INCREMENT=1;
+
+--
+-- Mapping between test and the class the test is uploaded together with
+--
 
 DROP TABLE IF EXISTS `test_uploaded_with_class`;
 CREATE TABLE `test_uploaded_with_class` (

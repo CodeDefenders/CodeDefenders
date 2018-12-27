@@ -21,7 +21,6 @@ package org.codedefenders.servlets.games;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.IntentionDAO;
-import org.codedefenders.database.UserDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
@@ -36,10 +35,10 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.AttackerIntention;
+import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidator;
@@ -65,6 +64,7 @@ import javax.servlet.http.HttpSession;
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
 import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
+import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
 import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
@@ -127,8 +127,8 @@ public class MultiplayerGameManager extends HttpServlet {
 					logger.info("Ending multiplayer game {} (Setting state to FINISHED)", activeGame.getId());
 					activeGame.setState(GameState.FINISHED);
 					boolean updated = activeGame.update();
-					if( updated ){
-					    KillmapDAO.enqueueJob( new KillMapJob(Type.GAME, activeGame.getId() ));
+					if (updated) {
+						KillmapDAO.enqueueJob(new KillMapJob(Type.GAME, activeGame.getId()));
 					}
 					response.sendRedirect(contextPath + "/multiplayer/games");
 					return;
@@ -142,13 +142,13 @@ public class MultiplayerGameManager extends HttpServlet {
 			case "resolveEquivalence": {
 				if (!activeGame.getRole(uid).equals(Role.ATTACKER)) {
 					messages.add("Can only resolve equivalence duels if you are an Attacker!");
-					break;
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
 				}
-				int currentEquivMutantID = Integer.parseInt(request.getParameter("currentEquivMutant"));
-
 				if (activeGame.getState().equals(GameState.FINISHED)) {
 					messages.add(String.format("Game %d has finished.", activeGame.getId()));
 					response.sendRedirect(contextPath + "/multiplayer/games");
+					return;
 				}
 
 				// Get the text submitted by the user.
@@ -158,11 +158,11 @@ public class MultiplayerGameManager extends HttpServlet {
 
 				Test newTest;
 				try {
-					newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp", activeGame.getMaxAssertionsPerTest());
+					newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, MODE_BATTLEGROUND_DIR, activeGame.getMaxAssertionsPerTest());
 				} catch (CodeValidatorException cve) {
 					messages.add(TEST_GENERIC_ERROR_MESSAGE);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-					response.sendRedirect(contextPath+"/multiplayer/play");
+					response.sendRedirect(contextPath + "/multiplayer/play");
 					return;
 				}
 
@@ -170,298 +170,303 @@ public class MultiplayerGameManager extends HttpServlet {
 				if (newTest == null) {
 					messages.add(String.format(TEST_INVALID_MESSAGE, activeGame.getMaxAssertionsPerTest()));
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-					response.sendRedirect(contextPath+"/multiplayer/play");
+					response.sendRedirect(contextPath + "/multiplayer/play");
 					return;
 				}
+
+				int currentEquivMutantID = Integer.parseInt(request.getParameter("currentEquivMutant"));
 
 				logger.info("Executing Action resolveEquivalence for mutant {} and test {}", currentEquivMutantID, newTest.getId());
 				TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-				if (compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
-					TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
-					if (testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
-						logger.info("Test {} passed on the CUT", newTest.getId());
-
-						// Instead of running equivalence on only one mutant, let's try with all mutants pending resolution
-						List<Mutant> mutantsPendingTests = activeGame.getMutantsMarkedEquivalentPending();
-						boolean killedClaimed = false;
-						int killedOthers = 0;
-						for (Mutant mPending : mutantsPendingTests) {
-							// TODO: Doesnt distinguish between failing because the test didnt run at all and failing because it detected the mutant
-							MutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
-							if (mPending.getEquivalent().equals(PROVEN_NO)) {
-								logger.info("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
-								// TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points added.
-								newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
-								final String message = UserDAO.getUserById(uid).getUsername() + " killed mutant " + mPending.getId() + " in an equivalence duel.";
-								Event notif = new Event(-1, activeGame.getId(), uid, message,
-										EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
-										new Timestamp(System.currentTimeMillis()));
-								notif.insert();
-								if (mPending.getId() == currentEquivMutantID)
-									killedClaimed = true;
-								else
-									killedOthers++;
-							} else { // ASSUMED_YES
-								if (mPending.getId() == currentEquivMutantID) {
-									// only kill the one mutant that was claimed
-									mPending.kill(ASSUMED_YES);
-									final String message = UserDAO.getUserById(uid).getUsername() +
-											" lost an equivalence duel. Mutant " + mPending.getId() +
-											" is assumed equivalent.";
-									Event notif = new Event(-1, activeGame.getId(), uid, message,
-											EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
-											new Timestamp(System.currentTimeMillis()));
-									notif.insert();
-								}
-								logger.info("Test {} failed to kill mutant {}, hence mutant is assumed equivalent", newTest.getId(), mPending.getId());
-							}
-						}
-						if (killedClaimed) {
-							messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
-							if (killedOthers == 1)
-								messages.add("...and it also killed another claimed mutant!");
-							else if (killedOthers > 1)
-								messages.add(String.format("...and it also killed other %d claimed mutants!", killedOthers));
-						} else {
-							messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
-							if (killedOthers == 1)
-								messages.add("...however, your test did kill another claimed mutant!");
-							else if (killedOthers > 1)
-								messages.add(String.format("...however, your test killed other %d claimed mutants!", killedOthers));
-						}
-						newTest.update();
-						activeGame.update();
-						response.sendRedirect(contextPath+"/multiplayer/play");
-						return;
-					} else {
-						//  (testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
-						logger.debug("testOriginalTarget: " + testOriginalTarget);
-						messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
-						messages.add(testOriginalTarget.message);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-					}
-				} else {
+				if (!compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 					logger.debug("compileTestTarget: " + compileTestTarget);
 					messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
 					messages.add(compileTestTarget.message);
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
 				}
+				TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+				if (!testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+					//  (testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
+					logger.debug("testOriginalTarget: " + testOriginalTarget);
+					messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
+					messages.add(testOriginalTarget.message);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
+				}
+				logger.info("Test {} passed on the CUT", newTest.getId());
+
+				// Instead of running equivalence on only one mutant, let's try with all mutants pending resolution
+				List<Mutant> mutantsPendingTests = activeGame.getMutantsMarkedEquivalentPending();
+				boolean killedClaimed = false;
+				int killedOthers = 0;
+				for (Mutant mPending : mutantsPendingTests) {
+					// TODO: Doesnt distinguish between failing because the test didnt run at all and failing because it detected the mutant
+					MutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
+					if (mPending.getEquivalent().equals(PROVEN_NO)) {
+						logger.info("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
+						// TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points added.
+						newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
+						final String message = UserDAO.getUserById(uid).getUsername() + " killed mutant " + mPending.getId() + " in an equivalence duel.";
+						Event notif = new Event(-1, activeGame.getId(), uid, message,
+								EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
+								new Timestamp(System.currentTimeMillis()));
+						notif.insert();
+						if (mPending.getId() == currentEquivMutantID) {
+							killedClaimed = true;
+						} else {
+							killedOthers++;
+						}
+					} else { // ASSUMED_YES
+						if (mPending.getId() == currentEquivMutantID) {
+							// only kill the one mutant that was claimed
+							mPending.kill(ASSUMED_YES);
+							final String message = UserDAO.getUserById(uid).getUsername() +
+									" lost an equivalence duel. Mutant " + mPending.getId() +
+									" is assumed equivalent.";
+							Event notif = new Event(-1, activeGame.getId(), uid, message,
+									EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
+									new Timestamp(System.currentTimeMillis()));
+							notif.insert();
+						}
+						logger.info("Test {} failed to kill mutant {}, hence mutant is assumed equivalent", newTest.getId(), mPending.getId());
+					}
+				}
+				if (killedClaimed) {
+					messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
+					if (killedOthers == 1) {
+						messages.add("...and it also killed another claimed mutant!");
+					} else if (killedOthers > 1) {
+						messages.add(String.format("...and it also killed other %d claimed mutants!", killedOthers));
+					}
+				} else {
+					messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
+					if (killedOthers == 1) {
+						messages.add("...however, your test did kill another claimed mutant!");
+					} else if (killedOthers > 1) {
+						messages.add(String.format("...however, your test killed other %d claimed mutants!", killedOthers));
+					}
+				}
+				newTest.update();
+				activeGame.update();
 				break;
 			}
 			case "createMutant": {
 				if (!activeGame.getRole(uid).equals(Role.ATTACKER)) {
 					messages.add("Can only submit mutants if you are an Attacker!");
-					break;
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
 				}
 
-				if (activeGame.getState().equals(GameState.ACTIVE)) {
-					int attackerID = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, activeGame.getId());
-					// Get the text submitted by the user.
-					String mutantText = request.getParameter("mutant");
-
-					// If the user has pending duels we cannot accept the mutant, but we keep it around
-					// so students do not lose mutants once the duel is solved.
-					if (GameManager.hasAttackerPendingMutantsInGame(activeGame.getId(), attackerID)
-							&& (session.getAttribute(Constants.BLOCK_ATTACKER) != null) && ((Boolean) session.getAttribute(Constants.BLOCK_ATTACKER))) {
-						messages.add(Constants.ATTACKER_HAS_PENDING_DUELS);
-						// Keep the mutant code in the view for later
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
-						break;
-					}
-
-					CodeValidatorLevel codeValidatorLevel = activeGame.getMutantValidatorLevel();
-
-					ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(activeGame.getCUT().getAsString(), mutantText, codeValidatorLevel);
-
-					if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
-						// Mutant is either the same as the CUT or it contains invalid code
-						messages.add(validationMessage.get());
-						break;
-					}
-					Mutant existingMutant = GameManager.existingMutant(activeGame.getId(), mutantText);
-					if (existingMutant != null) {
-						messages.add(MUTANT_DUPLICATED_MESSAGE);
-						TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
-						if (existingMutantTarget != null
-								&& !existingMutantTarget.status.equals(TargetExecution.Status.SUCCESS)
-								&& existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
-							messages.add(existingMutantTarget.message);
-						}
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
-						break;
-					}
-					
-					
-					Mutant newMutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "mp");
-					if (newMutant != null) {
-						TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
-						if (compileMutantTarget != null && compileMutantTarget.status.equals(TargetExecution.Status.SUCCESS)) {
-							Event notif = new Event(-1, activeGame.getId(), uid,
-									UserDAO.getUserById(uid).getUsername() + " created a mutant.",
-									EventType.ATTACKER_MUTANT_CREATED, EventStatus.GAME,
-									new Timestamp(System.currentTimeMillis() - 1000));
-							notif.insert();
-							messages.add(MUTANT_COMPILED_MESSAGE);
-							MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
-							activeGame.update();
-							
-							if( activeGame.isCapturePlayersIntention() ){
-								AttackerIntention intention = AttackerIntention.fromString(request.getParameter("attacker_intention"));
-								// This parameter is required !
-								if ( intention == null) {
-									messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.toString());
-									session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
-								} else {
-									collectAttackerIntentions(newMutant, intention);
-								}
-							}
-							
-
-							// Clean the mutated code only if mutant is accepted
-							session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-
-						} else {
-							messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
-							if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty()) {
-								messages.add(compileMutantTarget.message);
-							}
-							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
-						}
-					} else {
-						messages.add(MUTANT_CREATION_ERROR_MESSAGE);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
-						logger.error("Error creating mutant. Game: {}, Class: {}, User: {}", activeGame.getId(), activeGame.getClassId(), uid, mutantText);
-					}
-				} else {
+				if (activeGame.getState() != GameState.ACTIVE) {
 					messages.add(GRACE_PERIOD_MESSAGE);
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
 				}
+				int attackerID = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, activeGame.getId());
+				// Get the text submitted by the user.
+				String mutantText = request.getParameter("mutant");
+
+				// If the user has pending duels we cannot accept the mutant, but we keep it around
+				// so students do not lose mutants once the duel is solved.
+				if (GameManager.hasAttackerPendingMutantsInGame(activeGame.getId(), attackerID)
+						&& (session.getAttribute(Constants.BLOCK_ATTACKER) != null) && ((Boolean) session.getAttribute(Constants.BLOCK_ATTACKER))) {
+					messages.add(Constants.ATTACKER_HAS_PENDING_DUELS);
+					// Keep the mutant code in the view for later
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
+				}
+
+				CodeValidatorLevel codeValidatorLevel = activeGame.getMutantValidatorLevel();
+
+				ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(activeGame.getCUT().getAsString(), mutantText, codeValidatorLevel);
+
+				if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
+					// Mutant is either the same as the CUT or it contains invalid code
+					messages.add(validationMessage.get());
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
+				}
+				Mutant existingMutant = GameManager.existingMutant(activeGame.getId(), mutantText);
+				if (existingMutant != null) {
+					messages.add(MUTANT_DUPLICATED_MESSAGE);
+					TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
+					if (existingMutantTarget != null && !existingMutantTarget.status.equals(TargetExecution.Status.SUCCESS)
+							&& existingMutantTarget.message != null && !existingMutantTarget.message.isEmpty()) {
+						messages.add(existingMutantTarget.message);
+					}
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
+				}
+				Mutant newMutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, MODE_BATTLEGROUND_DIR);
+				if (newMutant == null) {
+					messages.add(MUTANT_CREATION_ERROR_MESSAGE);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+					logger.error("Error creating mutant. Game: {}, Class: {}, User: {}", activeGame.getId(), activeGame.getClassId(), uid, mutantText);
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
+				}
+				TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
+				if (compileMutantTarget == null || !compileMutantTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+					messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
+					if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty()) {
+						messages.add(compileMutantTarget.message);
+					}
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
+				}
+
+				messages.add(MUTANT_COMPILED_MESSAGE);
+				Event notif = new Event(-1, activeGame.getId(), uid,
+						UserDAO.getUserById(uid).getUsername() + " created a mutant.",
+						EventType.ATTACKER_MUTANT_CREATED, EventStatus.GAME,
+						new Timestamp(System.currentTimeMillis() - 1000));
+				notif.insert();
+				MutationTester.runAllTestsOnMutant(activeGame, newMutant, messages);
+				activeGame.update();
+
+				if (activeGame.isCapturePlayersIntention()) {
+					AttackerIntention intention = AttackerIntention.fromString(request.getParameter("attacker_intention"));
+					// This parameter is required !
+					if (intention == null) {
+						messages.add(ValidationMessage.MUTANT_MISSING_INTENTION.toString());
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
+					} else {
+						collectAttackerIntentions(newMutant, intention);
+					}
+				}
+
+				// Clean the mutated code only if mutant is accepted
+				session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
 				break;
 			}
 			case "createTest": {
 				if (!activeGame.getRole(uid).equals(Role.DEFENDER)) {
 					messages.add("Can only submit tests if you are an Defender!");
-					break;
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
 				}
-				if (activeGame.getState().equals(GameState.ACTIVE)) {
-					// Get the text submitted by the user.
-					String testText = request.getParameter("test");
-
-					// If it can be written to file and compiled, end turn. Otherwise, dont.
-					Test newTest;
-					try {
-						newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "mp", activeGame.getMaxAssertionsPerTest());
-					} catch (CodeValidatorException cve) {
-						messages.add(TEST_GENERIC_ERROR_MESSAGE);
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-						response.sendRedirect(contextPath + "/multiplayer/play");
-						return;
-					}
-
-					// If test is null, then test did compile but codevalidator triggered
-					if (newTest == null) {
-						messages.add(String.format(TEST_INVALID_MESSAGE, activeGame.getMaxAssertionsPerTest()));
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-						response.sendRedirect(contextPath + "/multiplayer/play");
-						return;
-					}
-					
-                    /*
-                     * Validation of Players Intention: if intentions must be
-                     * collected but none are specified in the user request we fail
-                     * the request, but keep the test code in the session
-                     */
-					Set<Integer> selectedLines = new HashSet<>();
-                    Set<Integer> selectedMutants = new HashSet<>();
-    
-                    // are not present we fail the request
-                    if (activeGame.isCapturePlayersIntention()) {
-                        // Validate Intentions to avoid tweaks with the UI
-                        boolean validatedCoveredLines = true;
-//                        boolean validatedKilledMutants = true;
-    
-                        // Prepare the validation message
-                        StringBuffer validationMessage = new StringBuffer();
-                        validationMessage.append("Cheeky! You cannot submit a test without specifing");
-    
-                        if (request.getParameter("selected_lines") != null) {
-                            selectedLines.addAll(DefenderIntention
-                                    .parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_lines")));
-                        }
-    
-                        if (selectedLines.isEmpty()) {
-                            validatedCoveredLines = false;
-                            validationMessage.append(" a line to cover");
-                        }
-                        // NOTE: We consider only covering lines at the moment
-                        // if (request.getParameter("selected_mutants") != null) {
-                        // selectedMutants.addAll(DefenderIntention
-                        // .parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_mutants")));
-                        // }
-                        // if( selectedMutants.isEmpty() &&
-                        // activeGame.isDeclareKilledMutants()) {
-                        // validatedKilledMutants = false;
-                        //
-                        // if( selectedLines.isEmpty() &&
-                        // activeGame.isCapturePlayersIntention() ){
-                        // validationMessage.append(" or");
-                        // }
-                        //
-                        // validationMessage.append(" a mutant to kill");
-                        // }
-                        validationMessage.append(".");
-    
-                        if (!validatedCoveredLines ) { // || !validatedKilledMutants
-                            messages.add(validationMessage.toString());
-                            // Keep the test around
-                            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-                            response.sendRedirect(contextPath + "/multiplayer/play");
-                            // Early return if validation fail.
-                            return;
-                        }
-                        
-                    }
-    
-                    // At this point the test is valid. If there's any
-                    // target/intention we store it as well.
-					logger.info("New Test {} by user {}", newTest.getId(), uid);
-					TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
-    
-                    if (activeGame.isCapturePlayersIntention()) {
-                        collectDefenderIntentions(newTest, selectedLines, selectedMutants);
-                    }
-
-					if (compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
-						TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
-						if (testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
-							messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-
-							// Include Test Smells in the messages back to user
-							includeDetectTestSmellsInMessages(newTest, messages);
-
-							Event notif = new Event(-1, activeGame.getId(), uid,
-									UserDAO.getUserById(uid).getUsername() + " created a test",
-									EventType.DEFENDER_TEST_CREATED, EventStatus.GAME,
-									new Timestamp(System.currentTimeMillis()));
-							notif.insert();
-
-							MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
-							activeGame.update();
-						} else {
-							// testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
-							messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
-							// TODO This might not prevent injection of malicious code!
-							messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
-							session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-						}
-					} else {
-						messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
-						messages.add(StringEscapeUtils.escapeHtml(compileTestTarget.message));
-						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-					}
-				} else {
+				if (!activeGame.getState().equals(GameState.ACTIVE)) {
 					messages.add(GRACE_PERIOD_MESSAGE);
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
 				}
+				// Get the text submitted by the user.
+				String testText = request.getParameter("test");
+
+				// If it can be written to file and compiled, end turn. Otherwise, dont.
+				Test newTest;
+				try {
+					newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, MODE_BATTLEGROUND_DIR, activeGame.getMaxAssertionsPerTest());
+				} catch (CodeValidatorException cve) {
+					messages.add(TEST_GENERIC_ERROR_MESSAGE);
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
+				}
+
+				// If test is null, then test did compile but codevalidator triggered
+				if (newTest == null) {
+					messages.add(String.format(TEST_INVALID_MESSAGE, activeGame.getMaxAssertionsPerTest()));
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
+				}
+
+				/*
+				 * Validation of Players Intention: if intentions must be
+				 * collected but none are specified in the user request we fail
+				 * the request, but keep the test code in the session
+				 */
+				Set<Integer> selectedLines = new HashSet<>();
+				Set<Integer> selectedMutants = new HashSet<>();
+
+				if (activeGame.isCapturePlayersIntention()) {
+					boolean validatedCoveredLines = true;
+//                        boolean validatedKilledMutants = true;
+
+					// Prepare the validation message
+					StringBuilder validationMessage = new StringBuilder();
+					validationMessage.append("Cheeky! You cannot submit a test without specifying");
+
+					final String selected_lines = request.getParameter("selected_lines");
+					if (selected_lines != null) {
+						Set<Integer> selectLinesSet = DefenderIntention.parseIntentionFromCommaSeparatedValueString(selected_lines);
+						selectedLines.addAll(selectLinesSet);
+					}
+
+					if (selectedLines.isEmpty()) {
+						validatedCoveredLines = false;
+						validationMessage.append(" a line to cover");
+					}
+					// NOTE: We consider only covering lines at the moment
+					// if (request.getParameter("selected_mutants") != null) {
+					// selectedMutants.addAll(DefenderIntention
+					// .parseIntentionFromCommaSeparatedValueString(request.getParameter("selected_mutants")));
+					// }
+					// if( selectedMutants.isEmpty() &&
+					// activeGame.isDeclareKilledMutants()) {
+					// validatedKilledMutants = false;
+					//
+					// if( selectedLines.isEmpty() &&
+					// activeGame.isCapturePlayersIntention() ){
+					// validationMessage.append(" or");
+					// }
+					//
+					// validationMessage.append(" a mutant to kill");
+					// }
+					validationMessage.append(".");
+
+					if (!validatedCoveredLines) { // || !validatedKilledMutants
+						messages.add(validationMessage.toString());
+						// Keep the test around
+						session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+						response.sendRedirect(contextPath + "/multiplayer/play");
+						return;
+					}
+				}
+				logger.info("New Test {} by user {}", newTest.getId(), uid);
+				TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+
+				if (activeGame.isCapturePlayersIntention()) {
+					collectDefenderIntentions(newTest, selectedLines, selectedMutants);
+				}
+
+				if (!compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+					messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+					messages.add(StringEscapeUtils.escapeHtml(compileTestTarget.message));
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
+				}
+				TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+				if (!testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+					// testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
+					messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
+					messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
+					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+					response.sendRedirect(contextPath + "/multiplayer/play");
+					return;
+				}
+
+				messages.add(TEST_PASSED_ON_CUT_MESSAGE);
+
+				// Include Test Smells in the messages back to user
+				includeDetectTestSmellsInMessages(newTest, messages);
+
+				final String message = UserDAO.getUserById(uid).getUsername() + " created a test";
+				final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+				final Event notif = new Event(-1, activeGame.getId(), uid, message, EventType.DEFENDER_TEST_CREATED, EventStatus.GAME, timestamp);
+				notif.insert();
+
+				MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
+				activeGame.update();
 				break;
 			}
 			default:
@@ -473,20 +478,19 @@ public class MultiplayerGameManager extends HttpServlet {
 	}
 
 	private void collectDefenderIntentions(Test newTest, Set<Integer> selectedLines, Set<Integer> selectedMutants) {
-		// Process parameters
 		try {
 			DefenderIntention intention = new DefenderIntention(selectedLines, selectedMutants);
 			IntentionDAO.storeIntentionForTest(newTest, intention);
 		} catch (Exception e) {
-			logger.error("Cannot store intention to database {}", e);
+			logger.error("Cannot store intention to database.", e);
 		}
 	}
-	
+
 	private void collectAttackerIntentions(Mutant newMutant, AttackerIntention intention) {
 		try {
 			IntentionDAO.storeIntentionForMutant(newMutant, intention);
 		} catch (Exception e) {
-			logger.error("Cannot store intention to database {}", e);
+			logger.error("Cannot store intention to database.", e);
 		}
 	}
 

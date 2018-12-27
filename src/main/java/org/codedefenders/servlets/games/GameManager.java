@@ -64,6 +64,7 @@ import testsmell.TestSmellDetector;
 
 import static org.codedefenders.util.Constants.F_SEP;
 import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
+import static org.codedefenders.util.Constants.MODE_DUEL_DIR;
 import static org.codedefenders.util.Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CLAIMED_EQUIVALENT_MESSAGE;
@@ -121,16 +122,16 @@ public class GameManager extends HttpServlet {
 					activeGame.update();
 				}
 				// If no mutants needed to be proved non-equivalent, direct to the Attacker Page.
-				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.ATTACKER_VIEW_JSP);
+				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.DUEL_ATTACKER_VIEW_JSP);
 				dispatcher.forward(request, response);
 			} else {
 				request.setAttribute("equivMutant", equivMutants.get(0));
-				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.RESOLVE_EQUIVALENCE_JSP);
+				RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.DUEL_RESOLVE_EQUIVALENCE_JSP);
 				dispatcher.forward(request, response);
 			}
 		} else {
 			// Direct to the Defender Page.
-			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.DEFENDER_VIEW_JSP);
+			RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.DUEL_DEFENDER_VIEW_JSP);
 			dispatcher.forward(request, response);
 		}// else
 //		Redirect.redirectBack(request, response);
@@ -167,7 +168,7 @@ public class GameManager extends HttpServlet {
 					Test newTest = null;
 
 					try {
-						newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
+						newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, MODE_DUEL_DIR);
 					} catch (CodeValidatorException e) {
 						logger.warn("Swallow Exception", e);
 						messages.add(TEST_GENERIC_ERROR_MESSAGE);
@@ -309,7 +310,7 @@ public class GameManager extends HttpServlet {
 					session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
 					break;
 				}
-				Mutant newMutant = createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, "sp");
+				Mutant newMutant = createMutant(activeGame.getId(), activeGame.getClassId(), mutantText, uid, MODE_DUEL_DIR);
 				if (newMutant != null) {
 					TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
 					if (compileMutantTarget != null && compileMutantTarget.status.equals(TargetExecution.Status.SUCCESS)) {
@@ -358,7 +359,7 @@ public class GameManager extends HttpServlet {
 				Test newTest = null;
 
 				try {
-					newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, "sp");
+					newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, MODE_DUEL_DIR);
 				} catch (CodeValidatorException e) {
 					logger.warn("Swallow Exception", e);
 					messages.add(TEST_GENERIC_ERROR_MESSAGE);
@@ -410,7 +411,8 @@ public class GameManager extends HttpServlet {
 		response.sendRedirect(request.getContextPath()+"/"+activeGame.getClass().getSimpleName().toLowerCase());//doGet(request, response);
 	}
 
-	static Mutant existingMutant(int gid, String mutatedCode) throws IOException {
+	// TODO Phil 13/12/18: extract to utility class
+	public static Mutant existingMutant(int gid, String mutatedCode) throws IOException {
 		String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
 
 		// return the mutant in the game with same MD5 if it exists; return null otherwise
@@ -485,7 +487,7 @@ public class GameManager extends HttpServlet {
 		if (compileTestTarget == null || !compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
 			return newTest;
 		}
-		
+
 		// Validate code or short circuit here
 		final String testCode = new String(Files.readAllBytes(Paths.get(javaFile)));
 		if (!CodeValidator.validateTestCode(testCode, maxNumberOfAssertions)) {
