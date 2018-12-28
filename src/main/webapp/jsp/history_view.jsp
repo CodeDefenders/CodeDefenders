@@ -25,6 +25,7 @@
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.database.UserDAO" %>
+<%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <% String pageTitle="Game History"; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div>
@@ -103,7 +104,7 @@
     <tbody>
 
         <%
-            List<MultiplayerGame> mgames = DatabaseAccess.getFinishedMultiplayerGamesForUser(uid);
+            List<MultiplayerGame> mgames = MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(uid);
             if (!mgames.isEmpty()) {
                 for (MultiplayerGame g : mgames) {
         %>

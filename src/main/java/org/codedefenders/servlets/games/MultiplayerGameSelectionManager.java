@@ -21,9 +21,9 @@ package org.codedefenders.servlets.games;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
@@ -87,7 +87,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             return;
         }
 
-        MultiplayerGame mg = DatabaseAccess.getMultiplayerGame(gameId);
+        MultiplayerGame mg = MultiplayerGameDAO.getMultiplayerGame(gameId);
         if (mg == null) {
             logger.warn("Could not find requested game: {}", gameId);
             response.sendRedirect(contextPath + "/games/user");
@@ -159,8 +159,8 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     boolean withMutants = request.getParameter("withMutants") != null;
                     String lineCovGoal = request.getParameter("line_cov");
                     String mutCovGoal = request.getParameter("mutant_cov");
-                    double lineCoverage = lineCovGoal == null ? 1.1 : Double.parseDouble(lineCovGoal);
-                    double mutantCoverage = mutCovGoal == null ? 1.1 : Double.parseDouble(mutCovGoal);
+                    float lineCoverage = lineCovGoal == null ? 1.1f : Float.parseFloat(lineCovGoal);
+                    float mutantCoverage = mutCovGoal == null ? 1.1f : Float.parseFloat(mutCovGoal);
                     boolean chatEnabled = request.getParameter("chatEnabled") != null;
                     boolean markUncovered = request.getParameter("markUncovered") != null;
                     final int minDefenders = Integer.parseInt(request.getParameter("minDefenders"));
@@ -174,23 +174,15 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
                     boolean capturePlayersIntention = request.getParameter("capturePlayersIntention") != null;
 
-                    // TODO Not sure what it does, but this was false by default
-                    boolean requiresValidation = false;
-
-                    MultiplayerGame nGame = new MultiplayerGame(classId, uid, level, (float) lineCoverage,
-                            (float) mutantCoverage, 1f, 100, 100, defenderLimit,
-                            attackerLimit,
-                            minDefenders,
-                            minAttackers,
-                            startTime,
-                            endTime,
-                            GameState.CREATED.name(),
-                            requiresValidation,
-                            maxAssertionsPerTest,
-                            chatEnabled,
-                            mutantValidatorLevel,
-                            markUncovered,
-                            capturePlayersIntention);
+                    final MultiplayerGame nGame = new MultiplayerGame.Builder(classId, uid, startTime, endTime, maxAssertionsPerTest, defenderLimit, attackerLimit, minDefenders, minAttackers)
+                            .level(level)
+                            .chatEnabled(chatEnabled)
+                            .markUncovered(markUncovered)
+                            .capturePlayersIntention(capturePlayersIntention)
+                            .lineCoverage(lineCoverage)
+                            .mutantCoverage(mutantCoverage)
+                            .mutantValidatorLevel(mutantValidatorLevel)
+                            .build();
 
                     validationResults = validator.validate(nGame);
                     if (!validationResults.isEmpty()) {
@@ -315,7 +307,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     return;
                 }
 
-                MultiplayerGame game = DatabaseAccess.getMultiplayerGame(gameId);
+                MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
                 if (game.removePlayer(uid)) {
                     messages.add("Game " + gameId + " left");
                     DatabaseAccess.removePlayerEventsForGame(gameId, uid);
@@ -326,7 +318,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     Event notif = new Event(-1, gameId, uid, message, notifType, eventStatus, timestamp);
                     notif.insert();
                 } else {
-                    messages.add("An error occured while leaving game " + gameId);
+                    messages.add("An error occurred while leaving game " + gameId);
                 }
                 // Redirect to the game selection menu.
                 response.sendRedirect(contextPath + "/games/user");

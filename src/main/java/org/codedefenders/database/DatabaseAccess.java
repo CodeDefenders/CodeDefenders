@@ -354,75 +354,15 @@ public class DatabaseAccess {
         return DB.executeQueryReturnList(query, DuelGameDAO::duelGameFromRS, values);
     }
 
-	public static DuelGame getActiveUnitTestingSession(int userId) {
-		String query = "SELECT * FROM games WHERE Defender_ID=? AND Mode='UTESTING' AND State='ACTIVE';";
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(userId));
-		List<DuelGame> games = getGames(stmt, conn);
-		if (games.isEmpty())
-			return null;
-		else
-			return games.get(0);
-	}
-
-	public static List<DuelGame> getGames(PreparedStatement stmt, Connection conn) {
-		List<DuelGame> gameList = new ArrayList<>();
-		try {
-			ResultSet rs = stmt.executeQuery();
-			while (rs.next()) {
-				gameList.add(new DuelGame(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"),
-						rs.getInt("Class_ID"), rs.getInt("CurrentRound"), rs.getInt("FinalRound"),
-						Role.valueOf(rs.getString("ActiveRole")), GameState.valueOf(rs.getString("State")),
-						GameLevel.valueOf(rs.getString("Level")), GameMode.valueOf(rs.getString("Mode"))));
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-		return gameList;
-	}
-
-	public static MultiplayerGame getMultiplayerGame(int id) {
-		String query = "SELECT * FROM games AS m WHERE ID=? AND m.Mode='PARTY'";
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
-		List<MultiplayerGame> mgs = getMultiplayerGames(stmt, conn);
-		if (mgs.size() > 0) {
-			return mgs.get(0);
-		}
-		return null;
-	}
-
-	public static List<MultiplayerGame> getMultiplayerGames(PreparedStatement stmt, Connection conn) {
-		List<MultiplayerGame> gameList = new ArrayList<>();
-		try {
-			ResultSet rs = stmt.executeQuery();
-			while (rs.next()) {
-				MultiplayerGame mg = new MultiplayerGame(rs.getInt("Class_ID"), rs.getInt("Creator_ID"),
-						GameLevel.valueOf(rs.getString("Level")), (float) rs.getDouble("Coverage_Goal"),
-						(float) rs.getDouble("Mutant_Goal"), rs.getInt("Prize"), rs.getInt("Defender_Value"),
-						rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
-						rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),
-						rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"),
-						rs.getInt("MaxAssertionsPerTest"),rs.getBoolean("ChatEnabled"),
-						CodeValidatorLevel.valueOf(rs.getString("MutantValidator")), rs.getBoolean("MarkUncovered"),
-						rs.getBoolean("CapturePlayersIntention")
-						);
-				mg.setId(rs.getInt("ID"));
-				gameList.add(mg);
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-		return gameList;
-	}
+    public static DuelGame getActiveUnitTestingSession(int userId) {
+        String query = String.join("\n",
+                "SELECT *",
+                "FROM games",
+                "WHERE Defender_ID=?",
+                "  AND Mode='UTESTING'",
+                "  AND State='ACTIVE';");
+        return DB.executeQueryReturnValue(query, DuelGameDAO::duelGameFromRS, DB.getDBV(userId));
+    }
 
 	public static List<Integer> getUsedAiTestsForGame(DuelGame g) {
 		List<Integer> testList = new ArrayList<>();

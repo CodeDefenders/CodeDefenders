@@ -20,6 +20,7 @@ package org.codedefenders.servlets.games;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.IntentionDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -104,7 +105,7 @@ public class MultiplayerGameManager extends HttpServlet {
 			return;
 		}
 		final String contextPath = request.getContextPath();
-		final MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(gameId);
+		final MultiplayerGame activeGame = MultiplayerGameDAO.getMultiplayerGame(gameId);
 
 		if (activeGame == null) {
 			logger.error("Could not retrieve game from database for gameId: {}", gameId);

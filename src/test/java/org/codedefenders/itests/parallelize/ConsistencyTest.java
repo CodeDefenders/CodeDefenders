@@ -18,11 +18,10 @@
  */
 package org.codedefenders.itests.parallelize;
 
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
@@ -33,7 +32,6 @@ import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManager;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorException;
-import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -223,13 +221,15 @@ public class ConsistencyTest {
 		System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Cut " + cut.getId());
 
 		//
-		MultiplayerGame multiplayerGame = new MultiplayerGame(cut.getId(), observer.getId(), GameLevel.HARD, (float) 1,
-				(float) 1, (float) 1, 10, 4, 4, 4, 0, 0, 
-				//
-				System.currentTimeMillis() - 1000 * 3600,
-				System.currentTimeMillis() + 1000 * 3600,
-				//
-				GameState.ACTIVE.name(), false, 2, true, CodeValidatorLevel.STRICT, false);
+		final long startTime = System.currentTimeMillis() - 1000 * 3600;
+		final long finishTime = System.currentTimeMillis() + 1000 * 3600;
+		final MultiplayerGame multiplayerGame = new MultiplayerGame
+				.Builder(cut.getId(), observer.getId(), startTime, finishTime, 2, 4, 4, 0, 0)
+				.defenderValue(10)
+				.attackerValue(4)
+				.state(GameState.ACTIVE)
+				.chatEnabled(true)
+				.build();
 		// Store to db
 		multiplayerGame.insert();
 
@@ -243,7 +243,7 @@ public class ConsistencyTest {
 
 		System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Game " + multiplayerGame.getId());
 
-		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(multiplayerGame.getId());
+		MultiplayerGame activeGame = MultiplayerGameDAO.getMultiplayerGame(multiplayerGame.getId());
 		assertEquals("Cannot find the right active game", multiplayerGame.getId(), activeGame.getId());
 
 		// Attack

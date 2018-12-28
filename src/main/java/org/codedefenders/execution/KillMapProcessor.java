@@ -1,5 +1,13 @@
 package org.codedefenders.execution;
 
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
@@ -10,14 +18,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This class setups the thread pool to process games killmaps asynchronously.
@@ -87,16 +87,14 @@ public class KillMapProcessor implements ServletContextListener {
                     break;
                 case GAME:
                     try {
-                        MultiplayerGame game = DatabaseAccess.getMultiplayerGame( theJob.getReference() );
+                        MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame( theJob.getReference() );
                         
-                        assert game.getId() == theJob.getReference().intValue();
+                        assert game.getId() == theJob.getReference();
                                 
                         logger.info("Computing killmap for game " + game.getId());
                         KillMap.forGame(game, DO_NOT_RECALCULATE);
                         logger.info("Killmap for game " + game.getId() + ". Remove job from DB");
                         // At this point we can remove the job from the DB
-                    } catch (InterruptedException | ExecutionException e) {
-                        logger.warn("Killmap computation failed!", e);
                     } catch (Throwable e) {
                         logger.warn("Killmap computation failed!", e);
                     } finally {

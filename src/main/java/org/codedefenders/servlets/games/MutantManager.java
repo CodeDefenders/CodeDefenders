@@ -20,6 +20,7 @@ package org.codedefenders.servlets.games;
 
 import com.google.gson.Gson;
 
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Mutant;
@@ -48,7 +49,7 @@ public class MutantManager extends HttpServlet {
         String contextPath = request.getContextPath();
         int gameId = Integer.parseInt(request.getParameter("gameId"));
 
-        AbstractGame game = DatabaseAccess.getMultiplayerGame(gameId);
+        AbstractGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
 
         int userId = (int) request.getSession().getAttribute("uid");
 

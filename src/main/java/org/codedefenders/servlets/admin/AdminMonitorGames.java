@@ -18,18 +18,10 @@
  */
 package org.codedefenders.servlets.admin;
 
-import java.io.IOException;
-import java.util.ArrayList;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UserDAO;
@@ -42,6 +34,15 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 public class AdminMonitorGames extends HttpServlet {
 
@@ -84,7 +85,7 @@ public class AdminMonitorGames extends HttpServlet {
 			else if (switchUser) {
 				Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
 						? Role.DEFENDER : Role.ATTACKER;
-				mg = DatabaseAccess.getMultiplayerGame(gameToRemoveFromId);
+				mg = MultiplayerGameDAO.getMultiplayerGame(gameToRemoveFromId);
 				if (!mg.addPlayerForce(userId, newRole))
 					messages.add("Inserting user " + userId + " failed! \n Please check the logs!");
 			}
@@ -109,7 +110,7 @@ public class AdminMonitorGames extends HttpServlet {
 				String errorMessage = "ERROR trying to start or stop game " + String.valueOf(gameId)
 						+ ".\nIf this problem persists, contact your administrator.";
 
-				mg = DatabaseAccess.getMultiplayerGame(gameId);
+				mg = MultiplayerGameDAO.getMultiplayerGame(gameId);
 
 				if (mg == null) {
 					messages.add(errorMessage);
@@ -128,7 +129,7 @@ public class AdminMonitorGames extends HttpServlet {
 			} else {
 				GameState newState = request.getParameter("games_btn").equals("Start Games") ? GameState.ACTIVE : GameState.FINISHED;
 				for (String gameId : selectedGames) {
-					mg = DatabaseAccess.getMultiplayerGame(Integer.parseInt(gameId));
+					mg = MultiplayerGameDAO.getMultiplayerGame(Integer.parseInt(gameId));
 					mg.setState(newState);
 					if (!mg.update()) {
 						messages.add("ERROR trying to start or stop game " + String.valueOf(gameId));

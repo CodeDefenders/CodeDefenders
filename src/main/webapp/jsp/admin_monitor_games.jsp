@@ -37,7 +37,7 @@
         <h3>Current Games</h3>
 
         <%
-            List<MultiplayerGame> insertedGames = AdminDAO.getUnfinishedMultiplayerGamesCreatedBy( (Integer)request.getSession().getAttribute("uid"));
+            List<MultiplayerGame> insertedGames = MultiplayerGameDAO.getUnfinishedMultiplayerGamesCreatedBy( (Integer)request.getSession().getAttribute("uid"));
             if (insertedGames.isEmpty()) {
         %>
         <div class="panel panel-default">
@@ -132,9 +132,9 @@
                 </td>
                 <td><%= g.getLevel().name() %>
                 </td>
-                <td class="col-sm-2"><%= g.getStartDateTime() %>
+                <td class="col-sm-2"><%= g.getFormattedStartDateTime() %>
                 </td>
-                <td class="col-sm-2"><%= g.getFinishDateTime() %>
+                <td class="col-sm-2"><%= g.getFormattedFinishDateTime() %>
                 </td>
                 <td class="col-sm-1" style="padding-top:4px; padding-bottom:4px">
                     <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"

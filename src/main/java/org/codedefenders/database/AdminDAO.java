@@ -18,15 +18,8 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.Role;
-import org.codedefenders.model.User;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.game.leaderboard.Entry;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -42,17 +35,7 @@ public class AdminDAO {
                     "  games\n" +
                     "WHERE State != 'FINISHED' AND Mode = 'PARTY' AND Finish_Time > NOW();";
 
-    private static final String UNFINISHED_MULTIPLAYER_GAMES_QUERY =
-            "SELECT *\n" +
-                    "FROM games\n" +
-                    "WHERE Mode = 'PARTY' AND (State = 'ACTIVE' OR State = 'CREATED');";
-
-    private static final String UNFINISHED_MULTIPLAYER_GAMES_BY_USER_QUERY =
-            "SELECT *\n" +
-                    "FROM games\n" +
-                    "WHERE Mode = 'PARTY' AND (State = 'ACTIVE' OR State = 'CREATED') AND Creator_ID = ?;";
-
-    public static final String USER_SCORE_QUERY =
+    private static final String USER_SCORE_QUERY =
             "SELECT\n" +
                     "  U.username                            AS username,\n" +
                     "  IFNULL(NMutants, 0)                   AS NMutants,\n" +
@@ -273,53 +256,6 @@ public class AdminDAO {
             "WHERE name = ?;";
     private static final String GET_SETTING = "SELECT *\n" +
             "FROM settings WHERE settings.name = ?;";
-
-    public static List<MultiplayerGame> getGamesFromRS(ResultSet rs, Connection conn, PreparedStatement stmt) {
-        List<MultiplayerGame> gamesList = new ArrayList<MultiplayerGame>();
-        try {
-            while (rs.next()) {
-                MultiplayerGame mg = new MultiplayerGame(rs.getInt("Class_ID"), rs.getInt("Creator_ID"),
-                        GameLevel.valueOf(rs.getString("Level")), (float) rs.getDouble("Coverage_Goal"),
-                        (float) rs.getDouble("Mutant_Goal"), rs.getInt("Prize"), rs.getInt("Defender_Value"),
-                        rs.getInt("Attacker_Value"), rs.getInt("Defenders_Limit"), rs.getInt("Attackers_Limit"),
-                        rs.getInt("Defenders_Needed"), rs.getInt("Attackers_Needed"), rs.getTimestamp("Start_Time").getTime(),
-                        rs.getTimestamp("Finish_Time").getTime(), rs.getString("State"), rs.getBoolean("RequiresValidation"),
-                        rs.getInt("MaxAssertionsPerTest"),rs.getBoolean("ChatEnabled"),
-                        CodeValidatorLevel.valueOf(rs.getString("MutantValidator")), rs.getBoolean("MarkUncovered"));
-                mg.setId(rs.getInt("ID"));
-                gamesList.add(mg);
-            }
-        } catch (SQLException se) {
-            logger.error("SQL exception caught", se);
-        } catch (Exception e) {
-            logger.error("Exception caught", e);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-        return gamesList;
-    }
-
-
-    public static List<MultiplayerGame> getAvailableGames() {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, AVAILABLE_GAMES_QUERY);
-        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        return getGamesFromRS(rs, conn, stmt);
-    }
-
-    public static List<MultiplayerGame> getUnfinishedMultiplayerGames() {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, UNFINISHED_MULTIPLAYER_GAMES_QUERY);
-        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        return getGamesFromRS(rs, conn, stmt);
-    }
-
-    public static List<MultiplayerGame> getUnfinishedMultiplayerGamesCreatedBy(int userID) {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, UNFINISHED_MULTIPLAYER_GAMES_BY_USER_QUERY, DB.getDBV(userID));
-        ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-        return getGamesFromRS(rs, conn, stmt);
-    }
 
     public static Entry getScore(int userID) throws UncheckedSQLException, SQLMappingException {
         return DB.executeQueryReturnValue(USER_SCORE_QUERY,

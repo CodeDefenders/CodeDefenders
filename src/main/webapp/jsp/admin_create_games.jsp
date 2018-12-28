@@ -27,6 +27,7 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminCreateGames" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
@@ -38,7 +39,7 @@
         <input type="hidden" name="formType" value="insertGames"/>
         <h3>Staged Games</h3>
         <%
-			List<MultiplayerGame> availableGames = AdminDAO.getAvailableGames();
+			List<MultiplayerGame> availableGames = MultiplayerGameDAO.getAvailableMultiplayerGames();
             List<MultiplayerGame> createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
             List<List<Integer>> attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE);
             List<List<Integer>> defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE);
@@ -124,9 +125,9 @@
                 </td>
                 <td><%= g.getLevel().name() %>
                 </td>
-                <td><%= g.getStartDateTime() %>
+                <td><%= g.getFormattedStartDateTime() %>
                 </td>
-                <td><%= g.getFinishDateTime() %>
+                <td><%= g.getFormattedFinishDateTime() %>
                 </td>
                 <td>
                     <div id="playersTableHidden" style="color: lightgray;"> (hidden)</div>

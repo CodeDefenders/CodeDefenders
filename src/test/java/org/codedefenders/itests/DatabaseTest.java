@@ -24,6 +24,8 @@ import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
@@ -92,8 +94,14 @@ public class DatabaseTest {
 
 		cut1 = new GameClass(22345678, "MyClass", "", "", "");
 		cut2 = new GameClass(34865,"", "AliasForClass2", "", "");
-		multiplayerGame = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, START_TIME, END_TIME, GameState.CREATED.name(), false, 5, true, CodeValidatorLevel.MODERATE, false);
+		multiplayerGame = new MultiplayerGame
+				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 5, 4, 4, 0, 0)
+                .level(GameLevel.EASY)
+				.defenderValue(10)
+				.attackerValue(4)
+				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+				.chatEnabled(true)
+				.build();
 	}
 
 	// This will re-create the same DB from scratch every time... is this really
@@ -178,8 +186,8 @@ public class DatabaseTest {
 
 		assertTrue(multiplayerGame.insert());
 
-		MultiplayerGame multiplayerGameFromDB = DatabaseAccess.getMultiplayerGame(multiplayerGame.getId());
-		assertEquals(multiplayerGameFromDB.getFinishDateTime(), multiplayerGame.getFinishDateTime());
+		MultiplayerGame multiplayerGameFromDB = MultiplayerGameDAO.getMultiplayerGame(multiplayerGame.getId());
+		assertEquals(multiplayerGameFromDB.getFormattedFinishDateTime(), multiplayerGame.getFormattedFinishDateTime());
 		assertTrue(Arrays.equals(multiplayerGameFromDB.getAttackerIds(), multiplayerGame.getAttackerIds()));
 		assertEquals(multiplayerGameFromDB.getPrize(), multiplayerGame.getPrize(), 1e-10);
 		assertEquals(multiplayerGameFromDB.getAttackerLimit(), multiplayerGame.getAttackerLimit());
@@ -201,25 +209,43 @@ public class DatabaseTest {
 		DuelGame dg1 = new DuelGame(cut1.getId(), user1.getId(), 100, Role.DEFENDER, GameLevel.EASY);
 		assumeTrue(dg1.insert());
 
-		MultiplayerGame mg2 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, START_TIME, END_TIME, GameState.ACTIVE.name(), false, 2, true,
-				CodeValidatorLevel.MODERATE, false);
+		MultiplayerGame mg2 = new MultiplayerGame
+				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 2, 4, 4, 0, 0)
+                .state(GameState.ACTIVE)
+				.level(GameLevel.EASY)
+				.defenderValue(10)
+				.attackerValue(4)
+				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+				.chatEnabled(true)
+				.build();
 		assumeTrue(mg2.insert());
 		assumeTrue(mg2.addPlayer(user1.getId(), Role.DEFENDER));
 		assertTrue(mg2.update());
 		
-		MultiplayerGame mg3 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, START_TIME, END_TIME, GameState.ACTIVE.name(), false, 2, true,
-				CodeValidatorLevel.MODERATE, false);
+		MultiplayerGame mg3 = new MultiplayerGame
+				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 2, 4, 4, 0, 0)
+				.state(GameState.ACTIVE)
+				.level(GameLevel.EASY)
+				.defenderValue(10)
+				.attackerValue(4)
+				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+				.chatEnabled(true)
+				.build();
 		assumeTrue(mg3.insert());
 		
 		assumeTrue(mg3.addPlayer(user1.getId(), Role.DEFENDER));
 		assumeTrue(mg3.addPlayer(user2.getId(), Role.ATTACKER));
 		assumeTrue(mg3.update());
 
-		MultiplayerGame mg4 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, START_TIME, END_TIME, GameState.FINISHED.name(), false, 2, true,
-				CodeValidatorLevel.MODERATE, false);
+		MultiplayerGame mg4 = new MultiplayerGame
+				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 2, 4, 4, 0, 0)
+				.state(GameState.FINISHED)
+				.level(GameLevel.EASY)
+				.defenderValue(10)
+				.attackerValue(4)
+				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+				.chatEnabled(true)
+				.build();
 		assumeTrue(mg4.insert());
 		
 		// TODO Why is 0
@@ -227,9 +253,9 @@ public class DatabaseTest {
 
 		assertEquals(1, DuelGameDAO.getDuelGamesForUser(user1.getId()).size());
 		// User 1 participates in 2 MP games
-		assertEquals(2, DatabaseAccess.getJoinedMultiplayerGamesForUser(user1.getId()).size());
+		assertEquals(2, MultiplayerGameDAO.getJoinedMultiplayerGamesForUser(user1.getId()).size());
 		// This might return data based on timestamp ... Makes test tricky
-		assertEquals(2, DatabaseAccess.getFinishedMultiplayerGamesForUser(user1.getId()).size());
+		assertEquals(2, MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(user1.getId()).size());
 
 		// FIXME:
 		// User 2 participates in 1 MP game, but probably beacuse of timestamp
@@ -254,7 +280,7 @@ public class DatabaseTest {
 		int playerID = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
 		assertTrue(playerID > 0);
 		assertEquals(UserDAO.getUserForPlayer(playerID).getId(), user1.getId());
-		assertTrue(DatabaseAccess.getPlayersForMultiplayerGame(multiplayerGame.getId(), Role.DEFENDER).length > 0);
+		assertTrue(GameDAO.getPlayersForGame(multiplayerGame.getId(), Role.DEFENDER).size() > 0);
 		assertEquals(DatabaseAccess.getPlayerPoints(playerID), 0);
 		DatabaseAccess.increasePlayerPoints(13, playerID);
 		assertEquals(DatabaseAccess.getPlayerPoints(playerID), 13);
@@ -331,13 +357,14 @@ public class DatabaseTest {
 
 
 		// Creator must be there already
-		multiplayerGame = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0,
-				//
-				System.currentTimeMillis() - 1000 * 3600,
-				System.currentTimeMillis() + 1000 * 3600,
-				//
-				GameState.CREATED.name(), false, 5, true, CodeValidatorLevel.MODERATE, false);
+		multiplayerGame = new MultiplayerGame
+				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 5, 4, 4, 0, 0)
+				.level(GameLevel.EASY)
+				.defenderValue(10)
+				.attackerValue(4)
+				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+				.chatEnabled(true)
+				.build();
 		// Why this ?
 		Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
 		// multiplayerGame.classId = cut2.getId();

@@ -193,11 +193,17 @@ public class ExecutionTest {
         cut.insert();
         // Observer creates a new MP game
         //
-        MultiplayerGame multiplayerGame = new MultiplayerGame(cut.getId(), observer.getId(), GameLevel.HARD, (float) 1,
-                (float) 1, (float) 1, 10, 4, 4, 4, 0, 0, // 
-                System.currentTimeMillis() - 1000 * 3600, // Start time
-                System.currentTimeMillis() + 1000 * 3600, // End time
-                GameState.ACTIVE.name(), false, 2, true, CodeValidatorLevel.STRICT, false);
+        final long startTime = System.currentTimeMillis() - 1000 * 3600;
+        final long endTime = System.currentTimeMillis() + 1000 * 3600;
+        MultiplayerGame multiplayerGame = new MultiplayerGame
+                .Builder(cut.getId(), observer.getId(), startTime, endTime, 2, 4, 4, 0, 0)
+                .state(GameState.ACTIVE)
+                .level(GameLevel.EASY)
+                .defenderValue(10)
+                .attackerValue(4)
+                .mutantValidatorLevel(CodeValidatorLevel.STRICT)
+                .chatEnabled(true)
+                .build();
         multiplayerGame.insert();
         System.out.println("ExecutionTest.testMutant9559() CREATED GAME " + multiplayerGame.getId() );
         // Attacker and Defender join the game.
