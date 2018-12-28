@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DB {
-    private static ConnectionPool connPool = ConnectionPool.getInstanceOf();
+    private static ConnectionPool connPool = ConnectionPool.instance();
     private static final Logger logger = LoggerFactory.getLogger(DB.class);
 
     // TODO Why throw a StorageException here (make NoMoreConnectionsException a RuntimeException?)

@@ -44,7 +44,7 @@ public class ConnectionPoolTest {
 
     @Test
     public void testConnectionPoolRelease() throws ConnectionPool.NoMoreConnectionsException {
-        final ConnectionPool connectionPool = ConnectionPool.getInstanceOf();
+        final ConnectionPool connectionPool = ConnectionPool.instance();
 
         final int nbConnectionsBefore = connectionPool.getNbConnections();
         assertTrue(nbConnectionsBefore > 0);
@@ -64,7 +64,7 @@ public class ConnectionPoolTest {
      */
     @Test
     public void testConnectionPoolLimit() throws ConnectionPool.NoMoreConnectionsException {
-        final ConnectionPool connectionPool = ConnectionPool.getInstanceOf();
+        final ConnectionPool connectionPool = ConnectionPool.instance();
         int numberOfConnections = connectionPool.getNbConnections();
 
         final List<Connection> stuckConnections = new ArrayList<>(numberOfConnections);

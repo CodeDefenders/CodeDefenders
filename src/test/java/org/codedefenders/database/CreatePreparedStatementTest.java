@@ -50,7 +50,7 @@ public class CreatePreparedStatementTest {
         try (Connection connection = db.getConnection()) {
 
             PowerMockito.mockStatic(ConnectionPool.class);
-            given(ConnectionPool.getInstanceOf()).willReturn(null); // ConnectionPool is not required for this test.
+            given(ConnectionPool.instance()).willReturn(null); // ConnectionPool is not required for this test.
 
             final String query = String.join("\n",
                     "SELECT User_ID",
@@ -74,7 +74,7 @@ public class CreatePreparedStatementTest {
         try (Connection connection = db.getConnection()) {
 
             PowerMockito.mockStatic(ConnectionPool.class);
-            given(ConnectionPool.getInstanceOf()).willReturn(null); // ConnectionPool is not required for this test.
+            given(ConnectionPool.instance()).willReturn(null); // ConnectionPool is not required for this test.
 
             final String query = String.join("\n",
                     "SELECT Username",

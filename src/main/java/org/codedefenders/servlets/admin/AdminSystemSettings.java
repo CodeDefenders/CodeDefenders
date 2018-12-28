@@ -252,9 +252,9 @@ public class AdminSystemSettings extends HttpServlet {
 					case INT_VALUE:
 						setting.setIntValue(Integer.parseInt(valueString));
 						if (setting.getName().equals(SETTING_NAME.CONNECTION_POOL_CONNECTIONS))
-							ConnectionPool.getInstanceOf().updateSize(Integer.parseInt(valueString));
+							ConnectionPool.instance().updateSize(Integer.parseInt(valueString));
 						if (setting.getName().equals(SETTING_NAME.CONNECTION_WAITING_TIME))
-							ConnectionPool.getInstanceOf().updateWaitingTime(Integer.parseInt(valueString));
+							ConnectionPool.instance().updateWaitingTime(Integer.parseInt(valueString));
 						break;
 					case BOOL_VALUE:
 						setting.setBoolValue(valueString != null);
