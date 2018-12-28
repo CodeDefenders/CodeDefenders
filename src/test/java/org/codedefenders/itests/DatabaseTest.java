@@ -21,6 +21,7 @@ package org.codedefenders.itests;
 import org.apache.commons.lang3.ArrayUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
@@ -222,9 +223,9 @@ public class DatabaseTest {
 		assumeTrue(mg4.insert());
 		
 		// TODO Why is 0
-		assertEquals(1, DatabaseAccess.getOpenGames().size());
+		assertEquals(1, DuelGameDAO.getOpenDuelGames().size());
 
-		assertEquals(1, DatabaseAccess.getGamesForUser(user1.getId()).size());
+		assertEquals(1, DuelGameDAO.getDuelGamesForUser(user1.getId()).size());
 		// User 1 participates in 2 MP games
 		assertEquals(2, DatabaseAccess.getJoinedMultiplayerGamesForUser(user1.getId()).size());
 		// This might return data based on timestamp ... Makes test tricky

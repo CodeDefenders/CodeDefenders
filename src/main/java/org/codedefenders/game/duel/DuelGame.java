@@ -18,9 +18,9 @@
  */
 package org.codedefenders.game.duel;
 
-import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
@@ -28,9 +28,6 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 
 public class DuelGame extends AbstractGame {
 
@@ -174,40 +171,17 @@ public class DuelGame extends AbstractGame {
 
 	@Override
 	public boolean insert() {
-		// Attempt to insert game info into database
-		Connection conn = DB.getConnection();
-		String query = "INSERT INTO games (Class_ID, Creator_ID, FinalRound, Level, Mode, State) VALUES (?, ?, ?, ?, ?, ?);";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(classId),
-				DB.getDBV((attackerId != 0) ? attackerId : defenderId),
-				DB.getDBV(finalRound),
-				DB.getDBV(level.name()),
-				DB.getDBV(mode.name()),
-				DB.getDBV(state.name())};
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		logger.info(stmt.toString());
-		int res = DB.executeUpdateGetKeys(stmt, conn);
-		if (res > -1) {
-			id = res;
+		try {
+			this.id = DuelGameDAO.storeDuelGame(this);
 			return true;
+		} catch (UncheckedSQLException e) {
+			logger.error("Failed to store duel game to database.", e);
+			return false;
 		}
-		return false;
 	}
 
 	@Override
 	public boolean update() {
-		Connection conn = DB.getConnection();
-		String query = null;
-		DatabaseValue[] valueList = null;
-		if (this.mode.equals(GameMode.UTESTING)) {
-			query = "UPDATE games SET CurrentRound=?, FinalRound=?, State=? WHERE ID=?";
-			valueList = new DatabaseValue[]{
-					DB.getDBV(currentRound), DB.getDBV(finalRound), DB.getDBV(state.name()), DB.getDBV(id)};
-		} else {
-			query = "UPDATE games SET CurrentRound=?, FinalRound=?, ActiveRole=?, State=? WHERE ID=?";
-			valueList = new DatabaseValue[]{
-					DB.getDBV(currentRound), DB.getDBV(finalRound), DB.getDBV(activeRole.toString()), DB.getDBV(state.name()), DB.getDBV(id)};
-		}
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		return DB.executeUpdate(stmt, conn);
+		return DuelGameDAO.updateDuelGame(this);
 	}
 }

@@ -32,6 +32,7 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.execution.AntRunner;
@@ -84,9 +85,9 @@ public class UnitTesting extends HttpServlet {
 			logger.debug("Getting active unit testing session for user " + uid);
 			activeGame = DatabaseAccess.getActiveUnitTestingSession(uid);
 		} else {
-			int gid = (Integer) ogid;
-			logger.debug("Getting game " + gid + " for " + uid);
-			activeGame = DatabaseAccess.getGameForKey("ID", gid);
+			int gameId = (Integer) ogid;
+			logger.debug("Getting game " + gameId + " for " + uid);
+			activeGame = DuelGameDAO.getDuelGameForId(gameId);
 		}
 		session.setAttribute("game", activeGame);
 

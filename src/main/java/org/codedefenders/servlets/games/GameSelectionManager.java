@@ -18,7 +18,7 @@
  */
 package org.codedefenders.servlets.games;
 
-import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
@@ -30,6 +30,8 @@ import org.codedefenders.game.singleplayer.SinglePlayerGame;
 import org.codedefenders.game.singleplayer.automated.attacker.AiAttacker;
 import org.codedefenders.game.singleplayer.automated.defender.AiDefender;
 import org.codedefenders.servlets.util.Redirect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 public class GameSelectionManager extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(GameSelectionManager.class);
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		String contextPath = request.getContextPath();
@@ -57,7 +60,8 @@ public class GameSelectionManager extends HttpServlet {
         ArrayList<String> messages = new ArrayList<String>();
         session.setAttribute("messages", messages);
 
-        switch (request.getParameter("formType")) {
+        final String action = request.getParameter("formType");
+        switch (action) {
 
             case "createGame":
 
@@ -150,7 +154,7 @@ public class GameSelectionManager extends HttpServlet {
                 try {
                     gameId = Integer.parseInt(request.getParameter("game"));
 
-                    DuelGame jGame = DatabaseAccess.getGameForKey("ID", gameId);
+                    DuelGame jGame = DuelGameDAO.getDuelGameForId(gameId);
 
                     if ((jGame.getAttackerId() == uid) || (jGame.getDefenderId() == uid)) {
                         // uid is already in the game
@@ -192,7 +196,7 @@ public class GameSelectionManager extends HttpServlet {
 
                 try {
                     gameId = Integer.parseInt(request.getParameter("game"));
-                    DuelGame eGame = DatabaseAccess.getGameForKey("ID", gameId);
+                    DuelGame eGame = DuelGameDAO.getDuelGameForId(gameId);
 
                     if (eGame.isUserInGame(uid)) {
                         session.setAttribute("gid", gameId);
@@ -209,7 +213,7 @@ public class GameSelectionManager extends HttpServlet {
                 }
                 break;
             default:
-                System.err.println("Action not recognised");
+                logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
                 break;
         }

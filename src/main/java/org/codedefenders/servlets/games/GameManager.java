@@ -19,7 +19,7 @@
 package org.codedefenders.servlets.games;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -103,11 +103,11 @@ public class GameManager extends HttpServlet {
 			return;
 		}
 
-		int gid = (Integer) ogid;
+		int gameId = (Integer) ogid;
 
-		logger.debug("Getting game " + gid + " for " + uid);
+		logger.debug("Getting game " + gameId + " for " + uid);
 
-		DuelGame activeGame = DatabaseAccess.getGameForKey("ID", gid);
+		DuelGame activeGame = DuelGameDAO.getDuelGameForId(gameId);
 		session.setAttribute("game", activeGame);
 
 		// If the game is finished, redirect to the score page.
@@ -277,8 +277,8 @@ public class GameManager extends HttpServlet {
 				break;
 
 			case "whoseTurn":
-				int gid = Integer.parseInt(request.getParameter("gameID"));
-				activeGame = DatabaseAccess.getGameForKey("ID", gid);
+				int gameId = Integer.parseInt(request.getParameter("gameID"));
+				activeGame = DuelGameDAO.getDuelGameForId(gameId);
 				String turn = activeGame.getActiveRole().equals(Role.ATTACKER) ? "attacker" : "defender";
 				response.setContentType("application/json");
 				response.setCharacterEncoding("UTF-8");

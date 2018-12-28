@@ -279,139 +279,18 @@ public class DatabaseAccess {
 		return events;
 	}
 
-	private static ArrayList<Event> getEventsWithMessage(PreparedStatement stmt, Connection conn) {
-		ArrayList<Event> events = new ArrayList<Event>();
-		try {
-			ResultSet rs = stmt.executeQuery();
-			while (rs.next()) {
-				Event event = new Event(rs.getInt("events.Event_ID"),
-						rs.getInt("Game_ID"),
-						rs.getInt("Player_ID"),
-						rs.getString("events.Event_Message"),
-						rs.getString("events.Event_Type"),
-						rs.getString("Event_Status"),
-						rs.getTimestamp("Timestamp"));
-				String chatMessage = rs.getString("ec.Message");
-				event.setChatMessage(chatMessage);
-				events.add(event);
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-			DB.cleanup(conn, stmt);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-		return events;
-	}
-
-	// FIXME Phil: key is always "ID". Could be changed to 'getGameForId' and first parameter removed.
-    public static DuelGame getGameForKey(String keyName, int id) {
-		String query = "SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," + "g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" + "IFNULL(att.User_ID,0) AS Attacker_ID, IFNULL(def.User_ID,0) AS Defender_ID\n" + "FROM games AS g\n" + "LEFT JOIN players AS att ON g.ID=att.Game_ID AND att.Role='ATTACKER' AND att.Active=TRUE\n" + "LEFT JOIN players AS def ON g.ID=def.Game_ID AND def.Role='DEFENDER' AND def.Active=TRUE\n" + "WHERE g." + keyName + "=?;\n";
-		// Load the MultiplayerGame Data with the provided ID.
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
-		ResultSet rs = DB.executeQueryReturnRS(conn, stmt);
-		try {
-			if (rs.next()) {
-				DuelGame gameRecord;
-				if (rs.getString("Mode").equals(GameMode.SINGLE.name()))
-					gameRecord = new SinglePlayerGame(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
-							rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), GameState.valueOf(rs.getString("State")),
-							GameLevel.valueOf(rs.getString("Level")), GameMode.valueOf(rs.getString("Mode")));
-				else
-					gameRecord = new DuelGame(rs.getInt("ID"), rs.getInt("Attacker_ID"), rs.getInt("Defender_ID"), rs.getInt("Class_ID"),
-							rs.getInt("CurrentRound"), rs.getInt("FinalRound"), Role.valueOf(rs.getString("ActiveRole")), GameState.valueOf(rs.getString("State")),
-							GameLevel.valueOf(rs.getString("Level")), GameMode.valueOf(rs.getString("Mode")));
-				return gameRecord;
-			}
-		} catch (SQLException se) {
-			logger.error("SQL exception caught", se);
-		} catch (Exception e) {
-			logger.error("Exception caught", e);
-		} finally {
-			DB.cleanup(conn, stmt);
-		}
-		return null;
-	}
-
-	/**
-	 * Returns list of <b>active</b> games for a user
-	 *
-	 * @param userId
-	 * @return
-	 */
-	public static List<DuelGame> getGamesForUser(int userId) {
-		String query = String.join("\n",
-				"SELECT games.*,",
-				"       IFNULL(att.User_ID,0) AS Attacker_ID,",
-				"       IFNULL(def.User_ID,0) AS Defender_ID",
-				"FROM games",
-				"LEFT JOIN players AS att",
-				"    ON games.ID = att.Game_ID",
-				"    AND att.Role = 'ATTACKER'",
-				"    AND att.Active = TRUE",
-				"LEFT JOIN players AS def",
-				"    ON games.ID = def.Game_ID",
-				"    AND def.Role='DEFENDER'",
-				"    AND def.Active = TRUE",
-				"WHERE games.Mode = 'DUEL'",
-				"  AND games.State != 'FINISHED'",
-				"  AND (games.Creator_ID = ?",
-				"    OR IFNULL(att.User_ID,0) = ?",
-				"    OR IFNULL(def.User_ID,0) = ?);"
-		);
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(userId),
-				DB.getDBV(userId),
-				DB.getDBV(userId)};
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		return getGames(stmt, conn);
-	}
-
-	public static List<MultiplayerGame> getJoinedMultiplayerGamesForUser(int userId) {
-		String query = "SELECT DISTINCT m.* FROM games AS m " + "LEFT JOIN players AS p ON p.Game_ID=m.ID \n" + "WHERE m.Mode = 'PARTY' AND (p.User_ID=?);";
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(userId));
-		return getMultiplayerGames(stmt, conn);
-	}
-
-	public static List<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
-		String query = "SELECT DISTINCT m.* FROM games AS m LEFT JOIN players AS p ON p.Game_ID=m.ID  AND p.Active=TRUE" +
-				" WHERE m.Mode = 'PARTY' AND (p.User_ID=? OR m.Creator_ID=?) AND m.State != 'FINISHED';";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(userId),
-				DB.getDBV(userId)};
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		return getMultiplayerGames(stmt, conn);
-	}
-
-	public static List<MultiplayerGame> getFinishedMultiplayerGamesForUser(int userId) {
-		String query = "SELECT DISTINCT m.* FROM games AS m " + "LEFT JOIN players AS p ON p.Game_ID=m.ID  AND p.Active=TRUE \n" + "WHERE (p.User_ID=? OR m.Creator_ID=?) AND m.State = 'FINISHED' AND m.Mode='PARTY';";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(userId),
-				DB.getDBV(userId)};
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		return getMultiplayerGames(stmt, conn);
-	}
-
-	public static List<MultiplayerGame> getOpenMultiplayerGamesForUser(int userId) {
-		String query = "SELECT * FROM games AS g\n"
-				+ "INNER JOIN (SELECT gatt.ID, sum(CASE WHEN Role = 'ATTACKER' THEN 1 ELSE 0 END) nAttackers, sum(CASE WHEN Role = 'DEFENDER' THEN 1 ELSE 0 END) nDefenders\n"
-				+ "              FROM games AS gatt LEFT JOIN players ON gatt.ID=players.Game_ID AND players.Active=TRUE GROUP BY gatt.ID) AS nplayers\n"
-				+ "ON g.ID=nplayers.ID\n"
-				+ "WHERE g.Mode='PARTY' AND g.Creator_ID!=? AND (g.State='CREATED' OR g.State='ACTIVE')\n"
-				+ "AND (g.RequiresValidation=FALSE OR (? IN (SELECT User_ID FROM users WHERE Validated=TRUE)))\n"
-				+ "AND g.ID NOT IN (SELECT g.ID FROM games g INNER JOIN players p ON g.ID=p.Game_ID WHERE p.User_ID=? AND p.Active=TRUE)\n"
-				+ "AND (nplayers.nAttackers < g.Attackers_Limit OR nplayers.nDefenders < g.Defenders_Limit);";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(userId),
-				DB.getDBV(userId),
-				DB.getDBV(userId)};
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		return getMultiplayerGames(stmt, conn);
-	}
+    private static Event getEventsWithMessage(ResultSet rs) throws SQLException {
+        Event event = new Event(rs.getInt("events.Event_ID"),
+                rs.getInt("Game_ID"),
+                rs.getInt("Player_ID"),
+                rs.getString("events.Event_Message"),
+                rs.getString("events.Event_Type"),
+                rs.getString("Event_Status"),
+                rs.getTimestamp("Timestamp"));
+        String chatMessage = rs.getString("ec.Message");
+        event.setChatMessage(chatMessage);
+        return event;
+    }
 
 	public static Role getRole(int userId, int gameId) {
 		Role role = Role.NONE;
@@ -444,43 +323,36 @@ public class DatabaseAccess {
 		return role;
 	}
 
-	/**
-	 * Returns list of <b>finished</b> games for a user
-	 *
-	 * @param userId
-	 * @return
-	 */
-	public static List<DuelGame> getHistoryForUser(int userId) {
-		String query = "SELECT g.ID, g.Class_ID, g.Level, g.Creator_ID, g.State," + "g.CurrentRound, g.FinalRound, g.ActiveRole, g.Mode, g.Creator_ID,\n" + "IFNULL(att.User_ID,0) AS Attacker_ID, IFNULL(def.User_ID,0) AS Defender_ID\n" + "FROM games AS g\n" + "LEFT JOIN players AS att ON g.ID=att.Game_ID  AND att.Role='ATTACKER'\n" + "LEFT JOIN players AS def ON g.ID=def.Game_ID AND def.Role='DEFENDER'\n" + "WHERE g.Mode != 'PARTY' AND g.State='FINISHED' AND (g.Creator_ID=? OR IFNULL(att.User_ID,0)=? OR IFNULL(def.User_ID,0)=?);\n";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(userId),
-				DB.getDBV(userId),
-				DB.getDBV(userId)};
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		return getGames(stmt, conn);
-	}
-
-	public static List<DuelGame> getOpenGames() {
-		String query = String.join("\n",
-				"SELECT games.*,",
-				"       IFNULL(att.User_ID,0) AS Attacker_ID,",
-				"       IFNULL(def.User_ID,0) AS Defender_ID",
-				"FROM games",
-				"LEFT JOIN players AS att",
-				"    ON games.ID=att.Game_ID",
-				"    AND att.Role='ATTACKER'",
-				"    AND att.Active=TRUE",
-				"LEFT JOIN players AS def",
-				"    ON games.ID=def.Game_ID",
-				"    AND def.Role='DEFENDER'",
-				"    AND def.Active=TRUE",
-				"WHERE games.Mode = 'DUEL'",
-				"  AND games.State = 'CREATED';"
-		);
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query);
-		return getGames(stmt, conn);
-	}
+    /**
+     * Returns list of <b>finished</b> games for a user, which are not multiplayer games.
+     *
+     * @param userId
+     * @return
+     */
+    public static List<DuelGame> getHistoryForUser(int userId) {
+        String query = String.join("\n",
+                "SELECT g.*,",
+                "  IFNULL(att.User_ID,0) AS Attacker_ID,",
+                "  IFNULL(def.User_ID,0) AS Defender_ID",
+                "FROM games AS g",
+                "LEFT JOIN players AS att",
+                "  ON g.ID=att.Game_ID",
+                "  AND att.Role='ATTACKER'",
+                "LEFT JOIN players AS def",
+                "  ON g.ID=def.Game_ID",
+                "  AND def.Role='DEFENDER'",
+                "WHERE g.Mode != 'PARTY'",
+                "  AND g.State='FINISHED'",
+                "  AND (g.Creator_ID=?",
+                "      OR IFNULL(att.User_ID,0)=?",
+                "      OR IFNULL(def.User_ID,0)=?);");
+        DatabaseValue[] values = new DatabaseValue[]{
+                DB.getDBV(userId),
+                DB.getDBV(userId),
+                DB.getDBV(userId)
+        };
+        return DB.executeQueryReturnList(query, DuelGameDAO::duelGameFromRS, values);
+    }
 
 	public static DuelGame getActiveUnitTestingSession(int userId) {
 		String query = "SELECT * FROM games WHERE Defender_ID=? AND Mode='UTESTING' AND State='ACTIVE';";

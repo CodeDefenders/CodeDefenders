@@ -29,6 +29,7 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.database.UserDAO" %>
+<%@ page import="org.codedefenders.database.DuelGameDAO" %>
 <% String pageTitle= null ; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <%
@@ -41,16 +42,14 @@
 	int uid = (Integer)request.getSession().getAttribute("uid");
 
 	// My Games
-	List<DuelGame> duelGames = DatabaseAccess.getGamesForUser(uid);
-	List<MultiplayerGame> multiplayerGames = DatabaseAccess.getMultiplayerGamesForUser(uid);
+	List<DuelGame> duelGames = DuelGameDAO.getDuelGamesForUser(uid);
 
 	List<AbstractGame> games = new ArrayList<AbstractGame>();
 	games.addAll( duelGames );
 	games.addAll( multiplayerGames );
 
 	// Open Games
-	List<DuelGame> openDuelGames = DatabaseAccess.getOpenGames();
-	List<MultiplayerGame> openMultiplayerGames = DatabaseAccess.getOpenMultiplayerGamesForUser(uid);
+	List<DuelGame> openDuelGames = DuelGameDAO.getOpenDuelGames();
 
 	List<AbstractGame> openGames = new ArrayList<AbstractGame>();
 	openGames.addAll( openDuelGames );

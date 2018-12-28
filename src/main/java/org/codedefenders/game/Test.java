@@ -23,6 +23,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.duel.DuelGame;
@@ -94,7 +95,8 @@ public class Test {
 	public Test(int classId, int gameId, String javaFile, String classFile, int playerId) {
 	    this.classId = classId;
 		this.gameId = gameId;
-        DuelGame g = DatabaseAccess.getGameForKey("ID", gameId);
+        // FIXME: Why will only work for Duel Games since multiplayer games do not have rounds.
+        DuelGame g = DuelGameDAO.getDuelGameForId(gameId);
         if (g != null) {
             this.roundCreated = g.getCurrentRound();
         } else {
@@ -169,7 +171,8 @@ public class Test {
 	}
 
 	public int getDefenderPoints() {
-		final DuelGame game = DatabaseAccess.getGameForKey("ID", this.gameId);
+		// FIXME: Why will only work for Duel Games since multiplayer games have multiple defenders
+		final DuelGame game = DuelGameDAO.getDuelGameForId(this.gameId);
 		if (game != null && playerId == game.getDefenderId()) {
 			return mutantsKilled;
 		} else {
@@ -228,7 +231,7 @@ public class Test {
 	}
 
 	@SuppressWarnings("Duplicates")
-	public String getAsString() {
+	private String getAsString() {
 		try {
 			return new String(Files.readAllBytes(Paths.get(javaFile)));
 		} catch (FileNotFoundException e) {
