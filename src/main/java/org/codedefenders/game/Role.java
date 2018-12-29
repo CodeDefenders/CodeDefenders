@@ -19,8 +19,27 @@
 package org.codedefenders.game;
 
 /**
- * Created by thoma on 09/06/2016.
+ * This enumeration represents roles players can have in a game.
  */
 public enum Role {
-    ATTACKER, DEFENDER, CREATOR, NONE
+    ATTACKER,
+    DEFENDER,
+    CREATOR,
+    NONE;
+
+    /**
+     * Similar to {@link #valueOf(String)} but returns {@code null} if
+     * {@link #valueOf(String) valueOf()} does not match.
+     *
+     * @param name the name of the requested enum.
+     * @return the game mode for the given name, or {@code null} if no game mode was found.
+     */
+    public static Role valueOrNull(String name) {
+        try {
+            return valueOf(name);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
 }

@@ -6,13 +6,16 @@ import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
-import java.util.HashMap;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class handles the database logic for killmaps.
+ *
  * @see KillMap
  */
 public class KillmapDAO {
@@ -38,21 +41,16 @@ public class KillmapDAO {
                 "SET HasKillMap = ?",
                 "WHERE ID = ?;");
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(hasKillMap), DB.getDBV(gameId));
-
-        try {
-            return DB.executeUpdate(stmt, conn);
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
+        return DB.executeUpdateQuery(query, DB.getDBV(hasKillMap), DB.getDBV(gameId));
     }
 
     /**
      * Helper method to retrieve killmap entries from the database.
      */
-    public static List<KillMap.KillMapEntry> getKillMapEntries(PreparedStatement stmt, Connection conn,
-           List<Test> tests, List<Mutant> mutants) throws UncheckedSQLException, SQLMappingException {
+    private static List<KillMap.KillMapEntry> getKillMapEntries(List<Test> tests, List<Mutant> mutants,
+                                                                String query, DatabaseValue... values) throws UncheckedSQLException, SQLMappingException {
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, values);
         try {
             stmt.setFetchSize(Integer.MIN_VALUE);
         } catch (SQLException e) {
@@ -61,10 +59,8 @@ public class KillmapDAO {
         }
 
         /* Set up mapping from test id to test / mutant id to mutant. */
-        Map<Integer, Test> testMap = new HashMap<>();
-        Map<Integer, Mutant> mutantMap = new HashMap<>();
-        for (Test test : tests) { testMap.put(test.getId(), test); }
-        for (Mutant mutant : mutants) { mutantMap.put(mutant.getId(), mutant); }
+        Map<Integer, Test> testMap = tests.stream().collect(Collectors.toMap(Test::getId, t -> t));
+        Map<Integer, Mutant> mutantMap = mutants.stream().collect(Collectors.toMap(Mutant::getId, m -> m));
 
         return DB.executeQueryReturnList(conn, stmt, rs -> {
             int testId = rs.getInt("Test_ID");
@@ -83,13 +79,10 @@ public class KillmapDAO {
                 "FROM killmap",
                 "WHERE killmap.Game_ID = ?");
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(gameId));
-
         List<Test> tests = TestDAO.getValidTestsForGame(gameId, false);
         List<Mutant> mutants = MutantDAO.getValidMutantsForGame(gameId);
 
-        return getKillMapEntries(stmt, conn, tests, mutants);
+        return getKillMapEntries(tests, mutants, query, DB.getDBV(gameId));
     }
 
     /**
@@ -101,13 +94,10 @@ public class KillmapDAO {
                 "FROM killmap",
                 "WHERE killmap.Class_ID = ?");
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(classId));
-
         List<Test> tests = TestDAO.getValidTestsForClass(classId);
         List<Mutant> mutants = MutantDAO.getValidMutantsForClass(classId);
 
-        return getKillMapEntries(stmt, conn, tests, mutants);
+        return getKillMapEntries(tests, mutants, query, DB.getDBV(classId));
     }
 
     /**
@@ -115,35 +105,24 @@ public class KillmapDAO {
      */
     public static boolean insertKillMapEntry(KillMap.KillMapEntry entry, int classId) {
         String query = String.join("\n",
-                "INSERT INTO killmap (Class_ID,Game_ID,Test_ID,Mutant_ID,Status) VALUES (?,?,?,?,?)",
+                "INSERT INTO killmap (Class_ID,Game_ID,Test_ID,Mutant_ID,Status)",
+                "VALUES (?,?,?,?,?)",
                 "ON DUPLICATE KEY UPDATE Status = VALUES(Status);");
+        int testGameId = entry.test.getGameId();
+        int mutantGameId = entry.mutant.getGameId();
 
-        Connection conn = DB.getConnection();
-
-        try {
-            PreparedStatement stmt = conn.prepareStatement(query);
-            stmt.setInt(1, classId);
-
-            if (entry.test.getGameId() == entry.mutant.getGameId()) {
-                stmt.setInt(2, entry.test.getGameId());
-            } else {
-                stmt.setNull(2, Types.INTEGER);
-            }
-
-            stmt.setInt(3, entry.test.getId());
-            stmt.setInt(4, entry.mutant.getId());
-            stmt.setString(5, entry.status.toString());
-
-
-            return DB.executeUpdate(stmt, conn);
-        } catch (SQLException e) {
-            logger.error("SQL exception caught", e);
-            return false;
-        }
+        DatabaseValue[] values = new DatabaseValue[]{
+                DB.getDBV(classId),
+                DB.getDBV(testGameId == mutantGameId ? testGameId : null),
+                DB.getDBV(entry.test.getId()),
+                DB.getDBV(entry.mutant.getId()),
+                DB.getDBV(entry.status.name()),
+        };
+        return DB.executeUpdateQuery(query, values);
     }
 
     /**
-     * Return a list of pending killmap jobs ordered by timestamp 
+     * Return a list of pending killmap jobs ordered by timestamp
      */
     public static List<KillMap.KillMapJob> getPendingJobs() {
         String query = String.join("\n",
@@ -155,46 +134,42 @@ public class KillmapDAO {
             int gameId = rs.getInt("Game_ID");
             int classId = rs.getInt("Class_ID");
             // if SQL NULL then int is 0
-            KillMap.KillMapJob.Type type = (classId != 0) ? KillMap.KillMapJob.Type.CLASS :KillMap.KillMapJob.Type.GAME;
+            KillMap.KillMapJob.Type type = (classId != 0) ? KillMap.KillMapJob.Type.CLASS : KillMap.KillMapJob.Type.GAME;
             int reference = (classId != 0) ? classId : gameId;
             return new KillMap.KillMapJob(type, reference);
         });
     }
 
     public static boolean enqueueJob(KillMap.KillMapJob theJob) {
-        String query = "";
+        String query;
         switch (theJob.getType()) {
-        case CLASS:
-            query = String.join("\n", "INSERT INTO killmapjob (Class_ID)", "VALUES (?)");
-            break;
-        case GAME:
-            query = String.join("\n", "INSERT INTO killmapjob (Game_ID)", "VALUES (?)");
-            break;
-        default:
-            logger.warn("Unknonw type of Killmap Job !");
-            return false;
+            case CLASS:
+                query = "INSERT INTO killmapjob (Class_ID) VALUES (?)";
+                break;
+            case GAME:
+                query = "INSERT INTO killmapjob (Game_ID) VALUES (?)";
+                break;
+            default:
+                logger.warn("Unknown type of Killmap Job !");
+                return false;
         }
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(theJob.getReference()));
-        return DB.executeUpdate(stmt, conn);
+        return DB.executeUpdateQuery(query, DB.getDBV(theJob.getReference()));
     }
 
     public static boolean removeJob(KillMap.KillMapJob theJob) {
-        String query = "";
+        String query;
         switch (theJob.getType()) {
-        case CLASS:
-            query = String.join("\n", "DELETE FROM killmapjob ", "WHERE Class_ID = ?");
-            break;
-        case GAME:
-            query = String.join("\n", "DELETE FROM killmapjob ", "WHERE Game_ID = ?");
-            break;
-        default:
-            logger.warn("Unknonw type of Killmap Job !");
-            return false;
+            case CLASS:
+                query = "DELETE FROM killmapjob WHERE Class_ID = ?";
+                break;
+            case GAME:
+                query = "DELETE FROM killmapjob WHERE Game_ID = ?";
+                break;
+            default:
+                logger.warn("Unknown type of Killmap Job !");
+                return false;
         }
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(theJob.getReference()));
-        return DB.executeUpdate(stmt, conn);
+        return DB.executeUpdateQuery(query, DB.getDBV(theJob.getReference()));
     }
 }

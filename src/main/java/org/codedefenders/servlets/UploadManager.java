@@ -851,7 +851,7 @@ public class UploadManager extends HttpServlet {
                 logger.info("Removing directory {} again", cutDir);
                 FileUtils.forceDelete(new File(cutDir));
             } catch (IOException e) {
-                // logged, but otherwise ignored. Not need to abort while aborting...
+                // logged, but otherwise ignored. No need to abort while aborting.
                 logger.error("Error removing directory of compiled classes.", e);
             }
             for (String file : files) {

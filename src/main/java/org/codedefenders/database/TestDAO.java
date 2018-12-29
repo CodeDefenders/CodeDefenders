@@ -25,14 +25,13 @@ import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
@@ -53,7 +52,7 @@ public class TestDAO {
      * @return The constructed test.
      * @see RSMapper
      */
-    public static Test testFromRS(ResultSet rs) throws SQLException {
+    static Test testFromRS(ResultSet rs) throws SQLException {
         int testId = rs.getInt("Test_ID");
         int gameId = rs.getInt("Game_ID");
         int classId = rs.getInt("Class_ID");
@@ -142,12 +141,12 @@ public class TestDAO {
                 "  AND u.User_ID = ?;"
         );
 
-        DatabaseValue[] valueList = new DatabaseValue[]{
+        DatabaseValue[] values = new DatabaseValue[]{
                 DB.getDBV(gameId),
                 DB.getDBV(DUMMY_DEFENDER_USER_ID)
         };
 
-        result.addAll(DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, valueList));
+        result.addAll(DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, values));
 
         return result;
     }
@@ -223,7 +222,7 @@ public class TestDAO {
         }
 
         String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, MutantsKilled, Player_ID, Points, Class_ID, Lines_Covered, Lines_Uncovered) VALUES (?,?,?,?,?,?,?,?,?,?);";
-        DatabaseValue[] valueList = new DatabaseValue[]{
+        DatabaseValue[] values = new DatabaseValue[]{
                 DB.getDBV(javaFile),
                 DB.getDBV(classFile),
                 DB.getDBV(gameId),
@@ -235,10 +234,8 @@ public class TestDAO {
                 DB.getDBV(linesCovered),
                 DB.getDBV(linesUncovered)
         };
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
-        final int result = DB.executeUpdateGetKeys(stmt, conn);
+        final int result = DB.executeUpdateQueryGetKeys(query, values);
         if (result != -1) {
             return result;
         } else {
@@ -258,14 +255,12 @@ public class TestDAO {
                 "INSERT INTO test_uploaded_with_class (Test_ID, Class_ID)",
                 "VALUES (?, ?);"
         );
-        DatabaseValue[] valueList = new DatabaseValue[]{
+        DatabaseValue[] values = new DatabaseValue[]{
                 DB.getDBV(testId),
                 DB.getDBV(classId)
         };
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
-        return DB.executeUpdate(stmt, conn);
+        return DB.executeUpdateQuery(query, values);
     }
 
     /**
@@ -280,10 +275,7 @@ public class TestDAO {
                 "DELETE FROM test_uploaded_with_class WHERE Test_ID = ?;"
         );
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
-
-        return DB.executeUpdate(stmt, conn);
+        return DB.executeUpdateQuery(query, DB.getDBV(id));
     }
 
     /**
@@ -305,19 +297,30 @@ public class TestDAO {
 
         final String range = bob.toString();
         String query = String.join("\n",
-                "DELETE FROM tests WHERE Test_ID in ",
+                "DELETE FROM tests",
+                " WHERE Test_ID in ",
                 range,
-                "DELETE FROM test_uploaded_with_class WHERE Test_ID in ",
+                "DELETE FROM test_uploaded_with_class",
+                "WHERE Test_ID in ",
                 range
         );
 
         // Hack to make sure all values are listed in both 'ranges'.
         tests.addAll(new LinkedList<>(tests));
-        DatabaseValue[] valueList = tests.stream().map(DB::getDBV).toArray(DatabaseValue[]::new);
+        DatabaseValue[] values = tests.stream().map(DB::getDBV).toArray(DatabaseValue[]::new);
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        return DB.executeUpdateQuery(query, values);
+    }
 
-        return DB.executeUpdate(stmt, conn);
+    /**
+     * Returns the number of killed AI mutants for a given test.
+     *
+     * @param testId the identifier of the test.
+     * @return number of killed AI mutants, or {@code 0} if none found.
+     */
+    public static int getNumAiMutantsKilledByTest(int testId) {
+        String query = "SELECT * FROM tests WHERE Test_ID=?;";
+        final Integer kills = DB.executeQueryReturnValue(query, rs -> rs.getInt("NumberAiMutantsKilled"), DB.getDBV(testId));
+        return Optional.ofNullable(kills).orElse(0);
     }
 }

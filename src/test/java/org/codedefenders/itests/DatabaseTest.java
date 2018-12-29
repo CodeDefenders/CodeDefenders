@@ -18,7 +18,6 @@
  */
 package org.codedefenders.itests;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.DuelGameDAO;
@@ -65,8 +64,9 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -201,7 +201,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void testGameLists() throws Exception {
+	public void testGameLists() {
 		assumeTrue(creator.insert());
 		assumeTrue(user1.insert());
 		assumeTrue(user2.insert());
@@ -240,31 +240,26 @@ public class DatabaseTest {
 
 		MultiplayerGame mg4 = new MultiplayerGame
 				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 2, 4, 4, 0, 0)
-				.state(GameState.FINISHED)
 				.level(GameLevel.EASY)
 				.defenderValue(10)
 				.attackerValue(4)
 				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
 				.chatEnabled(true)
 				.build();
-		assumeTrue(mg4.insert());
-
-		// TODO Why is 0
 		assertEquals(1, DuelGameDAO.getOpenDuelGames().size());
 
 		assertEquals(1, DuelGameDAO.getDuelGamesForUser(user1.getId()).size());
-		// User 1 participates in 2 MP games
+		assertEquals(1, MultiplayerGameDAO.getMultiplayerGamesForUser(user2.getId()).size());
+		assertEquals(2, MultiplayerGameDAO.getMultiplayerGamesForUser(user1.getId()).size());
 		assertEquals(2, MultiplayerGameDAO.getJoinedMultiplayerGamesForUser(user1.getId()).size());
-		// This might return data based on timestamp ... Makes test tricky
-		assertEquals(2, MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(user1.getId()).size());
+		assertEquals(0, MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(user1.getId()).size());
 
-		// FIXME:
-		// User 2 participates in 1 MP game, but probably beacuse of timestamp
-		// this is closed
-//		assertEquals(0, DatabaseAccess.getOpenMultiplayerGamesForUser(user2.getId()).size());
-		// TODO Not sure what's this and why it does not return 2...
-//		assertEquals(0, DatabaseAccess.getMultiplayerGamesForUser(user1.getId()).size());
+		assumeTrue(mg4.insert());
+		assumeTrue(mg4.addPlayer(user1.getId(), Role.DEFENDER));
+		mg4.setState(GameState.FINISHED);
+		assertTrue(mg4.update());
 
+		assertEquals(1, MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(user1.getId()).size());
 	}
 
 	@Test
@@ -514,25 +509,23 @@ public class DatabaseTest {
 		Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
 		assumeTrue(multiplayerGame.insert());
 
-		Integer[] ratings = new Integer[]{Feedback.MIN_RATING - 1, Feedback.MIN_RATING, Feedback.MAX_RATING, Feedback.MAX_RATING + 1};
-
-		List<Integer> ratingsList = Arrays.asList(ratings);
+		Integer[] ratings = IntStream.rangeClosed(Feedback.MIN_RATING, Feedback.MAX_RATING).boxed().toArray(Integer[]::new);
 		assertTrue("Feedback could not be inserted",
-				FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), ratingsList));
+				FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), Arrays.asList(ratings)));
 
-		final List<Integer> feedbackValues = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
+		List<Integer> feedbackValues = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
 		assertNotNull(feedbackValues);
 		Integer[] ratingsFromDB = feedbackValues.toArray(new Integer[0]);
-		Integer[] user1RatingsSanitized = {Feedback.MIN_RATING, Feedback.MIN_RATING, Feedback.MAX_RATING, Feedback.MAX_RATING};
 
-		assertArrayEquals(user1RatingsSanitized, ratingsFromDB);
+		assertArrayEquals(ratings, ratingsFromDB);
 
-		Integer[] updatedRatings = new Integer[]{Feedback.MAX_RATING, Feedback.MAX_RATING-1, Feedback.MIN_RATING+1, Feedback.MIN_RATING};
+		Integer[] updatedRatings = IntStream.generate(() -> new Random().nextInt(Feedback.MAX_RATING)).limit(7).boxed().toArray(Integer[]::new);
+
 		List<Integer> updatedRatingsList = Arrays.asList(updatedRatings);
 		assertTrue("Feedback could not be updated",
 				FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), updatedRatingsList));
 
-		final List<Integer> feedbackValues2 = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
+		List<Integer> feedbackValues2 = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
 		assertNotNull(feedbackValues2);
 		Integer[] updatedRatingsFromDB = feedbackValues2.toArray(new Integer[0]);
 		assertArrayEquals(updatedRatings, updatedRatingsFromDB);

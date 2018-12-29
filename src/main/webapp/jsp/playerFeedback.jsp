@@ -18,14 +18,14 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.apache.commons.lang.ArrayUtils" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.database.FeedbackDAO" %>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.model.Feedback" %>
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-<%@ page import="org.codedefenders.database.UserDAO" %>
+<%@ page import="org.codedefenders.database.GameDAO" %>
+<%@ page import="org.codedefenders.model.Player" %>
 <div id="playerFeedback" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
 
     <style>
@@ -182,19 +182,17 @@
 
                     <%
                         if (canSeePlayerFeedback) {
-                            int[] attackerIDs = game.getAttackerIds();
-                            for (int pid : game.getPlayerIds()) {
-                                User userFromPlayer = UserDAO.getUserForPlayer(pid);
-                                int userFromPlayerId = userFromPlayer.getId();
-                                String userName = userFromPlayer.getUsername();
+                            for (Player player : GameDAO.getAllPlayersForGame(gameId)) {
+                                User user = player.getUser();
+                                int userId = user.getId();
 
-                                if (FeedbackDAO.hasNotRated(gameId, userFromPlayerId))
+                                if (FeedbackDAO.hasNotRated(gameId, userId))
                                     continue;
 
-                                String rowColor = ArrayUtils.contains(attackerIDs, pid) ? "#9a002914" : "#0029a01a";
+                                String rowColor = player.getRole() == Role.ATTACKER ? "#9a002914" : "#0029a01a";
                     %>
                     <tr style="background-color:<%=rowColor%>">
-                        <td><%=userName%>
+                        <td><%=user.getUsername()%>
                         </td>
                         <%
                             List<Integer> ratingValues = FeedbackDAO.getFeedbackValues(gameId, userId);

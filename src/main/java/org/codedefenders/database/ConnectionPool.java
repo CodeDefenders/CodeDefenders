@@ -220,7 +220,7 @@ public final class ConnectionPool {
                 try {
                     conn.close();
                 } catch (SQLException e) {
-                    logger.error("Failed to close database connection.", e);
+                    logger.error("Failed to remove database connection from the pool.", e);
                 }
             }
             nbConnections = newSize;
@@ -232,7 +232,7 @@ public final class ConnectionPool {
                     connections.add(newConnection);
                     availableConnections.add(connections.get(i));
                 } catch (SQLException e) {
-                    logger.error("Failed to add database connection.", e);
+                    logger.error("Failed to add database connection to the pool.", e);
                 }
             }
             nbConnections = newSize;
@@ -243,16 +243,19 @@ public final class ConnectionPool {
         waitingTime = newWaitingTime;
     }
 
+    /**
+     * This does not close the given {@link Connection}.
+     */
     private void getParametersFromDB(Connection conn) throws SQLException {
         final AdminSystemSettings.SettingsDTO conns = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_POOL_CONNECTIONS, conn);
         if (conns == null) {
-            logger.warn("Could not retrieve CONNECTION_POOL_CONNECTIONS from database");
+            logger.warn("Could not retrieve CONNECTION_POOL_CONNECTIONS from database. Using default value.");
         } else {
             nbConnections = conns.getIntValue();
         }
         final AdminSystemSettings.SettingsDTO waitingTime = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_WAITING_TIME, conn);
         if (waitingTime == null) {
-            logger.warn("Could not retrieve CONNECTION_WAITING_TIME from database");
+            logger.warn("Could not retrieve CONNECTION_WAITING_TIME from database. Using default value.");
         } else {
             this.waitingTime = waitingTime.getIntValue();
         }

@@ -308,6 +308,9 @@ public class GameClass {
 
 	public DuelGame getDummyGame() throws NoDummyGameException {
 		DuelGame dg = DatabaseAccess.getAiDummyGameForClass(this.getId());
+		if (dg == null) {
+			throw new NoDummyGameException("No dummy game found.");
+		}
 		return dg;
 	}
 

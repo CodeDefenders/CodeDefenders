@@ -1,8 +1,9 @@
 package org.codedefenders.database;
 
+import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.User;
-import org.codedefenders.database.DB.RSMapper;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -19,7 +20,7 @@ public class UserDAO {
      * @return The constructed user.
      * @see RSMapper
      */
-    public static User userFromRS(ResultSet rs) throws SQLException {
+    static User userFromRS(ResultSet rs) throws SQLException {
         int userId = rs.getInt("User_ID");
         String password = rs.getString("Password");
         String userName = rs.getString("Username");

@@ -18,9 +18,16 @@
  */
 package org.codedefenders.servlets.auth;
 
-import static org.codedefenders.database.DatabaseAccess.setPasswordResetSecret;
-import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
-import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
+import org.apache.commons.lang.ArrayUtils;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.model.User;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.EmailUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,16 +45,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.model.User;
-import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.EmailUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
+import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
 
 public class LoginManager extends HttpServlet {
 
@@ -195,20 +194,21 @@ public class LoginManager extends HttpServlet {
 			case "resetPassword":
 				email = request.getParameter("accountEmail");
 				username = request.getParameter("accountUsername");
-				User u;
-				if ((u = UserDAO.getUserByEmail(email)) != null && u.getUsername().equals(username) &&
-						u.getEmail().equals(email)) {
-					String resetPwSecret = generatePasswordResetSecret();
-					setPasswordResetSecret(u.getId(), resetPwSecret);
-					String hostAddr = request.getScheme()+"://"+request.getServerName() + ":" + request.getServerPort()  + request.getContextPath();
-					String url =  hostAddr + "/login?resetPW=" + resetPwSecret;
-					String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
-							AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN).getIntValue());
-					if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg))
-						messages.add("A link for changing your password has been sent to " + email);
-				} else
-					messages.add("No such User found or Email and Username do not match");
-				response.sendRedirect(request.getContextPath() + "/login");
+				User u = UserDAO.getUserByEmail(email);
+                if (u == null || !u.getUsername().equals(username) || !u.getEmail().equals(email)) {
+                    messages.add("No such User found or Email and Username do not match");
+                } else {
+                    String resetPwSecret = generatePasswordResetSecret();
+                    DatabaseAccess.setPasswordResetSecret(u.getId(), resetPwSecret);
+                    String hostAddr = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+                    String url = hostAddr + "/login?resetPW=" + resetPwSecret;
+                    String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
+                            AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN).getIntValue());
+                    if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg)) {
+                        messages.add("A link for changing your password has been sent to " + email);
+                    }
+                }
+                response.sendRedirect(request.getContextPath() + "/login");
 				break;
 
 			case "changePassword":

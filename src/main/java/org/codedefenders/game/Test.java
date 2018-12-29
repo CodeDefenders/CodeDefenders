@@ -305,7 +305,7 @@ public class Test {
 	public int getAiMutantsKilled() {
 		if (aiMutantsKilled == 0) {
 			//Retrieve from DB.
-			aiMutantsKilled = DatabaseAccess.getNumAiMutantsKilledByTest(getId());
+			aiMutantsKilled = TestDAO.getNumAiMutantsKilledByTest(getId());
 		}
 		return aiMutantsKilled;
 	}

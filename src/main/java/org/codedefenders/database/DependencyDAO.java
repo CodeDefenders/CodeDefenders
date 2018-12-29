@@ -18,14 +18,12 @@
  */
 package org.codedefenders.database;
 
+import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.model.Dependency;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import org.codedefenders.database.DB.RSMapper;
 
 /**
  * This class handles the database logic for dependencies.
@@ -41,7 +39,7 @@ public class DependencyDAO {
      * @return The constructed dependency.
      * @see RSMapper
      */
-    public static Dependency dependencyFromRS(ResultSet rs, int classId) throws SQLException {
+    static Dependency dependencyFromRS(ResultSet rs, int classId) throws SQLException {
         final int id = rs.getInt("Dependency_ID");
         final String javaFile = rs.getString("JavaFile");
         final String classFile = rs.getString("ClassFile");
@@ -61,15 +59,13 @@ public class DependencyDAO {
         String classFile = DatabaseAccess.addSlashes(dependency.getClassFile());
 
         String query = "INSERT INTO dependencies (Class_ID, JavaFile, ClassFile) VALUES (?, ?, ?);";
-        DatabaseValue[] valueList = new DatabaseValue[]{
+        DatabaseValue[] values = new DatabaseValue[]{
                 DB.getDBV(classId),
                 DB.getDBV(javaFile),
                 DB.getDBV(classFile)
         };
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
-        final int result = DB.executeUpdateGetKeys(stmt, conn);
+        final int result = DB.executeUpdateQueryGetKeys(query, values);
         if (result != -1) {
             return result;
         } else {
@@ -85,14 +81,11 @@ public class DependencyDAO {
      */
     public static boolean removeDependencyForId(Integer id) {
         String query = "DELETE FROM dependencies WHERE Dependency_ID = ?;";
-        DatabaseValue[] valueList = new DatabaseValue[]{
+        DatabaseValue[] values = new DatabaseValue[]{
                 DB.getDBV(id),
         };
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        return DB.executeUpdate(stmt, conn);
+        return DB.executeUpdateQuery(query, values);
     }
 
     /**
@@ -115,11 +108,8 @@ public class DependencyDAO {
         final String range = bob.toString();
         String query = "DELETE FROM dependencies WHERE Dependency_ID in " + range;
 
-        DatabaseValue[] valueList = dependencies.stream().map(DB::getDBV).toArray(DatabaseValue[]::new);
+        DatabaseValue[] values = dependencies.stream().map(DB::getDBV).toArray(DatabaseValue[]::new);
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        return DB.executeUpdate(stmt, conn);
+        return DB.executeUpdateQuery(query, values);
     }
 }
