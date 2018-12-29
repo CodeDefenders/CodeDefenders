@@ -18,190 +18,142 @@
  */
 package org.codedefenders.database;
 
-import org.apache.commons.collections.ListUtils;
 import org.codedefenders.servlets.FeedbackManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
+import java.util.stream.Stream;
+
+import static org.codedefenders.model.Feedback.MAX_RATING;
+import static org.codedefenders.model.Feedback.MIN_RATING;
+import static org.codedefenders.model.Feedback.Type;
+import static org.codedefenders.model.Feedback.types;
 
 public class FeedbackDAO {
 
 	private static final Logger logger = LoggerFactory.getLogger(FeedbackManager.class);
 
+    public static boolean storeFeedback(int gameId, int userId, List<Integer> ratingsList) {
+        StringBuilder bob = new StringBuilder("INSERT INTO ratings (User_ID, Game_ID, type, value) VALUES ");
 
-	private static final String GET_FEEDBACK_QUERY = "SELECT value, type\n" +
-			"FROM ratings\n" +
-			"WHERE Game_ID = ? AND User_ID = ?;";
+        if (ratingsList.size() > types.size() || ratingsList.size() < 1)
+            return false;
 
-	private static final String UPDATE_FEEDBACK_QUERY = "UPDATE ratings\n" +
-			"SET value = ?\n" +
-			"WHERE Game_ID = ? AND User_ID = ? AND type = ?;";
+        String queryValues = "(?, ?, ?, ?),";
+        List<DatabaseValue> allValuesList = new ArrayList<>();
+        for (int i = 0; i < ratingsList.size(); i++) {
+            int boundedValue = Math.min(Math.max(MIN_RATING, ratingsList.get(i)), MAX_RATING);
+            List<DatabaseValue> valueList = Arrays.asList(
+                    DB.getDBV(userId),
+                    DB.getDBV(gameId),
+                    DB.getDBV(types.get(i).name()),
+                    DB.getDBV(boundedValue)
+            );
+            allValuesList.addAll(valueList);
+            bob.append(queryValues);
+        }
+        bob.deleteCharAt(bob.length() - 1).append(" ON DUPLICATE KEY UPDATE value = VALUES(value)");
 
-	private static final String GET_AVERAGE_CLASS_DIFFICULTIES = "SELECT\n" +
-			"  IFNULL(AVG(value), -1)   AS 'average',\n" +
-			"  c.Class_ID,\n" +
-			"  COUNT(value) AS 'votes'\n" +
-			"FROM\n" +
-			"  (SELECT * FROM ratings WHERE type = ? AND value > 0) as filteredRatings\n" +
-			"  RIGHT JOIN games g ON filteredRatings.Game_ID = g.ID\n" +
-			"  RIGHT JOIN classes c ON g.Class_ID = c.Class_ID\n" +
-			"GROUP BY c.Class_ID ORDER BY c.Class_ID;";
+        String query = bob.toString();
+        DatabaseValue[] values = allValuesList.toArray(new DatabaseValue[0]);
+        return DB.executeUpdateQuery(query, values);
+    }
 
-	private static final String GET_AVERAGE_GAME_RATINGS = "SELECT\n" +
-			"  AVG(value) AS 'average',\n" +
-			"  type\n" +
-			"FROM ratings\n" +
-			"WHERE Game_ID = ? AND value > 0\n" +
-			"GROUP BY type;";
+    public static List<Integer> getFeedbackValues(int gameId, int userId) {
+        List<Integer> values = Stream.generate(() -> -1).limit(types.size()).collect(Collectors.toList());
 
-	private static final String GET_NB_FEEDBACKS_FOR_GAME = "SELECT COUNT(DISTINCT User_ID) AS 'nb_feedbacks'\n" +
-			"FROM\n" +
-			"  ratings\n" +
-			"WHERE Game_ID = ?;";
+        final String query = String.join("\n",
+                "SELECT value, type",
+                "FROM ratings",
+                "WHERE Game_ID = ?",
+                "  AND User_ID = ?;");
 
-	private static FeedbackManager.FeedbackType[] feedbackTypes = FeedbackManager.FeedbackType.values();
+        DB.RSMapper<Boolean> mapper = rs -> {
+            String typeString = rs.getString("type");
+            if (types.stream().anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
+                int index = Type.valueOf(typeString).ordinal();
+                values.set(index, rs.getInt("value"));
+            } else {
+                logger.warn("No such feedback type: " + typeString);
+            }
+            return true;
+        };
 
-	public static boolean insertFeedback(int gid, int uid, List<Integer> ratingsList, FeedbackManager.FeedbackType[] feedbackTypes) {
-		String query = "INSERT INTO ratings VALUES ";
-		StringBuilder bob = new StringBuilder(query);
-		String queryValues = "(?, ?, ?, ?),";
+        List<Boolean> result = DB.executeQueryReturnList(query, mapper, DB.getDBV(gameId), DB.getDBV(userId));
+        if (result.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return values;
+    }
 
-		if (ratingsList.size() > feedbackTypes.length || ratingsList.size() < 1)
-			return false;
+    public static boolean hasNotRated(int gameId, int userId) {
+        return getFeedbackValues(gameId, userId).isEmpty();
+    }
 
-		List<DatabaseValue> allValuesList = new ArrayList<>();
-		for (int i = 0; i < ratingsList.size(); i++) {
-			int boundedValue = Math.min(Math.max(FeedbackManager.MIN_RATING, ratingsList.get(i)), FeedbackManager.MAX_RATING);
-			List<DatabaseValue> valueList = Arrays.asList(DB.getDBV(uid),
-					DB.getDBV(gid),
-					DB.getDBV(feedbackTypes[i].name()),
-					DB.getDBV(boundedValue));
-			allValuesList = ListUtils.union(allValuesList, valueList);
-			bob.append(queryValues);
-		}
+    public static List<Double> getAverageGameRatings(int gameId) throws UncheckedSQLException, SQLMappingException {
+        List<Double> values = DoubleStream.generate(() -> -1.0).limit(types.size()).boxed().collect(Collectors.toList());
 
-		DatabaseValue[] databaseValues = new DatabaseValue[allValuesList.size()];
-		databaseValues = allValuesList.toArray(databaseValues);
+        String query = String.join("\n",
+                "SELECT AVG(value) AS 'average', type",
+                "FROM ratings",
+                "WHERE Game_ID = ?",
+                "  AND value > 0",
+                "GROUP BY type;");
 
-		Connection conn = DB.getConnection();
-		PreparedStatement stmt = DB.createPreparedStatement(conn, bob.substring(0, bob.length() - 1), databaseValues);
-		return DB.executeUpdate(stmt, conn);
-	}
+        DB.RSMapper<Boolean> mapper = rs -> {
+            String typeString = rs.getString("type");
+            if (types.stream().anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
+                int index = Type.valueOf(typeString).ordinal();
+                values.set(index, rs.getDouble("average"));
+            } else {
+                logger.warn("No such feedback type: " + typeString);
+            }
+            return true;
+        };
 
-	public static boolean insertFeedback(int gid, int uid, List<Integer> ratingsList) {
-		return insertFeedback(gid, uid, ratingsList, feedbackTypes);
-	}
+        List<Boolean> result = DB.executeQueryReturnList(query, mapper, DB.getDBV(gameId));
 
-	public static Integer[] getFeedbackValues(int gid, int uid, FeedbackManager.FeedbackType[] feedbackTypes)
+        if (result.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return values;
+    }
+
+	private static List<Double> getAverageClassDifficultyRatings(Type feedbackType)
 			throws UncheckedSQLException, SQLMappingException {
-		Integer[] values = new Integer[feedbackTypes.length];
-		Arrays.fill(values, -1);
+        String query = String.join("\n",
+                "SELECT",
+                "  IFNULL(AVG(value), -1)   AS 'average',",
+                "  c.Class_ID,",
+                "  COUNT(value) AS 'votes'",
+                "FROM (SELECT * FROM ratings WHERE type = ? AND value > 0) as filteredRatings",
+                "RIGHT JOIN games g ON filteredRatings.Game_ID = g.ID",
+                "RIGHT JOIN classes c ON g.Class_ID = c.Class_ID",
+                "GROUP BY c.Class_ID ORDER BY c.Class_ID;");
 
-		List<Boolean> result = DB.executeQueryReturnList(GET_FEEDBACK_QUERY, rs -> {
-			String typeString = rs.getString(2);
-			if (Arrays.stream(feedbackTypes).anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
-				values[getFeedbackIndex(typeString, feedbackTypes)] = rs.getInt(1);
-			} else {
-				logger.warn("No such feedback type: " + typeString);
-			}
-			return true;
-		}, DB.getDBV(gid), DB.getDBV(uid));
-
-		if (result.isEmpty()) {
-			return null;
-		}
-		return values;
+        return DB.executeQueryReturnList(query, rs -> rs.getDouble(1), DB.getDBV(feedbackType.name()));
 	}
 
-	public static Integer[] getFeedbackValues(int gid, int uid) {
-		return getFeedbackValues(gid, uid, feedbackTypes);
-	}
-
-	public static boolean updateFeedback(int gid, int uid, List<Integer> ratingsList, FeedbackManager.FeedbackType[] feedbackTypes) {
-		if (ratingsList.size() > feedbackTypes.length || ratingsList.size() < 1)
-			return false;
-
-		Connection conn = DB.getConnection();
-		for (int i = 0; i < ratingsList.size(); i++) {
-			int boundedValue = Math.max(FeedbackManager.MIN_RATING, ratingsList.get(i)) % (FeedbackManager.MAX_RATING + 1);
-			DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(boundedValue),
-					DB.getDBV(gid),
-					DB.getDBV(uid),
-					DB.getDBV(feedbackTypes[i].name())};
-			PreparedStatement stmt = DB.createPreparedStatement(conn, UPDATE_FEEDBACK_QUERY, valueList);
-			if (!DB.executeUpdate(stmt, conn))
-				return false;
-		}
-		return true;
-	}
-
-	public static boolean updateFeedback(int gid, int uid, List<Integer> ratingsList) {
-		return updateFeedback(gid, uid, ratingsList, feedbackTypes);
-	}
-
-	public static boolean hasNotRated(int gid, int uid) {
-		return getFeedbackValues(gid, uid) == null;
-	}
-
-	public static double[] getAverageGameRatings(int gameId) throws UncheckedSQLException, SQLMappingException {
-		double[] values = new double[feedbackTypes.length];
-		Arrays.fill(values, -1);
-
-		List<Boolean> result = DB.executeQueryReturnList(GET_AVERAGE_GAME_RATINGS, rs -> {
-			String typeString = rs.getString(2);
-			if (Arrays.stream(feedbackTypes).anyMatch(feedbackType -> typeString.equals(feedbackType.name()))) {
-				values[getFeedbackIndex(typeString, feedbackTypes)] = rs.getDouble(1);
-			} else {
-				logger.warn("No such feedback type: " + typeString);
-			}
-			return true;
-		}, DB.getDBV(gameId));
-
-		if (result.isEmpty()) {
-			return null;
-		}
-		return values;
-	}
-
-	private static List<Double> getAverageClassDifficultyRatings(FeedbackManager.FeedbackType feedbackType)
-			throws UncheckedSQLException, SQLMappingException {
-		List<Double> rv = DB.executeQueryReturnList(GET_AVERAGE_CLASS_DIFFICULTIES, rs -> rs.getDouble(1),
-				DB.getDBV(feedbackType.name()));
-		if (rv.isEmpty()) {
-			return null;
-		}
-		return rv;
-	}
-
+    // TODO Phil 28/12/18: pretty sure this doesn't result in the wanted behavior. This is ordered, but when trying to map to classes, the classes aren't ordered so the mapping just disappears.
 	public static List<Double> getAverageMutationDifficulties() {
-		return getAverageClassDifficultyRatings(FeedbackManager.FeedbackType.CUT_MUTATION_DIFFICULTY);
+		return getAverageClassDifficultyRatings(Type.CUT_MUTATION_DIFFICULTY);
 	}
 
 	public static List<Double> getAverageTestDifficulties() {
-		return getAverageClassDifficultyRatings(FeedbackManager.FeedbackType.CUT_TEST_DIFFICULTY);
+		return getAverageClassDifficultyRatings(Type.CUT_TEST_DIFFICULTY);
 	}
 
 	public static int getNBFeedbacksForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
-	    return DB.executeQueryReturnValue(GET_NB_FEEDBACKS_FOR_GAME, rs -> rs.getInt(1), DB.getDBV(gameId));
+        String query = String.join("\n",
+                "SELECT COUNT(DISTINCT User_ID) AS 'nb_feedbacks'",
+                "FROM ratings",
+                "WHERE Game_ID = ?;");
+        return DB.executeQueryReturnValue(query, rs -> rs.getInt(1), DB.getDBV(gameId));
 	}
-
-	private static int getFeedbackIndex(String typeName, FeedbackManager.FeedbackType[] feedbackTypes) {
-		int index = 0;
-		for (FeedbackManager.FeedbackType feedbackType : feedbackTypes) {
-			if (typeName.equals(feedbackType.name())) {
-				return index;
-			}
-			index++;
-		}
-		return -1;
-	}
-
 }

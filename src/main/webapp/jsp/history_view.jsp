@@ -117,7 +117,7 @@
             <td class="col-sm-1"><%= g.getDefenderIds().length %></td>
             <td class="col-sm-2"><%= g.getLevel().name() %></td>
             <td class="col-sm-2">
-                <a class="btn btn-sm btn-default" id="<%="results_"+g.getId()%>" href="battleground?id=<%= g.getId() %>">View Results</a>
+                <a class="btn btn-sm btn-default" id="<%="results_"+g.getId()%>" href="multiplayer/history?id=<%= g.getId() %>">View Results</a>
             </td>
         </tr>
 

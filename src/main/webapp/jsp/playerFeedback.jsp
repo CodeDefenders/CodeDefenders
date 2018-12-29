@@ -20,11 +20,10 @@
 --%>
 <%@ page import="org.apache.commons.lang.ArrayUtils" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.database.FeedbackDAO" %>
 <%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.model.Feedback" %>
 <%@ page import="org.codedefenders.model.User" %>
-<%@ page import="org.codedefenders.servlets.FeedbackManager" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.database.UserDAO" %>
 <div id="playerFeedback" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
@@ -111,21 +110,21 @@
                         <tbody>
 
                         <%
-                            Integer[] oldValues = FeedbackDAO.getFeedbackValues(gameId, uid);
-                            for (FeedbackManager.FeedbackType f : FeedbackManager.FeedbackType.values()) {
-                                int oldValue = oldValues == null ? -1 : oldValues[f.ordinal()];
+                            List<Integer> oldValues = FeedbackDAO.getFeedbackValues(gameId, uid);
+                            for (Feedback.Type f : Feedback.types) {
+                                int oldValue = oldValues.isEmpty() ? -1 : oldValues.get(f.ordinal());
                                 if ((role.equals(Role.DEFENDER) &&
-                                        (f.equals(FeedbackManager.FeedbackType.CUT_MUTATION_DIFFICULTY) ||
-                                                f.equals(FeedbackManager.FeedbackType.DEFENDER_FAIRNESS)))
+                                        (f.equals(Feedback.Type.CUT_MUTATION_DIFFICULTY) ||
+                                                f.equals(Feedback.Type.DEFENDER_FAIRNESS)))
                                         ||
                                         (role.equals(Role.ATTACKER) &&
-                                                (f.equals(FeedbackManager.FeedbackType.CUT_TEST_DIFFICULTY) ||
-                                                        f.equals(FeedbackManager.FeedbackType.ATTACKER_FAIRNESS))))
+                                                (f.equals(Feedback.Type.CUT_TEST_DIFFICULTY) ||
+                                                        f.equals(Feedback.Type.ATTACKER_FAIRNESS))))
                                     continue;
                         %>
 
                         <tr>
-                            <td><%=f%>
+                            <td><%=f.description()%>
                             </td>
                             <td>
                                 <fieldset class="rating">
@@ -173,8 +172,8 @@
                     <thead>
                     <tr>
                         <th><%=canSeePlayerFeedback ? "Player" : ""%></th>
-                        <% for (FeedbackManager.FeedbackType f : FeedbackManager.FeedbackType.values()) {%>
-                        <th title="<%=f.toString()%>"><%=f.name().toUpperCase().replace('_', ' ').replace("CUT ", "")%>
+                        <% for (Feedback.Type f : Feedback.Type.values()) {%>
+                        <th title="<%=f.description()%>"><%=f.displayName()%>
                         </th>
                         <%}%>
                     </tr>
@@ -198,9 +197,9 @@
                         <td><%=userName%>
                         </td>
                         <%
-                            Integer[] ratingValues = FeedbackDAO.getFeedbackValues(gameId, userFromPlayerId);
-                            for (FeedbackManager.FeedbackType f : FeedbackManager.FeedbackType.values()) {
-                                int ratingValue = ratingValues == null ? -1 : ratingValues[f.ordinal()];
+                            List<Integer> ratingValues = FeedbackDAO.getFeedbackValues(gameId, userId);
+                            for (Feedback.Type f : Feedback.Type.values()) {
+                                int ratingValue = ratingValues == null ? -1 : ratingValues.get(f.ordinal());
                                 if (ratingValue < 1) {
                         %>
                         <td></td>
@@ -209,7 +208,7 @@
 
                         <td>
                             <fieldset class="rating">
-                                <%for (int i = FeedbackManager.MAX_RATING; i > 0; i--) {%>
+                                <%for (int i = Feedback.MAX_RATING; i > 0; i--) {%>
                                 <label class="full" title="<%=i%>"
                                        style="font-size:9px; color:<%=i <= ratingValue  ? "#FFD700" : "#bdbdbd"%>"></label>
                                 <%}%>
@@ -230,9 +229,9 @@
                     <tr>
                         <td>Average</td>
                         <%
-                            double[] avgRatings = FeedbackDAO.getAverageGameRatings(gameId);
-                            for (FeedbackManager.FeedbackType f : FeedbackManager.FeedbackType.values()) {
-                                double ratingValue = avgRatings == null ? -1 : avgRatings[f.ordinal()];
+                            List<Double> avgRatings = FeedbackDAO.getAverageGameRatings(gameId);
+                            for (Feedback.Type f : Feedback.types) {
+                                double ratingValue = avgRatings == null ? -1 : avgRatings.get(f.ordinal());
                                 if (ratingValue < 1) {
                         %>
                         <td></td>
@@ -242,7 +241,7 @@
                         <td>
                             <p style="text-align: left;"><%=String.format("%.1f", ratingValue)%></p>
                             <fieldset class="rating">
-                                <%for (int i = FeedbackManager.MAX_RATING; i > 0; i--) {%>
+                                <%for (int i = Feedback.MAX_RATING; i > 0; i--) {%>
                                 <label class="full" title="<%=i%>"
                                        style="font-size:9px; color:<%=i <= Math.round(ratingValue)  ? "#FFD700" : "#bdbdbd"%>"></label>
                                 <%}%>

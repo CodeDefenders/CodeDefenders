@@ -43,9 +43,9 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.Feedback;
 import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
-import org.codedefenders.servlets.FeedbackManager;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
@@ -64,14 +64,15 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
@@ -247,7 +248,7 @@ public class DatabaseTest {
 				.chatEnabled(true)
 				.build();
 		assumeTrue(mg4.insert());
-		
+
 		// TODO Why is 0
 		assertEquals(1, DuelGameDAO.getOpenDuelGames().size());
 
@@ -513,29 +514,27 @@ public class DatabaseTest {
 		Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
 		assumeTrue(multiplayerGame.insert());
 
-		Integer[] ratings = new Integer[]{FeedbackManager.MIN_RATING - 1, FeedbackManager.MIN_RATING, FeedbackManager.MAX_RATING, FeedbackManager.MAX_RATING + 1};
-		List<FeedbackManager.FeedbackType> feedbackTypesList = new ArrayList();
-		feedbackTypesList = Arrays.asList(ArrayUtils.subarray(FeedbackManager.FeedbackType.values(), 0, ratings.length));
-		// shuffle feedback type list
-		Collections.shuffle(feedbackTypesList);
-		FeedbackManager.FeedbackType[] feedbackTypes = new FeedbackManager.FeedbackType[feedbackTypesList.size()];
-		feedbackTypes = feedbackTypesList.toArray(feedbackTypes);
+		Integer[] ratings = new Integer[]{Feedback.MIN_RATING - 1, Feedback.MIN_RATING, Feedback.MAX_RATING, Feedback.MAX_RATING + 1};
 
 		List<Integer> ratingsList = Arrays.asList(ratings);
 		assertTrue("Feedback could not be inserted",
-				FeedbackDAO.insertFeedback(multiplayerGame.getId(), user1.getId(), ratingsList, feedbackTypes));
+				FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), ratingsList));
 
-		Integer[] ratingsFromDB = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId(), feedbackTypes);
-		Integer[] user1RatingsSanitized = new Integer[]{FeedbackManager.MIN_RATING, FeedbackManager.MIN_RATING, FeedbackManager.MAX_RATING, FeedbackManager.MAX_RATING};
+		final List<Integer> feedbackValues = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
+		assertNotNull(feedbackValues);
+		Integer[] ratingsFromDB = feedbackValues.toArray(new Integer[0]);
+		Integer[] user1RatingsSanitized = {Feedback.MIN_RATING, Feedback.MIN_RATING, Feedback.MAX_RATING, Feedback.MAX_RATING};
 
-		assertEquals(user1RatingsSanitized, ratingsFromDB);
+		assertArrayEquals(user1RatingsSanitized, ratingsFromDB);
 
-		Integer[] updatedRatings = new Integer[]{FeedbackManager.MAX_RATING, FeedbackManager.MAX_RATING-1, FeedbackManager.MIN_RATING+1, FeedbackManager.MIN_RATING};
+		Integer[] updatedRatings = new Integer[]{Feedback.MAX_RATING, Feedback.MAX_RATING-1, Feedback.MIN_RATING+1, Feedback.MIN_RATING};
 		List<Integer> updatedRatingsList = Arrays.asList(updatedRatings);
 		assertTrue("Feedback could not be updated",
-				FeedbackDAO.updateFeedback(multiplayerGame.getId(), user1.getId(), updatedRatingsList, feedbackTypes));
+				FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), updatedRatingsList));
 
-		Integer[] updatedRatingsFromDB = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId(), feedbackTypes);
-		assertEquals(updatedRatings, updatedRatingsFromDB);
+		final List<Integer> feedbackValues2 = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
+		assertNotNull(feedbackValues2);
+		Integer[] updatedRatingsFromDB = feedbackValues2.toArray(new Integer[0]);
+		assertArrayEquals(updatedRatings, updatedRatingsFromDB);
 	}
 }
