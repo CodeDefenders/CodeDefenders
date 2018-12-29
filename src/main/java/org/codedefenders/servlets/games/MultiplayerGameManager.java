@@ -284,7 +284,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
 				CodeValidatorLevel codeValidatorLevel = activeGame.getMutantValidatorLevel();
 
-				ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(activeGame.getCUT().getAsString(), mutantText, codeValidatorLevel);
+				ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(activeGame.getCUT().getSourceCode(), mutantText, codeValidatorLevel);
 
 				if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
 					// Mutant is either the same as the CUT or it contains invalid code

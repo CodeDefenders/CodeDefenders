@@ -19,6 +19,7 @@
 package org.codedefenders.game;
 
 import com.github.javaparser.JavaParser;
+import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.ast.body.ConstructorDeclaration;
@@ -45,7 +46,6 @@ import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -74,7 +74,7 @@ public class GameClass {
 	private String javaFile;
 	private String classFile;
 
-	private boolean isMockingEnabled = false;
+	private boolean isMockingEnabled;
 
 	private Set<String> additionalImports = new HashSet<>();
 	// Store begin and end line which corresponds to uncoverable non-initializad fields
@@ -84,6 +84,11 @@ public class GameClass {
 	private List<Range<Integer>> linesOfMethods = new ArrayList<>();
 	private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
 	private List<Range<Integer>> linesOfClosingBrackets = new ArrayList<>();
+
+	/**
+	 * The source code of this Java class. Used as an instance attribute so the file content only needs to be read once.
+	 */
+	private String sourceCode;
 
 	public GameClass(int id, String name, String alias, String jFile, String cFile, boolean isMockingEnabled) {
 		this(name, alias, jFile, cFile, isMockingEnabled);
@@ -123,10 +128,6 @@ public class GameClass {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
 	public String getBaseName() {
 		String[] tokens = name.split("\\.");
 		return tokens[tokens.length - 1];
@@ -140,14 +141,13 @@ public class GameClass {
 		return alias;
 	}
 
-	public void setAlias(String alias) {
-		this.alias = alias;
-	}
-
-    @SuppressWarnings("Duplicates")
-	public String getAsString() {
+	public String getSourceCode() {
+		if (sourceCode != null) {
+			return sourceCode;
+		}
 		try {
-			return new String(Files.readAllBytes(Paths.get(javaFile)));
+			sourceCode = new String(Files.readAllBytes(Paths.get(javaFile)));
+			return sourceCode;
 		} catch (FileNotFoundException e) {
 			logger.error("Could not find file " + javaFile);
 			return "[File Not Found]";
@@ -157,9 +157,8 @@ public class GameClass {
 		}
 	}
 
-	@SuppressWarnings("Duplicates")
 	public String getAsHTMLEscapedString() {
-		return StringEscapeUtils.escapeHtml(getAsString());
+		return StringEscapeUtils.escapeHtml(getSourceCode());
 	}
 
 	/**
@@ -264,20 +263,18 @@ public class GameClass {
 	 * (using *)
 	 */
 	private Set<String> includeAdditionalImportsFromCUT() {
-		Set<String> additionalImports = new HashSet<String>();
+		Set<String> additionalImports = new HashSet<>();
 		CompilationUnit cu;
-		try (FileInputStream in = new FileInputStream(javaFile)) {
-			// parse the file
-			cu = JavaParser.parse(in);
+		// parse the file
+		try {
+			cu = JavaParser.parse(getSourceCode());
 
 			// Extract the import declarations from the CUT and add them to additionaImports
-			for(ImportDeclaration declaredImport : cu.getImports()){
-				additionalImports.add( declaredImport.toString(new PrettyPrinterConfiguration().setPrintComments(false)) );
+			for (ImportDeclaration declaredImport : cu.getImports()) {
+				additionalImports.add(declaredImport.toString(new PrettyPrinterConfiguration().setPrintComments(false)));
 			}
-
-		} catch (IOException e) {
-			// If a java file is not provided, there's no import at all.
-			logger.warn("Swallow Exception: " + e.getMessage() );
+		} catch (ParseProblemException e) {
+			logger.warn("Failed to parse {}", name);
 		}
 		return additionalImports;
 	}
@@ -286,20 +283,8 @@ public class GameClass {
 		return javaFile;
 	}
 
-	public void setJavaFile(String javaFile) {
-		this.javaFile = javaFile;
-	}
-
 	public String getClassFile() {
 		return classFile;
-	}
-
-	public void setClassFile(String classFile) {
-		this.classFile = classFile;
-	}
-
-	public void setMockingEnabled(boolean isMockingEnabled) {
-		this.isMockingEnabled = isMockingEnabled;
 	}
 
 	public boolean isMockingEnabled() {
@@ -358,9 +343,9 @@ public class GameClass {
 	public List<Integer> getLinesOfNonInitializedFields() {
 		List<Integer> nonInitializedFieldsLines = new ArrayList<>();
 		CompilationUnit cu;
-		try (FileInputStream in = new FileInputStream(javaFile)) {
+		try {
 			// parse the file
-			cu = JavaParser.parse(in);
+			cu = JavaParser.parse(getSourceCode());
 
 			for (TypeDeclaration td : cu.getTypes()) {
 				// Add the fields for this class;
@@ -372,23 +357,21 @@ public class GameClass {
 						nonInitializedFieldsLines.addAll(findNonInitializedFieldsByType((TypeDeclaration) bd));
 					}
 				}
-
 			}
-
-		} catch ( IOException e) {
-			logger.warn("Swallow exception" + e);
+		} catch (ParseProblemException e) {
+			logger.warn("Failed to parse {}", name);
 		}
 		return nonInitializedFieldsLines;
 	}
 
 	// TODO Probably this shall be refactor using some code visitor so we do not
 	// reanalyze everything from scratch each time
-	public List<Integer> getCompileTimeConstants() {
+	private List<Integer> getCompileTimeConstants() {
 		List<Integer> compileTimeConstantsLine = new ArrayList<>();
 		CompilationUnit cu;
-		try (FileInputStream in = new FileInputStream(javaFile)) {
+		try {
 			// parse the file
-			cu = JavaParser.parse(in);
+			cu = JavaParser.parse(getSourceCode());
 
 			for (TypeDeclaration td : cu.getTypes()) {
 				// Static final or static final primitive in the class
@@ -403,8 +386,8 @@ public class GameClass {
 
 			}
 
-		} catch ( IOException e) {
-			logger.warn("Swallow exception" + e);
+		} catch (ParseProblemException e) {
+			logger.warn("Failed to parse {}", name);
 		}
 		return compileTimeConstantsLine;
 	}
@@ -413,9 +396,9 @@ public class GameClass {
 	public List<Integer> getLinesOfMethodSignatures() {
 		List<Integer> methodSignatures = new ArrayList<>();
 		CompilationUnit cu;
-		try (FileInputStream in = new FileInputStream(javaFile)) {
+		try {
 			// parse the file
-			cu = JavaParser.parse(in);
+			cu = JavaParser.parse(getSourceCode());
 
 			for (TypeDeclaration td : cu.getTypes()) {
 				// Static final or static final primitive in the class
@@ -429,9 +412,8 @@ public class GameClass {
 				}
 
 			}
-
-		} catch ( IOException e) {
-			logger.warn("Swallow exception" + e);
+		} catch (ParseProblemException e) {
+			logger.warn("Failed to parse {}", name);
 		}
 
 		Collections.sort(methodSignatures);
@@ -441,41 +423,42 @@ public class GameClass {
 	// Lines such as method signature are not coverable
 	// https://tomassetti.me/getting-started-with-javaparser-analyzing-java-code-programmatically/
 	// Returns the lines of the "}" which closes if statements without else branches
-	public List<Integer> getUnreachableClosingBracketsForIfStatements() {
+	private List<Integer> getUnreachableClosingBracketsForIfStatements() {
 		final List<Integer> lines = new ArrayList<>();
-		try (FileInputStream in = new FileInputStream(javaFile)) {
-			new VoidVisitorAdapter<Object>() {
+		try {
+			final VoidVisitorAdapter<Object> adapter = new VoidVisitorAdapter<Object>() {
 				@Override
 				public void visit(IfStmt ifStmt, Object arg) {
 					super.visit(ifStmt, arg);
 					Statement then = ifStmt.getThenStmt();
 					Statement elze = ifStmt.getElseStmt().orElse(null);
 					// There might be plenty of empty lines
-					if( then instanceof BlockStmt ) {
+					if (then instanceof BlockStmt) {
 
 						List<Statement> thenBlockStmts = ((BlockStmt) then).getStatements();
-						if( elze == null ){
+						if (elze == null) {
 							/*
 							 * This takes only the non-coverable one, meaning
 							 * that if } is on the same line of the last stmt it
 							 * is not considered here because it is should be already
 							 * considered
 							 */
-							if( thenBlockStmts.size() > 0 && ( thenBlockStmts.get( thenBlockStmts.size() - 1).getEnd().get().line < ifStmt.getEnd().get().line)){
+							if (thenBlockStmts.size() > 0 && (thenBlockStmts.get(thenBlockStmts.size() - 1).getEnd().get().line < ifStmt.getEnd().get().line)) {
 								// Add the range
-								linesOfClosingBrackets.add( Range.between( then.getBegin().get().line, ifStmt.getEnd().get().line));
-								lines.add( ifStmt.getEnd().get().line );
+								linesOfClosingBrackets.add(Range.between(then.getBegin().get().line, ifStmt.getEnd().get().line));
+								lines.add(ifStmt.getEnd().get().line);
 							}
-						}else {
-								// Add the range
-								linesOfClosingBrackets.add( Range.between( then.getBegin().get().line, elze.getBegin().get().line));
-								lines.add( elze.getBegin().get().line );
+						} else {
+							// Add the range
+							linesOfClosingBrackets.add(Range.between(then.getBegin().get().line, elze.getBegin().get().line));
+							lines.add(elze.getBegin().get().line);
 						}
 					}
 				}
-			}.visit(JavaParser.parse(in), null);
-		} catch ( IOException  e) {
-			logger.warn("Swallow exception" + e);
+			};
+			adapter.visit(JavaParser.parse(getSourceCode()), null);
+		} catch (ParseProblemException e) {
+			logger.warn("Failed to parse {}", name);
 		}
 		Collections.sort(lines);
 		return lines;
@@ -520,7 +503,6 @@ public class GameClass {
 
 	/**
 	 * Return the lines which correspond to Compile Time Constants. Mutation of those lines requries the tests to be recompiled against the mutant
-	 * @return
 	 */
 	public List<Integer> getLinesOfCompileTimeConstants() {
 		return linesOfCompileTimeConstants;
@@ -528,8 +510,6 @@ public class GameClass {
 
 	/**
 	 * Return the lines of the method signature for the method which contains the coveredLine
-	 * @param coveredLine
-	 * @return
 	 */
 	public List<Integer> getLinesOfMethodSignaturesFor(Integer coveredLine) {
 		List<Integer> lines = new ArrayList<Integer>();

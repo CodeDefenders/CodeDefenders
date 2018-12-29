@@ -368,7 +368,7 @@ public class ParallelizeTest {
 
 			Patch patch = DiffUtils.parseUnifiedDiff(diff);
 			// Read the CUT code
-			List<String> origincalCode = Arrays.asList( battlegroundGame.getCUT().getAsString().split("\n") );
+			List<String> origincalCode = Arrays.asList( battlegroundGame.getCUT().getSourceCode().split("\n") );
 			// Apply the patch
 
 			List<String> mutantCode =(List<String>) DiffUtils.patch( origincalCode, patch);

@@ -325,7 +325,7 @@ public class PuzzleGameManager extends HttpServlet {
         final ArrayList<String> messages = new ArrayList<>();
         session.setAttribute("messages", messages);
 
-        ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getAsString(), mutantText, mutantValidatorLevel);
+        ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
         if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
             // Mutant is either the same as the CUT or it contains invalid code
             messages.add(validationMessage.get());

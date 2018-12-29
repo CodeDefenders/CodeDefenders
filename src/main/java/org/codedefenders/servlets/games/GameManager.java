@@ -291,7 +291,7 @@ public class GameManager extends HttpServlet {
 				String mutantText = request.getParameter("mutant");
 
 				// Duels are always 'strict'
-				ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(activeGame.getCUT().getAsString(), mutantText, CodeValidatorLevel.STRICT);
+				ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(activeGame.getCUT().getSourceCode(), mutantText, CodeValidatorLevel.STRICT);
 				if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
 					// Mutant is either the same as the CUT or it contains invalid code
 					// Do not restore mutated code
