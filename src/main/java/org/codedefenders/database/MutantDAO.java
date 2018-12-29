@@ -97,7 +97,7 @@ public class MutantDAO {
                 "LEFT JOIN players ON players.ID = mutants.Player_ID ",
                 "LEFT JOIN users ON players.User_ID = users.User_ID ",
                 "WHERE mutants.Mutant_ID = ?;");
-        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DB.getDBV(mutantId));
+        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DatabaseValue.of(mutantId));
     }
 
     /**
@@ -109,7 +109,7 @@ public class MutantDAO {
                 "LEFT JOIN players ON players.ID=mutants.Player_ID ",
                 "LEFT JOIN users ON players.User_ID = users.User_ID ",
                 "WHERE mutants.Game_ID = ? AND mutants.MD5 = ?;");
-        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DB.getDBV(gameId), DB.getDBV(md5));
+        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId), DatabaseValue.of(md5));
     }
 
     /**
@@ -122,7 +122,7 @@ public class MutantDAO {
                 "LEFT JOIN users ON players.User_ID = users.User_ID ",
                 "WHERE mutants.Game_ID = ?",
                 "  AND mutants.ClassFile IS NOT NULL;");
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(gameId));
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId));
     }
 
     /**
@@ -138,7 +138,7 @@ public class MutantDAO {
                 "  AND games.Class_ID = ?",
                 "  AND mutants.ClassFile IS NOT NULL;");
 
-        result.addAll(DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(classId)));
+        result.addAll(DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId)));
 
         // Include also those mutants created during the upload. Player = -1
         String systemAttackerQuery = String.join("\n",
@@ -148,7 +148,7 @@ public class MutantDAO {
                 "  AND mutants.Class_ID = ?",
                 "  AND mutants.ClassFile IS NOT NULL;");
 
-        result.addAll(DB.executeQueryReturnList(systemAttackerQuery, MutantDAO::mutantFromRS, DB.getDBV(classId)));
+        result.addAll(DB.executeQueryReturnList(systemAttackerQuery, MutantDAO::mutantFromRS, DatabaseValue.of(classId)));
 
         return result;
     }
@@ -163,7 +163,7 @@ public class MutantDAO {
                 "LEFT JOIN users ON players.User_ID = users.User_ID ",
                 "WHERE mutants.Player_ID = ?",
                 "  AND mutants.ClassFile IS NOT NULL;");
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(playerId));
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(playerId));
     }
 
     /**
@@ -194,17 +194,17 @@ public class MutantDAO {
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         );
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(javaFile),
-                DB.getDBV(classFile),
-                DB.getDBV(gameId),
-                DB.getDBV(roundCreated),
-                DB.getDBV(equivalent.name()),
-                DB.getDBV(sqlAlive),
-                DB.getDBV(playerId),
-                DB.getDBV(score),
-                DB.getDBV(md5),
-                DB.getDBV(classId),
-                DB.getDBV(mutatedLinesString)
+                DatabaseValue.of(javaFile),
+                DatabaseValue.of(classFile),
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(roundCreated),
+                DatabaseValue.of(equivalent.name()),
+                DatabaseValue.of(sqlAlive),
+                DatabaseValue.of(playerId),
+                DatabaseValue.of(score),
+                DatabaseValue.of(md5),
+                DatabaseValue.of(classId),
+                DatabaseValue.of(mutatedLinesString)
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
@@ -228,8 +228,8 @@ public class MutantDAO {
                 "VALUES (?, ?);"
         );
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(mutantId),
-                DB.getDBV(classId)
+                DatabaseValue.of(mutantId),
+                DatabaseValue.of(classId)
         };
         return DB.executeUpdateQuery(query, values);
     }
@@ -246,8 +246,8 @@ public class MutantDAO {
                 "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID = ?"
         );
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(id),
-                DB.getDBV(id)
+                DatabaseValue.of(id),
+                DatabaseValue.of(id)
         };
         return DB.executeUpdateQuery(query, values);
     }
@@ -279,7 +279,7 @@ public class MutantDAO {
 
         // Hack to make sure all values are listed in both 'ranges'.
         mutants.addAll(new LinkedList<>(mutants));
-        DatabaseValue[] values = mutants.stream().map(DB::getDBV).toArray(DatabaseValue[]::new);
+        DatabaseValue[] values = mutants.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
 
         return DB.executeUpdateQuery(query, values);
     }
@@ -298,7 +298,7 @@ public class MutantDAO {
                 "  AND mutants.Game_ID = games.ID;"
         );
 
-        return DB.executeQueryReturnValue(query, res -> res.getInt("Class_ID"), DB.getDBV(mutantId));
+        return DB.executeQueryReturnValue(query, res -> res.getInt("Class_ID"), DatabaseValue.of(mutantId));
     }
 
     /**
@@ -309,7 +309,7 @@ public class MutantDAO {
      */
     public static int getNumTestsKillMutant(int mutantId) {
         String query = "SELECT * FROM mutants WHERE Mutant_ID=?;";
-        final Integer kills = DB.executeQueryReturnValue(query, rs -> rs.getInt("NumberAiKillingTests"), DB.getDBV(mutantId));
+        final Integer kills = DB.executeQueryReturnValue(query, rs -> rs.getInt("NumberAiKillingTests"), DatabaseValue.of(mutantId));
         return Optional.ofNullable(kills).orElse(0);
     }
 }

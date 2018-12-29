@@ -60,35 +60,35 @@ public class TargetExecutionDAO {
         if (targetExecution.hasTest() && targetExecution.hasMutant()) {
             query = "INSERT INTO targetexecutions (Test_ID, Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?, ?);";
             values = new DatabaseValue[] {
-                    DB.getDBV(targetExecution.testId),
-                    DB.getDBV(targetExecution.mutantId),
-                    DB.getDBV(targetExecution.target.name()),
-                    DB.getDBV(targetExecution.status.name()),
-                    DB.getDBV(insertedMessage)
+                    DatabaseValue.of(targetExecution.testId),
+                    DatabaseValue.of(targetExecution.mutantId),
+                    DatabaseValue.of(targetExecution.target.name()),
+                    DatabaseValue.of(targetExecution.status.name()),
+                    DatabaseValue.of(insertedMessage)
             };
         } else if (targetExecution.hasTest()) {
             query = "INSERT INTO targetexecutions (Test_ID, Target, Status, Message) VALUES (?, ?, ?, ?);";
             values = new DatabaseValue[] {
-                   DB.getDBV(targetExecution.testId),
-                   DB.getDBV(targetExecution.target.name()),
-                   DB.getDBV(targetExecution.status.name()),
-                   DB.getDBV(insertedMessage)
+                   DatabaseValue.of(targetExecution.testId),
+                   DatabaseValue.of(targetExecution.target.name()),
+                   DatabaseValue.of(targetExecution.status.name()),
+                   DatabaseValue.of(insertedMessage)
             };
         } else if (targetExecution.hasMutant()) {
             query = "INSERT INTO targetexecutions (Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?);";
             values = new DatabaseValue[] {
-                   DB.getDBV(targetExecution.mutantId),
-                   DB.getDBV(targetExecution.target.name()),
-                   DB.getDBV(targetExecution.status.name()),
-                   DB.getDBV(insertedMessage)
+                   DatabaseValue.of(targetExecution.mutantId),
+                   DatabaseValue.of(targetExecution.target.name()),
+                   DatabaseValue.of(targetExecution.status.name()),
+                   DatabaseValue.of(insertedMessage)
             };
         } else {
             // has no test or mutant data
             query = "INSERT INTO targetexecutions (Target, Status, Message) VALUES (?, ?, ?);";
             values = new DatabaseValue[]{
-                   DB.getDBV(targetExecution.target.name()),
-                   DB.getDBV(targetExecution.status.name()),
-                   DB.getDBV(insertedMessage)
+                   DatabaseValue.of(targetExecution.target.name()),
+                   DatabaseValue.of(targetExecution.status.name()),
+                   DatabaseValue.of(insertedMessage)
             };
         }
 
@@ -116,8 +116,8 @@ public class TargetExecutionDAO {
         );
 
         DatabaseValue[] values = new DatabaseValue[]{
-               DB.getDBV(testId),
-               DB.getDBV(mutantId)
+               DatabaseValue.of(testId),
+               DatabaseValue.of(mutantId)
         };
 
         return DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, values);
@@ -139,8 +139,8 @@ public class TargetExecutionDAO {
         );
 
         DatabaseValue[] values = new DatabaseValue[]{
-               DB.getDBV(test.getId()),
-               DB.getDBV(target.name())
+               DatabaseValue.of(test.getId()),
+               DatabaseValue.of(target.name())
         };
 
         return DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, values);
@@ -162,8 +162,8 @@ public class TargetExecutionDAO {
         );
 
         DatabaseValue[] values = new DatabaseValue[]{
-               DB.getDBV(mutant.getId()),
-               DB.getDBV(target.name())
+               DatabaseValue.of(mutant.getId()),
+               DatabaseValue.of(target.name())
         };
 
         return DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, values);

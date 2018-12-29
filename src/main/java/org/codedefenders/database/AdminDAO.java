@@ -61,22 +61,22 @@ public class AdminDAO {
                 "   GROUP BY PD.user_id)",
                 "    AS Defender ON U.user_id = Defender.user_id",
                 "WHERE U.user_id = ?;");
-        return DB.executeQueryReturnValue(query, DatabaseAccess::entryFromRS, DB.getDBV(userID));
+        return DB.executeQueryReturnValue(query, DatabaseAccess::entryFromRS, DatabaseValue.of(userID));
     }
 
     public static boolean deletePlayerTest(int pid) {
         String query = "DELETE FROM tests WHERE Player_ID =?;";
-        return DB.executeUpdateQuery(query, DB.getDBV(pid));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(pid));
     }
 
     public static boolean deletePlayerMutants(int pid) {
         String query = "DELETE FROM mutants WHERE Player_ID =?;";
-        return DB.executeUpdateQuery(query, DB.getDBV(pid));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(pid));
     }
 
     public static boolean deleteDefenderEquivalences(int pid) {
         String query = "DELETE FROM equivalences WHERE Defender_ID =?;";
-        return DB.executeUpdateQuery(query, DB.getDBV(pid));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(pid));
     }
 
     public static boolean deleteAttackerEquivalences(int pid) {
@@ -85,22 +85,22 @@ public class AdminDAO {
                 "WHERE Mutant_ID IN (SELECT Mutant_ID",
                 "                    FROM mutants",
                 "                    WHERE Player_ID = ?);");
-        return DB.executeUpdateQuery(query, DB.getDBV(pid));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(pid));
     }
 
     public static boolean deletePlayer(int pid) {
         String query = "DELETE FROM players WHERE ID =?;";
-        return DB.executeUpdateQuery(query, DB.getDBV(pid));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(pid));
     }
 
     public static boolean deleteTestTargetExecutions(int tid) {
         String query = "DELETE FROM targetexecutions WHERE Test_ID =?;";
-        return DB.executeUpdateQuery(query, DB.getDBV(tid));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(tid));
     }
 
     public static boolean deleteMutantTargetExecutions(int mid) {
         String query = "DELETE FROM targetexecutions WHERE Mutant_ID = ?;";
-        return DB.executeUpdateQuery(query, DB.getDBV(mid));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(mid));
     }
 
     private static List<String> userInfoFromRS(ResultSet rs) throws SQLException {
@@ -306,21 +306,21 @@ public class AdminDAO {
             playerInfo.add(String.valueOf(rs.getInt("nbSubmissions")));
             return playerInfo;
         };
-        return DB.executeQueryReturnList(query, mapper, DB.getDBV(gameId));
+        return DB.executeQueryReturnList(query, mapper, DatabaseValue.of(gameId));
     }
 
     public static boolean setUserPassword(int uid, String password) {
         String query = "UPDATE users SET Password = ? WHERE User_ID = ?;";
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(password),
-                DB.getDBV(uid)
+                DatabaseValue.of(password),
+                DatabaseValue.of(uid)
         };
         return DB.executeUpdateQuery(query, values);
     }
 
     public static boolean deleteUser(int userId) {
         String query = "DELETE FROM users WHERE User_ID = ?;";
-        return DB.executeUpdateQuery(query, DB.getDBV(userId));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(userId));
         // this does not work as foreign keys are not deleted (recommended: update w/ ON DELETE CASCADE)
     }
 
@@ -332,19 +332,19 @@ public class AdminDAO {
                 "SET ? = ?",
                 "WHERE name = ?;");
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(valueToSet),
+                DatabaseValue.of(valueToSet),
                 null,
-                DB.getDBV(setting.getName().name())
+                DatabaseValue.of(setting.getName().name())
         };
         switch (setting.getType()) {
             case STRING_VALUE:
-                values[0] = DB.getDBV(setting.getStringValue());
+                values[0] = DatabaseValue.of(setting.getStringValue());
                 break;
             case INT_VALUE:
-                values[0] = DB.getDBV(setting.getIntValue());
+                values[0] = DatabaseValue.of(setting.getIntValue());
                 break;
             case BOOL_VALUE:
-                values[0] = DB.getDBV(setting.getBoolValue());
+                values[0] = DatabaseValue.of(setting.getBoolValue());
                 break;
         }
         return DB.executeUpdateQuery(query, values);
@@ -374,7 +374,7 @@ public class AdminDAO {
     public static AdminSystemSettings.SettingsDTO getSystemSetting(AdminSystemSettings.SETTING_NAME name)
             throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM settings WHERE settings.name = ?;";
-        return DB.executeQueryReturnValue(query, AdminDAO::settingFromRS, DB.getDBV(name.name()));
+        return DB.executeQueryReturnValue(query, AdminDAO::settingFromRS, DatabaseValue.of(name.name()));
     }
 
     // TODO this is just used to initialize the connection pool, we should probably make more specific methods for that

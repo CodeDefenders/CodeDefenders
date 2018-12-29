@@ -262,7 +262,7 @@ public class Mutant implements Serializable {
 		Connection conn = DB.getConnection();
 
 		DatabaseValue[] valueList = new DatabaseValue[]{
-				DB.getDBV(score), DB.getDBV(id)
+				DatabaseValue.of(score), DatabaseValue.of(id)
 		};
 
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -296,10 +296,10 @@ public class Mutant implements Serializable {
 			query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=? WHERE Mutant_ID=? AND Alive=1;";
 		}
 
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(equivalent.name()),
-				DB.getDBV(sqlAlive()),
-				DB.getDBV(roundKilled),
-				DB.getDBV(id)};
+		DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(equivalent.name()),
+				DatabaseValue.of(sqlAlive()),
+				DatabaseValue.of(roundKilled),
+				DatabaseValue.of(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		//
 		return DB.executeUpdate(stmt, conn);
@@ -469,12 +469,12 @@ public class Mutant implements Serializable {
 
 		// We cannot update killed mutants
 		String query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, NumberAiKillingTests=?, Points=? WHERE Mutant_ID=? AND Alive=1;";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(equivalent.name()),
-				DB.getDBV(sqlAlive()),
-				DB.getDBV(roundKilled),
-				DB.getDBV(killedByAITests),
-				DB.getDBV(score),
-				DB.getDBV(id)};
+		DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(equivalent.name()),
+				DatabaseValue.of(sqlAlive()),
+				DatabaseValue.of(roundKilled),
+				DatabaseValue.of(killedByAITests),
+				DatabaseValue.of(score),
+				DatabaseValue.of(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
 		return DB.executeUpdate(stmt, conn);

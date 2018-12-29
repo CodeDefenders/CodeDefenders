@@ -36,7 +36,7 @@ public class PuzzleDAO {
                 "WHERE Chapter_ID = ?;"
         );
 
-        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleChapterFromResultSet, DB.getDBV(chapterId));
+        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleChapterFromResultSet, DatabaseValue.of(chapterId));
     }
 
     /**
@@ -65,7 +65,7 @@ public class PuzzleDAO {
                 "WHERE Puzzle_ID = ?;"
         );
 
-        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleFromResultSet, DB.getDBV(puzzleId));
+        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleFromResultSet, DatabaseValue.of(puzzleId));
     }
 
     /**
@@ -97,7 +97,7 @@ public class PuzzleDAO {
                 "ORDER BY Position;"
         );
 
-        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleFromResultSet, DB.getDBV(chapterId));
+        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleFromResultSet, DatabaseValue.of(chapterId));
     }
 
     /**
@@ -113,7 +113,7 @@ public class PuzzleDAO {
                 "  AND ID = ?;"
         );
 
-        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, DB.getDBV(gameId));
+        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(gameId));
     }
 
     /**
@@ -132,7 +132,7 @@ public class PuzzleDAO {
                 "ORDER BY Timestamp DESC;"
         );
 
-        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, DB.getDBV(puzzleId), DB.getDBV(userId));
+        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(puzzleId), DatabaseValue.of(userId));
     }
 
     /**
@@ -153,7 +153,7 @@ public class PuzzleDAO {
                 "ORDER BY Timestamp DESC;"
         );
 
-        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleGameFromResultSet, DB.getDBV(puzzleId), DB.getDBV(userId));
+        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(puzzleId), DatabaseValue.of(userId));
     }
 
 
@@ -174,7 +174,7 @@ public class PuzzleDAO {
                 "ORDER BY Timestamp DESC;"
         );
 
-        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleGameFromResultSet, DB.getDBV(userId));
+        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(userId));
     }
 
     /**
@@ -201,16 +201,16 @@ public class PuzzleDAO {
         );
 
         DatabaseValue[] values = new DatabaseValue[] {
-                DB.getDBV(game.getClassId()),
-                DB.getDBV(game.getLevel().toString()),
-                DB.getDBV(game.getCreatorId()),
-                DB.getDBV(game.getMaxAssertionsPerTest()),
-                DB.getDBV(game.getMutantValidatorLevel().toString()),
-                DB.getDBV(game.getState().toString()),
-                DB.getDBV(game.getCurrentRound()),
-                DB.getDBV(game.getActiveRole().toString()),
-                DB.getDBV(game.getMode().toString()),
-                DB.getDBV(game.getPuzzleId()),
+                DatabaseValue.of(game.getClassId()),
+                DatabaseValue.of(game.getLevel().toString()),
+                DatabaseValue.of(game.getCreatorId()),
+                DatabaseValue.of(game.getMaxAssertionsPerTest()),
+                DatabaseValue.of(game.getMutantValidatorLevel().toString()),
+                DatabaseValue.of(game.getState().toString()),
+                DatabaseValue.of(game.getCurrentRound()),
+                DatabaseValue.of(game.getActiveRole().toString()),
+                DatabaseValue.of(game.getMode().toString()),
+                DatabaseValue.of(game.getPuzzleId()),
         };
 
         return DB.executeUpdateQueryGetKeys(query, values);
@@ -239,16 +239,16 @@ public class PuzzleDAO {
         );
 
         DatabaseValue[] values = new DatabaseValue[] {
-                DB.getDBV(game.getClassId()),
-                DB.getDBV(game.getLevel().toString()),
-                DB.getDBV(game.getCreatorId()),
-                DB.getDBV(game.getMaxAssertionsPerTest()),
-                DB.getDBV(game.getMutantValidatorLevel().toString()),
-                DB.getDBV(game.getState().toString()),
-                DB.getDBV(game.getCurrentRound()),
-                DB.getDBV(game.getActiveRole().toString()),
-                DB.getDBV(game.getPuzzleId()),
-                DB.getDBV(game.getId()),
+                DatabaseValue.of(game.getClassId()),
+                DatabaseValue.of(game.getLevel().toString()),
+                DatabaseValue.of(game.getCreatorId()),
+                DatabaseValue.of(game.getMaxAssertionsPerTest()),
+                DatabaseValue.of(game.getMutantValidatorLevel().toString()),
+                DatabaseValue.of(game.getState().toString()),
+                DatabaseValue.of(game.getCurrentRound()),
+                DatabaseValue.of(game.getActiveRole().toString()),
+                DatabaseValue.of(game.getPuzzleId()),
+                DatabaseValue.of(game.getId()),
         };
 
         return DB.executeUpdateQuery(query, values);

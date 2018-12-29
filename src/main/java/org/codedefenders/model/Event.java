@@ -216,18 +216,18 @@ public class Event {
 			eventType.equals(EventType.DEFENDER_MUTANT_EQUIVALENT) ||
 			eventType.equals(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT) ){
 			query="INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status, Event_Message) VALUES (?, ?, ?, ?, ?);";
-			valueList = new DatabaseValue[]{DB.getDBV(gameId),
-					DB.getDBV(userId),
-					DB.getDBV(eventType.toString()),
-					DB.getDBV(eventStatus.toString()),
-					DB.getDBV( message)};
+			valueList = new DatabaseValue[]{DatabaseValue.of(gameId),
+					DatabaseValue.of(userId),
+					DatabaseValue.of(eventType.toString()),
+					DatabaseValue.of(eventStatus.toString()),
+					DatabaseValue.of( message)};
 		}
 		else {
 			query="INSERT INTO events (Game_ID, Player_ID, Event_Type, Event_Status) VALUES (?, ?, ?, ?);";
-			valueList = new DatabaseValue[]{DB.getDBV(gameId),
-					DB.getDBV(userId),
-					DB.getDBV(eventType.toString()),
-					DB.getDBV(eventStatus.toString())};
+			valueList = new DatabaseValue[]{DatabaseValue.of(gameId),
+					DatabaseValue.of(userId),
+					DatabaseValue.of(eventType.toString()),
+					DatabaseValue.of(eventStatus.toString())};
 		}
 
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -236,8 +236,8 @@ public class Event {
 			if (chatMessage != null) {
 				conn = DB.getConnection();
 				query = "INSERT INTO event_chat (Event_Id, Message) VALUES (?, ?);";
-				valueList = new DatabaseValue[]{DB.getDBV(eventId),
-						DB.getDBV(chatMessage)};
+				valueList = new DatabaseValue[]{DatabaseValue.of(eventId),
+						DatabaseValue.of(chatMessage)};
 				stmt = DB.createPreparedStatement(conn, query, valueList);
 				DB.executeUpdate(stmt, conn);
 			}
@@ -249,12 +249,12 @@ public class Event {
 	public boolean update() {
 		Connection conn = DB.getConnection();
 		String query = "UPDATE events SET Game_ID=?, Player_ID=?, Event_Type=?, Event_Status=?, Timestamp=FROM_UNIXTIME(?) WHERE Event_ID=?";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(gameId),
-				DB.getDBV(userId),
-				DB.getDBV(eventType.toString()),
-				DB.getDBV(eventStatus.toString()),
-				DB.getDBV((Long) time.getTime()),
-				DB.getDBV(eventId)};
+		DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(gameId),
+				DatabaseValue.of(userId),
+				DatabaseValue.of(eventType.toString()),
+				DatabaseValue.of(eventStatus.toString()),
+				DatabaseValue.of((Long) time.getTime()),
+				DatabaseValue.of(eventId)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		return DB.executeUpdate(stmt, conn);
 	}

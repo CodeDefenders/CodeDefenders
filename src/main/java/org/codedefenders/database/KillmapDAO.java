@@ -29,7 +29,7 @@ public class KillmapDAO {
                 "SELECT HasKillMap",
                 "FROM games",
                 "WHERE games.ID = ?");
-        return DB.executeQueryReturnValue(query, rs -> rs.getBoolean("HasKillMap"), DB.getDBV(gameId));
+        return DB.executeQueryReturnValue(query, rs -> rs.getBoolean("HasKillMap"), DatabaseValue.of(gameId));
     }
 
     /**
@@ -41,7 +41,7 @@ public class KillmapDAO {
                 "SET HasKillMap = ?",
                 "WHERE ID = ?;");
 
-        return DB.executeUpdateQuery(query, DB.getDBV(hasKillMap), DB.getDBV(gameId));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(hasKillMap), DatabaseValue.of(gameId));
     }
 
     /**
@@ -82,7 +82,7 @@ public class KillmapDAO {
         List<Test> tests = TestDAO.getValidTestsForGame(gameId, false);
         List<Mutant> mutants = MutantDAO.getValidMutantsForGame(gameId);
 
-        return getKillMapEntries(tests, mutants, query, DB.getDBV(gameId));
+        return getKillMapEntries(tests, mutants, query, DatabaseValue.of(gameId));
     }
 
     /**
@@ -97,7 +97,7 @@ public class KillmapDAO {
         List<Test> tests = TestDAO.getValidTestsForClass(classId);
         List<Mutant> mutants = MutantDAO.getValidMutantsForClass(classId);
 
-        return getKillMapEntries(tests, mutants, query, DB.getDBV(classId));
+        return getKillMapEntries(tests, mutants, query, DatabaseValue.of(classId));
     }
 
     /**
@@ -112,11 +112,11 @@ public class KillmapDAO {
         int mutantGameId = entry.mutant.getGameId();
 
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(classId),
-                DB.getDBV(testGameId == mutantGameId ? testGameId : null),
-                DB.getDBV(entry.test.getId()),
-                DB.getDBV(entry.mutant.getId()),
-                DB.getDBV(entry.status.name()),
+                DatabaseValue.of(classId),
+                DatabaseValue.of(testGameId == mutantGameId ? testGameId : null),
+                DatabaseValue.of(entry.test.getId()),
+                DatabaseValue.of(entry.mutant.getId()),
+                DatabaseValue.of(entry.status.name()),
         };
         return DB.executeUpdateQuery(query, values);
     }
@@ -154,7 +154,7 @@ public class KillmapDAO {
                 return false;
         }
 
-        return DB.executeUpdateQuery(query, DB.getDBV(theJob.getReference()));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(theJob.getReference()));
     }
 
     public static boolean removeJob(KillMap.KillMapJob theJob) {
@@ -170,6 +170,6 @@ public class KillmapDAO {
                 logger.warn("Unknown type of Killmap Job !");
                 return false;
         }
-        return DB.executeUpdateQuery(query, DB.getDBV(theJob.getReference()));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(theJob.getReference()));
     }
 }

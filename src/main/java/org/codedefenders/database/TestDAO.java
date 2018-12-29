@@ -92,7 +92,7 @@ public class TestDAO {
      */
     public static Test getTestById(int testId) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM tests WHERE Test_ID = ?;";
-        return DB.executeQueryReturnValue(query, TestDAO::testFromRS, DB.getDBV(testId));
+        return DB.executeQueryReturnValue(query, TestDAO::testFromRS, DatabaseValue.of(testId));
     }
 
     /**
@@ -100,7 +100,7 @@ public class TestDAO {
      */
     public static List<Test> getTestsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM tests WHERE Game_ID = ?;";
-        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(gameId));
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId));
     }
 
     /**
@@ -129,7 +129,7 @@ public class TestDAO {
                 "      AND ex.Status='SUCCESS'",
                 "  );"
         );
-        result.addAll(DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(gameId)));
+        result.addAll(DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId)));
 
         String systemDefenderQuery = String.join("\n",
                 "SELECT tests.*",
@@ -142,8 +142,8 @@ public class TestDAO {
         );
 
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(gameId),
-                DB.getDBV(DUMMY_DEFENDER_USER_ID)
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(DUMMY_DEFENDER_USER_ID)
         };
 
         result.addAll(DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, values));
@@ -176,7 +176,7 @@ public class TestDAO {
                 "      AND ex.Status='SUCCESS'",
                 "  );"
         );
-        result.addAll(DB.executeQueryReturnList(query, TestDAO::testFromRS, DB.getDBV(classId)));
+        result.addAll(DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(classId)));
 
         // Include also those tests uploaded, i.e, player_id = -1
         String systemDefenderQuery = String.join("\n",
@@ -187,7 +187,7 @@ public class TestDAO {
                 "  AND tests.ClassFile IS NOT NULL;"
         );
 
-        result.addAll(DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, DB.getDBV(classId)));
+        result.addAll(DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, DatabaseValue.of(classId)));
 
         return result;
     }
@@ -223,16 +223,16 @@ public class TestDAO {
 
         String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, MutantsKilled, Player_ID, Points, Class_ID, Lines_Covered, Lines_Uncovered) VALUES (?,?,?,?,?,?,?,?,?,?);";
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(javaFile),
-                DB.getDBV(classFile),
-                DB.getDBV(gameId),
-                DB.getDBV(roundCreated),
-                DB.getDBV(mutantsKilled),
-                DB.getDBV(playerId),
-                DB.getDBV(score),
-                DB.getDBV(classId),
-                DB.getDBV(linesCovered),
-                DB.getDBV(linesUncovered)
+                DatabaseValue.of(javaFile),
+                DatabaseValue.of(classFile),
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(roundCreated),
+                DatabaseValue.of(mutantsKilled),
+                DatabaseValue.of(playerId),
+                DatabaseValue.of(score),
+                DatabaseValue.of(classId),
+                DatabaseValue.of(linesCovered),
+                DatabaseValue.of(linesUncovered)
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
@@ -256,8 +256,8 @@ public class TestDAO {
                 "VALUES (?, ?);"
         );
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(testId),
-                DB.getDBV(classId)
+                DatabaseValue.of(testId),
+                DatabaseValue.of(classId)
         };
 
         return DB.executeUpdateQuery(query, values);
@@ -275,7 +275,7 @@ public class TestDAO {
                 "DELETE FROM test_uploaded_with_class WHERE Test_ID = ?;"
         );
 
-        return DB.executeUpdateQuery(query, DB.getDBV(id));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(id));
     }
 
     /**
@@ -307,7 +307,7 @@ public class TestDAO {
 
         // Hack to make sure all values are listed in both 'ranges'.
         tests.addAll(new LinkedList<>(tests));
-        DatabaseValue[] values = tests.stream().map(DB::getDBV).toArray(DatabaseValue[]::new);
+        DatabaseValue[] values = tests.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
 
         return DB.executeUpdateQuery(query, values);
     }
@@ -320,7 +320,7 @@ public class TestDAO {
      */
     public static int getNumAiMutantsKilledByTest(int testId) {
         String query = "SELECT * FROM tests WHERE Test_ID=?;";
-        final Integer kills = DB.executeQueryReturnValue(query, rs -> rs.getInt("NumberAiMutantsKilled"), DB.getDBV(testId));
+        final Integer kills = DB.executeQueryReturnValue(query, rs -> rs.getInt("NumberAiMutantsKilled"), DatabaseValue.of(testId));
         return Optional.ofNullable(kills).orElse(0);
     }
 }

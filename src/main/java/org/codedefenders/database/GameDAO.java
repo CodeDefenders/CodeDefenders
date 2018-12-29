@@ -53,10 +53,10 @@ public class GameDAO {
         );
 
         DatabaseValue[] values = {
-                DB.getDBV(gameId),
-                DB.getDBV(userId),
-                DB.getDBV(role.toString()),
-                DB.getDBV(role.toString())
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(userId),
+                DatabaseValue.of(role.toString()),
+                DatabaseValue.of(role.toString())
         };
 
         return DB.executeUpdateQuery(query, values);
@@ -77,8 +77,8 @@ public class GameDAO {
                 "  AND Role = ?",
                 "  AND Active=TRUE;");
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(gameId),
-                DB.getDBV(role.toString())
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(role.toString())
         };
 
         return DB.executeQueryReturnList(query, rs -> rs.getInt("ID"), values);
@@ -103,7 +103,7 @@ public class GameDAO {
                 "  AND players.User_ID = users.User_ID",
                 "  AND players.Active = TRUE;");
 
-        return DB.executeQueryReturnList(query, PlayerDAO::playerWithUserFromRS, DB.getDBV(gameId));
+        return DB.executeQueryReturnList(query, PlayerDAO::playerWithUserFromRS, DatabaseValue.of(gameId));
     }
 
     /**
@@ -120,8 +120,8 @@ public class GameDAO {
                 "WHERE Game_ID = ?",
                 "  AND User_ID = ?;");
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(gameId),
-                DB.getDBV(userId)
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(userId)
         };
 
         return DB.executeUpdateQuery(query, values);

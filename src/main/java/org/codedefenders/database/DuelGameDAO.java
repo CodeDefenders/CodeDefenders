@@ -95,12 +95,12 @@ public class DuelGameDAO {
         GameState state = game.getState();
 
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(classId),
-                DB.getDBV((attackerId != 0) ? attackerId : defenderId),
-                DB.getDBV(finalRound),
-                DB.getDBV(level.name()),
-                DB.getDBV(mode.name()),
-                DB.getDBV(state.name())
+                DatabaseValue.of(classId),
+                DatabaseValue.of((attackerId != 0) ? attackerId : defenderId),
+                DatabaseValue.of(finalRound),
+                DatabaseValue.of(level.name()),
+                DatabaseValue.of(mode.name()),
+                DatabaseValue.of(state.name())
         };
         final int result = DB.executeUpdateQueryGetKeys(query, values);
         if (result != -1) {
@@ -136,10 +136,10 @@ public class DuelGameDAO {
                         "    State=?",
                         "WHERE ID=?");
                 values = new DatabaseValue[]{
-                        DB.getDBV(currentRound),
-                        DB.getDBV(finalRound),
-                        DB.getDBV(state.name()),
-                        DB.getDBV(id)
+                        DatabaseValue.of(currentRound),
+                        DatabaseValue.of(finalRound),
+                        DatabaseValue.of(state.name()),
+                        DatabaseValue.of(id)
                 };
                 break;
             default:
@@ -153,11 +153,11 @@ public class DuelGameDAO {
                         "    State=?",
                         "WHERE ID=?");
                 values = new DatabaseValue[]{
-                        DB.getDBV(currentRound),
-                        DB.getDBV(finalRound),
-                        DB.getDBV(activeRole.toString()),
-                        DB.getDBV(state.name()),
-                        DB.getDBV(id)
+                        DatabaseValue.of(currentRound),
+                        DatabaseValue.of(finalRound),
+                        DatabaseValue.of(activeRole.toString()),
+                        DatabaseValue.of(state.name()),
+                        DatabaseValue.of(id)
                 };
         }
         return DB.executeUpdateQuery(query, values);
@@ -188,8 +188,8 @@ public class DuelGameDAO {
 //                "  AND Mode = ?"
         );
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(gameId),
-//                DB.getDBV(GameMode.DUEL.name())
+                DatabaseValue.of(gameId),
+//                DatabaseValue.of(GameMode.DUEL.name())
         };
         return DB.executeQueryReturnValue(query, DuelGameDAO::duelGameFromRS, values);
     }
@@ -222,9 +222,9 @@ public class DuelGameDAO {
                 "    OR IFNULL(def.User_ID,0) = ?);"
         );
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(userId),
-                DB.getDBV(userId),
-                DB.getDBV(userId)
+                DatabaseValue.of(userId),
+                DatabaseValue.of(userId),
+                DatabaseValue.of(userId)
         };
         return DB.executeQueryReturnList(query, DuelGameDAO::duelGameFromRS, values);
     }
@@ -252,8 +252,8 @@ public class DuelGameDAO {
                 "  AND games.State = ?;"
         );
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(GameMode.DUEL.name()),
-                DB.getDBV(GameState.CREATED.name())
+                DatabaseValue.of(GameMode.DUEL.name()),
+                DatabaseValue.of(GameState.CREATED.name())
         };
         return DB.executeQueryReturnList(query, DuelGameDAO::duelGameFromRS, values);
     }

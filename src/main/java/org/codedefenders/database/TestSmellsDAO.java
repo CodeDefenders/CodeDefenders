@@ -84,6 +84,6 @@ public class TestSmellsDAO {
                 "FROM test_smell",
                 "WHERE Test_ID = ?;"
         );
-        return DB.executeQueryReturnList(query, rs -> rs.getString("smell_name"), DB.getDBV(test.getId()));
+        return DB.executeQueryReturnList(query, rs -> rs.getString("smell_name"), DatabaseValue.of(test.getId()));
     }
 }

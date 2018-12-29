@@ -77,8 +77,8 @@ public class DatabaseAccess {
                 "WHERE Game_ID=? ",
                 "  AND Event_Status=?");
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(gameId),
-                DB.getDBV(EventStatus.GAME.toString())
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(EventStatus.GAME.toString())
         };
         return DB.executeQueryReturnList(query, DatabaseAccess::getEvents, values);
     }
@@ -86,9 +86,9 @@ public class DatabaseAccess {
     public static void removePlayerEventsForGame(int gameId, int playerId) {
         String query = "UPDATE events SET Event_Status=? WHERE Game_ID=? AND Player_ID=?";
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(EventStatus.DELETED.toString()),
-                DB.getDBV(gameId),
-                DB.getDBV(playerId)};
+                DatabaseValue.of(EventStatus.DELETED.toString()),
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(playerId)};
         DB.executeUpdateQuery(query, values);
     }
 
@@ -110,9 +110,9 @@ public class DatabaseAccess {
         }
 
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(gameId),
-                DB.getDBV(EventStatus.GAME.toString()),
-                DB.getDBV(time)};
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(EventStatus.GAME.toString()),
+                DatabaseValue.of(time)};
 
         return DB.executeQueryReturnList(query, DatabaseAccess::getEvents, values);
     }
@@ -139,13 +139,13 @@ public class DatabaseAccess {
         // EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
         // ATTACKER_MUTANT_KILLED_EQUIVALENT
         DatabaseValue[] values = new DatabaseValue[]{
-//				DB.getDBV(userId),
-                DB.getDBV(gameId),
-                DB.getDBV(EventStatus.GAME.toString()),
-                DB.getDBV(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT.toString()),
-                DB.getDBV(EventType.DEFENDER_MUTANT_EQUIVALENT.toString()),
-                DB.getDBV(EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT.toString()),
-                DB.getDBV(lastMessageId)};
+//				DatabaseValue.of(userId),
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(EventStatus.GAME.toString()),
+                DatabaseValue.of(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT.toString()),
+                DatabaseValue.of(EventType.DEFENDER_MUTANT_EQUIVALENT.toString()),
+                DatabaseValue.of(EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT.toString()),
+                DatabaseValue.of(lastMessageId)};
         return DB.executeQueryReturnList(query, DatabaseAccess::getEventsWithMessage, values);
     }
 
@@ -159,7 +159,7 @@ public class DatabaseAccess {
                 "  ON events.Event_Id = ec.Event_Id",
                 "WHERE Event_Status!='DELETED' ",
                 "  AND Player_ID=?;");
-        return DB.executeQueryReturnList(query, DatabaseAccess::getEvents, DB.getDBV(userId));
+        return DB.executeQueryReturnList(query, DatabaseAccess::getEvents, DatabaseValue.of(userId));
     }
 
     public static List<Event> getNewEventsForUser(int userId, long time) {
@@ -175,32 +175,32 @@ public class DatabaseAccess {
                 "  AND Event_Status<>? ",
                 "  AND Timestamp >= FROM_UNIXTIME(?)");
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(userId),
-                DB.getDBV(EventStatus.DELETED.toString()),
-                DB.getDBV(EventStatus.GAME.toString()),
-                DB.getDBV(time)};
+                DatabaseValue.of(userId),
+                DatabaseValue.of(EventStatus.DELETED.toString()),
+                DatabaseValue.of(EventStatus.GAME.toString()),
+                DatabaseValue.of(time)};
         return DB.executeQueryReturnList(query, DatabaseAccess::getEvents, values);
     }
 
     public static void setGameAsAIDummy(int gameId) {
         String query = "UPDATE games SET IsAIDummyGame = 1 WHERE ID = ?;";
-        DB.executeUpdateQuery(query, DB.getDBV(gameId));
+        DB.executeUpdateQuery(query, DatabaseValue.of(gameId));
     }
 
     public static DuelGame getAiDummyGameForClass(int classId) {
         String query = "SELECT * FROM games WHERE Class_ID=? AND IsAIDummyGame=1";
-        return DB.executeQueryReturnValue(query, DuelGameDAO::duelGameFromRS, DB.getDBV(classId));
+        return DB.executeQueryReturnValue(query, DuelGameDAO::duelGameFromRS, DatabaseValue.of(classId));
     }
 
     public static boolean isAiPrepared(GameClass c) {
         String query = "SELECT * FROM classes WHERE AiPrepared = 1 AND Class_ID = ?";
-        Boolean bool = DB.executeQueryReturnValue(query, rs -> true, DB.getDBV(c.getId()));
+        Boolean bool = DB.executeQueryReturnValue(query, rs -> true, DatabaseValue.of(c.getId()));
         return Optional.ofNullable(bool).orElse(false);
     }
 
     public static void setAiPrepared(GameClass c) {
         String query = "UPDATE classes SET AiPrepared = 1 WHERE Class_ID = ?;";
-        DB.executeUpdateQuery(query, DB.getDBV(c.getId()));
+        DB.executeUpdateQuery(query, DatabaseValue.of(c.getId()));
     }
 
     private static Event getEvents(ResultSet rs) throws SQLException {
@@ -243,10 +243,10 @@ public class DatabaseAccess {
                 "   OR (p.User_ID=?",
                 "      AND p.Game_ID=?))");
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(gameId),
-                DB.getDBV(userId),
-                DB.getDBV(userId),
-                DB.getDBV(gameId)};
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(userId),
+                DatabaseValue.of(userId),
+                DatabaseValue.of(gameId)};
         DB.RSMapper<Role> mapper = rs -> {
             if (rs.getInt("Creator_ID") == userId) {
                 return Role.CREATOR;
@@ -279,9 +279,9 @@ public class DatabaseAccess {
                 "      OR IFNULL(att.User_ID,0)=?",
                 "      OR IFNULL(def.User_ID,0)=?);");
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(userId),
-                DB.getDBV(userId),
-                DB.getDBV(userId)
+                DatabaseValue.of(userId),
+                DatabaseValue.of(userId),
+                DatabaseValue.of(userId)
         };
         return DB.executeQueryReturnList(query, DuelGameDAO::duelGameFromRS, values);
     }
@@ -293,32 +293,32 @@ public class DatabaseAccess {
                 "WHERE Defender_ID=?",
                 "  AND Mode='UTESTING'",
                 "  AND State='ACTIVE';");
-        return DB.executeQueryReturnValue(query, DuelGameDAO::duelGameFromRS, DB.getDBV(userId));
+        return DB.executeQueryReturnValue(query, DuelGameDAO::duelGameFromRS, DatabaseValue.of(userId));
     }
 
     public static List<Integer> getUsedAiTestsForGame(DuelGame g) {
         String query = "SELECT * FROM usedaitests WHERE Game_ID=?;";
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("Value"), DB.getDBV(g.getId()));
+        return DB.executeQueryReturnList(query, rs -> rs.getInt("Value"), DatabaseValue.of(g.getId()));
     }
 
     public static void increasePlayerPoints(int points, int player) {
         String query = "UPDATE players SET Points=Points+? WHERE ID=?";
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(points),
-                DB.getDBV(player)
+                DatabaseValue.of(points),
+                DatabaseValue.of(player)
         };
         DB.executeUpdateQuery(query, values);
     }
 
     public static int getEquivalentDefenderId(Mutant m) {
         String query = "SELECT * FROM equivalences WHERE Mutant_ID=?;";
-        final Integer id = DB.executeQueryReturnValue(query, rs -> rs.getInt("Defender_ID"), DB.getDBV(m.getId()));
+        final Integer id = DB.executeQueryReturnValue(query, rs -> rs.getInt("Defender_ID"), DatabaseValue.of(m.getId()));
         return Optional.ofNullable(id).orElse(-1);
     }
 
     public static int getPlayerPoints(int playerId) {
         String query = "SELECT Points FROM players WHERE ID=?;";
-        final Integer points = DB.executeQueryReturnValue(query, rs -> rs.getInt("Points"), DB.getDBV(playerId));
+        final Integer points = DB.executeQueryReturnValue(query, rs -> rs.getInt("Points"), DatabaseValue.of(playerId));
         return Optional.ofNullable(points).orElse(0);
     }
 
@@ -328,9 +328,9 @@ public class DatabaseAccess {
                 "VALUES (?, ?, ?)"
         );
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(mutant.getId()),
-                DB.getDBV(defender),
-                DB.getDBV(mutant.getScore())
+                DatabaseValue.of(mutant.getId()),
+                DatabaseValue.of(defender),
+                DatabaseValue.of(mutant.getScore())
         };
         return DB.executeUpdateQuery(query, values);
     }
@@ -338,15 +338,15 @@ public class DatabaseAccess {
     public static boolean setAiTestAsUsed(int testNumber, DuelGame g) {
         String query = "INSERT INTO usedaitests (Value, Game_ID) VALUES (?, ?);";
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(testNumber),
-                DB.getDBV(g.getId())
+                DatabaseValue.of(testNumber),
+                DatabaseValue.of(g.getId())
         };
         return DB.executeUpdateQueryGetKeys(query, values) > -1;
     }
 
     public static List<Integer> getUsedAiMutantsForGame(DuelGame g) {
         String query = "SELECT * FROM usedaimutants WHERE Game_ID=?;";
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("Value"), DB.getDBV(g.getId()));
+        return DB.executeQueryReturnList(query, rs -> rs.getInt("Value"), DatabaseValue.of(g.getId()));
     }
 
     /**
@@ -357,8 +357,8 @@ public class DatabaseAccess {
     public static boolean setAiMutantAsUsed(int mutantNumber, DuelGame g) {
         String query = "INSERT INTO usedaimutants (Value, Game_ID) VALUES (?, ?);";
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(mutantNumber),
-                DB.getDBV(g.getId())
+                DatabaseValue.of(mutantNumber),
+                DatabaseValue.of(g.getId())
         };
         return DB.executeUpdateQueryGetKeys(query, values) > -1;
     }
@@ -371,8 +371,8 @@ public class DatabaseAccess {
                 "WHERE User_ID = ?",
                 "  AND Game_ID = ?");
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(userId),
-                DB.getDBV(gameId)
+                DatabaseValue.of(userId),
+                DatabaseValue.of(gameId)
         };
         final Integer id = DB.executeQueryReturnValue(query, rs -> rs.getInt("ID"), values);
         return Optional.ofNullable(id).orElse(-1);
@@ -409,9 +409,9 @@ public class DatabaseAccess {
                 "  AND Mutant_ID = ?;"
         );
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(TargetExecution.Target.TEST_MUTANT.name()),
-                DB.getDBV(TargetExecution.Status.SUCCESS.name()),
-                DB.getDBV(mutantId)
+                DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
+                DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),
+                DatabaseValue.of(mutantId)
         };
         TargetExecution targ = DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, values);
         // TODO: We shouldn't give away that we don't know which test killed the mutant?
@@ -428,9 +428,9 @@ public class DatabaseAccess {
                 "  AND te.Mutant_ID = m.Mutant_ID",
                 "ORDER BY m.Mutant_ID ASC");
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(TargetExecution.Target.TEST_MUTANT.name()),
-                DB.getDBV(TargetExecution.Status.SUCCESS.name()),
-                DB.getDBV(testId)
+                DatabaseValue.of(TargetExecution.Target.TEST_MUTANT.name()),
+                DatabaseValue.of(TargetExecution.Status.SUCCESS.name()),
+                DatabaseValue.of(testId)
         };
         final List<Mutant> mutants = DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, values);
         return new HashSet<>(mutants);
@@ -442,8 +442,8 @@ public class DatabaseAccess {
     public static void logSession(int uid, String ipAddress) {
         String query = "INSERT INTO sessions (User_ID, IP_Address) VALUES (?, ?);";
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(uid),
-                DB.getDBV(ipAddress)
+                DatabaseValue.of(uid),
+                DatabaseValue.of(ipAddress)
         };
         DB.executeUpdateQuery(query, values);
     }
@@ -452,9 +452,9 @@ public class DatabaseAccess {
         String query = isDefender ? "SELECT MAX(test_id) FROM tests" : "SELECT MAX(mutant_id) FROM mutants";
         query += " WHERE game_id=? AND player_id = (SELECT id FROM players WHERE game_id=? AND user_id=?);";
         DatabaseValue[] valueList = new DatabaseValue[]{
-                DB.getDBV(gameId),
-                DB.getDBV(gameId),
-                DB.getDBV(userId)
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(userId)
         };
 
         final Integer result = DB.executeQueryReturnValue(query, rs -> rs.getInt(1), valueList);
@@ -470,10 +470,10 @@ public class DatabaseAccess {
                 + "AND TargetExecution_ID >= (SELECT MAX(TargetExecution_ID) from targetexecutions);";
 
         DatabaseValue[] valueList = new DatabaseValue[]{
-                DB.getDBV(lastSubmissionId),
-                DB.getDBV(gameId),
-                DB.getDBV(gameId),
-                DB.getDBV(userId)
+                DatabaseValue.of(lastSubmissionId),
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(userId)
         };
         TargetExecution t = DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, valueList);
         return Optional.ofNullable(t).map(te -> te.target).orElse(null);
@@ -486,8 +486,8 @@ public class DatabaseAccess {
                 "    pw_reset_timestamp = CURRENT_TIMESTAMP",
                 "WHERE User_ID = ?;");
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(pwResetSecret),
-                DB.getDBV(userId)
+                DatabaseValue.of(pwResetSecret),
+                DatabaseValue.of(userId)
         };
         return DB.executeUpdateQuery(query, values);
     }
@@ -502,7 +502,7 @@ public class DatabaseAccess {
                 "      AND\n" +
                 "      pw_reset_secret = ?;";
 
-        final Integer userId = DB.executeQueryReturnValue(query, rs -> rs.getInt("User_ID"), DB.getDBV(pwResetSecret));
+        final Integer userId = DB.executeQueryReturnValue(query, rs -> rs.getInt("User_ID"), DatabaseValue.of(pwResetSecret));
         return Optional.ofNullable(userId).orElse(-1);
     }
 }

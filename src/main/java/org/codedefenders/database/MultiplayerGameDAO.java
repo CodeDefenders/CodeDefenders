@@ -30,7 +30,6 @@ import java.sql.Timestamp;
 import java.util.List;
 
 import static org.codedefenders.database.DB.RSMapper;
-import static org.codedefenders.database.DB.getDBV;
 
 /**
  * This class handles the database logic for multiplayer games.
@@ -148,27 +147,27 @@ public class MultiplayerGameDAO {
                 "CapturePlayersIntention)",
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(classId),
-                DB.getDBV(level.name()),
-                DB.getDBV(prize),
-                DB.getDBV(defenderValue),
-                DB.getDBV(attackerValue),
-                DB.getDBV(lineCoverage),
-                DB.getDBV(mutantCoverage),
-                DB.getDBV(creatorId),
-                DB.getDBV(minAttackers),
-                DB.getDBV(minDefenders),
-                DB.getDBV(attackerLimit),
-                DB.getDBV(defenderLimit),
-                DB.getDBV(new Timestamp(startDateTime)),
-                DB.getDBV(new Timestamp(finishDateTime)),
-                DB.getDBV(state.name()),
-                DB.getDBV(mode.name()),
-                DB.getDBV(maxAssertionsPerTest),
-                DB.getDBV(chatEnabled),
-                DB.getDBV(mutantValidatorLevel.name()),
-                DB.getDBV(markUncovered),
-                DB.getDBV(capturePlayersIntention)
+                DatabaseValue.of(classId),
+                DatabaseValue.of(level.name()),
+                DatabaseValue.of(prize),
+                DatabaseValue.of(defenderValue),
+                DatabaseValue.of(attackerValue),
+                DatabaseValue.of(lineCoverage),
+                DatabaseValue.of(mutantCoverage),
+                DatabaseValue.of(creatorId),
+                DatabaseValue.of(minAttackers),
+                DatabaseValue.of(minDefenders),
+                DatabaseValue.of(attackerLimit),
+                DatabaseValue.of(defenderLimit),
+                DatabaseValue.of(new Timestamp(startDateTime)),
+                DatabaseValue.of(new Timestamp(finishDateTime)),
+                DatabaseValue.of(state.name()),
+                DatabaseValue.of(mode.name()),
+                DatabaseValue.of(maxAssertionsPerTest),
+                DatabaseValue.of(chatEnabled),
+                DatabaseValue.of(mutantValidatorLevel.name()),
+                DatabaseValue.of(markUncovered),
+                DatabaseValue.of(capturePlayersIntention)
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
@@ -211,15 +210,15 @@ public class MultiplayerGameDAO {
                 "WHERE ID = ?"
         );
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(classId),
-                DB.getDBV(level.name()),
-                DB.getDBV(prize),
-                DB.getDBV(defenderValue),
-                DB.getDBV(attackerValue),
-                DB.getDBV(lineCoverage),
-                DB.getDBV(mutantCoverage),
-                DB.getDBV(state.name()),
-                DB.getDBV(id)};
+                DatabaseValue.of(classId),
+                DatabaseValue.of(level.name()),
+                DatabaseValue.of(prize),
+                DatabaseValue.of(defenderValue),
+                DatabaseValue.of(attackerValue),
+                DatabaseValue.of(lineCoverage),
+                DatabaseValue.of(mutantCoverage),
+                DatabaseValue.of(state.name()),
+                DatabaseValue.of(id)};
 
         return DB.executeUpdateQuery(query, values);
     }
@@ -239,8 +238,8 @@ public class MultiplayerGameDAO {
                 "  AND Mode = ?");
 
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(gameId),
-                DB.getDBV(GameMode.PARTY.name())
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(GameMode.PARTY.name())
         };
 
         return DB.executeQueryReturnValue(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
@@ -259,8 +258,8 @@ public class MultiplayerGameDAO {
                 "  AND Mode = ?",
                 "  AND Finish_Time > NOW();");
         DatabaseValue[] values = new DatabaseValue[]{
-                getDBV(GameState.FINISHED.name()),
-                getDBV(GameMode.PARTY.name())
+                DatabaseValue.of(GameState.FINISHED.name()),
+                DatabaseValue.of(GameMode.PARTY.name())
         };
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
     }
@@ -285,9 +284,9 @@ public class MultiplayerGameDAO {
                 "  AND (nplayers.nAttackers < g.Attackers_Limit OR nplayers.nDefenders < g.Defenders_Limit);");
 
         DatabaseValue[] values = new DatabaseValue[]{
-                getDBV(userId),
-                getDBV(userId),
-                getDBV(userId)
+                DatabaseValue.of(userId),
+                DatabaseValue.of(userId),
+                DatabaseValue.of(userId)
         };
 
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
@@ -311,10 +310,10 @@ public class MultiplayerGameDAO {
                 "  AND (p.User_ID = ? OR m.Creator_ID = ?)",
                 "  AND m.State != ?;");
         DatabaseValue[] values = new DatabaseValue[]{
-                getDBV(GameMode.PARTY.name()),
-                getDBV(userId),
-                getDBV(userId),
-                getDBV(GameState.FINISHED.name())
+                DatabaseValue.of(GameMode.PARTY.name()),
+                DatabaseValue.of(userId),
+                DatabaseValue.of(userId),
+                DatabaseValue.of(GameState.FINISHED.name())
         };
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
     }
@@ -336,8 +335,8 @@ public class MultiplayerGameDAO {
                 "  AND (p.User_ID = ?);");
 
         DatabaseValue[] values = new DatabaseValue[]{
-                getDBV(GameMode.PARTY.name()),
-                getDBV(userId)
+                DatabaseValue.of(GameMode.PARTY.name()),
+                DatabaseValue.of(userId)
         };
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
     }
@@ -360,10 +359,10 @@ public class MultiplayerGameDAO {
                 "  AND m.Mode = ?;");
 
         DatabaseValue[] values = new DatabaseValue[]{
-                getDBV(userId),
-                getDBV(userId),
-                getDBV(GameState.FINISHED.name()),
-                getDBV(GameMode.PARTY.name())
+                DatabaseValue.of(userId),
+                DatabaseValue.of(userId),
+                DatabaseValue.of(GameState.FINISHED.name()),
+                DatabaseValue.of(GameMode.PARTY.name())
         };
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
     }
@@ -384,10 +383,10 @@ public class MultiplayerGameDAO {
                 "    OR State = ?)",
                 "  AND Creator_ID = ?;");
         DatabaseValue[] values = new DatabaseValue[]{
-                getDBV(GameMode.PARTY.name()),
-                getDBV(GameState.ACTIVE.name()),
-                getDBV(GameState.CREATED.name()),
-                getDBV(creatorId)
+                DatabaseValue.of(GameMode.PARTY.name()),
+                DatabaseValue.of(GameState.ACTIVE.name()),
+                DatabaseValue.of(GameState.CREATED.name()),
+                DatabaseValue.of(creatorId)
         };
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
     }

@@ -36,7 +36,7 @@ public class UserDAO {
      */
     public static User getUserById(int userId) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users WHERE User_ID = ?;";
-        return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DB.getDBV(userId));
+        return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DatabaseValue.of(userId));
     }
 
     /**
@@ -44,7 +44,7 @@ public class UserDAO {
      */
     public static User getUserByName(String name) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users WHERE Username=?;";
-        return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DB.getDBV(name));
+        return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DatabaseValue.of(name));
     }
 
     /**
@@ -52,7 +52,7 @@ public class UserDAO {
      */
     public static User getUserByEmail(String email) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM users WHERE Email = ?;";
-        return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DB.getDBV(email));
+        return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DatabaseValue.of(email));
     }
 
     public static User getUserForPlayer(int playerId) throws UncheckedSQLException, SQLMappingException {
@@ -61,7 +61,7 @@ public class UserDAO {
                 "FROM users, players",
                 "WHERE players.User_ID = users.User_ID",
                 "  AND players.ID = ?;");
-        return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DB.getDBV(playerId));
+        return DB.executeQueryReturnValue(query, UserDAO::userFromRS, DatabaseValue.of(playerId));
     }
 
     /**
@@ -108,7 +108,7 @@ public class UserDAO {
                 "    FROM players innerPlayers",
                 "    WHERE innerPlayers.User_ID = players.User_ID",
                 "  );");
-        return DB.executeQueryReturnValue(query, rs -> Role.valueOf(rs.getString("Role")), DB.getDBV(userId));
+        return DB.executeQueryReturnValue(query, rs -> Role.valueOf(rs.getString("Role")), DatabaseValue.of(userId));
     }
 
 }

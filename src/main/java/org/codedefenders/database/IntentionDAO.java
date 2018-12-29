@@ -56,9 +56,9 @@ public class IntentionDAO {
         );
 
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(testId),
-                DB.getDBV(gameId),
-                DB.getDBV(targetLines),
+                DatabaseValue.of(testId),
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(targetLines),
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
@@ -87,9 +87,9 @@ public class IntentionDAO {
         );
 
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(mutant.getId()),
-                DB.getDBV(mutant.getGameId()),
-                DB.getDBV(intention.toString()),
+                DatabaseValue.of(mutant.getId()),
+                DatabaseValue.of(mutant.getGameId()),
+                DatabaseValue.of(intention.toString()),
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);

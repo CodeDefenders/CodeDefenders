@@ -26,7 +26,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -276,69 +275,4 @@ public class DB {
         }
     }
 
-    /**
-     * Creates a typed {@link DatabaseValue} for a given integer value.
-     * The given integer value can be {@code null}.
-     *
-     * @param value the given value as a {@link Integer}, can be {@code null}.
-     * @return a database value for a given integer.
-     */
-    public static DatabaseValue getDBV(Integer value) {
-        return new DatabaseValue<>(value);
-    }
-
-    /**
-     * Creates a typed {@link DatabaseValue} for a given long value.
-     * The given long value can be {@code null}.
-     *
-     * @param value the given value as a {@link Long}, can be {@code null}.
-     * @return a database value for a given long.
-     */
-    public static DatabaseValue getDBV(Long value) {
-        return new DatabaseValue<>(value);
-    }
-
-    /**
-     * Creates a typed {@link DatabaseValue} for a given float value.
-     * The given float value can be {@code null}.
-     *
-     * @param value the given value as a {@link Float}, can be {@code null}.
-     * @return a database value for a given float.
-     */
-    public static DatabaseValue getDBV(Float value) {
-        return new DatabaseValue<>(value);
-    }
-
-    /**
-     * Creates a typed {@link DatabaseValue} for a given string value.
-     * The given string value can be {@code null}.
-     *
-     * @param value the given value as a {@link String}, can be {@code null}.
-     * @return a database value for a given string.
-     */
-    public static DatabaseValue getDBV(String value) {
-        return new DatabaseValue<>(value);
-    }
-
-    /**
-     * Creates a typed {@link DatabaseValue} for a given timestamp.
-     * The given timestamp can be {@code null}.
-     *
-     * @param value the given value as a {@link java.sql.Timestamp}, can be {@code null}.
-     * @return a database value for a given timestamp.
-     */
-    public static DatabaseValue getDBV(Timestamp value) {
-        return new DatabaseValue<>(value);
-    }
-
-    /**
-     * Creates a typed {@link DatabaseValue} for a given boolean value.
-     * The given boolean value can be {@code null}.
-     *
-     * @param value the given value as a {@link Boolean}, can be {@code null}.
-     * @return a database value for a given boolean.
-     */
-    public static DatabaseValue getDBV(Boolean value) {
-        return new DatabaseValue<>(value);
-    }
 }

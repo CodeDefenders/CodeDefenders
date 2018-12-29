@@ -136,7 +136,7 @@ public class Test {
 		String query = "UPDATE tests SET Points = Points + ? WHERE Test_ID=?;";
 		Connection conn = DB.getConnection();
 
-		DatabaseValue[] valueList = new DatabaseValue[] { DB.getDBV(score), DB.getDBV(id) };
+		DatabaseValue[] valueList = new DatabaseValue[] { DatabaseValue.of(score), DatabaseValue.of(id) };
 
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
@@ -197,7 +197,7 @@ public class Test {
 		String query = "UPDATE tests SET MutantsKilled = MutantsKilled + ? WHERE Test_ID=?;";
 		Connection conn = DB.getConnection();
 
-		DatabaseValue[] valueList = new DatabaseValue[] { DB.getDBV(1), DB.getDBV(id) };
+		DatabaseValue[] valueList = new DatabaseValue[] { DatabaseValue.of(1), DatabaseValue.of(id) };
 
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
@@ -272,12 +272,12 @@ public class Test {
 		}
 
 		String query = "UPDATE tests SET mutantsKilled=?,NumberAiMutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantsKilled),
-				DB.getDBV(aiMutantsKilled),
-				DB.getDBV(linesCoveredString),
-				DB.getDBV(linesUncoveredString),
-				DB.getDBV(score),
-				DB.getDBV(id)
+		DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(mutantsKilled),
+				DatabaseValue.of(aiMutantsKilled),
+				DatabaseValue.of(linesCoveredString),
+				DatabaseValue.of(linesUncoveredString),
+				DatabaseValue.of(score),
+				DatabaseValue.of(id)
 		};
 
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);

@@ -59,7 +59,7 @@ public class CreatePreparedStatementTest {
             );
 
             final String name = "Manuel Neuer";
-            final PreparedStatement preparedStatement = DB.createPreparedStatement(connection, query, DB.getDBV(name));
+            final PreparedStatement preparedStatement = DB.createPreparedStatement(connection, query, DatabaseValue.of(name));
             assertNotNull(preparedStatement);
 
             final ParameterMetaData parameterMetaData = preparedStatement.getParameterMetaData();
@@ -88,12 +88,12 @@ public class CreatePreparedStatementTest {
 
             final DatabaseValue[] databaseValues = new DatabaseValue[4 + 19];
             final String name = null;
-            databaseValues[0] = DB.getDBV(name);
-            databaseValues[1] = DB.getDBV("number1");
-            databaseValues[2] = DB.getDBV(false);
-            databaseValues[3] = DB.getDBV(true);
+            databaseValues[0] = DatabaseValue.of(name);
+            databaseValues[1] = DatabaseValue.of("number1");
+            databaseValues[2] = DatabaseValue.of(false);
+            databaseValues[3] = DatabaseValue.of(true);
             for (int i = 4; i < databaseValues.length; i++) {
-                databaseValues[i] = DB.getDBV(i + 123);
+                databaseValues[i] = DatabaseValue.of(i + 123);
             }
 
             final PreparedStatement preparedStatement = DB.createPreparedStatement(connection, query, databaseValues);

@@ -50,10 +50,10 @@ public class FeedbackDAO {
         for (int i = 0; i < ratingsList.size(); i++) {
             int boundedValue = Math.min(Math.max(MIN_RATING, ratingsList.get(i)), MAX_RATING);
             List<DatabaseValue> valueList = Arrays.asList(
-                    DB.getDBV(userId),
-                    DB.getDBV(gameId),
-                    DB.getDBV(types.get(i).name()),
-                    DB.getDBV(boundedValue)
+                    DatabaseValue.of(userId),
+                    DatabaseValue.of(gameId),
+                    DatabaseValue.of(types.get(i).name()),
+                    DatabaseValue.of(boundedValue)
             );
             allValuesList.addAll(valueList);
             bob.append(queryValues);
@@ -85,7 +85,7 @@ public class FeedbackDAO {
             return true;
         };
 
-        List<Boolean> result = DB.executeQueryReturnList(query, mapper, DB.getDBV(gameId), DB.getDBV(userId));
+        List<Boolean> result = DB.executeQueryReturnList(query, mapper, DatabaseValue.of(gameId), DatabaseValue.of(userId));
         if (result.isEmpty()) {
             return Collections.emptyList();
         }
@@ -117,7 +117,7 @@ public class FeedbackDAO {
             return true;
         };
 
-        List<Boolean> result = DB.executeQueryReturnList(query, mapper, DB.getDBV(gameId));
+        List<Boolean> result = DB.executeQueryReturnList(query, mapper, DatabaseValue.of(gameId));
 
         if (result.isEmpty()) {
             return Collections.emptyList();
@@ -137,7 +137,7 @@ public class FeedbackDAO {
                 "RIGHT JOIN classes c ON g.Class_ID = c.Class_ID",
                 "GROUP BY c.Class_ID ORDER BY c.Class_ID;");
 
-        return DB.executeQueryReturnList(query, rs -> rs.getDouble(1), DB.getDBV(feedbackType.name()));
+        return DB.executeQueryReturnList(query, rs -> rs.getDouble(1), DatabaseValue.of(feedbackType.name()));
 	}
 
     // TODO Phil 28/12/18: pretty sure this doesn't result in the wanted behavior. This is ordered, but when trying to map to classes, the classes aren't ordered so the mapping just disappears.
@@ -154,6 +154,6 @@ public class FeedbackDAO {
                 "SELECT COUNT(DISTINCT User_ID) AS 'nb_feedbacks'",
                 "FROM ratings",
                 "WHERE Game_ID = ?;");
-        return DB.executeQueryReturnValue(query, rs -> rs.getInt(1), DB.getDBV(gameId));
+        return DB.executeQueryReturnValue(query, rs -> rs.getInt(1), DatabaseValue.of(gameId));
 	}
 }

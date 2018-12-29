@@ -60,9 +60,9 @@ public class DependencyDAO {
 
         String query = "INSERT INTO dependencies (Class_ID, JavaFile, ClassFile) VALUES (?, ?, ?);";
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(classId),
-                DB.getDBV(javaFile),
-                DB.getDBV(classFile)
+                DatabaseValue.of(classId),
+                DatabaseValue.of(javaFile),
+                DatabaseValue.of(classFile)
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
@@ -82,7 +82,7 @@ public class DependencyDAO {
     public static boolean removeDependencyForId(Integer id) {
         String query = "DELETE FROM dependencies WHERE Dependency_ID = ?;";
         DatabaseValue[] values = new DatabaseValue[]{
-                DB.getDBV(id),
+                DatabaseValue.of(id),
         };
 
         return DB.executeUpdateQuery(query, values);
@@ -108,7 +108,7 @@ public class DependencyDAO {
         final String range = bob.toString();
         String query = "DELETE FROM dependencies WHERE Dependency_ID in " + range;
 
-        DatabaseValue[] values = dependencies.stream().map(DB::getDBV).toArray(DatabaseValue[]::new);
+        DatabaseValue[] values = dependencies.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
 
         return DB.executeUpdateQuery(query, values);
     }
