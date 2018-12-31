@@ -155,7 +155,7 @@ public class UnitTesting extends HttpServlet {
 
 		File newTestDir = FileUtils.getNextSubDir(getServletContext().getRealPath(DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + TESTS_DIR + F_SEP + ownerId));
 
-		String javaFile = FileUtils.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
+		String javaFile = FileUtils.createJavaTestFile(newTestDir, classUnderTest.getBaseName(), testText);
 
 		if (! validTestCode(javaFile)) {
 			return null;

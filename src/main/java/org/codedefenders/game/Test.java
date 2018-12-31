@@ -28,14 +28,13 @@ import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -230,17 +229,8 @@ public class Test {
 		return DatabaseAccess.getKilledMutantsForTestId(id);
 	}
 
-	@SuppressWarnings("Duplicates")
 	private String getAsString() {
-		try {
-			return new String(Files.readAllBytes(Paths.get(javaFile)));
-		} catch (FileNotFoundException e) {
-			logger.error("Could not find file " + javaFile);
-			return "[File Not Found]";
-		} catch (IOException e) {
-			logger.error("Could not read file " + javaFile);
-			return "[File Not Readable]";
-		}
+		return FileUtils.readJavaFileWithDefault(Paths.get(javaFile));
 	}
 
 	@SuppressWarnings("Duplicates")

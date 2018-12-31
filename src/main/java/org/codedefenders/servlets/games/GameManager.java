@@ -476,7 +476,7 @@ public class GameManager extends HttpServlet {
 
 		File newTestDir = FileUtils.getNextSubDir(TESTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId + F_SEP + "original");
 
-		String javaFile = FileUtils.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
+		String javaFile = FileUtils.createJavaTestFile(newTestDir, classUnderTest.getBaseName(), testText);
 
 		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
 

@@ -332,7 +332,7 @@ public class Mutant implements Serializable {
 		if(  cut == null ){
 		    cut = GameClassDAO.getClassForId(classId);
 		}
-		return CollectionUtils.containsAny(cut.getLinesOfCompileTimeConstants(), getLines());
+		return CollectionUtils.containsAny(cut.getCompileTimeConstants(), getLines());
 	}
 
 	/**
