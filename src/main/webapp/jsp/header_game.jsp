@@ -31,6 +31,7 @@ pageTitle = null;
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.database.UserDAO" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 <% DuelGame game = (DuelGame) session.getAttribute("game"); %>
 
 <div class="game-container"><h2 class="full-width page-title" style="text-align: center"><%= pTitle %></h2>

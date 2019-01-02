@@ -104,7 +104,7 @@
                 <h4><b>How much do you agree with the following statements:</b></h4>
                 <br>
 
-                <form id="sendFeedback" action="feedback" method="post">
+                <form id="sendFeedback" action="<%=request.getContextPath() + Paths.API_FEEDBACK%>" method="post">
                     <input type="hidden" name="formType" value="sendFeedback">
                     <table class="table-hover table-striped table-responsive ">
                         <tbody>

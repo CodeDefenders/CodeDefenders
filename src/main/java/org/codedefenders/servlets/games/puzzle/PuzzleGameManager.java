@@ -15,7 +15,7 @@ import org.codedefenders.game.puzzle.solving.MutantSolvingStrategy;
 import org.codedefenders.game.puzzle.solving.TestSolvingStrategy;
 import org.codedefenders.servlets.games.GameManager;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -53,9 +53,9 @@ import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 
 /**
- * This {@link HttpServlet} handles retrieval and in-game management for {@link PuzzleGame}s.
+ * This {@link HttpServlet} handles retrieval and in-game management for {@link PuzzleGame PuzzleGames}.
  * <p>
- * {@code GET} requests allow accessing puzzle games and {@code POST} requests all creating of tests or mutants.
+ * {@code GET} requests allow accessing puzzle games and {@code POST} requests handle creating of tests or mutants.
  * <p>
  * Serves under {@code /puzzlegame}.
  *
@@ -80,19 +80,19 @@ public class PuzzleGameManager extends HttpServlet {
 
             if (game == null) {
                 logger.error("Cannot retrieve puzzle game page. Failed to retrieve puzzle game from database for gameId: {}.", gameId);
-                response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
+                response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
                 return;
             }
             if (game.getCreatorId() != userId) {
                 logger.error("Cannot retrieve puzzle game page. User {} is not creator of the requested game: {}.", userId, gameId);
-                response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
+                response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
                 return;
             }
         } else {
             final Integer puzzleId = getIntParameter(request, "puzzleId");
             if (puzzleId == null) {
                 logger.error("Cannot retrieve puzzle game page. Failed to retrieve gameId and puzzleId from request.");
-                response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
+                response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
                 return;
             }
             game = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, userId);
@@ -116,7 +116,7 @@ public class PuzzleGameManager extends HttpServlet {
                 break;
             default:
                 logger.error("Trying to enter puzzle game with illegal role {}", role);
-                response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
+                response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
         }
     }
 

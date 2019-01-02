@@ -30,7 +30,7 @@
 %>
 <div id="creategame" class="container">
     <p>
-        Before you can start games, please <a href="games/upload" class="text-center new-account">upload a class under
+        Before you can start games, please <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="text-center new-account">upload a class under
         test</a>.
     </p>
 </div>
@@ -47,7 +47,7 @@
     } else {
 %>
 <div id="creategame" class="container">
-    <form id="create" action="<%=request.getContextPath() %>/multiplayer/games" method="post"
+    <form id="create" action="<%=request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post"
           class="form-creategame-mp">
         <input type="hidden" name="formType" value="createGame">
         <table class="tableform">
@@ -62,7 +62,7 @@
                     </select>
                 </td>
                 <td width="17%">
-                    <a href="games/upload" class="text-center new-account">Upload Class</a>
+                    <a href="<%=Paths.CLASS_UPLOAD%>" class="text-center new-account">Upload Class</a>
                 </td>
             </tr>
             <!--

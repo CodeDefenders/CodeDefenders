@@ -32,6 +32,7 @@ import org.codedefenders.game.singleplayer.automated.defender.AiDefender;
 import org.codedefenders.servlets.util.Redirect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.codedefenders.util.Paths;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class GameSelectionManager extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		String contextPath = request.getContextPath();
-		response.sendRedirect(contextPath + "/games/user");
+		response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
 	}
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -80,7 +81,7 @@ public class GameSelectionManager extends HttpServlet {
 
                     if (rounds < 1 || rounds > 10) {
                         messages.add("Invalid rounds amount");
-                        response.sendRedirect(contextPath+"/games");
+                        response.sendRedirect(contextPath+ Paths.GAMES_OVERVIEW);
                         return;
                     }
 
@@ -143,7 +144,7 @@ public class GameSelectionManager extends HttpServlet {
                     messages.add("There was a problem with the form.");
                 }
 
-                response.sendRedirect(contextPath+"/games");
+                response.sendRedirect(contextPath+ Paths.GAMES_OVERVIEW);
 
 
                 break;

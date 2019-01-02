@@ -31,6 +31,7 @@ import com.gargoylesoftware.htmlunit.html.HtmlTableDataCell;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 
 import org.codedefenders.model.User;
+import org.codedefenders.util.Paths;
 import org.junit.Assert;
 
 import java.io.File;
@@ -63,7 +64,7 @@ public class HelperUser {
 
 	// This send the post only !
 	public HtmlPage doRegister() throws FailingHttpStatusCodeException, IOException {
-		WebRequest registerRequest = new WebRequest(new URL(codedefendersHome + "/login"), HttpMethod.POST);
+		WebRequest registerRequest = new WebRequest(new URL(codedefendersHome + Paths.LOGIN), HttpMethod.POST);
 		registerRequest.setRequestParameters(Arrays.asList(
 				new NameValuePair("formType", "create"),
 				new NameValuePair("username", user.getUsername()),
@@ -75,7 +76,7 @@ public class HelperUser {
 	}
 
 	public void doLogin() throws FailingHttpStatusCodeException, IOException {
-		WebRequest loginRequest = new WebRequest(new URL(codedefendersHome + "/login"), HttpMethod.POST);
+		WebRequest loginRequest = new WebRequest(new URL(codedefendersHome + Paths.LOGIN), HttpMethod.POST);
 		// // Then we set the request parameters
 		loginRequest.setRequestParameters(Arrays.asList(
 				new NameValuePair("formType", "login"),
@@ -100,14 +101,14 @@ public class HelperUser {
 		// List the games already there
 		Set<String> myGames = new HashSet<String>();
 		//
-		HtmlPage gameUsers = browser.getPage(codedefendersHome + "/games/user");
+		HtmlPage gameUsers = browser.getPage(codedefendersHome + Paths.GAMES_OVERVIEW);
 		for (HtmlAnchor a : gameUsers.getAnchors()) {
-			if (a.getHrefAttribute().contains("multiplayer/games?id=")) {
+			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_SELECTION + "?id=")) {
 				myGames.add(a.getHrefAttribute());
 			}
 		}
 
-		WebRequest createGameRequest = new WebRequest(new URL(codedefendersHome + "/multiplayer/games"),
+		WebRequest createGameRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_SELECTION),
 				HttpMethod.POST);
 		createGameRequest.setRequestParameters(Arrays.asList(
 				new NameValuePair("formType", "createGame"),
@@ -126,12 +127,12 @@ public class HelperUser {
 
 		gameUsers = browser.getPage(createGameRequest);
 		// Reload the game page
-		gameUsers = browser.getPage(codedefendersHome + "/games/user");
+		gameUsers = browser.getPage(codedefendersHome + Paths.GAMES_OVERVIEW);
 
 		String newGameLink = null;
 		// TODO Check that we get there ?
 		for (HtmlAnchor a : gameUsers.getAnchors()) {
-			if (a.getHrefAttribute().contains("multiplayer/games?id=")) {
+			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_SELECTION + "?id=")) {
 				if (!myGames.contains(a.getHrefAttribute())) {
 					newGameLink = a.getHrefAttribute();
 					break;
@@ -149,14 +150,14 @@ public class HelperUser {
 		// List the games already there
 		Set<String> myGames = new HashSet<String>();
 		//
-		HtmlPage gameUsers = browser.getPage(codedefendersHome + "/games/user");
+		HtmlPage gameUsers = browser.getPage(codedefendersHome + Paths.GAMES_OVERVIEW);
 		for (HtmlAnchor a : gameUsers.getAnchors()) {
-			if (a.getHrefAttribute().contains("multiplayer/games?id=")) {
+			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_SELECTION + "?id=")) {
 				myGames.add(a.getHrefAttribute());
 			}
 		}
 
-		WebRequest createGameRequest = new WebRequest(new URL(codedefendersHome + "/multiplayer/games"),
+		WebRequest createGameRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_SELECTION),
 				HttpMethod.POST);
 		createGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 				new NameValuePair("formType", "createGame"), new NameValuePair("class", "" + classID), //
@@ -170,12 +171,12 @@ public class HelperUser {
 
 		gameUsers = browser.getPage(createGameRequest);
 		// Reload the game page
-		gameUsers = browser.getPage(codedefendersHome + "/games/user");
+		gameUsers = browser.getPage(codedefendersHome + Paths.GAMES_OVERVIEW);
 
 		String newGameLink = null;
 		// TODO Check that we get there ?
 		for (HtmlAnchor a : gameUsers.getAnchors()) {
-			if (a.getHrefAttribute().contains("multiplayer/games?id=")) {
+			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_SELECTION + "?id=")) {
 				if (!myGames.contains(a.getHrefAttribute())) {
 					newGameLink = a.getHrefAttribute();
 					break;
@@ -191,7 +192,7 @@ public class HelperUser {
 
 	public HtmlPage startGame(int gameID) throws FailingHttpStatusCodeException, IOException {
 
-		WebRequest startGameRequest = new WebRequest(new URL(codedefendersHome + "/multiplayergame"), HttpMethod.POST);
+		WebRequest startGameRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_GAME), HttpMethod.POST);
 		// // Then we set the request parameters
 		startGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 				new NameValuePair("formType", "startGame"), new NameValuePair("mpGameID", "" + gameID) }));
@@ -210,14 +211,14 @@ public class HelperUser {
 	 * @throws IOException
 	 */
 	public HtmlPage joinOpenGame(int gameID, boolean isAttacker) throws FailingHttpStatusCodeException, IOException {
-		HtmlPage openGames = browser.getPage(codedefendersHome + "/games/user");
+		HtmlPage openGames = browser.getPage(codedefendersHome + Paths.GAMES_OVERVIEW);
 
 		// Really we can simply click on that link once we know the gameID,
 		// no need to go to openGame page
 		HtmlAnchor joinLink = null;
 		for (HtmlAnchor a : openGames.getAnchors()) {
 			if (a.getHrefAttribute()
-					.contains("multiplayer/games?" + ((isAttacker) ? "attacker" : "defender") + "=1&id=" + gameID)) {
+					.contains(Paths.BATTLEGROUND_SELECTION + "?" + ((isAttacker) ? "attacker" : "defender") + "=1&id=" + gameID)) {
 				joinLink = a;
 				break;
 			}
@@ -230,7 +231,7 @@ public class HelperUser {
 	}
 
 	public void attack(int mpGameID, String mutant) throws FailingHttpStatusCodeException, IOException {
-		WebRequest attackRequest = new WebRequest(new URL(codedefendersHome + "/multiplayergame"), HttpMethod.POST);
+		WebRequest attackRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_GAME), HttpMethod.POST);
 		// // Then we set the request parameters
 		attackRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 				new NameValuePair("formType", "createMutant"), new NameValuePair("mpGameID", "" + mpGameID),
@@ -247,7 +248,7 @@ public class HelperUser {
 	}
 
 	public void defend(int mpGameID, String test) throws FailingHttpStatusCodeException, IOException {
-		WebRequest defendRequest = new WebRequest(new URL(codedefendersHome + "/multiplayergame"), HttpMethod.POST);
+		WebRequest defendRequest = new WebRequest(new URL(codedefendersHome + Paths.BATTLEGROUND_GAME), HttpMethod.POST);
 		// curl -X POST \
 		// --data "formType=createTest&mpGameID=${gameId}" \
 		// --data-urlencode test@${test} \
@@ -270,10 +271,10 @@ public class HelperUser {
 
 	public void claimEquivalenceOnLine(int mpGameID, int line)
 			throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-		HtmlPage playPage = browser.getPage(codedefendersHome + "/multiplayer/play?id=" + mpGameID);
+		HtmlPage playPage = browser.getPage(codedefendersHome + "" + Paths.BATTLEGROUND_GAME + "?id=" + mpGameID);
 		HtmlAnchor claimEquivalenceLink = null;
 		for (HtmlAnchor a : playPage.getAnchors()) {
-			if (a.getHrefAttribute().contains("multiplayer/play?equivLine=" + line)) {
+			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?equivLine=" + line)) {
 				claimEquivalenceLink = a;
 				break;
 			}
@@ -289,10 +290,10 @@ public class HelperUser {
 	public void acceptEquivalence(int mpGameID)
 			throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 		// codedefendersHome+"/multiplayer/
-		HtmlPage playPage = browser.getPage(codedefendersHome + "/multiplayer/play?id=" + mpGameID);
+		HtmlPage playPage = browser.getPage(codedefendersHome + "" + Paths.BATTLEGROUND_GAME + "?id=" + mpGameID);
 		HtmlAnchor acceptEquivalenceLink = null;
 		for (HtmlAnchor a : playPage.getAnchors()) {
-			if (a.getHrefAttribute().contains("multiplayer/play?acceptEquiv=")) {
+			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquiv=")) {
 				acceptEquivalenceLink = a;
 				break;
 			}
@@ -311,9 +312,9 @@ public class HelperUser {
 
 	public void assertNoMoreEquivalenceDuels(int mpGameID)
 			throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-		HtmlPage playPage = browser.getPage(codedefendersHome + "/multiplayer/play?id=" + mpGameID);
+		HtmlPage playPage = browser.getPage(codedefendersHome + "" + Paths.BATTLEGROUND_GAME + "?id=" + mpGameID);
 		for (HtmlAnchor a : playPage.getAnchors()) {
-			if (a.getHrefAttribute().contains("multiplayer/play?acceptEquiv=")) {
+			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquiv=")) {
 				Assert.fail("On game " + mpGameID + " there is still an equivalence duel open");
 			}
 		}
@@ -321,9 +322,9 @@ public class HelperUser {
 
 	public void assertThereIsAnEquivalenceDuel(int mpGameID)
 			throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-		HtmlPage playPage = browser.getPage(codedefendersHome + "/multiplayer/play?id=" + mpGameID);
+		HtmlPage playPage = browser.getPage(codedefendersHome + "" + Paths.BATTLEGROUND_GAME + "?id=" + mpGameID);
 		for (HtmlAnchor a : playPage.getAnchors()) {
-			if (a.getHrefAttribute().contains("multiplayer/play?acceptEquiv=")) {
+			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquiv=")) {
 				return;
 			}
 		}
@@ -341,7 +342,7 @@ public class HelperUser {
 	 * @throws IOException
 	 */
 	public int uploadClass(File file) throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-		HtmlPage uploadPage = browser.getPage(codedefendersHome + "/upload");
+		HtmlPage uploadPage = browser.getPage(codedefendersHome + Paths.CLASS_UPLOAD);
 
 		// Class IDs before
 		//
@@ -355,14 +356,14 @@ public class HelperUser {
 
 		HtmlForm form = (HtmlForm) uploadPage.getElementById("formUpload");
 		Assert.assertNotNull(form);
-		form.setActionAttribute(codedefendersHome + "/upload");
+		form.setActionAttribute(codedefendersHome + Paths.CLASS_UPLOAD);
 		form.getInputByName("fileUploadCUT").setValueAttribute(file.getAbsolutePath());
 		form.<HtmlFileInput>getInputByName("fileUploadCUT").setContentType("image/png");// optional
 
 		((HtmlSubmitInput) uploadPage.getFirstByXPath("//*[@id='submit-button']/input")).click();
 
 		// Explicitly reload the page
-		uploadPage = browser.getPage(codedefendersHome + "/upload");
+		uploadPage = browser.getPage(codedefendersHome + Paths.CLASS_UPLOAD);
 
 		for (Object l : uploadPage.getByXPath("//*[@id='classList']/table/tbody/.//td[1]")) {
 			if (l instanceof HtmlTableDataCell) {

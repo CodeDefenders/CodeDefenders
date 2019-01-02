@@ -24,7 +24,7 @@
 
 
 <div id="creategame" class="container">
-	<form id="create" action="<%=request.getContextPath() %>/games" method="post" class="form-creategame">
+	<form id="create" action="<%=request.getContextPath() + Paths.DUEL_SELECTION%>" method="post" class="form-creategame">
 		<h2>Create Game</h2>
 		<input type="hidden" name="formType" value="createGame">
 		<table class="tableform">
@@ -38,7 +38,7 @@
 					</select>
 				</td>
 				<td>
-					<a href="games/upload" class="text-center new-account">Upload Class</a>
+					<a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="text-center new-account">Upload Class</a>
 				</td>
 			</tr>
 			<%-- Disable mode selection for release.

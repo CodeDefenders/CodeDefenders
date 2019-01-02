@@ -1,7 +1,27 @@
 package org.codedefenders.servlets;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.itests.IntegrationTest;
+import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.util.Constants;
+import org.junit.Assume;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,28 +48,8 @@ import javax.servlet.http.HttpSession;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItem;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.codedefenders.database.DatabaseConnection;
-import org.codedefenders.itests.IntegrationTest;
-import org.codedefenders.rules.DatabaseRule;
-import org.codedefenders.util.Constants;
-import org.junit.Assume;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
@@ -57,7 +57,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @PowerMockIgnore({"javax.tools.*" })
 @PrepareForTest({DatabaseConnection.class})
-public class UploadManagerTest {
+public class ClassUploadManagerTest {
 
     private ServletFileUpload fileUpload;
     private HttpServletRequest request;
@@ -171,7 +171,7 @@ public class UploadManagerTest {
         int availableBytes = inputStream.available();
 
         // Write the inputStream to a FileItem
-        File outFile = codedefendersHome.createTempFile("UploadManagerTest","");
+        File outFile = codedefendersHome.createTempFile("ClassUploadManagerTest","");
         outFile.deleteOnExit();
         
         String contentType = null;
@@ -221,7 +221,7 @@ public class UploadManagerTest {
         // We use sessions as well
         when(request.getSession()).thenReturn(session);
 
-        UploadManager uploadManager = new UploadManager();
+        ClassUploadManager uploadManager = new ClassUploadManager();
         // Force the class to use the mocked one
         uploadManager.setServletFileUpload(fileUpload);
         uploadManager.doPost(request, mockedResponse);

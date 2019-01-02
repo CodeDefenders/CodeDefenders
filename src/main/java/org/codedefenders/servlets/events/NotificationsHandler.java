@@ -49,7 +49,7 @@ import javax.servlet.http.HttpSession;
  * <p>
  * In this servlet, all {@link NotificationType NotificationTypes} are handled.
  * <p>
- * Serves on path: `/notifications`.
+ * Serves on path: `/api/notifications`.
  */
 public class NotificationsHandler extends HttpServlet {
 	private static final Logger logger = LoggerFactory.getLogger(NotificationsHandler.class);

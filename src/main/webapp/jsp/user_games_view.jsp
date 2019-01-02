@@ -33,6 +33,7 @@
 <% String pageTitle= null ; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <%
+	// TODO Phil 04/12/18: extract all that logic into the GamesOverview servlet
 	String atkName;
 	String defName;
 	int atkId;
@@ -148,7 +149,7 @@
 					btnLabel = "Enter";
 				}
 %>
-			<form id="enterGameForm" action="<%= request.getContextPath() %>/games" method="post">
+			<form id="enterGameForm" action="<%= request.getContextPath() + Paths.DUEL_SELECTION%>" method="post">
 				<input type="hidden" name="formType" value="enterGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
 				<% if (uid == turnId ) {%>
@@ -208,7 +209,7 @@
 					case CREATOR:
 						if (g.getState() == GameState.CREATED) {
 %>
-			<form id="adminStartBtn-<%=g.getId()%>" action="<%=request.getContextPath() %>/multiplayergame" method="post">
+			<form id="adminStartBtn-<%=g.getId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post">
 				<button type="submit" class="btn btn-sm btn-primary" id="startGame-<%=g.getId()%>" form="adminStartBtn-<%=g.getId()%>">
 					Start Game
 				</button>
@@ -218,7 +219,7 @@
 <%
 						} else {
 %>
-			<a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>" href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Observe</a>
+			<a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>" href="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>?id=<%= g.getId() %>">Observe</a>
 <%
 						}
 					break;
@@ -226,13 +227,13 @@
 						if(!g.getState().equals(GameState.CREATED)) {
 %>
 			<a class = "btn btn-sm btn-primary" id="<%="attack-"+g.getId()%>" style="background-color: #884466;border-color: #772233;"
-			   href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Attack</a>
+			   href="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>?id=<%= g.getId() %>">Attack</a>
 <%
 						} else {
 %>
 			Joined as Attacker
 			<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue()) { %>
-			<form id="attLeave" action="<%= request.getContextPath() %>/multiplayer/games" method="post">
+			<form id="attLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
 				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
 				<button class="btn btn-sm btn-danger" id="<%="leave-attacker-"+g.getId()%>" type="submit" form="attLeave" value="Leave">
@@ -247,13 +248,13 @@
 						if(!g.getState().equals(GameState.CREATED)) {
 %>
 			<a class = "btn btn-sm btn-primary" id="<%="defend-"+g.getId()%>" style="background-color: #446688;border-color: #225577"
-			   href="<%= request.getContextPath() %>/multiplayer/games?id=<%= g.getId() %>">Defend</a>
+			   href="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>?id=<%= g.getId() %>">Defend</a>
 <%
 						} else {
 %>
 			Joined as Defender
 			<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue()) { %>
-			<form id="defLeave" action="<%= request.getContextPath() %>/multiplayer/games" method="post">
+			<form id="defLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
 				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
 				<input type="hidden" name="game" value="<%=g.getId()%>">
 				<button class = "btn btn-sm btn-danger" id="<%="leave-defender-"+g.getId()%>" type="submit" form="defLeave" value="Leave">
@@ -286,8 +287,8 @@
 %>
 
 	<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue()) { %>
-	<a id="createBattleground" class = "btn btn-primary" href="<%=request.getContextPath()%>/multiplayer/games/create">Create Battleground</a>
-	<a id="createDuel" class = "btn btn-primary" href="<%=request.getContextPath()%>/games/create">Create Duel</a>
+	<a id="createBattleground" class = "btn btn-primary" href="<%=request.getContextPath() + Paths.BATTLEGROUND_CREATE%>">Create Battleground</a>
+	<a id="createDuel" class = "btn btn-primary" href="<%=request.getContextPath() + Paths.DUEL_CREATE%>">Create Duel</a>
 	<%}%>
 
 <%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue()) { %>
@@ -373,7 +374,7 @@
 			<td class="col-sm-1"></td>
 			<td class="col-sm-1"></td>
 			<td class="col-sm-2">
-			<form id="joinGameForm" action="<%=request.getContextPath() %>/games" method="post">
+			<form id="joinGameForm" action="<%=request.getContextPath() + Paths.DUEL_SELECTION%>" method="post">
 					<input type="hidden" name="formType" value="joinGame">
 					<input type="hidden" name="game" value=<%=g.getId()%>>
 					<button type="submit" id="<%="duel-join-"+g.getId()%>" class="btn btn-primary btn-sm" value="Join Game">Join Game</button>
@@ -428,11 +429,11 @@
 			<td class="col-sm-2">
 				<% if(g.getAttackerIds().length < g.getAttackerLimit()) { %>
 				<a class="btn btn-sm btn-primary" id="<%="join-attacker-"+g.getId()%>" style="background-color: #884466;border-color: #772233; margin-bottom: 3px;"
-				   href="<%=request.getContextPath()%>/multiplayer/games?attacker=1&id=<%= g.getId() %>">Join as Attacker</a>
+				   href="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>?attacker=1&id=<%= g.getId() %>">Join as Attacker</a>
 				<% } %>
 				<% if(g.getDefenderIds().length < g.getDefenderLimit()) { %>
 				<a class="btn btn-sm btn-primary" id="<%="join-defender-"+g.getId()%>" style="background-color: #446688;border-color: #225577"
-				   href="<%=request.getContextPath()%>/multiplayer/games?defender=1&id=<%= g.getId() %>">Join as Defender</a>
+				   href="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>?defender=1&id=<%= g.getId() %>">Join as Defender</a>
 				<% } %>
 			</td>
 		</tr>

@@ -26,6 +26,7 @@ import org.codedefenders.model.User;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.EmailUtils;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -113,7 +114,7 @@ public class LoginManager extends HttpServlet {
 						session.setAttribute("messages", messages);
 						// Log user activity including the timestamp
 						DatabaseAccess.logSession(newUser.getId(), getClientIpAddress(request));
-						response.sendRedirect(request.getContextPath() + "/games");
+						response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
 					} else {
 						// TODO: How about some error handling?
 						messages.add("Could not create a user for you, sorry!");
@@ -147,7 +148,7 @@ public class LoginManager extends HttpServlet {
 								storeApplicationDataInSession(session);
 
 								// Default redirect page: Home
-								String defaultRedirectTarget = request.getContextPath() + "/games";
+								String defaultRedirectTarget = request.getContextPath() + Paths.GAMES_OVERVIEW;
 								String redirectTarget = defaultRedirectTarget;
 
 								Object from = session.getAttribute("loginFrom");
@@ -165,7 +166,7 @@ public class LoginManager extends HttpServlet {
 									//  #140: after a POST to login we get a 302 to notifications
 									// This is the only place where we do a redirect to a target from a variable.
 									// So we avoid to redirect to notifications
-									if( redirectTarget.contains( Constants.NOTIFICATIONS ) ){
+									if( redirectTarget.contains( Paths.API_NOTIFICATION) ){
 										// Clean up the session to avoid possible recursion
 										session.removeAttribute("loginFrom");
 										// Reset to redirect target
@@ -201,14 +202,14 @@ public class LoginManager extends HttpServlet {
                     String resetPwSecret = generatePasswordResetSecret();
                     DatabaseAccess.setPasswordResetSecret(u.getId(), resetPwSecret);
                     String hostAddr = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
-                    String url = hostAddr + "/login?resetPW=" + resetPwSecret;
+                    String url = hostAddr + Paths.LOGIN + "?resetPW=" + resetPwSecret;
                     String msg = String.format(CHANGE_PASSWORD_MSG, u.getUsername(), url,
                             AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PASSWORD_RESET_SECRET_LIFESPAN).getIntValue());
                     if (EmailUtils.sendEmail(u.getEmail(), "Code Defenders Password reset", msg)) {
                         messages.add("A link for changing your password has been sent to " + email);
                     }
                 }
-                response.sendRedirect(request.getContextPath() + "/login");
+                response.sendRedirect(request.getContextPath() + Paths.LOGIN);
 				break;
 
 			case "changePassword":
@@ -216,7 +217,7 @@ public class LoginManager extends HttpServlet {
 				confirm = request.getParameter("inputConfirmPasswordChange");
 				password = request.getParameter("inputPasswordChange");
 
-				String responseURL = request.getContextPath() + "/login?resetPW=" + resetPwSecret;
+				String responseURL = request.getContextPath() + Paths.LOGIN + "?resetPW=" + resetPwSecret;
 				int userId = DatabaseAccess.getUserIDForPWResetSecret(resetPwSecret);
 				if (resetPwSecret != null && userId > -1) {
 					if (!(validPassword(password))) {
@@ -226,7 +227,7 @@ public class LoginManager extends HttpServlet {
 						user.setEncodedPassword(User.encodePassword(password));
 						if (user.update()) {
 							DatabaseAccess.setPasswordResetSecret(user.getId(), null);
-							responseURL = request.getContextPath() + "/login";
+							responseURL = request.getContextPath() + Paths.LOGIN;
 							messages.add("Successfully changed your Password.");
 						}
 					} else {
@@ -234,7 +235,7 @@ public class LoginManager extends HttpServlet {
 					}
 				} else {
 					messages.add("Your Password reset link is not valid or has expired");
-					responseURL = request.getContextPath() + "/login";
+					responseURL = request.getContextPath() + Paths.LOGIN;
 				}
 				response.sendRedirect(responseURL);
 				break;

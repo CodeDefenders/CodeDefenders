@@ -157,6 +157,7 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 <div class="menu-top bg-grey bg-plus-4 text-white" style="padding-bottom:0px;">
     <div class="full-width">
         <div class="nest">

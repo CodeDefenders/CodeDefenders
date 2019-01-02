@@ -35,7 +35,7 @@
     <% request.setAttribute("adminActivePage", "adminCreateGames"); %>
     <%@ include file="/jsp/admin_navigation.jsp" %>
 
-    <form id="insertGames" action="admin" method="post">
+    <form id="insertGames" action="<%=request.getContextPath() + Paths.ADMIN_PAGE%>" method="post">
         <input type="hidden" name="formType" value="insertGames"/>
         <h3>Staged Games</h3>
         <%
@@ -226,7 +226,7 @@
         %>
 
     </form>
-    <form id="users" action="admin" method="post">
+    <form id="users" action="<%=request.getContextPath() + Paths.ADMIN_PAGE%>" method="post">
         <input type="hidden" name="formType" value="createGame">
 
         <h3>Unassigned Users</h3>
@@ -360,7 +360,7 @@
                     <%}%>
                 </select>
                 <br/>
-                <a href="<%=request.getContextPath()%>/games/upload?fromAdmin=true"> Upload Class </a>
+                <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>?fromAdmin=true"> Upload Class </a>
             </div>
             <div class="col-sm-1"></div>
             <div class="col-sm-2">
@@ -828,7 +828,7 @@
         </button>
 
         <p>
-            If you just want to create a single open game without assigning players, you can also use the <a href="<%=request.getContextPath()%>/multiplayer/games/create?fromAdmin=true"> Create game</a> interface.
+            If you just want to create a single open game without assigning players, you can also use the <a href="<%=request.getContextPath() + Paths.BATTLEGROUND_CREATE%>?fromAdmin=true"> Create game</a> interface.
         </p>
 
             <script>

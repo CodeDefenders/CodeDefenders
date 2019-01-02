@@ -87,7 +87,7 @@
 				Defend!
 			</button>
 		</h3>
-		<form id="def" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post">
+		<form id="def" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post">
 			<%@include file="../game_components/test_editor.jsp"%>
 			<input type="hidden" name="formType" value="createTest">
 			<input type="hidden" name="mpGameID" value="<%= game.getId() %>" />

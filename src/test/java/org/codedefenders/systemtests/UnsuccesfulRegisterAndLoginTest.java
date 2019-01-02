@@ -21,6 +21,8 @@ package org.codedefenders.systemtests;
 import com.palantir.docker.compose.DockerComposeRule;
 import com.palantir.docker.compose.configuration.DockerComposeFiles;
 import com.palantir.docker.compose.connection.waiting.HealthChecks;
+
+import org.codedefenders.util.Paths;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -70,7 +72,7 @@ public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
         driver.findElement(By.id("submitCreateAccount")).click();
 
         /* Make sure the registration wasn't successful */
-        assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders/games/user");
+        assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders" + Paths.GAMES_OVERVIEW);
 	}
 
 
@@ -99,7 +101,7 @@ public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
         driver.findElement(By.id("submitCreateAccount")).click();
 
         /* Make sure the registration wasn't successful */
-        assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders/games/user");
+        assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders" + Paths.GAMES_OVERVIEW);
 	}
 
     /**
@@ -127,7 +129,7 @@ public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
         driver.findElement(By.id("submitCreateAccount")).click();
 
         /* Make sure the registration wasn't successful */
-        assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders/games/user");
+        assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders" + Paths.GAMES_OVERVIEW);
     }
 
     /**
@@ -155,7 +157,7 @@ public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
         driver.findElement(By.id("submitCreateAccount")).click();
 
         /* Make sure the registration wasn't successful */
-        assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders/games/user");
+        assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders" + Paths.GAMES_OVERVIEW);
 	}
 
 
@@ -184,6 +186,6 @@ public class UnsuccesfulRegisterAndLoginTest extends AbstractEmptyDBSystemTest {
         driver.findElement(By.id("submitCreateAccount")).click();
 
         /* Make sure the registration wasn't successful */
-        assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders/games/user");
+        assertURLDoesntEndWith(driver.getCurrentUrl(), "codedefenders" + Paths.GAMES_OVERVIEW);
 	}
 }

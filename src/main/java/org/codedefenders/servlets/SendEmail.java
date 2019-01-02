@@ -19,6 +19,7 @@
 package org.codedefenders.servlets;
 
 import org.codedefenders.util.EmailUtils;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,7 @@ import javax.servlet.http.HttpServletResponse;
  * This {@link HttpServlet} handles requests to send mails. Mails are sent
  * using {@link EmailUtils#sendEmailToSelf(String, String, String)}.
  * <p>
- * Serves on path: `/sendEmail`.
+ * Serves on path: `/api/sendmail`.
  */
 public class SendEmail extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(SendEmail.class);
@@ -61,6 +62,6 @@ public class SendEmail extends HttpServlet {
         }
 		request.getSession().setAttribute("emailSent", value);
 
-		response.sendRedirect(request.getContextPath() + "/contact");
+		response.sendRedirect(request.getContextPath() + Paths.CONTACT_PAGE);
 	}
 }

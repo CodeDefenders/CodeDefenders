@@ -19,6 +19,7 @@
 
 --%>
 <%@ page import="java.util.ArrayList" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 <%@ include file="/jsp/header_base.jsp" %>
 <script type="text/javascript">
     $(document).ready(function() {

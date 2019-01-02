@@ -99,7 +99,7 @@
             <h3>Write a new JUnit test here</h3>
 
             <form id="def"
-                  action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>"
+                  action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>"
                   method="post">
                 <button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
                         onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"

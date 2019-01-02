@@ -27,7 +27,7 @@
 	<div class="w-100 up">
 		<h2>Upload Class</h2>
 		<div id="divUpload" >
-			<form id="formUpload" action="<%=request.getContextPath() %>/upload" class="form-upload" method="post" enctype="multipart/form-data">
+			<form id="formUpload" action="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="form-upload" method="post" enctype="multipart/form-data">
 				<span class="label label-danger" id="invalid_alias" style="color: white;visibility: hidden">Name with no whitespaces or special characters.</span>
 				<input id="classAlias" onkeyup="validateAlias()" name="classAlias" type="text" class="form-control" placeholder="Optional class alias, otherwise class name is used" >
 				<!--
@@ -168,7 +168,7 @@
 							<td><%=testingDiff > 0 ? String.valueOf(testingDiff) : ""%></td>
 							<!--
 							<td>
-								<form id="aiPrepButton<%= c.getId() %>" action="<%=request.getContextPath() %>/ai_preparer" method="post" >
+								<form id="aiPrepButton<%= c.getId() %>" action="<%=request.getContextPath() + Paths.AI_PREPARER%>" method="post" >
 									<button type="submit" class="btn btn-primary btn-game btn-right" form="aiPrepButton<%= c.getId() %>" onClick="this.form.submit(); this.disabled=true; this.value='Preparing...';"
 											<% //if (PrepareAI.isPrepared(c)) { %> disabled <% //} %>>
 										Prepare AI

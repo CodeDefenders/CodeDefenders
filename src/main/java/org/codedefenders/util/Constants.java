@@ -109,6 +109,7 @@ public class Constants {
 
 	public static final String GRACE_PERIOD_MESSAGE = "Game is now in grace period.";
 
+	// JSP file paths
 	public static final String LOGIN_VIEW_JSP = "jsp" + F_SEP + "login_view.jsp";
 	public static final String UTESTING_VIEW_JSP = "jsp" + F_SEP + "utesting_view.jsp";
 
@@ -116,32 +117,24 @@ public class Constants {
 	public static final String DUEL_ATTACKER_VIEW_JSP = "jsp/duel/attacker_view.jsp";
 	public static final String DUEL_DEFENDER_VIEW_JSP = "jsp/duel/defender_view.jsp";
 
+    public static final String BATTLEGROUND_GAME_VIEW_JSP = "/jsp/battleground/game_view.jsp";
+
 	public static final String PUZZLE_OVERVIEW_VIEW_JSP = "/jsp/puzzle/puzzle_overview.jsp";
 	public static final String PUZZLE_GAME_ATTACKER_VIEW_JSP = "/jsp/puzzle/attacker_view.jsp";
 	public static final String PUZZLE_GAME_DEFENDER_VIEW_JSP = "/jsp/puzzle/defender_view.jsp";
 
-	public static final String ADMIN_USER_JSP = "/jsp" + F_SEP + "admin_user_mgmt.jsp";
-	public static final String ADMIN_GAMES_JSP = "/jsp" + F_SEP + "admin_create_games.jsp";
-	public static final String ADMIN_SETTINGS_JSP = "/jsp" + F_SEP + "admin_system_settings.jsp";
-	public static final String ADMIN_MONITOR_JSP = "/jsp" + F_SEP + "admin_monitor_games.jsp";
-	public static final String ADMIN_ANALYTICS_USERS_JSP = "/jsp" + F_SEP + "admin_analytics_users.jsp";
-	public static final String ADMIN_ANALYTICS_CLASSES_JSP = "/jsp" + F_SEP + "admin_analytics_classes.jsp";
-	public static final String ADMIN_ANALYTICS_KILLMAP_JSP = "/jsp" + F_SEP + "admin_analytics_killmaps.jsp";
+	public static final String USER_GAMES_OVERVIEW_JSP = "/jsp/user_games_view.jsp";
+    public static final String CLASS_UPLOAD_VIEW_JSP = "/jsp/upload_class_view.jsp";
 
-	public static final String NOTIFICATIONS = "/notifications";
+	public static final String ADMIN_USER_JSP = "/jsp/admin_user_mgmt.jsp";
+	public static final String ADMIN_GAMES_JSP = "/jsp/admin_create_games.jsp";
+	public static final String ADMIN_SETTINGS_JSP = "/jsp/admin_system_settings.jsp";
+	public static final String ADMIN_MONITOR_JSP = "/jsp/admin_monitor_games.jsp";
+	public static final String ADMIN_ANALYTICS_USERS_JSP = "/jsp/admin_analytics_users.jsp";
+	public static final String ADMIN_ANALYTICS_CLASSES_JSP = "/jsp/admin_analytics_classes.jsp";
+	public static final String ADMIN_ANALYTICS_KILLMAP_JSP = "/jsp/admin_analytics_killmaps.jsp";
 
-    public static final String PUZZLE_OVERVIEW_PATH = "/puzzles";
-    public static final String PUZZLE_GAME_PATH = "/puzzlegame";
-    public static final String PUZZLE_GAME_SELECTION_PATH = "/puzzle/games";
-
-	public static final String ADMIN_ANALYTICS_USERS = "/admin/analytics/users";
-	public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";
-	public static final String ADMIN_ANALYTICS_KILLMAPS = "/admin/analytics/killmaps";
-
-	public static final String API_ANALYTICS_USERS = "/api/users";
-	public static final String API_ANALYTICS_CLASSES = "/api/classes";
-
-	// Messages
+    // Messages
 	public static final String WINNER_MESSAGE = "You won!";
 	public static final String LOSER_MESSAGE = "You lost!";
 	public static final String DRAW_MESSAGE = "It was a draw!";

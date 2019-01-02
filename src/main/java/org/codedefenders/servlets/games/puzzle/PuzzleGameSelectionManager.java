@@ -6,7 +6,7 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,8 +22,6 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.codedefenders.servlets.util.GameServletUtils.getGameId;
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
-import static org.codedefenders.util.Constants.PUZZLE_GAME_PATH;
-import static org.codedefenders.util.Constants.PUZZLE_OVERVIEW_PATH;
 import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
 
 /**
@@ -42,7 +40,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.sendRedirect(ctx(request) + Constants.PUZZLE_OVERVIEW_PATH);
+        response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
     }
 
     @Override
@@ -103,7 +101,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
 
         request.setAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME, game);
 
-        String path = ctx(request) + PUZZLE_GAME_PATH + "?gameId=" + game.getId();
+        String path = ctx(request) + Paths.PUZZLE_GAME + "?gameId=" + game.getId();
         response.sendRedirect(path);
     }
 
@@ -156,6 +154,6 @@ public class PuzzleGameSelectionManager extends HttpServlet {
         game.setState(GameState.FAILED);
         game.update();
 
-        response.sendRedirect(ctx(request) + PUZZLE_OVERVIEW_PATH);
+        response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
     }
 }

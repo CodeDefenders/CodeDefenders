@@ -22,7 +22,7 @@
 
 <%--
     Adds a JavaScript function progressBar() that inserts and updates a progressbar showing the status of the last
-    submitted mutant. The progressbar is inserted after #logout. It reads the mutant status from /notifications.
+    submitted mutant. The progressbar is inserted after #logout. It reads the mutant status from /api/notifications.
 
     @param Integer gameId
         The id of the game.
@@ -69,7 +69,7 @@
         }
         // Do a first request right away, such that compilation of this test is hopefully not yet started. This one will set the session...
 
-        var updateURL = "<%= request.getContextPath()%>/notifications?type=<%=NotificationType.PROGRESSBAR%>&progressBar=1&gameId=" + <%= gameIdTODORENAME %>;
+        var updateURL = "<%= request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.PROGRESSBAR%>&progressBar=1&gameId=" + <%= gameIdTODORENAME %>;
         updateProgressBar(updateURL);
 
         // Register the requests to start in 1 sec

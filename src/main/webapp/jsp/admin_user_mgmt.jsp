@@ -39,7 +39,7 @@
     <h3>Edit Info for User <%=u.getId()%>
     </h3>
 
-    <form id="editUser" action="admin/users" method="post">
+    <form id="editUser" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post">
         <input type="hidden" name="formType" value="editUser">
         <input type="hidden" name="uid" value="<%=u.getId()%>">
         <div class="input-group">
@@ -87,7 +87,7 @@
 
     <h3>Users</h3>
 
-    <form id="manageUsers" action="admin/users" method="post">
+    <form id="manageUsers" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post">
         <input type="hidden" name="formType" value="manageUsers">
 
         <table id="tableUsers"
@@ -192,7 +192,7 @@
 
     <h3>Create Accounts</h3>
 
-    <form id="createUsers" action="admin/users" method="post">
+    <form id="createUsers" action="<%=request.getContextPath() + Paths.ADMIN_USERS%>" method="post">
         <input type="hidden" name="formType" value="createUsers">
 
         <div class="form-group">

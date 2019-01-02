@@ -47,7 +47,7 @@
     }
 
     if (redirectToGames){
-        response.sendRedirect(request.getContextPath()+"/games/user");
+        response.sendRedirect(request.getContextPath()+ Paths.GAMES_OVERVIEW);
         return;
     }
 %>
@@ -90,13 +90,13 @@
                 role = Role.ATTACKER;
             }
         } else {
-            response.sendRedirect(request.getContextPath() + "/games/user");
+            response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
             return;
         }
     }
 
     if ((game.getState().equals(GameState.CREATED) || game.getState().equals(GameState.FINISHED)) && (!role.equals(Role.CREATOR))) {
-        response.sendRedirect(request.getContextPath()+"/games/user");
+        response.sendRedirect(request.getContextPath()+ Paths.GAMES_OVERVIEW);
         return;
     }
 
@@ -171,7 +171,7 @@
 			if (noneCovered && !game.isMarkUncovered()) {
 				// equivLine is not covered, possible iff passed directly as url argument
 				messages.add(MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
-				response.sendRedirect(request.getContextPath() + "/multiplayer/play");
+				response.sendRedirect(request.getContextPath() + Paths.BATTLEGROUND_GAME);
 				return;
 			}
 
@@ -190,7 +190,7 @@
 					: String.format("Flagged %d mutant%s as equivalent", nClaimed,
 							(nClaimed == 1 ? "" : 's'));
 			messages.add(flaggingMessage);
-			response.sendRedirect(request.getContextPath() + "/multiplayer/play");
+			response.sendRedirect(request.getContextPath() + Paths.BATTLEGROUND_GAME);
             return;
         } catch (NumberFormatException e) {
             logger.error("Can't parse equivalent line numbers", e);
@@ -216,7 +216,7 @@
                             new Timestamp(System.currentTimeMillis()));
                     notifEquiv.insert();
 
-                    response.sendRedirect(request.getContextPath()+"/multiplayer/play");
+                    response.sendRedirect(request.getContextPath()+ Paths.BATTLEGROUND_GAME);
                     return;
                 }
             }
@@ -299,7 +299,7 @@
             %><%@ include file="/jsp/battleground/creator_view.jsp" %><%
             break;
         default:
-            response.sendRedirect(request.getContextPath()+"/games/user");
+            response.sendRedirect(request.getContextPath()+ Paths.GAMES_OVERVIEW);
             return;
     }
 %>

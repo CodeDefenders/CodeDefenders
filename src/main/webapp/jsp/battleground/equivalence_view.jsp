@@ -86,13 +86,13 @@
             </script>
 
             <h3>Not equivalent? Write a killing test here:</h3>
-            <form id="equivalenceForm" action="<%= request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() %>" method="post">
+            <form id="equivalenceForm" action="<%= request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
                 <input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= equivMutant.getId() %>">
                 <input type="hidden" name="formType" value="resolveEquivalence">
 
                 <%@include file="../game_components/test_editor.jsp"%>
 
-                <a onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');" href="<%=request.getContextPath() %>/multiplayer/play?acceptEquiv=<%= equivMutant.getId() %>"><button type="button" class="btn btn-danger btn-left">Accept Equivalence</button></a>
+                <a onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');" href="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>?acceptEquiv=<%= equivMutant.getId() %>"><button type="button" class="btn btn-danger btn-left">Accept Equivalence</button></a>
                 <button form="equivalenceForm" class="btn btn-primary btn-game btn-right" name="rejectEquivalent" type="submit" onclick="progressBar(); this.from.submit();">Submit Killing Test</button>
 
                 <div>

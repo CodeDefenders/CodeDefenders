@@ -67,11 +67,13 @@
 </head>
 
 <body>
+<%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.game.duel.DuelGame" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="static org.codedefenders.game.GameState.FINISHED" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="java.util.ArrayList" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 <% DuelGame uTestingSession = (DuelGame) session.getAttribute("game"); %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -108,7 +110,7 @@
     </div>
 </nav>
 
-<form id="logout" action="<%=request.getContextPath() %>/login" method="post">
+<form id="logout" action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post">
     <input type="hidden" name="formType" value="logOut">
 </form>
 
@@ -149,7 +151,7 @@
             <button type="submit" class="btn btn-primary btn-game btn-right" form="def">Submit</button>
             <%} %>
         </h3>
-        <form id="def" action="<%=request.getContextPath() %>/utesting" method="post">
+        <form id="def" action="<%=request.getContextPath() + Paths.UTESTING_PATH%>" method="post">
             <%
                 String testCode;
                 String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
