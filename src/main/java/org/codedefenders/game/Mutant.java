@@ -25,6 +25,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
@@ -140,7 +141,7 @@ public class Mutant implements Serializable {
 		this.gameId = gameId;
 		this.classId = classId;
 		// FIXME: Why is this limited to a duel game?
-		final DuelGame game = DatabaseAccess.getGameForKey("ID", gameId);
+		final DuelGame game = DuelGameDAO.getDuelGameForId(gameId);
 		if (game != null) {
 			this.roundCreated = game.getCurrentRound();
 		}
@@ -261,7 +262,7 @@ public class Mutant implements Serializable {
 		Connection conn = DB.getConnection();
 
 		DatabaseValue[] valueList = new DatabaseValue[]{
-				DB.getDBV(score), DB.getDBV(id)
+				DatabaseValue.of(score), DatabaseValue.of(id)
 		};
 
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -279,7 +280,8 @@ public class Mutant implements Serializable {
 	// TODO Phil 12/12/18: extract database logic to MutantDAO
 	public boolean kill(Equivalence equivalent) {
 		alive = false;
-		roundKilled = DatabaseAccess.getGameForKey("ID", gameId).getCurrentRound();
+		// FIXME: Why will only work for Duel Games since multiplayer games do not have rounds.
+		roundKilled = DuelGameDAO.getDuelGameForId(gameId).getCurrentRound();
 		setEquivalent(equivalent);
 
 		// This should be blocking
@@ -294,10 +296,10 @@ public class Mutant implements Serializable {
 			query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=? WHERE Mutant_ID=? AND Alive=1;";
 		}
 
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(equivalent.name()),
-				DB.getDBV(sqlAlive()),
-				DB.getDBV(roundKilled),
-				DB.getDBV(id)};
+		DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(equivalent.name()),
+				DatabaseValue.of(sqlAlive()),
+				DatabaseValue.of(roundKilled),
+				DatabaseValue.of(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		//
 		return DB.executeUpdate(stmt, conn);
@@ -330,7 +332,7 @@ public class Mutant implements Serializable {
 		if(  cut == null ){
 		    cut = GameClassDAO.getClassForId(classId);
 		}
-		return CollectionUtils.containsAny(cut.getLinesOfCompileTimeConstants(), getLines());
+		return CollectionUtils.containsAny(cut.getCompileTimeConstants(), getLines());
 	}
 
 	/**
@@ -340,7 +342,8 @@ public class Mutant implements Serializable {
 		if (alive) {
 			// if mutant is alive, as many points as rounds it has survived
 			// TODO: as many points as tests it has survived?
-			DuelGame g = DatabaseAccess.getGameForKey("ID", gameId);
+			// FIXME: Why will only work for Duel Games since multiplayer games do not have rounds.
+			DuelGame g = DuelGameDAO.getDuelGameForId(gameId);
 			int points = g.getCurrentRound() - roundCreated; // rounds survived
 			if (g.getState().equals(GameState.FINISHED))
 				points++; // add a point for the last round if the game has finished
@@ -466,12 +469,12 @@ public class Mutant implements Serializable {
 
 		// We cannot update killed mutants
 		String query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, NumberAiKillingTests=?, Points=? WHERE Mutant_ID=? AND Alive=1;";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(equivalent.name()),
-				DB.getDBV(sqlAlive()),
-				DB.getDBV(roundKilled),
-				DB.getDBV(killedByAITests),
-				DB.getDBV(score),
-				DB.getDBV(id)};
+		DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(equivalent.name()),
+				DatabaseValue.of(sqlAlive()),
+				DatabaseValue.of(roundKilled),
+				DatabaseValue.of(killedByAITests),
+				DatabaseValue.of(score),
+				DatabaseValue.of(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
 		return DB.executeUpdate(stmt, conn);
@@ -484,7 +487,7 @@ public class Mutant implements Serializable {
 	public int getTimesKilledAi() {
 		if (killedByAITests == 0) {
 			//Retrieve from DB.
-			killedByAITests = DatabaseAccess.getNumTestsKillMutant(getId());
+			killedByAITests = MutantDAO.getNumTestsKillMutant(getId());
 		}
 		return killedByAITests;
 	}

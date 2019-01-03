@@ -28,277 +28,252 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.TimeUnit;
 
 import javax.naming.NamingException;
 
 /**
- * Implements the <code>Singleton</code>-pattern and object pooling. Handles
- * connections to the database by queuing them. Also checks the database driver
- * upon initialization and tries to refresh connections once if they do not work
- * when returned.
+ * This class manages database connection by collecting connections in a pool which can be queried.
+ * Queried connections have to be released to the pool again, otherwise the pool is leaking.
  *
- * @author wendling
+ * Available connections are handled in a {@link Queue}.
+ *
+ * The connection pool limits the number of instances to one. The instance can
+ * get retrieved using {@link #instance()}.
  */
 public final class ConnectionPool {
-	private static ConnectionPool connectionPool;
-	private List<Connection> connections;
-	private Queue<Connection> availableConnections;
-	private Logger logger = LoggerFactory.getLogger(ConnectionPool.class.getName());
+    private Logger logger = LoggerFactory.getLogger(ConnectionPool.class.getName());
 
-	private static int MAX_RETRIES = 5;
-	private static long RETRY_TIMEOUT = 5000;
+    private static ConnectionPool INSTANCE;
 
-	/**
-	 * Amount of time a thread waits to be notified of newly available connections.
-	 */
-	private int waitingTime;
+    private static final int MAX_RETRIES = 5;
+    private static final long RETRY_TIMEOUT = 5000;
 
-	/**
-	 * Number of constantly open connections.
-	 */
-	private int nbConnections;
+    private List<Connection> connections;
+    private Queue<Connection> availableConnections;
+    /**
+     * Amount of time a thread waits to be notified of newly available connections.
+     */
+    private long waitingTime = TimeUnit.SECONDS.toMillis(5);
 
-	private ConnectionPool() {
-		init();
-	}
+    /**
+     * Number of constantly open connections.
+     */
+    private int nbConnections = 20;
 
-	/**
-	 * Initializes the connections list and queue of available connections.
-	 */
-	private void init() {
-		for (int i = 1; i <= MAX_RETRIES; i++) {
-			logger.info("Initializing ConnectionPool... (retry " + i + " of "+ MAX_RETRIES + ")");
-			try {
-				Connection conn = DatabaseConnection.getConnection();
-				getParametersFromDB(conn);
-				conn.close();
-				// If we managed to connect, we can proceed. Otherwise, we retry
-				break;
-			} catch (StorageException | NamingException | SQLException e) {
-				logger.warn("Cannot connect to the Database", e);
-				if (i == MAX_RETRIES) {
-					logger.warn("Give up and fail deployment");
-					throw new StorageException("Could not initialize the database. Aborting.");
-				} else {
-					try {
-						logger.info("Retry connecting to DB in " + RETRY_TIMEOUT + " msec ");
-						Thread.sleep(RETRY_TIMEOUT);
-					} catch (InterruptedException e1) {
-						// Ignored
-					}
-				}
-			}
-		}
+    /**
+     * @return the connection pool. There should always only be one instance.
+     */
+    public static synchronized ConnectionPool instance() {
+        if (INSTANCE == null) {
+            INSTANCE = new ConnectionPool();
+        }
+        return INSTANCE;
+    }
 
-		Connection newConnection = null;
-		availableConnections = new LinkedList<>();
-		connections = new ArrayList<>();
+    private ConnectionPool() {
+        init();
+    }
 
-		try {
-			for (int i = 0; i < nbConnections; ++i) {
-				newConnection = refresh(newConnection);
-				connections.add(newConnection);
-				availableConnections.add(connections.get(i));
-			}
-		} catch (SQLException e) {
-			logger.error("SQL exception while opening connections.", e);
-			closeDBConnections();
-			throw new StorageException();
-		}
-		logger.info("ConnectionPool initialized with " + nbConnections + " connections.");
-	}
+    /**
+     * Initializes the connections list and queue of available connections.
+     */
+    private void init() {
+        for (int i = 1; i <= MAX_RETRIES; i++) {
+            logger.info("Initializing ConnectionPool... (retry " + i + " of " + MAX_RETRIES + ")");
+            try {
+                Connection conn = DatabaseConnection.getConnection();
+                getParametersFromDB(conn);
+                conn.close();
+                // If we managed to connect, we can proceed. Otherwise, we retry
+                break;
+            } catch (NamingException | SQLException e) {
+                logger.warn("Cannot connect to the Database", e);
+                if (i == MAX_RETRIES) {
+                    logger.warn("Give up and fail deployment");
+                    throw new NoMoreConnectionsException("Could not initialize the database. Aborting.");
+                } else {
+                    try {
+                        logger.info("Retry connecting to DB in " + RETRY_TIMEOUT + " msec ");
+                        Thread.sleep(RETRY_TIMEOUT);
+                    } catch (InterruptedException e1) {
+                        // Ignored
+                    }
+                }
+            }
+        }
 
-	/**
-	 * Returns the singleton object.
-	 *
-	 * @return single <code> ConnectionPool</code> object.
-	 */
-	public static synchronized ConnectionPool getInstanceOf() {
-		if (connectionPool == null) {
-			connectionPool = new ConnectionPool();
-		}
-		return connectionPool;
-	}
+        Connection newConnection;
+        availableConnections = new LinkedList<>();
+        connections = new ArrayList<>();
 
-	/**
-	 * Closes all data base connections in the queue.
-	 */
-	public void closeDBConnections() {
-		logger.info("Closing ConnectionPool connections...");
-		// Needed to avoid ConcurrentModificationException when iterating
-		// and removing
-		List<Connection> closedConnections = new ArrayList<Connection>();
-		try {
-			for (Connection connection : connections) {
-				connection.close();
-				availableConnections.remove(connection);
-				closedConnections.add(connection);
-			}
+        try {
+            for (int i = 0; i < nbConnections; ++i) {
+                newConnection = refreshConnection();
+                connections.add(newConnection);
+                availableConnections.add(connections.get(i));
+            }
+        } catch (SQLException e) {
+            logger.error("SQL exception while opening connections.", e);
+            closeDBConnections();
+            throw new UncheckedSQLException(e);
+        }
+        logger.info("ConnectionPool initialized with " + nbConnections + " connections.");
+    }
 
-		} catch (SQLException e) {
-			logger.warn("SQL exception while closing connections.");
-			throw new StorageException();
-		} finally {
-			connections.removeAll(closedConnections);
-		}
-		logger.info("Closed ConnectionPool connections successfully.");
-		connectionPool = null;
-	}
+    /**
+     * Closes all data base connections in the queue.
+     */
+    public void closeDBConnections() {
+        logger.info("Closing ConnectionPool connections...");
+        // Needed to avoid ConcurrentModificationException when iterating
+        // and removing
+        List<Connection> closedConnections = new ArrayList<>();
+        try {
+            for (Connection connection : connections) {
+                connection.close();
+                availableConnections.remove(connection);
+                closedConnections.add(connection);
+            }
 
-	/**
-	 * Returns an unused connection from the queue. Tries to refresh connections
-	 * once if they do not work.
-	 *
-	 * @return a free connection or null if none is available.
-	 * @throws NoMoreConnectionsException if there are no free connections
-	 */
-	public synchronized Connection getDBConnection() throws NoMoreConnectionsException {
-		Connection returnConn;
-		if (availableConnections.peek() != null) {
-			returnConn = availableConnections.poll();
-		} else {
-			try {
-				wait(waitingTime);
-			} catch (InterruptedException e) {
-				logger.warn("The DB thread was interrupted while waiting for a connection.");
-				throw new Error();
-			}
-			if (availableConnections.peek() == null) {
-				logger.warn("Threw NoMoreConnectionsException.");
-				throw new NoMoreConnectionsException();
-			}
-			returnConn = availableConnections.poll();
-		}
-		try {
-			returnConn.createStatement().execute("SELECT 1;");
-		} catch (SQLException e) {
-			logger.info("Refreshing SQL connection: " + returnConn + ".");
-			try {
-				returnConn = refresh(returnConn);
-				if (returnConn.isClosed() || !returnConn.createStatement().execute("SELECT 1;")) {
-					logger.error("Connection could not be refreshed.");
-					throw new StorageException();
-				}
-				logger.info("SQL connection " + returnConn + " refreshed successfully.");
-			} catch (SQLException e1) {
-				logger.error("SQL exception while refreshing connection: " + returnConn + ".", e1);
-				throw new StorageException();
-			}
+        } catch (SQLException e) {
+            logger.warn("SQL exception while closing connections.", e);
+            // otherwise ignored
+        } finally {
+            connections.removeAll(closedConnections);
+        }
+        logger.info("Closed ConnectionPool connections successfully.");
+        INSTANCE = null;
+    }
 
-		}
-		return returnConn;
-	}
+    /**
+     * Returns an unused connection from the queue. Tries to refreshConnection connections
+     * once if they do not work.
+     *
+     * @return a free connection or null if none is available.
+     * @throws NoMoreConnectionsException if there are no free connections
+     */
+    synchronized Connection getDBConnection() throws NoMoreConnectionsException {
+        Connection returnConn;
+        if (availableConnections.peek() != null) {
+            returnConn = availableConnections.poll();
+        } else {
+            try {
+                wait(waitingTime);
+            } catch (InterruptedException e) {
+                logger.warn("The DB thread was interrupted while waiting for a connection.");
+                throw new Error();
+            }
+            if (availableConnections.peek() == null) {
+                logger.warn("Threw NoMoreConnectionsException.");
+                throw new NoMoreConnectionsException("No connections available.");
+            }
+            returnConn = availableConnections.poll();
+        }
+        try {
+            returnConn.createStatement().execute("SELECT 1;");
+        } catch (SQLException e) {
+            logger.info("Refreshing SQL connection: " + returnConn + ".");
+            try {
+                returnConn = refreshConnection();
+                if (returnConn.isClosed() || !returnConn.createStatement().execute("SELECT 1;")) {
+                    logger.error("Connection could not be refreshed.");
+                    throw new NoMoreConnectionsException("No connections available. Refreshed connection is closed or failed to execute statement");
+                }
+                logger.info("SQL connection {} refreshed successfully.", returnConn);
+            } catch (SQLException e1) {
+                logger.error("SQL exception while refreshing connection: " + returnConn + ".", e1);
+                throw new NoMoreConnectionsException("No connections available.");
+            }
 
-	private Connection refresh(Connection returnConn) throws SQLException {
-		try {
-			return DatabaseConnection.getConnection();
-		} catch (NamingException e) {
-			logger.warn("JDBC Driver not found.", e);
-			throw new StorageException();
-		}
-	}
+        }
+        return returnConn;
+    }
 
-	/**
-	 * Releases a previously gotten connection so it is usable for other objects
-	 * again.
-	 *
-	 * @param connection to be released.
-	 */
-	public synchronized void releaseDBConnection(Connection connection) {
-		if (connection != null) {
-			availableConnections.add(connection);
-			/* disabled as currently we are using autocommit
-			try {
-				connection.rollback();
-			} catch (SQLException e) {
-				logger.error("SQL exception while releasing connections and "
-						+ "rolling back transactions.", e);
-				throw new StorageException(e.getMessage());
-			}*/
-			notifyAll();
-		}
-	}
+    private Connection refreshConnection() throws SQLException {
+        try {
+            return DatabaseConnection.getConnection();
+        } catch (NamingException e) {
+            logger.warn("JDBC Driver not found.", e);
+            throw new UncheckedSQLException("Could not update database connection.");
+        }
+    }
 
-	public void updateSize(int newSize) {
-		if (newSize < nbConnections) {
-			for (int i = newSize; i < nbConnections; i++) {
-				Connection conn = connections.get(i);
+    /**
+     * Releases a previously gotten connection so it is usable for other objects
+     * again.
+     *
+     * @param connection to be released.
+     */
+    synchronized void releaseDBConnection(Connection connection) {
+        if (connection != null) {
+            availableConnections.add(connection);
+            notifyAll();
+        }
+    }
+
+    public void updateSize(int newSize) {
+        if (newSize < nbConnections) {
+            for (int i = newSize; i < nbConnections; i++) {
+                Connection conn = connections.get(i);
                 availableConnections.remove(conn);
-				try {
-					conn.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			nbConnections = newSize;
-			connections = connections.subList(0, nbConnections);
-		} else if (newSize > nbConnections) {
-			Connection newConnection = null;
-			for (int i = nbConnections; i < newSize; i++) {
-				try {
-					newConnection = refresh(newConnection);
-					connections.add(newConnection);
-					availableConnections.add(connections.get(i));
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			nbConnections = newSize;
-		}
-	}
+                try {
+                    conn.close();
+                } catch (SQLException e) {
+                    logger.error("Failed to remove database connection from the pool.", e);
+                }
+            }
+            nbConnections = newSize;
+            connections = connections.subList(0, nbConnections);
+        } else if (newSize > nbConnections) {
+            for (int i = nbConnections; i < newSize; i++) {
+                try {
+                    Connection newConnection = refreshConnection();
+                    connections.add(newConnection);
+                    availableConnections.add(connections.get(i));
+                } catch (SQLException e) {
+                    logger.error("Failed to add database connection to the pool.", e);
+                }
+            }
+            nbConnections = newSize;
+        }
+    }
 
-	public void updateWaitingTime(int newWaitingTime) {
-		waitingTime = newWaitingTime;
-	}
+    public void updateWaitingTime(int newWaitingTime) {
+        waitingTime = newWaitingTime;
+    }
 
-	private void getParametersFromDB(Connection conn) throws StorageException, SQLException {
-		final AdminSystemSettings.SettingsDTO conns = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_POOL_CONNECTIONS, conn);
-		if (conns == null) {
-			throw new StorageException("Could not retrieve CONNECTION_POOL_CONNECTIONS from database");
-		}
-		nbConnections = conns.getIntValue();
-		final AdminSystemSettings.SettingsDTO waitingTime = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_WAITING_TIME, conn);
-		if (waitingTime == null) {
-			throw new StorageException("Could not retrieve CONNECTION_WAITING_TIME from database");
-		}
-		this.waitingTime = waitingTime.getIntValue();
-	}
+    /**
+     * This does not close the given {@link Connection}.
+     */
+    private void getParametersFromDB(Connection conn) throws SQLException {
+        final AdminSystemSettings.SettingsDTO conns = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_POOL_CONNECTIONS, conn);
+        if (conns == null) {
+            logger.warn("Could not retrieve CONNECTION_POOL_CONNECTIONS from database. Using default value.");
+        } else {
+            nbConnections = conns.getIntValue();
+        }
+        final AdminSystemSettings.SettingsDTO waitingTime = AdminDAO.getSystemSettingInt(AdminSystemSettings.SETTING_NAME.CONNECTION_WAITING_TIME, conn);
+        if (waitingTime == null) {
+            logger.warn("Could not retrieve CONNECTION_WAITING_TIME from database. Using default value.");
+        } else {
+            this.waitingTime = waitingTime.getIntValue();
+        }
+    }
 
-	public int getNbConnections() {
-		return nbConnections;
-	}
+    int getNbConnections() {
+        return nbConnections;
+    }
 
-	/**
-	 * Exception to be thrown by <code>ConnectionPool</code> and caught in calling
-	 * objects if it has no more available connections upon request.
-	 *
-	 * @author wendling
-	 */
-	public class NoMoreConnectionsException extends Exception {
-		NoMoreConnectionsException() {
-		}
-
-		public NoMoreConnectionsException(String message) {
-			super(message);
-		}
-	}
-
-	/**
-	 * Unchecked Exception for cases in which the data base is not available (wrong
-	 * driver, host,...) or corrupt (missing tables or entries) and functionality
-	 * is impeded.
-	 *
-	 * @author wendling
-	 */
-	public static class StorageException extends RuntimeException {
-
-		private static final long serialVersionUID = -6071779646574124576L;
-
-		StorageException() {
-		}
-
-		public StorageException(String message) {
-			super(message);
-		}
-	}
+    /**
+     * Exception to be thrown by <code>ConnectionPool</code> and caught in calling
+     * objects if it has no more available connections upon request.
+     *
+     * @author wendling
+     */
+    class NoMoreConnectionsException extends RuntimeException {
+        NoMoreConnectionsException(String message) {
+            super(message);
+        }
+    }
 }

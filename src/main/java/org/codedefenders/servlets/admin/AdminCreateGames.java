@@ -19,7 +19,7 @@
 package org.codedefenders.servlets.admin;
 
 import org.codedefenders.database.AdminDAO;
-import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -196,7 +196,7 @@ public class AdminCreateGames extends HttpServlet {
                     .get(gid);
 		} else {
 			gid = Integer.parseInt(gidString);
-			mg = DatabaseAccess.getMultiplayerGame(gid);
+			mg = MultiplayerGameDAO.getMultiplayerGame(gid);
 		}
 
 		// Remove the user. No need to check for creator or wrong user here
@@ -231,7 +231,7 @@ public class AdminCreateGames extends HttpServlet {
                 userList = ((List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE)).get(gid);
 		} else {
 			gid = Integer.parseInt(gidString);
-			mg = DatabaseAccess.getMultiplayerGame(gid);
+			mg = MultiplayerGameDAO.getMultiplayerGame(gid);
 		}
 		if (mg.getCreatorId() == addedUserId) {
 			messages.add("Cannot add user " + addedUserId + " to game " + String.valueOf(gid) + " because they are it's creator.");
@@ -427,12 +427,15 @@ public class AdminCreateGames extends HttpServlet {
                                                      ) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
-            MultiplayerGame multiplayerGame = new MultiplayerGame(cutID, creatorID, level, (float) 1, (float) 1,
-                    (float) 1, 10, 4, 0,
-                    0, 0, 0, startTime,
-                    finishTime, state.name(), false, maxAssertionsPerTest, chatEnabled, mutantValidatorLevel, markUncovered,
-                    capturePlayersIntention);
-            gameList.add(multiplayerGame);
+            final MultiplayerGame game = new MultiplayerGame.Builder(cutID, creatorID, startTime, finishTime, maxAssertionsPerTest, 0, 0, 0, 0)
+                    .level(level)
+                    .state(state)
+                    .chatEnabled(chatEnabled)
+                    .mutantValidatorLevel(mutantValidatorLevel)
+                    .markUncovered(markUncovered)
+                    .capturePlayersIntention(capturePlayersIntention)
+                    .build();
+            gameList.add(game);
         }
         return gameList;
     }

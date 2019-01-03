@@ -72,15 +72,15 @@ public class User {
 
 		if (id <= 0) {
 			query = "INSERT INTO users (Username, Password, Email) VALUES (?, ?, ?);";
-			valueList = new DatabaseValue[]{DB.getDBV(username),
-					DB.getDBV(encodedPassword),
-					DB.getDBV(email)};
+			valueList = new DatabaseValue[]{DatabaseValue.of(username),
+					DatabaseValue.of(encodedPassword),
+					DatabaseValue.of(email)};
 		} else {
 			query = "INSERT INTO users (User_ID, Username, Password, Email) VALUES (?, ?, ?, ?);";
-			valueList = new DatabaseValue[]{DB.getDBV(id),
-					DB.getDBV(username),
-					DB.getDBV(encodedPassword),
-					DB.getDBV(email)};
+			valueList = new DatabaseValue[]{DatabaseValue.of(id),
+					DatabaseValue.of(username),
+					DatabaseValue.of(encodedPassword),
+					DatabaseValue.of(email)};
 		}
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		int key = DB.executeUpdateGetKeys(stmt, conn);
@@ -97,12 +97,12 @@ public class User {
 		Connection conn = DB.getConnection();
 
 		String query = "UPDATE users SET Username = ?, Email = ?, Password = ?, Validated = ?, Active = ? WHERE User_ID = ?;";
-		valueList = new DatabaseValue[]{DB.getDBV(username),
-				DB.getDBV(email),
-				DB.getDBV(encodedPassword),
-				DB.getDBV(validated),
-				DB.getDBV(active),
-				DB.getDBV(id)};
+		valueList = new DatabaseValue[]{DatabaseValue.of(username),
+				DatabaseValue.of(email),
+				DatabaseValue.of(encodedPassword),
+				DatabaseValue.of(validated),
+				DatabaseValue.of(active),
+				DatabaseValue.of(id)};
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 		return DB.executeUpdate(stmt, conn);
 	}

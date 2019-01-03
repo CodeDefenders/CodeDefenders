@@ -23,8 +23,6 @@ import org.codedefenders.game.Test;
 import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.DefenderIntention;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.util.stream.Collectors;
 
 /**
@@ -57,16 +55,13 @@ public class IntentionDAO {
                 "VALUES (?,?,?);"
         );
 
-        DatabaseValue[] valueList = new DatabaseValue[]{
-                DB.getDBV(testId),
-                DB.getDBV(gameId),
-                DB.getDBV(targetLines),
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(testId),
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(targetLines),
         };
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        final int result = DB.executeUpdateGetKeys(stmt, conn);
+        final int result = DB.executeUpdateQueryGetKeys(query, values);
         if (result != -1) {
             return result;
         } else {
@@ -91,16 +86,13 @@ public class IntentionDAO {
                 "VALUES (?,?,?);"
         );
 
-        DatabaseValue[] valueList = new DatabaseValue[]{
-                DB.getDBV(mutant.getId()),
-                DB.getDBV(mutant.getGameId()),
-                DB.getDBV(intention.toString()),
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(mutant.getId()),
+                DatabaseValue.of(mutant.getGameId()),
+                DatabaseValue.of(intention.toString()),
         };
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        final int result = DB.executeUpdateGetKeys(stmt, conn);
+        final int result = DB.executeUpdateQueryGetKeys(query, values);
         if (result != -1) {
             return result;
         } else {

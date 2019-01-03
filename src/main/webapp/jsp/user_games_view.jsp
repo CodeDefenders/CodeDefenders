@@ -18,7 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
+<%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <%@ page import="org.codedefenders.game.AbstractGame" %>
 <%@ page import="org.codedefenders.game.GameMode" %>
 <%@ page import="org.codedefenders.game.GameState" %>
@@ -29,6 +29,7 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.database.UserDAO" %>
+<%@ page import="org.codedefenders.database.DuelGameDAO" %>
 <% String pageTitle= null ; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <%
@@ -41,18 +42,20 @@
 	int uid = (Integer)request.getSession().getAttribute("uid");
 
 	// My Games
-	List<DuelGame> duelGames = DatabaseAccess.getGamesForUser(uid);
-	List<MultiplayerGame> multiplayerGames = DatabaseAccess.getMultiplayerGamesForUser(uid);
+	List<DuelGame> duelGames = DuelGameDAO.getDuelGamesForUser(uid);
 
-	List<AbstractGame> games = new ArrayList<AbstractGame>();
+	List<MultiplayerGame> multiplayerGames = MultiplayerGameDAO.getMultiplayerGamesForUser(uid);
+
+	List<AbstractGame> games = new ArrayList<>();
 	games.addAll( duelGames );
 	games.addAll( multiplayerGames );
 
 	// Open Games
-	List<DuelGame> openDuelGames = DatabaseAccess.getOpenGames();
-	List<MultiplayerGame> openMultiplayerGames = DatabaseAccess.getOpenMultiplayerGamesForUser(uid);
+	List<DuelGame> openDuelGames = DuelGameDAO.getOpenDuelGames();
 
-	List<AbstractGame> openGames = new ArrayList<AbstractGame>();
+	List<MultiplayerGame> openMultiplayerGames = MultiplayerGameDAO.getOpenMultiplayerGamesForUser(uid);
+
+	List<AbstractGame> openGames = new ArrayList<>();
 	openGames.addAll( openDuelGames );
 	openGames.addAll( openMultiplayerGames );
 %>
@@ -197,8 +200,8 @@
 		<td class="col-sm-1"><%= g.getAttackerIds().length %></td>
 		<td class="col-sm-1"><%= g.getDefenderIds().length %></td>
 		<td class="col-sm-1"><%= g.getLevel().name() %></td>
-		<td class="col-sm-1"><%= g.getStartDateTime()%></td>
-		<td class="col-sm-1"><%= g.getFinishDateTime()%></td>
+		<td class="col-sm-1"><%= g.getFormattedStartDateTime()%></td>
+		<td class="col-sm-1"><%= g.getFormattedFinishDateTime()%></td>
 		<td class="col-sm-2">
 <%
 				switch(role){
@@ -420,8 +423,8 @@
 			<td class="col-sm-1"><%int attackers = g.getAttackerIds().length; %><%=attackers %> of <%=g.getMinAttackers()%>&ndash;<%=g.getAttackerLimit()%></td>
 			<td class="col-sm-1"><%int defenders = g.getDefenderIds().length; %><%=defenders %> of <%=g.getMinDefenders()%>&ndash;<%=g.getDefenderLimit()%></td>
 			<td class="col-sm-1"><%= g.getLevel().name() %></td>
-			<td class="col-sm-1"><%= g.getStartDateTime() %></td>
-			<td class="col-sm-1"><%= g.getFinishDateTime() %></td>
+			<td class="col-sm-1"><%= g.getFormattedStartDateTime() %></td>
+			<td class="col-sm-1"><%= g.getFormattedFinishDateTime() %></td>
 			<td class="col-sm-2">
 				<% if(g.getAttackerIds().length < g.getAttackerLimit()) { %>
 				<a class="btn btn-sm btn-primary" id="<%="join-attacker-"+g.getId()%>" style="background-color: #884466;border-color: #772233; margin-bottom: 3px;"

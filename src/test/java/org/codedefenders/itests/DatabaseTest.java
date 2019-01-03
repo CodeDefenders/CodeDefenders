@@ -18,11 +18,13 @@
  */
 package org.codedefenders.itests;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
@@ -40,9 +42,9 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.Feedback;
 import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
-import org.codedefenders.servlets.FeedbackManager;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
@@ -61,14 +63,16 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.IntStream;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeTrue;
 
@@ -89,10 +93,16 @@ public class DatabaseTest {
 
 		creator = new User(20000, "FREE_USERNAME3", User.encodePassword("TEST_PASSWORD3"), "TESTMAIL@TEST.TEST3");
 
-		cut1 = new GameClass(22345678, "MyClass", "", "", "");
-		cut2 = new GameClass(34865,"", "AliasForClass2", "", "");
-		multiplayerGame = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, START_TIME, END_TIME, GameState.CREATED.name(), false, 5, true, CodeValidatorLevel.MODERATE, false);
+		cut1 = new GameClass(22345678, "MyClass", "", "", "", false);
+		cut2 = new GameClass(34865,"", "AliasForClass2", "", "", false);
+		multiplayerGame = new MultiplayerGame
+				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 5, 4, 4, 0, 0)
+                .level(GameLevel.EASY)
+				.defenderValue(10)
+				.attackerValue(4)
+				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+				.chatEnabled(true)
+				.build();
 	}
 
 	// This will re-create the same DB from scratch every time... is this really
@@ -177,8 +187,8 @@ public class DatabaseTest {
 
 		assertTrue(multiplayerGame.insert());
 
-		MultiplayerGame multiplayerGameFromDB = DatabaseAccess.getMultiplayerGame(multiplayerGame.getId());
-		assertEquals(multiplayerGameFromDB.getFinishDateTime(), multiplayerGame.getFinishDateTime());
+		MultiplayerGame multiplayerGameFromDB = MultiplayerGameDAO.getMultiplayerGame(multiplayerGame.getId());
+		assertEquals(multiplayerGameFromDB.getFormattedFinishDateTime(), multiplayerGame.getFormattedFinishDateTime());
 		assertTrue(Arrays.equals(multiplayerGameFromDB.getAttackerIds(), multiplayerGame.getAttackerIds()));
 		assertEquals(multiplayerGameFromDB.getPrize(), multiplayerGame.getPrize(), 1e-10);
 		assertEquals(multiplayerGameFromDB.getAttackerLimit(), multiplayerGame.getAttackerLimit());
@@ -191,7 +201,7 @@ public class DatabaseTest {
 	}
 
 	@Test
-	public void testGameLists() throws Exception {
+	public void testGameLists() {
 		assumeTrue(creator.insert());
 		assumeTrue(user1.insert());
 		assumeTrue(user2.insert());
@@ -200,43 +210,56 @@ public class DatabaseTest {
 		DuelGame dg1 = new DuelGame(cut1.getId(), user1.getId(), 100, Role.DEFENDER, GameLevel.EASY);
 		assumeTrue(dg1.insert());
 
-		MultiplayerGame mg2 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, START_TIME, END_TIME, GameState.ACTIVE.name(), false, 2, true,
-				CodeValidatorLevel.MODERATE, false);
+		MultiplayerGame mg2 = new MultiplayerGame
+				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 2, 4, 4, 0, 0)
+                .state(GameState.ACTIVE)
+				.level(GameLevel.EASY)
+				.defenderValue(10)
+				.attackerValue(4)
+				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+				.chatEnabled(true)
+				.build();
 		assumeTrue(mg2.insert());
 		assumeTrue(mg2.addPlayer(user1.getId(), Role.DEFENDER));
 		assertTrue(mg2.update());
 		
-		MultiplayerGame mg3 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, START_TIME, END_TIME, GameState.ACTIVE.name(), false, 2, true,
-				CodeValidatorLevel.MODERATE, false);
+		MultiplayerGame mg3 = new MultiplayerGame
+				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 2, 4, 4, 0, 0)
+				.state(GameState.ACTIVE)
+				.level(GameLevel.EASY)
+				.defenderValue(10)
+				.attackerValue(4)
+				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+				.chatEnabled(true)
+				.build();
 		assumeTrue(mg3.insert());
 		
 		assumeTrue(mg3.addPlayer(user1.getId(), Role.DEFENDER));
 		assumeTrue(mg3.addPlayer(user2.getId(), Role.ATTACKER));
 		assumeTrue(mg3.update());
 
-		MultiplayerGame mg4 = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0, START_TIME, END_TIME, GameState.FINISHED.name(), false, 2, true,
-				CodeValidatorLevel.MODERATE, false);
+		MultiplayerGame mg4 = new MultiplayerGame
+				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 2, 4, 4, 0, 0)
+				.level(GameLevel.EASY)
+				.defenderValue(10)
+				.attackerValue(4)
+				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+				.chatEnabled(true)
+				.build();
+		assertEquals(1, DuelGameDAO.getOpenDuelGames().size());
+
+		assertEquals(1, DuelGameDAO.getDuelGamesForUser(user1.getId()).size());
+		assertEquals(1, MultiplayerGameDAO.getMultiplayerGamesForUser(user2.getId()).size());
+		assertEquals(2, MultiplayerGameDAO.getMultiplayerGamesForUser(user1.getId()).size());
+		assertEquals(2, MultiplayerGameDAO.getJoinedMultiplayerGamesForUser(user1.getId()).size());
+		assertEquals(0, MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(user1.getId()).size());
+
 		assumeTrue(mg4.insert());
-		
-		// TODO Why is 0
-		assertEquals(1, DatabaseAccess.getOpenGames().size());
+		assumeTrue(mg4.addPlayer(user1.getId(), Role.DEFENDER));
+		mg4.setState(GameState.FINISHED);
+		assertTrue(mg4.update());
 
-		assertEquals(1, DatabaseAccess.getGamesForUser(user1.getId()).size());
-		// User 1 participates in 2 MP games
-		assertEquals(2, DatabaseAccess.getJoinedMultiplayerGamesForUser(user1.getId()).size());
-		// This might return data based on timestamp ... Makes test tricky
-		assertEquals(2, DatabaseAccess.getFinishedMultiplayerGamesForUser(user1.getId()).size());
-
-		// FIXME:
-		// User 2 participates in 1 MP game, but probably beacuse of timestamp
-		// this is closed
-//		assertEquals(0, DatabaseAccess.getOpenMultiplayerGamesForUser(user2.getId()).size());
-		// TODO Not sure what's this and why it does not return 2...
-//		assertEquals(0, DatabaseAccess.getMultiplayerGamesForUser(user1.getId()).size());
-
+		assertEquals(1, MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(user1.getId()).size());
 	}
 
 	@Test
@@ -253,7 +276,7 @@ public class DatabaseTest {
 		int playerID = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
 		assertTrue(playerID > 0);
 		assertEquals(UserDAO.getUserForPlayer(playerID).getId(), user1.getId());
-		assertTrue(DatabaseAccess.getPlayersForMultiplayerGame(multiplayerGame.getId(), Role.DEFENDER).length > 0);
+		assertTrue(GameDAO.getPlayersForGame(multiplayerGame.getId(), Role.DEFENDER).size() > 0);
 		assertEquals(DatabaseAccess.getPlayerPoints(playerID), 0);
 		DatabaseAccess.increasePlayerPoints(13, playerID);
 		assertEquals(DatabaseAccess.getPlayerPoints(playerID), 13);
@@ -330,13 +353,14 @@ public class DatabaseTest {
 
 
 		// Creator must be there already
-		multiplayerGame = new MultiplayerGame(cut1.getId(), creator.getId(), GameLevel.EASY, (float) 1, (float) 1,
-				(float) 1, 10, 4, 4, 4, 0, 0,
-				//
-				System.currentTimeMillis() - 1000 * 3600,
-				System.currentTimeMillis() + 1000 * 3600,
-				//
-				GameState.CREATED.name(), false, 5, true, CodeValidatorLevel.MODERATE, false);
+		multiplayerGame = new MultiplayerGame
+				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 5, 4, 4, 0, 0)
+				.level(GameLevel.EASY)
+				.defenderValue(10)
+				.attackerValue(4)
+				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+				.chatEnabled(true)
+				.build();
 		// Why this ?
 		Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
 		// multiplayerGame.classId = cut2.getId();
@@ -485,29 +509,25 @@ public class DatabaseTest {
 		Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
 		assumeTrue(multiplayerGame.insert());
 
-		Integer[] ratings = new Integer[]{FeedbackManager.MIN_RATING - 1, FeedbackManager.MIN_RATING, FeedbackManager.MAX_RATING, FeedbackManager.MAX_RATING + 1};
-		List<FeedbackManager.FeedbackType> feedbackTypesList = new ArrayList();
-		feedbackTypesList = Arrays.asList(ArrayUtils.subarray(FeedbackManager.FeedbackType.values(), 0, ratings.length));
-		// shuffle feedback type list
-		Collections.shuffle(feedbackTypesList);
-		FeedbackManager.FeedbackType[] feedbackTypes = new FeedbackManager.FeedbackType[feedbackTypesList.size()];
-		feedbackTypes = feedbackTypesList.toArray(feedbackTypes);
-
-		List<Integer> ratingsList = Arrays.asList(ratings);
+		Integer[] ratings = IntStream.rangeClosed(Feedback.MIN_RATING, Feedback.MAX_RATING).boxed().toArray(Integer[]::new);
 		assertTrue("Feedback could not be inserted",
-				FeedbackDAO.insertFeedback(multiplayerGame.getId(), user1.getId(), ratingsList, feedbackTypes));
+				FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), Arrays.asList(ratings)));
 
-		Integer[] ratingsFromDB = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId(), feedbackTypes);
-		Integer[] user1RatingsSanitized = new Integer[]{FeedbackManager.MIN_RATING, FeedbackManager.MIN_RATING, FeedbackManager.MAX_RATING, FeedbackManager.MAX_RATING};
+		List<Integer> feedbackValues = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
+		assertNotNull(feedbackValues);
+		Integer[] ratingsFromDB = feedbackValues.toArray(new Integer[0]);
 
-		assertEquals(user1RatingsSanitized, ratingsFromDB);
+		assertArrayEquals(ratings, ratingsFromDB);
 
-		Integer[] updatedRatings = new Integer[]{FeedbackManager.MAX_RATING, FeedbackManager.MAX_RATING-1, FeedbackManager.MIN_RATING+1, FeedbackManager.MIN_RATING};
+		Integer[] updatedRatings = IntStream.generate(() -> new Random().nextInt(Feedback.MAX_RATING)).limit(7).boxed().toArray(Integer[]::new);
+
 		List<Integer> updatedRatingsList = Arrays.asList(updatedRatings);
 		assertTrue("Feedback could not be updated",
-				FeedbackDAO.updateFeedback(multiplayerGame.getId(), user1.getId(), updatedRatingsList, feedbackTypes));
+				FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), updatedRatingsList));
 
-		Integer[] updatedRatingsFromDB = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId(), feedbackTypes);
-		assertEquals(updatedRatings, updatedRatingsFromDB);
+		List<Integer> feedbackValues2 = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
+		assertNotNull(feedbackValues2);
+		Integer[] updatedRatingsFromDB = feedbackValues2.toArray(new Integer[0]);
+		assertArrayEquals(updatedRatings, updatedRatingsFromDB);
 	}
 }

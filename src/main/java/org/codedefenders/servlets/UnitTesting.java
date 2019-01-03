@@ -32,6 +32,7 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.execution.AntRunner;
@@ -84,9 +85,9 @@ public class UnitTesting extends HttpServlet {
 			logger.debug("Getting active unit testing session for user " + uid);
 			activeGame = DatabaseAccess.getActiveUnitTestingSession(uid);
 		} else {
-			int gid = (Integer) ogid;
-			logger.debug("Getting game " + gid + " for " + uid);
-			activeGame = DatabaseAccess.getGameForKey("ID", gid);
+			int gameId = (Integer) ogid;
+			logger.debug("Getting game " + gameId + " for " + uid);
+			activeGame = DuelGameDAO.getDuelGameForId(gameId);
 		}
 		session.setAttribute("game", activeGame);
 
@@ -154,7 +155,7 @@ public class UnitTesting extends HttpServlet {
 
 		File newTestDir = FileUtils.getNextSubDir(getServletContext().getRealPath(DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + TESTS_DIR + F_SEP + ownerId));
 
-		String javaFile = FileUtils.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
+		String javaFile = FileUtils.createJavaTestFile(newTestDir, classUnderTest.getBaseName(), testText);
 
 		if (! validTestCode(javaFile)) {
 			return null;

@@ -5,8 +5,6 @@ import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -53,7 +51,7 @@ public class TargetExecutionDAO {
      */
     public static int storeTargetExecution(TargetExecution targetExecution) {
         final String query;
-        final DatabaseValue[] valueList;
+        final DatabaseValue[] values;
 
         final String insertedMessage = targetExecution.message == null ? ""
                 : targetExecution.message.length() <= MESSAGE_LIMIT ? targetExecution.message
@@ -61,43 +59,40 @@ public class TargetExecutionDAO {
 
         if (targetExecution.hasTest() && targetExecution.hasMutant()) {
             query = "INSERT INTO targetexecutions (Test_ID, Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?, ?);";
-            valueList = new DatabaseValue[] {
-                    DB.getDBV(targetExecution.testId),
-                    DB.getDBV(targetExecution.mutantId),
-                    DB.getDBV(targetExecution.target.name()),
-                    DB.getDBV(targetExecution.status.name()),
-                    DB.getDBV(insertedMessage)
+            values = new DatabaseValue[] {
+                    DatabaseValue.of(targetExecution.testId),
+                    DatabaseValue.of(targetExecution.mutantId),
+                    DatabaseValue.of(targetExecution.target.name()),
+                    DatabaseValue.of(targetExecution.status.name()),
+                    DatabaseValue.of(insertedMessage)
             };
         } else if (targetExecution.hasTest()) {
             query = "INSERT INTO targetexecutions (Test_ID, Target, Status, Message) VALUES (?, ?, ?, ?);";
-            valueList = new DatabaseValue[] {
-                   DB.getDBV(targetExecution.testId),
-                   DB.getDBV(targetExecution.target.name()),
-                   DB.getDBV(targetExecution.status.name()),
-                   DB.getDBV(insertedMessage)
+            values = new DatabaseValue[] {
+                   DatabaseValue.of(targetExecution.testId),
+                   DatabaseValue.of(targetExecution.target.name()),
+                   DatabaseValue.of(targetExecution.status.name()),
+                   DatabaseValue.of(insertedMessage)
             };
         } else if (targetExecution.hasMutant()) {
             query = "INSERT INTO targetexecutions (Mutant_ID, Target, Status, Message) VALUES (?, ?, ?, ?);";
-            valueList = new DatabaseValue[] {
-                   DB.getDBV(targetExecution.mutantId),
-                   DB.getDBV(targetExecution.target.name()),
-                   DB.getDBV(targetExecution.status.name()),
-                   DB.getDBV(insertedMessage)
+            values = new DatabaseValue[] {
+                   DatabaseValue.of(targetExecution.mutantId),
+                   DatabaseValue.of(targetExecution.target.name()),
+                   DatabaseValue.of(targetExecution.status.name()),
+                   DatabaseValue.of(insertedMessage)
             };
         } else {
             // has no test or mutant data
             query = "INSERT INTO targetexecutions (Target, Status, Message) VALUES (?, ?, ?);";
-            valueList = new DatabaseValue[]{
-                   DB.getDBV(targetExecution.target.name()),
-                   DB.getDBV(targetExecution.status.name()),
-                   DB.getDBV(insertedMessage)
+            values = new DatabaseValue[]{
+                   DatabaseValue.of(targetExecution.target.name()),
+                   DatabaseValue.of(targetExecution.status.name()),
+                   DatabaseValue.of(insertedMessage)
             };
         }
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        final int result = DB.executeUpdateGetKeys(stmt, conn);
+        final int result = DB.executeUpdateQueryGetKeys(query, values);
         if (result != -1) {
             return result;
         } else {
@@ -120,12 +115,12 @@ public class TargetExecutionDAO {
                         "  AND Mutant_ID = ?;"
         );
 
-        DatabaseValue[] valueList = new DatabaseValue[]{
-               DB.getDBV(testId),
-               DB.getDBV(mutantId)
+        DatabaseValue[] values = new DatabaseValue[]{
+               DatabaseValue.of(testId),
+               DatabaseValue.of(mutantId)
         };
 
-        return DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, valueList);
+        return DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, values);
     }
 
     /**
@@ -143,12 +138,12 @@ public class TargetExecutionDAO {
                 "  AND Target = ?;"
         );
 
-        DatabaseValue[] valueList = new DatabaseValue[]{
-               DB.getDBV(test.getId()),
-               DB.getDBV(target.name())
+        DatabaseValue[] values = new DatabaseValue[]{
+               DatabaseValue.of(test.getId()),
+               DatabaseValue.of(target.name())
         };
 
-        return DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, valueList);
+        return DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, values);
     }
 
     /**
@@ -166,11 +161,11 @@ public class TargetExecutionDAO {
                 "  AND Target = ?;"
         );
 
-        DatabaseValue[] valueList = new DatabaseValue[]{
-               DB.getDBV(mutant.getId()),
-               DB.getDBV(target.name())
+        DatabaseValue[] values = new DatabaseValue[]{
+               DatabaseValue.of(mutant.getId()),
+               DatabaseValue.of(target.name())
         };
 
-        return DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, valueList);
+        return DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, values);
     }
 }

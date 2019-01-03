@@ -129,7 +129,7 @@ public class MajorMaker {
 
 	private Mutant createMutant(String mutantText) {
 		try {
-			final String sourceCode = cut.getAsString();
+			final String sourceCode = cut.getSourceCode();
 
 			// Runs diff match patch between the two Strings to see if there are any differences.
 			DiffMatchPatch dmp = new DiffMatchPatch();

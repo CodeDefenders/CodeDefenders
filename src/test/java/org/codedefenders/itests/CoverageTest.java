@@ -3,7 +3,6 @@ package org.codedefenders.itests;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
@@ -173,15 +172,14 @@ public class CoverageTest {
 		long startDate= System.currentTimeMillis() - 1000*3600;
 		long endDate = System.currentTimeMillis() + 1000*3600;
 		// Observer creates a new MP game
-		//
-		MultiplayerGame multiplayerGame = new MultiplayerGame(cut.getId(), observer.getId(), GameLevel.HARD, 
-				(float) 1,
-				(float) 1,
-				(float) 1, 10, 4, 4, 4, 
-				0, 0, 
-				startDate, endDate,
-				GameState.ACTIVE.name(), false, 2, true,
-				CodeValidatorLevel.MODERATE, false);
+		final MultiplayerGame multiplayerGame = new MultiplayerGame
+				.Builder(cut.getId(), observer.getId(), startDate, endDate, 2, 4, 4, 0, 0)
+				.defenderValue(10)
+				.attackerValue(4)
+				.state(GameState.ACTIVE)
+                .mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+				.chatEnabled(true)
+				.build();
 		multiplayerGame.insert();
 		// Attacker and Defender join the game.
 		multiplayerGame.addPlayer(defender.getId(), Role.DEFENDER);

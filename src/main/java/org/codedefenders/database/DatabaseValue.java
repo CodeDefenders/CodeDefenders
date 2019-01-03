@@ -28,10 +28,76 @@ import java.sql.Types;
  * if a SQL {@code NULL} value is represented.
  */
 public class DatabaseValue<T> {
+    /**
+     * Creates a typed {@link DatabaseValue} for a given integer value.
+     * The given integer value can be {@code null}.
+     *
+     * @param value the given value as a {@link Integer}, can be {@code null}.
+     * @return a database value for a given integer.
+     */
+    public static DatabaseValue<Integer> of(Integer value) {
+        return new DatabaseValue<>(value);
+    }
+
+    /**
+     * Creates a typed {@link DatabaseValue} for a given long value.
+     * The given long value can be {@code null}.
+     *
+     * @param value the given value as a {@link Long}, can be {@code null}.
+     * @return a database value for a given long.
+     */
+    public static DatabaseValue<Long> of(Long value) {
+        return new DatabaseValue<>(value);
+    }
+
+    /**
+     * Creates a typed {@link DatabaseValue} for a given float value.
+     * The given float value can be {@code null}.
+     *
+     * @param value the given value as a {@link Float}, can be {@code null}.
+     * @return a database value for a given float.
+     */
+    public static DatabaseValue<Float> of(Float value) {
+        return new DatabaseValue<>(value);
+    }
+
+    /**
+     * Creates a typed {@link DatabaseValue} for a given string value.
+     * The given string value can be {@code null}.
+     *
+     * @param value the given value as a {@link String}, can be {@code null}.
+     * @return a database value for a given string.
+     */
+    public static DatabaseValue<String> of(String value) {
+        return new DatabaseValue<>(value);
+    }
+
+    /**
+     * Creates a typed {@link DatabaseValue} for a given timestamp.
+     * The given timestamp can be {@code null}.
+     *
+     * @param value the given value as a {@link Timestamp}, can be {@code null}.
+     * @return a database value for a given timestamp.
+     */
+    public static DatabaseValue<Timestamp> of(Timestamp value) {
+        return new DatabaseValue<>(value);
+    }
+
+    /**
+     * Creates a typed {@link DatabaseValue} for a given boolean value.
+     * The given boolean value can be {@code null}.
+     *
+     * @param value the given value as a {@link Boolean}, can be {@code null}.
+     * @return a database value for a given boolean.
+     */
+    public static DatabaseValue<Boolean> of(Boolean value) {
+        return new DatabaseValue<>(value);
+    }
+
     private Type type;
     private T value;
 
-    DatabaseValue(T value) {
+    private DatabaseValue(T value) {
         this.type = Type.get(value);
         this.value = value;
     }

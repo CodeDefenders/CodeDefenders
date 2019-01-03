@@ -19,7 +19,7 @@
 package org.codedefenders.servlets.games;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -103,11 +103,11 @@ public class GameManager extends HttpServlet {
 			return;
 		}
 
-		int gid = (Integer) ogid;
+		int gameId = (Integer) ogid;
 
-		logger.debug("Getting game " + gid + " for " + uid);
+		logger.debug("Getting game " + gameId + " for " + uid);
 
-		DuelGame activeGame = DatabaseAccess.getGameForKey("ID", gid);
+		DuelGame activeGame = DuelGameDAO.getDuelGameForId(gameId);
 		session.setAttribute("game", activeGame);
 
 		// If the game is finished, redirect to the score page.
@@ -277,8 +277,8 @@ public class GameManager extends HttpServlet {
 				break;
 
 			case "whoseTurn":
-				int gid = Integer.parseInt(request.getParameter("gameID"));
-				activeGame = DatabaseAccess.getGameForKey("ID", gid);
+				int gameId = Integer.parseInt(request.getParameter("gameID"));
+				activeGame = DuelGameDAO.getDuelGameForId(gameId);
 				String turn = activeGame.getActiveRole().equals(Role.ATTACKER) ? "attacker" : "defender";
 				response.setContentType("application/json");
 				response.setCharacterEncoding("UTF-8");
@@ -291,7 +291,7 @@ public class GameManager extends HttpServlet {
 				String mutantText = request.getParameter("mutant");
 
 				// Duels are always 'strict'
-				ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(activeGame.getCUT().getAsString(), mutantText, CodeValidatorLevel.STRICT);
+				ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(activeGame.getCUT().getSourceCode(), mutantText, CodeValidatorLevel.STRICT);
 				if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
 					// Mutant is either the same as the CUT or it contains invalid code
 					// Do not restore mutated code
@@ -476,7 +476,7 @@ public class GameManager extends HttpServlet {
 
 		File newTestDir = FileUtils.getNextSubDir(TESTS_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + ownerId + F_SEP + "original");
 
-		String javaFile = FileUtils.createJavaFile(newTestDir, classUnderTest.getBaseName(), testText);
+		String javaFile = FileUtils.createJavaTestFile(newTestDir, classUnderTest.getBaseName(), testText);
 
 		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
 

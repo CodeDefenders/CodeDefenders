@@ -19,8 +19,15 @@
 package org.codedefenders.game;
 
 /**
- * Created by gordon on 20/02/2017.
+ * This enumeration represents all possible game modes.
  */
 public enum GameMode {
-    SINGLE, DUEL, PARTY, UTESTING, PUZZLE
+    SINGLE,
+    DUEL,
+    /**
+     * Also referred as <b>Battleground</b> mode.
+     */
+    PARTY,
+    UTESTING,
+    PUZZLE;
 }

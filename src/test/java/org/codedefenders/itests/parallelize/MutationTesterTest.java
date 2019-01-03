@@ -19,8 +19,8 @@
 package org.codedefenders.itests.parallelize;
 
 import org.codedefenders.MutationTesterUtilities;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -243,13 +243,15 @@ public class MutationTesterTest {
 		// System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant()
 		// Cut " + cut.getId());
 		//
-		MultiplayerGame multiplayerGame = new MultiplayerGame(cut.getId(), observer.getId(), GameLevel.HARD, (float) 1,
-				(float) 1, (float) 1, 10, 4, 4, 4, 0, 0,
-				//
-				System.currentTimeMillis() - 1000 * 3600,
-				System.currentTimeMillis() + 1000 * 3600,
-				//
-				GameState.ACTIVE.name(), false, 2, true, null, false);
+		final long startTime = System.currentTimeMillis() - 1000 * 3600;
+		final long endTime = System.currentTimeMillis() + 1000 * 3600;
+		MultiplayerGame multiplayerGame = new MultiplayerGame
+				.Builder(cut.getId(), observer.getId(), startTime, endTime, 2, 4, 4, 0, 0)
+				.state(GameState.ACTIVE)
+				.level(GameLevel.HARD)
+				.defenderValue(10)
+				.attackerValue(4)
+				.build();
 		multiplayerGame.insert();
 		//
 		// // Attacker and Defender must join the game. Those calls update also
@@ -265,7 +267,7 @@ public class MutationTesterTest {
 
 		// System.out.println(" Game " + multiplayerGame.getId());
 
-		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(multiplayerGame.getId());
+		MultiplayerGame activeGame = MultiplayerGameDAO.getMultiplayerGame(multiplayerGame.getId());
 		assertEquals("Cannot find the right active game", multiplayerGame.getId(), activeGame.getId());
 
 		// Use the trace for Game232 - Synchronosous for the moment

@@ -19,6 +19,7 @@
 
 --%>
 <%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 
 <% { %>
 
@@ -42,7 +43,7 @@
         return;
     }
 
-    MultiplayerGame game = DatabaseAccess.getMultiplayerGame(gameId);
+    MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
 
     if (game == null || game.getState() != GameState.FINISHED) {
         response.sendRedirect(request.getContextPath() + "/games/user");

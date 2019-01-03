@@ -129,14 +129,14 @@ public class LineCoverageGenerator {
         final Set<Integer> linesToAdd = new HashSet<>();
         // If there's at least one line covered, then static field initializer and compile time constants are covered
         if (!linesCovered.isEmpty()) {
-            linesToAdd.addAll(gameClass.getLinesOfCompileTimeConstants());
-            linesToAdd.addAll(gameClass.getLinesOfNonInitializedFields());
+            linesToAdd.addAll(gameClass.getCompileTimeConstants());
+            linesToAdd.addAll(gameClass.getNonInitializedFields());
         }
 
         // Now we need to map lines covered with methods and then-branches of ifstatements in the class
         for (Integer coveredLine : linesCovered) {
-            linesToAdd.addAll(gameClass.getLinesOfMethodSignaturesFor(coveredLine));
-            linesToAdd.addAll(gameClass.getLineOfClosingBracketFor(coveredLine));
+            linesToAdd.addAll(gameClass.getMethodSignaturesForLine(coveredLine));
+            linesToAdd.addAll(gameClass.getClosingBracketForLine(coveredLine));
             // If covered line belongs to method, add the method signature
         }
         //

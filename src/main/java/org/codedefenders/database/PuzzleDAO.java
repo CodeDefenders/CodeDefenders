@@ -1,7 +1,6 @@
 package org.codedefenders.database;
 
 import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.puzzle.Puzzle;
@@ -11,13 +10,9 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * This class handles the database logic for puzzles.
@@ -41,9 +36,7 @@ public class PuzzleDAO {
                 "WHERE Chapter_ID = ?;"
         );
 
-        return executeQueryReturnValue(query,
-                PuzzleDAO::getPuzzleChapterFromResultSet,
-                DB.getDBV(chapterId));
+        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleChapterFromResultSet, DatabaseValue.of(chapterId));
     }
 
     /**
@@ -57,8 +50,7 @@ public class PuzzleDAO {
                 "ORDER BY Position;"
         );
 
-        return executeQueryReturnList(query,
-                PuzzleDAO::getPuzzleChapterFromResultSet);
+        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleChapterFromResultSet);
     }
 
     /**
@@ -73,9 +65,7 @@ public class PuzzleDAO {
                 "WHERE Puzzle_ID = ?;"
         );
 
-        return executeQueryReturnValue(query,
-                PuzzleDAO::getPuzzleFromResultSet,
-                DB.getDBV(puzzleId));
+        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleFromResultSet, DatabaseValue.of(puzzleId));
     }
 
     /**
@@ -89,8 +79,7 @@ public class PuzzleDAO {
                 "ORDER BY Chapter_ID, Position;"
         );
 
-        return executeQueryReturnList(query,
-                PuzzleDAO::getPuzzleFromResultSet);
+        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleFromResultSet);
     }
 
     /**
@@ -108,9 +97,7 @@ public class PuzzleDAO {
                 "ORDER BY Position;"
         );
 
-        return executeQueryReturnList(query,
-                PuzzleDAO::getPuzzleFromResultSet,
-                DB.getDBV(chapterId));
+        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleFromResultSet, DatabaseValue.of(chapterId));
     }
 
     /**
@@ -126,9 +113,7 @@ public class PuzzleDAO {
                 "  AND ID = ?;"
         );
 
-        return executeQueryReturnValue(query,
-                PuzzleDAO::getPuzzleGameFromResultSet,
-                DB.getDBV(gameId));
+        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(gameId));
     }
 
     /**
@@ -147,9 +132,7 @@ public class PuzzleDAO {
                 "ORDER BY Timestamp DESC;"
         );
 
-        return executeQueryReturnValue(query,
-                PuzzleDAO::getPuzzleGameFromResultSet,
-                DB.getDBV(puzzleId), DB.getDBV(userId));
+        return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(puzzleId), DatabaseValue.of(userId));
     }
 
     /**
@@ -170,9 +153,7 @@ public class PuzzleDAO {
                 "ORDER BY Timestamp DESC;"
         );
 
-        return executeQueryReturnList(query,
-                PuzzleDAO::getPuzzleGameFromResultSet,
-                DB.getDBV(puzzleId), DB.getDBV(userId));
+        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(puzzleId), DatabaseValue.of(userId));
     }
 
 
@@ -193,9 +174,7 @@ public class PuzzleDAO {
                 "ORDER BY Timestamp DESC;"
         );
 
-        return executeQueryReturnList(query,
-                PuzzleDAO::getPuzzleGameFromResultSet,
-                DB.getDBV(userId));
+        return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(userId));
     }
 
     /**
@@ -221,22 +200,20 @@ public class PuzzleDAO {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         );
 
-        DatabaseValue[] valueList = new DatabaseValue[] {
-                DB.getDBV(game.getClassId()),
-                DB.getDBV(game.getLevel().toString()),
-                DB.getDBV(game.getCreatorId()),
-                DB.getDBV(game.getMaxAssertionsPerTest()),
-                DB.getDBV(game.getMutantValidatorLevel().toString()),
-                DB.getDBV(game.getState().toString()),
-                DB.getDBV(game.getCurrentRound()),
-                DB.getDBV(game.getActiveRole().toString()),
-                DB.getDBV(game.getMode().toString()),
-                DB.getDBV(game.getPuzzleId()),
+        DatabaseValue[] values = new DatabaseValue[] {
+                DatabaseValue.of(game.getClassId()),
+                DatabaseValue.of(game.getLevel().toString()),
+                DatabaseValue.of(game.getCreatorId()),
+                DatabaseValue.of(game.getMaxAssertionsPerTest()),
+                DatabaseValue.of(game.getMutantValidatorLevel().toString()),
+                DatabaseValue.of(game.getState().toString()),
+                DatabaseValue.of(game.getCurrentRound()),
+                DatabaseValue.of(game.getActiveRole().toString()),
+                DatabaseValue.of(game.getMode().toString()),
+                DatabaseValue.of(game.getPuzzleId()),
         };
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-        return DB.executeUpdateGetKeys(stmt, conn);
+        return DB.executeUpdateQueryGetKeys(query, values);
     }
 
     /**
@@ -261,22 +238,20 @@ public class PuzzleDAO {
                 "WHERE ID = ?;"
         );
 
-        DatabaseValue[] valueList = new DatabaseValue[] {
-                DB.getDBV(game.getClassId()),
-                DB.getDBV(game.getLevel().toString()),
-                DB.getDBV(game.getCreatorId()),
-                DB.getDBV(game.getMaxAssertionsPerTest()),
-                DB.getDBV(game.getMutantValidatorLevel().toString()),
-                DB.getDBV(game.getState().toString()),
-                DB.getDBV(game.getCurrentRound()),
-                DB.getDBV(game.getActiveRole().toString()),
-                DB.getDBV(game.getPuzzleId()),
-                DB.getDBV(game.getId()),
+        DatabaseValue[] values = new DatabaseValue[] {
+                DatabaseValue.of(game.getClassId()),
+                DatabaseValue.of(game.getLevel().toString()),
+                DatabaseValue.of(game.getCreatorId()),
+                DatabaseValue.of(game.getMaxAssertionsPerTest()),
+                DatabaseValue.of(game.getMutantValidatorLevel().toString()),
+                DatabaseValue.of(game.getState().toString()),
+                DatabaseValue.of(game.getCurrentRound()),
+                DatabaseValue.of(game.getActiveRole().toString()),
+                DatabaseValue.of(game.getPuzzleId()),
+                DatabaseValue.of(game.getId()),
         };
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-        return DB.executeUpdate(stmt, conn);
+        return DB.executeUpdateQuery(query, values);
     }
 
     /**
@@ -362,78 +337,6 @@ public class PuzzleDAO {
         } catch (SQLException e) {
             logger.error("Caught SQL exception while checking ResultSet.", e);
             return null;
-        }
-    }
-
-    /* TODO Add something like this to DB for the other DAOs to use? */
-    /**
-     * Executes the given query with the given parameters, then uses the given function to extract the first value from
-     * the {@link ResultSet}.
-     * @param query The query.
-     * @param mapFunction A function, which takes the query's {@link ResultSet} as an argument, and uses it to construct
-     *                    a return value. The function must not advance the {@link ResultSet}. If the function can't
-     *                    construct the desired value from the {@link ResultSet}, it must return {@code null};
-     * @param parameters The parameters for the query.
-     * @param <T> The type of value to be queried.
-     * @return The first result of the query, computed by the given function.
-     */
-    private static <T> T executeQueryReturnValue(String query, Function<ResultSet, T> mapFunction,
-                                                 DatabaseValue... parameters) {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, parameters);
-
-        try {
-            final ResultSet resultSet = stmt.executeQuery();
-
-            if (resultSet.next()) {
-                return mapFunction.apply(resultSet);
-            }
-            logger.warn("Query had no result.\n" + query);
-            return null;
-
-        } catch (SQLException e) {
-            logger.error("Caught SQL exception while executing query.", e);
-            return null;
-
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
-    }
-
-    /* TODO Add something like this to DB for the other DAOs to use? */
-    /**
-     * Executes the given query with the given parameters, then uses the given function to extract the values from
-     * the {@link ResultSet}.
-     * @param query The query.
-     * @param mapFunction A function, which takes the query's {@link ResultSet} as an argument, and uses it to construct
-     *                    a return value. The function must not advance the {@link ResultSet}. If the function can't
-     *                    construct the desired value from the {@link ResultSet}, it must return {@code null};
-     * @param parameters The parameters for the query.
-     * @param <T> The type of value to be queried.
-     * @return A list of the results of the query, computed by the given function.
-     */
-    private static <T> List<T> executeQueryReturnList(String query, Function<ResultSet, T> mapFunction,
-                                                      DatabaseValue... parameters) {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, parameters);
-
-        try {
-            final ResultSet resultSet = stmt.executeQuery();
-            List<T> values = new ArrayList<>();
-
-            while (resultSet.next()) {
-                T value = mapFunction.apply(resultSet);
-                if (value == null) return null;
-                values.add(value);
-            }
-            return values;
-
-        } catch (SQLException e) {
-            logger.error("Caught SQL exception while executing query.", e);
-            return null;
-
-        } finally {
-            DB.cleanup(conn, stmt);
         }
     }
 }

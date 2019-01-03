@@ -24,13 +24,12 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,6 +40,7 @@ import java.util.stream.Stream;
  * @see Mutant
  */
 public class MutantDAO {
+
     /**
      * Constructs a mutant from a {@link ResultSet} entry.
      *
@@ -48,7 +48,7 @@ public class MutantDAO {
      * @return The constructed mutant.
      * @see RSMapper
      */
-    public static Mutant mutantFromRS(ResultSet rs) throws SQLException {
+    static Mutant mutantFromRS(ResultSet rs) throws SQLException {
         int mutantId = rs.getInt("Mutant_ID");
         int gameId = rs.getInt("Game_ID");
         int classId = rs.getInt("Class_ID");
@@ -97,7 +97,7 @@ public class MutantDAO {
                 "LEFT JOIN players ON players.ID = mutants.Player_ID ",
                 "LEFT JOIN users ON players.User_ID = users.User_ID ",
                 "WHERE mutants.Mutant_ID = ?;");
-        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DB.getDBV(mutantId));
+        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DatabaseValue.of(mutantId));
     }
 
     /**
@@ -109,7 +109,7 @@ public class MutantDAO {
                 "LEFT JOIN players ON players.ID=mutants.Player_ID ",
                 "LEFT JOIN users ON players.User_ID = users.User_ID ",
                 "WHERE mutants.Game_ID = ? AND mutants.MD5 = ?;");
-        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DB.getDBV(gameId), DB.getDBV(md5));
+        return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId), DatabaseValue.of(md5));
     }
 
     /**
@@ -122,7 +122,7 @@ public class MutantDAO {
                 "LEFT JOIN users ON players.User_ID = users.User_ID ",
                 "WHERE mutants.Game_ID = ?",
                 "  AND mutants.ClassFile IS NOT NULL;");
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(gameId));
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId));
     }
 
     /**
@@ -138,7 +138,7 @@ public class MutantDAO {
                 "  AND games.Class_ID = ?",
                 "  AND mutants.ClassFile IS NOT NULL;");
 
-        result.addAll(DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(classId)));
+        result.addAll(DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId)));
 
         // Include also those mutants created during the upload. Player = -1
         String systemAttackerQuery = String.join("\n",
@@ -148,7 +148,7 @@ public class MutantDAO {
                 "  AND mutants.Class_ID = ?",
                 "  AND mutants.ClassFile IS NOT NULL;");
 
-        result.addAll(DB.executeQueryReturnList(systemAttackerQuery, MutantDAO::mutantFromRS, DB.getDBV(classId)));
+        result.addAll(DB.executeQueryReturnList(systemAttackerQuery, MutantDAO::mutantFromRS, DatabaseValue.of(classId)));
 
         return result;
     }
@@ -163,7 +163,7 @@ public class MutantDAO {
                 "LEFT JOIN users ON players.User_ID = users.User_ID ",
                 "WHERE mutants.Player_ID = ?",
                 "  AND mutants.ClassFile IS NOT NULL;");
-        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DB.getDBV(playerId));
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(playerId));
     }
 
     /**
@@ -193,23 +193,21 @@ public class MutantDAO {
                 "INSERT INTO mutants (JavaFile, ClassFile, Game_ID, RoundCreated, Equivalent, Alive, Player_ID, Points, MD5, Class_ID, MutatedLines)",
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         );
-        DatabaseValue[] valueList = new DatabaseValue[]{
-                DB.getDBV(javaFile),
-                DB.getDBV(classFile),
-                DB.getDBV(gameId),
-                DB.getDBV(roundCreated),
-                DB.getDBV(equivalent.name()),
-                DB.getDBV(sqlAlive),
-                DB.getDBV(playerId),
-                DB.getDBV(score),
-                DB.getDBV(md5),
-                DB.getDBV(classId),
-                DB.getDBV(mutatedLinesString)
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(javaFile),
+                DatabaseValue.of(classFile),
+                DatabaseValue.of(gameId),
+                DatabaseValue.of(roundCreated),
+                DatabaseValue.of(equivalent.name()),
+                DatabaseValue.of(sqlAlive),
+                DatabaseValue.of(playerId),
+                DatabaseValue.of(score),
+                DatabaseValue.of(md5),
+                DatabaseValue.of(classId),
+                DatabaseValue.of(mutatedLinesString)
         };
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
-        final int result = DB.executeUpdateGetKeys(stmt, conn);
+        final int result = DB.executeUpdateQueryGetKeys(query, values);
         if (result != -1) {
             return result;
         } else {
@@ -229,14 +227,11 @@ public class MutantDAO {
                 "INSERT INTO mutant_uploaded_with_class (Mutant_ID, Class_ID)",
                 "VALUES (?, ?);"
         );
-        DatabaseValue[] valueList = new DatabaseValue[]{
-                DB.getDBV(mutantId),
-                DB.getDBV(classId)
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(mutantId),
+                DatabaseValue.of(classId)
         };
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        return DB.executeUpdate(stmt, conn);
+        return DB.executeUpdateQuery(query, values);
     }
 
     /**
@@ -250,11 +245,11 @@ public class MutantDAO {
                 "DELETE FROM mutants WHERE Mutant_ID = ?;",
                 "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID = ?"
         );
-
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, DB.getDBV(id));
-
-        return DB.executeUpdate(stmt, conn);
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(id),
+                DatabaseValue.of(id)
+        };
+        return DB.executeUpdateQuery(query, values);
     }
 
     /**
@@ -276,20 +271,17 @@ public class MutantDAO {
 
         final String range = bob.toString();
         String query = String.join("\n",
-                "DELETE FROM mutants WHERE Mutant_ID in ",
-                range,
-                "DELETE FROM mutant_uploaded_with_class WHERE Mutant_ID in ",
-                range
+                "DELETE FROM mutants",
+                "WHERE Mutant_ID in " + range,
+                "DELETE FROM mutant_uploaded_with_class",
+                "WHERE Mutant_ID in " + range
         );
 
         // Hack to make sure all values are listed in both 'ranges'.
         mutants.addAll(new LinkedList<>(mutants));
-        DatabaseValue[] valueList = mutants.stream().map(DB::getDBV).toArray(DatabaseValue[]::new);
+        DatabaseValue[] values = mutants.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
 
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        return DB.executeUpdate(stmt, conn);
+        return DB.executeUpdateQuery(query, values);
     }
 
     /**
@@ -306,6 +298,18 @@ public class MutantDAO {
                 "  AND mutants.Game_ID = games.ID;"
         );
 
-        return DB.executeQueryReturnValue(query, res -> res.getInt("Class_ID"), DB.getDBV(mutantId));
+        return DB.executeQueryReturnValue(query, res -> res.getInt("Class_ID"), DatabaseValue.of(mutantId));
+    }
+
+    /**
+     * Returns the number of killed AI tests for a given mutant.
+     *
+     * @param mutantId the identifier of the mutant.
+     * @return number of killed AI tests, or {@code 0} if none found.
+     */
+    public static int getNumTestsKillMutant(int mutantId) {
+        String query = "SELECT * FROM mutants WHERE Mutant_ID=?;";
+        final Integer kills = DB.executeQueryReturnValue(query, rs -> rs.getInt("NumberAiKillingTests"), DatabaseValue.of(mutantId));
+        return Optional.ofNullable(kills).orElse(0);
     }
 }

@@ -23,18 +23,18 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DB;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -94,7 +94,8 @@ public class Test {
 	public Test(int classId, int gameId, String javaFile, String classFile, int playerId) {
 	    this.classId = classId;
 		this.gameId = gameId;
-        DuelGame g = DatabaseAccess.getGameForKey("ID", gameId);
+        // FIXME: Why will only work for Duel Games since multiplayer games do not have rounds.
+        DuelGame g = DuelGameDAO.getDuelGameForId(gameId);
         if (g != null) {
             this.roundCreated = g.getCurrentRound();
         } else {
@@ -134,7 +135,7 @@ public class Test {
 		String query = "UPDATE tests SET Points = Points + ? WHERE Test_ID=?;";
 		Connection conn = DB.getConnection();
 
-		DatabaseValue[] valueList = new DatabaseValue[] { DB.getDBV(score), DB.getDBV(id) };
+		DatabaseValue[] valueList = new DatabaseValue[] { DatabaseValue.of(score), DatabaseValue.of(id) };
 
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
@@ -169,7 +170,8 @@ public class Test {
 	}
 
 	public int getDefenderPoints() {
-		final DuelGame game = DatabaseAccess.getGameForKey("ID", this.gameId);
+		// FIXME: Why will only work for Duel Games since multiplayer games have multiple defenders
+		final DuelGame game = DuelGameDAO.getDuelGameForId(this.gameId);
 		if (game != null && playerId == game.getDefenderId()) {
 			return mutantsKilled;
 		} else {
@@ -194,7 +196,7 @@ public class Test {
 		String query = "UPDATE tests SET MutantsKilled = MutantsKilled + ? WHERE Test_ID=?;";
 		Connection conn = DB.getConnection();
 
-		DatabaseValue[] valueList = new DatabaseValue[] { DB.getDBV(1), DB.getDBV(id) };
+		DatabaseValue[] valueList = new DatabaseValue[] { DatabaseValue.of(1), DatabaseValue.of(id) };
 
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
@@ -227,17 +229,8 @@ public class Test {
 		return DatabaseAccess.getKilledMutantsForTestId(id);
 	}
 
-	@SuppressWarnings("Duplicates")
-	public String getAsString() {
-		try {
-			return new String(Files.readAllBytes(Paths.get(javaFile)));
-		} catch (FileNotFoundException e) {
-			logger.error("Could not find file " + javaFile);
-			return "[File Not Found]";
-		} catch (IOException e) {
-			logger.error("Could not read file " + javaFile);
-			return "[File Not Readable]";
-		}
+	private String getAsString() {
+		return FileUtils.readJavaFileWithDefault(Paths.get(javaFile));
 	}
 
 	@SuppressWarnings("Duplicates")
@@ -269,12 +262,12 @@ public class Test {
 		}
 
 		String query = "UPDATE tests SET mutantsKilled=?,NumberAiMutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
-		DatabaseValue[] valueList = new DatabaseValue[]{DB.getDBV(mutantsKilled),
-				DB.getDBV(aiMutantsKilled),
-				DB.getDBV(linesCoveredString),
-				DB.getDBV(linesUncoveredString),
-				DB.getDBV(score),
-				DB.getDBV(id)
+		DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(mutantsKilled),
+				DatabaseValue.of(aiMutantsKilled),
+				DatabaseValue.of(linesCoveredString),
+				DatabaseValue.of(linesUncoveredString),
+				DatabaseValue.of(score),
+				DatabaseValue.of(id)
 		};
 
 		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -302,7 +295,7 @@ public class Test {
 	public int getAiMutantsKilled() {
 		if (aiMutantsKilled == 0) {
 			//Retrieve from DB.
-			aiMutantsKilled = DatabaseAccess.getNumAiMutantsKilledByTest(getId());
+			aiMutantsKilled = TestDAO.getNumAiMutantsKilledByTest(getId());
 		}
 		return aiMutantsKilled;
 	}

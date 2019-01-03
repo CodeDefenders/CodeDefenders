@@ -18,8 +18,8 @@
  */
 package org.codedefenders.itests.parallelize;
 
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.MutationTester;
@@ -234,8 +234,6 @@ public class ParallelizeTest {
 		int classId = cut.getId();
 		int creatorId = creator.getId();
 		GameLevel level = GameLevel.HARD;
-		float lineCoverage = (float) 1;
-		float mutantCoverage = (float) 1;
 		float prize = (float) 1;
 		int defenderValue = 1;
 		int attackerValue = 1;
@@ -247,22 +245,25 @@ public class ParallelizeTest {
 		//
 		long finishDateTime = new Timestamp(System.currentTimeMillis() + 24 * 60 * 60 * 100 * 1000).getTime();
 
-		String status = GameState.ACTIVE.name();
+		GameState status = GameState.ACTIVE;
 		int maxAssertionsPerTest = 2;
-		boolean chatEnabled = false;
 		CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
-		boolean markUncovered = false;
 
-		MultiplayerGame multiplayerGame = new MultiplayerGame(classId, creatorId, level, lineCoverage, mutantCoverage,
-				prize, defenderValue, attackerValue, defenderLimit, attackerLimit, minDefenders, minAttackers,
-				startDateTime, finishDateTime, status, maxAssertionsPerTest, chatEnabled, mutantValidatorLevel,
-				markUncovered);
+		final MultiplayerGame multiplayerGame = new MultiplayerGame.Builder(classId, creatorId, startDateTime, finishDateTime, maxAssertionsPerTest, defenderLimit, attackerLimit, minDefenders, minAttackers)
+				.state(status)
+				.level(level)
+				.prize(prize)
+				.defenderValue(defenderValue)
+				.attackerValue(attackerValue)
+				.mutantValidatorLevel(mutantValidatorLevel)
+				.build();
+
 		// Store to db
 		boolean inserted = multiplayerGame.insert();
 		assumeTrue(inserted);
 
 		// Check that the game really started?
-		MultiplayerGame activeGame = DatabaseAccess.getMultiplayerGame(multiplayerGame.getId());
+		MultiplayerGame activeGame = MultiplayerGameDAO.getMultiplayerGame(multiplayerGame.getId());
 		assumeThat(multiplayerGame.getId(), is(activeGame.getId()));
 
 		return activeGame;
@@ -367,7 +368,7 @@ public class ParallelizeTest {
 
 			Patch patch = DiffUtils.parseUnifiedDiff(diff);
 			// Read the CUT code
-			List<String> origincalCode = Arrays.asList( battlegroundGame.getCUT().getAsString().split("\n") );
+			List<String> origincalCode = Arrays.asList( battlegroundGame.getCUT().getSourceCode().split("\n") );
 			// Apply the patch
 
 			List<String> mutantCode =(List<String>) DiffUtils.patch( origincalCode, patch);

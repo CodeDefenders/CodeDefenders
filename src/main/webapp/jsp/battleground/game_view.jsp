@@ -40,7 +40,7 @@
         gameId = 0;
         redirectToGames = true;
     }
-    MultiplayerGame game = DatabaseAccess.getMultiplayerGame(gameId);
+    MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
     if (game == null){
         logger.error(String.format("Could not find multiplayer game %d", gameId));
         redirectToGames = true;
@@ -72,6 +72,7 @@
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
+<%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <%
 	boolean renderMutants = true;
 	boolean redirect = false;

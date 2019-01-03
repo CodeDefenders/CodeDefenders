@@ -24,12 +24,12 @@ import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.game.singleplayer.SinglePlayerGame;
 import org.codedefenders.model.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +45,7 @@ import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
  * @see DuelGame
  * @see MultiplayerGame
  * @see SinglePlayerGame
+ * @see PuzzleGame
  */
 public abstract class AbstractGame {
 	protected static final Logger logger = LoggerFactory.getLogger(AbstractGame.class);
@@ -58,7 +59,7 @@ public abstract class AbstractGame {
 	protected GameLevel level;
 	protected GameMode mode;
 
-	protected ArrayList<Event> events;
+	protected List<Event> events;
 	protected List<Mutant> mutants;
 	protected List<Test> tests;
 
@@ -77,7 +78,7 @@ public abstract class AbstractGame {
 		return classId;
 	}
 
-	public ArrayList<Event> getEvents(){
+	public List<Event> getEvents(){
 		if (events == null){
 			events = DatabaseAccess.getEventsForGame(getId());
 		}
