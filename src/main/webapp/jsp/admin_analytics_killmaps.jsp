@@ -67,7 +67,7 @@
 	<h4>Submit KillMap Jobs for Classes</h4>
 	<div class="full-width">
 		<form id="killmapJobSubmission" name="killmapJobSubmission"
-			action="admin/analytics/killmaps" method="post">
+              action="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_KILLMAPS%>" method="post">
 		<%-- For each class in the DB gives the possibility to create the killmap. Additional data might be shown as well as in the Classes Analytics
 		but I cannot figure out how data are provided there ...--%>
 		    
@@ -113,7 +113,7 @@
 	<h4>Settings</h4>
 	<div class="full-width">
 		<form id="killmapProcessorSettings" name="killmapProcessorSettings"
-			action="admin/analytics/killmaps" method="post">
+              action="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_KILLMAPS%>" method="post">
 			<input type="hidden" name="formType" value="updateSettings">
 
 			<%

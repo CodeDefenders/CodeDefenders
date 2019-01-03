@@ -20,6 +20,7 @@ package org.codedefenders.servlets.auth;
 
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
+import org.codedefenders.util.Paths;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -68,18 +69,18 @@ public class LoginFilter implements Filter {
 	}
 
 	private boolean shouldAllow(HttpServletRequest request) {
-		String path = request.getRequestURI().toString();
-		String context = request.getContextPath().toString();
+		String path = request.getRequestURI();
+		String context = request.getContextPath();
 		if ((path.endsWith(context + "/")) //
 				|| (path.endsWith(context + "/favicon.ico")) //
-				|| (path.endsWith(context + "/login"))
-				|| (path.endsWith(context + "/help"))
+				|| (path.endsWith(context + Paths.LOGIN))
+				|| (path.endsWith(context + Paths.HELP_PAGE))
 				|| (path.endsWith(context + "/video")) || (path.endsWith(context + "/video.mp4"))
 				|| (path.contains(context + "/papers"))
-				|| (path.endsWith(context + "/sendEmail"))
+				|| (path.endsWith(context + Paths.API_SEND_EMAIL))
 				|| (path.endsWith(context + "/index.jsp"))
-				|| path.endsWith(context + "/about")
-				|| path.endsWith(context + "/contact"))
+				|| path.endsWith(context + Paths.ABOUT_PAGE)
+				|| path.endsWith(context + Paths.CONTACT_PAGE))
 			return true;
 
 		Pattern excludeUrls = Pattern.compile("^.*/(css|js|images|fonts|codemirror)/.*$", Pattern.CASE_INSENSITIVE);
@@ -93,6 +94,6 @@ public class LoginFilter implements Filter {
 
 		session.setAttribute("loginFrom", httpReq.getRequestURI());
 		String context = httpReq.getContextPath();
-		httpResp.sendRedirect(context+"/login");
+		httpResp.sendRedirect(context+ Paths.LOGIN);
 	}
 }

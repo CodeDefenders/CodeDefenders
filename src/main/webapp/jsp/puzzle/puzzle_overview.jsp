@@ -72,7 +72,7 @@
                             final String title = puzzleEntry.getPuzzle().getTitle();
                 %>
                 <a class="btn btn-xs"
-                   href="${pageContext.request.contextPath}/puzzlegame?puzzleId=<%=puzzleId%>"><%=title%></a>
+                   href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"><%=title%></a>
                 <%--TODO add puzzle description, maybe as a modal--%>
                 <%
                         } else { // Locked puzzle

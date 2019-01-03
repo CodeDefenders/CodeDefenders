@@ -19,6 +19,7 @@
 package org.codedefenders.game.singleplayer;
 
 import org.codedefenders.execution.AntRunner;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +36,7 @@ public class AiPreparer extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.sendRedirect(request.getContextPath()+"/games/upload");
+        response.sendRedirect(request.getContextPath()+ Paths.CLASS_UPLOAD);
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -55,6 +56,6 @@ public class AiPreparer extends HttpServlet {
                 break;
         }
 
-        response.sendRedirect(request.getContextPath()+"/games/upload");
+        response.sendRedirect(request.getContextPath() + Paths.CLASS_UPLOAD);
     }
 }

@@ -57,7 +57,7 @@
 
 <div class="admin-panel">
 	<h2>Admin</h2>
-	<form id="adminEndBtn" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post" style="display: inline-block;">
+	<form id="adminEndBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" style="display: inline-block;">
 		<button type="submit" class="btn btn-primary btn-game btn-left" id="endGame" form="adminEndBtn"
 				<% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
 			End Game
@@ -65,7 +65,7 @@
 		<input type="hidden" name="formType" value="endGame">
 		<input type="hidden" name="mpGameID" value="<%= game.getId() %>" />
 	</form>
-	<form id="adminStartBtn" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase()%>" method="post" style="display: inline-block;">
+	<form id="adminStartBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" style="display: inline-block;">
 		<button type="submit" class="btn btn-primary btn-game" id="startGame" form="adminStartBtn"
 				<% if (game.getState() != GameState.CREATED) { %> disabled <% } %>>
 			Start Game

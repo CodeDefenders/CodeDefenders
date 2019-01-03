@@ -43,9 +43,9 @@
     </table>
 
     <div class="btn-group">
-        <a download="user-analytics.csv" href="<%=request.getContextPath()+Constants.API_ANALYTICS_USERS%>?type=csv"
+        <a download="user-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_USERS%>?type=csv"
             type="button" class="btn btn-default" id="download-csv">Download as CSV</a>
-        <a download="user-analytics.json" href="<%=request.getContextPath()+Constants.API_ANALYTICS_USERS%>?type=json"
+        <a download="user-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_USERS%>?type=json"
            type="button" class="btn btn-default" id="download-json">Download as JSON</a>
     </div>
 
@@ -123,7 +123,7 @@
         $(document).ready(function() {
             table = $('#tableUsers').DataTable({
                 "ajax": {
-                    "url": "<%=request.getContextPath() + Constants.API_ANALYTICS_USERS%>",
+                    "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_USERS%>",
                     "dataSrc": "data"
                 },
                 "columns": [

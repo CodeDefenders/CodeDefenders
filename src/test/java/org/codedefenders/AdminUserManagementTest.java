@@ -1,18 +1,5 @@
 package org.codedefenders;
 
-import java.io.IOException;
-import java.net.URL;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.xml.bind.Unmarshaller;
-
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.itests.IntegrationTest;
@@ -21,6 +8,7 @@ import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.admin.AdminUserManagement;
 import org.codedefenders.servlets.auth.LoginManager;
 import org.codedefenders.util.EmailUtils;
+import org.codedefenders.util.Paths;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -34,6 +22,15 @@ import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
@@ -87,7 +84,7 @@ public class AdminUserManagementTest {
 	// Mockito.when(request.getParameter("formType")).thenReturn("createUsers");
 	// String userNameList = "user1,12345678\nuser2,12345678";
 	// Mockito.when(request.getRequestURL()).thenReturn(new
-	// StringBuffer("http://localhost:8080/admin/users"));
+	// StringBuffer("http://localhost:8080" + Constants.ADMIN_USERS));
 	// Mockito.when(request.getParameter("user_name_list")).thenReturn(userNameList);
 	//
 	// // Capture Response
@@ -156,7 +153,7 @@ public class AdminUserManagementTest {
 		Mockito.when(request.getServerName()).thenReturn("localhost");
 		Mockito.when(request.getServerPort()).thenReturn(8080);
 		Mockito.when(request.getContextPath()).thenReturn("/");
-		Mockito.when(request.getServletPath()).thenReturn("/admin/users");
+		Mockito.when(request.getServletPath()).thenReturn(Paths.ADMIN_USERS);
 		
 
 		Mockito.when(request.getParameter("user_name_list")).thenReturn(userNameList);
@@ -172,6 +169,6 @@ public class AdminUserManagementTest {
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		EmailUtils.sendEmail(Mockito.anyString(), Mockito.anyString(), captor.capture());
 		String email = captor.getValue();
-		Assert.assertFalse(email.contains("/admin/users"));
+		Assert.assertFalse(email.contains(Paths.ADMIN_USERS));
 	}
 }

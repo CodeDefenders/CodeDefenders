@@ -18,12 +18,12 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.apache.commons.lang.ArrayUtils" %>
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.model.NotificationType" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <%@ include file="/jsp/header_base.jsp" %>
 
@@ -37,8 +37,8 @@
             $(r).each(function (index) {
                 $("#userDropDown li:first-child").after(
                     "<li><a " +
-                    "href=\"" + "<%=request.getContextPath()%>" +
-                    "/multiplayer/games?id=" + r[index].gameId +
+                    "href=\"" + "<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>"
+                    + "?id=" + r[index].gameId +
                     "\" style=\"width:100%;\">" +
                     r[index].parsedMessage +
                     "</a></li>"
@@ -67,11 +67,11 @@
                 // refreshed every 5 seconds
                 var interval = 5000;
                 setInterval(function () {
-                    var url = "<%=request.getContextPath()%>/notifications?type=<%=NotificationType.USEREVENT%>&timestamp=" + (new Date().getTime() - interval);
+                    var url = "<%=request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.USEREVENT%>&timestamp=" + (new Date().getTime() - interval);
                     updateUserNotifications(url);
                 }, interval);
 
-                var url = "<%=request.getContextPath()%>/notifications?type=<%=NotificationType.USEREVENT%>&timestamp=0";
+                var url = "<%=request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.USEREVENT%>&timestamp=0";
                 updateUserNotifications(url);
             }
             $('[data-toggle="tooltip"]').tooltip();
@@ -95,34 +95,33 @@
                 <li style="float: none" class="dropdown"><a
                             id="headerGamesDropdown"
                             class="text-white button tab-link bg-minus-1 dropdown-toggle"
-                            href="<%=request.getContextPath() %>/games/user"
+                            href="<%=request.getContextPath() + Paths.GAMES_OVERVIEW%>"
                             style="width:100%;" data-toggle="dropdown" href="#">Games <span class="glyphicon glyphicon-menu-hamburger" style="float: right;"></span></a>
                         <ul class="dropdown-menu" style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
-                            <li><a id="headerUserGames" href="<%=request.getContextPath() %>/games/user" style="width:100%;">Games</a></li>
-                            <%-- <li><a id="headerOpenGames" href="<%=request.getContextPath() %>/games/open" style="width:100%;">Open Games</a></li> --%>
-                            <li><a id="headerGamesHistory" href="<%=request.getContextPath() %>/games/history" style="width:100%;">History</a></li>
+                            <li><a id="headerUserGames" href="<%=request.getContextPath()  + Paths.GAMES_OVERVIEW%>" style="width:100%;">Games</a></li>
+                            <li><a id="headerGamesHistory" href="<%=request.getContextPath() + Paths.GAMES_HISTORY %>" style="width:100%;">History</a></li>
                         </ul>
                 </li>
 
                 <% if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) { %>
-                <li style="float: none"><a id="headerUploadButton" class="text-white button tab-link bg-minus-1" href="games/upload" style="width:100%;">Upload Class</a></li>
+                <li style="float: none"><a id="headerUploadButton" class="text-white button tab-link bg-minus-1" href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" style="width:100%;">Upload Class</a></li>
                 <% }%>
 
                 <!-- link to puzzles overview
-                <li style="float: none"><a id="puzzleOverview" class="text-white button tab-link bg-minus-1" href="<%=request.getContextPath() %>/puzzles" style="width:100%;">Puzzles</a></li>
+                <li style="float: none"><a id="puzzleOverview" class="text-white button tab-link bg-minus-1" href="<%=request.getContextPath() + Paths.PUZZLE_OVERVIEW%>" style="width:100%;">Puzzles</a></li>
                 -->
 
                 <!-- link to puzzles overview
-                <li style="float: none"><a id="puzzleOverview" class="text-white button tab-link bg-minus-1" href="<%=request.getContextPath() %>/puzzles" style="width:100%;">Puzzles</a></li>
+                <li style="float: none"><a id="puzzleOverview" class="text-white button tab-link bg-minus-1" href="<%=request.getContextPath() + Paths.PUZZLE_OVERVIEW%>" style="width:100%;">Puzzles</a></li>
                 -->
 
-                <li style="float: none"><a id="headerLeaderboardButton" class="text-white button tab-link bg-minus-1" href="leaderboards" style="width: 100%;">Leaderboard</a></li>
+                <li style="float: none"><a id="headerLeaderboardButton" class="text-white button tab-link bg-minus-1" href="<%=request.getContextPath() + Paths.LEADERBOARD_PAGE%>" style="width: 100%;">Leaderboard</a></li>
                 <li style="float: none"><a id="headerHelpButton" class="text-white button tab-link bg-minus-1" href="help" style="width:100%;">Help</a></li>
                 <li style="float: none; white-space: nowrap;" class="dropdown"><a
                         id="headerUserDropdown"
                         class="text-white button tab-link bg-minus-1 dropdown-toggle"
-                        href="<%=request.getContextPath() %>/games/user"
+                        href="<%=request.getContextPath() + Paths.GAMES_OVERVIEW%>"
                         style="width:100%;" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                     <%=request.getSession().getAttribute("username")%>
                     (<span id="notificationCount"></span>)
@@ -132,7 +131,7 @@
                         #FFFFFF; border: 1px solid #000000;">
                         <li><a
                                id="headerLogout"
-                               href="<%=request.getContextPath()%>/logout"
+                               href="<%=request.getContextPath() + Paths.LOGOUT%>"
                                style="width:100%;border-bottom:1px solid
                                black">Logout
                         </a></li>
@@ -142,7 +141,7 @@
     </div>
 </div>
 
-<form id="logout" action="<%=request.getContextPath() %>/login" method="post">
+<form id="logout" action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post">
     <input type="hidden" name="formType" value="logOut">
 </form>
 

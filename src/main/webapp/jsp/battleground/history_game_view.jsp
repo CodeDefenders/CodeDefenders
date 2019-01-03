@@ -35,18 +35,18 @@
             gameId = Integer.parseInt(request.getParameter("id"));
             session.setAttribute("mpGameId", gameId);
         } catch (NumberFormatException e) {
-            response.sendRedirect(request.getContextPath()+"/games/history");
+            response.sendRedirect(request.getContextPath() + Paths.GAMES_HISTORY);
             return;
         }
     } else {
-        response.sendRedirect(request.getContextPath()+"/games/history");
+        response.sendRedirect(request.getContextPath() + Paths.GAMES_HISTORY);
         return;
     }
 
     MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
 
     if (game == null || game.getState() != GameState.FINISHED) {
-        response.sendRedirect(request.getContextPath() + "/games/user");
+        response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
     }
 
     int uid = ((Integer) session.getAttribute("uid"));

@@ -18,6 +18,7 @@
  */
 package org.codedefenders.systemtests;
 
+import org.codedefenders.util.Paths;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.openqa.selenium.By;
@@ -56,7 +57,7 @@ public class SuccessfulRegisterLogoutAndLoginTest extends AbstractEmptyDBSystemT
 		driver.findElement(By.id("submitCreateAccount")).click();
 
 		/* Check if we are on game list page */
-		assertURLEndsWith(driver.getCurrentUrl(), "codedefenders/games/user");
+		assertURLEndsWith(driver.getCurrentUrl(), "codedefenders" + Paths.GAMES_OVERVIEW);
 
 		/* Logout */
 		driver.findElement(By.id("headerUserDropdown")).click();
@@ -74,7 +75,7 @@ public class SuccessfulRegisterLogoutAndLoginTest extends AbstractEmptyDBSystemT
 		driver.findElement(By.id("signInButton")).click();
 
 		/* Check if we are on game list page */
-		assertURLEndsWith(driver.getCurrentUrl(), "codedefenders/games/user");
+		assertURLEndsWith(driver.getCurrentUrl(), "codedefenders" + Paths.GAMES_OVERVIEW);
 
 		/* Logout again */
 		driver.findElement(By.id("headerUserDropdown")).click();

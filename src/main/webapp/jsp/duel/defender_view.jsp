@@ -100,7 +100,7 @@
                 Defend!
             </button>
         </h3>
-        <form id="def" action="<%=request.getContextPath() + "/" + game.getClass().getSimpleName().toLowerCase() %>" method="post">
+        <form id="def" action="<%=request.getContextPath() + Paths.DUEL_GAME %>" method="post">
             <%@include file="../game_components/test_editor.jsp"%>
             <input type="hidden" name="formType" value="createTest">
         </form>
@@ -122,7 +122,7 @@
 <script>
 	<% if (game.getActiveRole().equals(Role.ATTACKER)) {%>
         function checkForUpdate(){
-            $.post('/duelgame', {
+            $.post('<%=request.getContextPath() + Paths.DUEL_GAME%>', {
                 formType: "whoseTurn",
                 gameID: <%= game.getId() %>
             }, function(data){

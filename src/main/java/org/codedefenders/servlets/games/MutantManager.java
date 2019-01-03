@@ -20,12 +20,13 @@ package org.codedefenders.servlets.games;
 
 import com.google.gson.Gson;
 
+import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
-import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +40,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+ // TODO Phil 02/01/19: this seems to be never used so we may remove it?
 public class MutantManager extends HttpServlet {
 
     private static final Logger logger =
@@ -81,7 +83,7 @@ public class MutantManager extends HttpServlet {
                 out.flush();
             }
         } catch (Exception e) {
-            response.sendRedirect(contextPath+"/games/user");
+            response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
         }
     }
 

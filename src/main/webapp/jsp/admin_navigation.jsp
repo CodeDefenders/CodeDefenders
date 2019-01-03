@@ -46,13 +46,13 @@
 
 <ul class="nav nav-tabs">
     <li class="<%=active(activePage,"adminCreateGames")%>">
-        <a id="adminCreateGames" href="<%=request.getContextPath()%>/admin/games">Create Games</a>
+        <a id="adminCreateGames" href="<%=request.getContextPath() + Paths.ADMIN_GAMES%>">Create Games</a>
     </li>
     <li class="<%=active(activePage,"adminMonitorGames")%>">
-        <a id="adminMonitorGames" href="<%=request.getContextPath()%>/admin/monitor">Monitor Games</a>
+        <a id="adminMonitorGames" href="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>">Monitor Games</a>
     </li>
     <li class="<%=active(activePage,"adminUserMgmt")%>">
-        <a id="adminUserMgmt" href="<%=request.getContextPath()%>/admin/users">Manage Users</a>
+        <a id="adminUserMgmt" href="<%=request.getContextPath() + Paths.ADMIN_USERS%>">Manage Users</a>
     </li>
     <li class="<%=active(activePage,"adminSystemSettings")%>">
         <a id="adminSystemSettings" href="<%=request.getContextPath()%>/admin/settings">System Settings</a>
@@ -60,9 +60,9 @@
     <li class="<%=active(activePage,"adminAnalytics")%> dropdown">
         <a id="adminAnalytics" class="dropdown-toggle" data-toggle="dropdown" href="#">Analytics&#160&#160<span class="glyphicon glyphicon-menu-hamburger"></span></a>
         <ul class="dropdown-menu">
-            <li><a id="adminAnalyticsUsers" href="<%=request.getContextPath() + Constants.ADMIN_ANALYTICS_USERS%>">Users</a></li>
-            <li><a id="adminAnalyticsClasses" href="<%=request.getContextPath() + Constants.ADMIN_ANALYTICS_CLASSES%>">Classes</a></li>
-            <li><a id="adminAnalyticsKillmaps" href="<%=request.getContextPath() + Constants.ADMIN_ANALYTICS_KILLMAPS%>">KillMaps</a></li>
+            <li><a id="adminAnalyticsUsers" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_USERS%>">Users</a></li>
+            <li><a id="adminAnalyticsClasses" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_CLASSES%>">Classes</a></li>
+            <li><a id="adminAnalyticsKillmaps" href="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_KILLMAPS%>">KillMaps</a></li>
         </ul>
     </li>
 </ul>

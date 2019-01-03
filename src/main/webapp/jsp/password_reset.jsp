@@ -1,4 +1,4 @@
-<%--
+<%@ page import="org.codedefenders.util.Paths" %><%--
 
     Copyright (C) 2016-2018 Code Defenders contributors
 
@@ -26,7 +26,7 @@
 	  Object uid = request.getSession().getAttribute("uid");
 	  Object username = request.getSession().getAttribute("username");
 	  if (uid != null && username != null)
-		  response.sendRedirect(request.getContextPath()+"/games");
+		  response.sendRedirect(request.getContextPath()+ Paths.GAMES_OVERVIEW);
 
 	  String email = request.getParameter("email");
 	  String reference = request.getParameter("reference");
@@ -36,7 +36,7 @@
   <div id="login" class="container">
       <div class="modal-body">
           <div id="create">
-              <form  action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
+              <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post" class="form-signin">
                   <input type="hidden" name="formType" value="resetPassword">
                   <input type="hidden" name="reference"
                          value="<%= reference %>">

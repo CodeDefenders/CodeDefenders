@@ -118,12 +118,12 @@
                                         if (gameType == GameMode.PARTY) {
                                             if (m.getLines().size() > 1) {
                                 %>
-                                                <a href="<%= request.getContextPath() %>/multiplayer/play?equivLines=<%=m.getLines().toString().replaceAll(", ", ",") %>"
+                                                <a href="<%= request.getContextPath() + Paths.BATTLEGROUND_GAME%>?equivLines=<%=m.getLines().toString().replaceAll(", ", ",") %>"
                                                    class="btn btn-default btn-diff"
                                                    onclick="return confirm('This will mark all player-created mutants on lines <%= m.getLines() %> as equivalent. Are you sure?');">
                                                     Claim Equivalent</a>
                                                 <% } else { %>
-                                                <a  href="<%= request.getContextPath() %>/multiplayer/play?equivLine=<%= m.getLines().get(0) %>"
+                                                <a  href="<%= request.getContextPath() + Paths.BATTLEGROUND_GAME%>?equivLine=<%= m.getLines().get(0) %>"
                                                    class="btn btn-default btn-diff"
                                                    onclick="return confirm('This will mark all player-created mutants on line <%= m.getLines().get(0) %> as equivalent. Are you sure?');">
                                                     Claim Equivalent</a>
@@ -131,7 +131,7 @@
                                             }
                                         } else if (gameType == GameMode.DUEL) {
                                 %>
-                                            <form id="equiv" action="<%=request.getContextPath() %>/duelgame" method="post" onsubmit="return confirm('This will mark mutant <%= m.getId() %> as equivalent. Are you sure?');">
+                                            <form id="equiv" action="<%=request.getContextPath() + Paths.DUEL_GAME%>" method="post" onsubmit="return confirm('This will mark mutant <%= m.getId() %> as equivalent. Are you sure?');">
                                                 <input type="hidden" name="formType" value="claimEquivalent">
                                                 <input type="hidden" name="mutantId" value="<%=m.getId()%>">
                                                 <button type="submit" class="btn btn-default btn-right">Claim Equivalent</button>

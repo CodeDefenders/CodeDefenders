@@ -45,9 +45,9 @@
     </table>
 
     <div class="btn-group">
-        <a download="classes-analytics.csv" href="<%=request.getContextPath()+Constants.API_ANALYTICS_CLASSES%>?type=csv"
+        <a download="classes-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?type=csv"
             type="button" class="btn btn-default" id="download-csv">Download as CSV</a>
-        <a download="classes-analytics.json" href="<%=request.getContextPath()+Constants.API_ANALYTICS_CLASSES%>?type=json"
+        <a download="classes-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_CLASSES%>?type=json"
            type="button" class="btn btn-default" id="download-json">Download as JSON</a>
     </div>
 
@@ -128,7 +128,7 @@
         $(document).ready(function() {
             table = $('#tableClasses').DataTable({
                 "ajax": {
-                    "url": "<%=request.getContextPath() + Constants.API_ANALYTICS_CLASSES%>",
+                    "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_CLASSES%>",
                     "dataSrc": "data"
                 },
                 "columns": [

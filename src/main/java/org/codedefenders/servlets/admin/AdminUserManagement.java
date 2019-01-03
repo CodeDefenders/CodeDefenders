@@ -25,6 +25,7 @@ import org.codedefenders.model.User;
 import org.codedefenders.servlets.auth.LoginManager;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.EmailUtils;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,7 +75,7 @@ public class AdminUserManagement extends HttpServlet {
 		final HttpSession session = request.getSession();
 		final ArrayList<String> messages = new ArrayList<>();
 		session.setAttribute("messages", messages);
-		String responsePath = request.getContextPath() + "/admin/users";
+		String responsePath = request.getContextPath() + Paths.ADMIN_USERS;
 
 		final String formType = request.getParameter("formType");
 		switch (formType) {

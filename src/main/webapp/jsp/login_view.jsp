@@ -21,6 +21,7 @@
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 <% String pageTitle = "Login"; %>
 
 <%@ include file="/jsp/header_logout.jsp" %>
@@ -29,12 +30,12 @@
     Object uid = request.getSession().getAttribute("uid");
     Object username = request.getSession().getAttribute("username");
     if (uid != null && username != null)
-        response.sendRedirect(request.getContextPath() + "/games");
+        response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
 %>
 
 
 <div id="login" class="container">
-    <form action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
+    <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post" class="form-signin">
         <input type="hidden" name="formType" value="login">
         <h2 class="form-signin-heading">Sign in</h2>
         <label for="inputUsername" class="sr-only">Username</label>
@@ -83,7 +84,7 @@
                 <h4 class="modal-title">Change your password</h4>
             </div>
             <div class="modal-body">
-                <form action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
+                <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post" class="form-signin">
                     <input type="hidden" name="resetPwSecret" id="resetPwSecret" value="<%=resetPw%>">
 
                     <input type="hidden" name="formType" value="changePassword">
@@ -132,7 +133,7 @@
                 <h4 class="modal-title">Reset your password</h4>
             </div>
             <div class="modal-body">
-                <form action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
+                <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post" class="form-signin">
                     <input type="hidden" name="formType" value="resetPassword">
                     <label for="inputUsername" class="sr-only">Username</label>
                     <input type="text" id="accountUsername" name="accountUsername" class="form-control"
@@ -166,7 +167,7 @@
             <%int pwMinLength = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue();%>
             <div class="modal-body">
                 <div id="create">
-                    <form action="<%=request.getContextPath() %>/login" method="post" class="form-signin">
+                    <form action="<%=request.getContextPath()  + Paths.LOGIN%>" method="post" class="form-signin">
                         <input type="hidden" name="formType" value="create">
                         <label for="inputUsername" class="sr-only">Username</label>
                         <span class="label label-danger" id="invalid_username_message" style="color: white;visibility: hidden">3-20 alphanumerics starting with a letter (a-z), no space or special characters.</span>

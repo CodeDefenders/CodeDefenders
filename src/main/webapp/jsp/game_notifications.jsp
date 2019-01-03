@@ -113,7 +113,7 @@
         var interval = 5000;
         var lastTime = 0;
         setInterval(function () {
-            var url = "<%= request.getContextPath()%>/notifications?type=<%=NotificationType.GAMEEVENT%>&gameId=<%=gameId%>&timestamp=" + lastTime;
+            var url = "<%= request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.GAMEEVENT%>&gameId=<%=gameId%>&timestamp=" + lastTime;
             lastTime = Math.round(new Date().getTime()/1000);
             updateGameNotifications(url);
         }, interval)
@@ -167,7 +167,7 @@
             // refreshed every 5 seconds
             var interval = 5000;
             setInterval(function () {
-                var url = "<%=request.getContextPath()%>/notifications?type=<%=NotificationType.PUSHEVENT%>&gameId=" + <%=gameId%> +"&timestamp=" + (new Date().getTime() - interval);
+                var url = "<%=request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.PUSHEVENT%>&gameId=" + <%=gameId%> +"&timestamp=" + (new Date().getTime() - interval);
                 updateMessages(url);
             }, interval)
     });

@@ -18,15 +18,16 @@
  */
 package org.codedefenders.systemtests;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.util.Properties;
-
+import org.codedefenders.util.Paths;
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.openqa.selenium.By;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.util.Properties;
 
 @Category(SystemTest.class)
 public class CheckCodeDefendersVersionTest extends AbstractEmptyDBSystemTest {
@@ -51,7 +52,7 @@ public class CheckCodeDefendersVersionTest extends AbstractEmptyDBSystemTest {
 //		Thread.sleep(500); //not sure why the sleep was needed, but it was needed or it wouldnt work :(
 //		target.click();
 		
-		driver.get(codeDefendersHome+"/about");
+		driver.get(codeDefendersHome+ Paths.ABOUT_PAGE);
 		
 		// // Retrieve the element
 		String versionString = driver.findElement(By.xpath("/html/body/div[2]/div[2]/div/div/p[1]")).getText();

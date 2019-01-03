@@ -67,6 +67,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -84,24 +85,19 @@ import static org.codedefenders.util.Constants.F_SEP;
 /**
  * This {@link HttpServlet} handles the upload of Java class files, which includes file validation and storing.
  * <p>
- * Serves on path: `/upload`, but redirects the view to `/games/upload`.
+ * Serves on path: `/upload`.
  */
-public class UploadManager extends HttpServlet {
-    private static final Logger logger = LoggerFactory.getLogger(UploadManager.class);
+public class ClassUploadManager extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(ClassUploadManager.class);
 
     private static List<String> reservedClassNames = Arrays.asList(
             "Test.java"
     );
 
-    private ServletFileUpload servletFileUpload;
-
-    // Enable minimal testing
-    void setServletFileUpload(ServletFileUpload servletFileUpload){
-        this.servletFileUpload=servletFileUpload;
-    }
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        response.sendRedirect(request.getContextPath() + "/games/upload");
+        RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.CLASS_UPLOAD_VIEW_JSP);
+        dispatcher.forward(request, response);
     }
 
     @SuppressWarnings("Duplicates")
@@ -135,9 +131,9 @@ public class UploadManager extends HttpServlet {
         // request.getParameter before fetching the file
         List<FileItem> items;
         try {
-            if( servletFileUpload == null ){
+            if (servletFileUpload == null) {
                 items = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
-            }else {
+            } else {
                 items = servletFileUpload.parseRequest(request);
             }
         } catch (FileUploadException e) {
@@ -461,7 +457,6 @@ public class UploadManager extends HttpServlet {
         // Since this is not happening in the context of a game we shall do it manually.
         List<Mutant> mutants = GameClassDAO.getMappedMutantsForClassId(cutId);
         List<Test> tests = GameClassDAO.getMappedTestsForClassId(cutId);
-
         try {
             // Custom Killmaps are not store in the DB for whatever reason,
             // while we need that !
@@ -505,16 +500,16 @@ public class UploadManager extends HttpServlet {
      * Adds the contents of a given zip file as mutants uploaded together with
      * a class under test.
      *
-     * @param request the request the mutants are added for.
-     * @param response the response to the request.
-     * @param messages messages which will be shown to the user, which made the request.
+     * @param request         the request the mutants are added for.
+     * @param response        the response to the request.
+     * @param messages        messages which will be shown to the user, which made the request.
      * @param compiledClasses a list of previously added CUT, tests and mutants,
      *                        which need to get cleaned up once something fails.
-     * @param cutId  the identifier of the class under test.
-     * @param cutFileName the file name of the class under test.
-     * @param cutDir the directory in which the class under test lies.
-     * @param mutantsZipFile the given zip file from which the mutants are added.
-     * @param dependencies dependencies required to compile the mutants.
+     * @param cutId           the identifier of the class under test.
+     * @param cutFileName     the file name of the class under test.
+     * @param cutDir          the directory in which the class under test lies.
+     * @param mutantsZipFile  the given zip file from which the mutants are added.
+     * @param dependencies    dependencies required to compile the mutants.
      * @return {@code true} if addition fails, {@code fail} otherwise.
      * @throws IOException when aborting the request fails.
      */
@@ -570,7 +565,6 @@ public class UploadManager extends HttpServlet {
                 return true;
             }
 
-
             String javaFilePath;
             try {
                 final String folderPath = String.join(F_SEP, cutDir, CUTS_MUTANTS_DIR, String.valueOf(index));
@@ -596,7 +590,7 @@ public class UploadManager extends HttpServlet {
                     logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
                     messages.add("Class upload failed. Internal error. Sorry about that!");
 
-                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses,javaFilePath);
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
                     return true;
                 }
             } else {
@@ -612,7 +606,7 @@ public class UploadManager extends HttpServlet {
                     logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
                     messages.add("Class upload failed. Internal error. Sorry about that!");
 
-                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses,javaFilePath);
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses, javaFilePath);
                     return true;
                 }
             }
@@ -640,23 +634,23 @@ public class UploadManager extends HttpServlet {
      * Adds the contents of a given zip file as tests uploaded together with
      * a class under test.
      *
-     * @param request the request the tests are added for.
-     * @param response the response to the request.
-     * @param messages messages which will be shown to the user, which made the request.
+     * @param request         the request the tests are added for.
+     * @param response        the response to the request.
+     * @param messages        messages which will be shown to the user, which made the request.
      * @param compiledClasses a list of previously added CUT, tests and mutants,
      *                        which need to get cleaned up once something fails.
-     * @param cutId  the identifier of the class under test.
-     * @param cutDir the directory in which the class under test lies.
-     * @param cut the class under test {@link GameClass} object.
-     * @param testsZipFile the given zip file from which the tests are added.
-     * @param dependencies dependencies required to compile the tests.
+     * @param cutId           the identifier of the class under test.
+     * @param cutDir          the directory in which the class under test lies.
+     * @param cut             the class under test {@link GameClass} object.
+     * @param testsZipFile    the given zip file from which the tests are added.
+     * @param dependencies    dependencies required to compile the tests.
      * @return {@code true} if addition fails, {@code fail} otherwise.
      * @throws IOException when aborting the request fails.
      */
     @SuppressWarnings("Duplicates")
     private boolean addTests(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages,
                              List<CompiledClass> compiledClasses, int cutId, String cutDir, GameClass cut,
-                              SimpleFile testsZipFile, List<JavaFileObject> dependencies) throws IOException {
+                             SimpleFile testsZipFile, List<JavaFileObject> dependencies) throws IOException {
 
         // Class under test is a dependency for all tests
         dependencies.add(new JavaFileObject(cut.getJavaFile()));
@@ -885,8 +879,8 @@ public class UploadManager extends HttpServlet {
      * <p>
      * This method should be the last thing called when aborting a request.
      *
-     * @param request         The handled request.
-     * @param response        The response of the handled requests.
+     * @param request  The handled request.
+     * @param response The response of the handled requests.
      * @throws IOException When an error during redirecting occurs.
      */
     private static void abortRequestAndCleanUp(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -944,5 +938,13 @@ public class UploadManager extends HttpServlet {
         DEPENDENCY,
         MUTANT,
         TEST
+    }
+
+    private ServletFileUpload servletFileUpload;
+
+    // Enable minimal testing
+    @Deprecated
+    void setServletFileUpload(ServletFileUpload servletFileUpload) {
+        this.servletFileUpload = servletFileUpload;
     }
 }

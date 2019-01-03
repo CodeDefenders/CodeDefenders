@@ -32,6 +32,7 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.util.Paths;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,8 +75,8 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         String contextPath = request.getContextPath();
         final String gameIdString = request.getParameter("id");
         if (gameIdString == null) {
-            logger.info("No gameId provided. Redirecting back to /games/user");
-            response.sendRedirect(contextPath + "/games/user");
+            logger.info("No gameId provided. Redirecting back to game overview");
+            response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
             return;
         }
         int gameId;
@@ -83,17 +84,17 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             gameId = Integer.parseInt(gameIdString);
         } catch (NumberFormatException e) {
             logger.error("Failed to format parameter id", e);
-            response.sendRedirect(contextPath + "/games/user");
+            response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
             return;
         }
 
         MultiplayerGame mg = MultiplayerGameDAO.getMultiplayerGame(gameId);
         if (mg == null) {
             logger.warn("Could not find requested game: {}", gameId);
-            response.sendRedirect(contextPath + "/games/user");
+            response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
         } else {
             mg.notifyPlayers();
-            String redirect = contextPath + "/multiplayer/play?id=" + gameId;
+            String redirect = contextPath + "" + Paths.BATTLEGROUND_GAME + "?id=" + gameId;
             if (request.getParameter("attacker") != null) {
                 redirect += "&attacker=1";
             } else if (request.getParameter("defender") != null) {
@@ -288,7 +289,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                         return;
                     }
                     // Redirect to the game selection menu.
-                    response.sendRedirect(contextPath + "/games/user");
+                    response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
                 } catch (Throwable e) {
                     logger.error("Unknown error during battleground creation.", e);
                     messages.add("Invalid Request");
@@ -321,7 +322,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                     messages.add("An error occurred while leaving game " + gameId);
                 }
                 // Redirect to the game selection menu.
-                response.sendRedirect(contextPath + "/games/user");
+                response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
                 break;
             default:
                 logger.info("Action not recognised: {}", action);

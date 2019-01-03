@@ -117,7 +117,7 @@ function __private_do_join_game(){
 curl -X GET \
 --cookie "${cookie}" --cookie-jar "${cookie}" \
 -o /dev/null \
--s ${CODE_DEFENDER_URL}/multiplayer/play?id=${gameId}
+-s ${CODE_DEFENDER_URL}/multiplayergame?id=${gameId}
 
 }
 

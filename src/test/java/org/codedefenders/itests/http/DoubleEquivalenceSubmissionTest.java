@@ -36,6 +36,7 @@ import com.gargoylesoftware.htmlunit.javascript.JavaScriptErrorListener;
 import com.gargoylesoftware.htmlunit.util.NameValuePair;
 
 import org.codedefenders.model.User;
+import org.codedefenders.util.Paths;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -192,7 +193,7 @@ public class DoubleEquivalenceSubmissionTest {
 		}
 
 		public void doLogin() throws FailingHttpStatusCodeException, IOException {
-			WebRequest loginRequest = new WebRequest(new URL("http://localhost:8080/login"), HttpMethod.POST);
+			WebRequest loginRequest = new WebRequest(new URL("http://localhost:8080"+ Paths.LOGIN), HttpMethod.POST);
 			// // Then we set the request parameters
 			loginRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 					new NameValuePair("formType", "login"), new NameValuePair("username", user.getUsername()),
@@ -205,14 +206,14 @@ public class DoubleEquivalenceSubmissionTest {
 			// List the games already there
 			Set<String> myGames = new HashSet<String>();
 			//
-			HtmlPage gameUsers = browser.getPage("http://localhost:8080/games/user");
+			HtmlPage gameUsers = browser.getPage("http://localhost:8080" + Paths.GAMES_OVERVIEW);
 			for (HtmlAnchor a : gameUsers.getAnchors()) {
-				if (a.getHrefAttribute().contains("multiplayer/games?id=")) {
+				if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_SELECTION + "?id=")) {
 					myGames.add(a.getHrefAttribute());
 				}
 			}
 
-			WebRequest createGameRequest = new WebRequest(new URL("http://localhost:8080/multiplayer/games"),
+			WebRequest createGameRequest = new WebRequest(new URL("http://localhost:8080/multiplayer" + Paths.GAMES_OVERVIEW),
 					HttpMethod.POST);
 			createGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 					new NameValuePair("formType", "createGame"), new NameValuePair("class", "221"), // This
@@ -231,7 +232,7 @@ public class DoubleEquivalenceSubmissionTest {
 			String newGameLink = null;
 			// TODO Check that we get there ?
 			for (HtmlAnchor a : gameUsers.getAnchors()) {
-				if (a.getHrefAttribute().contains("multiplayer/games?id=")) {
+				if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_SELECTION + "?id=")) {
 					if (!myGames.contains(a.getHrefAttribute())) {
 						newGameLink = a.getHrefAttribute();
 						break;
@@ -247,7 +248,7 @@ public class DoubleEquivalenceSubmissionTest {
 
 		public void startGame(int gameID) throws FailingHttpStatusCodeException, IOException {
 
-			WebRequest startGameRequest = new WebRequest(new URL("http://localhost:8080/multiplayergame"),
+			WebRequest startGameRequest = new WebRequest(new URL("http://localhost:8080" + Paths.BATTLEGROUND_GAME),
 					HttpMethod.POST);
 			// // Then we set the request parameters
 			startGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
@@ -259,14 +260,14 @@ public class DoubleEquivalenceSubmissionTest {
 		}
 
 		public void joinOpenGame(int gameID, boolean isAttacker) throws FailingHttpStatusCodeException, IOException {
-			HtmlPage openGames = browser.getPage("http://localhost:8080/games/open");
+			HtmlPage openGames = browser.getPage("http://localhost:8080" + Paths.GAMES_OVERVIEW);
 
 			// Really we can simply click on that link once we know the gameID,
 			// no need to go to openGame page
 			HtmlAnchor joinLink = null;
 			for (HtmlAnchor a : openGames.getAnchors()) {
 				if (a.getHrefAttribute().contains(
-						"multiplayer/games?" + ((isAttacker) ? "attacker" : "defender") + "=1&id=" + gameID)) {
+						Paths.BATTLEGROUND_SELECTION + "?" + ((isAttacker) ? "attacker" : "defender") + "=1&id=" + gameID)) {
 					joinLink = a;
 					break;
 				}
@@ -278,7 +279,7 @@ public class DoubleEquivalenceSubmissionTest {
 		}
 
 		public void attack(int mpGameID, String mutant) throws FailingHttpStatusCodeException, IOException {
-			WebRequest attackRequest = new WebRequest(new URL("http://localhost:8080/multiplayergame"),
+			WebRequest attackRequest = new WebRequest(new URL("http://localhost:8080" + Paths.BATTLEGROUND_GAME),
 					HttpMethod.POST);
 			// // Then we set the request parameters
 			attackRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
@@ -296,7 +297,7 @@ public class DoubleEquivalenceSubmissionTest {
 		}
 
 		public void defend(int mpGameID, String test) throws FailingHttpStatusCodeException, IOException {
-			WebRequest defendRequest = new WebRequest(new URL("http://localhost:8080/multiplayergame"),
+			WebRequest defendRequest = new WebRequest(new URL("http://localhost:8080" + Paths.BATTLEGROUND_GAME),
 					HttpMethod.POST);
 			// curl -X POST \
 			// --data "formType=createTest&mpGameID=${gameId}" \
@@ -320,10 +321,10 @@ public class DoubleEquivalenceSubmissionTest {
 
 		public void claimEquivalenceOnLine(int mpGameID, int line)
 				throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-			HtmlPage playPage = browser.getPage("http://localhost:8080/multiplayer/play?id=" + mpGameID);
+			HtmlPage playPage = browser.getPage("http://localhost:8080" + Paths.BATTLEGROUND_GAME + "?id=" + mpGameID);
 			HtmlAnchor claimEquivalenceLink = null;
 			for (HtmlAnchor a : playPage.getAnchors()) {
-				if (a.getHrefAttribute().contains("multiplayer/play?equivLine=" + line)) {
+				if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?equivLine=" + line)) {
 					claimEquivalenceLink = a;
 					break;
 				}
@@ -339,10 +340,10 @@ public class DoubleEquivalenceSubmissionTest {
 		public void acceptEquivalence(int mpGameID)
 				throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 			// http://localhost:8080/multiplayer/
-			HtmlPage playPage = browser.getPage("http://localhost:8080/multiplayer/play?id=" + mpGameID);
+			HtmlPage playPage = browser.getPage("http://localhost:8080" + Paths.BATTLEGROUND_GAME + "?id=" + mpGameID);
 			HtmlAnchor acceptEquivalenceLink = null;
 			for (HtmlAnchor a : playPage.getAnchors()) {
-				if (a.getHrefAttribute().contains("multiplayer/play?acceptEquiv=")) {
+				if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquiv=")) {
 					acceptEquivalenceLink = a;
 					break;
 				}
@@ -361,9 +362,9 @@ public class DoubleEquivalenceSubmissionTest {
 
 		public void assertNoMoreEquivalenceDuels(int mpGameID)
 				throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-			HtmlPage playPage = browser.getPage("http://localhost:8080/multiplayer/play?id=" + mpGameID);
+			HtmlPage playPage = browser.getPage("http://localhost:8080" + Paths.BATTLEGROUND_GAME + "?id=" + mpGameID);
 			for (HtmlAnchor a : playPage.getAnchors()) {
-				if (a.getHrefAttribute().contains("multiplayer/play?acceptEquiv=")) {
+				if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquiv=")) {
 					Assert.fail("On game " + mpGameID + " there is still an equivalence duel open");
 				}
 			}
@@ -371,9 +372,9 @@ public class DoubleEquivalenceSubmissionTest {
 
 		public void assertThereIsAnEquivalenceDuel(int mpGameID)
 				throws FailingHttpStatusCodeException, MalformedURLException, IOException {
-			HtmlPage playPage = browser.getPage("http://localhost:8080/multiplayer/play?id=" + mpGameID);
+			HtmlPage playPage = browser.getPage("http://localhost:8080" + Paths.BATTLEGROUND_GAME + "?id=" + mpGameID);
 			for (HtmlAnchor a : playPage.getAnchors()) {
-				if (a.getHrefAttribute().contains("multiplayer/play?acceptEquiv=")) {
+				if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquiv=")) {
 					return;
 				}
 			}

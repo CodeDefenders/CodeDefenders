@@ -276,13 +276,13 @@
          */
         const createEquivalenceButton = function (line, mutantsOnLine) {
             if (gameType === GameTypes.PARTY) {
-                return `<form onsubmit="if (window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')) { window.location.href = \'multiplayer/play?equivLine=` + line + `\'; } return false;">
+                return `<form onsubmit="if (window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')) { window.location.href = \'<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>?equivLine=` + line + `\'; } return false;">
                             <button class="btn btn-danger btn-sm" style="width: 100%;">
                                 <img src="` + Icons.FLAG + `" class="mutant-icon-image"/> Claim Equivalent
                             </button>
                         </form>`;
             } else if (gameType === GameTypes.DUEL) {
-                return `<form id="equiv" action="duelgame" method="post" onsubmit="return window.confirm('This will mark mutant ` + mutantsOnLine[0].id + ` as equivalent. Are you sure?')">
+                return `<form id="equiv" action="<%=request.getContextPath() + Paths.DUEL_GAME%>" method="post" onsubmit="return window.confirm('This will mark mutant ` + mutantsOnLine[0].id + ` as equivalent. Are you sure?')">
                             <input type="hidden" name="formType" value="claimEquivalent">
                             <input type="hidden" name="mutantId" value="` + mutantsOnLine[0].id + `">
                             <button class="btn btn-danger btn-sm" style="width: 100%;">

@@ -32,7 +32,7 @@
     <% request.setAttribute("adminActivePage", "adminMonitorGames"); %>
     <%@ include file="/jsp/admin_navigation.jsp" %>
 
-    <form id="games" action="admin/monitor" method="post">
+    <form id="games" action="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>" method="post">
         <input type="hidden" name="formType" value="startStopGame">
         <h3>Current Games</h3>
 
@@ -95,7 +95,7 @@
                 </td>
                 <td>
                     <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
-                       href="<%= request.getContextPath() %>/multiplayer/games?id=<%= gid %>">Observe</a>
+                       href="<%= request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>?id=<%= gid %>">Observe</a>
                 </td>
                 <td class="col-sm-2">
                     <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gid%>">

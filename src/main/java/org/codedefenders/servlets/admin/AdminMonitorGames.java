@@ -34,6 +34,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -142,7 +143,7 @@ public class AdminMonitorGames extends HttpServlet {
 				}
 			}
 		}
-		response.sendRedirect(request.getContextPath() + "/admin/monitor");
+		response.sendRedirect(request.getContextPath() + Paths.ADMIN_MONITOR);
 	}
 
 

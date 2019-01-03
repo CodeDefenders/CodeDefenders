@@ -99,7 +99,7 @@ public class GameManager extends HttpServlet {
 		String contextPath = request.getContextPath();
 
 		if (ogid == null) {
-			response.sendRedirect(contextPath+"/games/user");
+			response.sendRedirect(contextPath + org.codedefenders.util.Paths.GAMES_OVERVIEW);
 			return;
 		}
 

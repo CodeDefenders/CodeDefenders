@@ -30,7 +30,7 @@
     <%@ include file="/jsp/admin_navigation.jsp" %>
 
     <h3>System Settings</h3>
-    <form id="changeSettings" name="changeSettings" action="admin/settings" onsubmit="return validateForm()" method="post">
+    <form id="changeSettings" name="changeSettings" action="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>" onsubmit="return validateForm()" method="post">
         <script>
             function validateForm() {
                 var form = document.forms['changeSettings'];
