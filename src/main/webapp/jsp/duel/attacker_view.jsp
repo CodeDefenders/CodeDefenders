@@ -137,7 +137,7 @@
             }
         }, 'text');
     }
-    setInterval("checkForUpdate()", 10000);
+    setInterval(checkForUpdate, 10000);
     <% } %>
 </script>
 
