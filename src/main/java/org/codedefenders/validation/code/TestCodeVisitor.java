@@ -18,21 +18,14 @@
  */
 package org.codedefenders.validation.code;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Stream;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.expr.AssignExpr;
 import com.github.javaparser.ast.expr.BinaryExpr;
 import com.github.javaparser.ast.expr.ConditionalExpr;
+import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.stmt.AssertStmt;
@@ -43,30 +36,35 @@ import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
-import com.github.javaparser.ast.visitor.ModifierVisitor;
+import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * This class checks test code and checks whether the code is valid or not.
  * <p>
- * Extends {@link ModifierVisitorAdapter} but doesn't use the generic extra
+ * Extends {@link VoidVisitorAdapter} but doesn't use the generic extra
  * parameter on {@code visit(Node, __)}, so it's set to {@link Void} here.
  * <p>
  * Instances of this class can be used as follows:
  * <pre><code>CompilationUnit cu = ...;
- * TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions);
- * visitor.visit(cu, null); // Second parameter is never used
- * boolean result = visitor.isValid();
+ * int maxNumberOfAssertions = ...;
+ * boolean result = TestCodeVisitor.validFor(cu, maxNumberOfAssertions);
  * </code></pre>
  *
  * @author Jose Rojas
  * @author gambi
  * @author <a href="https://github.com/werli">Phil Werli<a/>
  */
-
-// TODO Why we need a Modifier visitor if we DO NOT modify the class we are visiting...
-
-class TestCodeVisitor extends ModifierVisitor<Void> {
+class TestCodeVisitor extends VoidVisitorAdapter<Void> {
     private static final Logger logger = LoggerFactory.getLogger(TestCodeVisitor.class);
 //  we can use TypeSolver for the visit to implement a fine grain security mechanism
 
@@ -83,7 +81,13 @@ class TestCodeVisitor extends ModifierVisitor<Void> {
     private int assertionCount = 0;
     private int maxNumberOfAssertions;
 
-    TestCodeVisitor(int maxNumberOfAssertions) {
+    static boolean validFor(CompilationUnit cu,int maxNumberOfAssertions) {
+        TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions);
+        visitor.visit(cu, null);
+        return visitor.isValid();
+    }
+
+    private TestCodeVisitor(int maxNumberOfAssertions) {
         this.maxNumberOfAssertions = maxNumberOfAssertions;
     }
 
@@ -112,29 +116,27 @@ class TestCodeVisitor extends ModifierVisitor<Void> {
     }
 
     @Override
-    public Node visit(ClassOrInterfaceDeclaration stmt, Void args) {
+    public void visit(ClassOrInterfaceDeclaration stmt, Void args) {
         if (!isValid || classCount++ > MAX_NUMBER_OF_CLASSES) {
             isValid = false;
-            return stmt;
+            return;
         }
         super.visit(stmt, args);
-        return stmt;
     }
 
     @Override
-    public Node visit(MethodDeclaration stmt, Void args) {
+    public void visit(MethodDeclaration stmt, Void args) {
         if (!isValid || methodCount++ > MAX_NUMBER_OF_METHODS) {
             isValid = false;
-            return stmt;
+            return;
         }
         super.visit(stmt, args);
-        return stmt;
     }
 
     @Override
-    public Node visit(ExpressionStmt stmt, Void args) {
+    public void visit(ExpressionStmt stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         String stringStmt = stmt.toString( new PrettyPrinterConfiguration().setPrintComments(false));
         for (String prohibited : CodeValidator.PROHIBITED_CALLS) {
@@ -142,145 +144,136 @@ class TestCodeVisitor extends ModifierVisitor<Void> {
             if (stringStmt.contains(prohibited)) {
                 messages.add("Invalid test contains a call to prohibited " + prohibited);
                 isValid = false;
-                return stmt;
+                return;
             }
         }
         stmtCount++;
-        return (Node) super.visit(stmt, args);
+        super.visit(stmt, args);
     }
 
     @Override
-    public Node visit(NameExpr stmt, Void args) {
+    public void visit(NameExpr stmt, Void args) {
         final String name = stmt.getNameAsString();
         if (name.equals("System") || name.equals("Random") || name.equals("Thread")) {
             messages.add("Invalid test contains System/Random/Thread uses");
             isValid = false;
         }
-        return stmt;
+        super.visit(stmt, args);
     }
 
     @Override
-    public Node visit(ForeachStmt stmt, Void args) {
+    public void visit(ForeachStmt stmt, Void args) {
         messages.add("Invalid test contains a ForeachStmt statement");
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(ForStmt stmt, Void args) {
+    public void visit(ForStmt stmt, Void args) {
         messages.add("Invalid test contains a ForStmt statement");
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(WhileStmt stmt, Void args) {
+    public void visit(WhileStmt stmt, Void args) {
         messages.add("Invalid test contains a WhileStmt statement");
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(DoStmt stmt, Void args) {
+    public void visit(DoStmt stmt, Void args) {
         messages.add("Invalid test contains a DoStmt statement");
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(SwitchStmt stmt, Void args) {
+    public void visit(SwitchStmt stmt, Void args) {
         messages.add("Invalid test contains a SwitchStmt statement");
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(IfStmt stmt, Void args) {
+    public void visit(IfStmt stmt, Void args) {
         messages.add("Invalid test contains an IfStmt statement");
         isValid = false;
-        return stmt;
     }
 
     @Override
-    public Node visit(ConditionalExpr stmt, Void args) {
+    public void visit(ConditionalExpr stmt, Void args) {
         messages.add("Invalid test contains a conditional statement: " + stmt.toString());
         isValid = false;
-        return stmt;
-    }
-
-    // TODO I am not sure assert and Assert shall be trated the same way...
-    @Override
-    public Node visit(AssertStmt stmt, Void args) {
-        stmtCount++;
-        if (!isValid || assertionCount++ > maxNumberOfAssertions) {
-            isValid = false;
-            return stmt;
-        }
-        super.visit(stmt, args);
-        return stmt;
     }
 
     @Override
-    public Node visit(MethodCallExpr stmt, Void args) {
+    public void visit(AssertStmt stmt, Void args) {
+        messages.add("Invalid assert statement: " + stmt.toString());
+        isValid = false;
+    }
+
+    @Override
+    public void visit(MethodCallExpr stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         stmtCount++;
         if (stmt.toString().startsWith("System.") || stmt.toString().startsWith("Random.")) {
             messages.add("There is a call to System/Random.*");
             isValid = false;
+            return;
         }
-        // This is missing assertThat and all the other assertMethods ?
-        final boolean anyMatch = Arrays.stream(new String[]{"assertEquals", "assertTrue", "assertFalse", "assertNull",
+
+        final boolean anyMatch = Arrays.stream(new String[]{
+                "assertEquals", "assertTrue", "assertFalse", "assertNull",
                 "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals", "assertThat"})
                 .anyMatch(s -> stmt.getNameAsString().equals(s));
         if (anyMatch) {
             if (assertionCount++ > maxNumberOfAssertions) {
                 isValid = false;
-                return stmt;
+                return;
             }
         }
         super.visit(stmt, args);
-        return stmt;
     }
 
     @Override
-    public Node visit(VariableDeclarator stmt, Void args) {
+    public void visit(VariableDeclarator stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
+        }
+        Optional<Expression> initializer = stmt.getInitializer();
+        if (initializer.isPresent()) {
+            String initString = initializer.get().toString();
+            if (initString.startsWith("System.*") || initString.startsWith("Random.*") ||
+                    initString.contains("Thread")) {
+                messages.add("There is a variable declaration using Thread/System/Random.*");
+                isValid = false;
+            }
         }
         super.visit(stmt, args);
-        if (stmt.getInitializer() != null && (stmt.getInitializer().toString().startsWith("System.*") || stmt.getInitializer().toString().startsWith("Random.*") ||
-                stmt.getInitializer().toString().contains("Thread"))) {
-            messages.add("There is a variable declaration using Thread/System/Random.*");
-            isValid = false;
-        }
-        return stmt;
     }
 
     @Override
-    public Node visit(final BinaryExpr stmt, Void arg) {
+    public void visit(final BinaryExpr stmt, Void args) {
         if (!isValid) {
-            return stmt;
+            return;
         }
         final BinaryExpr.Operator operator = stmt.getOperator();
         if (operator == BinaryExpr.Operator.AND || operator == BinaryExpr.Operator.OR) {
             isValid = false;
         }
-        return stmt;
+        super.visit(stmt, args);
     }
 
     @Override
-    public Node visit(final AssignExpr expr, Void arg) {
+    public void visit(final AssignExpr stmt, Void args) {
         if (!isValid) {
-            return expr;
+            return;
         }
-        final AssignExpr.Operator operator = expr.getOperator();
+        final AssignExpr.Operator operator = stmt.getOperator();
         if (operator != null && (Stream.of(AssignExpr.Operator.AND, AssignExpr.Operator.OR, AssignExpr.Operator.XOR)
                 .anyMatch(op -> operator == op))) {
             isValid = false;
         }
-        return expr;
+        super.visit(stmt, args);
     }
 
 }
