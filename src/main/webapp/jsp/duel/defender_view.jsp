@@ -18,11 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.game.GameLevel" %>
-<%@ page import="org.codedefenders.game.GameState" %>
 
 <% String pageTitle="Defending Class"; %>
-<%@ include file="/jsp/header_game.jsp" %>
+<%@ include file="/jsp/duel/header_game.jsp" %>
 
 <% { %>
 
@@ -58,6 +56,7 @@
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
 	request.setAttribute("gameType", GameMode.DUEL);
+    request.setAttribute("gameId", game.getId());
 
 	/* game_highlighting */
 	request.setAttribute("codeDivSelector", "#cut-div");
@@ -66,6 +65,7 @@
 	request.setAttribute("showEquivalenceButton", game.getState() == GameState.ACTIVE);
     // request.setAttribute("markUncoveredEquivalent", false);
     // request.setAttribute("gameType", GameMode.DUEL);
+//    request.setAttribute("gameId", game.getId());
 
 	/* finished_modal */
     int attackerScore = game.getAttackerScore();
@@ -77,7 +77,7 @@
     request.setAttribute("mutantValidatorLevel", CodeValidatorLevel.MODERATE);
 
     /* test_progressbar */
-    request.setAttribute("gameId", game.getId());
+//    request.setAttribute("gameId", game.getId());
 %>
 
 <% if (game.getState() == GameState.FINISHED) { %>
@@ -103,6 +103,7 @@
         <form id="def" action="<%=request.getContextPath() + Paths.DUEL_GAME %>" method="post">
             <%@include file="../game_components/test_editor.jsp"%>
             <input type="hidden" name="formType" value="createTest">
+            <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
         </form>
     </div>
 </div>
@@ -124,12 +125,12 @@
         function checkForUpdate(){
             $.post('<%=request.getContextPath() + Paths.DUEL_GAME%>', {
                 formType: "whoseTurn",
-                gameID: <%= game.getId() %>
-            }, function(data){
-                if(data === "defender"){
+                gameId: <%= game.getId() %>
+            }, function (data) {
+                if (data === "defender") {
                     window.location.reload();
                 }
-            },"text");
+            }, "text");
         }
         setInterval(checkForUpdate, 10000);
 	<% } %>

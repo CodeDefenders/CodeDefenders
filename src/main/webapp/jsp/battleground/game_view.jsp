@@ -20,35 +20,21 @@
 --%>
 <%
     final Logger logger = LoggerFactory.getLogger("game_view.jsp");
-    boolean redirectToGames = false;
-    // Get their user id from the session.
-    int uid = (Integer) session.getAttribute("uid");
-    int gameId = 0;
-    try {
-        gameId = Integer.parseInt(request.getParameter("id"));
-        session.setAttribute("mpGameId", gameId);
-    } catch (NumberFormatException e) {
-        logger.info("Game ID was not passed in the request " + request.getContextPath() + request.getRequestURI() +". Restoring from session.");
-        if (session.getAttribute("mpGameId") != null) {
-            gameId = (Integer) session.getAttribute("mpGameId");
-        } else {
-            logger.info("Don't know what game was open...");
-            redirectToGames = true;
-        }
-    } catch (Exception e2){
-        logger.error("Exception caught", e2);
-        gameId = 0;
-        redirectToGames = true;
-    }
-    MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
-    if (game == null){
-        logger.error(String.format("Could not find multiplayer game %d", gameId));
-        redirectToGames = true;
-    }
+    final int uid = ServletUtils.userId(request);
 
-    if (redirectToGames){
-        response.sendRedirect(request.getContextPath()+ Paths.GAMES_OVERVIEW);
-        return;
+    MultiplayerGame game;
+    String redirectURL;
+    int playerId;
+    {
+        int gameId = ((Integer) request.getAttribute("gameId"));
+        game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+        if (game == null){
+            logger.error("Could not find multiplayer game {}", gameId);
+            response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+            return;
+        }
+        playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
+        redirectURL = request.getContextPath() + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId;
     }
 %>
 
@@ -73,6 +59,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
+<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 <%
 	boolean renderMutants = true;
 	boolean redirect = false;
@@ -117,8 +104,6 @@
 <%
     messages = new ArrayList<>();
     session.setAttribute("messages", messages);
-
-    int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(uid, gameId);
 
     List<Mutant> mutants = game.getMutants();
 
@@ -171,7 +156,7 @@
 			if (noneCovered && !game.isMarkUncovered()) {
 				// equivLine is not covered, possible iff passed directly as url argument
 				messages.add(MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
-				response.sendRedirect(request.getContextPath() + Paths.BATTLEGROUND_GAME);
+				response.sendRedirect(redirectURL);
 				return;
 			}
 
@@ -190,7 +175,7 @@
 					: String.format("Flagged %d mutant%s as equivalent", nClaimed,
 							(nClaimed == 1 ? "" : 's'));
 			messages.add(flaggingMessage);
-			response.sendRedirect(request.getContextPath() + Paths.BATTLEGROUND_GAME);
+			response.sendRedirect(redirectURL);
             return;
         } catch (NumberFormatException e) {
             logger.error("Can't parse equivalent line numbers", e);
@@ -216,7 +201,7 @@
                             new Timestamp(System.currentTimeMillis()));
                     notifEquiv.insert();
 
-                    response.sendRedirect(request.getContextPath()+ Paths.BATTLEGROUND_GAME);
+                    response.sendRedirect(redirectURL);
                     return;
                 }
             }

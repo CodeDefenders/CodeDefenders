@@ -1,5 +1,12 @@
 package org.codedefenders.servlets.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Optional;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
@@ -9,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author <a href=https://github.com/werli>Phil Werli<a/>
  */
 public final class ServletUtils {
+    private static final Logger logger = LoggerFactory.getLogger(ServletUtils.class);
     private ServletUtils() {
     }
 
@@ -22,6 +30,25 @@ public final class ServletUtils {
      */
     public static String ctx(HttpServletRequest request) {
         return request.getContextPath();
+    }
+
+    /**
+     * Returns the base URL from a given request.
+     *
+     * @param request the request the URL is retrieved from
+     * @return the base URL as a {@link String} or {@code null} if no base URL could be retrieved.
+     */
+    public static String getBaseURL(HttpServletRequest request) {
+        String baseURL = null;
+        try {
+            baseURL = new URL(request.getScheme(),
+                    request.getServerName(),
+                    request.getServerPort(),
+                    request.getContextPath()).toString();
+        } catch (MalformedURLException ignored) {
+            logger.error("Could not retrieve base URL from request.");
+        }
+        return baseURL;
     }
 
     /**
@@ -40,43 +67,97 @@ public final class ServletUtils {
     }
 
     /**
-     * Extracts a given URL parameter from a given request.
+     * Extracts the formType action from the given request.
+     *
+     * @param request the request, which the formType action string is extracted from.
+     * @return a valid string extracted from the request, never {@link null} or empty.
+     * @throws IllegalStateException if no action can be extracted from the request.
+     */
+    public static String formType(HttpServletRequest request) {
+        final Optional<String> formType = getStringParameter(request, "formType");
+        if (!formType.isPresent()) {
+            throw new IllegalStateException("Could not retrieve 'formType' from request. Aborting request. Making sure the request parameters are set correctly.");
+        }
+        return formType.get();
+    }
+
+    /**
+     * Extracts the {@code gameId} URL parameter from a given request.
      * <p>
-     * If the parameter is no valid integer value, the method returns {@code null}.
+     * If {@code gameId} is no valid integer value, the method returns {@code null}.
+     *
+     * @param request the request, which {@code gameId} is extracted from.
+     * @return a valid integer extracted from the {@code gameId} parameter of the given request wrapped in an {@link Optional}, or {@link Optional#empty()}.
+     * @see ServletUtils#getIntParameter(HttpServletRequest, String)
+     */
+    public static Optional<Integer> gameId(HttpServletRequest request) {
+        return getIntParameter(request, "gameId");
+    }
+
+    /**
+     * Extracts a given integer URL parameter from a given request.
+     * <p>
+     * If the parameter is no valid integer value, the method returns an empty {@link Optional}.
      *
      * @param request   the request, which the parameter is extracted from.
      * @param parameter the given URL parameter.
-     * @return a valid integer extracted for the parameter of the given request, or {@code null}.
+     * @return a valid integer extracted for the parameter of the given request wrapped in an {@link Optional}, or {@link Optional#empty()}.
      */
-    public static Integer getIntParameter(HttpServletRequest request, String parameter) {
-        final Integer number;
+    public static Optional<Integer> getIntParameter(HttpServletRequest request, String parameter) {
+        return Optional.ofNullable(request.getParameter(parameter)).map(s -> {
+            try {
+                return Integer.parseInt(s);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        });
+    }
 
-        final String parameterString = request.getParameter(parameter);
-        if (parameterString == null) {
-            return null;
-        }
-        try {
-            number = Integer.parseInt(parameterString);
-        } catch (NumberFormatException e) {
-            return null;
-        }
-        return number;
+    /**
+     * Extracts a given float URL parameter from a given request.
+     * <p>
+     * If the parameter is no valid float value, the method returns an empty {@link Optional}.
+     *
+     * @param request   the request, which the parameter is extracted from.
+     * @param parameter the given URL parameter.
+     * @return a valid float extracted for the parameter of the given request wrapped in an {@link Optional}, or {@link Optional#empty()}.
+     */
+    public static Optional<Float> getFloatParameter(HttpServletRequest request, String parameter) {
+        return Optional.ofNullable(request.getParameter(parameter)).map(s -> {
+            try {
+                return Float.parseFloat(s);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        });
     }
 
     /**
      * Extracts a given URL parameter from a given request.
      * <p>
-     * If the parameter is not a valid string value, the method returns {@code null}.
+     * If the parameter is not a valid string value, the method returns an empty {@link Optional}.
      *
      * @param request   the request, which the parameter is extracted from.
      * @param parameter the given URL parameter.
-     * @return a string extracted for the parameter of the given request, or {@code null}.
+     * @return a string extracted for the parameter of the given request wrapped in an {@link Optional}, or {@link Optional#empty()}.
      */
-    public static String getStringParameter(HttpServletRequest request, String parameter) {
-        final String string = request.getParameter(parameter);
-        if (string == null || string.isEmpty()) {
-            return null;
-        }
-        return string;
+    public static Optional<String> getStringParameter(HttpServletRequest request, String parameter) {
+        return Optional.ofNullable(request.getParameter(parameter)).filter(s -> !s.isEmpty());
+    }
+
+    /**
+     * Checks whether a given URL parameter can be extracted from a given request.
+     * If the parameter can be extracted, returns a given {@code then} value.
+     * Otherwise return {@code other}.
+     *
+     * @param request   the request, which the parameter is extracted from.
+     * @param parameter the given URL parameter.
+     * @param then      the value that is returned when the request does contain the given parameter.
+     * @param other     the value that is returned when the request does not contain the given parameter.
+     * @param <T>       the type of {@code then} and {@code other} parameters and the return type.
+     * @return {@code then} if the given parameter can be extracted from the request, {@code other} otherwise.
+     */
+    public static <T> T parameterThenOrOther(HttpServletRequest request, String parameter, T then, T other) {
+        return Optional.ofNullable(request.getParameter(parameter)).map(s -> then).orElse(other);
     }
 }

@@ -29,7 +29,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.itests.IntegrationTest;
 import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
-import org.codedefenders.servlets.games.GameManager;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.junit.Before;
@@ -250,7 +250,7 @@ public class ConsistencyTest {
 		String mutantText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
 				Charset.defaultCharset());
-		Mutant mutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
+		Mutant mutant = GameManagingUtils.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
 				attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
 
 		// Generate the tests for the clients
@@ -260,7 +260,7 @@ public class ConsistencyTest {
 		//
 		List<org.codedefenders.game.Test> tests = new ArrayList<>();
 		for (final User defender : defenders) {
-			tests.add(GameManager.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(),
+			tests.add(GameManagingUtils.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(),
 					Constants.MODE_BATTLEGROUND_DIR));
 		}
 		System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + tests);

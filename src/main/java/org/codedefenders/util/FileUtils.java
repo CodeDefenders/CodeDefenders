@@ -31,7 +31,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -57,8 +56,7 @@ public class FileUtils {
     }
 
     public static String createJavaTestFile(File dir, String classBaseName, String testCode) throws IOException {
-        String javaFile = dir.getAbsolutePath() + F_SEP + TEST_PREFIX + classBaseName + JAVA_SOURCE_EXT;
-        Path path = Paths.get(javaFile);
+        Path path = dir.toPath().resolve(TEST_PREFIX + classBaseName + JAVA_SOURCE_EXT);
         Files.write(path, testCode.getBytes());
         return path.toString();
     }

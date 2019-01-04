@@ -32,7 +32,7 @@ public enum Role {
      * {@link #valueOf(String) valueOf()} does not match.
      *
      * @param name the name of the requested enum.
-     * @return the game mode for the given name, or {@code null} if no game mode was found.
+     * @return the enum for the given name, or {@code null} if none was found.
      */
     public static Role valueOrNull(String name) {
         try {
@@ -41,5 +41,4 @@ public enum Role {
             return null;
         }
     }
-
 }

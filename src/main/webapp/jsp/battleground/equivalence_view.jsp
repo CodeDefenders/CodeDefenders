@@ -49,12 +49,13 @@
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("gameType", GameMode.PARTY);
+    request.setAttribute("gameId", game.getId());
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 
     /* test_progressbar */
-    request.setAttribute("gameId", game.getId());
+//    request.setAttribute("gameId", game.getId());
 %>
 
 <div class="row">
@@ -89,10 +90,11 @@
             <form id="equivalenceForm" action="<%= request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
                 <input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= equivMutant.getId() %>">
                 <input type="hidden" name="formType" value="resolveEquivalence">
+                <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
 
                 <%@include file="../game_components/test_editor.jsp"%>
 
-                <a onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');" href="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>?acceptEquiv=<%= equivMutant.getId() %>"><button type="button" class="btn btn-danger btn-left">Accept Equivalence</button></a>
+                <a onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');" href="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>?gameId=<%=game.getId()%>&acceptEquiv=<%= equivMutant.getId() %>"><button type="button" class="btn btn-danger btn-left">Accept Equivalence</button></a>
                 <button form="equivalenceForm" class="btn btn-primary btn-game btn-right" name="rejectEquivalent" type="submit" onclick="progressBar(); this.from.submit();">Submit Killing Test</button>
 
                 <div>

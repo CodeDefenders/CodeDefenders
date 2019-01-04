@@ -85,7 +85,8 @@ import static org.codedefenders.util.Constants.F_SEP;
 /**
  * This {@link HttpServlet} handles the upload of Java class files, which includes file validation and storing.
  * <p>
- * Serves on path: `/upload`.
+ * Serves on path: {@code /class-upload}.
+ * @see org.codedefenders.util.Paths#CLASS_UPLOAD
  */
 public class ClassUploadManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(ClassUploadManager.class);

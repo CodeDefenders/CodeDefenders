@@ -20,6 +20,11 @@
 --%>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.model.NotificationType" %>
+
+<%
+    {
+    int gameId = (Integer) request.getAttribute("gameId");
+%>
 <script>
     //If the user is logged in, start receiving notifications
     var updateGameNotifications = function(url) {
@@ -174,9 +179,9 @@
 </script>
 
 
-<%if(game.isChatEnabled()) {%>
+    <%if(game.isChatEnabled()) {%>
 <div id="game-notification-bar" class="min<%
-if (role.equals(Role.CREATOR)) { %> creator<% } %>">
+        if (role.equals(Role.CREATOR)) { %> creator<% } %>">
 <a id="notification-show-bar"><span>(<span
 id="notif-game-total-count">0</span>)</span>
 </a>
@@ -234,4 +239,7 @@ id="notif-game-total-count">0</span>)</span>
             </div>
      </div><!-- col-md-6 left bottom -->
 </div>
-<%}%>
+<%
+    }
+}
+%>

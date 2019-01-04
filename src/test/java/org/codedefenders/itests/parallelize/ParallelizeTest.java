@@ -35,7 +35,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.itests.IntegrationTest;
 import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
-import org.codedefenders.servlets.games.GameManager;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -323,7 +323,7 @@ public class ParallelizeTest {
 					+"	}" + "\n"
 					+"}";
 
-			org.codedefenders.game.Test newTest = GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+			org.codedefenders.game.Test newTest = GameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 			MutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
 			assumeThat(battlegroundGame.getTests(true).size(), is(1));
 			// Append this for oracles and mocks
@@ -346,7 +346,7 @@ public class ParallelizeTest {
 					+"" + "\n"
 					+"	}" + "\n"
 					+"}";
-			newTest = GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+			newTest = GameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 			MutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
 			assumeThat(battlegroundGame.getTests(true).size(), is(2));
 			// Append this for oracles and mocks
@@ -374,7 +374,7 @@ public class ParallelizeTest {
 			List<String> mutantCode =(List<String>) DiffUtils.patch( origincalCode, patch);
 			String mutantText = String.join("\n", mutantCode);
 
-			Mutant mutant = GameManager.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(),
+			Mutant mutant = GameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(),
 					mutantText, attackerID, Constants.MODE_BATTLEGROUND_DIR);
 
 			// Mock the scheduler to return a random but known test distribution:
@@ -448,20 +448,20 @@ public class ParallelizeTest {
 					Files.readAllBytes(
 							new File("src/test/resources/itests/tests/PassingTestLift" + i + ".java").toPath()),
 					Charset.defaultCharset());
-			GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+			GameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 		}
 
 		// Schedule a test which kills the mutant - Where ? in the middle ?
 		String testText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/tests/KillingTestLift.java").toPath()),
 				Charset.defaultCharset());
-		GameManager.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+		GameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 
 		// Read and Submit the mutants - No tests so far
 		String mutantText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
 				Charset.defaultCharset());
-		Mutant mutant = GameManager.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(), mutantText,
+		Mutant mutant = GameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(), mutantText,
 				attackerID, Constants.MODE_BATTLEGROUND_DIR);
 
 		assertNotNull("Invalid mutant", mutant.getClassFile());

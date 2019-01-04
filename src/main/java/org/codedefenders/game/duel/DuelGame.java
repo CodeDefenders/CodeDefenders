@@ -133,6 +133,11 @@ public class DuelGame extends AbstractGame {
 		return totalScore;
 	}
 
+	public void start() {
+		state = GameState.ACTIVE;
+		activeRole = Role.ATTACKER;
+	}
+
 	public void passPriority() {
 		if (activeRole.equals(Role.ATTACKER)) {
 			activeRole = Role.DEFENDER;
@@ -147,7 +152,6 @@ public class DuelGame extends AbstractGame {
 			activeRole = Role.ATTACKER;
 			endRound();
 		}
-		update();
 	}
 
 	public void endRound() {

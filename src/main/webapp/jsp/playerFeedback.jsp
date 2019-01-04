@@ -26,6 +26,10 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.database.GameDAO" %>
 <%@ page import="org.codedefenders.model.Player" %>
+<%
+{
+    int gameId = (Integer) request.getAttribute("gameId");
+%>
 <div id="playerFeedback" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
 
     <style>
@@ -274,3 +278,6 @@
         document.getElementById('viewFeedbackLink').classList.toggle('active');
     }
 </script>
+<%
+}
+%>

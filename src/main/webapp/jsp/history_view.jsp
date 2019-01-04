@@ -70,7 +70,7 @@
             <td class="col-sm-2">
                 <form id="view" action="<%=request.getContextPath() + Paths.DUEL_SELECTION%>" method="post">
                     <input type="hidden" name="formType" value="enterGame">
-                    <input type="hidden" name="game" value=<%=g.getId()%>>
+                    <input type="hidden" name="gameId" value=<%=g.getId()%>>
                     <button id="<%="results_"+g.getId()%>" type="submit" class="btn btn-sm btn-default">View Scores</button>
                 </form>
             </td>
@@ -117,7 +117,7 @@
             <td class="col-sm-1"><%= g.getDefenderIds().length %></td>
             <td class="col-sm-2"><%= g.getLevel().name() %></td>
             <td class="col-sm-2">
-                <a class="btn btn-sm btn-default" id="<%="results_"+g.getId()%>" href="<%=request.getContextPath() + Paths.BATTLEGROUND_HISTORY%>?id=<%= g.getId() %>">View Results</a>
+                <a class="btn btn-sm btn-default" id="<%="results_"+g.getId()%>" href="<%=request.getContextPath() + Paths.BATTLEGROUND_HISTORY%>?gameId=<%= g.getId() %>">View Results</a>
             </td>
         </tr>
 

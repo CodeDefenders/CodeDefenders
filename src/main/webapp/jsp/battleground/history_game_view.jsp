@@ -20,33 +20,26 @@
 --%>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
+<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 
 <% { %>
 
 <%
     String pageTitle="Game History";
 
-    /* Get their user id from the session. */
-    String gameIdString = request.getParameter("id");
-    int gameId;
-
-    if (gameIdString != null) {
-        try {
-            gameId = Integer.parseInt(request.getParameter("id"));
-            session.setAttribute("mpGameId", gameId);
-        } catch (NumberFormatException e) {
+    MultiplayerGame game;
+    {
+        final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
+        if (!gameIdOpt.isPresent()) {
             response.sendRedirect(request.getContextPath() + Paths.GAMES_HISTORY);
             return;
         }
-    } else {
-        response.sendRedirect(request.getContextPath() + Paths.GAMES_HISTORY);
-        return;
-    }
+        game = MultiplayerGameDAO.getMultiplayerGame(gameIdOpt.get());
 
-    MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
-
-    if (game == null || game.getState() != GameState.FINISHED) {
-        response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+        if (game == null || game.getState() != GameState.FINISHED) {
+            response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+            return;
+        }
     }
 
     int uid = ((Integer) session.getAttribute("uid"));
@@ -77,6 +70,7 @@
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
     request.setAttribute("gameType", GameMode.PARTY);
+    request.setAttribute("gameId", game.getId());
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
@@ -84,6 +78,7 @@
     request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("gameType", GameMode.PARTY);
+//    request.setAttribute("gameId", game.getId());
 %>
 
 <%@ include file="/jsp/battleground/header_game.jsp" %>

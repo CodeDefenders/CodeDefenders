@@ -22,7 +22,7 @@ import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.User;
-import org.codedefenders.servlets.games.GameManager;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.slf4j.Logger;
@@ -49,7 +49,7 @@ public class MutationTesterUtilities {
                 try {
                     String mutantText = new String(Files.readAllBytes(new File(mutantFile).toPath()),
                             Charset.defaultCharset());
-                    Mutant mutant = GameManager.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
+                    Mutant mutant = GameManagingUtils.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
                             attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
                     System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + " with "
                             + mutant.getId());
@@ -74,7 +74,7 @@ public class MutationTesterUtilities {
                     // Compile and test original
                     String testText;
                     testText = new String(Files.readAllBytes(new File(testFile).toPath()), Charset.defaultCharset());
-                    org.codedefenders.game.Test newTest = GameManager.createTest(activeGame.getId(), activeGame.getClassId(),
+                    org.codedefenders.game.Test newTest = GameManagingUtils.createTest(activeGame.getId(), activeGame.getClassId(),
                             testText, defender.getId(), Constants.MODE_BATTLEGROUND_DIR);
 
                     System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + " with "

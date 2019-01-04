@@ -242,7 +242,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>DuelGameSelection</servlet-name>
-        <servlet-class>org.codedefenders.servlets.games.GameSelectionManager</servlet-class>
+        <servlet-class>org.codedefenders.servlets.games.duel.DuelGameSelectionManager</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -251,7 +251,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>DuelGameManager</servlet-name>
-        <servlet-class>org.codedefenders.servlets.games.GameManager</servlet-class>
+        <servlet-class>org.codedefenders.servlets.games.duel.DuelGameManager</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -271,7 +271,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>BattlegroundSelection</servlet-name>
-        <servlet-class>org.codedefenders.servlets.games.MultiplayerGameSelectionManager</servlet-class>
+        <servlet-class>org.codedefenders.servlets.games.battleground.MultiplayerGameSelectionManager</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -280,7 +280,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>BattlegroundManager</servlet-name>
-        <servlet-class>org.codedefenders.servlets.games.MultiplayerGameManager</servlet-class>
+        <servlet-class>org.codedefenders.servlets.games.battleground.MultiplayerGameManager</servlet-class>
     </servlet>
 
     <servlet-mapping>

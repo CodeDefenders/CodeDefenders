@@ -70,6 +70,7 @@
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
     request.setAttribute("gameType", GameMode.PUZZLE);
+    request.setAttribute("gameId", game.getId());
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
@@ -78,6 +79,7 @@
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("markUncoveredEquivalent", false);
     // request.setAttribute("gameType", GameMode.PUZZLE);
+//    request.setAttribute("gameId", game.getId());
 
     /* finished_modal TODO */
 
@@ -85,7 +87,7 @@
     request.setAttribute("mutantValidatorLevel", CodeValidatorLevel.MODERATE);
 
     /* mutant_progressbar */
-    request.setAttribute("gameId", game.getId());
+//    request.setAttribute("gameId", game.getId());
 %>
 
 
@@ -108,8 +110,9 @@
         <%@include file="../game_components/mutant_progress_bar.jsp"%>
         <h3 style="margin-bottom: 0;">Create a mutant here</h3>
 
-        <form id="reset" action="<%=(request.getContextPath() + Paths.PUZZLE_GAME) + "?gameId=" + game.getId()%>" method="post">
+        <form id="reset" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
             <input type="hidden" name="formType" value="reset">
+            <input type="hidden" name="gameId" value="<%= game.getId() %>">
             <button class="btn btn-primary btn-warning btn-game btn-right" id="btnReset" style="margin-top: -40px; margin-right: 80px">
                 Reset
             </button>

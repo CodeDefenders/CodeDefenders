@@ -37,8 +37,8 @@
             $(r).each(function (index) {
                 $("#userDropDown li:first-child").after(
                     "<li><a " +
-                    "href=\"" + "<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>"
-                    + "?id=" + r[index].gameId +
+                    "href=\"" + "<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>"
+                    + "?gameId=" + r[index].gameId +
                     "\" style=\"width:100%;\">" +
                     r[index].parsedMessage +
                     "</a></li>"
