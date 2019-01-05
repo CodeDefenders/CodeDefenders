@@ -73,9 +73,6 @@ public class DuelGameSelectionManager extends HttpServlet {
             case "joinGame":
                 joinGame(request, response);
                 return;
-            case "enterGame":
-                enterGame(request, response);
-                return;
             default:
                 logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
@@ -220,39 +217,5 @@ public class DuelGameSelectionManager extends HttpServlet {
         game.update();
 
         response.sendRedirect(ServletUtils.ctx(request) + Paths.DUEL_GAME + "?gameId=" + gameId);
-    }
-
-    private void enterGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final int userId = ServletUtils.userId(request);
-
-        HttpSession session = request.getSession();
-        ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
-
-        final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
-        if (!gameIdOpt.isPresent()) {
-            logger.error("No gameId parameter. Aborting request.");
-            Redirect.redirectBack(request, response);
-            return;
-        }
-        final int gameId = gameIdOpt.get();
-
-        final DuelGame game = DuelGameDAO.getDuelGameForId(gameId);
-        if (game == null) {
-            logger.error("No game found for gameId={}. Aborting request.", gameId);
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
-        if (!game.isUserInGame(userId)) {
-            logger.info("User {} not in request game {}", userId, gameId);
-            Redirect.redirectBack(request, response);
-            return;
-        }
-        if (game.getMode().equals(GameMode.UTESTING)) {
-            response.sendRedirect(ServletUtils.ctx(request) + Paths.UTESTING_PATH + "?gameId=" + gameId);
-        } else {
-            response.sendRedirect(ServletUtils.ctx(request) + Paths.DUEL_GAME + "?gameId=" + gameId);
-        }
     }
 }

@@ -145,26 +145,7 @@
         <td class="col-sm-1"></td>
         <td class="col-sm-1"></td>
 		<td class="col-sm-3">
-<%
-			if (g.getState().equals(GameState.ACTIVE)) { // Can enter only if game is in progress.
-				String btnLabel = "Your Turn";
-				if (g.getMode().equals(GameMode.UTESTING)) {
-					btnLabel = "Enter";
-				}
-%>
-			<form id="enterGameForm" action="<%= request.getContextPath() + Paths.DUEL_SELECTION%>" method="post">
-				<input type="hidden" name="formType" value="enterGame">
-				<input type="hidden" name="gameId" value="<%=g.getId()%>">
-				<% if (uid == turnId ) {%>
-				<button class="btn btn-primary" id="<%="duel-myturn-"+g.getId()%>" type="submit"><%=btnLabel%></button>
-				<% } else {%>
-				<button  class="btn btn-default btn-sm" id="<%="duel-enter-"+g.getId()%>" type="submit" value="Enter Game">Enter Game</button>
-				<% }%>
-			</form>
-
-<%
-			}
-%>
+			<a class="btn btn-sm btn-default" id="<%="results_"+g.getId()%>" href="<%=request.getContextPath() + Paths.DUEL_GAME%>?gameId=<%= g.getId() %>">Enter Game</a>
 		</td>
 	</tr>
 <%

@@ -58,8 +58,8 @@ pageTitle = null;
             }
 
             String loggedName = (String) request.getSession().getAttribute("username");
-            String atkName = UserDAO.getUserById(game.getAttackerId()).getUsername();
-            String defName = UserDAO.getUserById(game.getDefenderId()).getUsername();
+            String atkName=Optional.ofNullable(UserDAO.getUserById(game.getAttackerId())).map(User::getUsername).orElse("none");
+            String defName=Optional.ofNullable(UserDAO.getUserById(game.getDefenderId())).map(User::getUsername).orElse("none");
             if (atkName.equals(loggedName))
                 atkName = "you";
             else

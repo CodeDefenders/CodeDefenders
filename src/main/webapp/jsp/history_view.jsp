@@ -68,11 +68,7 @@
             <td class="col-sm-2"><%= defName %></td>
             <td class="col-sm-2"><%= g.getLevel().name() %></td>
             <td class="col-sm-2">
-                <form id="view" action="<%=request.getContextPath() + Paths.DUEL_SELECTION%>" method="post">
-                    <input type="hidden" name="formType" value="enterGame">
-                    <input type="hidden" name="gameId" value=<%=g.getId()%>>
-                    <button id="<%="results_"+g.getId()%>" type="submit" class="btn btn-sm btn-default">View Scores</button>
-                </form>
+                <a class="btn btn-sm btn-default" id="<%="results_"+g.getId()%>" href="<%=request.getContextPath() + Paths.DUEL_GAME%>?gameId=<%= g.getId() %>">View Scores</a>
             </td>
         </tr>
 
