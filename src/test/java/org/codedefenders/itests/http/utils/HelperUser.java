@@ -274,7 +274,7 @@ public class HelperUser {
 		HtmlPage playPage = browser.getPage(codedefendersHome + "" + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
 		HtmlAnchor claimEquivalenceLink = null;
 		for (HtmlAnchor a : playPage.getAnchors()) {
-			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?equivLine=" + line)) {
+			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?equivLines=" + line)) {
 				claimEquivalenceLink = a;
 				break;
 			}
@@ -293,7 +293,7 @@ public class HelperUser {
 		HtmlPage playPage = browser.getPage(codedefendersHome + "" + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
 		HtmlAnchor acceptEquivalenceLink = null;
 		for (HtmlAnchor a : playPage.getAnchors()) {
-			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquiv=")) {
+			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquivalent=")) {
 				acceptEquivalenceLink = a;
 				break;
 			}
@@ -314,7 +314,7 @@ public class HelperUser {
 			throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 		HtmlPage playPage = browser.getPage(codedefendersHome + "" + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
 		for (HtmlAnchor a : playPage.getAnchors()) {
-			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquiv=")) {
+			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquivalent=")) {
 				Assert.fail("On game " + gameId + " there is still an equivalence duel open");
 			}
 		}
@@ -324,7 +324,7 @@ public class HelperUser {
 			throws FailingHttpStatusCodeException, MalformedURLException, IOException {
 		HtmlPage playPage = browser.getPage(codedefendersHome + "" + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
 		for (HtmlAnchor a : playPage.getAnchors()) {
-			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquiv=")) {
+			if (a.getHrefAttribute().contains(Paths.BATTLEGROUND_GAME + "?acceptEquivalent=")) {
 				return;
 			}
 		}

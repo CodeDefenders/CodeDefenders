@@ -37,6 +37,7 @@ import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.User;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -52,10 +53,13 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -100,8 +104,8 @@ public class MultiplayerGameManager extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
         if (!gameIdOpt.isPresent()) {
-            logger.error("No gameId parameter. Aborting request.");
-            Redirect.redirectBack(request, response);
+            logger.debug("No gameId parameter. Aborting request.");
+            response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_SELECTION);
             return;
         }
         request.setAttribute("gameId", gameIdOpt.get());
@@ -114,7 +118,7 @@ public class MultiplayerGameManager extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
         if (!gameIdOpt.isPresent()) {
-            logger.error("No gameId parameter. Aborting request.");
+            logger.debug("No gameId parameter. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
         }
@@ -122,7 +126,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
         final MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
         if (game == null) {
-            logger.error("Could not retrieve game from database for gameId: {}", gameId);
+            logger.debug("Could not retrieve game from database for gameId: {}", gameId);
             Redirect.redirectBack(request, response);
             return;
         }
@@ -140,10 +144,15 @@ public class MultiplayerGameManager extends HttpServlet {
             case "reset": {
                 final HttpSession session = request.getSession();
                 session.removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+                response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
             case "resolveEquivalence": {
                 resolveEquivalence(request, response, gameId, game);
+                return;
+            }
+            case "claimEquivalent": {
+                claimEquivalent(request, response, gameId, game);
                 return;
             }
             default:
@@ -419,123 +428,249 @@ public class MultiplayerGameManager extends HttpServlet {
             return;
         }
 
-        // Get the text submitted by the user.
-        final Optional<String> test = ServletUtils.getStringParameter(request, "test");
-        if (!test.isPresent()) {
-            session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST);
-            response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
-            return;
-        }
-        final String testText = test.get();
+        boolean handleAcceptEquivalence = ServletUtils.parameterThenOrOther(request, "acceptEquivalent", true, false);
+        boolean handleRejectEquivalence = ServletUtils.parameterThenOrOther(request, "rejectEquivalent", true, false);
 
-        // If it can be written to file and compiled, end turn. Otherwise, dont.
-
-        Test newTest;
-        try {
-            newTest = GameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest());
-        } catch (CodeValidatorException cve) {
-            messages.add(TEST_GENERIC_ERROR_MESSAGE);
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-            response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
-            return;
-        }
-
-        // If test is null, it compiled but codevalidator triggered
-        if (newTest == null) {
-            messages.add(String.format(TEST_INVALID_MESSAGE, game.getMaxAssertionsPerTest()));
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-            response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
-            return;
-        }
-
-        final Optional<Integer> currentEquivMutant = ServletUtils.getIntParameter(request, "currentEquivMutant");
-        if (!currentEquivMutant.isPresent()) {
-            logger.info("Missing currentEquivMutant parameter.");
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-            response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
-            return;
-        }
-        int currentEquivMutantId = currentEquivMutant.orElse(-1);
-
-        logger.debug("Executing Action resolveEquivalence for mutant {} and test {}", currentEquivMutantId, newTest.getId());
-        TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
-
-        if (compileTestTarget == null || compileTestTarget.status != TargetExecution.Status.SUCCESS) {
-            logger.debug("compileTestTarget: " + compileTestTarget);
-            messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
-            if (compileTestTarget != null) {
-                messages.add(compileTestTarget.message);
+        if (handleAcceptEquivalence) {
+            // Accepting equivalence
+            final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
+            if (!equivMutantId.isPresent()) {
+                logger.debug("Missing equivMutantId parameter.");
+                response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+                return;
             }
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-            response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
-            return;
-        }
-        TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
-        if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
-            //  (testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
-            logger.debug("testOriginalTarget: " + testOriginalTarget);
-            messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
-            messages.add(testOriginalTarget.message);
-            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-            response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
-            return;
-        }
-        logger.debug("Test {} passed on the CUT", newTest.getId());
+            int mutantId = equivMutantId.get();
+            int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(userId, gameId);
+            List<Mutant> mutantsPending = game.getMutantsMarkedEquivalentPending();
 
-        // Instead of running equivalence on only one mutant, let's try with all mutants pending resolution
-        List<Mutant> mutantsPendingTests = game.getMutantsMarkedEquivalentPending();
-        boolean killedClaimed = false;
-        int killedOthers = 0;
-        for (Mutant mPending : mutantsPendingTests) {
-            // TODO: Doesnt distinguish between failing because the test didnt run at all and failing because it detected the mutant
-            MutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
-            if (mPending.getEquivalent() == Mutant.Equivalence.PROVEN_NO) {
-                logger.debug("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
-                // TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points added.
-                newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
-                final String message = UserDAO.getUserById(userId).getUsername() + " killed mutant " + mPending.getId() + " in an equivalence duel.";
-                Event notif = new Event(-1, gameId, userId, message, EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
-                        new Timestamp(System.currentTimeMillis()));
-                notif.insert();
-                if (mPending.getId() == currentEquivMutantId) {
-                    killedClaimed = true;
-                } else {
-                    killedOthers++;
-                }
-            } else { // ASSUMED_YES
-                if (mPending.getId() == currentEquivMutantId) {
-                    // only kill the one mutant that was claimed
-                    mPending.kill(ASSUMED_YES);
-                    final String message = UserDAO.getUserById(userId).getUsername() +
-                            " lost an equivalence duel. Mutant " + mPending.getId() +
-                            " is assumed equivalent.";
-                    Event notif = new Event(-1, gameId, userId, message,
+            for (Mutant m : mutantsPending) {
+                if (m.getId() == mutantId && m.getPlayerId() == playerId) {
+                    m.kill(Mutant.Equivalence.DECLARED_YES);
+                    DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
+                    messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
+
+                    User eventUser = UserDAO.getUserById(userId);
+
+                    Event notifEquiv = new Event(-1, game.getId(),
+                            userId,
+                            eventUser.getUsername() +
+                                    " accepts that their mutant " + m.getId() + " is equivalent.",
                             EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
-                    notif.insert();
+                    notifEquiv.insert();
+
+                    response.sendRedirect(request.getContextPath() + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+                    return;
                 }
-                logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent", newTest.getId(), mPending.getId());
             }
-        }
-        if (killedClaimed) {
-            messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
-            if (killedOthers == 1) {
-                messages.add("...and it also killed another claimed mutant!");
-            } else if (killedOthers > 1) {
-                messages.add(String.format("...and it also killed other %d claimed mutants!", killedOthers));
+
+            logger.info("User {} tried to accept equivalence for mutant {}, but mutant has no pending equivalences.", userId, mutantId);
+            response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+        } else if (handleRejectEquivalence) {
+            // Reject equivalence and submit killing test case
+            final Optional<String> test = ServletUtils.getStringParameter(request, "test");
+            if (!test.isPresent()) {
+                session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST);
+                response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+                return;
             }
+            final String testText = test.get();
+
+            // If it can be written to file and compiled, end turn. Otherwise, dont.
+            Test newTest;
+            try {
+                newTest = GameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest());
+            } catch (CodeValidatorException cve) {
+                messages.add(TEST_GENERIC_ERROR_MESSAGE);
+                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+                return;
+            }
+
+            // If test is null, it compiled but codevalidator triggered
+            if (newTest == null) {
+                messages.add(String.format(TEST_INVALID_MESSAGE, game.getMaxAssertionsPerTest()));
+                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+                return;
+            }
+
+            final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
+            if (!equivMutantId.isPresent()) {
+                logger.info("Missing equivMutantId parameter.");
+                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+                return;
+            }
+            int mutantId = equivMutantId.get();
+
+            logger.debug("Executing Action resolveEquivalence for mutant {} and test {}", mutantId, newTest.getId());
+            TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+
+            if (compileTestTarget == null || compileTestTarget.status != TargetExecution.Status.SUCCESS) {
+                logger.debug("compileTestTarget: " + compileTestTarget);
+                messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+                if (compileTestTarget != null) {
+                    messages.add(compileTestTarget.message);
+                }
+                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+                return;
+            }
+            TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+            if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
+                //  (testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
+                logger.debug("testOriginalTarget: " + testOriginalTarget);
+                messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
+                messages.add(testOriginalTarget.message);
+                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+                response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+                return;
+            }
+            logger.debug("Test {} passed on the CUT", newTest.getId());
+
+            // Instead of running equivalence on only one mutant, let's try with all mutants pending resolution
+            List<Mutant> mutantsPendingTests = game.getMutantsMarkedEquivalentPending();
+            boolean killedClaimed = false;
+            int killedOthers = 0;
+            for (Mutant mPending : mutantsPendingTests) {
+                // TODO: Doesnt distinguish between failing because the test didnt run at all and failing because it detected the mutant
+                MutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
+                if (mPending.getEquivalent() == Mutant.Equivalence.PROVEN_NO) {
+                    logger.debug("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
+                    // TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points added.
+                    newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
+                    final String message = UserDAO.getUserById(userId).getUsername() + " killed mutant " + mPending.getId() + " in an equivalence duel.";
+                    Event notif = new Event(-1, gameId, userId, message, EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
+                            new Timestamp(System.currentTimeMillis()));
+                    notif.insert();
+                    if (mPending.getId() == mutantId) {
+                        killedClaimed = true;
+                    } else {
+                        killedOthers++;
+                    }
+                } else { // ASSUMED_YES
+                    if (mPending.getId() == mutantId) {
+                        // only kill the one mutant that was claimed
+                        mPending.kill(ASSUMED_YES);
+                        final String message = UserDAO.getUserById(userId).getUsername() +
+                                " lost an equivalence duel. Mutant " + mPending.getId() +
+                                " is assumed equivalent.";
+                        Event notif = new Event(-1, gameId, userId, message,
+                                EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
+                                new Timestamp(System.currentTimeMillis()));
+                        notif.insert();
+                    }
+                    logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent", newTest.getId(), mPending.getId());
+                }
+            }
+            if (killedClaimed) {
+                messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
+                if (killedOthers == 1) {
+                    messages.add("...and it also killed another claimed mutant!");
+                } else if (killedOthers > 1) {
+                    messages.add(String.format("...and it also killed other %d claimed mutants!", killedOthers));
+                }
+            } else {
+                messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
+                if (killedOthers == 1) {
+                    messages.add("...however, your test did kill another claimed mutant!");
+                } else if (killedOthers > 1) {
+                    messages.add(String.format("...however, your test killed other %d claimed mutants!", killedOthers));
+                }
+            }
+            newTest.update();
+            game.update();
+            logger.info("Resolving equivalence was handled successfully");
+            response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
         } else {
-            messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
-            if (killedOthers == 1) {
-                messages.add("...however, your test did kill another claimed mutant!");
-            } else if (killedOthers > 1) {
-                messages.add(String.format("...however, your test killed other %d claimed mutants!", killedOthers));
-            }
+            logger.info("Rejecting resolving equivalence request. Missing parameters 'acceptEquivalent' or 'rejectEquivalent'.");
+            Redirect.redirectBack(request, response);
         }
-        newTest.update();
-        game.update();
-        logger.info("Resolving equivalence was handled successfully");
-        response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+    }
+
+    private void claimEquivalent(HttpServletRequest request, HttpServletResponse response, int gameId, MultiplayerGame game) throws IOException {
+        final int userId = ServletUtils.userId(request);
+
+        final String contextPath = ctx(request);
+        final HttpSession session = request.getSession();
+        final ArrayList<String> messages = new ArrayList<>();
+        session.setAttribute("messages", messages);
+
+        Role role = game.getRole(userId);
+
+        if (role != Role.DEFENDER) {
+            messages.add("Can only claim mutant as equivalent if you are a Defender!");
+            logger.info("Non defender (role={}) tried to claim mutant as equivalent.", role);
+            response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+            return;
+        }
+
+        if (game.getState() != GameState.ACTIVE && game.getState() != GameState.GRACE_ONE) {
+            messages.add("You cannot claim mutants as equivalent in this game anymore.");
+            logger.info("Mutant claimed for non-active game.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        Optional<String> equivLinesParam = ServletUtils.getStringParameter(request, "equivLines");
+        if (!equivLinesParam.isPresent()) {
+            logger.debug("Missing 'equivLines' parameter.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(userId, gameId);
+        AtomicInteger claimedMutants = new AtomicInteger();
+        AtomicBoolean noneCovered = new AtomicBoolean(true);
+        List<Mutant> mutantsAlive = game.getAliveMutants();
+
+        Arrays.stream(equivLinesParam.get().split(","))
+                .map(Integer::parseInt)
+                .filter(game::isLineCovered)
+                .forEach(line -> {
+                    noneCovered.set(false);
+                    mutantsAlive.stream()
+                            .filter(m -> m.getLines().contains(line) && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID)
+                            .forEach(m -> {
+                                m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+                                m.update();
+
+                                User mutantOwner = UserDAO.getUserForPlayer(m.getPlayerId());
+
+                                Event event = new Event(-1, gameId, mutantOwner.getId(),
+                                        "One or more of your mutants is flagged equivalent.",
+                                        EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
+                                        new Timestamp(System.currentTimeMillis()));
+                                event.insert();
+
+                                DatabaseAccess.insertEquivalence(m, playerId);
+                                claimedMutants.incrementAndGet();
+                            });
+                });
+
+        if (noneCovered.get() && !game.isMarkUncovered()) {
+            messages.add(Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
+            response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+            return;
+        }
+
+        int nClaimed = claimedMutants.get();
+        if (nClaimed > 0) {
+            String flaggingChatMessage = UserDAO.getUserById(userId).getUsername() + " flagged "
+                    + nClaimed + " mutant" + (nClaimed == 1 ? "" : "s") + " as equivalent.";
+            Event event = new Event(-1, gameId, userId, flaggingChatMessage,
+                    EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
+                    new Timestamp(System.currentTimeMillis()));
+            event.insert();
+        }
+
+        String flaggingMessage = nClaimed == 0
+                ? "Mutant has already been claimed as equivalent or killed!"
+                : String.format("Flagged %d mutant%s as equivalent", nClaimed,
+                (nClaimed == 1 ? "" : 's'));
+        messages.add(flaggingMessage);
+        response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
     }
 
     private void collectDefenderIntentions(Test newTest, Set<Integer> selectedLines, Set<Integer> selectedMutants) {

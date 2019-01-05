@@ -103,9 +103,9 @@
 
             <h3>Not equivalent? Write a killing test here:</h3>
             <form id="equivalenceForm" action="<%=request.getContextPath() + Paths.DUEL_GAME %>" method="post">
-                <input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= equivMutant.getId() %>">
                 <input type="hidden" name="formType" value="resolveEquivalence">
-                <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
+                <input type="hidden" name="gameId" value="<%= game.getId() %>">
+                <input type="hidden" id="equivMutantId" name="equivMutantId" value="<%= equivMutant.getId() %>">
 
                 <%@include file="../game_components/test_editor.jsp"%>
 

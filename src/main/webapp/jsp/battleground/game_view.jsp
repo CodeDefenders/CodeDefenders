@@ -49,11 +49,9 @@
 <%@ page import="org.codedefenders.model.EventStatus" %>
 <%@ page import="org.codedefenders.model.EventType" %>
 <%@ page import="org.codedefenders.model.User" %>
-<%@ page import="static org.codedefenders.util.Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE" %>
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.slf4j.Logger" %>
 <%@ page import="org.slf4j.LoggerFactory" %>
-<%@ page import="java.sql.Timestamp" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.HashMap" %>
 <%@ page import="java.util.List" %>
@@ -82,7 +80,7 @@
         }
     }
 
-    if ((game.getState().equals(GameState.CREATED) || game.getState().equals(GameState.FINISHED)) && (!role.equals(Role.CREATOR))) {
+    if (role != Role.CREATOR && (game.getState() == GameState.CREATED || game.getState() == GameState.FINISHED)) {
         response.sendRedirect(request.getContextPath()+ Paths.GAMES_OVERVIEW);
         return;
     }
@@ -93,7 +91,7 @@
     for (Test t : tests) {
         for (Integer lc : t.getLineCoverage().getLinesCovered()) {
             if (!linesCovered.containsKey(lc)) {
-                linesCovered.put(lc, new ArrayList<Test>());
+                linesCovered.put(lc, new ArrayList<>());
             }
             linesCovered.get(lc).add(t);
         }
@@ -115,102 +113,6 @@
 
     List<Mutant> mutantsPending = game.getMutantsMarkedEquivalentPending();
 
-    if (role.equals(Role.DEFENDER) && (request.getParameter("equivLine") != null || request.getParameter("equivLines") != null) &&
-            (game.getState().equals(GameState.ACTIVE) || game.getState().equals(GameState.GRACE_ONE))){
-        try {
-            List<Integer> equivLines = new ArrayList<Integer>();
-            if( request.getParameter("equivLine") != null ){
-				equivLines.add(Integer.parseInt(request.getParameter("equivLine")));
-            } else {
-				for( String s : request.getParameter("equivLines").replaceAll("\\[|\\]", "").split(",")){
-					equivLines.add(Integer.parseInt(s));
-				}
-            }
-
-            int nClaimed = 0;
-            boolean noneCovered = true;
-            for (Integer equivLine : equivLines) {
-				if (game.isLineCovered(equivLine)) {
-					noneCovered = false;
-					for (Mutant m : mutantsAlive) {
-						if (m.getLines().contains(equivLine) && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID) {
-							m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-							// BAD
-							m.update();
-
-							User mutantOwner = UserDAO.getUserForPlayer(m.getPlayerId());
-
-							Event notifEquivFlag = new Event(-1, game.getId(), mutantOwner.getId(),
-									"One or more of your mutants is flagged equivalent.",
-									EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
-									new Timestamp(System.currentTimeMillis()));
-							notifEquivFlag.insert();
-
-							DatabaseAccess.insertEquivalence(m, playerId);
-							nClaimed++;
-						}
-					}
-				}
-			}
-
-			if (noneCovered && !game.isMarkUncovered()) {
-				// equivLine is not covered, possible iff passed directly as url argument
-				messages.add(MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
-				response.sendRedirect(redirectURL);
-				return;
-			}
-
-			if (nClaimed >= 1) {
-				String flaggingChatMessage = UserDAO.getUserById(uid).getUsername() + " flagged "
-						+ nClaimed + " mutant" + (nClaimed == 1 ? "" : "s") + " as equivalent.";
-				Event notifMutant = new Event(-1, game.getId(), uid, flaggingChatMessage,
-						EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
-						new Timestamp(System.currentTimeMillis()));
-
-				notifMutant.insert();
-			}
-
-			String flaggingMessage = nClaimed < 1
-					? "Mutant has already been claimed as equivalent or killed!"
-					: String.format("Flagged %d mutant%s as equivalent", nClaimed,
-							(nClaimed == 1 ? "" : 's'));
-			messages.add(flaggingMessage);
-			response.sendRedirect(redirectURL);
-            return;
-        } catch (NumberFormatException e) {
-            logger.error("Can't parse equivalent line numbers", e);
-        }
-
-    } else if (role.equals(Role.ATTACKER) && request.getParameter("acceptEquiv") != null){
-        try {
-            int mutId = Integer.parseInt(request.getParameter("acceptEquiv"));
-
-            for (Mutant m : mutantsPending){
-                if (m.getPlayerId() == playerId &&  m.getId() == mutId){
-                    m.kill(Mutant.Equivalence.DECLARED_YES);
-                    DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
-                    messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
-
-                    User eventUser = UserDAO.getUserById(uid);
-
-                    Event notifEquiv = new Event(-1, game.getId(),
-                            uid,
-                            eventUser.getUsername() +
-                                    " accepts that their mutant " + m.getId() + " is equivalent.",
-                            EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
-                            new Timestamp(System.currentTimeMillis()));
-                    notifEquiv.insert();
-
-                    response.sendRedirect(redirectURL);
-                    return;
-                }
-            }
-        } catch (NumberFormatException e){
-            logger.error("Can't parse mutant ID", e);
-        }
-    }
-
-    List<Mutant> mutantsEquiv =  game.getMutantsMarkedEquivalent();
     Map<Integer, List<Mutant>> mutantLines = new HashMap<>();
     Map<Integer, List<Mutant>> mutantEquivPending = new HashMap<>();
     Map<Integer, List<Mutant>> mutantKilledLines = new HashMap<>();
@@ -223,7 +125,7 @@
     for (Mutant m : mutantsAlive) {
         for (int line : m.getLines()){
             if (!mutantLines.containsKey(line)){
-                mutantLines.put(line, new ArrayList<Mutant>());
+                mutantLines.put(line, new ArrayList<>());
             }
 
             mutantLines.get(line).add(m);
@@ -234,7 +136,7 @@
     for (Mutant m : mutantsPending) {
         for (int line : m.getLines()){
             if (!mutantEquivPending.containsKey(line)){
-                mutantEquivPending.put(line, new ArrayList<Mutant>());
+                mutantEquivPending.put(line, new ArrayList<>());
             }
             mutantEquivPending.get(line).add(m);
         }
@@ -247,12 +149,11 @@
     for (Mutant m : mutantsKilled) {
         for (int line : m.getLines()){
             if (!mutantKilledLines.containsKey(line)){
-                mutantKilledLines.put(line, new ArrayList<Mutant>());
+                mutantKilledLines.put(line, new ArrayList<>());
             }
             mutantKilledLines.get(line).add(m);
         }
     }
-    //ArrayList<String> messages = new ArrayList<String>();
 %>
 <%@ include file="/jsp/scoring_tooltip.jsp" %>
 <%@ include file="/jsp/playerFeedback.jsp" %>

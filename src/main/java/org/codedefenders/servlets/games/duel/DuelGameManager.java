@@ -187,19 +187,19 @@ public class DuelGameManager extends HttpServlet {
             return;
         }
 
-        final Optional<Integer> currentEquivMutantOpt = ServletUtils.getIntParameter(request, "currentEquivMutant");
-        if (!currentEquivMutantOpt.isPresent()) {
-            logger.error("No 'currentEquivMutant' parameter. Aborting request.");
+        final Optional<Integer> equivMutantIdOpt = ServletUtils.getIntParameter(request, "equivMutantId");
+        if (!equivMutantIdOpt.isPresent()) {
+            logger.error("No 'equivMutantId' parameter. Aborting request.");
             Redirect.redirectBack(request, response);
             return;
         }
-        int currentEquivMutantId = currentEquivMutantOpt.get();
+        int equivMutantId = equivMutantIdOpt.get();
 
-        Mutant mutant = game.getMutantByID(currentEquivMutantId);
+        Mutant mutant = game.getMutantByID(equivMutantId);
 
         // Check type of equivalence response.
         if (request.getParameter("rejectEquivalent") != null) { // If user wanted to supply a test
-            logger.debug("Equivalence rejected for mutant {}, processing killing test", currentEquivMutantId);
+            logger.debug("Equivalence rejected for mutant {}, processing killing test", equivMutantId);
 
             // Get the text submitted by the user.
             String testText = request.getParameter("test");
@@ -259,7 +259,7 @@ public class DuelGameManager extends HttpServlet {
             MutationTester.runEquivalenceTest(newTest, mutant);
             game.endRound();
             game.update();
-            Mutant mutantAfterTest = game.getMutantByID(currentEquivMutantId);
+            Mutant mutantAfterTest = game.getMutantByID(equivMutantId);
             if (mutantAfterTest.getEquivalent() == Mutant.Equivalence.PROVEN_NO) {
                 logger.info("Test {} killed mutant {}, hence NOT equivalent", newTest.getId(), mutant.getId());
                 messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
@@ -306,7 +306,7 @@ public class DuelGameManager extends HttpServlet {
             return;
         }
 
-        final Optional<Integer> mutantIdOpt = ServletUtils.getIntParameter(request, "mutantId");
+        final Optional<Integer> mutantIdOpt = ServletUtils.getIntParameter(request, "equivMutantId");
         if (!mutantIdOpt.isPresent()) {
             messages.add(MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE);
             response.sendRedirect(ServletUtils.ctx(request) + Paths.DUEL_GAME + "?gameId=" + gameId);
