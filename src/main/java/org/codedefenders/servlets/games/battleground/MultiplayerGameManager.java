@@ -102,13 +102,34 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
+        Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
         if (!gameIdOpt.isPresent()) {
-            logger.debug("No gameId parameter. Aborting request.");
-            response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_SELECTION);
+            logger.info("No gameId parameter. Aborting request.");
+            response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
             return;
         }
-        request.setAttribute("gameId", gameIdOpt.get());
+        int gameId = gameIdOpt.get();
+
+        MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+        if (game == null) {
+            logger.error("Could not find multiplayer game {}", gameId);
+            response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);
+            return;
+        }
+        int userId = ServletUtils.userId(request);
+        int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(userId, gameId);
+
+        // check is there is a pending equivalence duel for the user.
+        game.getMutantsMarkedEquivalentPending()
+                .stream()
+                .filter(m -> m.getPlayerId() == playerId)
+                .findFirst()
+                .ifPresent(mutant -> {
+                    request.setAttribute("equivMutant", mutant);
+                    request.setAttribute("openEquivalenceDuel", true);
+                });
+
+        request.setAttribute("game", game);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.BATTLEGROUND_GAME_VIEW_JSP);
         dispatcher.forward(request, response);

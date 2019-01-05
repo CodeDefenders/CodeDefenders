@@ -101,6 +101,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             case "createGame":
                 createGame(request, response);
                 return;
+            case "joinGame":
+                joinGame(request, response);
+                return;
             case "leaveGame":
                 leaveGame(request, response);
                 return;
@@ -308,6 +311,59 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
         // Redirect to the game selection menu.
         response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
+    }
+
+    private void joinGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        final int userId = userId(request);
+
+        HttpSession session = request.getSession();
+        ArrayList<String> messages = new ArrayList<>();
+        session.setAttribute("messages", messages);
+
+        final Optional<Integer> gameIdOpt = gameId(request);
+        if (!gameIdOpt.isPresent()) {
+            logger.error("No gameId parameter. Aborting request.");
+            Redirect.redirectBack(request, response);
+            return;
+        }
+        final int gameId = gameIdOpt.get();
+
+        MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+        if (game == null) {
+            logger.error("No game found for gameId={}. Aborting request.", gameId);
+            Redirect.redirectBack(request, response);
+            return;
+        }
+
+        Role role = game.getRole(userId);
+
+        if (role != Role.NONE) {
+            logger.info("User {} already in the requested game. Has role {}", userId, role);
+            return;
+        }
+        boolean defenderParamExists = ServletUtils.parameterThenOrOther(request, "defender", true, false);
+        boolean attackerParamExists = ServletUtils.parameterThenOrOther(request, "attacker", true, false);
+
+        if (defenderParamExists) {
+            if (game.addPlayer(userId, Role.DEFENDER)) {
+                logger.info("User {} joined game {} as a defender.", userId, gameId);
+                response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+            } else {
+                logger.info("User {} failed to join game {} as a defender.", userId, gameId);
+                response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+            }
+        } else if (attackerParamExists) {
+            if (game.addPlayer(userId, Role.ATTACKER)) {
+                logger.info("User {} joined game {} as an attacker.", userId, gameId);
+                response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+            } else {
+                logger.info("User {} failed to join game {} as an attacker.", userId, gameId);
+                response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+            }
+        } else {
+            logger.debug("No 'defender' or 'attacker' request parameter found. Abort request.");
+            response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+        }
     }
 
     private void leaveGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
