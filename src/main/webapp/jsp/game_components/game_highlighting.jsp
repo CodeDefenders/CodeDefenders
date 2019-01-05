@@ -263,7 +263,7 @@
             if (showEquivalenceButton
                 && status === MutantStatuses.ALIVE
                 && (markUncoveredEquivalent || testIdsPerLine.get(line))) {
-                button = createEquivalenceButton(line, mutantsOnLine);
+                button = createEquivalenceButton(line);
             }
 
             const content = document.createElement('div');
@@ -276,10 +276,9 @@
         /**
          * Creates the button with which to flag mutants as equivalent.
          * @param line The line number.
-         * @param mutantsOnLine The mutants on the line.
          * @return {string} The equivalence button.
          */
-        const createEquivalenceButton = function (line, mutantsOnLine) {
+        const createEquivalenceButton = function (line) {
             if (gameType === GameTypes.PARTY) {
                 return `<form id="equiv" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')">
                             <input type="hidden" name="formType" value="claimEquivalent">
@@ -290,9 +289,9 @@
                             </button>
                         </form>`;
             } else if (gameType === GameTypes.DUEL) {
-                return `<form id="equiv" action="<%=request.getContextPath() + Paths.DUEL_GAME%>" method="post" onsubmit="return window.confirm('This will mark mutant ` + mutantsOnLine[0].id + ` as equivalent. Are you sure?')">
+                return `<form id="equiv" action="<%=request.getContextPath() + Paths.DUEL_GAME%>" method="post" onsubmit="return window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')">
                             <input type="hidden" name="formType" value="claimEquivalent">
-                            <input type="hidden" name="equivMutantId" value="` + mutantsOnLine[0].id + `">
+                            <input type="hidden" name="equivLines" value="` + line + `">
                             <input type="hidden" name="gameId" value="` + <%=gameId%> + `">
                             <button class="btn btn-danger btn-sm" style="width: 100%;">
                                 <img src="` + Icons.FLAG + `" class="mutant-icon-image"/> Claim Equivalent

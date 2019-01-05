@@ -20,7 +20,6 @@ package org.codedefenders.servlets.games.duel;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DuelGameDAO;
-import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.MutationTester;
@@ -46,8 +45,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -57,7 +59,6 @@ import javax.servlet.http.HttpSession;
 
 import static org.codedefenders.util.Constants.MODE_DUEL_DIR;
 import static org.codedefenders.util.Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CLAIMED_EQUIVALENT_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
@@ -306,40 +307,59 @@ public class DuelGameManager extends HttpServlet {
             return;
         }
 
-        final Optional<Integer> mutantIdOpt = ServletUtils.getIntParameter(request, "equivMutantId");
-        if (!mutantIdOpt.isPresent()) {
-            messages.add(MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE);
-            response.sendRedirect(ServletUtils.ctx(request) + Paths.DUEL_GAME + "?gameId=" + gameId);
+        Optional<String> equivLinesParam = ServletUtils.getStringParameter(request, "equivLines");
+        if (!equivLinesParam.isPresent()) {
+            logger.debug("Missing 'equivLines' parameter.");
+            Redirect.redirectBack(request, response);
             return;
         }
-        int mutantId = mutantIdOpt.get();
 
-        Mutant mutantClaimed = MutantDAO.getMutantById(mutantId);
-        if (game.getMode() == GameMode.SINGLE) {
-            // TODO: Why is this not handled in the single player game but here?
-            //Singleplayer - use automatic system.
-            if (AntRunner.potentialEquivalent(mutantClaimed)) {
-                //Is potentially equiv - accept as equivalent
-                mutantClaimed.kill(Mutant.Equivalence.DECLARED_YES);
-                messages.add("The AI has accepted the mutant as equivalent.");
-            } else {
-                mutantClaimed.kill(Mutant.Equivalence.PROVEN_NO);
-                messages.add("The AI has submitted a test that kills the mutant and proves it non-equivalent!");
-            }
-            game.endTurn();
-            if (game.getState() != GameState.FINISHED) {
-                //The ai should make another move if the game isn't over
-                SinglePlayerGame spg = (SinglePlayerGame) game;
-                if (spg.getAi().makeTurn()) {
-                    messages.addAll(spg.getAi().getMessagesLastTurn());
-                }
-            }
-        } else {
-            mutantClaimed.setEquivalent(Mutant.Equivalence.PENDING_TEST);
-            mutantClaimed.update();
-            messages.add(MUTANT_CLAIMED_EQUIVALENT_MESSAGE);
-            game.passPriority();
-        }
+        AtomicInteger claimedMutants = new AtomicInteger();
+        AtomicBoolean noneCovered = new AtomicBoolean(true);
+        List<Mutant> mutantsAlive = game.getAliveMutants();
+
+        Arrays.stream(equivLinesParam.get().split(","))
+                .map(Integer::parseInt)
+                .forEach(line -> {
+                    noneCovered.set(false);
+                    mutantsAlive.stream()
+                            .filter(m -> m.getLines().contains(line) && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID)
+                            .forEach(m -> {
+                                if (game.getMode() == GameMode.SINGLE) {
+                                    // TODO: Why is this not handled in the single player game but here?
+                                    //Singleplayer - use automatic system.
+                                    if (AntRunner.potentialEquivalent(m)) {
+                                        //Is potentially equiv - accept as equivalent
+                                        m.kill(Mutant.Equivalence.DECLARED_YES);
+                                        messages.add("The AI has accepted the mutant as equivalent.");
+                                    } else {
+                                        m.kill(Mutant.Equivalence.PROVEN_NO);
+                                        messages.add("The AI has submitted a test that kills the mutant and proves it non-equivalent!");
+                                    }
+                                    game.endTurn();
+                                    if (game.getState() != GameState.FINISHED) {
+                                        //The ai should make another move if the game isn't over
+                                        SinglePlayerGame spg = (SinglePlayerGame) game;
+                                        if (spg.getAi().makeTurn()) {
+                                            messages.addAll(spg.getAi().getMessagesLastTurn());
+                                        }
+                                    }
+                                } else {
+                                    m.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+                                    m.update();
+                                    messages.add(MUTANT_CLAIMED_EQUIVALENT_MESSAGE);
+                                    claimedMutants.incrementAndGet();
+                                }
+                            });
+                });
+
+        int nClaimed = claimedMutants.get();
+        String flaggingMessage = nClaimed == 0
+                ? "Mutant has already been claimed as equivalent or killed!"
+                : String.format("Flagged %d mutant%s as equivalent", nClaimed,
+                (nClaimed == 1 ? "" : 's'));
+        messages.add(flaggingMessage);
+        game.passPriority();
         game.update();
         response.sendRedirect(ServletUtils.ctx(request) + Paths.DUEL_GAME + "?gameId=" + gameId);
     }
