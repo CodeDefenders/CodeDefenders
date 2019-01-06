@@ -44,6 +44,7 @@ public class PuzzleDAO {
 
     /**
      * Returns the {@link PuzzleChapter} for the given chapter ID.
+     *
      * @param chapterId The chapter ID.
      * @return The {@link PuzzleChapter} for the given chapter ID.
      */
@@ -59,6 +60,7 @@ public class PuzzleDAO {
 
     /**
      * Returns a {@link List} of all {@link PuzzleChapter PuzzleChapters}, sorted by the position in the chapter list.
+     *
      * @return A {@link List} of all {@link PuzzleChapter PuzzleChapters}, sorted by the position in the chapter list.
      */
     public static List<PuzzleChapter> getPuzzleChapters() {
@@ -73,6 +75,7 @@ public class PuzzleDAO {
 
     /**
      * Returns the {@link Puzzle} for the given puzzle ID.
+     *
      * @param puzzleId The puzzle ID.
      * @return The {@link Puzzle} for the given puzzle ID.
      */
@@ -88,6 +91,7 @@ public class PuzzleDAO {
 
     /**
      * Returns a {@link List} of all {@link Puzzle Puzzles}, sorted by the chapter ID and position in the chapter.
+     *
      * @return A {@link List} of all {@link Puzzle Puzzles}, sorted by the chapter ID and position in the chapter.
      */
     public static List<Puzzle> getPuzzles() {
@@ -103,6 +107,7 @@ public class PuzzleDAO {
     /**
      * Returns a {@link List} of all {@link Puzzle Puzzles} in the given {@link PuzzleChapter}, sorted by the position
      * in the chapter.
+     *
      * @param chapterId The chapter ID.
      * @return A {@link List} of all {@link Puzzle Puzzles} in the given {@link PuzzleChapter}, sorted by the position
      * in the chapter.
@@ -120,6 +125,7 @@ public class PuzzleDAO {
 
     /**
      * Returns the {@link PuzzleGame} for the given game ID.
+     *
      * @param gameId The game ID.
      * @return The {@link PuzzleGame} for the given game ID.
      */
@@ -135,8 +141,9 @@ public class PuzzleDAO {
 
     /**
      * Returns the {@link PuzzleGame} that represents the latest try on the given puzzle by the given user.
+     *
      * @param puzzleId The puzzle ID.
-     * @param userId The user ID.
+     * @param userId   The user ID.
      * @return The {@link PuzzleGame} that represents the latest try on the given puzzle by the given user.
      */
     public static PuzzleGame getLatestPuzzleGameForPuzzleAndUser(int puzzleId, int userId) {
@@ -154,8 +161,9 @@ public class PuzzleDAO {
     /**
      * Returns a {@link List} of {@link PuzzleGame PuzzleGames} that represents the tries on the given puzzle by the
      * given user. The list is sorted by the the timestamp of the games.
+     *
      * @param puzzleId The puzzle ID.
-     * @param userId The user ID.
+     * @param userId   The user ID.
      * @return A {@link List} of {@link PuzzleGame PuzzleGames} that represents the tries on the given puzzle by the
      * given user. The list is sorted by the the timestamp of the games.
      */
@@ -171,10 +179,10 @@ public class PuzzleDAO {
         return DB.executeQueryReturnList(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(puzzleId), DatabaseValue.of(userId));
     }
 
-
     /**
      * Returns a {@link List} of the active {@link PuzzleGame PuzzleGames} played by the given user.
      * The list is sorted by the the timestamp of the games.
+     *
      * @param userId The user ID.
      * @return A {@link List} of the active {@link PuzzleGame PuzzleGames} played by the given user.
      * The list is sorted by the the timestamp of the games.
@@ -192,7 +200,78 @@ public class PuzzleDAO {
     }
 
     /**
+     * Stores the given {@link Puzzle} in the database.
+     *
+     * @param puzzle The {@link Puzzle}.
+     * @return The ID of the stored puzzle, or -1 if the insert failed.
+     */
+    public static int storePuzzle(Puzzle puzzle) {
+        String query = String.join("\n",
+                "INSERT INTO puzzles",
+
+                "(Class_ID,",
+                "Active_Role,",
+                "Level,",
+                "Max_Assertions,",
+                "Mutant_Validator_Level,",
+                "Editable_Lines_Start,",
+                "Editable_Lines_End,",
+                "Chapter_ID,",
+                "Position,",
+                "Title,",
+                "Description)",
+
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+        );
+
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(puzzle.getClassId()),
+                DatabaseValue.of(puzzle.getActiveRole().toString()),
+                DatabaseValue.of(puzzle.getLevel().toString()),
+                DatabaseValue.of(puzzle.getMaxAssertionsPerTest()),
+                DatabaseValue.of(puzzle.getMutantValidatorLevel().toString()),
+                DatabaseValue.of(puzzle.getEditableLinesStart()),
+                DatabaseValue.of(puzzle.getEditableLinesEnd()),
+                DatabaseValue.of(puzzle.getChapterId()),
+                DatabaseValue.of(puzzle.getPosition()),
+                DatabaseValue.of(puzzle.getTitle()),
+                DatabaseValue.of(puzzle.getDescription())
+        };
+
+        return DB.executeUpdateQueryGetKeys(query, values);
+    }
+
+    /**
+     * Stores the given {@link PuzzleChapter} in the database.
+     *
+     * @param chapter The {@link PuzzleChapter}.
+     * @return The ID of the stored puzzle chapter, or -1 if the insert failed.
+     */
+    public static int storePuzzleChapter(PuzzleChapter chapter) {
+        String query = String.join("\n",
+                "INSERT INTO puzzle_chapters",
+
+                "(Chapter_ID,",
+                "Position,",
+                "Title,",
+                "Description)",
+
+                "VALUES (?, ?, ?, ?);"
+        );
+
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(chapter.getChapterId()),
+                DatabaseValue.of(chapter.getPosition()),
+                DatabaseValue.of(chapter.getTitle()),
+                DatabaseValue.of(chapter.getDescription()),
+        };
+
+        return DB.executeUpdateQueryGetKeys(query, values);
+    }
+
+    /**
      * Stores the given {@link PuzzleGame} in the database.
+     *
      * @param game The {@link PuzzleGame}.
      * @return The game ID of the stored game, or -1 if the insert failed.
      */
@@ -214,7 +293,7 @@ public class PuzzleDAO {
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         );
 
-        DatabaseValue[] values = new DatabaseValue[] {
+        DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(game.getClassId()),
                 DatabaseValue.of(game.getLevel().toString()),
                 DatabaseValue.of(game.getCreatorId()),
@@ -232,6 +311,7 @@ public class PuzzleDAO {
 
     /**
      * Updates the given {@link PuzzleGame}'s values in the database.
+     *
      * @param game The {@link PuzzleGame}.
      * @return {@code true} if the update was successful, {@code false}a otherwise.
      */
@@ -252,7 +332,7 @@ public class PuzzleDAO {
                 "WHERE ID = ?;"
         );
 
-        DatabaseValue[] values = new DatabaseValue[] {
+        DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(game.getClassId()),
                 DatabaseValue.of(game.getLevel().toString()),
                 DatabaseValue.of(game.getCreatorId()),
@@ -270,6 +350,7 @@ public class PuzzleDAO {
 
     /**
      * Creates a {@link PuzzleChapter} from a {@link ResultSet}.
+     *
      * @param rs The {@link ResultSet}.
      * @return The created {@link PuzzleChapter}.
      */
@@ -292,6 +373,7 @@ public class PuzzleDAO {
 
     /**
      * Creates a {@link Puzzle} from a {@link ResultSet}.
+     *
      * @param rs The {@link ResultSet}.
      * @return The created {@link Puzzle}.
      */
@@ -330,6 +412,7 @@ public class PuzzleDAO {
 
     /**
      * Creates a {@link PuzzleGame} from a {@link ResultSet}.
+     *
      * @param rs The {@link ResultSet}.
      * @return The created {@link PuzzleGame}.
      */
