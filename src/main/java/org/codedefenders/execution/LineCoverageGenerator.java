@@ -20,7 +20,6 @@ package org.codedefenders.execution;
 
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
-import org.codedefenders.game.Test;
 import org.jacoco.core.analysis.Analyzer;
 import org.jacoco.core.analysis.CoverageBuilder;
 import org.jacoco.core.analysis.IClassCoverage;
@@ -34,9 +33,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,27 +42,27 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * This class offers a static method {@link #generate(GameClass, Test)}, which
- * allows generation of line coverage for a given {@link GameClass} and {@link Test}.
+ * This class offers a static method {@link #generate(GameClass, Path) generate()}, which
+ * allows generation of line coverage for a given {@link GameClass} and {@link Path paht to a java test file}.
  */
 public class LineCoverageGenerator {
     private static final Logger logger = LoggerFactory.getLogger(LineCoverageGenerator.class);
     private static final String JACOCO_REPORT_FILE = "jacoco.exec";
 
     /**
-     * Generates and returns line coverage for a given {@link GameClass} and {@link Test}.
+     * Generates and returns line coverage for a given {@link GameClass} and {@link Path path to a java test file}.
      * <p>
      * The method requires the file 'jacoco.exec' to be present in the
      * folder the test lies in, otherwise the generation fails and an
      * empty {@link LineCoverage} instance is returned.
      *
-     * @param gameClass the class that is tested.
-     * @param test      the test used for testing.
+     * @param gameClass    the class that is tested.
+     * @param testJavaFile the test java file in which parent folder the 'jacoco.exe' file exists as a {@link Path}.
      * @return a {@link LineCoverage} instance with covered and uncovered lines if successful,
      * empty lists for covered and uncovered lines if failed.
      */
-    public static LineCoverage generate(GameClass gameClass, Test test) {
-        final File reportDirectory = Paths.get(test.getJavaFile()).getParent().toFile();
+    public static LineCoverage generate(GameClass gameClass, Path testJavaFile) {
+        final File reportDirectory = testJavaFile.getParent().toFile();
         final File executionDataFile = new File(reportDirectory, JACOCO_REPORT_FILE);
         final ExecFileLoader execFileLoader = new ExecFileLoader();
         try {
@@ -76,36 +74,27 @@ public class LineCoverageGenerator {
         // In memory data store for execution data
         final ExecutionDataStore executionDataStore = execFileLoader.getExecutionDataStore();
 
-		final CoverageBuilder coverageBuilder = new CoverageBuilder();
-		final Analyzer analyzer = new Analyzer(executionDataStore, coverageBuilder);
+        final CoverageBuilder coverageBuilder = new CoverageBuilder();
+        final Analyzer analyzer = new Analyzer(executionDataStore, coverageBuilder);
 
-		/*
-		 * Classes with inner classes corresponds to multiple files on the file
-		 * system But inside the db they are not reported. So we need to look
-		 * into the folder
-		 */
-		final File classFileFolder = new File(gameClass.getClassFile()).getParentFile();
-		// List all the .class files in this folder. Not sure if FilenameFilter
-		// is thread safe so I instantiate a new one every time.
-		for (File classFile : classFileFolder.listFiles(new FilenameFilter() {
-
-			// XXX Probably the alias would work the same
-			private final String regex = new File(gameClass.getClassFile()).getName().split("\\.")[0] + "\\$?.*"
-					+ "\\.class";
-			private final Pattern innerClassPatter = Pattern.compile(regex);
-
-			@Override
-			public boolean accept(File dir, String name) {
-				return innerClassPatter.matcher(name).matches();
-			}
-		})) {
-			try {
-				analyzer.analyzeClass(new ClassReader(new FileInputStream(classFile)));
-			} catch (IOException e) {
-				logger.error("Failed to analyze file: " + classFile + ". Returning empty LineCoverage.", e);
-				return new LineCoverage();
-			}
-		}
+        /*
+         * Classes with inner classes corresponds to multiple files on the file
+         * system But inside the db they are not reported. So we need to look
+         * into the folder
+         */
+        final File classFileFolder = new File(gameClass.getClassFile()).getParentFile();
+        // List all the .class files in this folder. Not sure if FilenameFilter
+        // is thread safe so I instantiate a new one every time.
+        final String regex = new File(gameClass.getClassFile()).getName().split("\\.")[0] + "\\$?.*\\.class";
+        final Pattern innerClassPatter = Pattern.compile(regex);
+        for (File classFile : classFileFolder.listFiles((dir, name) -> innerClassPatter.matcher(name).matches())){
+            try {
+                analyzer.analyzeClass(new ClassReader(new FileInputStream(classFile)));
+            } catch (IOException e) {
+                logger.error("Failed to analyze file: " + classFile + ". Returning empty LineCoverage.", e);
+                return new LineCoverage();
+            }
+        }
 
         final List<Integer> linesCovered = new LinkedList<>();
         final List<Integer> linesUncovered = new LinkedList<>();

@@ -738,11 +738,8 @@ public class ClassUploadManager extends HttpServlet {
                 return true;
             }
 
-            // LineCoverage#generate requires at least a dummy test object
-            final Test dummyTest = new Test(javaFilePath, null, -1, null);
-
             int testId;
-            final LineCoverage lineCoverage = LineCoverageGenerator.generate(cut, dummyTest);
+            final LineCoverage lineCoverage = LineCoverageGenerator.generate(cut, Paths.get(javaFilePath));
             final Test test = new Test(javaFilePath, classFilePath, cutId, lineCoverage);
             try {
                 testId = TestDAO.storeTest(test);

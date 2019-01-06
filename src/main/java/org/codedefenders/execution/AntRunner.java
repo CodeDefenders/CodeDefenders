@@ -225,7 +225,7 @@ public class AntRunner {
 		AntProcessResult result = runAntTarget("test-original", null, dir.getAbsolutePath(), cut, t.getFullyQualifiedClassName(), forceLocalExecution);
 
 		// add coverage information
-		final LineCoverage coverage = LineCoverageGenerator.generate(cut, t);
+		final LineCoverage coverage = LineCoverageGenerator.generate(cut, Paths.get(t.getJavaFile()));
 		t.setLineCoverage(coverage);
 		t.update();
 
