@@ -9,6 +9,6 @@ cd ..
 
 set -x # Debug
 
-mvn clean compile exec:java -Dexec.args="--cuts $(pwd)/installation/cuts/Branch.java --mutants $(pwd)/installation/mutants/Branch/0/Branch.java --tests  $(pwd)/installation/tests/Branch/0/TestBranch.java $(pwd)/installation/tests/Branch/1/TestBranch.java --puzzles $(pwd)/installation/puzzles/Branch/0/Puzzle.properties $(pwd)/installation/puzzles/Branch/1/Puzzle.properties --configurations $(pwd)/config.properties"
+mvn clean compile exec:java -Dexec.args="--cuts $(pwd)/installation/cuts/Branch/Branch.java --mutants $(pwd)/installation/mutants/Branch/0/Branch.java --tests  $(pwd)/installation/tests/Branch/0/TestBranch.java $(pwd)/installation/tests/Branch/1/TestBranch.java --puzzleChapters $(pwd)/installation/puzzleChapters/PuzzleChapter01.properties --puzzles $(pwd)/installation/puzzles/Branch/0/Puzzle.properties $(pwd)/installation/puzzles/Branch/1/Puzzle.properties --configurations $(pwd)/config.properties"
 
 cd $HERE

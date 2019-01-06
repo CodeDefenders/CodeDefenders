@@ -1,31 +1,17 @@
 package org.codedefenders.installer;
 
-import static org.codedefenders.util.Constants.F_SEP;
+import com.lexicalscope.jewel.cli.CliFactory;
+import com.lexicalscope.jewel.cli.Option;
+import com.mysql.cj.jdbc.MysqlDataSource;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.Compiler;
+import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.LineCoverageGenerator;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -34,336 +20,500 @@ import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.puzzle.Puzzle;
-import org.codedefenders.servlets.ClassUploadManager;
+import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.lexicalscope.jewel.cli.CliFactory;
-import com.lexicalscope.jewel.cli.Option;
-import com.mysql.cj.jdbc.MysqlDataSource;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
+/**
+ * This class allows adding {@link GameClass game classes (CUTs)}, {@link Mutant mutants},
+ * {@link Test tests}, {@link PuzzleChapter puzzle chapters} and {@link Puzzle puzzles}
+ * programmatically.
+ * <p>
+ * This means that a newly deployed Code Defenders instance already can have playable
+ * games or puzzles.
+ *
+ * @author gambi
+ * @author <a href="https://github.com/werli">Phil Werli<a/>
+ */
 public class Installer {
 
-	public interface ParsingInterface {
+    private static final Logger logger = LoggerFactory.getLogger(Installer.class);
 
-		@Option
-		File getConfigurations();
+    private interface ParsingInterface {
+        @Option(defaultToNull = true)
+        File getConfigurations();
 
-		@Option
-		List<File> getCuts();
+        /**
+         * For convention see {@link Installer#installCUT(File)}.
+         */
+        @Option(longName = "cuts")
+        List<File> getCuts();
 
-		@Option(defaultToNull = true)
-		List<File> getMutants();
+        /**
+         * For convention see {@link Installer#installMutant(File)}.
+         */
+        @Option(longName = "mutants", defaultToNull = true)
+        List<File> getMutants();
 
-		@Option(defaultToNull = true)
-		List<File> getTests();
+        /**
+         * For convention see {@link Installer#installTest(File)}.
+         */
+        @Option(longName = "tests", defaultToNull = true)
+        List<File> getTests();
 
-		@Option(longName = "puzzles", defaultToNull = true)
-		List<File> getPuzzleSpecs();
+        /**
+         * For convention see {@link Installer#installPuzzleChapter(File)}.
+         */
+        @Option(longName = "puzzleChapters", defaultToNull = true)
+        List<File> getPuzzleChapterSpecs();
 
-	}
+        /**
+         * For convention see {@link Installer#installPuzzle(File)}.
+         */
+        @Option(longName = "puzzles", defaultToNull = true)
+        List<File> getPuzzleSpecs();
+    }
 
-	private static void setupInitialContext(Properties configurations) throws NamingException {
-		// Create initial context
-		System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
-		System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
+    /**
+     * Mapping from CUT alias to the {@link GameClass} instance.
+     */
+    private Map<String, GameClass> installedCuts = new HashMap<>();
+    /**
+     * Mapping from a CUT alias to a mapping of positions to mutants.
+     */
+    private Map<String, Map<Integer, Mutant>> installedMutants = new HashMap<>();
+    /**
+     * Mapping from a CUT alias to a mapping of positions to test cases.
+     */
+    private Map<String, Map<Integer, Test>> installedTests = new HashMap<>();
+    /**
+     * Set of identifiers of puzzle chapters.
+     */
+    private Set<Integer> puzzleChapters = new HashSet<>();
 
-		InitialContext ic = new InitialContext();
+    /**
+     * Inserts in order: game classes (CUTs), mutants, tests, puzzle chapters and puzzles.
+     */
+    public static void main(String[] args) throws IOException, NamingException {
+        ParsingInterface commandLine = CliFactory.parseArguments(ParsingInterface.class, args);
+        Properties configurations = new Properties();
+        configurations.load(new FileInputStream(commandLine.getConfigurations()));
+        setupInitialContext(configurations);
 
-		ic.createSubcontext("java:");
-		ic.createSubcontext("java:/comp");
-		ic.createSubcontext("java:/comp/env");
-		// Maybe there a better way to do it ...
-		for (String pName : configurations.stringPropertyNames()) {
-			System.out.println("Installer.createDataSource() Storing property " + pName + " in the env with value "
-					+ configurations.get(pName));
-			ic.bind("java:/comp/env/" + pName, configurations.get(pName));
-		}
+        final List<File> cuts = commandLine.getCuts();
+        final List<File> mutants = commandLine.getMutants();
+        final List<File> tests = commandLine.getTests();
+        final List<File> puzzleChapterSpecs = commandLine.getPuzzleChapterSpecs();
+        final List<File> puzzleSpecs = commandLine.getPuzzleSpecs();
 
-		ic.createSubcontext("java:/comp/env/jdbc");
+        Installer installer = new Installer();
+        installer.run(cuts, mutants, tests, puzzleChapterSpecs, puzzleSpecs);
 
-		MysqlDataSource dataSource = new MysqlDataSource();
-		dataSource.setURL(configurations.getProperty("db.url"));
-		dataSource.setUser(configurations.getProperty("db.username"));
-		dataSource.setPassword(configurations.getProperty("db.password"));
+        // Running this code with mvn exec:java hangs the execution so we force the exit
+        System.exit(0);
+    }
 
-		ic.bind("java:/comp/env/jdbc/codedefenders", dataSource);
+    public static void installPuzzles() {
+        final List<File> cuts = getFilesForDir("cuts", ".java");
+        final List<File> mutants = getFilesForDir("mutants", ".java");
+        final List<File> tests = getFilesForDir("tests", ".java");
+        final List<File> puzzleChapterSpecs = getFilesForDir("puzzleChapters", ".properties");
+        final List<File> puzzleSpecs = getFilesForDir("puzzles", ".properties");
 
-	}
+        Installer installer = new Installer();
+        installer.run(cuts, mutants, tests, puzzleChapterSpecs, puzzleSpecs);
+    }
 
-	// Maps CUT name to the cutID in the DB
-	private Map<String, GameClass> installedCuts = new HashMap<>();
-	// Map classAlias and list of mutants for it
-	// TODO Choose a better implementation
-	private Map<String, Map<Integer, Mutant>> installedMutants = new HashMap<>();
-	private Map<String, Map<Integer, Test>> installedTests = new HashMap<>();
+    private static List<File> getFilesForDir(String dir, String fileExtension) {
+        final Path base = Paths.get(Constants.DATA_DIR, "installation");
 
-	private void installCUT(File cutFile) throws Exception {
-		String fileName = cutFile.getName();
-		String classAlias = fileName.replaceAll(".java", "");
+        List<File> files;
+        try {
+            files = Files.find(base.resolve(dir), 5, (path, basicFileAttributes) -> {
+                if (path.toFile().isDirectory()) {
+                    return false;
+                }
+                if (!path.getFileName().toString().endsWith(fileExtension)) {
+                    return false;
+                }
+                return true;
+            })
+                    .map(Path::toFile)
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            files = new ArrayList<>();
+        }
+        return files;
+    }
 
-		byte[] encoded = Files.readAllBytes(Paths.get(cutFile.getAbsolutePath()));
-		String fileContent = new String(encoded, Charset.defaultCharset());
+    private void run(List<File> cuts, List<File> mutants, List<File> tests, List<File> puzzleChapterSpecs, List<File> puzzleSpecs) {
+        for (File cutFile : cuts) {
+            try {
+                installCUT(cutFile);
+            } catch (Exception e) {
+                logger.error("Failed to install CUT " + cutFile, e);
+            }
+        }
 
-		String cutDir = Constants.CUTS_DIR + F_SEP + classAlias;
+        for (File mutantFile : mutants) {
+            try {
+                installMutant(mutantFile);
+            } catch (Exception e) {
+                logger.error("Failed to install MUTANT " + mutantFile, e);
+            }
+        }
 
-		boolean isMockingEnabled = false;
+        for (File testFile : tests) {
+            try {
+                installTest(testFile);
+            } catch (Exception e) {
+                logger.error("Failed to install TEST " + testFile, e);
+            }
+        }
 
-		// Store the CUT
-		String cutJavaFilePath = null;
-		String cutClassFilePath = null;
-		String classQualifiedName = null;
-		GameClass cut = null;
-		int cutId = -1;
-		cutJavaFilePath = ClassUploadManager.storeJavaFile(cutDir, fileName, fileContent);
-		System.out.println("Installer: stored CUT file to " + cutJavaFilePath);
-		cutClassFilePath = Compiler.compileJavaFileForContent(cutJavaFilePath, fileContent);
-		System.out.println("Installer: compiled CUT file to " + cutClassFilePath);
-		classQualifiedName = ClassUploadManager.getFullyQualifiedName(cutClassFilePath);
-		cut = new GameClass(classQualifiedName, classAlias, cutJavaFilePath, cutClassFilePath, isMockingEnabled);
-		// Pretty sure this does not update the cut object as one might
-		// expect. Or at least, return a new instance of the CUT object
-		cutId = GameClassDAO.storeClass(cut);
-		// Update the class to include the cutID
-		cut = new GameClass(cutId, classQualifiedName, classAlias, cutJavaFilePath, cutClassFilePath, isMockingEnabled);
-		System.out.println("Installer.main() Stored Class " + cut.getId() + " to " + cutJavaFilePath);
-		installedCuts.put(classAlias, cut);
-		installedMutants.put(classAlias, new HashMap<Integer, Mutant>());
-		installedTests.put(classAlias, new HashMap<Integer, Test>());
-	}
+        for (File puzzleChapterSpecFile : puzzleChapterSpecs) {
+            try {
+                installPuzzleChapter(puzzleChapterSpecFile);
+            } catch (Exception e) {
+                logger.error("Failed to install puzzle chapter " + puzzleChapterSpecFile, e);
+            }
+        }
 
-	private void installMutant(File mutantFile) throws Exception {
-		String mutantFileName = mutantFile.getName();
-		String classAlias = mutantFileName.replaceAll(".java", "");
-		// Convention over configuration
-		Integer targetPosition = Integer.parseInt(mutantFile.getParentFile().getName());
+        for (File puzzleSpecFile : puzzleSpecs) {
+            try {
+                installPuzzle(puzzleSpecFile);
+            } catch (Exception e) {
+                logger.error("Failed to install PUZZLE " + puzzleSpecFile, e);
+            }
+        }
+    }
 
-		if (!installedMutants.containsKey(classAlias)) {
-			throw new RuntimeException("There is not CUT installed for this mutant");
-		}
-		GameClass cut = installedCuts.get(classAlias);
+    /**
+     * Sets up the {@link InitialContext} for a given configuration.
+     * <p>
+     * Also adds the database {@link DataSource} to the initial context.
+     *
+     * @param configurations the configuration used to set the initial context.
+     * @throws NamingException when setting the initial context fails.
+     */
+    private static void setupInitialContext(Properties configurations) throws NamingException {
+        System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
+        System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
 
-		String cutDir = Constants.CUTS_DIR + F_SEP + classAlias;
+        InitialContext ic = new InitialContext();
 
-		byte[] mutantEncoded = Files.readAllBytes(Paths.get(mutantFile.getAbsolutePath()));
-		String mutantFileContent = new String(mutantEncoded, Charset.defaultCharset());
+        ic.createSubcontext("java:");
+        ic.createSubcontext("java:/comp");
+        ic.createSubcontext("java:/comp/env");
 
-		String folderPath = String.join(F_SEP, cutDir, Constants.CUTS_MUTANTS_DIR, String.valueOf(targetPosition));
-		//
-		String javaFilePath = ClassUploadManager.storeJavaFile(folderPath, mutantFileName, mutantFileContent);
-		String classFilePath = Compiler.compileJavaFileForContent(javaFilePath, mutantFileContent);
+        // Alessio: Maybe there a better way to do it...
+        for (String pName : configurations.stringPropertyNames()) {
+            logger.info("createDataSource() Storing property " + pName + " in the env with value "
+                    + configurations.get(pName));
+            ic.bind("java:/comp/env/" + pName, configurations.get(pName));
+        }
 
-		byte[] cutEncoded = Files.readAllBytes(Paths.get(cut.getJavaFile()));
-		String cutContent = new String(cutEncoded, Charset.defaultCharset());
+        ic.createSubcontext("java:/comp/env/jdbc");
 
-		String md5 = CodeValidator.getMD5FromText(cutContent);
-		Mutant mutant = new Mutant(javaFilePath, classFilePath, md5, cut.getId());
+        MysqlDataSource dataSource = new MysqlDataSource();
+        dataSource.setURL(configurations.getProperty("db.url"));
+        dataSource.setUser(configurations.getProperty("db.username"));
+        dataSource.setPassword(configurations.getProperty("db.password"));
 
-		int mutantId = MutantDAO.storeMutant(mutant);
-		mutant = DatabaseAccess.getMutantById(mutantId);
+        ic.bind("java:/comp/env/jdbc/codedefenders", dataSource);
+    }
 
-		System.out.println("Installer.main() Stored mutant " + mutantId + " in position " + targetPosition);
-		installedMutants.get(classAlias).put(targetPosition, mutant);
-	}
+    /**
+     * File convention: {@code cuts/<cut_alias>/<filename>}.
+     *
+     * @see ParsingInterface#getCuts()
+     */
+    private void installCUT(File cutFile) throws Exception {
+        String fileName = cutFile.getName();
+        String classAlias = cutFile.getParentFile().getName();
+        if (GameClassDAO.classExistsForAlias(classAlias)) {
+            logger.warn("Class alias {} does already exist. Skipping installation of CUT.", classAlias);
+            return;
+        }
 
-	private void installedTest(File testFile) throws Exception {
-		String testFileName = testFile.getName();
-		String classAlias = testFile.getParentFile().getParentFile().getName();
+        String fileContent = new String(Files.readAllBytes(cutFile.toPath()), Charset.defaultCharset());
 
-		System.out.println("Installer.installedTest() " + classAlias);
+        Path cutDir = Paths.get(Constants.CUTS_DIR, classAlias);
+        String cutJavaFilePath = FileUtils.storeFile(cutDir, fileName, fileContent).toString();
+        String cutClassFilePath = Compiler.compileJavaFileForContent(cutJavaFilePath, fileContent);
+        String classQualifiedName = FileUtils.getFullyQualifiedName(cutClassFilePath);
 
-		// Convention over configuration
-		Integer targetPosition = Integer.parseInt(testFile.getParentFile().getName());
+        // Store the CUT
+        boolean isMockingEnabled = false;
+        GameClass cut = new GameClass(classQualifiedName, classAlias, cutJavaFilePath, cutClassFilePath, isMockingEnabled);
+        cut.insert();
 
-		if (!installedTests.containsKey(classAlias)) {
-			throw new RuntimeException("There is not CUT installed for this test");
-		}
-		GameClass cut = installedCuts.get(classAlias);
+        logger.info("installCut(): Stored Class " + cut.getId() + " to " + cutJavaFilePath);
 
-		// All the tests require the same dependency on the CUT
-		List<JavaFileObject> dependencies = new ArrayList<>();
-		dependencies.add(new JavaFileObject(cut.getJavaFile()));
+        installedCuts.put(classAlias, cut);
+        installedMutants.put(classAlias, new HashMap<>());
+        installedTests.put(classAlias, new HashMap<>());
+    }
 
-		byte[] testEncoded = Files.readAllBytes(Paths.get(testFile.getAbsolutePath()));
-		String testFileContent = new String(testEncoded, Charset.defaultCharset());
+    /**
+     * File convention: {@code mutants/<cut_alias>/<position>/<filename>}.
+     *
+     * @see ParsingInterface#getMutants()
+     */
+    private void installMutant(File mutantFile) throws Exception {
+        String mutantFileName = mutantFile.getName();
+        String classAlias = mutantFile.getParentFile().getParentFile().getName();
+        if (!installedMutants.containsKey(classAlias)) {
+            logger.warn("CUT {} does not exist. Skipping installation of mutant.", classAlias);
+            return;
+        }
+        GameClass cut = installedCuts.get(classAlias);
 
-		String cutDir = Constants.CUTS_DIR + F_SEP + classAlias;
-		final String folderPath = String.join(F_SEP, cutDir, Constants.CUTS_TESTS_DIR, String.valueOf(targetPosition));
-		//
-		String javaFilePath = ClassUploadManager.storeJavaFile(folderPath, testFileName, testFileContent);
-		String classFilePath = Compiler.compileJavaTestFileForContent(javaFilePath, testFileContent, dependencies,
-				true);
+        int targetPosition;
+        try {
+            targetPosition = Integer.parseInt(mutantFile.getParentFile().getName());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("No valid position provided.");
+        }
 
-		final String testDir = Paths.get(javaFilePath).getParent().toString();
-		final String qualifiedName = ClassUploadManager.getFullyQualifiedName(classFilePath);
+        String mutantFileContent = new String(Files.readAllBytes(mutantFile.toPath()), Charset.defaultCharset());
 
-		// This adds a jacoco.exec file to the testDir
-		AntRunner.testOriginal(cut, testDir, qualifiedName);
+        Path cutDir = Paths.get(Constants.CUTS_DIR, classAlias);
+        Path folderPath = cutDir.resolve(Constants.CUTS_MUTANTS_DIR).resolve(String.valueOf(targetPosition));
+        String javaFilePath = FileUtils.storeFile(folderPath, mutantFileName, mutantFileContent).toString();
+        String classFilePath = Compiler.compileJavaFileForContent(javaFilePath, mutantFileContent);
 
-		// LineCoverage#generate requires at least a dummy test object
-		final Test dummyTest = new Test(javaFilePath, null, -1, null);
+        String md5 = CodeValidator.getMD5FromText(mutantFileContent);
+        Mutant mutant = new Mutant(javaFilePath, classFilePath, md5, cut.getId());
+        mutant.insert();
+        MutantDAO.mapMutantToClass(mutant.getId(), cut.getId());
 
-		final LineCoverage lineCoverage = LineCoverageGenerator.generate(cut, dummyTest);
-		Test test = new Test(javaFilePath, classFilePath, cut.getId(), lineCoverage);
-		int testId = TestDAO.storeTest(test);
+        logger.info("installMutant(): Stored mutant " + mutant.getId() + " in position " + targetPosition);
 
-		test = DatabaseAccess.getTestForId(testId);
+        installedMutants.get(classAlias).put(targetPosition, mutant);
+    }
 
-		System.out.println("Installer.main() Stored test " + test.getId() + " in position " + targetPosition);
+    /**
+     * File convention: {@code tests/<cut_alias>/<position>/<filename>}.
+     *
+     * @see ParsingInterface#getTests() Parser tests convention.
+     */
+    private void installTest(File testFile) throws Exception {
+        String testFileName = testFile.getName();
+        String classAlias = testFile.getParentFile().getParentFile().getName();
 
-		installedTests.get(classAlias).put(targetPosition, test);
-	}
+        if (!installedTests.containsKey(classAlias)) {
+            logger.warn("CUT {} does not exist. Skipping installation of mutant.", classAlias);
+            return;
+        }
+        GameClass cut = installedCuts.get(classAlias);
 
-	private List<Mutant> getMutantsByPositions(String classAlias, String[] positions) {
-		List<Mutant> mutants = new ArrayList<>();
-		for (String position : positions) {
-			int p = Integer.parseInt(position);
-			if (installedMutants.get(classAlias).containsKey(p)) {
-				mutants.add(installedMutants.get(classAlias).get(p));
-			}
-		}
-		return mutants;
-	}
+        int targetPosition;
+        try {
+            targetPosition = Integer.parseInt(testFile.getParentFile().getName());
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("No valid position provided.");
+        }
 
-	private List<Test> getTestsByPositions(String classAlias, String[] positions) {
-		List<Test> tests = new ArrayList<>();
-		for (String position : positions) {
-			int p = Integer.parseInt(position);
-			if (installedTests.get(classAlias).containsKey(p)) {
-				tests.add(installedTests.get(classAlias).get(p));
-			}
-		}
-		return tests;
-	}
+        // All the tests require the same dependency on the CUT
+        List<JavaFileObject> dependencies = Collections.singletonList(new JavaFileObject(cut.getJavaFile()));
 
-	public void createPuzzle(Properties cfg) throws Exception {
-		// Collect the data to create the puzzle
-		GameClass originalCut = getCutByAlias(cfg.getProperty("cut"));
-		if (originalCut == null) {
-			throw new Exception("Cannot create puzzle. Missing CUT " + cfg.getProperty("cut"));
-		}
+        String testFileContent = new String(Files.readAllBytes(testFile.toPath()), Charset.defaultCharset());
 
-		List<Mutant> originalMutants = getMutantsByPositions(originalCut.getAlias(),
-				cfg.getProperty("mutants").split(","));
-		List<Test> originalTests = getTestsByPositions(originalCut.getAlias(), cfg.getProperty("tests").split(","));
+        Path cutDir = Paths.get(Constants.CUTS_DIR, classAlias);
+        Path folderPath = cutDir.resolve(Constants.CUTS_TESTS_DIR).resolve(String.valueOf(targetPosition));
+        Path javaFilePath = FileUtils.storeFile(folderPath, testFileName, testFileContent);
+        String classFilePath = Compiler.compileJavaTestFileForContent(javaFilePath.toString(), testFileContent, dependencies, true);
 
-		// TODO How to create an Alias ?
-		// This shall be handled directly inside the DB with a query of some
-		// sort...
-		String alias = null;
-		for (int i = 1; i < 100; i++) {
-			alias = originalCut.getAlias() + "_Puzzle_" + i;
-			if (!GameClassDAO.classNotExistsForAlias(alias))
-				break;
-		}
-		if (alias == null) {
-			throw new Exception("Cannot create puzzle. Cannot find a suitable alias for CUT " + cfg.getProperty("cut"));
-		}
+        String testDir = folderPath.toString();
+        String qualifiedName = FileUtils.getFullyQualifiedName(classFilePath);
 
-		// Create another cut for this puzzle
-		GameClass puzzleClass = new GameClass(originalCut.getName(), alias,
-				originalCut.getJavaFile(), originalCut.getClassFile(), originalCut.isMockingEnabled());
-		// Pretty sure this does not update the cut object as one might
-		// expect. Or at least, return a new instance of the CUT object
-		int puzzleClassId = GameClassDAO.storeClass(puzzleClass);
-		System.out.println("Installer.createPuzzle() Created Puzzle Class " + puzzleClassId );
-		
-		// TODO Attach all the tests and mutants to this class... Really this shall
-		// be handled with TRANSACTIONS !
-		for (Mutant m : originalMutants) {
-			Mutant puzzleMutant = new Mutant(m.getJavaFile(), m.getClassFile(), m.getMd5(), puzzleClassId);
-			int puzzleMutantId = MutantDAO.storeMutant(puzzleMutant);
-			System.out.println("Installer.createPuzzle() Created Puzzle Mutant " + puzzleMutantId );
-		}
+        // This adds a jacoco.exec file to the testDir
+        AntRunner.testOriginal(cut, testDir, qualifiedName);
 
-		// TODO Attach all the tests and mutants to this class... Really this shall
-		// be handled with TRANSACTIONS !
-		for (Test t : originalTests) {
-			Test puzzleTest = new Test(t.getJavaFile(), t.getClassFile(), puzzleClassId, t.getLineCoverage());
-			int puzzleTestId = TestDAO.storeTest(puzzleTest);
-			System.out.println("Installer.createPuzzle() Created Puzzle Test " + puzzleTestId );
+        LineCoverage lineCoverage = LineCoverageGenerator.generate(cut, javaFilePath);
+        Test test = new Test(javaFilePath.toString(), classFilePath, cut.getId(), lineCoverage);
+        test.insert();
+        TestDAO.mapTestToClass(test.getId(), cut.getId());
 
-		}
+        logger.info("installTest() Stored test " + test.getId() + " in position " + targetPosition);
 
-		// String classId =
-		Role activeRole = Role.valueOf(cfg.getProperty("activeRole"));
-		GameLevel level = GameLevel.valueOf(cfg.getProperty("gameLevel", "HARD"));
+        installedTests.get(classAlias).put(targetPosition, test);
+    }
 
-		// Default values follows
-		int maxAssertionsPerTest = 2;
-		CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
-		String title = cfg.getProperty("title");
-		String description = cfg.getProperty("description");
+    /**
+     * File convention: {@code puzzleChapters/<files>}. Chapter specification files just
+     * need to be in that folder.
+     * <p>
+     * Mandatory properties: {@code chapterId}.
+     * <p>
+     * Optional properties: {@code position}, {@code title}, {@code description}.
+     *
+     * @see ParsingInterface#getPuzzleChapterSpecs() Parser puzzle chapter convention.
+     */
+    private void installPuzzleChapter(File puzzleChapterSpecFile) throws Exception {
+        Properties cfg = new Properties();
+        cfg.load(new FileInputStream(puzzleChapterSpecFile));
 
-		Integer editableLinesStart = null;
-		Integer editableLinesEnd = null;
-		Integer chapterId = null;
-		Integer position = null;
+        int chapterId = Optional.ofNullable(cfg.getProperty("chapterId"))
+                .map(Integer::parseInt)
+                .orElseThrow(() -> new IllegalArgumentException("No valid chapterId provided."));
+        Integer position = Optional.ofNullable(cfg.getProperty("position"))
+                .map(Integer::parseInt)
+                .orElse(null);
+        String title = cfg.getProperty("title");
+        String description = cfg.getProperty("description");
 
-		Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, level, maxAssertionsPerTest, mutantValidatorLevel,
-				editableLinesStart, editableLinesEnd, chapterId, position, title, description);
-		int puzzleId = PuzzleDAO.storePuzzle(puzzle);
-		System.out.println("Installer.createPuzzle() Created Puzzle " + puzzleId );
+        PuzzleChapter chapter = new PuzzleChapter(chapterId, position, title, description);
+        PuzzleDAO.storePuzzleChapter(chapter);
 
-	}
+        logger.info("installPuzzleChapter() Stored puzzle chapter with id " + chapterId);
 
-	private GameClass getCutByAlias(String alias) {
-		for (GameClass cut : installedCuts.values()) {
-			if (cut.getAlias().equals(alias)) {
-				return cut;
-			}
-		}
-		return null;
-	}
+        puzzleChapters.add(chapterId);
+    }
 
-	// No validation of input at the moment
-	// We make the assumption that mutants are named after class alias !
-	public static void main(String[] args) throws FileNotFoundException, IOException, NamingException {
-		ParsingInterface commandLine = CliFactory.parseArguments(ParsingInterface.class, args);
-		Properties configurations = new Properties();
-		configurations.load(new FileInputStream(commandLine.getConfigurations()));
-		setupInitialContext(configurations);
+    /**
+     * File convention: {@code puzzles/<cut_alias>/<puzzle_alias_ext>}.
+     * {@code <puzzle_alias_ext>} is used for the puzzle alias, which is constructed as follows:
+     * {@code <cut_alias>_puzzle_<puzzle_alias_ext>}
+     * <p>
+     * Mandatory properties: {@code activeRole} ({@link Role#DEFENDER 'DEFENDER'} or {@link Role#ATTACKER 'ATTACKER'}),
+     * {@code gameLevel} ({@link GameLevel#EASY 'EASY'} or {@link GameLevel#HARD 'HARD'},
+     * {@code chapterId} (has to be of existing chapter).
+     *
+     * <p>
+     * Optional properties: {@code mutants}, {@code tests}, {@code title}, {@code description},
+     * {@code editableLinesStart}, {@code editableLinesEnd},
+     * {@code position}.
+     *
+     * @see ParsingInterface#getPuzzleSpecs() Parser puzzles convention.
+     */
+    private void installPuzzle(File puzzleSpecFile) throws Exception {
+        Properties cfg = new Properties();
+        cfg.load(new FileInputStream(puzzleSpecFile));
 
-		Installer installer = new Installer();
-		for (File cutFile : commandLine.getCuts()) {
-			try {
-				installer.installCUT(cutFile);
-			} catch (Exception e) {
-				System.err.println("Failed to install CUT " + cutFile + ", " + e);
-			}
-		}
-		// Mutants must be processed in order starting from 0 !
-		for (File mutantFile : commandLine.getMutants()) {
-			try {
-				installer.installMutant(mutantFile);
-			} catch (Exception e) {
-				System.err.println("Failed to install MUTANT " + mutantFile + ", " + e);
-			}
-		}
+        String cutAlias = puzzleSpecFile.getParentFile().getName();
+        GameClass cut = installedCuts.get(cutAlias);
+        if (cut == null) {
+            logger.warn("CUT {} does not exist. Skipping installation of puzzle.", cutAlias);
+            return;
+        }
 
-		for (File testFile : commandLine.getTests()) {
-			try {
-				installer.installedTest(testFile);
-			} catch (Exception e) {
-				System.err.println("Failed to install TEST " + testFile + ", " + e);
-			}
-		}
+        String[] mutantPositions = cfg.getProperty("mutants", "").split(",");
 
-		for (File puzzleSpecFile : commandLine.getPuzzleSpecs()) {
-			try {
-				Properties cfg = new Properties();
-				cfg.load(new FileInputStream(puzzleSpecFile));
-				installer.createPuzzle(cfg);
-			} catch (Exception e) {
-				System.err.println("Failed to install PUZZLE " + puzzleSpecFile + ", " + e);
-				e.printStackTrace();
-			}
-		}
+        Map<Integer, Mutant> positionToMutantMap = installedMutants.get(cutAlias);
+        List<Mutant> originalMutants = Arrays.stream(mutantPositions)
+                .map(Integer::parseInt)
+                .map(positionToMutantMap::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
-		// Running this code with mvn exec:java hangs the execution so we force the exit
-		System.exit(0);
-	}
+        String[] testPositions = cfg.getProperty("tests", "").split(",");
+        Map<Integer, Test> positionToTestMap = installedTests.get(cutAlias);
+        List<Test> originalTests = Arrays.stream(testPositions)
+                .map(Integer::parseInt)
+                .map(positionToTestMap::get)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
 
+        String puzzleAliasExt = puzzleSpecFile.getName().replace(".properties", "");
+        String puzzleAlias = cutAlias + "_puzzle_" + puzzleAliasExt;
+
+        // Create a puzzle cut with another alias for this puzzle
+        GameClass puzzleClass = GameClass.ofPuzzle(cut.getName(), puzzleAlias, cut.getJavaFile(), cut.getClassFile(), cut.isMockingEnabled());
+        int puzzleClassId = GameClassDAO.storeClass(puzzleClass);
+        logger.info("installPuzzle(); Created Puzzle Class " + puzzleClassId);
+
+        // Read values from specification file
+        Role activeRole = Role.valueOf(cfg.getProperty("activeRole"));
+        GameLevel level = GameLevel.valueOf(cfg.getProperty("gameLevel", "HARD"));
+        String title = cfg.getProperty("title");
+        String description = cfg.getProperty("description");
+        Integer editableLinesStart = Optional.ofNullable(cfg.getProperty("editableLinesStart", null))
+                .map(Integer::parseInt)
+                .orElse(null);
+        Integer editableLinesEnd = Optional.ofNullable(cfg.getProperty("editableLinesEnd", null))
+                .map(Integer::parseInt)
+                .orElse(null);
+        Optional<Integer> chapterIdOpt = Optional.ofNullable(cfg.getProperty("chapterId")).map(Integer::parseInt);
+        if (!chapterIdOpt.isPresent() || !puzzleChapters.contains(chapterIdOpt.get())) {
+            logger.warn("Provided chapterId for puzzle was not provided or does not exist. Skipping this puzzle.");
+            return;
+        }
+        int chapterId = chapterIdOpt.get();
+        Integer position = Optional.ofNullable(cfg.getProperty("position"))
+                .map(Integer::parseInt)
+                .orElse(null);
+
+        // Default values
+        int maxAssertionsPerTest = CodeValidator.DEFAULT_NB_ASSERTIONS;
+        CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
+
+        Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, level, maxAssertionsPerTest, mutantValidatorLevel,
+                editableLinesStart, editableLinesEnd, chapterId, position, title, description);
+        int puzzleId = PuzzleDAO.storePuzzle(puzzle);
+
+        List<Mutant> puzzleMutants = new ArrayList<>();
+        // TODO batch insert
+        for (Mutant m : originalMutants) {
+            Mutant puzzleMutant = new Mutant(m.getJavaFile(), m.getClassFile(), m.getMd5(), puzzleClassId);
+            puzzleMutant.insert();
+            MutantDAO.mapMutantToClass(puzzleMutant.getId(), puzzleClassId);
+            logger.info("installPuzzle(); Created Puzzle Mutant " + puzzleMutant.getId());
+            puzzleMutants.add(puzzleMutant);
+        }
+
+        List<Test> puzzleTests = new ArrayList<>();
+        // TODO batch insert
+        for (Test t : originalTests) {
+            Test puzzleTest = new Test(t.getJavaFile(), t.getClassFile(), puzzleClassId, t.getLineCoverage());
+            puzzleTest.insert();
+            TestDAO.mapTestToClass(puzzleTest.getId(), puzzleClassId);
+            logger.info("installPuzzle(); Created Puzzle Test " + puzzleTest.getId());
+            puzzleTests.add(puzzleTest);
+        }
+
+        logger.info("installPuzzle() Created Puzzle " + puzzleId);
+
+        try {
+            KillMap killMap = KillMap.forCustom(puzzleTests, puzzleMutants, puzzleClassId, new ArrayList<>(), true, (t, m) -> true);
+            for (KillMap.KillMapEntry entry : killMap.getEntries()) {
+                // TODO Phil 04/12/18: Batch insert instead of insert in a for loop
+                KillmapDAO.insertKillMapEntry(entry, puzzleClassId);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Could error while calculating killmap for successfully installed puzzle.", e);
+        }
+    }
 }
