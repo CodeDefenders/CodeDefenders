@@ -227,14 +227,16 @@ public class GameClassDAO {
         String javaFile = DatabaseAccess.addSlashes(cut.getJavaFile());
         String classFile = DatabaseAccess.addSlashes(cut.getClassFile());
         boolean isMockingEnabled = cut.isMockingEnabled();
+        boolean isPuzzleClass = cut.isPuzzleClass();
 
-        String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile, RequireMocking) VALUES (?, ?, ?, ?, ?);";
+        String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile, RequireMocking, Puzzle) VALUES (?, ?, ?, ?, ?, ?);";
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(name),
                 DatabaseValue.of(alias),
                 DatabaseValue.of(javaFile),
                 DatabaseValue.of(classFile),
-                DatabaseValue.of(isMockingEnabled)
+                DatabaseValue.of(isMockingEnabled),
+                DatabaseValue.of(isPuzzleClass)
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
