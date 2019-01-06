@@ -22,7 +22,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
@@ -43,23 +42,20 @@ import org.codedefenders.game.Test;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
+import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.codedefenders.util.ZipFileUtils;
 import org.codedefenders.validation.code.CodeValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -74,13 +70,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import javassist.ClassPool;
-import javassist.CtClass;
-
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
+import static org.codedefenders.util.Constants.CUTS_DIR;
 import static org.codedefenders.util.Constants.CUTS_MUTANTS_DIR;
 import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
 
 /**
  * This {@link HttpServlet} handles the upload of Java class files, which includes file validation and storing.
@@ -122,7 +115,7 @@ public class ClassUploadManager extends HttpServlet {
         // Used to check whether mutants have the same name as the class under test.
         final String cutFileName;
         // The directory in which the CUT is saved in.
-        final String cutDir;
+        final Path cutDir;
         // Used to run calculate line coverage for tests
         final GameClass cut;
         // flag whether upload is with dependencies or not
@@ -250,13 +243,14 @@ public class ClassUploadManager extends HttpServlet {
             }
         }
 
-        final List<JavaFileObject> dependencies = new ArrayList<>();
         if (cutFile == null) {
             logger.error("Class upload failed. No class under test uploaded.");
             messages.add("Class upload failed. No class under test uploaded.");
             abortRequestAndCleanUp(request, response);
             return;
-        } else {
+        }
+
+        final List<JavaFileObject> dependencies = new ArrayList<>();
             final String fileName = cutFile.fileName;
             final String fileContent = new String(cutFile.fileContent, Charset.forName("UTF-8")).trim();
             if (!fileName.endsWith(".java")) {
@@ -279,37 +273,37 @@ public class ClassUploadManager extends HttpServlet {
                 return;
             }
 
-            if (classAlias == null || classAlias.equals("")) {
-                classAlias = fileName.replace(".java", "");
-            }
-            if (GameClassDAO.classNotExistsForAlias(classAlias)) {
-                logger.error("Class upload failed. Given alias {} was already used.", classAlias);
-                messages.add("Class upload failed. Given alias is already used.");
-                abortRequestAndCleanUp(request, response);
-                return;
-            }
+        if (classAlias == null || classAlias.equals("")) {
+            classAlias = fileName.replace(".java", "");
+        }
+        if (GameClassDAO.classNotExistsForAlias(classAlias)) {
+            logger.error("Class upload failed. Given alias {} was already used.", classAlias);
+            messages.add("Class upload failed. Given alias is already used.");
+            abortRequestAndCleanUp(request, response);
+            return;
+        }
 
-            cutDir = Constants.CUTS_DIR + F_SEP + classAlias;
-            final String cutJavaFilePath;
+        cutDir = Paths.get(CUTS_DIR, classAlias);
+        final String cutJavaFilePath;
+        try {
+            cutJavaFilePath = FileUtils.storeFile(cutDir, fileName, fileContent).toString();
+        } catch (IOException e) {
+            logger.error("Class upload failed. Could not store java file " + fileName, e);
+            messages.add("Class upload failed. Internal error. Sorry about that!");
+            abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+            return;
+        }
+
+        final String cutClassFilePath;
+        final List<JavaFileReferences> dependencyReferences = new LinkedList<>();
+        if (!withDependencies) {
             try {
-                cutJavaFilePath = storeJavaFile(cutDir, fileName, fileContent);
-            } catch (IOException e) {
-                logger.error("Class upload failed. Could not store java file " + fileName, e);
-                messages.add("Class upload failed. Internal error. Sorry about that!");
+                cutClassFilePath = Compiler.compileJavaFileForContent(cutJavaFilePath, fileContent);
+            } catch (CompileException e) {
+                logger.error("Class upload failed. Could not compile {}!\n\n{}", fileName, e.getMessage());
+                messages.add("Class upload failed. Could not compile " + fileName + "!\n" + e.getMessage());
+
                 abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
-                return;
-            }
-
-            final String cutClassFilePath;
-            final List<JavaFileReferences> dependencyReferences = new LinkedList<>();
-            if (!withDependencies) {
-                try {
-                    cutClassFilePath = Compiler.compileJavaFileForContent(cutJavaFilePath, fileContent);
-                } catch (CompileException e) {
-                    logger.error("Class upload failed. Could not compile {}!\n\n{}", fileName, e.getMessage());
-                    messages.add("Class upload failed. Could not compile " + fileName + "!\n" + e.getMessage());
-
-                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                     return;
                 } catch (IllegalStateException e) {
                     logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
@@ -322,69 +316,69 @@ public class ClassUploadManager extends HttpServlet {
                 final String zipFileName = dependenciesZipFile.fileName;
                 final byte[] zipFileContent = dependenciesZipFile.fileContent;
 
-                if (!zipFileName.endsWith(".zip")) {
-                    logger.error("Class upload failed. Given file {} was not a .zip file.", zipFileName);
-                    messages.add("Class upload failed. Dependencies must be provided in a .zip file.");
+            if (!zipFileName.endsWith(".zip")) {
+                logger.error("Class upload failed. Given file {} was not a .zip file.", zipFileName);
+                messages.add("Class upload failed. Dependencies must be provided in a .zip file.");
+                abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                return;
+            }
+
+            try {
+                final ZipFile zip = ZipFileUtils.createZip(zipFileContent);
+
+                // The returned list contains the files, but without an actual file path, just names.
+                dependencies.addAll(ZipFileUtils.getFilesFromZip(zip, true));
+            } catch (IOException e) {
+                logger.error("Class upload failed. Failed to extract dependencies ZIP file.");
+                messages.add("Class upload failed. Failed to extract dependencies ZIP file.");
+                abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                return;
+            }
+            for (int index = 0; index < dependencies.size(); index++) {
+                final JavaFileObject dependencyFile = dependencies.get(index);
+                final Path path = Paths.get(dependencyFile.getName());
+
+                final String dependencyFileName = path.getFileName().toString();
+                final String dependencyFileContent = dependencyFile.getContent();
+
+                if (!dependencyFileName.endsWith(".java")) {
+                    logger.error("Class upload failed. Given file {} was not a .java file.", dependencyFileName);
+                    messages.add("Class upload failed. Dependency must be a .java file.");
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                    return;
+                }
+                if (dependencyFileContent == null) {
+                    logger.error("Class upload failed. Provided fileContent is null. That shouldn't happen.");
+                    messages.add("Class upload failed. Internal error. Sorry about that!");
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                     return;
                 }
 
+                final String depJavaFilePath;
                 try {
-                    final ZipFile zip = ZipFileUtils.createZip(zipFileContent);
-
-                    // The returned list contains the files, but without an actual file path, just names.
-                    dependencies.addAll(ZipFileUtils.getFilesFromZip(zip, true));
+                    final Path folderPath = cutDir.resolve(CUTS_DEPENDENCY_DIR);
+                    depJavaFilePath = FileUtils.storeFile(folderPath, dependencyFileName, dependencyFileContent).toString();
+                    final String depClassFilePath = depJavaFilePath.replace(".java", ".class");
+                    dependencyReferences.add(new JavaFileReferences(depJavaFilePath, depClassFilePath));
                 } catch (IOException e) {
-                    logger.error("Class upload failed. Failed to extract dependencies ZIP file.");
-                    messages.add("Class upload failed. Failed to extract dependencies ZIP file.");
+                    logger.error("Class upload failed. Could not store java file " + dependencyFileName, e);
+                    messages.add("Class upload failed. Internal error. Sorry about that!");
                     abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                     return;
                 }
-                for (int index = 0; index < dependencies.size(); index++) {
-                    final JavaFileObject dependencyFile = dependencies.get(index);
-                    final Path path = Paths.get(dependencyFile.getName());
 
-                    final String dependencyFileName = path.getFileName().toString();
-                    final String dependencyFileContent = dependencyFile.getContent();
+                // Update the existing dependency file with the actually stored file path.
+                // This is required for the compilation of mutants and tests.
+                dependencies.set(index, new JavaFileObject(depJavaFilePath, dependencyFileContent));
+            }
 
-                    if (!dependencyFileName.endsWith(".java")) {
-                        logger.error("Class upload failed. Given file {} was not a .java file.", dependencyFileName);
-                        messages.add("Class upload failed. Dependency must be a .java file.");
-                        abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
-                        return;
-                    }
-                    if (dependencyFileContent == null) {
-                        logger.error("Class upload failed. Provided fileContent is null. That shouldn't happen.");
-                        messages.add("Class upload failed. Internal error. Sorry about that!");
-                        abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
-                        return;
-                    }
+            try {
+                cutClassFilePath = Compiler.compileJavaFileWithDependencies(cutJavaFilePath, dependencies);
+            } catch (CompileException e) {
+                logger.error("Class upload failed. Could not compile {}!\n\n{}", fileName, e.getMessage());
+                messages.add("Class upload failed. Could not compile " + fileName + "!\n" + e.getMessage());
 
-                    final String depJavaFilePath;
-                    try {
-                        final String folderPath = String.join(F_SEP, cutDir, CUTS_DEPENDENCY_DIR);
-                        depJavaFilePath = storeJavaFile(folderPath, dependencyFileName, dependencyFileContent);
-                        final String depClassFilePath = depJavaFilePath.replace(".java", ".class");
-                        dependencyReferences.add(new JavaFileReferences(depJavaFilePath, depClassFilePath));
-                    } catch (IOException e) {
-                        logger.error("Class upload failed. Could not store java file " + dependencyFileName, e);
-                        messages.add("Class upload failed. Internal error. Sorry about that!");
-                        abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
-                        return;
-                    }
-
-                    // Update the existing dependency file with the actually stored file path.
-                    // This is required for the compilation of mutants and tests.
-                    dependencies.set(index, new JavaFileObject(depJavaFilePath, dependencyFileContent));
-                }
-
-                try {
-                    cutClassFilePath = Compiler.compileJavaFileWithDependencies(cutJavaFilePath, dependencies);
-                } catch (CompileException e) {
-                    logger.error("Class upload failed. Could not compile {}!\n\n{}", fileName, e.getMessage());
-                    messages.add("Class upload failed. Could not compile " + fileName + "!\n" + e.getMessage());
-
-                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
                     return;
                 } catch (IllegalStateException e) {
                     logger.error("SEVERE ERROR. Could not find Java compiler. Please reconfigure your installed version.", e);
@@ -395,43 +389,42 @@ public class ClassUploadManager extends HttpServlet {
                 }
             }
 
-            String classQualifiedName;
-            try {
-                classQualifiedName = getFullyQualifiedName(cutClassFilePath);
-            } catch (IOException e) {
-                logger.error("Class upload failed. Could not get fully qualified name for " + fileName, e);
-                messages.add("Class upload failed. Internal error. Sorry about that!");
+        String classQualifiedName;
+        try {
+            classQualifiedName = FileUtils.getFullyQualifiedName(cutClassFilePath);
+        } catch (IOException e) {
+            logger.error("Class upload failed. Could not get fully qualified name for " + fileName, e);
+            messages.add("Class upload failed. Internal error. Sorry about that!");
 
-                abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
-                return;
-            }
+            abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+            return;
+        }
 
-            cut = new GameClass(classQualifiedName, classAlias, cutJavaFilePath, cutClassFilePath, isMockingEnabled);
-            try {
-                cutId = GameClassDAO.storeClass(cut);
-            } catch (Exception e) {
-                logger.error("Class upload failed. Could not store class to database.");
-                messages.add("Class upload failed. Internal error. Sorry about that!");
-                abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
-                return;
-            }
+        cut = new GameClass(classQualifiedName, classAlias, cutJavaFilePath, cutClassFilePath, isMockingEnabled);
+        try {
+            cutId = GameClassDAO.storeClass(cut);
+        } catch (Exception e) {
+            logger.error("Class upload failed. Could not store class to database.");
+            messages.add("Class upload failed. Internal error. Sorry about that!");
+            abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+            return;
+        }
 
-            compiledClasses.add(new CompiledClass(CompileClassType.CUT, cutId));
+        compiledClasses.add(new CompiledClass(CompileClassType.CUT, cutId));
 
-            if (withDependencies) {
-                for (JavaFileReferences dep : dependencyReferences) {
-                    final int depId;
-                    try {
-                        depId = DependencyDAO.storeDependency(new Dependency(cutId, dep.javaFile, dep.classFile));
-                    } catch (Exception e) {
-                        logger.error("Class upload failed. Could not store dependency class to database.");
-                        messages.add("Class upload failed. Internal error. Sorry about that!");
-                        abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
-                        return;
-                    }
-
-                    compiledClasses.add(new CompiledClass(CompileClassType.DEPENDENCY, depId));
+        if (withDependencies) {
+            for (JavaFileReferences dep : dependencyReferences) {
+                final int depId;
+                try {
+                    depId = DependencyDAO.storeDependency(new Dependency(cutId, dep.javaFile, dep.classFile));
+                } catch (Exception e) {
+                    logger.error("Class upload failed. Could not store dependency class to database.");
+                    messages.add("Class upload failed. Internal error. Sorry about that!");
+                    abortRequestAndCleanUp(request, response, cutDir, compiledClasses);
+                    return;
                 }
+
+                compiledClasses.add(new CompiledClass(CompileClassType.DEPENDENCY, depId));
             }
         }
 
@@ -516,7 +509,7 @@ public class ClassUploadManager extends HttpServlet {
      */
     @SuppressWarnings("Duplicates")
     private boolean addMutants(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages,
-                               List<CompiledClass> compiledClasses, int cutId, String cutFileName, String cutDir,
+                               List<CompiledClass> compiledClasses, int cutId, String cutFileName, Path cutDir,
                                SimpleFile mutantsZipFile, List<JavaFileObject> dependencies) throws IOException {
         boolean withDependencies = !dependencies.isEmpty();
 
@@ -568,8 +561,9 @@ public class ClassUploadManager extends HttpServlet {
 
             String javaFilePath;
             try {
-                final String folderPath = String.join(F_SEP, cutDir, CUTS_MUTANTS_DIR, String.valueOf(index));
-                javaFilePath = storeJavaFile(folderPath, fileName, fileContent);
+
+                final Path folderPath = cutDir.resolve(CUTS_MUTANTS_DIR).resolve(String.valueOf(index));
+                javaFilePath = FileUtils.storeFile(folderPath, fileName, fileContent).toString();
             } catch (IOException e) {
                 logger.error("Class upload failed. Could not store mutant java file " + fileName, e);
                 messages.add("Class upload failed. Internal error. Sorry about that!");
@@ -650,7 +644,7 @@ public class ClassUploadManager extends HttpServlet {
      */
     @SuppressWarnings("Duplicates")
     private boolean addTests(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages,
-                             List<CompiledClass> compiledClasses, int cutId, String cutDir, GameClass cut,
+                             List<CompiledClass> compiledClasses, int cutId, Path cutDir, GameClass cut,
                              SimpleFile testsZipFile, List<JavaFileObject> dependencies) throws IOException {
 
         // Class under test is a dependency for all tests
@@ -698,8 +692,8 @@ public class ClassUploadManager extends HttpServlet {
 
             String javaFilePath;
             try {
-                final String folderPath = String.join(F_SEP, cutDir, CUTS_TESTS_DIR, String.valueOf(index));
-                javaFilePath = storeJavaFile(folderPath, fileName, fileContent);
+                final Path folderPath = cutDir.resolve(CUTS_TESTS_DIR).resolve(String.valueOf(index));
+                javaFilePath = FileUtils.storeFile(folderPath, fileName, fileContent).toString();
             } catch (IOException e) {
                 logger.error("Class upload failed. Could not store java file of test class " + fileName, e);
                 messages.add("Class upload failed. Could not store java file of test class " + fileName);
@@ -726,7 +720,7 @@ public class ClassUploadManager extends HttpServlet {
 
             try {
                 final String testDir = Paths.get(javaFilePath).getParent().toString();
-                final String qualifiedName = getFullyQualifiedName(classFilePath);
+                final String qualifiedName = FileUtils.getFullyQualifiedName(classFilePath);
 
                 // This adds a jacoco.exec file to the testDir
                 AntRunner.testOriginal(cut, testDir, qualifiedName);
@@ -758,48 +752,6 @@ public class ClassUploadManager extends HttpServlet {
     }
 
     /**
-     * Returns the qualified name of a java class for a given {@code .java} file content.
-     * <p>
-     * E.g. {@code java.util.Collection} for {@link Collection}.
-     *
-     * @param javaClassFilePath The path to the java class file.
-     * @return A qualified name of the given java class.
-     * @throws IOException when reading the java file fails.
-     */
-    private String getFullyQualifiedName(String javaClassFilePath) throws IOException {
-        ClassPool classPool = ClassPool.getDefault();
-        CtClass cc = classPool.makeClass(new FileInputStream(new File(javaClassFilePath)));
-        return cc.getName();
-    }
-
-    /**
-     * Stores a Java file for given parameters on the hard drive.
-     *
-     * @param folderPath  The path of the folder the Java file will be stored in.
-     * @param fileName    The file name (e.g. {@code MyClass.java}).
-     * @param fileContent The actual file content.
-     * @return The path of the newly stored Java file.
-     * @throws IOException when storing the file fails.
-     */
-    private String storeJavaFile(String folderPath, String fileName, String fileContent) throws IOException {
-        final String filePath = folderPath + F_SEP + fileName;
-        try {
-            Files.createDirectories(Paths.get(folderPath));
-            final Path path = Files.createFile(Paths.get(filePath));
-            Files.write(path, fileContent.getBytes());
-            return path.toString();
-        } catch (IOException e) {
-            logger.error("Could not store Java File.", e);
-            try {
-                // removing folder again, if empty
-                Files.delete(Paths.get(folderPath));
-            } catch (DirectoryNotEmptyException ignored) {
-            }
-            throw e;
-        }
-    }
-
-    /**
      * Aborts a given request by removing all uploaded compile classes from for
      * the database and {@code .java} and {@code .class} files from the system.
      * <p>
@@ -814,7 +766,7 @@ public class ClassUploadManager extends HttpServlet {
      * @param files           Optional additional files, which need to be removed.
      * @throws IOException When an error during redirecting occurs.
      */
-    private static void abortRequestAndCleanUp(HttpServletRequest request, HttpServletResponse response, String cutDir,
+    private static void abortRequestAndCleanUp(HttpServletRequest request, HttpServletResponse response, Path cutDir,
                                                List<CompiledClass> compiledClasses, String... files) throws IOException {
         logger.debug("Aborting request...");
         if (cutDir != null) {
@@ -841,7 +793,7 @@ public class ClassUploadManager extends HttpServlet {
 
             try {
                 logger.info("Removing directory {} again", cutDir);
-                FileUtils.forceDelete(new File(cutDir));
+                org.apache.commons.io.FileUtils.forceDelete(cutDir.toFile());
             } catch (IOException e) {
                 // logged, but otherwise ignored. No need to abort while aborting.
                 logger.error("Error removing directory of compiled classes.", e);
