@@ -144,14 +144,14 @@ public class KillMapProcessor implements ServletContextListener {
             }
             // Avoid future problems
             if (AdminSystemSettings.SETTING_TYPE.BOOL_VALUE.equals(setting.getType())) {
-                logger.info("Initial conf from the DB:" + setting.getBoolValue());
+                logger.debug("Initial conf from the DB:" + setting.getBoolValue());
                 this.setEnabled(setting.getBoolValue());
                 break;
             }
         }
 
         executor = Executors.newScheduledThreadPool(1);
-        logger.info("KillMapProcessor Started ");
+        logger.debug("KillMapProcessor Started ");
         executor.scheduleWithFixedDelay(new KillMapJob(), INITIAL_DELAY_VALUE, EXECUTION_DELAY_VALUE,
                 EXECUTION_DELAY_UNIT);
 

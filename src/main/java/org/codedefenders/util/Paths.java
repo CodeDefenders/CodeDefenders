@@ -26,7 +26,7 @@ public class Paths {
     public static final String CLASS_UPLOAD = "/class-upload";
 
     public static final String DUEL_GAME = "/duelgame";
-    public static final String DUEL_SELECTION = "duel/games";
+    public static final String DUEL_SELECTION = "/duel/games";
     public static final String DUEL_CREATE = "/duel/create";
 
     public static final String BATTLEGROUND_GAME = "/multiplayergame";

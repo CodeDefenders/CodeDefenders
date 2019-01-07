@@ -6,11 +6,13 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -19,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static org.codedefenders.servlets.util.GameServletUtils.getGameId;
+import static org.codedefenders.servlets.util.ServletUtils.gameId;
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
 import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
@@ -45,7 +47,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        final String action = request.getParameter("formType");
+        final String action = ServletUtils.formType(request);
         switch (action) {
             case "createGame":
                 createGame(request, response);
@@ -75,15 +77,15 @@ public class PuzzleGameSelectionManager extends HttpServlet {
         final HttpSession session = request.getSession();
         final int userId = ((Integer) session.getAttribute("uid"));
 
-        final Integer puzzleId = getIntParameter(request, "puzzleId");
-        if (puzzleId == null) {
+        final Optional<Integer> puzzleId = getIntParameter(request, "puzzleId");
+        if (!puzzleId.isPresent()) {
             logger.error("Failed to retrieve puzzleId from request.");
             response.setStatus(SC_BAD_REQUEST);
             Redirect.redirectBack(request, response);
             return;
         }
 
-        final Puzzle puzzle = PuzzleDAO.getPuzzleForId(puzzleId);
+        final Puzzle puzzle = PuzzleDAO.getPuzzleForId(puzzleId.get());
         if (puzzle == null) {
             logger.error("Failed to retrieve puzzle from database for puzzleId: {}.", puzzleId);
             response.setStatus(SC_BAD_REQUEST);
@@ -120,13 +122,14 @@ public class PuzzleGameSelectionManager extends HttpServlet {
         final HttpSession session = request.getSession();
         final int userId = ((Integer) session.getAttribute("uid"));
 
-        final Integer gameId = getGameId(request);
-        if (gameId == null) {
+        final Optional<Integer> gameIdOpt = gameId(request);
+        if (!gameIdOpt.isPresent()) {
             logger.error("Failed to retrieve gameId from request.");
             response.setStatus(SC_BAD_REQUEST);
             Redirect.redirectBack(request, response);
             return;
         }
+        final int gameId = gameIdOpt.get();
 
         final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
         if (game == null) {

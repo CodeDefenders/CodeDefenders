@@ -590,7 +590,7 @@ public class MultiplayerGame extends AbstractGame {
             case FINISHED:
                 if (!listContainsEvent(events, EventType.GAME_FINISHED)) {
                     EventType et = EventType.GAME_FINISHED;
-                    notifyAttackers("A game has finised.", et);
+                    notifyAttackers("A game has finished.", et);
                     notifyDefenders("A game has finished.", et);
                     notifyCreator("Your game has finished.", et);
                     notifyGame("The game has ended.", et);

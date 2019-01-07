@@ -13,8 +13,9 @@ import org.codedefenders.game.Test;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.game.puzzle.solving.MutantSolvingStrategy;
 import org.codedefenders.game.puzzle.solving.TestSolvingStrategy;
-import org.codedefenders.servlets.games.GameManager;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorException;
@@ -25,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Optional;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,7 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static org.codedefenders.servlets.util.GameServletUtils.getGameId;
+import static org.codedefenders.servlets.util.ServletUtils.gameId;
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
 import static org.codedefenders.util.Constants.MODE_PUZZLE_DIR;
@@ -62,20 +64,21 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  * @author <a href=https://github.com/werli>Phil Werli<a/>
  * @see PuzzleGameSelectionManager
  * @see PuzzleGame
+ * @see org.codedefenders.util.Paths#PUZZLE_GAME
  */
 public class PuzzleGameManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(PuzzleGameManager.class);
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        final HttpSession session = request.getSession();
-        final int userId = ((Integer) session.getAttribute("uid"));
+        final int userId = ServletUtils.userId(request);
 
         final PuzzleGame game;
 
-        final Integer gameId = getGameId(request);
-        boolean fromGameId = gameId != null; // else from puzzleId
+        final Optional<Integer> gameIdOpt = gameId(request);
+        boolean fromGameId = gameIdOpt.isPresent(); // else from puzzleId
         if (fromGameId) {
+            final int gameId = gameIdOpt.get();
             game = PuzzleDAO.getPuzzleGameForId(gameId);
 
             if (game == null) {
@@ -89,12 +92,13 @@ public class PuzzleGameManager extends HttpServlet {
                 return;
             }
         } else {
-            final Integer puzzleId = getIntParameter(request, "puzzleId");
-            if (puzzleId == null) {
+            final Optional<Integer> puzzleIdOpt = getIntParameter(request, "puzzleId");
+            if (!puzzleIdOpt.isPresent()) {
                 logger.error("Cannot retrieve puzzle game page. Failed to retrieve gameId and puzzleId from request.");
                 response.sendRedirect(ctx(request) + Paths.PUZZLE_OVERVIEW);
                 return;
             }
+            final int puzzleId = puzzleIdOpt.get();
             game = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, userId);
 
             if (game == null) {
@@ -123,7 +127,7 @@ public class PuzzleGameManager extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final HttpSession session = request.getSession();
-        final String action = request.getParameter("formType");
+        final String action = ServletUtils.formType(request);
         switch (action) {
             case "reset":
                 session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
@@ -162,13 +166,14 @@ public class PuzzleGameManager extends HttpServlet {
     @SuppressWarnings("Duplicates")
     private static void createTest(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
         final int userId = ((Integer) session.getAttribute("uid"));
-        final Integer gameId = getGameId(request);
-        if (gameId == null) {
+        final Optional<Integer> gameIdOpt = gameId(request);
+        if (!gameIdOpt.isPresent()) {
             logger.error("Cannot create test for this puzzle. Failed to retrieve gameId from request.");
             response.setStatus(SC_BAD_REQUEST);
             Redirect.redirectBack(request, response);
             return;
         }
+        final int gameId = gameIdOpt.get();
 
         final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
         if (game == null) {
@@ -208,7 +213,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         final Test newTest;
         try {
-            newTest = GameManager.createTest(gameId, game.getClassId(), testText, userId, MODE_PUZZLE_DIR, game.getMaxAssertionsPerTest());
+            newTest = GameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_PUZZLE_DIR, game.getMaxAssertionsPerTest());
         } catch (CodeValidatorException e) {
             messages.add(TEST_GENERIC_ERROR_MESSAGE);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -246,7 +251,7 @@ public class PuzzleGameManager extends HttpServlet {
         MutationTester.runTestOnAllMutants(game, newTest, messages);
 
         // may be // final TestSolvingStrategy solving = Testgame.getTestSolver();
-        final TestSolvingStrategy solver = TestSolvingStrategy.get("KILLED_ALL_MUTANTS");
+        final TestSolvingStrategy solver = TestSolvingStrategy.get(TestSolvingStrategy.Types.KILLED_ALL_MUTANTS.name());
         if (solver == null) {
             throw new IllegalStateException("Test solving strategy not found. That shouldn't happen.");
         }
@@ -279,13 +284,14 @@ public class PuzzleGameManager extends HttpServlet {
      */
     private static void createMutant(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
         final int userId = ((Integer) session.getAttribute("uid"));
-        final Integer gameId = getGameId(request);
-        if (gameId == null) {
+        final Optional<Integer> gameIdOpt = gameId(request);
+        if (!gameIdOpt.isPresent()) {
             logger.error("Cannot create mutant for this puzzle. Failed to retrieve gameId from request.");
             response.setStatus(SC_BAD_REQUEST);
             Redirect.redirectBack(request, response);
             return;
         }
+        final int gameId = gameIdOpt.get();
 
         final PuzzleGame game = PuzzleDAO.getPuzzleGameForId(gameId);
         if (game == null) {
@@ -332,7 +338,7 @@ public class PuzzleGameManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        final Mutant existingMutant = GameManager.existingMutant(gameId, mutantText);
+        final Mutant existingMutant = GameManagingUtils.existingMutant(gameId, mutantText);
         if (existingMutant != null) {
             messages.add(MUTANT_DUPLICATED_MESSAGE);
             TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
@@ -344,7 +350,7 @@ public class PuzzleGameManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        final Mutant newMutant = GameManager.createMutant(gameId, game.getClassId(), mutantText, userId, MODE_PUZZLE_DIR);
+        final Mutant newMutant = GameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, userId, MODE_PUZZLE_DIR);
         if (newMutant == null) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);

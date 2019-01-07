@@ -28,7 +28,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
-import org.codedefenders.servlets.games.GameManager;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
@@ -215,7 +215,7 @@ public class ExecutionTest {
                 Files.readAllBytes(new File("src/test/resources/itests/mutants/XmlElement/Mutant9559.java").toPath()),
                 Charset.defaultCharset());
         // Do the mutant thingy
-        Mutant mutant = GameManager.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(), mutantText,
+        Mutant mutant = GameManagingUtils.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(), mutantText,
                 attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
         //
         MutationTester.runAllTestsOnMutant(multiplayerGame, mutant, messages);

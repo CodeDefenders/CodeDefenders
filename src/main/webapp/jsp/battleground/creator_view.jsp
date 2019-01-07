@@ -41,6 +41,7 @@
 	request.setAttribute("markUncoveredEquivalent", false);
 	request.setAttribute("viewDiff", true);
 	request.setAttribute("gameType", GameMode.PARTY);
+	request.setAttribute("gameId", game.getId());
 
 	/* game_highlighting */
 	request.setAttribute("codeDivSelector", "#cut-div");
@@ -48,6 +49,7 @@
 	request.setAttribute("mutants", game.getMutants());
 	request.setAttribute("showEquivalenceButton", false);
 	// request.setAttribute("gameType", GameMode.PARTY);
+//    request.setAttribute("gameId", game.getId());
 
 	/* mutant_explanation */
 	request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
@@ -57,21 +59,21 @@
 
 <div class="admin-panel">
 	<h2>Admin</h2>
-	<form id="adminEndBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" style="display: inline-block;">
+	<form id="adminEndBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post" style="display: inline-block;">
 		<button type="submit" class="btn btn-primary btn-game btn-left" id="endGame" form="adminEndBtn"
 				<% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
 			End Game
 		</button>
 		<input type="hidden" name="formType" value="endGame">
-		<input type="hidden" name="mpGameID" value="<%= game.getId() %>" />
+		<input type="hidden" name="gameId" value="<%= game.getId() %>" />
 	</form>
-	<form id="adminStartBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" style="display: inline-block;">
+	<form id="adminStartBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post" style="display: inline-block;">
 		<button type="submit" class="btn btn-primary btn-game" id="startGame" form="adminStartBtn"
 				<% if (game.getState() != GameState.CREATED) { %> disabled <% } %>>
 			Start Game
 		</button>
 		<input type="hidden" name="formType" value="startGame">
-		<input type="hidden" name="mpGameID" value="<%= game.getId() %>" />
+		<input type="hidden" name="gameId" value="<%= game.getId() %>" />
 	</form>
 </div>
 

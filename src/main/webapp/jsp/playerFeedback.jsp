@@ -26,6 +26,10 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.database.GameDAO" %>
 <%@ page import="org.codedefenders.model.Player" %>
+<%
+{
+    int gameId = (Integer) request.getAttribute("gameId");
+%>
 <div id="playerFeedback" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
 
     <style>
@@ -110,7 +114,7 @@
                         <tbody>
 
                         <%
-                            List<Integer> oldValues = FeedbackDAO.getFeedbackValues(gameId, uid);
+                            List<Integer> oldValues = FeedbackDAO.getFeedbackValues(gameId, userId);
                             for (Feedback.Type f : Feedback.types) {
                                 int oldValue = oldValues.isEmpty() ? -1 : oldValues.get(f.ordinal());
                                 if ((role.equals(Role.DEFENDER) &&
@@ -184,9 +188,9 @@
                         if (canSeePlayerFeedback) {
                             for (Player player : GameDAO.getAllPlayersForGame(gameId)) {
                                 User user = player.getUser();
-                                int userId = user.getId();
+                                int playerUserId = user.getId();
 
-                                if (FeedbackDAO.hasNotRated(gameId, userId))
+                                if (FeedbackDAO.hasNotRated(gameId, playerUserId))
                                     continue;
 
                                 String rowColor = player.getRole() == Role.ATTACKER ? "#9a002914" : "#0029a01a";
@@ -195,7 +199,7 @@
                         <td><%=user.getUsername()%>
                         </td>
                         <%
-                            List<Integer> ratingValues = FeedbackDAO.getFeedbackValues(gameId, userId);
+                            List<Integer> ratingValues = FeedbackDAO.getFeedbackValues(gameId, playerUserId);
                             for (Feedback.Type f : Feedback.Type.values()) {
                                 int ratingValue = ratingValues == null ? -1 : ratingValues.get(f.ordinal());
                                 if (ratingValue < 1) {
@@ -274,3 +278,6 @@
         document.getElementById('viewFeedbackLink').classList.toggle('active');
     }
 </script>
+<%
+}
+%>

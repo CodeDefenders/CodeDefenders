@@ -5,7 +5,7 @@ import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.*;
-import org.codedefenders.servlets.games.GameManager;
+import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.CodeValidatorException;
@@ -107,8 +107,8 @@ public class PuzzleGame extends AbstractGame {
                 final String testCode = new String(Files.readAllBytes(Paths.get(test.getJavaFile())),
                         StandardCharsets.UTF_8);
 
-                // GameManager#createTest() compiles, tests and stores the test
-                final Test createdTest = GameManager.createTest(game.id, game.classId, testCode,
+                // GameManagingUtils#createTest() compiles, tests and stores the test
+                final Test createdTest = GameManagingUtils.createTest(game.id, game.classId, testCode,
                         DUMMY_DEFENDER_USER_ID, "puzzle", game.maxAssertionsPerTest);
 
                 if (createdTest == null || createdTest.getClassFile() == null) {
@@ -122,8 +122,8 @@ public class PuzzleGame extends AbstractGame {
                 final String mutantCode = new String(Files.readAllBytes(Paths.get(mutant.getJavaFile())),
                         StandardCharsets.UTF_8);
 
-                // GameManager#createMutant() compiles and stores the mutant
-                final Mutant createdMutant = GameManager.createMutant(game.id, game.classId, mutantCode,
+                // GameManagingUtils#createMutant() compiles and stores the mutant
+                final Mutant createdMutant = GameManagingUtils.createMutant(game.id, game.classId, mutantCode,
                         DUMMY_ATTACKER_USER_ID, "puzzle");
 
                 if (createdMutant == null || createdMutant.getClassFile() == null) {

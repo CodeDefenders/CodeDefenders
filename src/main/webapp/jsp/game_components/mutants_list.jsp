@@ -45,6 +45,8 @@
     @param GameMode gameType
         Type of the game. Used for the "Claim Equivalent" URLs and dialog message.
         TODO find a better solution for this
+    @param int gameId
+        The game id of this currently played game. Used for URL parameters.
 --%>
 
 <% { %>
@@ -58,6 +60,7 @@
     Boolean markUncoveredEquivalent = (Boolean) request.getAttribute("markUncoveredEquivalent");
     Boolean viewDiff = (Boolean) request.getAttribute("viewDiff");
     GameMode gameType = (GameMode) request.getAttribute("gameType");
+    int gameId = (Integer) request.getAttribute("gameId");
 %>
 
 <div class="tabs bg-minus-3" role="tablist">
@@ -117,23 +120,22 @@
                                         && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID) {
                                         if (gameType == GameMode.PARTY) {
                                             if (m.getLines().size() > 1) {
+                                                String lineString = String.join(",", m.getLines().stream().map(String::valueOf).collect(Collectors.toList()));
                                 %>
-                                                <a href="<%= request.getContextPath() + Paths.BATTLEGROUND_GAME%>?equivLines=<%=m.getLines().toString().replaceAll(", ", ",") %>"
-                                                   class="btn btn-default btn-diff"
-                                                   onclick="return confirm('This will mark all player-created mutants on lines <%= m.getLines() %> as equivalent. Are you sure?');">
-                                                    Claim Equivalent</a>
-                                                <% } else { %>
-                                                <a  href="<%= request.getContextPath() + Paths.BATTLEGROUND_GAME%>?equivLine=<%= m.getLines().get(0) %>"
-                                                   class="btn btn-default btn-diff"
-                                                   onclick="return confirm('This will mark all player-created mutants on line <%= m.getLines().get(0) %> as equivalent. Are you sure?');">
-                                                    Claim Equivalent</a>
+                                <form id="equiv" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return confirm('This will mark all player-created mutants on line(s) <%= lineString %> as equivalent. Are you sure?');">
+                                    <input type="hidden" name="formType" value="claimEquivalent">
+                                    <input type="hidden" name="equivLines" value="<%=lineString%>">
+                                    <input type="hidden" name="gameId" value="<%=gameId%>">
+                                    <button type="submit" class="btn btn-default btn-right">Claim Equivalent</button>
+                                </form>
                                 <%
                                             }
                                         } else if (gameType == GameMode.DUEL) {
                                 %>
                                             <form id="equiv" action="<%=request.getContextPath() + Paths.DUEL_GAME%>" method="post" onsubmit="return confirm('This will mark mutant <%= m.getId() %> as equivalent. Are you sure?');">
                                                 <input type="hidden" name="formType" value="claimEquivalent">
-                                                <input type="hidden" name="mutantId" value="<%=m.getId()%>">
+                                                <input type="hidden" name="equivMutantId" value="<%=m.getId()%>">
+                                                <input type="hidden" name="gameId" value="<%=gameId%>">
                                                 <button type="submit" class="btn btn-default btn-right">Claim Equivalent</button>
                                             </form>
                                 <%

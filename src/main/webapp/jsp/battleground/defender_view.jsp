@@ -54,6 +54,7 @@
 	request.setAttribute("markUncoveredEquivalent", game.isMarkUncovered());
 	request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
 	request.setAttribute("gameType", GameMode.PARTY);
+	request.setAttribute("gameId", game.getId());
 
 	/* game_highlighting */
 	request.setAttribute("codeDivSelector", "#cut-div");
@@ -62,12 +63,13 @@
 	request.setAttribute("showEquivalenceButton", true);
 	// request.setAttribute("markUncoveredEquivalent", game.isMarkUncovered());
 	// request.setAttribute("gameType", GameMode.PARTY);
+//    request.setAttribute("gameId", game.getId());
 
 	/* mutant_explanation */
 	request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 
 	/* test_progressbar */
-	request.setAttribute("gameId", game.getId());
+//	request.setAttribute("gameId", game.getId());
 %>
 
 <!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
@@ -90,7 +92,7 @@
 		<form id="def" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post">
 			<%@include file="../game_components/test_editor.jsp"%>
 			<input type="hidden" name="formType" value="createTest">
-			<input type="hidden" name="mpGameID" value="<%= game.getId() %>" />
+			<input type="hidden" name="gameId" value="<%= game.getId() %>" />
 		</form>
 	</div>
 </div>

@@ -33,16 +33,19 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DuelGameDAO;
-import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +72,7 @@ import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS;
 
+// FIXME Once used again, this servlet should be refactored!
 public class UnitTesting extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory.getLogger(UnitTesting.class);
@@ -79,7 +83,7 @@ public class UnitTesting extends HttpServlet {
 		// Get the session information specific to the current user.
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
-		Object ogid = session.getAttribute("gid");
+		Object ogid = request.getAttribute("gameId");
 		DuelGame activeGame;
 		if (ogid == null) {
 			logger.debug("Getting active unit testing session for user " + uid);
@@ -89,7 +93,7 @@ public class UnitTesting extends HttpServlet {
 			logger.debug("Getting game " + gameId + " for " + uid);
 			activeGame = DuelGameDAO.getDuelGameForId(gameId);
 		}
-		session.setAttribute("game", activeGame);
+		request.setAttribute("game", activeGame);
 
 		RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.UTESTING_VIEW_JSP);
 		dispatcher.forward(request, response);
@@ -101,6 +105,7 @@ public class UnitTesting extends HttpServlet {
 		ArrayList<String> messages = new ArrayList<>();
 		HttpSession session = request.getSession();
 		int uid = (Integer) session.getAttribute("uid");
+		int gameId = ServletUtils.gameId(request).get();
 		DuelGame activeGame = (DuelGame) session.getAttribute("game");
 		session.setAttribute("messages", messages);
 
@@ -112,7 +117,7 @@ public class UnitTesting extends HttpServlet {
 		if (newTest == null) {
 			messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
 			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-			response.sendRedirect(request.getContextPath()+"/utesting");
+			Redirect.redirectBack(request, response);
 			return;
 		}
 		logger.debug("New Test " + newTest.getId());
@@ -137,7 +142,7 @@ public class UnitTesting extends HttpServlet {
 			messages.add(compileTestTarget.message);
 			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
 		}
-		response.sendRedirect(request.getContextPath()+"/utesting");
+		response.sendRedirect(request.getContextPath()+Paths.UTESTING_PATH + "?gameId=" + gameId);
 	}
 
 	/**
@@ -150,7 +155,7 @@ public class UnitTesting extends HttpServlet {
 	 * @return {@code null} if test is not valid
 	 * @throws IOException
 	 */
-	public Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
+	private Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
 		GameClass classUnderTest = GameClassDAO.getClassForId(cid);
 
 		File newTestDir = FileUtils.getNextSubDir(getServletContext().getRealPath(DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + TESTS_DIR + F_SEP + ownerId));

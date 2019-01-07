@@ -51,7 +51,7 @@ public class MultiplayerGameTest {
 		
 		Mockito.when(request.getContextPath()).thenReturn("");
 		Mockito.when(request.getParameter("formType")).thenReturn("createMutant");
-		Mockito.when(request.getParameter("mpGameID")).thenReturn("243");
+		Mockito.when(request.getParameter("gameId")).thenReturn("243");
 
 //		MultiplayerGame mp = 
 		//

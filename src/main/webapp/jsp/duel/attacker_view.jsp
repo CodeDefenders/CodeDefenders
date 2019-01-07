@@ -18,12 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.game.GameLevel" %>
-<%@ page import="org.codedefenders.game.GameMode" %>
-<%@ page import="org.codedefenders.game.GameState" %>
 
 <% String pageTitle = "Attacking Class"; %>
-<%@ include file="/jsp/header_game.jsp" %>
+<%@ include file="/jsp/duel/header_game.jsp" %>
 
 <% { %>
 
@@ -56,6 +53,7 @@
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
     request.setAttribute("gameType", GameMode.DUEL);
+    request.setAttribute("gameId", game.getId());
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
@@ -64,6 +62,7 @@
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("markUncoveredEquivalent", false);
     // request.setAttribute("gameType", GameMode.DUEL);
+//    request.setAttribute("gameId", game.getId());
 
     /* finished_modal */
     int attackerScore = game.getAttackerScore();
@@ -75,7 +74,7 @@
     request.setAttribute("mutantValidatorLevel", CodeValidatorLevel.MODERATE);
 
     /* mutant_progressbar */
-    request.setAttribute("gameId", game.getId());
+//    request.setAttribute("gameId", game.getId());
 %>
 
 <% if (game.getState() == GameState.FINISHED) { %>
@@ -103,6 +102,7 @@
 
         <form id="reset" action="<%=request.getContextPath() + Paths.DUEL_GAME %>" method="post">
             <input type="hidden" name="formType" value="reset">
+            <input type="hidden" name="gameId" value="<%=game.getId()%>">
             <button class="btn btn-primary btn-warning btn-game btn-right" id="btnReset" style="margin-top: -40px; margin-right: 80px">
                 Reset
             </button>
@@ -113,9 +113,8 @@
                     <% if (game.getState() != GameState.ACTIVE || game.getActiveRole() != Role.ATTACKER) { %> disabled <% } %>>
                 Attack!
             </button>
-
             <input type="hidden" name="formType" value="createMutant">
-            <input type="hidden" name="gameID" value="<%= game.getId() %>"/>
+            <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
 
             <%@include file="../game_components/mutant_editor.jsp"%>
             <%@include file="../game_components/game_highlighting.jsp"%>
@@ -130,7 +129,7 @@
     function checkForUpdate() {
         $.post('<%=request.getContextPath() + Paths.DUEL_GAME%>', {
             formType: "whoseTurn",
-            gameID: <%= game.getId() %>
+            gameId: <%= game.getId() %>
         }, function (data) {
             if (data === "attacker") {
                 window.location.reload();

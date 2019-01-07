@@ -51,6 +51,7 @@
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
     request.setAttribute("gameType", GameMode.PARTY);
+    request.setAttribute("gameId", game.getId());
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#newmut-div");
@@ -59,12 +60,13 @@
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("markUncoveredEquivalent", false);
     // request.setAttribute("gameType", GameMode.PARTY);
+//    request.setAttribute("gameId", game.getId());
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 
     /* mutant_progressbar */
-    request.setAttribute("gameId", game.getId());
+//    request.setAttribute("gameId", game.getId());
 %>
 
 <!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
@@ -89,6 +91,7 @@
 
         <form id="reset" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
             <input type="hidden" name="formType" value="reset">
+            <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
             <button class="btn btn-primary btn-warning btn-game btn-right" id="btnReset" style="margin-top: -40px; margin-right: 80px">
                 <%--TODO wtf why is this button suddently a little upper. literally 5px--%>
                 Reset
@@ -104,7 +107,7 @@
             <% } %>
 
             <input type="hidden" name="formType" value="createMutant">
-            <input type="hidden" name="gameID" value="<%= game.getId() %>"/>
+            <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
 
             <%@include file="../game_components/mutant_editor.jsp"%>
             <%@include file="../game_components/game_highlighting.jsp" %>

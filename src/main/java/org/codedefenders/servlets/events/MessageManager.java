@@ -41,7 +41,8 @@ import javax.servlet.http.HttpServletResponse;
  * This {@link HttpServlet} handles uploading and storing new chat messages. Chat
  * messages are stored as {@link Event Events}.
  * <p>
- * Serves on path: `/api/messages`.
+ * Serves on path: {@code /api/messages}.
+ * @see org.codedefenders.util.Paths#API_MESSAGES
  */
 public class MessageManager extends HttpServlet {
 

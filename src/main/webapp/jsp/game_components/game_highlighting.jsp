@@ -37,6 +37,10 @@
         The list of (valid) tests in the game.
     @param List<Mutant> mutants
         The list of (valid) mutants in the game.
+    @param GameMode gameType
+        The game mode of this currently played game.
+    @param int gameId
+        The game id of this currently played game. Used for URL parameters.
 --%>
 
 <%--
@@ -63,6 +67,7 @@
     Boolean showEquivalenceButton = (Boolean) request.getAttribute("showEquivalenceButton");
     Boolean markUncoveredEquivalent = (Boolean) request.getAttribute("markUncoveredEquivalent");
     GameMode gameType = (GameMode) request.getAttribute("gameType");
+    int gameId = (Integer) request.getAttribute("gameId");
 %>
 
 <%
@@ -258,7 +263,7 @@
             if (showEquivalenceButton
                 && status === MutantStatuses.ALIVE
                 && (markUncoveredEquivalent || testIdsPerLine.get(line))) {
-                button = createEquivalenceButton(line, mutantsOnLine);
+                button = createEquivalenceButton(line);
             }
 
             const content = document.createElement('div');
@@ -271,20 +276,23 @@
         /**
          * Creates the button with which to flag mutants as equivalent.
          * @param line The line number.
-         * @param mutantsOnLine The muitants on the line.
          * @return {string} The equivalence button.
          */
-        const createEquivalenceButton = function (line, mutantsOnLine) {
+        const createEquivalenceButton = function (line) {
             if (gameType === GameTypes.PARTY) {
-                return `<form onsubmit="if (window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')) { window.location.href = \'<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>?equivLine=` + line + `\'; } return false;">
+                return `<form id="equiv" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')">
+                            <input type="hidden" name="formType" value="claimEquivalent">
+                            <input type="hidden" name="equivLines" value="` + line + `">
+                            <input type="hidden" name="gameId" value="` + <%=gameId%> + `">
                             <button class="btn btn-danger btn-sm" style="width: 100%;">
                                 <img src="` + Icons.FLAG + `" class="mutant-icon-image"/> Claim Equivalent
                             </button>
                         </form>`;
             } else if (gameType === GameTypes.DUEL) {
-                return `<form id="equiv" action="<%=request.getContextPath() + Paths.DUEL_GAME%>" method="post" onsubmit="return window.confirm('This will mark mutant ` + mutantsOnLine[0].id + ` as equivalent. Are you sure?')">
+                return `<form id="equiv" action="<%=request.getContextPath() + Paths.DUEL_GAME%>" method="post" onsubmit="return window.confirm('This will mark all player-created mutants on line ` + line + ` as equivalent. Are you sure?')">
                             <input type="hidden" name="formType" value="claimEquivalent">
-                            <input type="hidden" name="mutantId" value="` + mutantsOnLine[0].id + `">
+                            <input type="hidden" name="equivLines" value="` + line + `">
+                            <input type="hidden" name="gameId" value="` + <%=gameId%> + `">
                             <button class="btn btn-danger btn-sm" style="width: 100%;">
                                 <img src="` + Icons.FLAG + `" class="mutant-icon-image"/> Claim Equivalent
                             </button>

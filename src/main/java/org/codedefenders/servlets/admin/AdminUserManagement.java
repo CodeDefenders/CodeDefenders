@@ -23,6 +23,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
 import org.codedefenders.servlets.auth.LoginManager;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.EmailUtils;
 import org.codedefenders.util.Paths;
@@ -30,8 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,7 +47,8 @@ import javax.servlet.http.HttpSession;
 /**
  * This {@link HttpServlet} handles admin requests for managing {@link User Users}.
  * <p>
- * Serves on path: `/admin/users`.
+ * Serves on path: {@code /admin/users}.
+ * @see org.codedefenders.util.Paths#ADMIN_USERS
  */
 public class AdminUserManagement extends HttpServlet {
 	private static final Logger logger = LoggerFactory.getLogger(AdminUserManagement.class);
@@ -158,34 +158,14 @@ public class AdminUserManagement extends HttpServlet {
 		final String[] lines = userNameListString.split(AdminCreateGames.USER_NAME_LIST_DELIMITER);
 
 		final boolean sendMail = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue();
-		final String hostAddress = getBaseURL(request);
+		final String hostAddress = ServletUtils.getBaseURL(request);
 
 		for (String credentials : lines) {
 			createUserAccount(credentials.trim(), messages, sendMail, hostAddress);
 		}
 	}
 
-	/**
-	 * Returns the base URL from a given request.
-     * // FIXME Phil: Move into Servlet utility class, which already exists on puzzle-mode branch.
-	 *
-	 * @param request the request the URL is retrieved from
-	 * @return the base URL as a {@link String} or {@code null} if no base URL could be retrieved.
-	 */
-	private static String getBaseURL(HttpServletRequest request) {
-	    String baseURL = null;
-		try {
-			baseURL = new URL(request.getScheme(),
-					request.getServerName(),
-					request.getServerPort(),
-					request.getContextPath()).toString();
-		} catch (MalformedURLException ignored) {
-		    logger.error("Could not retrieve base URL from request.");
-		}
-		return baseURL;
-	}
-
-	/**
+    /**
 	 * Creates a user for a given string, which has to be formatted like:
 	 * <p>
 	 * {@code username,password}

@@ -22,7 +22,7 @@
 <%@ page import="org.codedefenders.game.GameState" %>
 
 <% String pageTitle="Resolve Equivalence"; %>
-<%@ include file="/jsp/header_game.jsp" %>
+<%@ include file="/jsp/duel/header_game.jsp" %>
 
 <% { %>
 
@@ -54,6 +54,7 @@
     request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
     request.setAttribute("gameType", GameMode.PARTY);
+    request.setAttribute("gameId", game.getId());
 
     /* finished_modal */
     int attackerScore = game.getAttackerScore();
@@ -65,7 +66,7 @@
     request.setAttribute("mutantValidatorLevel", CodeValidatorLevel.MODERATE);
 
     /* test_progressbar */
-    request.setAttribute("gameId", game.getId());
+//    request.setAttribute("gameId", game.getId());
 %>
 
 <% if (game.getState() == GameState.FINISHED) { %>
@@ -102,8 +103,9 @@
 
             <h3>Not equivalent? Write a killing test here:</h3>
             <form id="equivalenceForm" action="<%=request.getContextPath() + Paths.DUEL_GAME %>" method="post">
-                <input form="equivalenceForm" type="hidden" id="currentEquivMutant" name="currentEquivMutant" value="<%= equivMutant.getId() %>">
                 <input type="hidden" name="formType" value="resolveEquivalence">
+                <input type="hidden" name="gameId" value="<%= game.getId() %>">
+                <input type="hidden" id="equivMutantId" name="equivMutantId" value="<%= equivMutant.getId() %>">
 
                 <%@include file="../game_components/test_editor.jsp"%>
 

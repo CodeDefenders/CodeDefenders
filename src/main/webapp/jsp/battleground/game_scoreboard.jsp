@@ -18,11 +18,10 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
-<%@ page import="org.codedefenders.model.User" %>
-<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.database.UserDAO" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
+<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="java.util.HashMap" %>
 <%
 
     HashMap mutantScores = game.getMutantScores();

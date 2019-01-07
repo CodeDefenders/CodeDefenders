@@ -95,7 +95,7 @@
                 </td>
                 <td>
                     <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
-                       href="<%= request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>?id=<%= gid %>">Observe</a>
+                       href="<%= request.getContextPath() + Paths.BATTLEGROUND_GAME%>?gameId=<%= gid %>">Observe</a>
                 </td>
                 <td class="col-sm-2">
                     <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gid%>">

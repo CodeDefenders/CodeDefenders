@@ -262,7 +262,7 @@ public class LoginManager extends HttpServlet {
 	 */
 	private void storeApplicationDataInSession(HttpSession session) {
 		// First check the Web abb context
-		Boolean isAttackerBlocked = Boolean.FALSE;
+		boolean isAttackerBlocked = false;
 		try {
 			InitialContext initialContext = new InitialContext();
 			Context environmentContext = (Context) initialContext.lookup("java:/comp/env");

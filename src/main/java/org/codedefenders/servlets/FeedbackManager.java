@@ -21,12 +21,14 @@ package org.codedefenders.servlets;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.model.Feedback;
 import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -38,25 +40,20 @@ public class FeedbackManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(FeedbackManager.class);
 
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-
-        ArrayList<String> messages = new ArrayList<String>();
+        ArrayList<String> messages = new ArrayList<>();
         HttpSession session = request.getSession();
         int uid = (Integer) session.getAttribute("uid");
 
-        int gameId;
-        if (session.getAttribute("mpGameId") != null) {
-            gameId = (Integer) session.getAttribute("mpGameId");
-        } else if (request.getParameter("mpGameID") != null) {
-            gameId = Integer.parseInt(request.getParameter("mpGameID"));
-            session.setAttribute("mpGameId", gameId);
-        } else {
-            // TODO Not sure this is 100% right
-            logger.error("Problem setting gameID !");
-            response.setStatus(500);
+        final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
+        if (!gameIdOpt.isPresent()) {
+            logger.error("No valid gameId parameter found");
+            Redirect.redirectBack(request, response);
             return;
         }
         session.setAttribute("messages", messages);
+        int gameId = gameIdOpt.get();
 
         switch (request.getParameter("formType")) {
             case "sendFeedback":

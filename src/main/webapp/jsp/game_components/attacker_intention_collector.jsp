@@ -19,9 +19,6 @@
 
 --%>
 
-<%@ page import="org.codedefenders.model.AttackerIntention" %>
-
-<%-- This jsp assumes that the availability of a MultiplayerGame variable named game --%>
 <script>
 
 function updateAttackForm(value){

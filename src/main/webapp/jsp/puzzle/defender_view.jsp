@@ -70,6 +70,7 @@
     request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
     request.setAttribute("gameType", GameMode.PUZZLE);
+    request.setAttribute("gameId", game.getId());
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
@@ -78,12 +79,13 @@
     request.setAttribute("showEquivalenceButton", true);
     // request.setAttribute("markUncoveredEquivalent", game.isMarkUncovered());
     // request.setAttribute("gameType", GameMode.PUZZLE);
+//    request.setAttribute("gameId", game.getId());
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", CodeValidatorLevel.MODERATE);
 
     /* test_progressbar */
-    request.setAttribute("gameId", game.getId());
+//    request.setAttribute("gameId", game.getId());
 %>
 <div class="game-container">
     <div class="row" style="padding: 0px 15px;">

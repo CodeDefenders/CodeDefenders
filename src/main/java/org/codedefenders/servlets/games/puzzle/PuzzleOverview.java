@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author <a href=https://github.com/werli>Phil Werli<a/>
  * @see PuzzleGameSelectionManager
  * @see PuzzleGame
+ * @see org.codedefenders.util.Paths#PUZZLE_OVERVIEW
  */
 public class PuzzleOverview extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(PuzzleOverview.class);

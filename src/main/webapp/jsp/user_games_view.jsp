@@ -59,6 +59,9 @@
 	List<AbstractGame> openGames = new ArrayList<>();
 	openGames.addAll( openDuelGames );
 	openGames.addAll( openMultiplayerGames );
+
+	boolean gamesJoinable = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue();
+
 %>
 
 <div class="w-100">
@@ -142,26 +145,7 @@
         <td class="col-sm-1"></td>
         <td class="col-sm-1"></td>
 		<td class="col-sm-3">
-<%
-			if (g.getState().equals(GameState.ACTIVE)) { // Can enter only if game is in progress.
-				String btnLabel = "Your Turn";
-				if (g.getMode().equals(GameMode.UTESTING)) {
-					btnLabel = "Enter";
-				}
-%>
-			<form id="enterGameForm" action="<%= request.getContextPath() + Paths.DUEL_SELECTION%>" method="post">
-				<input type="hidden" name="formType" value="enterGame">
-				<input type="hidden" name="game" value="<%=g.getId()%>">
-				<% if (uid == turnId ) {%>
-				<button class="btn btn-primary" id="<%="duel-myturn-"+g.getId()%>" type="submit"><%=btnLabel%></button>
-				<% } else {%>
-				<button  class="btn btn-default btn-sm" id="<%="duel-enter-"+g.getId()%>" type="submit" value="Enter Game">Enter Game</button>
-				<% }%>
-			</form>
-
-<%
-			}
-%>
+			<a class="btn btn-sm btn-default" id="<%="results_"+g.getId()%>" href="<%=request.getContextPath() + Paths.DUEL_GAME%>?gameId=<%= g.getId() %>">Enter Game</a>
 		</td>
 	</tr>
 <%
@@ -209,17 +193,17 @@
 					case CREATOR:
 						if (g.getState() == GameState.CREATED) {
 %>
-			<form id="adminStartBtn-<%=g.getId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post">
+			<form id="adminStartBtn-<%=g.getId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
 				<button type="submit" class="btn btn-sm btn-primary" id="startGame-<%=g.getId()%>" form="adminStartBtn-<%=g.getId()%>">
 					Start Game
 				</button>
 				<input type="hidden" name="formType" value="startGame">
-				<input type="hidden" name="mpGameID" value="<%= g.getId() %>" />
+				<input type="hidden" name="gameId" value="<%= g.getId() %>" />
 			</form>
 <%
 						} else {
 %>
-			<a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>" href="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>?id=<%= g.getId() %>">Observe</a>
+			<a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>" href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= g.getId() %>">Observe</a>
 <%
 						}
 					break;
@@ -227,15 +211,15 @@
 						if(!g.getState().equals(GameState.CREATED)) {
 %>
 			<a class = "btn btn-sm btn-primary" id="<%="attack-"+g.getId()%>" style="background-color: #884466;border-color: #772233;"
-			   href="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>?id=<%= g.getId() %>">Attack</a>
+			   href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= g.getId() %>">Attack</a>
 <%
 						} else {
 %>
 			Joined as Attacker
-			<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue()) { %>
+			<%if (gamesJoinable) { %>
 			<form id="attLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
 				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
-				<input type="hidden" name="game" value="<%=g.getId()%>">
+				<input type="hidden" name="gameId" value="<%=g.getId()%>">
 				<button class="btn btn-sm btn-danger" id="<%="leave-attacker-"+g.getId()%>" type="submit" form="attLeave" value="Leave">
 					Leave
 				</button>
@@ -248,15 +232,15 @@
 						if(!g.getState().equals(GameState.CREATED)) {
 %>
 			<a class = "btn btn-sm btn-primary" id="<%="defend-"+g.getId()%>" style="background-color: #446688;border-color: #225577"
-			   href="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>?id=<%= g.getId() %>">Defend</a>
+			   href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= g.getId() %>">Defend</a>
 <%
 						} else {
 %>
 			Joined as Defender
-			<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue()) { %>
+			<%if (gamesJoinable) { %>
 			<form id="defLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
 				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
-				<input type="hidden" name="game" value="<%=g.getId()%>">
+				<input type="hidden" name="gameId" value="<%=g.getId()%>">
 				<button class = "btn btn-sm btn-danger" id="<%="leave-defender-"+g.getId()%>" type="submit" form="defLeave" value="Leave">
 					Leave
 				</button>
@@ -291,7 +275,7 @@
 	<a id="createDuel" class = "btn btn-primary" href="<%=request.getContextPath() + Paths.DUEL_CREATE%>">Create Duel</a>
 	<%}%>
 
-<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue()) { %>
+<%if (gamesJoinable) { %>
 <h2 class="full-width page-title">Open Games</h2>
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
@@ -376,7 +360,7 @@
 			<td class="col-sm-2">
 			<form id="joinGameForm" action="<%=request.getContextPath() + Paths.DUEL_SELECTION%>" method="post">
 					<input type="hidden" name="formType" value="joinGame">
-					<input type="hidden" name="game" value=<%=g.getId()%>>
+					<input type="hidden" name="gameId" value=<%=g.getId()%>>
 					<button type="submit" id="<%="duel-join-"+g.getId()%>" class="btn btn-primary btn-sm" value="Join Game">Join Game</button>
 				</form>
 			</td>
@@ -421,19 +405,29 @@
 			<!-- Owner of the open game -->
 			<%-- <td class="col-sm-1"><%= DatabaseAccess.getUserForKey("User_ID", g.getCreatorId()).getUsername() %></td> --%>
 			<!--<td class="col-sm-1"><%/*= g.getPrize() */%></td>-->
-			<td class="col-sm-1"><%int attackers = g.getAttackerIds().length; %><%=attackers %> of <%=g.getMinAttackers()%>&ndash;<%=g.getAttackerLimit()%></td>
-			<td class="col-sm-1"><%int defenders = g.getDefenderIds().length; %><%=defenders %> of <%=g.getMinDefenders()%>&ndash;<%=g.getDefenderLimit()%></td>
+            <%int attackers = g.getAttackerIds().length;%>
+            <%int defenders = g.getDefenderIds().length;%>
+			<td class="col-sm-1"><%=attackers %> of <%=g.getMinAttackers()%>&ndash;<%=g.getAttackerLimit()%></td>
+			<td class="col-sm-1"><%=defenders %> of <%=g.getMinDefenders()%>&ndash;<%=g.getDefenderLimit()%></td>
 			<td class="col-sm-1"><%= g.getLevel().name() %></td>
 			<td class="col-sm-1"><%= g.getFormattedStartDateTime() %></td>
 			<td class="col-sm-1"><%= g.getFormattedFinishDateTime() %></td>
 			<td class="col-sm-2">
-				<% if(g.getAttackerIds().length < g.getAttackerLimit()) { %>
-				<a class="btn btn-sm btn-primary" id="<%="join-attacker-"+g.getId()%>" style="background-color: #884466;border-color: #772233; margin-bottom: 3px;"
-				   href="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>?attacker=1&id=<%= g.getId() %>">Join as Attacker</a>
+				<% if (attackers < g.getAttackerLimit()) { %>
+				<form id="joinGameForm_attacker_<%=g.getId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
+					<input type="hidden" name="formType" value="joinGame">
+					<input type="hidden" name="gameId" value=<%=g.getId()%>>
+					<input type="hidden" name="attacker" value=1>
+					<button type="submit" id="<%="join-attacker-"+g.getId()%>" class="btn btn-primary btn-sm" style="background-color: #884466;border-color: #772233; margin-bottom: 3px;" value="Join as Attacker">Join as Attacker</button>
+				</form>
 				<% } %>
-				<% if(g.getDefenderIds().length < g.getDefenderLimit()) { %>
-				<a class="btn btn-sm btn-primary" id="<%="join-defender-"+g.getId()%>" style="background-color: #446688;border-color: #225577"
-				   href="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>?defender=1&id=<%= g.getId() %>">Join as Defender</a>
+				<% if (defenders < g.getDefenderLimit()) { %>
+				<form id="joinGameForm_defender_<%=g.getId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
+					<input type="hidden" name="formType" value="joinGame">
+					<input type="hidden" name="gameId" value=<%=g.getId()%>>
+					<input type="hidden" name="defender" value=1>
+					<button type="submit" id="<%="join-defender-"+g.getId()%>" class="btn btn-primary btn-sm" style="background-color: #446688;border-color: #225577" value="Join as Defender">Join as Defender</button>
+				</form>
 				<% } %>
 			</td>
 		</tr>

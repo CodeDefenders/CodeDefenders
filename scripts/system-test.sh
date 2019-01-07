@@ -117,7 +117,7 @@ function __private_do_join_game(){
 curl -X GET \
 --cookie "${cookie}" --cookie-jar "${cookie}" \
 -o /dev/null \
--s ${CODE_DEFENDER_URL}/multiplayergame?id=${gameId}
+-s ${CODE_DEFENDER_URL}/multiplayergame?gameId=${gameId}
 
 }
 
@@ -130,7 +130,7 @@ function __private_do_attack() {
 
   # This return the total time to complete the request 
 curl -X POST \
---data "formType=createMutant&mpGameID=${gameId}" \
+--data "formType=createMutant&gameId=${gameId}" \
 --data-urlencode mutant@${mutant} \
 --cookie "${cookie}" --cookie-jar "${cookie}" \
 -w @curl-format.txt \
@@ -147,7 +147,7 @@ function __private_do_defend() {
 #echo "Game ${gameId}: Defend with "${test}
 # This return the total time to complete the request
 curl -X POST \
---data "formType=createTest&mpGameID=${gameId}" \
+--data "formType=createTest&gameId=${gameId}" \
 --data-urlencode test@${test} \
 --cookie "${cookie}" --cookie-jar "${cookie}" \
 -w @curl-format.txt \

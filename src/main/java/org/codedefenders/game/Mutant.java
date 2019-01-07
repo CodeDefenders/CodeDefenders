@@ -347,7 +347,7 @@ public class Mutant implements Serializable {
 			int points = g.getCurrentRound() - roundCreated; // rounds survived
 			if (g.getState().equals(GameState.FINISHED))
 				points++; // add a point for the last round if the game has finished
-			logger.info("Alive mutant " + getId() + " contributes " + points + " attacker points");
+			logger.debug("Alive mutant " + getId() + " contributes " + points + " attacker points");
 			return points;
 		} else {
 			if (classFile == null || classFile.equals("null")) // non-compilable
@@ -357,11 +357,11 @@ public class Mutant implements Serializable {
 			if (equivalent.equals(Equivalence.ASSUMED_YES)) // claimed, rejected, test did not kill it
 				return 0;
 			if (equivalent.equals(Equivalence.PROVEN_NO)) { // claimed, rejected, test killed it
-				logger.info("Claimed/rejected/killed mutant " + getId() + " contributes 2 attacker points");
+				logger.debug("Claimed/rejected/killed mutant " + getId() + " contributes 2 attacker points");
 				return 2;
 			}
 			int points = roundKilled - roundCreated; // rounds survived
-			logger.info("Killed mutant " + getId() + " contributes " + points + " attacker points");
+			logger.debug("Killed mutant " + getId() + " contributes " + points + " attacker points");
 			return points;
 		}
 	}
@@ -380,7 +380,7 @@ public class Mutant implements Serializable {
 				return 0;
 			}
 		}
-		logger.info("Mutant " + getId() + " contributes 0 defender points (alive or non-compilable)");
+		logger.debug("Mutant " + getId() + " contributes 0 defender points (alive or non-compilable)");
 		return 0;
 	}
 

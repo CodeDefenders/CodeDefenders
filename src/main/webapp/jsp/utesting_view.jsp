@@ -74,7 +74,7 @@
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.codedefenders.util.Paths" %>
-<% DuelGame uTestingSession = (DuelGame) session.getAttribute("game"); %>
+<% DuelGame uTestingSession = (DuelGame) request.getAttribute("game"); %>
 
 <nav class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
@@ -152,6 +152,7 @@
             <%} %>
         </h3>
         <form id="def" action="<%=request.getContextPath() + Paths.UTESTING_PATH%>" method="post">
+            <input type="hidden" name="gameId" value=<%=uTestingSession.getId()%>>
             <%
                 String testCode;
                 String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);

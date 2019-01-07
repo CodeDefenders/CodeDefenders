@@ -18,9 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%-- This jsp assumes that the availability of a MultiplayerGame variable named game --%>
 <script>
-var sMutants = new Set();
 var sLine = null; // Primary Target
 
 var codeOriginalDisplay= document.querySelector('#code').parentNode.style.display;
