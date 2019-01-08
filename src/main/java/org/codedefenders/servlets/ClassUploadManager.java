@@ -276,7 +276,7 @@ public class ClassUploadManager extends HttpServlet {
         if (classAlias == null || classAlias.equals("")) {
             classAlias = fileName.replace(".java", "");
         }
-        if (GameClassDAO.classNotExistsForAlias(classAlias)) {
+        if (GameClassDAO.classExistsForAlias(classAlias)) {
             logger.error("Class upload failed. Given alias {} was already used.", classAlias);
             messages.add("Class upload failed. Given alias is already used.");
             abortRequestAndCleanUp(request, response);

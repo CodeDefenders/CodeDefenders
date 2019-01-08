@@ -102,12 +102,12 @@ public class GameClassDAO {
     }
 
     /**
-     * Checks for a given alias whether a class with this alias do not yet exist.
+     * Checks for a given alias whether a class with this alias already exists.
      *
      * @param alias the alias that is checked.
-     * @return {@code true} if alias does not exist, {@code false} otherwise.
+     * @return {@code true} if alias does exist, {@code false} otherwise.
      */
-    public static boolean classNotExistsForAlias(String alias) throws UncheckedSQLException, SQLMappingException {
+    public static boolean classExistsForAlias(String alias) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM classes WHERE Alias = ?";
         Boolean rv = DB.executeQueryReturnValue(query, rs -> true, DatabaseValue.of(alias));
         return rv != null;
