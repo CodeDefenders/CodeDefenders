@@ -18,7 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<% pageTitle = "Game " + game.getId();
+<% pageTitle = null;
 %>
 <%@ include file="/jsp/header_main.jsp" %>
 </div></div></div></div></div>
@@ -32,23 +32,43 @@
 <%@ page import="static org.codedefenders.game.GameState.ACTIVE" %>
 
 <div class="game-container">
-<nav class="nest" style="width: 90%; margin-left: auto; margin-right: auto;">
-    <div class="crow fly">
-        <div style="text-align: left">
-
-            <h3><%= role %>::<%= game.getState().toString() %></h3>
+    <nav class="nest" style="width: 90%; margin-left: auto; margin-right: auto;">
+        <div class="crow fly">
+            <div class="col-md-3"><h2><%= "Game " + game.getId() %>
+            </h2></div>
+            <div class="col-md-6" style="text-align: center">
+                <h2>
+                    <%
+                        switch (role.toString()) {
+                            case "CREATOR": %>
+                    You're the creator of this game.
+                    <%
+                            break;
+                        case "ATTACKER": %>
+                    Attack the class!
+                    <%
+                            break;
+                        case "DEFENDER": %>
+                    Defend your class!
+                    <%
+                                break;
+                        }
+                    %>
+                </h2>
+            </div>
+            <div>
+                <a href="#" class="btn btn-diff" id="btnScoringTooltip" data-toggle="modal"
+                   data-target="#scoringTooltip"
+                   style="color: black; font-size: 18px; padding: 5px;">
+                    <span class="glyphicon glyphicon-question-sign"></span>
+                </a>
+                <a href="#" class="btn btn-default btn-diff" id="btnScoreboard" data-toggle="modal"
+                   data-target="#scoreboard">Show Scoreboard</a>
+                <a href="#" class="btn btn-default btn-diff" id="btnFeedback" data-toggle="modal"
+                   data-target="#playerFeedback">
+                    Feedback
+                </a>
+            </div>
         </div>
-        <div style="text-align: center"><h1><%= game.getCUT().getName() %></h1></div>
-        <div>
-            <a href="#" class="btn btn-diff" id="btnScoringTooltip" data-toggle="modal" data-target="#scoringTooltip"
-               style="color: black; font-size: 18px; padding: 5px;">
-            <span class="glyphicon glyphicon-question-sign"></span>
-            </a>
-            <a href="#" class="btn btn-default btn-diff" id="btnScoreboard" data-toggle="modal" data-target="#scoreboard">Show Scoreboard</a>
-            <a href="#" class="btn btn-default btn-diff" id="btnFeedback" data-toggle="modal" data-target="#playerFeedback">
-                Feedback
-            </a>
-        </div>
-    </div>
-</nav>
-<div class="clear"></div>
+    </nav>
+    <div class="clear"></div>
