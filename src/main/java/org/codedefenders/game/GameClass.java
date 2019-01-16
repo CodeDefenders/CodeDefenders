@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +64,9 @@ public class GameClass {
     private List<Integer> linesOfCompileTimeConstants = new ArrayList<>();
     private List<Integer> linesOfNonCoverableCode = new ArrayList<>();
     private List<Integer> nonInitializedFields = new ArrayList<>();
+    //
+    private List<Integer> emptyLines = new ArrayList<>();
+    private Map<Integer, Integer> linesCoveringEmptyLines = new HashMap<>();
 
     private List<Range<Integer>> linesOfMethods = new ArrayList<>();
     private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
@@ -101,6 +105,8 @@ public class GameClass {
         this.linesOfMethods.addAll(visit.getMethods());
         this.linesOfMethodSignatures.addAll(visit.getMethodSignatures());
         this.linesOfClosingBrackets.addAll(visit.getClosingBrackets());
+        this.emptyLines.addAll(visit.getEmptyLines());
+        this.linesCoveringEmptyLines.putAll(visit.getLinesCoveringEmptyLines());
     }
 
     /**
@@ -322,5 +328,26 @@ public class GameClass {
     @Override
     public String toString() {
         return "[id=" + id + ",name=" + name + ",alias=" + alias + "]";
+    }
+
+    /**
+     * Returns the empty lines which are covered by any of the already covered lines. An empty line
+     * can be covered if it belongs to a method and is followed by a covered line (either empty or not) 
+     * 
+     * @param alreadyCoveredLines
+     * @return
+     */
+    public List<Integer> getCoveredEmptyLines(List<Integer> alreadyCoveredLines) {
+        List<Integer> collect = new ArrayList();
+        for( Range<Integer> linesOfMethod : linesOfMethods){
+            for( int line = linesOfMethod.getMinimum(); line < linesOfMethod.getMaximum(); line ++){
+                if( emptyLines.contains(line) ){
+                    if( alreadyCoveredLines.contains( linesCoveringEmptyLines.get( line ) ) ){
+                        collect.add( line );
+                    } 
+                }
+            }
+        }
+        return Collections.unmodifiableList(collect);
     }
 }

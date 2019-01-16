@@ -2,7 +2,10 @@ package org.codedefenders.util.analysis;
 
 import org.apache.commons.lang3.Range;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -21,7 +24,9 @@ public class CodeAnalysisResult {
     private final Set<Range<Integer>> methodSignatures = new HashSet<>();
     private final Set<Range<Integer>> methods = new HashSet<>();
     private final Set<Range<Integer>> closingBrackets = new HashSet<>();
-
+    private final Set<Integer> emptyLines = new HashSet<>();
+    private final Map<Integer, Integer> linesCoveringEmptyLines = new HashMap<>();
+    
     CodeAnalysisResult imported(String imported) { this.additionalImports.add(imported); return this; }
 
     CodeAnalysisResult compileTimeConstant(Integer line) { this.compileTimeConstants.add(line); return this; }
@@ -35,6 +40,10 @@ public class CodeAnalysisResult {
     CodeAnalysisResult methods(Range<Integer> lines) { this.methods.add(lines); return this; }
 
     CodeAnalysisResult closingBracket(Range<Integer> lines) { this.closingBrackets.add(lines); return this; }
+    
+    CodeAnalysisResult emptyLine(Integer line) { this.emptyLines.add(line); return this; }
+    
+    CodeAnalysisResult lineCoversEmptyLine(Integer coveringLine, Integer emptyLine) { this.linesCoveringEmptyLines.put( emptyLine,  coveringLine); return this; }
 
 
     public Set<String> getAdditionalImports() {
@@ -63,5 +72,13 @@ public class CodeAnalysisResult {
 
     public Set<Range<Integer>> getClosingBrackets() {
         return closingBrackets;
+    }
+
+    public Set<Integer> getEmptyLines() {
+        return emptyLines;
+    }
+
+    public Map<Integer, Integer> getLinesCoveringEmptyLines() {
+        return linesCoveringEmptyLines;
     }
 }
