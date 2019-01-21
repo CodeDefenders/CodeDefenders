@@ -327,27 +327,25 @@ public class AdminDAO {
     public static boolean updateSystemSetting(AdminSystemSettings.SettingsDTO setting) {
         String valueToSet = setting.getType().name();
 
-        String query = String.join("\n",
-                "UPDATE settings",
-                "SET ? = ?",
-                "WHERE name = ?;");
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(valueToSet),
-                null,
-                DatabaseValue.of(setting.getName().name())
-        };
+        DatabaseValue value = null;
         switch (setting.getType()) {
             case STRING_VALUE:
-                values[0] = DatabaseValue.of(setting.getStringValue());
+                value = DatabaseValue.of(setting.getStringValue());
                 break;
             case INT_VALUE:
-                values[0] = DatabaseValue.of(setting.getIntValue());
+                value = DatabaseValue.of(setting.getIntValue());
                 break;
             case BOOL_VALUE:
-                values[0] = DatabaseValue.of(setting.getBoolValue());
+                value = DatabaseValue.of(setting.getBoolValue());
                 break;
         }
-        return DB.executeUpdateQuery(query, values);
+
+        String query = String.join("\n",
+                "UPDATE settings",
+                "SET " + valueToSet + " = ?",
+                "WHERE name = ?;");
+
+        return DB.executeUpdateQuery(query, value, DatabaseValue.of(setting.getName().name()));
     }
 
     private static AdminSystemSettings.SettingsDTO settingFromRS(ResultSet rs) throws SQLException {
