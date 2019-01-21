@@ -29,34 +29,48 @@
 <div class="menu-top bg-light-blue .minus-2 text-white" style="padding: 5px;">
     <div class="full-width" style="padding-top: 3px;">
         <div class="ws-12 container" style="text-align: right; clear:
-        both; margin: 0px; padding: 0px; width: 100%;">
+        both; width: 100%;">
+            <div>
+                <a id="site-logo" class="main-title text-white tab-link bg-minus-1"
+                   href="${pageContext.request.contextPath}/">
+                    <img class="logo" href="${pageContext.request.contextPath}/"
+                         src="images/logo.png" style="float:left; margin-left: 10px; margin-right: 10px"/>
+                    <div id="home"
+                         style="text-align: center; font-size: x-large; padding: 15px 20px 0 0;float: left">
+                        Code Defenders
+                    </div>
+                </a>
+            </div>
             <button type="button"
-                    class="navbar-toggle tex-white buton tab-link bg-minus-1" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    class="navbar-toggle tex-white buton tab-link bg-minus-1" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1">
                 Menu <span class="glyphicon glyphicon-plus"></span>
             </button>
-            <ul class="crow fly navbar navbar-nav collapse navbar-collapse"
-                id="bs-example-navbar-collapse-1"
-                style="z-index: 1000; text-align: center; list-style:none;
-                width: 80%; float: none; margin: 0 auto;">
+            <div class="col-md-9">
+                <ul class="crow fly no-gutter navbar navbar-nav collapse navbar-collapse"
+                    id="bs-example-navbar-collapse-1"
+                    style="z-index: 1000; text-align: center; list-style:none;
+                width: 100%; float: right">
 
-                <%if(!pageTitle.equals("Login")) {%>
-                <li style="float: none"><a class="text-white button tab-link bg-minus-1"
-                                           href="login" style="width:100%;">Login</a></li>
-                <%}%>
+                    <%if (!pageTitle.equals("Login")) {%>
+                    <li style="float: none"><a class="text-white button tab-link bg-minus-1"
+                                               href="login" style="width:100%;">Login</a></li>
+                    <%}%>
 
-                <li style="float: none"><a
-                        class="text-white button tab-link bg-minus-1"
-                       href="#research" style="width:100%;">Research</a></li>
-                <li style="float: none"><a class="text-white button tab-link bg-minus-1"
-                       href="help" style="width:100%;">Help</a></li>
-            </ul>
+                    <li style="float: none"><a
+                            class="text-white button tab-link bg-minus-1"
+                            href="#research" style="width:100%;">Research</a></li>
+                    <li style="float: none"><a class="text-white button tab-link bg-minus-1"
+                                               href="help" style="width:100%;">Help</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
 <%
     ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
     request.getSession().removeAttribute("messages");
-    if (messages != null && ! messages.isEmpty()) {
+    if (messages != null && !messages.isEmpty()) {
 %>
 <div class="alert alert-info" id="messages-div">
     <% for (String m : messages) { %>
@@ -64,4 +78,4 @@
     <% } %>
     <script> $('#messages-div').delay(10000).fadeOut(); </script>
 </div>
-<%	} %>
+<% } %>

@@ -158,27 +158,3 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.codedefenders.util.Paths" %>
-<div class="menu-top bg-grey bg-plus-4 text-white" style="padding-bottom:0px;">
-    <div class="full-width">
-        <div class="nest">
-            <div class="crow fly nogutter">
-                <div>
-                    <div>
-                        <div class="tabs-blue-grey">
-                            <a href="${pageContext.request.contextPath}/" class="main-title" id="site-logo">
-                                <div class="crow">
-                                    <div id="home" class="ws-12" style="font-size: 36px; text-align: center;">
-                                        <span><img class="logo" href="${pageContext.request.contextPath}/" src="images/logo.png"/></span>
-                                        Code Defenders
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="bg-plus-3" style="padding:2px 0; margin-bottom: 0px; margin-top: 5px;"></div>
-    </div>
-</div>
-<div  style="background-color: #fafafa; min-height: 90%; padding-bottom: 20px;"/>

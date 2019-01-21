@@ -5641,7 +5641,7 @@ input[type=submit]:disabled:active {
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
   width: auto;
   -webkit-transition: all 0.2s ease;
   -moz-transition: all 0.2s ease;
