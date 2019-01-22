@@ -32,30 +32,11 @@
 <%@ page import="static org.codedefenders.game.GameState.ACTIVE" %>
 
 <div class="game-container">
-    <nav class="nest" style="width: 90%; margin-left: auto; margin-right: auto;">
+    <nav class="nest" style="width: 100%; margin-left: 0; margin-right: auto;">
         <div class="crow fly">
-            <div class="col-md-3"><h2><%= "Game " + game.getId() %>
+            <% String userRole = role.toString().toLowerCase(); %>
+            <div><h2 style="margin-top: 7px; text-transform: capitalize"><%= "Game " + game.getId() + " (" + userRole + ")" %>
             </h2></div>
-            <div class="col-md-6" style="text-align: center">
-                <h2>
-                    <%
-                        switch (role.toString()) {
-                            case "CREATOR": %>
-                    You're the creator of this game.
-                    <%
-                            break;
-                        case "ATTACKER": %>
-                    Attack the class!
-                    <%
-                            break;
-                        case "DEFENDER": %>
-                    Defend your class!
-                    <%
-                                break;
-                        }
-                    %>
-                </h2>
-            </div>
             <div>
                 <a href="#" class="btn btn-diff" id="btnScoringTooltip" data-toggle="modal"
                    data-target="#scoringTooltip"
