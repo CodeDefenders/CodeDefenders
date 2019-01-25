@@ -110,6 +110,7 @@ public class AdminAnalyticsKillMapsApi extends HttpServlet {
             "userName",
             "classId",
             "className",
+            "role",
             "usefulMutants",
             "usefulTests"
         };

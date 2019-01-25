@@ -35,6 +35,7 @@
                 <th>User Name</th>
                 <th>Class ID</th>
                 <th>Class Name</th>
+                <th>Role</th>
                 <th>Useful Mutants</th>
                 <th>Useful Tests</th>
                 <th>Useful Actions</th>
@@ -63,6 +64,7 @@
                     { "data": "userName" },
                     { "data": "classId" },
                     { "data": "className" },
+                    { "data": "role" },
                     { "data": "usefulMutants" },
                     { "data": "usefulTests" },
                     { "data":

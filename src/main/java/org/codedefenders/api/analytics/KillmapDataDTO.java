@@ -1,10 +1,13 @@
 package org.codedefenders.api.analytics;
 
+import org.codedefenders.game.Role;
+
 public class KillmapDataDTO implements Comparable<KillmapDataDTO> {
     private int userId;
     private int classId;
     private String userName;
     private String className;
+    private Role role;
     private int usefulMutants;
     private int usefulTests;
 
@@ -38,6 +41,14 @@ public class KillmapDataDTO implements Comparable<KillmapDataDTO> {
 
     public void setClassName(String className) {
         this.className = className;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 
     public int getUsefulMutants() {

@@ -21,6 +21,7 @@ package org.codedefenders.database;
 import org.codedefenders.api.analytics.ClassDataDTO;
 import org.codedefenders.api.analytics.KillmapDataDTO;
 import org.codedefenders.api.analytics.UserDataDTO;
+import org.codedefenders.game.Role;
 import org.codedefenders.model.Feedback;
 
 import java.util.List;
@@ -214,62 +215,68 @@ public class AnalyticsDAO {
         "       IFNULL(useful_tests.Useful_Tests,0)     AS Useful_Tests,",
         "       IFNULL(useful_mutants.Useful_Mutants,0) AS Useful_Mutants",
 
-        /* Get all (classId, userId) pairs for which data exists in the killmap. */
+        /* Get all (classId, userId, role) pairs for which data exists in the killmap. */
         "FROM",
-        "  (",
-        "    SELECT DISTINCT killmap.Class_ID AS Class_ID,",
-        "                    classes.Name     AS Class_Name,",
-        "                    users.User_ID    AS User_ID,",
-        "                    users.Username   AS User_Name",
-        "    FROM killmap, classes, mutants, players, users",
-        "    WHERE killmap.Class_ID = classes.Class_ID",
-        "      AND killmap.Mutant_ID = mutants.Mutant_ID",
-        "      AND mutants.Player_ID = players.ID",
-        "      AND players.User_ID = users.User_ID",
+        "(",
+        "  SELECT DISTINCT killmap.Class_ID AS Class_ID,",
+        "                  classes.Name     AS Class_Name,",
+        "                  users.User_ID    AS User_ID,",
+        "                  users.Username   AS User_Name,",
+        "                  players.Role     AS Role",
+        "  FROM killmap, classes, mutants, players, users",
+        "  WHERE killmap.Class_ID = classes.Class_ID",
+        "    AND killmap.Mutant_ID = mutants.Mutant_ID",
+        "    AND mutants.Player_ID = players.ID",
+        "    AND players.User_ID = users.User_ID",
 
-        "    UNION",
+        "  UNION",
 
-        "    SELECT DISTINCT killmap.Class_ID AS Class_ID,",
-        "                    classes.Name     AS Class_Name,",
-        "                    users.User_ID    AS User_ID,",
-        "                    users.Username   AS User_Name",
-        "    FROM killmap, classes, tests, players, users",
-        "    WHERE killmap.Class_ID = classes.Class_ID",
-        "      AND killmap.Test_ID = tests.Test_ID",
-        "      AND tests.Player_ID = players.ID",
-        "      AND players.User_ID = users.User_ID",
-        "  ) AS killmap_participations",
+        "  SELECT DISTINCT killmap.Class_ID AS Class_ID,",
+        "                  classes.Name     AS Class_Name,",
+        "                  users.User_ID    AS User_ID,",
+        "                  users.Username   AS User_Name,",
+        "                  players.Role     AS Role",
+        "  FROM killmap, classes, tests, players, users",
+        "  WHERE killmap.Class_ID = classes.Class_ID",
+        "    AND killmap.Test_ID = tests.Test_ID",
+        "    AND tests.Player_ID = players.ID",
+        "    AND players.User_ID = users.User_ID",
+        ") AS killmap_participations",
 
         /* Count number of useful tests. */
         "LEFT JOIN",
         "(",
         "  SELECT COUNT(DISTINCT killmap.Test_ID) AS Useful_Tests,",
         "         killmap.Class_ID                AS Class_ID,",
-        "         players.User_ID                 AS User_ID",
+        "         players.User_ID                 AS User_ID,",
+        "         players.Role                    AS Role",
         "  FROM killmap, tests, players",
         "  WHERE killmap.Status = 'KILL'",
         "    AND killmap.Test_ID = tests.Test_ID",
         "    AND tests.Player_ID = players.ID",
-        "  GROUP BY killmap.Class_ID, players.User_ID",
+        "  GROUP BY killmap.Class_ID, players.User_ID, players.Role",
         ") AS useful_tests",
         "  ON killmap_participations.Class_ID = useful_tests.Class_ID",
         "  AND killmap_participations.User_ID = useful_tests.User_ID",
+        "  AND killmap_participations.Role = useful_tests.Role",
 
         /* Count number of useful mutants. */
         "LEFT JOIN",
         "(",
         "  SELECT COUNT(DISTINCT killmap.Mutant_ID) AS Useful_Mutants,",
         "         killmap.Class_ID                  AS Class_ID,",
-        "         players.User_ID                   AS User_ID",
+        "         players.User_ID                   AS User_ID,",
+        "         players.Role                      AS Role",
         "  FROM killmap, mutants, players",
         "  WHERE EXISTS(SELECT k.Mutant_ID FROM killmap k WHERE k.Mutant_ID = killmap.Mutant_ID AND k.Status = 'KILL')",
         "    AND EXISTS(SELECT k.Mutant_ID FROM killmap k WHERE k.Mutant_ID = killmap.Mutant_ID AND k.Status = 'NO_KILL')",
         "    AND killmap.Mutant_ID = mutants.Mutant_ID",
         "    AND players.ID = mutants.Player_ID",
-        "  GROUP BY killmap.Class_ID, players.User_ID",
+        "  GROUP BY killmap.Class_ID, players.User_ID, players.Role",
         ") AS useful_mutants",
         "  ON killmap_participations.Class_ID = useful_mutants.Class_ID",
         "  AND killmap_participations.User_ID = useful_mutants.User_ID",
+        "  AND killmap_participations.Role = useful_mutants.Role",
 
         "ORDER BY Class_ID, User_ID;");
 
@@ -338,6 +345,7 @@ public class AnalyticsDAO {
             k.setClassName(rs.getString("Class_Name"));
             k.setUserId(rs.getInt("User_ID"));
             k.setUserName(rs.getString("User_Name"));
+            k.setRole(Role.valueOf(rs.getString("Role")));
             k.setUsefulMutants(rs.getInt("Useful_Mutants"));
             k.setUsefulTests(rs.getInt("Useful_Tests"));
             return k;
