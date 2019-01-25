@@ -57,6 +57,9 @@
     <li class="<%=active(activePage,"adminSystemSettings")%>">
         <a id="adminSystemSettings" href="<%=request.getContextPath()%>/admin/settings">System Settings</a>
     </li>
+    <li class="<%=active(activePage,"adminKillMaps")%>">
+        <a id="adminKillMaps" href="<%=request.getContextPath()%>/admin/killmaps">Generate KillMaps</a>
+    </li>
     <li class="<%=active(activePage,"adminAnalytics")%> dropdown">
         <a id="adminAnalytics" class="dropdown-toggle" data-toggle="dropdown" href="#">Analytics&#160&#160<span class="glyphicon glyphicon-menu-hamburger"></span></a>
         <ul class="dropdown-menu">

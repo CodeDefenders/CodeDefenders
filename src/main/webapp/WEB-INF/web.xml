@@ -416,6 +416,15 @@
     </servlet>
 
     <servlet-mapping>
+        <servlet-name>AdminKillMaps</servlet-name>
+        <url-pattern>/admin/killmaps</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>AdminKillMaps</servlet-name>
+        <servlet-class>org.codedefenders.servlets.admin.AdminKillMaps</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
         <servlet-name>AdminAnalyticsUsers</servlet-name>
         <url-pattern>/admin/analytics/users</url-pattern>
     </servlet-mapping>
@@ -458,6 +467,15 @@
     <servlet>
         <servlet-name>AdminAnalyticsClassesApi</servlet-name>
         <servlet-class>org.codedefenders.servlets.admin.api.AdminAnalyticsClassesApi</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AdminAnalyticsKillmapsApi</servlet-name>
+        <url-pattern>/admin/api/killmap</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>AdminAnalyticsKillmapsApi</servlet-name>
+        <servlet-class>org.codedefenders.servlets.admin.api.AdminAnalyticsKillMapsApi</servlet-class>
     </servlet>
     <!-- Admin pages end -->
 

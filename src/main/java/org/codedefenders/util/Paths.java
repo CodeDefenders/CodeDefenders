@@ -42,6 +42,7 @@ public class Paths {
     public static final String ADMIN_MONITOR = "/admin/monitor";
     public static final String ADMIN_USERS = "/admin/users";
     public static final String ADMIN_SETTINGS = "/admin/settings";
+    public static final String ADMIN_KILLMAPS = "/admin/killmaps";
 
     public static final String ADMIN_ANALYTICS_USERS = "/admin/analytics/users";
     public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";
@@ -54,4 +55,5 @@ public class Paths {
     public static final String API_SEND_EMAIL = "/api/sendmail";
     public static final String API_ANALYTICS_USERS = "/admin/api/users";
     public static final String API_ANALYTICS_CLASSES = "/admin/api/classes";
+    public static final String API_ANALYTICS_KILLMAP = "/admin/api/killmap";
 }

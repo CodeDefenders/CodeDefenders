@@ -331,7 +331,7 @@ public class AnalyticsDAO {
         });
     }
 
-    public static List<KillmapDataDTO> getAnalyticsKillmapData() throws UncheckedSQLException, SQLMappingException {
+    public static List<KillmapDataDTO> getAnalyticsKillMapData() throws UncheckedSQLException, SQLMappingException {
         return DB.executeQueryReturnList(ANALYTICS_KILLMAP_USEFUL_ACTIONS_QUERY, rs -> {
             KillmapDataDTO k = new KillmapDataDTO();
             k.setClassId(rs.getInt("Class_ID"));
