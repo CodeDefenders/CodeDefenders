@@ -25,7 +25,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.httpclient.HttpStatus;
 import org.codedefenders.api.analytics.ClassDataDTO;
-import org.codedefenders.database.ApiDAO;
+import org.codedefenders.database.AnalyticsDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +81,7 @@ public class AdminAnalyticsClassesApi extends HttpServlet {
         response.setContentType("application/json");
 
         long timeStart = System.currentTimeMillis();
-        List<ClassDataDTO> classData = ApiDAO.getAnalyticsClassData();
+        List<ClassDataDTO> classData = AnalyticsDAO.getAnalyticsClassData();
         long timeEnd = System.currentTimeMillis();
 
         PrintWriter out = response.getWriter();
@@ -103,7 +103,7 @@ public class AdminAnalyticsClassesApi extends HttpServlet {
     private void getCSV(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
 
-        List<ClassDataDTO> classData = ApiDAO.getAnalyticsClassData();
+        List<ClassDataDTO> classData = AnalyticsDAO.getAnalyticsClassData();
 
         String[] columns = new String[]{
             "id",

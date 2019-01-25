@@ -19,19 +19,13 @@
 package org.codedefenders.servlets.admin.api;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.mysql.cj.xdevapi.JsonString;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.lang.time.DateUtils;
 import org.codedefenders.api.analytics.UserDataDTO;
-import org.codedefenders.database.ApiDAO;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.database.AnalyticsDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,11 +35,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
-import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 public class AdminAnalyticsUsersApi extends HttpServlet {
@@ -90,7 +81,7 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
         response.setContentType("application/json");
 
         long timeStart = System.currentTimeMillis();
-        List<UserDataDTO> userData = ApiDAO.getAnalyticsUserData();
+        List<UserDataDTO> userData = AnalyticsDAO.getAnalyticsUserData();
         long timeEnd = System.currentTimeMillis();
 
         PrintWriter out = response.getWriter();
@@ -112,7 +103,7 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
     private void getCSV(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
 
-        List<UserDataDTO> userData = ApiDAO.getAnalyticsUserData();
+        List<UserDataDTO> userData = AnalyticsDAO.getAnalyticsUserData();
 
         String[] columns = new String[]{
             "id",
