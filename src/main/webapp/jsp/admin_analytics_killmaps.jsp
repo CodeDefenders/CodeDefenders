@@ -49,6 +49,34 @@
         <a download="killmap-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?type=json"
            type="button" class="btn btn-default" id="download-json">Download as JSON</a>
     </div>
+    <div style="display: inline-block; margin-left: 10px;">
+        <a data-toggle="collapse" href="#explanation" style="color: black">
+            <span class="glyphicon glyphicon-question-sign"></span>
+        </a>
+    </div>
+
+    <div id="explanation" class="collapse panel panel-default" style="margin-top: 10px;">
+        <div class="panel-body" style="padding: 10px;">
+            This table uses data from the class killmaps to determine the number of useful tests and mutants per
+            player, class and role.
+            <p></p>
+            <table>
+                <tr>
+                    <td><b>Useful Tests:</b></td>
+                    <td>Number of tests, which killed at least one mutant.</td>
+                </tr>
+                <tr>
+                    <td><b>Useful Mutants:</b></td>
+                    <td>Number of mutants, which were killed by at least one test,
+                        but were covered and not killed by at least one other test.</td>
+                </tr>
+                <tr>
+                    <td><b>Useful Actions:</b></td>
+                    <td>Sum of useful tests and useful mutants.</td>
+                </tr>
+            </table>
+        </div>
+    </div>
 
     <script>
         var table;
@@ -73,6 +101,9 @@
                             }
                     }
                 ],
+                /* "columnDefs": [
+                    { className: "text-right", "targets": [0,2,5,6,7] },
+                ], */
                 "pageLength": 50,
                 "order": [[ 1, "asc" ]]
             });
