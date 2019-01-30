@@ -5648,7 +5648,7 @@ input[type=submit]:disabled:active {
   -o-transition: all 0.2s ease;
   -ms-transition: all 0.2s ease;
   transition: all 0.2s ease;
-  display: inline-block;
+  /* display: inline-block; */
   *display: inline;
   *zoom: 1;
   -webkit-box-shadow: 0px 1px 2px 1px rgba(0,0,0,0.12);

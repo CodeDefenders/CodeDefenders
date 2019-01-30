@@ -29,7 +29,7 @@
 
 <script>
     //If the user is logged in, start receiving notifications
-    var updateUserNotifications = function(url) {
+    var updateUserNotifications = function (url) {
         $.getJSON(url, function (r) {
 
             var notificationCount = 0;
@@ -44,7 +44,7 @@
                     "</a></li>"
                 );
 
-                if (r[index].eventStatus == "NEW"){
+                if (r[index].eventStatus == "NEW") {
                     notificationCount += 1;
                 }
             });
@@ -82,33 +82,39 @@
 <div class="menu-top bg-light-blue .minus-2 text-white" style="padding: 5px;">
     <div class="full-width">
         <div class="row ws-12 container" style="text-align: right; clear:
-        both; width: 100%">
-            <a id="site-logo" class="main-title text-white tab-link bg-minus-1"
+        both; width: 100%; padding: 0">
+
+            <!-- toggle menu button for small frames -->
+            <button type="button"
+                    class="navbar-toggle collapsed text-white button tab-link bg-minus-1"
+                    data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1"
+            style="margin-top: 3px">
+                Menu <span class="glyphicon glyphicon-plus"></span>
+            </button>
+
+            <!-- logo and pagetitle -->
+            <a id="site-logo" class="navbar-brand site-logo main-title text-white tab-link"
                href="${pageContext.request.contextPath}/">
                 <img class="logo" href="${pageContext.request.contextPath}/"
-                     src="images/logo.png" style="float:left; margin-left: 10px; margin-right: 10px"/>
-                <div id="home"
-                     style="text-align: center; font-size: x-large; padding: 15px 20px 0 0;float: left">
+                     src="images/logo.png" style="float:left; margin-left: 15px; margin-right: 10px"/>
+                <div id="headerhome"
+                     style="text-align: center; font-size: x-large; padding: 15px 20px 0 0; float: left">
                     Code Defenders
                 </div>
             </a>
-            <button type="button"
-                    class="navbar-toggle tex-white buton tab-link bg-minus-1" data-toggle="collapse"
-                    data-target="#bs-example-navbar-collapse-1">
-                Menu <span class="glyphicon glyphicon-plus"></span>
-            </button>
-            <div class="col-md-9">
-                <ul
-                        class="crow fly no-gutter navbar navbar-nav collapse navbar-collapse"
-                        id="bs-example-navbar-collapse-1"
-                        style="z-index: 1000; text-align: center; list-style: none;
-                 width: 100%; float: right; padding-top: 3px">
-                    <li style="float: none" class="dropdown bg-light-blue"><a
+
+            <!-- navigation bar -->
+            <div id="bs-example-navbar-collapse-1" class="navbar-collapse collapse">
+                <ul class="crow no-gutter nav navbar-nav" style="display: flow-root">
+
+                    <!-- Multiplayer dropdown -->
+                    <li class="col-md-4 dropdown bg-light-blue"><a
                             id="headerGamesDropdown"
                             class="text-white button tab-link bg-minus-1 dropdown-toggle"
-                            href="<%=request.getContextPath() + Paths.GAMES_OVERVIEW%>"
-                            style="width:100%;" data-toggle="dropdown" href="#"> Multiplayer <span
-                            class="glyphicon glyphicon-menu-hamburger" style="float: right;"></span></a>
+                            data-toggle="dropdown" style="width: 100%"> Multiplayer <span
+                            class="glyphicon glyphicon-menu-hamburger"
+                            style="float: right; margin-left: 30px"></span></a>
                         <ul class="dropdown-menu" style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
                             <li><a id="headerUserGames" href="<%=request.getContextPath()  + Paths.GAMES_OVERVIEW%>"
@@ -120,24 +126,31 @@
                                    style="width: 100%;">Leaderboard</a></li>
                         </ul>
                     </li>
-                    <li style="float: none"><a id="puzzleOverview" class="text-white button tab-link bg-minus-1"
-                                               href="<%=request.getContextPath() + Paths.PUZZLE_OVERVIEW%>"
-                                               style="width:100%;">Puzzles</a></li>
 
-                    <li style="float: none; white-space: nowrap;" class="dropdown"><a
+                    <!-- Puzzles -->
+                    <li class="col-md-4"><a id="puzzleOverview" class="text-white button tab-link bg-minus-1"
+                                            href="<%=request.getContextPath() + Paths.PUZZLE_OVERVIEW%>"
+                                            style="width: 100%; margin-right: 60px">
+                        Puzzles
+                    </a></li>
+
+                    <!-- User -->
+                    <li class="col-md-4 dropdown"><a
                             id="headerUserDropdown"
                             class="text-white button tab-link bg-minus-1 dropdown-toggle bg-light-blue"
                             href="<%=request.getContextPath() + Paths.GAMES_OVERVIEW%>"
-                            style="width:100%;" data-toggle="dropdown" href="#"><span class="glyphicon glyphicon-user"
-                                                                                      aria-hidden="true"></span>
+                            data-toggle="dropdown" href="#"
+                            style="width: 100%"><span class="glyphicon glyphicon-user"
+                                                      aria-hidden="true"></span>
                         <%=request.getSession().getAttribute("username")%>
                         (<span id="notificationCount"></span>)
-                        <span class="glyphicon glyphicon-menu-hamburger" style="float: right"></span></a>
+                        <span class="glyphicon glyphicon-menu-hamburger" style="float: right; margin-left: 15px"></span></a>
                         <ul id="userDropDown" class="dropdown-menu"
                             style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
                             <li><a id="headerHelpButton"
-                                   href="<%=request.getContextPath()%>/help" style="width:100%; border-bottom:1px solid">Help</a></li>
+                                   href="<%=request.getContextPath()%>/help"
+                                   style="width:100%; border-bottom:1px solid">Help</a></li>
                             <li><a
                                     id="headerLogout"
                                     href="<%=request.getContextPath() + Paths.LOGOUT%>"

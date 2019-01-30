@@ -343,7 +343,7 @@ th, td {
 }
 
 .button.tab-link, .button.list-item{
-	text-transform: lowercase;
+	/* text-transform: lowercase; */
 }
 
 .footer .container .text-muted {
