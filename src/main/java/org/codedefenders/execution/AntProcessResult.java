@@ -18,6 +18,7 @@
  */
 package org.codedefenders.execution;
 
+import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,13 +71,40 @@ public class AntProcessResult {
 				} else if (line.equalsIgnoreCase("BUILD SUCCESSFUL"))
 					compiled = true;
 			}
-			compilerOutput = compilerOutputBuilder.toString();
+			compilerOutput = sanitize(compilerOutputBuilder.toString());
 			testOutput = testOutputBuilder.toString();
 			inputStreamText = isLog.toString();
 		} catch (IOException e) {
 			logger.error("Error while reading input stream", e);
 		}
 	}
+
+    /**
+     * Sanitize the compiler output by identifying the output folder and
+     * removing it from the compiler output before sending it over the clients.
+     *
+     * @param fullCompilerOutput
+     * @return
+     */
+    private String sanitize(String fullCompilerOutput) {
+        String outputFolder = null; // This is what we shall remove from the log
+        StringBuffer sanitized = new StringBuffer();
+        for (String line : fullCompilerOutput.split("\n")) {
+            // This might not work with dependencies, but we should always
+            // mutate one file at time, right?
+            if (line.startsWith("[javac] Compiling 1 source file to ")) {
+                // Get the value of the output folder
+                outputFolder = line.replace("[javac] Compiling 1 source file to ", "");
+            } else {
+                if (line.contains(outputFolder)) {
+                    line = line.replace(outputFolder + Constants.F_SEP, "");
+                }
+                // Pass it along the output
+                sanitized.append(line).append("\n");
+            }
+        }
+        return sanitized.toString();
+    }
 
 	void setErrorStreamText(String errorStreamText) {
 		this.errorStreamText = errorStreamText;
