@@ -85,7 +85,7 @@ public class AntProcessResult {
      * decoration utility, and possibly the sanitize methods to some other
      * components.
      */
-    private String decorateWithLinksToCode(String sanitize) {
+    private String decorateWithLinksToCode(String compilerOutput) {
         StringBuffer decorated = new StringBuffer();
         Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
         for (String line : compilerOutput.split("\n")) {
