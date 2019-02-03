@@ -100,9 +100,17 @@
     <script type="text/javascript">
     function jumpToLine(i) {
         var editor = document.querySelector('#code').nextSibling.CodeMirror;
-            // This is to scrool down the view. Not sure how to achieve this
-            var scrollingElement = (document.scrollingElement || document.body);
-            scrollingElement.scrollTop = scrollingElement.scrollHeight;
+            // This is to scrool down the view to the form containing the code.
+            var form = document.getElementById("atk")
+            if (form == null ){
+                form = document.getElementById("def")
+            }
+            if (form == null ){
+                // We are not in a game page since there's no attacker or defender form
+                return;
+            }
+            form.scrollIntoView()
+
             // This highlights the selected line
             editor.setCursor(i-1);
             // This simulate scrolling down inside code mirror view
