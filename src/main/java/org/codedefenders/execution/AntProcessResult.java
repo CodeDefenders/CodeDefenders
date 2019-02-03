@@ -71,37 +71,13 @@ public class AntProcessResult {
 				} else if (line.equalsIgnoreCase("BUILD SUCCESSFUL"))
 					compiled = true;
 			}
-			compilerOutput = decorateWithLinksToCode( sanitize(compilerOutputBuilder.toString()) );
+			compilerOutput = sanitize(compilerOutputBuilder.toString());
 			testOutput = testOutputBuilder.toString();
 			inputStreamText = isLog.toString();
 		} catch (IOException e) {
 			logger.error("Error while reading input stream", e);
 		}
 	}
-
-    /**
-     * Add links that points to line for errors. Not sure that invoking a JS
-     * function suing a link in this way is 100% safe ! XXX Consider to move the
-     * decoration utility, and possibly the sanitize methods to some other
-     * components.
-     */
-    private String decorateWithLinksToCode(String compilerOutput) {
-        StringBuffer decorated = new StringBuffer();
-        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
-        for (String line : compilerOutput.split("\n")) {
-            Matcher m = p.matcher(line);
-            if (m.find()) {
-                // Replace the line number with the link, which contains the
-                // line number
-                String replaced = line.replaceAll("(\\[javac\\].*\\.java:)([0-9]+)(: error:.*)",
-                        "$1<a onclick=\"jumpToLine($2)\" href=\"javascript:void(0);\">$2<\\/a>$3");
-                decorated.append(replaced).append("\n");
-            } else {
-                decorated.append(line).append("\n");
-            }
-        }
-        return decorated.toString();
-    }
 
     /**
      * Sanitize the compiler output by identifying the output folder and
