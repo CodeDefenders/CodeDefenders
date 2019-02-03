@@ -35,7 +35,7 @@
             var notificationCount = 0;
 
             $(r).each(function (index) {
-                $("#userDropDown li:first-child").after(
+                $("#userDropDown li:last-child").after(
                     "<li><a " +
                     "href=\"" + "<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>"
                     + "?gameId=" + r[index].gameId +
@@ -150,12 +150,11 @@
                         #FFFFFF; border: 1px solid #000000;">
                             <li><a id="headerHelpButton"
                                    href="<%=request.getContextPath()%>/help"
-                                   style="width:100%; border-bottom:1px solid">Help</a></li>
+                                   style="width:100%">Help</a></li>
                             <li><a
                                     id="headerLogout"
                                     href="<%=request.getContextPath() + Paths.LOGOUT%>"
-                                    style="width:100%;border-bottom:1px solid
-                               black">Logout
+                                    style="width:100%;border-bottom:1px solid">Logout
                             </a></li>
                         </ul>
                     </li>
