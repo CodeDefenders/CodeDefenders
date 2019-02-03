@@ -214,7 +214,9 @@ public class CodeValidator {
 		}
 		// We cannot use equality here because inserting empty lines will change the lineStart attribute of the Comment node.
 		for (int i = 0; i < originalComments.length; i++) {
-			if (!originalComments[i].toString().equals(mutatedComments[i].toString())) {
+		    // Somehow the mutated comments contain char(13) '\r' in addition to '\n'
+		    // TODO Where those come from? CodeMirror? 
+			if ( ! originalComments[i].toString().replaceAll("\\r","").equals(mutatedComments[i].toString().replaceAll("\\r","")) ) {
 				return true;
 			}
 		}

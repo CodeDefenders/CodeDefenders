@@ -57,8 +57,7 @@
 
 </div> <%-- TODO move the whole div here after changing the header --%>
 
-<div class="admin-panel">
-	<h2>Admin</h2>
+<div class="admin-panel col-md-12">
 	<form id="adminEndBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post" style="display: inline-block;">
 		<button type="submit" class="btn btn-primary btn-game btn-left" id="endGame" form="adminEndBtn"
 				<% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>

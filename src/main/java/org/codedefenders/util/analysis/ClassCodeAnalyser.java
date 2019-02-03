@@ -1,5 +1,14 @@
 package org.codedefenders.util.analysis;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.apache.commons.lang3.Range;
+import org.apache.xerces.util.SynchronizedSymbolTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseProblemException;
 import com.github.javaparser.ast.CompilationUnit;
@@ -10,18 +19,13 @@ import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.FieldDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.comments.Comment;
 import com.github.javaparser.ast.stmt.BlockStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.type.PrimitiveType;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
-
-import org.apache.commons.lang3.Range;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * Code analysing class which uses {@link ResultVisitor} to iterate through java class code
@@ -80,14 +84,75 @@ public class ClassCodeAnalyser {
         public void visit(BlockStmt n, CodeAnalysisResult result) {
             super.visit(n, result);
 
+            int blockStart = n.getBegin().get().line;
+            int blockEnd = n.getEnd().get().line;
+            
+            Set<Integer> nonEmptyLines = new HashSet<>();
+
+            // Those correspond to '{' and '}' and are not empty by default
+            
+            nonEmptyLines.add(blockStart);
+            nonEmptyLines.add(blockEnd);
+            
+            // Lines which contain comments are not empty
+            for(Comment c : n.getAllContainedComments()){
+                for(int line = c.getBegin().get().line; line <= c.getEnd().get().line; line ++ ){
+                    nonEmptyLines.add( line );
+                } 
+            }
+
+            // Processing the block
             NodeList<Statement> statements = n.getStatements();
             if (!statements.isEmpty()) {
+                // Lines which contain statements (and are not block themselves) are not empty
+                for( Statement s : statements ){
+                    if( s instanceof BlockStmt ){
+                        continue;
+                    }
+                    for(int line = s.getBegin().get().line; line <= s.getEnd().get().line; line ++ ){
+                        nonEmptyLines.add( line );
+                    }
+                }
+                
                 Statement lastInnerStatement = statements.get(statements.size() - 1);
                 int end = n.getEnd().get().line;
                 if (lastInnerStatement.getEnd().get().line < end) {
                     result.nonCoverableCode(end);
                 }
+
+            
+                Set<Integer> emptyLines = new HashSet<>();
+                // At this point we get empty lines by difference by removing from the block all the non empty lines
+                for( int line = blockStart; line <= blockEnd; line ++ ){
+                    if( nonEmptyLines.contains( line ) ){
+                        continue;
+                    }
+                    result.emptyLine(line);
+                    emptyLines.add(line);
+                }
+                
+                // We finally found the lines which can cover those empty lines by looking at the first non-empty, non-comment statement
+                // If that is covered, then the empty is covered. TODO Not sure how we handle the '{' opening the blocks tho.
+                for(int emptyLine : emptyLines){
+                    // By default the end of the block which directly contains the empty line is the statement which can cover it
+                    int coveringLine = blockEnd;
+                    for( Statement s : statements ){
+                        int sStart = s.getBegin().get().line;
+                        if( sStart < emptyLine ){
+                            // Skip statements that are before the empty line
+                            continue;
+                        } else {
+                            // This works because statements are not empty and are not comments
+                            if( sStart <= coveringLine ){
+                                coveringLine = sStart;
+                            }
+                        }
+                    } 
+                    result.lineCoversEmptyLine(coveringLine, emptyLine);
+                }
             }
+            
+            
         }
 
         @Override
