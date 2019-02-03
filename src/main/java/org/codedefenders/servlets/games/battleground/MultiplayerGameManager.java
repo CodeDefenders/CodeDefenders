@@ -60,6 +60,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -290,7 +292,12 @@ public class MultiplayerGameManager extends HttpServlet {
 
         if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
-            messages.add(StringEscapeUtils.escapeHtml(compileTestTarget.message));
+            // We escape the content of the message for new tests since user can embed there anything
+            String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message); 
+            // We introduce our decoration
+            String decorate = decorateWithLinksToCode( escapedHtml );
+            messages.add( decorate );
+            //
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
@@ -321,6 +328,30 @@ public class MultiplayerGameManager extends HttpServlet {
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
     }
 
+    /**
+     * Add links that points to line for errors. Not sure that invoking a JS
+     * function suing a link in this way is 100% safe ! XXX Consider to move the
+     * decoration utility, and possibly the sanitize methods to some other
+     * components.
+     */
+    private String decorateWithLinksToCode(String compilerOutput) {
+        StringBuffer decorated = new StringBuffer();
+        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
+        for (String line : compilerOutput.split("\n")) {
+            Matcher m = p.matcher(line);
+            if (m.find()) {
+                // Replace the line number with the link, which contains the
+                // line number
+                String replaced = line.replaceAll("(\\[javac\\].*\\.java:)([0-9]+)(: error:.*)",
+                        "$1<a onclick=\"jumpToLine($2)\" href=\"javascript:void(0);\">$2<\\/a>$3");
+                decorated.append(replaced).append("\n");
+            } else {
+                decorated.append(line).append("\n");
+            }
+        }
+        return decorated.toString();
+    }
+    
     private void createMutant(HttpServletRequest request, HttpServletResponse response, int gameId, MultiplayerGame game) throws IOException {
         final int userId = ServletUtils.userId(request);
 
@@ -395,9 +426,13 @@ public class MultiplayerGameManager extends HttpServlet {
         TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
         if (compileMutantTarget == null || compileMutantTarget.status != TargetExecution.Status.SUCCESS) {
             messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
+            // There's a ton of defensive programming here...
             if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty()) {
-                // Add compile output
-                messages.add(compileMutantTarget.message);
+                // We escape the content of the message for new tests since user can embed there anything
+                String escapedHtml = StringEscapeUtils.escapeHtml(compileMutantTarget.message); 
+                // We introduce our decoration
+                String decorate = decorateWithLinksToCode( escapedHtml );
+                messages.add( decorate );
             }
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);

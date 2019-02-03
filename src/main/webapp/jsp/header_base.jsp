@@ -90,6 +90,40 @@
     <link href="codemirror/addon/search/matchesonscrollbar.css" rel="stylesheet" type="text/css" >
     <link href="codemirror/addon/hint/show-hint.css" rel="stylesheet" type="text/css" >
 
+    <%-- This function shall be loaded on any page in which we compile the mutant --%>
+    <%-- Sources:
+        https://stackoverflow.com/questions/688196/how-to-use-a-link-to-call-javascript/688228#688228
+        https://stackoverflow.com/questions/11715646/scroll-automatically-to-the-bottom-of-the-page
+        https://stackoverflow.com/questions/10575343/codemirror-is-it-possible-to-scroll-to-a-line-so-that-it-is-in-the-middle-of-w/10725768
+    --%>
+    <!-- Function to link compiler error messages to code mirror -->
+    <script type="text/javascript">
+    function jumpToLine(i) {
+        var editor = document.querySelector('#code').nextSibling.CodeMirror;
+            // This is to scrool down the view to the form containing the code.
+            var form = document.getElementById("atk")
+            if (form == null ){
+                form = document.getElementById("def")
+            }
+            if (form == null ){
+                // We are not in a game page since there's no attacker or defender form
+                return;
+            }
+            form.scrollIntoView()
+
+            // This highlights the selected line
+            editor.setCursor(i-1);
+            // This simulate scrolling down inside code mirror view
+            window.setTimeout(function() {
+                editor.addLineClass(i-1, null, "center-me");
+                var line = $('.CodeMirror-lines .center-me');
+                var h = line.parent();
+                $('.CodeMirror-scroll').scrollTop(0).scrollTop(line.offset().top - $('.CodeMirror-scroll').offset().top - Math.round($('.CodeMirror-scroll').height()/2));
+           }, 200);
+        }
+    </script>
+
+
     <!-- Table sorter -->
     <script type="text/javascript" src="js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="js/moment.min.js"></script> <!-- must come before datetime-moment -->
