@@ -343,7 +343,7 @@ th, td {
 }
 
 .button.tab-link, .button.list-item{
-	text-transform: lowercase;
+	/* text-transform: lowercase; */
 }
 
 .footer .container .text-muted {
@@ -360,7 +360,7 @@ th, td {
 }
 
 .menu-top {
-	height: 64px;
+	height: 60px;
 
 }
 
@@ -383,7 +383,7 @@ img.displayed {
 }
 
 img.logo {
-    max-width:45px;
+    max-width:40px;
 }
 
 nav {
