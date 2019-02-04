@@ -109,9 +109,8 @@
                 <ul class="crow no-gutter nav navbar-nav" style="display: flow-root">
 
                     <!-- Multiplayer dropdown -->
-                    <li class="col-md-4 dropdown bg-light-blue"><a
-                            id="headerGamesDropdown"
-                            class="text-white button tab-link bg-minus-1 dropdown-toggle"
+                    <li class="col-md-4 dropdown"><a id="headerGamesDropdown"
+                            class="text-white button tab-link bg-minus-1 dropdown-toggle" href="#"
                             data-toggle="dropdown" style="width: 100%"> Multiplayer <span
                             class="glyphicon glyphicon-menu-hamburger"
                             style="float: right; margin-left: 30px"></span></a>
@@ -137,8 +136,7 @@
                     <!-- User -->
                     <li class="col-md-4 dropdown"><a
                             id="headerUserDropdown"
-                            class="text-white button tab-link bg-minus-1 dropdown-toggle bg-light-blue"
-                            href="<%=request.getContextPath() + Paths.GAMES_OVERVIEW%>"
+                            class="text-white button tab-link bg-minus-1 dropdown-toggle"
                             data-toggle="dropdown" href="#"
                             style="width: 100%"><span class="glyphicon glyphicon-user"
                                                       aria-hidden="true"></span>
