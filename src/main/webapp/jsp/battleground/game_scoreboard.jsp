@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="org.codedefenders.database.TestDAO"%>
+<%@page import="org.codedefenders.database.MutantDAO"%>
 <%@ page import="org.codedefenders.database.UserDAO" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ page import="org.codedefenders.model.User" %>
@@ -29,8 +31,8 @@
 
     HashMap testScores = game.getTestScores();
 
+    // Those return the PlayerID not the UserID
     int[] attackers = game.getAttackerIds();
-
     int[] defenders = game.getDefenderIds();
 %>
 <div id="scoreboard" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
@@ -70,6 +72,14 @@
                             continue;
                         }
                         User aUser = UserDAO.getUserForPlayer(i);
+                        
+                        // Does system attacker submitted any mutant?
+                        // TODO #418: we use UserId instead of PlayerID because there's a bug in the logic which initialize the game.
+                        // For system generated mutants,  mutant.playerID == userID, which is wrong...
+                        if(aUser.getId() == 3 && MutantDAO.getMutantsByGameAndUser(game.getId(), aUser.getId()).isEmpty() ){
+                           continue;
+                        }
+                        
                         total = 0;
                         int counter = 0;
                         %>
@@ -167,6 +177,13 @@
                                 continue;
                             }
                             User dUser = UserDAO.getUserForPlayer(i);
+                            
+                            // XXX: Hardcoded id for system user
+                            // TODO #418
+                            if(dUser.getId() == 4 && TestDAO.getTestsForGameAndUser(game.getId(), dUser.getId()).isEmpty() ){
+                                continue;
+                             }
+                            
                             total = 0;
                     %>
                     <tr class="defender"><td>
