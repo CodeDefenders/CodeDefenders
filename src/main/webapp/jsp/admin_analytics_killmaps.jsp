@@ -18,132 +18,97 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.execution.KillMap"%>
-<%@ page import="org.codedefenders.execution.KillMap.KillMapJob"%>
-<%@ page import="org.codedefenders.execution.KillMap.KillMapJob.Type"%>
-<%@ page import="org.codedefenders.execution.KillMapProcessor"%>
-<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings"%>
-<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO"%>
-<%@ page import="org.codedefenders.database.GameClassDAO" %>
-
-<%
-    String pageTitle = null;
-%>
-<%@ include file="/jsp/header_main.jsp"%>
+<% String pageTitle = null; %>
+<%@ include file="/jsp/header_main.jsp" %>
 
 <div class="full-width">
-	<%
-    request.setAttribute("adminActivePage", "adminAnalytics");
-	   
-    KillMapProcessor killMapProcessor = (KillMapProcessor) request.getServletContext().getAttribute(KillMapProcessor.NAME);
-    int gamePendingJobs = 0;
-    int classPendingJobs = 0;
-    for( KillMap.KillMapJob pendingJob : killMapProcessor.getPendingJobs() ){
-        switch (pendingJob.getType()) {
-        case CLASS:
-            classPendingJobs += 1;
-            break;
-        case GAME:
-            gamePendingJobs += 1;
-            break;
-        }
-    }
-    
-	%>
-	<%@ include file="/jsp/admin_navigation.jsp"%>
+    <% request.setAttribute("adminActivePage", "adminAnalytics"); %>
+    <%@ include file="/jsp/admin_navigation.jsp" %>
 
-	<h3>KillMaps</h3>
-	<h4>Status</h4>
-	<%-- Use this as starting point to provide more fine grained details and controls: --%>
-	<p>
-		Pending KillMap Jobs for Games:
-		<%= gamePendingJobs %>
-		</p>
-	<p>
-        Pending KillMap Jobs for Classes:
-        <%= classPendingJobs %>
-        </p>
+    <h3>Useful Actions</h3>
 
-	<h4>Submit KillMap Jobs for Classes</h4>
-	<div class="full-width">
-		<form id="killmapJobSubmission" name="killmapJobSubmission"
-              action="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_KILLMAPS%>" method="post">
-		<%-- For each class in the DB gives the possibility to create the killmap. Additional data might be shown as well as in the Classes Analytics
-		but I cannot figure out how data are provided there ...--%>
-		    
-            <input type="hidden" name="formType" value="submitKillMapClassJob">
-            
-    <table id="tableClasses"
+    <table id="tableKillmaps"
            class="table table-striped table-hover table-responsive">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>Name</th>
-                <th>Alias</th>
-                <th>Action</th>
+                <th>User ID</th>
+                <th>User Name</th>
+                <th>Class ID</th>
+                <th>Class Name</th>
+                <th>Role</th>
+                <th>Useful Mutants</th>
+                <th>Useful Tests</th>
+                <th>Useful Actions</th>
             </tr>
         </thead>
-        <tbody>
-                <%
-                for (GameClass cut : GameClassDAO.getAllClasses()) {
-                    // Probably we should avoid listing here puzzle games classes
-                %>
+    </table>
+
+    <div class="btn-group">
+        <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?type=csv"
+            type="button" class="btn btn-default" id="download-csv">Download as CSV</a>
+        <a download="killmap-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?type=json"
+           type="button" class="btn btn-default" id="download-json">Download as JSON</a>
+    </div>
+    <div style="display: inline-block; margin-left: 10px;">
+        <a data-toggle="collapse" href="#explanation" style="color: black">
+            <span class="glyphicon glyphicon-question-sign"></span>
+        </a>
+    </div>
+
+    <div id="explanation" class="collapse panel panel-default" style="margin-top: 10px;">
+        <div class="panel-body" style="padding: 10px;">
+            This table uses data from the class killmaps to determine the number of useful tests and mutants per
+            player, class and role.
+            <p></p>
+            <table>
                 <tr>
-                    <td><%= cut.getId() %></td>
-                    <td><%= cut.getName() %></td>
-                    <td><%= cut.getAlias() %></td>
-                    <td>
-                        <button type="submit"
-                            id="<%= cut.getId() %>" name="classID" value="<%= cut.getId() %>"
-                            class="btn btn-primary"  aria-label="Submit a job for this class" id="saveSettingsBtn">
-                            <span class="glyphicon glyphicon-send" aria-hidden="true"></span>
-                        </button>
-                    </td>
+                    <td><b>Useful Tests:</b></td>
+                    <td>Number of tests, which killed at least one mutant.</td>
                 </tr>
-                <%
-                }
-                %>
-		</tbody>
-    </table>	
-    
-			
-	   </form>
-	</div>
+                <tr>
+                    <td><b>Useful Mutants:</b></td>
+                    <td>Number of mutants, which were killed by at least one test,
+                        but were covered and not killed by at least one other test.</td>
+                </tr>
+                <tr>
+                    <td><b>Useful Actions:</b></td>
+                    <td>Sum of useful tests and useful mutants.</td>
+                </tr>
+            </table>
+        </div>
+    </div>
 
-	<h4>Settings</h4>
-	<div class="full-width">
-		<form id="killmapProcessorSettings" name="killmapProcessorSettings"
-              action="<%=request.getContextPath() + Paths.ADMIN_ANALYTICS_KILLMAPS%>" method="post">
-			<input type="hidden" name="formType" value="updateSettings">
+    <script>
+        var table;
 
-			<%
-			    for (AdminSystemSettings.SettingsDTO setting : AdminDAO.getSystemSettings()) {
-			        if( ! AdminSystemSettings.SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.equals( setting.getName())){
-			            continue;
-			        }
-			        String readableName = setting.getName().name().toLowerCase().replace("_", " ");
-			        String explanation = setting.getName().toString();
-			        switch (setting.getType()) {
-			        case BOOL_VALUE:
-			%>
-			<div class="input-group" id="<%="group_"+setting.getName().name()%>">
-				<span class="input-group-addon"
-					style="width: 250px; text-align: left;" title="<%=explanation%>"><%=readableName%>
-				</span> <input type="checkbox" id="<%=setting.getName().name()%>"
-					name="<%=setting.getName().name()%>" class="form-control"
-					data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
-					data-onstyle="primary" data-offstyle=""
-					<%=setting.getBoolValue() ? "checked" : ""%>>
-			</div>
-            <%
-                         break;
+        $(document).ready(function() {
+            table = $('#tableKillmaps').DataTable({
+                "ajax": {
+                    "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_KILLMAP%>",
+                    "dataSrc": "data"
+                },
+                "columns": [
+                    { "data": "userId" },
+                    { "data": "userName" },
+                    { "data": "classId" },
+                    { "data": "className" },
+                    { "data": "role" },
+                    { "data": "usefulMutants" },
+                    { "data": "usefulTests" },
+                    { "data":
+                            function(row, type, val, meta) {
+                                return row.usefulMutants + row.usefulTests;
+                            }
                     }
-			   }
-		    %>
-			<br>
-			<button type="submit" class="btn btn-primary" name="saveSettingsBtn"
-				id="saveSettingsBtn">Save</button>
-		</form>
-	</div>
+                ],
+                /* "columnDefs": [
+                    { className: "text-right", "targets": [0,2,5,6,7] },
+                ], */
+                "pageLength": 50,
+                "order": [[ 1, "asc" ]]
+            });
+        });
+    </script>
+
 </div>
-<%@ include file="/jsp/footer.jsp"%>
+<%@ include file="/jsp/footer.jsp" %>

@@ -24,7 +24,7 @@ import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.httpclient.HttpStatus;
-import org.codedefenders.api.analytics.UserDataDTO;
+import org.codedefenders.api.analytics.KillmapDataDTO;
 import org.codedefenders.database.AnalyticsDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +39,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.List;
 
-public class AdminAnalyticsUsersApi extends HttpServlet {
-    private static final Logger logger = LoggerFactory.getLogger(AdminAnalyticsUsersApi.class);
+public class AdminAnalyticsKillMapsApi extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(AdminAnalyticsKillMapsApi.class);
 
     /**
-     * Returns a JSON or CSV file containing the user analytics data.
+     * Returns a JSON or CSV file containing the killmap analytics data.
      * <p></p>
      * The URL parameter {@code type} specifies the type of data to return:<br>
      * {@code type=json} will return JSON, {@code type=CSV} will return CSV.<br>
@@ -65,7 +65,7 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
     }
 
     /**
-     * Returns a JSON file containing the user analytics data.<br>
+     * Returns a JSON file containing the killmap analytics data.<br>
      * The returned JSON will have the following format:<br>
      * <pre>
      * {
@@ -81,7 +81,7 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
         response.setContentType("application/json");
 
         long timeStart = System.currentTimeMillis();
-        List<UserDataDTO> userData = AnalyticsDAO.getAnalyticsUserData();
+        List<KillmapDataDTO> classData = AnalyticsDAO.getAnalyticsKillMapData();
         long timeEnd = System.currentTimeMillis();
 
         PrintWriter out = response.getWriter();
@@ -90,43 +90,38 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
         JsonObject root = new JsonObject();
         root.add("timestamp", gson.toJsonTree(Instant.now().getEpochSecond()));
         root.add("processingTime", gson.toJsonTree(timeEnd - timeStart));
-        root.add("data", gson.toJsonTree(userData));
+        root.add("data", gson.toJsonTree(classData));
 
         out.print(gson.toJson(root));
         out.flush();
     }
 
     /**
-     * Returns a CSV file containing the user analytics data.
+     * Returns a CSV file containing the killmap analytics data.
      * The returned CSV will have a header.
      */
     private void getCSV(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
 
-        List<UserDataDTO> userData = AnalyticsDAO.getAnalyticsUserData();
+        List<KillmapDataDTO> killmapData = AnalyticsDAO.getAnalyticsKillMapData();
 
         String[] columns = new String[]{
-            "id",
-            "username",
-            "gamesPlayed",
-            "attackerGamesPlayed",
-            "defenderGamesPlayed",
-            "attackerScore",
-            "defenderScore",
-            "mutantsSubmitted",
-            "mutantsAlive",
-            "mutantsEquivalent",
-            "testsSubmitted",
-            "mutantsKilled"
+            "userId",
+            "userName",
+            "classId",
+            "className",
+            "role",
+            "usefulMutants",
+            "usefulTests"
         };
 
         PrintWriter out = response.getWriter();
         CSVPrinter csvPrinter = new CSVPrinter(out, CSVFormat.DEFAULT.withHeader(columns));
 
-        for (UserDataDTO user : userData) {
+        for (KillmapDataDTO k : killmapData) {
             for(String column : columns) {
                 try {
-                    csvPrinter.print(PropertyUtils.getProperty(user, column));
+                    csvPrinter.print(PropertyUtils.getProperty(k, column));
                 } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                     throw new RuntimeException(e);
                 }

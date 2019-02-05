@@ -127,9 +127,10 @@ public class Constants {
 	public static final String ADMIN_GAMES_JSP = "/jsp/admin_create_games.jsp";
 	public static final String ADMIN_SETTINGS_JSP = "/jsp/admin_system_settings.jsp";
 	public static final String ADMIN_MONITOR_JSP = "/jsp/admin_monitor_games.jsp";
+	public static final String ADMIN_KILLMAPS_JSP = "/jsp/admin_killmaps.jsp";
 	public static final String ADMIN_ANALYTICS_USERS_JSP = "/jsp/admin_analytics_users.jsp";
 	public static final String ADMIN_ANALYTICS_CLASSES_JSP = "/jsp/admin_analytics_classes.jsp";
-	public static final String ADMIN_ANALYTICS_KILLMAP_JSP = "/jsp/admin_analytics_killmaps.jsp";
+	public static final String ADMIN_ANALYTICS_KILLMAPS_JSP = "/jsp/admin_analytics_killmaps.jsp";
 
     // Messages
 	public static final String WINNER_MESSAGE = "You won!";
