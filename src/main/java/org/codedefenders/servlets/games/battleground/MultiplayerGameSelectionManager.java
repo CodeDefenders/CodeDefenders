@@ -20,6 +20,7 @@ package org.codedefenders.servlets.games.battleground;
 
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.execution.KillMap;
@@ -33,6 +34,7 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.Player;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -238,6 +240,19 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         nGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
         nGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
 
+        int dummyAttackerPlayerId = -1;
+        int dummyDefenderPlayerId = -1;
+        for (Player player : GameDAO.getAllPlayersForGame(nGame.getId())) {
+            if (player.getUser().getId() == DUMMY_ATTACKER_USER_ID) {
+                dummyAttackerPlayerId = player.getId();
+            } else if (player.getUser().getId() == DUMMY_DEFENDER_USER_ID) {
+                dummyDefenderPlayerId = player.getId();
+            }
+        }
+
+        assert dummyAttackerPlayerId != -1;
+        assert dummyDefenderPlayerId != -1;
+
         // this mutant map links the uploaded mutants and the once generated from them here
         // This implements bookkeeping for killmap
         Map<Mutant, Mutant> mutantMap = new HashMap<>();
@@ -258,7 +273,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                         // Alive be default
                         true,
                         //
-                        DUMMY_ATTACKER_USER_ID);
+                        dummyAttackerPlayerId);
                 // insert this into the DB and link the mutant to the game
                 newMutant.insert();
                 // BookKeeping
@@ -272,7 +287,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             for (Test test : uploadedTests) {
                 // At this point we need to fill in all the details
                 Test newTest = new Test(-1, classId, nGame.getId(), test.getJavaFile(),
-                        test.getClassFile(), 0, 0, DUMMY_DEFENDER_USER_ID, test.getLineCoverage().getLinesCovered(),
+                        test.getClassFile(), 0, 0, dummyDefenderPlayerId, test.getLineCoverage().getLinesCovered(),
                         test.getLineCoverage().getLinesUncovered(), 0);
                 newTest.insert();
                 testMap.put(test, newTest);
@@ -291,8 +306,14 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                         if (entry.mutant.getId() == uploadedMutant.getId() &&
                                 entry.test.getId() == uploadedTest.getId() &&
                                 entry.status.equals(KillMapEntry.Status.KILL)) {
-                            // This also update the DB
-                            mutantMap.get(uploadedMutant).kill();
+
+                            // If the mutant was not yet killed by some other test increment the kill count for the test
+                            // and kill the mutant, otherwise continue
+                            // We need this because the killmap gives us all the possible combinations !
+                            if( mutantMap.get(uploadedMutant).isAlive() ){
+                                testMap.get( uploadedTest).killMutant();
+                                mutantMap.get(uploadedMutant).kill();
+                            }
                             alive = false;
                             break;
                         }
