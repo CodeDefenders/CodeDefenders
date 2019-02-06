@@ -446,6 +446,15 @@
                 </div>
             </div>
             <div class="col-sm-3">
+                <label for="" class="label-normal">Include predefined mutants (if available)</label>
+                <input type="checkbox" id="withMutants" name="withMutants"
+                       class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
+                       data-onstyle="primary" data-offstyle="">
+                <br/>
+                <label for="" class="label-normal">Include predefined tests (if available)</label>
+                <input type="checkbox" id="withTests" name="withTests"
+                       class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
+                       data-onstyle="primary" data-offstyle="">
             </div>
             <div class="col-sm-2">
                 <label for="startTime" class="label-normal">Start Time</label>
@@ -809,7 +818,7 @@
                     Capture Players Intention
                 </label>
                 <input type="checkbox" id="capturePlayersIntention" name="capturePlayersIntention"
-                       class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
+                       class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
                        data-onstyle="primary" data-offstyle="">
             </div>
             <div class="col-sm-1">
