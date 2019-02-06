@@ -103,6 +103,32 @@ public class TestDAO {
         return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId));
     }
 
+    public static List<Test> getTestsForGameAndUser(int gameId, int userId) throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "SELECT * FROM tests ",
+                "LEFT JOIN players ON players.ID = tests.Player_ID ",
+                "LEFT JOIN users ON players.User_ID = users.User_ID ",
+                "WHERE tests.Game_ID = ?",
+                "  AND players.User_ID = ?",
+                ";");
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId), DatabaseValue.of(userId));
+    }
+    
+    
+    /**
+     * Returns the {@link Test Tests} from the given game for the given player
+     */
+    public static List<Test> getTestsForGameAndPlayer(int gameId, int playerId) throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "SELECT * FROM tests ",
+                "LEFT JOIN players ON players.ID = tests.Player_ID ",
+                "LEFT JOIN users ON players.User_ID = users.User_ID ",
+                "WHERE tests.Game_ID = ?",
+                "  AND tests.Player_ID = ?",
+                ";");
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId), DatabaseValue.of( playerId));
+    }
+    
     /**
      * Returns the valid {@link Test Tests} from the given game.
      * Valid tests are compilable and do not fail when executed against the original class.

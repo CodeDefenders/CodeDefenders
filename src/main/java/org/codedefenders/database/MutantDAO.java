@@ -113,6 +113,34 @@ public class MutantDAO {
     }
 
     /**
+     * Returns the {@link Mutant Mutants} from the given game for the given player
+     */
+    public static List<Mutant> getMutantsByGameAndPlayer(int gameId, int playerId) throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "SELECT * FROM mutants ",
+                "LEFT JOIN players ON players.ID = mutants.Player_ID ",
+                "LEFT JOIN users ON players.User_ID = users.User_ID ",
+                "WHERE mutants.Game_ID = ?",
+                "  AND mutants.Player_ID = ?",
+                ";");
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId), DatabaseValue.of( playerId));
+    }
+    
+    /**
+     * Returns the {@link Mutant Mutants} from the given game for the given user
+     */
+    public static List<Mutant> getMutantsByGameAndUser(int gameId, int userId) throws UncheckedSQLException, SQLMappingException {
+        String query = String.join("\n",
+                "SELECT * FROM mutants ",
+                "LEFT JOIN players ON players.ID = mutants.Player_ID ",
+                "LEFT JOIN users ON players.User_ID = users.User_ID ",
+                "WHERE mutants.Game_ID = ?",
+                "  AND players.User_ID = ?",
+                ";");
+        return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId), DatabaseValue.of( userId));
+    }
+    
+    /**
      * Returns the compilable {@link Mutant Mutants} from the given game.
      */
     public static List<Mutant> getValidMutantsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
