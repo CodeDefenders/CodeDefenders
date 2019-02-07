@@ -123,6 +123,21 @@ public class Test {
 		this.score = score;
 		lineCoverage = new LineCoverage(linesCovered, linesUncovered);
 	}
+
+    /**
+     * Creates a test from another test instance, but in a new game and for a new player.
+     *
+     * @param gameId   the game identifier of the new test.
+     * @param playerId the players identifier of the new test.
+     * @param other    the test instance the new is created for.
+     * @return a test based on another test instance, gameId and playerId.
+     */
+    public static Test newTestForGameAndPlayerIds(int gameId, int playerId, Test other) {
+        final Test test = new Test(other.classId, gameId, other.javaFile, other.classFile, playerId);
+        test.lineCoverage = other.lineCoverage;
+        return test;
+    }
+
 	// TODO Check that increment score does not consider mutants that were killed already
 	public void incrementScore(int score) {
 		if (score == 0) {

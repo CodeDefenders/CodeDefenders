@@ -18,27 +18,31 @@
  */
 package org.codedefenders.game.puzzle;
 
+import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.PuzzleDAO;
-import org.codedefenders.execution.MutationTester;
-import org.codedefenders.game.*;
-import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.execution.KillMap;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameMode;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.codedefenders.validation.code.CodeValidatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.codedefenders.util.Constants.*;
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 /**
  * Represents an instance of a {@link Puzzle puzzle}, which is played by one player.
@@ -117,44 +121,40 @@ public class PuzzleGame extends AbstractGame {
             logger.error(errorMsg + " Could not add dummy defender to game.");
             return null;
         }
+        int dummyAttackerId = DatabaseAccess.getPlayerIdForMultiplayerGame(DUMMY_ATTACKER_USER_ID, game.id);
+        int dummyDefenderId = DatabaseAccess.getPlayerIdForMultiplayerGame(DUMMY_DEFENDER_USER_ID, game.id);
 
-        try {
+        /* Add the tests from the puzzle. */
+        for (Test test : mappedTests) {
+            final Test newTest = Test.newTestForGameAndPlayerIds(game.id, dummyDefenderId, test);
+            newTest.insert();
+        }
+        Map<Mutant, Mutant> mutantMap = new HashMap<>();
 
-            /* Add the tests from the puzzle. */
-            for (Test test : mappedTests) {
-                final String testCode = new String(Files.readAllBytes(Paths.get(test.getJavaFile())),
-                        StandardCharsets.UTF_8);
-
-                // GameManagingUtils#createTest() compiles, tests and stores the test
-                final Test createdTest = GameManagingUtils.createTest(game.id, game.classId, testCode,
-                        DUMMY_DEFENDER_USER_ID, "puzzle", game.maxAssertionsPerTest);
-
-                if (createdTest == null || createdTest.getClassFile() == null) {
-                    logger.error("An error occurred while adding a mapped test.");
-                    return null;
+        /* Add the mutants from the puzzle. */
+        for (Mutant mutant : mappedMutants) {
+            final Mutant newMutant = new Mutant(game.id, game.classId, mutant.getJavaFile(), mutant.getClassFile(), true, dummyAttackerId);
+            newMutant.insert();
+            mutantMap.put(mutant, newMutant);
+        }
+        List<KillMap.KillMapEntry> killmap = KillmapDAO.getKillMapEntriesForClass(game.classId);
+        for (Mutant uploadedMutant : mappedMutants) {
+            boolean alive = true;
+            for (Test uploadedTest : mappedTests) {
+                // Does the test kill the mutant?
+                for (KillMap.KillMapEntry entry : killmap) {
+                    if (entry.mutant.getId() == uploadedMutant.getId() &&
+                            entry.test.getId() == uploadedTest.getId() &&
+                            entry.status == KillMap.KillMapEntry.Status.KILL) {
+                        mutantMap.get(uploadedMutant).kill();
+                        alive = false;
+                        break;
+                    }
+                }
+                if (!alive) {
+                    break;
                 }
             }
-
-            /* Add the mutants from the puzzle. */
-            for (Mutant mutant : mappedMutants) {
-                final String mutantCode = new String(Files.readAllBytes(Paths.get(mutant.getJavaFile())),
-                        StandardCharsets.UTF_8);
-
-                // GameManagingUtils#createMutant() compiles and stores the mutant
-                final Mutant createdMutant = GameManagingUtils.createMutant(game.id, game.classId, mutantCode,
-                        DUMMY_ATTACKER_USER_ID, "puzzle");
-
-                if (createdMutant == null || createdMutant.getClassFile() == null) {
-                    logger.error("An error occurred while adding a mapped mutant.");
-                    return null;
-                }
-
-                MutationTester.runAllTestsOnMutant(game, createdMutant, new ArrayList<>());
-            }
-
-        } catch (IOException | CodeValidatorException e) {
-            logger.error(errorMsg + " An exception occurred while adding mapped mutants and tests.", e);
-            return null;
         }
 
         if (!game.addPlayer(uid, game.getActiveRole())) {
