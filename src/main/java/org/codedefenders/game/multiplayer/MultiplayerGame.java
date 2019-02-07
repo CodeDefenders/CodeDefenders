@@ -88,6 +88,11 @@ public class MultiplayerGame extends AbstractGame {
 
     private boolean capturePlayersIntention;
 
+    // We need a temporary locatio where to store information about system tests
+    // and mutants
+    private boolean withTests;
+    private boolean withMutants;
+
     private static final Format format = new SimpleDateFormat("yy/MM/dd HH:mm");
 
     public static class Builder {
@@ -117,6 +122,9 @@ public class MultiplayerGame extends AbstractGame {
         private GameLevel level = GameLevel.HARD;
         private CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.STRICT;
 
+        private boolean withTests = false;
+        private boolean withMutants = false;
+
         public Builder(int classId, int creatorId, long startDateTime, long finishDateTime, int maxAssertionsPerTest,
                        int defenderLimit, int attackerLimit, int minimumDefenders, int minimumAttackers) {
             this.classId = classId;
@@ -143,6 +151,9 @@ public class MultiplayerGame extends AbstractGame {
 		public Builder state(GameState state) { this.state = state; return this; }
 		public Builder level(GameLevel level) { this.level = level; return this; }
 		public Builder mutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) { this.mutantValidatorLevel = mutantValidatorLevel; return this; }
+
+		public Builder withTests(boolean withTests) { this.withTests = withTests; return this; }
+		public Builder withMutants(boolean withMutants) { this.withMutants = withMutants; return this; }
 
 		public MultiplayerGame build() {
 			return new MultiplayerGame(this);
@@ -174,6 +185,18 @@ public class MultiplayerGame extends AbstractGame {
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.markUncovered = builder.markUncovered;
         this.capturePlayersIntention = builder.capturePlayersIntention;
+
+        // This is mostly a temporary patch
+        this.withMutants = builder.withMutants;
+        this.withTests = builder.withTests;
+    }
+
+    public boolean hasSystemTests() {
+        return this.withTests;
+    }
+
+    public boolean hasSystemMutants() {
+        return this.withMutants;
     }
 
     public int getAttackerLimit() {

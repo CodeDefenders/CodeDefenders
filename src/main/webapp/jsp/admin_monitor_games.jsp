@@ -174,6 +174,13 @@
 
                 for (List<String> playerInfo : playersInfo) {
                     int pid = Integer.parseInt(playerInfo.get(0));
+                    // Do not visualize system users.
+                    int userID = UserDAO.getUserForPlayer( pid ).getId();
+                    // Note this does not prevent someone to forge move player requests which remove system users from the game
+                    if( userID == Constants.DUMMY_ATTACKER_USER_ID || userID == Constants.DUMMY_DEFENDER_USER_ID ){
+                        continue;
+                    }
+
                     String userName = playerInfo.get(1);
                     Role role = Role.valueOf(playerInfo.get(2));
                     String ts = playerInfo.get(3);

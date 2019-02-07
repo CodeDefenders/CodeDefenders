@@ -19,19 +19,33 @@
 package org.codedefenders.servlets.admin;
 
 import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.UserDAO;
+import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.multiplayer.PlayerScore;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -40,6 +54,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import javax.servlet.ServletException;
@@ -79,6 +94,9 @@ public class AdminCreateGames extends HttpServlet {
     private boolean markUncovered;
     private int maxAssertionsPerTest;
     private CodeValidatorLevel mutantValidatorLevel;
+
+    private boolean withTests;
+    private boolean withMutants;
 
     private boolean capturePlayersIntention;
 
@@ -288,6 +306,9 @@ public class AdminCreateGames extends HttpServlet {
 			chatEnabled = request.getParameter("chatEnabled") != null;
 			markUncovered = request.getParameter("markUncovered") != null;
 
+			withTests = request.getParameter("withTests") != null;
+			withMutants= request.getParameter("withMutants") != null;
+
 			capturePlayersIntention = request.getParameter("capturePlayersIntention") != null;
 		} catch (Exception e) {
 			messages.add("There was a problem with the form.");
@@ -336,9 +357,119 @@ public class AdminCreateGames extends HttpServlet {
 
 
 	private void insertFilledGame(MultiplayerGame multiplayerGame, List<Integer> attackerIDs, List<Integer> defenderIDs) {
-        multiplayerGame.insert();
-        for (int aid : attackerIDs) multiplayerGame.addPlayerForce(aid, Role.ATTACKER);
-        for (int did : defenderIDs) multiplayerGame.addPlayerForce(did, Role.DEFENDER);
+	    // We need to take care of loading and setting system tests and mutants as well for this game
+//        multiplayerGame.insert();
+	    // XXX Code duplication: This is take from {@link MultiplayerGameSelectionManager}
+	    if (multiplayerGame.insert()) {
+            Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+            Event event = new Event(-1, multiplayerGame.getId(), multiplayerGame.getCreatorId(), "Game Created",
+                    EventType.GAME_CREATED, EventStatus.GAME, timestamp);
+            event.insert();
+        } else {
+            // TODO What to do if the insert did not work !?
+            logger.warn("Cannot create game !");
+        }
+
+        // Handle the system tests and mutants
+        // Mutants and tests uploaded with the class are already stored in the DB
+	    int classId = multiplayerGame.getClassId();
+        List<Mutant> uploadedMutants = GameClassDAO.getMappedMutantsForClassId(classId);
+        List<Test> uploadedTests = GameClassDAO.getMappedTestsForClassId(classId);
+
+        // Always add system player to send mutants and tests at runtime!
+        multiplayerGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
+        multiplayerGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
+
+        // Retrieve the playerId for system users
+        int dummyAttackerPlayerId = -1;
+        int dummyDefenderPlayerId = -1;
+
+        for (Player player : GameDAO.getAllPlayersForGame(multiplayerGame.getId())) {
+            if (player.getUser().getId() == DUMMY_ATTACKER_USER_ID) {
+                dummyAttackerPlayerId = player.getId();
+            } else if (player.getUser().getId() == DUMMY_DEFENDER_USER_ID) {
+                dummyDefenderPlayerId = player.getId();
+            }
+        }
+
+        assert dummyAttackerPlayerId != -1;
+        assert dummyDefenderPlayerId != -1;
+
+        // this mutant map links the uploaded mutants and the once generated from them here
+        // This implements bookkeeping for killmap
+        Map<Mutant, Mutant> mutantMap = new HashMap<>();
+        Map<Test, Test> testMap = new HashMap<>();
+
+        boolean withTests = multiplayerGame.hasSystemTests();
+        boolean withMutants = multiplayerGame.hasSystemMutants();
+
+        // Register Valid Mutants.
+        if (withMutants) {
+            // Validate uploaded mutants from the list
+            // Link the mutants to the game
+            for (Mutant mutant : uploadedMutants) {
+//                          final String mutantCode = new String(Files.readAllBytes();
+                Mutant newMutant = new Mutant(multiplayerGame.getId(), classId,
+                        mutant.getJavaFile(),
+                        mutant.getClassFile(),
+                        // Alive be default
+                        true,
+                        //
+                        dummyAttackerPlayerId);
+                // insert this into the DB and link the mutant to the game
+                newMutant.insert();
+                // BookKeeping
+                mutantMap.put(mutant, newMutant);
+            }
+        }
+        // Register Valid Tests
+        if (withTests) {
+            // Validate the tests from the list
+            for (Test test : uploadedTests) {
+                // At this point we need to fill in all the details
+                Test newTest = new Test(-1, classId, multiplayerGame.getId(), test.getJavaFile(),
+                        test.getClassFile(), 0, 0, dummyDefenderPlayerId, test.getLineCoverage().getLinesCovered(),
+                        test.getLineCoverage().getLinesUncovered(), 0);
+                newTest.insert();
+                testMap.put(test, newTest);
+            }
+        }
+
+        if (withMutants && withTests) {
+            List<KillMapEntry> killmap = KillmapDAO.getKillMapEntriesForClass(classId);
+            // Filter the killmap and keep only the one created during the upload ...
+
+            for (Mutant uploadedMutant : uploadedMutants) {
+                boolean alive = true;
+                for (Test uploadedTest : uploadedTests) {
+                    // Does the test kill the mutant?
+                    for (KillMapEntry entry : killmap) {
+                        if (entry.mutant.getId() == uploadedMutant.getId() &&
+                                entry.test.getId() == uploadedTest.getId() &&
+                                entry.status.equals(KillMapEntry.Status.KILL)) {
+                            // This also update the DB
+                            if( mutantMap.get(uploadedMutant).isAlive() ){
+                                testMap.get( uploadedTest).killMutant();
+                                mutantMap.get(uploadedMutant).kill();
+                            }
+                            alive = false;
+                            break;
+                        }
+                    }
+                    if (!alive) {
+                        break;
+                    }
+                }
+            }
+        }
+
+        // Finally add the regular users
+        for (int aid : attackerIDs) {
+            multiplayerGame.addPlayerForce(aid, Role.ATTACKER);
+        }
+        for (int did : defenderIDs) {
+            multiplayerGame.addPlayerForce(did, Role.DEFENDER);
+        }
     }
 
     private void createAndFillGames(HttpSession session, List<MultiplayerGame> createdGames, List<List<Integer>> attackerIdsList, List<List<Integer>> defenderIdsList) {
@@ -360,7 +491,9 @@ public class AdminCreateGames extends HttpServlet {
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
                  cutID, currentUserID, gamesLevel, gamesState,
                 startTime, finishTime, maxAssertionsPerTest, chatEnabled,
-                mutantValidatorLevel, markUncovered, capturePlayersIntention);
+                mutantValidatorLevel, markUncovered, //
+                withTests, withMutants, //
+                capturePlayersIntention);
 
         if (teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_DESCENDING) || teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_SHUFFLED)) {
             Collections.sort(attackerIDs, new ReverseDefenderScoreComparator());
@@ -423,6 +556,7 @@ public class AdminCreateGames extends HttpServlet {
                                                      long startTime, long finishTime, int maxAssertionsPerTest,
                                                      boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
                                                      boolean markUncovered, //
+                                                     boolean withTests, boolean withMutants, //
                                                      boolean capturePlayersIntention
                                                      ) {
         List<MultiplayerGame> gameList = new ArrayList<>();
@@ -433,6 +567,8 @@ public class AdminCreateGames extends HttpServlet {
                     .chatEnabled(chatEnabled)
                     .mutantValidatorLevel(mutantValidatorLevel)
                     .markUncovered(markUncovered)
+                    .withTests(withTests)
+                    .withMutants(withMutants)
                     .capturePlayersIntention(capturePlayersIntention)
                     .build();
             gameList.add(game);
