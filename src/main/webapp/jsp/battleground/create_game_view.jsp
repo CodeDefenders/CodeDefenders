@@ -62,7 +62,7 @@
                     </select>
                 </td>
                 <td width="17%">
-                    <a href="<%=Paths.CLASS_UPLOAD%>" class="text-center new-account">Upload Class</a>
+                    <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="text-center new-account">Upload Class</a>
                 </td>
             </tr>
             <!--
