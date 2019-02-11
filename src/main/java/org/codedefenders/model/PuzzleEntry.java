@@ -102,12 +102,21 @@ public class PuzzleEntry implements Comparable {
         return game.getState();
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public int compareTo(Object o) {
         if (!(o instanceof PuzzleEntry)) {
             return -1;
         }
         final PuzzleEntry obj = (PuzzleEntry) o;
-        return this.getPuzzleId() - obj.getPuzzleId();
+        final Integer pos1 = this.puzzle.getPosition();
+        final Integer pos2 = obj.puzzle.getPosition();
+        if (pos1 == null) {
+            return 1;
+        }
+        if (pos2 == null) {
+            return -1;
+        }
+        return pos1 - pos2;
     }
 }
