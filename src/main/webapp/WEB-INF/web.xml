@@ -369,7 +369,7 @@
 
     <servlet-mapping>
         <servlet-name>FeedbackAPI</servlet-name>
-        <url-pattern>/feedback</url-pattern>
+        <url-pattern>/api/feedback</url-pattern>
     </servlet-mapping>
     <servlet>
         <servlet-name>FeedbackAPI</servlet-name>
