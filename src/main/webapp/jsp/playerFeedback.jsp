@@ -110,6 +110,7 @@
 
                 <form id="sendFeedback" action="<%=request.getContextPath() + Paths.API_FEEDBACK%>" method="post">
                     <input type="hidden" name="formType" value="sendFeedback">
+                    <input type="hidden" name="gameId" value="<%=gameId%>">
                     <table class="table-hover table-striped table-responsive ">
                         <tbody>
 
