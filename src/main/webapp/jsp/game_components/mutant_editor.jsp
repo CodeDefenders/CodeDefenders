@@ -175,6 +175,24 @@
             change.cancel();
         }
     });
+
+	// All the lines which are not between startEditLine and endEditLine() must be greyed out
+	// https://stackoverflow.com/questions/1720320/how-to-dynamically-create-css-class-in-javascript-and-apply
+	// https://stackoverflow.com/questions/5081690/how-to-gray-out-a-html-element
+	// Define the Grayout style
+    if(endEditLine != null) {
+        var style = document.createElement('style');
+        style.type = 'text/css';
+        style.innerHTML = '.grayout { opacity: 0.5; filter: alpha(opacity = 50);}';
+        document.getElementsByTagName('head')[0].appendChild(style);
+        // Apply the gray out style to the non-editable lines
+        var count = editorMutant.lineCount();
+        for (i = 0; i < count; i++) {
+            if ((i + 1) < startEditLine || (i + 1) > endEditLine) {
+                editorMutant.addLineClass(i, "text", "grayout");
+            }
+        }
+    }
 </script>
 
 <%
