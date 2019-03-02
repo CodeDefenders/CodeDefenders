@@ -96,7 +96,7 @@ public class AntProcessResult {
                 // Get the value of the output folder
                 outputFolder = line.replace("[javac] Compiling 1 source file to ", "");
             } else {
-                if (line.contains(outputFolder)) {
+                if (outputFolder != null && line.contains(outputFolder)) {
                     line = line.replace(outputFolder + Constants.F_SEP, "");
                 }
                 // Pass it along the output
