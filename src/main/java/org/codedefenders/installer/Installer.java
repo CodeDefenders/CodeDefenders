@@ -60,8 +60,11 @@ import javax.sql.DataSource;
  * {@link Test tests}, {@link PuzzleChapter puzzle chapters} and {@link Puzzle puzzles}
  * programmatically.
  * <p>
- * This means that a newly deployed Code Defenders instance already can have playable
- * games or puzzles.
+ * Using {@link #main(String[]) the main method}, this installer can be used
+ * as a command line tool.
+ * <p>
+ * Using {@link #installPuzzles(Path) installPuzzles()}, the installer can be
+ * called programmatically inside code defenders.
  *
  * @author gambi
  * @author <a href="https://github.com/werli">Phil Werli<a/>
@@ -70,6 +73,9 @@ public class Installer {
 
     private static final Logger logger = LoggerFactory.getLogger(Installer.class);
 
+    /**
+     * Used for parsing the command line.
+     */
     private interface ParsingInterface {
         @Option(defaultToNull = true)
         File getConfigurations();
@@ -144,23 +150,43 @@ public class Installer {
         System.exit(0);
     }
 
-    public static void installPuzzles() {
-        final List<File> cuts = getFilesForDir("cuts", ".java");
-        final List<File> mutants = getFilesForDir("mutants", ".java");
-        final List<File> tests = getFilesForDir("tests", ".java");
-        final List<File> puzzleChapterSpecs = getFilesForDir("puzzleChapters", ".properties");
-        final List<File> puzzleSpecs = getFilesForDir("puzzles", ".properties");
+    /**
+     * Looks for puzzle related files in a given directory.
+     * In the directory, this method will look for files in the following sub-folders:
+     * <ul>
+     * <li>{@code cuts/}</li> holds puzzles classes. See {@link #installCUT(File) installCUT()} for file convention.
+     * <li>{@code mutants/}</li> holds puzzle mutants. See {@link #installMutant(File)}  installedMutant()} for file convention.
+     * <li>{@code tests/}</li> holds puzzles tests. See {@link #installTest(File) installTest()} for file convention.
+     * <li>{@code puzzleChapters/}</li> holds puzzle chapters information. See {@link #installPuzzleChapter(File) installPuzzleChapter()} for file convention.
+     * <li>{@code puzzles/}</li> holds puzzle information. See {@link #installPuzzle(File) installPuzzle()} for file convention.
+     * </ul>
+     *
+     * @param directory the directory puzzle related files are looked at.
+     */
+    public static void installPuzzles(Path directory) {
+        final List<File> cuts = getFilesForDir(directory.resolve("cuts"), ".java");
+        final List<File> mutants = getFilesForDir(directory.resolve("mutants"), ".java");
+        final List<File> tests = getFilesForDir(directory.resolve("tests"), ".java");
+        final List<File> puzzleChapterSpecs = getFilesForDir(directory.resolve("puzzleChapters"), ".properties");
+        final List<File> puzzleSpecs = getFilesForDir(directory.resolve("puzzles"), ".properties");
 
         Installer installer = new Installer();
         installer.run(cuts, mutants, tests, puzzleChapterSpecs, puzzleSpecs);
     }
 
-    private static List<File> getFilesForDir(String dir, String fileExtension) {
-        final Path base = Paths.get(Constants.DATA_DIR, "installation");
-
+    /**
+     * Finds all files for in a given directory for a given file extension.
+     * <p>
+     * Iterates through a maximal folder depth of 5.
+     *
+     * @param directory the directory the files should be found in.
+     * @param fileExtension the extension of the to be found files.
+     * @return a list of found files. Empty if none or an error occurred.
+     */
+    private static List<File> getFilesForDir(Path directory, String fileExtension) {
         List<File> files;
         try {
-            files = Files.find(base.resolve(dir), 5, (path, basicFileAttributes) -> {
+            files = Files.find(directory, 5, (path, basicFileAttributes) -> {
                 if (path.toFile().isDirectory()) {
                     return false;
                 }
