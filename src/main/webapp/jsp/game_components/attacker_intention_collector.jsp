@@ -54,14 +54,15 @@ theForm.insertBefore(container, attackButton.nextSibling);
 
 var intentionDropDown = document.createElement("SELECT");
 intentionDropDown.setAttribute("id", "intention-table");
-intentionDropDown.setAttribute("style", "height: 25px; width: 20%; margin-top: 10px");
+intentionDropDown.setAttribute("style", "width: 30%");
 intentionDropDown.setAttribute("onchange", "updateAttackForm(this.value)");
+intentionDropDown.setAttribute("class", "form-control");
 intentionDropDown.innerHTML = '<option selected disabled hidden>My mutant is</option>' +
-    '<option value="KILLABLE" name="attacker-intention" onclick="updateAttackForm(\'KILLABLE\')">Killable</option>' +
-    '<option value="EQUIVALENT" name="attacker-intention" onclick="updateAttackForm(\'EQUIVALENT\')">Equivalent</option>' +
-    '<option value="DONTKNOW" name="attacker-intention" onclick="updateAttackForm(\'DONTKNOW\')">I don\'t know</option>' +
+    '<option value="KILLABLE" name="attacker-intention">Killable</option>' +
+    '<option value="EQUIVALENT" name="attacker-intention">Equivalent</option>' +
+    '<option value="DONTKNOW" name="attacker-intention">I don\'t know</option>' +
     '</select>';
 
-container.appendChild(theTable)
+container.appendChild(intentionDropDown)
 
 </script>
