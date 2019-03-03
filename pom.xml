@@ -400,6 +400,17 @@
 	</profiles>
 
 	<dependencies>
+	    <!-- Context and Dependency Injection (CDI) -->
+        <!--  https://stackoverflow.com/questions/18995951/how-to-install-and-use-cdi-on-tomcat -->
+        <!--  ALTERNATIVES: use TomEE (?) or OpenWebBeans -->
+        <!--  http://balusc.omnifaces.org/2013/10/how-to-install-cdi-in-tomcat.html -->
+        <!--  http://docs.jboss.org/weld/reference/latest/en-US/html/injection.html -->
+        <dependency>
+            <groupId>org.jboss.weld.servlet</groupId>
+            <artifactId>weld-servlet-shaded</artifactId>
+            <version>3.0.5.Final</version>
+        </dependency>
+
 		<!-- Test Smell Detector -->
 		<dependency>
 			<groupId>edu.rit.se.testsmells</groupId>
