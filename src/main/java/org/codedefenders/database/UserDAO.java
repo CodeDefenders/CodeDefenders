@@ -78,10 +78,9 @@ public class UserDAO {
      */
     public static List<User> getUnassignedUsers() throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
-                "SELECT DISTINCT users.*",
-                "FROM users",
-                "WHERE users.User_ID > 4",
-                "  AND users.User_ID NOT IN",
+                "SELECT DISTINCT u.*",
+                "FROM view_valid_users u",
+                "WHERE u.User_ID NOT IN",
                 "    (",
                 "      SELECT DISTINCT players.User_ID",
                 "      FROM players, games",

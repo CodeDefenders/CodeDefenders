@@ -108,9 +108,8 @@ public class PuzzleDAO {
     public static PuzzleGame getPuzzleGameForId(int gameId) {
         String query = String.join("\n",
                 "SELECT *",
-                "FROM games",
-                "WHERE Mode = 'PUZZLE'",
-                "  AND ID = ?;"
+                "FROM view_puzzle_games games",
+                "WHERE ID = ?;"
         );
 
         return DB.executeQueryReturnValue(query, PuzzleDAO::getPuzzleGameFromResultSet, DatabaseValue.of(gameId));
@@ -125,9 +124,8 @@ public class PuzzleDAO {
     public static PuzzleGame getLatestPuzzleGameForPuzzleAndUser(int puzzleId, int userId) {
         String query = String.join("\n",
                 "SELECT *",
-                "FROM games",
-                "WHERE Mode = 'PUZZLE'",
-                "  AND Puzzle_ID = ?",
+                "FROM view_puzzle_games games",
+                "WHERE Puzzle_ID = ?",
                 "  AND Creator_ID = ?",
                 "ORDER BY Timestamp DESC;"
         );
@@ -146,9 +144,8 @@ public class PuzzleDAO {
     public static List<PuzzleGame> getPuzzleGamesForPuzzleAndUser(int puzzleId, int userId) {
         String query = String.join("\n",
                 "SELECT *",
-                "FROM games",
-                "WHERE Mode = 'PUZZLE'",
-                "  AND Puzzle_ID = ?",
+                "FROM view_puzzle_games games",
+                "WHERE Puzzle_ID = ?",
                 "  AND Creator_ID = ?",
                 "ORDER BY Timestamp DESC;"
         );
@@ -167,9 +164,8 @@ public class PuzzleDAO {
     public static List<PuzzleGame> getActivePuzzleGamesForUser(int userId) {
         String query = String.join("\n",
                 "SELECT *",
-                "FROM games",
-                "WHERE Mode = 'PUZZLE'",
-                "  AND State = 'ACTIVE'",
+                "FROM view_puzzle_games games",
+                "WHERE State = 'ACTIVE'",
                 "  AND Creator_ID = ?",
                 "ORDER BY Timestamp DESC;"
         );

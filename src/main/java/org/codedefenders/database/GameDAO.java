@@ -92,16 +92,10 @@ public class GameDAO {
      */
     public static List<Player> getAllPlayersForGame(int gameId) {
         String query = String.join("\n",
-                "SELECT players.*,",
-                "  users.Password AS usersPassword,",
-                "  users.Username AS usersUsername,",
-                "  users.Email AS usersEmail,",
-                "  users.Validated AS usersValidated,",
-                "  users.Active AS usersActive",
-                "FROM players, users",
-                "WHERE players.Game_ID = ?",
-                "  AND players.User_ID = users.User_ID",
-                "  AND players.Active = TRUE;");
+                "SELECT *",
+                "FROM view_players_with_userdata",
+                "WHERE Game_ID = ?",
+                "  AND Active = TRUE;");
 
         return DB.executeQueryReturnList(query, PlayerDAO::playerWithUserFromRS, DatabaseValue.of(gameId));
     }

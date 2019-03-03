@@ -144,16 +144,11 @@ public class TestDAO {
         List<Test> result = new ArrayList<>();
 
         String query = String.join("\n",
-                "SELECT tests.* FROM tests",
-                (defendersOnly ? "INNER JOIN players pl on tests.Player_ID = pl.ID" : ""),
-                "WHERE tests.Game_ID=? AND tests.ClassFile IS NOT NULL",
-                (defendersOnly ? "AND pl.Role='DEFENDER'" : ""),
-                "  AND EXISTS (",
-                "    SELECT * FROM targetexecutions ex",
-                "    WHERE ex.Test_ID = tests.Test_ID",
-                "      AND ex.Target='TEST_ORIGINAL'",
-                "      AND ex.Status='SUCCESS'",
-                "  );"
+                "SELECT t.*",
+                "FROM view_valid_tests t",
+                (defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : ""),
+                "WHERE t.Game_ID=?",
+                (defendersOnly ? "AND pl.Role='DEFENDER';" : ";")
         );
         result.addAll(DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId)));
 
@@ -190,17 +185,10 @@ public class TestDAO {
         List<Test> result = new ArrayList<>();
 
         String query = String.join("\n",
-                "SELECT tests.*",
-                "FROM tests, games",
-                "WHERE tests.Game_ID = games.ID",
-                "  AND games.Class_ID = ?",
-                "  AND tests.ClassFile IS NOT NULL",
-                "  AND EXISTS (",
-                "    SELECT * FROM targetexecutions ex",
-                "    WHERE ex.Test_ID = tests.Test_ID",
-                "      AND ex.Target='TEST_ORIGINAL'",
-                "      AND ex.Status='SUCCESS'",
-                "  );"
+                "SELECT t.*",
+                "FROM view_valid_tests t, games",
+                "WHERE t.Game_ID = games.ID",
+                "  AND games.Class_ID = ?;"
         );
         result.addAll(DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(classId)));
 
