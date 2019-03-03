@@ -52,29 +52,15 @@ container.setAttribute("style", "width: 100%");
 //parent.insertAfter(container, theForm);
 theForm.insertBefore(container, attackButton.nextSibling);
 
-var theTable = document.createElement("TABLE");
-theTable.setAttribute("id", "intention-table");
-theTable.setAttribute("style", "height: 40px");
-
-//Insert cells
-var newRow = theTable.insertRow();
-var newCell  = newRow.insertCell();
-//Write the HTML inside the cell
-newCell.innerHTML='<strong>Is your mutant:</strong>';
-
-var newCell  = newRow.insertCell();
-//Write the HTML inside the cell
-newCell.innerHTML='<input type="radio" name="attacker-intention" value="killable" onmousedown="updateAttackForm(\'KILLABLE\')"/>&nbsp;Killable';
-
-
-var newCell  = newRow.insertCell();
-//Write the HTML inside the cell
-newCell.innerHTML='<input type="radio" name="attacker-intention" value="equivalent" onmousedown="updateAttackForm(\'EQUIVALENT\')"/>&nbsp;Equivalent';
-
-
-var newCell  = newRow.insertCell();
-//Write the HTML inside the cell
-newCell.innerHTML='<input type="radio" name="attacker-intention" value="dontknow" onmousedown="updateAttackForm(\'DONTKNOW\')"/>&nbsp;I don\'t know';
+var intentionDropDown = document.createElement("SELECT");
+intentionDropDown.setAttribute("id", "intention-table");
+intentionDropDown.setAttribute("style", "height: 25px; width: 20%; margin-top: 10px");
+intentionDropDown.setAttribute("onchange", "updateAttackForm(this.value)");
+intentionDropDown.innerHTML = '<option selected disabled hidden>My mutant is</option>' +
+    '<option value="KILLABLE" name="attacker-intention" onclick="updateAttackForm(\'KILLABLE\')">Killable</option>' +
+    '<option value="EQUIVALENT" name="attacker-intention" onclick="updateAttackForm(\'EQUIVALENT\')">Equivalent</option>' +
+    '<option value="DONTKNOW" name="attacker-intention" onclick="updateAttackForm(\'DONTKNOW\')">I don\'t know</option>' +
+    '</select>';
 
 container.appendChild(theTable)
 
