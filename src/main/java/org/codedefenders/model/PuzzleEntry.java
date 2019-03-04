@@ -109,8 +109,8 @@ public class PuzzleEntry implements Comparable {
             return -1;
         }
         final PuzzleEntry obj = (PuzzleEntry) o;
-        final Integer pos1 = this.puzzle.getPosition();
-        final Integer pos2 = obj.puzzle.getPosition();
+        final Integer pos1 = this.getPuzzle().getPosition();
+        final Integer pos2 = obj.getPuzzle().getPosition();
         if (pos1 == null) {
             return 1;
         }

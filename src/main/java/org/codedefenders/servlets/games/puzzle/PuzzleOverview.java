@@ -86,7 +86,7 @@ public class PuzzleOverview extends HttpServlet {
     }
 
     /**
-     * Helper function which converst a {@link Puzzle} to a {@link PuzzleEntry} for a given userId and a
+     * Helper function which converts a {@link Puzzle} to a {@link PuzzleEntry} for a given userId and a
      * set of active {@link PuzzleGame}s.
      *
      * If there exist an active game for this puzzle, the returned entry contains a {@link PuzzleGame} instance.

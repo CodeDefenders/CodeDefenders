@@ -261,6 +261,8 @@ public class PuzzleGameManager extends HttpServlet {
             game.incrementCurrentRound();
         } else {
             game.setState(GameState.SOLVED);
+            messages.clear();
+            messages.add("Congratulations, your test solved the puzzle! You have unlocked the <a href=" + request.getContextPath() + Paths.PUZZLE_GAME + ">next Puzzle</a>.");
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
@@ -385,6 +387,8 @@ public class PuzzleGameManager extends HttpServlet {
             game.incrementCurrentRound();
         } else {
             game.setState(GameState.SOLVED);
+            messages.clear();
+            messages.add("Congratulations, your mutant solved the puzzle! You have unlocked the <a href=" + request.getContextPath() + Paths.PUZZLE_GAME + ">next Puzzle</a>.");
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
