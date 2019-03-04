@@ -96,7 +96,7 @@
                 <button type="button" class="btn btn-primary btn-game btn-right dropdown-toggle" data-toggle="dropdown"
                         id="submitMutant" form="atk" aria-haspopup="true" aria-expanded="false"
                         <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                    Attack with... <span class="glyphicon glyphicon-triangle-bottom" style="font-size: small"/>
+                    Attack <span class="glyphicon glyphicon-triangle-bottom" style="font-size: small"/>
                 </button>
             </div>
             <% } %>

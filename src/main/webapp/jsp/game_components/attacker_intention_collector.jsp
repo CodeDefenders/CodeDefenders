@@ -51,7 +51,7 @@
     killableMutant.setAttribute("class", "dropdown-item");
     killableMutant.setAttribute("style", "cursor: pointer");
     killableMutant.setAttribute("onclick", "updateAttackForm(\'KILLABLE\')");
-    killableMutant.innerHTML = 'a killable mutant';
+    killableMutant.innerHTML = 'My mutant is killable';
     // connect <ul>, <li> and <a> elements
     intentionList.appendChild(killableListItem);
     killableListItem.appendChild(killableMutant);
@@ -61,7 +61,7 @@
     equivalentMutant.setAttribute("class", "dropdown-item");
     equivalentMutant.setAttribute("style", "cursor: pointer");
     equivalentMutant.setAttribute("onclick", "updateAttackForm(\'EQUIVALENT\')");
-    equivalentMutant.innerHTML = 'an equivalent mutant';
+    equivalentMutant.innerHTML = 'My mutant is equivalent';
     // connect <ul>, <li> and <a> elements
     intentionList.appendChild(equivalentListItem);
     equivalentListItem.appendChild(equivalentMutant);
@@ -71,7 +71,7 @@
     unknownMutant.setAttribute("class", "dropdown-item");
     unknownMutant.setAttribute("style", "cursor: pointer");
     unknownMutant.setAttribute("onclick", "updateAttackForm(\'DONTKNOW\')");
-    unknownMutant.innerHTML = 'I don\'t know';
+    unknownMutant.innerHTML = 'I don\'t know if my mutant is killable';
     // connect <ul>, <li> and <a> elements
     intentionList.appendChild(unknownListItem);
     unknownListItem.appendChild(unknownMutant);
