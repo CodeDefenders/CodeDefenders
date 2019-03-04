@@ -86,25 +86,32 @@
     </div>
 
     <div class="col-md-6" id="newmut-div">
-        <%@include file="../game_components/mutant_progress_bar.jsp"%>
-        <h3 style="margin-bottom: 0;">Create a mutant here</h3>
+        <%@include file="../game_components/mutant_progress_bar.jsp" %>
+        <div class="row" style="display: contents">
+            <h3 style="margin-bottom: 0; display: inline">Create a mutant here</h3>
 
-        <form id="reset" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
-            <input type="hidden" name="formType" value="reset">
-            <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
-            <button class="btn btn-primary btn-warning btn-game btn-right" id="btnReset" style="margin-top: -40px; margin-right: 80px">
-                <%--TODO wtf why is this button suddently a little upper. literally 5px--%>
-                Reset
-            </button>
-        </form>
+            <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
+            <%if (game.getState().equals(ACTIVE)) {%>
+            <div id="attackDropDown" class="dropdown" style="float: right; margin-right: 5px">
+                <button type="button" class="btn btn-primary btn-game btn-right dropdown-toggle" data-toggle="dropdown"
+                        id="submitMutant" form="atk" aria-haspopup="true" aria-expanded="false"
+                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
+                    Attack with... <span class="glyphicon glyphicon-triangle-bottom" style="font-size: small"/>
+                </button>
+            </div>
+            <% } %>
+
+            <!-- Reset button -->
+            <form id="reset" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post" style="float: right; margin-right: 5px">
+                <button class="btn btn-primary btn-warning btn-game btn-right" id="btnReset">
+                    Reset
+                </button>
+                <input type="hidden" name="formType" value="reset">
+                <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
+            </form>
+        </div>
 
         <form id="atk" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
-            <% if (game.getState().equals(ACTIVE)) {%>
-                <button type="submit" class="btn btn-primary btn-game btn-right" id="submitMutant" form="atk" onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';" style="margin-top: -50px"
-                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                    Attack!
-                </button>
-            <% } %>
 
             <input type="hidden" name="formType" value="createMutant">
             <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
