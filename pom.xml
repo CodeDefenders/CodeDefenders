@@ -400,6 +400,15 @@
 	</profiles>
 
 	<dependencies>
+    	<!-- Web Socket API -->
+	   <dependency>
+		  <groupId>org.apache.tomcat</groupId>
+    		<artifactId>tomcat-websocket</artifactId>
+	   	   <version>8.5.23</version>
+		  <scope>provided</scope>
+	   </dependency>
+	    
+	
 	    <!-- Context and Dependency Injection (CDI) -->
         <dependency>
             <groupId>org.jboss.weld.servlet</groupId>
