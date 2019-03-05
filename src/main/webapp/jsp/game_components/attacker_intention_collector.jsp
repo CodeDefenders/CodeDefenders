@@ -20,62 +20,60 @@
 --%>
 
 <script>
+    var attackButton = document.getElementById('submitMutant');
+    var theForm = document.getElementById('atk');
 
-function updateAttackForm(value){
-	var attackButton = document.getElementById('submitMutant');
-	attackButton.disabled = false;
-	document.getElementById("attacker_intention").value = value;
-}
+    function updateAttackForm(value){
+        document.getElementById("attacker_intention").value = value;
+        progressBar();
+        theForm.submit();
+        attackButton.disabled = true;
+    }
 
-var theForm = document.getElementById('atk');
+    var input = document.createElement("input");
+    input.setAttribute("type", "hidden");
+    input.setAttribute("id", "attacker_intention");
+    input.setAttribute("name", "attacker_intention");
+    input.setAttribute("value", "");
+    theForm.appendChild(input);
 
-var input = document.createElement("input");
-input.setAttribute("type", "hidden");
-input.setAttribute("id", "attacker_intention");
-input.setAttribute("name", "attacker_intention");
-input.setAttribute("value", "");
-//append to form element that you want .
-theForm.appendChild(input);
+    var attackDropDown = document.getElementById("attackDropDown");
 
+    // create <ul> element containing list of intention options
+    var intentionList = document.createElement('ul');
+    intentionList.setAttribute("class", "dropdown-menu dropdown-menu-right");
+    intentionList.setAttribute("aria-labelledby", "submitMutant");
+    // append <ul> to dropDown attack button
+    attackDropDown.appendChild(intentionList);
 
-var attackButton = document.getElementById('submitMutant');
-attackButton.setAttribute("style","margin-top: -0px");
-attackButton.disabled = true;
+    var killableListItem = document.createElement('li');
+    var killableMutant = document.createElement('a');
+    killableMutant.setAttribute("class", "dropdown-item");
+    killableMutant.setAttribute("style", "cursor: pointer");
+    killableMutant.setAttribute("onclick", "updateAttackForm(\'KILLABLE\')");
+    killableMutant.innerHTML = 'My mutant is killable';
+    // connect <ul>, <li> and <a> elements
+    intentionList.appendChild(killableListItem);
+    killableListItem.appendChild(killableMutant);
 
-var resetButton = document.getElementById('btnReset');
-resetButton.setAttribute("style","margin-top: -0px; margin-right: 0px");
+    var equivalentListItem = document.createElement('li');
+    var equivalentMutant = document.createElement('a');
+    equivalentMutant.setAttribute("class", "dropdown-item");
+    equivalentMutant.setAttribute("style", "cursor: pointer");
+    equivalentMutant.setAttribute("onclick", "updateAttackForm(\'EQUIVALENT\')");
+    equivalentMutant.innerHTML = 'My mutant is equivalent';
+    // connect <ul>, <li> and <a> elements
+    intentionList.appendChild(equivalentListItem);
+    equivalentListItem.appendChild(equivalentMutant);
 
-var container = document.createElement('div');
-container.setAttribute("style", "width: 100%");
-
-// Put the container before the form
-//parent.insertAfter(container, theForm);
-theForm.insertBefore(container, attackButton.nextSibling);
-
-var theTable = document.createElement("TABLE");
-theTable.setAttribute("id", "intention-table");
-theTable.setAttribute("style", "height: 40px");
-
-//Insert cells
-var newRow = theTable.insertRow();
-var newCell  = newRow.insertCell();
-//Write the HTML inside the cell
-newCell.innerHTML='<strong>Is your mutant:</strong>';
-
-var newCell  = newRow.insertCell();
-//Write the HTML inside the cell
-newCell.innerHTML='<input type="radio" name="attacker-intention" value="killable" onmousedown="updateAttackForm(\'KILLABLE\')"/>&nbsp;Killable';
-
-
-var newCell  = newRow.insertCell();
-//Write the HTML inside the cell
-newCell.innerHTML='<input type="radio" name="attacker-intention" value="equivalent" onmousedown="updateAttackForm(\'EQUIVALENT\')"/>&nbsp;Equivalent';
-
-
-var newCell  = newRow.insertCell();
-//Write the HTML inside the cell
-newCell.innerHTML='<input type="radio" name="attacker-intention" value="dontknow" onmousedown="updateAttackForm(\'DONTKNOW\')"/>&nbsp;I don\'t know';
-
-container.appendChild(theTable)
+    var unknownListItem = document.createElement('li');
+    var unknownMutant = document.createElement('a');
+    unknownMutant.setAttribute("class", "dropdown-item");
+    unknownMutant.setAttribute("style", "cursor: pointer");
+    unknownMutant.setAttribute("onclick", "updateAttackForm(\'DONTKNOW\')");
+    unknownMutant.innerHTML = 'I don\'t know if my mutant is killable';
+    // connect <ul>, <li> and <a> elements
+    intentionList.appendChild(unknownListItem);
+    unknownListItem.appendChild(unknownMutant);
 
 </script>
