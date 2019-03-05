@@ -1,6 +1,7 @@
 package org.codedefenders.notification.impl;
 
 import javax.annotation.ManagedBean;
+import javax.enterprise.context.ApplicationScoped;
 
 import org.codedefenders.notification.INotificationService;
 
@@ -12,7 +13,9 @@ import com.google.common.eventbus.EventBus;
  * @author gambi
  *
  */
-@ManagedBean 
+// https://docs.oracle.com/javaee/6/api/javax/enterprise/context/ApplicationScoped.html
+@ManagedBean
+@ApplicationScoped // Make this service behave like a singleton in the app
 public class NotificationService implements INotificationService {
 
     // TODO Maybe there's some better instantiation options
