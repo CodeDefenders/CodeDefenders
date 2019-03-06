@@ -44,16 +44,16 @@
 			switch (message['message']) {
 			case 'NEW_MUTANT':
 				// After test is submitted
-				progressBar.innerHTML = '<div class="progress-bar progress-bar-info" role="progressbar" style="width: 33%; font-size: 15px; line-height: 40px;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">Validating and Compiling Mutant</div>';
+				progressBar.innerHTML = '<div class="progress-bar progress-bar-info" role="progressbar" style="width: 33%; font-size: 15px; line-height: 40px;" aria-valuenow="33" aria-valuemin="0" aria-valuemax="100">Validating Mutant</div>';
 				break;
 			case 'COMPILE_MUTANT': // After test is compiled
-				progressBar.innerHTML = '<div class="progress-bar progress-bar-info" role="progressbar" style="width: 66%; font-size: 15px; line-height: 40px;" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100">Running first Test Against Mutant</div>';
+				progressBar.innerHTML = '<div class="progress-bar progress-bar-info" role="progressbar" style="width: 66%; font-size: 15px; line-height: 40px;" aria-valuenow="66" aria-valuemin="0" aria-valuemax="100">Compiling Mutant </div>';
 				break;
 			case 'TEST_MUTANT': // After testing original
-				progressBar.innerHTML = '<div class="progress-bar progress-bar-warning" role="progressbar" style="width: 90%; font-size: 15px; line-height: 40px;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">Running more Tests Against Mutant</div>';
+				progressBar.innerHTML = '<div class="progress-bar progress-bar-warning" role="progressbar" style="width: 90%; font-size: 15px; line-height: 40px;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">Running Tests Against Mutant</div>';
 				break;
 			case 'MUTANT_KILLED': // If the mutant dies
-				progressBar.innerHTML = '<div class="progress-bar progress-bar-danger" role="progressbar" style="width: 90%; font-size: 15px; line-height: 40px;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Mutant was Killed</div>';
+				progressBar.innerHTML = '<div class="progress-bar progress-bar-danger" role="progressbar" style="width: 100%; font-size: 15px; line-height: 40px;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Mutant was Killed</div>';
 				
 				// Remove the bar from the DOM
                 progressBar.parentNode.removeChild(progressBar);
@@ -71,7 +71,7 @@
         
                 break;
 			case 'MUTANT_DONE':
-				progressBar.innerHTML = '<div class="progress-bar progress-bar-success" role="progressbar" style="width: 90%; font-size: 15px; line-height: 40px;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Mutant survived</div>';
+				progressBar.innerHTML = '<div class="progress-bar progress-bar-success" role="progressbar" style="width: 100%; font-size: 15px; line-height: 40px;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Mutant survived</div>';
 
 				// Remove the bar from the DOM
 				progressBar.parentNode.removeChild(progressBar);
