@@ -44,6 +44,7 @@ import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDAT
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_LOGIC_INSTANCEOF;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -58,6 +59,29 @@ public class CodeValidatorTest {
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+	@Test
+    public void mutantChangeInstanceofUsingStrictCheckingTriggerValidation(){
+        String originalCode = ""
+                + "public Complex pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + "public Complex pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Float ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + "}";
+        
+        assertEquals(MUTANT_VALIDATION_LOGIC_INSTANCEOF, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+    }
+    
+	
+	
 	@Test
 	public void mutantAfterSlashShouldNotTriggerValidation(){
 		String originalCode = ""
