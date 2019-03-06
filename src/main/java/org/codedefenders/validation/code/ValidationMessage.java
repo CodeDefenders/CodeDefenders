@@ -17,6 +17,9 @@ public enum ValidationMessage {
     MUTANT_VALIDATION_MODIFIER("Invalid mutant, sorry! Changing modifiers such as 'static' or 'public' is not allowed."),
     MUTANT_VALIDATION_COMMENT("Invalid mutant, sorry! Adding or modifying comments is not allowed."),
     MUTANT_VALIDATION_LOGIC("Invalid mutant, sorry! Your mutant contains new logical operations"),
+    
+    MUTANT_VALIDATION_LOGIC_INSTANCEOF("Invalid mutant, sorry! Your mutant modify an instanceof condition"),
+    
     MUTANT_VALIDATION_OPERATORS("Invalid mutant, sorry! Your mutant contains prohibited operations such as bitshifts, ternary operators, added comments or multiple statments per line."),
     MUTANT_VALIDATION_CALLS("Your mutant contains calls to System.*, Random.* or new control structures.\n\nShame on you!"),
     MUTANT_VALIDATION_IDENTICAL("Invalid mutant, sorry! Your mutant is identical to the CUT"),
@@ -24,15 +27,17 @@ public enum ValidationMessage {
     MUTANT_MISSING_INTENTION("Invalid mutant, sorry! You must declare your intention."),
     MUTATION_CLASS_DECLARATION("Invalid mutation contains class declaration."),
     MUTATION_METHOD_DECLARATION("Invalid mutation contains method declaration."),
+    
     MUTATION_SYSTEM_USE("Invalid mutation contains System uses"),
+    MUTATION_SYSTEM_CALL("Invalid mutation contains a call to System.*"),
+    MUTATION_SYSTEM_DECLARATION("Invalid mutation contains variable declaration using System.*"),
+
     MUTATION_FOR_EACH_STATEMENT("Invalid mutation contains a ForeachStmt statement"),
     MUTATION_IF_STATEMENT("Invalid mutation contains an IfStmt statement"),
     MUTATION_FOR_STATEMENT("Invalid mutation contains a ForStmt statement"),
     MUTATION_WHILE_STATEMENT("Invalid mutation contains a WhileStmt statement"),
     MUTATION_DO_STATEMENT("Invalid mutation contains a DoStmt statement"),
-    MUTATION_SWITCH_STATEMENT("Invalid mutation contains a SwitchStmt statement"),
-    MUTATION_SYSTEM_CALL("Invalid mutation contains a call to System.*"),
-    MUTATION_SYSTEM_DECLARATION("Invalid mutation contains variable declaration using System.*");
+    MUTATION_SWITCH_STATEMENT("Invalid mutation contains a SwitchStmt statement");
 
 	
     private String message;
