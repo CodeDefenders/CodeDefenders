@@ -108,4 +108,14 @@ function makeMarker() {
 // Trigger the logic that updates the UI at last
 toggleDefend();
 
+// If we there's lines to "pre-select" we do it now
+<%if (session.getAttribute("selected_lines") != null) {%>
+console.log("setting value for selected_lines "+<%=session.getAttribute("selected_lines")%> )
+input.setAttribute("value", "<%=session.getAttribute("selected_lines")%>");
+selectedLine = parseInt(<%=session.getAttribute("selected_lines")%>); 
+selectLine(selectedLine); // +1
+editor.setGutterMarker(selectedLine-1, "CodeMirror-linenumbers", makeMarker());
+<%}%>
+
+
 </script>

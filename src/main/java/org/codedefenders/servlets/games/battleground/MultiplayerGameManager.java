@@ -283,11 +283,15 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
         }
+        
         logger.debug("New Test {} by user {}", newTest.getId(), userId);
         TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
         if (game.isCapturePlayersIntention()) {
             collectDefenderIntentions(newTest, selectedLines, selectedMutants);
+            // Store intentions in the session in case tests is broken we automatically re-select the same line
+            // TODO At the moment, there is only and only one line
+            session.setAttribute("selected_lines", selectedLines.iterator().next());
         }
 
         if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
@@ -325,6 +329,9 @@ public class MultiplayerGameManager extends HttpServlet {
         MutationTester.runTestOnAllMultiplayerMutants(game, newTest, messages);
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
+        
+        // Clean up the session
+        session.removeAttribute("selected_lines");
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
     }
 
