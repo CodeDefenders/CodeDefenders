@@ -29,7 +29,12 @@ import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.body.TypeDeclaration;
 import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.comments.Comment;
+import com.github.javaparser.ast.expr.InstanceOfExpr;
 import com.github.javaparser.ast.stmt.BlockStmt;
+import com.github.javaparser.ast.stmt.IfStmt;
+import com.github.javaparser.ast.type.ReferenceType;
+import com.github.javaparser.ast.visitor.ModifierVisitor;
+import com.github.javaparser.ast.visitor.Visitable;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
@@ -44,6 +49,7 @@ import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -51,6 +57,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -151,6 +158,10 @@ public class CodeValidator {
 				}
 		}
 
+		if (level == CodeValidatorLevel.STRICT && containsInstanceOfChanges(originalCU, mutatedCU)) {
+		    return ValidationMessage.MUTANT_VALIDATION_LOGIC_INSTANCEOF;
+		}
+		
 		// Use AST to check for equivalence of CUT
 		if( originalCU.equals( mutatedCU ) ){
 			return ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
@@ -204,7 +215,50 @@ public class CodeValidator {
 		return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
 	}
 
-	private static boolean containsModifiedComments(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+	/**
+	 * Check if the mutation introduce a change to an instanceof condition
+	 * 
+	 * @param word_changes
+	 * @return
+	 */
+	private static boolean containsInstanceOfChanges(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+	    final List<ReferenceType> instanceOfInsideOriginal = new ArrayList<>();
+	    final List<ReferenceType> instanceOfInsideMutated = new ArrayList<>();
+	    final AtomicBoolean analyzingMutant = new AtomicBoolean(false);
+	    
+	    
+        ModifierVisitor<Void> visitor = new ModifierVisitor<Void>() {
+
+            @Override
+            public Visitable visit(IfStmt n, Void arg) {
+                // Extract elements from the condition
+                if (n.getCondition() instanceof InstanceOfExpr) {
+                    InstanceOfExpr expr = (InstanceOfExpr) n.getCondition();
+                    ReferenceType type = expr.getType();
+
+                    // Accumulate instanceOF
+                    if (analyzingMutant.get()) {
+                        instanceOfInsideMutated.add(type);
+                    } else {
+                        instanceOfInsideOriginal.add(type);
+                    }
+
+                }
+                return super.visit(n, arg);
+            }
+        };
+
+        visitor.visit(originalCU,null);
+        
+        if( ! instanceOfInsideOriginal.isEmpty() ){
+            analyzingMutant.set( true );
+            visitor.visit(mutatedCU, null);
+        }
+        
+        return ! instanceOfInsideMutated.equals( instanceOfInsideOriginal );
+    }
+
+    private static boolean containsModifiedComments(CompilationUnit originalCU, CompilationUnit mutatedCU) {
 		// We assume getAllContainedComments() preserves the order of comments
 		Comment[] originalComments = originalCU.getAllContainedComments().toArray(new Comment[] {});
 		Comment[] mutatedComments = mutatedCU.getAllContainedComments().toArray(new Comment[] {});
@@ -413,6 +467,7 @@ public class CodeValidator {
 	private static ValidationMessage validInsertion(String diff, CodeValidatorLevel level) {
 		try {
 			BlockStmt blockStmt = JavaParser.parseBlock("{ " + diff + " }");
+			// TODO Should this called always and not only for checking if there's validInsertion ?
 			MutationVisitor visitor = new MutationVisitor(level);
 			visitor.visit(blockStmt, null);
             if (!visitor.isValid()) {

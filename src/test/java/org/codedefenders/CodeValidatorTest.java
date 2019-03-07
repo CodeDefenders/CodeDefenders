@@ -22,6 +22,7 @@ import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.ValidationMessage;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,6 +45,7 @@ import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDAT
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_LOGIC_INSTANCEOF;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -58,6 +60,113 @@ public class CodeValidatorTest {
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+	@Test
+    public void mutantChangeInstanceofUsingStrictCheckingTriggerValidation(){
+        String originalCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.STRICT;
+        
+        assertEquals(MUTANT_VALIDATION_LOGIC_INSTANCEOF, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+    }
+	
+	@Test
+    public void mutantMultipleChangesInstanceofUsingStrictCheckingTriggerValidation(){
+        String originalCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int c = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int c = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int c = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.STRICT;
+        ValidationMessage actualMessage = validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel);
+        assertEquals(MUTANT_VALIDATION_LOGIC_INSTANCEOF, actualMessage);
+    }
+	
+	@Test
+    public void mutantNoChangeInstanceofUsingStrictCheckingShouldNotTriggerValidation(){
+        String originalCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int c = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int c = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int c = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.STRICT;
+        ValidationMessage actualMessage = validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel);
+        assertEquals(MUTANT_VALIDATION_SUCCESS, actualMessage);
+    }
+    
+	
+	
 	@Test
 	public void mutantAfterSlashShouldNotTriggerValidation(){
 		String originalCode = ""
