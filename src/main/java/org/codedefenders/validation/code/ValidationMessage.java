@@ -18,7 +18,7 @@ public enum ValidationMessage {
     MUTANT_VALIDATION_COMMENT("Invalid mutant, sorry! Adding or modifying comments is not allowed."),
     MUTANT_VALIDATION_LOGIC("Invalid mutant, sorry! Your mutant contains new logical operations"),
     
-    MUTANT_VALIDATION_LOGIC_INSTANCEOF("Invalid mutant, sorry! Your mutant modify an instanceof condition"),
+    MUTANT_VALIDATION_LOGIC_INSTANCEOF("Invalid mutant, sorry! Your mutant modifies an instanceof condition"),
     
     MUTANT_VALIDATION_OPERATORS("Invalid mutant, sorry! Your mutant contains prohibited operations such as bitshifts, ternary operators, added comments or multiple statments per line."),
     MUTANT_VALIDATION_CALLS("Your mutant contains calls to System.*, Random.* or new control structures.\n\nShame on you!"),
