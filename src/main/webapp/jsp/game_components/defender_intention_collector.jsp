@@ -100,8 +100,8 @@ editor.on("gutterClick", function(cm, n) {
 
 function makeMarker() {
   var marker = document.createElement("div");
-  marker.style.color = "#822";
-  marker.innerHTML = "x";
+  /* marker.style.color = "#822"; */
+  marker.innerHTML = "<span class=\"glyphicon glyphicon-hand-right\" aria-hidden=\"true\"></span>";
   return marker;
 }
 
