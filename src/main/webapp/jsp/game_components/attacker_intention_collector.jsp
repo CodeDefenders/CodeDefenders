@@ -37,7 +37,37 @@
     input.setAttribute("value", "");
     theForm.appendChild(input);
 
-    var attackDropDown = document.getElementById("attackDropDown");
+    // Replace the submit button with the following code:
+    var originalAttachButton = document.getElementById("submitMutant");
+
+    // Create the attackDropDown
+    var attackDropDown = document.createElement('div');
+    attackDropDown.setAttribute("id", "attackDropDown")
+    attackDropDown.setAttribute("class", "dropdown")
+    attackDropDown.setAttribute("style", "float: right; margin-right: 5px")
+    
+    var attackDropDownButton = document.createElement('button');
+    attackDropDownButton.setAttribute("type", "button")
+    attackDropDownButton.setAttribute("class", "btn btn-primary btn-game btn-right dropdown-toggle")
+    attackDropDownButton.setAttribute("data-toggle", "dropdown")
+    // Note the ID !
+    attackDropDownButton.setAttribute("id", "submitMutantTemp" )
+    attackDropDownButton.setAttribute("form", "atk" )
+    attackDropDownButton.setAttribute("aria-haspopup", "true" )
+    attackDropDownButton.setAttribute("aria-expanded", "false" )
+    attackDropDownButton.innerHTML="Attack <span class=\"glyphicon glyphicon-triangle-bottom\" style=\"font-size: small\"/></span>";
+    //
+    attackDropDown.appendChild(attackDropDownButton)
+    
+    <% if (game.getState() != GameState.ACTIVE) { %> 
+    attackDropDownButton.disabled = true;
+    <% } %>
+   
+    // At this point we replace originalAttachButton
+    originalAttachButton.parentNode.replaceChild(attackDropDown, originalAttachButton);
+
+    // Finally we adjust the id of the submitMutantTemp button
+    attackDropDownButton.setAttribute("id", "submitMutant")
 
     // create <ul> element containing list of intention options
     var intentionList = document.createElement('ul');

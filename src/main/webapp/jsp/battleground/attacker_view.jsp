@@ -92,13 +92,12 @@
 
             <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
             <%if (game.getState().equals(ACTIVE)) {%>
-            <div id="attackDropDown" class="dropdown" style="float: right; margin-right: 5px">
-                <button type="button" class="btn btn-primary btn-game btn-right dropdown-toggle" data-toggle="dropdown"
-                        id="submitMutant" form="atk" aria-haspopup="true" aria-expanded="false"
-                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                    Attack <span class="glyphicon glyphicon-triangle-bottom" style="font-size: small"/>
-                </button>
-            </div>
+
+			<button type="submit" class="btn btn-primary btn-game btn-right"
+				id="submitMutant" form="atk"
+				onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';"
+				style="float: right; margin-right: 5px"
+				<% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>Attack!</button>
             <% } %>
 
             <!-- Reset button -->
