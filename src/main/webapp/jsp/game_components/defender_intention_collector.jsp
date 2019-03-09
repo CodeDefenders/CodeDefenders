@@ -27,8 +27,8 @@ var codeOriginalDisplay= document.querySelector('#code').parentNode.style.displa
 var theForm = document.getElementById('def');
 var parent = document.getElementById('utest-div');
 var container = document.createElement('div');
-container.setAttribute("style", "text-align: center;");
-container.innerHTML='<h4 style="margin-top: 50px">Select a target line from the Class Under Test to enable test editor</h4>'
+container.setAttribute("style", "text-align: left;");
+container.innerHTML='<h4 style="margin-top: 50px">Click on the line number you are targeting in the Class Under Test<br> with your test to enable the test editor</h4>'
 // Hide the div
 container.style.display = "none";
 // Put the container before the form
