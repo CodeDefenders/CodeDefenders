@@ -36,16 +36,24 @@ parent.insertBefore(container, theForm);
 
 function toggleDefend() {
 	var input = document.getElementById('selected_lines');
+	var submitTestButton = document.getElementById('submitTest')
 	if( sLine == null ) {
 		// When no lines are selected hide code mirror and display the alternative text instead
-		document.getElementById('submitTest').disabled = true;
+		// Disable the button
+		submitTestButton.disabled = true;
+		// Standard text
+		submitTestButton.innerText = "Defend !";
+
 		document.querySelector('#code').parentNode.style.display = "none";
 		container.style.display = "block";
 		// Update the value of the hidden field
 		input.setAttribute("value", "");
 	} else {
-		// Use the whatever display value was there
-		document.getElementById('submitTest').disabled = false;
+		// Enable the button
+		submitTestButton.disabled = false;
+		// Update the text inside the Defend button to show the selected line as well
+		submitTestButton.innerText = "Defend Line " + sLine + " !";
+
 		document.querySelector('#code').parentNode.style.display = codeOriginalDisplay;
 		container.style.display = "none";
 		// Update the value of the hidden field
