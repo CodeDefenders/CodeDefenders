@@ -29,8 +29,8 @@ import java.nio.file.Paths;
 import java.util.Iterator;
 
 import static junit.framework.TestCase.assertTrue;
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.core.AllOf.allOf;
+import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -209,11 +209,15 @@ public class StaticAnalysisTest {
         String testTemplate = gc.getHTMLEscapedTestTemplate();
         assertThat(testTemplate, allOf(
                 containsString("import static org.junit.Assert.*;"),
+                containsString("import static org.hamcrest.MatcherAssert.assertThat;"),
+                containsString("import static org.hamcrest.Matchers.*;"),
                 containsString("import org.junit.*;")
         ));
+        
         // We need -1 to get rid of the last token
-        int expectedImports = testTemplate.split("import").length - 1;
-        assertEquals("The test template has the wrong number of imports", 2, expectedImports);
+        int expectedImports = 4;
+        int actualImports = testTemplate.split("import").length - 1;
+        assertEquals("The test template has the wrong number of imports", expectedImports, actualImports);
     }
 
     @Test
@@ -227,13 +231,16 @@ public class StaticAnalysisTest {
         assertThat(testTemplate, allOf(
                 containsString("import static org.junit.Assert.*;"),
                 containsString("import org.junit.*;"),
+                containsString("import static org.hamcrest.MatcherAssert.assertThat;"),
+                containsString("import static org.hamcrest.Matchers.*;"),
                 containsString("import java.util.Enumeration;"),
                 containsString("import java.util.Hashtable;"),
                 containsString("import java.util.Iterator;"),
                 containsString("import java.util.List;"),
                 containsString("import java.util.Vector;")));
 
-        int expectedImports = testTemplate.split("import").length - 1;
-        assertEquals("The test template has the wrong number of imports", 7, expectedImports);
+        int expectedImports = 9;
+        int actualImports = testTemplate.split("import").length - 1;
+        assertEquals("The test template has the wrong number of imports", expectedImports, actualImports);
     }
 }
