@@ -57,11 +57,14 @@ public class AutomaticImportTest {
 				allOf(
 						containsString("import static org.mockito.Mockito.*;"),
 						containsString("import static org.junit.Assert.*;"),
+						containsString("import static org.hamcrest.MatcherAssert.assertThat;"),
+                        containsString("import static org.hamcrest.Matchers.*;"),
 						containsString("import org.junit.*;")
 				));
 		// We need -1 to get rid of the last token
-		int expectedImports = testTemplate.split("import").length - 1;
-		assertEquals( "The test template has the wrong number of imports", 3, expectedImports );
+		int expectedImports = 5;
+		int actualImports = testTemplate.split("import").length - 1;
+		assertEquals( "The test template has the wrong number of imports", expectedImports, actualImports );
 	}
 
 	@org.junit.Test
@@ -73,10 +76,13 @@ public class AutomaticImportTest {
 
 		String testTemplate = gc.getHTMLEscapedTestTemplate();
 
+		
 		assertThat(testTemplate,
 				allOf(
 						containsString("import static org.mockito.Mockito.*;"),
 						containsString("import static org.junit.Assert.*;"),
+						containsString("import static org.hamcrest.MatcherAssert.assertThat;"),
+						containsString("import static org.hamcrest.Matchers.*;"),
 						containsString("import org.junit.*;"),
 						containsString("import java.util.Enumeration;"),
 						containsString("import java.util.Hashtable;"),
@@ -85,8 +91,9 @@ public class AutomaticImportTest {
 						containsString("import java.util.Vector;")
 						)
 				);
-
-		int expectedImports = testTemplate.split("import").length - 1;
-		assertEquals( "The test template has the wrong number of imports", 8, expectedImports );
+		int expectedImports = 10;
+		int actualImports = testTemplate.split("import").length - 1;
+		
+		assertEquals( "The test template has the wrong number of imports", expectedImports, actualImports);
 	}
 }

@@ -34,12 +34,15 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -48,6 +51,33 @@ import java.util.stream.IntStream;
  * modifying it or creating test cases for it.
  */
 public class GameClass {
+
+    public final static List<String> BASIC_IMPORTS;
+    public final static List<String> MOCKITO_IMPORTS;
+
+    static {
+        BASIC_IMPORTS = Collections.unmodifiableList(
+                Arrays.asList(
+                        // Enable JUnit
+                        "import org.junit.*;",
+                        // Additional empty line to match IntelliJ import formatting.
+                        "",
+                        // Enable easy Assertions
+                        "import static org.junit.Assert.*;",
+                        // Enable Hamcrest assertThat
+                        "import static org.hamcrest.MatcherAssert.assertThat;",
+                        // Enable Hamcrest basic Matchers
+                        "import static org.hamcrest.Matchers.*;"
+                )
+        );
+        MOCKITO_IMPORTS =
+                Collections.unmodifiableList(
+                        Arrays.asList(
+                                // Enable Mockito
+                                "import static org.mockito.Mockito.*;"
+                        )
+                );
+    }
 
     private static final Logger logger = LoggerFactory.getLogger(GameClass.class);
 
@@ -134,6 +164,15 @@ public class GameClass {
         return name;
     }
 
+    /**
+     * Returns a copy of the additional import statements computed for this class
+     *
+     * @return
+     */
+    public Set<String> getAdditionalImports() {
+        return new HashSet<>(additionalImports);
+    }
+
     public String getJavaFile() {
         return javaFile;
     }
@@ -186,6 +225,9 @@ public class GameClass {
      * <p>
      * Be aware that this template is not HTML escaped.
      * Please use {@link #getHTMLEscapedTestTemplate()}.
+     * <p>
+     * Apart from the additional imports, the template is
+     * formatted based on the default IntelliJ formatting.
      *
      * @return template for a JUnit test as a {@link String}.
      * @see #getHTMLEscapedTestTemplate()
@@ -194,10 +236,9 @@ public class GameClass {
         final StringBuilder bob = new StringBuilder();
         final String classPackage = getPackage();
         if (!classPackage.isEmpty()) {
-            bob.append(String.format("package %s;\n\n", classPackage));
+            bob.append(String.format("package %s\n;", classPackage));
+            bob.append("\n");
         }
-
-        bob.append("import org.junit.*;\n");
 
         for (String additionalImport : this.additionalImports) {
             // Additional import are already in the form of 'import X.Y.Z;\n'
@@ -205,9 +246,14 @@ public class GameClass {
         }
         bob.append("\n");
 
-        bob.append("import static org.junit.Assert.*;\n");
+        for (String importEntry : BASIC_IMPORTS) {
+            bob.append(importEntry).append("\n");
+        }
+
         if (this.isMockingEnabled) {
-            bob.append("import static org.mockito.Mockito.*;\n");
+            for (String importEntry : MOCKITO_IMPORTS) {
+                bob.append(importEntry).append("\n");
+            }
         }
         bob.append("\n");
 
@@ -227,19 +273,27 @@ public class GameClass {
         return StringEscapeUtils.escapeHtml(getTestTemplate());
     }
 
+    private final static Pattern TEST_METHOD_PATTERN = Pattern.compile(".*public void test\\(\\) throws Throwable.*");
+
     /**
+     * Returns the index of first editable line of this class
+     * test template.
+     * <p>
+     * Note that first index starts at 1.
+     *
      * @return the first editable line of this class test template.
      * @see #getTestTemplate()
      */
-    public Integer getTestTemplateFirstEditLine() {
-        int out = 8 + this.additionalImports.size();
-        if (!getPackage().isEmpty()) {
-            out += 2;
+    public int getTestTemplateFirstEditLine() {
+        String[] templateLines = getTestTemplate().split("\n");
+        for (int i = 0; i < templateLines.length; i++) {
+            Matcher matcher = TEST_METHOD_PATTERN.matcher(templateLines[i]);
+            if (matcher.find()) {
+                return i + 1;
+            }
         }
-        if (this.isMockingEnabled) {
-            out++;
-        }
-        return out;
+        logger.warn("Test template for {} does not contain valid test method.", name);
+        return -1;
     }
 
     public DuelGame getDummyGame() throws NoDummyGameException {
@@ -325,29 +379,27 @@ public class GameClass {
         return Collections.unmodifiableList(collect);
     }
 
-    @Override
-    public String toString() {
-        return "[id=" + id + ",name=" + name + ",alias=" + alias + "]";
-    }
-
     /**
      * Returns the empty lines which are covered by any of the already covered lines. An empty line
-     * can be covered if it belongs to a method and is followed by a covered line (either empty or not) 
-     * 
-     * @param alreadyCoveredLines
-     * @return
+     * can be covered if it belongs to a method and is followed by a covered line (either empty or not)
      */
     public List<Integer> getCoveredEmptyLines(List<Integer> alreadyCoveredLines) {
-        List<Integer> collect = new ArrayList();
-        for( Range<Integer> linesOfMethod : linesOfMethods){
-            for( int line = linesOfMethod.getMinimum(); line < linesOfMethod.getMaximum(); line ++){
-                if( emptyLines.contains(line) ){
-                    if( alreadyCoveredLines.contains( linesCoveringEmptyLines.get( line ) ) ){
-                        collect.add( line );
-                    } 
+        List<Integer> collect = new ArrayList<>();
+        for (Range<Integer> linesOfMethod : linesOfMethods) {
+            for (int line = linesOfMethod.getMinimum(); line < linesOfMethod.getMaximum(); line++) {
+                if (emptyLines.contains(line)) {
+                    if (alreadyCoveredLines.contains(linesCoveringEmptyLines.get(line))) {
+                        collect.add(line);
+                    }
                 }
             }
         }
         return Collections.unmodifiableList(collect);
     }
+
+    @Override
+    public String toString() {
+        return "[id=" + id + ",name=" + name + ",alias=" + alias + "]";
+    }
+
 }
