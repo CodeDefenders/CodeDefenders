@@ -149,7 +149,7 @@
                                 <% if (viewDiff){ %>
                                 <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>"
                                    data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
-                                    <div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
+                                    <div id="modalMut<%=m.getId()%>" class="modal mutant-modal fade" role="dialog"
                                          style="z-index: 10000;">
                                         <div class="modal-dialog">
                                             <!-- Modal content-->
@@ -217,7 +217,7 @@
                             </td>
                             <td class="col-sm-1">
                                 <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
-                                <div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
+                                <div id="modalMut<%=m.getId()%>" class="modal mutant-modal fade" role="dialog"
                                      style="z-index: 10000;">
                                     <div class="modal-dialog">
                                         <!-- Modal content-->
@@ -287,7 +287,7 @@
                     <td class="col-sm-1">
                         <% if (viewDiff){ %>
                         <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
-                        <div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
+                        <div id="modalMut<%=m.getId()%>" class="modal mutant-modal fade" role="dialog"
                              style="z-index: 10000;">
                             <div class="modal-dialog">
                                 <!-- Modal content-->
@@ -355,7 +355,7 @@
                             </td>
                             <td class="col-sm-1">
                                 <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
-                                <div id="modalMut<%=m.getId()%>" class="modal fade" role="dialog"
+                                <div id="modalMut<%=m.getId()%>" class="modal mutant-modal fade" role="dialog"
                                      style="z-index: 10000;">
                                     <div class="modal-dialog">
                                         <!-- Modal content-->
@@ -392,7 +392,7 @@
 </div>
 
 <script>
-    $('.modal').on('shown.bs.modal', function() {
+    $('.mutant-modal').on('shown.bs.modal', function() {
         var codeMirrorContainer = $(this).find(".CodeMirror")[0];
         if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
             codeMirrorContainer.CodeMirror.refresh();
