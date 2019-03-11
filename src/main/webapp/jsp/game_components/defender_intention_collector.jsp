@@ -27,8 +27,8 @@ var codeOriginalDisplay= document.querySelector('#code').parentNode.style.displa
 var theForm = document.getElementById('def');
 var parent = document.getElementById('utest-div');
 var container = document.createElement('div');
-container.setAttribute("style", "text-align: center;");
-container.innerHTML='<h4 style="margin-top: 50px">Select a target line from the Class Under Test to enable test editor</h4>'
+container.setAttribute("style", "text-align: left;");
+container.innerHTML='<h4 style="margin-top: 50px">Click on the line number you are targeting in the Class Under Test<br> with your test to enable the test editor</h4>'
 // Hide the div
 container.style.display = "none";
 // Put the container before the form
@@ -36,16 +36,24 @@ parent.insertBefore(container, theForm);
 
 function toggleDefend() {
 	var input = document.getElementById('selected_lines');
+	var submitTestButton = document.getElementById('submitTest')
 	if( sLine == null ) {
 		// When no lines are selected hide code mirror and display the alternative text instead
-		document.getElementById('submitTest').disabled = true;
+		// Disable the button
+		submitTestButton.disabled = true;
+		// Standard text
+		submitTestButton.innerText = "Defend !";
+
 		document.querySelector('#code').parentNode.style.display = "none";
 		container.style.display = "block";
 		// Update the value of the hidden field
 		input.setAttribute("value", "");
 	} else {
-		// Use the whatever display value was there
-		document.getElementById('submitTest').disabled = false;
+		// Enable the button
+		submitTestButton.disabled = false;
+		// Update the text inside the Defend button to show the selected line as well
+		submitTestButton.innerText = "Defend Line " + sLine + " !";
+
 		document.querySelector('#code').parentNode.style.display = codeOriginalDisplay;
 		container.style.display = "none";
 		// Update the value of the hidden field
@@ -100,8 +108,8 @@ editor.on("gutterClick", function(cm, n) {
 
 function makeMarker() {
   var marker = document.createElement("div");
-  marker.style.color = "#822";
-  marker.innerHTML = "x";
+  /* marker.style.color = "#822"; */
+  marker.innerHTML = "<span class=\"glyphicon glyphicon-hand-right\" aria-hidden=\"true\"></span>";
   return marker;
 }
 
