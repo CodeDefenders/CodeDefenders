@@ -34,7 +34,7 @@
             <tr>
                 <th id="toggle-all-details"><span class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span></th>
                 <th>ID</th>
-                <th>Name</th>
+                <th>Name (Alias)</th>
                 <th>Games Played</th>
                 <th>Test Submitted</th>
                 <th>Tests per Game</th>
@@ -139,7 +139,11 @@
                         "defaultContent": '<span class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"></span>'
                     },
                     { "data": "id" },
-                    { "data": "classname" },
+                    { "data":
+                            function(row, type, val, meta) {
+                                return row.classname + ' (' + row.classalias + ')';
+                            }
+                    },
                     { "data": "nrGames" },
                     { "data": "testsSubmitted" },
                     { "data":
