@@ -21,6 +21,7 @@ package org.codedefenders.api.analytics;
 public class ClassDataDTO {
     private long id;
     private String classname;
+    private String classalias;
     private int nrGames;
     private int attackerWins;
     private int defenderWins;
@@ -45,6 +46,14 @@ public class ClassDataDTO {
 
     public void setClassname(String classname) {
         this.classname = classname;
+    }
+
+    public String getClassalias() {
+        return classalias;
+    }
+
+    public void setClassalias(String classalias) {
+        this.classalias = classalias;
     }
 
     public int getNrGames() {

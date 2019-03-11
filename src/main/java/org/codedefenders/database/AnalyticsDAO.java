@@ -90,6 +90,7 @@ public class AnalyticsDAO {
     private static final String ANALYTICS_CLASS_DATA_QUERY = String.join("\n",
         "SELECT classes.Class_ID                                AS ID,",
         "       IFNULL(classes.Name,0)                          AS Classname,",
+        "       IFNULL(classes.Alias,0)                         AS Classalias,",
         "       IFNULL(NrGames,0)                               AS NrGames,",
         "       IFNULL(NrPlayers,0)                             AS NrPlayers,",
         "       IFNULL(AttackerWins,0)                          AS AttackerWins,",
@@ -306,6 +307,7 @@ public class AnalyticsDAO {
             ClassDataDTO c = new ClassDataDTO();
             c.setId(rs.getLong("ID"));
             c.setClassname(rs.getString("Classname"));
+            c.setClassalias(rs.getString("Classalias"));
             c.setNrGames(rs.getInt("NrGames"));
             c.setAttackerWins(rs.getInt("AttackerWins"));
             c.setDefenderWins(rs.getInt("DefenderWins"));

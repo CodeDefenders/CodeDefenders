@@ -108,6 +108,7 @@ public class AdminAnalyticsClassesApi extends HttpServlet {
         String[] columns = new String[]{
             "id",
             "classname",
+            "classalias",
             "nrGames",
             "attackerWins",
             "defenderWins",
