@@ -93,10 +93,8 @@ public class MutantDAO {
      */
     public static Mutant getMutantById(int mutantId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
-                "SELECT * FROM mutants ",
-                "LEFT JOIN players ON players.ID = mutants.Player_ID ",
-                "LEFT JOIN users ON players.User_ID = users.User_ID ",
-                "WHERE mutants.Mutant_ID = ?;");
+                "SELECT * FROM view_mutants_with_user m",
+                "WHERE m.Mutant_ID = ?;");
         return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DatabaseValue.of(mutantId));
     }
 
@@ -105,10 +103,8 @@ public class MutantDAO {
      */
     public static Mutant getMutantByGameAndMd5(int gameId, String md5) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
-                "SELECT * FROM mutants ",
-                "LEFT JOIN players ON players.ID=mutants.Player_ID ",
-                "LEFT JOIN users ON players.User_ID = users.User_ID ",
-                "WHERE mutants.Game_ID = ? AND mutants.MD5 = ?;");
+                "SELECT * FROM view_mutants_with_user m",
+                "WHERE m.Game_ID = ? AND m.MD5 = ?;");
         return DB.executeQueryReturnValue(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId), DatabaseValue.of(md5));
     }
 
@@ -117,12 +113,9 @@ public class MutantDAO {
      */
     public static List<Mutant> getMutantsByGameAndPlayer(int gameId, int playerId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
-                "SELECT * FROM mutants ",
-                "LEFT JOIN players ON players.ID = mutants.Player_ID ",
-                "LEFT JOIN users ON players.User_ID = users.User_ID ",
-                "WHERE mutants.Game_ID = ?",
-                "  AND mutants.Player_ID = ?",
-                ";");
+                "SELECT * FROM view_mutants_with_user m",
+                "WHERE m.Game_ID = ?",
+                "  AND m.Player_ID = ?;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId), DatabaseValue.of( playerId));
     }
     
@@ -131,12 +124,9 @@ public class MutantDAO {
      */
     public static List<Mutant> getMutantsByGameAndUser(int gameId, int userId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
-                "SELECT * FROM mutants ",
-                "LEFT JOIN players ON players.ID = mutants.Player_ID ",
-                "LEFT JOIN users ON players.User_ID = users.User_ID ",
-                "WHERE mutants.Game_ID = ?",
-                "  AND players.User_ID = ?",
-                ";");
+                "SELECT * FROM view_mutants_with_user m",
+                "WHERE m.Game_ID = ?",
+                "  AND m.User_ID = ?;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId), DatabaseValue.of( userId));
     }
     
@@ -145,11 +135,9 @@ public class MutantDAO {
      */
     public static List<Mutant> getValidMutantsForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
-                "SELECT * FROM mutants ",
-                "LEFT JOIN players ON players.ID = mutants.Player_ID ",
-                "LEFT JOIN users ON players.User_ID = users.User_ID ",
-                "WHERE mutants.Game_ID = ?",
-                "  AND mutants.ClassFile IS NOT NULL;");
+                "SELECT *",
+                "FROM view_valid_mutants m ",
+                "WHERE m.Game_ID = ?;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId));
     }
 
@@ -160,21 +148,19 @@ public class MutantDAO {
         List<Mutant> result = new ArrayList<>();
 
         String query = String.join("\n",
-                "SELECT mutants.*",
-                "FROM mutants, games",
-                "WHERE mutants.Game_ID = games.ID",
-                "  AND games.Class_ID = ?",
-                "  AND mutants.ClassFile IS NOT NULL;");
+                "SELECT m.*",
+                "FROM view_valid_mutants m, games",
+                "WHERE m.Game_ID = games.ID",
+                "  AND games.Class_ID = ?");
 
         result.addAll(DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(classId)));
 
         // Include also those mutants created during the upload. Player = -1
         String systemAttackerQuery = String.join("\n",
-                "SELECT mutants.*",
-                "FROM mutants, mutant_uploaded_with_class up",
-                "WHERE mutants.Mutant_ID = up.Mutant_ID",
-                "  AND mutants.Class_ID = ?",
-                "  AND mutants.ClassFile IS NOT NULL;");
+                "SELECT m.*",
+                "FROM view_valid_mutants m, mutant_uploaded_with_class up",
+                "WHERE m.Mutant_ID = up.Mutant_ID",
+                "  AND m.Class_ID = ?;");
 
         result.addAll(DB.executeQueryReturnList(systemAttackerQuery, MutantDAO::mutantFromRS, DatabaseValue.of(classId)));
 
@@ -186,11 +172,9 @@ public class MutantDAO {
      */
     public static List<Mutant> getValidMutantsForPlayer(int playerId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
-                "SELECT * FROM mutants ",
-                "LEFT JOIN players ON players.ID=mutants.Player_ID ",
-                "LEFT JOIN users ON players.User_ID = users.User_ID ",
-                "WHERE mutants.Player_ID = ?",
-                "  AND mutants.ClassFile IS NOT NULL;");
+                "SELECT *",
+                "FROM view_valid_mutants m ",
+                "WHERE Player_ID = ?");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(playerId));
     }
 

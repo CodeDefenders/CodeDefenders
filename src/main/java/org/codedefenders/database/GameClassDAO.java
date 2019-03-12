@@ -96,7 +96,7 @@ public class GameClassDAO {
      * @return all game classes.
      */
     public static List<GameClass> getAllClasses() {
-        String query = "SELECT * FROM classes;";
+        String query = "SELECT * FROM view_playable_classes;";
 
         return DB.executeQueryReturnList(query, GameClassDAO::gameClassFromRS);
     }

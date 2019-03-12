@@ -6,12 +6,27 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
+DROP TABLE IF EXISTS `killmapjob`;
 
+CREATE TABLE killmapjob
+(
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Game_ID` int(11),
+  `Class_ID` int(11),
+  `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`ID`)
+) AUTO_INCREMENT=1;
+
+DROP TABLE IF EXISTS `test_smell`;
+CREATE TABLE test_smell (
+	`Test_ID` int(11),
+	`smell_name` VARCHAR(500),
+	PRIMARY KEY (Test_ID, smell_name)
+);
 
 --
 -- Table structure for table `settings`
 --
-
 DROP TABLE IF EXISTS `settings`;
 CREATE TABLE `settings` (
   `name` varchar(50) NOT NULL,
@@ -43,7 +58,8 @@ INSERT INTO settings (name, type, STRING_VALUE, INT_VALUE, BOOL_VALUE) VALUES
   ('EMAIL_ADDRESS', 'STRING_VALUE', '', NULL, NULL),
   ('EMAILS_ENABLED', 'BOOL_VALUE', NULL, NULL, FALSE),
   ('DEBUG_MODE', 'BOOL_VALUE', NULL, NULL, FALSE),
-  ('EMAIL_PASSWORD', 'STRING_VALUE', '', NULL, NULL);
+  ('EMAIL_PASSWORD', 'STRING_VALUE', '', NULL, NULL),
+  ('AUTOMATIC_KILLMAP_COMPUTATION', 'BOOL_VALUE', NULL, NULL, FALSE);
 
 --
 -- Table structure for table `ratings`
@@ -74,6 +90,7 @@ CREATE TABLE `classes` (
   `Alias` varchar(50) NOT NULL,
   `AiPrepared` tinyint(1) DEFAULT '0',
   `RequireMocking` tinyint(1) DEFAULT '0',
+  `Puzzle` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`Class_ID`),
   UNIQUE KEY `classes_Alias_uindex` (`Alias`)
 ) AUTO_INCREMENT=100;
@@ -119,21 +136,25 @@ CREATE TABLE `games` (
   `ChatEnabled` tinyint(1) DEFAULT '1',
   `Attackers_Limit` int(11) DEFAULT '0',
   `Defenders_Limit` int(11) DEFAULT '0',
-  `State` enum('CREATED','ACTIVE','FINISHED','GRACE_ONE','GRACE_TWO') DEFAULT 'CREATED',
+  `State` enum('CREATED','ACTIVE','FINISHED','GRACE_ONE','GRACE_TWO','SOLVED','FAILED') DEFAULT 'CREATED',
   `CurrentRound` tinyint(4) NOT NULL DEFAULT '1',
   `FinalRound` tinyint(4) NOT NULL DEFAULT '5',
   `ActiveRole` enum('ATTACKER','DEFENDER') NOT NULL DEFAULT 'ATTACKER',
-  `Mode` enum('SINGLE','DUEL','PARTY','UTESTING') NOT NULL DEFAULT 'DUEL',
+  `Mode` enum('SINGLE','DUEL','PARTY','UTESTING','PUZZLE') NOT NULL DEFAULT 'DUEL',
   `RequiresValidation` tinyint(1) NOT NULL DEFAULT '0',
   `IsAIDummyGame` tinyint(1) NOT NULL DEFAULT '0',
   `HasKillMap` tinyint(1) NOT NULL DEFAULT '0',
   `CapturePlayersIntention` tinyint(1) NOT NULL DEFAULT '0',
+  `Puzzle_ID` int(11) DEFAULT NULL,
   PRIMARY KEY (`ID`),
   KEY `fk_creatorId_idx` (`Creator_ID`),
   KEY `fk_className_idx` (`Class_ID`),
+  KEY `games_puzzles_Puzzle_ID_fk` (`Puzzle_ID`),
   CONSTRAINT `fk_classId` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_className` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `fk_creatorId` FOREIGN KEY (`Creator_ID`) REFERENCES `users` (`User_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `hasKillMap` CHECK (HasKillMap = 0 OR State = 'FINISHED'), -- only finished games can have a killmap
+  CONSTRAINT `games_puzzles_Puzzle_ID_fk` FOREIGN KEY (`Puzzle_ID`) REFERENCES `puzzles` (`Puzzle_ID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) AUTO_INCREMENT=100;
 
 --
@@ -194,6 +215,7 @@ CREATE TABLE `mutants` (
   CONSTRAINT `fk_gameId_muts` FOREIGN KEY (`Game_ID`) REFERENCES `games` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `fk_playerId_muts` FOREIGN KEY (`Player_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) AUTO_INCREMENT=100;
+
 
 --
 -- Mapping between mutants and the class the mutant is uploaded together with
@@ -260,6 +282,44 @@ CREATE TABLE `targetexecutions` (
 ) AUTO_INCREMENT=100;
 
 --
+-- Table structure for table `puzzle_chapters`
+--
+
+DROP TABLE IF EXISTS `puzzle_chapters`;
+CREATE TABLE `puzzle_chapters` (
+  `Chapter_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Position` int(11) DEFAULT NULL,
+  `Title` varchar(100) DEFAULT NULL,
+  `Description` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`Chapter_ID`),
+  UNIQUE KEY `puzzles_chapter_Position_unique` (`Position`)
+) AUTO_INCREMENT=100;
+
+--
+-- Table structure for table `puzzles`
+--
+
+DROP TABLE IF EXISTS `puzzles`;
+CREATE TABLE `puzzles` (
+  `Puzzle_ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Class_ID` int(11) NOT NULL,
+  `Active_Role` enum('ATTACKER','DEFENDER') NOT NULL,
+  `Level` enum('EASY','HARD') DEFAULT 'HARD',
+  `Max_Assertions` int(11) NOT NULL DEFAULT '2',
+  `Mutant_Validator_Level` enum('STRICT','MODERATE','RELAXED') NOT NULL DEFAULT 'MODERATE',
+  `Editable_Lines_Start` int(11) DEFAULT NULL,
+  `Editable_Lines_End` int(11) DEFAULT NULL,
+  `Chapter_ID` int(11) DEFAULT NULL,
+  `Position` int(11) DEFAULT NULL,
+  `Title` varchar(100) DEFAULT NULL,
+  `Description` varchar(1000) DEFAULT NULL,
+  PRIMARY KEY (`Puzzle_ID`),
+  UNIQUE KEY `puzzles_Chapter_ID_Position_unique` (`Chapter_ID`,`Position`),
+  KEY `puzzles_classes_Class_ID_fk` (`Class_ID`),
+  CONSTRAINT `puzzles_classes_Class_ID_fk` FOREIGN KEY (`Class_ID`) REFERENCES `classes` (`Class_ID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `puzzles_puzzle_chapters_Level_fk` FOREIGN KEY (`Chapter_ID`) REFERENCES `puzzle_chapters` (`Chapter_ID`) ON DELETE SET NULL ON UPDATE CASCADE
+) AUTO_INCREMENT=100;
+--
 -- Table structure for table `tests`
 --
 
@@ -300,6 +360,18 @@ CREATE TABLE `test_uploaded_with_class` (
   FOREIGN KEY (`Class_ID`) REFERENCES classes (`Class_ID`),
   FOREIGN KEY (`Test_ID`) REFERENCES tests (`Test_ID`)
 );
+
+DROP TABLE IF EXISTS `intention`;
+CREATE TABLE `intention` (
+  `Intention_ID`       int(11) NOT NULL AUTO_INCREMENT,
+  `Test_ID`            int(11),
+  `Mutant_ID`          int(11),
+  `Game_ID`            int(11) NOT NULL,
+  `Target_Mutants`     longtext,
+  `Target_Lines`       longtext,
+  `Target_Mutant_Type` longtext,
+  PRIMARY KEY (`Intention_ID`)
+) AUTO_INCREMENT = 1;
 --
 -- Table structure for table `usedaimutants`
 --
@@ -399,6 +471,25 @@ CREATE TABLE `sessions` (
 ) AUTO_INCREMENT=100;
 
 --
+-- Table structure for table `equivalences`
+--
+
+DROP TABLE IF EXISTS `equivalences`;
+CREATE TABLE `equivalences` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `Mutant_ID` int(11) DEFAULT NULL,
+  `Defender_ID` int(11) DEFAULT NULL,
+  `Mutant_Points` int(11) DEFAULT '0',
+  `Expired` tinyint(4) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID_UNIQUE` (`ID`),
+  KEY `fk_equiv_def_idx` (`Defender_ID`),
+  KEY `fk_equiv_mutant_idx` (`Mutant_ID`),
+  CONSTRAINT `fk_equiv_def` FOREIGN KEY (`Defender_ID`) REFERENCES `players` (`ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fk_equiv_mutant` FOREIGN KEY (`Mutant_ID`) REFERENCES `mutants` (`Mutant_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) AUTO_INCREMENT=100;
+
+--
 -- Table structure for table `events`
 --
 
@@ -466,6 +557,69 @@ VALUES
   ('GAME_PLAYER_LEFT','@event_user left the game'),
   ('GAME_STARTED','The game has started!');
 
+CREATE OR REPLACE VIEW `view_playable_classes` AS
+SELECT *
+FROM `classes`
+WHERE Puzzle = 0;
+
+CREATE OR REPLACE VIEW `view_puzzle_classes` AS
+SELECT *
+FROM `classes`
+WHERE Puzzle = 1;
+
+CREATE OR REPLACE VIEW `view_battleground_games` AS
+SELECT *
+FROM games
+WHERE Mode = 'PARTY';
+
+CREATE OR REPLACE VIEW `view_puzzle_games` AS
+SELECT *
+FROM games
+WHERE Mode = 'PUZZLE';
+
+CREATE OR REPLACE VIEW `view_mutants_with_user` AS
+SELECT mutants.*, users.*
+FROM mutants
+       LEFT JOIN players ON players.ID = mutants.Player_ID
+       LEFT JOIN users ON players.User_ID = users.User_ID;
+
+CREATE OR REPLACE VIEW `view_valid_mutants` AS
+SELECT *
+FROM view_mutants_with_user
+WHERE ClassFile IS NOT NULL;
+
+CREATE OR REPLACE VIEW `view_players` AS
+SELECT *
+FROM players
+WHERE `ID` >= 100;
+
+CREATE OR REPLACE VIEW `view_players_with_userdata` AS
+SELECT p.*,
+       u.Password  AS usersPassword,
+       u.Username  AS usersUsername,
+       u.Email     AS usersEmail,
+       u.Validated AS usersValidated,
+       u.Active    AS usersActive
+FROM players AS p,
+     users AS u
+WHERE p.User_ID = u.User_ID;
+
+CREATE OR REPLACE VIEW `view_valid_tests` AS
+SELECT *
+FROM tests
+WHERE tests.ClassFile IS NOT NULL
+  AND EXISTS(
+    SELECT *
+    FROM targetexecutions ex
+    WHERE ex.Test_ID = tests.Test_ID
+      AND ex.Target = 'TEST_ORIGINAL'
+      AND ex.Status = 'SUCCESS'
+  );
+
+CREATE OR REPLACE VIEW `view_valid_users`
+AS SELECT * FROM `users`
+   WHERE `User_ID` >= 5;
+
 --
 -- Leaderboard Views
 --
@@ -499,15 +653,9 @@ CREATE OR REPLACE VIEW `view_leaderboard`
       IFNULL(DScore, 0)                     AS DScore,
       IFNULL(NKilled, 0)                    AS NKilled,
       IFNULL(AScore, 0) + IFNULL(DScore, 0) AS TotalScore
-    FROM users U
+    FROM view_valid_users U
       LEFT JOIN view_attackers ON U.user_id = view_attackers.user_id
-      LEFT JOIN view_defenders ON U.user_id = view_defenders.user_id
-    WHERE U.user_id >= 100; -- Ignore automated players
-
-
-
--- Event to activate multiplayer game
--- SET @@global.event_scheduler = 1;
+      LEFT JOIN view_defenders ON U.user_id = view_defenders.user_id;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;

@@ -233,13 +233,11 @@ public class MultiplayerGameDAO {
     public static MultiplayerGame getMultiplayerGame(int gameId) {
         String query = String.join("\n",
                 "SELECT *",
-                "FROM games",
-                "WHERE ID=?",
-                "  AND Mode = ?");
+                "FROM view_battleground_games",
+                "WHERE ID=?;");
 
         DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(gameId),
-                DatabaseValue.of(GameMode.PARTY.name())
+                DatabaseValue.of(gameId)
         };
 
         return DB.executeQueryReturnValue(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
@@ -253,13 +251,11 @@ public class MultiplayerGameDAO {
     public static List<MultiplayerGame> getAvailableMultiplayerGames() {
         String query = String.join("\n",
                 "SELECT *",
-                "FROM games",
+                "FROM view_battleground_games",
                 "WHERE State != ?",
-                "  AND Mode = ?",
                 "  AND Finish_Time > NOW();");
         DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(GameState.FINISHED.name()),
-                DatabaseValue.of(GameMode.PARTY.name())
+                DatabaseValue.of(GameState.FINISHED.name())
         };
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
     }
@@ -271,14 +267,13 @@ public class MultiplayerGameDAO {
      * @return a list of {@link MultiplayerGame MultiplayerGames}, empty if none are found.
      */
     public static List<MultiplayerGame> getOpenMultiplayerGamesForUser(int userId) {
-        // TODO Phil 27/12/18: use a view for open multiplayer games
         String query = String.join("\n",
                 "SELECT *" +
-                        "FROM games AS g",
+                        "FROM view_battleground_games AS g",
                 "INNER JOIN (SELECT gatt.ID, sum(CASE WHEN Role = 'ATTACKER' THEN 1 ELSE 0 END) nAttackers, sum(CASE WHEN Role = 'DEFENDER' THEN 1 ELSE 0 END) nDefenders",
                 "              FROM games AS gatt LEFT JOIN players ON gatt.ID = players.Game_ID AND players.Active = TRUE GROUP BY gatt.ID) AS nplayers",
                 "  ON g.ID = nplayers.ID",
-                "WHERE g.Mode='PARTY' AND g.Creator_ID!=? AND (g.State='CREATED' OR g.State='ACTIVE')",
+                "WHERE g.Creator_ID!=? AND (g.State='CREATED' OR g.State='ACTIVE')",
                 "  AND (g.RequiresValidation=FALSE OR (? IN (SELECT User_ID FROM users WHERE Validated=TRUE)))",
                 "  AND g.ID NOT IN (SELECT g.ID FROM games g INNER JOIN players p ON g.ID=p.Game_ID WHERE p.User_ID=? AND p.Active=TRUE)",
                 "  AND (nplayers.nAttackers < g.Attackers_Limit OR nplayers.nDefenders < g.Defenders_Limit);");
@@ -302,15 +297,13 @@ public class MultiplayerGameDAO {
     public static List<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
         String query = String.join("\n",
                 "SELECT DISTINCT m.*",
-                "FROM games AS m",
+                "FROM view_battleground_games AS m",
                 "LEFT JOIN players AS p",
                 "  ON p.Game_ID=m.ID",
                 "    AND p.Active=TRUE",
-                "WHERE m.Mode = ?",
-                "  AND (p.User_ID = ? OR m.Creator_ID = ?)",
+                "WHERE (p.User_ID = ? OR m.Creator_ID = ?)",
                 "  AND m.State != ?;");
         DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(GameMode.PARTY.name()),
                 DatabaseValue.of(userId),
                 DatabaseValue.of(userId),
                 DatabaseValue.of(GameState.FINISHED.name())
@@ -328,14 +321,12 @@ public class MultiplayerGameDAO {
     public static List<MultiplayerGame> getJoinedMultiplayerGamesForUser(int userId) {
         String query = String.join("\n",
                 "SELECT DISTINCT m.*",
-                "FROM games AS m",
+                "FROM view_battleground_games AS m",
                 "LEFT JOIN players AS p",
                 "  ON p.Game_ID = m.ID \n",
-                "WHERE m.Mode = ?",
-                "  AND (p.User_ID = ?);");
+                "WHERE (p.User_ID = ?);");
 
         DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(GameMode.PARTY.name()),
                 DatabaseValue.of(userId)
         };
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
@@ -351,18 +342,16 @@ public class MultiplayerGameDAO {
     public static List<MultiplayerGame> getFinishedMultiplayerGamesForUser(int userId) {
         String query = String.join("\n",
                 "SELECT DISTINCT m.* ",
-                "FROM games AS m ",
+                "FROM view_battleground_games AS m ",
                 "LEFT JOIN players AS p ON p.Game_ID = m.ID ",
                 "  AND p.Active = TRUE",
                 "WHERE (p.User_ID = ? OR m.Creator_ID = ?)",
-                "  AND m.State = ?",
-                "  AND m.Mode = ?;");
+                "  AND m.State = ?;");
 
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(userId),
                 DatabaseValue.of(userId),
-                DatabaseValue.of(GameState.FINISHED.name()),
-                DatabaseValue.of(GameMode.PARTY.name())
+                DatabaseValue.of(GameState.FINISHED.name())
         };
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
     }
@@ -377,13 +366,11 @@ public class MultiplayerGameDAO {
     public static List<MultiplayerGame> getUnfinishedMultiplayerGamesCreatedBy(int creatorId) {
         String query = String.join("\n",
                 "SELECT *",
-                "FROM games",
-                "WHERE Mode = ?",
-                "  AND (State = ?",
+                "FROM view_battleground_games",
+                "WHERE (State = ?",
                 "    OR State = ?)",
                 "  AND Creator_ID = ?;");
         DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(GameMode.PARTY.name()),
                 DatabaseValue.of(GameState.ACTIVE.name()),
                 DatabaseValue.of(GameState.CREATED.name()),
                 DatabaseValue.of(creatorId)
