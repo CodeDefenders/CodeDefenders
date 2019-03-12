@@ -121,6 +121,12 @@ public class MultiplayerGameManager extends HttpServlet {
         int userId = ServletUtils.userId(request);
         int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(userId, gameId);
 
+        if (playerId == -1) {
+            logger.info("User {} not part of game {}. Aborting request.", userId, gameId);
+            response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
+            return;
+        }
+
         // check is there is a pending equivalence duel for the user.
         game.getMutantsMarkedEquivalentPending()
                 .stream()
