@@ -196,7 +196,7 @@ public class LoginManager extends HttpServlet {
 				email = request.getParameter("accountEmail");
 				username = request.getParameter("accountUsername");
 				User u = UserDAO.getUserByEmail(email);
-                if (u == null || !u.getUsername().equals(username) || !u.getEmail().equals(email)) {
+                if (u == null || !u.getUsername().equals(username) || !u.getEmail().equalsIgnoreCase(email)) {
                     messages.add("No such User found or Email and Username do not match");
                 } else {
                     String resetPwSecret = generatePasswordResetSecret();
