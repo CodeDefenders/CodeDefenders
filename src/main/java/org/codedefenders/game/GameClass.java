@@ -236,7 +236,7 @@ public class GameClass {
         final StringBuilder bob = new StringBuilder();
         final String classPackage = getPackage();
         if (!classPackage.isEmpty()) {
-            bob.append(String.format("package %s\n;", classPackage));
+            bob.append(String.format("package %s;\n", classPackage));
             bob.append("\n");
         }
 
