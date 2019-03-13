@@ -26,7 +26,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -34,10 +33,9 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.nio.file.Paths;
 
-import static org.codedefenders.util.Constants.F_SEP;
-import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
-import static org.codedefenders.util.Constants.TEST_PREFIX;
+import static org.codedefenders.util.Constants.*;
 
 /**
  * This class offers static methods for file functionality.
@@ -64,12 +62,8 @@ public class FileUtils {
     public static File getNextSubDir(String path) {
         File folder = new File(path);
         folder.mkdirs();
-        String[] directories = folder.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory() && (isParsable(name));
-            }
-        });
+        String[] directories = folder.list(
+                (current, name) -> new File(current, name).isDirectory() && (isParsable(name)));
         Arrays.sort(directories);
         String newPath;
         if (directories.length == 0)
@@ -155,5 +149,33 @@ public class FileUtils {
             return fileName;
         }
         return fileName.substring(0, index);
+    }
+
+    /**
+     * Converts a path relative to {@link Constants#DATA_DIR} to an absolute path.
+     * If the given path is absolute, returns the given path. If the given path is relative, returns an absolute path
+     * that concatenates {@link Constants#DATA_DIR} and the given path.
+     *
+     * @param path a path relative to {@link Constants#DATA_DIR}, or an absolute path.
+     * @return an absolute path that describes the given path.
+     */
+    public static Path getDataPath(String path) {
+        return getDataPath(Paths.get(path));
+    }
+
+    /**
+     * Converts a path relative to {@link Constants#DATA_DIR} to an absolute path.
+     * If the given path is absolute, returns the given path. If the given path is relative, returns an absolute path
+     * that concatenates {@link Constants#DATA_DIR} and the given path.
+     *
+     * @param path a path relative to {@link Constants#DATA_DIR}, or an absolute path.
+     * @return an absolute path that describes the given path.
+     */
+    public static Path getDataPath(Path path) {
+        if (path.isAbsolute()) {
+            return path;
+        } else {
+            return Paths.get(DATA_DIR, path.toString());
+        }
     }
 }
