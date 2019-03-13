@@ -22,6 +22,7 @@ import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Test;
+import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,6 +63,8 @@ public class TestDAO {
         }
         String javaFile = rs.getString("JavaFile");
         String classFile = rs.getString("ClassFile");
+        String absoluteJavaFile = FileUtils.getAbsoluteDataPath(javaFile).toString();
+        String absoluteClassFile = FileUtils.getAbsoluteDataPath(classFile).toString();
         int roundCreated = rs.getInt("RoundCreated");
         int mutantsKilled = rs.getInt("MutantsKilled");
         int playerId = rs.getInt("Player_ID");
@@ -83,8 +86,8 @@ public class TestDAO {
                             .collect(Collectors.toList()));
         }
 
-        return new Test(testId, classId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId,
-                linesCovered, linesUncovered, points);
+        return new Test(testId, classId, gameId, absoluteJavaFile, absoluteClassFile, roundCreated, mutantsKilled,
+                playerId, linesCovered, linesUncovered, points);
     }
 
     /**
@@ -219,6 +222,8 @@ public class TestDAO {
     public static int storeTest(Test test) throws UncheckedSQLException {
         String javaFile = DatabaseAccess.addSlashes(test.getJavaFile());
         String classFile = DatabaseAccess.addSlashes(test.getClassFile());
+        String relativeJavaFile = FileUtils.getRelativeDataPath(javaFile).toString();
+        String relativeClassFile = FileUtils.getRelativeDataPath(classFile).toString();
         int gameId = test.getGameId();
         int roundCreated = test.getRoundCreated();
         int mutantsKilled = test.getMutantsKilled();
@@ -237,8 +242,8 @@ public class TestDAO {
 
         String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, MutantsKilled, Player_ID, Points, Class_ID, Lines_Covered, Lines_Uncovered) VALUES (?,?,?,?,?,?,?,?,?,?);";
         DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(javaFile),
-                DatabaseValue.of(classFile),
+                DatabaseValue.of(relativeJavaFile),
+                DatabaseValue.of(relativeClassFile),
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(roundCreated),
                 DatabaseValue.of(mutantsKilled),

@@ -20,6 +20,7 @@ package org.codedefenders.database;
 
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.model.Dependency;
+import org.codedefenders.util.FileUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -43,7 +44,9 @@ public class DependencyDAO {
         final int id = rs.getInt("Dependency_ID");
         final String javaFile = rs.getString("JavaFile");
         final String classFile = rs.getString("ClassFile");
-        return new Dependency(id, classId, javaFile, classFile);
+        String absoluteJavaFile = FileUtils.getAbsoluteDataPath(javaFile).toString();
+        String absoluteClassFile = FileUtils.getAbsoluteDataPath(classFile).toString();
+        return new Dependency(id, classId, absoluteJavaFile, absoluteClassFile);
     }
 
     /**
@@ -57,12 +60,14 @@ public class DependencyDAO {
         int classId = dependency.getClassId();
         String javaFile = DatabaseAccess.addSlashes(dependency.getJavaFile());
         String classFile = DatabaseAccess.addSlashes(dependency.getClassFile());
+        String relativeJavaFile = FileUtils.getRelativeDataPath(javaFile).toString();
+        String relativeClassFile = FileUtils.getRelativeDataPath(classFile).toString();
 
         String query = "INSERT INTO dependencies (Class_ID, JavaFile, ClassFile) VALUES (?, ?, ?);";
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
-                DatabaseValue.of(javaFile),
-                DatabaseValue.of(classFile)
+                DatabaseValue.of(relativeJavaFile),
+                DatabaseValue.of(relativeClassFile)
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);

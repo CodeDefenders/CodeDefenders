@@ -159,8 +159,8 @@ public class FileUtils {
      * @param path a path relative to {@link Constants#DATA_DIR}, or an absolute path.
      * @return an absolute path that describes the given path.
      */
-    public static Path getDataPath(String path) {
-        return getDataPath(Paths.get(path));
+    public static Path getAbsoluteDataPath(String path) {
+        return getAbsoluteDataPath(Paths.get(path));
     }
 
     /**
@@ -171,11 +171,37 @@ public class FileUtils {
      * @param path a path relative to {@link Constants#DATA_DIR}, or an absolute path.
      * @return an absolute path that describes the given path.
      */
-    public static Path getDataPath(Path path) {
+    public static Path getAbsoluteDataPath(Path path) {
         if (path.isAbsolute()) {
             return path;
         } else {
             return Paths.get(DATA_DIR, path.toString());
+        }
+    }
+
+    /**
+     * Converts an absolute path to a path relative to {@link Constants#DATA_DIR} if the path is a descendant of
+     * {@link Constants#DATA_DIR}. Otherwise, returns the given path itself.
+     *
+     * @param path an absolute path.
+     * @return a path relative to {@link Constants#DATA_DIR} or the path itself.
+     */
+    public static Path getRelativeDataPath(String path) {
+        return getRelativeDataPath(Paths.get(path));
+    }
+
+    /**
+     * Converts an absolute path to a path relative to {@link Constants#DATA_DIR} if the path is a descendant of
+     * {@link Constants#DATA_DIR}. Otherwise, returns the given path itself.
+     *
+     * @param path an absolute path.
+     * @return a path relative to {@link Constants#DATA_DIR} or the path itself.
+     */
+    public static Path getRelativeDataPath(Path path) {
+        if (path.startsWith(DATA_DIR)) {
+            return Paths.get(DATA_DIR).relativize(path);
+        } else {
+            return path;
         }
     }
 }
