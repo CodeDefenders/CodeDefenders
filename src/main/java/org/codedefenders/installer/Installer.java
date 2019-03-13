@@ -225,7 +225,7 @@ public class Installer {
      * @param configurations the configuration used to set the initial context.
      * @throws NamingException when setting the initial context fails.
      */
-    private static void setupInitialContext(Properties configurations) throws NamingException {
+    public static void setupInitialContext(Properties configurations) throws NamingException {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
         System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
 

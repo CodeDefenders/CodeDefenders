@@ -74,8 +74,8 @@ public class AntRunner {
 		InitialContext initialContext;
 		try {
 			initialContext = new InitialContext();
-			NamingEnumeration<NameClassPair> list = initialContext.list("java:/comp/env");
-			Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
+			NamingEnumeration<NameClassPair> list = initialContext.list("java:comp/env");
+			Context environmentContext = (Context) initialContext.lookup("java:comp/env");
 
 			// Looking up a name which is not there causes an exception
 			// Some are unsafe !

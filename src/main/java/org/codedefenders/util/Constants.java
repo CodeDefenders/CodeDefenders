@@ -40,7 +40,7 @@ public class Constants {
 		String dataHome = null;
 		try {
 			initialContext = new InitialContext();
-			Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
+			Context environmentContext = (Context) initialContext.lookup("java:comp/env");
 			dataHome = (String) environmentContext.lookup("data.dir");
 
 		} catch (NamingException e) {
