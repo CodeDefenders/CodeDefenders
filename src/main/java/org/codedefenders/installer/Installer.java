@@ -232,24 +232,24 @@ public class Installer {
         InitialContext ic = new InitialContext();
 
         ic.createSubcontext("java:");
-        ic.createSubcontext("java:/comp");
-        ic.createSubcontext("java:/comp/env");
+        ic.createSubcontext("java:comp");
+        ic.createSubcontext("java:comp/env");
 
         // Alessio: Maybe there a better way to do it...
         for (String pName : configurations.stringPropertyNames()) {
             logger.info("createDataSource() Storing property " + pName + " in the env with value "
                     + configurations.get(pName));
-            ic.bind("java:/comp/env/" + pName, configurations.get(pName));
+            ic.bind("java:comp/env/" + pName, configurations.get(pName));
         }
 
-        ic.createSubcontext("java:/comp/env/jdbc");
+        ic.createSubcontext("java:comp/env/jdbc");
 
         MysqlDataSource dataSource = new MysqlDataSource();
         dataSource.setURL(configurations.getProperty("db.url"));
         dataSource.setUser(configurations.getProperty("db.username"));
         dataSource.setPassword(configurations.getProperty("db.password"));
 
-        ic.bind("java:/comp/env/jdbc/codedefenders", dataSource);
+        ic.bind("java:comp/env/jdbc/codedefenders", dataSource);
     }
 
     /**
