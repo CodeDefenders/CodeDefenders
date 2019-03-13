@@ -362,7 +362,7 @@ public class Compiler {
                 final Path oldPath = getClassPath(dependency, baseDirectory);
                 // path relative from the base directory, {@code dependencies/} folder just has to be added between them
                 final Path classFileStructure = baseDirectory.relativize(Paths.get(oldPath.toString().replace(".java", ".class")));
-                final Path newPath = Paths.get(String.join(F_SEP, baseDirectory.toString(), CUTS_DEPENDENCY_DIR, classFileStructure.toString()));
+                final Path newPath = Paths.get(baseDirectory.toString(), CUTS_DEPENDENCY_DIR, classFileStructure.toString());
 
                 Files.createDirectories(newPath.getParent());
                 Files.move(oldPath, newPath);

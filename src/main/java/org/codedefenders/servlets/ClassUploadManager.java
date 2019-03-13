@@ -289,7 +289,7 @@ public class ClassUploadManager extends HttpServlet {
                 return;
             }
 
-            cutDir = Constants.CUTS_DIR + F_SEP + classAlias;
+            cutDir = Paths.get(Constants.CUTS_DIR, classAlias).toString();
             final String cutJavaFilePath;
             try {
                 cutJavaFilePath = storeJavaFile(cutDir, fileName, fileContent);
@@ -362,7 +362,7 @@ public class ClassUploadManager extends HttpServlet {
 
                     final String depJavaFilePath;
                     try {
-                        final String folderPath = String.join(F_SEP, cutDir, CUTS_DEPENDENCY_DIR);
+                        final String folderPath = Paths.get(cutDir, CUTS_DEPENDENCY_DIR).toString();
                         depJavaFilePath = storeJavaFile(folderPath, dependencyFileName, dependencyFileContent);
                         final String depClassFilePath = depJavaFilePath.replace(".java", ".class");
                         dependencyReferences.add(new JavaFileReferences(depJavaFilePath, depClassFilePath));
@@ -568,7 +568,7 @@ public class ClassUploadManager extends HttpServlet {
 
             String javaFilePath;
             try {
-                final String folderPath = String.join(F_SEP, cutDir, CUTS_MUTANTS_DIR, String.valueOf(index));
+                final String folderPath = Paths.get(cutDir, CUTS_MUTANTS_DIR, String.valueOf(index)).toString();
                 javaFilePath = storeJavaFile(folderPath, fileName, fileContent);
             } catch (IOException e) {
                 logger.error("Class upload failed. Could not store mutant java file " + fileName, e);
@@ -698,7 +698,7 @@ public class ClassUploadManager extends HttpServlet {
 
             String javaFilePath;
             try {
-                final String folderPath = String.join(F_SEP, cutDir, CUTS_TESTS_DIR, String.valueOf(index));
+                final String folderPath = Paths.get(cutDir, CUTS_TESTS_DIR, String.valueOf(index)).toString();
                 javaFilePath = storeJavaFile(folderPath, fileName, fileContent);
             } catch (IOException e) {
                 logger.error("Class upload failed. Could not store java file of test class " + fileName, e);
@@ -785,7 +785,7 @@ public class ClassUploadManager extends HttpServlet {
      * @throws IOException when storing the file fails.
      */
     private String storeJavaFile(String folderPath, String fileName, String fileContent) throws IOException {
-        final String filePath = folderPath + F_SEP + fileName;
+        final String filePath = Paths.get(folderPath, fileName).toString();
         try {
             Files.createDirectories(Paths.get(folderPath));
             final Path path = Files.createFile(Paths.get(filePath));

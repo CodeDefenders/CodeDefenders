@@ -44,13 +44,13 @@ public class FileUtils {
     private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
     public static String createIndexXML(File dir, String fileName, String contents) throws IOException {
-        String path = dir.getAbsolutePath() + F_SEP + fileName + ".xml";
-        File infoFile = new File(path);
+        Path path = Paths.get(dir.getAbsolutePath(), fileName + ".xml");
+        File infoFile = path.toFile();
         FileWriter infoWriter = new FileWriter(infoFile);
         BufferedWriter bInfoWriter = new BufferedWriter(infoWriter);
         bInfoWriter.write(contents);
         bInfoWriter.close();
-        return path;
+        return path.toString();
     }
 
     public static String createJavaTestFile(File dir, String classBaseName, String testCode) throws IOException {
@@ -62,18 +62,18 @@ public class FileUtils {
     public static File getNextSubDir(String path) {
         File folder = new File(path);
         folder.mkdirs();
-        String[] directories = folder.list(
-                (current, name) -> new File(current, name).isDirectory() && (isParsable(name)));
+        String[] directories =
+            folder.list((current, name) -> new File(current, name).isDirectory() && (isParsable(name)));
         Arrays.sort(directories);
         String newPath;
-        if (directories.length == 0)
-            newPath = folder.getAbsolutePath() + F_SEP + "00000001";
-        else {
+        if (directories.length == 0) {
+            newPath = Paths.get(folder.getAbsolutePath(), "00000001").toString();
+        } else {
             File lastDir = new File(directories[directories.length - 1]);
             int newIndex = Integer.parseInt(lastDir.getName()) + 1;
             String formatted = String.format("%08d", newIndex);
 
-            newPath = path + F_SEP + formatted;
+            newPath = Paths.get(path, formatted).toString();
         }
         File newDir = new File(newPath);
         newDir.mkdirs();
