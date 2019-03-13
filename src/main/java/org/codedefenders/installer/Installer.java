@@ -79,36 +79,15 @@ public class Installer {
     private interface ParsingInterface {
         @Option(defaultToNull = true)
         File getConfigurations();
-
+        
         /**
-         * For convention see {@link Installer#installCUT(File)}.
+         * Directory containing the resources for creating the puzzled. Same as
+         * the one used to generate the zip file
+         * 
+         * @return
          */
-        @Option(longName = "cuts")
-        List<File> getCuts();
-
-        /**
-         * For convention see {@link Installer#installMutant(File)}.
-         */
-        @Option(longName = "mutants", defaultToNull = true)
-        List<File> getMutants();
-
-        /**
-         * For convention see {@link Installer#installTest(File)}.
-         */
-        @Option(longName = "tests", defaultToNull = true)
-        List<File> getTests();
-
-        /**
-         * For convention see {@link Installer#installPuzzleChapter(File)}.
-         */
-        @Option(longName = "puzzleChapters", defaultToNull = true)
-        List<File> getPuzzleChapterSpecs();
-
-        /**
-         * For convention see {@link Installer#installPuzzle(File)}.
-         */
-        @Option(longName = "puzzles", defaultToNull = true)
-        List<File> getPuzzleSpecs();
+        @Option(longName = "bundle-directory")
+        File getBundleDirectory();
     }
 
     /**
@@ -136,17 +115,10 @@ public class Installer {
         Properties configurations = new Properties();
         configurations.load(new FileInputStream(commandLine.getConfigurations()));
         setupInitialContext(configurations);
-
-        final List<File> cuts = commandLine.getCuts();
-        final List<File> mutants = commandLine.getMutants();
-        final List<File> tests = commandLine.getTests();
-        final List<File> puzzleChapterSpecs = commandLine.getPuzzleChapterSpecs();
-        final List<File> puzzleSpecs = commandLine.getPuzzleSpecs();
-
-        Installer installer = new Installer();
-        installer.run(cuts, mutants, tests, puzzleChapterSpecs, puzzleSpecs);
-
-        // Running this code with mvn exec:java hangs the execution so we force the exit
+        // No need to create the zip file, we can directly use the "exploded" directory
+        Installer.installPuzzles(commandLine.getBundleDirectory().toPath());
+        // Running this code with mvn exec:java hangs the execution so we force
+        // the exit
         System.exit(0);
     }
 
