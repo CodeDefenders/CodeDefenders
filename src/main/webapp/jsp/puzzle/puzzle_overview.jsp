@@ -32,7 +32,7 @@
         Associated puzzles are sorted on the puzzle identifier.
 
 --%>
-
+<!doctype html>
 <%@ include file="/jsp/header_main.jsp"
 %>
 <%
@@ -40,9 +40,6 @@
     SortedSet<PuzzleChapterEntry> puzzleChapterEntries = (SortedSet<PuzzleChapterEntry>) request.getAttribute("puzzleChapterEntries");
 %>
 
-<%
-    if (puzzleChapterEntries.isEmpty()) {
-%>
 <div class="w-100">
     <h2 class="full-width page-title">Puzzles</h2>
     <table id="puzzles" class="table table-striped table-hover table-responsive table-paragraphs games-table">
@@ -63,19 +60,18 @@
                     final PuzzleChapter chapter = puzzleChapterEntry.getChapter();
 
             %>
-            <td><%=chapter.getTitle()%></td>
-            <%-- TODO add chapter description, maybe as a modal --%>
-            <%--<td><%=chapter.getDescription()%></td>--%>
+            <td><div data-toggle="popover" data-placement="top" data-content="<%=chapter.getDescription()%>"><%=chapter.getTitle()%></div></td>
             <td>
                 <%
                     for (PuzzleEntry puzzleEntry : puzzleChapterEntry.getPuzzleEntries()) {
                         if (puzzleEntry.getType() == PuzzleEntry.Type.GAME || !puzzleEntry.isLocked()) {
                             final int puzzleId = puzzleEntry.getPuzzleId();
                             final String title = puzzleEntry.getPuzzle().getTitle();
+                            final String description = puzzleEntry.getPuzzle().getDescription();
                 %>
                 <a class="btn btn-xs"
-                   href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"><%=title%></a>
-                <%--TODO add puzzle description, maybe as a modal--%>
+                   href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
+                    data-toggle="popover" data-placement="top" data-content="<%=description%>"><%=title%></a>
                 <%
                         } else { // Locked puzzle
                 %>
@@ -90,10 +86,16 @@
             } }
         %>
     </table>
+    <script>
+        $(function () {
+            $('[data-toggle="popover"]').popover({
+                trigger: 'hover'
+            })
+        })
+    </script>
 </div>
 
 <%
-    }
 }
 %>
 <%@include file="../footer.jsp" %>
