@@ -43,15 +43,17 @@
 <%
     if (puzzleChapterEntries.isEmpty()) {
 %>
-<span>No puzzles yet</span>
-<%-- TODO improve view if no puzzles available --%>
-<%
-    } else { //
-%>
 <div class="w-100">
     <h2 class="full-width page-title">Puzzles</h2>
     <table id="puzzles" class="table table-striped table-hover table-responsive table-paragraphs games-table">
         <tr>
+            <%
+                if (puzzleChapterEntries.isEmpty()) {
+            %>
+            <th colspan="100%"> Currently there are no puzzles available. </th>
+            <%
+            } else { //
+            %>
             <th>Lecture</th>
             <th>Levels</th>
         </tr>
@@ -85,7 +87,7 @@
             </td>
         </tr>
         <%
-            }
+            } }
         %>
     </table>
 </div>
