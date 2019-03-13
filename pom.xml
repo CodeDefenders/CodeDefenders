@@ -178,6 +178,9 @@
 			  <configuration>
 			    <header>src/etc/header.txt</header>
 			    <useDefaultExcludes>true</useDefaultExcludes>
+              	<mapping>
+              	    <java>SLASHSTAR_STYLE</java>
+              	</mapping>
 			    <properties>
                               <year>2016-2019</year>
 			    </properties>
