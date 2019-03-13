@@ -113,7 +113,7 @@
 				<input id="fileUploadPuzzles" name="fileUploadPuzzles" type="file" class="file-loading" accept=".zip"/>
             </span>
             <br>
-            <button class="btn btn-md btn-primary" type="submit" id="upload" onClick="this.disabled=true; this.innerText='Uploading...';">Upload</button>
+            <button class="btn btn-md btn-primary" type="submit" id="upload" onClick="this.form.submit(); this.disabled=true; this.innerText='Uploading...';">Upload</button>
         </form>
     </div>
 
