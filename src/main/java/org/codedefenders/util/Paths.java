@@ -58,6 +58,7 @@ public class Paths {
     public static final String ADMIN_PAGE = "/admin";
     public static final String ADMIN_GAMES = "/admin/games";
     public static final String ADMIN_MONITOR = "/admin/monitor";
+    public static final String ADMIN_PUZZLES = "/admin/puzzles";
     public static final String ADMIN_USERS = "/admin/users";
     public static final String ADMIN_SETTINGS = "/admin/settings";
     public static final String ADMIN_KILLMAPS = "/admin/killmaps";

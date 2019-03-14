@@ -102,12 +102,12 @@ public class GameClassDAO {
     }
 
     /**
-     * Checks for a given alias whether a class with this alias do not yet exist.
+     * Checks for a given alias whether a class with this alias already exists.
      *
      * @param alias the alias that is checked.
-     * @return {@code true} if alias does not exist, {@code false} otherwise.
+     * @return {@code true} if alias does exist, {@code false} otherwise.
      */
-    public static boolean classNotExistsForAlias(String alias) throws UncheckedSQLException, SQLMappingException {
+    public static boolean classExistsForAlias(String alias) throws UncheckedSQLException, SQLMappingException {
         String query = "SELECT * FROM classes WHERE Alias = ?";
         Boolean rv = DB.executeQueryReturnValue(query, rs -> true, DatabaseValue.of(alias));
         return rv != null;
@@ -227,14 +227,16 @@ public class GameClassDAO {
         String javaFile = DatabaseAccess.addSlashes(cut.getJavaFile());
         String classFile = DatabaseAccess.addSlashes(cut.getClassFile());
         boolean isMockingEnabled = cut.isMockingEnabled();
+        boolean isPuzzleClass = cut.isPuzzleClass();
 
-        String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile, RequireMocking) VALUES (?, ?, ?, ?, ?);";
+        String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile, RequireMocking, Puzzle) VALUES (?, ?, ?, ?, ?, ?);";
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(name),
                 DatabaseValue.of(alias),
                 DatabaseValue.of(javaFile),
                 DatabaseValue.of(classFile),
-                DatabaseValue.of(isMockingEnabled)
+                DatabaseValue.of(isMockingEnabled),
+                DatabaseValue.of(isPuzzleClass)
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
