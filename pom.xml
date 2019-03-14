@@ -178,8 +178,11 @@
 			  <configuration>
 			    <header>src/etc/header.txt</header>
 			    <useDefaultExcludes>true</useDefaultExcludes>
+              	<mapping>
+              	    <java>SLASHSTAR_STYLE</java>
+              	</mapping>
 			    <properties>
-                              <year>2016-2018</year>
+                              <year>2016-2019</year>
 			    </properties>
 			    <excludes>
                               <exclude>LICENSE.txt</exclude>
@@ -196,6 +199,8 @@
                               <exclude>docker/**</exclude>
 			      <exclude>config.properties</exclude>
 			      <exclude>src/test/resources/**</exclude>
+			      <exclude>installation/puzzles/**</exclude>
+			      <exclude>local-repo/**</exclude>
 			    </excludes>
 			  </configuration>
 			</plugin>
