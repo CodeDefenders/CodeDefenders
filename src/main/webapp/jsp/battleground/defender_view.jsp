@@ -94,6 +94,7 @@
 			<input type="hidden" name="formType" value="createTest">
 			<input type="hidden" name="gameId" value="<%= game.getId() %>" />
 		</form>
+		<%@include file="../game_components/editor_help_config_toolbar.jsp"%>
 	</div>
 </div>
 
