@@ -120,4 +120,12 @@ public class GameDAO {
 
         return DB.executeUpdateQuery(query, values);
     }
+
+    public static Integer getCurrentRound(int gameId) {
+        String query = String.join("\n",
+                "SELECT CurrentRound",
+                "FROM games",
+                "WHERE games.ID = ?;");
+        return DB.executeQueryReturnValue(query, rs -> rs.getInt("CurrentRound"), DatabaseValue.of(gameId));
+    }
 }

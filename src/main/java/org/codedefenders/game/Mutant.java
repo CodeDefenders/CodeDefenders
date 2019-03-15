@@ -22,13 +22,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.DatabaseValue;
-import org.codedefenders.database.DuelGameDAO;
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.*;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -140,11 +134,7 @@ public class Mutant implements Serializable {
 	public Mutant(int gameId, int classId,  String jFile, String cFile, boolean alive, int playerId) {
 		this.gameId = gameId;
 		this.classId = classId;
-		// FIXME: Why is this limited to a duel game?
-		final DuelGame game = DuelGameDAO.getDuelGameForId(gameId);
-		if (game != null) {
-			this.roundCreated = game.getCurrentRound();
-		}
+        this.roundCreated = GameDAO.getCurrentRound(gameId);
 		this.javaFile = jFile;
 		this.classFile = cFile;
 		this.alive = alive;
