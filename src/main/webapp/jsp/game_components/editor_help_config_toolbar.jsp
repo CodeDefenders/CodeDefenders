@@ -6,6 +6,7 @@
         </div>
     </div>
 
+    <%--
     <div class="btn-group" role="group" aria-label="Second group">
         <div class="dropdown">
             <button class="btn btn-default btn-ssm dropdown-toggle" type="button" id="editorModeMenu" data-toggle="dropdown">
@@ -20,5 +21,6 @@
             </ul>
         </div>
     </div>
+    --%>
 
 </div>
