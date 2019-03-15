@@ -6519,18 +6519,7 @@ ul {
   }
 }
 
-.help-main-div {
-
-}
-.help-main-div img {
-  margin: 0px auto;
-}
-.help-main-div h2 {
-  margin-left: 16px;
-}
-.help-main-div h3 {
-  margin-left: 24px;
-}
-.help-main-div p {
-  margin-left: 32px;
+/* Small bootstrap buttons (between btn-sm and btn-xs) */
+.btn-ssm {
+  padding: 1px 4px;
 }
