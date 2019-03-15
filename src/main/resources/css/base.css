@@ -38,6 +38,7 @@
   overflow: hidden;
   background: #fafafa;
   margin-bottom: 50px;
+  overflow: visible;
 }
 
 #messages strong {
