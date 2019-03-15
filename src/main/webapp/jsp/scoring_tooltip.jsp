@@ -18,10 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<div id="scoringTooltip" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
-    <div class="modal-dialog">
-        <!-- Modal content-->
-        <div class="modal-content" style="z-index: 10000; position: absolute; width: 150%; left:-15%;">
+<div id="scoringTooltip" class="modal fade" role="dialog">
+    <div class="modal-dialog" style="width: 850px;">
+        <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Scoring System</h4>
@@ -78,10 +77,9 @@
                     <br/><br/>
                 </div>
             </div>
-
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>
