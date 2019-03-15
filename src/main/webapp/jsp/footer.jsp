@@ -26,7 +26,7 @@
     </div>
 </div>
 
-<div style=" position: fixed; bottom: 0; width: 100%; z-index: -1000">
+<div style=" position: fixed; bottom: 0; width: 100%; z-index: 1000">
     <div class="bg-light-blue .minus-2 text-white" style="padding: 5px;">
         <div class="full-width" style="padding-top: 3px;">
             <div class="ws-12 container" style="text-align: right; clear:
