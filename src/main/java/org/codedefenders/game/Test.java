@@ -20,12 +20,7 @@ package org.codedefenders.game;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.DatabaseValue;
-import org.codedefenders.database.DuelGameDAO;
-import org.codedefenders.database.TestDAO;
-import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.database.*;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -94,13 +89,7 @@ public class Test {
 	public Test(int classId, int gameId, String javaFile, String classFile, int playerId) {
 	    this.classId = classId;
 		this.gameId = gameId;
-        // FIXME: Why will only work for Duel Games since multiplayer games do not have rounds.
-        DuelGame g = DuelGameDAO.getDuelGameForId(gameId);
-        if (g != null) {
-            this.roundCreated = g.getCurrentRound();
-        } else {
-            logger.error("Could not fetch game for gameId: " + gameId);
-        }
+        this.roundCreated = GameDAO.getCurrentRound(gameId);
 		this.javaFile = javaFile;
 		this.classFile = classFile;
 		this.playerId = playerId;
