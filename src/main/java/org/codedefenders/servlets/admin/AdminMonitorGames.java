@@ -92,15 +92,17 @@ public class AdminMonitorGames extends HttpServlet {
 			}
 
 		} else {  // admin is starting or stopping selected games
-			String[] selectedGames = request.getParameterValues("selectedGames");
 
-			if (selectedGames == null) {
+			String[] selectedGames = request.getParameterValues("selectedGames");
+			String gameSelectedViaPlayButton = request.getParameter("start_stop_btn");
+
+			if (selectedGames == null || gameSelectedViaPlayButton != null ) {
 				// admin is starting or stopping a single game
 				int gameId = -1;
 				// Get the identifying information required to create a game from the submitted form.
 
 				try {
-					gameId = Integer.parseInt(request.getParameter("start_stop_btn"));
+					gameId = Integer.parseInt( gameSelectedViaPlayButton );
 				} catch (Exception e) {
 					messages.add("There was a problem with the form.");
 					response.sendRedirect(request.getContextPath() + "/admin");
