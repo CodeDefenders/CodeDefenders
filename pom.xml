@@ -9,7 +9,7 @@
 	</properties>
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
-	<version>1.4-SNAPSHOT</version>
+	<version>1.4</version>
 	<url>http://www.code-defenders.org/</url>
 	<inceptionYear>2016</inceptionYear>
 
