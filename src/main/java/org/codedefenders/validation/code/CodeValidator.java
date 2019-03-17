@@ -149,6 +149,11 @@ public class CodeValidator {
 			return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
 		}
 
+		// Check if package was modified
+		if( containsChangesToPackageDeclarations( originalCU, mutatedCU ) ){
+		    return ValidationMessage.MUTANT_VALIDATION_PACKAGE_SIGNATURE;
+		}
+
 		// If the mutants contains changes to method signatures, mark it as not valid
 		if (level == CodeValidatorLevel.STRICT) {
 				if (mutantChangesMethodSignatures(originalCU, mutatedCU)
@@ -215,6 +220,17 @@ public class CodeValidator {
 		return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
 	}
 
+	/**
+     * Check if the mutation introduce a change to the package declaration of the mutant
+     * 
+     * @param word_changes
+     * @return
+     */
+    private static boolean containsChangesToPackageDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+        return ! originalCU.getPackageDeclaration().equals( mutatedCU.getPackageDeclaration() );
+    }
+
+    
 	/**
 	 * Check if the mutation introduce a change to an instanceof condition
 	 * 

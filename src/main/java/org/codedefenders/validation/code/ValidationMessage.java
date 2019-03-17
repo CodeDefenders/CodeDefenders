@@ -42,6 +42,8 @@ public enum ValidationMessage {
     MUTANT_VALIDATION_CALLS("Your mutant contains calls to System.*, Random.* or new control structures.\n\nShame on you!"),
     MUTANT_VALIDATION_IDENTICAL("Invalid mutant, sorry! Your mutant is identical to the CUT"),
     MUTANT_VALIDATION_METHOD_SIGNATURE("Invalid mutant, sorry! Your mutant changes one or more method signatures or field names or import statements"),
+    MUTANT_VALIDATION_PACKAGE_SIGNATURE("Invalid mutant, sorry! Your mutant changes the package signature"),
+
     MUTANT_MISSING_INTENTION("Invalid mutant, sorry! You must declare your intention."),
     MUTATION_CLASS_DECLARATION("Invalid mutation contains class declaration."),
     MUTATION_METHOD_DECLARATION("Invalid mutation contains method declaration."),
@@ -56,7 +58,6 @@ public enum ValidationMessage {
     MUTATION_WHILE_STATEMENT("Invalid mutation contains a WhileStmt statement"),
     MUTATION_DO_STATEMENT("Invalid mutation contains a DoStmt statement"),
     MUTATION_SWITCH_STATEMENT("Invalid mutation contains a SwitchStmt statement");
-
 	
     private String message;
 

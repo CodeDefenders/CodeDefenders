@@ -44,6 +44,7 @@ import static org.codedefenders.validation.code.CodeValidator.validateMutantGetM
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_COMMENT;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_PACKAGE_SIGNATURE;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_SUCCESS;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_LOGIC_INSTANCEOF;
 import static org.junit.Assert.assertEquals;
@@ -60,6 +61,124 @@ public class CodeValidatorTest {
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+    @Test
+    public void changeToPackageShouldTriggerValidation() {
+        String originalCode = ""
+                + "package theoriginalpackage;"+ "\n"
+                + "\n"
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + "package anotherpackage;"+ "\n"
+                + "\n"
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
+        
+        assertEquals(MUTANT_VALIDATION_PACKAGE_SIGNATURE, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+    }
+    
+    @Test
+    public void changeToEmptyPackageShouldTriggerValidation() {
+        String originalCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + "package anotherpackage;"+ "\n"
+                + "\n"
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
+        
+        assertEquals(MUTANT_VALIDATION_PACKAGE_SIGNATURE, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+    }
+
+    @Test
+    public void samePackageDeclarationShouldNotTriggerValidation() {
+        String originalCode = ""
+                + "package theoriginalpackage;"+ "\n"
+                + "\n"
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + "package theoriginalpackage;"+ "\n"
+                + "\n"
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
+        
+        assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+    }
+    
+    @Test
+    public void sameEmptyPackageDeclarationShouldNotTriggerValidation() {
+        String originalCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
+        
+        assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+    }
+    
 	@Test
     public void mutantChangeInstanceofUsingStrictCheckingTriggerValidation(){
         String originalCode = ""
