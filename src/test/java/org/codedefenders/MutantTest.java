@@ -22,9 +22,11 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.duel.DuelGame;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -49,7 +51,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({DuelGameDAO.class, GameClassDAO.class})
+@PrepareForTest({GameDAO.class, DuelGameDAO.class, GameClassDAO.class})
 public class MutantTest {
 
     @Rule
@@ -138,6 +140,8 @@ public class MutantTest {
         when(mockedDualGame.getClassId()).thenReturn(1);
         PowerMockito.mockStatic(GameClassDAO.class);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        PowerMockito.mockStatic(GameDAO.class);
+        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
@@ -203,6 +207,8 @@ public class MutantTest {
         when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        PowerMockito.mockStatic(GameDAO.class);
+        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
@@ -261,6 +267,8 @@ public class MutantTest {
         when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        PowerMockito.mockStatic(GameDAO.class);
+        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
@@ -320,6 +328,8 @@ public class MutantTest {
         when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        PowerMockito.mockStatic(GameDAO.class);
+        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
@@ -380,6 +390,8 @@ public class MutantTest {
         PowerMockito.mockStatic(GameClassDAO.class);
         when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        PowerMockito.mockStatic(GameDAO.class);
+        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
@@ -456,6 +468,8 @@ public class MutantTest {
         when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        PowerMockito.mockStatic(GameDAO.class);
+        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
@@ -522,6 +536,8 @@ public class MutantTest {
         when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        PowerMockito.mockStatic(GameDAO.class);
+        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
@@ -585,6 +601,8 @@ public class MutantTest {
         when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
         when(mockedDualGame.getClassId()).thenReturn(1);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
+        PowerMockito.mockStatic(GameDAO.class);
+        when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
         //
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getAbsolutePath());
         //
