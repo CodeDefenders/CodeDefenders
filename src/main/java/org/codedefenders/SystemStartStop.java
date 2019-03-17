@@ -24,22 +24,15 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.servlet.http.HttpSessionAttributeListener;
-import javax.servlet.http.HttpSessionBindingEvent;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
 
-public class SystemStartStop implements ServletContextListener,
-        HttpSessionListener, HttpSessionAttributeListener {
+public class SystemStartStop implements ServletContextListener {
     private static final Logger logger = LoggerFactory.getLogger(SystemStartStop.class);
 
     // Public constructor is required by servlet spec
     public SystemStartStop() {
     }
 
-    // -------------------------------------------------------
-    // ServletContextListener implementation
-    // -------------------------------------------------------
+    @Override
     public void contextInitialized(ServletContextEvent sce) {
         /* This method is called when the servlet context is
          * initialized(when the Web application is deployed).
@@ -49,6 +42,7 @@ public class SystemStartStop implements ServletContextListener,
         logger.info("Code Defenders started successfully.");
     }
 
+    @Override
     public void contextDestroyed(ServletContextEvent sce) {
         /* This method is invoked when the Servlet Context
          * (the Web application) is undeployed or
@@ -56,31 +50,5 @@ public class SystemStartStop implements ServletContextListener,
          */
         ConnectionPool.instance().closeDBConnections();
         logger.info("Code Defenders shut down successfully.");
-    }
-
-    // -------------------------------------------------------
-    // HttpSessionListener implementation
-    // -------------------------------------------------------
-    public void sessionCreated(HttpSessionEvent se) {
-        // Session is created. */
-    }
-
-    public void sessionDestroyed(HttpSessionEvent se) {
-        // Session is destroyed.
-    }
-
-    // -------------------------------------------------------
-    // HttpSessionAttributeListener implementation
-    // -------------------------------------------------------
-    public void attributeAdded(HttpSessionBindingEvent sbe) {
-        // This method is called when an attribute is added to a session.
-    }
-
-    public void attributeRemoved(HttpSessionBindingEvent sbe) {
-        // This method is called when an attribute is removed from a session.
-    }
-
-    public void attributeReplaced(HttpSessionBindingEvent sbe) {
-        // This method is invoked when an attribute is replaced in a session.
     }
 }
