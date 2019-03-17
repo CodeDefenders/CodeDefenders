@@ -18,7 +18,10 @@
  */
 package org.codedefenders.inputvalidation;
 
-import static org.junit.Assert.*;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -30,9 +33,8 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import javax.validation.executable.ExecutableValidator;
 
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class MultiplayerGameValidationTest {
 
@@ -74,6 +76,7 @@ public class MultiplayerGameValidationTest {
 		assertEquals(1, validateValue.size());
 	}
 
+	@Ignore
 	@Test
 	public void testValidateMalformedDate() throws NoSuchMethodException, SecurityException {
 
