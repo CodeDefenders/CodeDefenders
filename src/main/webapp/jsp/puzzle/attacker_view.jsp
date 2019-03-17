@@ -131,10 +131,12 @@
             <%@include file="../game_components/mutant_editor.jsp"%>
             <%@include file="../game_components/game_highlighting.jsp" %>
         </form>
-
         <%@include file="../game_components/mutant_explanation.jsp"%>
+        <%@include file="../game_components/editor_help_config_toolbar.jsp"%>
     </div>
 </div>
+
+<%@include file="../game_components/editor_help_config_modal.jsp"%>
 
 <%@include file="../footer_game.jsp"%>
 

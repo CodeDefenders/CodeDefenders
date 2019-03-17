@@ -56,17 +56,17 @@
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#newmut-div");
     // request.setAttribute("tests", game.getTests());
-//    request.setAttribute("mutants", game.getMutants());
+    // request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("markUncoveredEquivalent", false);
     // request.setAttribute("gameType", GameMode.PARTY);
-//    request.setAttribute("gameId", game.getId());
+    // request.setAttribute("gameId", game.getId());
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 
     /* mutant_progressbar */
-//    request.setAttribute("gameId", game.getId());
+    // request.setAttribute("gameId", game.getId());
 %>
 
 <!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
@@ -111,15 +111,14 @@
         </div>
 
         <form id="atk" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
-
             <input type="hidden" name="formType" value="createMutant">
             <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
 
             <%@include file="../game_components/mutant_editor.jsp"%>
             <%@include file="../game_components/game_highlighting.jsp" %>
         </form>
-
         <%@include file="../game_components/mutant_explanation.jsp"%>
+        <%@include file="../game_components/editor_help_config_toolbar.jsp"%>
     </div>
 </div>
 

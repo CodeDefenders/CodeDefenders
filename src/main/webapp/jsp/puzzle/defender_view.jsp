@@ -115,6 +115,7 @@
 
                 <%@include file="../game_components/test_editor.jsp" %>
             </form>
+            <%@include file="../game_components/editor_help_config_toolbar.jsp"%>
         </div>
     </div>
 
@@ -131,5 +132,8 @@
     </div>
 </div>
 
+<%@include file="../game_components/editor_help_config_modal.jsp"%>
+
 <%@include file="../footer_game.jsp" %>
+
 <% } %>
