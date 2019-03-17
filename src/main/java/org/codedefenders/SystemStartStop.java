@@ -38,8 +38,13 @@ public class SystemStartStop implements ServletContextListener {
          * initialized(when the Web application is deployed).
          * You can initialize servlet context related data here.
          */
-        ConnectionPool.instance();
-        logger.info("Code Defenders started successfully.");
+        try {
+            ConnectionPool.instance();
+            logger.info("Code Defenders started successfully.");
+        } catch (Exception e) {
+            // Fail Deployment
+            throw new RuntimeException("Deployment failed. Reason: ", e);
+        }
     }
 
     @Override
