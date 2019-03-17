@@ -114,6 +114,7 @@
         };
 
         const GameTypes = {
+            PUZZLE: 'PUZZLE',
             PARTY: 'PARTY',
             DUEL: 'DUEL'
         };
@@ -296,8 +297,13 @@
                                 <img src="` + Icons.FLAG + `" class="mutant-icon-image"/> Claim Equivalent
                             </button>
                         </form>`;
+            } else if (gameType === GameTypes.PUZZLE) {
+                /* For the moment we disallow equivalence duels in puzzles */
+                return '';
             } else {
                 console.error('Unknown game type for equivalence button: ' + gameType);
+                /* If we are not sure what to do, just do not show the button */
+                return '';
             }
         };
 
