@@ -154,6 +154,11 @@ public class CodeValidator {
 		    return ValidationMessage.MUTANT_VALIDATION_PACKAGE_SIGNATURE;
 		}
 
+		// Check a class signature was modified
+        if( containsChangesToClassDeclarations( originalCU, mutatedCU ) ){
+            return ValidationMessage.MUTANT_VALIDATION_CLASS_SIGNATURE;
+        }
+
 		// If the mutants contains changes to method signatures, mark it as not valid
 		if (level == CodeValidatorLevel.STRICT) {
 				if (mutantChangesMethodSignatures(originalCU, mutatedCU)
@@ -231,6 +236,26 @@ public class CodeValidator {
     }
 
     
+    /**
+     * Check if the mutation introduce a change to a class declaration in the mutant
+     * 
+     * @param word_changes
+     * @return
+     */
+    private static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+        Map<String, EnumSet> originalTypes = new HashMap<>();
+        for(TypeDeclaration type : originalCU.getTypes()){
+            originalTypes.put( type.getNameAsString(), type.getModifiers());
+        }
+        //
+        Map<String, EnumSet> mutatedTypes = new HashMap<>();
+        for(TypeDeclaration type : mutatedCU.getTypes()){
+            mutatedTypes.put( type.getNameAsString(), type.getModifiers()); 
+        }
+        //
+        return ! originalTypes.equals( mutatedTypes );
+    }
+
 	/**
 	 * Check if the mutation introduce a change to an instanceof condition
 	 * 
