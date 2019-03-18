@@ -115,6 +115,47 @@ public class CodeValidatorTest {
         
         assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
     }
+	
+	// TODO Not a good test with so many assert. This is 
+	@Test 
+	public void testVariousChangesToClassSignatureRelaxed(){
+	    CodeValidatorLevel level = CodeValidatorLevel.RELAXED;
+	    assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "public final class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("class Rational  {}", "public class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("class Rational  {}", "final class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "class Rational  {}", level));
+	    // This is wrong as protected is not allowed in that position
+        // assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "protected class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("final class Rational  {}", "class Rational  {}", level));
+        //
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Outer { public class Rational  {}}", "public class Outer { protected class Rational  {}}", level));
+	}
+	
+	@Test 
+    public void testVariousChangesToClassSignatureModerate(){
+        CodeValidatorLevel level = CodeValidatorLevel.MODERATE;
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "public final class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("class Rational  {}", "public class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("class Rational  {}", "final class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("final class Rational  {}", "class Rational  {}", level));
+        //
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Outer { public class Rational  {}}", "public class Outer { protected class Rational  {}}", level));
+    }
+	
+	@Test 
+    public void testVariousChangesToClassSignatureStrict(){
+        CodeValidatorLevel level = CodeValidatorLevel.STRICT;
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "public final class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("class Rational  {}", "public class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("class Rational  {}", "final class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("final class Rational  {}", "class Rational  {}", level));
+        //
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Outer { public class Rational  {}}", "public class Outer { protected class Rational  {}}", level));
+    }
+	
+	
     @Test
     public void changeToPackageShouldTriggerValidation() {
         String originalCode = ""
@@ -1266,24 +1307,9 @@ public class CodeValidatorTest {
 	public void checkModerateRelaxations(CodeValidatorLevel level) {
 		boolean isValid = !level.equals(CodeValidatorLevel.STRICT);
 		if (isValid) {
-			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {}", "public final class Rational  {}", level));
-			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("class Rational  {}", "public class Rational  {}", level));
-			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("class Rational  {}", "final class Rational  {}", level));
-			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {}", "class Rational  {}", level));
-			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {}", "protected class Rational  {}", level));
-			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("final class Rational  {}", "class Rational  {}", level));
-
 			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  { public void test(){ r.num = r.num; }}", "public class Rational  { public void test(){  r.num = r.num | ((r.num & (1 << 29)) << 1); }}", level));
 			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  { public void test(){ r.num = r.num; }}", "public class Rational  { public void test(){ r.num = r.num << 1+344; }}", level));
 		} else {
-			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {}", "public final class Rational  {}", level));
-			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("class Rational  {}", "public class Rational  {}", level));
-			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("class Rational  {}", "final class Rational  {}", level));
-			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {}", "class Rational  {}", level));
-
-			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Outer { public class Rational  {}}", "public class Outer { protected class Rational  {}}", level));
-			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("final class Rational  {}", "class Rational  {}", level));
-
 			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  { public void test(){ r.num = r.num; }}", "public class Rational  { public void test(){ r.num = r.num | ((r.num & (1 << 29)) << 1); }}", level));
 			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  { public void test(){ r.num = r.num; }}", "public class Rational  { public void test(){ r.num = r.num << 1+344; }}", level));
 		}

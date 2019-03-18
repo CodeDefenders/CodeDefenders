@@ -52,10 +52,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -236,6 +239,19 @@ public class CodeValidator {
     }
 
     
+    private static Map<String, EnumSet> extractTypeDeclaration(TypeDeclaration td ){
+        Map<String, EnumSet> typeData = new HashMap<>();
+        typeData.put( td.getNameAsString(), td.getModifiers());
+        // Inspect if this type declares inner classes
+        for (Object bd : td.getMembers()) {
+            if (bd instanceof TypeDeclaration) {
+                // Handle Inner classes - recursively
+                typeData.putAll(extractTypeDeclaration((TypeDeclaration) bd));
+            }
+        }
+        return typeData;
+    }
+    
     /**
      * Check if the mutation introduce a change to a class declaration in the mutant
      * 
@@ -243,14 +259,14 @@ public class CodeValidator {
      * @return
      */
     private static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
-        Map<String, EnumSet> originalTypes = new HashMap<>();
+        Map<String, EnumSet> originalTypes = new HashMap();
         for(TypeDeclaration type : originalCU.getTypes()){
-            originalTypes.put( type.getNameAsString(), type.getModifiers());
+            originalTypes.putAll(extractTypeDeclaration(type));
         }
         //
         Map<String, EnumSet> mutatedTypes = new HashMap<>();
         for(TypeDeclaration type : mutatedCU.getTypes()){
-            mutatedTypes.put( type.getNameAsString(), type.getModifiers()); 
+            mutatedTypes.putAll(extractTypeDeclaration(type)); 
         }
         //
         return ! originalTypes.equals( mutatedTypes );
