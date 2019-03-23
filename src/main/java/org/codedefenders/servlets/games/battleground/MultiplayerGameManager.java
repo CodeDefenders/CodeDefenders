@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2016-2018 Code Defenders contributors
+/*
+ * Copyright (C) 2016-2019 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -121,7 +121,7 @@ public class MultiplayerGameManager extends HttpServlet {
         int userId = ServletUtils.userId(request);
         int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(userId, gameId);
 
-        if (playerId == -1) {
+        if (playerId == -1 && game.getCreatorId() != userId) {
             logger.info("User {} not part of game {}. Aborting request.", userId, gameId);
             response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
             return;

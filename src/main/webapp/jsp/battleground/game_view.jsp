@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (C) 2016-2018 Code Defenders contributors
+    Copyright (C) 2016-2019 Code Defenders contributors
 
     This file is part of Code Defenders.
 
@@ -37,6 +37,7 @@
 <%@ include file="/jsp/scoring_tooltip.jsp" %>
 <%@ include file="/jsp/playerFeedback.jsp" %>
 <%@ include file="/jsp/battleground/game_scoreboard.jsp" %>
+<%@ include file="/jsp/game_components/editor_help_config_modal.jsp" %>
 <div class="crow fly no-gutter up">
 <%
     messages = new ArrayList<>();

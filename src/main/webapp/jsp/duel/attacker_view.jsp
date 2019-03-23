@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (C) 2016-2018 Code Defenders contributors
+    Copyright (C) 2016-2019 Code Defenders contributors
 
     This file is part of Code Defenders.
 
@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-
 <% String pageTitle = "Attacking Class"; %>
 <%@ include file="/jsp/duel/header_game.jsp" %>
 
@@ -119,8 +118,8 @@
             <%@include file="../game_components/mutant_editor.jsp"%>
             <%@include file="../game_components/game_highlighting.jsp"%>
         </form>
-
         <%@include file="../game_components/mutant_explanation.jsp"%>
+        <%@include file="../game_components/editor_help_config_toolbar.jsp"%>
     </div>
 </div>
 
@@ -139,6 +138,10 @@
     setInterval(checkForUpdate, 10000);
     <% } %>
 </script>
+
+</div>
+<%@include file="../game_components/editor_help_config_modal.jsp"%>
+<div>
 
 <%@ include file="/jsp/footer_game.jsp" %>
 

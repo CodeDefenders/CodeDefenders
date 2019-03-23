@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2016-2018 Code Defenders contributors
+/*
+ * Copyright (C) 2016-2019 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -89,6 +89,8 @@ public class GameClass {
 
     private boolean isMockingEnabled;
 
+    private boolean isPuzzleClass;
+
     private Set<String> additionalImports = new HashSet<>();
     // Store begin and end line which corresponds to uncoverable non-initializad fields
     private List<Integer> linesOfCompileTimeConstants = new ArrayList<>();
@@ -124,6 +126,18 @@ public class GameClass {
         this.isMockingEnabled = isMockingEnabled;
 
         visitCode();
+    }
+
+    public static GameClass ofPuzzleWithId(int id, String name, String alias, String javaFilePath, String classFilePath, boolean isMockingEnabled) {
+        GameClass gameClass = ofPuzzle(name, alias, javaFilePath, classFilePath, isMockingEnabled);
+        gameClass.id = id;
+        return gameClass;
+    }
+
+    public static GameClass ofPuzzle(String name, String alias, String javaFilePath, String classFilePath, boolean isMockingEnabled) {
+        GameClass gameClass = new GameClass(name, alias, javaFilePath, classFilePath, isMockingEnabled);
+        gameClass.isPuzzleClass = true;
+        return gameClass;
     }
 
     private void visitCode() {
@@ -183,6 +197,10 @@ public class GameClass {
 
     public boolean isMockingEnabled() {
         return this.isMockingEnabled;
+    }
+
+    public boolean isPuzzleClass() {
+        return this.isPuzzleClass;
     }
 
     public String getBaseName() {

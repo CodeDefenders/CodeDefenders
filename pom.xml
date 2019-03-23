@@ -9,7 +9,7 @@
 	</properties>
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders</artifactId>
-	<version>1.4-SNAPSHOT</version>
+	<version>1.5-SNAPSHOT</version>
 	<url>http://www.code-defenders.org/</url>
 	<inceptionYear>2016</inceptionYear>
 
@@ -29,6 +29,22 @@
 		</filters>
 
 		<plugins>
+			<!-- Execute the installer within maven without the need of packaging a jar for it -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.6.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>org.codedefenders.installer.Installer</mainClass>
+				</configuration>
+			</plugin>
 			<!-- Fails if the ${config.properties} file does not exists -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -178,8 +194,11 @@
 			  <configuration>
 			    <header>src/etc/header.txt</header>
 			    <useDefaultExcludes>true</useDefaultExcludes>
+              	<mapping>
+              	    <java>SLASHSTAR_STYLE</java>
+              	</mapping>
 			    <properties>
-                              <year>2016-2018</year>
+                              <year>2016-2019</year>
 			    </properties>
 			    <excludes>
                               <exclude>LICENSE.txt</exclude>
@@ -196,6 +215,8 @@
                               <exclude>docker/**</exclude>
 			      <exclude>config.properties</exclude>
 			      <exclude>src/test/resources/**</exclude>
+			      <exclude>installation/puzzles/**</exclude>
+			      <exclude>local-repo/**</exclude>
 			    </excludes>
 			  </configuration>
 			</plugin>
@@ -386,6 +407,19 @@
 			<version>0.1</version>
 		</dependency>
 
+		<!-- Installer -->
+		<dependency>
+			<groupId>com.lexicalscope.jewelcli</groupId>
+			<artifactId>jewelcli</artifactId>
+			<version>0.8.9</version>
+		</dependency>
+		
+		<dependency>
+    		<groupId>org.apache.tomcat</groupId>
+    		<artifactId>tomcat-catalina</artifactId>
+    		<version>9.0.13</version>
+		</dependency>
+		
 		<!-- Server side validation -->
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -394,9 +428,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.glassfish</groupId>
-			<artifactId>javax.el</artifactId>
-			<version>3.0.1-b09</version>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jasper-el</artifactId>
+			<version>9.0.16</version>
 			<scope>test</scope>
 		</dependency>
 

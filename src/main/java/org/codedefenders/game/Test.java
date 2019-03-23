@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2016-2018 Code Defenders contributors
+/*
+ * Copyright (C) 2016-2019 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -20,12 +20,7 @@ package org.codedefenders.game;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.DatabaseValue;
-import org.codedefenders.database.DuelGameDAO;
-import org.codedefenders.database.TestDAO;
-import org.codedefenders.database.UncheckedSQLException;
+import org.codedefenders.database.*;
 import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -94,13 +89,7 @@ public class Test {
 	public Test(int classId, int gameId, String javaFile, String classFile, int playerId) {
 	    this.classId = classId;
 		this.gameId = gameId;
-        // FIXME: Why will only work for Duel Games since multiplayer games do not have rounds.
-        DuelGame g = DuelGameDAO.getDuelGameForId(gameId);
-        if (g != null) {
-            this.roundCreated = g.getCurrentRound();
-        } else {
-            logger.error("Could not fetch game for gameId: " + gameId);
-        }
+        this.roundCreated = GameDAO.getCurrentRound(gameId);
 		this.javaFile = javaFile;
 		this.classFile = classFile;
 		this.playerId = playerId;
@@ -123,6 +112,21 @@ public class Test {
 		this.score = score;
 		lineCoverage = new LineCoverage(linesCovered, linesUncovered);
 	}
+
+    /**
+     * Creates a test from another test instance, but in a new game and for a new player.
+     *
+     * @param gameId   the game identifier of the new test.
+     * @param playerId the players identifier of the new test.
+     * @param other    the test instance the new is created for.
+     * @return a test based on another test instance, gameId and playerId.
+     */
+    public static Test newTestForGameAndPlayerIds(int gameId, int playerId, Test other) {
+        final Test test = new Test(other.classId, gameId, other.javaFile, other.classFile, playerId);
+        test.lineCoverage = other.lineCoverage;
+        return test;
+    }
+
 	// TODO Check that increment score does not consider mutants that were killed already
 	public void incrementScore(int score) {
 		if (score == 0) {

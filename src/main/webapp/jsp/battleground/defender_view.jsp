@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (C) 2016-2018 Code Defenders contributors
+    Copyright (C) 2016-2019 Code Defenders contributors
 
     This file is part of Code Defenders.
 
@@ -94,6 +94,7 @@
 			<input type="hidden" name="formType" value="createTest">
 			<input type="hidden" name="gameId" value="<%= game.getId() %>" />
 		</form>
+		<%@include file="../game_components/editor_help_config_toolbar.jsp"%>
 	</div>
 </div>
 

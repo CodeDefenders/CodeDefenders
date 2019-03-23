@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (C) 2016-2018 Code Defenders contributors
+    Copyright (C) 2016-2019 Code Defenders contributors
 
     This file is part of Code Defenders.
 
@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-
 <%@ page import="com.google.gson.Gson" %>
 <%@ page import="com.google.gson.GsonBuilder" %>
 <%@ page import="org.codedefenders.game.GameHighlightingDTO" %>
@@ -115,6 +114,7 @@
         };
 
         const GameTypes = {
+            PUZZLE: 'PUZZLE',
             PARTY: 'PARTY',
             DUEL: 'DUEL'
         };
@@ -297,8 +297,13 @@
                                 <img src="` + Icons.FLAG + `" class="mutant-icon-image"/> Claim Equivalent
                             </button>
                         </form>`;
+            } else if (gameType === GameTypes.PUZZLE) {
+                /* For the moment we disallow equivalence duels in puzzles */
+                return '';
             } else {
                 console.error('Unknown game type for equivalence button: ' + gameType);
+                /* If we are not sure what to do, just do not show the button */
+                return '';
             }
         };
 

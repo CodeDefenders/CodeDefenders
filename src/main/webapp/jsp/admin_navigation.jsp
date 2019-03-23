@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (C) 2016-2018 Code Defenders contributors
+    Copyright (C) 2016-2019 Code Defenders contributors
 
     This file is part of Code Defenders.
 
@@ -54,11 +54,14 @@
     <li class="<%=active(activePage,"adminUserMgmt")%>">
         <a id="adminUserMgmt" href="<%=request.getContextPath() + Paths.ADMIN_USERS%>">Manage Users</a>
     </li>
+    <li class="<%=active(activePage,"adminPuzzles")%>">
+        <a id="adminPuzzles" href="<%=request.getContextPath() + Paths.ADMIN_PUZZLES%>">Manage Puzzles</a>
+    </li>
     <li class="<%=active(activePage,"adminSystemSettings")%>">
-        <a id="adminSystemSettings" href="<%=request.getContextPath()%>/admin/settings">System Settings</a>
+        <a id="adminSystemSettings" href="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>">System Settings</a>
     </li>
     <li class="<%=active(activePage,"adminKillMaps")%>">
-        <a id="adminKillMaps" href="<%=request.getContextPath()%>/admin/killmaps">Generate KillMaps</a>
+        <a id="adminKillMaps" href="<%=request.getContextPath() + Paths.ADMIN_KILLMAPS%>">Generate KillMaps</a>
     </li>
     <li class="<%=active(activePage,"adminAnalytics")%> dropdown">
         <a id="adminAnalytics" class="dropdown-toggle" data-toggle="dropdown" href="#">Analytics&#160&#160<span class="glyphicon glyphicon-menu-hamburger"></span></a>

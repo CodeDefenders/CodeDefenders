@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2016-2018 Code Defenders contributors
+/*
+ * Copyright (C) 2016-2019 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -41,7 +41,7 @@ public class Constants {
 		String dataHome = null;
 		try {
 			initialContext = new InitialContext();
-			Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
+			Context environmentContext = (Context) initialContext.lookup("java:comp/env");
 			dataHome = (String) environmentContext.lookup("data.dir");
 
 		} catch (NamingException e) {
@@ -125,6 +125,7 @@ public class Constants {
 
 	public static final String ADMIN_USER_JSP = "/jsp/admin_user_mgmt.jsp";
 	public static final String ADMIN_GAMES_JSP = "/jsp/admin_create_games.jsp";
+	public static final String ADMIN_PUZZLE_JSP = "/jsp/admin_puzzles.jsp";
 	public static final String ADMIN_SETTINGS_JSP = "/jsp/admin_system_settings.jsp";
 	public static final String ADMIN_MONITOR_JSP = "/jsp/admin_monitor_games.jsp";
 	public static final String ADMIN_KILLMAPS_JSP = "/jsp/admin_killmaps.jsp";

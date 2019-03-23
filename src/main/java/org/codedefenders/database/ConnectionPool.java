@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2016-2018 Code Defenders contributors
+/*
+ * Copyright (C) 2016-2019 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -88,7 +88,7 @@ public final class ConnectionPool {
                 // If we managed to connect, we can proceed. Otherwise, we retry
                 break;
             } catch (NamingException | SQLException e) {
-                logger.warn("Cannot connect to the Database", e);
+                logger.warn("Cannot connect to the Database" + e.getMessage());
                 if (i == MAX_RETRIES) {
                     logger.warn("Give up and fail deployment");
                     throw new NoMoreConnectionsException("Could not initialize the database. Aborting.");
@@ -98,8 +98,11 @@ public final class ConnectionPool {
                         Thread.sleep(RETRY_TIMEOUT);
                     } catch (InterruptedException e1) {
                         // Ignored
+                        throw new RuntimeException("Could not initialize the database. Aborting.", e1);
                     }
                 }
+            } catch (Throwable e) {
+                throw new RuntimeException("Could not initialize the database. Aborting.", e);
             }
         }
 
@@ -115,8 +118,13 @@ public final class ConnectionPool {
             }
         } catch (SQLException e) {
             logger.error("SQL exception while opening connections.", e);
-            closeDBConnections();
-            throw new UncheckedSQLException(e);
+            try {
+                closeDBConnections();
+            } catch (Exception e1) {
+                logger.error("SQL exception while closing connections.", e);
+            }
+            // throw new UncheckedSQLException(e);
+            throw new RuntimeException("Could not initialize the database. Aborting.", e);
         }
         logger.info("ConnectionPool initialized with " + nbConnections + " connections.");
     }

@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016-2019 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.codedefenders.validation.code;
 
 /**
@@ -23,7 +41,11 @@ public enum ValidationMessage {
     MUTANT_VALIDATION_OPERATORS("Invalid mutant, sorry! Your mutant contains prohibited operations such as bitshifts, ternary operators, added comments or multiple statments per line."),
     MUTANT_VALIDATION_CALLS("Your mutant contains calls to System.*, Random.* or new control structures.\n\nShame on you!"),
     MUTANT_VALIDATION_IDENTICAL("Invalid mutant, sorry! Your mutant is identical to the CUT"),
+    
     MUTANT_VALIDATION_METHOD_SIGNATURE("Invalid mutant, sorry! Your mutant changes one or more method signatures or field names or import statements"),
+    MUTANT_VALIDATION_PACKAGE_SIGNATURE("Invalid mutant, sorry! Your mutant changes the package signature"),
+    MUTANT_VALIDATION_CLASS_SIGNATURE("Invalid mutant, sorry! Your mutant changes a class signature"),
+
     MUTANT_MISSING_INTENTION("Invalid mutant, sorry! You must declare your intention."),
     MUTATION_CLASS_DECLARATION("Invalid mutation contains class declaration."),
     MUTATION_METHOD_DECLARATION("Invalid mutation contains method declaration."),
@@ -38,7 +60,6 @@ public enum ValidationMessage {
     MUTATION_WHILE_STATEMENT("Invalid mutation contains a WhileStmt statement"),
     MUTATION_DO_STATEMENT("Invalid mutation contains a DoStmt statement"),
     MUTATION_SWITCH_STATEMENT("Invalid mutation contains a SwitchStmt statement");
-
 	
     private String message;
 

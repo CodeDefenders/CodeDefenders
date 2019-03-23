@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2016-2018 Code Defenders contributors
+/*
+ * Copyright (C) 2016-2019 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -18,20 +18,25 @@
  */
 package org.codedefenders.util;
 
+import javassist.ClassPool;
+import javassist.CtClass;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.nio.file.Paths;
 
@@ -202,6 +207,50 @@ public class FileUtils {
             return Paths.get(DATA_DIR).relativize(path);
         } else {
             return path;
+        }
+    }
+
+   /**
+     * Returns the qualified name of a java class for a given {@code .java} file content.
+     * <p>
+     * E.g. {@code java.util.Collection} for {@link Collection}.
+     *
+     * @param javaClassFilePath The path to the java class file.
+     * @return A qualified name of the given java class.
+     * @throws IOException when reading the java file fails.
+     */
+    public static String getFullyQualifiedName(String javaClassFilePath) throws IOException {
+        ClassPool classPool = ClassPool.getDefault();
+        CtClass cc = classPool.makeClass(new FileInputStream(new File(javaClassFilePath)));
+        return cc.getName();
+    }
+
+    /**
+     * Stores a file for given parameters on the hard drive.
+     *
+     * @param folderPath  The path of the folder the file will be stored in as a {@link Path}. The folder must not
+     *                    already exist.
+     * @param fileName    The file name (e.g. {@code MyClass.java}).
+     * @param fileContent The actual file content.
+     * @return The path of the newly stored file.
+     * @throws IOException when storing the file fails.
+     */
+    public static Path storeFile(Path folderPath, String fileName, String fileContent) throws IOException {
+
+        final Path filePath = folderPath.resolve(fileName);
+        try {
+            Files.createDirectories(folderPath);
+            final Path path = Files.createFile(filePath);
+            Files.write(path, fileContent.getBytes());
+            return path;
+        } catch (IOException e) {
+            logger.error("Could not store file.", e);
+            try {
+                // removing folder again, if empty
+                Files.delete(folderPath);
+            } catch (DirectoryNotEmptyException ignored) {
+            }
+            throw e;
         }
     }
 }

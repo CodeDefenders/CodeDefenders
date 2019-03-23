@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2016-2018 Code Defenders contributors
+/*
+ * Copyright (C) 2016-2019 Code Defenders contributors
  *
  * This file is part of Code Defenders.
  *
@@ -52,10 +52,13 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
@@ -149,6 +152,16 @@ public class CodeValidator {
 			return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
 		}
 
+		// Check if package was modified
+		if( containsChangesToPackageDeclarations( originalCU, mutatedCU ) ){
+		    return ValidationMessage.MUTANT_VALIDATION_PACKAGE_SIGNATURE;
+		}
+
+		// Check a class signature was modified
+        if( containsChangesToClassDeclarations( originalCU, mutatedCU ) ){
+            return ValidationMessage.MUTANT_VALIDATION_CLASS_SIGNATURE;
+        }
+
 		// If the mutants contains changes to method signatures, mark it as not valid
 		if (level == CodeValidatorLevel.STRICT) {
 				if (mutantChangesMethodSignatures(originalCU, mutatedCU)
@@ -214,6 +227,50 @@ public class CodeValidator {
 
 		return ValidationMessage.MUTANT_VALIDATION_SUCCESS;
 	}
+
+	/**
+     * Check if the mutation introduce a change to the package declaration of the mutant
+     * 
+     * @param word_changes
+     * @return
+     */
+    private static boolean containsChangesToPackageDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+        return ! originalCU.getPackageDeclaration().equals( mutatedCU.getPackageDeclaration() );
+    }
+
+    
+    private static Map<String, EnumSet> extractTypeDeclaration(TypeDeclaration td ){
+        Map<String, EnumSet> typeData = new HashMap<>();
+        typeData.put( td.getNameAsString(), td.getModifiers());
+        // Inspect if this type declares inner classes
+        for (Object bd : td.getMembers()) {
+            if (bd instanceof TypeDeclaration) {
+                // Handle Inner classes - recursively
+                typeData.putAll(extractTypeDeclaration((TypeDeclaration) bd));
+            }
+        }
+        return typeData;
+    }
+    
+    /**
+     * Check if the mutation introduce a change to a class declaration in the mutant
+     * 
+     * @param word_changes
+     * @return
+     */
+    private static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
+        Map<String, EnumSet> originalTypes = new HashMap();
+        for(TypeDeclaration type : originalCU.getTypes()){
+            originalTypes.putAll(extractTypeDeclaration(type));
+        }
+        //
+        Map<String, EnumSet> mutatedTypes = new HashMap<>();
+        for(TypeDeclaration type : mutatedCU.getTypes()){
+            mutatedTypes.putAll(extractTypeDeclaration(type)); 
+        }
+        //
+        return ! originalTypes.equals( mutatedTypes );
+    }
 
 	/**
 	 * Check if the mutation introduce a change to an instanceof condition

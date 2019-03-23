@@ -1,5 +1,6 @@
 <%--
-    Copyright (C) 2016-2018 Code Defenders contributors
+
+    Copyright (C) 2016-2019 Code Defenders contributors
 
     This file is part of Code Defenders.
 
@@ -114,6 +115,7 @@
 
                 <%@include file="../game_components/test_editor.jsp" %>
             </form>
+            <%@include file="../game_components/editor_help_config_toolbar.jsp"%>
         </div>
     </div>
 
@@ -130,5 +132,8 @@
     </div>
 </div>
 
+<%@include file="../game_components/editor_help_config_modal.jsp"%>
+
 <%@include file="../footer_game.jsp" %>
+
 <% } %>
