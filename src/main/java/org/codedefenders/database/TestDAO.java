@@ -26,6 +26,7 @@ import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class TestDAO {
         String javaFile = rs.getString("JavaFile");
         String classFile = rs.getString("ClassFile");
         String absoluteJavaFile = FileUtils.getAbsoluteDataPath(javaFile).toString();
-        String absoluteClassFile = FileUtils.getAbsoluteDataPath(classFile).toString();
+        String absoluteClassFile = classFile == null ? null : FileUtils.getAbsoluteDataPath(classFile).toString();
         int roundCreated = rs.getInt("RoundCreated");
         int mutantsKilled = rs.getInt("MutantsKilled");
         int playerId = rs.getInt("Player_ID");
@@ -220,10 +221,13 @@ public class TestDAO {
      * @throws UncheckedSQLException If storing the test was not successful.
      */
     public static int storeTest(Test test) throws UncheckedSQLException {
+        logger.info("TEST JAVA FILE: " + test.getJavaFile());
+        logger.info("TEST CLASS FILE: " + test.getClassFile());
+
         String javaFile = DatabaseAccess.addSlashes(test.getJavaFile());
         String classFile = DatabaseAccess.addSlashes(test.getClassFile());
         String relativeJavaFile = FileUtils.getRelativeDataPath(javaFile).toString();
-        String relativeClassFile = FileUtils.getRelativeDataPath(classFile).toString();
+        String relativeClassFile = classFile == null ? null : FileUtils.getRelativeDataPath(classFile).toString();
         int gameId = test.getGameId();
         int roundCreated = test.getRoundCreated();
         int mutantsKilled = test.getMutantsKilled();

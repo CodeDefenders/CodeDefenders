@@ -60,7 +60,7 @@ public class MutantDAO {
         String javaFile = rs.getString("JavaFile");
         String classFile = rs.getString("ClassFile");
         String absoluteJavaFile = FileUtils.getAbsoluteDataPath(javaFile).toString();
-        String absoluteClassFile = FileUtils.getAbsoluteDataPath(classFile).toString();
+        String absoluteClassFile = classFile == null ? null : FileUtils.getAbsoluteDataPath(classFile).toString();
         boolean alive = rs.getBoolean("Alive");
         Equivalence equiv = Equivalence.valueOf(rs.getString("Equivalent"));
         int roundCreated = rs.getInt("RoundCreated");
@@ -195,7 +195,7 @@ public class MutantDAO {
         String javaFile = DatabaseAccess.addSlashes(mutant.getJavaFile());
         String classFile = DatabaseAccess.addSlashes(mutant.getClassFile());
         String relativeJavaFile = FileUtils.getRelativeDataPath(javaFile).toString();
-        String relativeClassFile = FileUtils.getRelativeDataPath(classFile).toString();
+        String relativeClassFile = classFile == null ? null : FileUtils.getRelativeDataPath(classFile).toString();
         int gameId = mutant.getGameId();
         int classId = mutant.getClassId();
         int roundCreated = mutant.getRoundCreated();
