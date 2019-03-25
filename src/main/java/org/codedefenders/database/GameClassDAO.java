@@ -23,6 +23,7 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Dependency;
+import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +55,11 @@ public class GameClassDAO {
         String alias = rs.getString("Alias");
         String javaFile = rs.getString("JavaFile");
         String classFile = rs.getString("ClassFile");
+        String absoluteJavaFile = FileUtils.getAbsoluteDataPath(javaFile).toString();
+        String absoluteClassFile = FileUtils.getAbsoluteDataPath(classFile).toString();
         boolean requireMocking = rs.getBoolean("RequireMocking");
 
-        return new GameClass(classId , name, alias, javaFile, classFile, requireMocking);
+        return new GameClass(classId , name, alias, absoluteJavaFile, absoluteClassFile, requireMocking);
     }
 
 
@@ -226,6 +229,8 @@ public class GameClassDAO {
         String alias = cut.getAlias();
         String javaFile = DatabaseAccess.addSlashes(cut.getJavaFile());
         String classFile = DatabaseAccess.addSlashes(cut.getClassFile());
+        String relativeJavaFile = FileUtils.getRelativeDataPath(javaFile).toString();
+        String relativeClassFile = FileUtils.getRelativeDataPath(classFile).toString();
         boolean isMockingEnabled = cut.isMockingEnabled();
         boolean isPuzzleClass = cut.isPuzzleClass();
 
@@ -233,8 +238,8 @@ public class GameClassDAO {
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(name),
                 DatabaseValue.of(alias),
-                DatabaseValue.of(javaFile),
-                DatabaseValue.of(classFile),
+                DatabaseValue.of(relativeJavaFile),
+                DatabaseValue.of(relativeClassFile),
                 DatabaseValue.of(isMockingEnabled),
                 DatabaseValue.of(isPuzzleClass)
         };

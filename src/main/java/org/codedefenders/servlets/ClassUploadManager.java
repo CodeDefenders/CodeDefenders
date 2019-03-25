@@ -70,8 +70,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.CUTS_DIR;
+import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.CUTS_MUTANTS_DIR;
 import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
 

@@ -18,6 +18,8 @@
  */
 package org.codedefenders.util;
 
+import javassist.ClassPool;
+import javassist.CtClass;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +29,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryNotEmptyException;
@@ -37,13 +38,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.nio.file.Paths;
 
-import javassist.ClassPool;
-import javassist.CtClass;
-
-import static org.codedefenders.util.Constants.F_SEP;
-import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
-import static org.codedefenders.util.Constants.TEST_PREFIX;
+import static org.codedefenders.util.Constants.*;
 
 /**
  * This class offers static methods for file functionality.
@@ -52,13 +49,13 @@ public class FileUtils {
     private static final Logger logger = LoggerFactory.getLogger(FileUtils.class);
 
     public static String createIndexXML(File dir, String fileName, String contents) throws IOException {
-        String path = dir.getAbsolutePath() + F_SEP + fileName + ".xml";
-        File infoFile = new File(path);
+        Path path = Paths.get(dir.getAbsolutePath(), fileName + ".xml");
+        File infoFile = path.toFile();
         FileWriter infoWriter = new FileWriter(infoFile);
         BufferedWriter bInfoWriter = new BufferedWriter(infoWriter);
         bInfoWriter.write(contents);
         bInfoWriter.close();
-        return path;
+        return path.toString();
     }
 
     public static String createJavaTestFile(File dir, String classBaseName, String testCode) throws IOException {
@@ -70,22 +67,18 @@ public class FileUtils {
     public static File getNextSubDir(String path) {
         File folder = new File(path);
         folder.mkdirs();
-        String[] directories = folder.list(new FilenameFilter() {
-            @Override
-            public boolean accept(File current, String name) {
-                return new File(current, name).isDirectory() && (isParsable(name));
-            }
-        });
+        String[] directories =
+            folder.list((current, name) -> new File(current, name).isDirectory() && (isParsable(name)));
         Arrays.sort(directories);
         String newPath;
-        if (directories.length == 0)
-            newPath = folder.getAbsolutePath() + F_SEP + "00000001";
-        else {
+        if (directories.length == 0) {
+            newPath = Paths.get(folder.getAbsolutePath(), "00000001").toString();
+        } else {
             File lastDir = new File(directories[directories.length - 1]);
             int newIndex = Integer.parseInt(lastDir.getName()) + 1;
             String formatted = String.format("%08d", newIndex);
 
-            newPath = path + F_SEP + formatted;
+            newPath = Paths.get(path, formatted).toString();
         }
         File newDir = new File(newPath);
         newDir.mkdirs();
@@ -164,6 +157,60 @@ public class FileUtils {
     }
 
     /**
+     * Converts a path relative to {@link Constants#DATA_DIR} to an absolute path.
+     * If the given path is absolute, returns the given path. If the given path is relative, returns an absolute path
+     * that concatenates {@link Constants#DATA_DIR} and the given path.
+     *
+     * @param path a path relative to {@link Constants#DATA_DIR}, or an absolute path.
+     * @return an absolute path that describes the given path.
+     */
+    public static Path getAbsoluteDataPath(String path) {
+        return getAbsoluteDataPath(Paths.get(path));
+    }
+
+    /**
+     * Converts a path relative to {@link Constants#DATA_DIR} to an absolute path.
+     * If the given path is absolute, returns the given path. If the given path is relative, returns an absolute path
+     * that concatenates {@link Constants#DATA_DIR} and the given path.
+     *
+     * @param path a path relative to {@link Constants#DATA_DIR}, or an absolute path.
+     * @return an absolute path that describes the given path.
+     */
+    public static Path getAbsoluteDataPath(Path path) {
+        if (path.isAbsolute()) {
+            return path;
+        } else {
+            return Paths.get(DATA_DIR, path.toString());
+        }
+    }
+
+    /**
+     * Converts an absolute path to a path relative to {@link Constants#DATA_DIR} if the path is a descendant of
+     * {@link Constants#DATA_DIR}. Otherwise, returns the given path itself.
+     *
+     * @param path an absolute path.
+     * @return a path relative to {@link Constants#DATA_DIR} or the path itself.
+     */
+    public static Path getRelativeDataPath(String path) {
+        return getRelativeDataPath(Paths.get(path));
+    }
+
+    /**
+     * Converts an absolute path to a path relative to {@link Constants#DATA_DIR} if the path is a descendant of
+     * {@link Constants#DATA_DIR}. Otherwise, returns the given path itself.
+     *
+     * @param path an absolute path.
+     * @return a path relative to {@link Constants#DATA_DIR} or the path itself.
+     */
+    public static Path getRelativeDataPath(Path path) {
+        if (path.startsWith(DATA_DIR)) {
+            return Paths.get(DATA_DIR).relativize(path);
+        } else {
+            return path;
+        }
+    }
+
+   /**
      * Returns the qualified name of a java class for a given {@code .java} file content.
      * <p>
      * E.g. {@code java.util.Collection} for {@link Collection}.
