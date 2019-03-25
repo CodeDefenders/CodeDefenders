@@ -284,7 +284,7 @@ public class PuzzleGameManager extends HttpServlet {
             game.setState(GameState.SOLVED);
             messages.clear();
             boolean isAnAttackGame = false;
-            messages.add( generateWinningMessage(request, game, isAnAttackGame));
+            messages.add( generateWinningMessage(request, userId, game, isAnAttackGame));
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
@@ -411,13 +411,13 @@ public class PuzzleGameManager extends HttpServlet {
             game.setState(GameState.SOLVED);
             messages.clear();
             boolean isAnAttackGame = true;
-            messages.add( generateWinningMessage(request, game, isAnAttackGame));
+            messages.add( generateWinningMessage(request, userId, game, isAnAttackGame));
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
     }
     
-    private static String generateWinningMessage(HttpServletRequest request, PuzzleGame game, boolean isAnAttackGame) {
+    private static String generateWinningMessage(HttpServletRequest request, int userId, PuzzleGame game, boolean isAnAttackGame) {
         StringBuffer message = new StringBuffer();
         message.append("Congratulations, your" + (isAnAttackGame ? "mutant" : "test") + " solved the puzzle!");
 
@@ -438,26 +438,33 @@ public class PuzzleGameManager extends HttpServlet {
             if (puzzleChapter.getChapterId() < currentChapter) {
                 continue;
             }
-            // Check in current chapter
-            else if (puzzleChapter.getChapterId() == currentChapter) {
+            // Check in current and next chapters
+            else if (puzzleChapter.getChapterId() >= currentChapter) {
+                /*
+                 * This returns the puzzles ordered by position and (hopefully)
+                 * and empty, not-null list if there's not puzzles
+                 */
                 for (Puzzle puzzle : PuzzleDAO.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
-                    if (puzzle.getPosition() > currentPositionInChapter) {
-                        message.append(" ").append("Try to solve the <a href=" + request.getContextPath()
-                                + Paths.PUZZLE_GAME + "?puzzleId=" + puzzle.getPuzzleId() + ">next Puzzle</a>, or go back to the <a href=" + request.getContextPath()
-                                + Paths.PUZZLE_GAME + ">Puzzle Overview</a>.");
-                        return message.toString();
+                    if (puzzleChapter.getChapterId() == currentChapter
+                            && puzzle.getPosition() <= currentPositionInChapter) {
+                        // Skip past and current puzzles in the same chapter
+                        continue;
                     }
-                }
-            } else {
-                // Get the first puzzle for the first non-empty chapter
-                List<Puzzle> puzzles = PuzzleDAO.getPuzzlesForChapterId(puzzleChapter.getChapterId());
-                if (!puzzles.isEmpty()) {
-                    message.append(" ").append("Try to solve the <a href=" + request.getContextPath()
-                            + Paths.PUZZLE_GAME + "?puzzleId=" + puzzles.get(0).getPuzzleId() + ">next Puzzle</a>, or go back to the <a href=" + request.getContextPath()
-                                + Paths.PUZZLE_GAME + ">Puzzle Overview</a>.");
-                    return message.toString();
-                } else {
-                    continue;
+                    // Skip already solved puzzles
+                    PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzle.getPuzzleId(), userId);
+                    if (
+                            playedGame == null || // Not yet played this puzzle 
+                            ( playedGame != null  && ! playedGame.getState().equals(GameState.SOLVED)) // played but not yet solved. Condition expressed to be readable.
+                    ) {
+                        message.append(" ")
+                                .append("Try to solve the <a href=" + request.getContextPath() + Paths.PUZZLE_GAME
+                                        + "?puzzleId=" + puzzle.getPuzzleId()
+                                        + ">next Puzzle</a>, or go back to the <a href=" + request.getContextPath()
+                                        + Paths.PUZZLE_GAME + ">Puzzle Overview</a>.");
+                        return message.toString();
+                    } else {
+                        continue;
+                    }
                 }
             }
         }
