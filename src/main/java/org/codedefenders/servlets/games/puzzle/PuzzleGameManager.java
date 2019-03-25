@@ -419,7 +419,7 @@ public class PuzzleGameManager extends HttpServlet {
     
     private static String generateWinningMessage(HttpServletRequest request, int userId, PuzzleGame game, boolean isAnAttackGame) {
         StringBuffer message = new StringBuffer();
-        message.append("Congratulations, your" + (isAnAttackGame ? "mutant" : "test") + " solved the puzzle!");
+        message.append("Congratulations, your " + (isAnAttackGame ? "mutant" : "test") + " solved the puzzle!");
 
         /*
          * TODO: this code does not yet consider already solved and locked
