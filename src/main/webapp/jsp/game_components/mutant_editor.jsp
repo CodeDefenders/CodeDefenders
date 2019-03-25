@@ -285,9 +285,6 @@
         $('.hideAfterRendering').each(function () {
             $(this).removeClass('active')
         });
-
-        // This button somehow moved 5px, so it's fixed back again
-        document.getElementById("btnReset").style.marginTop = "-35px";
     </script>
 </div>
 
