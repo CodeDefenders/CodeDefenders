@@ -193,7 +193,7 @@ public class AntRunner {
 	public static boolean potentialEquivalent(Mutant m) {
 		logger.info("Checking if mutant {} is potentially equivalent.", m.getId());
 		GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
-		String suiteDir = AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias();
+		String suiteDir = Paths.get(AI_DIR, "tests", cut.getAlias()).toString();
 
 		// TODO: is this actually executing a whole test suite?
 		AntProcessResult result = runAntTarget("test-mutant", m.getDirectory(), suiteDir, cut, cut.getName() + Constants.SUITE_EXT);
@@ -263,7 +263,7 @@ public class AntRunner {
 		if (result.compiled()) {
 			// If the input stream returned a 'successful build' message, the CUT compiled correctly
 			logger.info("Compiled uploaded CUT successfully");
-			File f = new File(CUTS_DIR + Constants.F_SEP + cut.getAlias());
+			File f = Paths.get(CUTS_DIR, cut.getAlias()).toFile();
 			final String compiledClassName = FilenameUtils.getBaseName(cut.getJavaFile()) + Constants.JAVA_CLASS_EXT;
 			LinkedList<File> matchingFiles = (LinkedList<File>)FileUtils.listFiles(f, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
 			if (! matchingFiles.isEmpty())
@@ -460,7 +460,7 @@ public class AntRunner {
 		command.add(target); // "-v", "-d", for verbose, debug
 		// This ensures that ant actually uses the data dir we setup
 		command.add("-Dcodedef.home=" + Constants.DATA_DIR);
-		///
+
 		command.add("-Dmutant.file=" + mutantDir);
 		command.add("-Dtest.file=" + testDir);
 		command.add("-Dcut.dir=" + cutDir);
@@ -469,7 +469,7 @@ public class AntRunner {
 		command.add("-Dclassname=" + cut.getName());
 		command.add("-DtestClassname=" + testClassName);
 		command.add("-Dcuts.deps=" + cutDir + F_SEP + CUTS_DEPENDENCY_DIR);
-		//
+
 		if (mutantDir != null && testDir != null) {
 			String separator = F_SEP;
 			if (separator.equals("\\")){
@@ -479,8 +479,8 @@ public class AntRunner {
 			String mutantFile = String.format("%s-%s", tokens[tokens.length - 2], tokens[tokens.length - 1]);
 			String testMutantFile = testDir.replace("original", mutantFile);
 			// TODO This might need refactoring
-			File testMutantFileDir = new File( testMutantFile  );
-			if( ! testMutantFileDir.exists() ){
+			File testMutantFileDir = new File(testMutantFile);
+			if(!testMutantFileDir.exists()){
 				testMutantFileDir.mkdirs();
 			}
 			//

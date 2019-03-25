@@ -23,6 +23,7 @@ import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
+import org.codedefenders.util.FileUtils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -58,6 +59,8 @@ public class MutantDAO {
         }
         String javaFile = rs.getString("JavaFile");
         String classFile = rs.getString("ClassFile");
+        String absoluteJavaFile = FileUtils.getAbsoluteDataPath(javaFile).toString();
+        String absoluteClassFile = classFile == null ? null : FileUtils.getAbsoluteDataPath(classFile).toString();
         boolean alive = rs.getBoolean("Alive");
         Equivalence equiv = Equivalence.valueOf(rs.getString("Equivalent"));
         int roundCreated = rs.getInt("RoundCreated");
@@ -66,8 +69,8 @@ public class MutantDAO {
         int points = rs.getInt("Points");
         String md5 = rs.getString("MD5");
 
-        Mutant mutant = new Mutant(mutantId, classId, gameId, javaFile, classFile, alive, equiv, roundCreated,
-                roundKilled, playerId, md5);
+        Mutant mutant = new Mutant(mutantId, classId, gameId, absoluteJavaFile, absoluteClassFile, alive, equiv,
+                roundCreated, roundKilled, playerId, md5);
         mutant.setScore(points);
         // since mutated lines can be null
         final String mutatedLines = rs.getString("MutatedLines");
@@ -191,6 +194,8 @@ public class MutantDAO {
     public static int storeMutant(Mutant mutant) throws Exception {
         String javaFile = DatabaseAccess.addSlashes(mutant.getJavaFile());
         String classFile = DatabaseAccess.addSlashes(mutant.getClassFile());
+        String relativeJavaFile = FileUtils.getRelativeDataPath(javaFile).toString();
+        String relativeClassFile = classFile == null ? null : FileUtils.getRelativeDataPath(classFile).toString();
         int gameId = mutant.getGameId();
         int classId = mutant.getClassId();
         int roundCreated = mutant.getRoundCreated();
@@ -206,8 +211,8 @@ public class MutantDAO {
                 " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
         );
         DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(javaFile),
-                DatabaseValue.of(classFile),
+                DatabaseValue.of(relativeJavaFile),
+                DatabaseValue.of(relativeClassFile),
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(roundCreated),
                 DatabaseValue.of(equivalent.name()),

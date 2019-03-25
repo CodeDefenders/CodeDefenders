@@ -44,8 +44,10 @@ import static org.codedefenders.validation.code.CodeValidator.validateMutantGetM
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_COMMENT;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_IDENTICAL;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_METHOD_SIGNATURE;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_PACKAGE_SIGNATURE;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_SUCCESS;
 import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_LOGIC_INSTANCEOF;
+import static org.codedefenders.validation.code.ValidationMessage.MUTANT_VALIDATION_CLASS_SIGNATURE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -60,6 +62,218 @@ public class CodeValidatorTest {
 	@Rule
 	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+	@Test
+    public void changeInClassSignatureShouldTriggerValidation() {
+        String originalCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + " public final class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
+        
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+    }
+	
+	@Test
+    public void noChangeInClassSignatureShouldNotTriggerValidation() {
+        String originalCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
+        
+        assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+    }
+	
+	// TODO Not a good test with so many assert. This is 
+	@Test 
+	public void testVariousChangesToClassSignatureRelaxed(){
+	    CodeValidatorLevel level = CodeValidatorLevel.RELAXED;
+	    assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "public final class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("class Rational  {}", "public class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("class Rational  {}", "final class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "class Rational  {}", level));
+	    // This is wrong as protected is not allowed in that position
+        // assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "protected class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("final class Rational  {}", "class Rational  {}", level));
+        //
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Outer { public class Rational  {}}", "public class Outer { protected class Rational  {}}", level));
+	}
+	
+	@Test 
+    public void testVariousChangesToClassSignatureModerate(){
+        CodeValidatorLevel level = CodeValidatorLevel.MODERATE;
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "public final class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("class Rational  {}", "public class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("class Rational  {}", "final class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("final class Rational  {}", "class Rational  {}", level));
+        //
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Outer { public class Rational  {}}", "public class Outer { protected class Rational  {}}", level));
+    }
+	
+	@Test 
+    public void testVariousChangesToClassSignatureStrict(){
+        CodeValidatorLevel level = CodeValidatorLevel.STRICT;
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "public final class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("class Rational  {}", "public class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("class Rational  {}", "final class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Rational  {}", "class Rational  {}", level));
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("final class Rational  {}", "class Rational  {}", level));
+        //
+        assertEquals(MUTANT_VALIDATION_CLASS_SIGNATURE, validateMutantGetMessage("public class Outer { public class Rational  {}}", "public class Outer { protected class Rational  {}}", level));
+    }
+	
+	
+    @Test
+    public void changeToPackageShouldTriggerValidation() {
+        String originalCode = ""
+                + "package theoriginalpackage;"+ "\n"
+                + "\n"
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + "package anotherpackage;"+ "\n"
+                + "\n"
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
+        
+        assertEquals(MUTANT_VALIDATION_PACKAGE_SIGNATURE, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+    }
+    
+    @Test
+    public void changeToEmptyPackageShouldTriggerValidation() {
+        String originalCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + "package anotherpackage;"+ "\n"
+                + "\n"
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
+        
+        assertEquals(MUTANT_VALIDATION_PACKAGE_SIGNATURE, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+    }
+
+    @Test
+    public void samePackageDeclarationShouldNotTriggerValidation() {
+        String originalCode = ""
+                + "package theoriginalpackage;"+ "\n"
+                + "\n"
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + "package theoriginalpackage;"+ "\n"
+                + "\n"
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
+        
+        assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+    }
+    
+    @Test
+    public void sameEmptyPackageDeclarationShouldNotTriggerValidation() {
+        String originalCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Number ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        String mutatedCode = ""
+                + " public class Test{"+ "\n" 
+                + "  public void pow() { " + "\n"
+                + "   Integer a = new Integer(3);"+ "\n"
+                + "   if( a instanceof Object ){"+ "\n"
+                + "      int b = a.intValue();"+ "\n"
+                + "   }"+ "\n"
+                + " }"+ "\n"
+                + "}";
+        
+        CodeValidatorLevel codeValidatorLevel = CodeValidatorLevel.RELAXED;
+        
+        assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage(originalCode, mutatedCode, codeValidatorLevel));
+    }
+    
 	@Test
     public void mutantChangeInstanceofUsingStrictCheckingTriggerValidation(){
         String originalCode = ""
@@ -1093,24 +1307,9 @@ public class CodeValidatorTest {
 	public void checkModerateRelaxations(CodeValidatorLevel level) {
 		boolean isValid = !level.equals(CodeValidatorLevel.STRICT);
 		if (isValid) {
-			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {}", "public final class Rational  {}", level));
-			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("class Rational  {}", "public class Rational  {}", level));
-			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("class Rational  {}", "final class Rational  {}", level));
-			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {}", "class Rational  {}", level));
-			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {}", "protected class Rational  {}", level));
-			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("final class Rational  {}", "class Rational  {}", level));
-
 			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  { public void test(){ r.num = r.num; }}", "public class Rational  { public void test(){  r.num = r.num | ((r.num & (1 << 29)) << 1); }}", level));
 			assertEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  { public void test(){ r.num = r.num; }}", "public class Rational  { public void test(){ r.num = r.num << 1+344; }}", level));
 		} else {
-			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {}", "public final class Rational  {}", level));
-			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("class Rational  {}", "public class Rational  {}", level));
-			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("class Rational  {}", "final class Rational  {}", level));
-			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  {}", "class Rational  {}", level));
-
-			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Outer { public class Rational  {}}", "public class Outer { protected class Rational  {}}", level));
-			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("final class Rational  {}", "class Rational  {}", level));
-
 			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  { public void test(){ r.num = r.num; }}", "public class Rational  { public void test(){ r.num = r.num | ((r.num & (1 << 29)) << 1); }}", level));
 			assertNotEquals(MUTANT_VALIDATION_SUCCESS, validateMutantGetMessage("public class Rational  { public void test(){ r.num = r.num; }}", "public class Rational  { public void test(){ r.num = r.num << 1+344; }}", level));
 		}

@@ -19,6 +19,7 @@
 package org.codedefenders.util;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -76,8 +77,7 @@ public class Constants {
 	public static final int DUMMY_ATTACKER_USER_ID = 3;
 	public static final int DUMMY_DEFENDER_USER_ID = 4;
 
-	//public static String DATA_DIR    = F_SEP + "WEB-INF" + F_SEP + "data";
-	public static final String CUTS_DIR = DATA_DIR + F_SEP + "sources";
+	public static final String CUTS_DIR = Paths.get(DATA_DIR, "sources").toString();
 	// dependencies, mutants and tests subdirectories for CUTs
 	public static final String CUTS_DEPENDENCY_DIR = "dependencies";
 	public static final String CUTS_MUTANTS_DIR = "mutants";
@@ -88,13 +88,13 @@ public class Constants {
 	public static final String MODE_DUEL_DIR = "sp";
 	public static final String MODE_BATTLEGROUND_DIR = "mp";
 
-	public static final String MUTANTS_DIR = DATA_DIR + F_SEP + "mutants";
-	public static final String TESTS_DIR = DATA_DIR + F_SEP + "tests";
-	public static final String AI_DIR = DATA_DIR + F_SEP + "ai";
+	public static final String MUTANTS_DIR = Paths.get(DATA_DIR, "mutants").toString();
+	public static final String TESTS_DIR = Paths.get(DATA_DIR, "tests").toString();
+	public static final String AI_DIR = Paths.get(DATA_DIR, "ai").toString();
 
-	public static final String LIB_JUNIT = DATA_DIR + F_SEP + "lib" + F_SEP + "junit-4.12.jar";
-	public static final String LIB_HAMCREST = DATA_DIR + F_SEP + "lib" + F_SEP + "hamcrest-all-1.3.jar";
-	public static final String LIB_MOCKITO = DATA_DIR + F_SEP + "lib" + F_SEP + "mockito-all-1.9.5.jar";
+	public static final String LIB_JUNIT = Paths.get(DATA_DIR, "lib", "junit-4.12.jar").toString();
+	public static final String LIB_HAMCREST = Paths.get(DATA_DIR, "lib", "hamcrest-all-1.3.jar").toString();
+	public static final String LIB_MOCKITO = Paths.get(DATA_DIR, "lib", "mockito-all-1.9.5.jar").toString();
 
 	public static final String TEST_CLASSPATH = Constants.LIB_JUNIT + File.pathSeparatorChar + Constants.LIB_HAMCREST + File.pathSeparatorChar + Constants.LIB_MOCKITO;
 
@@ -107,8 +107,8 @@ public class Constants {
 	public static final String GRACE_PERIOD_MESSAGE = "Game is now in grace period.";
 
 	// JSP file paths
-	public static final String LOGIN_VIEW_JSP = "jsp" + F_SEP + "login_view.jsp";
-	public static final String UTESTING_VIEW_JSP = "jsp" + F_SEP + "utesting_view.jsp";
+	public static final String LOGIN_VIEW_JSP = Paths.get("jsp", "login_view.jsp").toString();
+	public static final String UTESTING_VIEW_JSP = Paths.get("jsp", "utesting_view.jsp").toString();
 
 	public static final String DUEL_RESOLVE_EQUIVALENCE_JSP = "jsp/duel/equivalence_view.jsp";
 	public static final String DUEL_ATTACKER_VIEW_JSP = "jsp/duel/attacker_view.jsp";
