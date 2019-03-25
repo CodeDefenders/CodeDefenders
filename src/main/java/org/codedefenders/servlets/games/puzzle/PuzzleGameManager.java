@@ -28,6 +28,8 @@ import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.puzzle.Puzzle;
+import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.game.puzzle.solving.MutantSolvingStrategy;
 import org.codedefenders.game.puzzle.solving.TestSolvingStrategy;
@@ -44,6 +46,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.ServletException;
@@ -280,7 +283,8 @@ public class PuzzleGameManager extends HttpServlet {
         } else {
             game.setState(GameState.SOLVED);
             messages.clear();
-            messages.add("Congratulations, your test solved the puzzle! You have unlocked the <a href=" + request.getContextPath() + Paths.PUZZLE_GAME + ">next Puzzle</a>.");
+            boolean isAnAttackGame = false;
+            messages.add( generateWinningMessage(request, game, isAnAttackGame));
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
@@ -406,9 +410,63 @@ public class PuzzleGameManager extends HttpServlet {
         } else {
             game.setState(GameState.SOLVED);
             messages.clear();
-            messages.add("Congratulations, your mutant solved the puzzle! You have unlocked the <a href=" + request.getContextPath() + Paths.PUZZLE_GAME + ">next Puzzle</a>.");
+            boolean isAnAttackGame = true;
+            messages.add( generateWinningMessage(request, game, isAnAttackGame));
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
+    }
+    
+    private static String generateWinningMessage(HttpServletRequest request, PuzzleGame game, boolean isAnAttackGame) {
+        StringBuffer message = new StringBuffer();
+        message.append("Congratulations, your" + (isAnAttackGame ? "mutant" : "test") + " solved the puzzle!");
+
+        /*
+         * TODO: this code does not yet consider already solved and locked
+         * puzzles.
+         */
+        int currentChapter = game.getPuzzle().getChapterId();
+        int currentPositionInChapter = game.getPuzzle().getPosition();
+
+        /*
+         * Find the next puzzle in the same chapter or the first puzzle in the
+         * next not empty chapters
+         */
+        for (PuzzleChapter puzzleChapter : PuzzleDAO.getPuzzleChapters()) {
+
+            // Skip chapters before this one
+            if (puzzleChapter.getChapterId() < currentChapter) {
+                continue;
+            }
+            // Check in current chapter
+            else if (puzzleChapter.getChapterId() == currentChapter) {
+                for (Puzzle puzzle : PuzzleDAO.getPuzzlesForChapterId(puzzleChapter.getChapterId())) {
+                    if (puzzle.getPosition() > currentPositionInChapter) {
+                        message.append(" ").append("Try to solve the <a href=" + request.getContextPath()
+                                + Paths.PUZZLE_GAME + "?puzzleId=" + puzzle.getPuzzleId() + ">next Puzzle</a>, or go back to the <a href=" + request.getContextPath()
+                                + Paths.PUZZLE_GAME + ">Puzzle Overview</a>.");
+                        return message.toString();
+                    }
+                }
+            } else {
+                // Get the first puzzle for the first non-empty chapter
+                List<Puzzle> puzzles = PuzzleDAO.getPuzzlesForChapterId(puzzleChapter.getChapterId());
+                if (!puzzles.isEmpty()) {
+                    message.append(" ").append("Try to solve the <a href=" + request.getContextPath()
+                            + Paths.PUZZLE_GAME + "?puzzleId=" + puzzles.get(0).getPuzzleId() + ">next Puzzle</a>, or go back to the <a href=" + request.getContextPath()
+                                + Paths.PUZZLE_GAME + ">Puzzle Overview</a>.");
+                    return message.toString();
+                } else {
+                    continue;
+                }
+            }
+        }
+
+        /*
+         * If we got here, the user has solved all the puzzles ?
+         */
+        message.append(" ").append("You solved all the puzzles, go back to the <a href=" + request.getContextPath()
+                + Paths.PUZZLE_GAME + ">Puzzle Overview</a>.");
+        return message.toString();
     }
 }
