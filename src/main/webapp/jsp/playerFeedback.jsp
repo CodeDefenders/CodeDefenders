@@ -120,11 +120,13 @@
                                 int oldValue = oldValues.isEmpty() ? -1 : oldValues.get(f.ordinal());
                                 if ((role.equals(Role.DEFENDER) &&
                                         (f.equals(Feedback.Type.CUT_MUTATION_DIFFICULTY) ||
-                                                f.equals(Feedback.Type.DEFENDER_FAIRNESS)))
+                                                f.equals(Feedback.Type.DEFENDER_FAIRNESS) ||
+                                                f.equals(Feedback.Type.DEFENDER_COMPETENCE)))
                                         ||
                                         (role.equals(Role.ATTACKER) &&
                                                 (f.equals(Feedback.Type.CUT_TEST_DIFFICULTY) ||
-                                                        f.equals(Feedback.Type.ATTACKER_FAIRNESS))))
+                                                        f.equals(Feedback.Type.ATTACKER_FAIRNESS) ||
+                                                        f.equals(Feedback.Type.ATTACKER_COMPETENCE))))
                                     continue;
                         %>
 
