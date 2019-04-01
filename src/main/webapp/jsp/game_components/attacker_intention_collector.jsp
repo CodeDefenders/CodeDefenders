@@ -22,9 +22,11 @@
     var attackButton = document.getElementById('submitMutant');
     var theForm = document.getElementById('atk');
 
+    // Who calls this function ?
     function updateAttackForm(value){
         document.getElementById("attacker_intention").value = value;
-        progressBar();
+        /* progressBar(); */
+        registerMutantProgressBar();
         theForm.submit();
         attackButton.disabled = true;
     }

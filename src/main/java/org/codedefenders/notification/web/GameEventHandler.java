@@ -6,6 +6,7 @@ import javax.websocket.EncodeException;
 import javax.websocket.Session;
 
 import org.codedefenders.notification.model.GameLifecycleEvent;
+import org.codedefenders.notification.model.MutantLifecycleEvent;
 import org.codedefenders.notification.model.Notification;
 import org.codedefenders.notification.model.TestLifecycleEvent;
 
@@ -37,7 +38,16 @@ public class GameEventHandler {
     
     @Subscribe
     public void pushGameEvent(TestLifecycleEvent e) throws IOException, EncodeException {
-        if (this.playerId == e.getTest().getPlayerId() ){
+        System.out.println("GameEventHandler.pushGameEvent() TestLifecycleEvent  " + e.getTest() );
+        if (this.playerId != e.getTest().getPlayerId() ){
+            session.getBasicRemote().sendObject( notification );
+        } 
+    }
+    
+    @Subscribe
+    public void pushGameEvent(MutantLifecycleEvent e) throws IOException, EncodeException {
+        System.out.println("GameEventHandler.pushGameEvent() MutantLifecycleEvent " + e.getMutant().getPlayerId() );
+        if (this.playerId != e.getMutant().getPlayerId() ){
             session.getBasicRemote().sendObject( notification );
         } 
     }

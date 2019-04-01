@@ -114,6 +114,7 @@
         });
     };
 
+    // TODO Make this a on-demand function call when one clicks on the notification icons...
     $(document).ready(function() {
         var interval = 5000;
         var lastTime = 0;

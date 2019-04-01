@@ -5,11 +5,17 @@ public class PushSocketRegistrationEvent {
     private int gameID;
     private int playerID;
     private String target;
+    private String action;
     
-    public PushSocketRegistrationEvent(String target, int gameID, int playerID) {
+    public PushSocketRegistrationEvent(String target, int gameID, int playerID, String action) {
         this.gameID = gameID;
         this.target = target;
         this.playerID = playerID;
+        this.action = action;
+    }
+    
+    public String getAction() {
+        return action;
     }
     
     public String getTarget() {

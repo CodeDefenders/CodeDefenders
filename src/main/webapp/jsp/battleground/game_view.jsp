@@ -27,17 +27,32 @@
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     int userId = ServletUtils.userId(request); // required for playerFeedback, too
 	Role role = game.getRole(userId); // required for header_game, too
+    // TODO Not sure this is in general correct  
+    int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(userId, game.getId());
 %>
 <%-- Set request attributes for the components. --%>
 <%
     /* playerFeedback & game_notifications */
     request.setAttribute("gameId", game.getId());
+    request.setAttribute("playerId", playerId);
 %>
 <%@ include file="/jsp/battleground/header_game.jsp" %>
+
+<%-- Push notifications using WebSocket --%>
+<%@ include file="/jsp/push_notifications.jsp"%>
+<%-- Show the bell icon with counts of unread notifications: requires push_notifications.jsp --%>
+<%@ include file="/jsp/push_game_notifications.jsp"%>
+<%-- Show the mail icon with counts of unread notifications: requires push_notifications.jsp --%>
+<%@ include file="/jsp/push_chat_notifications.jsp"%>
+
 <%@ include file="/jsp/scoring_tooltip.jsp" %>
 <%@ include file="/jsp/playerFeedback.jsp" %>
 <%@ include file="/jsp/battleground/game_scoreboard.jsp" %>
+<<<<<<< HEAD
 <%@ include file="/jsp/game_components/editor_help_config_modal.jsp" %>
+=======
+
+>>>>>>> 48c275fc... Enabled Push notifications for game events and chat events.
 <div class="crow fly no-gutter up">
 <%
     messages = new ArrayList<>();
@@ -78,5 +93,5 @@ if (game.isCapturePlayersIntention()) {
 	}
 }
 %>
-<%@ include file="/jsp/game_notifications.jsp"%>
+<%-- <%@ include file="/jsp/game_notifications.jsp"%> --%>
 <%@ include file="/jsp/battleground/footer_game.jsp" %>

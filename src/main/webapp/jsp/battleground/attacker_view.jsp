@@ -86,7 +86,9 @@
     </div>
 
     <div class="col-md-6" id="newmut-div">
-        <%@include file="../game_components/mutant_progress_bar.jsp" %>
+        
+        <%@include file="../game_components/push_mutant_progress_bar.jsp"%>
+        
         <div class="row" style="display: contents">
             <h3 style="margin-bottom: 0; display: inline">Create a mutant here</h3>
 
@@ -110,7 +112,12 @@
             </form>
         </div>
 
+<<<<<<< HEAD
         <form id="atk" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
+=======
+        <form id="atk" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post" >
+
+>>>>>>> 48c275fc... Enabled Push notifications for game events and chat events.
             <input type="hidden" name="formType" value="createMutant">
             <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
 

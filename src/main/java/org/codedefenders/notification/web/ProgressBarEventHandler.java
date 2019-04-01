@@ -15,28 +15,40 @@ public class ProgressBarEventHandler {
 
     private int playerId;
     private Session session;
-    
+
     public ProgressBarEventHandler(int playerId, Session session) {
         this.playerId = playerId;
         this.session = session;
     }
-    
+
     @Subscribe
     public void updateProgressBar(TestLifecycleEvent e) throws IOException, EncodeException {
         if (this.playerId == e.getTest().getPlayerId()) {
-            Notification notification = new Notification("PROGRESS_BAR");
+            Notification notification = new Notification("PROGRESSBAR");
             notification.setMessage(e.getEventType());
-            session.getBasicRemote().sendObject(notification);
+            synchronized (session) {
+                if (session.isOpen()) {
+                    session.getBasicRemote().sendObject(notification);
+                } else {
+                   // TODO Log this ?
+                }
+            }
         }
     }
-    
+
     // For some reason mutants have owner but tests do not...
     @Subscribe
     public void updateProgressBar(MutantLifecycleEvent e) throws IOException, EncodeException {
         if (this.playerId == e.getMutant().getPlayerId()) {
-            Notification notification = new Notification("PROGRESS_BAR");
+            Notification notification = new Notification("PROGRESSBAR");
             notification.setMessage(e.getEventType());
-            session.getBasicRemote().sendObject(notification);
+            synchronized (session) {
+                if (session.isOpen()) {
+                    session.getBasicRemote().sendObject(notification);
+                } else {
+                    // TODO Log this ?
+                 }
+            }
         }
     }
 }
