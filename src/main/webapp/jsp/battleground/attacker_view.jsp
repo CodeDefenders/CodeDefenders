@@ -112,12 +112,7 @@
             </form>
         </div>
 
-<<<<<<< HEAD
         <form id="atk" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
-=======
-        <form id="atk" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post" >
-
->>>>>>> 48c275fc... Enabled Push notifications for game events and chat events.
             <input type="hidden" name="formType" value="createMutant">
             <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
 

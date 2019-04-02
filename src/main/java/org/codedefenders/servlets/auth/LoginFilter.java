@@ -82,6 +82,20 @@ public class LoginFilter implements Filter {
 	private boolean loginRequired(HttpServletRequest request) {
 		String path = request.getRequestURI();
 		String context = request.getContextPath();
+		
+        /*
+         * Do not authenticate the requests to the WebSocket since the
+         * HttpSession is not visible from there. WebSocket authentication shall
+         * be handled in a different Filter.
+         * 
+         * TODO Maybe there's a way already to route Ws requests into WsFilters,
+         * but for the moment we need to match their URL
+         */
+        if (path.matches("/notifications/.*/[0-9][0-9]*")) {
+            System.out.println("LoginFilter.loginRequired() " + request.getProtocol() + " " + path);
+            return false;
+        }
+		
 		if ((path.endsWith(context + "/"))
 				|| (path.endsWith(context + "/favicon.ico"))
 				|| (path.endsWith(context + Paths.LOGIN))

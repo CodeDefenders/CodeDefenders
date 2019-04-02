@@ -7,11 +7,14 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.websocket.CloseReason;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
+import javax.websocket.CloseReason.CloseCode;
+import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
@@ -70,32 +73,33 @@ public class PushSocket {
     }
     /////
 
+    private boolean validate(Session session, String ticket, Integer owner) throws IOException{
+        if( ! ticketingServices.validateTicket(ticket, owner)){
+            logger.info("Invalid ticket for session " + session );
+            session.close( new CloseReason( CloseCodes.CANNOT_ACCEPT, "Invalid ticket"));
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
     @OnOpen
     public void open(Session session, //
             @PathParam("ticket") String ticket, @PathParam("userId") Integer userId) throws IOException {
 
-        // Validate this WebSocket against UserID using the Request-Ticket
-        if (ticketingServices.validateTicket(ticket, userId)) {
-            validSession = true;
-        } else {
-            logger.warn("Invalid ticket " + ticket + " for user " + userId);
-            validSession = false;
+        if( ! validate(session, ticket, userId )){
             return;
         }
-        //
+        
         this.userId = userId;
         this.ticket = ticket;
     }
 
     @OnClose
     public void close(Session session) {
+        
         // Invalidate the ticket
         ticketingServices.invalidateTicket(this.ticket);
-
-        if (!validSession) {
-            logger.warn("Invalid session for " + session);
-            return;
-        }
 
         if (this.gameEventHandler != null) {
             notificationService.unregister(this.gameEventHandler);
@@ -110,10 +114,6 @@ public class PushSocket {
 
     @OnMessage
     public void onMessage(String json, Session session) {
-        if (!validSession) {
-            logger.warn("Invalid session for " + session);
-            return;
-        }
 
         // TODO Create a typeAdapterFactory:
         // https://stackoverflow.com/questions/22307382/how-do-i-implement-typeadapterfactory-in-gson
@@ -163,9 +163,7 @@ public class PushSocket {
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        if (!validSession)
-            return;
-        this.close(session);
+        logger.error("Session " + session + " is on error. Cause: ", throwable );
     }
 
 }

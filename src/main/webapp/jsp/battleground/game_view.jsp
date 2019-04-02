@@ -48,11 +48,7 @@
 <%@ include file="/jsp/scoring_tooltip.jsp" %>
 <%@ include file="/jsp/playerFeedback.jsp" %>
 <%@ include file="/jsp/battleground/game_scoreboard.jsp" %>
-<<<<<<< HEAD
 <%@ include file="/jsp/game_components/editor_help_config_modal.jsp" %>
-=======
-
->>>>>>> 48c275fc... Enabled Push notifications for game events and chat events.
 <div class="crow fly no-gutter up">
 <%
     messages = new ArrayList<>();
