@@ -87,7 +87,8 @@
 		
 		<%-- TODO Why progress bar here is handled differently than mutant submission ?! --%>
 		<h3>Write a new JUnit test here
-			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def" onClick="registerTestProgressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
+			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def" 
+			onClick="registerTestProgressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
 					<% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
 				Defend!
 			</button>

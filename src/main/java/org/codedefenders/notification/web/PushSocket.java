@@ -108,6 +108,7 @@ public class PushSocket {
             notificationService.unregister(this.chatEventHandler);
         }
         if (this.progressBarEventHandler != null) {
+            logger.info("Deregistering Progress Bar " + session );
             notificationService.unregister(this.progressBarEventHandler);
         }
     }

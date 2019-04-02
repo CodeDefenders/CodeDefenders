@@ -97,7 +97,9 @@
 
 			<button type="submit" class="btn btn-primary btn-game btn-right"
 				id="submitMutant" form="atk"
-				onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';"
+				
+				onClick="registerMutantProgressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';"
+				
 				style="float: right; margin-right: 5px"
 				<% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>Attack!</button>
             <% } %>
