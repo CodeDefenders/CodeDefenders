@@ -177,12 +177,12 @@
                         <input type="email" id="inputEmail" name="email" class="form-control" placeholder="Email" required>
                         <label for="inputPassword" class="sr-only">Password</label>
                         <input type="password" id="inputPasswordCreate" name="password" class="form-control"
-                               onkeyup="validatePassword()" placeholder="Password" required minlength="<%=pwMinLength%>">
-                        <span class="label label-danger" id="pw_confirm_message_create" style="color: white;visibility: hidden">Passwords do not match!</span>
+                               onkeyup="validatePassword()" placeholder="Password" required minlength="<%=pwMinLength%>" style="margin: 0">
                         <label for="inputPassword" class="sr-only">Password</label>
                         <input type="password" id="inputConfirmPasswordCreate" name="confirm" class="form-control"
-                               onkeyup="validatePassword()" placeholder="Confirm Password" required>
-                        <button class="btn btn-lg btn-primary btn-block" id="submitCreateAccount" type="submit">Create Account</button>
+                               onkeyup="validatePassword()" placeholder="Confirm Password" required style="margin: 0">
+                        <span class="label label-danger" id="pw_confirm_message_create" style="color: white;visibility: hidden">Passwords do not match!</span>
+                        <button class="btn btn-lg btn-primary btn-block" id="submitCreateAccount" type="submit" style="margin-top: 5px">Create Account</button>
                     </form>
                     <span style="margin-right:5px; font-size:small;">Valid username: 3-20 alphanumerics starting with a letter (a-z), no space or special characters.<br>
                         Valid password: <%=AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.MIN_PASSWORD_LENGTH).getIntValue()%>-20 alphanumeric characters, no whitespace or special characters.</span>
