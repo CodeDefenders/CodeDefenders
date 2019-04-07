@@ -18,11 +18,23 @@
  */
 package org.codedefenders.servlets.games;
 
+import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
+import static org.codedefenders.util.Constants.TESTS_DIR;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
-import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.execution.TargetExecution;
@@ -37,87 +49,80 @@ import org.codedefenders.validation.code.CodeValidatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;
 
-import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
-import static org.codedefenders.util.Constants.TESTS_DIR;
-
 /**
- * This class offers static utility methods used by servlets managing active games.
+ * This class offers static utility methods used by servlets managing active
+ * games. Since each request handles a different submission this class has the
+ * {@link RequestScoped} annotation.
  *
  * @see org.codedefenders.servlets.games.duel.DuelGameManager
  * @see org.codedefenders.servlets.games.battleground.MultiplayerGameManager
  * @see org.codedefenders.servlets.games.puzzle.PuzzleGameManager
  */
-public class GameManagingUtils {
-    // @Inject
-    private static ClassCompilerService classCompiler;
+// TODO Probably a better name for those class and interface would not harm..
+@RequestScoped
+public class GameManagingUtils implements IGameManagingUtils {
     
-    //  @Inject
-    private static BackendExecutorService backend;
+    @Inject
+    private ClassCompilerService classCompiler;
 
-    static {
-        InitialContext initialContext;
-        try {
-            initialContext = new InitialContext();
-            BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
-            //
-            Bean bean = null;
-            CreationalContext ctx = null;
-            //
-            bean = (Bean) bm.getBeans(BackendExecutorService.class, new Annotation[0]).iterator().next();
-            ctx = bm.createCreationalContext(bean);
-            backend = (BackendExecutorService) bm.getReference(bean, BackendExecutorService.class, ctx);
-            //
-            bean = (Bean) bm.getBeans(ClassCompilerService.class, new Annotation[0]).iterator().next();
-            ctx = bm.createCreationalContext(bean);
-            classCompiler = (ClassCompilerService) bm.getReference(bean, ClassCompilerService.class, ctx);
-        } catch (NamingException e) {
-            e.printStackTrace();
-        }
-    }
-    
+    @Inject
+    private BackendExecutorService backend;
+
+    // static {
+    // InitialContext initialContext;
+    // try {
+    // initialContext = new InitialContext();
+    // BeanManager bm = (BeanManager)
+    // initialContext.lookup("java:comp/env/BeanManager");
+    // //
+    // Bean bean = null;
+    // CreationalContext ctx = null;
+    // //
+    // bean = (Bean) bm.getBeans(BackendExecutorService.class, new
+    // Annotation[0]).iterator().next();
+    // ctx = bm.createCreationalContext(bean);
+    // backend = (BackendExecutorService) bm.getReference(bean,
+    // BackendExecutorService.class, ctx);
+    // //
+    // bean = (Bean) bm.getBeans(ClassCompilerService.class, new
+    // Annotation[0]).iterator().next();
+    // ctx = bm.createCreationalContext(bean);
+    // classCompiler = (ClassCompilerService) bm.getReference(bean,
+    // ClassCompilerService.class, ctx);
+    // } catch (NamingException e) {
+    // e.printStackTrace();
+    // }
+    // }
+
     private static final Logger logger = LoggerFactory.getLogger(GameManagingUtils.class);
 
-    /**
-     * Returns a {@link Mutant} instance if for a given game and mutated code an mutant exists already,
-     * returns {@code null} otherwise.
-     *
-     * @param gameId      the identifier of the given game.
-     * @param mutatedCode the mutated source code.
-     * @return a {@link Mutant} for the game and mutated code, or if not found {@code null}.
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.codedefenders.servlets.games.IGameManagingUtils#existingMutant(int,
+     * java.lang.String)
      */
-    public static Mutant existingMutant(int gameId, String mutatedCode) {
+    @Override
+    public Mutant existingMutant(int gameId, String mutatedCode) {
         String md5Mutant = CodeValidator.getMD5FromText(mutatedCode);
 
-        // return the mutant in the game with same MD5 if it exists; return null otherwise
+        // return the mutant in the game with same MD5 if it exists; return null
+        // otherwise
         return MutantDAO.getMutantByGameAndMd5(gameId, md5Mutant);
     }
 
-    /**
-     * Returns {@code true} a given player has mutants with unresolved equivalence
-     * allegations in a game against him, {@code false} otherwise.
-     *
-     * @param gameId     the identifier of the given game.
-     * @param attackerId the player identifier of the attacker.
-     * @return {@code true} if a given player has pending equivalences, {@code false} otherwise.
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.codedefenders.servlets.games.IGameManagingUtils#
+     * hasAttackerPendingMutantsInGame(int, int)
      */
-    public static boolean hasAttackerPendingMutantsInGame(int gameId, int attackerId) {
+    @Override
+    public boolean hasAttackerPendingMutantsInGame(int gameId, int attackerId) {
         for (Mutant m : MutantDAO.getValidMutantsForGame(gameId)) {
             if (m.getPlayerId() == attackerId && m.getEquivalent() == Mutant.Equivalence.PENDING_TEST) {
                 return true;
@@ -126,21 +131,16 @@ public class GameManagingUtils {
         return false;
     }
 
-    /**
-     * Stores a given mutant and calls {@link AntRunner#compileMutant(File, String, int, GameClass, int)
-     * AntRunner#compileMutant()}.
-     * <p>
-     * <b>Here, the mutated code is assumed to be valid.</b>
-     *
-     * @param gameId       the identifier of the game the mutant is created in.
-     * @param classId      the identifier of the class the mutant is mutated from.
-     * @param mutatedCode  the source code of the mutant.
-     * @param ownerUserId  the identifier of the user who created the mutant.
-     * @param subDirectory the directory used for '/mutants/subDirectory/gameId/userId'
-     * @return a {@link Mutant}, but never {@code null}.
-     * @throws IOException when storing the mutant was not successful.
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.codedefenders.servlets.games.IGameManagingUtils#createMutant(int,
+     * int, java.lang.String, int, java.lang.String)
      */
-    public static Mutant createMutant(int gameId, int classId, String mutatedCode, int ownerUserId, String subDirectory) throws IOException {
+    @Override
+    public Mutant createMutant(int gameId, int classId, String mutatedCode, int ownerUserId, String subDirectory)
+            throws IOException {
         // Mutant is assumed valid here
 
         GameClass classMutated = GameClassDAO.getClassForId(classId);
@@ -161,36 +161,35 @@ public class GameManagingUtils {
         Files.write(mutantFilePath, cleanedMutatedCode.getBytes());
 
         // sanity check TODO Phil: Why tho?
-        assert CodeValidator.getMD5FromText(cleanedMutatedCode).equals(CodeValidator.getMD5FromFile(mutantFilePath.toString()))
-                : "MD5 hashes differ between code as text and code from new file";
+        assert CodeValidator.getMD5FromText(cleanedMutatedCode).equals(CodeValidator.getMD5FromFile(
+                mutantFilePath.toString())) : "MD5 hashes differ between code as text and code from new file";
 
-        // Compile the mutant and add it to the game if possible; otherwise, TODO: delete these files created?
+        // Compile the mutant and add it to the game if possible; otherwise,
+        // TODO: delete these files created?
         return classCompiler.compileMutant(newMutantDir, mutantFilePath.toString(), gameId, classMutated, ownerUserId);
     }
 
-    /**
-     * Calls {@link #createTest(int, int, String, int, String, int)},but with the default number
-     * of assertions specified in {@link CodeValidator#DEFAULT_NB_ASSERTIONS}.
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.codedefenders.servlets.games.IGameManagingUtils#createTest(int,
+     * int, java.lang.String, int, java.lang.String)
      */
-    public static Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory) throws IOException, CodeValidatorException {
+    @Override
+    public Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory)
+            throws IOException, CodeValidatorException {
         return createTest(gameId, classId, testText, ownerUserId, subDirectory, CodeValidator.DEFAULT_NB_ASSERTIONS);
     }
 
-
-    /**
-     * Stores and validates a given test.
-     * Calls {@link AntRunner#compileTest(File, String, int, GameClass, int)} AntRunner#compileTest()} after.
-     *
-     * @param gameId       the identifier of the game the test is created in.
-     * @param classId      the identifier of the class the test is created for.
-     * @param testText the source code of the test.
-     * @param ownerUserId  the identifier of the user who created the mutant.
-     * @param subDirectory the directory used for '/tests/subDirectory/gameId/userId/original'
-     * @return a {@link Test} is valid, {@code null} otherwise.
-     * @throws IOException when storing the test was not successful.
-     * @throws CodeValidatorException when code validation resulted in an error.
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.codedefenders.servlets.games.IGameManagingUtils#createTest(int,
+     * int, java.lang.String, int, java.lang.String, int)
      */
-    public static Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory, int maxNumberOfAssertions) throws IOException, CodeValidatorException {
+    @Override
+    public Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory,
+            int maxNumberOfAssertions) throws IOException, CodeValidatorException {
         GameClass cut = GameClassDAO.getClassForId(classId);
 
         Path path = Paths.get(TESTS_DIR, subDirectory, String.valueOf(gameId), String.valueOf(ownerUserId), "original");
@@ -203,7 +202,8 @@ public class GameManagingUtils {
         TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest,
                 TargetExecution.Target.COMPILE_TEST);
 
-        // If the test did not compile we short circuit here. We shall not return null
+        // If the test did not compile we short circuit here. We shall not
+        // return null
         if (compileTestTarget == null || !compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
             return newTest;
         }
@@ -214,7 +214,8 @@ public class GameManagingUtils {
             return null;
         }
 
-        // Eventually check the test actually passes when applied to the original code.
+        // Eventually check the test actually passes when applied to the
+        // original code.
         if (compileTestTarget.status == TargetExecution.Status.SUCCESS) {
             backend.testOriginal(newTestDir, newTest);
             try {

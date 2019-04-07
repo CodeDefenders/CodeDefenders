@@ -47,6 +47,7 @@ public class ConfigurationPropertyProducer {
             
     }
 
+    // TODO This can be improved to automatically try to resolve property names like: anotherProperty-> another.property
     private String getKey(final InjectionPoint ip) {
         return (ip.getAnnotated().isAnnotationPresent(Property.class)
                 && !ip.getAnnotated().getAnnotation(Property.class).value().isEmpty())

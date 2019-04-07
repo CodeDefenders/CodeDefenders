@@ -18,6 +18,33 @@
  */
 package org.codedefenders.itests.parallelize;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
+
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.execution.MutationTester;
@@ -45,32 +72,6 @@ import org.mockito.stubbing.Answer;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.spi.InitialContextFactory;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
@@ -111,6 +112,9 @@ public class ConsistencyTest {
 	@Mock
 	private InitialContextFactory mockedFactory;
 
+	@Inject
+    private GameManagingUtils gameManagingUtils;
+	
 	// https://stackoverflow.com/questions/36734275/how-to-mock-initialcontext-constructor-in-unit-testing
 	// FIXME this has hardcoded values, not sure how to handle those... maybe
 	// read from the config.properties file ?
@@ -250,7 +254,7 @@ public class ConsistencyTest {
 		String mutantText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
 				Charset.defaultCharset());
-		Mutant mutant = GameManagingUtils.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
+		Mutant mutant = gameManagingUtils.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
 				attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
 
 		// Generate the tests for the clients
@@ -260,7 +264,7 @@ public class ConsistencyTest {
 		//
 		List<org.codedefenders.game.Test> tests = new ArrayList<>();
 		for (final User defender : defenders) {
-			tests.add(GameManagingUtils.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(),
+			tests.add(gameManagingUtils.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(),
 					Constants.MODE_BATTLEGROUND_DIR));
 		}
 		System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + tests);

@@ -68,6 +68,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameClassPair;
@@ -90,6 +91,9 @@ import static org.junit.Assume.assumeTrue;
 @PrepareForTest({ DatabaseConnection.class, MutationTester.class}) // , MutationTester.class })
 public class ParallelizeTest {
 
+    @Inject
+    private GameManagingUtils gameManagingUtils;
+    
 	// PowerMock does not work with @ClassRule !!
 	// This really should be only per class, not per test... in each test we can
 	// truncate the tables ?
@@ -323,7 +327,7 @@ public class ParallelizeTest {
 					+"	}" + "\n"
 					+"}";
 
-			org.codedefenders.game.Test newTest = GameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+			org.codedefenders.game.Test newTest = gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 			MutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
 			assumeThat(battlegroundGame.getTests(true).size(), is(1));
 			// Append this for oracles and mocks
@@ -346,7 +350,7 @@ public class ParallelizeTest {
 					+"" + "\n"
 					+"	}" + "\n"
 					+"}";
-			newTest = GameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+			newTest = gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 			MutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
 			assumeThat(battlegroundGame.getTests(true).size(), is(2));
 			// Append this for oracles and mocks
@@ -374,7 +378,7 @@ public class ParallelizeTest {
 			List<String> mutantCode =(List<String>) DiffUtils.patch( origincalCode, patch);
 			String mutantText = String.join("\n", mutantCode);
 
-			Mutant mutant = GameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(),
+			Mutant mutant = gameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(),
 					mutantText, attackerID, Constants.MODE_BATTLEGROUND_DIR);
 
 			// Mock the scheduler to return a random but known test distribution:
@@ -448,20 +452,20 @@ public class ParallelizeTest {
 					Files.readAllBytes(
 							new File("src/test/resources/itests/tests/PassingTestLift" + i + ".java").toPath()),
 					Charset.defaultCharset());
-			GameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+			gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 		}
 
 		// Schedule a test which kills the mutant - Where ? in the middle ?
 		String testText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/tests/KillingTestLift.java").toPath()),
 				Charset.defaultCharset());
-		GameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+		gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 
 		// Read and Submit the mutants - No tests so far
 		String mutantText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
 				Charset.defaultCharset());
-		Mutant mutant = GameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(), mutantText,
+		Mutant mutant = gameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(), mutantText,
 				attackerID, Constants.MODE_BATTLEGROUND_DIR);
 
 		assertNotNull("Invalid mutant", mutant.getClassFile());

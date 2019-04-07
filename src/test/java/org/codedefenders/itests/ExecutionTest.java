@@ -56,6 +56,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameClassPair;
@@ -68,6 +69,9 @@ import javax.naming.spi.InitialContextFactory;
 @PrepareForTest({DatabaseConnection.class})
 public class ExecutionTest {
 
+    @Inject
+    private GameManagingUtils gameManagingUtils;
+    
     @Rule
     public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
 
@@ -215,7 +219,7 @@ public class ExecutionTest {
                 Files.readAllBytes(new File("src/test/resources/itests/mutants/XmlElement/Mutant9559.java").toPath()),
                 Charset.defaultCharset());
         // Do the mutant thingy
-        Mutant mutant = GameManagingUtils.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(), mutantText,
+        Mutant mutant = gameManagingUtils.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(), mutantText,
                 attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
         //
         MutationTester.runAllTestsOnMutant(multiplayerGame, mutant, messages);

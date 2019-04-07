@@ -97,10 +97,13 @@ public class DuelGameManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(DuelGameManager.class);
 
     @Inject
-    private static ClassCompilerService classCompiler;
+    private ClassCompilerService classCompiler;
     
     @Inject
-    private static BackendExecutorService backend;
+    private BackendExecutorService backend;
+    
+    @Inject
+    private GameManagingUtils gameManagingUtils;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -224,7 +227,7 @@ public class DuelGameManager extends HttpServlet {
             Test newTest;
 
             try {
-                newTest = GameManagingUtils.createTest(game.getId(), game.getClassId(), testText, userId, MODE_DUEL_DIR);
+                newTest = gameManagingUtils.createTest(game.getId(), game.getClassId(), testText, userId, MODE_DUEL_DIR);
             } catch (CodeValidatorException e) {
                 logger.warn("Handled CodeValidator error.", e);
                 messages.add(TEST_GENERIC_ERROR_MESSAGE);
@@ -440,7 +443,7 @@ public class DuelGameManager extends HttpServlet {
             response.sendRedirect(ServletUtils.ctx(request) + Paths.DUEL_GAME + "?gameId=" + gameId);
             return;
         }
-        Mutant existingMutant = GameManagingUtils.existingMutant(gameId, mutantText);
+        Mutant existingMutant = gameManagingUtils.existingMutant(gameId, mutantText);
         if (existingMutant != null) {
             messages.add(MUTANT_DUPLICATED_MESSAGE);
             TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
@@ -452,7 +455,7 @@ public class DuelGameManager extends HttpServlet {
             response.sendRedirect(ServletUtils.ctx(request) + Paths.DUEL_GAME + "?gameId=" + gameId);
             return;
         }
-        Mutant newMutant = GameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, userId, MODE_DUEL_DIR);
+        Mutant newMutant = gameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, userId, MODE_DUEL_DIR);
         if (newMutant == null) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
@@ -531,7 +534,7 @@ public class DuelGameManager extends HttpServlet {
 
         Test newTest;
         try {
-            newTest = GameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_DUEL_DIR);
+            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_DUEL_DIR);
         } catch (CodeValidatorException e) {
             logger.warn("Handled CodeValidator error.", e);
             messages.add(TEST_GENERIC_ERROR_MESSAGE);

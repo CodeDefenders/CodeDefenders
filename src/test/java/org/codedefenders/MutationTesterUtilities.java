@@ -34,6 +34,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.inject.Inject;
+
 /**
  * This class supports the testing of MutationTester
  *
@@ -44,12 +46,16 @@ public class MutationTesterUtilities {
     public static Runnable attack(MultiplayerGame activeGame, String mutantFile, User attacker,
                                   ArrayList<String> messages, Logger logger) throws IOException {
         return new Runnable() {
+            
+            @Inject
+            private GameManagingUtils gameManagingUtils;
+            
             @Override
             public void run() {
                 try {
                     String mutantText = new String(Files.readAllBytes(new File(mutantFile).toPath()),
                             Charset.defaultCharset());
-                    Mutant mutant = GameManagingUtils.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
+                    Mutant mutant = gameManagingUtils.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
                             attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
                     System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + " with "
                             + mutant.getId());
@@ -68,13 +74,17 @@ public class MutationTesterUtilities {
     public static Runnable defend(MultiplayerGame activeGame, String testFile, User defender,
                                   ArrayList<String> messages, Logger logger) {
         return new Runnable() {
+            
+            @Inject
+            private GameManagingUtils gameManagingUtils;
+            
             @Override
             public void run() {
                 try {
                     // Compile and test original
                     String testText;
                     testText = new String(Files.readAllBytes(new File(testFile).toPath()), Charset.defaultCharset());
-                    org.codedefenders.game.Test newTest = GameManagingUtils.createTest(activeGame.getId(), activeGame.getClassId(),
+                    org.codedefenders.game.Test newTest = gameManagingUtils.createTest(activeGame.getId(), activeGame.getClassId(),
                             testText, defender.getId(), Constants.MODE_BATTLEGROUND_DIR);
 
                     System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + " with "

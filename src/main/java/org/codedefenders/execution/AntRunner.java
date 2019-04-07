@@ -34,13 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.ManagedBean;
-import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -55,12 +49,6 @@ import org.codedefenders.game.Test;
 import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.codedefenders.util.Constants.AI_DIR;
-import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
-import static org.codedefenders.util.Constants.CUTS_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
-import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
 
 /**
  * @author Jose Rojas

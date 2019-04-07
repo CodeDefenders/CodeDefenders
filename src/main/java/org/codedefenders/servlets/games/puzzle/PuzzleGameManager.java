@@ -18,6 +18,37 @@
  */
 package org.codedefenders.servlets.games.puzzle;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.servlets.util.ServletUtils.gameId;
+import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
+import static org.codedefenders.util.Constants.MODE_PUZZLE_DIR;
+import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
+import static org.codedefenders.util.Constants.PUZZLE_GAME_ATTACKER_VIEW_JSP;
+import static org.codedefenders.util.Constants.PUZZLE_GAME_DEFENDER_VIEW_JSP;
+import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
+import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
+import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Optional;
+
+import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -44,37 +75,6 @@ import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
-import static org.codedefenders.servlets.util.ServletUtils.gameId;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.servlets.util.ServletUtils.getIntParameter;
-import static org.codedefenders.util.Constants.MODE_PUZZLE_DIR;
-import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
-import static org.codedefenders.util.Constants.PUZZLE_GAME_ATTACKER_VIEW_JSP;
-import static org.codedefenders.util.Constants.PUZZLE_GAME_DEFENDER_VIEW_JSP;
-import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
-
 /**
  * This {@link HttpServlet} handles retrieval and in-game management for {@link PuzzleGame PuzzleGames}.
  * <p>
@@ -89,7 +89,10 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  */
 public class PuzzleGameManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(PuzzleGameManager.class);
-
+    
+    @Inject
+    private GameManagingUtils gameManagingUtils;
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final int userId = ServletUtils.userId(request);
@@ -185,7 +188,7 @@ public class PuzzleGameManager extends HttpServlet {
      * @throws IOException when redirecting fails.
      */
     @SuppressWarnings("Duplicates")
-    private static void createTest(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+    private void createTest(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
         final int userId = ((Integer) session.getAttribute("uid"));
         final Optional<Integer> gameIdOpt = gameId(request);
         if (!gameIdOpt.isPresent()) {
@@ -234,7 +237,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         final Test newTest;
         try {
-            newTest = GameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_PUZZLE_DIR, game.getMaxAssertionsPerTest());
+            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_PUZZLE_DIR, game.getMaxAssertionsPerTest());
         } catch (CodeValidatorException e) {
             messages.add(TEST_GENERIC_ERROR_MESSAGE);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
@@ -306,7 +309,7 @@ public class PuzzleGameManager extends HttpServlet {
      * @param session  the session of the requesting user.
      * @throws IOException when redirecting fails.
      */
-    private static void createMutant(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
+    private void createMutant(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
         final int userId = ((Integer) session.getAttribute("uid"));
         final Optional<Integer> gameIdOpt = gameId(request);
         if (!gameIdOpt.isPresent()) {
@@ -362,7 +365,7 @@ public class PuzzleGameManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        final Mutant existingMutant = GameManagingUtils.existingMutant(gameId, mutantText);
+        final Mutant existingMutant = gameManagingUtils.existingMutant(gameId, mutantText);
         if (existingMutant != null) {
             messages.add(MUTANT_DUPLICATED_MESSAGE);
             TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
@@ -374,7 +377,7 @@ public class PuzzleGameManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        final Mutant newMutant = GameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, userId, MODE_PUZZLE_DIR);
+        final Mutant newMutant = gameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, userId, MODE_PUZZLE_DIR);
         if (newMutant == null) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
@@ -417,7 +420,7 @@ public class PuzzleGameManager extends HttpServlet {
         Redirect.redirectBack(request, response);
     }
     
-    private static String generateWinningMessage(HttpServletRequest request, int userId, PuzzleGame game, boolean isAnAttackGame) {
+    private String generateWinningMessage(HttpServletRequest request, int userId, PuzzleGame game, boolean isAnAttackGame) {
         StringBuffer message = new StringBuffer();
         message.append("Congratulations, your " + (isAnAttackGame ? "mutant" : "test") + " solved the puzzle!");
 
