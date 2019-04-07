@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.ManagedBean;
+import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameClassPair;
@@ -43,6 +45,7 @@ import javax.naming.NamingException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.codedefenders.configuration.Property;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
@@ -71,64 +74,31 @@ public class AntRunner implements //
         MutantGeneratorService {
 
 	private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
-	//
-	private static String antHome = null;
-	private static boolean clusterEnabled = false;
-	private static boolean forceLocalExecution = false;
-	//
-	private static String clusterJavaHome = null;
-	private static String clusterReservationName = null;
-	private static String clusterTimeOutMinutes = "2";
 
-	// Alessio: DO NOT REALLY LIKE THOSE...
-	static {
-		// First check the Web abb context
-		InitialContext initialContext;
-		try {
-			initialContext = new InitialContext();
-			NamingEnumeration<NameClassPair> list = initialContext.list("java:comp/env");
-			Context environmentContext = (Context) initialContext.lookup("java:comp/env");
+	@Inject
+	@Property("ant.home")
+	private String antHome;
+	
+	@Inject
+    @Property("cluster.mode") 
+	private boolean clusterEnabled;
+	
+	@Inject
+    @Property("force.local.execution")
+	private boolean forceLocalExecution;
+	
+	@Inject
+    @Property("cluster.java.home")
+	private String clusterJavaHome;
+	
+	@Inject
+    @Property("cluster.reservation.name")
+	private String clusterReservationName;
+	
+	@Inject
+    @Property("cluster.timeout")
+	private String clusterTimeOutMinutes;
 
-			// Looking up a name which is not there causes an exception
-			// Some are unsafe !
-			while (list.hasMore()) {
-				String name = list.next().getName();
-				switch (name) {
-					case "ant.home":
-						antHome = (String) environmentContext.lookup(name);
-						break;
-					case "cluster.mode":
-						clusterEnabled = "enabled".equalsIgnoreCase((String) environmentContext.lookup(name));
-						break;
-					case "cluster.java.home":
-						clusterJavaHome = (String) environmentContext.lookup(name);
-						break;
-					case "cluster.reservation.name":
-						clusterReservationName = (String) environmentContext.lookup(name);
-						break;
-					case "cluster.timeout":
-						clusterTimeOutMinutes = (String) environmentContext.lookup(name);
-						break;
-					case "forceLocalExecution":
-						forceLocalExecution = "enabled".equalsIgnoreCase((String) environmentContext.lookup(name));
-						break;
-				}
-			}
-
-		} catch (NamingException e) {
-			e.printStackTrace();
-		}
-
-		// Check Env
-		if (antHome == null) {
-			ProcessBuilder pb = new ProcessBuilder();
-			Map env = pb.environment();
-			antHome = (String) env.get("ANT_HOME");
-		}
-
-
-	}
-	/////
 
 	public boolean testKillsMutant(Mutant m, Test t) {
 		GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
