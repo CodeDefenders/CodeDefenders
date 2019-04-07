@@ -23,6 +23,8 @@ import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.AntRunner;
+import org.codedefenders.execution.BackendExecutorService;
+import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
@@ -37,10 +39,17 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;
@@ -56,6 +65,33 @@ import static org.codedefenders.util.Constants.TESTS_DIR;
  * @see org.codedefenders.servlets.games.puzzle.PuzzleGameManager
  */
 public class GameManagingUtils {
+    // @Inject
+    private static ClassCompilerService classCompiler;
+    
+    //  @Inject
+    private static BackendExecutorService backend;
+
+    static {
+        InitialContext initialContext;
+        try {
+            initialContext = new InitialContext();
+            BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
+            //
+            Bean bean = null;
+            CreationalContext ctx = null;
+            //
+            bean = (Bean) bm.getBeans(BackendExecutorService.class, new Annotation[0]).iterator().next();
+            ctx = bm.createCreationalContext(bean);
+            backend = (BackendExecutorService) bm.getReference(bean, BackendExecutorService.class, ctx);
+            //
+            bean = (Bean) bm.getBeans(ClassCompilerService.class, new Annotation[0]).iterator().next();
+            ctx = bm.createCreationalContext(bean);
+            classCompiler = (ClassCompilerService) bm.getReference(bean, ClassCompilerService.class, ctx);
+        } catch (NamingException e) {
+            e.printStackTrace();
+        }
+    }
+    
     private static final Logger logger = LoggerFactory.getLogger(GameManagingUtils.class);
 
     /**
@@ -129,7 +165,7 @@ public class GameManagingUtils {
                 : "MD5 hashes differ between code as text and code from new file";
 
         // Compile the mutant and add it to the game if possible; otherwise, TODO: delete these files created?
-        return AntRunner.compileMutant(newMutantDir, mutantFilePath.toString(), gameId, classMutated, ownerUserId);
+        return classCompiler.compileMutant(newMutantDir, mutantFilePath.toString(), gameId, classMutated, ownerUserId);
     }
 
     /**
@@ -162,7 +198,7 @@ public class GameManagingUtils {
 
         String javaFile = FileUtils.createJavaTestFile(newTestDir, cut.getBaseName(), testText);
 
-        Test newTest = AntRunner.compileTest(newTestDir, javaFile, gameId, cut, ownerUserId);
+        Test newTest = classCompiler.compileTest(newTestDir, javaFile, gameId, cut, ownerUserId);
 
         TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest,
                 TargetExecution.Target.COMPILE_TEST);
@@ -180,7 +216,7 @@ public class GameManagingUtils {
 
         // Eventually check the test actually passes when applied to the original code.
         if (compileTestTarget.status == TargetExecution.Status.SUCCESS) {
-            AntRunner.testOriginal(newTestDir, newTest);
+            backend.testOriginal(newTestDir, newTest);
             try {
                 // Detect test smell and store them to DB
                 TestSmellDetector testSmellDetector = TestSmellDetector.createTestSmellDetector();

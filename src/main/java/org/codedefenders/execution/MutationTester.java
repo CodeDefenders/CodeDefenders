@@ -33,6 +33,7 @@ import org.codedefenders.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -46,6 +47,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameClassPair;
@@ -70,6 +74,9 @@ import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
 public class MutationTester {
 	private static final Logger logger = LoggerFactory.getLogger(MutationTester.class);
 
+	// @Inject // This does not work for static classes 
+    private static BackendExecutorService backend;
+    
 	private static boolean parallelize = false;
 
 	private static boolean useMutantCoverage = true;
@@ -84,6 +91,11 @@ public class MutationTester {
 			initialContext = new InitialContext();
 			NamingEnumeration<NameClassPair> list = initialContext.list("java:/comp/env");
 			Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
+			// 
+			BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
+			Bean bean = (Bean) bm.getBeans(BackendExecutorService.class, new Annotation[0]).iterator().next();
+			CreationalContext ctx = bm.createCreationalContext(bean);
+			backend = (BackendExecutorService) bm.getReference(bean, BackendExecutorService.class, ctx);
 
 			// Looking up a name which is not there causes an exception
 			// Some are unsafe !
@@ -100,8 +112,10 @@ public class MutationTester {
 			}
 
 		} catch (NamingException e) {
-			logger.error("Failed to Java environment variables.", e);
+			logger.error("Failed to load Java environment variables.", e);
 		}
+		
+		
 	}
 
 	// RUN MUTATION TESTS: Runs all the mutation tests for a particular game,
@@ -439,7 +453,7 @@ public class MutationTester {
 			logger.error("Execution result found for Mutant {} and Test {}.", mutant.getId(), test.getId());
 			return false;
 		}
-        final TargetExecution executedTarget = AntRunner.testMutant(mutant, test);
+        final TargetExecution executedTarget = backend.testMutant(mutant, test);
 
         // If the test did NOT pass, the mutant was detected and should be killed.
 		if (!executedTarget.status.equals(FAIL) && !executedTarget.status.equals(ERROR)) {
@@ -470,7 +484,7 @@ public class MutationTester {
 
         // As a result of this test, either the test the attacker has written
         // kills the mutant or doesnt.
-        TargetExecution executedTarget = AntRunner.testMutant(mutant, test);
+        TargetExecution executedTarget = backend.testMutant(mutant, test);
 
         // Kill the mutant if it was killed by the test or if it's marked
         // equivalent

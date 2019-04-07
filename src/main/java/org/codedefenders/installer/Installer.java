@@ -10,6 +10,7 @@ import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.execution.AntRunner;
+import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.LineCoverageGenerator;
@@ -50,6 +51,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -73,6 +75,9 @@ public class Installer {
 
     private static final Logger logger = LoggerFactory.getLogger(Installer.class);
 
+    @Inject
+    private BackendExecutorService backend;
+    
     /**
      * Used for parsing the command line.
      */
@@ -358,7 +363,7 @@ public class Installer {
         String qualifiedName = FileUtils.getFullyQualifiedName(classFilePath);
 
         // This adds a jacoco.exec file to the testDir
-        AntRunner.testOriginal(cut, testDir, qualifiedName);
+        backend.testOriginal(cut, testDir, qualifiedName);
 
         LineCoverage lineCoverage = LineCoverageGenerator.generate(cut, javaFilePath);
         Test test = new Test(javaFilePath.toString(), classFilePath, cut.getId(), lineCoverage);

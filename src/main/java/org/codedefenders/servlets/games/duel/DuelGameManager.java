@@ -21,7 +21,8 @@ package org.codedefenders.servlets.games.duel;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.execution.AntRunner;
+import org.codedefenders.execution.BackendExecutorService;
+import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameMode;
@@ -44,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +53,12 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -87,6 +95,12 @@ import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTI
 public class DuelGameManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(DuelGameManager.class);
+
+    @Inject
+    private static ClassCompilerService classCompiler;
+    
+    @Inject
+    private static BackendExecutorService backend;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -328,7 +342,7 @@ public class DuelGameManager extends HttpServlet {
                                 if (game.getMode() == GameMode.SINGLE) {
                                     // TODO: Why is this not handled in the single player game but here?
                                     //Singleplayer - use automatic system.
-                                    if (AntRunner.potentialEquivalent(m)) {
+                                    if (backend.potentialEquivalent(m)) {
                                         //Is potentially equiv - accept as equivalent
                                         m.kill(Mutant.Equivalence.DECLARED_YES);
                                         messages.add("The AI has accepted the mutant as equivalent.");
@@ -464,7 +478,7 @@ public class DuelGameManager extends HttpServlet {
         } else {
             // TODO: Why doesnt that happen in SinglePlayerGame.endTurn()?
             //Singleplayer - check for potential equivalent.
-            if (AntRunner.potentialEquivalent(newMutant)) {
+            if (backend.potentialEquivalent(newMutant)) {
                 //Is potentially equiv - mark as equivalent and update.
                 messages.add("The AI has started an equivalence challenge on your last mutant.");
                 newMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
