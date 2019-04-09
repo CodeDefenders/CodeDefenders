@@ -23,6 +23,7 @@ import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
+import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameMode;
@@ -104,6 +105,9 @@ public class DuelGameManager extends HttpServlet {
     
     @Inject
     private GameManagingUtils gameManagingUtils;
+    
+    @Inject
+    private IMutationTester mutationTester;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -274,7 +278,7 @@ public class DuelGameManager extends HttpServlet {
             }
             // TODO: Allow multiple trials?
             // TODO: Doesnt differentiate between failing because the test didn't run and failing because it detected the mutant
-            MutationTester.runEquivalenceTest(newTest, mutant);
+            mutationTester.runEquivalenceTest(newTest, mutant);
             game.endRound();
             game.update();
             Mutant mutantAfterTest = game.getMutantByID(equivMutantId);
@@ -474,7 +478,7 @@ public class DuelGameManager extends HttpServlet {
             return;
         }
         messages.add(MUTANT_COMPILED_MESSAGE);
-        MutationTester.runAllTestsOnMutant(game, newMutant, messages);
+        mutationTester.runAllTestsOnMutant(game, newMutant, messages);
 
         if (game.getMode() != GameMode.SINGLE) {
             game.endTurn();
@@ -571,7 +575,7 @@ public class DuelGameManager extends HttpServlet {
             return;
         }
         messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-        MutationTester.runTestOnAllMutants(game, newTest, messages);
+        mutationTester.runTestOnAllMutants(game, newTest, messages);
 
         game.endTurn();
         game.update();

@@ -64,6 +64,7 @@ import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
+import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
@@ -105,6 +106,9 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private GameManagingUtils gameManagingUtils;
+    
+    @Inject
+    private IMutationTester mutationTester;
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -336,7 +340,7 @@ public class MultiplayerGameManager extends HttpServlet {
         final Event notif = new Event(-1, gameId, userId, message, EventType.DEFENDER_TEST_CREATED, EventStatus.GAME, timestamp);
         notif.insert();
 
-        MutationTester.runTestOnAllMultiplayerMutants(game, newTest, messages);
+        mutationTester.runTestOnAllMultiplayerMutants(game, newTest, messages);
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
         
@@ -461,7 +465,7 @@ public class MultiplayerGameManager extends HttpServlet {
         Event notif = new Event(-1, gameId, userId, notificationMsg, EventType.ATTACKER_MUTANT_CREATED, EventStatus.GAME,
                 new Timestamp(System.currentTimeMillis() - 1000));
         notif.insert();
-        MutationTester.runAllTestsOnMutant(game, newMutant, messages);
+        mutationTester.runAllTestsOnMutant(game, newMutant, messages);
         game.update();
 
         if (game.isCapturePlayersIntention()) {
@@ -608,7 +612,7 @@ public class MultiplayerGameManager extends HttpServlet {
             int killedOthers = 0;
             for (Mutant mPending : mutantsPendingTests) {
                 // TODO: Doesnt distinguish between failing because the test didnt run at all and failing because it detected the mutant
-                MutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
+                mutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
                 if (mPending.getEquivalent() == Mutant.Equivalence.PROVEN_NO) {
                     logger.debug("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
                     // TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points added.

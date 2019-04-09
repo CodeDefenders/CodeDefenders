@@ -52,6 +52,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameMode;
@@ -92,6 +93,9 @@ public class PuzzleGameManager extends HttpServlet {
     
     @Inject
     private GameManagingUtils gameManagingUtils;
+    
+    @Inject
+    private IMutationTester mutationTester; 
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -272,7 +276,7 @@ public class PuzzleGameManager extends HttpServlet {
         messages.add(TEST_PASSED_ON_CUT_MESSAGE);
         session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST);
 
-        MutationTester.runTestOnAllMutants(game, newTest, messages);
+        mutationTester.runTestOnAllMutants(game, newTest, messages);
 
         // may be // final TestSolvingStrategy solving = Testgame.getTestSolver();
         final TestSolvingStrategy solver = TestSolvingStrategy.get(TestSolvingStrategy.Types.KILLED_ALL_MUTANTS.name());
@@ -399,7 +403,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         messages.add(MUTANT_COMPILED_MESSAGE);
         session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-        MutationTester.runAllTestsOnMutant(game, newMutant, messages);
+        mutationTester.runAllTestsOnMutant(game, newMutant, messages);
 
         // may be // final MutantSolvingStrategy solving = game.getMutantSolver();
         final MutantSolvingStrategy solver = MutantSolvingStrategy.get(MutantSolvingStrategy.Types.SURVIVED_ALL_MUTANTS.name());

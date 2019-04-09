@@ -30,6 +30,7 @@ import javax.inject.Inject;
 
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.execution.BackendExecutorService;
+import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
@@ -52,6 +53,9 @@ public class AiDefender extends AiPlayer {
 
     @Inject
     private BackendExecutorService backend;
+    
+    @Inject
+    private IMutationTester mutationTester;
     
 	private static final Logger logger = LoggerFactory.getLogger(AiDefender.class);
 
@@ -200,7 +204,7 @@ public class AiDefender extends AiPlayer {
 			t.update();
 			TargetExecution newExec = new TargetExecution(t.getId(), 0, TargetExecution.Target.COMPILE_TEST, TargetExecution.Status.SUCCESS, null);
 			newExec.insert();
-			MutationTester.runTestOnAllMutants(game, t, messages);
+			mutationTester.runTestOnAllMutants(game, t, messages);
 			DatabaseAccess.setAiTestAsUsed(origTestNum, game);
 			File dir = new File(origT.getDirectory());
 			backend.testOriginal(dir, t);

@@ -18,6 +18,7 @@
  */
 package org.codedefenders;
 
+import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
@@ -37,7 +38,7 @@ import java.util.Date;
 import javax.inject.Inject;
 
 /**
- * This class supports the testing of MutationTester
+ * This class supports the testing of mutationTester
  *
  * @author gambi
  */
@@ -50,6 +51,9 @@ public class MutationTesterUtilities {
             @Inject
             private GameManagingUtils gameManagingUtils;
             
+            @Inject
+            private IMutationTester mutationTester;
+            
             @Override
             public void run() {
                 try {
@@ -59,7 +63,7 @@ public class MutationTesterUtilities {
                             attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
                     System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + " with "
                             + mutant.getId());
-                    MutationTester.runAllTestsOnMutant(activeGame, mutant, messages);
+                    mutationTester.runAllTestsOnMutant(activeGame, mutant, messages);
                     activeGame.update();
                     System.out.println(new Date() + " MutationTesterTest.attack() " + attacker.getId() + ": "
                             + messages.get(messages.size() - 1));
@@ -78,6 +82,9 @@ public class MutationTesterUtilities {
             @Inject
             private GameManagingUtils gameManagingUtils;
             
+            @Inject
+            private IMutationTester mutationTester;
+            
             @Override
             public void run() {
                 try {
@@ -89,7 +96,7 @@ public class MutationTesterUtilities {
 
                     System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + " with "
                             + newTest.getId());
-                    MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
+                    mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, messages);
                     activeGame.update();
                     System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + ": "
                             + messages.get(messages.size() - 1));

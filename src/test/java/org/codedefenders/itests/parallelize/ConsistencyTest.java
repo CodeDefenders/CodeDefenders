@@ -1,4 +1,6 @@
+
 /*
+
  * Copyright (C) 2016-2019 Code Defenders contributors
  *
  * This file is part of Code Defenders.
@@ -47,6 +49,7 @@ import javax.naming.spi.InitialContextFactory;
 
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameState;
@@ -75,7 +78,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DatabaseConnection.class }) // , MutationTester.class })
+@PrepareForTest({ DatabaseConnection.class }) // , mutationTester.class })
 public class ConsistencyTest {
 
 	// PowerMock does not work with @ClassRule !!
@@ -84,6 +87,8 @@ public class ConsistencyTest {
 	@Rule
 	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql"); //, "useAffectedRows=true");
 
+	@Inject
+    private IMutationTester mutationTester;
 	//
 	private static File codedefendersHome;
 
@@ -106,7 +111,7 @@ public class ConsistencyTest {
 	}
 
 	// CUT
-	private MutationTester tester;
+	private IMutationTester tester;
 
 	// We use the "real ant runner" but we need to provide a mock to Context
 	@Mock
@@ -282,7 +287,7 @@ public class ConsistencyTest {
 				@Override
 				public void run() {
 					System.out.println("Submit test " + newTest.getId());
-					MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, new ArrayList<>());
+					mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, new ArrayList<>());
 					activeGame.update();
 				}
 			});

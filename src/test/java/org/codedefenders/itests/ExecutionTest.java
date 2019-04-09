@@ -19,6 +19,7 @@
 package org.codedefenders.itests;
 
 import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -66,12 +67,15 @@ import javax.naming.spi.InitialContextFactory;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({DatabaseConnection.class})
+@PrepareForTest({ DatabaseConnection.class })
 public class ExecutionTest {
 
     @Inject
     private GameManagingUtils gameManagingUtils;
-    
+
+    @Inject
+    private IMutationTester mutationTester;
+
     @Rule
     public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
 
@@ -191,25 +195,21 @@ public class ExecutionTest {
         cutFolder.mkdirs();
         File jFile = new File(cutFolder, "XmlElement.java");
         File cFile = new File(cutFolder, "XmlElement.class");
-        Files.copy(Paths.get("src/test/resources/itests/sources/XmlElement/XmlElement.java"), new FileOutputStream(jFile));
-        Files.copy(Paths.get("src/test/resources/itests/sources/XmlElement/XmlElement.class"), new FileOutputStream(cFile));
+        Files.copy(Paths.get("src/test/resources/itests/sources/XmlElement/XmlElement.java"),
+                new FileOutputStream(jFile));
+        Files.copy(Paths.get("src/test/resources/itests/sources/XmlElement/XmlElement.class"),
+                new FileOutputStream(cFile));
         GameClass cut = new GameClass("XmlElement", "XmlElement", jFile.getAbsolutePath(), cFile.getAbsolutePath());
         cut.insert();
         // Observer creates a new MP game
         //
         final long startTime = System.currentTimeMillis() - 1000 * 3600;
         final long endTime = System.currentTimeMillis() + 1000 * 3600;
-        MultiplayerGame multiplayerGame = new MultiplayerGame
-                .Builder(cut.getId(), observer.getId(), startTime, endTime, 2, 4, 4, 0, 0)
-                .state(GameState.ACTIVE)
-                .level(GameLevel.EASY)
-                .defenderValue(10)
-                .attackerValue(4)
-                .mutantValidatorLevel(CodeValidatorLevel.STRICT)
-                .chatEnabled(true)
-                .build();
+        MultiplayerGame multiplayerGame = new MultiplayerGame.Builder(cut.getId(), observer.getId(), startTime, endTime,
+                2, 4, 4, 0, 0).state(GameState.ACTIVE).level(GameLevel.EASY).defenderValue(10).attackerValue(4)
+                        .mutantValidatorLevel(CodeValidatorLevel.STRICT).chatEnabled(true).build();
         multiplayerGame.insert();
-        System.out.println("ExecutionTest.testMutant9559() CREATED GAME " + multiplayerGame.getId() );
+        System.out.println("ExecutionTest.testMutant9559() CREATED GAME " + multiplayerGame.getId());
         // Attacker and Defender join the game.
         multiplayerGame.addPlayer(defender.getId(), Role.DEFENDER);
         multiplayerGame.addPlayer(attacker.getId(), Role.ATTACKER);
@@ -219,11 +219,10 @@ public class ExecutionTest {
                 Files.readAllBytes(new File("src/test/resources/itests/mutants/XmlElement/Mutant9559.java").toPath()),
                 Charset.defaultCharset());
         // Do the mutant thingy
-        Mutant mutant = gameManagingUtils.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(), mutantText,
-                attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
+        Mutant mutant = gameManagingUtils.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(),
+                mutantText, attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
         //
-        MutationTester.runAllTestsOnMutant(multiplayerGame, mutant, messages);
-
+        mutationTester.runAllTestsOnMutant(multiplayerGame, mutant, messages);
 
     }
 }

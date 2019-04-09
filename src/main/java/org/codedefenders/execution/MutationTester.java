@@ -19,6 +19,7 @@
 package org.codedefenders.execution;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.codedefenders.configuration.Property;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
@@ -47,9 +48,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameClassPair;
@@ -70,53 +73,63 @@ import static org.codedefenders.util.Constants.TEST_KILLED_ONE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_ZERO_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
 
-// Class that handles compilation and testing by creating a Process with the relevant ant target
-public class MutationTester {
+/**
+ *  Class that handles compilation and testing by creating a Process with the relevant ant target.
+ *  Since execution is related to single request, we use a Request Scope.
+ *  
+ *  We inject instances using {@link MutationTesterProducer}
+ */
+public class MutationTester implements IMutationTester {
 	private static final Logger logger = LoggerFactory.getLogger(MutationTester.class);
 
-	// @Inject // This does not work for static classes 
-    private static BackendExecutorService backend;
+	@Inject  
+    private BackendExecutorService backend;
     
-	private static boolean parallelize = false;
-
-	private static boolean useMutantCoverage = true;
+//	@Inject
+//	@Property("parallelize")
+//	private boolean parallelize = false;
+	
+	@Inject
+	@Property("mutant.coverage")
+	private boolean useMutantCoverage;
+	
 	// Use a shared executor pool, prevents thread explosion.
-	private static ExecutorService sharedExecutorService = Executors.newFixedThreadPool(30);
+//	private ExecutorService sharedExecutorService = Executors.newFixedThreadPool(30);
 
-	// DO NOT REALLY LIKE THOSE...
-	static {
-		// First check the Web abb context
-		InitialContext initialContext;
-		try {
-			initialContext = new InitialContext();
-			NamingEnumeration<NameClassPair> list = initialContext.list("java:/comp/env");
-			Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
-			// 
-			BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
-			Bean bean = (Bean) bm.getBeans(BackendExecutorService.class, new Annotation[0]).iterator().next();
-			CreationalContext ctx = bm.createCreationalContext(bean);
-			backend = (BackendExecutorService) bm.getReference(bean, BackendExecutorService.class, ctx);
-
-			// Looking up a name which is not there causes an exception
-			// Some are unsafe !
-			while (list.hasMore()) {
-				String name = list.next().getName();
-				switch (name) {
-				case "mutant.coverage":
-					useMutantCoverage = "enabled".equalsIgnoreCase((String) environmentContext.lookup(name));
-					break;
-				case "parallelize":
-					parallelize = "enabled".equalsIgnoreCase((String) environmentContext.lookup(name));
-					break;
-				}
-			}
-
-		} catch (NamingException e) {
-			logger.error("Failed to load Java environment variables.", e);
-		}
-		
-		
-	}
+//	// DO NOT REALLY LIKE THOSE...
+//	static {
+//		// First check the Web abb context
+//		InitialContext initialContext;
+//		try {
+//			initialContext = new InitialContext();
+//			NamingEnumeration<NameClassPair> list = initialContext.list("java:/comp/env");
+//			Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
+//			// 
+//			BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
+//			Bean bean = (Bean) bm.getBeans(BackendExecutorService.class, new Annotation[0]).iterator().next();
+//			CreationalContext ctx = bm.createCreationalContext(bean);
+//			backend = (BackendExecutorService) bm.getReference(bean, BackendExecutorService.class, ctx);
+//
+//			// Looking up a name which is not there causes an exception
+//			// Some are unsafe !
+//			while (list.hasMore()) {
+//				String name = list.next().getName();
+//				switch (name) {
+//				case "mutant.coverage":
+//					useMutantCoverage = "enabled".equalsIgnoreCase((String) environmentContext.lookup(name));
+//					break;
+//				case "parallelize":
+//					parallelize = "enabled".equalsIgnoreCase((String) environmentContext.lookup(name));
+//					break;
+//				}
+//			}
+//
+//		} catch (NamingException e) {
+//			logger.error("Failed to load Java environment variables.", e);
+//		}
+//		
+//		
+//	}
 
 	// RUN MUTATION TESTS: Runs all the mutation tests for a particular game,
 	// using all the alive mutants and all tests
@@ -124,7 +137,11 @@ public class MutationTester {
 	// Inputs: The ID of the game to run mutation tests for
 	// Outputs: None
 
-	public static void runTestOnAllMutants(AbstractGame game, Test test, ArrayList<String> messages) {
+	/* (non-Javadoc)
+     * @see org.codedefenders.execution.IMutationTester#runTestOnAllMutants(org.codedefenders.game.AbstractGame, org.codedefenders.game.Test, java.util.ArrayList)
+     */
+	@Override
+    public void runTestOnAllMutants(AbstractGame game, Test test, ArrayList<String> messages) {
 		int killed = 0;
 		List<Mutant> mutants = game.getAliveMutants();
 		for (Mutant mutant : mutants) {
@@ -148,7 +165,11 @@ public class MutationTester {
 		}
 	}
 
-	public static void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages) {
+	/* (non-Javadoc)
+     * @see org.codedefenders.execution.IMutationTester#runTestOnAllMultiplayerMutants(org.codedefenders.game.multiplayer.MultiplayerGame, org.codedefenders.game.Test, java.util.ArrayList)
+     */
+	@Override
+    public void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages) {
 		int killed = 0;
 		List<Mutant> mutants = game.getAliveMutants();
 		mutants.addAll(game.getMutantsMarkedEquivalentPending());
@@ -157,59 +178,59 @@ public class MutationTester {
 		// Acquire and release the connection
 		User u = UserDAO.getUserForPlayer(test.getPlayerId());
 
-		if (parallelize) {
-			// Fork and Join parallelization
-			Map<Mutant, FutureTask<Boolean>> tasks = new HashMap<Mutant, FutureTask<Boolean>>();
-			for (final Mutant mutant : mutants) {
-				if (useMutantCoverage && !test.isMutantCovered(mutant)) {
-					// System.out.println("Skipping non-covered mutant "
-					// + mutant.getId() + ", test " + test.getId());
-					continue;
-				}
-
-				FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
-
-					@Override
-					public Boolean call() throws Exception {
-						// This automatically update the 'mutants' and 'tests'
-						// tables, as well as the test and mutant objects.
-						return testVsMutant(test, mutant);
-					}
-				});
-
-				// This is for checking later
-				tasks.put(mutant, task);
-
-				sharedExecutorService.execute(task);
-			}
-
-			// TODO Mayse use some timeout ?!
-			for (final Mutant mutant : mutants) {
-				if (useMutantCoverage && !test.isMutantCovered(mutant))
-					continue;
-
-				// checks if task done
-				// System.out.println(
-				// "Is mutant done? " + tasks.get(mutant).isDone());
-				// checks if task canceled
-				// System.out.println("Is mutant cancelled? "
-				// + tasks.get(mutant).isCancelled());
-				// fetches result and waits if not ready
-
-				// THIS IS BLOCKING !!!
-				try {
-					if (tasks.get(mutant).get()) {
-						killed++;
-						killedMutants.add(mutant);
-					}
-				} catch (InterruptedException | ExecutionException | CancellationException e) {
-                    logger.error("While waiting results for mutant " + mutant, e);
-                }
-			}
-
-			tasks.clear();
-
-		} else {
+//		if (parallelize) {
+//			// Fork and Join parallelization
+//			Map<Mutant, FutureTask<Boolean>> tasks = new HashMap<Mutant, FutureTask<Boolean>>();
+//			for (final Mutant mutant : mutants) {
+//				if (useMutantCoverage && !test.isMutantCovered(mutant)) {
+//					// System.out.println("Skipping non-covered mutant "
+//					// + mutant.getId() + ", test " + test.getId());
+//					continue;
+//				}
+//
+//				FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
+//
+//					@Override
+//					public Boolean call() throws Exception {
+//						// This automatically update the 'mutants' and 'tests'
+//						// tables, as well as the test and mutant objects.
+//						return testVsMutant(test, mutant);
+//					}
+//				});
+//
+//				// This is for checking later
+//				tasks.put(mutant, task);
+//
+//				sharedExecutorService.execute(task);
+//			}
+//
+//			// TODO Mayse use some timeout ?!
+//			for (final Mutant mutant : mutants) {
+//				if (useMutantCoverage && !test.isMutantCovered(mutant))
+//					continue;
+//
+//				// checks if task done
+//				// System.out.println(
+//				// "Is mutant done? " + tasks.get(mutant).isDone());
+//				// checks if task canceled
+//				// System.out.println("Is mutant cancelled? "
+//				// + tasks.get(mutant).isCancelled());
+//				// fetches result and waits if not ready
+//
+//				// THIS IS BLOCKING !!!
+//				try {
+//					if (tasks.get(mutant).get()) {
+//						killed++;
+//						killedMutants.add(mutant);
+//					}
+//				} catch (InterruptedException | ExecutionException | CancellationException e) {
+//                    logger.error("While waiting results for mutant " + mutant, e);
+//                }
+//			}
+//
+//			tasks.clear();
+//
+//		} else {
 			// Normal execution
 			for (Mutant mutant : mutants) {
 				if (useMutantCoverage && !test.isMutantCovered(mutant)) {
@@ -223,7 +244,7 @@ public class MutationTester {
 					killedMutants.add(mutant);
 				}
 			}
-		}
+//		}
 
 		for (Mutant mutant : mutants){
 			if (mutant.isAlive()){
@@ -273,119 +294,109 @@ public class MutationTester {
 		}
 	}
 
-	/**
-	 * Execute all the tests registered for the defenders against the provided
-	 * mutant, using a random scheduling of test execution.
-	 *
-	 * @param game
-	 * @param mutant
-	 * @param messages
-	 */
-	public static void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages) {
+	/* (non-Javadoc)
+     * @see org.codedefenders.execution.IMutationTester#runAllTestsOnMutant(org.codedefenders.game.AbstractGame, org.codedefenders.game.Mutant, java.util.ArrayList)
+     */
+	@Override
+    public void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages) {
 		runAllTestsOnMutant(game, mutant, messages, new RandomTestScheduler());
 	}
 
-	/**
-	 * Execute all the tests registered for the defenders against the provided
-	 * mutant, using a the given TestScheduler for ordering the execution of
-	 * tests.
-	 *
-	 * @param game
-	 * @param mutant
-	 * @param messages
-	 * @param scheduler
-	 */
-	public static void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages,
+	/* (non-Javadoc)
+     * @see org.codedefenders.execution.IMutationTester#runAllTestsOnMutant(org.codedefenders.game.AbstractGame, org.codedefenders.game.Mutant, java.util.ArrayList, org.codedefenders.execution.TestScheduler)
+     */
+	@Override
+    public  void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages,
 			TestScheduler scheduler) {
 		// Schedule the executable tests submitted by the defenders only (true)
 		List<Test> tests = scheduler.scheduleTests( game.getTests(true) ) ;
 
 		User u = UserDAO.getUserForPlayer(mutant.getPlayerId());
 
-		if (parallelize) {
-			final Map<Test, FutureTask<Boolean>> tasks = new HashMap<Test, FutureTask<Boolean>>();
-			for (Test test : tests) {
-				if (useMutantCoverage && !test.isMutantCovered(mutant)) {
-					logger.info("Skipping non-covered mutant " + mutant.getId() + ", test " + test.getId());
-					continue;
-				}
-
-				FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
-
-					@Override
-					public Boolean call() throws Exception {
-						logger.info("Executing mutant " + mutant.getId() + ", test " + test.getId());
-						// TODO Is this testVsMutant thread safe?
-						return testVsMutant(test, mutant);
-                    }
-                });
-
-                // Book keeping
-                tasks.put(test, task);
-            }
-
-            // Submit all the tests in the given order
-            for (Test test : tests ) {
-                if (tasks.containsKey(test)) {
-                	logger.debug("MutationTester.runAllTestsOnMutant() : Scheduling Task " + test);
-                    sharedExecutorService.execute(tasks.get(test));
-                }
-            }
-
-            // Wait for the result. Check by the order defined by the scheduler.
-            for (Test test : tests ) {
-                // Why this happens ?
-                if (! tasks.containsKey(test)) {
-                    logger.debug("Tasks does not contain " + test.getId() );
-                    continue;
-                }
-
-                Future<Boolean> task = tasks.get(test);
-                logger.debug("MutationTester.runAllTestsOnMutant() Checking task " + task + ". Done: "
-                        + task.isDone() + ". Cancelled: " + task.isCancelled());
-                try {
-
-                    boolean hasTestkilledTheMutant = false;
-
-                    try {
-                        hasTestkilledTheMutant = task.get();
-                    } catch (CancellationException ce) {
-                        //
-                        logger.warn("Swallowing ", ce);
-                    }
-
-                    if (hasTestkilledTheMutant) {
-                        // This test killede the mutant...
-                        messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
-
-                        if (game instanceof MultiplayerGame) {
-                            ArrayList<Mutant> mlist = new ArrayList<Mutant>();
-                            mlist.add(mutant);
-
-							logger.info(">> Test {} kills mutant {} get {} points. Mutant is still alive ? {}",
-									test.getId(), mutant.getId(), Scorer.score((MultiplayerGame) game, test, mlist),
-									mutant.isAlive());
-							test.incrementScore(Scorer.score((MultiplayerGame) game, test, mlist));
-						}
-
-                        Event notif = new Event(-1, game.getId(),
-                                UserDAO.getUserForPlayer(test.getPlayerId()).getId(),
-                                u.getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT,
-                                EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
-                        notif.insert();
-
-                        // Early return. No need to check for the other executions.
-                        return;
-
-                    }
-                } catch (InterruptedException | ExecutionException e) {
-                    System.out.println(
-                            "MutationTester.runAllTestsOnMutant() ERROR While waiting results for task " + e.getMessage() );
-//                    e.printStackTrace();
-                }
-            }
-
-        } else {
+//		if (parallelize) {
+//			final Map<Test, FutureTask<Boolean>> tasks = new HashMap<Test, FutureTask<Boolean>>();
+//			for (Test test : tests) {
+//				if (useMutantCoverage && !test.isMutantCovered(mutant)) {
+//					logger.info("Skipping non-covered mutant " + mutant.getId() + ", test " + test.getId());
+//					continue;
+//				}
+//
+//				FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
+//
+//					@Override
+//					public Boolean call() throws Exception {
+//						logger.info("Executing mutant " + mutant.getId() + ", test " + test.getId());
+//						// TODO Is this testVsMutant thread safe?
+//						return testVsMutant(test, mutant);
+//                    }
+//                });
+//
+//                // Book keeping
+//                tasks.put(test, task);
+//            }
+//
+//            // Submit all the tests in the given order
+//            for (Test test : tests ) {
+//                if (tasks.containsKey(test)) {
+//                	logger.debug("MutationTester.runAllTestsOnMutant() : Scheduling Task " + test);
+//                    sharedExecutorService.execute(tasks.get(test));
+//                }
+//            }
+//
+//            // Wait for the result. Check by the order defined by the scheduler.
+//            for (Test test : tests ) {
+//                // Why this happens ?
+//                if (! tasks.containsKey(test)) {
+//                    logger.debug("Tasks does not contain " + test.getId() );
+//                    continue;
+//                }
+//
+//                Future<Boolean> task = tasks.get(test);
+//                logger.debug("MutationTester.runAllTestsOnMutant() Checking task " + task + ". Done: "
+//                        + task.isDone() + ". Cancelled: " + task.isCancelled());
+//                try {
+//
+//                    boolean hasTestkilledTheMutant = false;
+//
+//                    try {
+//                        hasTestkilledTheMutant = task.get();
+//                    } catch (CancellationException ce) {
+//                        //
+//                        logger.warn("Swallowing ", ce);
+//                    }
+//
+//                    if (hasTestkilledTheMutant) {
+//                        // This test killede the mutant...
+//                        messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
+//
+//                        if (game instanceof MultiplayerGame) {
+//                            ArrayList<Mutant> mlist = new ArrayList<Mutant>();
+//                            mlist.add(mutant);
+//
+//							logger.info(">> Test {} kills mutant {} get {} points. Mutant is still alive ? {}",
+//									test.getId(), mutant.getId(), Scorer.score((MultiplayerGame) game, test, mlist),
+//									mutant.isAlive());
+//							test.incrementScore(Scorer.score((MultiplayerGame) game, test, mlist));
+//						}
+//
+//                        Event notif = new Event(-1, game.getId(),
+//                                UserDAO.getUserForPlayer(test.getPlayerId()).getId(),
+//                                u.getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT,
+//                                EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
+//                        notif.insert();
+//
+//                        // Early return. No need to check for the other executions.
+//                        return;
+//
+//                    }
+//                } catch (InterruptedException | ExecutionException e) {
+//                    System.out.println(
+//                            "MutationTester.runAllTestsOnMutant() ERROR While waiting results for task " + e.getMessage() );
+////                    e.printStackTrace();
+//                }
+//            }
+//
+//        } else {
 
             for (Test test : tests) {
                 if (useMutantCoverage && !test.isMutantCovered(mutant)) {
@@ -413,7 +424,7 @@ public class MutationTester {
                     return; // return as soon as the first test kills the mutant we return
                 }
             }
-        }
+//        }
 
 		// TODO In the original implementation (see commit 4fbdc78304374ee31a06d56f8ce67ca80309e24c for example)
 		// the first block and the second one are swapped. Why ?
@@ -448,7 +459,7 @@ public class MutationTester {
      * @param mutant
      * @return {@code true} if the test killed the mutant, {@code false} otherwise
      */
-    private static boolean testVsMutant(Test test, Mutant mutant) {
+    private boolean testVsMutant(Test test, Mutant mutant) {
         if (TargetExecutionDAO.getTargetExecutionForPair(test.getId(), mutant.getId()) != null) {
 			logger.error("Execution result found for Mutant {} and Test {}.", mutant.getId(), test.getId());
 			return false;
@@ -470,14 +481,11 @@ public class MutationTester {
         return true;
 	}
 
-    /**
-     * Runs an equivalence test using an attacker supplied test and a mutant thought to be equivalent.
-     * Kills mutant either with ASSUMED_YES if test passes on the mutant or with PROVEN_NO otherwise
-     *
-     * @param test   attacker-created test
-     * @param mutant a mutant
+    /* (non-Javadoc)
+     * @see org.codedefenders.execution.IMutationTester#runEquivalenceTest(org.codedefenders.game.Test, org.codedefenders.game.Mutant)
      */
-    public static void runEquivalenceTest(Test test, Mutant mutant) {
+    @Override
+    public void runEquivalenceTest(Test test, Mutant mutant) {
         logger.info("Running equivalence test for test {} and mutant {}.", test.getId(), mutant.getId());
         // The test created is new and was made by the attacker (there is no
         // need to check if the mutant/test pairing has been run already)
