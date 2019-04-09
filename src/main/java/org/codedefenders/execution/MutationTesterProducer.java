@@ -28,8 +28,6 @@ public class MutationTesterProducer {
     @Produces
     @RequestScoped
     public IMutationTester getMutationTester() {
-
-        System.out.println("MutationTesterProducer.getMutationTester() enableParalleExecution ? " + enableParalleExecution);
         if( enableParalleExecution ){
             return new ParallelMutationTester(backend, useMutantCoverage, testExecutorThreadPool);
         } else{
