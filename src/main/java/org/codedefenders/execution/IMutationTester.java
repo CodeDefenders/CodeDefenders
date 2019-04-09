@@ -9,9 +9,9 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 
 public interface IMutationTester {
 
-    void runTestOnAllMutants(AbstractGame game, Test test, ArrayList<String> messages);
+    public void runTestOnAllMutants(AbstractGame game, Test test, ArrayList<String> messages);
 
-    void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages);
+    public void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages);
 
     /**
      * Execute all the tests registered for the defenders against the provided
@@ -21,7 +21,7 @@ public interface IMutationTester {
      * @param mutant
      * @param messages
      */
-    void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages);
+    public void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages);
 
     /**
      * Execute all the tests registered for the defenders against the provided
@@ -33,7 +33,7 @@ public interface IMutationTester {
      * @param messages
      * @param scheduler
      */
-    void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages, TestScheduler scheduler);
+    public void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages, TestScheduler scheduler);
 
     /**
      * Runs an equivalence test using an attacker supplied test and a mutant thought to be equivalent.
@@ -42,6 +42,8 @@ public interface IMutationTester {
      * @param test   attacker-created test
      * @param mutant a mutant
      */
-    void runEquivalenceTest(Test test, Mutant mutant);
+    public void runEquivalenceTest(Test test, Mutant mutant);
+    
+    public boolean testVsMutant(Test test, Mutant mutant);
 
 }

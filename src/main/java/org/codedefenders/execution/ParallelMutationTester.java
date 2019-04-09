@@ -18,10 +18,6 @@
  */
 package org.codedefenders.execution;
 
-import static org.codedefenders.execution.TargetExecution.Status.ERROR;
-import static org.codedefenders.execution.TargetExecution.Status.FAIL;
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_NO;
-import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 import static org.codedefenders.util.Constants.MUTANT_ALIVE_1_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_ALIVE_N_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_KILLED_BY_TEST_MESSAGE;
@@ -34,12 +30,21 @@ import static org.codedefenders.util.Constants.TEST_SUBMITTED_MESSAGE;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 import javax.enterprise.inject.Alternative;
+import javax.inject.Inject;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.configuration.Property;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
@@ -54,48 +59,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Class that handles compilation and testing by creating a Process with the
- * relevant ant target. Since execution is related to single request, we use a
- * Request Scope.
+ * This is a parallel implementation of IMutationTester. Parallelism is achieved
+ * by means of the injected executionService
  * 
  * We inject instances using {@link MutationTesterProducer}
  */
 @Alternative // This disable the automatic injection so we pass dependencies via the constructor
-public class MutationTester implements IMutationTester {
-    private static final Logger logger = LoggerFactory.getLogger(MutationTester.class);
-
-    protected BackendExecutorService backend;
-    protected boolean useMutantCoverage;
-
-    public MutationTester(BackendExecutorService backend, boolean useMutantCoverage) {
-        this.backend = backend;
-        this.useMutantCoverage = useMutantCoverage;
+public class ParallelMutationTester extends MutationTester //
+        implements IMutationTester // This MIGHT be superfluous but I am not
+                                   // sure how CDI works with annotations
+{
+    private ExecutorService testExecutorThreadPool;
+    
+    public ParallelMutationTester(BackendExecutorService backend, boolean useMutantCoverage, ExecutorService testExecutorThreadPool) {
+        super(backend, useMutantCoverage);
+        this.testExecutorThreadPool = testExecutorThreadPool;
     }
 
-    @Override
-    public void runTestOnAllMutants(AbstractGame game, Test test, ArrayList<String> messages) {
-        int killed = 0;
-        List<Mutant> mutants = game.getAliveMutants();
-        for (Mutant mutant : mutants) {
-            killed += testVsMutant(test, mutant) ? 1 : 0;
-        }
-        if (killed == 0)
-            if (mutants.size() == 0)
-                messages.add(TEST_SUBMITTED_MESSAGE);
-            else
-                messages.add(TEST_KILLED_ZERO_MESSAGE);
-        else {
-            if (killed == 1) {
-                if (mutants.size() == 1)
-                    messages.add(TEST_KILLED_LAST_MESSAGE);
-                else
-                    messages.add(TEST_KILLED_ONE_MESSAGE);
-            } else {
-                messages.add(String.format(TEST_KILLED_N_MESSAGE, killed));
-            }
-
-        }
-    }
+    private static final Logger logger = LoggerFactory.getLogger(ParallelMutationTester.class);
 
     @Override
     public void runTestOnAllMultiplayerMutants(MultiplayerGame game, Test test, ArrayList<String> messages) {
@@ -107,18 +88,56 @@ public class MutationTester implements IMutationTester {
         // Acquire and release the connection
         User u = UserDAO.getUserForPlayer(test.getPlayerId());
 
-        for (Mutant mutant : mutants) {
+        // Fork and Join parallelization
+        Map<Mutant, FutureTask<Boolean>> tasks = new HashMap<Mutant, FutureTask<Boolean>>();
+        for (final Mutant mutant : mutants) {
             if (useMutantCoverage && !test.isMutantCovered(mutant)) {
                 // System.out.println("Skipping non-covered mutant "
                 // + mutant.getId() + ", test " + test.getId());
                 continue;
             }
 
-            if (testVsMutant(test, mutant)) {
-                killed++;
-                killedMutants.add(mutant);
+            FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
+
+                @Override
+                public Boolean call() throws Exception {
+                    // This automatically update the 'mutants' and 'tests'
+                    // tables, as well as the test and mutant objects.
+                    return testVsMutant(test, mutant);
+                }
+            });
+
+            // This is for checking later
+            tasks.put(mutant, task);
+
+            testExecutorThreadPool.execute(task);
+        }
+
+        // TODO Mayse use some timeout ?!
+        for (final Mutant mutant : mutants) {
+            if (useMutantCoverage && !test.isMutantCovered(mutant))
+                continue;
+
+            // checks if task done
+            // System.out.println(
+            // "Is mutant done? " + tasks.get(mutant).isDone());
+            // checks if task canceled
+            // System.out.println("Is mutant cancelled? "
+            // + tasks.get(mutant).isCancelled());
+            // fetches result and waits if not ready
+
+            // THIS IS BLOCKING !!!
+            try {
+                if (tasks.get(mutant).get()) {
+                    killed++;
+                    killedMutants.add(mutant);
+                }
+            } catch (InterruptedException | ExecutionException | CancellationException e) {
+                logger.error("While waiting results for mutant " + mutant, e);
             }
         }
+
+        tasks.clear();
 
         for (Mutant mutant : mutants) {
             if (mutant.isAlive()) {
@@ -168,11 +187,13 @@ public class MutationTester implements IMutationTester {
         }
     }
 
-    @Override
-    public void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages) {
-        runAllTestsOnMutant(game, mutant, messages, new RandomTestScheduler());
-    }
-
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.codedefenders.execution.IMutationTester#runAllTestsOnMutant(org.
+     * codedefenders.game.AbstractGame, org.codedefenders.game.Mutant,
+     * java.util.ArrayList, org.codedefenders.execution.TestScheduler)
+     */
     @Override
     public void runAllTestsOnMutant(AbstractGame game, Mutant mutant, ArrayList<String> messages,
             TestScheduler scheduler) {
@@ -181,31 +202,85 @@ public class MutationTester implements IMutationTester {
 
         User u = UserDAO.getUserForPlayer(mutant.getPlayerId());
 
+        final Map<Test, FutureTask<Boolean>> tasks = new HashMap<Test, FutureTask<Boolean>>();
         for (Test test : tests) {
             if (useMutantCoverage && !test.isMutantCovered(mutant)) {
                 logger.info("Skipping non-covered mutant " + mutant.getId() + ", test " + test.getId());
                 continue;
             }
 
-            if (testVsMutant(test, mutant)) {
-                logger.info("Test {} kills mutant {}", test.getId(), mutant.getId());
-                messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
-                if (game instanceof MultiplayerGame) {
-                    ArrayList<Mutant> mlist = new ArrayList<Mutant>();
-                    mlist.add(mutant);
-                    // test.setScore(Scorer.score((MultiplayerGame) game, test,
-                    // mlist));
-                    // test.update();
-                    test.incrementScore(Scorer.score((MultiplayerGame) game, test, mlist));
+            FutureTask<Boolean> task = new FutureTask<Boolean>(new Callable<Boolean>() {
+
+                @Override
+                public Boolean call() throws Exception {
+                    logger.info("Executing mutant " + mutant.getId() + ", test " + test.getId());
+                    // TODO Is this testVsMutant thread safe?
+                    return testVsMutant(test, mutant);
+                }
+            });
+
+            // Book keeping
+            tasks.put(test, task);
+        }
+
+        // Submit all the tests in the given order
+        for (Test test : tests) {
+            if (tasks.containsKey(test)) {
+                logger.debug("MutationTester.runAllTestsOnMutant() : Scheduling Task " + test);
+                testExecutorThreadPool.execute(tasks.get(test));
+            }
+        }
+
+        // Wait for the result. Check by the order defined by the scheduler.
+        for (Test test : tests) {
+            // Why this happens ?
+            if (!tasks.containsKey(test)) {
+                logger.debug("Tasks does not contain " + test.getId());
+                continue;
+            }
+
+            Future<Boolean> task = tasks.get(test);
+            logger.debug("MutationTester.runAllTestsOnMutant() Checking task " + task + ". Done: " + task.isDone()
+                    + ". Cancelled: " + task.isCancelled());
+            try {
+
+                boolean hasTestkilledTheMutant = false;
+
+                try {
+                    hasTestkilledTheMutant = task.get();
+                } catch (CancellationException ce) {
+                    //
+                    logger.warn("Swallowing ", ce);
                 }
 
-                Event notif = new Event(-1, game.getId(), UserDAO.getUserForPlayer(test.getPlayerId()).getId(),
-                        u.getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT, EventStatus.GAME,
-                        new Timestamp(System.currentTimeMillis()));
-                notif.insert();
+                if (hasTestkilledTheMutant) {
+                    // This test killede the mutant...
+                    messages.add(String.format(MUTANT_KILLED_BY_TEST_MESSAGE, test.getId()));
 
-                return; // return as soon as the first test kills the mutant we
-                        // return
+                    if (game instanceof MultiplayerGame) {
+                        ArrayList<Mutant> mlist = new ArrayList<Mutant>();
+                        mlist.add(mutant);
+
+                        logger.info(">> Test {} kills mutant {} get {} points. Mutant is still alive ? {}",
+                                test.getId(), mutant.getId(), Scorer.score((MultiplayerGame) game, test, mlist),
+                                mutant.isAlive());
+
+                        test.incrementScore(Scorer.score((MultiplayerGame) game, test, mlist));
+                    }
+
+                    Event notif = new Event(-1, game.getId(), UserDAO.getUserForPlayer(test.getPlayerId()).getId(),
+                            u.getUsername() + "&#39;s mutant is killed", EventType.DEFENDER_KILLED_MUTANT,
+                            EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
+                    notif.insert();
+
+                    // Early return. No need to check for the other executions.
+                    return;
+
+                }
+            } catch (InterruptedException | ExecutionException e) {
+                logger.warn(
+                        "MutationTester.runAllTestsOnMutant() ERROR While waiting results for task " + e.getMessage());
+                // e.printStackTrace();
             }
         }
 
@@ -235,76 +310,6 @@ public class MutationTester implements IMutationTester {
         Event notif = new Event(-1, game.getId(), u.getId(), u.getUsername() + "&#39;s mutant survives the test suite.",
                 EventType.ATTACKER_MUTANT_SURVIVED, EventStatus.GAME, new Timestamp(System.currentTimeMillis()));
         notif.insert();
-    }
-
-    /**
-     * Runs a test against a mutant.
-     *
-     * @param test
-     * @param mutant
-     * @return {@code true} if the test killed the mutant, {@code false}
-     *         otherwise
-     */
-    public boolean testVsMutant(Test test, Mutant mutant) {
-        if (TargetExecutionDAO.getTargetExecutionForPair(test.getId(), mutant.getId()) != null) {
-            logger.error("Execution result found for Mutant {} and Test {}.", mutant.getId(), test.getId());
-            return false;
-        }
-
-        final TargetExecution executedTarget = backend.testMutant(mutant, test);
-
-        // If the test did NOT pass, the mutant was detected and should be
-        // killed.
-        if (!executedTarget.status.equals(FAIL) && !executedTarget.status.equals(ERROR)) {
-            logger.debug("Test {} did not kill Mutant {}", test.getId(), mutant.getId());
-            return false;
-        }
-        if (!mutant.kill(ASSUMED_NO)) {
-            logger.info("Test {} would have killed Mutant {}, but Mutant {} was already dead!", test.getId(),
-                    mutant.getId(), mutant.getId());
-            return false;
-        }
-
-        logger.info("Test {} killed Mutant {}", test.getId(), mutant.getId());
-        test.killMutant();
-        return true;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.codedefenders.execution.IMutationTester#runEquivalenceTest(org.
-     * codedefenders.game.Test, org.codedefenders.game.Mutant)
-     */
-    @Override
-    public void runEquivalenceTest(Test test, Mutant mutant) {
-        logger.info("Running equivalence test for test {} and mutant {}.", test.getId(), mutant.getId());
-        // The test created is new and was made by the attacker (there is no
-        // need to check if the mutant/test pairing has been run already)
-
-        // As a result of this test, either the test the attacker has written
-        // kills the mutant or doesnt.
-        TargetExecution executedTarget = backend.testMutant(mutant, test);
-
-        // Kill the mutant if it was killed by the test or if it's marked
-        // equivalent
-        if (executedTarget.status.equals(ERROR) || executedTarget.status.equals(FAIL)) {
-            // If the test did NOT pass, the mutant was detected and is proven
-            // to be non-equivalent
-            if (mutant.kill(PROVEN_NO)) {
-                logger.info("Test {} kills mutant {} and resolve equivalence.", test.getId(), mutant.getId());
-                test.killMutant();
-            } else {
-                logger.info(
-                        "Test {} would have killed Mutant {} and resolve equivalence, but Mutant {} was alredy dead. No need to resolve equivalence.!",
-                        test.getId(), mutant.getId(), mutant.getId());
-            }
-        } else {
-            // If the test DID pass, the mutant went undetected and it is
-            // assumed to be equivalent.
-            // Avoid killing, let player accept as equivalent instead
-            // mutant.kill(ASSUMED_YES);
-        }
     }
 
 }

@@ -39,12 +39,13 @@ public class ConfigurationPropertyProducer {
     @Property
     @Produces
     public boolean produceBoolean(final InjectionPoint ip) {
-        if( this.properties.contains(getKey(ip)) ){
-            return Boolean.valueOf(this.properties.getProperty(getKey(ip)));
-        } else {
+        String key = getKey(ip);
+        if( this.properties.containsKey(key) ){
+            String value = this.properties.getProperty(key);
+            return "enabled".equals( value );
+        }else {
             return false;
         }
-            
     }
 
     // TODO This can be improved to automatically try to resolve property names like: anotherProperty-> another.property
@@ -75,6 +76,7 @@ public class ConfigurationPropertyProducer {
             while (list.hasMore()) {
                 String name = list.next().getName();
                 properties.put(name, (String) environmentContext.lookup(name));
+//                System.out.println("ConfigurationPropertyProducer.init() Registering " + name + " with value " + environmentContext.lookup(name) ); 
             }
 
         } catch (NamingException e) {
