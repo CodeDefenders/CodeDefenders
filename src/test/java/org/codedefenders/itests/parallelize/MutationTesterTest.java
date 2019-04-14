@@ -21,7 +21,7 @@ package org.codedefenders.itests.parallelize;
 import org.codedefenders.MutationTesterUtilities;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.execution.MutationTester;
+import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
@@ -125,7 +125,7 @@ public class MutationTesterTest {
 	}
 
 	// CUT
-	private MutationTester tester;
+	private IMutationTester tester;
 
 	// We use the "real ant runner" but we need to provide a mock to Context
 	@Mock

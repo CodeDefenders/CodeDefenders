@@ -18,17 +18,11 @@
  */
 package org.codedefenders.execution;
 
-import org.apache.commons.lang.ArrayUtils;
-import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.database.MutantDAO;
-import org.codedefenders.database.TestDAO;
-import org.codedefenders.game.AbstractGame;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.codedefenders.execution.KillMap.KillMapEntry.Status.KILL;
+import static org.codedefenders.execution.KillMap.KillMapEntry.Status.NO_KILL;
+import static org.codedefenders.execution.KillMap.KillMapEntry.Status.UNKNOWN;
 
+import java.lang.annotation.Annotation;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -42,13 +36,23 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.function.BiFunction;
 
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import static org.codedefenders.execution.KillMap.KillMapEntry.Status.KILL;
-import static org.codedefenders.execution.KillMap.KillMapEntry.Status.NO_KILL;
-import static org.codedefenders.execution.KillMap.KillMapEntry.Status.UNKNOWN;
+import org.apache.commons.lang.ArrayUtils;
+import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestDAO;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Maps tests to their killed mutants in a finished game.
@@ -62,6 +66,9 @@ public class KillMap {
 
     private static final Logger logger = LoggerFactory.getLogger(KillMap.class);
 
+    // @Inject // This does not work for static classes 
+    private static BackendExecutorService backend;
+    
     private static boolean USE_COVERAGE = true;
     private static boolean PARALLELIZE = true;
     private final static int NUM_THREADS = 40;
@@ -77,10 +84,20 @@ public class KillMap {
             Object parallelizeObj = environmentContext.lookup("parallelize");
             USE_COVERAGE = (useCoverageObj == null) ? USE_COVERAGE : "enabled".equalsIgnoreCase((String) useCoverageObj);
             PARALLELIZE = (parallelizeObj == null) ? PARALLELIZE : "enabled".equalsIgnoreCase((String) parallelizeObj);
+            
+            // 
+            BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
+            Bean bean = (Bean) bm.getBeans(BackendExecutorService.class, new Annotation[0]).iterator().next();
+            CreationalContext ctx = bm.createCreationalContext(bean);
+            backend = (BackendExecutorService) bm.getReference(bean, BackendExecutorService.class, ctx);
+            
         } catch (NamingException e) {
             logger.error("Encountered missing option", e);
         }
     }
+    
+    
+    
 
     /** Filter which allows every test-mutant combination. */
     private static final BiFunction<Test, Mutant, Boolean> NO_FILTER = (test, mutant) -> true;
@@ -407,7 +424,7 @@ public class KillMap {
                 entry = new KillMapEntry(test, mutant, KillMapEntry.Status.NO_COVERAGE);
 
             } else {
-                TargetExecution executedTarget = AntRunner.testMutant(mutant, test);
+                TargetExecution executedTarget = backend.testMutant(mutant, test);
                 KillMapEntry.Status status;
 
                 switch (executedTarget.status) {

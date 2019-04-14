@@ -30,6 +30,7 @@ import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.execution.AntRunner;
+import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
@@ -63,6 +64,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
+import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -83,6 +85,9 @@ import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
  */
 public class ClassUploadManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(ClassUploadManager.class);
+    
+    @Inject
+    private BackendExecutorService backend;
 
     private static List<String> reservedClassNames = Arrays.asList(
             "Test.java"
@@ -723,7 +728,7 @@ public class ClassUploadManager extends HttpServlet {
                 final String qualifiedName = FileUtils.getFullyQualifiedName(classFilePath);
 
                 // This adds a jacoco.exec file to the testDir
-                AntRunner.testOriginal(cut, testDir, qualifiedName);
+                backend.testOriginal(cut, testDir, qualifiedName);
             } catch (Exception e) {
                 logger.error("Class upload failed. Test " + fileName + " failed", e);
                 messages.add("Class upload failed. Test " + fileName + " failed");

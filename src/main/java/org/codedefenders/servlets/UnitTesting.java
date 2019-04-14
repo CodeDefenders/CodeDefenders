@@ -36,6 +36,8 @@ import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.execution.AntRunner;
+import org.codedefenders.execution.BackendExecutorService;
+import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameState;
@@ -53,8 +55,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -77,6 +85,34 @@ public class UnitTesting extends HttpServlet {
 
 	private static final Logger logger = LoggerFactory.getLogger(UnitTesting.class);
 
+	// @Inject
+    private static ClassCompilerService classCompiler;
+    
+    //  @Inject
+    private static BackendExecutorService backend;
+
+    static {
+        InitialContext initialContext;
+        try {
+            initialContext = new InitialContext();
+            BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
+            //
+            Bean bean = null;
+            CreationalContext ctx = null;
+            //
+            bean = (Bean) bm.getBeans(BackendExecutorService.class, new Annotation[0]).iterator().next();
+            ctx = bm.createCreationalContext(bean);
+            backend = (BackendExecutorService) bm.getReference(bean, BackendExecutorService.class, ctx);
+            //
+            bean = (Bean) bm.getBeans(ClassCompilerService.class, new Annotation[0]).iterator().next();
+            ctx = bm.createCreationalContext(bean);
+            classCompiler = (ClassCompilerService) bm.getReference(bean, ClassCompilerService.class, ctx);
+        } catch (NamingException e) {
+            e.printStackTrace();
+        }
+    }
+	
+	
 	// Based on info provided, navigate to the correct view for the user
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
@@ -167,11 +203,11 @@ public class UnitTesting extends HttpServlet {
 		}
 
 		// Check the test actually passes when applied to the original code.
-		Test newTest = AntRunner.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
+		Test newTest = classCompiler.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
 		TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 		if (compileTestTarget != null && compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
-			AntRunner.testOriginal(newTestDir, newTest);
+			backend.testOriginal(newTestDir, newTest);
 		}
 		return newTest;
 	}
