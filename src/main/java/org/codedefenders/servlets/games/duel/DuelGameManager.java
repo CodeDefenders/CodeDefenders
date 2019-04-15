@@ -21,7 +21,9 @@ package org.codedefenders.servlets.games.duel;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.execution.AntRunner;
+import org.codedefenders.execution.BackendExecutorService;
+import org.codedefenders.execution.ClassCompilerService;
+import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameMode;
@@ -44,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +54,12 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -87,6 +96,18 @@ import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTI
 public class DuelGameManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(DuelGameManager.class);
+
+    @Inject
+    private ClassCompilerService classCompiler;
+    
+    @Inject
+    private BackendExecutorService backend;
+    
+    @Inject
+    private GameManagingUtils gameManagingUtils;
+    
+    @Inject
+    private IMutationTester mutationTester;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -210,7 +231,7 @@ public class DuelGameManager extends HttpServlet {
             Test newTest;
 
             try {
-                newTest = GameManagingUtils.createTest(game.getId(), game.getClassId(), testText, userId, MODE_DUEL_DIR);
+                newTest = gameManagingUtils.createTest(game.getId(), game.getClassId(), testText, userId, MODE_DUEL_DIR);
             } catch (CodeValidatorException e) {
                 logger.warn("Handled CodeValidator error.", e);
                 messages.add(TEST_GENERIC_ERROR_MESSAGE);
@@ -257,7 +278,7 @@ public class DuelGameManager extends HttpServlet {
             }
             // TODO: Allow multiple trials?
             // TODO: Doesnt differentiate between failing because the test didn't run and failing because it detected the mutant
-            MutationTester.runEquivalenceTest(newTest, mutant);
+            mutationTester.runEquivalenceTest(newTest, mutant);
             game.endRound();
             game.update();
             Mutant mutantAfterTest = game.getMutantByID(equivMutantId);
@@ -328,7 +349,7 @@ public class DuelGameManager extends HttpServlet {
                                 if (game.getMode() == GameMode.SINGLE) {
                                     // TODO: Why is this not handled in the single player game but here?
                                     //Singleplayer - use automatic system.
-                                    if (AntRunner.potentialEquivalent(m)) {
+                                    if (backend.potentialEquivalent(m)) {
                                         //Is potentially equiv - accept as equivalent
                                         m.kill(Mutant.Equivalence.DECLARED_YES);
                                         messages.add("The AI has accepted the mutant as equivalent.");
@@ -426,7 +447,7 @@ public class DuelGameManager extends HttpServlet {
             response.sendRedirect(ServletUtils.ctx(request) + Paths.DUEL_GAME + "?gameId=" + gameId);
             return;
         }
-        Mutant existingMutant = GameManagingUtils.existingMutant(gameId, mutantText);
+        Mutant existingMutant = gameManagingUtils.existingMutant(gameId, mutantText);
         if (existingMutant != null) {
             messages.add(MUTANT_DUPLICATED_MESSAGE);
             TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
@@ -438,7 +459,7 @@ public class DuelGameManager extends HttpServlet {
             response.sendRedirect(ServletUtils.ctx(request) + Paths.DUEL_GAME + "?gameId=" + gameId);
             return;
         }
-        Mutant newMutant = GameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, userId, MODE_DUEL_DIR);
+        Mutant newMutant = gameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, userId, MODE_DUEL_DIR);
         if (newMutant == null) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
@@ -457,14 +478,14 @@ public class DuelGameManager extends HttpServlet {
             return;
         }
         messages.add(MUTANT_COMPILED_MESSAGE);
-        MutationTester.runAllTestsOnMutant(game, newMutant, messages);
+        mutationTester.runAllTestsOnMutant(game, newMutant, messages);
 
         if (game.getMode() != GameMode.SINGLE) {
             game.endTurn();
         } else {
             // TODO: Why doesnt that happen in SinglePlayerGame.endTurn()?
             //Singleplayer - check for potential equivalent.
-            if (AntRunner.potentialEquivalent(newMutant)) {
+            if (backend.potentialEquivalent(newMutant)) {
                 //Is potentially equiv - mark as equivalent and update.
                 messages.add("The AI has started an equivalence challenge on your last mutant.");
                 newMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
@@ -517,7 +538,7 @@ public class DuelGameManager extends HttpServlet {
 
         Test newTest;
         try {
-            newTest = GameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_DUEL_DIR);
+            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_DUEL_DIR);
         } catch (CodeValidatorException e) {
             logger.warn("Handled CodeValidator error.", e);
             messages.add(TEST_GENERIC_ERROR_MESSAGE);
@@ -554,7 +575,7 @@ public class DuelGameManager extends HttpServlet {
             return;
         }
         messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-        MutationTester.runTestOnAllMutants(game, newTest, messages);
+        mutationTester.runTestOnAllMutants(game, newTest, messages);
 
         game.endTurn();
         game.update();

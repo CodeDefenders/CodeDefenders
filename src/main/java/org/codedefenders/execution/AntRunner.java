@@ -18,18 +18,11 @@
  */
 package org.codedefenders.execution;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.LineCoverage;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
-import org.codedefenders.util.Constants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.codedefenders.util.Constants.AI_DIR;
+import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
+import static org.codedefenders.util.Constants.CUTS_DIR;
+import static org.codedefenders.util.Constants.F_SEP;
+import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -40,85 +33,62 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
+import javax.annotation.ManagedBean;
+import javax.inject.Inject;
 
-import static org.codedefenders.util.Constants.AI_DIR;
-import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
-import static org.codedefenders.util.Constants.CUTS_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
-import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.codedefenders.configuration.Property;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.LineCoverage;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
+import org.codedefenders.util.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Jose Rojas
  * @author Alessio Gambi (last edit)
  */
-public class AntRunner {
+@ManagedBean
+public class AntRunner implements //
+        BackendExecutorService, //
+        ClassCompilerService, //
+        TestGeneratorService, //
+        MutantGeneratorService {
 
 	private static final Logger logger = LoggerFactory.getLogger(AntRunner.class);
-	//
-	private static String antHome = null;
-	private static boolean clusterEnabled = false;
-	private static boolean forceLocalExecution = false;
-	//
-	private static String clusterJavaHome = null;
-	private static String clusterReservationName = null;
-	private static String clusterTimeOutMinutes = "2";
 
-	// Alessio: DO NOT REALLY LIKE THOSE...
-	static {
-		// First check the Web abb context
-		InitialContext initialContext;
-		try {
-			initialContext = new InitialContext();
-			NamingEnumeration<NameClassPair> list = initialContext.list("java:comp/env");
-			Context environmentContext = (Context) initialContext.lookup("java:comp/env");
-
-			// Looking up a name which is not there causes an exception
-			// Some are unsafe !
-			while (list.hasMore()) {
-				String name = list.next().getName();
-				switch (name) {
-					case "ant.home":
-						antHome = (String) environmentContext.lookup(name);
-						break;
-					case "cluster.mode":
-						clusterEnabled = "enabled".equalsIgnoreCase((String) environmentContext.lookup(name));
-						break;
-					case "cluster.java.home":
-						clusterJavaHome = (String) environmentContext.lookup(name);
-						break;
-					case "cluster.reservation.name":
-						clusterReservationName = (String) environmentContext.lookup(name);
-						break;
-					case "cluster.timeout":
-						clusterTimeOutMinutes = (String) environmentContext.lookup(name);
-						break;
-					case "forceLocalExecution":
-						forceLocalExecution = "enabled".equalsIgnoreCase((String) environmentContext.lookup(name));
-						break;
-				}
-			}
-
-		} catch (NamingException e) {
-			e.printStackTrace();
-		}
-
-		// Check Env
-		if (antHome == null) {
-			ProcessBuilder pb = new ProcessBuilder();
-			Map env = pb.environment();
-			antHome = (String) env.get("ANT_HOME");
-		}
+	@Inject
+	@Property("ant.home")
+	private String antHome;
+	
+	@Inject
+    @Property("cluster.mode") 
+	private boolean clusterEnabled;
+	
+	@Inject
+    @Property("force.local.execution")
+	private boolean forceLocalExecution;
+	
+	@Inject
+    @Property("cluster.java.home")
+	private String clusterJavaHome;
+	
+	@Inject
+    @Property("cluster.reservation.name")
+	private String clusterReservationName;
+	
+	@Inject
+    @Property("cluster.timeout")
+	private String clusterTimeOutMinutes;
 
 
-	}
-	/////
-
-	public static boolean testKillsMutant(Mutant m, Test t) {
+	public boolean testKillsMutant(Mutant m, Test t) {
 		GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
 
 		AntProcessResult result = runAntTarget("test-mutant", m.getDirectory(), t.getDirectory(), cut, t.getFullyQualifiedClassName());
@@ -134,7 +104,7 @@ public class AntRunner {
 	 * @return A {@link TargetExecution} object
 	 */
 	@SuppressWarnings("Duplicates")
-	static TargetExecution testMutant(Mutant m, Test t) {
+	public TargetExecution testMutant(Mutant m, Test t) {
 		logger.info("Running test {} on mutant {}", t.getId(), m.getId());
 		GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
 		if( cut == null ){
@@ -167,7 +137,7 @@ public class AntRunner {
 	}
 
 	@SuppressWarnings("Duplicates")
-	static TargetExecution recompileTestAndTestMutant(Mutant m, Test t) {
+	public TargetExecution recompileTestAndTestMutant(Mutant m, Test t) {
 		logger.info("Running test {} on mutant {}", t.getId(), m.getId());
 		GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
 
@@ -190,7 +160,7 @@ public class AntRunner {
 		return newExec;
 	}
 
-	public static boolean potentialEquivalent(Mutant m) {
+	public boolean potentialEquivalent(Mutant m) {
 		logger.info("Checking if mutant {} is potentially equivalent.", m.getId());
 		GameClass cut = GameClassDAO.getClassForGameId(m.getGameId());
 		String suiteDir = Paths.get(AI_DIR, "tests", cut.getAlias()).toString();
@@ -202,7 +172,7 @@ public class AntRunner {
 		return !(result.hasError() || result.hasFailure());
 	}
 
-	public static void testOriginal(GameClass cut, String testDir, String testClassName) throws Exception {
+	public void testOriginal(GameClass cut, String testDir, String testClassName) throws Exception {
 		AntProcessResult result = runAntTarget("test-original", null, testDir, cut, testClassName, forceLocalExecution);
 
 		if (result.hasFailure() || result.hasError()) {
@@ -219,7 +189,7 @@ public class AntRunner {
 	 * @param t A {@link Test} object
 	 * @return A {@link TargetExecution} object
 	 */
-	public static TargetExecution testOriginal(File dir, Test t) {
+	public TargetExecution testOriginal(File dir, Test t) {
 		GameClass cut = GameClassDAO.getClassForGameId(t.getGameId());
 
 		AntProcessResult result = runAntTarget("test-original", null, dir.getAbsolutePath(), cut, t.getFullyQualifiedClassName(), forceLocalExecution);
@@ -253,7 +223,7 @@ public class AntRunner {
 	 * @param cut Class under test
 	 * @return The path to the compiled CUT
 	 */
-	public static String compileCUT(GameClass cut) throws CompileException {
+	public String compileCUT(GameClass cut) throws CompileException {
 		AntProcessResult result = runAntTarget("compile-cut", null, null, cut, null, forceLocalExecution);
 
 		logger.info("Compile New CUT, Compilation result: {}", result);
@@ -265,7 +235,7 @@ public class AntRunner {
 			logger.info("Compiled uploaded CUT successfully");
 			File f = Paths.get(CUTS_DIR, cut.getAlias()).toFile();
 			final String compiledClassName = FilenameUtils.getBaseName(cut.getJavaFile()) + Constants.JAVA_CLASS_EXT;
-			LinkedList<File> matchingFiles = (LinkedList<File>)FileUtils.listFiles(f, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
+			LinkedList<File> matchingFiles = (LinkedList<File>) FileUtils.listFiles(f, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter());
 			if (! matchingFiles.isEmpty())
 				pathCompiledClassName = matchingFiles.get(0).getAbsolutePath();
 		} else {
@@ -287,7 +257,7 @@ public class AntRunner {
 	 * @param ownerId User who submitted mutant
 	 * @return A {@link Mutant} object
 	 */
-	public static Mutant compileMutant(File dir, String jFile, int gameID, GameClass cut, int ownerId) {
+	public Mutant compileMutant(File dir, String jFile, int gameID, GameClass cut, int ownerId) {
 
 		// Gets the classname for the mutant from the game it is in
 		AntProcessResult result = runAntTarget("compile-mutant", dir.getAbsolutePath(), null, cut, null, forceLocalExecution);
@@ -331,7 +301,7 @@ public class AntRunner {
 	 * @param ownerId Player who submitted test
 	 * @return A {@link Test} object
 	 */
-	public static Test compileTest(File dir, String jFile, int gameID, GameClass cut, int ownerId) {
+	public Test compileTest(File dir, String jFile, int gameID, GameClass cut, int ownerId) {
 		//public static int compileTest(ServletContext context, Test t) {
 
 		AntProcessResult result = runAntTarget("compile-test", null, dir.getAbsolutePath(), cut, null, forceLocalExecution);
@@ -370,7 +340,7 @@ public class AntRunner {
 	 * Generates mutant classes using Major
 	 * @param cut game class
 	 */
-	public static void generateMutantsFromCUT(final GameClass cut) {
+	public void generateMutantsFromCUT(final GameClass cut) {
 		runAntTarget("mutant-gen-cut", null, null, cut, null);
 	}
 
@@ -378,7 +348,7 @@ public class AntRunner {
 	 * Generates tests using EvoSuite
 	 * @param cut CUT filename
 	 */
-	public static void generateTestsFromCUT(final GameClass cut) {
+	public void generateTestsFromCUT(final GameClass cut) {
 		runAntTarget("test-gen-cut", null, null, cut, null);
 	}
 
@@ -386,7 +356,7 @@ public class AntRunner {
 	 * Compiles generated test suite
 	 * @param cut Class under test
 	 */
-	public static boolean compileGenTestSuite(final GameClass cut) {
+	public boolean compileGenTestSuite(final GameClass cut) {
 		AntProcessResult result = runAntTarget("compile-gen-tests", null, null, cut, cut.getName() + Constants.SUITE_EXT);
 
 		// Return true iff compilation succeeds
@@ -403,11 +373,11 @@ public class AntRunner {
 	 * @param testClassName Name of JUnit test class
 	 * @return Result an AntProcessResult object containing output details of the ant process
 	 */
-	private static AntProcessResult runAntTarget(String target, String mutantFile, String testDir, GameClass cut, String testClassName) {
+	private AntProcessResult runAntTarget(String target, String mutantFile, String testDir, GameClass cut, String testClassName) {
 		return runAntTarget(target, mutantFile, testDir, cut, testClassName, false);
 	}
 	
-	private static AntProcessResult runAntTarget(String target, String mutantDir, String testDir, GameClass cut, String testClassName, boolean forcedLocally) {
+	private AntProcessResult runAntTarget(String target, String mutantDir, String testDir, GameClass cut, String testClassName, boolean forcedLocally) {
 		logger.info("Running Ant Target: {} with mFile: {} and tFile: {}", target, mutantDir, testDir);
 
 		ProcessBuilder pb = new ProcessBuilder();

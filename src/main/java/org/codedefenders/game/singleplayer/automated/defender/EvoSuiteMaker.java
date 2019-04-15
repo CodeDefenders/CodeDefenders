@@ -18,15 +18,8 @@
  */
 package org.codedefenders.game.singleplayer.automated.defender;
 
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.execution.AntRunner;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.Test;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.FileUtils;
+import static org.codedefenders.util.Constants.AI_DIR;
+import static org.codedefenders.util.Constants.F_SEP;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -34,11 +27,31 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.codedefenders.util.Constants.AI_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
+import javax.inject.Inject;
+
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.execution.BackendExecutorService;
+import org.codedefenders.execution.ClassCompilerService;
+import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.execution.TestGeneratorService;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.FileUtils;
 
 public class EvoSuiteMaker {
 
+    @Inject
+    private ClassCompilerService classCompiler;
+    
+    @Inject
+    private TestGeneratorService testGenerator;
+    
+    @Inject
+    private BackendExecutorService backend;
+    
 	private int cId;
 	private GameClass cut;
 	private DuelGame dGame;
@@ -55,7 +68,7 @@ public class EvoSuiteMaker {
 	}
 
 	public boolean makeSuite() throws Exception{
-		AntRunner.generateTestsFromCUT(cut);
+	    testGenerator.generateTestsFromCUT(cut);
 		//AntRunner.compileGenTestSuite(cut);
 		//Need a dummy game to add test to.
 
@@ -67,11 +80,11 @@ public class EvoSuiteMaker {
 				File newTestDir = FileUtils.getNextSubDir(AI_DIR + F_SEP + "tests" +
 						F_SEP + cut.getAlias());
 				String jFile = FileUtils.createJavaTestFile(newTestDir, cut.getBaseName(), t);
-				Test newTest = AntRunner.compileTest(newTestDir, jFile, dGame.getId(), cut, AiDefender.ID);
+				Test newTest = classCompiler.compileTest(newTestDir, jFile, dGame.getId(), cut, AiDefender.ID);
 				TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
 				if (compileTestTarget != null && compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
-					AntRunner.testOriginal(newTestDir, newTest);
+					backend.testOriginal(newTestDir, newTest);
 					validTests.add(newTest);
 				}
 			}
