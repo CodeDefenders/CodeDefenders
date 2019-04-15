@@ -157,7 +157,7 @@
         $(document).ready(function() {
             try {
                 $('table.mutant-table').DataTable( {
-                    "pagingType": "full_numbers",
+                    "pagingType": "full",
                     "searching": true,
                     "lengthChange": false,
                     "ordering": false,
