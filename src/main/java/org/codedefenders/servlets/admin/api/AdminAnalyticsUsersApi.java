@@ -49,16 +49,17 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
      * {@code type=json} will return JSON, {@code type=CSV} will return CSV.<br>
      * If {@code type} is not specified, JSON will be returned.
      */
+    @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String type = request.getParameter("type");
+        String type = request.getParameter("fileType");
         if (type == null) {
             type = "json";
         }
 
         if (type.equalsIgnoreCase("json")) {
-            getJSON(request, response);
+            doGetJSON(response);
         } else if (type.equalsIgnoreCase("csv")) {
-            getCSV(request, response);
+            doGetCSV(response);
         } else {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
         }
@@ -77,7 +78,7 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
      * }
      * </pre>
      */
-    private void getJSON(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void doGetJSON(HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
 
         long timeStart = System.currentTimeMillis();
@@ -100,7 +101,7 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
      * Returns a CSV file containing the user analytics data.
      * The returned CSV will have a header.
      */
-    private void getCSV(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void doGetCSV(HttpServletResponse response) throws IOException {
         response.setContentType("text/csv");
 
         List<UserDataDTO> userData = AnalyticsDAO.getAnalyticsUserData();
@@ -137,5 +138,6 @@ public class AdminAnalyticsUsersApi extends HttpServlet {
         csvPrinter.flush();
     }
 
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException { }
 }

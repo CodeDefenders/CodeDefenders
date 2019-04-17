@@ -486,6 +486,15 @@
         <servlet-name>AdminAnalyticsKillmapsApi</servlet-name>
         <servlet-class>org.codedefenders.servlets.admin.api.AdminAnalyticsKillMapsApi</servlet-class>
     </servlet>
+
+    <servlet-mapping>
+        <servlet-name>AdminKillmapManagementApi</servlet-name>
+        <url-pattern>/admin/api/killmapmanagement</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>AdminKillmapManagementApi</servlet-name>
+        <servlet-class>org.codedefenders.servlets.admin.api.KillMapManagementApi</servlet-class>
+    </servlet>
     <!-- Admin pages end -->
 
     <error-page>

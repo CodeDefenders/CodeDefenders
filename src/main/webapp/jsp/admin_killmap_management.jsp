@@ -37,12 +37,21 @@
     </div>
 
     <ul class="nav nav-tabs" style="margin-top: 25px;">
-        <li role="presentation" class="active"><a href="#availabe" aria-controls="availabe" role="tab" data-toggle="tab">Available</a></li>
-        <li role="presentation"><a href="#queued" aria-controls="queued" role="tab" data-toggle="tab">Queued</a></li>
+        <li role="presentation" class="active"><a href="#manual" aria-controls="manual" role="tab" data-toggle="tab">Enter IDs</a></li>
+        <li role="presentation"><a href="#availabe" aria-controls="availabe" role="tab" data-toggle="tab">Choose Available KillMaps</a></li>
+        <li role="presentation"><a href="#queue" aria-controls="queue" role="tab" data-toggle="tab">Show Queued</a></li>
     </ul>
 
     <div class="tab-content" style="margin-top: 25px;">
-        <div role="tabpanel" class="tab-pane active" id="availabe" data-toggle="tab">
+        <div role="tabpanel" class="tab-pane active" id="manual" data-toggle="tab">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                </div>
+                <div class="panel-body">
+                </div>
+            </div>
+        </div>
+        <div role="tabpanel" class="tab-pane" id="availabe" data-toggle="tab">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     Classes
@@ -82,7 +91,7 @@
                 </div>
             </div>
         </div>
-        <div role="tabpanel" class="tab-pane" id="queued" data-toggle="tab">
+        <div role="tabpanel" class="tab-pane" id="queue" data-toggle="tab">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     Classes
@@ -129,7 +138,16 @@
         const colorRow = function () {
             const data = this.data();
             const node = this.node();
-            var percentage = data.percentage * 100;
+
+            let percentage;
+
+            const expectedNrEntries = (data.nrTests * data.nrMutants);
+            if (expectedNrEntries !== 0) {
+                percentage = ((data.nrEntries * 100) / expectedNrEntries).toFixed(0);
+            } else {
+                percentage = 0;
+            }
+
             node.style.background = "linear-gradient(to right, rgba(41, 182, 246, 0.15) " + percentage + "%, transparent " + percentage + "%)";
         };
 
@@ -138,47 +156,38 @@
             node.style.background = null;
         };
 
-        var classTable;
-        var gameTable;
-        var classQueueTable;
-        var gameQueueTable;
+        const progressFromRow = function (row) {
+            const expectedNrEntries = (row.nrTests * row.nrMutants);
+            if (expectedNrEntries !== 0) {
+                return ((row.nrEntries * 100) / expectedNrEntries).toFixed(2) + '%';
+            } else {
+                return 'NA';
+            }
+        };
+
+        let classTable;
+        let gameTable;
+        let classQueueTable;
+        let gameQueueTable;
 
         $(document).ready(function() {
             classTable = $('#tableClasses').DataTable({
-                "data": [
-                    { class: 101, name: 'Test', mutants: 7, tests: 8, percentage: 0.7},
-                    { class: 102, name: 'Test', mutants: 5, tests: 3, percentage: 0.0},
-                    { class: 103, name: 'Test', mutants: 25, tests: 7, percentage: 1.0},
-                    { class: 104, name: 'Test', mutants: 40, tests: 65, percentage: 0.3},
-                    { class: 105, name: 'Test', mutants: 3, tests: 2, percentage: 0.7},
-                    { class: 101, name: 'Test', mutants: 7, tests: 8, percentage: 0.7},
-                    { class: 102, name: 'Test', mutants: 5, tests: 3, percentage: 0.0},
-                    { class: 103, name: 'Test', mutants: 25, tests: 7, percentage: 1.0},
-                    { class: 104, name: 'Test', mutants: 40, tests: 65, percentage: 0.3},
-                    { class: 105, name: 'Test', mutants: 3, tests: 2, percentage: 0.7},
-                    { class: 101, name: 'Test', mutants: 7, tests: 8, percentage: 0.7},
-                    { class: 102, name: 'Test', mutants: 5, tests: 3, percentage: 0.0},
-                    { class: 103, name: 'Test', mutants: 25, tests: 7, percentage: 1.0},
-                    { class: 104, name: 'Test', mutants: 40, tests: 65, percentage: 0.3},
-                    { class: 105, name: 'Test', mutants: 3, tests: 2, percentage: 0.7},
-                    { class: 101, name: 'Test', mutants: 7, tests: 8, percentage: 0.7},
-                    { class: 102, name: 'Test', mutants: 5, tests: 3, percentage: 0.0},
-                    { class: 103, name: 'Test', mutants: 25, tests: 7, percentage: 1.0},
-                    { class: 104, name: 'Test', mutants: 40, tests: 65, percentage: 0.3},
-                    { class: 105, name: 'Test', mutants: 3, tests: 2, percentage: 0.7},
-                ],
+                "ajax": {
+                    "url": "<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT + "?pageType=available&killmapType=class&fileType=json"%>",
+                    "dataSrc": "data"
+                },
                 "columns": [
                     { "data": null,
                       "defaultContent": '<input type="checkbox" class="select-for-queue">' },
-                    { "data":  "class",
+                    { "data":  "classId",
                       "title": "Class" },
-                    { "data":  "name",
+                    { "data":  "className",
                       "title": "Name" },
-                    { "data":  "mutants",
+                    { "data":  "nrMutants",
                       "title": "Mutants" },
-                    { "data":  "tests",
+                    { "data":  "nrTests",
                       "title": "Tests" },
-                    { "data":  "percentage",
+                    { "data":  progressFromRow,
                       "title": "Computed" },
                 ],
                 "scrollY": "400px",
@@ -189,40 +198,22 @@
             });
 
             gameTable = $('#tableGames').DataTable({
-                "data": [
-                    { game: 101, mode: "PARTY", mutants: 7, tests: 8, percentage: 0.7},
-                    { game: 102, mode: "DUEL", mutants: 5, tests: 3, percentage: 0.0},
-                    { game: 103, mode: "PARTY", mutants: 25, tests: 7, percentage: 1.0},
-                    { game: 104, mode: "PARTY", mutants: 40, tests: 65, percentage: 0.3},
-                    { game: 105, mode: "DUEL", mutants: 3, tests: 2, percentage: 0.7},
-                    { game: 101, mode: "PARTY", mutants: 7, tests: 8, percentage: 0.7},
-                    { game: 102, mode: "DUEL", mutants: 5, tests: 3, percentage: 0.0},
-                    { game: 103, mode: "PARTY", mutants: 25, tests: 7, percentage: 1.0},
-                    { game: 104, mode: "PARTY", mutants: 40, tests: 65, percentage: 0.3},
-                    { game: 105, mode: "DUEL", mutants: 3, tests: 2, percentage: 0.7},
-                    { game: 101, mode: "PARTY", mutants: 7, tests: 8, percentage: 0.7},
-                    { game: 102, mode: "DUEL", mutants: 5, tests: 3, percentage: 0.0},
-                    { game: 103, mode: "PARTY", mutants: 25, tests: 7, percentage: 1.0},
-                    { game: 104, mode: "PARTY", mutants: 40, tests: 65, percentage: 0.3},
-                    { game: 105, mode: "DUEL", mutants: 3, tests: 2, percentage: 0.7},
-                    { game: 101, mode: "PARTY", mutants: 7, tests: 8, percentage: 0.7},
-                    { game: 102, mode: "DUEL", mutants: 5, tests: 3, percentage: 0.0},
-                    { game: 103, mode: "PARTY", mutants: 25, tests: 7, percentage: 1.0},
-                    { game: 104, mode: "PARTY", mutants: 40, tests: 65, percentage: 0.3},
-                    { game: 105, mode: "DUEL", mutants: 3, tests: 2, percentage: 0.7},
-                ],
+                "ajax": {
+                    "url": "<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT + "?pageType=available&killmapType=game&fileType=json"%>",
+                    "dataSrc": "data"
+                },
                 "columns": [
                     { "data": null,
                       "defaultContent": '<input type="checkbox" class="select-for-queue">' },
-                    { "data":  "game",
+                    { "data":  "gameId",
                       "title": "Game" },
-                    { "data":  "mode",
+                    { "data":  "gameMode",
                       "title": "Mode" },
-                    { "data":  "mutants",
+                    { "data":  "nrMutants",
                       "title": "Mutants" },
-                    { "data":  "tests",
+                    { "data":  "nrTests",
                       "title": "Tests" },
-                    { "data":  "percentage",
+                    { "data":  progressFromRow,
                       "title": "Computed" },
                 ],
                 "scrollY": "400px",
@@ -233,40 +224,22 @@
             });
 
             classQueueTable = $('#tableClassesQueue').DataTable({
-                "data": [
-                    { class: 101, name: 'Test', mutants: 7, tests: 8, percentage: 0.7},
-                    { class: 102, name: 'Test', mutants: 5, tests: 3, percentage: 0.0},
-                    { class: 103, name: 'Test', mutants: 25, tests: 7, percentage: 1.0},
-                    { class: 104, name: 'Test', mutants: 40, tests: 65, percentage: 0.3},
-                    { class: 105, name: 'Test', mutants: 3, tests: 2, percentage: 0.7},
-                    { class: 101, name: 'Test', mutants: 7, tests: 8, percentage: 0.7},
-                    { class: 102, name: 'Test', mutants: 5, tests: 3, percentage: 0.0},
-                    { class: 103, name: 'Test', mutants: 25, tests: 7, percentage: 1.0},
-                    { class: 104, name: 'Test', mutants: 40, tests: 65, percentage: 0.3},
-                    { class: 105, name: 'Test', mutants: 3, tests: 2, percentage: 0.7},
-                    { class: 101, name: 'Test', mutants: 7, tests: 8, percentage: 0.7},
-                    { class: 102, name: 'Test', mutants: 5, tests: 3, percentage: 0.0},
-                    { class: 103, name: 'Test', mutants: 25, tests: 7, percentage: 1.0},
-                    { class: 104, name: 'Test', mutants: 40, tests: 65, percentage: 0.3},
-                    { class: 105, name: 'Test', mutants: 3, tests: 2, percentage: 0.7},
-                    { class: 101, name: 'Test', mutants: 7, tests: 8, percentage: 0.7},
-                    { class: 102, name: 'Test', mutants: 5, tests: 3, percentage: 0.0},
-                    { class: 103, name: 'Test', mutants: 25, tests: 7, percentage: 1.0},
-                    { class: 104, name: 'Test', mutants: 40, tests: 65, percentage: 0.3},
-                    { class: 105, name: 'Test', mutants: 3, tests: 2, percentage: 0.7},
-                ],
+                "ajax": {
+                    "url": "<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT + "?pageType=queue&killmapType=class&fileType=json"%>",
+                    "dataSrc": "data"
+                },
                 "columns": [
                     { "data": null,
                       "defaultContent": '<input type="checkbox" class="select-for-queue">' },
-                    { "data":  "class",
+                    { "data":  "classId",
                       "title": "Class" },
-                    { "data":  "name",
+                    { "data":  "className",
                       "title": "Name" },
-                    { "data":  "mutants",
+                    { "data":  "nrMutants",
                       "title": "Mutants" },
-                    { "data":  "tests",
+                    { "data":  "nrTests",
                       "title": "Tests" },
-                    { "data":  "percentage",
+                    { "data":  progressFromRow,
                       "title": "Computed" },
                 ],
                 "scrollY": "400px",
@@ -277,40 +250,22 @@
             });
 
             gameQueueTable = $('#tableGamesQueue').DataTable({
-                "data": [
-                    { game: 101, mode: "PARTY", mutants: 7, tests: 8, percentage: 0.7},
-                    { game: 102, mode: "DUEL", mutants: 5, tests: 3, percentage: 0.0},
-                    { game: 103, mode: "PARTY", mutants: 25, tests: 7, percentage: 1.0},
-                    { game: 104, mode: "PARTY", mutants: 40, tests: 65, percentage: 0.3},
-                    { game: 105, mode: "DUEL", mutants: 3, tests: 2, percentage: 0.7},
-                    { game: 101, mode: "PARTY", mutants: 7, tests: 8, percentage: 0.7},
-                    { game: 102, mode: "DUEL", mutants: 5, tests: 3, percentage: 0.0},
-                    { game: 103, mode: "PARTY", mutants: 25, tests: 7, percentage: 1.0},
-                    { game: 104, mode: "PARTY", mutants: 40, tests: 65, percentage: 0.3},
-                    { game: 105, mode: "DUEL", mutants: 3, tests: 2, percentage: 0.7},
-                    { game: 101, mode: "PARTY", mutants: 7, tests: 8, percentage: 0.7},
-                    { game: 102, mode: "DUEL", mutants: 5, tests: 3, percentage: 0.0},
-                    { game: 103, mode: "PARTY", mutants: 25, tests: 7, percentage: 1.0},
-                    { game: 104, mode: "PARTY", mutants: 40, tests: 65, percentage: 0.3},
-                    { game: 105, mode: "DUEL", mutants: 3, tests: 2, percentage: 0.7},
-                    { game: 101, mode: "PARTY", mutants: 7, tests: 8, percentage: 0.7},
-                    { game: 102, mode: "DUEL", mutants: 5, tests: 3, percentage: 0.0},
-                    { game: 103, mode: "PARTY", mutants: 25, tests: 7, percentage: 1.0},
-                    { game: 104, mode: "PARTY", mutants: 40, tests: 65, percentage: 0.3},
-                    { game: 105, mode: "DUEL", mutants: 3, tests: 2, percentage: 0.7},
-                ],
+                "ajax": {
+                    "url": "<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT + "?pageType=queue&killmapType=game&fileType=json"%>",
+                    "dataSrc": "data"
+                },
                 "columns": [
                     { "data": null,
                       "defaultContent": '<input type="checkbox" class="select-for-queue">' },
-                    { "data":  "game",
+                    { "data":  "gameId",
                       "title": "Game" },
-                    { "data":  "mode",
+                    { "data":  "gameMode",
                       "title": "Mode" },
-                    { "data":  "mutants",
+                    { "data":  "nrMutants",
                       "title": "Mutants" },
-                    { "data":  "tests",
+                    { "data":  "nrTests",
                       "title": "Tests" },
-                    { "data":  "percentage",
+                    { "data":  progressFromRow,
                       "title": "Computed" },
                 ],
                 "scrollY": "400px",
