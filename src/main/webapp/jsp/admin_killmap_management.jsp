@@ -165,6 +165,14 @@
             }
         };
 
+        const classNameFromRow = function (row) {
+            if (row.className === row.classAlias) {
+                return row.className;
+            } else {
+                return row.className + ' (alias ' + row.classAlias + ')';
+            }
+        };
+
         let classTable;
         let gameTable;
         let classQueueTable;
@@ -181,7 +189,7 @@
                       "defaultContent": '<input type="checkbox" class="select-for-queue">' },
                     { "data":  "classId",
                       "title": "Class" },
-                    { "data":  "className",
+                    { "data":  classNameFromRow,
                       "title": "Name" },
                     { "data":  "nrMutants",
                       "title": "Mutants" },
@@ -233,7 +241,7 @@
                       "defaultContent": '<input type="checkbox" class="select-for-queue">' },
                     { "data":  "classId",
                       "title": "Class" },
-                    { "data":  "className",
+                    { "data":  classNameFromRow,
                       "title": "Name" },
                     { "data":  "nrMutants",
                       "title": "Mutants" },

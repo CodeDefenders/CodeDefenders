@@ -194,10 +194,36 @@ public class KillmapDAO {
                 query = "DELETE FROM killmapjob WHERE Game_ID = ?";
                 break;
             default:
-                logger.warn("Unknown type of Killmap Job !");
+                logger.warn("Unknown type of Killmap Job!");
                 return false;
         }
         return DB.executeUpdateQuery(query, DatabaseValue.of(theJob.getReference()));
+    }
+
+    public static boolean removeJobsByIds(KillMap.KillMapJob.Type jobType, List<Integer> ids) {
+        if (ids.isEmpty()) {
+            return true;
+        }
+
+        String idName;
+        switch (jobType) {
+            case CLASS:
+                idName = "Class_ID";
+                break;
+            case GAME:
+                idName = "Game_ID";
+                break;
+            default:
+                logger.warn("Unknown type of Killmap Job!");
+                return false;
+        }
+
+        String idsString = ids.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        String query = "DELETE FROM killmapjob WHERE " + idName + " in (" + idsString + ")";
+        return DB.executeUpdateQuery(query);
     }
 
 
@@ -259,8 +285,8 @@ public class KillmapDAO {
     }
 
     public static List<KillMapClassProgress> getAllKillMapClassProgress() {
-        String classIdsQuery = String.join("\n",
-            "SELECT Class_ID, Name",
+        String classesQuery = String.join("\n",
+            "SELECT Class_ID, Name, Alias",
             "FROM view_playable_classes",
             "ORDER BY Class_ID;");
 
@@ -279,10 +305,11 @@ public class KillmapDAO {
             "FROM killmap",
             "GROUP BY Class_ID;");
 
-        List<KillMapClassProgress> progresses = DB.executeQueryReturnList(classIdsQuery, rs -> {
+        List<KillMapClassProgress> progresses = DB.executeQueryReturnList(classesQuery, rs -> {
             KillMapClassProgress progress = new KillMapClassProgress();
             progress.setClassId(rs.getInt("Class_ID"));
             progress.setClassName(rs.getString("Name"));
+            progress.setClassAlias(rs.getString("Alias"));
             return progress;
         });
 
@@ -305,7 +332,7 @@ public class KillmapDAO {
 
     public static List<KillMapGameProgress> getAllKillMapGameProgress() {
         // TODO: view_playable_games?
-        String gameIdsQuery = String.join("\n",
+        String gamesQuery = String.join("\n",
             "SELECT ID, Mode",
             "FROM games",
             "WHERE ID >= 0",
@@ -327,7 +354,7 @@ public class KillmapDAO {
             "FROM killmap",
             "GROUP BY Game_ID;");
 
-        List<KillMapGameProgress> progresses = DB.executeQueryReturnList(gameIdsQuery, rs -> {
+        List<KillMapGameProgress> progresses = DB.executeQueryReturnList(gamesQuery, rs -> {
             KillMapGameProgress progress = new KillMapGameProgress();
             progress.gameId = rs.getInt("ID");
             progress.gameMode = GameMode.valueOf(rs.getString("Mode"));
@@ -353,7 +380,7 @@ public class KillmapDAO {
 
     public static List<KillMapClassProgress> getQueuedKillMapClassProgress() {
         String classesQuery = String.join("\n",
-                "SELECT classes.Class_ID, classes.Name",
+                "SELECT classes.Class_ID, classes.Name, classes.Alias",
                 "FROM killmapjob, classes",
                 "WHERE killmapjob.Class_ID = classes.Class_ID",
                 "ORDER BY Class_ID;");
@@ -362,6 +389,7 @@ public class KillmapDAO {
             KillMapClassProgress progress = new KillMapClassProgress();
             progress.setClassId(rs.getInt("Class_ID"));
             progress.setClassName(rs.getString("Name"));
+            progress.setClassAlias(rs.getString("Alias"));
             return progress;
         });
 
@@ -384,8 +412,8 @@ public class KillmapDAO {
 
         List<KillMapGameProgress> progresses = DB.executeQueryReturnList(gamesQuery, rs -> {
             KillMapGameProgress progress = new KillMapGameProgress();
-            progress.gameId = rs.getInt("ID");
-            progress.gameMode = GameMode.valueOf(rs.getString("Mode"));
+            progress.setGameId(rs.getInt("ID"));
+            progress.setGameMode(GameMode.valueOf(rs.getString("Mode")));
             return progress;
         });
 
@@ -455,6 +483,7 @@ public class KillmapDAO {
     public static class KillMapClassProgress extends KillMapProgress {
         private int classId;
         private String className;
+        private String classAlias;
 
         public int getClassId() {
             return classId;
@@ -470,6 +499,14 @@ public class KillmapDAO {
 
         public void setClassName(String className) {
             this.className = className;
+        }
+
+        public String getClassAlias() {
+            return classAlias;
+        }
+
+        public void setClassAlias(String classAlias) {
+            this.classAlias = classAlias;
         }
     }
 }

@@ -26,17 +26,15 @@ public class KillMapManagementApi extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        logger.info("GOT GET");
-
         String page = request.getParameter("pageType"); // manual, available, queue
         if (page == null) {
-            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            response.setStatus(HttpStatus.SC_BAD_REQUEST); // TODO return an error message
             return;
         }
 
         String killmapType = request.getParameter("killmapType"); // class, game
         if (killmapType == null) {
-            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            response.setStatus(HttpStatus.SC_BAD_REQUEST); // TODO return an error message
             return;
         }
 
@@ -45,31 +43,13 @@ public class KillMapManagementApi extends HttpServlet {
             filetype = "json";
         }
 
-        if (filetype.equalsIgnoreCase("json")) {
+        if (filetype.equalsIgnoreCase("json")) { // TODO: case sensitive or case insensitive
             doGetJSON(response, page, killmapType);
         } else if (filetype.equalsIgnoreCase("csv")) {
             doGetCSV(response, page, killmapType);
         } else {
-            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            response.setStatus(HttpStatus.SC_BAD_REQUEST); // TODO return an error message
         }
-    }
-
-    public List<? extends KillMapProgress> getData(String page, String killmapType) {
-        if (page.equalsIgnoreCase("available")) {
-            if (killmapType.equalsIgnoreCase("class")) {
-                return KillmapDAO.getAllKillMapClassProgress();
-            } else if (killmapType.equalsIgnoreCase("game")) {
-                return KillmapDAO.getAllKillMapGameProgress();
-            }
-        } else if (page.equalsIgnoreCase("queue")) {
-            if (killmapType.equalsIgnoreCase("class")) {
-                return KillmapDAO.getQueuedKillMapClassProgress();
-            } else if (killmapType.equalsIgnoreCase("game")) {
-                return KillmapDAO.getQueuedKillMapGameProgress();
-            }
-        }
-
-        return null;
     }
 
     private void doGetJSON(HttpServletResponse response, String page, String killmapType) throws IOException {
@@ -106,30 +86,12 @@ public class KillMapManagementApi extends HttpServlet {
             return;
         }
 
-        /*
-        String[] columns;
-        if (!progresses.isEmpty()) {
-            try {
-                Set<String> keys = PropertyUtils.describe(progresses.get(0)).keySet();
-                keys.remove("class");
-                columns = new String[keys.size()];
-                int i = 0;
-                for (String key : keys) {
-                    columns[i++] = key;
-                }
-            } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            columns = new String[0];
-        }
-        */
-
         String[] columns;
         if (killmapType.equalsIgnoreCase("class")) {
             columns = new String[]{
                 "classId",
                 "className",
+                "classAlias",
                 "nrTests",
                 "nrMutants",
                 "nrEntries"
@@ -159,5 +121,23 @@ public class KillMapManagementApi extends HttpServlet {
         }
 
         csvPrinter.flush();
+    }
+
+    public List<? extends KillMapProgress> getData(String page, String killmapType) {
+        if (page.equalsIgnoreCase("available")) {
+            if (killmapType.equalsIgnoreCase("class")) {
+                return KillmapDAO.getAllKillMapClassProgress();
+            } else if (killmapType.equalsIgnoreCase("game")) {
+                return KillmapDAO.getAllKillMapGameProgress();
+            }
+        } else if (page.equalsIgnoreCase("queue")) {
+            if (killmapType.equalsIgnoreCase("class")) {
+                return KillmapDAO.getQueuedKillMapClassProgress();
+            } else if (killmapType.equalsIgnoreCase("game")) {
+                return KillmapDAO.getQueuedKillMapGameProgress();
+            }
+        }
+
+        return null;
     }
 }

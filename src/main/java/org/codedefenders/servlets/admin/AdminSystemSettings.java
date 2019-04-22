@@ -236,7 +236,7 @@ public class AdminSystemSettings extends HttpServlet {
 	}
 
 	// TODO Those methods should be factored into a class and exposed for reuse
-	public void updateSystemSettings(HttpServletRequest request, ArrayList<String> messages) {
+	public void updateSystemSettings(HttpServletRequest request, List<String> messages) {
 		List<SettingsDTO> settings = AdminDAO.getSystemSettings();
 
 		boolean success = true;

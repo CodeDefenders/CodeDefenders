@@ -18,7 +18,11 @@
  */
 package org.codedefenders.servlets.admin;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.execution.KillMap.KillMapJob;
 import org.codedefenders.execution.KillMap.KillMapJob.Type;
@@ -28,7 +32,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -42,8 +47,6 @@ public class AdminKillMaps extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(AdminKillMaps.class);
 
-    private final static String DEFAULT_MESSAGE = "Settings saved.";
-
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher(Constants.ADMIN_KILLMAPS_JSP).forward(request, response);
@@ -51,75 +54,138 @@ public class AdminKillMaps extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        // Validate user requests
         // TODO This shall be a call done by an admin user.
         // But I guess there's no way to check this...
 
         String formType = request.getParameter("formType");
+        if (formType == null) {
+            request.getRequestDispatcher(Constants.ADMIN_KILLMAPS_JSP).forward(request, response);
+            return;
+        }
+
         switch (formType) {
-            case "submitKillMapClassJob":
-                submitKillMapClassJob(request);
+
+            case "toggleExecution":
+                String enableString = request.getParameter("enable");
+                if (enableString == null) {
+                    addMessage(request.getSession(), "Invalid request. Missing parameter.");
+                    break;
+                }
+                if (enableString.equals("true")) { // TODO: case sensitive or case insensitive
+                    toggleExecution(request, true);
+                } else if (enableString.equals("false")) {
+                    toggleExecution(request, false);
+                } else {
+                    addMessage(request.getSession(), "Invalid request. Invalid parameter.");
+                    break;
+                }
+
                 break;
-            case "updateSettings":
-                updateSettings(request);
+
+            case "submitKillMapJob":
+            case "cancelKillMapJob":
+                /* Get the type of killmap: game or class. */
+                String jobTypeString = request.getParameter("jobType");
+                Type jobType;
+                if (jobTypeString == null) {
+                    addMessage(request.getSession(), "Invalid request. Missing job type.");
+                    break;
+                }
+                try {
+                    jobType = Type.valueOf(jobTypeString.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    addMessage(request.getSession(), "Invalid request. Invalid job type.");
+                    break;
+                }
+
+                /* Get the (class or game) ids. */
+                String idsString = request.getParameter("ids");
+                List<Integer> ids;
+                if (idsString == null) {
+                    addMessage(request.getSession(), "Invalid request. Missing IDs.");
+                    break;
+                }
+                try {
+                    Gson gson = new Gson();
+                    ids = gson.fromJson(idsString, new TypeToken<List<Integer>>(){}.getType());
+                } catch (JsonSyntaxException e) {
+                    addMessage(request.getSession(), "Invalid request. Invalid IDs.");
+                    break;
+                }
+
+                if (formType.equals("submitKillMapJob")) {
+                    submitKillMapJobs(request, jobType, ids);
+                } else {
+                    cancelKillMapJobs(request, jobType, ids);
+                }
+
+                break;
+
+            default:
+                addMessage(request.getSession(), "Invalid request. Invalid form type.");
                 break;
         }
+
         request.getRequestDispatcher(Constants.ADMIN_KILLMAPS_JSP).forward(request, response);
     }
 
-    private void submitKillMapClassJob(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        ArrayList<String> messages = new ArrayList<String>();
-        String cID = request.getParameter("classID");
-
-        try {
-            // Validate the input ?
-            int classID = Integer.parseInt(cID);
-            GameClassDAO.getClassForId(classID);
-            KillmapDAO.enqueueJob(new KillMapJob(Type.CLASS, classID));
-            messages.add("Submitted Job for Class " + classID);
-        } catch (NumberFormatException e) {
-            messages.add("Invalid parameter " + cID);
-        } catch (Throwable e) {
-            messages.add("Invalid request !");
+    private void submitKillMapJobs(HttpServletRequest request, Type jobType, List<Integer> ids) {
+        /* Check if classes or games exist for the given ids. */
+        List<Integer> existingIds = null;
+        if (jobType == Type.CLASS) {
+            existingIds = GameClassDAO.filterExistingClassIDs(ids);
+        } else if (jobType == Type.GAME) {
+            existingIds = GameDAO.filterExistingGameIDs(ids);
         }
-        session.setAttribute("messages", messages);
+        if (existingIds.size() != ids.size()) {
+
+            Set<Integer> existingIdsSet = new TreeSet<>(existingIds);
+            String missingIds = ids.stream()
+                    .filter(id -> !existingIdsSet.contains(id))
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(", "));
+            addMessage(request.getSession(), "Invalid request. No games / classes for ID(s) " + missingIds + " exist.");
+            return;
+        }
+
+        /* Enqueue the jobs. */
+        for (int id : ids) {
+            KillmapDAO.enqueueJob(new KillMapJob(jobType, id));
+        }
     }
 
-    private void updateSettings(HttpServletRequest request) {
-        HttpSession session = request.getSession();
-        ArrayList<String> messages = new ArrayList<String>();
-        // Get their user id from the session.
-        int currentUserID = (Integer) session.getAttribute("uid");
+    private void cancelKillMapJobs(HttpServletRequest request, Type jobType, List<Integer> ids) {
+        // TODO cancel current killmap computation if necessary
+        KillmapDAO.removeJobsByIds(jobType, ids);
+    }
 
-        String valueString = request
-                .getParameter(AdminSystemSettings.SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.name());
-
+    private void toggleExecution(HttpServletRequest request, boolean enable) {
+        int currentUserID = (Integer) request.getSession().getAttribute("uid");
         ServletContext context = getServletContext();
         KillMapProcessor killMapProcessor = (KillMapProcessor) context.getAttribute(KillMapProcessor.NAME);
-        if (valueString != null && !killMapProcessor.isEnabled()) {
-            // This means enable
+
+        List<String> messages = (List<String>) request.getSession().getAttribute("messages");
+        if (messages == null) messages = new ArrayList<>();
+        request.getSession().setAttribute("messages", messages);
+
+        if (enable) {
             logger.info("User {} enabled Killmap Processor", currentUserID);
             killMapProcessor.setEnabled(true);
-            /*
-             * Store the setting into the DB. We use the code which is already
-             * in place under the assumption that we do not need to pass the
-             * entire set of configurations to update one entry
-             */
             (new AdminSystemSettings()).updateSystemSettings(request, messages);
-
-        } else if (valueString == null && killMapProcessor.isEnabled()) {
-            // This means disable
+        } else {
             logger.info("User {} disabled Killmap Processor", currentUserID);
             killMapProcessor.setEnabled(false);
-            // Store the setting into the DB. We use the code which is already
-            // in place
             (new AdminSystemSettings()).updateSystemSettings(request, messages);
-
-        } else {
-            logger.debug("Invalid request from user {}", currentUserID);
         }
-        session.setAttribute("messages", messages);
+    }
 
+    // TODO: Provide this method for other classes -> dependency injection
+    private void addMessage(HttpSession session, String message) {
+        List<String> messages = (List<String>) session.getAttribute("messages");
+        if (messages == null) {
+            messages = new ArrayList<>();
+            session.setAttribute("messages", messages);
+        }
+        messages.add(message);
     }
 }
