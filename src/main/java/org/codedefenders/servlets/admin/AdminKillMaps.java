@@ -21,6 +21,7 @@ package org.codedefenders.servlets.admin;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
@@ -28,6 +29,8 @@ import org.codedefenders.execution.KillMap.KillMapJob;
 import org.codedefenders.execution.KillMap.KillMapJob.Type;
 import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.util.Constants;
+import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
+import org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,12 +68,13 @@ public class AdminKillMaps extends HttpServlet {
 
         switch (formType) {
 
-            case "toggleExecution":
+            case "toggleKillMapProcessing":
                 String enableString = request.getParameter("enable");
                 if (enableString == null) {
                     addMessage(request.getSession(), "Invalid request. Missing parameter.");
                     break;
                 }
+                logger.info("HERE: " + enableString);
                 if (enableString.equals("true")) { // TODO: case sensitive or case insensitive
                     toggleExecution(request, true);
                 } else if (enableString.equals("false")) {
@@ -106,8 +110,9 @@ public class AdminKillMaps extends HttpServlet {
                     break;
                 }
                 try {
+                    // TODO: also allow array without brackets, i.e. comma separated list
                     Gson gson = new Gson();
-                    ids = gson.fromJson(idsString, new TypeToken<List<Integer>>(){}.getType());
+                    ids = gson.fromJson("[" + idsString + "]", new TypeToken<List<Integer>>(){}.getType()); //TODO
                 } catch (JsonSyntaxException e) {
                     addMessage(request.getSession(), "Invalid request. Invalid IDs.");
                     break;
@@ -171,11 +176,11 @@ public class AdminKillMaps extends HttpServlet {
         if (enable) {
             logger.info("User {} enabled Killmap Processor", currentUserID);
             killMapProcessor.setEnabled(true);
-            (new AdminSystemSettings()).updateSystemSettings(request, messages);
+            AdminDAO.updateSystemSetting(new SettingsDTO(SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION, true));
         } else {
             logger.info("User {} disabled Killmap Processor", currentUserID);
             killMapProcessor.setEnabled(false);
-            (new AdminSystemSettings()).updateSystemSettings(request, messages);
+            AdminDAO.updateSystemSetting(new SettingsDTO(SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION, false));
         }
     }
 

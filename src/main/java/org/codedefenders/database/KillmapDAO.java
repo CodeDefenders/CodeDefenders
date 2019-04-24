@@ -380,10 +380,10 @@ public class KillmapDAO {
 
     public static List<KillMapClassProgress> getQueuedKillMapClassProgress() {
         String classesQuery = String.join("\n",
-                "SELECT classes.Class_ID, classes.Name, classes.Alias",
-                "FROM killmapjob, classes",
-                "WHERE killmapjob.Class_ID = classes.Class_ID",
-                "ORDER BY Class_ID;");
+            "SELECT classes.Class_ID, classes.Name, classes.Alias",
+            "FROM killmapjob, classes",
+            "WHERE killmapjob.Class_ID = classes.Class_ID",
+            "ORDER BY Class_ID;");
 
         List<KillMapClassProgress> progresses = DB.executeQueryReturnList(classesQuery, rs -> {
             KillMapClassProgress progress = new KillMapClassProgress();
@@ -405,10 +405,10 @@ public class KillmapDAO {
 
     public static List<KillMapGameProgress> getQueuedKillMapGameProgress() {
         String gamesQuery = String.join("\n",
-                "SELECT games.ID, games.Mode",
-                "FROM killmapjob, games",
-                "WHERE killmapjob.Game_ID = games.ID",
-                "ORDER BY Game_ID;");
+            "SELECT games.ID, games.Mode",
+            "FROM killmapjob, games",
+            "WHERE killmapjob.Game_ID = games.ID",
+            "ORDER BY Game_ID;");
 
         List<KillMapGameProgress> progresses = DB.executeQueryReturnList(gamesQuery, rs -> {
             KillMapGameProgress progress = new KillMapGameProgress();
@@ -425,6 +425,17 @@ public class KillmapDAO {
         }
 
         return progresses;
+    }
+
+    public static int getNumClassKillmapJobsQueued() {
+        String query = "SELECT COUNT(DISTINCT Class_ID) from killmapjob WHERE Class_ID IS NOT NULL;";
+        return DB.executeQueryReturnValue(query, rs -> rs.getInt(1));
+    }
+
+
+    public static int getNumGameKillmapJobsQueued() {
+        String query = "SELECT COUNT(DISTINCT Game_ID) from killmapjob WHERE Game_ID IS NOT NULL;";
+        return DB.executeQueryReturnValue(query, rs -> rs.getInt(1));
     }
 
     // TODO: move into KillMap or into own class file?

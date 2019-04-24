@@ -18,20 +18,57 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME" %>
+<%@ page import="org.codedefenders.database.KillmapDAO" %>
+
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
+
+<%
+    SettingsDTO processorSetting = AdminDAO.getSystemSetting(SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION);
+    boolean processorEnabled = processorSetting.getBoolValue();
+
+    String processorExplanation = SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.toString();
+
+    int numClassesQueued = KillmapDAO.getNumClassKillmapJobsQueued();
+    int numGamesQueued = KillmapDAO.getNumGameKillmapJobsQueued();
+%>
 
 <div class="full-width">
     <% request.setAttribute("adminActivePage", "adminKillMaps"); %>
     <%@ include file="/jsp/admin_navigation.jsp" %>
 
+    <%-- TODO check if the database settings value mathes the processor state? --%>
     <div class="panel panel-default" style="margin-top: 25px;">
         <div class="panel-body">
-            10 Games and 13 Classes currently queued.<br>
-            Killmap computation is enabled, currently computing: Class ID 123.
+            <%= numClassesQueued %> Class<%= numClassesQueued > 0 ? "es" : "" %> and
+            <%= numGamesQueued %> Game<%= numGamesQueued > 0 ? "s" : "" %>  currently queued.<br>
+            <% if (processorEnabled) { %>
+                Currently computing: TODO
+            <% } %>
             <p></p>
-            <form class="form-inline">
-                <button class="btn btn-danger">Stop killmap computation</button>
+
+            <form id="killmap-processor-settings" name="killmap-processor-settings" title="<%= processorExplanation %>"
+                  action="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS %>" method="post">
+                <input type="hidden" name="formType" value="toggleKillMapProcessing">
+                <% if (processorEnabled) { %>
+                    <label for="toggle-killmap-processing">
+                        Killmap Processing is <span class="text-success">enabled</span>
+                    </label>
+                    <br>
+                    <button type="submit" name="enable" value="false" id="toggle-killmap-processing" class="btn btn-danger">
+                        Disable KillMap Processing
+                    </button>
+                <% } else { %>
+                    <label for="toggle-killmap-processing">
+                        Killmap Processing is <span class="text-danger">disabled</span>
+                    </label>
+                    <br>
+                    <button type="submit" name="enable" value="true" id="toggle-killmap-processing" class="btn btn-success">
+                        Enable KillMap Processing
+                    </button>
+                <% } %>
             </form>
         </div>
     </div>
@@ -46,8 +83,62 @@
         <div role="tabpanel" class="tab-pane active" id="manual" data-toggle="tab">
             <div class="panel panel-default">
                 <div class="panel-heading">
+                    Classes
                 </div>
                 <div class="panel-body">
+                    <form id="enter-class-ids" name="enter-class-ids"
+                          action="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS %>" method="post">
+                        <input type="hidden" name="formType" value="submitKillMapJob">
+                        <input type="hidden" name="jobType" value="class">
+
+                        <div class="form-group">
+                            <label for="class-ids">Class IDs</label>
+                            <a data-toggle="collapse" href="#class-ids-explanation" style="color: black;">
+                                <span class="glyphicon glyphicon-question-sign"></span>
+                            </a>
+                            <div id="class-ids-explanation" class="collapse panel panel-default" style="margin-top: 10px;">
+                                <div class="panel-body" style="padding: 10px;">
+                                    Comma separated list of class IDs to generate killmaps for.
+                                    Newlines and whitespaces are allowed.
+                                </div>
+                            </div>
+                            <textarea name="ids" id="class-ids" class="form-control" placeholder="Class IDs" rows="1"></textarea>
+                        </div>
+
+                        <button type="submit" id="submit-class-ids" class="btn btn-primary">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Games
+                </div>
+                <div class="panel-body">
+                    <form id="enter-game-ids" name="enter-game-ids"
+                          action="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS %>" method="post">
+                        <input type="hidden" name="formType" value="submitKillMapJob">
+                        <input type="hidden" name="jobType" value="game">
+
+                        <div class="form-group">
+                            <label for="game-ids">Game IDs</label>
+                            <a data-toggle="collapse" href="#game-ids-explanation" style="color: black;">
+                                <span class="glyphicon glyphicon-question-sign"></span>
+                            </a>
+                            <div id="game-ids-explanation" class="collapse panel panel-default" style="margin-top: 10px;">
+                                <div class="panel-body" style="padding: 10px;">
+                                    Comma separated list of game IDs to generate killmaps for.
+                                    Newlines and whitespaces are allowed.
+                                </div>
+                            </div>
+                            <textarea name="ids" id="game-ids" class="form-control" placeholder="Game IDs" rows="1"></textarea>
+                        </div>
+
+                        <button type="submit" id="submit-game-ids" class="btn btn-primary">
+                            Submit
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

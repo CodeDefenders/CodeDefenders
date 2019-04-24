@@ -143,7 +143,7 @@ public class GameDAO {
             return new ArrayList<>();
         }
         String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
-        String query = "SELECT ID FROM games WHERE Class_ID in (" + idsString + ")";
+        String query = "SELECT ID FROM games WHERE ID in (" + idsString + ")";
         return DB.executeQueryReturnList(query, rs -> rs.getInt("ID"));
     }
 }

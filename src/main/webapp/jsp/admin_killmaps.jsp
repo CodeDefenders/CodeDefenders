@@ -115,7 +115,7 @@
 
 			<%
 			    for (AdminSystemSettings.SettingsDTO setting : AdminDAO.getSystemSettings()) {
-			        if( ! AdminSystemSettings.SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.equals( setting.getName())){
+			        if( ! AdminSystemSettings.SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.equals(setting.getName())){
 			            continue;
 			        }
 			        String readableName = setting.getName().name().toLowerCase().replace("_", " ");
