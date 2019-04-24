@@ -86,17 +86,18 @@ public class AdminKillMaps extends HttpServlet {
 
                 break;
 
-            case "submitKillMapJob":
-            case "cancelKillMapJob":
+            case "submitKillMapJobs":
+            case "cancelKillMapJobs":
+            case "deleteKillMaps":
                 /* Get the type of killmap: game or class. */
-                String jobTypeString = request.getParameter("jobType");
-                Type jobType;
-                if (jobTypeString == null) {
+                String killmapTypeString = request.getParameter("killmapType");
+                Type killmapType;
+                if (killmapTypeString == null) {
                     addMessage(request.getSession(), "Invalid request. Missing job type.");
                     break;
                 }
                 try {
-                    jobType = Type.valueOf(jobTypeString.toUpperCase());
+                    killmapType = Type.valueOf(killmapTypeString.toUpperCase());
                 } catch (IllegalArgumentException e) {
                     addMessage(request.getSession(), "Invalid request. Invalid job type.");
                     break;
@@ -110,18 +111,28 @@ public class AdminKillMaps extends HttpServlet {
                     break;
                 }
                 try {
-                    // TODO: also allow array without brackets, i.e. comma separated list
+                    /* Convert comma-separated list into JSON array if necessary. */
+                    idsString = idsString.trim();
+                    if (idsString.length() == 0 || idsString.charAt(0) != '[') {
+                        idsString = "[" + idsString + "]";
+                    }
                     Gson gson = new Gson();
-                    ids = gson.fromJson("[" + idsString + "]", new TypeToken<List<Integer>>(){}.getType()); //TODO
+                    ids = gson.fromJson(idsString, new TypeToken<List<Integer>>(){}.getType());
                 } catch (JsonSyntaxException e) {
                     addMessage(request.getSession(), "Invalid request. Invalid IDs.");
                     break;
                 }
 
-                if (formType.equals("submitKillMapJob")) {
-                    submitKillMapJobs(request, jobType, ids);
-                } else {
-                    cancelKillMapJobs(request, jobType, ids);
+                switch (formType) {
+                    case "submitKillMapJobs":
+                        submitKillMapJobs(request, killmapType, ids);
+                        break;
+                    case "cancelKillMapJobs":
+                        cancelKillMapJobs(request, killmapType, ids);
+                        break;
+                    case "deleteKillMaps":
+                        deleteKillMaps(request, killmapType, ids);
+                        break;
                 }
 
                 break;
@@ -134,16 +145,18 @@ public class AdminKillMaps extends HttpServlet {
         request.getRequestDispatcher(Constants.ADMIN_KILLMAPS_JSP).forward(request, response);
     }
 
-    private void submitKillMapJobs(HttpServletRequest request, Type jobType, List<Integer> ids) {
+    private void submitKillMapJobs(HttpServletRequest request, Type killmapType, List<Integer> ids) {
         /* Check if classes or games exist for the given ids. */
         List<Integer> existingIds = null;
-        if (jobType == Type.CLASS) {
+        if (killmapType == Type.CLASS) {
             existingIds = GameClassDAO.filterExistingClassIDs(ids);
-        } else if (jobType == Type.GAME) {
+        } else if (killmapType == Type.GAME) {
             existingIds = GameDAO.filterExistingGameIDs(ids);
+        } else {
+            return;
         }
-        if (existingIds.size() != ids.size()) {
 
+        if (existingIds.size() != ids.size()) {
             Set<Integer> existingIdsSet = new TreeSet<>(existingIds);
             String missingIds = ids.stream()
                     .filter(id -> !existingIdsSet.contains(id))
@@ -155,13 +168,38 @@ public class AdminKillMaps extends HttpServlet {
 
         /* Enqueue the jobs. */
         for (int id : ids) {
-            KillmapDAO.enqueueJob(new KillMapJob(jobType, id));
+            KillmapDAO.enqueueJob(new KillMapJob(killmapType, id));
         }
     }
 
-    private void cancelKillMapJobs(HttpServletRequest request, Type jobType, List<Integer> ids) {
+    private void cancelKillMapJobs(HttpServletRequest request, Type killmapType, List<Integer> ids) {
         // TODO cancel current killmap computation if necessary
-        KillmapDAO.removeJobsByIds(jobType, ids);
+        if (!KillmapDAO.removeJobsByIds(killmapType, ids)) {
+            //TODO
+        }
+    }
+
+    private void deleteKillMaps(HttpServletRequest request, Type killmapType, List<Integer> ids) {
+        List<Integer> errorIds = new LinkedList<>();
+
+        if (killmapType == Type.CLASS) {
+            for (int id : ids) {
+                if (!KillmapDAO.deleteKillMapForClass(id)) {
+                    errorIds.add(id);
+                }
+            }
+        } else if (killmapType == Type.GAME) {
+            for (int id : ids) {
+                if (!KillmapDAO.deleteKillMapForGame(id)) {
+                    errorIds.add(id);
+                }
+            }
+        }
+
+        if (!errorIds.isEmpty()) {
+            String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(", "));
+            addMessage(request.getSession(), "Error while deleting killmap for ID(s) " + idsString + ".");
+        }
     }
 
     private void toggleExecution(HttpServletRequest request, boolean enable) {

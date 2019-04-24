@@ -126,9 +126,9 @@ public class KillMapManagementApi extends HttpServlet {
     public List<? extends KillMapProgress> getData(String page, String killmapType) {
         if (page.equalsIgnoreCase("available")) {
             if (killmapType.equalsIgnoreCase("class")) {
-                return KillmapDAO.getAllKillMapClassProgress();
+                return KillmapDAO.getNonQueuedKillMapClassProgress();
             } else if (killmapType.equalsIgnoreCase("game")) {
-                return KillmapDAO.getAllKillMapGameProgress();
+                return KillmapDAO.getNonQueuedKillMapGameProgress();
             }
         } else if (page.equalsIgnoreCase("queue")) {
             if (killmapType.equalsIgnoreCase("class")) {

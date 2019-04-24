@@ -144,6 +144,16 @@ public class KillmapDAO {
         return DB.executeUpdateQuery(query, values);
     }
 
+    public static boolean deleteKillMapForGame(int gameId) {
+        String query = "DELETE FROM killmap WHERE Game_ID = ?;";
+        return DB.executeUpdateQuery(query, DatabaseValue.of(gameId));
+    }
+
+    public static boolean deleteKillMapForClass(int classId) {
+        String query = "DELETE FROM killmap WHERE Class_ID = ?;";
+        return DB.executeUpdateQuery(query, DatabaseValue.of(classId));
+    }
+
 
 
 
@@ -290,10 +300,15 @@ public class KillmapDAO {
         return progress;
     }
 
-    public static List<KillMapClassProgress> getAllKillMapClassProgress() {
+    public static List<KillMapClassProgress> getNonQueuedKillMapClassProgress() {
         String classesQuery = String.join("\n",
             "SELECT Class_ID, Name, Alias",
-            "FROM view_playable_classes",
+            "FROM view_playable_classes classes",
+            "WHERE NOT EXISTS (",
+            "   SELECT *",
+            "   FROM killmapjob",
+            "   WHERE killmapjob.Class_ID = classes.Class_ID",
+            ")",
             "ORDER BY Class_ID;");
 
         String nrTestsQuery = String.join("\n",
@@ -342,13 +357,19 @@ public class KillmapDAO {
         return progresses;
     }
 
-    public static List<KillMapGameProgress> getAllKillMapGameProgress() {
+    //TODO: javadoc: "assumption: few killmaps are queued, many are available"
+    public static List<KillMapGameProgress> getNonQueuedKillMapGameProgress() {
         // TODO: view_playable_games?
         String gamesQuery = String.join("\n",
             "SELECT ID, Mode",
             "FROM games",
             "WHERE ID >= 0",
             "  AND (Mode = 'DUEL' OR MODE = 'PARTY')",
+            "  AND NOT EXISTS (",
+            "     SELECT *",
+            "     FROM killmapjob",
+            "     WHERE killmapjob.Game_ID = games.ID",
+            "  )",
             "ORDER BY ID;");
 
         String nrTestsQuery = String.join("\n",
@@ -390,6 +411,7 @@ public class KillmapDAO {
         return progresses;
     }
 
+    //TODO: javadoc: "assumption: few killmaps are queued, many are available"
     public static List<KillMapClassProgress> getQueuedKillMapClassProgress() {
         String classesQuery = String.join("\n",
             "SELECT classes.Class_ID, classes.Name, classes.Alias",
