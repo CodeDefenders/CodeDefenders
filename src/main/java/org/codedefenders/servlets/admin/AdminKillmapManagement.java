@@ -45,23 +45,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-public class AdminKillMaps extends HttpServlet {
-    private static final long serialVersionUID = 4237104046949774958L;
-
-    private static final Logger logger = LoggerFactory.getLogger(AdminKillMaps.class);
+public class AdminKillmapManagement extends HttpServlet {
+    private static final Logger logger = LoggerFactory.getLogger(AdminKillmapManagement.class);
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher(Constants.ADMIN_KILLMAPS_JSP).forward(request, response);
     }
 
+    // TODO: show number of queued / canceled / deleted killmaps in messages
+
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         // TODO This shall be a call done by an admin user.
         // But I guess there's no way to check this...
 
+        /* Handle parameter "formType" */
         String formType = request.getParameter("formType");
         if (formType == null) {
+            addMessage(request.getSession(), "Invalid request. Missing form type.");
             request.getRequestDispatcher(Constants.ADMIN_KILLMAPS_JSP).forward(request, response);
             return;
         }
@@ -69,27 +71,25 @@ public class AdminKillMaps extends HttpServlet {
         switch (formType) {
 
             case "toggleKillMapProcessing":
+                /* Handle parameter "enable" */
                 String enableString = request.getParameter("enable");
                 if (enableString == null) {
-                    addMessage(request.getSession(), "Invalid request. Missing parameter.");
+                    addMessage(request.getSession(), "Invalid request. Missing parameter \"enable\".");
                     break;
                 }
-                logger.info("HERE: " + enableString);
-                if (enableString.equals("true")) { // TODO: case sensitive or case insensitive
+                if (enableString.equals("true")) {
                     toggleExecution(request, true);
                 } else if (enableString.equals("false")) {
                     toggleExecution(request, false);
                 } else {
-                    addMessage(request.getSession(), "Invalid request. Invalid parameter.");
-                    break;
+                    addMessage(request.getSession(), "Invalid request. Invalid parameter \"enable\".");
                 }
-
                 break;
 
             case "submitKillMapJobs":
             case "cancelKillMapJobs":
             case "deleteKillMaps":
-                /* Get the type of killmap: game or class. */
+                /* Handle parameter "killmapType" */
                 String killmapTypeString = request.getParameter("killmapType");
                 Type killmapType;
                 if (killmapTypeString == null) {
@@ -103,7 +103,7 @@ public class AdminKillMaps extends HttpServlet {
                     break;
                 }
 
-                /* Get the (class or game) ids. */
+                /* Handle parameter "ids" */
                 String idsString = request.getParameter("ids");
                 List<Integer> ids;
                 if (idsString == null) {
@@ -134,12 +134,10 @@ public class AdminKillMaps extends HttpServlet {
                         deleteKillMaps(request, killmapType, ids);
                         break;
                 }
-
                 break;
 
             default:
                 addMessage(request.getSession(), "Invalid request. Invalid form type.");
-                break;
         }
 
         request.getRequestDispatcher(Constants.ADMIN_KILLMAPS_JSP).forward(request, response);
@@ -147,58 +145,64 @@ public class AdminKillMaps extends HttpServlet {
 
     private void submitKillMapJobs(HttpServletRequest request, Type killmapType, List<Integer> ids) {
         /* Check if classes or games exist for the given ids. */
-        List<Integer> existingIds = null;
+        List<Integer> existingIds;
         if (killmapType == Type.CLASS) {
             existingIds = GameClassDAO.filterExistingClassIDs(ids);
-        } else if (killmapType == Type.GAME) {
-            existingIds = GameDAO.filterExistingGameIDs(ids);
         } else {
-            return;
+            existingIds = GameDAO.filterExistingGameIDs(ids);
         }
 
-        if (existingIds.size() != ids.size()) {
+        /* If all classes / games exist, queue the jobs. */
+        if (existingIds.size() == ids.size()) {
+            for (int id : ids) {
+                if (!KillmapDAO.enqueueJob(new KillMapJob(killmapType, id))) {
+                    addMessage(request.getSession(), "Error while queueing selected killmap.");
+                    return;
+                }
+            }
+
+            addMessage(request.getSession(), "Successfully queued "
+                    + ids.size() + " " + pluralize(ids.size(), "killmap", "s") + ".");
+
+        /* Otherwise, construct an error message with the missing ids. */
+        } else {
             Set<Integer> existingIdsSet = new TreeSet<>(existingIds);
             String missingIds = ids.stream()
                     .filter(id -> !existingIdsSet.contains(id))
                     .map(String::valueOf)
                     .collect(Collectors.joining(", "));
-            addMessage(request.getSession(), "Invalid request. No games / classes for ID(s) " + missingIds + " exist.");
-            return;
-        }
 
-        /* Enqueue the jobs. */
-        for (int id : ids) {
-            KillmapDAO.enqueueJob(new KillMapJob(killmapType, id));
+            int count = ids.size() - existingIds.size();
+            boolean plural = count == 0 || count > 1;
+            String typeString;
+            if (killmapType == Type.CLASS) {
+                typeString = plural ? "classes" : "class";
+            } else {
+                typeString = plural ? "games" : "game";
+            }
+            String idString = plural ? "IDs" : "ID";
+
+            addMessage(request.getSession(),
+                    "Invalid request. No " + typeString + " for " + idString + " " + missingIds + " exist.");
         }
     }
 
     private void cancelKillMapJobs(HttpServletRequest request, Type killmapType, List<Integer> ids) {
         // TODO cancel current killmap computation if necessary
-        if (!KillmapDAO.removeJobsByIds(killmapType, ids)) {
-            //TODO
+        if (KillmapDAO.removeKillmapJobsByIds(killmapType, ids)) {
+            addMessage(request.getSession(), "Successfully canceled "
+                    + ids.size() + " " + pluralize(ids.size(), "job", "s") + ".");
+        } else {
+            addMessage(request.getSession(), "Error while canceling selected jobs.");
         }
     }
 
     private void deleteKillMaps(HttpServletRequest request, Type killmapType, List<Integer> ids) {
-        List<Integer> errorIds = new LinkedList<>();
-
-        if (killmapType == Type.CLASS) {
-            for (int id : ids) {
-                if (!KillmapDAO.deleteKillMapForClass(id)) {
-                    errorIds.add(id);
-                }
-            }
-        } else if (killmapType == Type.GAME) {
-            for (int id : ids) {
-                if (!KillmapDAO.deleteKillMapForGame(id)) {
-                    errorIds.add(id);
-                }
-            }
-        }
-
-        if (!errorIds.isEmpty()) {
-            String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(", "));
-            addMessage(request.getSession(), "Error while deleting killmap for ID(s) " + idsString + ".");
+        if (KillmapDAO.removeKillmapsByIds(killmapType, ids)) {
+            addMessage(request.getSession(), "Successfully deleted "
+                    + ids.size() + " " + pluralize(ids.size(), "killmap", "s") + ".");
+        } else {
+            addMessage(request.getSession(), "Error while deleting selected killmaps.");
         }
     }
 
@@ -214,21 +218,38 @@ public class AdminKillMaps extends HttpServlet {
         if (enable) {
             logger.info("User {} enabled Killmap Processor", currentUserID);
             killMapProcessor.setEnabled(true);
-            AdminDAO.updateSystemSetting(new SettingsDTO(SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION, true));
+            if (AdminDAO.updateSystemSetting(new SettingsDTO(SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION, true))) {
+                addMessage(request.getSession(), "Successfully enabled killmap processing.");
+            } else {
+                addMessage(request.getSession(), "Error while enabling killmap processing.");
+            }
         } else {
             logger.info("User {} disabled Killmap Processor", currentUserID);
             killMapProcessor.setEnabled(false);
-            AdminDAO.updateSystemSetting(new SettingsDTO(SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION, false));
+            if (AdminDAO.updateSystemSetting(new SettingsDTO(SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION, false))) {
+                addMessage(request.getSession(), "Successfully disabled killmap processing.");
+            } else {
+                addMessage(request.getSession(), "Error while disabling killmap processing.");
+            }
         }
     }
 
     // TODO: Provide this method for other classes -> dependency injection
     private void addMessage(HttpSession session, String message) {
+        @SuppressWarnings("unchecked")
         List<String> messages = (List<String>) session.getAttribute("messages");
         if (messages == null) {
             messages = new ArrayList<>();
             session.setAttribute("messages", messages);
         }
         messages.add(message);
+    }
+
+    private String pluralize(int amount, String word, String suffix) {
+        if (amount == 0 || amount > 1) {
+            return word + suffix;
+        } else {
+            return word;
+        }
     }
 }

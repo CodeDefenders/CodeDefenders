@@ -50,13 +50,14 @@
             <%= numGamesQueued %> Game<%= (numGamesQueued == 0 || numGamesQueued > 1) ? "s" : "" %>  currently queued.
             <br>
             <% if (processorEnabled) { %>
-                Currently computing: TODO
+                Currently processing: TODO
             <% } %>
             <p></p>
 
             <form id="killmap-processor-settings" name="killmap-processor-settings" title="<%= processorExplanation %>"
                   action="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS %>" method="post">
                 <input type="hidden" name="formType" value="toggleKillMapProcessing">
+                <input type="hidden" name="page" value="<%= currentPage %>">
                 <% if (processorEnabled) { %>
                     <label for="toggle-killmap-processing">
                         Killmap Processing is <span class="text-success">enabled</span>
@@ -80,19 +81,19 @@
 
 
     <ul class="nav nav-tabs" style="margin-top: 25px; margin-bottom: 25px;">
-        <li <%=currentPage.equals("manual") ? "class=\"active\"" : ""%>>
+        <li <%= currentPage.equals("manual") ? "class=\"active\"" : "" %>>
             <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "?page=manual" %>">
                 Enter IDs
             </a>
         </li>
-        <li <%=currentPage.equals("available") ? "class=\"active\"" : ""%>>
+        <li <%= currentPage.equals("available") ? "class=\"active\"" : "" %>>
             <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "?page=available" %>">
-                Choose From Available Killmaps
+                Available Killmaps
             </a>
         </li>
-        <li <%=currentPage.equals("queue") ? "class=\"active\"" : ""%>>
+        <li <%= currentPage.equals("queue") ? "class=\"active\"" : "" %>>
             <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "?page=queue" %>">
-                Show Queued Killmaps
+                Queued Killmaps
             </a>
         </li>
     </ul>
@@ -162,21 +163,25 @@
             </div>
         </div>
 
-    <% } else if (currentPage.equals("available")) { %>
+    <% } else if (currentPage.equals("available") || currentPage.equals("queue")) { %>
 
         <div class="panel panel-default">
             <div class="panel-heading">
-                Classes <span id="selected-count-classes"></span>
+                Classes
                 <div style="float: right;">
-                    <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
+                    <input type="search" id="search-classes" class="form-control" placeholder="Search" style="height: .65em; width: 10em; display: inline;">
+                    <div class="btn-group" data-toggle="buttons" style="margin-left: 1em;">
                         <label class="btn btn-xs btn-default">
                             <input id="toggle-progress-classes" type="checkbox"> Show progress
                         </label>
                     </div>
-                    <button id="invert-selection-classes" class="btn btn-xs btn-default">Invert Selection</button>
-                    <button id="clear-selection-classes" class="btn btn-xs btn-default" style="margin-right: 1em;">Clear Selection</button>
-                    <button id="queue-selection-classes" class="btn btn-xs btn-primary">Queue Selected</button>
-                    <button id="delete-selection-classes" class="btn btn-xs btn-danger">Delete Selected</button>
+                    <button id="invert-selection-classes" class="btn btn-xs btn-default" style="margin-left: 1em;">Invert Selection</button>
+                    <% if (currentPage.equals("available")) { %>
+                        <button id="queue-selection-classes" class="btn btn-xs btn-primary" style="margin-left: 1em;">Queue Selected</button>
+                        <button id="delete-selection-classes" class="btn btn-xs btn-danger">Delete Selected</button>
+                    <% } else { %>
+                        <button id="cancel-selection-classes" class="btn btn-xs btn-primary" style="margin-left: 1em;">Cancel Selected</button>
+                    <% } %>
                 </div>
             </div>
             <div class="panel-body">
@@ -185,17 +190,21 @@
         </div>
         <div class="panel panel-default">
             <div class="panel-heading">
-                Games <span id="selected-count-games"></span>
+                Games
                 <div style="float: right;">
-                    <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
+                    <input type="search" id="search-games" class="form-control" placeholder="Search" style="height: .65em; width: 10em; display: inline;">
+                    <div class="btn-group" data-toggle="buttons" style="margin-left: 1em;">
                         <label class="btn btn-xs btn-default">
                             <input id="toggle-progress-games" type="checkbox"> Show progress
                         </label>
                     </div>
-                    <button id="invert-selection-games" class="btn btn-xs btn-default">Invert Selection</button>
-                    <button id="clear-selection-games" class="btn btn-xs btn-default" style="margin-right: 1em;">Clear Selection</button>
-                    <button id="queue-selection-games" class="btn btn-xs btn-primary">Queue Selected</button>
-                    <button id="delete-selection-games" class="btn btn-xs btn-danger">Delete Selected</button>
+                    <button id="invert-selection-games" class="btn btn-xs btn-default" style="margin-left: 1em;">Invert Selection</button>
+                    <% if (currentPage.equals("available")) { %>
+                        <button id="queue-selection-games" class="btn btn-xs btn-primary" style="margin-left: 1em;">Queue Selected</button>
+                        <button id="delete-selection-games" class="btn btn-xs btn-danger">Delete Selected</button>
+                    <% } else { %>
+                        <button id="cancel-selection-games" class="btn btn-xs btn-primary" style="margin-left: 1em;">Cancel Selected</button>
+                    <% } %>
                 </div>
             </div>
             <div class="panel-body">
@@ -203,51 +212,41 @@
             </div>
         </div>
 
-    <% } else if (currentPage.equals("queue")) { %>
-
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                Classes <span id="selected-count-classes"></span>
-                <div style="float: right;">
-                    <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
-                        <label class="btn btn-xs btn-default">
-                            <input id="toggle-progress-classes" type="checkbox"> Show progress
-                        </label>
+        <a data-toggle="collapse" href="#downloads" style="color: black;">
+            <span class="glyphicon glyphicon-download"></span> Download Tables
+        </a>
+        <div id="downloads" class="collapse panel panel-default" style="margin-top: 10px;">
+            <div class="panel-body">
+                <div style="display: inline-block; margin-right: 25px;">
+                    <label>Classes</label>
+                    <br>
+                    <div class="btn-group">
+                        <a download="classes.csv"
+                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=class&fileType=csv"
+                           type="button" class="btn btn-default" id="download-classes-csv">Download as CSV</a>
+                        <a download="classes.json"
+                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=class&fileType=json"
+                           type="button" class="btn btn-default" id="download-classes-json">Download as JSON</a>
                     </div>
-                    <button id="invert-selection-classes" class="btn btn-xs btn-default">Invert Selection</button>
-                    <button id="clear-selection-classes" class="btn btn-xs btn-default" style="margin-right: 1em;">Clear Selection</button>
-                    <button id="cancel-selection-classes" class="btn btn-xs btn-default">Cancel Selected</button>
+                </div>
+
+                <div style="display: inline-block;">
+                    <label>Games</label>
+                    <br>
+                    <div class="btn-group">
+                        <a download="games.csv"
+                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=game&fileType=csv"
+                           type="button" class="btn btn-default" id="download-games-csv">Download as CSV</a>
+                        <a download="games.json"
+                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=game&fileType=json"
+                           type="button" class="btn btn-default" id="download-games-json">Download as JSON</a>
+                    </div>
                 </div>
             </div>
-            <div class="panel-body">
-                <table id="table-classes" class="table table-striped table-responsive"></table>
-            </div>
         </div>
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                Games <span id="selected-count-games"></span>
-                <div style="float: right;">
-                    <div class="btn-group" data-toggle="buttons" style="margin-right: 1em;">
-                        <label class="btn btn-xs btn-default">
-                            <input id="toggle-progress-games" type="checkbox"> Show progress
-                        </label>
-                    </div>
-                    <button id="invert-selection-games" class="btn btn-xs btn-default">Invert Selection</button>
-                    <button id="clear-selection-games" class="btn btn-xs btn-default" style="margin-right: 1em;">Clear Selection</button>
-                    <button id="cancel-selection-games" class="btn btn-xs btn-default">Cancel Selected</button>
-                </div>
-            </div>
-            <div class="panel-body">
-                <table id="table-games" class="table table-striped table-responsive"></table>
-            </div>
-        </div>
-
     <% } %>
 
     <script>
-        // TODO: constant string formatting (single quotes?)
-        // TODO: constant object key formatting (no quotes?)
-
         const colorRow = function () {
             const data = this.data();
             const node = this.node();
@@ -269,17 +268,6 @@
         const uncolorRow = function () {
             const node = this.node();
             node.style.background = null;
-        };
-
-        const clearSelection = function (table) {
-            const data = table.data();
-
-            for (let i = 0; i < data.length; i++) {
-                const node = table.row(i).node();
-                const checkbox = $(node).find('input');
-
-                checkbox.prop('checked', false);
-            }
         };
 
         const invertSelection = function (table) {
@@ -348,58 +336,58 @@
 
         $(document).ready(function() {
             const classTable = $('#table-classes').DataTable({
-                "ajax": {
-                    "url": "<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=class&fileType=json",
-                    "dataSrc": "data"
+                ajax: {
+                    url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=class&fileType=json',
+                    dataSrc: 'data'
                 },
-                "columns": [
-                    { "data": null,
-                      "defaultContent": '<input type="checkbox" class="select-for-queue">' },
-                    { "data":  "classId",
-                      "title": "Class" },
-                    { "data":  classNameFromRow,
-                      "title": "Name" },
-                    { "data":  "nrMutants",
-                      "title": "Mutants" },
-                    { "data":  "nrTests",
-                      "title": "Tests" },
-                    { "data":  progressFromRow,
-                      "title": "Computed" },
+                columns: [
+                    { data: null,
+                      defaultContent: '<input type="checkbox" class="select-for-queue">' },
+                    { data:  'classId',
+                      title: 'Class' },
+                    { data:  classNameFromRow,
+                      title: 'Name' },
+                    { data:  'nrMutants',
+                      title: 'Mutants' },
+                    { data:  'nrTests',
+                      title: 'Tests' },
+                    { data:  progressFromRow,
+                      title: 'Computed' },
                 ],
-                "scrollY": "400px",
-                "scrollCollapse": true,
-                "paging": false,
-                "dom": 't',
-                "language": { emptyTable: emptyClassTableMessage }
+                scrollY: '400px',
+                scrollCollapse: true,
+                paging: false,
+                dom: 't',
+                language: { emptyTable: emptyClassTableMessage }
             });
 
             const gameTable = $('#table-games').DataTable({
-                "ajax": {
-                    "url": "<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=game&fileType=json",
-                    "dataSrc": "data"
+                ajax: {
+                    url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=game&fileType=json',
+                    dataSrc: 'data'
                 },
-                "columns": [
-                    { "data": null,
-                      "defaultContent": '<input type="checkbox" class="select-for-queue">' },
-                    { "data":  "gameId",
-                      "title": "Game" },
-                    { "data":  "gameMode",
-                      "title": "Mode" },
-                    { "data":  "nrMutants",
-                      "title": "Mutants" },
-                    { "data":  "nrTests",
-                      "title": "Tests" },
-                    { "data":  progressFromRow,
-                      "title": "Computed" },
+                columns: [
+                    { data: null,
+                      defaultContent: '<input type="checkbox" class="select-for-queue">' },
+                    { data:  'gameId',
+                      title: 'Game' },
+                    { data:  'gameMode',
+                      title: 'Mode' },
+                    { data:  'nrMutants',
+                      title: 'Mutants' },
+                    { data:  'nrTests',
+                      title: 'Tests' },
+                    { data:  progressFromRow,
+                      title: 'Computed' },
                 ],
-                "scrollY": "400px",
-                "scrollCollapse": true,
-                "paging": false,
-                "dom": 't',
-                "language": { emptyTable: emptyGameTableMessage }
+                scrollY: '400px',
+                scrollCollapse: true,
+                paging: false,
+                dom: 't',
+                language: { emptyTable: emptyGameTableMessage }
             });
 
-            $("#toggle-progress-classes").on("change", function () {
+            $('#toggle-progress-classes').on('change', function () {
                 if ($(this).is(':checked')) {
                     classTable.rows().every(colorRow);
                 } else {
@@ -407,7 +395,7 @@
                 }
             });
 
-            $("#toggle-progress-games").on("change", function () {
+            $('#toggle-progress-games').on('change', function () {
                 if ($(this).is(':checked')) {
                     gameTable.rows().every(colorRow);
                 } else {
@@ -417,15 +405,27 @@
 
             $('#invert-selection-classes').on('click', () => invertSelection(classTable));
             $('#invert-selection-games').on('click',   () => invertSelection(gameTable));
-            $('#clear-selection-classes').on('click',  () => clearSelection(classTable));
-            $('#clear-selection-games').on('click',    () => clearSelection(gameTable));
 
             $('#queue-selection-classes').on('click',  () => postIds(classTable, 'submitKillMapJobs', 'class'));
             $('#queue-selection-games').on('click',    () => postIds(gameTable, 'submitKillMapJobs', 'game'));
-            $('#delete-selection-classes').on('click', () => postIds(classTable, 'deleteKillMaps', 'class'));
-            $('#delete-selection-games').on('click',   () => postIds(gameTable, 'deleteKillMaps', 'game'));
             $('#cancel-selection-classes').on('click', () => postIds(classTable, 'cancelKillMapJobs', 'class'));
             $('#cancel-selection-games').on('click',   () => postIds(gameTable, 'cancelKillMapJobs', 'game'));
+
+            $('#delete-selection-classes').on('click', () => {
+                if (confirm('Are you sure you want to delete the selected killmaps?'))
+                    postIds(classTable, 'deleteKillMaps', 'class')
+            });
+            $('#delete-selection-games').on('click', () => {
+                if (confirm('Are you sure you want to delete the selected killmaps?'))
+                    postIds(gameTable, 'deleteKillMaps', 'game')
+            });
+
+            $('#search-classes').on('keyup', function () {
+                classTable.search(this.value).draw();
+            });
+            $('#search-games').on('keyup', function () {
+                gameTable.search(this.value).draw();
+            });
         });
     </script>
 

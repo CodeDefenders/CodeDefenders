@@ -21,8 +21,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.Instant;
 import java.util.List;
 
-public class KillMapManagementApi extends HttpServlet {
-    private static Logger logger = LoggerFactory.getLogger(KillMapManagementApi.class);
+public class AdminKillmapManagementApi extends HttpServlet {
+    private static Logger logger = LoggerFactory.getLogger(AdminKillmapManagementApi.class);
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {

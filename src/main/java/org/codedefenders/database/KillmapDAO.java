@@ -143,15 +143,30 @@ public class KillmapDAO {
         };
         return DB.executeUpdateQuery(query, values);
     }
+    public static boolean removeKillmapsByIds(KillMap.KillMapJob.Type killmapType, List<Integer> ids) {
+        if (ids.isEmpty()) {
+            return true;
+        }
 
-    public static boolean deleteKillMapForGame(int gameId) {
-        String query = "DELETE FROM killmap WHERE Game_ID = ?;";
-        return DB.executeUpdateQuery(query, DatabaseValue.of(gameId));
-    }
+        String idName;
+        switch (killmapType) {
+            case CLASS:
+                idName = "Class_ID";
+                break;
+            case GAME:
+                idName = "Game_ID";
+                break;
+            default:
+                logger.warn("Unknown type of Killmap Job!");
+                return false;
+        }
 
-    public static boolean deleteKillMapForClass(int classId) {
-        String query = "DELETE FROM killmap WHERE Class_ID = ?;";
-        return DB.executeUpdateQuery(query, DatabaseValue.of(classId));
+        String idsString = ids.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+
+        String query = "DELETE FROM killmap WHERE " + idName + " in (" + idsString + ")";
+        return DB.executeUpdateQuery(query);
     }
 
 
@@ -210,7 +225,7 @@ public class KillmapDAO {
         return DB.executeUpdateQuery(query, DatabaseValue.of(theJob.getReference()));
     }
 
-    public static boolean removeJobsByIds(KillMap.KillMapJob.Type jobType, List<Integer> ids) {
+    public static boolean removeKillmapJobsByIds(KillMap.KillMapJob.Type jobType, List<Integer> ids) {
         if (ids.isEmpty()) {
             return true;
         }

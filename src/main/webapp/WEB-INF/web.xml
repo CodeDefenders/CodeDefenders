@@ -430,7 +430,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>AdminKillMaps</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.AdminKillMaps</servlet-class>
+        <servlet-class>org.codedefenders.servlets.admin.AdminKillmapManagement</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -493,7 +493,7 @@
     </servlet-mapping>
     <servlet>
         <servlet-name>AdminKillmapManagementApi</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.api.KillMapManagementApi</servlet-class>
+        <servlet-class>org.codedefenders.servlets.admin.api.AdminKillmapManagementApi</servlet-class>
     </servlet>
     <!-- Admin pages end -->
 
