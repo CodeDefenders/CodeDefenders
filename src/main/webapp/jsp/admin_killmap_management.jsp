@@ -42,8 +42,8 @@
     <%-- TODO check if the database settings value mathes the processor state? --%>
     <div class="panel panel-default" style="margin-top: 25px;">
         <div class="panel-body">
-            <%= numClassesQueued %> Class<%= numClassesQueued > 0 ? "es" : "" %> and
-            <%= numGamesQueued %> Game<%= numGamesQueued > 0 ? "s" : "" %>  currently queued.<br>
+            <%= numClassesQueued %> Class<%= (numClassesQueued == 0 || numClassesQueued > 1) ? "es" : "" %> and
+            <%= numGamesQueued %> Game<%= (numGamesQueued == 0 || numGamesQueued > 1) ? "s" : "" %>  currently queued.<br>
             <% if (processorEnabled) { %>
                 Currently computing: TODO
             <% } %>

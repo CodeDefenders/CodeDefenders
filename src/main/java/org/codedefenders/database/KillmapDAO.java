@@ -230,6 +230,39 @@ public class KillmapDAO {
 
 
 
+    public static KillMapProgress getKillMapProgressForClass(int classId) {
+        String nrTestsQuery = String.join("\n",
+                "SELECT COUNT(Test_ID)",
+                "FROM view_valid_tests",
+                "WHERE Game_ID >= 0",
+                "  AND Class_ID = ?;");
+
+        String nrMutantsQuery = String.join("\n",
+                "SELECT COUNT(Mutant_ID)",
+                "FROM view_valid_mutants",
+                "WHERE Game_ID >= 0",
+                "  AND Class_ID = ?;");
+
+        String nrEntriesQuery = String.join("\n",
+                "SELECT COUNT(*)",
+                "FROM killmap, tests, mutants",
+                "WHERE killmap.Test_ID = tests.Test_ID",
+                "  AND killmap.Mutant_ID = mutants.Mutant_ID",
+                "  AND tests.Game_ID >= 0",
+                "  AND mutants.Game_ID >= 0",
+                "  AND killmap.Class_ID = ?;");
+
+        int nrTests = DB.executeQueryReturnValue(nrTestsQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
+        int nrMutants = DB.executeQueryReturnValue(nrMutantsQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
+        int nrEntries = DB.executeQueryReturnValue(nrEntriesQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
+
+        KillMapProgress progress = new KillMapProgress();
+        progress.setNrTests(nrTests);
+        progress.setNrMutants(nrMutants);
+        progress.setNrEntries(nrEntries);
+        return progress;
+    }
+
     public static KillMapProgress getKillMapProgressForGame(int gameId) {
         String nrTestsQuery = String.join("\n",
             "SELECT COUNT(Test_ID)",
@@ -257,33 +290,6 @@ public class KillmapDAO {
         return progress;
     }
 
-    public static KillMapProgress getKillMapProgressForClass(int classId) {
-        String nrTestsQuery = String.join("\n",
-            "SELECT COUNT(Test_ID)",
-            "FROM view_valid_tests",
-            "WHERE Class_ID = ?;");
-
-        String nrMutantsQuery = String.join("\n",
-            "SELECT COUNT(Mutant_ID)",
-            "FROM view_valid_mutants",
-            "WHERE Class_ID = ?;");
-
-        String nrEntriesQuery = String.join("\n",
-            "SELECT COUNT(*)",
-            "FROM killmap",
-            "WHERE Class_ID = ?;");
-
-        int nrTests = DB.executeQueryReturnValue(nrTestsQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
-        int nrMutants = DB.executeQueryReturnValue(nrMutantsQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
-        int nrEntries = DB.executeQueryReturnValue(nrEntriesQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
-
-        KillMapProgress progress = new KillMapProgress();
-        progress.setNrTests(nrTests);
-        progress.setNrMutants(nrMutants);
-        progress.setNrEntries(nrEntries);
-        return progress;
-    }
-
     public static List<KillMapClassProgress> getAllKillMapClassProgress() {
         String classesQuery = String.join("\n",
             "SELECT Class_ID, Name, Alias",
@@ -293,17 +299,23 @@ public class KillmapDAO {
         String nrTestsQuery = String.join("\n",
             "SELECT Class_ID, COUNT(Test_ID)",
             "FROM view_valid_tests",
+            "WHERE Game_ID >= 0",
             "GROUP BY Class_ID;");
 
         String nrMutantsQuery = String.join("\n",
             "SELECT Class_ID, COUNT(Mutant_ID)",
             "FROM view_valid_mutants",
+            "WHERE Game_ID >= 0",
             "GROUP BY Class_ID;");
 
         String nrEntriesQuery = String.join("\n",
-            "SELECT Class_ID, COUNT(*)",
-            "FROM killmap",
-            "GROUP BY Class_ID;");
+            "SELECT killmap.Class_ID, COUNT(*)",
+            "FROM killmap, tests, mutants",
+            "WHERE killmap.Test_ID = tests.Test_ID",
+            "  AND killmap.Mutant_ID = mutants.Mutant_ID",
+            "  AND tests.Game_ID >= 0",
+            "  AND mutants.Game_ID >= 0",
+            "GROUP BY killmap.Class_ID;");
 
         List<KillMapClassProgress> progresses = DB.executeQueryReturnList(classesQuery, rs -> {
             KillMapClassProgress progress = new KillMapClassProgress();
