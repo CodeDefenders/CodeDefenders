@@ -72,30 +72,39 @@ public class KillMap {
     private static boolean USE_COVERAGE = true;
     private static boolean PARALLELIZE = true;
     private final static int NUM_THREADS = 40;
-    /* TODO Put this into config.properties? MutationTester also has hard-coded number of threads. */
+    /* TODO: Put this into config.properties? MutationTester also has hard-coded number of threads. */
 
     /* Get settings if they are set, otherwise use defaults. */
     static {
-        InitialContext initialContext;
         try {
-            initialContext = new InitialContext();
+            InitialContext initialContext = new InitialContext();
             Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
-            Object useCoverageObj = environmentContext.lookup("mutant.coverage");
-            Object parallelizeObj = environmentContext.lookup("parallelize");
-            USE_COVERAGE = (useCoverageObj == null) ? USE_COVERAGE : "enabled".equalsIgnoreCase((String) useCoverageObj);
+            Object parallelizeObj = environmentContext.lookup("codedefenders/parallelize");
             PARALLELIZE = (parallelizeObj == null) ? PARALLELIZE : "enabled".equalsIgnoreCase((String) parallelizeObj);
-            
-            // 
+        } catch (NamingException e) {
+            logger.error("Encountered missing option", e);
+        }
+
+        try {
+            InitialContext initialContext = new InitialContext();
+            Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
+            Object useCoverageObj = environmentContext.lookup("codedefenders/mutant.coverage");
+            USE_COVERAGE = (useCoverageObj == null) ? USE_COVERAGE : "enabled".equalsIgnoreCase((String) useCoverageObj);
+        } catch (NamingException e) {
+            logger.error("Encountered missing option", e);
+        }
+
+        try {
+            InitialContext initialContext = new InitialContext();
             BeanManager bm = (BeanManager) initialContext.lookup("java:comp/env/BeanManager");
             Bean bean = (Bean) bm.getBeans(BackendExecutorService.class, new Annotation[0]).iterator().next();
             CreationalContext ctx = bm.createCreationalContext(bean);
             backend = (BackendExecutorService) bm.getReference(bean, BackendExecutorService.class, ctx);
-            
         } catch (NamingException e) {
-            logger.error("Encountered missing option", e);
+            logger.error("Could not acquire BeanManager", e);
         }
     }
-    
+
     
     
 
@@ -456,8 +465,8 @@ public class KillMap {
      * Represents a job for computing a killmap
      */
     public static class KillMapJob {
-        public static enum Type {
-            CLASS, GAME;
+        public enum Type {
+            CLASS, GAME
         }
 
         private Type type;
@@ -481,7 +490,7 @@ public class KillMap {
      * Represents a result of executing a test against a mutant.
      */
     public static class KillMapEntry {
-        public static enum Status {
+        public enum Status {
             /** Test kills mutant. */
             KILL,
             /** Test covers mutant but doesn't kill it. */
