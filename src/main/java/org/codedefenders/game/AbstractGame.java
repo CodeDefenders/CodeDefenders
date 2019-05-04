@@ -181,4 +181,8 @@ public abstract class AbstractGame {
 	public String toString() {
 		return "[gameId=" + id + ",classId=" + classId + ",state=" + state + ",mode=" + mode + "]";
 	}
+
+	public boolean isFinished() {
+		return this.state == GameState.FINISHED || this.state == GameState.SOLVED || this.state == GameState.FAILED;
+	}
 }

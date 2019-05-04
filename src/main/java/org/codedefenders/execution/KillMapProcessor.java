@@ -68,9 +68,6 @@ public class KillMapProcessor implements ServletContextListener {
     // We make it easy: instead of stopping and restarting the executor, we
     // simply skip the job if the processor is disabled
     private static boolean isEnabled = true;
-    // Make it easy to understand the parameter of KillmapDAO methods
-    private static boolean DO_NOT_RECALCULATE = false;
-    private static boolean RECALCULATE = true;
 
     private class KillMapJob implements Runnable {
 
@@ -92,7 +89,7 @@ public class KillMapProcessor implements ServletContextListener {
                 switch ( theJob.getType() ) {
                 case CLASS:
                     try{
-                        KillMap.forClass(theJob.getReference(), DO_NOT_RECALCULATE);
+                        KillMap.forClass(theJob.getId());
                     } catch (InterruptedException | ExecutionException e) {
                         logger.warn("Killmap computation failed!", e);
                     } catch (Throwable e) {
@@ -105,12 +102,12 @@ public class KillMapProcessor implements ServletContextListener {
                     break;
                 case GAME:
                     try {
-                        MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame( theJob.getReference() );
+                        MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame( theJob.getId() );
                         
-                        assert game.getId() == theJob.getReference();
+                        assert game.getId() == theJob.getId();
                                 
                         logger.info("Computing killmap for game " + game.getId());
-                        KillMap.forGame(game, DO_NOT_RECALCULATE);
+                        KillMap.forGame(game);
                         logger.info("Killmap for game " + game.getId() + ". Remove job from DB");
                         // At this point we can remove the job from the DB
                     } catch (Throwable e) {

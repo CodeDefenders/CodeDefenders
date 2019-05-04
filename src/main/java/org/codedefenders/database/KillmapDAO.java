@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -143,6 +142,7 @@ public class KillmapDAO {
         };
         return DB.executeUpdateQuery(query, values);
     }
+
     public static boolean removeKillmapsByIds(KillMap.KillMapJob.Type killmapType, List<Integer> ids) {
         if (ids.isEmpty()) {
             return true;
@@ -206,7 +206,7 @@ public class KillmapDAO {
                 return false;
         }
 
-        return DB.executeUpdateQuery(query, DatabaseValue.of(theJob.getReference()));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(theJob.getId()));
     }
 
     public static boolean removeJob(KillMap.KillMapJob theJob) {
@@ -222,7 +222,7 @@ public class KillmapDAO {
                 logger.warn("Unknown type of Killmap Job!");
                 return false;
         }
-        return DB.executeUpdateQuery(query, DatabaseValue.of(theJob.getReference()));
+        return DB.executeUpdateQuery(query, DatabaseValue.of(theJob.getId()));
     }
 
     public static boolean removeKillmapJobsByIds(KillMap.KillMapJob.Type jobType, List<Integer> ids) {
