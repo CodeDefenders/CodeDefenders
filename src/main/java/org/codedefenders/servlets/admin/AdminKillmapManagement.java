@@ -140,7 +140,9 @@ public class AdminKillmapManagement extends HttpServlet {
                 addMessage(request.getSession(), "Invalid request. Invalid form type.");
         }
 
-        request.getRequestDispatcher(Constants.ADMIN_KILLMAPS_JSP).forward(request, response);
+        /* Use PRG (post redirect get) to prevent erroneous killmap job submissions. */
+        response.sendRedirect(request.getContextPath() + "/"
+                + Constants.ADMIN_KILLMAPS_JSP + "?page=" + request.getParameter("page"));
     }
 
     private void submitKillMapJobs(HttpServletRequest request, Type killmapType, List<Integer> ids) {
