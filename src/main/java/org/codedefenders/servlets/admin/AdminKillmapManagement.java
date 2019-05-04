@@ -198,7 +198,7 @@ public class AdminKillmapManagement extends HttpServlet {
     }
 
     private void deleteKillMaps(HttpServletRequest request, Type killmapType, List<Integer> ids) {
-        if (KillmapDAO.removeKillmapsByIds(killmapType, ids)) {
+        if (ids.isEmpty() || KillmapDAO.removeKillmapsByIds(killmapType, ids)) {
             addMessage(request.getSession(), "Successfully deleted "
                     + ids.size() + " " + pluralize(ids.size(), "killmap", "s") + ".");
         } else {
