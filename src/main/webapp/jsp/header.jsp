@@ -182,6 +182,8 @@
                     || m.equals(Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE)
                     || m.equals(Constants.TEST_DID_NOT_COMPILE_MESSAGE)) {
                 fadeOut = false;
+            } else if (m.contains("Congratulations, your") && m.contains("solved the puzzle!")){
+                fadeOut = false;
             }
         }
         if (fadeOut) {

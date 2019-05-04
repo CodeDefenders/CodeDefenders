@@ -20,6 +20,7 @@
 --%>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 <%@ page import="static org.codedefenders.util.Constants.*" %>
+<%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
 
 <%--
     Puzzle game view for a defender. Retrieves the given puzzle game
@@ -29,7 +30,7 @@
         The puzzle game to be displayed.
 --%>
 
-<% String pageTitle = "Defending Class"; %>
+<% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
 </div></div></div></div></div>
@@ -41,6 +42,7 @@
     PuzzleGame game = (PuzzleGame) request.getAttribute(REQUEST_ATTRIBUTE_PUZZLE_GAME);
 
     final GameClass cut = game.getCUT();
+    final Puzzle puzzle = game.getPuzzle();
 
     /* class_viewer */
     request.setAttribute("className", cut.getBaseName());
@@ -87,8 +89,18 @@
 
     /* test_progressbar */
 //    request.setAttribute("gameId", game.getId());
+
+    final String title = puzzle.getTitle();
+    final String description = puzzle.getDescription();
 %>
+
+
 <div class="game-container">
+    <div class="row" style="padding: 0px 15px;">
+        <h4 class="col-md-2"><b><%=title%></b></h4>
+        <h4><%=description%></h4>
+    </div>
+    <hr class="hr-primary" style="margin: 5px">
     <div class="row" style="padding: 0px 15px;">
         <div class="col-md-6" id="cut-div">
             <h3>Class Under Test</h3>
@@ -99,17 +111,16 @@
 
         <div class="col-md-6" id="ut-div">
             <%@include file="../game_components/test_progress_bar.jsp" %>
-            <h3>Write a new JUnit test here</h3>
-
-            <form id="def"
-                  action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>"
-                  method="post">
+            <h3>Write a new JUnit test here
                 <button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
                         onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
                         <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                     Defend!
                 </button>
-
+            </h3>
+            <form id="def"
+                  action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>"
+                  method="post">
                 <input type="hidden" name="formType" value="createTest">
                 <input type="hidden" name="gameId" value="<%= game.getId() %>">
 

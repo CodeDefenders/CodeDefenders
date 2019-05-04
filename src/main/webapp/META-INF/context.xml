@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
+
+    <Resource name="BeanManager" 
+        auth="Container"
+        type="javax.enterprise.inject.spi.BeanManager"
+        factory="org.jboss.weld.resources.ManagerObjectFactory"/>
+
 	<!-- The values in this file are filled with the values from the config.properties file -->
 
 	<Resource
@@ -15,52 +21,52 @@
 		password="${db.password}" />
 
 	<Environment
-		name="data.dir"
+		name="codedefenders/data.dir"
 		type="java.lang.String"
 		value="${data.dir}" />
 
 	<Environment
-		name="ant.home"
+		name="codedefenders/ant.home"
 		type="java.lang.String"
 		value="${ant.home}" />
 
 	<Environment
-		name="cluster.mode"
+		name="codedefenders/cluster.mode"
 		type="java.lang.String"
 		value="${cluster.mode}" />
 		
 	<Environment
-		name="cluster.java.home"
+		name="codedefenders/cluster.java.home"
 		type="java.lang.String"
 		value="${cluster.java.home}" />
 		
 	<Environment
-		name="cluster.timeout"
+		name="codedefenders/cluster.timeout"
 		type="java.lang.String"
 		value="${cluster.timeout}" />
 		
 	<Environment
-		name="cluster.reservation.name"
+		name="codedefenders/cluster.reservation.name"
 		type="java.lang.String"
 		value="${cluster.reservation.name}" />
 	
 	<Environment
-		name="parallelize"
+		name="codedefenders/parallelize"
 		type="java.lang.String"
 		value="${parallelize}" />
 		
 	<Environment
-		name="forceLocalExecution"
+		name="codedefenders/force.local.execution"
 		type="java.lang.String"
-		value="${forceLocalExecution}" />
+		value="${force.local.execution}" />
 
 	<Environment
-			name="mutant.coverage"
+			name="codedefenders/mutant.coverage"
 			type="java.lang.String"
 			value="${mutant.coverage}" />
 
 	<Environment
-			name="block.attacker"
+			name="codedefenders/block.attacker"
 			type="java.lang.String"
 			value="${block.attacker}" />
 

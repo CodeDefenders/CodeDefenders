@@ -22,6 +22,7 @@ import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.UserDAO;
+import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.RandomTestScheduler;
 import org.codedefenders.execution.TargetExecution;
@@ -68,6 +69,7 @@ import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameClassPair;
@@ -87,9 +89,15 @@ import static org.junit.Assume.assumeTrue;
 
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DatabaseConnection.class, MutationTester.class}) // , MutationTester.class })
+@PrepareForTest({ DatabaseConnection.class, MutationTester.class}) // , mutationTester.class })
 public class ParallelizeTest {
 
+    @Inject
+    private GameManagingUtils gameManagingUtils;
+    
+    @Inject
+    private IMutationTester mutationTester; 
+    
 	// PowerMock does not work with @ClassRule !!
 	// This really should be only per class, not per test... in each test we can
 	// truncate the tables ?
@@ -118,7 +126,7 @@ public class ParallelizeTest {
 	}
 
 	// CUT
-	private MutationTester tester;
+	private IMutationTester tester;
 
 	// We use the "real ant runner" but we need to provide a mock to Context
 	@Mock
@@ -323,8 +331,8 @@ public class ParallelizeTest {
 					+"	}" + "\n"
 					+"}";
 
-			org.codedefenders.game.Test newTest = GameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
-			MutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
+			org.codedefenders.game.Test newTest = gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+			mutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
 			assumeThat(battlegroundGame.getTests(true).size(), is(1));
 			// Append this for oracles and mocks
 			submittedTests.add( newTest );
@@ -346,8 +354,8 @@ public class ParallelizeTest {
 					+"" + "\n"
 					+"	}" + "\n"
 					+"}";
-			newTest = GameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
-			MutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
+			newTest = gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+			mutationTester.runTestOnAllMultiplayerMutants(battlegroundGame, newTest, messages);
 			assumeThat(battlegroundGame.getTests(true).size(), is(2));
 			// Append this for oracles and mocks
 			submittedTests.add( newTest );
@@ -374,7 +382,7 @@ public class ParallelizeTest {
 			List<String> mutantCode =(List<String>) DiffUtils.patch( origincalCode, patch);
 			String mutantText = String.join("\n", mutantCode);
 
-			Mutant mutant = GameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(),
+			Mutant mutant = gameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(),
 					mutantText, attackerID, Constants.MODE_BATTLEGROUND_DIR);
 
 			// Mock the scheduler to return a random but known test distribution:
@@ -385,7 +393,7 @@ public class ParallelizeTest {
 							org.mockito.Matchers.anyList());
 
 			// Do the execution
-			MutationTester.runAllTestsOnMutant(battlegroundGame, mutant, messages, mockedTestScheduler);
+			mutationTester.runAllTestsOnMutant(battlegroundGame, mutant, messages, mockedTestScheduler);
 
 			// Check that the test execution logged in the DB are in the same order
 			List<TargetExecution> executedTargets = new ArrayList<TargetExecution>();
@@ -396,11 +404,11 @@ public class ParallelizeTest {
 
 
 
-			// Ideal Solution: use verify static, problem MutationTester is the class under test AND the mocked class !
+			// Ideal Solution: use verify static, problem mutationTester is the class under test AND the mocked class !
 //			 PowerMockito.verifyStatic(VerificationModeFactory.times(2));
 //			 // Since I am not sure the instances will be the same given the DB interaction I need to explicitly
 //			 // check the content of the elements
-//			 MutationTester.testVsMutant(
+//			 mutationTester.testVsMutant(
 //					 Mockito.argThat(
 //					 // Match test by ID
 //					 new ArgumentMatcher<org.codedefenders.game.Test>() {
@@ -448,20 +456,20 @@ public class ParallelizeTest {
 					Files.readAllBytes(
 							new File("src/test/resources/itests/tests/PassingTestLift" + i + ".java").toPath()),
 					Charset.defaultCharset());
-			GameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+			gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 		}
 
 		// Schedule a test which kills the mutant - Where ? in the middle ?
 		String testText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/tests/KillingTestLift.java").toPath()),
 				Charset.defaultCharset());
-		GameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
+		gameManagingUtils.createTest(battlegroundGame.getId(), battlegroundGame.getClassId(), testText, defenderID, Constants.MODE_BATTLEGROUND_DIR);
 
 		// Read and Submit the mutants - No tests so far
 		String mutantText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
 				Charset.defaultCharset());
-		Mutant mutant = GameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(), mutantText,
+		Mutant mutant = gameManagingUtils.createMutant(battlegroundGame.getId(), battlegroundGame.getClassId(), mutantText,
 				attackerID, Constants.MODE_BATTLEGROUND_DIR);
 
 		assertNotNull("Invalid mutant", mutant.getClassFile());
@@ -470,7 +478,7 @@ public class ParallelizeTest {
 		// TODO Mock the AntRunner... an interface would make things a lot
 		// easier !
 		// Finally invoke the method.... For the moment this invokes AntRunner
-		MutationTester.runAllTestsOnMutant(battlegroundGame, mutant, messages);
+		mutationTester.runAllTestsOnMutant(battlegroundGame, mutant, messages);
 
 		// assertMutant is killed !
 		assertFalse("Mutant not killed", mutant.isAlive());

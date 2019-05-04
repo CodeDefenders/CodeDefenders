@@ -18,8 +18,28 @@
  */
 package org.codedefenders.itests;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+
+import javax.inject.Inject;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
+
 import org.codedefenders.database.DatabaseConnection;
-import org.codedefenders.execution.MutationTester;
+import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
@@ -45,30 +65,17 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.spi.InitialContextFactory;
-
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ DatabaseConnection.class })
 public class CoverageTest {
+    
+    @Inject
+    private GameManagingUtils gameManagingUtils;
 
+    @Inject
+    private IMutationTester mutationTester;
+    
 	@Rule // Look for the file on the classpath
 	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
 
@@ -207,10 +214,10 @@ public class CoverageTest {
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/ClassWithPrivateInnerClass/ClassWithPrivateInnerClass.java").toPath()),
 				Charset.defaultCharset());
 		// Do the mutant thingy
-		Mutant mutant = GameManagingUtils.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(), mutantText,
+		Mutant mutant = gameManagingUtils.createMutant(multiplayerGame.getId(), multiplayerGame.getClassId(), mutantText,
 				attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
 		//
-		MutationTester.runAllTestsOnMutant(multiplayerGame, mutant, messages);
+		mutationTester.runAllTestsOnMutant(multiplayerGame, mutant, messages);
 		// Probably I need to store the mutant ?
 		multiplayerGame.update();
 		
@@ -218,9 +225,9 @@ public class CoverageTest {
 		//
 		// Compile and test original
 		String testText = new String(Files.readAllBytes(new File("src/test/resources/itests/tests/ClassWithPrivateInnerClass/TestClassWithPrivateInnerClass.java").toPath()), Charset.defaultCharset());
-		org.codedefenders.game.Test newTest = GameManagingUtils.createTest(multiplayerGame.getId(), multiplayerGame.getClassId(),
+		org.codedefenders.game.Test newTest = gameManagingUtils.createTest(multiplayerGame.getId(), multiplayerGame.getClassId(),
 				testText, defender.getId(), Constants.MODE_BATTLEGROUND_DIR);
-		MutationTester.runTestOnAllMultiplayerMutants(multiplayerGame, newTest, messages);
+		mutationTester.runTestOnAllMultiplayerMutants(multiplayerGame, newTest, messages);
 		multiplayerGame.update();
 		//
 		System.out.println("MutationTesterTest.defend() " + defender.getId() + ": " + messages.get(messages.size() - 1));

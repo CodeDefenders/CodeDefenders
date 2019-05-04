@@ -18,6 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="org.codedefenders.game.puzzle.PuzzleGame"%>
+<%@page import="org.codedefenders.database.PuzzleDAO"%>
+<%@page import="org.codedefenders.game.GameState"%>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleChapter" %>
 <%@ page import="org.codedefenders.model.PuzzleChapterEntry" %>
 <%@ page import="org.codedefenders.model.PuzzleEntry" %>
@@ -65,19 +68,34 @@
             <td>
                 <%
                     for (PuzzleEntry puzzleEntry : puzzleChapterEntry.getPuzzleEntries()) {
-                        if (puzzleEntry.getType() == PuzzleEntry.Type.GAME || !puzzleEntry.isLocked()) {
+                        final String title = puzzleEntry.getPuzzle().getTitle();
+                        final String description = puzzleEntry.getPuzzle().getDescription();
+                        // I have no idea what's this PuzzleEntry class... is kind of a wrapped around puzzle and puzzlegame? is it an object used for rendering ?
+                        if (puzzleEntry.getType() == PuzzleEntry.Type.GAME ){
+                            final String color = (puzzleEntry.getState().equals(GameState.ACTIVE) ? "btn-info" : "btn-primary");
                             final int puzzleId = puzzleEntry.getPuzzleId();
-                            final String title = puzzleEntry.getPuzzle().getTitle();
-                            final String description = puzzleEntry.getPuzzle().getDescription();
-                %>
-                <a class="btn btn-xs"
-                   href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
-                    data-toggle="popover" data-placement="top" data-content="<%=description%>"><%=title%></a>
-                <%
-                        } else { // Locked puzzle
-                %>
-                <p class="glyphicon glyphicon-lock"></p>
-                <%
+                            %>
+                            <a class="btn btn-sm <%=color%>"
+                               href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
+                                data-toggle="popover" data-placement="top" data-content="<%=description%>"><%=title%></a>
+                            <%
+                        }else if( ! puzzleEntry.isLocked() ){
+                            final int puzzleId = puzzleEntry.getPuzzleId();
+                            final Integer userId = (Integer) request.getSession().getAttribute("uid");
+                            PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzleId, userId);
+                            String color = "btn-primary";
+                            if (playedGame != null  && playedGame.getState().equals(GameState.SOLVED)) {
+                                color = "btn-success";
+                            }
+                            %>
+                            <a class="btn btn-sm <%=color%>"
+                               href="<%=request.getContextPath() + Paths.PUZZLE_GAME%>?puzzleId=<%=puzzleId%>"
+                                data-toggle="popover" data-placement="top" data-content="<%=description%>"><%=title%></a>
+                            <%
+                        } else{
+                            %>
+                            <a disabled class="btn btn-sm btn-secondary" data-toggle="popover" data-placement="top" data-content="<%=description%>"><%=title%></a>
+                            <%
                         }
                     }
                 %>
