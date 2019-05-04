@@ -50,7 +50,10 @@
             <%= numGamesQueued %> Game<%= (numGamesQueued == 0 || numGamesQueued > 1) ? "s" : "" %>  currently queued.
             <br>
             <% if (processorEnabled) { %>
+                Killmap Processing is <span class="text-success">enabled</span> <br>
                 Currently processing: TODO
+            <% } else { %>
+                Killmap Processing is <span class="text-danger">disabled</span>
             <% } %>
             <p></p>
 
@@ -59,18 +62,10 @@
                 <input type="hidden" name="formType" value="toggleKillMapProcessing">
                 <input type="hidden" name="page" value="<%= currentPage %>">
                 <% if (processorEnabled) { %>
-                    <label for="toggle-killmap-processing">
-                        Killmap Processing is <span class="text-success">enabled</span>
-                    </label>
-                    <br>
                     <button type="submit" name="enable" value="false" id="toggle-killmap-processing" class="btn btn-danger">
                         Disable KillMap Processing
                     </button>
                 <% } else { %>
-                    <label for="toggle-killmap-processing">
-                        Killmap Processing is <span class="text-danger">disabled</span>
-                    </label>
-                    <br>
                     <button type="submit" name="enable" value="true" id="toggle-killmap-processing" class="btn btn-success">
                         Enable KillMap Processing
                     </button>
