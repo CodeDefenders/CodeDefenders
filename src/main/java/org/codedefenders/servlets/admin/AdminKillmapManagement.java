@@ -21,6 +21,7 @@ package org.codedefenders.servlets.admin;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
+import org.apache.commons.lang3.StringUtils;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
@@ -47,6 +48,32 @@ import javax.servlet.http.HttpServletResponse;
 import static org.codedefenders.util.MessageUtils.pluralize;
 import static org.codedefenders.util.MessageUtils.addMessage;
 
+/**
+ * Handles toggling killmap processing, queueing killmaps for computation, deleting killmaps and cancelling queued
+ * killmap jobs.
+ *
+ * <p></p>
+ * The killmap computation page consists of three pages that are accessed via the GET parameter "page".
+ * <ul>
+ *      <li>manual: enter ids manually to queue or delete killmaps</li>
+ *      <li>available: choose killmaps to queue or delete from a table of available killmaps</li>
+ *      <li>queue: choose killmap jobs to cancel from a table of current killmap jobs</li>
+ * </ul>
+ *
+ * <p></p>
+ * The POST parameters for the servlet are
+ * <ul>
+ *      <li>page: the current page, used for redirection<br>
+ *          "manual", "available", "queue"</li>
+ *      <li>formType: the action of the submitted form<br>
+ *          "toggleKillMapProcessing", "submitKillMapJobs", "cancelKillMapJobs", "deleteKillMaps"</li>
+ *      <li>enable: enable or disable killmap processing<br>
+ *          "true", "false"</li>
+ *      <li>killmapType: type of killmaps to queue delete or cancel<br>
+ *          "class", "game"</li>
+ *      <li>ids: either a comma separated list or a JSON array of class/game ids</li>
+ * </ul>
+ */
 public class AdminKillmapManagement extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminKillmapManagement.class);
 
@@ -55,12 +82,15 @@ public class AdminKillmapManagement extends HttpServlet {
         request.getRequestDispatcher(Constants.ADMIN_KILLMAPS_JSP).forward(request, response);
     }
 
-    // TODO: show number of queued / canceled / deleted killmaps in messages
-
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        // TODO This shall be a call done by an admin user.
-        // But I guess there's no way to check this...
+        // TODO: This shall be a call done by an admin user but I guess there's no way to check this...
+
+        /* Handle parameter "page" */
+        String page = request.getParameter("page");
+        if (page == null) {
+            page = "manual";
+        }
 
         /* Handle parameter "formType" */
         String formType = request.getParameter("formType");
@@ -80,9 +110,9 @@ public class AdminKillmapManagement extends HttpServlet {
                     break;
                 }
                 if (enableString.equals("true")) {
-                    toggleExecution(request, true);
+                    toggleProcessing(request, true);
                 } else if (enableString.equals("false")) {
-                    toggleExecution(request, false);
+                    toggleProcessing(request, false);
                 } else {
                     addMessage(request.getSession(), "Invalid request. Invalid parameter \"enable\".");
                 }
@@ -143,11 +173,12 @@ public class AdminKillmapManagement extends HttpServlet {
         }
 
         /* Use PRG (post redirect get) to prevent erroneous killmap job submissions. */
-        response.sendRedirect(request.getContextPath() + "/"
-                + Constants.ADMIN_KILLMAPS_JSP + "?page=" + request.getParameter("page"));
+        response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_KILLMAPS_JSP + "?page=" + page);
     }
 
     private void submitKillMapJobs(HttpServletRequest request, KillMapType killmapType, List<Integer> ids) {
+        int currentUserID = (Integer) request.getSession().getAttribute("uid");
+
         /* Check if classes or games exist for the given ids. */
         List<Integer> existingIds;
         if (killmapType == KillMapType.CLASS) {
@@ -158,15 +189,20 @@ public class AdminKillmapManagement extends HttpServlet {
 
         /* If all classes / games exist, queue the jobs. */
         if (existingIds.size() == ids.size()) {
+            List<Integer> successfulIds = new LinkedList<>();
             for (int id : ids) {
                 if (!KillmapDAO.enqueueJob(new KillMapJob(killmapType, id))) {
-                    addMessage(request.getSession(), "Error while queueing selected killmap.");
-                    return;
+                    logger.warn("Failed to queue killmap for {}: {}", killmapType, StringUtils.join(ids));
+                    addMessage(request.getSession(), String.format("Failed to queue selected %s.",
+                            pluralize(ids.size(), "killmap", "killmaps")));
+                } else {
+                    successfulIds.add(id);
                 }
             }
 
-            addMessage(request.getSession(), "Successfully queued "
-                    + ids.size() + " " + pluralize(ids.size(), "killmap", "killmaps") + ".");
+            logger.info("User {} queued killmaps for {}: {}", currentUserID, killmapType, StringUtils.join(successfulIds));
+            addMessage(request.getSession(), String.format("Successfully queued %d %s.",
+                    successfulIds.size(), pluralize(successfulIds.size(), "killmap", "killmaps")));
 
         /* Otherwise, construct an error message with the missing ids. */
         } else {
@@ -177,59 +213,68 @@ public class AdminKillmapManagement extends HttpServlet {
                     .collect(Collectors.joining(", "));
 
             int count = ids.size() - existingIds.size();
-            boolean plural = count == 0 || count > 1;
-            String typeString;
+            String type;
             if (killmapType == KillMapType.CLASS) {
-                typeString = plural ? "classes" : "class";
+                type = pluralize(count, "class", "classes");
             } else {
-                typeString = plural ? "games" : "game";
+                type = pluralize(count, "game", "games");
             }
-            String idString = plural ? "IDs" : "ID";
 
-            addMessage(request.getSession(),
-                    "Invalid request. No " + typeString + " for " + idString + " " + missingIds + " exist.");
+            addMessage(request.getSession(), String.format("Invalid request. No %s for %s %s exist. No killmaps were queued.",
+                    type, pluralize(count, "ID", "IDs"), missingIds));
         }
     }
 
+    // TODO: cancel current killmap computation if necessary?
     private void cancelKillMapJobs(HttpServletRequest request, KillMapType killmapType, List<Integer> ids) {
-        // TODO: cancel current killmap computation if necessary
         if (KillmapDAO.removeKillmapJobsByIds(killmapType, ids)) {
-            addMessage(request.getSession(), "Successfully canceled "
-                    + ids.size() + " " + pluralize(ids.size(), "job", "jobs") + ".");
+            int currentUserID = (Integer) request.getSession().getAttribute("uid");
+            logger.info("User {} canceled killmap jobs for {}: {}",
+                    currentUserID, killmapType, StringUtils.join(ids, ", "));
+            addMessage(request.getSession(), String.format("Successfully canceled %d %s.",
+                    ids.size(), pluralize(ids.size(), "job", "jobs")));
         } else {
-            addMessage(request.getSession(), "Error while canceling selected jobs.");
+            logger.warn("Failed to cancel killmap jobs: " + StringUtils.join(ids, ", "));
+            addMessage(request.getSession(), "Failed to cancel selected jobs.");
         }
     }
 
     private void deleteKillMaps(HttpServletRequest request, KillMapType killmapType, List<Integer> ids) {
-        if (ids.isEmpty() || KillmapDAO.removeKillmapsByIds(killmapType, ids)) {
-            addMessage(request.getSession(), "Successfully deleted "
-                    + ids.size() + " " + pluralize(ids.size(), "killmap", "killmaps") + ".");
-        } else {
-            addMessage(request.getSession(), "Error while deleting selected killmaps.");
-        }
+        /* Don't check the return value of removeKillmapsByIds,
+         * because zero rows could be deleted which is not an error. */
+        KillmapDAO.removeKillmapsByIds(killmapType, ids);
+        int currentUserID = (Integer) request.getSession().getAttribute("uid");
+        logger.info("User {} deleted killmaps for {}: {}",
+                currentUserID, killmapType, StringUtils.join(ids, ", "));
+        addMessage(request.getSession(), String.format("Successfully deleted %d %s.",
+                ids.size(), pluralize(ids.size(), "killmap", "killmaps")));
+
+        /* logger.warn("Failed to delete killmaps: {}", StringUtils.join(ids, ", "));
+        addMessage(request.getSession(), "Failed to delete selected killmaps."); */
     }
 
-    private void toggleExecution(HttpServletRequest request, boolean enable) {
+    private void toggleProcessing(HttpServletRequest request, boolean enable) {
         int currentUserID = (Integer) request.getSession().getAttribute("uid");
         ServletContext context = getServletContext();
         KillMapProcessor killMapProcessor = (KillMapProcessor) context.getAttribute(KillMapProcessor.NAME);
 
         if (enable) {
-            logger.info("User {} enabled Killmap Processor", currentUserID);
             killMapProcessor.setEnabled(true);
             if (AdminDAO.updateSystemSetting(new SettingsDTO(SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION, true))) {
+                logger.info("User {} enabled killmap processing", currentUserID);
                 addMessage(request.getSession(), "Successfully enabled killmap processing.");
             } else {
-                addMessage(request.getSession(), "Error while enabling killmap processing.");
+                logger.warn("Failed to enable killmap processing");
+                addMessage(request.getSession(), "Failed to enable killmap processing");
             }
         } else {
-            logger.info("User {} disabled Killmap Processor", currentUserID);
             killMapProcessor.setEnabled(false);
             if (AdminDAO.updateSystemSetting(new SettingsDTO(SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION, false))) {
+                logger.info("User {} enabled killmap processing", currentUserID);
                 addMessage(request.getSession(), "Successfully disabled killmap processing.");
             } else {
-                addMessage(request.getSession(), "Error while disabling killmap processing.");
+                logger.warn("Failed to disable killmap processing");
+                addMessage(request.getSession(), "Failed to disable killmap processing");
             }
         }
     }

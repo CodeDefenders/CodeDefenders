@@ -28,6 +28,11 @@
 <%@ include file="/jsp/header_main.jsp" %>
 
 <%
+    /* The current page. There are three pages:
+     * manual:    enter ids manually to queue or delete killmaps
+     * available: choose killmaps to queue or delete from a table of available killmaps
+     * queue:     choose killmap jobs to cancel from a table of current killmap jobs
+     */
     String currentPage = request.getParameter("page");
     if (currentPage == null) {
         currentPage = "manual";

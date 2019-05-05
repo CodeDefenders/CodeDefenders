@@ -253,70 +253,11 @@ public class KillmapDAO {
     }
 
 
-
-
-
-    public static KillMapProgress getKillMapProgressForClass(int classId) {
-        String nrTestsQuery = String.join("\n",
-                "SELECT COUNT(Test_ID)",
-                "FROM view_valid_tests",
-                "WHERE Game_ID >= 0",
-                "  AND Class_ID = ?;");
-
-        String nrMutantsQuery = String.join("\n",
-                "SELECT COUNT(Mutant_ID)",
-                "FROM view_valid_mutants",
-                "WHERE Game_ID >= 0",
-                "  AND Class_ID = ?;");
-
-        String nrEntriesQuery = String.join("\n",
-                "SELECT COUNT(*)",
-                "FROM killmap, tests, mutants",
-                "WHERE killmap.Test_ID = tests.Test_ID",
-                "  AND killmap.Mutant_ID = mutants.Mutant_ID",
-                "  AND tests.Game_ID >= 0",
-                "  AND mutants.Game_ID >= 0",
-                "  AND killmap.Class_ID = ?;");
-
-        int nrTests = DB.executeQueryReturnValue(nrTestsQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
-        int nrMutants = DB.executeQueryReturnValue(nrMutantsQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
-        int nrEntries = DB.executeQueryReturnValue(nrEntriesQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
-
-        KillMapProgress progress = new KillMapProgress();
-        progress.setNrTests(nrTests);
-        progress.setNrMutants(nrMutants);
-        progress.setNrEntries(nrEntries);
-        return progress;
-    }
-
-    public static KillMapProgress getKillMapProgressForGame(int gameId) {
-        String nrTestsQuery = String.join("\n",
-            "SELECT COUNT(Test_ID)",
-            "FROM view_valid_tests",
-            "WHERE Game_ID = ?;");
-
-        String nrMutantsQuery = String.join("\n",
-            "SELECT COUNT(Mutant_ID)",
-            "FROM view_valid_mutants",
-            "WHERE Game_ID = ?;");
-
-        String nrEntriesQuery = String.join("\n",
-            "SELECT COUNT(*)",
-            "FROM killmap",
-            "WHERE Game_ID = ?;");
-
-        int nrTests = DB.executeQueryReturnValue(nrTestsQuery, rs -> rs.getInt(1), DatabaseValue.of(gameId));
-        int nrMutants = DB.executeQueryReturnValue(nrMutantsQuery, rs -> rs.getInt(1), DatabaseValue.of(gameId));
-        int nrEntries = DB.executeQueryReturnValue(nrEntriesQuery, rs -> rs.getInt(1), DatabaseValue.of(gameId));
-
-        KillMapProgress progress = new KillMapProgress();
-        progress.setNrTests(nrTests);
-        progress.setNrMutants(nrMutants);
-        progress.setNrEntries(nrEntries);
-        return progress;
-    }
-
+    /** Returns the killmaps progress for all class killmaps not queued for processing. */
     public static List<KillMapClassProgress> getNonQueuedKillMapClassProgress() {
+        /* Use queries that GROUP the entire killmap, tests and mutants tables, under the assumption that
+         * most most killmaps are not queued for computation and most of the data will be used. */
+
         String classesQuery = String.join("\n",
             "SELECT Class_ID, Name, Alias",
             "FROM view_playable_classes classes",
@@ -373,9 +314,11 @@ public class KillmapDAO {
         return progresses;
     }
 
-    //TODO: javadoc: "assumption: few killmaps are queued, many are available"
+    /** Returns the killmaps progress for all game killmaps not queued for processing. */
     public static List<KillMapGameProgress> getNonQueuedKillMapGameProgress() {
-        // TODO: view_playable_games?
+        /* Use queries that GROUP the entire killmap, tests and mutants tables, under the assumption that
+         * most most killmaps are not queued for computation and most of the data will be used. */
+
         String gamesQuery = String.join("\n",
             "SELECT ID, Mode",
             "FROM games",
@@ -427,8 +370,11 @@ public class KillmapDAO {
         return progresses;
     }
 
-    //TODO: javadoc: "assumption: few killmaps are queued, many are available"
+    /** Returns the killmaps progress for all class killmaps queued for processing. */
     public static List<KillMapClassProgress> getQueuedKillMapClassProgress() {
+        /* First query the classes that are queued, then query the rest for each class,
+           under the assumption that only a small fraction of classes are queued for computation. */
+
         String classesQuery = String.join("\n",
             "SELECT classes.Class_ID, classes.Name, classes.Alias",
             "FROM killmapjob, classes",
@@ -453,7 +399,11 @@ public class KillmapDAO {
         return progresses;
     }
 
+    /** Returns the killmaps progress for all game killmaps queued for processing. */
     public static List<KillMapGameProgress> getQueuedKillMapGameProgress() {
+        /* First query the games that are queued, then query the rest for each game,
+           under the assumption that only a small fraction of classes are queued for computation. */
+
         String gamesQuery = String.join("\n",
             "SELECT games.ID, games.Mode",
             "FROM killmapjob, games",
@@ -477,19 +427,95 @@ public class KillmapDAO {
         return progresses;
     }
 
+    /** Returns the number of queued jobs for class killmaps. */
     public static int getNumClassKillmapJobsQueued() {
         String query = "SELECT COUNT(DISTINCT Class_ID) from killmapjob WHERE Class_ID IS NOT NULL;";
         return DB.executeQueryReturnValue(query, rs -> rs.getInt(1));
     }
 
 
+    /** Returns the number of queued jobs for game killmaps. */
     public static int getNumGameKillmapJobsQueued() {
         String query = "SELECT COUNT(DISTINCT Game_ID) from killmapjob WHERE Game_ID IS NOT NULL;";
         return DB.executeQueryReturnValue(query, rs -> rs.getInt(1));
     }
 
-    // TODO: move into KillMap or into own class file?
-    // TODO: make members private and use getters and setters
+    /**
+     * Returns the killmap progress for the class with the given id.
+     * @param classId The class id.
+     * @return The killmap progress for the class.
+     */
+    private static KillMapProgress getKillMapProgressForClass(int classId) {
+        String nrTestsQuery = String.join("\n",
+                "SELECT COUNT(Test_ID)",
+                "FROM view_valid_tests",
+                "WHERE Game_ID >= 0",
+                "  AND Class_ID = ?;");
+
+        String nrMutantsQuery = String.join("\n",
+                "SELECT COUNT(Mutant_ID)",
+                "FROM view_valid_mutants",
+                "WHERE Game_ID >= 0",
+                "  AND Class_ID = ?;");
+
+        String nrEntriesQuery = String.join("\n",
+                "SELECT COUNT(*)",
+                "FROM killmap, tests, mutants",
+                "WHERE killmap.Test_ID = tests.Test_ID",
+                "  AND killmap.Mutant_ID = mutants.Mutant_ID",
+                "  AND tests.Game_ID >= 0",
+                "  AND mutants.Game_ID >= 0",
+                "  AND killmap.Class_ID = ?;");
+
+        int nrTests = DB.executeQueryReturnValue(nrTestsQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
+        int nrMutants = DB.executeQueryReturnValue(nrMutantsQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
+        int nrEntries = DB.executeQueryReturnValue(nrEntriesQuery, rs -> rs.getInt(1), DatabaseValue.of(classId));
+
+        KillMapProgress progress = new KillMapProgress();
+        progress.setNrTests(nrTests);
+        progress.setNrMutants(nrMutants);
+        progress.setNrEntries(nrEntries);
+        return progress;
+    }
+
+    /**
+     * Returns the killmap progress for the game with the given id.
+     * @param gameId The game id.
+     * @return The killmap progress for the game.
+     */
+    private static KillMapProgress getKillMapProgressForGame(int gameId) {
+        String nrTestsQuery = String.join("\n",
+                "SELECT COUNT(Test_ID)",
+                "FROM view_valid_tests",
+                "WHERE Game_ID = ?;");
+
+        String nrMutantsQuery = String.join("\n",
+                "SELECT COUNT(Mutant_ID)",
+                "FROM view_valid_mutants",
+                "WHERE Game_ID = ?;");
+
+        String nrEntriesQuery = String.join("\n",
+                "SELECT COUNT(*)",
+                "FROM killmap",
+                "WHERE Game_ID = ?;");
+
+        int nrTests = DB.executeQueryReturnValue(nrTestsQuery, rs -> rs.getInt(1), DatabaseValue.of(gameId));
+        int nrMutants = DB.executeQueryReturnValue(nrMutantsQuery, rs -> rs.getInt(1), DatabaseValue.of(gameId));
+        int nrEntries = DB.executeQueryReturnValue(nrEntriesQuery, rs -> rs.getInt(1), DatabaseValue.of(gameId));
+
+        KillMapProgress progress = new KillMapProgress();
+        progress.setNrTests(nrTests);
+        progress.setNrMutants(nrMutants);
+        progress.setNrEntries(nrEntries);
+        return progress;
+    }
+
+    /**
+     * Represents the computation progress for a killmap through the number of test, mutants,
+     * and previously computed test vs. mutant execution outcomes.
+     *
+     * Used to display the progress on the killmap management page.
+     */
     public static class KillMapProgress {
         private int nrTests;
         private int nrMutants;
@@ -520,6 +546,7 @@ public class KillmapDAO {
         }
     }
 
+    /** Represents the progress of a game killmap. */
     public static class KillMapGameProgress extends KillMapProgress {
         private int gameId;
         private GameMode gameMode;
@@ -541,6 +568,7 @@ public class KillmapDAO {
         }
     }
 
+    /** Represents the progress of a class killmap. */
     public static class KillMapClassProgress extends KillMapProgress {
         private int classId;
         private String className;

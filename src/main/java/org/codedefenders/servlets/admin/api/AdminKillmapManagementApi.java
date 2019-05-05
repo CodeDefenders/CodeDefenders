@@ -52,6 +52,19 @@ public class AdminKillmapManagementApi extends HttpServlet {
         }
     }
 
+    /**
+     * Returns a JSON file containing the class analytics data.<br>
+     * The returned JSON will have the following format:<br>
+     * <pre>
+     * {
+     *     timestamp: ...,
+     *     processingTime: ...,
+     *     data: [
+     *          ...
+     *     ]
+     * }
+     * </pre>
+     */
     private void doGetJSON(HttpServletResponse response, String page, String killmapType) throws IOException {
         response.setContentType("application/json");
 
@@ -77,6 +90,10 @@ public class AdminKillmapManagementApi extends HttpServlet {
         out.flush();
     }
 
+    /**
+     * Returns a CSV file containing the user analytics data.
+     * The returned CSV will have a header.
+     */
     private void doGetCSV(HttpServletResponse response, String page, String killmapType) throws IOException {
         response.setContentType("text/csv");
 
