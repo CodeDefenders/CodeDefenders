@@ -53,11 +53,13 @@
             <%= numClassesQueued %> <%= pluralize(numClassesQueued, "Class", "Classes") %> and
             <%= numGamesQueued %> <%= pluralize(numGamesQueued, "Game", "Games") %> currently queued.
             <br>
+
             <% if (processorEnabled) { %>
                 Killmap Processing is <span class="text-success">enabled</span>
             <% } else { %>
                 Killmap Processing is <span class="text-danger">disabled</span>
             <% } %>
+
             <% if (currentJob != null) {
                     String jobType;
                     switch (currentJob.getType()) {
@@ -112,30 +114,22 @@
                 Classes
             </div>
             <div class="panel-body">
-                <form id="enter-class-ids" name="enter-class-ids"
-                      action="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS %>" method="post">
-                    <input type="hidden" name="formType" value="submitKillMapJobs">
-                    <input type="hidden" name="killmapType" value="class">
-                    <input type="hidden" name="page" value="<%= currentPage %>">
-
-                    <div class="form-group">
-                        <label for="class-ids">Class IDs</label>
-                        <a data-toggle="collapse" href="#class-ids-explanation" style="color: black;">
-                            <span class="glyphicon glyphicon-question-sign"></span>
-                        </a>
-                        <div id="class-ids-explanation" class="collapse panel panel-default" style="margin-top: 10px;">
-                            <div class="panel-body" style="padding: 10px;">
-                                Comma separated list of class IDs to generate killmaps for.
-                                Newlines and whitespaces are allowed.
-                            </div>
+                <div class="form-group">
+                    <label for="class-ids">Class IDs</label>
+                    <a data-toggle="collapse" href="#class-ids-explanation" style="color: black;">
+                        <span class="glyphicon glyphicon-question-sign"></span>
+                    </a>
+                    <div id="class-ids-explanation" class="collapse panel panel-default" style="margin-top: 10px;">
+                        <div class="panel-body" style="padding: 10px;">
+                            Comma separated list of class IDs to generate killmaps for.
+                            Newlines and whitespaces are allowed.
                         </div>
-                        <textarea name="ids" id="class-ids" class="form-control" placeholder="Class IDs" rows="3"></textarea>
                     </div>
+                    <textarea name="ids" id="class-ids" class="form-control" placeholder="Class IDs" rows="3"></textarea>
+                </div>
 
-                    <button type="submit" id="submit-class-ids" class="btn btn-primary">
-                        Submit
-                    </button>
-                </form>
+                <button id="queue-ids-classes" class="btn btn-primary">Queue</button>
+                <button id="delete-ids-classes" class="btn btn-danger">Delete</button>
             </div>
         </div>
         <div class="panel panel-default">
@@ -143,30 +137,22 @@
                 Games
             </div>
             <div class="panel-body">
-                <form id="enter-game-ids" name="enter-game-ids"
-                      action="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS %>" method="post">
-                    <input type="hidden" name="formType" value="submitKillMapJobs">
-                    <input type="hidden" name="killmapType" value="game">
-                    <input type="hidden" name="page" value="<%= currentPage %>">
-
-                    <div class="form-group">
-                        <label for="game-ids">Game IDs</label>
-                        <a data-toggle="collapse" href="#game-ids-explanation" style="color: black;">
-                            <span class="glyphicon glyphicon-question-sign"></span>
-                        </a>
-                        <div id="game-ids-explanation" class="collapse panel panel-default" style="margin-top: 10px;">
-                            <div class="panel-body" style="padding: 10px;">
-                                Comma separated list of game IDs to generate killmaps for.
-                                Newlines and whitespaces are allowed.
-                            </div>
+                <div class="form-group">
+                    <label for="game-ids">Game IDs</label>
+                    <a data-toggle="collapse" href="#game-ids-explanation" style="color: black;">
+                        <span class="glyphicon glyphicon-question-sign"></span>
+                    </a>
+                    <div id="game-ids-explanation" class="collapse panel panel-default" style="margin-top: 10px;">
+                        <div class="panel-body" style="padding: 10px;">
+                            Comma separated list of game IDs to generate killmaps for.
+                            Newlines and whitespaces are allowed.
                         </div>
-                        <textarea name="ids" id="game-ids" class="form-control" placeholder="Game IDs" rows="3"></textarea>
                     </div>
+                    <textarea name="ids" id="game-ids" class="form-control" placeholder="Game IDs" rows="3"></textarea>
+                </div>
 
-                    <button type="submit" id="submit-game-ids" class="btn btn-primary">
-                        Submit
-                    </button>
-                </form>
+                <button id="queue-ids-games" class="btn btn-primary">Queue</button>
+                <button id="delete-ids-games" class="btn btn-danger">Delete</button>
             </div>
         </div>
 
@@ -254,187 +240,192 @@
     <% } %>
 
     <script>
-        const colorRow = function () {
-            const data = this.data();
-            const node = this.node();
-
-            let percentage;
-
-            const expectedNrEntries = (data.nrTests * data.nrMutants);
-            if (expectedNrEntries !== 0) {
-                percentage = ((data.nrEntries * 100) / expectedNrEntries).toFixed(0);
-            } else {
-                percentage = 0;
-            }
-
-            node.style.background = 'linear-gradient(to right, '
-                + 'rgba(41, 182, 246, 0.15) ' + percentage + '%, '
-                + 'transparent ' + percentage + '%)';
-        };
-
-        const uncolorRow = function () {
-            const node = this.node();
-            node.style.background = null;
-        };
-
-        const invertSelection = function (table) {
-            const data = table.data();
-
-            for (let i = 0; i < data.length; i++) {
-                const node = table.row(i).node();
-                const checkbox = $(node).find('input');
-
-                checkbox.prop('checked', (_, checked) => !checked);
-            }
-        };
-
-        const postIds = function (table, formType, killmapType) {
-            const data = table.data();
-            const ids = [];
-
-            for (let i = 0; i < data.length; i++) {
-                const node = table.row(i).node();
-                const checkbox = $(node).find('input');
-
-                if (checkbox.is(':checked')) {
-                    ids.push(data[i][killmapType + 'Id']);
-                }
-            }
-
+        const postIds = function (idsString, formType, killmapType) {
             const form = $(
                   '<form action="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS %>" method="post">'
                 +     '<input type="hidden" name="page" value="<%= currentPage %>">'
                 +     '<input type="hidden" name="formType" value="' + formType + '">'
                 +     '<input type="hidden" name="killmapType" value="' + killmapType + '">'
-                +     '<input type="hidden" name="ids" value="' + JSON.stringify(ids) + '">'
                 + '</form>'
             );
+
+            /* Construct form field with ids like this so we dont have to sanitize the ids. */
+            const idsField = $('<input type="hidden" name="ids" value="">');
+            idsField.val(idsString);
+            form.append(idsField);
+
             $('body').append(form);
             form.submit();
         };
-
-        const progressFromRow = function (row) {
-            const expectedNrEntries = (row.nrTests * row.nrMutants);
-            if (expectedNrEntries !== 0) {
-                return ((row.nrEntries * 100) / expectedNrEntries).toFixed(0) + '%';
-            } else {
-                return 'NA';
-            }
-        };
-
-        const classNameFromRow = function (row) {
-            if (row.className === row.classAlias) {
-                return row.className;
-            } else {
-                return row.className + ' (alias ' + row.classAlias + ')';
-            }
-        };
-
-        let emptyClassTableMessage = '';
-        let emptyGameTableMessage = '';
-
-        <% if (currentPage.equals("available")) { %>
-            emptyClassTableMessage = 'No classes available.';
-            emptyGameTableMessage = 'No games available.';
-        <% } else if (currentPage.equals("queue")) { %>
-            emptyClassTableMessage = 'No classes queued for killmap computation.';
-            emptyGameTableMessage = 'No games queued for killmap computation.';
-        <% } %>
-
-        $(document).ready(function() {
-            const classTable = $('#table-classes').DataTable({
-                ajax: {
-                    url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=class&fileType=json',
-                    dataSrc: 'data'
-                },
-                columns: [
-                    { data: null,
-                      defaultContent: '<input type="checkbox" class="select-for-queue">' },
-                    { data:  'classId',
-                      title: 'Class' },
-                    { data:  classNameFromRow,
-                      title: 'Name' },
-                    { data:  'nrMutants',
-                      title: 'Mutants' },
-                    { data:  'nrTests',
-                      title: 'Tests' },
-                    { data:  progressFromRow,
-                      title: 'Computed' },
-                ],
-                scrollY: '400px',
-                scrollCollapse: true,
-                paging: false,
-                dom: 't',
-                language: { emptyTable: emptyClassTableMessage }
-            });
-
-            const gameTable = $('#table-games').DataTable({
-                ajax: {
-                    url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=game&fileType=json',
-                    dataSrc: 'data'
-                },
-                columns: [
-                    { data: null,
-                      defaultContent: '<input type="checkbox" class="select-for-queue">' },
-                    { data:  'gameId',
-                      title: 'Game' },
-                    { data:  'gameMode',
-                      title: 'Mode' },
-                    { data:  'nrMutants',
-                      title: 'Mutants' },
-                    { data:  'nrTests',
-                      title: 'Tests' },
-                    { data:  progressFromRow,
-                      title: 'Computed' },
-                ],
-                scrollY: '400px',
-                scrollCollapse: true,
-                paging: false,
-                dom: 't',
-                language: { emptyTable: emptyGameTableMessage }
-            });
-
-            $('#toggle-progress-classes').on('change', function () {
-                if ($(this).is(':checked')) {
-                    classTable.rows().every(colorRow);
-                } else {
-                    classTable.rows().every(uncolorRow);
-                }
-            });
-
-            $('#toggle-progress-games').on('change', function () {
-                if ($(this).is(':checked')) {
-                    gameTable.rows().every(colorRow);
-                } else {
-                    gameTable.rows().every(uncolorRow);
-                }
-            });
-
-            $('#invert-selection-classes').on('click', () => invertSelection(classTable));
-            $('#invert-selection-games').on('click',   () => invertSelection(gameTable));
-
-            $('#queue-selection-classes').on('click',  () => postIds(classTable, 'submitKillMapJobs', 'class'));
-            $('#queue-selection-games').on('click',    () => postIds(gameTable, 'submitKillMapJobs', 'game'));
-            $('#cancel-selection-classes').on('click', () => postIds(classTable, 'cancelKillMapJobs', 'class'));
-            $('#cancel-selection-games').on('click',   () => postIds(gameTable, 'cancelKillMapJobs', 'game'));
-
-            $('#delete-selection-classes').on('click', () => {
-                if (confirm('Are you sure you want to delete the selected killmaps?'))
-                    postIds(classTable, 'deleteKillMaps', 'class')
-            });
-            $('#delete-selection-games').on('click', () => {
-                if (confirm('Are you sure you want to delete the selected killmaps?'))
-                    postIds(gameTable, 'deleteKillMaps', 'game')
-            });
-
-            $('#search-classes').on('keyup', function () {
-                classTable.search(this.value).draw();
-            });
-            $('#search-games').on('keyup', function () {
-                gameTable.search(this.value).draw();
-            });
-        });
     </script>
+
+    <% if (currentPage.equals("manual")) { %>
+        <script>
+            $(document).ready(function() {
+                $('#queue-ids-classes').on('click',  () => postIds($("#class-ids").val(), 'submitKillMapJobs', 'class'));
+                $('#queue-ids-games').on('click',    () => postIds($("#game-ids").val(), 'submitKillMapJobs', 'game'));
+
+                $('#delete-ids-classes').on('click', () => {
+                    if (confirm('Are you sure you want to delete the specified killmaps?'))
+                        postIds($("#class-ids").val(), 'deleteKillMaps', 'class');
+                });
+                $('#delete-ids-games').on('click', () => {
+                    if (confirm('Are you sure you want to delete the specified killmaps?'))
+                        postIds($("#game-ids").val(), 'deleteKillMaps', 'game');
+                });
+            });
+        </script>
+
+    <% } else if (currentPage.equals("available") || currentPage.equals("queue")) { %>
+        <script>
+            const postTable = function (table, formType, killmapType) {
+                const data = table.data();
+                const ids = [];
+
+                for (let i = 0; i < data.length; i++) {
+                    const node = table.row(i).node();
+                    const checkbox = $(node).find('input');
+
+                    if (checkbox.is(':checked')) {
+                        ids.push(data[i][killmapType + 'Id']);
+                    }
+                }
+
+                postIds(JSON.stringify(ids), formType, killmapType);
+            };
+
+            const colorRow = function () {
+                const data = this.data();
+                const node = this.node();
+                let percentage;
+
+                const expectedNrEntries = (data.nrTests * data.nrMutants);
+                if (expectedNrEntries !== 0) {
+                    percentage = ((data.nrEntries * 100) / expectedNrEntries).toFixed(0);
+                } else {
+                    percentage = 0;
+                }
+
+                node.style.background = 'linear-gradient(to right, '
+                    + 'rgba(41, 182, 246, 0.15) ' + percentage + '%, '
+                    + 'transparent ' + percentage + '%)';
+            };
+
+            const uncolorRow = function () {
+                const node = this.node();
+                node.style.background = null;
+            };
+
+            const invertSelection = function (table) {
+                const data = table.data();
+
+                for (let i = 0; i < data.length; i++) {
+                    const node = table.row(i).node();
+                    const checkbox = $(node).find('input');
+                    checkbox.prop('checked', (_, checked) => !checked);
+                }
+            };
+
+            const progressFromRow = function (row) {
+                const expectedNrEntries = (row.nrTests * row.nrMutants);
+                if (expectedNrEntries !== 0) {
+                    return ((row.nrEntries * 100) / expectedNrEntries).toFixed(0) + '%';
+                } else {
+                    return 'NA';
+                }
+            };
+
+            const classNameFromRow = function (row) {
+                if (row.className === row.classAlias) {
+                    return row.className;
+                } else {
+                    return row.className + ' (alias ' + row.classAlias + ')';
+                }
+            };
+
+            let emptyClassTableMessage;
+            let emptyGameTableMessage;
+
+            <% if (currentPage.equals("available")) { %>
+                emptyClassTableMessage = 'No classes available.';
+                emptyGameTableMessage = 'No games available.';
+            <% } else { %>
+                emptyClassTableMessage = 'No classes queued for killmap computation.';
+                emptyGameTableMessage = 'No games queued for killmap computation.';
+            <% } %>
+
+            $(document).ready(function() {
+                const classTable = $('#table-classes').DataTable({
+                    ajax: {
+                        url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=class&fileType=json',
+                        dataSrc: 'data'
+                    },
+                    columns: [
+                        { data: null,             defaultContent: '<input type="checkbox" class="select-for-queue">' },
+                        { data: 'classId',        title: 'Class' },
+                        { data: classNameFromRow, title: 'Name' },
+                        { data: 'nrMutants',      title: 'Mutants' },
+                        { data: 'nrTests',        title: 'Tests' },
+                        { data: progressFromRow,  title: 'Computed' },
+                    ],
+                    scrollY: '400px',
+                    scrollCollapse: true,
+                    paging: false,
+                    dom: 't',
+                    language: {emptyTable: emptyClassTableMessage}
+                });
+
+                const gameTable = $('#table-games').DataTable({
+                    ajax: {
+                        url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=game&fileType=json',
+                        dataSrc: 'data'
+                    },
+                    columns: [
+                        { data: null,            defaultContent: '<input type="checkbox" class="select-for-queue">' },
+                        { data: 'gameId',        title: 'Game' },
+                        { data: 'gameMode',      title: 'Mode' },
+                        { data: 'nrMutants',     title: 'Mutants' },
+                        { data: 'nrTests',       title: 'Tests' },
+                        { data: progressFromRow, title: 'Computed' },
+                    ],
+                    scrollY: '400px',
+                    scrollCollapse: true,
+                    paging: false,
+                    dom: 't',
+                    language: {emptyTable: emptyGameTableMessage}
+                });
+
+                $('#toggle-progress-classes').on('change', function () {
+                    const colorFun = $(this).is(':checked') ? colorRow : uncolorRow;
+                    classTable.rows().every(colorFun);
+                });
+                $('#toggle-progress-games').on('change', function () {
+                    const colorFun = $(this).is(':checked') ? colorRow : uncolorRow;
+                    gameTable.rows().every(colorFun);
+                });
+
+                $('#search-classes').on('keyup', function () { classTable.search(this.value).draw(); });
+                $('#search-games').on('keyup',   function () { gameTable.search(this.value).draw(); });
+
+                $('#invert-selection-classes').on('click', () => invertSelection(classTable));
+                $('#invert-selection-games').on('click',   () => invertSelection(gameTable));
+
+                $('#queue-selection-classes').on('click',  () => postTable(classTable, 'submitKillMapJobs', 'class'));
+                $('#queue-selection-games').on('click',    () => postTable(gameTable, 'submitKillMapJobs', 'game'));
+                $('#cancel-selection-classes').on('click', () => postTable(classTable, 'cancelKillMapJobs', 'class'));
+                $('#cancel-selection-games').on('click',   () => postTable(gameTable, 'cancelKillMapJobs', 'game'));
+
+                $('#delete-selection-classes').on('click', () => {
+                    if (confirm('Are you sure you want to delete the selected killmaps?'))
+                        postTable(classTable, 'deleteKillMaps', 'class')
+                });
+                $('#delete-selection-games').on('click', () => {
+                    if (confirm('Are you sure you want to delete the selected killmaps?'))
+                        postTable(gameTable, 'deleteKillMaps', 'game')
+                });
+            });
+        </script>
+    <% } %>
 
 </div>
 <%@ include file="/jsp/footer.jsp" %>
