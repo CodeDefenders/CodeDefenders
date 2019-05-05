@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Maps tests to their killed mutants in a finished game.
  * Killmaps are computed and saved to the DB on the first time they are requested. This may take a long time.
- * {@link KillmapDAO#hasKillMap(int)}  can be used to check if a game's killmap has already been computed before.
+ * {@link KillmapDAO#hasKillMap(int)}  can be used to check if a finished game's killmap has already been computed.
  * <p/>
  * Only one killmap can be computed at a time. Further request are queued via {@code synchronized}.
  * This is mostly to prevent multiple calculations of the same killmap at once, e.g. by accidentally refreshing a page.
@@ -433,27 +433,9 @@ public class KillMap {
         }
     }
 
-    /** Represents a job for computing a killmap */
-    public static class KillMapJob {
-        public enum Type {
-            CLASS, GAME
-        }
-
-        private Type type;
-        private Integer id;
-
-        public KillMapJob(Type type, Integer id) {
-            this.type = type;
-            this.id = id;
-        }
-
-        public Type getType() {
-            return type;
-        }
-
-        public Integer getId() {
-            return id;
-        }
+    /** The killmap types. Game or class killmap. */
+    public enum KillMapType {
+        CLASS, GAME
     }
 
     /** Represents a result of executing a test against a mutant. */

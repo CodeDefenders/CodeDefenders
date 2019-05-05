@@ -19,6 +19,7 @@
 package org.codedefenders.database;
 
 import org.codedefenders.execution.KillMap;
+import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -143,7 +144,7 @@ public class KillmapDAO {
         return DB.executeUpdateQuery(query, values);
     }
 
-    public static boolean removeKillmapsByIds(KillMap.KillMapJob.Type killmapType, List<Integer> ids) {
+    public static boolean removeKillmapsByIds(KillMap.KillMapType killmapType, List<Integer> ids) {
         if (ids.isEmpty()) {
             return true;
         }
@@ -176,7 +177,7 @@ public class KillmapDAO {
     /**
      * Return a list of pending killmap jobs ordered by timestamp
      */
-    public static List<KillMap.KillMapJob> getPendingJobs() {
+    public static List<KillMapProcessor.KillMapJob> getPendingJobs() {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM killmapjob",
@@ -186,13 +187,13 @@ public class KillmapDAO {
             int gameId = rs.getInt("Game_ID");
             int classId = rs.getInt("Class_ID");
             // if SQL NULL then int is 0
-            KillMap.KillMapJob.Type type = (classId != 0) ? KillMap.KillMapJob.Type.CLASS : KillMap.KillMapJob.Type.GAME;
+            KillMap.KillMapType type = (classId != 0) ? KillMap.KillMapType.CLASS : KillMap.KillMapType.GAME;
             int reference = (classId != 0) ? classId : gameId;
-            return new KillMap.KillMapJob(type, reference);
+            return new KillMapProcessor.KillMapJob(type, reference);
         });
     }
 
-    public static boolean enqueueJob(KillMap.KillMapJob theJob) {
+    public static boolean enqueueJob(KillMapProcessor.KillMapJob theJob) {
         String query;
         switch (theJob.getType()) {
             case CLASS:
@@ -209,7 +210,7 @@ public class KillmapDAO {
         return DB.executeUpdateQuery(query, DatabaseValue.of(theJob.getId()));
     }
 
-    public static boolean removeJob(KillMap.KillMapJob theJob) {
+    public static boolean removeJob(KillMapProcessor.KillMapJob theJob) {
         String query;
         switch (theJob.getType()) {
             case CLASS:
@@ -225,7 +226,7 @@ public class KillmapDAO {
         return DB.executeUpdateQuery(query, DatabaseValue.of(theJob.getId()));
     }
 
-    public static boolean removeKillmapJobsByIds(KillMap.KillMapJob.Type jobType, List<Integer> ids) {
+    public static boolean removeKillmapJobsByIds(KillMap.KillMapType jobType, List<Integer> ids) {
         if (ids.isEmpty()) {
             return true;
         }

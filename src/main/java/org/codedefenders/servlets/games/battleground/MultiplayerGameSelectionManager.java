@@ -25,6 +25,7 @@ import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;
+import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
@@ -473,7 +474,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             game.setState(GameState.FINISHED);
             boolean updated = game.update();
             if (updated) {
-                KillmapDAO.enqueueJob(new KillMap.KillMapJob(KillMap.KillMapJob.Type.GAME, gameId));
+                KillmapDAO.enqueueJob(new KillMapProcessor.KillMapJob(KillMap.KillMapType.GAME, gameId));
             }
             response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_SELECTION);
         } else {

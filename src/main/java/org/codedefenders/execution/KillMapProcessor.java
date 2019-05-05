@@ -64,12 +64,14 @@ public class KillMapProcessor implements ServletContextListener {
     // Ref name
     public static final String NAME = "KILLMAP_PROCESSOR";
 
-    // This is reset everytime we re-deploy the app.
+    // This is reset every time we re-deploy the app.
     // We make it easy: instead of stopping and restarting the executor, we
     // simply skip the job if the processor is disabled
     private static boolean isEnabled = true;
 
-    private class KillMapJob implements Runnable {
+    private KillMapJob currentJob = null;
+
+    private class Processor implements Runnable {
 
         @Override
         public void run() {
@@ -78,14 +80,14 @@ public class KillMapProcessor implements ServletContextListener {
             }
             // Retrieve all of them to have a partial count, but execute only
             // the first
-            List<KillMap.KillMapJob> gamesToProcess = KillmapDAO.getPendingJobs();
+            List<KillMapJob> gamesToProcess = KillmapDAO.getPendingJobs();
             if (gamesToProcess.isEmpty()) {
                 logger.debug("No killmap computation to process");
-//                KillMap.forGame(game, DO_NOT_RECALCULATE);
-                return;
             } else {
                 
-                KillMap.KillMapJob theJob = gamesToProcess.get(0);
+                KillMapJob theJob = gamesToProcess.get(0);
+                currentJob = theJob;
+
                 switch ( theJob.getType() ) {
                 case CLASS:
                     try{
@@ -96,7 +98,7 @@ public class KillMapProcessor implements ServletContextListener {
                         logger.warn("Killmap computation failed!", e);
                     } finally {
                         // If the job fails and we leave it in the database,
-                        // we risk to create an infinite loop. So we remove it everytime !
+                        // we risk to create an infinite loop. So we remove it every time !
                         KillmapDAO.removeJob(theJob);
                     }
                     break;
@@ -114,11 +116,12 @@ public class KillMapProcessor implements ServletContextListener {
                         logger.warn("Killmap computation failed!", e);
                     } finally {
                         // If the job fails and we leave it in the database,
-                        // we risk to create an infinite loop. So we remove it everytime !
+                        // we risk to create an infinite loop. So we remove it every time !
                         KillmapDAO.removeJob(theJob);
                     }
                 }
-                
+
+                currentJob = null;
             }
         }
     }
@@ -135,12 +138,19 @@ public class KillMapProcessor implements ServletContextListener {
     }
 
     /**
+     * Returns the job that is currently processed.
+     * Can be {@code null} even when killmap processing is enabled.
+     * @return The currently processed job.
+     */
+    public KillMapJob getCurrentJob() {
+        return currentJob;
+    }
+
+    /**
      * Return the ID of the games or classes for which there's a pending killmap
      * computation
-     * 
-     * @return
      */
-    public List<KillMap.KillMapJob> getPendingJobs() {
+    public List<KillMapJob> getPendingJobs() {
         return KillmapDAO.getPendingJobs();
     }
 
@@ -167,7 +177,7 @@ public class KillMapProcessor implements ServletContextListener {
 
         executor = Executors.newScheduledThreadPool(1);
         logger.debug("KillMapProcessor Started ");
-        executor.scheduleWithFixedDelay(new KillMapJob(), INITIAL_DELAY_VALUE, EXECUTION_DELAY_VALUE,
+        executor.scheduleWithFixedDelay(new Processor(), INITIAL_DELAY_VALUE, EXECUTION_DELAY_VALUE,
                 EXECUTION_DELAY_UNIT);
 
         ServletContext context = sce.getServletContext();
@@ -192,4 +202,22 @@ public class KillMapProcessor implements ServletContextListener {
         }
     }
 
+    /** Represents a job for computing a killmap */
+    public static class KillMapJob {
+        private KillMap.KillMapType type;
+        private Integer id;
+
+        public KillMapJob(KillMap.KillMapType type, Integer id) {
+            this.type = type;
+            this.id = id;
+        }
+
+        public KillMap.KillMapType getType() {
+            return type;
+        }
+
+        public Integer getId() {
+            return id;
+        }
+    }
 }

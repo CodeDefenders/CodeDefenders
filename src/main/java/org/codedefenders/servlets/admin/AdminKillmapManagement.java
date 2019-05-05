@@ -25,8 +25,8 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
-import org.codedefenders.execution.KillMap.KillMapJob;
-import org.codedefenders.execution.KillMap.KillMapJob.Type;
+import org.codedefenders.execution.KillMapProcessor.KillMapJob;
+import org.codedefenders.execution.KillMap.KillMapType;
 import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.util.Constants;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
@@ -43,7 +43,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+
+import static org.codedefenders.util.MessageUtils.pluralize;
+import static org.codedefenders.util.MessageUtils.addMessage;
 
 public class AdminKillmapManagement extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminKillmapManagement.class);
@@ -91,13 +93,13 @@ public class AdminKillmapManagement extends HttpServlet {
             case "deleteKillMaps":
                 /* Handle parameter "killmapType" */
                 String killmapTypeString = request.getParameter("killmapType");
-                Type killmapType;
+                KillMapType killmapType;
                 if (killmapTypeString == null) {
                     addMessage(request.getSession(), "Invalid request. Missing job type.");
                     break;
                 }
                 try {
-                    killmapType = Type.valueOf(killmapTypeString.toUpperCase());
+                    killmapType = KillMapType.valueOf(killmapTypeString.toUpperCase());
                 } catch (IllegalArgumentException e) {
                     addMessage(request.getSession(), "Invalid request. Invalid job type.");
                     break;
@@ -145,10 +147,10 @@ public class AdminKillmapManagement extends HttpServlet {
                 + Constants.ADMIN_KILLMAPS_JSP + "?page=" + request.getParameter("page"));
     }
 
-    private void submitKillMapJobs(HttpServletRequest request, Type killmapType, List<Integer> ids) {
+    private void submitKillMapJobs(HttpServletRequest request, KillMapType killmapType, List<Integer> ids) {
         /* Check if classes or games exist for the given ids. */
         List<Integer> existingIds;
-        if (killmapType == Type.CLASS) {
+        if (killmapType == KillMapType.CLASS) {
             existingIds = GameClassDAO.filterExistingClassIDs(ids);
         } else {
             existingIds = GameDAO.filterExistingGameIDs(ids);
@@ -164,7 +166,7 @@ public class AdminKillmapManagement extends HttpServlet {
             }
 
             addMessage(request.getSession(), "Successfully queued "
-                    + ids.size() + " " + pluralize(ids.size(), "killmap", "s") + ".");
+                    + ids.size() + " " + pluralize(ids.size(), "killmap", "killmaps") + ".");
 
         /* Otherwise, construct an error message with the missing ids. */
         } else {
@@ -177,7 +179,7 @@ public class AdminKillmapManagement extends HttpServlet {
             int count = ids.size() - existingIds.size();
             boolean plural = count == 0 || count > 1;
             String typeString;
-            if (killmapType == Type.CLASS) {
+            if (killmapType == KillMapType.CLASS) {
                 typeString = plural ? "classes" : "class";
             } else {
                 typeString = plural ? "games" : "game";
@@ -189,20 +191,20 @@ public class AdminKillmapManagement extends HttpServlet {
         }
     }
 
-    private void cancelKillMapJobs(HttpServletRequest request, Type killmapType, List<Integer> ids) {
-        // TODO cancel current killmap computation if necessary
+    private void cancelKillMapJobs(HttpServletRequest request, KillMapType killmapType, List<Integer> ids) {
+        // TODO: cancel current killmap computation if necessary
         if (KillmapDAO.removeKillmapJobsByIds(killmapType, ids)) {
             addMessage(request.getSession(), "Successfully canceled "
-                    + ids.size() + " " + pluralize(ids.size(), "job", "s") + ".");
+                    + ids.size() + " " + pluralize(ids.size(), "job", "jobs") + ".");
         } else {
             addMessage(request.getSession(), "Error while canceling selected jobs.");
         }
     }
 
-    private void deleteKillMaps(HttpServletRequest request, Type killmapType, List<Integer> ids) {
+    private void deleteKillMaps(HttpServletRequest request, KillMapType killmapType, List<Integer> ids) {
         if (ids.isEmpty() || KillmapDAO.removeKillmapsByIds(killmapType, ids)) {
             addMessage(request.getSession(), "Successfully deleted "
-                    + ids.size() + " " + pluralize(ids.size(), "killmap", "s") + ".");
+                    + ids.size() + " " + pluralize(ids.size(), "killmap", "killmaps") + ".");
         } else {
             addMessage(request.getSession(), "Error while deleting selected killmaps.");
         }
@@ -212,10 +214,6 @@ public class AdminKillmapManagement extends HttpServlet {
         int currentUserID = (Integer) request.getSession().getAttribute("uid");
         ServletContext context = getServletContext();
         KillMapProcessor killMapProcessor = (KillMapProcessor) context.getAttribute(KillMapProcessor.NAME);
-
-        List<String> messages = (List<String>) request.getSession().getAttribute("messages");
-        if (messages == null) messages = new ArrayList<>();
-        request.getSession().setAttribute("messages", messages);
 
         if (enable) {
             logger.info("User {} enabled Killmap Processor", currentUserID);
@@ -233,25 +231,6 @@ public class AdminKillmapManagement extends HttpServlet {
             } else {
                 addMessage(request.getSession(), "Error while disabling killmap processing.");
             }
-        }
-    }
-
-    // TODO: Provide this method for other classes -> dependency injection
-    private void addMessage(HttpSession session, String message) {
-        @SuppressWarnings("unchecked")
-        List<String> messages = (List<String>) session.getAttribute("messages");
-        if (messages == null) {
-            messages = new ArrayList<>();
-            session.setAttribute("messages", messages);
-        }
-        messages.add(message);
-    }
-
-    private String pluralize(int amount, String word, String suffix) {
-        if (amount == 0 || amount > 1) {
-            return word + suffix;
-        } else {
-            return word;
         }
     }
 }

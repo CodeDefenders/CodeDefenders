@@ -18,9 +18,11 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME" %>
 <%@ page import="org.codedefenders.database.KillmapDAO" %>
+<%@ page import="org.codedefenders.execution.KillMapProcessor" %>
+<%@ page import="org.codedefenders.execution.KillMapProcessor.KillMapJob" %>
+<%@ page import="static org.codedefenders.util.MessageUtils.pluralize" %>
 
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
@@ -31,9 +33,12 @@
         currentPage = "manual";
     }
 
-    SettingsDTO processorSetting = AdminDAO.getSystemSetting(SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION);
-    boolean processorEnabled = processorSetting.getBoolValue();
     String processorExplanation = SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.toString();
+    ServletContext context = pageContext.getServletContext();
+    KillMapProcessor processor = (KillMapProcessor) context.getAttribute(KillMapProcessor.NAME);
+
+    boolean processorEnabled = processor.isEnabled();
+    KillMapJob currentJob = processor.getCurrentJob();
 
     int numClassesQueued = KillmapDAO.getNumClassKillmapJobsQueued();
     int numGamesQueued = KillmapDAO.getNumGameKillmapJobsQueued();
@@ -43,17 +48,24 @@
     <% request.setAttribute("adminActivePage", "adminKillMaps"); %>
     <%@ include file="/jsp/admin_navigation.jsp" %>
 
-    <%-- TODO check if the database settings value matches the processor state? --%>
     <div class="panel panel-default" style="margin-top: 25px;">
         <div class="panel-body">
-            <%= numClassesQueued %> Class<%= (numClassesQueued == 0 || numClassesQueued > 1) ? "es" : "" %> and
-            <%= numGamesQueued %> Game<%= (numGamesQueued == 0 || numGamesQueued > 1) ? "s" : "" %>  currently queued.
+            <%= numClassesQueued %> <%= pluralize(numClassesQueued, "Class", "Classes") %> and
+            <%= numGamesQueued %> <%= pluralize(numGamesQueued, "Game", "Games") %> currently queued.
             <br>
             <% if (processorEnabled) { %>
-                Killmap Processing is <span class="text-success">enabled</span> <br>
-                Currently processing: TODO
+                Killmap Processing is <span class="text-success">enabled</span>
             <% } else { %>
                 Killmap Processing is <span class="text-danger">disabled</span>
+            <% } %>
+            <% if (currentJob != null) {
+                    String jobType;
+                    switch (currentJob.getType()) {
+                        case CLASS: jobType = "Class"; break;
+                        case GAME: jobType = "Game"; break;
+                        default: jobType = "[Unknown]";
+                    } %>
+                <br> Currently processing: <%= jobType %> with ID <%= currentJob.getId() %>
             <% } %>
             <p></p>
 
