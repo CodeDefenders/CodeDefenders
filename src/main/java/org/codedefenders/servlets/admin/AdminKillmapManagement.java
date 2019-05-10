@@ -32,6 +32,7 @@ import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.util.Constants;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME;
 import org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +80,11 @@ public class AdminKillmapManagement extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        if (setPage(request) == null) {
+            response.sendRedirect(request.getContextPath() + Paths.ADMIN_KILLMAPS);
+            return;
+        }
+
         request.getRequestDispatcher(Constants.ADMIN_KILLMAPS_JSP).forward(request, response);
     }
 
@@ -86,10 +92,11 @@ public class AdminKillmapManagement extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         // TODO: This shall be a call done by an admin user but I guess there's no way to check this...
 
-        /* Handle parameter "page" */
-        String page = request.getParameter("page");
-        if (page == null) {
-            page = "manual";
+        KillmapPage page = setPage(request);
+        if (page == null || page == KillmapPage.NONE) {
+            addMessage(request.getSession(), "Invalid request. Invalid URL.");
+            response.sendRedirect(request.getContextPath() + Paths.ADMIN_KILLMAPS);
+            return;
         }
 
         /* Handle parameter "formType" */
@@ -173,7 +180,7 @@ public class AdminKillmapManagement extends HttpServlet {
         }
 
         /* Use PRG (post redirect get) to prevent erroneous killmap job submissions. */
-        response.sendRedirect(request.getContextPath() + "/" + Constants.ADMIN_KILLMAPS_JSP + "?page=" + page);
+        response.sendRedirect(request.getRequestURI());
     }
 
     private void submitKillMapJobs(HttpServletRequest request, KillMapType killmapType, List<Integer> ids) {
@@ -277,5 +284,36 @@ public class AdminKillmapManagement extends HttpServlet {
                 addMessage(request.getSession(), "Failed to disable killmap processing");
             }
         }
+    }
+
+    /**
+     * Sets the page attribute in the request according to the path info in the URL.
+     * @return The page according to the path info.
+     */
+    private KillmapPage setPage(HttpServletRequest request) {
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null) {
+            request.setAttribute("page", null);
+            return KillmapPage.NONE;
+        }
+
+        pathInfo = pathInfo.substring(1).toUpperCase();
+
+        try {
+            KillmapPage page = KillmapPage.valueOf(pathInfo);
+            request.setAttribute("page", page);
+            return page;
+
+        } catch (IllegalArgumentException e) {
+            request.setAttribute("page", null);
+            return null;
+        }
+    }
+
+    public enum KillmapPage {
+        NONE,
+        MANUAL,
+        AVAILABLE,
+        QUEUE
     }
 }

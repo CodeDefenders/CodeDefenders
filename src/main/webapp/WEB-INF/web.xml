@@ -425,11 +425,11 @@
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>AdminKillMaps</servlet-name>
-        <url-pattern>/admin/killmaps</url-pattern>
+        <servlet-name>AdminKillmapManagement</servlet-name>
+        <url-pattern>/admin/killmaps/*</url-pattern>
     </servlet-mapping>
     <servlet>
-        <servlet-name>AdminKillMaps</servlet-name>
+        <servlet-name>AdminKillmapManagement</servlet-name>
         <servlet-class>org.codedefenders.servlets.admin.AdminKillmapManagement</servlet-class>
     </servlet>
 

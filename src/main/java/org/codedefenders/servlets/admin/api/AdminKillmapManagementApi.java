@@ -26,29 +26,32 @@ public class AdminKillmapManagementApi extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String page = request.getParameter("pageType"); // manual, available, queue
-        if (page == null) {
-            response.setStatus(HttpStatus.SC_BAD_REQUEST); // TODO return an error message
+        String dataType = request.getParameter("dataType"); // available, queue
+        if (dataType == null) {
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            logger.warn("Invalid request to killmap api: dataType = null");
             return;
         }
 
         String killmapType = request.getParameter("killmapType"); // class, game
         if (killmapType == null) {
-            response.setStatus(HttpStatus.SC_BAD_REQUEST); // TODO return an error message
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            logger.warn("Invalid request to killmap api: killmapType = null");
             return;
         }
 
-        String filetype = request.getParameter("fileType");
-        if (filetype == null) {
-            filetype = "json";
+        String fileType = request.getParameter("fileType"); // json, csv
+        if (fileType == null) {
+            fileType = "json";
         }
 
-        if (filetype.equalsIgnoreCase("json")) { // TODO: case sensitive or case insensitive
-            doGetJSON(response, page, killmapType);
-        } else if (filetype.equalsIgnoreCase("csv")) {
-            doGetCSV(response, page, killmapType);
+        if (fileType.equalsIgnoreCase("json")) {
+            doGetJSON(response, dataType, killmapType);
+        } else if (fileType.equalsIgnoreCase("csv")) {
+            doGetCSV(response, dataType, killmapType);
         } else {
-            response.setStatus(HttpStatus.SC_BAD_REQUEST); // TODO return an error message
+            response.setStatus(HttpStatus.SC_BAD_REQUEST);
+            logger.warn("Invalid request to killmap api: fileType = " + fileType);
         }
     }
 
@@ -65,12 +68,12 @@ public class AdminKillmapManagementApi extends HttpServlet {
      * }
      * </pre>
      */
-    private void doGetJSON(HttpServletResponse response, String page, String killmapType) throws IOException {
+    private void doGetJSON(HttpServletResponse response, String dataType, String killmapType) throws IOException {
         response.setContentType("application/json");
 
         long timeStart = System.currentTimeMillis();
 
-        List <? extends KillMapProgress> progresses = getData(page, killmapType);
+        List <? extends KillMapProgress> progresses = getData(dataType, killmapType);
         if (progresses == null) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
@@ -94,10 +97,10 @@ public class AdminKillmapManagementApi extends HttpServlet {
      * Returns a CSV file containing the user analytics data.
      * The returned CSV will have a header.
      */
-    private void doGetCSV(HttpServletResponse response, String page, String killmapType) throws IOException {
+    private void doGetCSV(HttpServletResponse response, String dataType, String killmapType) throws IOException {
         response.setContentType("text/csv");
 
-        List <? extends KillMapProgress> progresses = getData(page, killmapType);
+        List <? extends KillMapProgress> progresses = getData(dataType, killmapType);
         if (progresses == null) {
             response.setStatus(HttpStatus.SC_BAD_REQUEST);
             return;
@@ -140,19 +143,25 @@ public class AdminKillmapManagementApi extends HttpServlet {
         csvPrinter.flush();
     }
 
-    public List<? extends KillMapProgress> getData(String page, String killmapType) {
-        if (page.equalsIgnoreCase("available")) {
+    public List<? extends KillMapProgress> getData(String dataType, String killmapType) {
+        if (dataType.equalsIgnoreCase("available")) {
             if (killmapType.equalsIgnoreCase("class")) {
                 return KillmapDAO.getNonQueuedKillMapClassProgress();
             } else if (killmapType.equalsIgnoreCase("game")) {
                 return KillmapDAO.getNonQueuedKillMapGameProgress();
+            } else {
+                logger.warn("Invalid request to killmap api: killmapType = " + killmapType);
             }
-        } else if (page.equalsIgnoreCase("queue")) {
+        } else if (dataType.equalsIgnoreCase("queue")) {
             if (killmapType.equalsIgnoreCase("class")) {
                 return KillmapDAO.getQueuedKillMapClassProgress();
             } else if (killmapType.equalsIgnoreCase("game")) {
                 return KillmapDAO.getQueuedKillMapGameProgress();
+            } else {
+                logger.warn("Invalid request to killmap api: killmapType = " + killmapType);
             }
+        } else {
+            logger.warn("Invalid request to killmap api: dataType = " + dataType);
         }
 
         return null;

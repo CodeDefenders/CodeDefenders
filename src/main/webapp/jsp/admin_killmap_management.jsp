@@ -23,6 +23,7 @@
 <%@ page import="org.codedefenders.execution.KillMapProcessor" %>
 <%@ page import="org.codedefenders.execution.KillMapProcessor.KillMapJob" %>
 <%@ page import="static org.codedefenders.util.MessageUtils.pluralize" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminKillmapManagement.KillmapPage" %>
 
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
@@ -33,10 +34,7 @@
      * available: choose killmaps to queue or delete from a table of available killmaps
      * queue:     choose killmap jobs to cancel from a table of current killmap jobs
      */
-    String currentPage = request.getParameter("page");
-    if (currentPage == null) {
-        currentPage = "manual";
-    }
+    KillmapPage currentPage = (KillmapPage) request.getAttribute("page");
 
     String processorExplanation = SETTING_NAME.AUTOMATIC_KILLMAP_COMPUTATION.toString();
     ServletContext context = pageContext.getServletContext();
@@ -77,9 +75,8 @@
             <p></p>
 
             <form id="killmap-processor-settings" name="killmap-processor-settings" title="<%= processorExplanation %>"
-                  action="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS %>" method="post">
+                  method="post">
                 <input type="hidden" name="formType" value="toggleKillMapProcessing">
-                <input type="hidden" name="page" value="<%= currentPage %>">
                 <% if (processorEnabled) { %>
                     <button type="submit" name="enable" value="false" id="toggle-killmap-processing" class="btn btn-danger">
                         Disable KillMap Processing
@@ -95,24 +92,24 @@
 
 
     <ul class="nav nav-tabs" style="margin-top: 25px; margin-bottom: 25px;">
-        <li <%= currentPage.equals("manual") ? "class=\"active\"" : "" %>>
-            <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "?page=manual" %>">
+        <li <%= currentPage == KillmapPage.MANUAL ? "class=\"active\"" : "" %>>
+            <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "/manual" %>">
                 Enter IDs
             </a>
         </li>
-        <li <%= currentPage.equals("available") ? "class=\"active\"" : "" %>>
-            <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "?page=available" %>">
+        <li <%= currentPage == KillmapPage.AVAILABLE ? "class=\"active\"" : "" %>>
+            <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "/available" %>">
                 Available Killmaps
             </a>
         </li>
-        <li <%= currentPage.equals("queue") ? "class=\"active\"" : "" %>>
-            <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "?page=queue" %>">
+        <li <%= currentPage == KillmapPage.QUEUE ? "class=\"active\"" : "" %>>
+            <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "/queue" %>">
                 Queued Killmaps
             </a>
         </li>
     </ul>
 
-    <% if (currentPage.equals("manual")) { %>
+    <% if (currentPage == KillmapPage.MANUAL) { %>
 
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -161,7 +158,7 @@
             </div>
         </div>
 
-    <% } else if (currentPage.equals("available") || currentPage.equals("queue")) { %>
+    <% } else if (currentPage == KillmapPage.AVAILABLE || currentPage == KillmapPage.QUEUE) { %>
 
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -174,7 +171,7 @@
                         </label>
                     </div>
                     <button id="invert-selection-classes" class="btn btn-xs btn-default" style="margin-left: 1em;">Invert Selection</button>
-                    <% if (currentPage.equals("available")) { %>
+                    <% if (currentPage == KillmapPage.AVAILABLE) { %>
                         <button id="queue-selection-classes" class="btn btn-xs btn-primary" style="margin-left: 1em;">Queue Selected</button>
                         <button id="delete-selection-classes" class="btn btn-xs btn-danger">Delete Selected</button>
                     <% } else { %>
@@ -197,7 +194,7 @@
                         </label>
                     </div>
                     <button id="invert-selection-games" class="btn btn-xs btn-default" style="margin-left: 1em;">Invert Selection</button>
-                    <% if (currentPage.equals("available")) { %>
+                    <% if (currentPage == KillmapPage.AVAILABLE) { %>
                         <button id="queue-selection-games" class="btn btn-xs btn-primary" style="margin-left: 1em;">Queue Selected</button>
                         <button id="delete-selection-games" class="btn btn-xs btn-danger">Delete Selected</button>
                     <% } else { %>
@@ -220,10 +217,10 @@
                     <br>
                     <div class="btn-group">
                         <a download="classes.csv"
-                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=class&fileType=csv"
+                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=csv"
                            type="button" class="btn btn-default" id="download-classes-csv">Download as CSV</a>
                         <a download="classes.json"
-                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=class&fileType=json"
+                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=json"
                            type="button" class="btn btn-default" id="download-classes-json">Download as JSON</a>
                     </div>
                 </div>
@@ -233,10 +230,10 @@
                     <br>
                     <div class="btn-group">
                         <a download="games.csv"
-                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=game&fileType=csv"
+                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=csv"
                            type="button" class="btn btn-default" id="download-games-csv">Download as CSV</a>
                         <a download="games.json"
-                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=game&fileType=json"
+                           href="<%= request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=json"
                            type="button" class="btn btn-default" id="download-games-json">Download as JSON</a>
                     </div>
                 </div>
@@ -247,8 +244,7 @@
     <script>
         const postIds = function (idsString, formType, killmapType) {
             const form = $(
-                  '<form action="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS %>" method="post">'
-                +     '<input type="hidden" name="page" value="<%= currentPage %>">'
+                  '<form method="post">'
                 +     '<input type="hidden" name="formType" value="' + formType + '">'
                 +     '<input type="hidden" name="killmapType" value="' + killmapType + '">'
                 + '</form>'
@@ -264,7 +260,7 @@
         };
     </script>
 
-    <% if (currentPage.equals("manual")) { %>
+    <% if (currentPage == KillmapPage.MANUAL) { %>
         <script>
             $(document).ready(function() {
                 $('#queue-ids-classes').on('click',  () => postIds($("#class-ids").val(), 'submitKillMapJobs', 'class'));
@@ -281,7 +277,7 @@
             });
         </script>
 
-    <% } else if (currentPage.equals("available") || currentPage.equals("queue")) { %>
+    <% } else if (currentPage == KillmapPage.AVAILABLE || currentPage == KillmapPage.QUEUE) { %>
         <script>
             const postTable = function (table, formType, killmapType) {
                 const data = table.data();
@@ -351,7 +347,7 @@
             let emptyClassTableMessage;
             let emptyGameTableMessage;
 
-            <% if (currentPage.equals("available")) { %>
+            <% if (currentPage == KillmapPage.AVAILABLE) { %>
                 emptyClassTableMessage = 'No classes available.';
                 emptyGameTableMessage = 'No games available.';
             <% } else { %>
@@ -362,7 +358,7 @@
             $(document).ready(function() {
                 const classTable = $('#table-classes').DataTable({
                     ajax: {
-                        url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=class&fileType=json',
+                        url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=class&fileType=json',
                         dataSrc: 'data'
                     },
                     columns: [
@@ -382,7 +378,7 @@
 
                 const gameTable = $('#table-games').DataTable({
                     ajax: {
-                        url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?pageType=<%= currentPage %>&killmapType=game&fileType=json',
+                        url: '<%=request.getContextPath() + Paths.API_KILLMAP_MANAGEMENT %>?dataType=<%= currentPage %>&killmapType=game&fileType=json',
                         dataSrc: 'data'
                     },
                     columns: [
