@@ -6,9 +6,8 @@ import org.codedefenders.model.User;
 
 /**
  * @author gambi
- *
  */
-public class GameLeftEvent extends GameLifecycleEvent{
+public class GameLeftEvent extends GameLifecycleEvent {
 
     // Maybe Ended ?!
     final static String eventType = EventStatus.LEFT.toString();

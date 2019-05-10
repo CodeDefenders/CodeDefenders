@@ -25,13 +25,13 @@ public class TicketingService implements ITicketingService {
 
     @Override
     public boolean validateTicket(String ticket, Integer owner) {
-        if( ticket == null || owner == null ) return false;
-        return owner == tickets.get(ticket);
+        if (ticket == null || owner == null) return false;
+        return owner.equals(tickets.get(ticket));
     }
 
     @Override
     public void invalidateTicket(String ticket) {
-        if( ticket != null)
+        if (ticket != null)
             tickets.remove( ticket );
     }
 

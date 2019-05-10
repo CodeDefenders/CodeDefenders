@@ -35,7 +35,7 @@ public class GameEventHandler {
     private int playerId;
 
     /*
-     * WebSocker Session
+     * WebSocket Session
      */
     private Session session;
 

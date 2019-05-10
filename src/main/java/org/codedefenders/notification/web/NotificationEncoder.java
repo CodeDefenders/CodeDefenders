@@ -22,5 +22,4 @@ public class NotificationEncoder implements Encoder.Text<Notification> {
     public String encode(Notification object) throws EncodeException {
         return new Gson().toJson(object);
     }
-
 }

@@ -9,22 +9,21 @@ import com.google.common.eventbus.EventBus;
 
 /**
  * Notification Service implementation.
-
+ * This service behaves like a singleton in the app.
+ * See https://docs.oracle.com/javaee/6/api/javax/enterprise/context/ApplicationScoped.html
  * @author gambi
- *
  */
-// https://docs.oracle.com/javaee/6/api/javax/enterprise/context/ApplicationScoped.html
 @ManagedBean
-@ApplicationScoped // Make this service behave like a singleton in the app
+@ApplicationScoped
 public class NotificationService implements INotificationService {
 
     // TODO Maybe there's some better instantiation options
     private EventBus eventBus = new EventBus();
     
     // TODO Ensures that event bus is defined in a Tomcat System Listener !
-//    public NotificationService(EventBus eventBus) {
-//        this.eventBus = eventBus;
-//    }
+    // public NotificationService(EventBus eventBus) {
+    //     this.eventBus = eventBus;
+    // }
     
     public NotificationService() {}
     

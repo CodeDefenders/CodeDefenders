@@ -5,9 +5,8 @@ import org.codedefenders.model.EventStatus;
 
 /**
  * @author gambi
- *
  */
-public class GameCreatedEvent extends GameLifecycleEvent{
+public class GameCreatedEvent extends GameLifecycleEvent {
 
     final static String eventType = EventStatus.NEW.toString();
     

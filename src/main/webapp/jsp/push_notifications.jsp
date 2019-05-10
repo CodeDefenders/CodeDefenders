@@ -29,7 +29,7 @@
 
 <script language="javascript" type="text/javascript">
 var wsUri = "ws://localhost:8080/notifications/<%=request.getAttribute(TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME)%>/<%=session.getAttribute("uid")%>";
-console.log("Setting up websocket at", wsUri)
+console.log("Setting up websocket at", wsUri);
 
 //Global Scope
 notificationMessageHandlers = []
@@ -39,7 +39,7 @@ websocket.onmessage = function(evt) {
     // This is brutal...
     // https://stackoverflow.com/questions/7116035/parse-json-received-with-websocket-results-in-error
     /* console.log("Got notification: " + evt.data ) */
-    message = JSON.parse(evt.data.replace(/[\s\0]/g, ' '))
+    message = JSON.parse(evt.data.replace(/[\s\0]/g, ' '));
     for (var key in notificationMessageHandlers) {
     	notificationMessageHandlers[key](message);
     }
@@ -58,14 +58,14 @@ function waitForSocketConnection(socket, callback){
     setTimeout(
         function () {
             if (socket.readyState === 1) {
-                console.log("Connection is made")
+                console.log("Connection is made");
                 if(callback != null){
                     callback();
                 }
                 return;
 
             } else {
-                console.log("wait for connection...")
+                console.log("wait for connection...");
                 waitForSocketConnection(socket, callback);
             }
 

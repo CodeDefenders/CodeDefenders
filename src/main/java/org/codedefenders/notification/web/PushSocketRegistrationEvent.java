@@ -4,6 +4,8 @@ public class PushSocketRegistrationEvent {
 
     private int gameID;
     private int playerID;
+
+    // TODO multiple targets and actions to save messages?
     private String target;
     private String action;
     

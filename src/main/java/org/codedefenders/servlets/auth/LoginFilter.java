@@ -21,6 +21,8 @@ package org.codedefenders.servlets.auth;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
 import org.codedefenders.util.Paths;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -42,6 +44,7 @@ import javax.servlet.http.HttpSession;
  * If the user accesses such a page and is logged in, HTTP header fields are set to disable caching.
  */
 public class LoginFilter implements Filter {
+	private static final Logger logger = LoggerFactory.getLogger(LoginFilter.class);
 
 	public void init(FilterConfig config) throws ServletException { }
 
@@ -82,28 +85,29 @@ public class LoginFilter implements Filter {
 	private boolean loginRequired(HttpServletRequest request) {
 		String path = request.getRequestURI();
 		String context = request.getContextPath();
-		
+
         /*
          * Do not authenticate the requests to the WebSocket since the
          * HttpSession is not visible from there. WebSocket authentication shall
          * be handled in a different Filter.
-         * 
+         *
          * TODO Maybe there's a way already to route Ws requests into WsFilters,
          * but for the moment we need to match their URL
          */
         if (path.matches("/notifications/.*/[0-9][0-9]*")) {
-            System.out.println("LoginFilter.loginRequired() " + request.getProtocol() + " " + path);
+            logger.info("LoginFilter.loginRequired() " + request.getProtocol() + " " + path);
             return false;
         }
-		
+
 		if ((path.endsWith(context + "/"))
-				|| (path.endsWith(context + "/favicon.ico"))
-				|| (path.endsWith(context + Paths.LOGIN))
-				|| (path.endsWith(context + Paths.HELP_PAGE))
-				|| (path.endsWith(context + "/video")) || (path.endsWith(context + "/video.mp4"))
-				|| (path.contains(context + "/papers"))
-				|| (path.endsWith(context + Paths.API_SEND_EMAIL))
-				|| (path.endsWith(context + "/index.jsp"))
+				|| path.endsWith(context + "/favicon.ico")
+				|| path.endsWith(context + Paths.LOGIN)
+				|| path.endsWith(context + Paths.HELP_PAGE)
+				|| path.endsWith(context + "/video")
+				|| path.endsWith(context + "/video.mp4")
+				|| path.contains(context + "/papers")
+				|| path.endsWith(context + Paths.API_SEND_EMAIL)
+				|| path.endsWith(context + "/index.jsp")
 				|| path.endsWith(context + Paths.ABOUT_PAGE)
 				|| path.endsWith(context + Paths.CONTACT_PAGE))
 			return false;

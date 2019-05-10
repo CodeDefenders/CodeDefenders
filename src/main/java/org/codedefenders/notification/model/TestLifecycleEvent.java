@@ -3,9 +3,7 @@ package org.codedefenders.notification.model;
 import org.codedefenders.game.Test;
 
 /**
- * 
  * @author gambi
- *
  */
 public abstract class TestLifecycleEvent {
     /*

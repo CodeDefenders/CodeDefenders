@@ -5,9 +5,8 @@ import org.codedefenders.model.EventStatus;
 
 /**
  * @author gambi
- *
  */
-public class GameStoppedEvent extends GameLifecycleEvent{
+public class GameStoppedEvent extends GameLifecycleEvent {
 
     // Maybe Ended ?!
     final static String eventType = EventStatus.DELETED.toString();

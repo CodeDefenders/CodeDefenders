@@ -3,9 +3,7 @@ package org.codedefenders.notification.model;
 import org.codedefenders.game.Mutant;
 
 /**
- * 
  * @author gambi
- *
  */
 public abstract class MutantLifecycleEvent {
 
@@ -15,10 +13,7 @@ public abstract class MutantLifecycleEvent {
     private String eventType;
     private Mutant mutant;
 
-    public MutantLifecycleEvent(
-            Mutant mutant,
-            String eventType
-            ) {
+    public MutantLifecycleEvent(Mutant mutant, String eventType) {
         this.mutant = mutant;
         this.eventType = eventType;
     }

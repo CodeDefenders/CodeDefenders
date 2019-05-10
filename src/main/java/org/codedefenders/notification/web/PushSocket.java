@@ -26,10 +26,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
-@ServerEndpoint(value = "/notifications/{ticket}/{userId}", //
-        encoders = { NotificationEncoder.class })
 // Since we manage here different message types we cannot have a single decoder
 // @RequestScoped -> TODO What's this?
+@ServerEndpoint(value = "/notifications/{ticket}/{userId}", encoders = { NotificationEncoder.class })
 public class PushSocket {
 
     // @Inject
@@ -59,11 +58,11 @@ public class PushSocket {
             Bean bean;
             CreationalContext ctx;
 
-            bean = (Bean) bm.getBeans(INotificationService.class).iterator().next();
+            bean = bm.getBeans(INotificationService.class).iterator().next();
             ctx = bm.createCreationalContext(bean);
             notificationService = (INotificationService) bm.getReference(bean, INotificationService.class, ctx);
 
-            bean = (Bean) bm.getBeans(ITicketingService.class).iterator().next();
+            bean = bm.getBeans(ITicketingService.class).iterator().next();
             ctx = bm.createCreationalContext(bean);
             ticketingServices = (ITicketingService) bm.getReference(bean, ITicketingService.class, ctx);
 
@@ -71,7 +70,6 @@ public class PushSocket {
             e.printStackTrace();
         }
     }
-    /////
 
     private boolean validate(Session session, String ticket, Integer owner) throws IOException{
         if( ! ticketingServices.validateTicket(ticket, owner)){
@@ -82,22 +80,22 @@ public class PushSocket {
             return true;
         }
     }
-    
-    @OnOpen
-    public void open(Session session, //
-            @PathParam("ticket") String ticket, @PathParam("userId") Integer userId) throws IOException {
 
-        if( ! validate(session, ticket, userId )){
+    @OnOpen
+    public void open(Session session, @PathParam("ticket") String ticket, @PathParam("userId") Integer userId)
+            throws IOException {
+
+        if (!validate(session, ticket, userId)) {
             return;
         }
-        
+
         this.userId = userId;
         this.ticket = ticket;
     }
 
     @OnClose
     public void close(Session session) {
-        
+
         // Invalidate the ticket
         ticketingServices.invalidateTicket(this.ticket);
 
@@ -108,7 +106,7 @@ public class PushSocket {
             notificationService.unregister(this.chatEventHandler);
         }
         if (this.progressBarEventHandler != null) {
-            logger.info("Deregistering Progress Bar " + session );
+            logger.info("Deregistering Progress Bar " + session);
             notificationService.unregister(this.progressBarEventHandler);
         }
     }
@@ -120,11 +118,10 @@ public class PushSocket {
         // https://stackoverflow.com/questions/22307382/how-do-i-implement-typeadapterfactory-in-gson
         if (json.contains("org.codedefenders.notification.web.PushSocketRegistrationEvent")) {
             try {
-                PushSocketRegistrationEvent registration = (PushSocketRegistrationEvent) new Gson().fromJson(json,
-                        PushSocketRegistrationEvent.class);
+                PushSocketRegistrationEvent registration = new Gson().fromJson(json, PushSocketRegistrationEvent.class);
 
-                System.out.println("PushSocket.onMessage() GOT " + json + " ->" + registration);
-                
+                System.out.println("PushSocket.onMessage() GOT " + json + " -> " + registration);
+
                 if ("GAME_EVENT".equals(registration.getTarget())) {
                     this.gameEventHandler = new GameEventHandler(registration.getPlayerID(), registration.getGameID(),
                             session);
@@ -133,8 +130,8 @@ public class PushSocket {
                     this.chatEventHandler = new ChatEventHandler(this.userId, session);
                     notificationService.register(this.chatEventHandler);
                 } else if ("PROGRESSBAR_EVENT".equals(registration.getTarget())) {
-                    
-                    if( "DEREGISTER".equalsIgnoreCase( registration.getAction() ) ){
+
+                    if ("DEREGISTER".equalsIgnoreCase(registration.getAction())){
                         logger.info("Deregistering Progress Bar " + session );
                         if (this.progressBarEventHandler != null) {
                             notificationService.unregister(this.progressBarEventHandler);
@@ -144,14 +141,14 @@ public class PushSocket {
                         notificationService.register(this.progressBarEventHandler);
                         logger.info("Registering Progress Bar " + session );
                     }
-                    
+
                 }
             } catch (Throwable e) {
                 logger.error("Cannot parse registration event", e);
             }
         } else {
             try {
-                ChatEvent chatMessage = (ChatEvent) new Gson().fromJson(json, ChatEvent.class);
+                ChatEvent chatMessage = new Gson().fromJson(json, ChatEvent.class);
                 // TODO Add routing information here? e.g., direct message vs
                 // team
                 // vs game

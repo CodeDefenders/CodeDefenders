@@ -25,7 +25,6 @@ public class ChatEvent {
     }
     
     public ChatEvent(int userID, String message, int... recipients) {
-        super();
         this.senderID = userID;
         this.message = message;
         for (int recipient : recipients) {
@@ -33,7 +32,7 @@ public class ChatEvent {
         }
     }
 
-    public boolean sendTo(int userID) {
+    public boolean addRecipient(int userID) {
         return recipients.contains(userID);
     }
 

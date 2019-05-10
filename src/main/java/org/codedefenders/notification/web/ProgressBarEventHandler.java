@@ -14,7 +14,7 @@ import com.google.common.eventbus.Subscribe;
 public class ProgressBarEventHandler {
 
     private int playerId;
-    private Session session;
+    private final Session session;
 
     public ProgressBarEventHandler(int playerId, Session session) {
         this.playerId = playerId;

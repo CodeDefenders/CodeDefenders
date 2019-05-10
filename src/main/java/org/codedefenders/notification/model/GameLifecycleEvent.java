@@ -5,9 +5,8 @@ import org.codedefenders.game.AbstractGame;
 /**
  * Higher level LifeCycleEvent, by subscribing to this type of event one can
  * receive ALL sort of life cycle events (i.e., subclasses)
- * 
- * @author gambi
  *
+ * @author gambi
  */
 public abstract class GameLifecycleEvent {
 
@@ -15,7 +14,6 @@ public abstract class GameLifecycleEvent {
     private String eventType;
 
     public GameLifecycleEvent(AbstractGame game, String eventType) {
-        super();
         this.game = game;
         this.eventType = eventType;
     }

@@ -47,7 +47,7 @@ public class TicketingFilter implements Filter {
                 request.setAttribute(TICKET_REQUEST_ATTRIBUTE_NAME, ticket);
                 System.out.println("TicketingFilter.doFilter() Registering ticket " + ticket + " for " + userId
                         + " from " + httpReq.getRequestURI());
-                //
+
                 chain.doFilter(request, response);
             } else {
                 /*
