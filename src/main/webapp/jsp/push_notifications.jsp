@@ -28,7 +28,8 @@
 <%@ page import="org.codedefenders.notification.web.TicketingFilter"  %>
 
 <script language="javascript" type="text/javascript">
-var wsUri = "ws://localhost:8080/notifications/<%=request.getAttribute(TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME)%>/<%=session.getAttribute("uid")%>";
+// TODO: is there a better way to do this?
+var wsUri = "ws://<%=request.getServerName()%>:<%=request.getServerPort()%><%=request.getContextPath()%>/notifications/<%=request.getAttribute(TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME)%>/<%=session.getAttribute("uid")%>";
 console.log("Setting up websocket at", wsUri);
 
 //Global Scope
@@ -55,6 +56,7 @@ function sendMessage(msg){
 
 // Make the function wait until the connection is made...
 function waitForSocketConnection(socket, callback){
+    // TODO: this is sometimes called twice if the connection succeeds or there is an error
     setTimeout(
         function () {
             if (socket.readyState === 1) {
