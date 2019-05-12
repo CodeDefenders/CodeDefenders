@@ -18,15 +18,9 @@
  */
 package org.codedefenders.game.singleplayer.automated.attacker;
 
-import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
-import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.execution.AntRunner;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.util.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.codedefenders.util.Constants.AI_DIR;
+import static org.codedefenders.util.Constants.F_SEP;
+import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -37,13 +31,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import static org.codedefenders.util.Constants.AI_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
-import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
+import javax.inject.Inject;
+
+import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.execution.AntRunner;
+import org.codedefenders.execution.ClassCompilerService;
+import org.codedefenders.execution.MutantGeneratorService;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.util.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MajorMaker {
     private static final Logger logger = LoggerFactory.getLogger(MajorMaker.class);
 
+    @Inject
+    private MutantGeneratorService mutantGenerator;
+    @Inject
+    private ClassCompilerService classCompiler;
+    
 	private int cId;
 	private GameClass cut;
 	private DuelGame dGame;
@@ -60,7 +69,7 @@ public class MajorMaker {
 	}
 
 	public void createMutants() throws NoMutantsException {
-		AntRunner.generateMutantsFromCUT(cut);
+	    mutantGenerator.generateMutantsFromCUT(cut);
 
 		File cutFile = new File(cut.getJavaFile());
 		List<String> cutLines = FileUtils.readLines(cutFile.toPath());
@@ -159,7 +168,7 @@ public class MajorMaker {
 			fw.close();
 
 			// Compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
-			return AntRunner.compileMutant(newMutantDir, mutantFileName, dGame.getId(), cut, AiAttacker.ID);
+			return classCompiler.compileMutant(newMutantDir, mutantFileName, dGame.getId(), cut, AiAttacker.ID);
 		} catch (IOException e) {
 			logger.error("Could not write mutant", e);
 		}

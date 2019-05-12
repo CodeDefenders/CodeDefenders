@@ -1,4 +1,6 @@
+
 /*
+
  * Copyright (C) 2016-2019 Code Defenders contributors
  *
  * This file is part of Code Defenders.
@@ -18,8 +20,36 @@
  */
 package org.codedefenders.itests.parallelize;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.spi.InitialContextFactory;
+
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameState;
@@ -46,35 +76,9 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NameClassPair;
-import javax.naming.NamingEnumeration;
-import javax.naming.NamingException;
-import javax.naming.spi.InitialContextFactory;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-
 @Category(IntegrationTest.class)
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ DatabaseConnection.class }) // , MutationTester.class })
+@PrepareForTest({ DatabaseConnection.class }) // , mutationTester.class })
 public class ConsistencyTest {
 
 	// PowerMock does not work with @ClassRule !!
@@ -83,6 +87,8 @@ public class ConsistencyTest {
 	@Rule
 	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql"); //, "useAffectedRows=true");
 
+	@Inject
+    private IMutationTester mutationTester;
 	//
 	private static File codedefendersHome;
 
@@ -105,12 +111,15 @@ public class ConsistencyTest {
 	}
 
 	// CUT
-	private MutationTester tester;
+	private IMutationTester tester;
 
 	// We use the "real ant runner" but we need to provide a mock to Context
 	@Mock
 	private InitialContextFactory mockedFactory;
 
+	@Inject
+    private GameManagingUtils gameManagingUtils;
+	
 	// https://stackoverflow.com/questions/36734275/how-to-mock-initialcontext-constructor-in-unit-testing
 	// FIXME this has hardcoded values, not sure how to handle those... maybe
 	// read from the config.properties file ?
@@ -250,7 +259,7 @@ public class ConsistencyTest {
 		String mutantText = new String(
 				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
 				Charset.defaultCharset());
-		Mutant mutant = GameManagingUtils.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
+		Mutant mutant = gameManagingUtils.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
 				attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
 
 		// Generate the tests for the clients
@@ -260,7 +269,7 @@ public class ConsistencyTest {
 		//
 		List<org.codedefenders.game.Test> tests = new ArrayList<>();
 		for (final User defender : defenders) {
-			tests.add(GameManagingUtils.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(),
+			tests.add(gameManagingUtils.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(),
 					Constants.MODE_BATTLEGROUND_DIR));
 		}
 		System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + tests);
@@ -278,7 +287,7 @@ public class ConsistencyTest {
 				@Override
 				public void run() {
 					System.out.println("Submit test " + newTest.getId());
-					MutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, new ArrayList<>());
+					mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, new ArrayList<>());
 					activeGame.update();
 				}
 			});

@@ -18,6 +18,45 @@
  */
 package org.codedefenders.servlets.games.battleground;
 
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
+import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
+import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
+import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
+import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.inject.Inject;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.IntentionDAO;
@@ -25,6 +64,7 @@ import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
+import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
@@ -51,45 +91,6 @@ import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
-import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
-import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
-
 /**
  * This {@link HttpServlet} handles retrieval and in-game management for {@link MultiplayerGame battleground games}.
  * <p>
@@ -104,6 +105,12 @@ public class MultiplayerGameManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameManager.class);
 
+    @Inject
+    private GameManagingUtils gameManagingUtils;
+    
+    @Inject
+    private IMutationTester mutationTester;
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
@@ -223,7 +230,7 @@ public class MultiplayerGameManager extends HttpServlet {
         // If it can be written to file and compiled, end turn. Otherwise, dont.
         Test newTest;
         try {
-            newTest = GameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest());
+            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest());
         } catch (CodeValidatorException cve) {
             messages.add(TEST_GENERIC_ERROR_MESSAGE);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
@@ -334,7 +341,7 @@ public class MultiplayerGameManager extends HttpServlet {
         final Event notif = new Event(-1, gameId, userId, message, EventType.DEFENDER_TEST_CREATED, EventStatus.GAME, timestamp);
         notif.insert();
 
-        MutationTester.runTestOnAllMultiplayerMutants(game, newTest, messages);
+        mutationTester.runTestOnAllMultiplayerMutants(game, newTest, messages);
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
         
@@ -399,7 +406,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
         // If the user has pending duels we cannot accept the mutant, but we keep it around
         // so students do not lose mutants once the duel is solved.
-        if (GameManagingUtils.hasAttackerPendingMutantsInGame(gameId, attackerID)
+        if (gameManagingUtils.hasAttackerPendingMutantsInGame(gameId, attackerID)
                 && (session.getAttribute(Constants.BLOCK_ATTACKER) != null) && ((Boolean) session.getAttribute(Constants.BLOCK_ATTACKER))) {
             messages.add(Constants.ATTACKER_HAS_PENDING_DUELS);
             // Keep the mutant code in the view for later
@@ -418,7 +425,7 @@ public class MultiplayerGameManager extends HttpServlet {
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
-        Mutant existingMutant = GameManagingUtils.existingMutant(gameId, mutantText);
+        Mutant existingMutant = gameManagingUtils.existingMutant(gameId, mutantText);
         if (existingMutant != null) {
             messages.add(MUTANT_DUPLICATED_MESSAGE);
             TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
@@ -430,7 +437,7 @@ public class MultiplayerGameManager extends HttpServlet {
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
-        Mutant newMutant = GameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, userId, MODE_BATTLEGROUND_DIR);
+        Mutant newMutant = gameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, userId, MODE_BATTLEGROUND_DIR);
         if (newMutant == null) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
@@ -459,7 +466,7 @@ public class MultiplayerGameManager extends HttpServlet {
         Event notif = new Event(-1, gameId, userId, notificationMsg, EventType.ATTACKER_MUTANT_CREATED, EventStatus.GAME,
                 new Timestamp(System.currentTimeMillis() - 1000));
         notif.insert();
-        MutationTester.runAllTestsOnMutant(game, newMutant, messages);
+        mutationTester.runAllTestsOnMutant(game, newMutant, messages);
         game.update();
 
         if (game.isCapturePlayersIntention()) {
@@ -550,7 +557,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             Test newTest;
             try {
-                newTest = GameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest());
+                newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest());
             } catch (CodeValidatorException cve) {
                 messages.add(TEST_GENERIC_ERROR_MESSAGE);
                 session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
@@ -606,7 +613,7 @@ public class MultiplayerGameManager extends HttpServlet {
             int killedOthers = 0;
             for (Mutant mPending : mutantsPendingTests) {
                 // TODO: Doesnt distinguish between failing because the test didnt run at all and failing because it detected the mutant
-                MutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
+                mutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
                 if (mPending.getEquivalent() == Mutant.Equivalence.PROVEN_NO) {
                     logger.debug("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
                     // TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points added.

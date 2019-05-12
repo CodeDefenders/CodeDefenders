@@ -31,7 +31,7 @@
     @param PuzzleGame Constants#REQUEST_ATTRIBUTE_PUZZLE_GAME
         The puzzle game to be displayed.
 --%>
-<% String pageTitle = "Attacking Class"; %>
+<% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp"%>
 
 </div></div></div></div></div>
@@ -89,9 +89,16 @@
 
     /* mutant_progressbar */
 //    request.setAttribute("gameId", game.getId());
+
+    final String title = puzzle.getTitle();
+    final String description = puzzle.getDescription();
 %>
 
-
+    <div class="row" style="padding: 0px 15px;">
+        <h4 class="col-md-2"><b><%=title%></b></h4>
+        <h4><%=description%></h4>
+    </div>
+    <hr class="hr-primary" style="margin: 5px">
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6">
         <div id="mutants-div">

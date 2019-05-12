@@ -33,6 +33,7 @@ public class Constants {
 
 	public static final String F_SEP = System.getProperty("file.separator");
 
+	// TODO Cannot be injected in static context  
 	public static final String DATA_DIR;
 
 	static {
@@ -42,7 +43,7 @@ public class Constants {
 		try {
 			initialContext = new InitialContext();
 			Context environmentContext = (Context) initialContext.lookup("java:comp/env");
-			dataHome = (String) environmentContext.lookup("data.dir");
+			dataHome = (String) environmentContext.lookup("codedefenders/data.dir");
 
 		} catch (NamingException e) {
 			// e.printStackTrace();
@@ -67,7 +68,7 @@ public class Constants {
 	}
 
 	// Configuration variable names
-	public static final String BLOCK_ATTACKER = "block.attacker";
+	public static final String BLOCK_ATTACKER = "codedefenders/block.attacker";
 
 	// Dummy game
 	public static final int DUMMY_GAME_ID = -1;

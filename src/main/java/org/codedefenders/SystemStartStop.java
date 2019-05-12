@@ -18,15 +18,20 @@
  */
 package org.codedefenders;
 
-import org.codedefenders.database.ConnectionPool;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.codedefenders.database.ConnectionPool;
+import org.codedefenders.execution.ThreadPoolManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SystemStartStop implements ServletContextListener {
     private static final Logger logger = LoggerFactory.getLogger(SystemStartStop.class);
+
+    @Inject
+    private ThreadPoolManager mgr;
 
     // Public constructor is required by servlet spec
     public SystemStartStop() {
@@ -34,9 +39,10 @@ public class SystemStartStop implements ServletContextListener {
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        /* This method is called when the servlet context is
-         * initialized(when the Web application is deployed).
-         * You can initialize servlet context related data here.
+        /*
+         * This method is called when the servlet context is initialized(when
+         * the Web application is deployed). You can initialize servlet context
+         * related data here.
          */
         try {
             ConnectionPool.instance();
@@ -45,15 +51,22 @@ public class SystemStartStop implements ServletContextListener {
             // Fail Deployment
             throw new RuntimeException("Deployment failed. Reason: ", e);
         }
+
+        mgr.register("test-executor").withMax(4).withCore(2).add();
     }
 
     @Override
     public void contextDestroyed(ServletContextEvent sce) {
-        /* This method is invoked when the Servlet Context
-         * (the Web application) is undeployed or
-         * Application Server shuts down.
+        /*
+         * This method is invoked when the Servlet Context (the Web application)
+         * is undeployed or Application Server shuts down.
          */
-        ConnectionPool.instance().closeDBConnections();
-        logger.info("Code Defenders shut down successfully.");
+        try {
+            ConnectionPool.instance().closeDBConnections();
+            logger.info("Code Defenders shut down successfully.");
+        } catch (Throwable e) {
+            logger.error("Error in closing connections", e);
+        }
+        // The ThreadPoolManager should be able to automatically stop the instances  
     }
 }
