@@ -42,8 +42,8 @@
 
                 <%-- Make those interactive later ! For the moment they are just place holders ! --%>
                 <%-- Probably use some DISABLE CSS or something  --%>
-                <a class="notification-chat glyphicon glyphicon-envelope"></a>
-                <a class="notification-game glyphicon glyphicon-bell"></a>
+                <a id="notification-chat" class="notification-icon glyphicon glyphicon-envelope"></a>
+                <a id="notification-game" class="notification-icon glyphicon glyphicon-bell"></a>
                 <%-- --%>
 
                 <a href="#" class="btn btn-diff" id="btnScoringTooltip" data-toggle="modal"

@@ -1,4 +1,4 @@
-<link href="css/notification-chat.css" rel="stylesheet" type="text/css" />
+<link href="css/notification-icons.css" rel="stylesheet" type="text/css" />
 
 <%-- Assume this is already there or replace the one which is there !
 <div class="notification-chat"></div>
@@ -23,7 +23,7 @@ where we might have the list of "read" messages.
 		
 		console.log("Chat: Got message " + message)
 
-		var el = document.querySelector('.notification-chat');
+		var el = document.querySelector('#notification-chat');
 		var count = Number(el.getAttribute('data-count')) || 0;
 		el.setAttribute('data-count', count + 1);
 		el.classList.remove('notify');

@@ -1,8 +1,6 @@
-
 /* https://codepen.io/ryanmorr/pen/RPZZjd */
-/* Notifications */
 
-.notification-game {
+.notification-icon {
     display: inline-block;
     position: relative;
     padding: 0.6em;
@@ -12,19 +10,21 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
-.notification-game::before,
-.notification-game::after {
+.notification-icon::before,
+.notification-icon::after {
     color: #fff;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-.notification-game::before {
+.notification-icon::before {
     display: block;
     transform-origin: top center;
 }
 
-.notification-game::after {
-    font-family: Arial;
+.notification-icon::after {
+    content: attr(data-count);
+
+    font-family: Arial, sans-serif;
     font-size: 0.7em;
     font-weight: 700;
     position: absolute;
@@ -36,8 +36,6 @@
     border-radius: 60px;
     background: #3498db;
     opacity: 0;
-    content: attr(data-count);
-    opacity: 0;
     -webkit-transform: scale(0.5);
     transform: scale(0.5);
     transition: transform, opacity;
@@ -45,12 +43,12 @@
     transition-timing-function: ease-out;
 }
 
-.notification-game.notify::before {
+.notification-icon.notify::before {
     -webkit-animation: ring 1.5s ease;
     animation: ring 1.5s ease;
 }
 
-.notification-game.show-count::after {
+.notification-icon.show-count::after {
     -webkit-transform: scale(1);
     transform: scale(1);
     opacity: 1;

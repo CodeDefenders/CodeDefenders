@@ -1,10 +1,9 @@
-<link href="css/notification-game.css" rel="stylesheet" type="text/css" />
+<link href="css/notification-icons.css" rel="stylesheet" type="text/css" />
 
 <%-- Assume this is already there or replace the one which is there !
 <div class="notification-game"></div>
 TODO after reloading the page we lose the notificaiton count so we might need to store this into the session or load it from the db
 where we might have the list of "read" messages.  
- 
 --%>
 
 <script language="javascript" type="text/javascript">
@@ -31,7 +30,7 @@ where we might have the list of "read" messages.
 		if( message['type'] != 'GAME')
 			return;
 		
-		var el = document.querySelector('.notification-game');
+		var el = document.querySelector('#notification-game');
 		var count = Number(el.getAttribute('data-count')) || 0;
 		el.setAttribute('data-count', count + 1);
 		el.classList.remove('notify');
