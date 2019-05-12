@@ -6,30 +6,23 @@ TODO after reloading the page we lose the notificaiton count so we might need to
 where we might have the list of "read" messages.  
 --%>
 
-<script language="javascript" type="text/javascript">
+<script>
+	// Send a registration message to the WebSocket
+	var registration = {
+	    type: "org.codedefenders.notification.web.PushSocketRegistrationEvent",
+        gameID: <%=request.getAttribute("gameId")%>, // Check game_view.jsp@34
+        playerID: <%=request.getAttribute("playerId")%>,
+        target: 'GAME_EVENT'
+    };
 
-	// Send a registration messaget to the WebSocket
-	var registration = {};
-	// Check game_view.jsp@34
-	registration['type'] = "org.codedefenders.notification.web.PushSocketRegistrationEvent";
-	registration['gameID'] = <%=request.getAttribute("gameId")%>;
-	registration['playerID'] = <%=request.getAttribute("playerId")%>;
-	registration['target'] = "GAME_EVENT";
-	
     // This ensures that connection is open. Will retry otherwise
-	sendMessage(JSON.stringify(registration));
-    console.log("Game notification registered " + JSON.stringify(registration) )
-    
-	// Replace this with something probably a bit more reliabel:
-	// https://gist.github.com/ismasan/299789
-	// notificationMessageHandlers.push(gameEventHandler);
+	pushSocket.send(registration);
+    console.log("Game notification registered:");
+    console.log(registration);
 
 	// This should be interpreted as a local var...
-	shakeIt = function(message) {
+	shakeIt = function (message) {
 		// Ideally here one would simply encode this behavior in the notificationMessageHandlers
-		if( message['type'] != 'GAME')
-			return;
-		
 		var el = document.querySelector('#notification-game');
 		var count = Number(el.getAttribute('data-count')) || 0;
 		el.setAttribute('data-count', count + 1);
@@ -39,7 +32,8 @@ where we might have the list of "read" messages.
 		if (count === 0) {
 			el.classList.add('show-count');
 		}
-	}
+	};
+
 	// This does not show the actual notifications, but only that there might some !
-	notificationMessageHandlers.push(shakeIt);
+    pushSocket.register(PushSocket.EventType.GAME, shakeIt);
 </script>

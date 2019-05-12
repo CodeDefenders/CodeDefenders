@@ -113,6 +113,13 @@ public class PushSocket {
 
     @OnMessage
     public void onMessage(String json, Session session) {
+        /*
+        try {
+            session.getBasicRemote().sendText(json);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        */
 
         // TODO Create a typeAdapterFactory:
         // https://stackoverflow.com/questions/22307382/how-do-i-implement-typeadapterfactory-in-gson
