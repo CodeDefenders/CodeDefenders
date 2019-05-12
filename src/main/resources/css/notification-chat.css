@@ -18,11 +18,8 @@
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-/* \f0e0 displays an envelop, \f27a for the icon of a baloon/chat */
 .notification-chat::before {
     display: block;
-    content: "\f0e0";
-    font-family: "FontAwesome";
     transform-origin: top center;
 }
 

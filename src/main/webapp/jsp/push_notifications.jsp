@@ -33,7 +33,7 @@ var wsUri = "ws://<%=request.getServerName()%>:<%=request.getServerPort()%><%=re
 console.log("Setting up websocket at", wsUri);
 
 //Global Scope
-notificationMessageHandlers = []
+notificationMessageHandlers = [];
 websocket = new WebSocket(wsUri);
 websocket.onmessage = function(evt) {
     // Iterate over the registered handlers and pass the evt to them
@@ -42,7 +42,7 @@ websocket.onmessage = function(evt) {
     /* console.log("Got notification: " + evt.data ) */
     message = JSON.parse(evt.data.replace(/[\s\0]/g, ' '));
     for (var key in notificationMessageHandlers) {
-    	notificationMessageHandlers[key](message);
+        notificationMessageHandlers[key](message);
     }
 };
 
@@ -55,22 +55,21 @@ function sendMessage(msg){
 }
 
 // Make the function wait until the connection is made...
-function waitForSocketConnection(socket, callback){
+function waitForSocketConnection(socket, callback) {
     // TODO: this is sometimes called twice if the connection succeeds or there is an error
     setTimeout(
         function () {
             if (socket.readyState === 1) {
                 console.log("Connection is made");
-                if(callback != null){
+                if (callback != null) {
                     callback();
                 }
-                return;
 
             } else {
                 console.log("wait for connection...");
                 waitForSocketConnection(socket, callback);
             }
 
-        }, 50); // wait 5 milisecond for the connection...
+        }, 50); // wait 50 milliseconds for the connection...
 }
 </script>

@@ -39,13 +39,13 @@
             </h2></div>
             <%-- This bar shows the possible interactions at game level --%>
             <div class="container">
-                
+
                 <%-- Make those interactive later ! For the moment they are just place holders ! --%>
                 <%-- Probably use some DISABLE CSS or something  --%>
-                <a class="notification-chat"></a>
-                <a class="notification-game"></a>
+                <a class="notification-chat glyphicon glyphicon-envelope"></a>
+                <a class="notification-game glyphicon glyphicon-bell"></a>
                 <%-- --%>
-                
+
                 <a href="#" class="btn btn-diff" id="btnScoringTooltip" data-toggle="modal"
                    data-target="#scoringTooltip"
                    style="color: black; font-size: 18px; padding: 5px;">

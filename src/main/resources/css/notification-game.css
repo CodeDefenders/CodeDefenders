@@ -12,7 +12,7 @@
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
-.notification-game::before, 
+.notification-game::before,
 .notification-game::after {
     color: #fff;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
@@ -20,8 +20,6 @@
 
 .notification-game::before {
     display: block;
-    content: "\f0f3";
-    font-family: "FontAwesome";
     transform-origin: top center;
 }
 
