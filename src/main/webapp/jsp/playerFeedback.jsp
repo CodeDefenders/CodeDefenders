@@ -180,7 +180,7 @@
                     <tr>
                         <th><%=canSeePlayerFeedback ? "Player" : ""%></th>
                         <% for (Feedback.Type f : Feedback.Type.values()) {%>
-                        <th title="<%=f.description()%>"><%=f.displayName()%>
+                        <th style="width: 12.5%" title="<%=f.description()%>"><%=f.displayName()%>
                         </th>
                         <%}%>
                     </tr>
@@ -277,6 +277,8 @@
         var provideFeedbackModalStyle = document.getElementById('provide_feedback_modal').style.display;
         document.getElementById('view_feedback_modal').style.display = provideFeedbackModalStyle;
         document.getElementById('provide_feedback_modal').style.display = provideFeedbackModalStyle == 'none' ? 'block' : 'none';
+        document.getElementById('view_feedback_modal').style.width = "90%";
+        document.getElementById('view_feedback_modal').style.margin = "0 auto";
         document.getElementById('provideFeedbackLink').classList.toggle('active');
         document.getElementById('viewFeedbackLink').classList.toggle('active');
     }
