@@ -99,12 +99,12 @@
         </li>
         <li <%= currentPage == KillmapPage.AVAILABLE ? "class=\"active\"" : "" %>>
             <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "/available" %>">
-                Available Killmaps
+                Select Classes / Games
             </a>
         </li>
         <li <%= currentPage == KillmapPage.QUEUE ? "class=\"active\"" : "" %>>
             <a href="<%= request.getContextPath() + Paths.ADMIN_KILLMAPS + "/queue" %>">
-                Queued Killmaps
+                Queued Killmap Jobs
             </a>
         </li>
     </ul>
