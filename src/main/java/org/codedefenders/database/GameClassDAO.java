@@ -29,7 +29,11 @@ import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import static org.codedefenders.database.DB.RSMapper;
 
@@ -287,5 +291,20 @@ public class GameClassDAO {
         DatabaseValue[] values = classes.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
 
         return DB.executeUpdateQuery(query, values);
+    }
+
+    /**
+     * Checks for which of the given IDs classes exist in the database.
+     *
+     * @param ids The class IDs to check.
+     * @return The given class IDs for which classes exist.
+     */
+    public static List<Integer> filterExistingClassIDs(List<Integer> ids) {
+        if (ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+        String query = "SELECT Class_ID FROM classes WHERE Class_ID in (" + idsString + ")";
+        return DB.executeQueryReturnList(query, rs -> rs.getInt("Class_ID"));
     }
 }

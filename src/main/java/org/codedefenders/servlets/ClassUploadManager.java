@@ -462,9 +462,7 @@ public class ClassUploadManager extends HttpServlet {
             // Since gameID = -1, DAOs cannot find the class linked to this
             // game, hence its if, which is needed instead inside mutants and
             // tests
-            KillMap killMap = KillMap.forCustom(tests, mutants, cutId, new ArrayList<>(), true,
-                    // Since this is required. Make a default one.
-                    (t, u) -> true);
+            KillMap killMap = KillMap.forCustom(tests, mutants, cutId, new ArrayList<>());
             for (KillMapEntry entry : killMap.getEntries()) {
                 // TODO Phil 04/12/18: Batch insert instead of insert in a for loop
                 KillmapDAO.insertKillMapEntry(entry, cutId);

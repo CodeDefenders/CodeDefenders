@@ -44,9 +44,9 @@
     </table>
 
     <div class="btn-group">
-        <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?type=csv"
+        <a download="killmap-analytics.csv" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?filetype=csv"
             type="button" class="btn btn-default" id="download-csv">Download as CSV</a>
-        <a download="killmap-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?type=json"
+        <a download="killmap-analytics.json" href="<%=request.getContextPath()+Paths.API_ANALYTICS_KILLMAP%>?filetype=json"
            type="button" class="btn btn-default" id="download-json">Download as JSON</a>
     </div>
     <div style="display: inline-block; margin-left: 10px;">
@@ -84,7 +84,7 @@
         $(document).ready(function() {
             table = $('#tableKillmaps').DataTable({
                 "ajax": {
-                    "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_KILLMAP%>",
+                    "url": "<%=request.getContextPath() + Paths.API_ANALYTICS_KILLMAP + "?fileType=json"%>",
                     "dataSrc": "data"
                 },
                 "columns": [

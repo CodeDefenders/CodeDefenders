@@ -510,7 +510,7 @@ public class Installer {
         logger.info("installPuzzle() Created Puzzle " + puzzleId);
 
         try {
-            KillMap killMap = KillMap.forCustom(puzzleTests, puzzleMutants, puzzleClassId, new ArrayList<>(), true, (t, m) -> true);
+            KillMap killMap = KillMap.forCustom(puzzleTests, puzzleMutants, puzzleClassId, new ArrayList<>());
             for (KillMap.KillMapEntry entry : killMap.getEntries()) {
                 // TODO Phil 04/12/18: Batch insert instead of insert in a for loop
                 KillmapDAO.insertKillMapEntry(entry, puzzleClassId);

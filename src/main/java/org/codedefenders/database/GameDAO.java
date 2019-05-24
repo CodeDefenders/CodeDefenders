@@ -25,7 +25,10 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Player;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 /**
  * This class handles the common database logic between games types.
@@ -127,5 +130,20 @@ public class GameDAO {
                 "FROM games",
                 "WHERE games.ID = ?;");
         return DB.executeQueryReturnValue(query, rs -> rs.getInt("CurrentRound"), DatabaseValue.of(gameId));
+    }
+
+    /**
+     * Checks for which of the given IDs games exist in the database.
+     *
+     * @param ids The game IDs to check.
+     * @return The given game IDs for which games exist.
+     */
+    public static List<Integer> filterExistingGameIDs(List<Integer> ids) {
+        if (ids.isEmpty()) {
+            return new ArrayList<>();
+        }
+        String idsString = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+        String query = "SELECT ID FROM games WHERE ID in (" + idsString + ")";
+        return DB.executeQueryReturnList(query, rs -> rs.getInt("ID"));
     }
 }

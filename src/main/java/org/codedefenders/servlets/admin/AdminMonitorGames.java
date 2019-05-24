@@ -25,8 +25,8 @@ import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UserDAO;
-import org.codedefenders.execution.KillMap.KillMapJob;
-import org.codedefenders.execution.KillMap.KillMapJob.Type;
+import org.codedefenders.execution.KillMapProcessor.KillMapJob;
+import org.codedefenders.execution.KillMap.KillMapType;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
@@ -125,7 +125,7 @@ public class AdminMonitorGames extends HttpServlet {
                     } else {
                         // Schedule the killmap
                         if (GameState.FINISHED.equals(newState)) {
-                            KillmapDAO.enqueueJob( new KillMapJob(Type.GAME, gameId));
+                            KillmapDAO.enqueueJob( new KillMapJob(KillMapType.GAME, gameId));
                         }
                     }
 				}
@@ -139,7 +139,7 @@ public class AdminMonitorGames extends HttpServlet {
                     } else {
                         // Schedule the killmap
                         if (GameState.FINISHED.equals(newState)) {
-                            KillmapDAO.enqueueJob( new KillMapJob(Type.GAME, Integer.parseInt(gameId)));
+                            KillmapDAO.enqueueJob( new KillMapJob(KillMapType.GAME, Integer.parseInt(gameId)));
                         }
                     }
 				}
