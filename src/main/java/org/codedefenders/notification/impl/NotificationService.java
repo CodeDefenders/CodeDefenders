@@ -29,17 +29,19 @@ public class NotificationService implements INotificationService {
 
     @Override
     public void post(Object message) {
-        eventBus.post(message);
+        // TODO: disable notifications for now
+        // eventBus.post(message);
     }
 
     @Override
     public void register(Object eventHandler) {
-        eventBus.register(eventHandler);
+        // TODO: disable notifications for now
+        // eventBus.register(eventHandler);
     }
 
     @Override
     public void unregister(Object eventHandler) {
-        eventBus.unregister(eventHandler);
+        // TODO: disable notifications for now
+        // eventBus.unregister(eventHandler);
     }
-
 }
