@@ -3,11 +3,10 @@ package org.codedefenders.notification.model;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ChatEvent {
+public class ChatEvent extends PushEvent {
 
     private int senderID;
     private Set<Integer> recipients = new HashSet<>();
-    private String eventType;
 
     // TODO Escaping, size limit, etc..
     private String message;
@@ -18,10 +17,6 @@ public class ChatEvent {
 
     public String getMessage() {
         return message;
-    }
-
-    public String getEventType() {
-        return eventType;
     }
 
     // TODO: do we need recipients or is the gameId and team sufficient?
@@ -36,5 +31,4 @@ public class ChatEvent {
     public boolean hasRecipient(int userID) {
         return recipients.contains(userID);
     }
-
 }

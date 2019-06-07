@@ -4,11 +4,10 @@ import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
-import org.codedefenders.notification.model.Notification;
-
 import com.google.gson.Gson;
+import org.codedefenders.notification.model.PushEvent;
 
-public class NotificationEncoder implements Encoder.Text<Notification> {
+public class NotificationEncoder implements Encoder.Text<PushEvent> {
 
     @Override
     public void init(EndpointConfig endpointConfig) {
@@ -19,7 +18,7 @@ public class NotificationEncoder implements Encoder.Text<Notification> {
     }
 
     @Override
-    public String encode(Notification object) throws EncodeException {
+    public String encode(PushEvent object) throws EncodeException {
         return new Gson().toJson(object);
     }
 }

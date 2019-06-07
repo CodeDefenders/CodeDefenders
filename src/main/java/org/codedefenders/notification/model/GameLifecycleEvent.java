@@ -9,21 +9,13 @@ import org.codedefenders.game.AbstractGame;
  * @author gambi
  */
 public abstract class GameLifecycleEvent {
-
     private AbstractGame game;
-    private String eventType;
 
-    public GameLifecycleEvent(AbstractGame game, String eventType) {
+    public GameLifecycleEvent(AbstractGame game) {
         this.game = game;
-        this.eventType = eventType;
     }
 
     public AbstractGame getGame() {
         return game;
     }
-
-    public String getEventType() {
-        return eventType;
-    }
-
 }

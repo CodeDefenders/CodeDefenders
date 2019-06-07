@@ -7,14 +7,12 @@ import org.codedefenders.model.User;
 /**
  * @author gambi
  */
+// Maybe Ended ?!
 public class GameLeftEvent extends GameLifecycleEvent {
-
-    // Maybe Ended ?!
-    final static String eventType = EventStatus.LEFT.toString();
     private User user;
-    
+
     public GameLeftEvent(AbstractGame game, User user) {
-        super(game, eventType);
+        super(game);
         this.user = user;
     }
 

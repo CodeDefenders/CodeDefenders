@@ -113,57 +113,17 @@ public class PushSocket {
 
     @OnMessage
     public void onMessage(String json, Session session) {
-        /*
-        try {
-            session.getBasicRemote().sendText(json);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        */
-
         // TODO Create a typeAdapterFactory:
         // https://stackoverflow.com/questions/22307382/how-do-i-implement-typeadapterfactory-in-gson
-        if (json.contains("org.codedefenders.notification.web.PushSocketRegistrationEvent")) {
-            try {
-                PushSocketRegistrationEvent registration = new Gson().fromJson(json, PushSocketRegistrationEvent.class);
 
-                System.out.println("PushSocket.onMessage() GOT " + json + " -> " + registration);
+        // Registration for event types
+        // PushSocketRegistrationEvent registration = new Gson().fromJson(json, PushSocketRegistrationEvent.class);
+        // this.gameEventHandler = new GameEventHandler(registration.getPlayerID(), registration.getGameID(), session);
+        // notificationService.register(gameEventHandler);
 
-                if ("GAME_EVENT".equals(registration.getTarget())) {
-                    this.gameEventHandler = new GameEventHandler(registration.getPlayerID(), registration.getGameID(),
-                            session);
-                    notificationService.register(gameEventHandler);
-                } else if ("CHAT_EVENT".equals(registration.getTarget())) {
-                    this.chatEventHandler = new ChatEventHandler(this.userId, session);
-                    notificationService.register(this.chatEventHandler);
-                } else if ("PROGRESSBAR_EVENT".equals(registration.getTarget())) {
-
-                    if ("DEREGISTER".equalsIgnoreCase(registration.getAction())){
-                        logger.info("Deregistering Progress Bar " + session );
-                        if (this.progressBarEventHandler != null) {
-                            notificationService.unregister(this.progressBarEventHandler);
-                        }
-                    } else{
-                        this.progressBarEventHandler = new ProgressBarEventHandler(registration.getPlayerID(), session);
-                        notificationService.register(this.progressBarEventHandler);
-                        logger.info("Registering Progress Bar " + session );
-                    }
-
-                }
-            } catch (Throwable e) {
-                logger.error("Cannot parse registration event", e);
-            }
-        } else {
-            try {
-                ChatEvent chatMessage = new Gson().fromJson(json, ChatEvent.class);
-                // TODO Add routing information here? e.g., direct message vs
-                // team
-                // vs game
-                notificationService.post(chatMessage);
-            } catch (Throwable e) {
-                logger.error("Cannot parse chat event", e);
-            }
-        }
+        // Chat messages
+        // ChatEvent chatMessage = new Gson().fromJson(json, ChatEvent.class);
+        // notificationService.post(chatMessage);
     }
 
     @OnError

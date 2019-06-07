@@ -6,15 +6,10 @@ import javax.websocket.EncodeException;
 import javax.websocket.Session;
 
 import org.codedefenders.notification.model.ChatEvent;
-import org.codedefenders.notification.model.Notification;
 
 import com.google.common.eventbus.Subscribe;
 
 public class ChatEventHandler {
-
-    // TODO Why not simply a string?
-    // TODO Message is never set?
-    private final Notification notification = new Notification("CHAT");
 
     private int userId;
     private Session session;
@@ -27,7 +22,8 @@ public class ChatEventHandler {
     @Subscribe
     public void pushChatMessage(ChatEvent e) throws IOException, EncodeException {
         if (e.hasRecipient(this.userId)) {
-            session.getBasicRemote().sendObject(notification);
+            // TODO
+            // session.getBasicRemote().sendObject(notification);
         }
     }
 }

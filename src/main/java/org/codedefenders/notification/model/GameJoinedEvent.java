@@ -7,14 +7,12 @@ import org.codedefenders.model.User;
 /**
  * @author gambi
  */
+// Maybe Ended ?!
 public class GameJoinedEvent extends GameLifecycleEvent {
-
-    // Maybe Ended ?!
-    final static String eventType = EventStatus.JOINED.toString();
     private User user;
 
     public GameJoinedEvent(AbstractGame game, User user) {
-        super(game, eventType);
+        super(game);
         this.user = user;
     }
 

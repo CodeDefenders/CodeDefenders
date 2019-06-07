@@ -19,14 +19,14 @@ public class NotificationService implements INotificationService {
 
     // TODO Maybe there's some better instantiation options
     private EventBus eventBus = new EventBus();
-    
+
     // TODO Ensures that event bus is defined in a Tomcat System Listener !
     // public NotificationService(EventBus eventBus) {
     //     this.eventBus = eventBus;
     // }
-    
+
     public NotificationService() {}
-    
+
     @Override
     public void post(Object message) {
         eventBus.post(message);
@@ -35,7 +35,6 @@ public class NotificationService implements INotificationService {
     @Override
     public void register(Object eventHandler) {
         eventBus.register(eventHandler);
-        
     }
 
     @Override

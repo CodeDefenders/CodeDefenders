@@ -5,21 +5,13 @@ import org.codedefenders.game.Test;
 /**
  * @author gambi
  */
-public abstract class TestLifecycleEvent {
-    /*
-     * This is a superset of TargetExecution.Target.Type unless we extend that
-     * class
-     */
-    private String eventType;
+/* Types of test lifecycle events are a superset of TargetExecution.Target.Type
+ * TODO: extend this class */
+public abstract class TestLifecycleEvent extends PushEvent {
     private Test test;
 
-    public TestLifecycleEvent(Test test, String eventType) {
-        this.eventType = eventType;
+    public TestLifecycleEvent(Test test) {
         this.test = test;
-    }
-
-    public String getEventType() {
-        return eventType;
     }
 
     public Test getTest() {
