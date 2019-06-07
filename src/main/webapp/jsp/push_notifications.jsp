@@ -18,17 +18,22 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%-- 
+<%--
 
     This code setups a web socket for the page. It ensures that each request is validated against
     an automatically generated ticket which it matched with the user. Components wishing to receive push events
     must register proper handlers with the notifications channel.
-    
+
 --%>
 <%@ page import="org.codedefenders.notification.web.TicketingFilter"  %>
 
 <script type="text/javascript">
 
+    /*
+     * TODO: do we need to keep a map of event types here or should we send every event to every handler?
+     * TODO: logic to try to reconnect
+     * TODO: handle sending register/unregister events in the register/unregister methods of PushSocket?
+     */
     class PushSocket {
         constructor (url) {
             this.handlers = new Map();
@@ -135,49 +140,4 @@
 
     const wsUri = "ws://<%=name%>:<%=port%><%=context%>/notifications/<%=ticket%>/<%=uid%>";
     window.pushSocket = new PushSocket(wsUri);
-
-    <%--
-    // TODO: is there a better way to do this?
-    console.log("Setting up websocket at", wsUri);
-
-    //Global Scope
-    notificationMessageHandlers = [];
-    websocket = new WebSocket(wsUri);
-    websocket.onmessage = function(evt) {
-        // Iterate over the registered handlers and pass the evt to them
-        // This is brutal...
-        // https://stackoverflow.com/questions/7116035/parse-json-received-with-websocket-results-in-error
-        /* console.log("Got notification: " + evt.data ) */
-        message = JSON.parse(evt.data.replace(/[\s\0]/g, ' '));
-        for (var key in notificationMessageHandlers) {
-            notificationMessageHandlers[key](message);
-        }
-    };
-
-    // TODO Honestly I do not know this is the correct way, to just ref to websocket directly...
-    function sendMessage(msg){
-        // Wait until the state of the socket is not ready and send the message when it is...
-        waitForSocketConnection(websocket, function(){
-            websocket.send(msg);
-        });
-    }
-
-    // Make the function wait until the connection is made...
-    function waitForSocketConnection(socket, callback) {
-        setTimeout(
-            function () {
-                if (socket.readyState === 1) {
-                    console.log("Connection is made");
-                    if (callback != null) {
-                        callback();
-                    }
-
-                } else {
-                    console.log("wait for connection...");
-                    waitForSocketConnection(socket, callback);
-                }
-
-            }, 50); // wait 50 milliseconds for the connection...
-    }
-    --%>
 </script>

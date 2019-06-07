@@ -37,7 +37,10 @@
 <script>
     var updateProgressBar = function (url) {
         var progressBarDiv = document.getElementById("progress-bar");
+        console.log("update mutant progress bar"); // TODO: remove
         $.get(url, function (r) {
+                console.log("response in mutant progress bar"); // TODO: remove
+                console.log(r);
                 $(r).each(function (index) {
                     switch (r[index]) {
                         case 'COMPILE_MUTANT': // After test is compiled

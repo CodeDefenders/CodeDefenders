@@ -7,7 +7,7 @@ import org.codedefenders.game.Mutant;
  */
 /* Types of mutant lifecycle events are a superset of TargetExecution.Target.Type
  * TODO: extend this class */
-public abstract class MutantLifecycleEvent extends PushEvent {
+public abstract class MutantLifecycleEvent {
     private Mutant mutant;
 
     public MutantLifecycleEvent(Mutant mutant) {

@@ -86,14 +86,16 @@
     </div>
 
     <div class="col-md-6" id="newmut-div">
-        <%@include file="../game_components/push_mutant_progress_bar.jsp"%>
+        <%--<%@include file="../game_components/push_mutant_progress_bar.jsp"%>--%>
+        <%@include file="../game_components/mutant_progress_bar.jsp"%>
 
         <div class="row" style="display: contents">
             <h3 style="margin-bottom: 0; display: inline">Create a mutant here</h3>
 
             <!-- Attack button with intention dropDown set in attacker_intention_collector.jsp -->
+            <%-- TODO: change back to registerMutantProgressBar() --%>
             <button type="submit" class="btn btn-primary btn-game btn-right" id="submitMutant" form="atk"
-                onClick="registerMutantProgressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';"
+                onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Attacking...';"
                 style="float: right; margin-right: 5px"
                 <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
                 Attack!
