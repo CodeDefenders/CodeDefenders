@@ -8,7 +8,7 @@ public class ChatEvent {
     private int senderID;
     private Set<Integer> recipients = new HashSet<>();
     private String eventType;
-    
+
     // TODO Escaping, size limit, etc..
     private String message;
 
@@ -23,7 +23,8 @@ public class ChatEvent {
     public String getEventType() {
         return eventType;
     }
-    
+
+    // TODO: do we need recipients or is the gameId and team sufficient?
     public ChatEvent(int userID, String message, int... recipients) {
         this.senderID = userID;
         this.message = message;
@@ -32,7 +33,7 @@ public class ChatEvent {
         }
     }
 
-    public boolean addRecipient(int userID) {
+    public boolean hasRecipient(int userID) {
         return recipients.contains(userID);
     }
 

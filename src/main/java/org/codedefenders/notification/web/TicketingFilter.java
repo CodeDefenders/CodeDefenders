@@ -1,7 +1,6 @@
 package org.codedefenders.notification.web;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.inject.Inject;
 import javax.servlet.Filter;
@@ -18,7 +17,7 @@ import org.codedefenders.notification.ITicketingService;
 public class TicketingFilter implements Filter {
 
     public static final String TICKET_REQUEST_ATTRIBUTE_NAME = "notification-ticket";
-    
+
     @Inject
     private ITicketingService ticketingService;
 
@@ -43,7 +42,7 @@ public class TicketingFilter implements Filter {
                  * This is a valid HTTP request from LoginFilter, we decorate it
                  * with a new ticket
                  */
-                String ticket = ticketingService.generatedTicketForOwner(userId);
+                String ticket = ticketingService.generateTicketForOwner(userId);
                 request.setAttribute(TICKET_REQUEST_ATTRIBUTE_NAME, ticket);
                 System.out.println("TicketingFilter.doFilter() Registering ticket " + ticket + " for " + userId
                         + " from " + httpReq.getRequestURI());

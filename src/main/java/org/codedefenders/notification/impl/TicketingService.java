@@ -14,9 +14,9 @@ public class TicketingService implements ITicketingService {
 
     // Add duration for validity ?
     private ConcurrentHashMap<String, Integer> tickets = new ConcurrentHashMap<String, Integer>();
-    
+
     @Override
-    public synchronized String generatedTicketForOwner(Integer owner) {
+    public synchronized String generateTicketForOwner(Integer owner) {
         // TODO Validate. Owner cannot be null !
         String ticket = UUID.randomUUID().toString();
         tickets.put(ticket, owner);
@@ -32,7 +32,7 @@ public class TicketingService implements ITicketingService {
     @Override
     public void invalidateTicket(String ticket) {
         if (ticket != null)
-            tickets.remove( ticket );
+            tickets.remove(ticket);
     }
 
 }

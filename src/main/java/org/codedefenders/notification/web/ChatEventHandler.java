@@ -26,7 +26,7 @@ public class ChatEventHandler {
 
     @Subscribe
     public void pushChatMessage(ChatEvent e) throws IOException, EncodeException {
-        if (e.addRecipient(this.userId)) {
+        if (e.hasRecipient(this.userId)) {
             session.getBasicRemote().sendObject(notification);
         }
     }

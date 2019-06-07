@@ -47,7 +47,7 @@ public class ProgressBarEventHandler {
                     session.getBasicRemote().sendObject(notification);
                 } else {
                     // TODO Log this ?
-                 }
+                }
             }
         }
     }

@@ -72,7 +72,7 @@ public class PushSocket {
     }
 
     private boolean validate(Session session, String ticket, Integer owner) throws IOException{
-        if( ! ticketingServices.validateTicket(ticket, owner)){
+        if (! ticketingServices.validateTicket(ticket, owner)){
             logger.info("Invalid ticket for session " + session );
             session.close( new CloseReason( CloseCodes.CANNOT_ACCEPT, "Invalid ticket"));
             return false;
@@ -106,7 +106,7 @@ public class PushSocket {
             notificationService.unregister(this.chatEventHandler);
         }
         if (this.progressBarEventHandler != null) {
-            logger.info("Deregistering Progress Bar " + session);
+            logger.info("Unregistering Progress Bar " + session);
             notificationService.unregister(this.progressBarEventHandler);
         }
     }
@@ -168,7 +168,7 @@ public class PushSocket {
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        logger.error("Session " + session + " is on error. Cause: ", throwable );
+        logger.error("Session " + session + " is on error. Cause: ", throwable);
     }
 
 }
