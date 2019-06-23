@@ -23,6 +23,7 @@ import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.execution.KillMapProcessor;
@@ -36,6 +37,13 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.Player;
+import org.codedefenders.model.User;
+import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.model.GameCreatedEvent;
+import org.codedefenders.notification.model.GameJoinedEvent;
+import org.codedefenders.notification.model.GameLeftEvent;
+import org.codedefenders.notification.model.GameStartedEvent;
+import org.codedefenders.notification.model.GameStoppedEvent;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -56,6 +64,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -91,6 +100,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameSelectionManager.class);
 
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
+
+    @Inject
+    private INotificationService notificationService;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -326,6 +338,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             }
         }
 
+        /*
+         * Publish the event that a new game started
+         */
+        notificationService.post(new GameCreatedEvent(nGame));
+
+
         // Redirect to admin interface
         if (request.getParameter("fromAdmin").equals("true")) {
             response.sendRedirect(contextPath + "/admin");
@@ -366,9 +384,17 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         boolean defenderParamExists = ServletUtils.parameterThenOrOther(request, "defender", true, false);
         boolean attackerParamExists = ServletUtils.parameterThenOrOther(request, "attacker", true, false);
 
+        User user = UserDAO.getUserById(userId);
+
         if (defenderParamExists) {
             if (game.addPlayer(userId, Role.DEFENDER)) {
                 logger.info("User {} joined game {} as a defender.", userId, gameId);
+
+                /*
+                 * Publish the event about the user
+                 */
+                notificationService.post(new GameJoinedEvent(game, user));
+
                 response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             } else {
                 logger.info("User {} failed to join game {} as a defender.", userId, gameId);
@@ -377,6 +403,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         } else if (attackerParamExists) {
             if (game.addPlayer(userId, Role.ATTACKER)) {
                 logger.info("User {} joined game {} as an attacker.", userId, gameId);
+
+                /*
+                 * Publish the event about the user
+                 */
+                notificationService.post(new GameJoinedEvent(game, user));
+
                 response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             } else {
                 logger.info("User {} failed to join game {} as an attacker.", userId, gameId);
@@ -428,6 +460,14 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         notif.insert();
 
         logger.info("User {} successfully left game {}", userId, gameId);
+
+        /*
+         * Publish the event about the user
+         */
+        User user = UserDAO.getUserById(userId);
+        notificationService.post(new GameLeftEvent(game, user));
+
+
         response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
     }
 
@@ -451,6 +491,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             game.setState(GameState.ACTIVE);
             game.update();
         }
+
+        /*
+         * Publish the event about the user
+         */
+        notificationService.post(new GameStartedEvent(game));
+
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
     }
 
@@ -476,6 +522,12 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             if (updated) {
                 KillmapDAO.enqueueJob(new KillMapProcessor.KillMapJob(KillMap.KillMapType.GAME, gameId));
             }
+
+            /*
+             * Publish the event about the user
+             */
+            notificationService.post(new GameStoppedEvent(game));
+
             response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_SELECTION);
         } else {
             response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_HISTORY + "?gameId=" + gameId);

@@ -22,9 +22,11 @@
     var attackButton = document.getElementById('submitMutant');
     var theForm = document.getElementById('atk');
 
+    // Who calls this function ?
     function updateAttackForm(value){
         document.getElementById("attacker_intention").value = value;
-        progressBar();
+        /* progressBar(); */
+        registerMutantProgressBar();
         theForm.submit();
         attackButton.disabled = true;
     }
@@ -44,7 +46,7 @@
     attackDropDown.setAttribute("id", "attackDropDown")
     attackDropDown.setAttribute("class", "dropdown")
     attackDropDown.setAttribute("style", "float: right; margin-right: 5px")
-    
+
     var attackDropDownButton = document.createElement('button');
     attackDropDownButton.setAttribute("type", "button")
     attackDropDownButton.setAttribute("class", "btn btn-primary btn-game btn-right dropdown-toggle")
@@ -57,11 +59,11 @@
     attackDropDownButton.innerHTML="Attack <span class=\"glyphicon glyphicon-triangle-bottom\" style=\"font-size: small\"/></span>";
     //
     attackDropDown.appendChild(attackDropDownButton)
-    
-    <% if (game.getState() != GameState.ACTIVE) { %> 
+
+    <% if (game.getState() != GameState.ACTIVE) { %>
     attackDropDownButton.disabled = true;
     <% } %>
-   
+
     // At this point we replace originalAttachButton
     originalAttachButton.parentNode.replaceChild(attackDropDown, originalAttachButton);
 
@@ -104,5 +106,4 @@
     // connect <ul>, <li> and <a> elements
     intentionList.appendChild(unknownListItem);
     unknownListItem.appendChild(unknownMutant);
-
 </script>

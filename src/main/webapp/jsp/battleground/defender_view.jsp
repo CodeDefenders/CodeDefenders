@@ -83,12 +83,18 @@
 
 	<div class="col-md-6" id="utest-div">
 		<%@include file="../game_components/test_progress_bar.jsp"%>
+		<%--<%@include file="../game_components/push_test_progress_bar.jsp"%>--%>
+
+		<%-- TODO Why progress bar here is handled differently than mutant submission ?! --%>
+		<%-- TODO: change back to registerTestProgressBar() --%>
 		<h3>Write a new JUnit test here
-			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def" onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
-					<% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
+			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
+                onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
+                <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
 				Defend!
 			</button>
 		</h3>
+
 		<form id="def" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post">
 			<%@include file="../game_components/test_editor.jsp"%>
 			<input type="hidden" name="formType" value="createTest">

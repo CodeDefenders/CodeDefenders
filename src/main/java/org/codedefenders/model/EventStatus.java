@@ -22,6 +22,9 @@ package org.codedefenders.model;
  * Created by thomas on 06/03/2017.
  */
 public enum EventStatus {
-    GAME, NEW, SEEN, DELETED
-
+    GAME, NEW, SEEN, DELETED, ENDED, JOINED, LEFT, STARTED
+    /* FIXME: What should this enum represent? This is a mixture between:
+     *  event type (GAME),
+     *  event status (NEW, SEEN, DELETED)
+     *  and game event type (ENDED, JOINED, LEFT, STARTED) */
 }
