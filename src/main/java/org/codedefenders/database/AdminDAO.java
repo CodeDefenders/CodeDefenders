@@ -18,7 +18,10 @@
  */
 package org.codedefenders.database;
 
+import org.codedefenders.game.Role;
 import org.codedefenders.game.leaderboard.Entry;
+import org.codedefenders.model.User;
+import org.codedefenders.model.UserInfo;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 
 import java.sql.Connection;
@@ -103,7 +106,17 @@ public class AdminDAO {
         return DB.executeUpdateQuery(query, DatabaseValue.of(mid));
     }
 
-    private static List<String> userInfoFromRS(ResultSet rs) throws SQLException {
+    private static UserInfo userInfoFromRS(ResultSet rs) throws SQLException {
+        final User user = UserDAO.userFromRS(rs);
+
+        Timestamp ts = rs.getTimestamp("lastLogin");
+        final Role lastRole = Role.valueOrNull("lastRole");
+        final int totalScore = rs.getInt("TotalScore");
+
+        return new UserInfo(user, ts, lastRole, totalScore);
+    }
+
+    private static List<String> uglyListUserInfoFromRS(ResultSet rs) throws SQLException {
         List<String> userInfo = new ArrayList<>();
         userInfo.add(String.valueOf(rs.getInt("User_ID")));
         userInfo.add(rs.getString("Username"));
@@ -171,15 +184,18 @@ public class AdminDAO {
                 "    (State = 'ACTIVE' OR State = 'CREATED') AND Finish_Time > NOW() AND Role IN ('ATTACKER', 'DEFENDER') AND Active = 1",
                 ")",
                 "ORDER BY lastLogin DESC, User_ID;");
-        return DB.executeQueryReturnList(query, AdminDAO::userInfoFromRS);
+        return DB.executeQueryReturnList(query, AdminDAO::uglyListUserInfoFromRS);
     }
 
-    public static List<List<String>> getAllUsersInfo() throws UncheckedSQLException, SQLMappingException {
+    public static List<UserInfo> getAllUsersInfo() throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT DISTINCT",
                 "  users.User_ID,",
                 "  users.Username,",
                 "  users.Email,",
+                "  users.Password,",
+                "  users.Validated,",
+                "  users.Active,",
                 "  lastLogin.ts AS lastLogin,",
                 "  Role         AS lastRole,",
                 "  totalScore",

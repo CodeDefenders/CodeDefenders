@@ -23,6 +23,7 @@
 <%@ page import="org.codedefenders.database.*" %>
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.model.UserInfo" %>
 <% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
@@ -106,7 +107,7 @@
             <tbody>
 
             <%
-                List<List<String>> unassignedUsersInfo = AdminDAO.getAllUsersInfo();
+                List<UserInfo> unassignedUsersInfo = AdminDAO.getAllUsersInfo();
                 if (unassignedUsersInfo.isEmpty()) {
             %>
 
@@ -119,17 +120,18 @@
             <%
             } else {
                 int currentUserID = (Integer) session.getAttribute("uid");
-                for (List<String> userInfo : unassignedUsersInfo) {
-                    int uid = Integer.valueOf(userInfo.get(0));
-                    String username = userInfo.get(1);
-                    String email = userInfo.get(2);
-                    String lastLogin = userInfo.get(3);
-                    String totalScore = userInfo.get(5);
+                for (UserInfo userInfo : unassignedUsersInfo) {
+                    int userId = userInfo.getUser().getId();
+                    String username = userInfo.getUser().getUsername();
+                    String email = userInfo.getUser().getEmail();
+                    boolean active = userInfo.getUser().isActive();
+                    String lastLogin = userInfo.getLastLoginString();
+                    int totalScore = userInfo.getTotalScore();
             %>
 
-            <tr id="<%="user_row_"+uid%>">
-                <td class="col-sm-1"><%= uid%>
-                    <input type="hidden" name="added_uid" value=<%=uid%>>
+            <tr id="<%="user_row_"+userId%>">
+                <td class="col-sm-1"><%= userId%>
+                    <input type="hidden" name="added_uid" value=<%=userId%>>
                 </td>
                 <td class="col-sm-2"><%= username %>
                 </td>
@@ -140,16 +142,18 @@
                 <td class="col-sm-2"><%= lastLogin %>
                 </td>
                 <td style="padding-top:4px; padding-bottom:4px">
-                    <button class="btn btn-sm btn-primary" id="<%="edit_user_"+uid%>" name="editUserInfo" type="submit" value="<%=uid%>">
+                    <button class="btn btn-sm btn-primary" id="<%="edit_user_"+userId%>" name="editUserInfo" type="submit" value="<%=userId%>">
                         <span class="glyphicon glyphicon-pencil"></span>
                     </button>
                 </td>
                 <td style="padding-top:4px; padding-bottom:4px">
-                    <%if (currentUserID != uid) {%>
-                    <button class="btn btn-sm btn-danger" id="<%="remove_user_"+uid%>" type="submit" value="<%=uid%>" name="deleteUserButton"
-                            onclick="return confirm('Are you sure you want to permanently delete <%=username%>\'s ' +
-                                    'account? \nThis will also delete all their games, mutants, tests, equivalences' +
-                                    ' plus the games\'s mutants, tests and equivalences');" disabled>
+                    <%if (currentUserID != userId) {%>
+                    <button class="btn btn-sm btn-danger" id="<%="inactive_user_"+userId%>" type="submit" value="<%=userId%>" name="setUserInactive"
+                            <% if(!active) { %>
+                            title="User is already set inactive." disabled
+                            <% } %>
+                            onclick="return confirm('Are you sure you want to set <%=username%>\'s account to inactive?');"
+                        >
                         <span class="glyphicon glyphicon-trash"></span>
                     </button>
                     <%}%>

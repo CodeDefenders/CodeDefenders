@@ -616,9 +616,10 @@ WHERE tests.ClassFile IS NOT NULL
       AND ex.Status = 'SUCCESS'
   );
 
-CREATE OR REPLACE VIEW `view_valid_users`
-AS SELECT * FROM `users`
-   WHERE `User_ID` >= 5;
+CREATE OR REPLACE VIEW `view_valid_users` AS
+SELECT * FROM `users`
+   WHERE `User_ID` >= 5
+    AND Active = 1;
 
 --
 -- Leaderboard Views
