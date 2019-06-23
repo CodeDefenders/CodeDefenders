@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -77,51 +78,78 @@ public class AdminUserManagement extends HttpServlet {
         session.setAttribute("messages", messages);
         String responsePath = request.getContextPath() + Paths.ADMIN_USERS;
 
-        final String formType = request.getParameter("formType");
-        switch (formType) {
-            case "manageUsers":
-                String userToResetIdString = request.getParameter("resetPasswordButton");
-                String userToDeleteIdString = request.getParameter("deleteUserButton");
-                String userToEditIdString = request.getParameter("editUserInfo");
-                if (userToResetIdString != null) {
-                    messages.add(resetUserPW(Integer.parseInt(userToResetIdString)));
-                } else if (userToDeleteIdString != null) {
-                    messages.add(deleteUser(Integer.parseInt(userToDeleteIdString)));
-                } else if (userToEditIdString != null) {
-                    responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userToEditIdString;
+        final String formType = ServletUtils.formType(request);
+		switch (formType) {
+			case "manageUsers": {
+                final Optional<Integer> userToReset = ServletUtils.getIntParameter(request, "resetPasswordButton");
+                if (userToReset.isPresent()) {
+                    messages.add(resetUserPW(userToReset.get()));
+                    break;
                 }
-                break;
-            case "createUsers":
-                final String userList = request.getParameter("user_name_list");
-                if (userList == null) {
+                final Optional<Integer> userId = ServletUtils.getIntParameter(request, "setUserInactive");
+                if (userId.isPresent()) {
+                    final boolean success = setUserInactive(userId.get());
+                    if (success) {
+                        messages.add("Successfully set user with id " + userId.get() + " as inactive.");
+                    } else {
+                        logger.warn("Setting user as inactive failed.");
+                        messages.add("Failed to set user as inactive.");
+                    }
+                }
+                final Optional<Integer> userToEdit = ServletUtils.getIntParameter(request, "editUserInfo");
+                if (userToEdit.isPresent()) {
+                    responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userToEdit.get();
+                    break;
+                }
+            }
+			case "createUsers": {
+                final Optional<String> userList = ServletUtils.getStringParameter(request, "user_name_list");
+				if (!userList.isPresent()) {
                     logger.error("Creating users failed. Missing parameter 'user_name_list'");
                 } else {
                     logger.info("Creating users....");
-                    createUserAccounts(request, userList, messages);
-                    logger.info("Creating users succeeded.");
+                    createUserAccounts(request, userList.get(), messages);
+					logger.info("Creating users succeeded.");
+				}
+				break;
+            }
+			case "editUser": {
+			    // TODO Phil 23/06/19: update 'uid' request parameter as it is the same as the userid from the session attributes
+                final Optional<Integer> userId = ServletUtils.getIntParameter(request, "uid");
+                if (!userId.isPresent()) {
+                    logger.error("Creating users failed. Missing request parameter 'uid'");
+                } else {
+                    String successMsg = "Successfully updated info for User " + userId.get();
+                    String msg = editUser(userId.get(), request, successMsg);
+                    messages.add(msg);
+                    if (!msg.equals(successMsg)) {
+                        responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + userId.get();
+                    }
                 }
                 break;
-            case "editUser":
-                String uidString = request.getParameter("uid");
-                String successMsg = "Successfully updated info for User " + uidString;
-                String msg = editUser(uidString, request, successMsg);
-                messages.add(msg);
-                if (!msg.equals(successMsg)) {
-                    responsePath = request.getContextPath() + Constants.ADMIN_USER_JSP + "?editUser=" + uidString;
-                }
-                break;
-            default:
+            }
+			default:
                 logger.error("Action {" + formType + "} not recognised.");
                 break;
-        }
+		}
 
         response.sendRedirect(responsePath);
     }
 
-    private String editUser(String uid, HttpServletRequest request, String successMsg) {
-        User u = UserDAO.getUserById(Integer.parseInt(uid));
+    private boolean setUserInactive(int userId) {
+	    final User user = UserDAO.getUserById(userId);
+        if (user == null) {
+            return false;
+        }
+        user.setActive(false);
+        return user.update();
+
+    }
+
+	private String editUser(int userId, HttpServletRequest request, String successMsg) {
+        User u = UserDAO.getUserById(userId);
         if (u == null)
-            return "Error. User " + uid + " cannot be retrieved from database.";
+            return "Error. User " + userId + " cannot be retrieved from database.";
 
         String name = request.getParameter("name");
         String email = request.getParameter("email");
@@ -150,7 +178,7 @@ public class AdminUserManagement extends HttpServlet {
         u.setEmail(email);
 
         if (!u.update())
-            return "Error trying to update info for user " + uid + "!";
+            return "Error trying to update info for user " + userId + "!";
         return successMsg;
     }
 
