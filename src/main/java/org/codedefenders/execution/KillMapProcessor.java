@@ -42,10 +42,10 @@ import javax.servlet.annotation.WebListener;
  * It reads from the DB KillMapJobs the id of the games waiting for their
  * killmap to be computed, and processes them one at the time. Results are then
  * stored to killmap, and the job is removed from the database
- * 
+ *
  * TODO We should need to decouple the actual processor from the context
  * listener for better testing.
- * 
+ *
  * @author gambi
  *
  */
@@ -84,7 +84,7 @@ public class KillMapProcessor implements ServletContextListener {
             if (gamesToProcess.isEmpty()) {
                 logger.debug("No killmap computation to process");
             } else {
-                
+
                 KillMapJob theJob = gamesToProcess.get(0);
                 currentJob = theJob;
 
@@ -105,9 +105,9 @@ public class KillMapProcessor implements ServletContextListener {
                 case GAME:
                     try {
                         MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame( theJob.getId() );
-                        
+
                         assert game.getId() == theJob.getId();
-                                
+
                         logger.info("Computing killmap for game " + game.getId());
                         KillMap.forGame(game);
                         logger.info("Killmap for game " + game.getId() + ". Remove job from DB");

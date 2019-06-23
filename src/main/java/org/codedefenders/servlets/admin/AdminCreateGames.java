@@ -127,240 +127,240 @@ public class AdminCreateGames extends HttpServlet {
         }
     }
 
-	private void insertGame(HttpServletResponse response, HttpServletRequest request, ArrayList<String> messages, HttpSession session) throws IOException {
-		attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE);
-		defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE);
-		String gameAndUserRemoveId = request.getParameter("tempGameUserRemoveButton");
-		String gameAndUserSwitchId = request.getParameter("tempGameUserSwitchButton");
-		String gameAndUserMoveToId = request.getParameter("tempGameUserMoveToButton");
+    private void insertGame(HttpServletResponse response, HttpServletRequest request, ArrayList<String> messages, HttpSession session) throws IOException {
+        attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE);
+        defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE);
+        String gameAndUserRemoveId = request.getParameter("tempGameUserRemoveButton");
+        String gameAndUserSwitchId = request.getParameter("tempGameUserSwitchButton");
+        String gameAndUserMoveToId = request.getParameter("tempGameUserMoveToButton");
 
-		if (gameAndUserMoveToId != null) {
-			int userId = Integer.valueOf(request.getParameter("tempGameUserMoveToButton").split("_")[2]);
-			String targetGameIdString = request.getParameter("game_" + userId);
-			String currentGameIdString = request.getParameter("tempGameUserMoveToButton").split("_")[5];
-			Role role = Role.valueOf(request.getParameter("role_" + userId));
-			// If any of this fail state of staged games will be inconsistent
-			removePlayerFromGame(session, messages, userId, currentGameIdString);
-			associatePlayerToGameWithRole(session, messages, userId, targetGameIdString, role);
-		} else if (gameAndUserRemoveId != null || gameAndUserSwitchId != null ) {
-			// admin is removing user  from temp game or switching their role or
-			boolean switchUser = gameAndUserSwitchId != null;
-			String gameAndUserId = switchUser ? gameAndUserSwitchId : gameAndUserRemoveId;
-			int gameToRemoveFromId = Integer.parseInt(gameAndUserId.split("-")[0]);
-			Integer userToRemoveId = Integer.parseInt(gameAndUserId.split("-")[1]);
-			List<Integer> attackerIds = attackerIdsList.get(gameToRemoveFromId);
-			List<Integer> defenderIds = defenderIdsList.get(gameToRemoveFromId);
-			if (attackerIds.contains(userToRemoveId)) {
-				attackerIds.remove(userToRemoveId);
-				if (switchUser)
-					defenderIds.add(userToRemoveId);
-			} else {
-				defenderIds.remove(userToRemoveId);
-				if (switchUser)
-					attackerIds.add(userToRemoveId);
-			}
-		} else { // admin is inserting or deleting selected temp games
-			String[] selectedTempGames;
-			selectedTempGames = request.getParameterValues("selectedTempGames");
-			createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
+        if (gameAndUserMoveToId != null) {
+            int userId = Integer.valueOf(request.getParameter("tempGameUserMoveToButton").split("_")[2]);
+            String targetGameIdString = request.getParameter("game_" + userId);
+            String currentGameIdString = request.getParameter("tempGameUserMoveToButton").split("_")[5];
+            Role role = Role.valueOf(request.getParameter("role_" + userId));
+            // If any of this fail state of staged games will be inconsistent
+            removePlayerFromGame(session, messages, userId, currentGameIdString);
+            associatePlayerToGameWithRole(session, messages, userId, targetGameIdString, role);
+        } else if (gameAndUserRemoveId != null || gameAndUserSwitchId != null ) {
+            // admin is removing user  from temp game or switching their role or
+            boolean switchUser = gameAndUserSwitchId != null;
+            String gameAndUserId = switchUser ? gameAndUserSwitchId : gameAndUserRemoveId;
+            int gameToRemoveFromId = Integer.parseInt(gameAndUserId.split("-")[0]);
+            Integer userToRemoveId = Integer.parseInt(gameAndUserId.split("-")[1]);
+            List<Integer> attackerIds = attackerIdsList.get(gameToRemoveFromId);
+            List<Integer> defenderIds = defenderIdsList.get(gameToRemoveFromId);
+            if (attackerIds.contains(userToRemoveId)) {
+                attackerIds.remove(userToRemoveId);
+                if (switchUser)
+                    defenderIds.add(userToRemoveId);
+            } else {
+                defenderIds.remove(userToRemoveId);
+                if (switchUser)
+                    attackerIds.add(userToRemoveId);
+            }
+        } else { // admin is inserting or deleting selected temp games
+            String[] selectedTempGames;
+            selectedTempGames = request.getParameterValues("selectedTempGames");
+            createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
 
-			if (selectedTempGames == null) {
-				messages.add("Please select at least one Game to insert.");
-				response.sendRedirect(request.getContextPath() + "/admin");
-				return;
-			}
+            if (selectedTempGames == null) {
+                messages.add("Please select at least one Game to insert.");
+                response.sendRedirect(request.getContextPath() + "/admin");
+                return;
+            }
 
-			List<Integer> selectedGameIndices = new ArrayList<>();
-			for (String u : selectedTempGames) {
-				selectedGameIndices.add(Integer.parseInt(u));
-			}
+            List<Integer> selectedGameIndices = new ArrayList<>();
+            for (String u : selectedTempGames) {
+                selectedGameIndices.add(Integer.parseInt(u));
+            }
 
-			if (request.getParameter("games_btn").equals("insert Games")) {
-				for (int i : selectedGameIndices) {
-					insertFilledGame(createdGames.get(i), attackerIdsList.get(i), defenderIdsList.get(i));
-				}
-			}
+            if (request.getParameter("games_btn").equals("insert Games")) {
+                for (int i : selectedGameIndices) {
+                    insertFilledGame(createdGames.get(i), attackerIdsList.get(i), defenderIdsList.get(i));
+                }
+            }
 
-			// remove starting from end so indices don't get messed up
-			Collections.sort(selectedGameIndices);
-			Collections.reverse(selectedGameIndices);
+            // remove starting from end so indices don't get messed up
+            Collections.sort(selectedGameIndices);
+            Collections.reverse(selectedGameIndices);
 
-			for (int i : selectedGameIndices) {
-				createdGames.remove(i);
-				attackerIdsList.remove(i);
-				defenderIdsList.remove(i);
-			}
-		}
+            for (int i : selectedGameIndices) {
+                createdGames.remove(i);
+                attackerIdsList.remove(i);
+                defenderIdsList.remove(i);
+            }
+        }
 
-		response.sendRedirect(request.getContextPath() + "/admin");
-	}
+        response.sendRedirect(request.getContextPath() + "/admin");
+    }
 
-	private void removePlayerFromGame(HttpSession session, ArrayList<String> messages, int removedUserId, String gidString) {
-		Integer gid;
-		List<Integer> userList = new ArrayList<>();
-		boolean isTempGame = gidString.startsWith("T");
+    private void removePlayerFromGame(HttpSession session, ArrayList<String> messages, int removedUserId, String gidString) {
+        Integer gid;
+        List<Integer> userList = new ArrayList<>();
+        boolean isTempGame = gidString.startsWith("T");
 
-		// Selecting the target game
-		if (isTempGame) {
-			createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
-			gid = Integer.parseInt(gidString.substring(1));
-			mg = createdGames.get(gid);
-			// My current role matters not the one I will play in the next game !
-			// So return the list that contains me...
+        // Selecting the target game
+        if (isTempGame) {
+            createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
+            gid = Integer.parseInt(gidString.substring(1));
+            mg = createdGames.get(gid);
+            // My current role matters not the one I will play in the next game !
+            // So return the list that contains me...
             userList = (
                     ((List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE)).get(gid).contains(new Integer(removedUserId))
                             ? (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE)
                             : (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE))
                     .get(gid);
-		} else {
-			gid = Integer.parseInt(gidString);
-			mg = MultiplayerGameDAO.getMultiplayerGame(gid);
-		}
+        } else {
+            gid = Integer.parseInt(gidString);
+            mg = MultiplayerGameDAO.getMultiplayerGame(gid);
+        }
 
-		// Remove the user. No need to check for creator or wrong user here
-		if (isTempGame) {
-			if(userList.remove(new Integer( removedUserId ))){
-				messages.add("Removed user " + removedUserId + " from game " + gidString);
-			}else {
-				messages.add("ERROR trying to remove user " + removedUserId + " from game " + gidString);
-			}
-		} else {
-			if (mg.removePlayer(removedUserId)) {
-				messages.add("Removed user " + removedUserId + " from game " + gidString);
-			} else {
-				messages.add("ERROR trying to remove user " + removedUserId + " from game " + gidString);
-			}
-		}
-	}
+        // Remove the user. No need to check for creator or wrong user here
+        if (isTempGame) {
+            if(userList.remove(new Integer( removedUserId ))){
+                messages.add("Removed user " + removedUserId + " from game " + gidString);
+            }else {
+                messages.add("ERROR trying to remove user " + removedUserId + " from game " + gidString);
+            }
+        } else {
+            if (mg.removePlayer(removedUserId)) {
+                messages.add("Removed user " + removedUserId + " from game " + gidString);
+            } else {
+                messages.add("ERROR trying to remove user " + removedUserId + " from game " + gidString);
+            }
+        }
+    }
 
-	private void associatePlayerToGameWithRole(HttpSession session, ArrayList<String> messages, int addedUserId, String gidString, Role role) {
+    private void associatePlayerToGameWithRole(HttpSession session, ArrayList<String> messages, int addedUserId, String gidString, Role role) {
 
-		int gid;
-		List<Integer> userList = new ArrayList<>();
-		boolean isTempGame = gidString.startsWith("T");
-		// Selecting the target game
-		if (isTempGame) {
-			createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
-			gid = Integer.parseInt(gidString.substring(1));
-			mg = createdGames.get(gid);
+        int gid;
+        List<Integer> userList = new ArrayList<>();
+        boolean isTempGame = gidString.startsWith("T");
+        // Selecting the target game
+        if (isTempGame) {
+            createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
+            gid = Integer.parseInt(gidString.substring(1));
+            mg = createdGames.get(gid);
             if (role.equals(Role.ATTACKER))
                 userList = ((List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE)).get(gid);
             else
                 userList = ((List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE)).get(gid);
-		} else {
-			gid = Integer.parseInt(gidString);
-			mg = MultiplayerGameDAO.getMultiplayerGame(gid);
-		}
-		if (mg.getCreatorId() == addedUserId) {
-			messages.add("Cannot add user " + addedUserId + " to game " + String.valueOf(gid) + " because they are it's creator.");
-		} else {
-			if (isTempGame) {
-				userList.add(addedUserId);
-				messages.add("Added user " + addedUserId + " to game " + gidString + " as " + role);
-			} else {
-				if (mg.addPlayer(addedUserId, role)) {
-					messages.add("Added user " + addedUserId + " to game " + gidString + " as " + role);
-				} else {
-					messages.add("ERROR trying to add user " + addedUserId + " to game " + gidString + " as " + role);
-				}
-			}
-		}
-	}
+        } else {
+            gid = Integer.parseInt(gidString);
+            mg = MultiplayerGameDAO.getMultiplayerGame(gid);
+        }
+        if (mg.getCreatorId() == addedUserId) {
+            messages.add("Cannot add user " + addedUserId + " to game " + String.valueOf(gid) + " because they are it's creator.");
+        } else {
+            if (isTempGame) {
+                userList.add(addedUserId);
+                messages.add("Added user " + addedUserId + " to game " + gidString + " as " + role);
+            } else {
+                if (mg.addPlayer(addedUserId, role)) {
+                    messages.add("Added user " + addedUserId + " to game " + gidString + " as " + role);
+                } else {
+                    messages.add("ERROR trying to add user " + addedUserId + " to game " + gidString + " as " + role);
+                }
+            }
+        }
+    }
 
-	private void createGame(HttpServletResponse response, HttpServletRequest request, ArrayList<String> messages, HttpSession session) throws IOException {
-		String rowUserId = request.getParameter("userListButton");
-		if (rowUserId != null) { // if admin is trying to add a single user to a game
-			int addedUserId = Integer.parseInt(rowUserId);
-			// Get the identifying information required to create a game from the submitted form.
-			String gidString = request.getParameter("game_" + addedUserId);
-			Role role = Role.valueOf(request.getParameter("role_" + addedUserId));
-			//
-			associatePlayerToGameWithRole(session, messages, addedUserId, gidString, role);
-		} else { // if admin is batch creating games
-			batchCreateGames(request, response, session, messages);
-		}
-		response.sendRedirect(request.getContextPath() + "/admin");
-	}
+    private void createGame(HttpServletResponse response, HttpServletRequest request, ArrayList<String> messages, HttpSession session) throws IOException {
+        String rowUserId = request.getParameter("userListButton");
+        if (rowUserId != null) { // if admin is trying to add a single user to a game
+            int addedUserId = Integer.parseInt(rowUserId);
+            // Get the identifying information required to create a game from the submitted form.
+            String gidString = request.getParameter("game_" + addedUserId);
+            Role role = Role.valueOf(request.getParameter("role_" + addedUserId));
+            //
+            associatePlayerToGameWithRole(session, messages, addedUserId, gidString, role);
+        } else { // if admin is batch creating games
+            batchCreateGames(request, response, session, messages);
+        }
+        response.sendRedirect(request.getContextPath() + "/admin");
+    }
 
-	private void batchCreateGames(HttpServletRequest request, HttpServletResponse response, HttpSession session, ArrayList<String> messages) throws IOException {
-		attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE);
-		defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE);
-		createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
-		String userIdListString ;
-		String userNameListString;
-		try {
-			userIdListString = request.getParameter("hidden_user_id_list");
-			userNameListString = request.getParameter("user_name_list");
-			cutID = Integer.parseInt(request.getParameter("class"));
-			roleAssignmentMethod = request.getParameter("roles").equals(RoleAssignmentMethod.OPPOSITE.name())
-					? RoleAssignmentMethod.OPPOSITE : RoleAssignmentMethod.RANDOM;
-			teamAssignmentMethod = TeamAssignmentMethod.valueOf(request.getParameter("teams"));
-			attackersPerGame = Integer.parseInt(request.getParameter("attackers"));
-			defendersPerGame = Integer.parseInt(request.getParameter("defenders"));
-			gamesLevel = GameLevel.valueOf(request.getParameter("gamesLevel"));
-			gamesState = request.getParameter("gamesState").equals(GameState.ACTIVE.name()) ? GameState.ACTIVE : GameState.CREATED;
-			startTime = Long.parseLong(request.getParameter("startTime"));
-			finishTime = Long.parseLong(request.getParameter("finishTime"));
-			maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
-			mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
-			chatEnabled = request.getParameter("chatEnabled") != null;
-			markUncovered = request.getParameter("markUncovered") != null;
+    private void batchCreateGames(HttpServletRequest request, HttpServletResponse response, HttpSession session, ArrayList<String> messages) throws IOException {
+        attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE);
+        defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE);
+        createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
+        String userIdListString ;
+        String userNameListString;
+        try {
+            userIdListString = request.getParameter("hidden_user_id_list");
+            userNameListString = request.getParameter("user_name_list");
+            cutID = Integer.parseInt(request.getParameter("class"));
+            roleAssignmentMethod = request.getParameter("roles").equals(RoleAssignmentMethod.OPPOSITE.name())
+                    ? RoleAssignmentMethod.OPPOSITE : RoleAssignmentMethod.RANDOM;
+            teamAssignmentMethod = TeamAssignmentMethod.valueOf(request.getParameter("teams"));
+            attackersPerGame = Integer.parseInt(request.getParameter("attackers"));
+            defendersPerGame = Integer.parseInt(request.getParameter("defenders"));
+            gamesLevel = GameLevel.valueOf(request.getParameter("gamesLevel"));
+            gamesState = request.getParameter("gamesState").equals(GameState.ACTIVE.name()) ? GameState.ACTIVE : GameState.CREATED;
+            startTime = Long.parseLong(request.getParameter("startTime"));
+            finishTime = Long.parseLong(request.getParameter("finishTime"));
+            maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
+            mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
+            chatEnabled = request.getParameter("chatEnabled") != null;
+            markUncovered = request.getParameter("markUncovered") != null;
 
-			withTests = request.getParameter("withTests") != null;
-			withMutants= request.getParameter("withMutants") != null;
+            withTests = request.getParameter("withTests") != null;
+            withMutants= request.getParameter("withMutants") != null;
 
-			capturePlayersIntention = request.getParameter("capturePlayersIntention") != null;
-		} catch (Exception e) {
-			messages.add("There was a problem with the form.");
-			response.sendRedirect(request.getContextPath() + "/admin");
-			return;
-		}
+            capturePlayersIntention = request.getParameter("capturePlayersIntention") != null;
+        } catch (Exception e) {
+            messages.add("There was a problem with the form.");
+            response.sendRedirect(request.getContextPath() + "/admin");
+            return;
+        }
 
-		selectedUserIDs = new ArrayList<>();
-		if (userIdListString != null && !userIdListString.equals("")) {
-			String[] userIdList = userIdListString.trim().split(",");
-			for (String u : userIdList) {
-				String idString = u.replace("<", "").replace(">", "");
-				selectedUserIDs.add(Integer.parseInt(idString));
-			}
-		}
-		if (userNameListString != null) {
-			for (String uName : userNameListString.split(USER_NAME_LIST_DELIMITER)) {
-				if (uName.length() > 0) {
-					User u = UserDAO.getUserByName(uName);
-					if (u == null)
-						messages.add("No user with name or email \'" + uName + "\'!");
-					else if (!selectedUserIDs.contains(u.getId()))
-						selectedUserIDs.add(u.getId());
-				}
-			}
-		}
+        selectedUserIDs = new ArrayList<>();
+        if (userIdListString != null && !userIdListString.equals("")) {
+            String[] userIdList = userIdListString.trim().split(",");
+            for (String u : userIdList) {
+                String idString = u.replace("<", "").replace(">", "");
+                selectedUserIDs.add(Integer.parseInt(idString));
+            }
+        }
+        if (userNameListString != null) {
+            for (String uName : userNameListString.split(USER_NAME_LIST_DELIMITER)) {
+                if (uName.length() > 0) {
+                    User u = UserDAO.getUserByName(uName);
+                    if (u == null)
+                        messages.add("No user with name or email \'" + uName + "\'!");
+                    else if (!selectedUserIDs.contains(u.getId()))
+                        selectedUserIDs.add(u.getId());
+                }
+            }
+        }
 
-		List<Integer> unassignedUserIds = getUnassignedUserIds(attackerIdsList, defenderIdsList);
-		for (Integer uid : new ArrayList<>(selectedUserIDs)) {
-			if (!unassignedUserIds.contains(uid)) {
-				messages.add("user " + uid + " is already playing another game!");
-				selectedUserIDs.remove(uid);
-			}
-		}
-
-
-		if (selectedUserIDs.size() == 0) {
-			messages.add("Please select at least one User.");
-		} else {
-			messages.add("Creating " + gamesLevel + " games for users " + selectedUserIDs + " with CUT " + cutID + ", assigning roles " +
-					roleAssignmentMethod + ", assigning teams " + teamAssignmentMethod + " with " + attackersPerGame +
-					" Attackers and " + defendersPerGame + " Defenders each.");
-			createAndFillGames(session, createdGames, attackerIdsList, defenderIdsList);
-		}
-	}
+        List<Integer> unassignedUserIds = getUnassignedUserIds(attackerIdsList, defenderIdsList);
+        for (Integer uid : new ArrayList<>(selectedUserIDs)) {
+            if (!unassignedUserIds.contains(uid)) {
+                messages.add("user " + uid + " is already playing another game!");
+                selectedUserIDs.remove(uid);
+            }
+        }
 
 
-	private void insertFilledGame(MultiplayerGame multiplayerGame, List<Integer> attackerIDs, List<Integer> defenderIDs) {
-	    // We need to take care of loading and setting system tests and mutants as well for this game
+        if (selectedUserIDs.size() == 0) {
+            messages.add("Please select at least one User.");
+        } else {
+            messages.add("Creating " + gamesLevel + " games for users " + selectedUserIDs + " with CUT " + cutID + ", assigning roles " +
+                    roleAssignmentMethod + ", assigning teams " + teamAssignmentMethod + " with " + attackersPerGame +
+                    " Attackers and " + defendersPerGame + " Defenders each.");
+            createAndFillGames(session, createdGames, attackerIdsList, defenderIdsList);
+        }
+    }
+
+
+    private void insertFilledGame(MultiplayerGame multiplayerGame, List<Integer> attackerIDs, List<Integer> defenderIDs) {
+        // We need to take care of loading and setting system tests and mutants as well for this game
 //        multiplayerGame.insert();
-	    // XXX Code duplication: This is take from {@link MultiplayerGameSelectionManager}
-	    if (multiplayerGame.insert()) {
+        // XXX Code duplication: This is take from {@link MultiplayerGameSelectionManager}
+        if (multiplayerGame.insert()) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
             Event event = new Event(-1, multiplayerGame.getId(), multiplayerGame.getCreatorId(), "Game Created",
                     EventType.GAME_CREATED, EventStatus.GAME, timestamp);
@@ -372,7 +372,7 @@ public class AdminCreateGames extends HttpServlet {
 
         // Handle the system tests and mutants
         // Mutants and tests uploaded with the class are already stored in the DB
-	    int classId = multiplayerGame.getClassId();
+        int classId = multiplayerGame.getClassId();
         List<Mutant> uploadedMutants = GameClassDAO.getMappedMutantsForClassId(classId);
         List<Test> uploadedTests = GameClassDAO.getMappedTestsForClassId(classId);
 

@@ -31,10 +31,10 @@ import javax.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EnsureFloat {
 
-	String message() default "Not a float";
+    String message() default "Not a float";
 
-	Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-	Class<? extends Payload>[] payload() default {};
+    Class<? extends Payload>[] payload() default {};
 
 }

@@ -52,135 +52,135 @@ public class MajorMaker {
     private MutantGeneratorService mutantGenerator;
     @Inject
     private ClassCompilerService classCompiler;
-    
-	private int cId;
-	private GameClass cut;
-	private DuelGame dGame;
-	private ArrayList<Mutant> validMutants;
 
-	public MajorMaker(int classId, DuelGame dummyGame) {
-		cId = classId;
-		cut = GameClassDAO.getClassForId(cId);
-		dGame = dummyGame;
-	}
+    private int cId;
+    private GameClass cut;
+    private DuelGame dGame;
+    private ArrayList<Mutant> validMutants;
 
-	public ArrayList<Mutant> getValidMutants() {
-		return validMutants;
-	}
+    public MajorMaker(int classId, DuelGame dummyGame) {
+        cId = classId;
+        cut = GameClassDAO.getClassForId(cId);
+        dGame = dummyGame;
+    }
 
-	public void createMutants() throws NoMutantsException {
-	    mutantGenerator.generateMutantsFromCUT(cut);
+    public ArrayList<Mutant> getValidMutants() {
+        return validMutants;
+    }
 
-		File cutFile = new File(cut.getJavaFile());
-		List<String> cutLines = FileUtils.readLines(cutFile.toPath());
-		validMutants = new ArrayList<Mutant>();
+    public void createMutants() throws NoMutantsException {
+        mutantGenerator.generateMutantsFromCUT(cut);
 
-		for (String info : getMutantList()) {
-			//Each mutant in mutants log.
+        File cutFile = new File(cut.getJavaFile());
+        List<String> cutLines = FileUtils.readLines(cutFile.toPath());
+        validMutants = new ArrayList<Mutant>();
 
-			//Get required mutant info.
-			MutantPatch mP = createMutantPatch(info);
+        for (String info : getMutantList()) {
+            //Each mutant in mutants log.
 
-			//Modify original contents with mutant.
-			List<String> newLines = doPatch(cutLines, mP);
-			final String mutantText = String.join("\n", newLines);
+            //Get required mutant info.
+            MutantPatch mP = createMutantPatch(info);
 
-			Mutant m = createMutant(mutantText);
-			if (m != null) {
-				//Successfully created mutant.
-				if(m.getClassFile() != null) {
-					validMutants.add(m);
-				}
-			}
-		}
-		if (validMutants.isEmpty()) {
-			//No valid mutants exist.
-			throw new NoMutantsException();
-		}
-	}
+            //Modify original contents with mutant.
+            List<String> newLines = doPatch(cutLines, mP);
+            final String mutantText = String.join("\n", newLines);
 
-	/**
-	 * Modify a list of strings from a class to have a mutant.
-	 * @param lines original class's lines.
-	 * @param patch the mutant's patch information.
-	 * @return the new list of lines.
-	 */
-	private List<String> doPatch(List<String> lines, MutantPatch patch) {
-		//Copy contents of original lines.
-		List<String> newLines = new ArrayList<String>(lines);
-		String l = newLines.get(patch.getLineNum() - 1);
-		String pOrig = patch.getOriginal();
-		//TODO: Check the validity of the escape char fixing in the replacement below (ie replace QE ...)
-		String pRepl = patch.getReplacement().replace("QE","");
-		String newLine = l.replaceFirst(Pattern.quote(pOrig), pRepl);
-		newLines.set(patch.getLineNum() - 1, newLine);
-		return newLines;
-	}
+            Mutant m = createMutant(mutantText);
+            if (m != null) {
+                //Successfully created mutant.
+                if(m.getClassFile() != null) {
+                    validMutants.add(m);
+                }
+            }
+        }
+        if (validMutants.isEmpty()) {
+            //No valid mutants exist.
+            throw new NoMutantsException();
+        }
+    }
 
-	private MutantPatch createMutantPatch(String mutantInfo) {
-		String[] splitInfo = mutantInfo.split(":");
-			/*
-			0 = Mutant's id
-			1 = Name of mutation operator
-			2 = Original operator symbol
-			3 = New operator symbol
-			4 = Full name of mutated method
-			5 = Line number of CUT
-			6 = 'from' |==> 'to'  (<NO-OP> means empty string)
-			 */
-		//Only really need values 5 and 6.
-		//Use replace option?
-		int lineNum = Integer.parseInt(splitInfo[5]);
-		String[] beforeAfter = splitInfo[6].split(Pattern.quote(" |==> ")); //Before = 0, After = 1
+    /**
+     * Modify a list of strings from a class to have a mutant.
+     * @param lines original class's lines.
+     * @param patch the mutant's patch information.
+     * @return the new list of lines.
+     */
+    private List<String> doPatch(List<String> lines, MutantPatch patch) {
+        //Copy contents of original lines.
+        List<String> newLines = new ArrayList<String>(lines);
+        String l = newLines.get(patch.getLineNum() - 1);
+        String pOrig = patch.getOriginal();
+        //TODO: Check the validity of the escape char fixing in the replacement below (ie replace QE ...)
+        String pRepl = patch.getReplacement().replace("QE","");
+        String newLine = l.replaceFirst(Pattern.quote(pOrig), pRepl);
+        newLines.set(patch.getLineNum() - 1, newLine);
+        return newLines;
+    }
 
-		return new MutantPatch(lineNum, beforeAfter);
-	}
+    private MutantPatch createMutantPatch(String mutantInfo) {
+        String[] splitInfo = mutantInfo.split(":");
+            /*
+            0 = Mutant's id
+            1 = Name of mutation operator
+            2 = Original operator symbol
+            3 = New operator symbol
+            4 = Full name of mutated method
+            5 = Line number of CUT
+            6 = 'from' |==> 'to'  (<NO-OP> means empty string)
+             */
+        //Only really need values 5 and 6.
+        //Use replace option?
+        int lineNum = Integer.parseInt(splitInfo[5]);
+        String[] beforeAfter = splitInfo[6].split(Pattern.quote(" |==> ")); //Before = 0, After = 1
 
-	private Mutant createMutant(String mutantText) {
-		try {
-			final String sourceCode = cut.getSourceCode();
+        return new MutantPatch(lineNum, beforeAfter);
+    }
 
-			// Runs diff match patch between the two Strings to see if there are any differences.
-			DiffMatchPatch dmp = new DiffMatchPatch();
-			LinkedList<DiffMatchPatch.Diff> changes = dmp.diffMain(sourceCode.trim().replace("\n", "").replace("\r", ""), mutantText.trim().replace("\n", "").replace("\r", ""), true);
-			boolean noChange = true;
-			for (DiffMatchPatch.Diff d : changes) {
-				if (d.operation != DiffMatchPatch.Operation.EQUAL) {
-					noChange = false;
-					break;
-				}
-			}
-			// If there were no differences, return, as the mutant is the same as original.
-			if (noChange) {
-				return null;
-			}
+    private Mutant createMutant(String mutantText) {
+        try {
+            final String sourceCode = cut.getSourceCode();
 
-			// Setup folder the files will go in
-			File newMutantDir = FileUtils.getNextSubDir(AI_DIR + F_SEP + "mutants" + F_SEP + cut.getAlias());
+            // Runs diff match patch between the two Strings to see if there are any differences.
+            DiffMatchPatch dmp = new DiffMatchPatch();
+            LinkedList<DiffMatchPatch.Diff> changes = dmp.diffMain(sourceCode.trim().replace("\n", "").replace("\r", ""), mutantText.trim().replace("\n", "").replace("\r", ""), true);
+            boolean noChange = true;
+            for (DiffMatchPatch.Diff d : changes) {
+                if (d.operation != DiffMatchPatch.Operation.EQUAL) {
+                    noChange = false;
+                    break;
+                }
+            }
+            // If there were no differences, return, as the mutant is the same as original.
+            if (noChange) {
+                return null;
+            }
 
-			// 1 the Mutant String into a java file
-			String mutantFileName = newMutantDir + F_SEP + cut.getBaseName() + JAVA_SOURCE_EXT;
-			File mutantFile = new File(mutantFileName);
-			FileWriter fw = new FileWriter(mutantFile);
-			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(mutantText);
-			bw.close();
-			fw.close();
+            // Setup folder the files will go in
+            File newMutantDir = FileUtils.getNextSubDir(AI_DIR + F_SEP + "mutants" + F_SEP + cut.getAlias());
 
-			// Compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
-			return classCompiler.compileMutant(newMutantDir, mutantFileName, dGame.getId(), cut, AiAttacker.ID);
-		} catch (IOException e) {
-			logger.error("Could not write mutant", e);
-		}
-		return null;
+            // 1 the Mutant String into a java file
+            String mutantFileName = newMutantDir + F_SEP + cut.getBaseName() + JAVA_SOURCE_EXT;
+            File mutantFile = new File(mutantFileName);
+            FileWriter fw = new FileWriter(mutantFile);
+            BufferedWriter bw = new BufferedWriter(fw);
+            bw.write(mutantText);
+            bw.close();
+            fw.close();
 
-	}
+            // Compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
+            return classCompiler.compileMutant(newMutantDir, mutantFileName, dGame.getId(), cut, AiAttacker.ID);
+        } catch (IOException e) {
+            logger.error("Could not write mutant", e);
+        }
+        return null;
 
-	private List<String> getMutantList() {
-		String loc = AI_DIR + F_SEP + "mutants" + F_SEP + cut.getAlias() + ".log";
-		File f = new File(loc);
-		List<String> l = FileUtils.readLines(f.toPath());
-		//TODO: Handle errors.
-		return l;
-	}
+    }
+
+    private List<String> getMutantList() {
+        String loc = AI_DIR + F_SEP + "mutants" + F_SEP + cut.getAlias() + ".log";
+        File f = new File(loc);
+        List<String> l = FileUtils.readLines(f.toPath());
+        //TODO: Handle errors.
+        return l;
+    }
 }

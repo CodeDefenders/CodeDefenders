@@ -27,21 +27,21 @@ package org.codedefenders.validation.code;
  * @author <a href="https://github.com/werli">Phil Werli<a/>
  */
 public enum ValidationMessage {
-	// Generic error message.
-	MUTANT_VALIDATION_FAILED("Invalid mutant. Your mutant does not comply with our rules."),
+    // Generic error message.
+    MUTANT_VALIDATION_FAILED("Invalid mutant. Your mutant does not comply with our rules."),
 
     MUTANT_VALIDATION_SUCCESS("Your mutant complies with our rules."),
     MUTANT_VALIDATION_LINES("Invalid mutant, sorry! Removing or adding lines is not allowed."),
     MUTANT_VALIDATION_MODIFIER("Invalid mutant, sorry! Changing modifiers such as 'static' or 'public' is not allowed."),
     MUTANT_VALIDATION_COMMENT("Invalid mutant, sorry! Adding or modifying comments is not allowed."),
     MUTANT_VALIDATION_LOGIC("Invalid mutant, sorry! Your mutant contains new logical operations"),
-    
+
     MUTANT_VALIDATION_LOGIC_INSTANCEOF("Invalid mutant, sorry! Your mutant modifies an instanceof condition"),
-    
+
     MUTANT_VALIDATION_OPERATORS("Invalid mutant, sorry! Your mutant contains prohibited operations such as bitshifts, ternary operators, added comments or multiple statments per line."),
     MUTANT_VALIDATION_CALLS("Your mutant contains calls to System.*, Random.* or new control structures.\n\nShame on you!"),
     MUTANT_VALIDATION_IDENTICAL("Invalid mutant, sorry! Your mutant is identical to the CUT"),
-    
+
     MUTANT_VALIDATION_METHOD_SIGNATURE("Invalid mutant, sorry! Your mutant changes one or more method signatures or field names or import statements"),
     MUTANT_VALIDATION_PACKAGE_SIGNATURE("Invalid mutant, sorry! Your mutant changes the package signature"),
     MUTANT_VALIDATION_CLASS_SIGNATURE("Invalid mutant, sorry! Your mutant changes a class signature"),
@@ -49,7 +49,7 @@ public enum ValidationMessage {
     MUTANT_MISSING_INTENTION("Invalid mutant, sorry! You must declare your intention."),
     MUTATION_CLASS_DECLARATION("Invalid mutation contains class declaration."),
     MUTATION_METHOD_DECLARATION("Invalid mutation contains method declaration."),
-    
+
     MUTATION_SYSTEM_USE("Invalid mutation contains System uses"),
     MUTATION_SYSTEM_CALL("Invalid mutation contains a call to System.*"),
     MUTATION_SYSTEM_DECLARATION("Invalid mutation contains variable declaration using System.*"),
@@ -60,7 +60,7 @@ public enum ValidationMessage {
     MUTATION_WHILE_STATEMENT("Invalid mutation contains a WhileStmt statement"),
     MUTATION_DO_STATEMENT("Invalid mutation contains a DoStmt statement"),
     MUTATION_SWITCH_STATEMENT("Invalid mutation contains a SwitchStmt statement");
-	
+
     private String message;
 
     ValidationMessage(String message) {

@@ -31,11 +31,11 @@ import javax.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface ConsistentDateParameters {
- 
+
     String message() default
       "End date must be after begin date and both must be in the future";
- 
+
     Class<?>[] groups() default {};
- 
+
     Class<? extends Payload>[] payload() default {};
 }

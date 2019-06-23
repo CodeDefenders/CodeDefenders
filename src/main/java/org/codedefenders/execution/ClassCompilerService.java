@@ -29,7 +29,7 @@ public interface ClassCompilerService {
      * @return A {@link Test} object
      */
     public Test compileTest(File dir, String jFile, int gameID, GameClass cut, int ownerId);
-    
+
     /**
      * Compiles CUT
      *
@@ -37,11 +37,11 @@ public interface ClassCompilerService {
      * @return The path to the compiled CUT
      */
     public String compileCUT(GameClass cut) throws CompileException;
-    
+
     /**
      * Compiles generated test suite
      * @param cut Class under test
      */
     public boolean compileGenTestSuite(final GameClass cut);
-    
+
 }

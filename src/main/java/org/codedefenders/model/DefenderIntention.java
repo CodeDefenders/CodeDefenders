@@ -23,39 +23,39 @@ import java.util.Set;
 
 public class DefenderIntention {
 
-	private Set<Integer> lines;
-	private Set<Integer> mutants;
+    private Set<Integer> lines;
+    private Set<Integer> mutants;
 
-	public DefenderIntention(Set<Integer> lines, Set<Integer> mutants) {
-		this.lines = lines;
-		this.mutants = mutants;
-	}
+    public DefenderIntention(Set<Integer> lines, Set<Integer> mutants) {
+        this.lines = lines;
+        this.mutants = mutants;
+    }
 
-	public Set<Integer> getLines() {
-		return lines;
-	}
+    public Set<Integer> getLines() {
+        return lines;
+    }
 
-	public Set<Integer> getMutants() {
-		return mutants;
-	}
+    public Set<Integer> getMutants() {
+        return mutants;
+    }
 
-	public static Set<Integer> parseIntentionFromCommaSeparatedValueString(String csvString) {
-		Set<Integer> parsed = new HashSet<>();
+    public static Set<Integer> parseIntentionFromCommaSeparatedValueString(String csvString) {
+        Set<Integer> parsed = new HashSet<>();
 
-		String[] numbers = csvString.split(",");
-		for (String number : numbers) {
-			if ("".equals(number) || (number != null && number.trim().equals(""))) {
-				continue;
-			}
-			parsed.add(Integer.valueOf(number));
-		}
-		return parsed;
-	}
+        String[] numbers = csvString.split(",");
+        for (String number : numbers) {
+            if ("".equals(number) || (number != null && number.trim().equals(""))) {
+                continue;
+            }
+            parsed.add(Integer.valueOf(number));
+        }
+        return parsed;
+    }
 
-	@Override
-	public String toString() {
-		return "DefenderIntention :" + "\n"
-				+ "\tLines: " + lines + "\n"
-				+ "\tMutants:" + mutants;
-	}
+    @Override
+    public String toString() {
+        return "DefenderIntention :" + "\n"
+                + "\tLines: " + lines + "\n"
+                + "\tMutants:" + mutants;
+    }
 }

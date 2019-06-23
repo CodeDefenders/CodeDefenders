@@ -44,47 +44,47 @@ import javax.servlet.http.HttpSession;
  * If the user accesses such a page and is logged in, HTTP header fields are set to disable caching.
  */
 public class LoginFilter implements Filter {
-	private static final Logger logger = LoggerFactory.getLogger(LoginFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginFilter.class);
 
-	public void init(FilterConfig config) throws ServletException { }
+    public void init(FilterConfig config) throws ServletException { }
 
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
 
-		HttpServletRequest httpRequest = (HttpServletRequest) request;
-		HttpServletResponse httpResponse = (HttpServletResponse) response;
+        HttpServletRequest httpRequest = (HttpServletRequest) request;
+        HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-		if (!loginRequired(httpRequest)) {
-			chain.doFilter(request, response);
-		} else {
-			HttpSession session = httpRequest.getSession();
-			Integer uid = (Integer) session.getAttribute("uid");
+        if (!loginRequired(httpRequest)) {
+            chain.doFilter(request, response);
+        } else {
+            HttpSession session = httpRequest.getSession();
+            Integer uid = (Integer) session.getAttribute("uid");
 
-			if (uid != null) {
-				User user = UserDAO.getUserById(uid);
-				if (user != null && user.isActive()) {
-					/* Disable caching in the HTTP header.
-					 * https://stackoverflow.com/questions/13640109/how-to-prevent-browser-cache-for-php-site */
-					httpResponse.setHeader("Pragma", "No-cache");
-					httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-					httpResponse.setDateHeader("Expires", -1);
+            if (uid != null) {
+                User user = UserDAO.getUserById(uid);
+                if (user != null && user.isActive()) {
+                    /* Disable caching in the HTTP header.
+                     * https://stackoverflow.com/questions/13640109/how-to-prevent-browser-cache-for-php-site */
+                    httpResponse.setHeader("Pragma", "No-cache");
+                    httpResponse.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                    httpResponse.setDateHeader("Expires", -1);
 
-					chain.doFilter(request, response);
-				} else {
-					session.invalidate();
-					redirectToLogin(httpRequest, response);
-				}
-			} else {
-				redirectToLogin(httpRequest, response);
-			}
-		}
-	}
+                    chain.doFilter(request, response);
+                } else {
+                    session.invalidate();
+                    redirectToLogin(httpRequest, response);
+                }
+            } else {
+                redirectToLogin(httpRequest, response);
+            }
+        }
+    }
 
-	public void destroy() { }
+    public void destroy() { }
 
-	private boolean loginRequired(HttpServletRequest request) {
-		String path = request.getRequestURI();
-		String context = request.getContextPath();
+    private boolean loginRequired(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        String context = request.getContextPath();
 
         /*
          * Do not authenticate the requests to the WebSocket since the
@@ -99,30 +99,30 @@ public class LoginFilter implements Filter {
             return false;
         }
 
-		if ((path.endsWith(context + "/"))
-				|| path.endsWith(context + "/favicon.ico")
-				|| path.endsWith(context + Paths.LOGIN)
-				|| path.endsWith(context + Paths.HELP_PAGE)
-				|| path.endsWith(context + "/video")
-				|| path.endsWith(context + "/video.mp4")
-				|| path.contains(context + "/papers")
-				|| path.endsWith(context + Paths.API_SEND_EMAIL)
-				|| path.endsWith(context + "/index.jsp")
-				|| path.endsWith(context + Paths.ABOUT_PAGE)
-				|| path.endsWith(context + Paths.CONTACT_PAGE))
-			return false;
+        if ((path.endsWith(context + "/"))
+                || path.endsWith(context + "/favicon.ico")
+                || path.endsWith(context + Paths.LOGIN)
+                || path.endsWith(context + Paths.HELP_PAGE)
+                || path.endsWith(context + "/video")
+                || path.endsWith(context + "/video.mp4")
+                || path.contains(context + "/papers")
+                || path.endsWith(context + Paths.API_SEND_EMAIL)
+                || path.endsWith(context + "/index.jsp")
+                || path.endsWith(context + Paths.ABOUT_PAGE)
+                || path.endsWith(context + Paths.CONTACT_PAGE))
+            return false;
 
-		Pattern excludeUrls = Pattern.compile("^.*/(css|js|images|fonts|codemirror)/.*$", Pattern.CASE_INSENSITIVE);
-		Matcher m = excludeUrls.matcher(path);
-		return !m.matches();
-	}
+        Pattern excludeUrls = Pattern.compile("^.*/(css|js|images|fonts|codemirror)/.*$", Pattern.CASE_INSENSITIVE);
+        Matcher m = excludeUrls.matcher(path);
+        return !m.matches();
+    }
 
-	private void redirectToLogin(HttpServletRequest httpReq, ServletResponse response) throws IOException {
-	    HttpSession session = httpReq.getSession();
-		HttpServletResponse httpResp = (HttpServletResponse) response;
+    private void redirectToLogin(HttpServletRequest httpReq, ServletResponse response) throws IOException {
+        HttpSession session = httpReq.getSession();
+        HttpServletResponse httpResp = (HttpServletResponse) response;
 
-		session.setAttribute("loginFrom", httpReq.getRequestURI());
-		String context = httpReq.getContextPath();
-		httpResp.sendRedirect(context+ Paths.LOGIN);
-	}
+        session.setAttribute("loginFrom", httpReq.getRequestURI());
+        String context = httpReq.getContextPath();
+        httpResp.sendRedirect(context+ Paths.LOGIN);
+    }
 }

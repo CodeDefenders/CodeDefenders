@@ -99,13 +99,13 @@ public class DuelGameManager extends HttpServlet {
 
     @Inject
     private ClassCompilerService classCompiler;
-    
+
     @Inject
     private BackendExecutorService backend;
-    
+
     @Inject
     private GameManagingUtils gameManagingUtils;
-    
+
     @Inject
     private IMutationTester mutationTester;
 

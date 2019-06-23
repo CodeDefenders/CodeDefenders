@@ -30,144 +30,144 @@ import java.sql.PreparedStatement;
 
 public class User {
 
-	private static final Logger logger = LoggerFactory.getLogger(User.class);
+    private static final Logger logger = LoggerFactory.getLogger(User.class);
 
-	private int id;
-	private String username;
-	private String encodedPassword;
-	private String email;
-	private boolean validated;
-	private boolean active;
+    private int id;
+    private String username;
+    private String encodedPassword;
+    private String email;
+    private boolean validated;
+    private boolean active;
 
-	public User(String username) {
-		this(username, User.encodePassword(""));
-	}
+    public User(String username) {
+        this(username, User.encodePassword(""));
+    }
 
-	public User(String username, String encodedPassword) {
-		this(username, encodedPassword, "");
-	}
+    public User(String username, String encodedPassword) {
+        this(username, encodedPassword, "");
+    }
 
-	public User(String username, String encodedPassword, String email) {
-		this(0, username, encodedPassword, email);
-	}
+    public User(String username, String encodedPassword, String email) {
+        this(0, username, encodedPassword, email);
+    }
 
-	public User(int id, String username, String encodedPassword, String email) {
-		this(id, username, encodedPassword, email, false, true);
-	}
+    public User(int id, String username, String encodedPassword, String email) {
+        this(id, username, encodedPassword, email, false, true);
+    }
 
-	public User(int id, String username, String encodedPassword, String email, boolean validated, boolean active) {
-		this.id = id;
-		this.username = username;
-		this.encodedPassword = encodedPassword;
-		this.email = email.toLowerCase();
-		this.validated = validated;
-		this.active = active;
-	}
+    public User(int id, String username, String encodedPassword, String email, boolean validated, boolean active) {
+        this.id = id;
+        this.username = username;
+        this.encodedPassword = encodedPassword;
+        this.email = email.toLowerCase();
+        this.validated = validated;
+        this.active = active;
+    }
 
-	public boolean insert() {
-		// TODO Phil 12/12/18: Update this like Test#insert() to use DAO insert method but update identifier
-		DatabaseValue[] valueList;
-		String query;
-		Connection conn = DB.getConnection();
+    public boolean insert() {
+        // TODO Phil 12/12/18: Update this like Test#insert() to use DAO insert method but update identifier
+        DatabaseValue[] valueList;
+        String query;
+        Connection conn = DB.getConnection();
 
-		if (id <= 0) {
-			query = "INSERT INTO users (Username, Password, Email) VALUES (?, ?, ?);";
-			valueList = new DatabaseValue[]{DatabaseValue.of(username),
-					DatabaseValue.of(encodedPassword),
-					DatabaseValue.of(email)};
-		} else {
-			query = "INSERT INTO users (User_ID, Username, Password, Email) VALUES (?, ?, ?, ?);";
-			valueList = new DatabaseValue[]{DatabaseValue.of(id),
-					DatabaseValue.of(username),
-					DatabaseValue.of(encodedPassword),
-					DatabaseValue.of(email)};
-		}
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		int key = DB.executeUpdateGetKeys(stmt, conn);
-		if (key != -1) {
-			this.id = key;
-			return true;
-		} else {
-			return false;
-		}
-	}
+        if (id <= 0) {
+            query = "INSERT INTO users (Username, Password, Email) VALUES (?, ?, ?);";
+            valueList = new DatabaseValue[]{DatabaseValue.of(username),
+                    DatabaseValue.of(encodedPassword),
+                    DatabaseValue.of(email)};
+        } else {
+            query = "INSERT INTO users (User_ID, Username, Password, Email) VALUES (?, ?, ?, ?);";
+            valueList = new DatabaseValue[]{DatabaseValue.of(id),
+                    DatabaseValue.of(username),
+                    DatabaseValue.of(encodedPassword),
+                    DatabaseValue.of(email)};
+        }
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        int key = DB.executeUpdateGetKeys(stmt, conn);
+        if (key != -1) {
+            this.id = key;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	public boolean update() {
-		DatabaseValue[] valueList;
-		Connection conn = DB.getConnection();
+    public boolean update() {
+        DatabaseValue[] valueList;
+        Connection conn = DB.getConnection();
 
-		String query = "UPDATE users SET Username = ?, Email = ?, Password = ?, Validated = ?, Active = ? WHERE User_ID = ?;";
-		valueList = new DatabaseValue[]{DatabaseValue.of(username),
-				DatabaseValue.of(email),
-				DatabaseValue.of(encodedPassword),
-				DatabaseValue.of(validated),
-				DatabaseValue.of(active),
-				DatabaseValue.of(id)};
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		return DB.executeUpdate(stmt, conn);
-	}
+        String query = "UPDATE users SET Username = ?, Email = ?, Password = ?, Validated = ?, Active = ? WHERE User_ID = ?;";
+        valueList = new DatabaseValue[]{DatabaseValue.of(username),
+                DatabaseValue.of(email),
+                DatabaseValue.of(encodedPassword),
+                DatabaseValue.of(validated),
+                DatabaseValue.of(active),
+                DatabaseValue.of(id)};
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        return DB.executeUpdate(stmt, conn);
+    }
 
-	public boolean isValidated() {
-		return validated;
-	}
+    public boolean isValidated() {
+        return validated;
+    }
 
-	public int getId() {
-		return id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public void setId(int id) {
-		this.id = id;
-	}
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public String getEncodedPassword() {
-		return encodedPassword;
-	}
+    public String getEncodedPassword() {
+        return encodedPassword;
+    }
 
-	public void setEncodedPassword(String encodedPassword) {
-		this.encodedPassword = encodedPassword;
-	}
+    public void setEncodedPassword(String encodedPassword) {
+        this.encodedPassword = encodedPassword;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public boolean isActive() {
-		return active;
-	}
+    public boolean isActive() {
+        return active;
+    }
 
-	public void setActive(boolean active) {
-		this.active = active;
-	}
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
-	public void logSession(String ipAddress) {
-		DatabaseAccess.logSession(id, ipAddress);
-	}
+    public void logSession(String ipAddress) {
+        DatabaseAccess.logSession(id, ipAddress);
+    }
 
-	public String printFriendly(String color) {
-		String username = getUsername();
+    public String printFriendly(String color) {
+        String username = getUsername();
 
-		return "<span style='color: " + color + "'>@" + getUsername() +
-				"</span>";
-	}
+        return "<span style='color: " + color + "'>@" + getUsername() +
+                "</span>";
+    }
 
-	public static String encodePassword(String password) {
-		return new BCryptPasswordEncoder().encode(password);
-	}
+    public static String encodePassword(String password) {
+        return new BCryptPasswordEncoder().encode(password);
+    }
 
-	public static boolean passwordMatches(String rawPassword, String encodedPassword) {
-		return new BCryptPasswordEncoder().matches(rawPassword, encodedPassword);
-	}
+    public static boolean passwordMatches(String rawPassword, String encodedPassword) {
+        return new BCryptPasswordEncoder().matches(rawPassword, encodedPassword);
+    }
 
 }

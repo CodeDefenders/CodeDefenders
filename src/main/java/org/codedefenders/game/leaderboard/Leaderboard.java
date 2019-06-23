@@ -27,8 +27,8 @@ import java.util.List;
  */
 public class Leaderboard {
 
-	public static List<Entry> getAll() {
-		return DatabaseAccess.getLeaderboard();
-	}
+    public static List<Entry> getAll() {
+        return DatabaseAccess.getLeaderboard();
+    }
 
 }

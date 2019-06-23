@@ -13,25 +13,25 @@ import org.codedefenders.game.Test;
 public interface BackendExecutorService{
 
     /**
-     * 
+     *
      * @param cut
      * @param testDir
      * @param testClassName
      * @throws Exception
      */
     public void testOriginal(GameClass cut, String testDir, String testClassName) throws Exception;
-    
+
     /**
-     * 
+     *
      * @param dir
      * @param t
      * @return
      */
     public TargetExecution testOriginal(File dir, Test t);
-    
+
     /**
      * Executes a test against a mutant
-     * 
+     *
      * @param m
      *            A {@link Mutant} object
      * @param t
@@ -42,7 +42,7 @@ public interface BackendExecutorService{
     public TargetExecution testMutant(Mutant m, Test t);
 
     /**
-     * 
+     *
      * @param m
      * @return
      */

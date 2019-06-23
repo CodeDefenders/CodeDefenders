@@ -44,7 +44,7 @@ public class CodeAnalysisResult {
     private final Set<Range<Integer>> closingBrackets = new HashSet<>();
     private final Set<Integer> emptyLines = new HashSet<>();
     private final Map<Integer, Integer> linesCoveringEmptyLines = new HashMap<>();
-    
+
     CodeAnalysisResult imported(String imported) { this.additionalImports.add(imported); return this; }
 
     CodeAnalysisResult compileTimeConstant(Integer line) { this.compileTimeConstants.add(line); return this; }
@@ -58,9 +58,9 @@ public class CodeAnalysisResult {
     CodeAnalysisResult methods(Range<Integer> lines) { this.methods.add(lines); return this; }
 
     CodeAnalysisResult closingBracket(Range<Integer> lines) { this.closingBrackets.add(lines); return this; }
-    
+
     CodeAnalysisResult emptyLine(Integer line) { this.emptyLines.add(line); return this; }
-    
+
     CodeAnalysisResult lineCoversEmptyLine(Integer coveringLine, Integer emptyLine) { this.linesCoveringEmptyLines.put( emptyLine,  coveringLine); return this; }
 
 

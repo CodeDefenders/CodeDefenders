@@ -64,7 +64,7 @@ import testsmell.TestSmellDetector;
 // TODO Probably a better name for those class and interface would not harm..
 @RequestScoped
 public class GameManagingUtils implements IGameManagingUtils {
-    
+
     @Inject
     private ClassCompilerService classCompiler;
 
@@ -101,7 +101,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.codedefenders.servlets.games.IGameManagingUtils#existingMutant(int,
      * java.lang.String)
@@ -117,7 +117,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.codedefenders.servlets.games.IGameManagingUtils#
      * hasAttackerPendingMutantsInGame(int, int)
      */
@@ -133,7 +133,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.codedefenders.servlets.games.IGameManagingUtils#createMutant(int,
      * int, java.lang.String, int, java.lang.String)
@@ -171,7 +171,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.codedefenders.servlets.games.IGameManagingUtils#createTest(int,
      * int, java.lang.String, int, java.lang.String)
      */
@@ -183,7 +183,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.codedefenders.servlets.games.IGameManagingUtils#createTest(int,
      * int, java.lang.String, int, java.lang.String, int)
      */

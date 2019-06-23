@@ -32,10 +32,10 @@ import javax.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EnsureInteger {
 
-	String message() default "Not an integer";
+    String message() default "Not an integer";
 
-	Class<?>[] groups() default {};
+    Class<?>[] groups() default {};
 
-	Class<? extends Payload>[] payload() default {};
+    Class<? extends Payload>[] payload() default {};
 
 }

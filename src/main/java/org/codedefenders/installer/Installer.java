@@ -77,18 +77,18 @@ public class Installer {
 
     @Inject
     private BackendExecutorService backend;
-    
+
     /**
      * Used for parsing the command line.
      */
     private interface ParsingInterface {
         @Option(defaultToNull = true)
         File getConfigurations();
-        
+
         /**
          * Directory containing the resources for creating the puzzled. Same as
          * the one used to generate the zip file
-         * 
+         *
          * @return
          */
         @Option(longName = "bundle-directory")

@@ -43,7 +43,7 @@ public interface IMutationTester {
      * @param mutant a mutant
      */
     public void runEquivalenceTest(Test test, Mutant mutant);
-    
+
     public boolean testVsMutant(Test test, Mutant mutant);
 
 }

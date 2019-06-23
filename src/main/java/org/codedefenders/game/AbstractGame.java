@@ -48,141 +48,141 @@ import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
  * @see PuzzleGame
  */
 public abstract class AbstractGame {
-	protected static final Logger logger = LoggerFactory.getLogger(AbstractGame.class);
+    protected static final Logger logger = LoggerFactory.getLogger(AbstractGame.class);
 
-	protected GameClass cut;
+    protected GameClass cut;
 
-	protected int id;
-	protected int classId;
-	protected int creatorId;
-	protected GameState state;
-	protected GameLevel level;
-	protected GameMode mode;
+    protected int id;
+    protected int classId;
+    protected int creatorId;
+    protected GameState state;
+    protected GameLevel level;
+    protected GameMode mode;
 
-	protected List<Event> events;
-	protected List<Mutant> mutants;
-	protected List<Test> tests;
+    protected List<Event> events;
+    protected List<Mutant> mutants;
+    protected List<Test> tests;
 
-	public abstract boolean addPlayer(int userId, Role role);
+    public abstract boolean addPlayer(int userId, Role role);
 
-	public abstract boolean insert();
+    public abstract boolean insert();
 
-	public abstract boolean update();
+    public abstract boolean update();
 
 
-	public int getId() {
-		return id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public int getClassId() {
-		return classId;
-	}
+    public int getClassId() {
+        return classId;
+    }
 
-	public List<Event> getEvents(){
-		if (events == null){
-			events = DatabaseAccess.getEventsForGame(getId());
-		}
-		return events;
-	}
+    public List<Event> getEvents(){
+        if (events == null){
+            events = DatabaseAccess.getEventsForGame(getId());
+        }
+        return events;
+    }
 
-	public GameClass getCUT() {
-		if (cut == null) {
-			cut = GameClassDAO.getClassForId(classId);
-		}
-		return cut;
-	}
+    public GameClass getCUT() {
+        if (cut == null) {
+            cut = GameClassDAO.getClassForId(classId);
+        }
+        return cut;
+    }
 
-	public int getCreatorId() {
-		return creatorId;
-	}
+    public int getCreatorId() {
+        return creatorId;
+    }
 
-	public GameState getState() {
-		return state;
-	}
+    public GameState getState() {
+        return state;
+    }
 
-	public void setState(GameState s) {
-		state = s;
-	}
+    public void setState(GameState s) {
+        state = s;
+    }
 
-	public GameLevel getLevel() {
-		return this.level;
-	}
+    public GameLevel getLevel() {
+        return this.level;
+    }
 
-	public void setLevel(GameLevel level) {
-		this.level = level;
-	}
+    public void setLevel(GameLevel level) {
+        this.level = level;
+    }
 
-	public GameMode getMode() {
-		return this.mode;
-	}
+    public GameMode getMode() {
+        return this.mode;
+    }
 
-	protected void setMode(GameMode newMode) { this.mode = newMode; }
+    protected void setMode(GameMode newMode) { this.mode = newMode; }
 
-	public List<Test> getTests() {
-		return getTests(false);
-	}
+    public List<Test> getTests() {
+        return getTests(false);
+    }
 
-	public List<Test> getTests(boolean defendersOnly) {
-		if (tests == null) {
-			tests = TestDAO.getValidTestsForGame(this.id, defendersOnly);
-		}
-		return tests;
-	}
+    public List<Test> getTests(boolean defendersOnly) {
+        if (tests == null) {
+            tests = TestDAO.getValidTestsForGame(this.id, defendersOnly);
+        }
+        return tests;
+    }
 
-	public List<Mutant> getMutants() {
-		if (mutants == null){
-			mutants = MutantDAO.getValidMutantsForGame(id);
-		}
-		return mutants;
-	}
+    public List<Mutant> getMutants() {
+        if (mutants == null){
+            mutants = MutantDAO.getValidMutantsForGame(id);
+        }
+        return mutants;
+    }
 
-	public List<Mutant> getAliveMutants() {
-		return getMutants().stream().filter(mutant -> mutant.isAlive() &&
-				mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO) &&
-				mutant.getClassFile() != null).collect(Collectors.toList());
-	}
+    public List<Mutant> getAliveMutants() {
+        return getMutants().stream().filter(mutant -> mutant.isAlive() &&
+                mutant.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO) &&
+                mutant.getClassFile() != null).collect(Collectors.toList());
+    }
 
-	public List<Mutant> getKilledMutants() {
-		return getMutants()
-				.stream()
-				.filter(mutant -> !mutant.isAlive()
-						&& (mutant.getEquivalent().equals(ASSUMED_NO)
-						|| mutant.getEquivalent().equals(PROVEN_NO)) && (mutant.getClassFile() != null))
-				.collect(Collectors.toList());
-	}
+    public List<Mutant> getKilledMutants() {
+        return getMutants()
+                .stream()
+                .filter(mutant -> !mutant.isAlive()
+                        && (mutant.getEquivalent().equals(ASSUMED_NO)
+                        || mutant.getEquivalent().equals(PROVEN_NO)) && (mutant.getClassFile() != null))
+                .collect(Collectors.toList());
+    }
 
-	public List<Mutant> getMutantsMarkedEquivalent() {
-		return getMutants()
-				.stream()
-				.filter(mutant -> mutant.getEquivalent().equals(ASSUMED_YES) || mutant.getEquivalent().equals(DECLARED_YES))
-				.collect(Collectors.toList());
-	}
+    public List<Mutant> getMutantsMarkedEquivalent() {
+        return getMutants()
+                .stream()
+                .filter(mutant -> mutant.getEquivalent().equals(ASSUMED_YES) || mutant.getEquivalent().equals(DECLARED_YES))
+                .collect(Collectors.toList());
+    }
 
-	public List<Mutant> getMutantsMarkedEquivalentPending() {
-		return getMutants()
-				.stream()
-				.filter(mutant -> mutant.getEquivalent().equals(PENDING_TEST))
-				.collect(Collectors.toList());
-	}
+    public List<Mutant> getMutantsMarkedEquivalentPending() {
+        return getMutants()
+                .stream()
+                .filter(mutant -> mutant.getEquivalent().equals(PENDING_TEST))
+                .collect(Collectors.toList());
+    }
 
-	public Mutant getMutantByID(int mutantID) {
-		for (Mutant m : getMutants()) {
-			if (m.getId() == mutantID)
-				return m;
-		}
-		return null;
-	}
+    public Mutant getMutantByID(int mutantID) {
+        for (Mutant m : getMutants()) {
+            if (m.getId() == mutantID)
+                return m;
+        }
+        return null;
+    }
 
-	public Role getRole(int userId){
-		return DatabaseAccess.getRole(userId, getId());
-	}
+    public Role getRole(int userId){
+        return DatabaseAccess.getRole(userId, getId());
+    }
 
-	@Override
-	public String toString() {
-		return "[gameId=" + id + ",classId=" + classId + ",state=" + state + ",mode=" + mode + "]";
-	}
+    @Override
+    public String toString() {
+        return "[gameId=" + id + ",classId=" + classId + ",state=" + state + ",mode=" + mode + "]";
+    }
 
-	public boolean isFinished() {
-		return this.state == GameState.FINISHED || this.state == GameState.SOLVED || this.state == GameState.FAILED;
-	}
+    public boolean isFinished() {
+        return this.state == GameState.FINISHED || this.state == GameState.SOLVED || this.state == GameState.FAILED;
+    }
 }

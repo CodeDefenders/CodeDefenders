@@ -37,7 +37,7 @@ import static org.codedefenders.model.Feedback.types;
 
 public class FeedbackDAO {
 
-	private static final Logger logger = LoggerFactory.getLogger(FeedbackManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(FeedbackManager.class);
 
     public static boolean storeFeedback(int gameId, int userId, List<Integer> ratingsList) {
         StringBuilder bob = new StringBuilder("INSERT INTO ratings (User_ID, Game_ID, type, value) VALUES ");
@@ -125,8 +125,8 @@ public class FeedbackDAO {
         return values;
     }
 
-	private static List<Double> getAverageClassDifficultyRatings(Type feedbackType)
-			throws UncheckedSQLException, SQLMappingException {
+    private static List<Double> getAverageClassDifficultyRatings(Type feedbackType)
+            throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT",
                 "  IFNULL(AVG(value), -1)   AS 'average',",
@@ -138,22 +138,22 @@ public class FeedbackDAO {
                 "GROUP BY c.Class_ID ORDER BY c.Class_ID;");
 
         return DB.executeQueryReturnList(query, rs -> rs.getDouble(1), DatabaseValue.of(feedbackType.name()));
-	}
+    }
 
     // TODO Phil 28/12/18: pretty sure this doesn't result in the wanted behavior. This is ordered, but when trying to map to classes, the classes aren't ordered so the mapping just disappears.
-	public static List<Double> getAverageMutationDifficulties() {
-		return getAverageClassDifficultyRatings(Type.CUT_MUTATION_DIFFICULTY);
-	}
+    public static List<Double> getAverageMutationDifficulties() {
+        return getAverageClassDifficultyRatings(Type.CUT_MUTATION_DIFFICULTY);
+    }
 
-	public static List<Double> getAverageTestDifficulties() {
-		return getAverageClassDifficultyRatings(Type.CUT_TEST_DIFFICULTY);
-	}
+    public static List<Double> getAverageTestDifficulties() {
+        return getAverageClassDifficultyRatings(Type.CUT_TEST_DIFFICULTY);
+    }
 
-	public static int getNBFeedbacksForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
+    public static int getNBFeedbacksForGame(int gameId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT COUNT(DISTINCT User_ID) AS 'nb_feedbacks'",
                 "FROM ratings",
                 "WHERE Game_ID = ?;");
         return DB.executeQueryReturnValue(query, rs -> rs.getInt(1), DatabaseValue.of(gameId));
-	}
+    }
 }

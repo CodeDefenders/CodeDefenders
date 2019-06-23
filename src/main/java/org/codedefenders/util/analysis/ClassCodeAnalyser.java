@@ -104,19 +104,19 @@ public class ClassCodeAnalyser {
 
             int blockStart = n.getBegin().get().line;
             int blockEnd = n.getEnd().get().line;
-            
+
             Set<Integer> nonEmptyLines = new HashSet<>();
 
             // Those correspond to '{' and '}' and are not empty by default
-            
+
             nonEmptyLines.add(blockStart);
             nonEmptyLines.add(blockEnd);
-            
+
             // Lines which contain comments are not empty
             for(Comment c : n.getAllContainedComments()){
                 for(int line = c.getBegin().get().line; line <= c.getEnd().get().line; line ++ ){
                     nonEmptyLines.add( line );
-                } 
+                }
             }
 
             // Processing the block
@@ -131,14 +131,14 @@ public class ClassCodeAnalyser {
                         nonEmptyLines.add( line );
                     }
                 }
-                
+
                 Statement lastInnerStatement = statements.get(statements.size() - 1);
                 int end = n.getEnd().get().line;
                 if (lastInnerStatement.getEnd().get().line < end) {
                     result.nonCoverableCode(end);
                 }
 
-            
+
                 Set<Integer> emptyLines = new HashSet<>();
                 // At this point we get empty lines by difference by removing from the block all the non empty lines
                 for( int line = blockStart; line <= blockEnd; line ++ ){
@@ -148,7 +148,7 @@ public class ClassCodeAnalyser {
                     result.emptyLine(line);
                     emptyLines.add(line);
                 }
-                
+
                 // We finally found the lines which can cover those empty lines by looking at the first non-empty, non-comment statement
                 // If that is covered, then the empty is covered. TODO Not sure how we handle the '{' opening the blocks tho.
                 for(int emptyLine : emptyLines){
@@ -165,12 +165,12 @@ public class ClassCodeAnalyser {
                                 coveringLine = sStart;
                             }
                         }
-                    } 
+                    }
                     result.lineCoversEmptyLine(coveringLine, emptyLine);
                 }
             }
-            
-            
+
+
         }
 
         @Override

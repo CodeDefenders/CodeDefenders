@@ -379,15 +379,15 @@ public class AdminDAO {
     /**
      * This does not close the given {@link Connection}.
      */
-	static AdminSystemSettings.SettingsDTO getSystemSettingInt(AdminSystemSettings.SETTING_NAME name, Connection conn) throws SQLException {
+    static AdminSystemSettings.SettingsDTO getSystemSettingInt(AdminSystemSettings.SETTING_NAME name, Connection conn) throws SQLException {
         String query = "SELECT * FROM settings WHERE settings.name = ?;";
-		PreparedStatement stmt = conn.prepareStatement(query);
-		stmt.setString(1, name.name());
-		ResultSet rs = stmt.executeQuery();
-		if (rs.next()) {
-			AdminSystemSettings.SETTING_TYPE settingType = AdminSystemSettings.SETTING_TYPE.valueOf(rs.getString("type"));
-			return new AdminSystemSettings.SettingsDTO(name, rs.getInt(settingType.name()));
-		}
-		return null;
-	}
+        PreparedStatement stmt = conn.prepareStatement(query);
+        stmt.setString(1, name.name());
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+            AdminSystemSettings.SETTING_TYPE settingType = AdminSystemSettings.SETTING_TYPE.valueOf(rs.getString("type"));
+            return new AdminSystemSettings.SettingsDTO(name, rs.getInt(settingType.name()));
+        }
+        return null;
+    }
 }

@@ -31,161 +31,161 @@ import org.codedefenders.game.Test;
 
 public class DuelGame extends AbstractGame {
 
-	private int attackerId;
-	private int defenderId;
+    private int attackerId;
+    private int defenderId;
 
-	private int currentRound;
-	private int finalRound;
+    private int currentRound;
+    private int finalRound;
 
-	private Role activeRole;
+    private Role activeRole;
 
-	public DuelGame(int classId, int userId, int maxRounds, Role role, GameLevel level) {
-		this.classId = classId;
+    public DuelGame(int classId, int userId, int maxRounds, Role role, GameLevel level) {
+        this.classId = classId;
 
-		if (role.equals(Role.ATTACKER)) {
-			attackerId = userId;
-		} else {
-			defenderId = userId;
-		}
+        if (role.equals(Role.ATTACKER)) {
+            attackerId = userId;
+        } else {
+            defenderId = userId;
+        }
 
-		this.currentRound = 1;
-		this.finalRound = maxRounds;
+        this.currentRound = 1;
+        this.finalRound = maxRounds;
 
-		this.activeRole = Role.ATTACKER;
-		this.state = GameState.CREATED;
+        this.activeRole = Role.ATTACKER;
+        this.state = GameState.CREATED;
 
-		this.level = level;
-		this.mode = GameMode.DUEL;
-	}
+        this.level = level;
+        this.mode = GameMode.DUEL;
+    }
 
-	public DuelGame(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, GameState state, GameLevel level, GameMode mode) {
-		this.id = id;
-		this.attackerId = attackerId;
-		this.defenderId = defenderId;
-		this.classId = classId;
-		this.currentRound = currentRound;
-		this.finalRound = finalRound;
-		this.activeRole = activeRole;
-		this.state = state;
-		this.level = level;
-		this.mode = mode;
-	}
+    public DuelGame(int id, int attackerId, int defenderId, int classId, int currentRound, int finalRound, Role activeRole, GameState state, GameLevel level, GameMode mode) {
+        this.id = id;
+        this.attackerId = attackerId;
+        this.defenderId = defenderId;
+        this.classId = classId;
+        this.currentRound = currentRound;
+        this.finalRound = finalRound;
+        this.activeRole = activeRole;
+        this.state = state;
+        this.level = level;
+        this.mode = mode;
+    }
 
-	public int getAttackerId() {
-		return attackerId;
-	}
+    public int getAttackerId() {
+        return attackerId;
+    }
 
-	public void setAttackerId(int aid) {
-		attackerId = aid;
-	}
+    public void setAttackerId(int aid) {
+        attackerId = aid;
+    }
 
-	public int getDefenderId() {
-		return defenderId;
-	}
+    public int getDefenderId() {
+        return defenderId;
+    }
 
-	public void setDefenderId(int did) {
-		defenderId = did;
-	}
+    public void setDefenderId(int did) {
+        defenderId = did;
+    }
 
-	public boolean isUserInGame(int uid) {
-		if ((uid == attackerId) || (uid == defenderId)) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+    public boolean isUserInGame(int uid) {
+        if ((uid == attackerId) || (uid == defenderId)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-	public int getCurrentRound() {
-		return currentRound;
-	}
+    public int getCurrentRound() {
+        return currentRound;
+    }
 
-	public int getFinalRound() {
-		return finalRound;
-	}
+    public int getFinalRound() {
+        return finalRound;
+    }
 
-	public Role getActiveRole() {
-		return activeRole;
-	}
+    public Role getActiveRole() {
+        return activeRole;
+    }
 
-	// ATTACKER, DEFENDER, NEITHER
-	public void setActiveRole(Role role) {
-		activeRole = role;
-	}
+    // ATTACKER, DEFENDER, NEITHER
+    public void setActiveRole(Role role) {
+        activeRole = role;
+    }
 
-	public int getAttackerScore() {
-		int totalScore = 0;
+    public int getAttackerScore() {
+        int totalScore = 0;
 
-		for (Mutant m : getMutants())
-			totalScore += m.getAttackerPoints();
-		logger.debug("Attacker Score: " + totalScore);
-		return totalScore;
-	}
+        for (Mutant m : getMutants())
+            totalScore += m.getAttackerPoints();
+        logger.debug("Attacker Score: " + totalScore);
+        return totalScore;
+    }
 
-	public int getDefenderScore() {
-		int totalScore = 0;
+    public int getDefenderScore() {
+        int totalScore = 0;
 
-		for (Test t : getTests())
-			totalScore += t.getDefenderPoints();
+        for (Test t : getTests())
+            totalScore += t.getDefenderPoints();
 
-		for (Mutant m : getMutants())
-			totalScore += m.getDefenderPoints();
-		logger.debug("Defender Score: " + totalScore);
-		return totalScore;
-	}
+        for (Mutant m : getMutants())
+            totalScore += m.getDefenderPoints();
+        logger.debug("Defender Score: " + totalScore);
+        return totalScore;
+    }
 
-	public void start() {
-		state = GameState.ACTIVE;
-		activeRole = Role.ATTACKER;
-	}
+    public void start() {
+        state = GameState.ACTIVE;
+        activeRole = Role.ATTACKER;
+    }
 
-	public void passPriority() {
-		if (activeRole.equals(Role.ATTACKER)) {
-			activeRole = Role.DEFENDER;
-		} else
-			activeRole = Role.ATTACKER;
-	}
+    public void passPriority() {
+        if (activeRole.equals(Role.ATTACKER)) {
+            activeRole = Role.DEFENDER;
+        } else
+            activeRole = Role.ATTACKER;
+    }
 
-	public void endTurn() {
-		if (activeRole.equals(Role.ATTACKER)) {
-			activeRole = Role.DEFENDER;
-		} else {
-			activeRole = Role.ATTACKER;
-			endRound();
-		}
-	}
+    public void endTurn() {
+        if (activeRole.equals(Role.ATTACKER)) {
+            activeRole = Role.DEFENDER;
+        } else {
+            activeRole = Role.ATTACKER;
+            endRound();
+        }
+    }
 
-	public void endRound() {
-		if (currentRound < finalRound) {
-			currentRound++;
-		} else if ((currentRound == finalRound) && (state.equals(GameState.ACTIVE))) {
-			state = GameState.FINISHED;
-		}
-	}
+    public void endRound() {
+        if (currentRound < finalRound) {
+            currentRound++;
+        } else if ((currentRound == finalRound) && (state.equals(GameState.ACTIVE))) {
+            state = GameState.FINISHED;
+        }
+    }
 
-	public boolean addPlayer(int userId, Role role) {
-		if (GameDAO.addPlayerToGame(id, userId, role)) {
-			if (role.equals(Role.ATTACKER))
-				attackerId = userId;
-			else
-				defenderId = userId;
-			return true;
-		}
-		return false;
-	}
+    public boolean addPlayer(int userId, Role role) {
+        if (GameDAO.addPlayerToGame(id, userId, role)) {
+            if (role.equals(Role.ATTACKER))
+                attackerId = userId;
+            else
+                defenderId = userId;
+            return true;
+        }
+        return false;
+    }
 
-	@Override
-	public boolean insert() {
-		try {
-			this.id = DuelGameDAO.storeDuelGame(this);
-			return true;
-		} catch (UncheckedSQLException e) {
-			logger.error("Failed to store duel game to database.", e);
-			return false;
-		}
-	}
+    @Override
+    public boolean insert() {
+        try {
+            this.id = DuelGameDAO.storeDuelGame(this);
+            return true;
+        } catch (UncheckedSQLException e) {
+            logger.error("Failed to store duel game to database.", e);
+            return false;
+        }
+    }
 
-	@Override
-	public boolean update() {
-		return DuelGameDAO.updateDuelGame(this);
-	}
+    @Override
+    public boolean update() {
+        return DuelGameDAO.updateDuelGame(this);
+    }
 }

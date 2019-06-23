@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This is a parallel implementation of IMutationTester. Parallelism is achieved
  * by means of the injected executionService
- * 
+ *
  * We inject instances using {@link MutationTesterProducer}
  */
 @Alternative // This disable the automatic injection so we pass dependencies via the constructor
@@ -70,7 +70,7 @@ public class ParallelMutationTester extends MutationTester //
                                    // sure how CDI works with annotations
 {
     private ExecutorService testExecutorThreadPool;
-    
+
     public ParallelMutationTester(BackendExecutorService backend, boolean useMutantCoverage, ExecutorService testExecutorThreadPool) {
         super(backend, useMutantCoverage);
         this.testExecutorThreadPool = testExecutorThreadPool;
@@ -189,7 +189,7 @@ public class ParallelMutationTester extends MutationTester //
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.codedefenders.execution.IMutationTester#runAllTestsOnMutant(org.
      * codedefenders.game.AbstractGame, org.codedefenders.game.Mutant,
      * java.util.ArrayList, org.codedefenders.execution.TestScheduler)

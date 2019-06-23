@@ -15,7 +15,7 @@ import javax.naming.NamingException;
 /**
  * Taken from:
  * https://dzone.com/articles/how-to-inject-property-file-properties-with-cdi
- * 
+ *
  * TODO For testing we might need to include "a mocked" set of configuration values:
  * https://dzone.com/articles/field-injection-when-mocking-frameworks-fail
  */
@@ -76,7 +76,7 @@ public class ConfigurationPropertyProducer {
             while (list.hasMore()) {
                 String name = list.next().getName();
                 properties.put(name, (String) environmentContext.lookup(name));
-//                System.out.println("ConfigurationPropertyProducer.init() Registering " + name + " with value " + environmentContext.lookup(name) ); 
+//                System.out.println("ConfigurationPropertyProducer.init() Registering " + name + " with value " + environmentContext.lookup(name) );
             }
 
         } catch (NamingException e) {

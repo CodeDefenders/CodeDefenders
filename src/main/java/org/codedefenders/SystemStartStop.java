@@ -67,6 +67,6 @@ public class SystemStartStop implements ServletContextListener {
         } catch (Throwable e) {
             logger.error("Error in closing connections", e);
         }
-        // The ThreadPoolManager should be able to automatically stop the instances  
+        // The ThreadPoolManager should be able to automatically stop the instances
     }
 }

@@ -117,8 +117,8 @@ public class TestDAO {
                 ";");
         return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId), DatabaseValue.of(userId));
     }
-    
-    
+
+
     /**
      * Returns the {@link Test Tests} from the given game for the given player
      */
@@ -132,7 +132,7 @@ public class TestDAO {
                 ";");
         return DB.executeQueryReturnList(query, TestDAO::testFromRS, DatabaseValue.of(gameId), DatabaseValue.of( playerId));
     }
-    
+
     /**
      * Returns the valid {@link Test Tests} from the given game.
      * Valid tests are compilable and do not fail when executed against the original class.
