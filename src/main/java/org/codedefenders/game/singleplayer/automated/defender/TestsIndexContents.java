@@ -38,53 +38,53 @@ import static org.codedefenders.util.Constants.TEST_INFO_EXT;
  */
 class TestsIndexContents {
 
-	private ArrayList<Integer> testIds;
-	private int dummyGameId;
-	private int numTests;
+    private ArrayList<Integer> testIds;
+    private int dummyGameId;
+    private int numTests;
 
-	public TestsIndexContents(GameClass cut) {
-		testIds = new ArrayList<Integer>();
-		dummyGameId = -1;
-		numTests = -1;
-		//Parse the test index file of a given class.
-		try {
-			File f = new File(AI_DIR + F_SEP + "tests" + F_SEP +
-					cut.getAlias() + F_SEP + "TestsIndex" + TEST_INFO_EXT);
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder dBuild = dbFactory.newDocumentBuilder();
-			Document d = dBuild.parse(f);
+    public TestsIndexContents(GameClass cut) {
+        testIds = new ArrayList<Integer>();
+        dummyGameId = -1;
+        numTests = -1;
+        //Parse the test index file of a given class.
+        try {
+            File f = new File(AI_DIR + F_SEP + "tests" + F_SEP +
+                    cut.getAlias() + F_SEP + "TestsIndex" + TEST_INFO_EXT);
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuild = dbFactory.newDocumentBuilder();
+            Document d = dBuild.parse(f);
 
-			d.getDocumentElement().normalize();
+            d.getDocumentElement().normalize();
 
-			NodeList tNodes = d.getElementsByTagName("test");
-			for (int i = 0; i < tNodes.getLength(); i++) {
-				Node tNode = tNodes.item(i);
-				Node id = tNode.getAttributes().getNamedItem("id");
-				testIds.add(Integer.parseInt(id.getTextContent()));
-			}
-			NodeList q = d.getElementsByTagName("quantity");
-			numTests = Integer.parseInt(q.item(0).getTextContent());
-			NodeList g = d.getElementsByTagName("dummygame");
-			dummyGameId = Integer.parseInt(g.item(0).getTextContent());
+            NodeList tNodes = d.getElementsByTagName("test");
+            for (int i = 0; i < tNodes.getLength(); i++) {
+                Node tNode = tNodes.item(i);
+                Node id = tNode.getAttributes().getNamedItem("id");
+                testIds.add(Integer.parseInt(id.getTextContent()));
+            }
+            NodeList q = d.getElementsByTagName("quantity");
+            numTests = Integer.parseInt(q.item(0).getTextContent());
+            NodeList g = d.getElementsByTagName("dummygame");
+            dummyGameId = Integer.parseInt(g.item(0).getTextContent());
 
-		} catch (Exception e) {
-			e.printStackTrace();
-			//TODO: Handle errors.
-		}
+        } catch (Exception e) {
+            e.printStackTrace();
+            //TODO: Handle errors.
+        }
 
 
-	}
+    }
 
-	public ArrayList<Integer> getTestIds() {
-		return testIds;
-	}
+    public ArrayList<Integer> getTestIds() {
+        return testIds;
+    }
 
-	public int getNumTests() {
-		return numTests;
-	}
+    public int getNumTests() {
+        return numTests;
+    }
 
-	public int getDummyGameId() {
-		return dummyGameId;
-	}
+    public int getDummyGameId() {
+        return dummyGameId;
+    }
 
 }

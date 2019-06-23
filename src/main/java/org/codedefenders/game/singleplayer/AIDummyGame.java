@@ -30,9 +30,9 @@ import org.codedefenders.game.singleplayer.automated.attacker.AiAttacker;
 
 public class AIDummyGame extends DuelGame {
 
-	public AIDummyGame(int classId) {
-		super(classId, AiAttacker.ID, 1, Role.ATTACKER, GameLevel.EASY);
-		setState(GameState.ACTIVE);
-	}
+    public AIDummyGame(int classId) {
+        super(classId, AiAttacker.ID, 1, Role.ATTACKER, GameLevel.EASY);
+        setState(GameState.ACTIVE);
+    }
 
 }

@@ -51,67 +51,67 @@ import javassist.CtClass;
  * @see Mutant
  */
 public class Test {
-	private static final Logger logger = LoggerFactory.getLogger(Test.class);
+    private static final Logger logger = LoggerFactory.getLogger(Test.class);
 
-	private int id;
-	private int playerId;
-	private int gameId;
-	private int classId;
-	private String javaFile;
-	private String classFile;
+    private int id;
+    private int playerId;
+    private int gameId;
+    private int classId;
+    private String javaFile;
+    private String classFile;
 
-	private int roundCreated;
-	private int mutantsKilled;
-	private int score;
-	private int aiMutantsKilled; // how many generated mutants this test killed.
-	private LineCoverage lineCoverage;
+    private int roundCreated;
+    private int mutantsKilled;
+    private int score;
+    private int aiMutantsKilled; // how many generated mutants this test killed.
+    private LineCoverage lineCoverage;
 
-	/**
-	 * Creates a new Test with following attributes:
-	 * <ul>
-	 * <li><code>gameId -1</code></li>
-	 * <li><code>playerId -1</code></li>
-	 * <li><code>roundCreated -1</code></li>
-	 * <li><code>score 0</code></li>
-	 * </ul>
-	 */
-	public Test(String javaFilePath, String classFilePath, int classId, LineCoverage lineCoverage) {
-		this.javaFile = javaFilePath;
-		this.classFile = classFilePath;
-		this.gameId = Constants.DUMMY_GAME_ID;
-		this.playerId = Constants.DUMMY_CREATOR_USER_ID;
-		this.roundCreated = -1;
-		this.score = 0;
-		this.classId = classId;
-		this.lineCoverage = lineCoverage;
-	}
+    /**
+     * Creates a new Test with following attributes:
+     * <ul>
+     * <li><code>gameId -1</code></li>
+     * <li><code>playerId -1</code></li>
+     * <li><code>roundCreated -1</code></li>
+     * <li><code>score 0</code></li>
+     * </ul>
+     */
+    public Test(String javaFilePath, String classFilePath, int classId, LineCoverage lineCoverage) {
+        this.javaFile = javaFilePath;
+        this.classFile = classFilePath;
+        this.gameId = Constants.DUMMY_GAME_ID;
+        this.playerId = Constants.DUMMY_CREATOR_USER_ID;
+        this.roundCreated = -1;
+        this.score = 0;
+        this.classId = classId;
+        this.lineCoverage = lineCoverage;
+    }
 
-	public Test(int classId, int gameId, String javaFile, String classFile, int playerId) {
-	    this.classId = classId;
-		this.gameId = gameId;
+    public Test(int classId, int gameId, String javaFile, String classFile, int playerId) {
+        this.classId = classId;
+        this.gameId = gameId;
         this.roundCreated = GameDAO.getCurrentRound(gameId);
-		this.javaFile = javaFile;
-		this.classFile = classFile;
-		this.playerId = playerId;
-		this.score = 0;
-		this.lineCoverage = new LineCoverage();
-	}
+        this.javaFile = javaFile;
+        this.classFile = classFile;
+        this.playerId = playerId;
+        this.score = 0;
+        this.lineCoverage = new LineCoverage();
+    }
 
-	@Deprecated
-	public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled, int playerId) {
-		this(testId, classId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId, Collections.emptyList(), Collections.emptyList(), 0);
-	}
+    @Deprecated
+    public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled, int playerId) {
+        this(testId, classId, gameId, javaFile, classFile, roundCreated, mutantsKilled, playerId, Collections.emptyList(), Collections.emptyList(), 0);
+    }
 
-	public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled,
-				int playerId, List<Integer> linesCovered, List<Integer> linesUncovered, int score) {
-		this(classId, gameId, javaFile, classFile, playerId);
+    public Test(int testId, int classId, int gameId, String javaFile, String classFile, int roundCreated, int mutantsKilled,
+                int playerId, List<Integer> linesCovered, List<Integer> linesUncovered, int score) {
+        this(classId, gameId, javaFile, classFile, playerId);
 
-		this.id = testId;
-		this.roundCreated = roundCreated;
-		this.mutantsKilled = mutantsKilled;
-		this.score = score;
-		lineCoverage = new LineCoverage(linesCovered, linesUncovered);
-	}
+        this.id = testId;
+        this.roundCreated = roundCreated;
+        this.mutantsKilled = mutantsKilled;
+        this.score = score;
+        lineCoverage = new LineCoverage(linesCovered, linesUncovered);
+    }
 
     /**
      * Creates a test from another test instance, but in a new game and for a new player.
@@ -127,242 +127,242 @@ public class Test {
         return test;
     }
 
-	// TODO Check that increment score does not consider mutants that were killed already
-	public void incrementScore(int score) {
-		if (score == 0) {
-			// Why this is happening?
-			// Phil: ^ because the calculated score for this test so far is zero (e.g. no mutants in a game yet)
-			logger.warn("Do not increment score for test {} when score is zero", getId());
-			return;
-		}
+    // TODO Check that increment score does not consider mutants that were killed already
+    public void incrementScore(int score) {
+        if (score == 0) {
+            // Why this is happening?
+            // Phil: ^ because the calculated score for this test so far is zero (e.g. no mutants in a game yet)
+            logger.warn("Do not increment score for test {} when score is zero", getId());
+            return;
+        }
 
-		String query = "UPDATE tests SET Points = Points + ? WHERE Test_ID=?;";
-		Connection conn = DB.getConnection();
+        String query = "UPDATE tests SET Points = Points + ? WHERE Test_ID=?;";
+        Connection conn = DB.getConnection();
 
-		DatabaseValue[] valueList = new DatabaseValue[] { DatabaseValue.of(score), DatabaseValue.of(id) };
+        DatabaseValue[] valueList = new DatabaseValue[] { DatabaseValue.of(score), DatabaseValue.of(id) };
 
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
-		boolean incremented = DB.executeUpdate(stmt, conn);
+        boolean incremented = DB.executeUpdate(stmt, conn);
 
-		logger.info("Increment score for {} by {}. Update? {} ", toString(), score, incremented);
-	}
+        logger.info("Increment score for {} by {}. Update? {} ", toString(), score, incremented);
+    }
 
-	@Deprecated()
-	public void setScore(int store) {
-		score = store;
-	}
+    @Deprecated()
+    public void setScore(int store) {
+        score = store;
+    }
 
-	public void updateScore(int score) {
-		this.score += score;
-	}
+    public void updateScore(int score) {
+        this.score += score;
+    }
 
-	public int getId() {
-		return id;
-	}
+    public int getId() {
+        return id;
+    }
 
-	public int getGameId() {
-		return gameId;
-	}
+    public int getGameId() {
+        return gameId;
+    }
 
-	public int getMutantsKilled() {
-		return mutantsKilled;
-	}
+    public int getMutantsKilled() {
+        return mutantsKilled;
+    }
 
-	public int getRoundCreated() {
-		return roundCreated;
-	}
+    public int getRoundCreated() {
+        return roundCreated;
+    }
 
-	public int getDefenderPoints() {
-		// FIXME: Why will only work for Duel Games since multiplayer games have multiple defenders
-		final DuelGame game = DuelGameDAO.getDuelGameForId(this.gameId);
-		if (game != null && playerId == game.getDefenderId()) {
-			return mutantsKilled;
-		} else {
-			return 0;
-		}
-	}
+    public int getDefenderPoints() {
+        // FIXME: Why will only work for Duel Games since multiplayer games have multiple defenders
+        final DuelGame game = DuelGameDAO.getDuelGameForId(this.gameId);
+        if (game != null && playerId == game.getDefenderId()) {
+            return mutantsKilled;
+        } else {
+            return 0;
+        }
+    }
 
-	public String getDirectory() {
-		File file = new File(javaFile);
-		return file.getAbsoluteFile().getParent();
-	}
+    public String getDirectory() {
+        File file = new File(javaFile);
+        return file.getAbsoluteFile().getParent();
+    }
 
-	// Increment the number of mutant killed directly on the DB
-	// And update the local object. But it requires several queries/connections
-	//
-	// TODO Check that this method is never called for tests that kill a mutant that was already dead...
-	public void killMutant() {
-		// mutantsKilled++;
-		// update();
-		logger.info("Test {} killed a new mutant", getId());
+    // Increment the number of mutant killed directly on the DB
+    // And update the local object. But it requires several queries/connections
+    //
+    // TODO Check that this method is never called for tests that kill a mutant that was already dead...
+    public void killMutant() {
+        // mutantsKilled++;
+        // update();
+        logger.info("Test {} killed a new mutant", getId());
 
-		String query = "UPDATE tests SET MutantsKilled = MutantsKilled + ? WHERE Test_ID=?;";
-		Connection conn = DB.getConnection();
+        String query = "UPDATE tests SET MutantsKilled = MutantsKilled + ? WHERE Test_ID=?;";
+        Connection conn = DB.getConnection();
 
-		DatabaseValue[] valueList = new DatabaseValue[] { DatabaseValue.of(1), DatabaseValue.of(id) };
+        DatabaseValue[] valueList = new DatabaseValue[] { DatabaseValue.of(1), DatabaseValue.of(id) };
 
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
 
-		boolean updated = DB.executeUpdate(stmt, conn);
+        boolean updated = DB.executeUpdate(stmt, conn);
 
-		// Eventually update the kill count from the DB
-		mutantsKilled = TestDAO.getTestById(getId()).getMutantsKilled();
-		
-		logger.info("Test {} new killcount is {}. Was updated ? {} ", toString(), mutantsKilled, updated);
-	}
+        // Eventually update the kill count from the DB
+        mutantsKilled = TestDAO.getTestById(getId()).getMutantsKilled();
 
-	public boolean isMutantCovered(Mutant mutant) {
-		return CollectionUtils.containsAny(lineCoverage.getLinesCovered(), mutant.getLines());
-	}
+        logger.info("Test {} new killcount is {}. Was updated ? {} ", toString(), mutantsKilled, updated);
+    }
 
-	public Set<Mutant> getCoveredMutants(List<Mutant> mutants) {
-		List<Integer> coverage = lineCoverage.getLinesCovered();
-		Set<Mutant> coveredMutants = new TreeSet<>(Mutant.orderByIdAscending());
+    public boolean isMutantCovered(Mutant mutant) {
+        return CollectionUtils.containsAny(lineCoverage.getLinesCovered(), mutant.getLines());
+    }
 
-		for(Mutant m : mutants) {
-			if(CollectionUtils.containsAny(coverage, m.getLines())) {
-				coveredMutants.add(m);
-			}
-		}
+    public Set<Mutant> getCoveredMutants(List<Mutant> mutants) {
+        List<Integer> coverage = lineCoverage.getLinesCovered();
+        Set<Mutant> coveredMutants = new TreeSet<>(Mutant.orderByIdAscending());
 
-		return coveredMutants;
-	}
+        for(Mutant m : mutants) {
+            if(CollectionUtils.containsAny(coverage, m.getLines())) {
+                coveredMutants.add(m);
+            }
+        }
 
-	public Set<Mutant> getKilledMutants() {
-		return DatabaseAccess.getKilledMutantsForTestId(id);
-	}
+        return coveredMutants;
+    }
 
-	private String getAsString() {
-		return FileUtils.readJavaFileWithDefault(Paths.get(javaFile));
-	}
+    public Set<Mutant> getKilledMutants() {
+        return DatabaseAccess.getKilledMutantsForTestId(id);
+    }
 
-	@SuppressWarnings("Duplicates")
-	public String getAsHTMLEscapedString() {
-		return StringEscapeUtils.escapeHtml(getAsString());
-	}
+    private String getAsString() {
+        return FileUtils.readJavaFileWithDefault(Paths.get(javaFile));
+    }
 
-	public boolean insert() {
-		try {
-			this.id = TestDAO.storeTest(this);
-			return true;
-		} catch (UncheckedSQLException e) {
-			logger.error("Failed to store test to database.", e);
-			return false;
-		}
-	}
+    @SuppressWarnings("Duplicates")
+    public String getAsHTMLEscapedString() {
+        return StringEscapeUtils.escapeHtml(getAsString());
+    }
 
-	@Deprecated
-	public boolean update() {
-		logger.debug("Updating Test");
-		Connection conn = DB.getConnection();
+    public boolean insert() {
+        try {
+            this.id = TestDAO.storeTest(this);
+            return true;
+        } catch (UncheckedSQLException e) {
+            logger.error("Failed to store test to database.", e);
+            return false;
+        }
+    }
 
-		String linesCoveredString = "";
-		String linesUncoveredString= "";
+    @Deprecated
+    public boolean update() {
+        logger.debug("Updating Test");
+        Connection conn = DB.getConnection();
 
-		if (lineCoverage != null) {
-			linesCoveredString = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
-			linesUncoveredString = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
-		}
+        String linesCoveredString = "";
+        String linesUncoveredString= "";
 
-		String query = "UPDATE tests SET mutantsKilled=?,NumberAiMutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
-		DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(mutantsKilled),
-				DatabaseValue.of(aiMutantsKilled),
-				DatabaseValue.of(linesCoveredString),
-				DatabaseValue.of(linesUncoveredString),
-				DatabaseValue.of(score),
-				DatabaseValue.of(id)
-		};
+        if (lineCoverage != null) {
+            linesCoveredString = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
+            linesUncoveredString = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
+        }
 
-		PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-		return DB.executeUpdate(stmt, conn);
-	}
+        String query = "UPDATE tests SET mutantsKilled=?,NumberAiMutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
+        DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(mutantsKilled),
+                DatabaseValue.of(aiMutantsKilled),
+                DatabaseValue.of(linesCoveredString),
+                DatabaseValue.of(linesUncoveredString),
+                DatabaseValue.of(score),
+                DatabaseValue.of(id)
+        };
 
-	public String getFullyQualifiedClassName() {
-		if (classFile == null)
-			return null;
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
+        return DB.executeUpdate(stmt, conn);
+    }
 
-		ClassPool classPool = ClassPool.getDefault();
-		CtClass cc = null;
-		try {
-			cc = classPool.makeClass(new FileInputStream(new File(classFile)));
-		} catch (IOException e) {
-			logger.error("IO exception caught", e);
-		}
-		return cc == null ? null : cc.getName();
-	}
+    public String getFullyQualifiedClassName() {
+        if (classFile == null)
+            return null;
 
-	public boolean isValid() {
-		return classFile != null;
-	}
+        ClassPool classPool = ClassPool.getDefault();
+        CtClass cc = null;
+        try {
+            cc = classPool.makeClass(new FileInputStream(new File(classFile)));
+        } catch (IOException e) {
+            logger.error("IO exception caught", e);
+        }
+        return cc == null ? null : cc.getName();
+    }
 
-	public int getAiMutantsKilled() {
-		if (aiMutantsKilled == 0) {
-			//Retrieve from DB.
-			aiMutantsKilled = TestDAO.getNumAiMutantsKilledByTest(getId());
-		}
-		return aiMutantsKilled;
-	}
+    public boolean isValid() {
+        return classFile != null;
+    }
 
-	public void incrementAiMutantsKilled() {
-		aiMutantsKilled++;
-	}
+    public int getAiMutantsKilled() {
+        if (aiMutantsKilled == 0) {
+            //Retrieve from DB.
+            aiMutantsKilled = TestDAO.getNumAiMutantsKilledByTest(getId());
+        }
+        return aiMutantsKilled;
+    }
 
-	public String getJavaFile() {
-		return javaFile;
-	}
+    public void incrementAiMutantsKilled() {
+        aiMutantsKilled++;
+    }
 
-	public void setJavaFile(String javaFile) {
-		this.javaFile = javaFile;
-	}
+    public String getJavaFile() {
+        return javaFile;
+    }
 
-	public String getClassFile() {
-		return classFile;
-	}
+    public void setJavaFile(String javaFile) {
+        this.javaFile = javaFile;
+    }
 
-	public LineCoverage getLineCoverage() {
-		return lineCoverage;
-	}
+    public String getClassFile() {
+        return classFile;
+    }
 
-	public void setPlayerId(int id) {
-		playerId = id;
-	}
+    public LineCoverage getLineCoverage() {
+        return lineCoverage;
+    }
+
+    public void setPlayerId(int id) {
+        playerId = id;
+    }
 
 
-	public int getPlayerId() {
-		return playerId;
-	}
+    public int getPlayerId() {
+        return playerId;
+    }
 
-	public int getScore() {
-		return score;
-	}
+    public int getScore() {
+        return score;
+    }
 
-	public int getClassId() {
-		return classId;
-	}
+    public int getClassId() {
+        return classId;
+    }
 
-	@Deprecated
-	public void setAiMutantsKilled(int count) {
-		aiMutantsKilled = count;
-	}
+    @Deprecated
+    public void setAiMutantsKilled(int count) {
+        aiMutantsKilled = count;
+    }
 
-	@Deprecated
-	public void setLineCoverage(LineCoverage lineCoverage) {
-		this.lineCoverage = lineCoverage;
-	}
+    @Deprecated
+    public void setLineCoverage(LineCoverage lineCoverage) {
+        this.lineCoverage = lineCoverage;
+    }
 
-	// First created appears first
-	public static Comparator<Test> orderByIdAscending() {
-		return (o1, o2) -> o1.id - o2.id;
-	}
+    // First created appears first
+    public static Comparator<Test> orderByIdAscending() {
+        return (o1, o2) -> o1.id - o2.id;
+    }
 
-	// Last created appears first
-	public static Comparator<Test> orderByIdDescending() {
-		return (o1, o2) -> o2.id - o1.id;
-	}
+    // Last created appears first
+    public static Comparator<Test> orderByIdDescending() {
+        return (o1, o2) -> o2.id - o1.id;
+    }
 
-	@Override
-	public String toString() {
-		return "[testId=" + id + ",classId="+ classId + ",mutantsKilled=" + mutantsKilled + ",score=" + score + "]";
-	}
+    @Override
+    public String toString() {
+        return "[testId=" + id + ",classId="+ classId + ",mutantsKilled=" + mutantsKilled + ",score=" + score + "]";
+    }
 }

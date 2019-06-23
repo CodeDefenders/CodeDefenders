@@ -107,10 +107,10 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private GameManagingUtils gameManagingUtils;
-    
+
     @Inject
     private IMutationTester mutationTester;
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         Optional<Integer> gameIdOpt = ServletUtils.gameId(request);
@@ -298,7 +298,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
         }
-        
+
         logger.debug("New Test {} by user {}", newTest.getId(), userId);
         TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
@@ -312,7 +312,7 @@ public class MultiplayerGameManager extends HttpServlet {
         if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
             // We escape the content of the message for new tests since user can embed there anything
-            String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message); 
+            String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
             // We introduce our decoration
             String decorate = decorateWithLinksToCode( escapedHtml );
             messages.add( decorate );
@@ -344,7 +344,7 @@ public class MultiplayerGameManager extends HttpServlet {
         mutationTester.runTestOnAllMultiplayerMutants(game, newTest, messages);
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
-        
+
         // Clean up the session
         session.removeAttribute("selected_lines");
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -373,7 +373,7 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         return decorated.toString();
     }
-    
+
     private void createMutant(HttpServletRequest request, HttpServletResponse response, int gameId, MultiplayerGame game) throws IOException {
         final int userId = ServletUtils.userId(request);
 
@@ -451,7 +451,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // There's a ton of defensive programming here...
             if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty()) {
                 // We escape the content of the message for new tests since user can embed there anything
-                String escapedHtml = StringEscapeUtils.escapeHtml(compileMutantTarget.message); 
+                String escapedHtml = StringEscapeUtils.escapeHtml(compileMutantTarget.message);
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode( escapedHtml );
                 messages.add( decorate );

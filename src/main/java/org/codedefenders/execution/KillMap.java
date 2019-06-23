@@ -63,7 +63,7 @@ public class KillMap {
 
     // @Inject // This does not work for static classes
     private static BackendExecutorService backend;
-    
+
     private static boolean USE_COVERAGE = true;
     private static boolean PARALLELIZE = true;
     private final static int NUM_THREADS = 40;

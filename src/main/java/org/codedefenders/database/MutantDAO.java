@@ -121,7 +121,7 @@ public class MutantDAO {
                 "  AND m.Player_ID = ?;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId), DatabaseValue.of( playerId));
     }
-    
+
     /**
      * Returns the {@link Mutant Mutants} from the given game for the given user
      */
@@ -132,7 +132,7 @@ public class MutantDAO {
                 "  AND m.User_ID = ?;");
         return DB.executeQueryReturnList(query, MutantDAO::mutantFromRS, DatabaseValue.of(gameId), DatabaseValue.of( userId));
     }
-    
+
     /**
      * Returns the compilable {@link Mutant Mutants} from the given game.
      */

@@ -28,22 +28,22 @@ public class ConsistentDateParameterValidator implements ConstraintValidator<Con
 
     @Override
     public boolean isValid(Object[] value, ConstraintValidatorContext context) {
-         
+
         if (value[12] == null || value[13] == null) {
             return false;
         }
-        
+
         // FIXME
         // Parse to date if possible and then compare with before/after
         return true;
-// 
-//        if (!(value[0] instanceof LocalDate) 
+//
+//        if (!(value[0] instanceof LocalDate)
 //          || !(value[1] instanceof LocalDate)) {
 //            throw new IllegalArgumentException(
 //              "Illegal method signature, expected two parameters of type LocalDate.");
 //        }
-// 
-//        return ((LocalDate) value[0]).isAfter(LocalDate.now()) 
+//
+//        return ((LocalDate) value[0]).isAfter(LocalDate.now())
 //          && ((LocalDate) value[0]).isBefore((LocalDate) value[1]);
     }
 }

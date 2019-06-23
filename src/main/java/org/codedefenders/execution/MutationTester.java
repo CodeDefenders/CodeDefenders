@@ -57,7 +57,7 @@ import org.slf4j.LoggerFactory;
  * Class that handles compilation and testing by creating a Process with the
  * relevant ant target. Since execution is related to single request, we use a
  * Request Scope.
- * 
+ *
  * We inject instances using {@link MutationTesterProducer}
  */
 @Alternative // This disable the automatic injection so we pass dependencies via the constructor
@@ -272,7 +272,7 @@ public class MutationTester implements IMutationTester {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.codedefenders.execution.IMutationTester#runEquivalenceTest(org.
      * codedefenders.game.Test, org.codedefenders.game.Mutant)
      */

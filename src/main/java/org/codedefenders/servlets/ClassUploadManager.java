@@ -85,7 +85,7 @@ import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
  */
 public class ClassUploadManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(ClassUploadManager.class);
-    
+
     @Inject
     private BackendExecutorService backend;
 
@@ -474,12 +474,12 @@ public class ClassUploadManager extends HttpServlet {
         Redirect.redirectBack(request, response);
 
         // TODO Phil: Will this be used in the future? Looks like legacy code.
-//			if (shouldPrepareAI) {
-//				if (!PrepareAI.createTestsAndMutants()) {
-//					logger.error("Preparation of AI for class failed, please prepare the class again, or try a different class.");
-//					messages.add("Preparation of AI for class failed, please prepare the class again, or try a different class.");
-//				}
-//			}
+//            if (shouldPrepareAI) {
+//                if (!PrepareAI.createTestsAndMutants()) {
+//                    logger.error("Preparation of AI for class failed, please prepare the class again, or try a different class.");
+//                    messages.add("Preparation of AI for class failed, please prepare the class again, or try a different class.");
+//                }
+//            }
     }
 
     /**

@@ -90,13 +90,13 @@ import org.slf4j.LoggerFactory;
  */
 public class PuzzleGameManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(PuzzleGameManager.class);
-    
+
     @Inject
     private GameManagingUtils gameManagingUtils;
-    
+
     @Inject
-    private IMutationTester mutationTester; 
-    
+    private IMutationTester mutationTester;
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         final int userId = ServletUtils.userId(request);
@@ -423,7 +423,7 @@ public class PuzzleGameManager extends HttpServlet {
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);
     }
-    
+
     private String generateWinningMessage(HttpServletRequest request, int userId, PuzzleGame game, boolean isAnAttackGame) {
         StringBuffer message = new StringBuffer();
         message.append("Congratulations, your " + (isAnAttackGame ? "mutant" : "test") + " solved the puzzle!");
@@ -460,7 +460,7 @@ public class PuzzleGameManager extends HttpServlet {
                     // Skip already solved puzzles
                     PuzzleGame playedGame = PuzzleDAO.getLatestPuzzleGameForPuzzleAndUser(puzzle.getPuzzleId(), userId);
                     if (
-                            playedGame == null || // Not yet played this puzzle 
+                            playedGame == null || // Not yet played this puzzle
                             ( playedGame != null  && ! playedGame.getState().equals(GameState.SOLVED)) // played but not yet solved. Condition expressed to be readable.
                     ) {
                         message.append(" ")

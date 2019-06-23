@@ -83,11 +83,11 @@ import static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTI
 // FIXME Once used again, this servlet should be refactored!
 public class UnitTesting extends HttpServlet {
 
-	private static final Logger logger = LoggerFactory.getLogger(UnitTesting.class);
+    private static final Logger logger = LoggerFactory.getLogger(UnitTesting.class);
 
-	// @Inject
+    // @Inject
     private static ClassCompilerService classCompiler;
-    
+
     //  @Inject
     private static BackendExecutorService backend;
 
@@ -111,142 +111,142 @@ public class UnitTesting extends HttpServlet {
             e.printStackTrace();
         }
     }
-	
-	
-	// Based on info provided, navigate to the correct view for the user
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-		// Get the session information specific to the current user.
-		HttpSession session = request.getSession();
-		int uid = (Integer) session.getAttribute("uid");
-		Object ogid = request.getAttribute("gameId");
-		DuelGame activeGame;
-		if (ogid == null) {
-			logger.debug("Getting active unit testing session for user " + uid);
-			activeGame = DatabaseAccess.getActiveUnitTestingSession(uid);
-		} else {
-			int gameId = (Integer) ogid;
-			logger.debug("Getting game " + gameId + " for " + uid);
-			activeGame = DuelGameDAO.getDuelGameForId(gameId);
-		}
-		request.setAttribute("game", activeGame);
 
-		RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.UTESTING_VIEW_JSP);
-		dispatcher.forward(request, response);
-	}
+    // Based on info provided, navigate to the correct view for the user
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		logger.debug("Executing doPost");
+        // Get the session information specific to the current user.
+        HttpSession session = request.getSession();
+        int uid = (Integer) session.getAttribute("uid");
+        Object ogid = request.getAttribute("gameId");
+        DuelGame activeGame;
+        if (ogid == null) {
+            logger.debug("Getting active unit testing session for user " + uid);
+            activeGame = DatabaseAccess.getActiveUnitTestingSession(uid);
+        } else {
+            int gameId = (Integer) ogid;
+            logger.debug("Getting game " + gameId + " for " + uid);
+            activeGame = DuelGameDAO.getDuelGameForId(gameId);
+        }
+        request.setAttribute("game", activeGame);
 
-		ArrayList<String> messages = new ArrayList<>();
-		HttpSession session = request.getSession();
-		int uid = (Integer) session.getAttribute("uid");
-		int gameId = ServletUtils.gameId(request).get();
-		DuelGame activeGame = (DuelGame) session.getAttribute("game");
-		session.setAttribute("messages", messages);
+        RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.UTESTING_VIEW_JSP);
+        dispatcher.forward(request, response);
+    }
 
-		// Get the text submitted by the user.
-		String testText = request.getParameter("test");
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        logger.debug("Executing doPost");
 
-		// If it can be written to file and compiled, end turn. Otherwise, dont.
-		Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, Constants.MODE_DUEL_DIR);
-		if (newTest == null) {
-			messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
-			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-			Redirect.redirectBack(request, response);
-			return;
-		}
-		logger.debug("New Test " + newTest.getId());
-		TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+        ArrayList<String> messages = new ArrayList<>();
+        HttpSession session = request.getSession();
+        int uid = (Integer) session.getAttribute("uid");
+        int gameId = ServletUtils.gameId(request).get();
+        DuelGame activeGame = (DuelGame) session.getAttribute("game");
+        session.setAttribute("messages", messages);
 
-		if (compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
-			TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
-			if (testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
-				messages.add(TEST_PASSED_ON_CUT_MESSAGE);
-				activeGame.endRound();
-				activeGame.update();
-				if (activeGame.getState().equals(GameState.FINISHED))
-					messages.add("Great! Unit testing goal achieved. Session finished.");
-			} else {
-				// testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
-				messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
-				messages.add(testOriginalTarget.message);
-				session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-			}
-		} else {
-			messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
-			messages.add(compileTestTarget.message);
-			session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
-		}
-		response.sendRedirect(request.getContextPath()+Paths.UTESTING_PATH + "?gameId=" + gameId);
-	}
+        // Get the text submitted by the user.
+        String testText = request.getParameter("test");
 
-	/**
-	 *
-	 * @param gid
-	 * @param cid
-	 * @param testText
-	 * @param ownerId
-	 * @param subDirectory - Directy inside data to store information
-	 * @return {@code null} if test is not valid
-	 * @throws IOException
-	 */
-	private Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
-		GameClass classUnderTest = GameClassDAO.getClassForId(cid);
+        // If it can be written to file and compiled, end turn. Otherwise, dont.
+        Test newTest = createTest(activeGame.getId(), activeGame.getClassId(), testText, uid, Constants.MODE_DUEL_DIR);
+        if (newTest == null) {
+            messages.add(String.format(TEST_INVALID_MESSAGE, DEFAULT_NB_ASSERTIONS));
+            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+            Redirect.redirectBack(request, response);
+            return;
+        }
+        logger.debug("New Test " + newTest.getId());
+        TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-		File newTestDir = FileUtils.getNextSubDir(getServletContext().getRealPath(DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + TESTS_DIR + F_SEP + ownerId));
+        if (compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+            TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
+            if (testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+                messages.add(TEST_PASSED_ON_CUT_MESSAGE);
+                activeGame.endRound();
+                activeGame.update();
+                if (activeGame.getState().equals(GameState.FINISHED))
+                    messages.add("Great! Unit testing goal achieved. Session finished.");
+            } else {
+                // testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
+                messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
+                messages.add(testOriginalTarget.message);
+                session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+            }
+        } else {
+            messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+            messages.add(compileTestTarget.message);
+            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
+        }
+        response.sendRedirect(request.getContextPath()+Paths.UTESTING_PATH + "?gameId=" + gameId);
+    }
 
-		String javaFile = FileUtils.createJavaTestFile(newTestDir, classUnderTest.getBaseName(), testText);
+    /**
+     *
+     * @param gid
+     * @param cid
+     * @param testText
+     * @param ownerId
+     * @param subDirectory - Directy inside data to store information
+     * @return {@code null} if test is not valid
+     * @throws IOException
+     */
+    private Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
+        GameClass classUnderTest = GameClassDAO.getClassForId(cid);
 
-		if (! validTestCode(javaFile)) {
-			return null;
-		}
+        File newTestDir = FileUtils.getNextSubDir(getServletContext().getRealPath(DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + TESTS_DIR + F_SEP + ownerId));
 
-		// Check the test actually passes when applied to the original code.
-		Test newTest = classCompiler.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
-		TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
+        String javaFile = FileUtils.createJavaTestFile(newTestDir, classUnderTest.getBaseName(), testText);
 
-		if (compileTestTarget != null && compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
-			backend.testOriginal(newTestDir, newTest);
-		}
-		return newTest;
-	}
+        if (! validTestCode(javaFile)) {
+            return null;
+        }
 
-	private boolean validTestCode(String javaFile) throws IOException {
+        // Check the test actually passes when applied to the original code.
+        Test newTest = classCompiler.compileTest(newTestDir, javaFile, gid, classUnderTest, ownerId);
+        TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
 
-		CompilationUnit cu;
-		FileInputStream in = null;
-		try {
-			in = new FileInputStream(javaFile);
-			// parse the file
-			cu = JavaParser.parse(in);
-			// prints the resulting compilation unit to default system output
-			if (cu.getTypes().size() != 1) {
-				logger.debug("Invalid test suite contains more than one type declaration.");
-				return false;
-			}
-			TypeDeclaration clazz = cu.getTypes().get(0);
-			if (clazz.getMembers().size() != 1) {
-				logger.debug("Invalid test suite contains more than one method.");
-				return false;
-			}
-			MethodDeclaration test = (MethodDeclaration)clazz.getMembers().get(0);
-			BlockStmt testBody = test.getBody().get();
-			for (Node node : testBody.getChildNodes()) {
-				if (node instanceof ForeachStmt
-						|| node instanceof IfStmt
-						|| node instanceof ForStmt
-						|| node instanceof WhileStmt
-						|| node instanceof DoStmt) {
-					logger.debug("Invalid test contains " + node.getClass().getSimpleName() + " statement");
-					return false;
-				}
-			}
-		} catch (FileNotFoundException e) {
-			logger.error("Found error: ", e);
-		} finally {
-			in.close();
-		}
-		return true;
-	}
+        if (compileTestTarget != null && compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+            backend.testOriginal(newTestDir, newTest);
+        }
+        return newTest;
+    }
+
+    private boolean validTestCode(String javaFile) throws IOException {
+
+        CompilationUnit cu;
+        FileInputStream in = null;
+        try {
+            in = new FileInputStream(javaFile);
+            // parse the file
+            cu = JavaParser.parse(in);
+            // prints the resulting compilation unit to default system output
+            if (cu.getTypes().size() != 1) {
+                logger.debug("Invalid test suite contains more than one type declaration.");
+                return false;
+            }
+            TypeDeclaration clazz = cu.getTypes().get(0);
+            if (clazz.getMembers().size() != 1) {
+                logger.debug("Invalid test suite contains more than one method.");
+                return false;
+            }
+            MethodDeclaration test = (MethodDeclaration)clazz.getMembers().get(0);
+            BlockStmt testBody = test.getBody().get();
+            for (Node node : testBody.getChildNodes()) {
+                if (node instanceof ForeachStmt
+                        || node instanceof IfStmt
+                        || node instanceof ForStmt
+                        || node instanceof WhileStmt
+                        || node instanceof DoStmt) {
+                    logger.debug("Invalid test contains " + node.getClass().getSimpleName() + " statement");
+                    return false;
+                }
+            }
+        } catch (FileNotFoundException e) {
+            logger.error("Found error: ", e);
+        } finally {
+            in.close();
+        }
+        return true;
+    }
 }

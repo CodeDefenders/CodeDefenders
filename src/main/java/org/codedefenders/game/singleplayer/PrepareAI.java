@@ -47,7 +47,7 @@ import org.codedefenders.game.singleplayer.automated.defender.AiDefender;
 import org.codedefenders.game.singleplayer.automated.defender.EvoSuiteMaker;
 
 public class PrepareAI {
-    
+
 //    @Inject
     private static BackendExecutorService backend;
 
@@ -179,7 +179,7 @@ public class PrepareAI {
 
     /**
      * Select an index of an arraylist, with a bias to earlier or later values.
-     * 
+     *
      * @param length
      *            Number of indexes in the arraylist.
      * @param bias

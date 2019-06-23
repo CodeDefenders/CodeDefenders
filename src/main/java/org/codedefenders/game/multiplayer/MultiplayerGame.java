@@ -138,27 +138,27 @@ public class MultiplayerGame extends AbstractGame {
             this.minimumAttackers = minimumAttackers;
         }
 
-		public Builder id(int id) { this.id = id; return this; }
-		public Builder requiresValidation(boolean requiresValidation) { this.requiresValidation = requiresValidation; return this; }
-		public Builder capturePlayersIntention(boolean capturePlayersIntention) { this.capturePlayersIntention = capturePlayersIntention; return this; }
-		public Builder chatEnabled(boolean chatEnabled) { this.chatEnabled = chatEnabled; return this; }
-		public Builder markUncovered(boolean markUncovered) { this.markUncovered = markUncovered; return this; }
-		public Builder prize(float prize) { this.prize = prize; return this; }
+        public Builder id(int id) { this.id = id; return this; }
+        public Builder requiresValidation(boolean requiresValidation) { this.requiresValidation = requiresValidation; return this; }
+        public Builder capturePlayersIntention(boolean capturePlayersIntention) { this.capturePlayersIntention = capturePlayersIntention; return this; }
+        public Builder chatEnabled(boolean chatEnabled) { this.chatEnabled = chatEnabled; return this; }
+        public Builder markUncovered(boolean markUncovered) { this.markUncovered = markUncovered; return this; }
+        public Builder prize(float prize) { this.prize = prize; return this; }
         public Builder lineCoverage(float lineCoverage) { this.lineCoverage = lineCoverage; return this; }
         public Builder mutantCoverage(float mutantCoverage) { this.mutantCoverage = mutantCoverage; return this; }
-		public Builder defenderValue(int defenderValue) { this.defenderValue = defenderValue; return this; }
-		public Builder attackerValue(int attackerValue) { this.attackerValue = attackerValue; return this; }
-		public Builder state(GameState state) { this.state = state; return this; }
-		public Builder level(GameLevel level) { this.level = level; return this; }
-		public Builder mutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) { this.mutantValidatorLevel = mutantValidatorLevel; return this; }
+        public Builder defenderValue(int defenderValue) { this.defenderValue = defenderValue; return this; }
+        public Builder attackerValue(int attackerValue) { this.attackerValue = attackerValue; return this; }
+        public Builder state(GameState state) { this.state = state; return this; }
+        public Builder level(GameLevel level) { this.level = level; return this; }
+        public Builder mutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) { this.mutantValidatorLevel = mutantValidatorLevel; return this; }
 
-		public Builder withTests(boolean withTests) { this.withTests = withTests; return this; }
-		public Builder withMutants(boolean withMutants) { this.withMutants = withMutants; return this; }
+        public Builder withTests(boolean withTests) { this.withTests = withTests; return this; }
+        public Builder withMutants(boolean withMutants) { this.withMutants = withMutants; return this; }
 
-		public MultiplayerGame build() {
-			return new MultiplayerGame(this);
-		}
-	}
+        public MultiplayerGame build() {
+            return new MultiplayerGame(this);
+        }
+    }
 
     private MultiplayerGame(Builder builder) {
         this.mode = GameMode.PARTY;

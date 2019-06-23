@@ -13,18 +13,18 @@ public class MutationTesterProducer {
     @Inject
     @Property("parallelize")
     private boolean enableParalleExecution;
-    
+
     @Inject
     private BackendExecutorService backend;
 
     @Inject
     @ThreadPool("test-executor")
     private ExecutorService testExecutorThreadPool;
-    
+
     @Inject
     @Property("mutant.coverage")
     private boolean useMutantCoverage;
-    
+
     @Produces
     @RequestScoped
     public IMutationTester getMutationTester() {

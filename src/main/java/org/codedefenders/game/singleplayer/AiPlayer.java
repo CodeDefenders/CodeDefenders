@@ -29,48 +29,48 @@ import java.util.ArrayList;
  */
 public abstract class AiPlayer {
 
-	public enum GenerationMethod {
-		RANDOM, //Randomly select mutant.
-		COVERAGE, //Select random mutant by least covered lines.
-		KILLCOUNT //Number of mutants a test kills, or number of tests that kill mutant.
-	}
+    public enum GenerationMethod {
+        RANDOM, //Randomly select mutant.
+        COVERAGE, //Select random mutant by least covered lines.
+        KILLCOUNT //Number of mutants a test kills, or number of tests that kill mutant.
+    }
 
-	protected DuelGame game;
-	protected Role role;
-	protected ArrayList<String> messages;
+    protected DuelGame game;
+    protected Role role;
+    protected ArrayList<String> messages;
 
-	public AiPlayer(DuelGame g) {
-		game = g;
-		messages = new ArrayList<String>();
-	}
+    public AiPlayer(DuelGame g) {
+        game = g;
+        messages = new ArrayList<String>();
+    }
 
-	/**
-	 * Make the AI's turn if it is its turn.
-	 * @return true if turn successfully made, false otherwise - can be used to show notifications
-	 */
-	public boolean makeTurn() {
-		boolean success = false;
-		messages.clear();
-		if (game.getActiveRole().equals(role)) {
-			if (tryTurn()) { success = true; }
-			game.endTurn();
-		}
-		return success;
-	}
+    /**
+     * Make the AI's turn if it is its turn.
+     * @return true if turn successfully made, false otherwise - can be used to show notifications
+     */
+    public boolean makeTurn() {
+        boolean success = false;
+        messages.clear();
+        if (game.getActiveRole().equals(role)) {
+            if (tryTurn()) { success = true; }
+            game.endTurn();
+        }
+        return success;
+    }
 
-	public boolean tryTurn() {
-		switch (game.getLevel()) {
-			case EASY: return turnEasy();
-			case HARD: return turnHard();
-			default: return turnHard();
-		}
-	}
+    public boolean tryTurn() {
+        switch (game.getLevel()) {
+            case EASY: return turnEasy();
+            case HARD: return turnHard();
+            default: return turnHard();
+        }
+    }
 
-	public abstract boolean turnEasy();
+    public abstract boolean turnEasy();
 
-	public abstract boolean turnHard();
+    public abstract boolean turnHard();
 
-	protected abstract boolean runTurn(GenerationMethod strat);
+    protected abstract boolean runTurn(GenerationMethod strat);
 
-	public abstract ArrayList<String> getMessagesLastTurn();
+    public abstract ArrayList<String> getMessagesLastTurn();
 }

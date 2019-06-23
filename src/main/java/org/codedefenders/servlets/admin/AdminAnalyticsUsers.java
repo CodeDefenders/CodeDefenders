@@ -29,14 +29,14 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class AdminAnalyticsUsers extends HttpServlet {
-	private static final Logger logger = LoggerFactory.getLogger(AdminAnalyticsUsers.class);
+    private static final Logger logger = LoggerFactory.getLogger(AdminAnalyticsUsers.class);
 
-	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		request.getRequestDispatcher(Constants.ADMIN_ANALYTICS_USERS_JSP).forward(request, response);
-	}
+    @Override
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        request.getRequestDispatcher(Constants.ADMIN_ANALYTICS_USERS_JSP).forward(request, response);
+    }
 
-	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-	}
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    }
 }

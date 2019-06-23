@@ -50,7 +50,7 @@ public class AdminMonitorGames extends HttpServlet {
     private MultiplayerGame mg;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		request.getRequestDispatcher(Constants.ADMIN_MONITOR_JSP).forward(request, response);
+        request.getRequestDispatcher(Constants.ADMIN_MONITOR_JSP).forward(request, response);
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -73,80 +73,80 @@ public class AdminMonitorGames extends HttpServlet {
     }
 
 
-	private void startStopGame(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages) throws IOException {
-		String playerToRemoveIdGameIdString = request.getParameter("activeGameUserRemoveButton");
-		String playerToSwitchIdGameIdString = request.getParameter("activeGameUserSwitchButton");
-		boolean switchUser = playerToSwitchIdGameIdString != null;
-		if (playerToRemoveIdGameIdString != null || playerToSwitchIdGameIdString != null) { // admin is removing user from temp game
-			int playerToRemoveId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[0]);
-			int gameToRemoveFromId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[1]);
-			int userId = UserDAO.getUserForPlayer(playerToRemoveId).getId();
-			if (!deletePlayer(playerToRemoveId, gameToRemoveFromId))
-				messages.add("Deleting player " + playerToRemoveId + " failed! \n Please check the logs!");
-			else if (switchUser) {
-				Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
-						? Role.DEFENDER : Role.ATTACKER;
-				mg = MultiplayerGameDAO.getMultiplayerGame(gameToRemoveFromId);
-				if (!mg.addPlayerForce(userId, newRole))
-					messages.add("Inserting user " + userId + " failed! \n Please check the logs!");
-			}
+    private void startStopGame(HttpServletRequest request, HttpServletResponse response, ArrayList<String> messages) throws IOException {
+        String playerToRemoveIdGameIdString = request.getParameter("activeGameUserRemoveButton");
+        String playerToSwitchIdGameIdString = request.getParameter("activeGameUserSwitchButton");
+        boolean switchUser = playerToSwitchIdGameIdString != null;
+        if (playerToRemoveIdGameIdString != null || playerToSwitchIdGameIdString != null) { // admin is removing user from temp game
+            int playerToRemoveId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[0]);
+            int gameToRemoveFromId = Integer.parseInt((switchUser ? playerToSwitchIdGameIdString : playerToRemoveIdGameIdString).split("-")[1]);
+            int userId = UserDAO.getUserForPlayer(playerToRemoveId).getId();
+            if (!deletePlayer(playerToRemoveId, gameToRemoveFromId))
+                messages.add("Deleting player " + playerToRemoveId + " failed! \n Please check the logs!");
+            else if (switchUser) {
+                Role newRole = Role.valueOf(playerToSwitchIdGameIdString.split("-")[2]).equals(Role.ATTACKER)
+                        ? Role.DEFENDER : Role.ATTACKER;
+                mg = MultiplayerGameDAO.getMultiplayerGame(gameToRemoveFromId);
+                if (!mg.addPlayerForce(userId, newRole))
+                    messages.add("Inserting user " + userId + " failed! \n Please check the logs!");
+            }
 
-		} else {  // admin is starting or stopping selected games
+        } else {  // admin is starting or stopping selected games
 
-			String[] selectedGames = request.getParameterValues("selectedGames");
-			String gameSelectedViaPlayButton = request.getParameter("start_stop_btn");
+            String[] selectedGames = request.getParameterValues("selectedGames");
+            String gameSelectedViaPlayButton = request.getParameter("start_stop_btn");
 
-			if (selectedGames == null || gameSelectedViaPlayButton != null ) {
-				// admin is starting or stopping a single game
-				int gameId = -1;
-				// Get the identifying information required to create a game from the submitted form.
+            if (selectedGames == null || gameSelectedViaPlayButton != null ) {
+                // admin is starting or stopping a single game
+                int gameId = -1;
+                // Get the identifying information required to create a game from the submitted form.
 
-				try {
-					gameId = Integer.parseInt( gameSelectedViaPlayButton );
-				} catch (Exception e) {
-					messages.add("There was a problem with the form.");
-					response.sendRedirect(request.getContextPath() + "/admin");
-					return;
-				}
+                try {
+                    gameId = Integer.parseInt( gameSelectedViaPlayButton );
+                } catch (Exception e) {
+                    messages.add("There was a problem with the form.");
+                    response.sendRedirect(request.getContextPath() + "/admin");
+                    return;
+                }
 
 
-				String errorMessage = "ERROR trying to start or stop game " + String.valueOf(gameId)
-						+ ".\nIf this problem persists, contact your administrator.";
+                String errorMessage = "ERROR trying to start or stop game " + String.valueOf(gameId)
+                        + ".\nIf this problem persists, contact your administrator.";
 
-				mg = MultiplayerGameDAO.getMultiplayerGame(gameId);
+                mg = MultiplayerGameDAO.getMultiplayerGame(gameId);
 
-				if (mg == null) {
-					messages.add(errorMessage);
-				} else {
-					GameState newState = mg.getState() == GameState.ACTIVE ? GameState.FINISHED : GameState.ACTIVE;
-					mg.setState(newState);
-					if (!mg.update()) {
-						messages.add(errorMessage);
+                if (mg == null) {
+                    messages.add(errorMessage);
+                } else {
+                    GameState newState = mg.getState() == GameState.ACTIVE ? GameState.FINISHED : GameState.ACTIVE;
+                    mg.setState(newState);
+                    if (!mg.update()) {
+                        messages.add(errorMessage);
                     } else {
                         // Schedule the killmap
                         if (GameState.FINISHED.equals(newState)) {
                             KillmapDAO.enqueueJob( new KillMapJob(KillMapType.GAME, gameId));
                         }
                     }
-				}
-			} else {
-				GameState newState = request.getParameter("games_btn").equals("Start Games") ? GameState.ACTIVE : GameState.FINISHED;
-				for (String gameId : selectedGames) {
-					mg = MultiplayerGameDAO.getMultiplayerGame(Integer.parseInt(gameId));
-					mg.setState(newState);
-					if (!mg.update()) {
-						messages.add("ERROR trying to start or stop game " + String.valueOf(gameId));
+                }
+            } else {
+                GameState newState = request.getParameter("games_btn").equals("Start Games") ? GameState.ACTIVE : GameState.FINISHED;
+                for (String gameId : selectedGames) {
+                    mg = MultiplayerGameDAO.getMultiplayerGame(Integer.parseInt(gameId));
+                    mg.setState(newState);
+                    if (!mg.update()) {
+                        messages.add("ERROR trying to start or stop game " + String.valueOf(gameId));
                     } else {
                         // Schedule the killmap
                         if (GameState.FINISHED.equals(newState)) {
                             KillmapDAO.enqueueJob( new KillMapJob(KillMapType.GAME, Integer.parseInt(gameId)));
                         }
                     }
-				}
-			}
-		}
-		response.sendRedirect(request.getContextPath() + Paths.ADMIN_MONITOR);
-	}
+                }
+            }
+        }
+        response.sendRedirect(request.getContextPath() + Paths.ADMIN_MONITOR);
+    }
 
 
     private static boolean deletePlayer(int pid, int gid) {

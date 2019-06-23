@@ -46,7 +46,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class MessageManager extends HttpServlet {
 
-	private static final Logger logger = LoggerFactory.getLogger(MessageManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(MessageManager.class);
 
     /**
      * Checks for a given request whether it holds the required parameters.
@@ -63,10 +63,10 @@ public class MessageManager extends HttpServlet {
         return gameId != null && message != null && target != null;
     }
 
-	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		response.setContentType("application/json");
-		PrintWriter out = response.getWriter();
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
         if (!hasParameters(request)) {
             logger.debug("Missing required request parameters.");
             response.setStatus(400);
@@ -110,5 +110,5 @@ public class MessageManager extends HttpServlet {
                 out.flush();
             }
         }
-	}
+    }
 }

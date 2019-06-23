@@ -139,7 +139,7 @@ public class DatabaseAccess {
         // EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
         // ATTACKER_MUTANT_KILLED_EQUIVALENT
         DatabaseValue[] values = new DatabaseValue[]{
-//				DatabaseValue.of(userId),
+//                DatabaseValue.of(userId),
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(EventStatus.GAME.toString()),
                 DatabaseValue.of(EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT.toString()),
