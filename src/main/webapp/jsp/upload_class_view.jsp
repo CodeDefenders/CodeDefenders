@@ -113,7 +113,7 @@
 		-->
 		<div id="classList" >
 			<%
-				List<GameClass> gameClasses = GameClassDAO.getAllClasses();
+				List<GameClass> gameClasses = GameClassDAO.getAllPlayableClasses();
 				List<Double> avgMutationDifficulties = FeedbackDAO.getAverageMutationDifficulties();
 				List<Double> avgTestDifficulties = FeedbackDAO.getAverageTestDifficulties();
 			%>

@@ -30,9 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import static org.codedefenders.database.DB.RSMapper;
@@ -97,12 +95,29 @@ public class GameClassDAO {
     }
 
     /**
-     * Retrieves all game classes in a {@link List}. If no game classes
-     * are found, the list is empty, but not {@link null}.
+     * Retrieves <b>all</b>game classes in a {@link List}. Even non-playable or
+     * inactive classes. These classes should never be shown to users, use
+     * {@link #getAllPlayableClasses()} instead.
+     * <p>
+     * If no game classes are found, the list is empty, but not {@link null}.
      *
      * @return all game classes.
      */
     public static List<GameClass> getAllClasses() {
+        String query = "SELECT * FROM classes;";
+
+        return DB.executeQueryReturnList(query, GameClassDAO::gameClassFromRS);
+    }
+
+    /**
+     * Retrieves all playable game classes in a {@link List}. You can use a playable
+     * class for the creation of games.
+     * <p>
+     * If no game classes are found, the list is empty, but not {@link null}.
+     *
+     * @return all game classes.
+     */
+    public static List<GameClass> getAllPlayableClasses() {
         String query = "SELECT * FROM view_playable_classes;";
 
         return DB.executeQueryReturnList(query, GameClassDAO::gameClassFromRS);

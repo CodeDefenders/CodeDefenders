@@ -32,7 +32,7 @@
 				<td>Java Class</td>
 				<td id="classTd">
 					<select id="class" name="class" class="form-control selectpicker" data-size="large" >
-						<% for (GameClass c : GameClassDAO.getAllClasses()) { %>
+						<% for (GameClass c : GameClassDAO.getAllPlayableClasses()) { %>
 						<option value="<%=c.getId()%>"><%=c.getAlias()%></option>
 						<%}%>
 					</select>

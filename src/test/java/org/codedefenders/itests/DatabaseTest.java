@@ -166,13 +166,13 @@ public class DatabaseTest {
 
 	@Test
 	public void testInsertClasses() throws Exception {
-		assertEquals(0, GameClassDAO.getAllClasses().size());
+		assertEquals(0, GameClassDAO.getAllPlayableClasses().size());
 
 		assertTrue("Should have inserted class", cut1.insert());
-		assertEquals(1, GameClassDAO.getAllClasses().size());
+		assertEquals(1, GameClassDAO.getAllPlayableClasses().size());
 
 		assertTrue("Should have inserted class", cut2.insert());
-		assertEquals(2, GameClassDAO.getAllClasses().size());
+		assertEquals(2, GameClassDAO.getAllPlayableClasses().size());
 		PowerMockito.verifyStatic();
 	}
 

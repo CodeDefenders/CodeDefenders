@@ -24,7 +24,7 @@
 <% String pageTitle = "Create Battleground"; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <%
-    List<GameClass> gameClasses = GameClassDAO.getAllClasses();
+    List<GameClass> gameClasses = GameClassDAO.getAllPlayableClasses();
     if (gameClasses.isEmpty()) {
         if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) {
 %>

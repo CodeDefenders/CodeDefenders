@@ -354,7 +354,7 @@
             <div class="col-sm-2" id="cutDiv">
                 <label for="cut_select" class="label-normal">CUT</label>
                 <select name="class" class="form-control selectpicker" data-size="large" id="cut_select">
-                    <% for (GameClass c : GameClassDAO.getAllClasses()) { %>
+                    <% for (GameClass c : GameClassDAO.getAllPlayableClasses()) { %>
                     <option value="<%=c.getId()%>"><%=c.getAlias()%>
                     </option>
                     <%}%>
