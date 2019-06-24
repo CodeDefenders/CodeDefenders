@@ -91,6 +91,7 @@ CREATE TABLE `classes` (
   `AiPrepared` tinyint(1) DEFAULT '0',
   `RequireMocking` tinyint(1) DEFAULT '0',
   `Puzzle` tinyint(1) NOT NULL DEFAULT '0',
+  `Active` tinyint(1) NOT NULL DEFAULT '1',
   PRIMARY KEY (`Class_ID`),
   UNIQUE KEY `classes_Alias_uindex` (`Alias`)
 ) AUTO_INCREMENT=100;
@@ -557,14 +558,19 @@ VALUES
   ('GAME_PLAYER_LEFT','@event_user left the game'),
   ('GAME_STARTED','The game has started!');
 
+CREATE OR REPLACE VIEW `view_active_classes` AS
+SELECT *
+FROM classes
+WHERE Active = 1;
+
 CREATE OR REPLACE VIEW `view_playable_classes` AS
 SELECT *
-FROM `classes`
+FROM `view_active_classes`
 WHERE Puzzle = 0;
 
 CREATE OR REPLACE VIEW `view_puzzle_classes` AS
 SELECT *
-FROM `classes`
+FROM `view_active_classes`
 WHERE Puzzle = 1;
 
 CREATE OR REPLACE VIEW `view_battleground_games` AS

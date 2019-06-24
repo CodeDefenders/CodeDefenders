@@ -60,8 +60,9 @@ public class GameClassDAO {
         String absoluteJavaFile = FileUtils.getAbsoluteDataPath(javaFile).toString();
         String absoluteClassFile = FileUtils.getAbsoluteDataPath(classFile).toString();
         boolean requireMocking = rs.getBoolean("RequireMocking");
+        boolean isActive = rs.getBoolean("Active");
 
-        return new GameClass(classId , name, alias, absoluteJavaFile, absoluteClassFile, requireMocking);
+        return new GameClass(classId , name, alias, absoluteJavaFile, absoluteClassFile, requireMocking, isActive);
     }
 
 
@@ -252,15 +253,17 @@ public class GameClassDAO {
         String relativeClassFile = FileUtils.getRelativeDataPath(classFile).toString();
         boolean isMockingEnabled = cut.isMockingEnabled();
         boolean isPuzzleClass = cut.isPuzzleClass();
+        boolean isActive = cut.isActive();
 
-        String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile, RequireMocking, Puzzle) VALUES (?, ?, ?, ?, ?, ?);";
+        String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile, RequireMocking, Puzzle, Active) VALUES (?, ?, ?, ?, ?, ?, ?);";
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(name),
                 DatabaseValue.of(alias),
                 DatabaseValue.of(relativeJavaFile),
                 DatabaseValue.of(relativeClassFile),
                 DatabaseValue.of(isMockingEnabled),
-                DatabaseValue.of(isPuzzleClass)
+                DatabaseValue.of(isPuzzleClass),
+                DatabaseValue.of(isActive)
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
