@@ -416,6 +416,15 @@
     </servlet>
 
     <servlet-mapping>
+        <servlet-name>AdminClassesManagement</servlet-name>
+        <url-pattern>/admin/classes</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>AdminClassesManagement</servlet-name>
+        <servlet-class>org.codedefenders.servlets.admin.AdminClassesManagement</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
         <servlet-name>AdminPuzzles</servlet-name>
         <url-pattern>/admin/puzzles</url-pattern>
     </servlet-mapping>
