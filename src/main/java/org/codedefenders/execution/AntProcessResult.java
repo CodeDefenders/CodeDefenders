@@ -18,11 +18,11 @@
  */
 package org.codedefenders.execution;
 
-import org.codedefenders.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -97,7 +97,7 @@ public class AntProcessResult {
                 outputFolder = line.replace("[javac] Compiling 1 source file to ", "");
             } else {
                 if (outputFolder != null && line.contains(outputFolder)) {
-                    line = line.replace(outputFolder + Constants.F_SEP, "");
+                    line = line.replace(outputFolder + File.separator, "");
                 }
                 // Pass it along the output
                 sanitized.append(line).append("\n");

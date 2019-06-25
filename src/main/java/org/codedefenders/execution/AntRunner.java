@@ -21,7 +21,6 @@ package org.codedefenders.execution;
 import static org.codedefenders.util.Constants.AI_DIR;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
 import static org.codedefenders.util.Constants.CUTS_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
 import static org.codedefenders.util.Constants.JAVA_CLASS_EXT;
 
 import java.io.BufferedReader;
@@ -438,10 +437,10 @@ public class AntRunner implements //
         command.add("-Dclassbasename=" + cut.getBaseName());
         command.add("-Dclassname=" + cut.getName());
         command.add("-DtestClassname=" + testClassName);
-        command.add("-Dcuts.deps=" + cutDir + F_SEP + CUTS_DEPENDENCY_DIR);
+        command.add("-Dcuts.deps=" + Paths.get(cutDir, CUTS_DEPENDENCY_DIR));
 
         if (mutantDir != null && testDir != null) {
-            String separator = F_SEP;
+            String separator = File.separator;
             if (separator.equals("\\")){
                 separator = "\\\\";
             }

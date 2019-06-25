@@ -37,7 +37,7 @@ public class GameManagerTest {
 	@Test
 	public void testGetNextSubDirEmpty() throws IOException {
 		File folder = getCleanTmpGameDir(1);
-		assertEquals(folder.getAbsolutePath() + File.separator + "00000001", FileUtils.getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
+		assertEquals(folder.getAbsolutePath() + File.separator + "00000001", FileUtils.getNextSubDir(folder.toPath()).getAbsolutePath());
 	}
 
 	@Test
@@ -46,7 +46,7 @@ public class GameManagerTest {
 		File subfolder = new File(folder.getAbsolutePath() + File.separator + "00000001");
 		subfolder.delete();
 		subfolder.mkdir();
-		assertEquals(folder.getAbsolutePath() + File.separator + "00000002", FileUtils.getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
+		assertEquals(folder.getAbsolutePath() + File.separator + "00000002", FileUtils.getNextSubDir(folder.toPath()).getAbsolutePath());
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class GameManagerTest {
 		File subfolder2 = new File(folder.getAbsolutePath() + File.separator + "00000002");
 		subfolder2.delete();
 		subfolder2.mkdir();
-		assertEquals(folder.getAbsolutePath() + File.separator + "00000003", FileUtils.getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
+		assertEquals(folder.getAbsolutePath() + File.separator + "00000003", FileUtils.getNextSubDir(folder.toPath()).getAbsolutePath());
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class GameManagerTest {
 		File subfolder3 = new File(folder.getAbsolutePath() + File.separator + "foo");
 		subfolder3.delete();
 		subfolder3.mkdir();
-		assertEquals(folder.getAbsolutePath() + File.separator + "00000003", FileUtils.getNextSubDir(folder.getAbsolutePath()).getAbsolutePath());
+		assertEquals(folder.getAbsolutePath() + File.separator + "00000003", FileUtils.getNextSubDir(folder.toPath()).getAbsolutePath());
 	}
 
 	private File getCleanTmpGameDir(int gameId) throws IOException {

@@ -24,13 +24,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import static org.codedefenders.util.Constants.AI_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
 import static org.codedefenders.util.Constants.TEST_INFO_EXT;
 
 /**
@@ -48,8 +48,7 @@ class TestsIndexContents {
         numTests = -1;
         //Parse the test index file of a given class.
         try {
-            File f = new File(AI_DIR + F_SEP + "tests" + F_SEP +
-                    cut.getAlias() + F_SEP + "TestsIndex" + TEST_INFO_EXT);
+            File f = Paths.get(AI_DIR, "tests", cut.getAlias(), "TestsIndex" + TEST_INFO_EXT).toFile();
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuild = dbFactory.newDocumentBuilder();
             Document d = dBuild.parse(f);

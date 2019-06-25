@@ -19,13 +19,13 @@
 package org.codedefenders.game.singleplayer.automated.attacker;
 
 import static org.codedefenders.util.Constants.AI_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
 import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -35,7 +35,6 @@ import javax.inject.Inject;
 
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.execution.MutantGeneratorService;
 import org.codedefenders.game.GameClass;
@@ -156,11 +155,10 @@ public class MajorMaker {
             }
 
             // Setup folder the files will go in
-            File newMutantDir = FileUtils.getNextSubDir(AI_DIR + F_SEP + "mutants" + F_SEP + cut.getAlias());
+            File newMutantDir = FileUtils.getNextSubDir(Paths.get(AI_DIR, "mutants", cut.getAlias()));
 
             // 1 the Mutant String into a java file
-            String mutantFileName = newMutantDir + F_SEP + cut.getBaseName() + JAVA_SOURCE_EXT;
-            File mutantFile = new File(mutantFileName);
+            File mutantFile = newMutantDir.toPath().resolve(cut.getBaseName() + JAVA_SOURCE_EXT).toFile();
             FileWriter fw = new FileWriter(mutantFile);
             BufferedWriter bw = new BufferedWriter(fw);
             bw.write(mutantText);
@@ -168,7 +166,7 @@ public class MajorMaker {
             fw.close();
 
             // Compile the mutant - if you can, add it to the Game State, otherwise, delete these files created.
-            return classCompiler.compileMutant(newMutantDir, mutantFileName, dGame.getId(), cut, AiAttacker.ID);
+            return classCompiler.compileMutant(newMutantDir, mutantFile.toString(), dGame.getId(), cut, AiAttacker.ID);
         } catch (IOException e) {
             logger.error("Could not write mutant", e);
         }
@@ -177,8 +175,7 @@ public class MajorMaker {
     }
 
     private List<String> getMutantList() {
-        String loc = AI_DIR + F_SEP + "mutants" + F_SEP + cut.getAlias() + ".log";
-        File f = new File(loc);
+        File f = Paths.get(AI_DIR, "mutants", cut.getAlias() + ".log").toFile();
         List<String> l = FileUtils.readLines(f.toPath());
         //TODO: Handle errors.
         return l;

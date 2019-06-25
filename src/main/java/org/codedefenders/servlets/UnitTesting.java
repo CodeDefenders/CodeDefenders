@@ -35,7 +35,6 @@ import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.execution.TargetExecution;
@@ -56,6 +55,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 import javax.enterprise.context.spi.CreationalContext;
@@ -71,7 +71,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import static org.codedefenders.util.Constants.DATA_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
 import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
 import static org.codedefenders.util.Constants.TESTS_DIR;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
@@ -194,7 +193,8 @@ public class UnitTesting extends HttpServlet {
     private Test createTest(int gid, int cid, String testText, int ownerId, String subDirectory) throws IOException {
         GameClass classUnderTest = GameClassDAO.getClassForId(cid);
 
-        File newTestDir = FileUtils.getNextSubDir(getServletContext().getRealPath(DATA_DIR + F_SEP + subDirectory + F_SEP + gid + F_SEP + TESTS_DIR + F_SEP + ownerId));
+        final Path path = java.nio.file.Paths.get(DATA_DIR, subDirectory, String.valueOf(gid), TESTS_DIR, String.valueOf(ownerId));
+        File newTestDir = FileUtils.getNextSubDir(path);
 
         String javaFile = FileUtils.createJavaTestFile(newTestDir, classUnderTest.getBaseName(), testText);
 
