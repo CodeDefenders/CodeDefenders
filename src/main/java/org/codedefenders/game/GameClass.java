@@ -175,6 +175,20 @@ public class GameClass {
         }
     }
 
+    /**
+     * Calls {@link GameClassDAO} to update this {@link GameClass} instance in the database.
+     *
+     * @return {@code true} if updating was successful, {@code false} otherwise.
+     */
+    public boolean update() {
+        try {
+            return GameClassDAO.updateClass(this);
+        } catch (UncheckedSQLException e) {
+            logger.error("Failed to store game class to database.", e);
+            return false;
+        }
+    }
+
     public int getId() {
         return id;
     }
@@ -210,6 +224,10 @@ public class GameClass {
 
     public boolean isActive() {
         return isActive;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     public String getBaseName() {

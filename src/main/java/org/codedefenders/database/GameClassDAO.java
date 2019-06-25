@@ -23,6 +23,7 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Dependency;
+import org.codedefenders.model.GameClassInfo;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import static org.codedefenders.database.DB.RSMapper;
  *
  * @author <a href="https://github.com/werli">Phil Werli<a/>
  * @see GameClass
+ * @see GameClassInfo
  */
 public class GameClassDAO {
     private static final Logger logger = LoggerFactory.getLogger(GameClassDAO.class);
@@ -51,7 +53,7 @@ public class GameClassDAO {
      * @return The constructed game class.
      * @see RSMapper
      */
-    static GameClass gameClassFromRS(ResultSet rs) throws SQLException {
+    private static GameClass gameClassFromRS(ResultSet rs) throws SQLException {
         int classId = rs.getInt("Class_ID");
         String name = rs.getString("Name");
         String alias = rs.getString("Alias");
@@ -65,6 +67,19 @@ public class GameClassDAO {
         return new GameClass(classId , name, alias, absoluteJavaFile, absoluteClassFile, requireMocking, isActive);
     }
 
+    /**
+     * Constructs class information from a {@link ResultSet} entry.
+     *
+     * @param rs The {@link ResultSet}.
+     * @return The constructed game class information instance.
+     * @see RSMapper
+     */
+    private static GameClassInfo gameClassInfoFromRS(ResultSet rs) throws SQLException {
+        GameClass gc = gameClassFromRS(rs);
+        int gamesWithClass = rs.getInt("games_count");
+
+        return new GameClassInfo(gc, gamesWithClass);
+    }
 
     /**
      * Retrieves a game class for a given identifier.
@@ -97,17 +112,21 @@ public class GameClassDAO {
 
     /**
      * Retrieves <b>all</b>game classes in a {@link List}. Even non-playable or
-     * inactive classes. These classes should never be shown to users, use
+     * inactive classes. These classes should never be shown to non-admin users, use
      * {@link #getAllPlayableClasses()} instead.
      * <p>
      * If no game classes are found, the list is empty, but not {@link null}.
      *
      * @return all game classes.
      */
-    public static List<GameClass> getAllClasses() {
-        String query = "SELECT * FROM classes;";
+    public static List<GameClassInfo> getAllClassInfos() {
+        String query = String.join("\n",
+                "SELECT classes.*, (SELECT COUNT(games.ID) from games WHERE games.Class_ID = classes.Class_ID) as games_count",
+                "FROM classes",
+                "GROUP BY classes.Class_ID;"
+        );
 
-        return DB.executeQueryReturnList(query, GameClassDAO::gameClassFromRS);
+        return DB.executeQueryReturnList(query, GameClassDAO::gameClassInfoFromRS);
     }
 
     /**
@@ -122,6 +141,21 @@ public class GameClassDAO {
         String query = "SELECT * FROM view_playable_classes;";
 
         return DB.executeQueryReturnList(query, GameClassDAO::gameClassFromRS);
+    }
+
+    /**
+     * Checks for a given class identifier whether at least one game
+     * with this class exists.
+     *
+     * @param classId the class identifier of the checked class.
+     * @return {@code true} if at least one game does exist, {@code false} otherwise.
+     */
+    public static boolean gamesExistsForClass(Integer classId) {
+        String query = String.join("\n",
+                "SELECT (COUNT(games.ID) > 0) AS games_exist",
+                "FROM games",
+                "WHERE games.Class_ID = ?");
+        return DB.executeQueryReturnValue(query, rs -> rs.getBoolean("games_exist"), DatabaseValue.of(classId));
     }
 
     /**
@@ -276,6 +310,39 @@ public class GameClassDAO {
     }
 
     /**
+     * Updates a given {@link GameClass} in the database and returns whether
+     * updating was successful or not.
+     *
+     * @param cut the given class as a {@link GameClass}.
+     * @return whether updating was successful or not
+     * @throws UncheckedSQLException If storing the class was not successful.
+     */
+    public static boolean updateClass(GameClass cut) throws UncheckedSQLException {
+        int classId = cut.getId();
+        String alias = cut.getAlias();
+        boolean isMockingEnabled = cut.isMockingEnabled();
+        boolean isActive = cut.isActive();
+
+        String query = String.join("\n",
+                "UPDATE classes",
+                "  SET",
+                "  Alias = ? ,",
+                "  RequireMocking = ? ,",
+                "  Active = ?",
+                "WHERE class_ID = ?"
+
+        );
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(alias),
+                DatabaseValue.of(isMockingEnabled),
+                DatabaseValue.of(isActive),
+                DatabaseValue.of(classId)
+        };
+
+        return DB.executeUpdateQuery(query, values);
+    }
+
+    /**
      * Removes a class for a given identifier.
      *
      * @param id the identifier of the class to be removed.
@@ -285,7 +352,40 @@ public class GameClassDAO {
         String query = "DELETE FROM classes WHERE Class_ID = ?;";
 
         return DB.executeUpdateQuery(query, DatabaseValue.of(id));
+    }
 
+    /**
+     * <b>This method should be treated with caution.</b>
+     *
+     * Call {@link #gamesExistsForClass(Integer)} beforehand to make sure the class is
+     * not actually used.
+     *
+     * Removes a class and all of its corresponding dependencies, mutants and tests
+     * from the database for a given identifier.
+     *
+     * @param id the identifier of the class to be removed.
+     * @return {@code true} for successful removal, {@code false} otherwise.
+     */
+    public static boolean forceRemoveClassForId(Integer id) {
+        final String query1 = "DELETE FROM dependencies WHERE Class_ID = ?;";
+        final String query2 = "DELETE FROM mutant_uploaded_with_class WHERE Class_ID = ?;";
+        final String query3 = "DELETE FROM test_uploaded_with_class WHERE Class_ID = ?;";
+        final String query4 = String.join("\n",
+                "DELETE FROM targetexecutions",
+                "WHERE Mutant_ID IN",
+                "(SELECT Mutant_ID FROM mutants WHERE Class_ID = ?);");
+        final String query5 = "DELETE FROM mutants WHERE Class_ID = ?;";
+        final String query6 = "DELETE FROM tests WHERE Class_ID = ?;";
+
+        DB.executeUpdateQuery(query1, DatabaseValue.of(id));
+        DB.executeUpdateQuery(query2, DatabaseValue.of(id));
+        DB.executeUpdateQuery(query3, DatabaseValue.of(id));
+        DB.executeUpdateQuery(query4, DatabaseValue.of(id));
+        DB.executeUpdateQuery(query5, DatabaseValue.of(id));
+        DB.executeUpdateQuery(query6, DatabaseValue.of(id));
+
+        final String query = "DELETE FROM classes WHERE Class_ID = ?;";
+        return DB.executeUpdateQuery(query, DatabaseValue.of(id));
     }
 
     /**
