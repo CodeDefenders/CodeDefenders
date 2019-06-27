@@ -82,7 +82,7 @@ public class FileUtilsTest {
             Assume.assumeNoException(e);
             return;
         }
-        File nextSubDir = FileUtils.getNextSubDir(dummyDirectory.toString());
+        File nextSubDir = FileUtils.getNextSubDir(dummyDirectory);
 
         String expected = dir.toString();
         Assert.assertNotEquals(expected, nextSubDir.toPath());

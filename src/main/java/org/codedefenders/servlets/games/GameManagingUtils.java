@@ -18,19 +18,6 @@
  */
 package org.codedefenders.servlets.games;
 
-import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
-import static org.codedefenders.util.Constants.TESTS_DIR;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -49,8 +36,21 @@ import org.codedefenders.validation.code.CodeValidatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;
+
+import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
+import static org.codedefenders.util.Constants.TESTS_DIR;
 
 /**
  * This class offers static utility methods used by servlets managing active
@@ -147,7 +147,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         String classMutatedBaseName = classMutated.getBaseName();
 
         Path path = Paths.get(Constants.MUTANTS_DIR, subDirectory, String.valueOf(gameId), String.valueOf(ownerUserId));
-        File newMutantDir = FileUtils.getNextSubDir(path.toString());
+        File newMutantDir = FileUtils.getNextSubDir(path);
 
         logger.debug("NewMutantDir: {}", newMutantDir.getAbsolutePath());
         logger.debug("Class Mutated: {} (basename: {})", classMutated.getName(), classMutatedBaseName);
@@ -193,7 +193,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         GameClass cut = GameClassDAO.getClassForId(classId);
 
         Path path = Paths.get(TESTS_DIR, subDirectory, String.valueOf(gameId), String.valueOf(ownerUserId), "original");
-        File newTestDir = FileUtils.getNextSubDir(path.toString());
+        File newTestDir = FileUtils.getNextSubDir(path);
 
         String javaFile = FileUtils.createJavaTestFile(newTestDir, cut.getBaseName(), testText);
 

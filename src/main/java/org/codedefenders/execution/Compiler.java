@@ -39,7 +39,6 @@ import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
 import static org.codedefenders.util.Constants.TEST_CLASSPATH;
 
 /**

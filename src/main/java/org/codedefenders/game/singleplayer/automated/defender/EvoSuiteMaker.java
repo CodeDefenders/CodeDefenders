@@ -19,11 +19,11 @@
 package org.codedefenders.game.singleplayer.automated.defender;
 
 import static org.codedefenders.util.Constants.AI_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,8 +77,7 @@ public class EvoSuiteMaker {
 
         try {
             for (String t : testStrings) {
-                File newTestDir = FileUtils.getNextSubDir(AI_DIR + F_SEP + "tests" +
-                        F_SEP + cut.getAlias());
+                File newTestDir = FileUtils.getNextSubDir(Paths.get(AI_DIR, "tests", cut.getAlias()));
                 String jFile = FileUtils.createJavaTestFile(newTestDir, cut.getBaseName(), t);
                 Test newTest = classCompiler.compileTest(newTestDir, jFile, dGame.getId(), cut, AiDefender.ID);
                 TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
@@ -120,9 +119,8 @@ public class EvoSuiteMaker {
             }
         }
 
-        String packageDir = cut.getPackage().replace(".", Constants.F_SEP);
-        String loc = AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias() +
-                F_SEP + packageDir + F_SEP + cut.getBaseName();
+        String packageDir = cut.getPackage().replace(".", File.separator);
+        String loc = Paths.get(AI_DIR, "tests", cut.getAlias(), packageDir, cut.getBaseName()).toString();
         try {
             FileWriter fw = new FileWriter(loc + "NewSuite");
             fw.write(buf);
@@ -146,9 +144,8 @@ public class EvoSuiteMaker {
      * @return test suite
      */
     private List<String> getTestSuiteLines() {
-        String packageDir = cut.getPackage().replace(".", Constants.F_SEP);
-        String loc = AI_DIR + F_SEP + "tests" + F_SEP + cut.getAlias() +
-                F_SEP + packageDir + F_SEP + cut.getBaseName() + "_ESTest.java";
+        String packageDir = cut.getPackage().replace(".", File.separator);
+        String loc = Paths.get(AI_DIR, "tests", cut.getAlias(), packageDir, cut.getBaseName() + "_ESTest.java").toString();
         File f = new File(loc);
         return FileUtils.readLines(f.toPath());
     }

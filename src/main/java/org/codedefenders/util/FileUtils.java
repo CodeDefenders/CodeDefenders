@@ -18,8 +18,6 @@
  */
 package org.codedefenders.util;
 
-import javassist.ClassPool;
-import javassist.CtClass;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,13 +32,18 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.nio.file.Paths;
 
-import static org.codedefenders.util.Constants.*;
+import javassist.ClassPool;
+import javassist.CtClass;
+
+import static org.codedefenders.util.Constants.DATA_DIR;
+import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
+import static org.codedefenders.util.Constants.TEST_PREFIX;
 
 /**
  * This class offers static methods for file functionality.
@@ -64,23 +67,23 @@ public class FileUtils {
         return path.toString();
     }
 
-    public static File getNextSubDir(String path) {
-        File folder = new File(path);
+    public static File getNextSubDir(Path directory) {
+        File folder = directory.toFile();
         folder.mkdirs();
         String[] directories =
             folder.list((current, name) -> new File(current, name).isDirectory() && (isParsable(name)));
         Arrays.sort(directories);
-        String newPath;
+        Path newPath;
         if (directories.length == 0) {
-            newPath = Paths.get(folder.getAbsolutePath(), "00000001").toString();
+            newPath = Paths.get(folder.getAbsolutePath(), "00000001");
         } else {
             File lastDir = new File(directories[directories.length - 1]);
             int newIndex = Integer.parseInt(lastDir.getName()) + 1;
             String formatted = String.format("%08d", newIndex);
 
-            newPath = Paths.get(path, formatted).toString();
+            newPath = directory.resolve(formatted);
         }
-        File newDir = new File(newPath);
+        File newDir = newPath.toFile();
         newDir.mkdirs();
         return newDir;
     }

@@ -31,8 +31,6 @@ import javax.naming.NamingException;
  */
 public class Constants {
 
-    public static final String F_SEP = System.getProperty("file.separator");
-
     // TODO Cannot be injected in static context
     public static final String DATA_DIR;
 

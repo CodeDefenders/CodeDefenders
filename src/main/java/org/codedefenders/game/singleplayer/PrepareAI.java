@@ -18,20 +18,6 @@
  */
 package org.codedefenders.game.singleplayer;
 
-import static org.codedefenders.util.Constants.AI_DIR;
-import static org.codedefenders.util.Constants.F_SEP;
-
-import java.io.File;
-import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import org.apache.commons.io.FileUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
@@ -45,6 +31,20 @@ import org.codedefenders.game.singleplayer.automated.attacker.AiAttacker;
 import org.codedefenders.game.singleplayer.automated.attacker.MajorMaker;
 import org.codedefenders.game.singleplayer.automated.defender.AiDefender;
 import org.codedefenders.game.singleplayer.automated.defender.EvoSuiteMaker;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.Annotation;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import static org.codedefenders.util.Constants.AI_DIR;
 
 public class PrepareAI {
 
@@ -162,14 +162,14 @@ public class PrepareAI {
      */
     private static void killAi(GameClass c) {
         try {
-            File tDir = new File(AI_DIR + F_SEP + "tests" + F_SEP + c.getAlias());
+            File tDir = Paths.get(AI_DIR, "tests", c.getAlias()).toFile();
             FileUtils.deleteDirectory(tDir);
         } catch (IOException e) {
             // Deleting mutants failed.
             e.printStackTrace();
         }
         try {
-            File mDir = new File(AI_DIR + F_SEP + "mutants" + F_SEP + c.getAlias());
+            File mDir = Paths.get(AI_DIR, "mutants", c.getAlias()).toFile();
             FileUtils.deleteDirectory(mDir);
         } catch (IOException e) {
             // Deleting mutants failed.
