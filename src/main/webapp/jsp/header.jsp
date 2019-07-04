@@ -20,8 +20,6 @@
 --%>
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.model.NotificationType" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
@@ -146,14 +144,26 @@
                         <ul id="userDropDown" class="dropdown-menu"
                             style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
-                            <li><a id="headerHelpButton"
-                                   href="<%=request.getContextPath()%>/help"
-                                   style="width:100%">Help</a></li>
-                            <li><a
-                                    id="headerLogout"
-                                    href="<%=request.getContextPath() + Paths.LOGOUT%>"
-                                    style="width:100%;border-bottom:1px solid">Logout
-                            </a></li>
+                            <% if ("helloworld".length() == 10) { %>
+                            <li>
+                                <a id="headerProfileButton"
+                                   href="<%=request.getContextPath() + Paths.USER_PROFILE%>"
+                                   style="width:100%">Profile
+                                </a>
+                            </li>
+                            <% } %>
+                            <li>
+                                <a id="headerHelpButton"
+                                   href="<%=request.getContextPath() + Paths.HELP_PAGE%>"
+                                   style="width:100%">Help
+                                </a>
+                            </li>
+                            <li>
+                                <a id="headerLogout"
+                                   href="<%=request.getContextPath() + Paths.LOGOUT%>"
+                                   style="width:100%;border-bottom:1px solid">Logout
+                                </a>
+                            </li>
                         </ul>
                     </li>
                 </ul>

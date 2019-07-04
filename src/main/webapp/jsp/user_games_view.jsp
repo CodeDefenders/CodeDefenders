@@ -30,6 +30,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.database.UserDAO" %>
 <%@ page import="org.codedefenders.database.DuelGameDAO" %>
+<%@ page import="org.codedefenders.database.AdminDAO" %>
 <% String pageTitle= null ; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <%
