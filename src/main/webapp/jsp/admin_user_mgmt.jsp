@@ -129,7 +129,7 @@
                     int totalScore = userInfo.getTotalScore();
             %>
 
-            <tr id="<%="user_row_"+userId%>">
+            <tr id="<%="user_row_"+userId%>" <%=active ? "" : "class=\"danger\""%>>
                 <td class="col-sm-1"><%= userId%>
                     <input type="hidden" name="added_uid" value=<%=userId%>>
                 </td>
