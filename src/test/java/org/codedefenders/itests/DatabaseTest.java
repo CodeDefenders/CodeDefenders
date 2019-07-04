@@ -93,8 +93,8 @@ public class DatabaseTest {
 
 		creator = new User(20000, "FREE_USERNAME3", User.encodePassword("TEST_PASSWORD3"), "TESTMAIL@TEST.TEST3");
 
-		cut1 = new GameClass(22345678, "MyClass", "", "", "", false);
-		cut2 = new GameClass(34865,"", "AliasForClass2", "", "", false);
+		cut1 = new GameClass(22345678, "MyClass", "", "", "", false, true);
+		cut2 = new GameClass(34865,"", "AliasForClass2", "", "", false, true);
 		multiplayerGame = new MultiplayerGame
 				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 5, 4, 4, 0, 0)
                 .level(GameLevel.EASY)
@@ -166,13 +166,13 @@ public class DatabaseTest {
 
 	@Test
 	public void testInsertClasses() throws Exception {
-		assertEquals(0, GameClassDAO.getAllClasses().size());
+		assertEquals(0, GameClassDAO.getAllPlayableClasses().size());
 
 		assertTrue("Should have inserted class", cut1.insert());
-		assertEquals(1, GameClassDAO.getAllClasses().size());
+		assertEquals(1, GameClassDAO.getAllPlayableClasses().size());
 
 		assertTrue("Should have inserted class", cut2.insert());
-		assertEquals(2, GameClassDAO.getAllClasses().size());
+		assertEquals(2, GameClassDAO.getAllPlayableClasses().size());
 		PowerMockito.verifyStatic();
 	}
 

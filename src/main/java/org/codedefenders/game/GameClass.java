@@ -91,6 +91,8 @@ public class GameClass {
 
     private boolean isPuzzleClass;
 
+    private boolean isActive;
+
     private Set<String> additionalImports = new HashSet<>();
     // Store begin and end line which corresponds to uncoverable non-initializad fields
     private List<Integer> linesOfCompileTimeConstants = new ArrayList<>();
@@ -113,9 +115,10 @@ public class GameClass {
         this(name, alias, jFile, cFile, false);
     }
 
-    public GameClass(int id, String name, String alias, String jFile, String cFile, boolean isMockingEnabled) {
+    public GameClass(int id, String name, String alias, String jFile, String cFile, boolean isMockingEnabled, boolean isActive) {
         this(name, alias, jFile, cFile, isMockingEnabled);
         this.id = id;
+        this.isActive = isActive;
     }
 
     public GameClass(String name, String alias, String jFile, String cFile, boolean isMockingEnabled) {
@@ -124,6 +127,7 @@ public class GameClass {
         this.javaFile = jFile;
         this.classFile = cFile;
         this.isMockingEnabled = isMockingEnabled;
+        this.isActive = true;
 
         visitCode();
     }
@@ -137,6 +141,7 @@ public class GameClass {
     public static GameClass ofPuzzle(String name, String alias, String javaFilePath, String classFilePath, boolean isMockingEnabled) {
         GameClass gameClass = new GameClass(name, alias, javaFilePath, classFilePath, isMockingEnabled);
         gameClass.isPuzzleClass = true;
+        gameClass.isActive = true;
         return gameClass;
     }
 
@@ -164,6 +169,20 @@ public class GameClass {
         try {
             this.id = GameClassDAO.storeClass(this);
             return true;
+        } catch (UncheckedSQLException e) {
+            logger.error("Failed to store game class to database.", e);
+            return false;
+        }
+    }
+
+    /**
+     * Calls {@link GameClassDAO} to update this {@link GameClass} instance in the database.
+     *
+     * @return {@code true} if updating was successful, {@code false} otherwise.
+     */
+    public boolean update() {
+        try {
+            return GameClassDAO.updateClass(this);
         } catch (UncheckedSQLException e) {
             logger.error("Failed to store game class to database.", e);
             return false;
@@ -201,6 +220,14 @@ public class GameClass {
 
     public boolean isPuzzleClass() {
         return this.isPuzzleClass;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
     }
 
     public String getBaseName() {

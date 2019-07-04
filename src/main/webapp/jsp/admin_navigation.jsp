@@ -54,6 +54,9 @@
     <li class="<%=active(activePage,"adminUserMgmt")%>">
         <a id="adminUserMgmt" href="<%=request.getContextPath() + Paths.ADMIN_USERS%>">Manage Users</a>
     </li>
+    <li class="<%=active(activePage,"adminClasses")%>">
+        <a id="adminClasses" href="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>">Manage Classes</a>
+    </li>
     <li class="<%=active(activePage,"adminPuzzles")%>">
         <a id="adminPuzzles" href="<%=request.getContextPath() + Paths.ADMIN_PUZZLES%>">Manage Puzzles</a>
     </li>
