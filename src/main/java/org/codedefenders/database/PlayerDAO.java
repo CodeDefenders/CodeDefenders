@@ -63,6 +63,7 @@ public class PlayerDAO {
      *     <li>{@code usersEmail}</li>
      *     <li>{@code usersValidated}</li>
      *     <li>{@code usersActive}</li>
+     *     <li>{@code usersAllowContact}</li>
      * </ul>
      *
      * @param rs The {@link ResultSet}.
@@ -82,7 +83,8 @@ public class PlayerDAO {
         String email = rs.getString("usersEmail");
         boolean validated = rs.getBoolean("usersValidated");
         boolean userActive = rs.getBoolean("usersActive");
-        final User user = new User(userId, userName, password, email, validated, userActive);
+        boolean allowContact = rs.getBoolean("usersAllowContact");
+        final User user = new User(userId, userName, password, email, validated, userActive, allowContact);
 
         return new Player(id, user, gameId, points, role, active);
     }

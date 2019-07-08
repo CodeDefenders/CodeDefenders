@@ -190,12 +190,7 @@ public class AdminDAO {
     public static List<UserInfo> getAllUsersInfo() throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT DISTINCT",
-                "  users.User_ID,",
-                "  users.Username,",
-                "  users.Email,",
-                "  users.Password,",
-                "  users.Validated,",
-                "  users.Active,",
+                "  users.*,",
                 "  lastLogin.ts AS lastLogin,",
                 "  Role         AS lastRole,",
                 "  totalScore",

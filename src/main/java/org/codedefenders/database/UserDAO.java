@@ -45,8 +45,9 @@ public class UserDAO {
         String email = rs.getString("Email");
         boolean validated = rs.getBoolean("Validated");
         boolean active = rs.getBoolean("Active");
+        boolean allowContact = rs.getBoolean("AllowContact");
 
-        return new User(userId, userName, password, email, validated, active);
+        return new User(userId, userName, password, email, validated, active, allowContact);
     }
 
     /**

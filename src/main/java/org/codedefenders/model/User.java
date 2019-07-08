@@ -38,6 +38,7 @@ public class User {
     private String email;
     private boolean validated;
     private boolean active;
+    private boolean allowContact;
 
     public User(String username) {
         this(username, User.encodePassword(""));
@@ -52,16 +53,17 @@ public class User {
     }
 
     public User(int id, String username, String encodedPassword, String email) {
-        this(id, username, encodedPassword, email, false, true);
+        this(id, username, encodedPassword, email, false, true, false);
     }
 
-    public User(int id, String username, String encodedPassword, String email, boolean validated, boolean active) {
+    public User(int id, String username, String encodedPassword, String email, boolean validated, boolean active, boolean allowContact) {
         this.id = id;
         this.username = username;
         this.encodedPassword = encodedPassword;
         this.email = email.toLowerCase();
         this.validated = validated;
         this.active = active;
+        this.allowContact = allowContact;
     }
 
     public boolean insert() {
@@ -96,13 +98,24 @@ public class User {
         DatabaseValue[] valueList;
         Connection conn = DB.getConnection();
 
-        String query = "UPDATE users SET Username = ?, Email = ?, Password = ?, Validated = ?, Active = ? WHERE User_ID = ?;";
-        valueList = new DatabaseValue[]{DatabaseValue.of(username),
+        String query = String.join("\n",
+                "UPDATE users",
+                "SET Username = ?,",
+                "  Email = ?,",
+                "  Password = ?,",
+                "  Validated = ?,",
+                "  Active = ?,",
+                "  AllowContact = ?",
+                "WHERE User_ID = ?;");
+        valueList = new DatabaseValue[]{
+                DatabaseValue.of(username),
                 DatabaseValue.of(email),
                 DatabaseValue.of(encodedPassword),
                 DatabaseValue.of(validated),
                 DatabaseValue.of(active),
-                DatabaseValue.of(id)};
+                DatabaseValue.of(allowContact),
+                DatabaseValue.of(id)
+        };
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
         return DB.executeUpdate(stmt, conn);
     }
@@ -149,6 +162,15 @@ public class User {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+
+    public boolean getAllowContact() {
+        return allowContact;
+    }
+
+    public void setAllowContact(boolean allowContact) {
+        this.allowContact = allowContact;
     }
 
     public void logSession(String ipAddress) {
