@@ -22,8 +22,13 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.codedefenders.model.NotificationType" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.codedefenders.servlets.UserProfileManager" %>
 
 <%@ include file="/jsp/header_base.jsp" %>
+
+<%
+    boolean profileEnabled = UserProfileManager.checkEnabled();
+%>
 
 <script>
     //If the user is logged in, start receiving notifications
@@ -144,7 +149,7 @@
                         <ul id="userDropDown" class="dropdown-menu"
                             style="background-color:
                         #FFFFFF; border: 1px solid #000000;">
-                            <% if ("helloworld".length() == 10) { %>
+                            <% if (profileEnabled) { %>
                             <li>
                                 <a id="headerProfileButton"
                                    href="<%=request.getContextPath() + Paths.USER_PROFILE%>"

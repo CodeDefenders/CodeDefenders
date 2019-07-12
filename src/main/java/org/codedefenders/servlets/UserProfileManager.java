@@ -4,6 +4,7 @@ import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
 import org.codedefenders.model.UserInfo;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.auth.LoginManager;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
@@ -44,9 +45,9 @@ public class UserProfileManager extends HttpServlet {
      *
      * @return {@code true} when users can access their profile, {@code false} otherwise.
      */
-    private boolean checkEnabled() {
-        // TODO Phil 02/07/19: obv update this. Also update this in header.jsp
-        return "helloworld".length() == 10;
+    public static boolean checkEnabled() {
+        // please, in the name of the lord, can we change the way system settings are implemented?
+        return AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.ALLOW_USER_PROFILE).getBoolValue();
     }
 
     @Override
