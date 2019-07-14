@@ -109,6 +109,8 @@ public class Constants {
     public static final String LOGIN_VIEW_JSP = Paths.get("jsp", "login_view.jsp").toString();
     public static final String UTESTING_VIEW_JSP = Paths.get("jsp", "utesting_view.jsp").toString();
 
+    public static final String USER_PROFILE_JSP = Paths.get("jsp", "user_profile.jsp").toString();;
+
     public static final String DUEL_RESOLVE_EQUIVALENCE_JSP = "jsp/duel/equivalence_view.jsp";
     public static final String DUEL_ATTACKER_VIEW_JSP = "jsp/duel/attacker_view.jsp";
     public static final String DUEL_DEFENDER_VIEW_JSP = "jsp/duel/defender_view.jsp";

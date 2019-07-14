@@ -188,6 +188,17 @@
     </servlet>
     <!-- Login Authentication end -->
 
+    <!-- User management start-->
+    <servlet-mapping>
+        <servlet-name>UserProfile</servlet-name>
+        <url-pattern>/profile</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>UserProfile</servlet-name>
+        <servlet-class>org.codedefenders.servlets.UserProfileManager</servlet-class>
+    </servlet>
+    <!-- User management end-->
+
     <!-- Misc start-->
     <servlet-mapping>
         <servlet-name>GameOverview</servlet-name>

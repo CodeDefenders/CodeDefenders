@@ -21,6 +21,8 @@
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
 <%@ page import="static org.codedefenders.validation.code.CodeValidator.DEFAULT_NB_ASSERTIONS" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
+<%@ page import="org.codedefenders.database.AdminDAO" %>
+<%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <% String pageTitle = "Create Battleground"; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <%

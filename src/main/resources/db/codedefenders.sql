@@ -59,7 +59,8 @@ INSERT INTO settings (name, type, STRING_VALUE, INT_VALUE, BOOL_VALUE) VALUES
   ('EMAILS_ENABLED', 'BOOL_VALUE', NULL, NULL, FALSE),
   ('DEBUG_MODE', 'BOOL_VALUE', NULL, NULL, FALSE),
   ('EMAIL_PASSWORD', 'STRING_VALUE', '', NULL, NULL),
-  ('AUTOMATIC_KILLMAP_COMPUTATION', 'BOOL_VALUE', NULL, NULL, FALSE);
+  ('AUTOMATIC_KILLMAP_COMPUTATION', 'BOOL_VALUE', NULL, NULL, FALSE),
+  ('ALLOW_USER_PROFILE', 'BOOL_VALUE', NULL, NULL, TRUE);
 
 --
 -- Table structure for table `ratings`
@@ -423,6 +424,7 @@ CREATE TABLE `users` (
   `Email` varchar(150) NOT NULL,
   `Validated` tinyint(1) NOT NULL DEFAULT '0',
   `Active` tinyint(1) NOT NULL DEFAULT '1',
+  `AllowContact` tinyint(1) NOT NULL DEFAULT '0',
   `pw_reset_timestamp` timestamp NULL DEFAULT NULL,
   `pw_reset_secret` varchar(254) DEFAULT NULL,
   PRIMARY KEY (`User_ID`),
@@ -601,11 +603,12 @@ WHERE `ID` >= 100;
 
 CREATE OR REPLACE VIEW `view_players_with_userdata` AS
 SELECT p.*,
-       u.Password  AS usersPassword,
-       u.Username  AS usersUsername,
-       u.Email     AS usersEmail,
-       u.Validated AS usersValidated,
-       u.Active    AS usersActive
+       u.Password     AS usersPassword,
+       u.Username     AS usersUsername,
+       u.Email        AS usersEmail,
+       u.Validated    AS usersValidated,
+       u.Active       AS usersActive,
+       u.AllowContact AS usersAllowContact
 FROM players AS p,
      users AS u
 WHERE p.User_ID = u.User_ID;

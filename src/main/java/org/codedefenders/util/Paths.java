@@ -39,6 +39,8 @@ public class Paths {
     public static final String AI_PREPARER = "/ai_preparer";
     public static final String UTESTING_PATH = "/utesting";
 
+    public static final String USER_PROFILE = "/profile";
+
     public static final String GAMES_OVERVIEW = "/games/overview";
     public static final String GAMES_HISTORY = "/games/history";
     public static final String CLASS_UPLOAD = "/class-upload";
