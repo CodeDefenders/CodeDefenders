@@ -18,6 +18,7 @@
  */
 package org.codedefenders.database;
 
+import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
@@ -51,6 +52,7 @@ public class MultiplayerGameDAO {
         if (mode != GameMode.PARTY) {
             return null;
         }
+        GameClass cut = GameClassDAO.gameClassFromRS(rs);
         int id = rs.getInt("ID");
         int classId = rs.getInt("Class_ID");
         int creatorId = rs.getInt("Creator_ID");
@@ -74,6 +76,7 @@ public class MultiplayerGameDAO {
         int attackerValue = rs.getInt("Attacker_Value");
 
         return new MultiplayerGame.Builder(classId, creatorId, startTime, finishTime, maxAssertionsPerTest, defenderLimit, attackerLimit, minDefenders, minAttackers)
+                .cut(cut)
                 .id(id)
                 .state(state)
                 .level(level)
