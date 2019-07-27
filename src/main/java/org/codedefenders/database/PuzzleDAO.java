@@ -18,6 +18,7 @@
  */
 package org.codedefenders.database;
 
+import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
@@ -418,6 +419,7 @@ public class PuzzleDAO {
      */
     private static PuzzleGame getPuzzleGameFromResultSet(ResultSet rs) {
         try {
+            GameClass cut = GameClassDAO.gameClassFromRS(rs);
             int gameId = rs.getInt("games.ID");
             int classId = rs.getInt("games.Class_ID");
             GameLevel level = GameLevel.valueOf(rs.getString("games.Level"));
@@ -429,8 +431,8 @@ public class PuzzleDAO {
             Role activeRole = Role.valueOf(rs.getString("games.ActiveRole"));
             int puzzleId = rs.getInt("games.Puzzle_ID");
 
-            return new PuzzleGame(puzzleId, gameId, classId, level, creatorId, maxAssertionsPerTest, mutantValidatorLevel,
-                    state, currentRound, activeRole);
+            return new PuzzleGame(cut, puzzleId, gameId, classId, level, creatorId,
+                maxAssertionsPerTest, mutantValidatorLevel, state, currentRound, activeRole);
         } catch (SQLException e) {
             logger.error("Caught SQL exception while checking ResultSet.", e);
             return null;

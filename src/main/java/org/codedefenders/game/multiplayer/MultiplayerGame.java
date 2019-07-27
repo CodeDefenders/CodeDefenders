@@ -25,6 +25,7 @@ import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
@@ -108,6 +109,7 @@ public class MultiplayerGame extends AbstractGame {
         private final int minimumAttackers;
 
         // optional values with default values
+        private GameClass cut = null;
         private int id = -1;
         private boolean requiresValidation = false;
         private boolean capturePlayersIntention = false;
@@ -138,6 +140,7 @@ public class MultiplayerGame extends AbstractGame {
             this.minimumAttackers = minimumAttackers;
         }
 
+        public Builder cut(GameClass cut) { this.cut = cut; return this; }
         public Builder id(int id) { this.id = id; return this; }
         public Builder requiresValidation(boolean requiresValidation) { this.requiresValidation = requiresValidation; return this; }
         public Builder capturePlayersIntention(boolean capturePlayersIntention) { this.capturePlayersIntention = capturePlayersIntention; return this; }
@@ -163,6 +166,7 @@ public class MultiplayerGame extends AbstractGame {
     private MultiplayerGame(Builder builder) {
         this.mode = GameMode.PARTY;
 
+        this.cut = builder.cut;
         this.id = builder.id;
         this.classId = builder.classId;
         this.creatorId = builder.creatorId;

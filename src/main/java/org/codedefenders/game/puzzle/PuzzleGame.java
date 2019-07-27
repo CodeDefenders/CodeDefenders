@@ -25,6 +25,7 @@ import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
@@ -201,7 +202,8 @@ public class PuzzleGame extends AbstractGame {
     /**
      * Constructor for reading a puzzle game from the database.
      */
-    public PuzzleGame(int puzzleId,
+    public PuzzleGame(GameClass cut,
+                      int puzzleId,
                       int id,
                       int classId,
                       GameLevel level,
@@ -212,6 +214,7 @@ public class PuzzleGame extends AbstractGame {
                       int currentRound,
                       Role activeRole) {
         /* AbstractGame attributes */
+        this.cut = cut;
         this.id = id;
         this.classId = classId;
         this.creatorId = creatorId;
