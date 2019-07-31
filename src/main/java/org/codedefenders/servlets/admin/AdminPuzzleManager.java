@@ -6,6 +6,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.installer.Installer;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.zip.ZipFile;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +41,9 @@ import javax.servlet.http.HttpSession;
  */
 public class AdminPuzzleManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleManager.class);
+    
+    @Inject
+    private BackendExecutorService backend;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -126,7 +131,7 @@ public class AdminPuzzleManager extends HttpServlet {
                     final ZipFile zip = ZipFileUtils.createZip(fileContentBytes);
                     final Path rootDirectory = ZipFileUtils.extractZipGetRootDir(zip, true);
 
-                    Installer.installPuzzles(rootDirectory);
+                    Installer.installPuzzles(rootDirectory, backend);
 
                     FileUtils.forceDelete(rootDirectory.toFile());
 
