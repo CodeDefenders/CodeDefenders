@@ -30,6 +30,6 @@ public interface TestScheduler {
      * @param tests
      * @return
      */
-    public List<Test> scheduleTests(Collection<Test> tests);
+    List<Test> scheduleTests(Collection<Test> tests);
 
 }

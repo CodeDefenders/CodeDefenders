@@ -8,5 +8,5 @@ public interface TestGeneratorService {
      * Generates tests using EvoSuite
      * @param cut CUT filename
      */
-    public void generateTestsFromCUT(final GameClass cut);
+    void generateTestsFromCUT(final GameClass cut);
 }
