@@ -1,4 +1,4 @@
-<%--
+<%@ page import="org.codedefenders.model.KeyMap" %><%--
 
     Copyright (C) 2016-2019 Code Defenders contributors
 
@@ -28,6 +28,8 @@
     @param Integer startEditLine
         Start of editable lines. If smaller than one or {@code null}, the code can
         be modified from the start.
+    @param KeyMap user-keymap (session attribute)
+        The user's preferred key map. Can be {@code null}.
 --%>
 
 <% { %>
@@ -40,6 +42,7 @@
     if (startEditLine == null || startEditLine < 1) {
         startEditLine = 1;
     }
+    KeyMap keymap = ((KeyMap) Optional.ofNullable(session.getAttribute("user-keymap")).orElse(KeyMap.DEFAULT));
 %>
 
 <pre><textarea id="code" name="test" title="test" cols="80" rows="30"><%=testCode%></textarea></pre>
@@ -139,7 +142,7 @@
             "Ctrl-Space": "autocomplete",
             "Tab": "insertSoftTab"
         },
-        keyMap: "default",
+        keyMap: "<%=keymap.getCMName()%>",
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
     });
 
