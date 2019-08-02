@@ -8,50 +8,50 @@ import org.codedefenders.game.Test;
 
 /**
  * @author gambi
- *
  */
-public interface BackendExecutorService{
+public interface BackendExecutorService {
 
     /**
+     * Execute a {@link Test test} against a {@link GameClass class under test}.
+     * Calling this method results in an added {@code jacoco.exec} file to the given test directory.
      *
-     * @param cut
-     * @param testDir
-     * @param testClassName
-     * @throws Exception
+     * @param cut the class under test that is tested.
+     * @param testDir the directory the generated {@code jacoco.exec} file is placed as a {@link String}.
+     * @param testClassName the qualified name of the test class to be executed.
+     * @throws Exception when the test failed to execute or during execution.
      */
-    public void testOriginal(GameClass cut, String testDir, String testClassName) throws Exception;
+    void testOriginal(GameClass cut, String testDir, String testClassName) throws Exception;
 
     /**
+     * Executes a test against the original code
      *
-     * @param dir
-     * @param t
-     * @return
+     * @param dir  Test directory
+     * @param test A {@link Test} object
+     * @return A {@link TargetExecution} object
      */
-    public TargetExecution testOriginal(File dir, Test t);
+    TargetExecution testOriginal(File dir, Test test);
 
     /**
      * Executes a test against a mutant
      *
-     * @param m
-     *            A {@link Mutant} object
-     * @param t
-     *            A {@link Test} object
+     * @param m A {@link Mutant} object
+     * @param t A {@link Test} object
      * @return A {@link TargetExecution} object
      */
-    @SuppressWarnings("Duplicates")
-    public TargetExecution testMutant(Mutant m, Test t);
+    TargetExecution testMutant(Mutant m, Test t);
 
     /**
+     * @param mutant
+     * @return
+     */
+    boolean potentialEquivalent(Mutant mutant);
+
+    /**
+     * Checks whether a given mutant is killed by a given test.
      *
-     * @param m
-     * @return
+     * @param mutant the mutant to be tested.
+     * @param test   the test applied to the mutant.
+     * @return {@code true} iff the test kills the given mutant, {@code false} otherwise.
      */
-    public boolean potentialEquivalent(Mutant m);
-
-    /**
-     * @param m
-     * @param t
-     * @return
-     */
-    public boolean testKillsMutant(Mutant m, Test t);
+    boolean testKillsMutant(Mutant mutant, Test test);
 }

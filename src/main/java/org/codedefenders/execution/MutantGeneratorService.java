@@ -8,5 +8,5 @@ public interface MutantGeneratorService {
      * Generates mutant classes using Major
      * @param cut game class
      */
-    public void generateMutantsFromCUT(final GameClass cut);
+    void generateMutantsFromCUT(final GameClass cut);
 }

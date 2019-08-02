@@ -9,7 +9,6 @@ import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.database.TestDAO;
-import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
@@ -27,6 +26,8 @@ import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.JavaFileObject;
 import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.environment.se.WeldContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,8 +66,8 @@ import javax.sql.DataSource;
  * Using {@link #main(String[]) the main method}, this installer can be used
  * as a command line tool.
  * <p>
- * Using {@link #installPuzzles(Path) installPuzzles()}, the installer can be
- * called programmatically inside code defenders.
+ * Using {@link #installPuzzles(Path, BackendExecutorService) installPuzzles()}, the
+ * installer can be called programmatically inside code defenders.
  *
  * @author gambi
  * @author <a href="https://github.com/werli">Phil Werli<a/>
@@ -75,8 +76,12 @@ public class Installer {
 
     private static final Logger logger = LoggerFactory.getLogger(Installer.class);
 
-    @Inject
     private BackendExecutorService backend;
+
+    @Inject
+    public Installer(BackendExecutorService backend) {
+        this.backend = backend;
+    }
 
     /**
      * Used for parsing the command line.
@@ -88,8 +93,6 @@ public class Installer {
         /**
          * Directory containing the resources for creating the puzzled. Same as
          * the one used to generate the zip file
-         *
-         * @return
          */
         @Option(longName = "bundle-directory")
         File getBundleDirectory();
@@ -119,10 +122,14 @@ public class Installer {
         ParsingInterface commandLine = CliFactory.parseArguments(ParsingInterface.class, args);
         Properties configurations = new Properties();
         configurations.load(new FileInputStream(commandLine.getConfigurations()));
+
         setupInitialContext(configurations);
+
+        // Get an instance of backend from the Context
+        InitialContext initialContext = new InitialContext();
+        BackendExecutorService backend = (BackendExecutorService) initialContext.lookup("java:comp/env/codedefenders/backend");
         // No need to create the zip file, we can directly use the "exploded" directory
-        Installer.installPuzzles(commandLine.getBundleDirectory().toPath());
-        // Running this code with mvn exec:java hangs the execution so we force
+        Installer.installPuzzles(commandLine.getBundleDirectory().toPath(), backend);
         // the exit
         System.exit(0);
     }
@@ -140,14 +147,14 @@ public class Installer {
      *
      * @param directory the directory puzzle related files are looked at.
      */
-    public static void installPuzzles(Path directory) {
+    public static void installPuzzles(Path directory, BackendExecutorService backend) {
         final List<File> cuts = getFilesForDir(directory.resolve("cuts"), ".java");
         final List<File> mutants = getFilesForDir(directory.resolve("mutants"), ".java");
         final List<File> tests = getFilesForDir(directory.resolve("tests"), ".java");
         final List<File> puzzleChapterSpecs = getFilesForDir(directory.resolve("puzzleChapters"), ".properties");
         final List<File> puzzleSpecs = getFilesForDir(directory.resolve("puzzles"), ".properties");
 
-        Installer installer = new Installer();
+        Installer installer = new Installer(backend);
         installer.run(cuts, mutants, tests, puzzleChapterSpecs, puzzleSpecs);
     }
 
@@ -230,7 +237,7 @@ public class Installer {
      * @param configurations the configuration used to set the initial context.
      * @throws NamingException when setting the initial context fails.
      */
-    public static void setupInitialContext(Properties configurations) throws NamingException {
+    private static void setupInitialContext(Properties configurations) throws NamingException {
         System.setProperty(Context.INITIAL_CONTEXT_FACTORY, "org.apache.naming.java.javaURLContextFactory");
         System.setProperty(Context.URL_PKG_PREFIXES, "org.apache.naming");
 
@@ -239,12 +246,12 @@ public class Installer {
         ic.createSubcontext("java:");
         ic.createSubcontext("java:comp");
         ic.createSubcontext("java:comp/env");
+        ic.createSubcontext("java:comp/env/codedefenders");
 
         // Alessio: Maybe there a better way to do it...
         for (String pName : configurations.stringPropertyNames()) {
-            logger.info("createDataSource() Storing property " + pName + " in the env with value "
-                    + configurations.get(pName));
-            ic.bind("java:comp/env/" + pName, configurations.get(pName));
+            logger.info("Setting java:comp/env/codedefenders/" + pName + " = " + configurations.get(pName));
+            ic.bind("java:comp/env/codedefenders/" + pName, configurations.get(pName));
         }
 
         ic.createSubcontext("java:comp/env/jdbc");
@@ -255,12 +262,18 @@ public class Installer {
         dataSource.setPassword(configurations.getProperty("db.password"));
 
         ic.bind("java:comp/env/jdbc/codedefenders", dataSource);
+
+        // Maybe there's a way to provide the beans definition directly here...
+        Weld weld = new Weld();
+        WeldContainer container = weld.initialize();
+        // Manually load the dependencies and set the backend in the context, this is only because I cannot inject BeanManager
+        BackendExecutorService backend = container.instance().select(BackendExecutorService.class).get();
+        ic.bind("java:comp/env/codedefenders/backend", backend);
+        // Weld will be automatically closed at system.exit
     }
 
     /**
      * File convention: {@code cuts/<cut_alias>/<filename>}.
-     *
-     * @see ParsingInterface#getCuts()
      */
     private void installCUT(File cutFile) throws Exception {
         String fileName = cutFile.getName();
@@ -291,9 +304,8 @@ public class Installer {
 
     /**
      * File convention: {@code mutants/<cut_alias>/<position>/<filename>}.
-     *
-     * @see ParsingInterface#getMutants()
      */
+    @SuppressWarnings("Duplicates")
     private void installMutant(File mutantFile) throws Exception {
         String mutantFileName = mutantFile.getName();
         String classAlias = mutantFile.getParentFile().getParentFile().getName();
@@ -319,8 +331,9 @@ public class Installer {
 
         String md5 = CodeValidator.getMD5FromText(mutantFileContent);
         Mutant mutant = new Mutant(javaFilePath, classFilePath, md5, cut.getId());
-        mutant.insert();
-        MutantDAO.mapMutantToClass(mutant.getId(), cut.getId());
+
+        int mutantId = MutantDAO.storeMutant(mutant);
+        MutantDAO.mapMutantToClass(mutantId, cut.getId());
 
         logger.info("installMutant(): Stored mutant " + mutant.getId() + " in position " + targetPosition);
 
@@ -329,9 +342,8 @@ public class Installer {
 
     /**
      * File convention: {@code tests/<cut_alias>/<position>/<filename>}.
-     *
-     * @see ParsingInterface#getTests() Parser tests convention.
      */
+    @SuppressWarnings("Duplicates")
     private void installTest(File testFile) throws Exception {
         String testFileName = testFile.getName();
         String classAlias = testFile.getParentFile().getParentFile().getName();
@@ -367,8 +379,9 @@ public class Installer {
 
         LineCoverage lineCoverage = LineCoverageGenerator.generate(cut, javaFilePath);
         Test test = new Test(javaFilePath.toString(), classFilePath, cut.getId(), lineCoverage);
-        test.insert();
-        TestDAO.mapTestToClass(test.getId(), cut.getId());
+
+        int testId = TestDAO.storeTest(test);
+        TestDAO.mapTestToClass(testId, cut.getId());
 
         logger.info("installTest() Stored test " + test.getId() + " in position " + targetPosition);
 
@@ -382,8 +395,6 @@ public class Installer {
      * Mandatory properties: {@code chapterId}.
      * <p>
      * Optional properties: {@code position}, {@code title}, {@code description}.
-     *
-     * @see ParsingInterface#getPuzzleChapterSpecs() Parser puzzle chapter convention.
      */
     private void installPuzzleChapter(File puzzleChapterSpecFile) throws Exception {
         Properties cfg = new Properties();
@@ -419,8 +430,6 @@ public class Installer {
      * Optional properties: {@code mutants}, {@code tests}, {@code title}, {@code description},
      * {@code editableLinesStart}, {@code editableLinesEnd},
      * {@code position}.
-     *
-     * @see ParsingInterface#getPuzzleSpecs() Parser puzzles convention.
      */
     private void installPuzzle(File puzzleSpecFile) throws Exception {
         Properties cfg = new Properties();

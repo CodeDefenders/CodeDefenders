@@ -17,7 +17,7 @@ public interface ClassCompilerService {
      * @param ownerId User who submitted mutant
      * @return A {@link Mutant} object
      */
-    public Mutant compileMutant(File dir, String jFile, int gameID, GameClass cut, int ownerId);
+    Mutant compileMutant(File dir, String jFile, int gameID, GameClass cut, int ownerId);
 
     /**
      * Compiles test
@@ -28,7 +28,7 @@ public interface ClassCompilerService {
      * @param ownerId Player who submitted test
      * @return A {@link Test} object
      */
-    public Test compileTest(File dir, String jFile, int gameID, GameClass cut, int ownerId);
+    Test compileTest(File dir, String jFile, int gameID, GameClass cut, int ownerId);
 
     /**
      * Compiles CUT
@@ -36,12 +36,12 @@ public interface ClassCompilerService {
      * @param cut Class under test
      * @return The path to the compiled CUT
      */
-    public String compileCUT(GameClass cut) throws CompileException;
+    String compileCUT(GameClass cut) throws CompileException;
 
     /**
      * Compiles generated test suite
      * @param cut Class under test
      */
-    public boolean compileGenTestSuite(final GameClass cut);
+    boolean compileGenTestSuite(final GameClass cut);
 
 }

@@ -53,7 +53,7 @@ import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
 import static org.codedefenders.util.Constants.TESTS_DIR;
 
 /**
- * This class offers static utility methods used by servlets managing active
+ * This class offers utility methods used by servlets managing active
  * games. Since each request handles a different submission this class has the
  * {@link RequestScoped} annotation.
  *
@@ -71,40 +71,10 @@ public class GameManagingUtils implements IGameManagingUtils {
     @Inject
     private BackendExecutorService backend;
 
-    // static {
-    // InitialContext initialContext;
-    // try {
-    // initialContext = new InitialContext();
-    // BeanManager bm = (BeanManager)
-    // initialContext.lookup("java:comp/env/BeanManager");
-    // //
-    // Bean bean = null;
-    // CreationalContext ctx = null;
-    // //
-    // bean = (Bean) bm.getBeans(BackendExecutorService.class, new
-    // Annotation[0]).iterator().next();
-    // ctx = bm.createCreationalContext(bean);
-    // backend = (BackendExecutorService) bm.getReference(bean,
-    // BackendExecutorService.class, ctx);
-    // //
-    // bean = (Bean) bm.getBeans(ClassCompilerService.class, new
-    // Annotation[0]).iterator().next();
-    // ctx = bm.createCreationalContext(bean);
-    // classCompiler = (ClassCompilerService) bm.getReference(bean,
-    // ClassCompilerService.class, ctx);
-    // } catch (NamingException e) {
-    // e.printStackTrace();
-    // }
-    // }
-
     private static final Logger logger = LoggerFactory.getLogger(GameManagingUtils.class);
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.codedefenders.servlets.games.IGameManagingUtils#existingMutant(int,
-     * java.lang.String)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Mutant existingMutant(int gameId, String mutatedCode) {
@@ -115,11 +85,8 @@ public class GameManagingUtils implements IGameManagingUtils {
         return MutantDAO.getMutantByGameAndMd5(gameId, md5Mutant);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.codedefenders.servlets.games.IGameManagingUtils#
-     * hasAttackerPendingMutantsInGame(int, int)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public boolean hasAttackerPendingMutantsInGame(int gameId, int attackerId) {
@@ -131,12 +98,8 @@ public class GameManagingUtils implements IGameManagingUtils {
         return false;
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * org.codedefenders.servlets.games.IGameManagingUtils#createMutant(int,
-     * int, java.lang.String, int, java.lang.String)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Mutant createMutant(int gameId, int classId, String mutatedCode, int ownerUserId, String subDirectory)
@@ -169,11 +132,8 @@ public class GameManagingUtils implements IGameManagingUtils {
         return classCompiler.compileMutant(newMutantDir, mutantFilePath.toString(), gameId, classMutated, ownerUserId);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.codedefenders.servlets.games.IGameManagingUtils#createTest(int,
-     * int, java.lang.String, int, java.lang.String)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory)
@@ -181,11 +141,8 @@ public class GameManagingUtils implements IGameManagingUtils {
         return createTest(gameId, classId, testText, ownerUserId, subDirectory, CodeValidator.DEFAULT_NB_ASSERTIONS);
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.codedefenders.servlets.games.IGameManagingUtils#createTest(int,
-     * int, java.lang.String, int, java.lang.String, int)
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory,

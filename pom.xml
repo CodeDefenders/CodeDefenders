@@ -415,6 +415,12 @@
             <artifactId>weld-servlet-shaded</artifactId>
             <version>3.0.5.Final</version>
         </dependency>
+        <!-- Not sure if this creates a conflict -->
+        <dependency>
+                <groupId>org.jboss.weld.se</groupId>
+                <artifactId>weld-se-core</artifactId>
+                <version>3.0.5.Final</version>
+        </dependency>
 
         <!-- EventBus implementation, but any EventBus or MOM might work as well -->
         <dependency>

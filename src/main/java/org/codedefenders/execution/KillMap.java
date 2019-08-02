@@ -73,7 +73,7 @@ public class KillMap {
         /* Get settings if they are set, otherwise use defaults. */
         try {
             InitialContext initialContext = new InitialContext();
-            Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
+            Context environmentContext = (Context) initialContext.lookup("java:comp/env");
             Object parallelizeObj = environmentContext.lookup("codedefenders/parallelize");
             PARALLELIZE = (parallelizeObj == null) ? PARALLELIZE : "enabled".equals(parallelizeObj);
         } catch (NamingException e) {
@@ -81,7 +81,7 @@ public class KillMap {
         }
         try {
             InitialContext initialContext = new InitialContext();
-            Context environmentContext = (Context) initialContext.lookup("java:/comp/env");
+            Context environmentContext = (Context) initialContext.lookup("java:comp/env");
             Object useCoverageObj = environmentContext.lookup("codedefenders/mutant.coverage");
             USE_COVERAGE = (useCoverageObj == null) ? USE_COVERAGE : "enabled".equals(useCoverageObj);
         } catch (NamingException e) {
@@ -97,6 +97,17 @@ public class KillMap {
             backend = (BackendExecutorService) bm.getReference(bean, BackendExecutorService.class, ctx);
         } catch (NamingException e) {
             logger.error("Could not acquire BeanManager", e);
+        }
+        /*
+         * If we are running this outside a container, DI must be done manually by looking up the JNDI resource.
+         */
+        if (backend == null) {
+            try {
+                InitialContext initialContext = new InitialContext();
+                backend = (BackendExecutorService) initialContext.lookup("java:comp/env/codedefenders/backend");
+            } catch (NamingException e) {
+                logger.error("Could not acquire BackendExecutorService", e);
+            }
         }
     }
 
