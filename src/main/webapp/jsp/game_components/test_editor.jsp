@@ -42,7 +42,7 @@
     if (startEditLine == null || startEditLine < 1) {
         startEditLine = 1;
     }
-    KeyMap keymap = ((KeyMap) Optional.ofNullable(session.getAttribute("user-keymap")).orElse(KeyMap.DEFAULT));
+    KeyMap keymap = ((KeyMap) session.getAttribute("user-keymap"));
 %>
 
 <pre><textarea id="code" name="test" title="test" cols="80" rows="30"><%=testCode%></textarea></pre>

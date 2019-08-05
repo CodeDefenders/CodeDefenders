@@ -425,6 +425,7 @@ CREATE TABLE `users` (
   `Validated` tinyint(1) NOT NULL DEFAULT '0',
   `Active` tinyint(1) NOT NULL DEFAULT '1',
   `AllowContact` tinyint(1) NOT NULL DEFAULT '0',
+  `KeyMap` enum('DEFAULT','SUBLIME','VIM','EMACS') NOT NULL DEFAULT 'DEFAULT',
   `pw_reset_timestamp` timestamp NULL DEFAULT NULL,
   `pw_reset_secret` varchar(254) DEFAULT NULL,
   PRIMARY KEY (`User_ID`),
@@ -612,7 +613,8 @@ SELECT p.*,
        u.Email        AS usersEmail,
        u.Validated    AS usersValidated,
        u.Active       AS usersActive,
-       u.AllowContact AS usersAllowContact
+       u.AllowContact AS usersAllowContact,
+       u.KeyMap       AS usersKeyMap
 FROM players AS p,
      users AS u
 WHERE p.User_ID = u.User_ID;

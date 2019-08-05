@@ -1,9 +1,8 @@
 <%@ page import="org.codedefenders.model.KeyMap" %>
-<%@ page import="java.util.Optional" %>
 
 <%
     {
-    KeyMap keymap = ((KeyMap) Optional.ofNullable(session.getAttribute("user-keymap")).orElse(KeyMap.DEFAULT));
+        KeyMap keymap = ((KeyMap) session.getAttribute("user-keymap"));
 %>
 <div class="btn-toolbar" role="toolbar">
 

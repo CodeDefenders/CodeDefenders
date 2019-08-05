@@ -90,8 +90,13 @@ public class UserProfileManager extends HttpServlet {
             case "updateKeyMap": {
                 final String parameter = ServletUtils.getStringParameter(request, "editorKeyMap").orElse(null);
                 final KeyMap editorKeyMap = KeyMap.valueOrDefault(parameter);
-                session.setAttribute("user-keymap", editorKeyMap);
-                messages.add("Successfully updated editor preference.");
+                if (updateUserKeyMap(userId, editorKeyMap)) {
+                    session.setAttribute("user-keymap", editorKeyMap);
+                    messages.add("Successfully updated editor preference.");
+                } else {
+                    logger.info("Failed to update editor preference for user {}.", userId);
+                    messages.add("Failed to update editor preference.");
+                }
                 Redirect.redirectBack(request, response);
                 return;
             }
@@ -126,6 +131,15 @@ public class UserProfileManager extends HttpServlet {
                 logger.error("Action {" + formType + "} not recognised.");
                 response.sendRedirect(responsePath);
         }
+    }
+
+    private boolean updateUserKeyMap(int userId, KeyMap editorKeyMap) {
+        final User user = UserDAO.getUserById(userId);
+        if (user == null) {
+            return false;
+        }
+        user.setKeyMap(editorKeyMap);
+        return user.update();
     }
 
     private boolean updateUserInformation(int userId, Optional<String> email, Optional<String> password, boolean allowContact) {

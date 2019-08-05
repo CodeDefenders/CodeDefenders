@@ -53,7 +53,7 @@
     if (endEditLine != null && (endEditLine < 1 || endEditLine < startEditLine)) {
         endEditLine = null;
     }
-    KeyMap keymap = ((KeyMap) Optional.ofNullable(session.getAttribute("user-keymap")).orElse(KeyMap.DEFAULT));
+    KeyMap keymap = ((KeyMap) session.getAttribute("user-keymap"));
 %>
 <script>
     let startEditLine = <%=startEditLine%> ;

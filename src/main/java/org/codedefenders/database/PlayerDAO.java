@@ -19,6 +19,7 @@
 package org.codedefenders.database;
 
 import org.codedefenders.game.Role;
+import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 
@@ -64,6 +65,7 @@ public class PlayerDAO {
      *     <li>{@code usersValidated}</li>
      *     <li>{@code usersActive}</li>
      *     <li>{@code usersAllowContact}</li>
+     *     <li>{@code usersKeyMap}</li>
      * </ul>
      *
      * @param rs The {@link ResultSet}.
@@ -84,7 +86,9 @@ public class PlayerDAO {
         boolean validated = rs.getBoolean("usersValidated");
         boolean userActive = rs.getBoolean("usersActive");
         boolean allowContact = rs.getBoolean("usersAllowContact");
-        final User user = new User(userId, userName, password, email, validated, userActive, allowContact);
+        KeyMap keyMap = KeyMap.valueOrDefault(rs.getString("usersKeyMap"));
+
+        final User user = new User(userId, userName, password, email, validated, userActive, allowContact, keyMap);
 
         return new Player(id, user, gameId, points, role, active);
     }
