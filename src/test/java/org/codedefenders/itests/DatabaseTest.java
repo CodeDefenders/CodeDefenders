@@ -25,6 +25,7 @@ import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UserDAO;
@@ -265,7 +266,7 @@ public class DatabaseTest {
 
 		assertTrue(multiplayerGame.insert());
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
-		int playerID = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		int playerID = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
 		assertTrue(playerID > 0);
 		assertEquals(UserDAO.getUserForPlayer(playerID).getId(), user1.getId());
 		assertTrue(GameDAO.getPlayersForGame(multiplayerGame.getId(), Role.DEFENDER).size() > 0);
@@ -291,7 +292,7 @@ public class DatabaseTest {
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
 		int gid = multiplayerGame.getId();
-		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), gid);
+		int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), gid);
 		int cutID = cut2.getId();
 		mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
@@ -320,7 +321,7 @@ public class DatabaseTest {
 		assertTrue(multiplayerGame.insert());
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
-		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
 		int cutID = cut2.getId();
         Mutant mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
@@ -360,7 +361,7 @@ public class DatabaseTest {
 		assertTrue(multiplayerGame.insert());
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
-		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
 		int cutID = cut2.getId();
         Mutant mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
@@ -392,7 +393,7 @@ public class DatabaseTest {
 		assertTrue(multiplayerGame.insert());
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
 
-		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
 		test = new org.codedefenders.game.Test(99, cut1.getId(), multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10, pid);
 		test.setPlayerId(pid);
 
@@ -425,7 +426,7 @@ public class DatabaseTest {
 		assumeTrue(user2.insert());
 		assumeTrue(multiplayerGame.addPlayer(user2.getId(), Role.DEFENDER));
 
-		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user2.getId(), multiplayerGame.getId());
+		int pid = PlayerDAO.getPlayerIdForUserAndGame(user2.getId(), multiplayerGame.getId());
 		assertTrue(DatabaseAccess.insertEquivalence(mutant1, pid));
 		assertEquals(DatabaseAccess.getEquivalentDefenderId(mutant1), pid);
 	}
@@ -446,7 +447,7 @@ public class DatabaseTest {
 		assertTrue(multiplayerGame.addPlayer(user2.getId(), Role.ATTACKER));
 
 		//
-		int pidDefender = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		int pidDefender = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
 		test = new org.codedefenders.game.Test(99, cut1.getId(), multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10,
 				pidDefender);
 		test.setPlayerId(pidDefender);
@@ -458,7 +459,7 @@ public class DatabaseTest {
 		assumeTrue(test.update());
 
 		//
-		int pidAttacker = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		int pidAttacker = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
 		int cutID = cut1.getId();
 
         Mutant mutant1 = new Mutant(999,  cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
@@ -482,7 +483,7 @@ public class DatabaseTest {
 												// events does not have foreign
 												// keys
 		testInsertPlayer();
-		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user2.getId(), multiplayerGame.getId());
+		int pid = PlayerDAO.getPlayerIdForUserAndGame(user2.getId(), multiplayerGame.getId());
 		Timestamp ts = Timestamp.valueOf("1995-03-27 12:08:00");
 		Event ev = new Event(1, multiplayerGame.getId(), pid, "message", EventType.ATTACKER_MESSAGE, EventStatus.GAME,
 				ts);

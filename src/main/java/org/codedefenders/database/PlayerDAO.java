@@ -24,6 +24,7 @@ import org.codedefenders.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 /**
  * This class handles the database logic for players.
@@ -87,5 +88,26 @@ public class PlayerDAO {
         final User user = new User(userId, userName, password, email, validated, userActive, allowContact);
 
         return new Player(id, user, gameId, points, role, active);
+    }
+
+    /**
+     * Retrieves the identifier of a player of a given user in a given game.
+     *
+     * @param userId the user identifier as an {@code int}.
+     * @param gameId the game identifier as an {@code int}.
+     * @return the playerId for a user in a game.
+     */
+    public static int getPlayerIdForUserAndGame(int userId, int gameId) {
+        String query = String.join("\n",
+                "SELECT players.ID",
+                "FROM players",
+                "WHERE User_ID = ?",
+                "  AND Game_ID = ?");
+        DatabaseValue[] values = new DatabaseValue[]{
+                DatabaseValue.of(userId),
+                DatabaseValue.of(gameId)
+        };
+        final Integer id = DB.executeQueryReturnValue(query, rs -> rs.getInt("ID"), values);
+        return Optional.ofNullable(id).orElse(-1);
     }
 }

@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.Mutant;
@@ -90,7 +91,7 @@ public class MutantManager extends HttpServlet {
     private boolean canAccess(HttpServletRequest request) {
         //TODO: Implement heavy load/DDOS handling
         if (request.getParameter("gameId") != null) {
-            int pId = DatabaseAccess.getPlayerIdForMultiplayerGame(
+            int pId = PlayerDAO.getPlayerIdForUserAndGame(
                     (int)request.getSession().getAttribute("uid"),
                     Integer.parseInt(request.getParameter("gameId"))
             );

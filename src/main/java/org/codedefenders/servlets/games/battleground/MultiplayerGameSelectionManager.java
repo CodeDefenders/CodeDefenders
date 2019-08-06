@@ -23,6 +23,7 @@ import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;
@@ -253,18 +254,8 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         nGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
         nGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
 
-        int dummyAttackerPlayerId = -1;
-        int dummyDefenderPlayerId = -1;
-        for (Player player : GameDAO.getAllPlayersForGame(nGame.getId())) {
-            if (player.getUser().getId() == DUMMY_ATTACKER_USER_ID) {
-                dummyAttackerPlayerId = player.getId();
-            } else if (player.getUser().getId() == DUMMY_DEFENDER_USER_ID) {
-                dummyDefenderPlayerId = player.getId();
-            }
-        }
-
-        assert dummyAttackerPlayerId != -1;
-        assert dummyDefenderPlayerId != -1;
+        int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, nGame.getId());
+        int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, nGame.getId());
 
         // this mutant map links the uploaded mutants and the once generated from them here
         // This implements bookkeeping for killmap

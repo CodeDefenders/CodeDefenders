@@ -269,21 +269,6 @@ public class DatabaseAccess {
         return DB.executeUpdateQuery(query, values);
     }
 
-    // TODO Phil 27/12/18: this isn't limited to multiplayer games
-    public static int getPlayerIdForMultiplayerGame(int userId, int gameId) {
-        String query = String.join("\n",
-                "SELECT players.ID",
-                "FROM players",
-                "WHERE User_ID = ?",
-                "  AND Game_ID = ?");
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(userId),
-                DatabaseValue.of(gameId)
-        };
-        final Integer id = DB.executeQueryReturnValue(query, rs -> rs.getInt("ID"), values);
-        return Optional.ofNullable(id).orElse(-1);
-    }
-
     static Entry entryFromRS(ResultSet rs) throws SQLException {
         Entry p = new Entry();
         p.setUsername(rs.getString("username"));

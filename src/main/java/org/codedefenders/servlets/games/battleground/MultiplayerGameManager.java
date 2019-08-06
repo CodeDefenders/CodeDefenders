@@ -61,11 +61,11 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.IntentionDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.IMutationTester;
-import org.codedefenders.execution.MutationTester;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
@@ -78,7 +78,6 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
-import org.codedefenders.notification.INotificationService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -128,7 +127,7 @@ public class MultiplayerGameManager extends HttpServlet {
             return;
         }
         int userId = ServletUtils.userId(request);
-        int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(userId, gameId);
+        int playerId = PlayerDAO.getPlayerIdForUserAndGame(userId, gameId);
 
         if (playerId == -1 && game.getCreatorId() != userId) {
             logger.info("User {} not part of game {}. Aborting request.", userId, gameId);
@@ -147,6 +146,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 });
 
         request.setAttribute("game", game);
+        request.setAttribute("playerId", playerId);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.BATTLEGROUND_GAME_VIEW_JSP);
         dispatcher.forward(request, response);
@@ -402,7 +402,7 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         final String mutantText = mutant.get();
 
-        int attackerID = DatabaseAccess.getPlayerIdForMultiplayerGame(userId, gameId);
+        int attackerID = PlayerDAO.getPlayerIdForUserAndGame(userId, gameId);
 
         // If the user has pending duels we cannot accept the mutant, but we keep it around
         // so students do not lose mutants once the duel is solved.
@@ -518,7 +518,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             int mutantId = equivMutantId.get();
-            int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(userId, gameId);
+            int playerId = PlayerDAO.getPlayerIdForUserAndGame(userId, gameId);
             List<Mutant> mutantsPending = game.getMutantsMarkedEquivalentPending();
 
             for (Mutant m : mutantsPending) {
@@ -698,7 +698,7 @@ public class MultiplayerGameManager extends HttpServlet {
             return;
         }
 
-        int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(userId, gameId);
+        int playerId = PlayerDAO.getPlayerIdForUserAndGame(userId, gameId);
         AtomicInteger claimedMutants = new AtomicInteger();
         AtomicBoolean noneCovered = new AtomicBoolean(true);
         List<Mutant> mutantsAlive = game.getAliveMutants();

@@ -27,14 +27,13 @@
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     int userId = ServletUtils.userId(request); // required for playerFeedback, too
 	Role role = game.getRole(userId); // required for header_game, too
-    // TODO Not sure this is in general correct
-    int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(userId, game.getId());
 %>
 <%-- Set request attributes for the components. --%>
 <%
     /* playerFeedback & game_notifications */
     request.setAttribute("gameId", game.getId());
-    request.setAttribute("playerId", playerId);
+    // playerId already set in servlet.
+    // request.setAttribute("playerId", playerId);
 %>
 <%@ include file="/jsp/battleground/header_game.jsp" %>
 

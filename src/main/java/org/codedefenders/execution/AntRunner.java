@@ -39,8 +39,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.codedefenders.configuration.Property;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
@@ -263,7 +263,7 @@ public class AntRunner implements //
             final LinkedList<File> matchingFiles = new LinkedList<>(FileUtils.listFiles(dir, FileFilterUtils.nameFileFilter(compiledClassName), FileFilterUtils.trueFileFilter()));
             assert (!matchingFiles.isEmpty()) : "if compilation was successful, .class file must exist";
             String cFile = matchingFiles.get(0).getAbsolutePath();
-            int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gameID);
+            int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameID);
             newMutant = new Mutant(gameID, cut.getId(), jFile, cFile, true, playerId);
             newMutant.insert();
             TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.SUCCESS, null);
@@ -273,7 +273,7 @@ public class AntRunner implements //
             // New target execution recording failed compile, providing the return messages from the ant javac task
             String message = result.getCompilerOutput();
             logger.error("Failed to compile mutant {}: {}", jFile, message);
-            int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gameID);
+            int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameID);
             newMutant = new Mutant(gameID, cut.getId(), jFile, null, false, playerId);
             newMutant.insert();
             TargetExecution newExec = new TargetExecution(0, newMutant.getId(), TargetExecution.Target.COMPILE_MUTANT, TargetExecution.Status.FAIL, message);
@@ -290,7 +290,7 @@ public class AntRunner implements //
 
         AntProcessResult result = runAntTarget("compile-test", null, dir.getAbsolutePath(), cut, null, forceLocalExecution);
 
-        int playerId = DatabaseAccess.getPlayerIdForMultiplayerGame(ownerId, gameID);
+        int playerId = PlayerDAO.getPlayerIdForUserAndGame(ownerId, gameID);
 
         // If the input stream returned a 'successful build' message, the test compiled correctly
         if (result.compiled()) {
