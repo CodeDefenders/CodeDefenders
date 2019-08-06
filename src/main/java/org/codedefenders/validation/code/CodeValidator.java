@@ -259,7 +259,7 @@ public class CodeValidator {
      * @return
      */
     private static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
-        Map<String, EnumSet> originalTypes = new HashMap();
+        Map<String, EnumSet> originalTypes = new HashMap<>();
         for(TypeDeclaration type : originalCU.getTypes()){
             originalTypes.putAll(extractTypeDeclaration(type));
         }

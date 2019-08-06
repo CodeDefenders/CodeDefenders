@@ -271,23 +271,6 @@ public class MultiplayerGame extends AbstractGame {
         return capturePlayersIntention;
     }
 
-    /**
-     * Get winning team. Return NONE if a draw.
-     *
-     * @return Winning team.
-     */
-    public Role getWinningTeam() {
-        Role victor = Role.NONE;
-        int scoreAtt = getAttackerTeamScore();
-        int scoreDef = getDefenderTeamScore();
-        if (scoreAtt > scoreDef) {
-            victor = Role.ATTACKER;
-        } else if (scoreAtt < scoreDef) {
-            victor = Role.DEFENDER;
-        }
-        return victor;
-    }
-
     public long getStartDateTime() {
         return startDateTime;
     }
@@ -552,27 +535,6 @@ public class MultiplayerGame extends AbstractGame {
         }
 
         return testScores;
-    }
-
-    private int getAttackerTeamScore() {
-        int totalScore = 0;
-
-        for (Mutant m : getMutants())
-            totalScore += m.getAttackerPoints();
-        logger.debug("Attacker Score: " + totalScore);
-        return totalScore;
-    }
-
-    private int getDefenderTeamScore() {
-        int totalScore = 0;
-
-        for (Test t : getTests(true))
-            totalScore += t.getDefenderPoints();
-
-        for (Mutant m : getMutants())
-            totalScore += m.getDefenderPoints();
-        logger.debug("Defender Score: " + totalScore);
-        return totalScore;
     }
 
     public boolean isLineCovered(int lineNumber) {

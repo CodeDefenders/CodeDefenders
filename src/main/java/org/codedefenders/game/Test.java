@@ -172,11 +172,6 @@ public class Test {
         return roundCreated;
     }
 
-    public int getDefenderPoints() {
-        // TODO Phil 01/08/19:
-        return 0;
-    }
-
     public String getDirectory() {
         File file = new File(javaFile);
         return file.getAbsoluteFile().getParent();
@@ -187,6 +182,7 @@ public class Test {
     //
     // TODO Check that this method is never called for tests that kill a mutant that was already dead...
     public void killMutant() {
+        // TODO Phil 06/08/19: Why isn't the out-commented code called?
         // mutantsKilled++;
         // update();
         logger.info("Test {} killed a new mutant", getId());

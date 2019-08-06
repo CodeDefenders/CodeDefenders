@@ -79,8 +79,6 @@ public class Mutant implements Serializable {
 
     private boolean alive;
 
-    private int killingTestId = 0;
-
     private Equivalence equivalent;
 
     /* Mutant Equivalence */
@@ -154,8 +152,6 @@ public class Mutant implements Serializable {
         this.equivalent = equiv;
         this.roundCreated = rCreated;
         this.roundKilled = rKilled;
-        if(roundKilled > 0)
-            this.killingTestId = DatabaseAccess.getKillingTestIdForMutant(id);
 
         score = 0;
     }
@@ -198,10 +194,6 @@ public class Mutant implements Serializable {
         if (e.equals(Equivalence.DECLARED_YES) || e.equals(Equivalence.ASSUMED_YES)) {
             score = 0;
         }
-    }
-
-    public String getSourceFile() {
-        return javaFile;
     }
 
     public String getClassFile() {
@@ -275,8 +267,7 @@ public class Mutant implements Serializable {
     // TODO Phil 12/12/18: extract database logic to MutantDAO
     public boolean kill(Equivalence equivalent) {
         alive = false;
-        // TODO Phil 01/08/19: Use to be Duel Game
-        roundKilled = 0;
+        roundKilled = GameDAO.getCurrentRound(gameId);
         setEquivalent(equivalent);
 
         // This should be blocking
@@ -291,12 +282,13 @@ public class Mutant implements Serializable {
             query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=? WHERE Mutant_ID=? AND Alive=1;";
         }
 
-        DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(equivalent.name()),
-                DatabaseValue.of(sqlAlive()),
-                DatabaseValue.of(roundKilled),
-                DatabaseValue.of(id)};
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-        //
+        DatabaseValue[] values = new DatabaseValue[]{
+            DatabaseValue.of(equivalent.name()),
+            DatabaseValue.of(sqlAlive()),
+            DatabaseValue.of(roundKilled),
+            DatabaseValue.of(id)
+        };
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, values);
         return DB.executeUpdate(stmt, conn);
     }
 
