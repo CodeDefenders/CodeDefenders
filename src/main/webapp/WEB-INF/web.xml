@@ -235,54 +235,7 @@
         <servlet-name>Leaderboard</servlet-name>
         <jsp-file>/jsp/leaderboards.jsp</jsp-file>
     </servlet>
-
-    <servlet>
-        <servlet-name>AiPreparer</servlet-name>
-        <servlet-class>org.codedefenders.game.singleplayer.AiPreparer</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>AiPreparer</servlet-name>
-        <url-pattern>/ai_preparer</url-pattern>
-    </servlet-mapping>
-
-    <servlet-mapping>
-        <servlet-name>UnitTesting</servlet-name>
-        <url-pattern>/utesting</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>UnitTesting</servlet-name>
-        <servlet-class>org.codedefenders.servlets.UnitTesting</servlet-class>
-    </servlet>
     <!-- Misc end-->
-
-    <!-- Duel mode servlets start -->
-    <servlet-mapping>
-        <servlet-name>DuelGameSelection</servlet-name>
-        <url-pattern>/duel/games</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>DuelGameSelection</servlet-name>
-        <servlet-class>org.codedefenders.servlets.games.duel.DuelGameSelectionManager</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>DuelGameManager</servlet-name>
-        <url-pattern>/duelgame</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>DuelGameManager</servlet-name>
-        <servlet-class>org.codedefenders.servlets.games.duel.DuelGameManager</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>DuelGameCreatePage</servlet-name>
-        <url-pattern>/duel/create</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>DuelGameCreatePage</servlet-name>
-        <jsp-file>/jsp/duel/create_game_view.jsp</jsp-file>
-    </servlet>
-    <!-- Duel mode servlets end -->
 
     <!-- Battleground mode servlets start -->
     <servlet-mapping>
