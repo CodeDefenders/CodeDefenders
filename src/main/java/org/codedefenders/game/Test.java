@@ -37,7 +37,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -62,7 +61,6 @@ public class Test {
     private int roundCreated;
     private int mutantsKilled;
     private int score;
-    private int aiMutantsKilled; // how many generated mutants this test killed.
     private LineCoverage lineCoverage;
 
     /**
@@ -242,30 +240,13 @@ public class Test {
         }
     }
 
-    @Deprecated
     public boolean update() {
-        logger.debug("Updating Test");
-        Connection conn = DB.getConnection();
-
-        String linesCoveredString = "";
-        String linesUncoveredString= "";
-
-        if (lineCoverage != null) {
-            linesCoveredString = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
-            linesUncoveredString = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
+        try {
+            return TestDAO.updateTest(this);
+        } catch (UncheckedSQLException e) {
+            logger.error("Failed to store test to database.", e);
+            return false;
         }
-
-        String query = "UPDATE tests SET mutantsKilled=?,NumberAiMutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
-        DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(mutantsKilled),
-                DatabaseValue.of(aiMutantsKilled),
-                DatabaseValue.of(linesCoveredString),
-                DatabaseValue.of(linesUncoveredString),
-                DatabaseValue.of(score),
-                DatabaseValue.of(id)
-        };
-
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-        return DB.executeUpdate(stmt, conn);
     }
 
     public String getFullyQualifiedClassName() {
@@ -284,18 +265,6 @@ public class Test {
 
     public boolean isValid() {
         return classFile != null;
-    }
-
-    public int getAiMutantsKilled() {
-        if (aiMutantsKilled == 0) {
-            //Retrieve from DB.
-            aiMutantsKilled = TestDAO.getNumAiMutantsKilledByTest(getId());
-        }
-        return aiMutantsKilled;
-    }
-
-    public void incrementAiMutantsKilled() {
-        aiMutantsKilled++;
     }
 
     public String getJavaFile() {
@@ -318,7 +287,6 @@ public class Test {
         playerId = id;
     }
 
-
     public int getPlayerId() {
         return playerId;
     }
@@ -331,12 +299,6 @@ public class Test {
         return classId;
     }
 
-    @Deprecated
-    public void setAiMutantsKilled(int count) {
-        aiMutantsKilled = count;
-    }
-
-    @Deprecated
     public void setLineCoverage(LineCoverage lineCoverage) {
         this.lineCoverage = lineCoverage;
     }

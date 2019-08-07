@@ -23,12 +23,12 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.database.DB;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.UncheckedSQLException;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.validation.code.CodeValidator;
@@ -208,6 +208,10 @@ public class Mutant implements Serializable {
         return roundCreated;
     }
 
+    public int getRoundKilled() {
+        return roundKilled;
+    }
+
     public String getMd5() {
         return md5;
     }
@@ -219,10 +223,6 @@ public class Mutant implements Serializable {
 
     public boolean isAlive() {
         return alive;
-    }
-
-    public int sqlAlive() {
-        return alive ? 1 : 0;
     }
 
     public int getPlayerId() {
@@ -284,7 +284,7 @@ public class Mutant implements Serializable {
 
         DatabaseValue[] values = new DatabaseValue[]{
             DatabaseValue.of(equivalent.name()),
-            DatabaseValue.of(sqlAlive()),
+            DatabaseValue.of(alive),
             DatabaseValue.of(roundKilled),
             DatabaseValue.of(id)
         };
@@ -322,56 +322,6 @@ public class Mutant implements Serializable {
         return CollectionUtils.containsAny(cut.getCompileTimeConstants(), getLines());
     }
 
-    /**
-     * @return attacker points for this mutant in DUEL MODE
-     */
-    public int getAttackerPoints() {
-        if (alive) {
-            // if mutant is alive, as many points as rounds it has survived
-            // TODO: as many points as tests it has survived?
-            // FIXME: Why will only work for Duel Games since multiplayer games do not have rounds.
-            int points = 0;
-//            DuelGame g = DuelGameDAO.getDuelGameForId(gameId);
-//            int points = g.getCurrentRound() - roundCreated; // rounds survived
-//            if (g.getState().equals(GameState.FINISHED))
-//                points++; // add a point for the last round if the game has finished
-            logger.debug("Alive mutant " + getId() + " contributes " + points + " attacker points");
-            return points;
-        } else {
-            if (classFile == null || classFile.equals("null")) // non-compilable
-                return 0;
-            if (equivalent.equals(Equivalence.DECLARED_YES)) // accepted equivalent
-                return 0;
-            if (equivalent.equals(Equivalence.ASSUMED_YES)) // claimed, rejected, test did not kill it
-                return 0;
-            if (equivalent.equals(Equivalence.PROVEN_NO)) { // claimed, rejected, test killed it
-                logger.debug("Claimed/rejected/killed mutant " + getId() + " contributes 2 attacker points");
-                return 2;
-            }
-            int points = roundKilled - roundCreated; // rounds survived
-            logger.debug("Killed mutant " + getId() + " contributes " + points + " attacker points");
-            return points;
-        }
-    }
-
-    /**
-     * @return defender points for this mutant in DUEL MODE
-     */
-    public int getDefenderPoints() {
-        if (!alive && classFile != null) {
-            if (equivalent.equals(Equivalence.ASSUMED_NO) || equivalent.equals(Equivalence.DECLARED_YES)) {
-                return 1; // accepted equivalent
-            } else if (equivalent.equals(Equivalence.ASSUMED_YES)) {
-                return 2; // claimed, rejected, test did not kill it
-            } else {
-                // claimed, rejected, test killed it
-                return 0;
-            }
-        }
-        logger.debug("Mutant " + getId() + " contributes 0 defender points (alive or non-compilable)");
-        return 0;
-    }
-
     public Patch getDifferences() {
         if (difference == null) {
             computeDifferences();
@@ -407,7 +357,7 @@ public class Mutant implements Serializable {
         difference = DiffUtils.diff(sutLines, mutantLines);
     }
 
-    public String getPatchString() {
+    private String getPatchString() {
         GameClass sut = GameClassDAO.getClassForGameId(gameId);
         if( sut == null ){
             // in this case gameId might have been -1 (upload)
@@ -446,42 +396,13 @@ public class Mutant implements Serializable {
         }
     }
 
-    // update will run when changes to a mutant are made.
-    // Updates values of Equivalent, Alive, RoundKilled.
-    // These values update when Mutants are suspected of being equivalent, go through an equivalence test, or are killed.
-    @Deprecated
     public boolean update() {
-
-        // This should be blocking
-        Connection conn = DB.getConnection();
-
-        // We cannot update killed mutants
-        String query = "UPDATE mutants SET Equivalent=?, Alive=?, RoundKilled=?, NumberAiKillingTests=?, Points=? WHERE Mutant_ID=? AND Alive=1;";
-        DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(equivalent.name()),
-                DatabaseValue.of(sqlAlive()),
-                DatabaseValue.of(roundKilled),
-                DatabaseValue.of(killedByAITests),
-                DatabaseValue.of(score),
-                DatabaseValue.of(id)};
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-
-        return DB.executeUpdate(stmt, conn);
-    }
-
-    public void setTimesKilledAi(int count) {
-        killedByAITests = count;
-    }
-
-    public int getTimesKilledAi() {
-        if (killedByAITests == 0) {
-            //Retrieve from DB.
-            killedByAITests = MutantDAO.getNumTestsKillMutant(getId());
+        try {
+            return MutantDAO.updateMutant(this);
+        } catch (UncheckedSQLException e) {
+            logger.error("Failed to store mutant to database.", e);
+            return false;
         }
-        return killedByAITests;
-    }
-
-    public void incrementTimesKilledAi() {
-        killedByAITests++;
     }
 
     // Does this every get called if mutant is not stored to DB ?
@@ -497,13 +418,11 @@ public class Mutant implements Serializable {
      * by a mutation.
      *
      * An insertion only modifies the line it was inserted in
-     *
-     * @return lines modified in the original class
      */
-    public void computeLinesAndDescription() {
+    private void computeLinesAndDescription() {
         // This workflow is not really nice...
-        List<Integer> mutatedLines = new ArrayList<Integer>();
-        description = new ArrayList<String>();
+        List<Integer> mutatedLines = new ArrayList<>();
+        description = new ArrayList<>();
 
         Patch p = getDifferences();
         for (Delta d : p.getDeltas()) {

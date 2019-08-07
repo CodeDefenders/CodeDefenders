@@ -407,12 +407,10 @@ public class DatabaseTest {
 		LineCoverage lc = new LineCoverage();
 		test.setLineCoverage(lc);
 		test.setScore(17);
-		test.setAiMutantsKilled(23);
 		assertTrue(test.update());
 
 		testFromDB = TestDAO.getTestById(test.getId());
 		assertEquals(testFromDB.getScore(), test.getScore());
-		assertEquals(testFromDB.getAiMutantsKilled(), test.getAiMutantsKilled());
 		assertEquals(testFromDB.getLineCoverage().getLinesCovered(), test.getLineCoverage().getLinesCovered());
 		assertEquals(testFromDB.getLineCoverage().getLinesUncovered(), test.getLineCoverage().getLinesUncovered());
 	}
@@ -455,7 +453,6 @@ public class DatabaseTest {
 		LineCoverage lc = new LineCoverage();
 		test.setLineCoverage(lc);
 		test.setScore(17);
-		test.setAiMutantsKilled(23);
 		assumeTrue(test.update());
 
 		//

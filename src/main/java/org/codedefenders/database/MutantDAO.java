@@ -200,7 +200,7 @@ public class MutantDAO {
         int classId = mutant.getClassId();
         int roundCreated = mutant.getRoundCreated();
         Equivalence equivalent = mutant.getEquivalent() == null ? Equivalence.ASSUMED_NO : mutant.getEquivalent();
-        int sqlAlive = mutant.sqlAlive();
+        boolean alive = mutant.isAlive();
         int playerId = mutant.getPlayerId();
         int score = mutant.getScore();
         String md5 = mutant.getMd5();
@@ -216,7 +216,7 @@ public class MutantDAO {
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(roundCreated),
                 DatabaseValue.of(equivalent.name()),
-                DatabaseValue.of(sqlAlive),
+                DatabaseValue.of(alive),
                 DatabaseValue.of(playerId),
                 DatabaseValue.of(score),
                 DatabaseValue.of(md5),
@@ -230,6 +230,42 @@ public class MutantDAO {
         } else {
             throw new Exception("Could not store mutant to database.");
         }
+    }
+
+    /**
+     * Updates a given {@link Mutant} in the database and returns whether
+     * updating was successful or not.
+     *
+     * @param mutant the given mutant as a {@link Mutant}.
+     * @return whether updating was successful or not
+     * @throws UncheckedSQLException If storing the mutant was not successful.
+     */
+    public static boolean updateMutant(Mutant mutant) throws UncheckedSQLException {
+        int mutantId = mutant.getId();
+
+        Equivalence equivalent = mutant.getEquivalent() == null ? Equivalence.ASSUMED_NO : mutant.getEquivalent();
+        boolean alive = mutant.isAlive();
+        int roundKilled = mutant.getRoundKilled();
+        int score = mutant.getScore();
+
+        String query = String.join("\n",
+            "UPDATE mutants",
+            "SET",
+            "  Equivalent=?,",
+            "  Alive=?,",
+            "  RoundKilled=?,",
+            "  Points=?",
+            "WHERE Mutant_ID=? AND Alive=1;"
+        );
+        DatabaseValue[] values = new DatabaseValue[]{
+            DatabaseValue.of(equivalent.name()),
+            DatabaseValue.of(alive),
+            DatabaseValue.of(roundKilled),
+            DatabaseValue.of(score),
+            DatabaseValue.of(mutantId)
+        };
+
+        return DB.executeUpdateQuery(query, values);
     }
 
     /**

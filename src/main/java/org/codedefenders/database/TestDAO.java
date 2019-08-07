@@ -26,14 +26,12 @@ import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
@@ -264,6 +262,41 @@ public class TestDAO {
     }
 
     /**
+     * Updates a given {@link Test} in the database and returns whether
+     * updating was successful or not.
+     *
+     * @param test the given test as a {@link Test}.
+     * @return whether updating was successful or not
+     * @throws UncheckedSQLException If storing the test was not successful.
+     */
+    public static boolean updateTest(Test test) throws UncheckedSQLException {
+        final int testId = test.getId();
+        final int mutantsKilled = test.getMutantsKilled();
+        final int score = test.getScore();
+
+        String linesCoveredString = "";
+        String linesUncoveredString= "";
+
+        LineCoverage lineCoverage = test.getLineCoverage();
+        if (lineCoverage != null) {
+            linesCoveredString = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
+            linesUncoveredString = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
+        }
+
+
+        String query = "UPDATE tests SET mutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
+        DatabaseValue[] values = new DatabaseValue[]{
+            DatabaseValue.of(mutantsKilled),
+            DatabaseValue.of(linesCoveredString),
+            DatabaseValue.of(linesUncoveredString),
+            DatabaseValue.of(score),
+            DatabaseValue.of(testId)
+        };
+
+        return DB.executeUpdateQuery(query, values);
+    }
+
+    /**
      * Stores a mapping between a {@link Test} and a {@link GameClass} in the database.
      *
      * @param testId  the identifier of the test.
@@ -330,17 +363,5 @@ public class TestDAO {
         DatabaseValue[] values = tests.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
 
         return DB.executeUpdateQuery(query, values);
-    }
-
-    /**
-     * Returns the number of killed AI mutants for a given test.
-     *
-     * @param testId the identifier of the test.
-     * @return number of killed AI mutants, or {@code 0} if none found.
-     */
-    public static int getNumAiMutantsKilledByTest(int testId) {
-        String query = "SELECT * FROM tests WHERE Test_ID=?;";
-        final Integer kills = DB.executeQueryReturnValue(query, rs -> rs.getInt("NumberAiMutantsKilled"), DatabaseValue.of(testId));
-        return Optional.ofNullable(kills).orElse(0);
     }
 }
