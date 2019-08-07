@@ -20,16 +20,13 @@
 --%>
 <%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <%@ page import="org.codedefenders.game.AbstractGame" %>
-<%@ page import="org.codedefenders.game.GameMode" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.Role" %>
-<%@ page import="org.codedefenders.game.duel.DuelGame" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.database.UserDAO" %>
-<%@ page import="org.codedefenders.database.DuelGameDAO" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <% String pageTitle= null ; %>
 <%@ include file="/jsp/header_main.jsp" %>
@@ -44,21 +41,15 @@
 	int uid = (Integer)request.getSession().getAttribute("uid");
 
 	// My Games
-	List<DuelGame> duelGames = DuelGameDAO.getDuelGamesForUser(uid);
-
 	List<MultiplayerGame> multiplayerGames = MultiplayerGameDAO.getMultiplayerGamesForUser(uid);
 
 	List<AbstractGame> games = new ArrayList<>();
-	games.addAll( duelGames );
 	games.addAll( multiplayerGames );
 
 	// Open Games
-	List<DuelGame> openDuelGames = DuelGameDAO.getOpenDuelGames();
-
 	List<MultiplayerGame> openMultiplayerGames = MultiplayerGameDAO.getOpenMultiplayerGamesForUser(uid);
 
 	List<AbstractGame> openGames = new ArrayList<>();
-	openGames.addAll( openDuelGames );
 	openGames.addAll( openMultiplayerGames );
 
 	boolean gamesJoinable = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue();
@@ -87,71 +78,7 @@
 <%
 	} else {
 		for (AbstractGame ag : games) {
-			if( ag instanceof DuelGame ){
-/****************************************************************************************************************************************/
-				DuelGame g = (DuelGame) ag;
-
-				atkName = null;
-				defName = null;
-
-				if (g.getAttackerId() != 0) {
-					atkName = UserDAO.getUserById(g.getAttackerId()).getUsername();
-				}
-
-				if (g.getDefenderId() != 0) {
-					defName = UserDAO.getUserById(g.getDefenderId()).getUsername();
-				}
-
-				int turnId = g.getAttackerId();
-
-				if (g.getActiveRole().equals(Role.DEFENDER))
-					turnId = g.getDefenderId();
-
-				if (atkName == null) {atkName = "Empty";}
-				if (defName == null) {defName = "Empty";}
-
-				final GameClass cut = g.getCUT();%>
-	<tr id="<%="game-"+g.getId()%>">
-		<td class="col-sm-1"><%= g.getId() %></td>
-		<td class="col-sm-1">Duel</td>
-		<td class="col-sm-1"></td>
-		<td class="col-sm-1">
-			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
-				<%=cut.getAlias()%>
-			</a>
-			<div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;" >
-				<div class="modal-dialog">
-					<!-- Modal content-->
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal">&times;</button>
-							<h4 class="modal-title"><%=cut.getAlias()%></h4>
-						</div>
-						<div class="modal-body">
-							<pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
-																id="sut<%=g.getId()%>"
-																name="cut<%=g.getId()%>" cols="80"
-																rows="30"><%=cut.getAsHTMLEscapedString()%></textarea></pre>
-						</div>
-						<div class="modal-footer">
-							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-						</div>
-					</div>
-				</div>
-			</div>
-		</td>
-		<td class="col-sm-1"><%= atkName %></td>
-		<td class="col-sm-1"><%= defName %></td>
-		<td class="col-sm-1"><%= g.getLevel().name() %></td>
-        <td class="col-sm-1"></td>
-        <td class="col-sm-1"></td>
-		<td class="col-sm-3">
-			<a class="btn btn-sm btn-default" id="<%="results_"+g.getId()%>" href="<%=request.getContextPath() + Paths.DUEL_GAME%>?gameId=<%= g.getId() %>">Enter Game</a>
-		</td>
-	</tr>
-<%
-/****************************************************************************************************************************************/
-			} else if ( ag instanceof MultiplayerGame ){
+			if ( ag instanceof MultiplayerGame ){
 /****************************************************************************************************************************************/
 				MultiplayerGame g = (MultiplayerGame) ag;
 				Role role = g.getRole(uid);
@@ -273,7 +200,6 @@
 
 	<%if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue()) { %>
 	<a id="createBattleground" class = "btn btn-primary" href="<%=request.getContextPath() + Paths.BATTLEGROUND_CREATE%>">Create Battleground</a>
-	<a id="createDuel" class = "btn btn-primary" href="<%=request.getContextPath() + Paths.DUEL_CREATE%>">Create Duel</a>
 	<%}%>
 
 <%if (gamesJoinable) { %>
@@ -299,76 +225,7 @@
 <%
 	} else {
 		for (AbstractGame ag : openGames) {
-			if( ag instanceof DuelGame ){
-/****************************************************************************************************************************************/
-				DuelGame g = (DuelGame) ag;
-				atkName = null;
-				defName = null;
-
-				// Single or UTesting games cannot be joined
-				if (g.getMode().equals(GameMode.SINGLE) ||
-						g.getMode().equals(GameMode.UTESTING)) {continue;}
-
-				atkId = g.getAttackerId();
-				defId = g.getDefenderId();
-
-				// User is already playing this game
-				if ((atkId == uid)||(defId == uid)) {continue;}
-
-				if (atkId != 0) {atkName = UserDAO.getUserById(atkId).getUsername();}
-				if (defId != 0) {defName = UserDAO.getUserById(defId).getUsername();}
-
-				if ((atkName != null)&&(defName != null)) {continue;}
-
-				if (atkName == null) {atkName = "Empty";}
-				if (defName == null) {defName = "Empty";}
-				final GameClass cut = g.getCUT();%>
-
-		<tr id="<%="game-"+g.getId()%>">
-			<td class="col-sm-1"><%= g.getId() %></td>
-			<td class="col-sm-1">Duel</td>
-			<td class="col-sm-1"></td>
-			<td class="col-sm-2">
-				<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=g.getId()%>">
-					<%=cut.getAlias()%>
-				</a>
-				<div id="modalCUTFor<%=g.getId()%>" class="modal fade" role="dialog" style="text-align: left;" >
-					<div class="modal-dialog">
-						<!-- Modal content-->
-						<div class="modal-content">
-							<div class="modal-header">
-								<button type="button" class="close" data-dismiss="modal">&times;</button>
-								<h4 class="modal-title"><%=cut.getAlias()%></h4>
-							</div>
-							<div class="modal-body classPreview">
-								<pre class="readonly-pre"><textarea
-										class="readonly-textarea" id="sut<%=g.getId()%>"
-										name="cut<%=g.getId()%>" cols="80"
-										rows="30"><%=cut.getAsHTMLEscapedString()%></textarea></pre>
-							</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-							</div>
-						</div>
-					</div>
-				</div>
-			</td>
-			<td class="col-sm-2"><%= atkName %></td>
-			<td class="col-sm-2"><%= defName %></td>
-			<td class="col-sm-1"><%= g.getLevel().name() %></td>
-			<td class="col-sm-1"></td>
-			<td class="col-sm-1"></td>
-			<td class="col-sm-2">
-			<form id="joinGameForm" action="<%=request.getContextPath() + Paths.DUEL_SELECTION%>" method="post">
-					<input type="hidden" name="formType" value="joinGame">
-					<input type="hidden" name="gameId" value=<%=g.getId()%>>
-					<button type="submit" id="<%="duel-join-"+g.getId()%>" class="btn btn-primary btn-sm" value="Join Game">Join Game</button>
-				</form>
-			</td>
-		</tr>
-<%
-/****************************************************************************************************************************************/
-			} else if ( ag instanceof MultiplayerGame ){
+            if ( ag instanceof MultiplayerGame ){
 /****************************************************************************************************************************************/
 				MultiplayerGame g = (MultiplayerGame) ag;
 				Role role = g.getRole(uid);

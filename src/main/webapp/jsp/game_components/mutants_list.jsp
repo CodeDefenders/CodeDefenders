@@ -130,15 +130,6 @@
                                 </form>
                                 <%
                                             }
-                                        } else if (gameType == GameMode.DUEL) {
-                                %>
-                                            <form id="equiv" action="<%=request.getContextPath() + Paths.DUEL_GAME%>" method="post" onsubmit="return confirm('This will mark mutant <%= m.getId() %> as equivalent. Are you sure?');">
-                                                <input type="hidden" name="formType" value="claimEquivalent">
-                                                <input type="hidden" name="equivMutantId" value="<%=m.getId()%>">
-                                                <input type="hidden" name="gameId" value="<%=gameId%>">
-                                                <button type="submit" class="btn btn-default btn-right">Claim Equivalent</button>
-                                            </form>
-                                <%
                                         }
                                     }
                                     if (m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){
