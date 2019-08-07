@@ -192,10 +192,8 @@ public class MutantDAO {
      * @throws Exception If storing the mutant was not successful.
      */
     public static int storeMutant(Mutant mutant) throws Exception {
-        String javaFile = DatabaseAccess.addSlashes(mutant.getJavaFile());
-        String classFile = DatabaseAccess.addSlashes(mutant.getClassFile());
-        String relativeJavaFile = FileUtils.getRelativeDataPath(javaFile).toString();
-        String relativeClassFile = classFile == null ? null : FileUtils.getRelativeDataPath(classFile).toString();
+        String relativeJavaFile = FileUtils.getRelativeDataPath(mutant.getJavaFile()).toString();
+        String relativeClassFile = mutant.getClassFile() == null ? null : FileUtils.getRelativeDataPath(mutant.getClassFile()).toString();
         int gameId = mutant.getGameId();
         int classId = mutant.getClassId();
         int roundCreated = mutant.getRoundCreated();

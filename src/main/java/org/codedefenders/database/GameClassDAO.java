@@ -281,10 +281,8 @@ public class GameClassDAO {
     public static int storeClass(GameClass cut) throws UncheckedSQLException {
         String name = cut.getName();
         String alias = cut.getAlias();
-        String javaFile = DatabaseAccess.addSlashes(cut.getJavaFile());
-        String classFile = DatabaseAccess.addSlashes(cut.getClassFile());
-        String relativeJavaFile = FileUtils.getRelativeDataPath(javaFile).toString();
-        String relativeClassFile = FileUtils.getRelativeDataPath(classFile).toString();
+        String relativeJavaFile = FileUtils.getRelativeDataPath(cut.getJavaFile()).toString();
+        String relativeClassFile = FileUtils.getRelativeDataPath(cut.getClassFile()).toString();
         boolean isMockingEnabled = cut.isMockingEnabled();
         boolean isPuzzleClass = cut.isPuzzleClass();
         boolean isActive = cut.isActive();

@@ -57,13 +57,6 @@ public class DatabaseAccess {
         return s;
     }
 
-    static String addSlashes(String s) {
-        if (s == null) {
-            return null;
-        }
-        return s.replaceAll("\\\\", "\\\\\\\\");
-    }
-
     public static List<Event> getEventsForGame(int gameId) {
         String query = String.join("\n",
                 "SELECT *",

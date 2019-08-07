@@ -219,10 +219,8 @@ public class TestDAO {
      * @throws UncheckedSQLException If storing the test was not successful.
      */
     public static int storeTest(Test test) throws UncheckedSQLException {
-        String javaFile = DatabaseAccess.addSlashes(test.getJavaFile());
-        String classFile = DatabaseAccess.addSlashes(test.getClassFile());
-        String relativeJavaFile = FileUtils.getRelativeDataPath(javaFile).toString();
-        String relativeClassFile = classFile == null ? null : FileUtils.getRelativeDataPath(classFile).toString();
+        String relativeJavaFile = FileUtils.getRelativeDataPath(test.getJavaFile()).toString();
+        String relativeClassFile = test.getClassFile() == null ? null : FileUtils.getRelativeDataPath(test.getClassFile()).toString();
         int gameId = test.getGameId();
         int roundCreated = test.getRoundCreated();
         int mutantsKilled = test.getMutantsKilled();
