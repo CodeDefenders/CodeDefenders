@@ -20,11 +20,8 @@ package org.codedefenders.game;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.Range;
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.UncheckedSQLException;
-import org.codedefenders.game.duel.DuelGame;
-import org.codedefenders.game.singleplayer.NoDummyGameException;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.analysis.ClassCodeAnalyser;
@@ -339,14 +336,6 @@ public class GameClass {
         }
         logger.warn("Test template for {} does not contain valid test method.", name);
         return -1;
-    }
-
-    public DuelGame getDummyGame() throws NoDummyGameException {
-        DuelGame dg = DatabaseAccess.getAiDummyGameForClass(this.getId());
-        if (dg == null) {
-            throw new NoDummyGameException("No dummy game found.");
-        }
-        return dg;
     }
 
     /**

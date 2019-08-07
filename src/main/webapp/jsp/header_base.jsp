@@ -183,7 +183,6 @@
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
-<%@ page import="org.codedefenders.game.duel.DuelGame" %>
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.Role" %>

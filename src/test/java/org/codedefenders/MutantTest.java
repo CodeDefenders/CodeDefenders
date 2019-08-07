@@ -20,13 +20,12 @@ package org.codedefenders;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
-import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
-import org.codedefenders.game.duel.DuelGame;
-import org.junit.Before;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -51,7 +50,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({GameDAO.class, DuelGameDAO.class, GameClassDAO.class})
+@PrepareForTest({GameDAO.class, GameClassDAO.class, MultiplayerGame.class})
 public class MutantTest {
 
     @Rule
@@ -125,19 +124,19 @@ public class MutantTest {
         FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
         GameClass mockedGameClass = mock(GameClass.class);
-        DuelGame mockedDualGame = mock(DuelGame.class);
+        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
         int mockedClassID = 1;
         int mockedGameID = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
         when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+        when(mockedGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedGame.getId()).thenReturn(mockedGameID);
 
-        PowerMockito.mockStatic(DuelGameDAO.class);
-        when(DuelGameDAO.getDuelGameForId(mockedGameID)).thenReturn(mockedDualGame);
-        when(mockedDualGame.getClassId()).thenReturn(1);
+        PowerMockito.mockStatic(MultiplayerGameDAO.class);
+        when(MultiplayerGameDAO.getMultiplayerGame(mockedGameID)).thenReturn(mockedGame);
+        when(mockedGame.getClassId()).thenReturn(1);
         PowerMockito.mockStatic(GameClassDAO.class);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
@@ -192,20 +191,20 @@ public class MutantTest {
         FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
         GameClass mockedGameClass = mock(GameClass.class);
-        DuelGame mockedDualGame = mock(DuelGame.class);
+        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
         int mockedClassID = 1;
         int mockedGameID = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
         when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+        when(mockedGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedGame.getId()).thenReturn(mockedGameID);
 
-        PowerMockito.mockStatic(DuelGameDAO.class);
+        PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
-        when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
-        when(mockedDualGame.getClassId()).thenReturn(1);
+        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
+        when(mockedGame.getClassId()).thenReturn(1);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
         when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
@@ -252,20 +251,20 @@ public class MutantTest {
         FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
         GameClass mockedGameClass = mock(GameClass.class);
-        DuelGame mockedDualGame = mock(DuelGame.class);
+        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
         int mockedClassID = 1;
         int mockedGameID = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
         when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+        when(mockedGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedGame.getId()).thenReturn(mockedGameID);
 
-        PowerMockito.mockStatic(DuelGameDAO.class);
+        PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
-        when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
-        when(mockedDualGame.getClassId()).thenReturn(1);
+        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
+        when(mockedGame.getClassId()).thenReturn(1);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
         when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
@@ -313,20 +312,20 @@ public class MutantTest {
         FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
         GameClass mockedGameClass = mock(GameClass.class);
-        DuelGame mockedDualGame = mock(DuelGame.class);
+        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
         int mockedClassID = 1;
         int mockedGameID = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
         when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+        when(mockedGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedGame.getId()).thenReturn(mockedGameID);
 
-        PowerMockito.mockStatic(DuelGameDAO.class);
+        PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
-        when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
-        when(mockedDualGame.getClassId()).thenReturn(1);
+        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
+        when(mockedGame.getClassId()).thenReturn(1);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
         when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
@@ -376,19 +375,19 @@ public class MutantTest {
         FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
         GameClass mockedGameClass = mock(GameClass.class);
-        DuelGame mockedDualGame = mock(DuelGame.class);
+        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
         int mockedClassID = 1;
         int mockedGameID = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
         when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+        when(mockedGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedGame.getId()).thenReturn(mockedGameID);
 
-        PowerMockito.mockStatic(DuelGameDAO.class);
+        PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
-        when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
+        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
         when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
@@ -408,8 +407,8 @@ public class MutantTest {
 
     @Test
     public void testGetLinesForInsertionMutantOnDisjointLines() throws IOException {
-//		int classId = DuelGameDAO.getDuelGameForId(gameId).getClassId();
-//		GameClass sut = DuelGameDAO.getClassForId(classId);
+//		int classId = MultiplayerGameDAO.getMultiplayerGame(gameId).getClassId();
+//		GameClass sut = MultiplayerGameDAO.getClassForId(classId);
 
         // Mock the class provide a temmp sourceFile with original content in it
         String originalCode = "public class Lift {" + "\n"
@@ -453,20 +452,20 @@ public class MutantTest {
         FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
         GameClass mockedGameClass = mock(GameClass.class);
-        DuelGame mockedDualGame = mock(DuelGame.class);
+        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
         int mockedClassID = 1;
         int mockedGameID = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
         when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+        when(mockedGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedGame.getId()).thenReturn(mockedGameID);
 
-        PowerMockito.mockStatic(DuelGameDAO.class);
+        PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
-        when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
-        when(mockedDualGame.getClassId()).thenReturn(1);
+        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
+        when(mockedGame.getClassId()).thenReturn(1);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
         when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
@@ -521,20 +520,20 @@ public class MutantTest {
         FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
         GameClass mockedGameClass = mock(GameClass.class);
-        DuelGame mockedDualGame = mock(DuelGame.class);
+        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
         int mockedClassID = 1;
         int mockedGameID = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
         when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+        when(mockedGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedGame.getId()).thenReturn(mockedGameID);
 
-        PowerMockito.mockStatic(DuelGameDAO.class);
+        PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
-        when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
-        when(mockedDualGame.getClassId()).thenReturn(1);
+        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
+        when(mockedGame.getClassId()).thenReturn(1);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
         when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);
@@ -586,20 +585,20 @@ public class MutantTest {
         FileUtils.writeStringToFile(mutantJavaFile, mutantCode);
 
         GameClass mockedGameClass = mock(GameClass.class);
-        DuelGame mockedDualGame = mock(DuelGame.class);
+        MultiplayerGame mockedGame = mock(MultiplayerGame.class);
 
         int mockedClassID = 1;
         int mockedGameID = 1;
 
         when(mockedGameClass.getJavaFile()).thenReturn(cutJavaFile.getPath());
         when(mockedGameClass.getId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getClassId()).thenReturn(mockedClassID);
-        when(mockedDualGame.getId()).thenReturn(mockedGameID);
+        when(mockedGame.getClassId()).thenReturn(mockedClassID);
+        when(mockedGame.getId()).thenReturn(mockedGameID);
 
-        PowerMockito.mockStatic(DuelGameDAO.class);
+        PowerMockito.mockStatic(MultiplayerGameDAO.class);
         PowerMockito.mockStatic(GameClassDAO.class);
-        when(DuelGameDAO.getDuelGameForId(1)).thenReturn(mockedDualGame);
-        when(mockedDualGame.getClassId()).thenReturn(1);
+        when(MultiplayerGameDAO.getMultiplayerGame(1)).thenReturn(mockedGame);
+        when(mockedGame.getClassId()).thenReturn(1);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
         PowerMockito.mockStatic(GameDAO.class);
         when(GameDAO.getCurrentRound(mockedGameID)).thenReturn(2);

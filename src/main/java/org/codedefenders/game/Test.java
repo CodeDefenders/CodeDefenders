@@ -21,7 +21,6 @@ package org.codedefenders.game;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.*;
-import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
@@ -174,13 +173,8 @@ public class Test {
     }
 
     public int getDefenderPoints() {
-        // FIXME: Why will only work for Duel Games since multiplayer games have multiple defenders
-        final DuelGame game = DuelGameDAO.getDuelGameForId(this.gameId);
-        if (game != null && playerId == game.getDefenderId()) {
-            return mutantsKilled;
-        } else {
-            return 0;
-        }
+        // TODO Phil 01/08/19:
+        return 0;
     }
 
     public String getDirectory() {

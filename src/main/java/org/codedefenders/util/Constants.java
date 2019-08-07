@@ -82,9 +82,8 @@ public class Constants {
     public static final String CUTS_MUTANTS_DIR = "mutants";
     public static final String CUTS_TESTS_DIR = "tests";
 
-    // Puzzle, Duel and Battleground mutant and test folders
+    // Puzzle and Battleground mutant and test folders
     public static final String MODE_PUZZLE_DIR = "puzzle";
-    public static final String MODE_DUEL_DIR = "sp";
     public static final String MODE_BATTLEGROUND_DIR = "mp";
 
     public static final String MUTANTS_DIR = Paths.get(DATA_DIR, "mutants").toString();

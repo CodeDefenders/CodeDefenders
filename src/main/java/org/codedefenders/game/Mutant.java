@@ -22,8 +22,13 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.codedefenders.database.*;
-import org.codedefenders.game.duel.DuelGame;
+import org.codedefenders.database.DB;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.DatabaseValue;
+import org.codedefenders.database.GameClassDAO;
+import org.codedefenders.database.GameDAO;
+import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.validation.code.CodeValidator;
@@ -270,8 +275,8 @@ public class Mutant implements Serializable {
     // TODO Phil 12/12/18: extract database logic to MutantDAO
     public boolean kill(Equivalence equivalent) {
         alive = false;
-        // FIXME: Why will only work for Duel Games since multiplayer games do not have rounds.
-        roundKilled = DuelGameDAO.getDuelGameForId(gameId).getCurrentRound();
+        // TODO Phil 01/08/19: Use to be Duel Game
+        roundKilled = 0;
         setEquivalent(equivalent);
 
         // This should be blocking
@@ -333,10 +338,11 @@ public class Mutant implements Serializable {
             // if mutant is alive, as many points as rounds it has survived
             // TODO: as many points as tests it has survived?
             // FIXME: Why will only work for Duel Games since multiplayer games do not have rounds.
-            DuelGame g = DuelGameDAO.getDuelGameForId(gameId);
-            int points = g.getCurrentRound() - roundCreated; // rounds survived
-            if (g.getState().equals(GameState.FINISHED))
-                points++; // add a point for the last round if the game has finished
+            int points = 0;
+//            DuelGame g = DuelGameDAO.getDuelGameForId(gameId);
+//            int points = g.getCurrentRound() - roundCreated; // rounds survived
+//            if (g.getState().equals(GameState.FINISHED))
+//                points++; // add a point for the last round if the game has finished
             logger.debug("Alive mutant " + getId() + " contributes " + points + " attacker points");
             return points;
         } else {

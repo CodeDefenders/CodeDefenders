@@ -18,7 +18,6 @@
  */
 package org.codedefenders.servlets;
 
-import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
 import org.codedefenders.util.Constants;
@@ -32,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * This {@link HttpServlet} handles to the overview page of {@link DuelGame Duel} and
+ * This {@link HttpServlet} handles to the overview page of
  * {@link MultiplayerGame Battleground} games.
  * <p>
  * {@code GET} requests redirect to a game overview page.

@@ -22,7 +22,13 @@ package org.codedefenders.game;
  * This enumeration represents all possible game modes.
  */
 public enum GameMode {
+    /**
+     * @deprecated
+     */
     SINGLE,
+    /**
+     * @deprecated
+     */
     DUEL,
     /**
      * Also referred as <b>Battleground</b> mode.

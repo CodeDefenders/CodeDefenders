@@ -20,21 +20,18 @@ package org.codedefenders.database;
 
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
-import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.model.Player;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 /**
  * This class handles the common database logic between games types.
  *
  * @see AbstractGame
- * @see DuelGame
  * @see MultiplayerGame
  * @see PuzzleGame
  */

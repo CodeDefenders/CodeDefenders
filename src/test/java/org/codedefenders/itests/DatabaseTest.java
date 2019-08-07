@@ -20,7 +20,6 @@ package org.codedefenders.itests;
 
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
-import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
@@ -37,7 +36,6 @@ import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.game.Role;
-import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -207,9 +205,6 @@ public class DatabaseTest {
 		assumeTrue(user2.insert());
 		assumeTrue(cut1.insert());
 
-		DuelGame dg1 = new DuelGame(cut1.getId(), user1.getId(), 100, Role.DEFENDER, GameLevel.EASY);
-		assumeTrue(dg1.insert());
-
 		MultiplayerGame mg2 = new MultiplayerGame
 				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 2, 4, 4, 0, 0)
                 .state(GameState.ACTIVE)
@@ -246,9 +241,6 @@ public class DatabaseTest {
 				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
 				.chatEnabled(true)
 				.build();
-		assertEquals(1, DuelGameDAO.getOpenDuelGames().size());
-
-		assertEquals(1, DuelGameDAO.getDuelGamesForUser(user1.getId()).size());
 		assertEquals(1, MultiplayerGameDAO.getMultiplayerGamesForUser(user2.getId()).size());
 		assertEquals(2, MultiplayerGameDAO.getMultiplayerGamesForUser(user1.getId()).size());
 		assertEquals(2, MultiplayerGameDAO.getJoinedMultiplayerGamesForUser(user1.getId()).size());
