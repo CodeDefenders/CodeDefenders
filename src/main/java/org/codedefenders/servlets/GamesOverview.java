@@ -32,6 +32,7 @@ import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -48,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
  * @see PuzzleOverview
  * @see org.codedefenders.util.Paths#GAMES_OVERVIEW
  */
+@WebServlet("/games/overview")
 public class GamesOverview extends HttpServlet {
 
     @Override

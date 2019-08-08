@@ -45,6 +45,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -89,6 +90,7 @@ import org.slf4j.LoggerFactory;
  * @see PuzzleGame
  * @see org.codedefenders.util.Paths#PUZZLE_GAME
  */
+@WebServlet("/puzzlegame")
 public class PuzzleGameManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(PuzzleGameManager.class);
 

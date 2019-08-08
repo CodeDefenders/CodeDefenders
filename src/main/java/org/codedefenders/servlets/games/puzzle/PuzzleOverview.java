@@ -38,6 +38,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -54,6 +55,7 @@ import javax.servlet.http.HttpServletResponse;
  * @see PuzzleGame
  * @see org.codedefenders.util.Paths#PUZZLE_OVERVIEW
  */
+@WebServlet("/puzzles")
 public class PuzzleOverview extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(PuzzleOverview.class);
 

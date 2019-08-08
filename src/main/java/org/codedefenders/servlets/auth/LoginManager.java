@@ -41,6 +41,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,6 +50,7 @@ import javax.servlet.http.HttpSession;
 import static org.codedefenders.servlets.admin.AdminUserManagement.DIGITS;
 import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
 
+@WebServlet("/login")
 public class LoginManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginManager.class);

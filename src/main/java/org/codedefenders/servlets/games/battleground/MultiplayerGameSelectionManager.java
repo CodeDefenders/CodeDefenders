@@ -67,6 +67,7 @@ import java.util.Set;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -97,6 +98,7 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
  *
  * @see org.codedefenders.util.Paths#BATTLEGROUND_SELECTION
  */
+@WebServlet("/multiplayer/games")
 public class MultiplayerGameSelectionManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameSelectionManager.class);
 

@@ -37,11 +37,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
  // TODO Phil 02/01/19: this seems to be never used so we may remove it?
+@WebServlet("/api/game_mutants")
 public class MutantManager extends HttpServlet {
 
     private static final Logger logger =

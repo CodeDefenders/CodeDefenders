@@ -21,6 +21,7 @@ package org.codedefenders.servlets.auth;
 import java.io.IOException;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Created by thoma on 11/07/2016.
  */
+@WebServlet("/logout")
 public class LogoutManager extends HttpServlet {
 
     private static final long serialVersionUID = -4985646814054170059L;

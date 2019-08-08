@@ -33,6 +33,7 @@ import java.io.PrintWriter;
 import java.sql.Timestamp;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
  * Serves on path: {@code /api/messages}.
  * @see org.codedefenders.util.Paths#API_MESSAGES
  */
+@WebServlet("/api/messages")
 public class MessageManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(MessageManager.class);

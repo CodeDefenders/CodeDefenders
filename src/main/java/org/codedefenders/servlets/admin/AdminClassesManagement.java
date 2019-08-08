@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,6 +44,7 @@ import javax.servlet.http.HttpSession;
  * Serves on path: {@code /admin/classes}.
  * @see Paths#ADMIN_CLASSES
  */
+@WebServlet("/admin/classes")
 public class AdminClassesManagement extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminClassesManagement.class);
 

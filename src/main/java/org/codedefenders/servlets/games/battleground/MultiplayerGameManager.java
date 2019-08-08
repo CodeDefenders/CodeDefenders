@@ -73,6 +73,7 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -106,6 +107,7 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
  *
  * @see org.codedefenders.util.Paths#BATTLEGROUND_GAME
  */
+@WebServlet("/multiplayergame")
 public class MultiplayerGameManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameManager.class);
