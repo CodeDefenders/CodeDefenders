@@ -39,7 +39,7 @@
 					</a>
 					Gordon Fraser, Alessio Gambi, Marvin Kreis and Jos&eacute; Miguel Rojas.
 					<span class="paper_title">&#8220;Gamifying a Software Testing Course with Code Defenders,&#8221;</span>
-					In <span class="paper_venue">Proc. of the ACM Technical Symposium on Computer Science Education (SIGCSE)</span>, ACM, 2017.
+					In <span class="paper_venue">Proc. of the ACM Technical Symposium on Computer Science Education (SIGCSE)</span>, ACM, 2019.
 					<a href="javascript:void(0)" onclick="javascript:toggleBibtex(document.getElementById('sigcse19_bibtex'));">[Bibtex]</a>
 					<div id="sigcse19_bibtex" class="bibtex_hide" >
 	<pre class="tex"><code>@inproceedings{ICSE_SEET2017_CodeDefenders,
