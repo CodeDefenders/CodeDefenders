@@ -23,13 +23,13 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DependencyDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UncheckedSQLException;
-import org.codedefenders.execution.AntRunner;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.CompileException;
 import org.codedefenders.execution.Compiler;
@@ -41,6 +41,7 @@ import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.model.Dependency;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
@@ -72,8 +73,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import static org.codedefenders.util.Constants.CUTS_DIR;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.servlets.util.ServletUtils.userId;
 import static org.codedefenders.util.Constants.CUTS_DEPENDENCY_DIR;
+import static org.codedefenders.util.Constants.CUTS_DIR;
 import static org.codedefenders.util.Constants.CUTS_MUTANTS_DIR;
 import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
 
@@ -95,13 +98,29 @@ public class ClassUploadManager extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.CLASS_UPLOAD_VIEW_JSP);
-        dispatcher.forward(request, response);
+        final boolean classUploadEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue();
+        if (classUploadEnabled) {
+            RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.CLASS_UPLOAD_VIEW_JSP);
+            dispatcher.forward(request, response);
+        } else {
+            HttpSession session = request.getSession();
+            ArrayList<String> messages = new ArrayList<>();
+            session.setAttribute("messages", messages);
+            messages.add("Class upload is disabled.");
+            response.sendRedirect(ctx(request) + org.codedefenders.util.Paths.GAMES_OVERVIEW);
+        }
     }
 
     @SuppressWarnings("Duplicates")
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        final boolean classUploadEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue();
+        if (!classUploadEnabled) {
+            final int userId = userId(request);
+            logger.warn("User {} tried to upload a class, but class upload is disabled.", userId);
+            return;
+        }
+
         HttpSession session = request.getSession();
         ArrayList<String> messages = new ArrayList<>();
         session.setAttribute("messages", messages);
@@ -472,14 +491,6 @@ public class ClassUploadManager extends HttpServlet {
         }
 
         Redirect.redirectBack(request, response);
-
-        // TODO Phil: Will this be used in the future? Looks like legacy code.
-//            if (shouldPrepareAI) {
-//                if (!PrepareAI.createTestsAndMutants()) {
-//                    logger.error("Preparation of AI for class failed, please prepare the class again, or try a different class.");
-//                    messages.add("Preparation of AI for class failed, please prepare the class again, or try a different class.");
-//                }
-//            }
     }
 
     /**
