@@ -83,7 +83,7 @@ import difflib.DiffUtils;
 public class CodeValidator {
     private static Logger logger = LoggerFactory.getLogger(CodeValidator.class);
 
-    //Default number of max. allowed assertions for battleground games, also value used for duel games
+    //Default number of max. allowed assertions for battleground games
     public static final int DEFAULT_NB_ASSERTIONS = 2;
 
     //TODO check if removing ";" makes people take advantage of using multiple statements
@@ -259,7 +259,7 @@ public class CodeValidator {
      * @return
      */
     private static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
-        Map<String, EnumSet> originalTypes = new HashMap();
+        Map<String, EnumSet> originalTypes = new HashMap<>();
         for(TypeDeclaration type : originalCU.getTypes()){
             originalTypes.putAll(extractTypeDeclaration(type));
         }

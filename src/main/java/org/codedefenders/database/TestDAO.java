@@ -26,14 +26,12 @@ import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
@@ -221,10 +219,8 @@ public class TestDAO {
      * @throws UncheckedSQLException If storing the test was not successful.
      */
     public static int storeTest(Test test) throws UncheckedSQLException {
-        String javaFile = DatabaseAccess.addSlashes(test.getJavaFile());
-        String classFile = DatabaseAccess.addSlashes(test.getClassFile());
-        String relativeJavaFile = FileUtils.getRelativeDataPath(javaFile).toString();
-        String relativeClassFile = classFile == null ? null : FileUtils.getRelativeDataPath(classFile).toString();
+        String relativeJavaFile = FileUtils.getRelativeDataPath(test.getJavaFile()).toString();
+        String relativeClassFile = test.getClassFile() == null ? null : FileUtils.getRelativeDataPath(test.getClassFile()).toString();
         int gameId = test.getGameId();
         int roundCreated = test.getRoundCreated();
         int mutantsKilled = test.getMutantsKilled();
@@ -261,6 +257,41 @@ public class TestDAO {
         } else {
             throw new UncheckedSQLException("Could not store test to database.");
         }
+    }
+
+    /**
+     * Updates a given {@link Test} in the database and returns whether
+     * updating was successful or not.
+     *
+     * @param test the given test as a {@link Test}.
+     * @return whether updating was successful or not
+     * @throws UncheckedSQLException If storing the test was not successful.
+     */
+    public static boolean updateTest(Test test) throws UncheckedSQLException {
+        final int testId = test.getId();
+        final int mutantsKilled = test.getMutantsKilled();
+        final int score = test.getScore();
+
+        String linesCoveredString = "";
+        String linesUncoveredString= "";
+
+        LineCoverage lineCoverage = test.getLineCoverage();
+        if (lineCoverage != null) {
+            linesCoveredString = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
+            linesUncoveredString = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
+        }
+
+
+        String query = "UPDATE tests SET mutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
+        DatabaseValue[] values = new DatabaseValue[]{
+            DatabaseValue.of(mutantsKilled),
+            DatabaseValue.of(linesCoveredString),
+            DatabaseValue.of(linesUncoveredString),
+            DatabaseValue.of(score),
+            DatabaseValue.of(testId)
+        };
+
+        return DB.executeUpdateQuery(query, values);
     }
 
     /**
@@ -330,17 +361,5 @@ public class TestDAO {
         DatabaseValue[] values = tests.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);
 
         return DB.executeUpdateQuery(query, values);
-    }
-
-    /**
-     * Returns the number of killed AI mutants for a given test.
-     *
-     * @param testId the identifier of the test.
-     * @return number of killed AI mutants, or {@code 0} if none found.
-     */
-    public static int getNumAiMutantsKilledByTest(int testId) {
-        String query = "SELECT * FROM tests WHERE Test_ID=?;";
-        final Integer kills = DB.executeQueryReturnValue(query, rs -> rs.getInt("NumberAiMutantsKilled"), DatabaseValue.of(testId));
-        return Optional.ofNullable(kills).orElse(0);
     }
 }

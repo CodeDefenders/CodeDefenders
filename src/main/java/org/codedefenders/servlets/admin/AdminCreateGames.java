@@ -20,9 +20,9 @@ package org.codedefenders.servlets.admin;
 
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.game.GameLevel;
@@ -35,17 +35,12 @@ import org.codedefenders.game.multiplayer.PlayerScore;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.util.Constants;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.codedefenders.servlets.util.ServletUtils.parameterThenOrOther;
-import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
-import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -62,6 +57,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
+import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
 public class AdminCreateGames extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminCreateGames.class);
@@ -381,19 +379,8 @@ public class AdminCreateGames extends HttpServlet {
         multiplayerGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
 
         // Retrieve the playerId for system users
-        int dummyAttackerPlayerId = -1;
-        int dummyDefenderPlayerId = -1;
-
-        for (Player player : GameDAO.getAllPlayersForGame(multiplayerGame.getId())) {
-            if (player.getUser().getId() == DUMMY_ATTACKER_USER_ID) {
-                dummyAttackerPlayerId = player.getId();
-            } else if (player.getUser().getId() == DUMMY_DEFENDER_USER_ID) {
-                dummyDefenderPlayerId = player.getId();
-            }
-        }
-
-        assert dummyAttackerPlayerId != -1;
-        assert dummyDefenderPlayerId != -1;
+        int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, multiplayerGame.getId());
+        int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, multiplayerGame.getId());
 
         // this mutant map links the uploaded mutants and the once generated from them here
         // This implements bookkeeping for killmap

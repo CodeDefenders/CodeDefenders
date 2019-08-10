@@ -20,12 +20,12 @@ package org.codedefenders.itests;
 
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseConnection;
-import org.codedefenders.database.DuelGameDAO;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.MutantDAO;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.UserDAO;
@@ -37,7 +37,6 @@ import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Mutant.Equivalence;
 import org.codedefenders.game.Role;
-import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -207,9 +206,6 @@ public class DatabaseTest {
 		assumeTrue(user2.insert());
 		assumeTrue(cut1.insert());
 
-		DuelGame dg1 = new DuelGame(cut1.getId(), user1.getId(), 100, Role.DEFENDER, GameLevel.EASY);
-		assumeTrue(dg1.insert());
-
 		MultiplayerGame mg2 = new MultiplayerGame
 				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 2, 4, 4, 0, 0)
                 .state(GameState.ACTIVE)
@@ -246,9 +242,6 @@ public class DatabaseTest {
 				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
 				.chatEnabled(true)
 				.build();
-		assertEquals(1, DuelGameDAO.getOpenDuelGames().size());
-
-		assertEquals(1, DuelGameDAO.getDuelGamesForUser(user1.getId()).size());
 		assertEquals(1, MultiplayerGameDAO.getMultiplayerGamesForUser(user2.getId()).size());
 		assertEquals(2, MultiplayerGameDAO.getMultiplayerGamesForUser(user1.getId()).size());
 		assertEquals(2, MultiplayerGameDAO.getJoinedMultiplayerGamesForUser(user1.getId()).size());
@@ -273,7 +266,7 @@ public class DatabaseTest {
 
 		assertTrue(multiplayerGame.insert());
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
-		int playerID = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		int playerID = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
 		assertTrue(playerID > 0);
 		assertEquals(UserDAO.getUserForPlayer(playerID).getId(), user1.getId());
 		assertTrue(GameDAO.getPlayersForGame(multiplayerGame.getId(), Role.DEFENDER).size() > 0);
@@ -299,7 +292,7 @@ public class DatabaseTest {
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
 		int gid = multiplayerGame.getId();
-		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), gid);
+		int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), gid);
 		int cutID = cut2.getId();
 		mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
@@ -328,7 +321,7 @@ public class DatabaseTest {
 		assertTrue(multiplayerGame.insert());
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
-		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
 		int cutID = cut2.getId();
         Mutant mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
@@ -368,7 +361,7 @@ public class DatabaseTest {
 		assertTrue(multiplayerGame.insert());
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
-		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
 		int cutID = cut2.getId();
         Mutant mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
 				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
@@ -400,7 +393,7 @@ public class DatabaseTest {
 		assertTrue(multiplayerGame.insert());
 		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
 
-		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
 		test = new org.codedefenders.game.Test(99, cut1.getId(), multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10, pid);
 		test.setPlayerId(pid);
 
@@ -414,12 +407,10 @@ public class DatabaseTest {
 		LineCoverage lc = new LineCoverage();
 		test.setLineCoverage(lc);
 		test.setScore(17);
-		test.setAiMutantsKilled(23);
 		assertTrue(test.update());
 
 		testFromDB = TestDAO.getTestById(test.getId());
 		assertEquals(testFromDB.getScore(), test.getScore());
-		assertEquals(testFromDB.getAiMutantsKilled(), test.getAiMutantsKilled());
 		assertEquals(testFromDB.getLineCoverage().getLinesCovered(), test.getLineCoverage().getLinesCovered());
 		assertEquals(testFromDB.getLineCoverage().getLinesUncovered(), test.getLineCoverage().getLinesUncovered());
 	}
@@ -433,7 +424,7 @@ public class DatabaseTest {
 		assumeTrue(user2.insert());
 		assumeTrue(multiplayerGame.addPlayer(user2.getId(), Role.DEFENDER));
 
-		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user2.getId(), multiplayerGame.getId());
+		int pid = PlayerDAO.getPlayerIdForUserAndGame(user2.getId(), multiplayerGame.getId());
 		assertTrue(DatabaseAccess.insertEquivalence(mutant1, pid));
 		assertEquals(DatabaseAccess.getEquivalentDefenderId(mutant1), pid);
 	}
@@ -454,7 +445,7 @@ public class DatabaseTest {
 		assertTrue(multiplayerGame.addPlayer(user2.getId(), Role.ATTACKER));
 
 		//
-		int pidDefender = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		int pidDefender = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
 		test = new org.codedefenders.game.Test(99, cut1.getId(), multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10,
 				pidDefender);
 		test.setPlayerId(pidDefender);
@@ -462,11 +453,10 @@ public class DatabaseTest {
 		LineCoverage lc = new LineCoverage();
 		test.setLineCoverage(lc);
 		test.setScore(17);
-		test.setAiMutantsKilled(23);
 		assumeTrue(test.update());
 
 		//
-		int pidAttacker = DatabaseAccess.getPlayerIdForMultiplayerGame(user1.getId(), multiplayerGame.getId());
+		int pidAttacker = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
 		int cutID = cut1.getId();
 
         Mutant mutant1 = new Mutant(999,  cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
@@ -490,7 +480,7 @@ public class DatabaseTest {
 												// events does not have foreign
 												// keys
 		testInsertPlayer();
-		int pid = DatabaseAccess.getPlayerIdForMultiplayerGame(user2.getId(), multiplayerGame.getId());
+		int pid = PlayerDAO.getPlayerIdForUserAndGame(user2.getId(), multiplayerGame.getId());
 		Timestamp ts = Timestamp.valueOf("1995-03-27 12:08:00");
 		Event ev = new Event(1, multiplayerGame.getId(), pid, "message", EventType.ATTACKER_MESSAGE, EventStatus.GAME,
 				ts);

@@ -82,9 +82,8 @@ public class Constants {
     public static final String CUTS_MUTANTS_DIR = "mutants";
     public static final String CUTS_TESTS_DIR = "tests";
 
-    // Puzzle, Duel and Battleground mutant and test folders
+    // Puzzle and Battleground mutant and test folders
     public static final String MODE_PUZZLE_DIR = "puzzle";
-    public static final String MODE_DUEL_DIR = "sp";
     public static final String MODE_BATTLEGROUND_DIR = "mp";
 
     public static final String MUTANTS_DIR = Paths.get(DATA_DIR, "mutants").toString();
@@ -110,10 +109,6 @@ public class Constants {
     public static final String UTESTING_VIEW_JSP = Paths.get("jsp", "utesting_view.jsp").toString();
 
     public static final String USER_PROFILE_JSP = Paths.get("jsp", "user_profile.jsp").toString();;
-
-    public static final String DUEL_RESOLVE_EQUIVALENCE_JSP = "jsp/duel/equivalence_view.jsp";
-    public static final String DUEL_ATTACKER_VIEW_JSP = "jsp/duel/attacker_view.jsp";
-    public static final String DUEL_DEFENDER_VIEW_JSP = "jsp/duel/defender_view.jsp";
 
     public static final String BATTLEGROUND_GAME_VIEW_JSP = "/jsp/battleground/game_view.jsp";
 

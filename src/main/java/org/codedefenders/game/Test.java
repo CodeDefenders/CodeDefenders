@@ -21,7 +21,6 @@ package org.codedefenders.game;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.*;
-import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
@@ -38,7 +37,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -63,7 +61,6 @@ public class Test {
     private int roundCreated;
     private int mutantsKilled;
     private int score;
-    private int aiMutantsKilled; // how many generated mutants this test killed.
     private LineCoverage lineCoverage;
 
     /**
@@ -173,16 +170,6 @@ public class Test {
         return roundCreated;
     }
 
-    public int getDefenderPoints() {
-        // FIXME: Why will only work for Duel Games since multiplayer games have multiple defenders
-        final DuelGame game = DuelGameDAO.getDuelGameForId(this.gameId);
-        if (game != null && playerId == game.getDefenderId()) {
-            return mutantsKilled;
-        } else {
-            return 0;
-        }
-    }
-
     public String getDirectory() {
         File file = new File(javaFile);
         return file.getAbsoluteFile().getParent();
@@ -193,6 +180,7 @@ public class Test {
     //
     // TODO Check that this method is never called for tests that kill a mutant that was already dead...
     public void killMutant() {
+        // TODO Phil 06/08/19: Why isn't the out-commented code called?
         // mutantsKilled++;
         // update();
         logger.info("Test {} killed a new mutant", getId());
@@ -252,30 +240,13 @@ public class Test {
         }
     }
 
-    @Deprecated
     public boolean update() {
-        logger.debug("Updating Test");
-        Connection conn = DB.getConnection();
-
-        String linesCoveredString = "";
-        String linesUncoveredString= "";
-
-        if (lineCoverage != null) {
-            linesCoveredString = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
-            linesUncoveredString = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
+        try {
+            return TestDAO.updateTest(this);
+        } catch (UncheckedSQLException e) {
+            logger.error("Failed to store test to database.", e);
+            return false;
         }
-
-        String query = "UPDATE tests SET mutantsKilled=?,NumberAiMutantsKilled=?,Lines_Covered=?,Lines_Uncovered=?,Points=? WHERE Test_ID=?;";
-        DatabaseValue[] valueList = new DatabaseValue[]{DatabaseValue.of(mutantsKilled),
-                DatabaseValue.of(aiMutantsKilled),
-                DatabaseValue.of(linesCoveredString),
-                DatabaseValue.of(linesUncoveredString),
-                DatabaseValue.of(score),
-                DatabaseValue.of(id)
-        };
-
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
-        return DB.executeUpdate(stmt, conn);
     }
 
     public String getFullyQualifiedClassName() {
@@ -294,18 +265,6 @@ public class Test {
 
     public boolean isValid() {
         return classFile != null;
-    }
-
-    public int getAiMutantsKilled() {
-        if (aiMutantsKilled == 0) {
-            //Retrieve from DB.
-            aiMutantsKilled = TestDAO.getNumAiMutantsKilledByTest(getId());
-        }
-        return aiMutantsKilled;
-    }
-
-    public void incrementAiMutantsKilled() {
-        aiMutantsKilled++;
     }
 
     public String getJavaFile() {
@@ -328,7 +287,6 @@ public class Test {
         playerId = id;
     }
 
-
     public int getPlayerId() {
         return playerId;
     }
@@ -341,12 +299,6 @@ public class Test {
         return classId;
     }
 
-    @Deprecated
-    public void setAiMutantsKilled(int count) {
-        aiMutantsKilled = count;
-    }
-
-    @Deprecated
     public void setLineCoverage(LineCoverage lineCoverage) {
         this.lineCoverage = lineCoverage;
     }

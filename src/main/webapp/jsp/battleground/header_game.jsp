@@ -24,7 +24,6 @@
 <%@ page import="java.util.*" %>
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.game.Mutant" %>
-<%@ page import="org.codedefenders.game.duel.DuelGame" %>
 <%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.GameClass" %>

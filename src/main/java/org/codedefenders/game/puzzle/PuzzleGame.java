@@ -18,10 +18,10 @@
  */
 package org.codedefenders.game.puzzle;
 
-import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.game.AbstractGame;
@@ -122,8 +122,8 @@ public class PuzzleGame extends AbstractGame {
             logger.error(errorMsg + " Could not add dummy defender to game.");
             return null;
         }
-        int dummyAttackerId = DatabaseAccess.getPlayerIdForMultiplayerGame(DUMMY_ATTACKER_USER_ID, game.id);
-        int dummyDefenderId = DatabaseAccess.getPlayerIdForMultiplayerGame(DUMMY_DEFENDER_USER_ID, game.id);
+        int dummyAttackerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.id);
+        int dummyDefenderId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.id);
 
         /* Add the tests from the puzzle. */
         for (Test test : mappedTests) {

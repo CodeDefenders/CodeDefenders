@@ -18,71 +18,13 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
-<%@ page import="org.codedefenders.game.Role" %>
-<%@ page import="org.codedefenders.game.duel.DuelGame" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
-<%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.database.UserDAO" %>
 <%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <% String pageTitle="Game History"; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div>
-<h3>Duels</h3>
-<table class="table table-striped table-hover table-responsive table-paragraphs games-table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Class</th>
-            <th>Attacker</th>
-            <th>Defender</th>
-            <th>Level</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-
-        <%
-            String atkName;
-            String defName;
-            int uid = (Integer)request.getSession().getAttribute("uid");
-            int atkId;
-            int defId;
-            List<DuelGame> games = DatabaseAccess.getHistoryForUser(uid);
-
-            if (!games.isEmpty()) {
-                for (DuelGame g : games) {
-                    atkId = g.getAttackerId();
-                    defId = g.getDefenderId();
-                    User attacker = UserDAO.getUserById(atkId);
-                    User defender = UserDAO.getUserById(defId);
-                    atkName = attacker == null ? "-" : attacker.getUsername();
-                    defName = defender == null ? "-" : defender.getUsername();
-        %>
-
-        <tr id="<%="game_"+g.getId()%>">
-            <td class="col-sm-2"><%= g.getId() %></td>
-            <td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
-            <td class="col-sm-2"><%= atkName %></td>
-            <td class="col-sm-2"><%= defName %></td>
-            <td class="col-sm-2"><%= g.getLevel().name() %></td>
-            <td class="col-sm-2">
-                <a class="btn btn-sm btn-default" id="<%="results_"+g.getId()%>" href="<%=request.getContextPath() + Paths.DUEL_GAME%>?gameId=<%= g.getId() %>">View Scores</a>
-            </td>
-        </tr>
-
-        <%
-                }
-            } else {
-        %>
-
-        <tr><td colspan="100%"> Empty duels history. </td></tr>
-
-        <%  } %>
-
-    </tbody>
-</table>
 
 <h3>Battlegrounds</h3>
 <table class="table table-striped table-hover table-responsive table-paragraphs games-table">
@@ -100,7 +42,8 @@
     <tbody>
 
         <%
-            List<MultiplayerGame> mgames = MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(uid);
+            int userId = (Integer)request.getSession().getAttribute("uid");
+            List<MultiplayerGame> mgames = MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(userId);
             if (!mgames.isEmpty()) {
                 for (MultiplayerGame g : mgames) {
         %>
@@ -129,7 +72,6 @@
     </tbody>
 </table>
 
-</div>
 </div>
 
 <%@ include file="/jsp/footer.jsp" %>

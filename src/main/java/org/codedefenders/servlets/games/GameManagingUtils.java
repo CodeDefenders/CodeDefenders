@@ -57,7 +57,6 @@ import static org.codedefenders.util.Constants.TESTS_DIR;
  * games. Since each request handles a different submission this class has the
  * {@link RequestScoped} annotation.
  *
- * @see org.codedefenders.servlets.games.duel.DuelGameManager
  * @see org.codedefenders.servlets.games.battleground.MultiplayerGameManager
  * @see org.codedefenders.servlets.games.puzzle.PuzzleGameManager
  */

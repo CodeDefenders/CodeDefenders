@@ -102,7 +102,7 @@ public final class ServletUtils {
     /**
      * Extracts the {@code gameId} URL parameter from a given request.
      * <p>
-     * If {@code gameId} is no valid integer value, the method returns {@code null}.
+     * If {@code gameId} is no valid integer value, the method returns {@link Optional#empty()}.
      *
      * @param request the request, which {@code gameId} is extracted from.
      * @return a valid integer extracted from the {@code gameId} parameter of the given request wrapped in an {@link Optional}, or {@link Optional#empty()}.

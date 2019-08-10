@@ -19,10 +19,8 @@
 package org.codedefenders.database;
 
 import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.GameClass;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
-import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.leaderboard.Entry;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
@@ -57,13 +55,6 @@ public class DatabaseAccess {
         s = s.replaceAll("\\\"", "&quot;");
         s = s.replaceAll("\\'", "&apos;");
         return s;
-    }
-
-    static String addSlashes(String s) {
-        if (s == null) {
-            return null;
-        }
-        return s.replaceAll("\\\\", "\\\\\\\\");
     }
 
     public static List<Event> getEventsForGame(int gameId) {
@@ -182,27 +173,6 @@ public class DatabaseAccess {
         return DB.executeQueryReturnList(query, DatabaseAccess::getEvents, values);
     }
 
-    public static void setGameAsAIDummy(int gameId) {
-        String query = "UPDATE games SET IsAIDummyGame = 1 WHERE ID = ?;";
-        DB.executeUpdateQuery(query, DatabaseValue.of(gameId));
-    }
-
-    public static DuelGame getAiDummyGameForClass(int classId) {
-        String query = "SELECT * FROM games WHERE Class_ID=? AND IsAIDummyGame=1";
-        return DB.executeQueryReturnValue(query, DuelGameDAO::duelGameFromRS, DatabaseValue.of(classId));
-    }
-
-    public static boolean isAiPrepared(GameClass c) {
-        String query = "SELECT * FROM classes WHERE AiPrepared = 1 AND Class_ID = ?";
-        Boolean bool = DB.executeQueryReturnValue(query, rs -> true, DatabaseValue.of(c.getId()));
-        return Optional.ofNullable(bool).orElse(false);
-    }
-
-    public static void setAiPrepared(GameClass c) {
-        String query = "UPDATE classes SET AiPrepared = 1 WHERE Class_ID = ?;";
-        DB.executeUpdateQuery(query, DatabaseValue.of(c.getId()));
-    }
-
     private static Event getEvents(ResultSet rs) throws SQLException {
         Event event = new Event(
                 rs.getInt("events.Event_ID"),
@@ -258,49 +228,6 @@ public class DatabaseAccess {
         return Optional.ofNullable(role).orElse(Role.NONE);
     }
 
-    /**
-     * Returns list of <b>finished</b> games for a user, which are not multiplayer games.
-     */
-    public static List<DuelGame> getHistoryForUser(int userId) {
-        String query = String.join("\n",
-                "SELECT g.*,",
-                "  IFNULL(att.User_ID,0) AS Attacker_ID,",
-                "  IFNULL(def.User_ID,0) AS Defender_ID",
-                "FROM games AS g",
-                "LEFT JOIN players AS att",
-                "  ON g.ID=att.Game_ID",
-                "  AND att.Role='ATTACKER'",
-                "LEFT JOIN players AS def",
-                "  ON g.ID=def.Game_ID",
-                "  AND def.Role='DEFENDER'",
-                "WHERE g.Mode != 'PARTY'",
-                "  AND g.State='FINISHED'",
-                "  AND (g.Creator_ID=?",
-                "      OR IFNULL(att.User_ID,0)=?",
-                "      OR IFNULL(def.User_ID,0)=?);");
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(userId),
-                DatabaseValue.of(userId),
-                DatabaseValue.of(userId)
-        };
-        return DB.executeQueryReturnList(query, DuelGameDAO::duelGameFromRS, values);
-    }
-
-    public static DuelGame getActiveUnitTestingSession(int userId) {
-        String query = String.join("\n",
-                "SELECT *",
-                "FROM games",
-                "WHERE Defender_ID=?",
-                "  AND Mode='UTESTING'",
-                "  AND State='ACTIVE';");
-        return DB.executeQueryReturnValue(query, DuelGameDAO::duelGameFromRS, DatabaseValue.of(userId));
-    }
-
-    public static List<Integer> getUsedAiTestsForGame(DuelGame g) {
-        String query = "SELECT * FROM usedaitests WHERE Game_ID=?;";
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("Value"), DatabaseValue.of(g.getId()));
-    }
-
     public static void increasePlayerPoints(int points, int player) {
         String query = "UPDATE players SET Points=Points+? WHERE ID=?";
         DatabaseValue[] values = new DatabaseValue[]{
@@ -333,49 +260,6 @@ public class DatabaseAccess {
                 DatabaseValue.of(mutant.getScore())
         };
         return DB.executeUpdateQuery(query, values);
-    }
-
-    public static boolean setAiTestAsUsed(int testNumber, DuelGame g) {
-        String query = "INSERT INTO usedaitests (Value, Game_ID) VALUES (?, ?);";
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(testNumber),
-                DatabaseValue.of(g.getId())
-        };
-        return DB.executeUpdateQueryGetKeys(query, values) > -1;
-    }
-
-    public static List<Integer> getUsedAiMutantsForGame(DuelGame g) {
-        String query = "SELECT * FROM usedaimutants WHERE Game_ID=?;";
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("Value"), DatabaseValue.of(g.getId()));
-    }
-
-    /**
-     * @param mutantNumber the number of the mutant
-     * @param g            the game the mutant belongs to
-     * @return
-     */
-    public static boolean setAiMutantAsUsed(int mutantNumber, DuelGame g) {
-        String query = "INSERT INTO usedaimutants (Value, Game_ID) VALUES (?, ?);";
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(mutantNumber),
-                DatabaseValue.of(g.getId())
-        };
-        return DB.executeUpdateQueryGetKeys(query, values) > -1;
-    }
-
-    // TODO Phil 27/12/18: this isn't limited to multiplayer games
-    public static int getPlayerIdForMultiplayerGame(int userId, int gameId) {
-        String query = String.join("\n",
-                "SELECT players.ID",
-                "FROM players",
-                "WHERE User_ID = ?",
-                "  AND Game_ID = ?");
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(userId),
-                DatabaseValue.of(gameId)
-        };
-        final Integer id = DB.executeQueryReturnValue(query, rs -> rs.getInt("ID"), values);
-        return Optional.ofNullable(id).orElse(-1);
     }
 
     static Entry entryFromRS(ResultSet rs) throws SQLException {

@@ -22,10 +22,8 @@ import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
-import org.codedefenders.game.duel.DuelGame;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.game.puzzle.PuzzleGame;
-import org.codedefenders.game.singleplayer.SinglePlayerGame;
 import org.codedefenders.model.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,9 +40,7 @@ import static org.codedefenders.game.Mutant.Equivalence.PROVEN_NO;
 /**
  * Abstract class for games of different modes.
  *
- * @see DuelGame
  * @see MultiplayerGame
- * @see SinglePlayerGame
  * @see PuzzleGame
  */
 public abstract class AbstractGame {
