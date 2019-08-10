@@ -27,8 +27,10 @@
 <%@ include file="/jsp/header_main.jsp" %>
 <%
     List<GameClass> gameClasses = GameClassDAO.getAllPlayableClasses();
+    boolean isClassUploadEnabled = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue();
+
     if (gameClasses.isEmpty()) {
-        if (AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.CLASS_UPLOAD).getBoolValue()) {
+        if (isClassUploadEnabled) {
 %>
 <div id="creategame" class="container">
     <p>
@@ -63,9 +65,11 @@
                         <%}%>
                     </select>
                 </td>
-                <td width="17%">
-                    <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="text-center new-account">Upload Class</a>
-                </td>
+                <%if (isClassUploadEnabled) {%>
+                    <td width="17%">
+                        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="text-center new-account">Upload Class</a>
+                    </td>
+                <%}%>
             </tr>
             <!--
             <tr>
