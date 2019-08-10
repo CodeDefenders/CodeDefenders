@@ -1,3 +1,9 @@
+<%@ page import="org.codedefenders.model.KeyMap" %>
+
+<%
+    {
+        KeyMap keymap = ((KeyMap) session.getAttribute("user-keymap"));
+%>
 <div class="btn-toolbar" role="toolbar">
 
     <div class="btn-group" role="group">
@@ -6,21 +12,35 @@
         </div>
     </div>
 
-    <%--
     <div class="btn-group" role="group" aria-label="Second group">
-        <div class="dropdown">
+        <div id="keymap-drowdown" class="dropdown">
             <button class="btn btn-default btn-ssm dropdown-toggle" type="button" id="editorModeMenu" data-toggle="dropdown">
                 <span class="caret"></span>
-                Editor Mode: Normal
+                Editor Mode: <span id="current-keymap" ><%=keymap.getCMName()%></span>
             </button>
             <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="editorModeMenu">
-                <li><a>Normal</a></li>
+                <li><a><%=keymap.getCMName()%></a></li>
                 <li role="separator" class="divider"></li>
-                <li><a>Vim</a></li>
-                <li><a>Emacs</a></li>
+                <%
+                    for (KeyMap km : KeyMap.values()) {
+                        if (km != keymap) {
+                %>
+                        <li>
+                            <a>
+                                <form action="<%=request.getContextPath() + Paths.USER_PROFILE%>" method="post">
+                                    <input type="hidden" class="form-control" name="formType" value="updateKeyMap">
+                                    <input type="hidden" class="form-control" name="editorKeyMap" value="<%=km.name()%>">
+                                    <button style="width: 100%; all: inherit" type="submit"><%=km.getCMName()%></button>
+                                </form>
+                            </a>
+                        </li>
+                <%
+                        }
+                    }
+                %>
             </ul>
         </div>
     </div>
-    --%>
 
 </div>
+<% } %>

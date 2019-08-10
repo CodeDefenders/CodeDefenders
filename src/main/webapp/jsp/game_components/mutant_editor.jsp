@@ -34,6 +34,8 @@
     @param Integer endEditLine
         End of editable lines in the orginial mutant.
         If smaller than one or {@code null}, the code can be modified until the end.
+    @param KeyMap user-keymap (session attribute)
+        The user's preferred key map. Can be {@code null}.
 --%>
 
 <% { %>
@@ -51,6 +53,7 @@
     if (endEditLine != null && (endEditLine < 1 || endEditLine < startEditLine)) {
         endEditLine = null;
     }
+    KeyMap keymap = ((KeyMap) session.getAttribute("user-keymap"));
 %>
 <script>
     let startEditLine = <%=startEditLine%> ;
@@ -160,7 +163,7 @@
             "Ctrl-Space": "autocomplete",
             "Tab": "insertSoftTab"
         },
-        keyMap: "default",
+        keyMap: "<%=keymap.getCMName()%>",
         gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
     });
 
@@ -227,7 +230,7 @@
                         "Ctrl-Space": "autocomplete",
                         "Tab": "insertSoftTab"
                     },
-                    keyMap: "default",
+                    keyMap: "<%=keymap.getCMName()%>",
                     gutters: ['CodeMirror-linenumbers', 'CodeMirror-mutantIcons']
                 });
 

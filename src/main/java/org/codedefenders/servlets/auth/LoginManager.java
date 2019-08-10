@@ -111,6 +111,7 @@ public class LoginManager extends HttpServlet {
                         HttpSession session = request.getSession();
                         session.setAttribute("uid", newUser.getId());
                         session.setAttribute("username", newUser.getUsername());
+                        session.setAttribute("user-keymap", newUser.getKeyMap());
                         session.setAttribute("messages", messages);
                         // Log user activity including the timestamp
                         DatabaseAccess.logSession(newUser.getId(), getClientIpAddress(request));
@@ -144,6 +145,7 @@ public class LoginManager extends HttpServlet {
                                 DatabaseAccess.logSession(activeUser.getId(), getClientIpAddress(request));
                                 session.setAttribute("uid", activeUser.getId());
                                 session.setAttribute("username", activeUser.getUsername());
+                                session.setAttribute("user-keymap", activeUser.getKeyMap());
                                 //
                                 storeApplicationDataInSession(session);
 

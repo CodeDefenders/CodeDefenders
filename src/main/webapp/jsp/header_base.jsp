@@ -84,6 +84,10 @@
     <script src="codemirror/addon/hint/show-hint.js" type="text/javascript" ></script>
     <script src="codemirror/addon/hint/anyword-hint.js" type="text/javascript" ></script>
 
+    <script src="codemirror/keymap/emacs.js" type="text/javascript" ></script>
+    <script src="codemirror/keymap/sublime.js" type="text/javascript" ></script>
+    <script src="codemirror/keymap/vim.js" type="text/javascript" ></script>
+
     <link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" />
     <!-- <link href="codemirror/lib/codemirror.css" rel="stylesheet" type="text/css" > -->
     <link href="codemirror/addon/dialog/dialog.css" rel="stylesheet" type="text/css" >

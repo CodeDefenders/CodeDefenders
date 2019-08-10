@@ -20,6 +20,7 @@ package org.codedefenders.database;
 
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.Role;
+import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.User;
 
 import java.sql.ResultSet;
@@ -46,8 +47,9 @@ public class UserDAO {
         boolean validated = rs.getBoolean("Validated");
         boolean active = rs.getBoolean("Active");
         boolean allowContact = rs.getBoolean("AllowContact");
+        KeyMap keyMap = KeyMap.valueOrDefault(rs.getString("KeyMap"));
 
-        return new User(userId, userName, password, email, validated, active, allowContact);
+        return new User(userId, userName, password, email, validated, active, allowContact, keyMap);
     }
 
     /**

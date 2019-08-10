@@ -39,6 +39,7 @@ public class User {
     private boolean validated;
     private boolean active;
     private boolean allowContact;
+    private KeyMap keyMap;
 
     public User(String username) {
         this(username, User.encodePassword(""));
@@ -53,10 +54,10 @@ public class User {
     }
 
     public User(int id, String username, String encodedPassword, String email) {
-        this(id, username, encodedPassword, email, false, true, false);
+        this(id, username, encodedPassword, email, false, true, false, KeyMap.DEFAULT);
     }
 
-    public User(int id, String username, String encodedPassword, String email, boolean validated, boolean active, boolean allowContact) {
+    public User(int id, String username, String encodedPassword, String email, boolean validated, boolean active, boolean allowContact, KeyMap keyMap) {
         this.id = id;
         this.username = username;
         this.encodedPassword = encodedPassword;
@@ -64,6 +65,7 @@ public class User {
         this.validated = validated;
         this.active = active;
         this.allowContact = allowContact;
+        this.keyMap = keyMap;
     }
 
     public boolean insert() {
@@ -105,7 +107,8 @@ public class User {
                 "  Password = ?,",
                 "  Validated = ?,",
                 "  Active = ?,",
-                "  AllowContact = ?",
+                "  AllowContact = ?,",
+                "  KeyMap = ?",
                 "WHERE User_ID = ?;");
         valueList = new DatabaseValue[]{
                 DatabaseValue.of(username),
@@ -114,6 +117,7 @@ public class User {
                 DatabaseValue.of(validated),
                 DatabaseValue.of(active),
                 DatabaseValue.of(allowContact),
+                DatabaseValue.of(keyMap.name()),
                 DatabaseValue.of(id)
         };
         PreparedStatement stmt = DB.createPreparedStatement(conn, query, valueList);
@@ -173,13 +177,15 @@ public class User {
         this.allowContact = allowContact;
     }
 
-    public void logSession(String ipAddress) {
-        DatabaseAccess.logSession(id, ipAddress);
+    public KeyMap getKeyMap() {
+        return keyMap;
+    }
+
+    public void setKeyMap(KeyMap keyMap) {
+        this.keyMap = keyMap;
     }
 
     public String printFriendly(String color) {
-        String username = getUsername();
-
         return "<span style='color: " + color + "'>@" + getUsername() +
                 "</span>";
     }

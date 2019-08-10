@@ -2,10 +2,12 @@ package org.codedefenders.servlets;
 
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
+import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.User;
 import org.codedefenders.model.UserInfo;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.auth.LoginManager;
+import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
@@ -85,6 +87,19 @@ public class UserProfileManager extends HttpServlet {
 
         final String formType = ServletUtils.formType(request);
         switch (formType) {
+            case "updateKeyMap": {
+                final String parameter = ServletUtils.getStringParameter(request, "editorKeyMap").orElse(null);
+                final KeyMap editorKeyMap = KeyMap.valueOrDefault(parameter);
+                if (updateUserKeyMap(userId, editorKeyMap)) {
+                    session.setAttribute("user-keymap", editorKeyMap);
+                    messages.add("Successfully updated editor preference.");
+                } else {
+                    logger.info("Failed to update editor preference for user {}.", userId);
+                    messages.add("Failed to update editor preference.");
+                }
+                Redirect.redirectBack(request, response);
+                return;
+            }
             case "updateProfile": {
                 final Optional<String> email = ServletUtils.getStringParameter(request, "updatedEmail");
                 final Optional<String> password = ServletUtils.getStringParameter(request, "updatedPassword");
@@ -92,34 +107,39 @@ public class UserProfileManager extends HttpServlet {
                 final boolean success = updateUserInformation(userId, email, password, allowContact);
                 if (success) {
                     messages.add("Successfully updated profile information.");
-                    response.sendRedirect(responsePath);
-                    return;
                 } else {
                     logger.info("Failed to update profile information for user {}.", userId);
                     messages.add("Failed to update profile information. Please contact the page administrator.");
-                    response.sendRedirect(responsePath);
-                    return;
                 }
+                response.sendRedirect(responsePath);
+                return;
             }
             case "deleteAccount": {
                 // Does not actually delete the account but pseudomizes it
                 final boolean success = removeUserInformation(userId);
                 if (success) {
-                    logger.info("User {} successfully set themselves as inactive.");
+                    logger.info("User {} successfully set themselves as inactive.", userId);
                     messages.add("You successfully deleted your account. Sad to see you go. :(");
-                    response.sendRedirect(ServletUtils.getBaseURL(request));
-                    return;
                 } else {
-                    logger.info("Failed to set user {} as inactive.");
+                    logger.info("Failed to set user {} as inactive.", userId);
                     messages.add("Failed to set your account as inactive. Please contact the page administrator.");
-                    response.sendRedirect(responsePath);
-                    return;
                 }
+                response.sendRedirect(responsePath);
+                return;
             }
             default:
                 logger.error("Action {" + formType + "} not recognised.");
                 response.sendRedirect(responsePath);
         }
+    }
+
+    private boolean updateUserKeyMap(int userId, KeyMap editorKeyMap) {
+        final User user = UserDAO.getUserById(userId);
+        if (user == null) {
+            return false;
+        }
+        user.setKeyMap(editorKeyMap);
+        return user.update();
     }
 
     private boolean updateUserInformation(int userId, Optional<String> email, Optional<String> password, boolean allowContact) {
