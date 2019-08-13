@@ -18,11 +18,13 @@
  */
 package org.codedefenders.servlets.games.puzzle;
 
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -93,7 +95,14 @@ public class PuzzleGameSelectionManager extends HttpServlet {
      */
     static void createGame(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         final HttpSession session = request.getSession();
-        final int userId = ((Integer) session.getAttribute("uid"));
+        final int userId = ServletUtils.userId(request);
+
+        final boolean canCreateGames = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue();
+        if (!canCreateGames) {
+            logger.warn("User {} tried to create a puzzle game, but creating games is not permitted.", userId);
+            Redirect.redirectBack(request, response);
+            return;
+        }
 
         final Optional<Integer> puzzleId = getIntParameter(request, "puzzleId");
         if (!puzzleId.isPresent()) {
