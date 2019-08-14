@@ -46,8 +46,11 @@ import javax.servlet.http.HttpSession;
 public class LoginFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(LoginFilter.class);
 
+	@Override
     public void init(FilterConfig config) throws ServletException { }
 
+
+    @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
         throws IOException, ServletException {
 
@@ -80,6 +83,7 @@ public class LoginFilter implements Filter {
         }
     }
 
+    @Override
     public void destroy() { }
 
     private boolean loginRequired(HttpServletRequest request) {
@@ -107,7 +111,6 @@ public class LoginFilter implements Filter {
                 || path.endsWith(context + "/video.mp4")
                 || path.contains(context + "/papers")
                 || path.endsWith(context + Paths.API_SEND_EMAIL)
-                || path.endsWith(context + "/index.jsp")
                 || path.endsWith(context + Paths.ABOUT_PAGE)
                 || path.endsWith(context + Paths.CONTACT_PAGE))
             return false;

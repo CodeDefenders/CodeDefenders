@@ -112,7 +112,7 @@
 		</td>
 		<td class="col-sm-1"><%= g.getAttackerIds().length %></td>
 		<td class="col-sm-1"><%= g.getDefenderIds().length %></td>
-		<td class="col-sm-1"><%= g.getLevel().name() %></td>
+		<td class="col-sm-1"><%= g.getLevel() %></td>
 		<td class="col-sm-1"><%= g.getFormattedStartDateTime()%></td>
 		<td class="col-sm-1"><%= g.getFormattedFinishDateTime()%></td>
 		<td class="col-sm-2">
@@ -267,7 +267,7 @@
             <%int defenders = g.getDefenderIds().length;%>
 			<td class="col-sm-1"><%=attackers %> of <%=g.getMinAttackers()%>&ndash;<%=g.getAttackerLimit()%></td>
 			<td class="col-sm-1"><%=defenders %> of <%=g.getMinDefenders()%>&ndash;<%=g.getDefenderLimit()%></td>
-			<td class="col-sm-1"><%= g.getLevel().name() %></td>
+			<td class="col-sm-1"><%= g.getLevel() %></td>
 			<td class="col-sm-1"><%= g.getFormattedStartDateTime() %></td>
 			<td class="col-sm-1"><%= g.getFormattedFinishDateTime() %></td>
 			<td class="col-sm-2">

@@ -18,18 +18,17 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<hr>
 
 <div id="research" class="paper-list">
 
-	<h1>
+	<h2 style="border-top: 1px solid lightgray; padding-top: 20px">
 		<a id="showResearch" data-toggle="collapse" href="#researchBox" style="color:black"
-		onclick="changeChevron()">
+		   onclick="changeChevron()">
 			Research
-			<span id = "researchBoxToggle" class="glyphicon glyphicon-chevron-down" style=" font-size: 25px; margin: 5px; "></span>
+			<span id = "researchBoxToggle" class="glyphicon glyphicon-chevron-down" style=" font-size: 20px; margin: 5px; "></span>
 		</a>
-	</h1>
-    <p></p>
+	</h2>
+	<p></p>
 	<div id="researchBox" class="collapse" style="font-size: 12px;">
 		<div class="row-fluid">
 			<ul class="papercite_bibliography">
@@ -171,9 +170,7 @@
 		</div>
 	</div>
 </div>
-<hr>
 
-</body>
 <script>function changeChevron() {
     var toggle = document.getElementById('researchBoxToggle');
     var currentClass = toggle.getAttribute("class");
@@ -182,13 +179,12 @@
 }
 
 function toggleBibtex(div) {
-        var className = div.getAttribute("class");
-        if(className=="bibtex_hide") {
-            div.className = "bibtex_show";
-        }
-        else{
-            div.className = "bibtex_hide";
-        }
+    var className = div.getAttribute("class");
+    if(className=="bibtex_hide") {
+        div.className = "bibtex_show";
     }
+    else{
+        div.className = "bibtex_hide";
+    }
+}
 </script>
-</html>

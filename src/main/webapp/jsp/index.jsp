@@ -1,6 +1,6 @@
 <%--
 
-    Copyright (C) 2016-2019 Code Defenders contributors
+    Copyright (C) 2016-2018 Code Defenders contributors
 
     This file is part of Code Defenders.
 
@@ -18,18 +18,133 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<% String pageTitle = "Welcome"; %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%  String pageTitle = "Welcome";
+    List<MultiplayerGame> openGames = (List<MultiplayerGame>) request.getAttribute("openMultiplayerGames");
+    Map<Integer, String> gameCreatorNames = (Map<Integer, String>) request.getAttribute("gameCreatorNames");
+%>
 
 <%@ include file="/jsp/header_logout.jsp" %>
 
-	<div id="splash" class="jumbotron masthead">
-		<h1>Code Defenders</h1>
-		<p>A Mutation Testing Game</p>
-		<a id="enter" class="btn btn-primary btn-large" href="login">Enter</a>
-		<p><img style="margin-top:20px" src="images/schema.jpeg" class="img-responsive displayed"/></p>
-		<p class="text-muted" style="font-size:small;">
-			<b>Important note:</b> Internet Explorer is not currently supported.
-		</p>
-	</div>
+<div class="nest">
+    <div class="crow fly no-gutter">
+        <div id="splash" class="jumbotron masthead">
+            <h2><img class="logo" href="${pageContext.request.contextPath}/"
+                     src="images/logo.png" style="margin-right: 10px"/>Code Defenders: A Mutation Testing Game</h2>
+
+<%--            <!-- Puzzle--> may be used in the future once puzzles are more sophisticated--%>
+<%--            <h3 class="text-primary"--%>
+<%--                style="border-top: 1px solid; border-bottom: 1px solid; padding: 10px; /*background: #d9edf7">--%>
+<%--                Puzzles--%>
+<%--            </h3>--%>
+<%--            <p style="font-size: medium">Play one of our predefined puzzles to improve your testing skills in the--%>
+<%--                following lectures:</p>--%>
+<%--            <%--%>
+<%--                final List<PuzzleChapter> puzzleChapters = PuzzleDAO.getPuzzleChapters();--%>
+<%--            %>--%>
+
+<%--            <table class="table table-hover table-responsive table-paragraphs games-table">--%>
+<%--                <%for (PuzzleChapter chapter : puzzleChapters) {%>--%>
+<%--                <tr>--%>
+<%--                    <td>--%>
+<%--                        <%=chapter.getTitle()%>: <%=chapter.getDescription()%>--%>
+<%--                    </td>--%>
+<%--                </tr>--%>
+<%--                <%}%>--%>
+<%--            </table>--%>
+
+            <!-- Battleground -->
+            <!--
+            <h3 class="text-primary"
+                style="border-top: 1px solid; border-bottom: 1px solid; padding: 10px; /*background: #d9edf7">
+                Currently Active Battleground Games
+            </h3>
+            -->
+            <p style="font-size: medium">Currently active multiplayer games:</p>
+
+            <table class="table table-hover table-responsive table-paragraphs games-table">
+                <tr>
+                    <th>Creator</th>
+                    <th>Class</th>
+                    <th>Attack</th>
+                    <th>Defense</th>
+                    <th>Level</th>
+                </tr>
+                <%
+                    if (openGames.isEmpty()) {
+                %>
+                <tr>
+                    <td colspan="100%"> Currently there are no open games.</td>
+                </tr>
+                <%
+                } else {
+                    for (MultiplayerGame game : openGames) {
+                    final GameClass cut = game.getCUT();
+                    int attackers = game.getAttackerIds().length;
+                    int defenders = game.getDefenderIds().length;
+                    %>
+                <tr id="<%="game-"+game.getId()%>">
+                    <td class="col-sm-1"><%=gameCreatorNames.get(game.getId())%></td>
+                    <td class="col-sm-2">
+                        <span><%=cut.getAlias()%></span>
+<%--                        <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=game.getId()%>">--%>
+<%--                            <%=cut.getAlias()%>--%>
+<%--                        </a>--%>
+<%--                        <div id="modalCUTFor<%=game.getId()%>" class="modal" role="dialog" style="text-align: left;">--%>
+<%--                            <div class="modal-dialog">--%>
+<%--                                <!-- Modal content-->--%>
+<%--                                <div class="modal-content">--%>
+<%--                                    <div class="modal-header">--%>
+<%--                                        <button type="button" class="close" data-dismiss="modal">&times;</button>--%>
+<%--                                        <h4 class="modal-title"><%=cut.getAlias()%></h4>--%>
+<%--                                    </div>--%>
+<%--                                    <div class="modal-body">--%>
+<%--                                        <pre class="readonly-pre"><textarea--%>
+<%--                                                class="readonly-textarea classPreview"--%>
+<%--                                                id="sut<%=game.getId()%>"--%>
+<%--                                                name="cut<%=game.getId()%>" cols="80"--%>
+<%--                                                rows="30"><%=cut.getAsHTMLEscapedString()%></textarea></pre>--%>
+<%--                                    </div>--%>
+<%--                                    <div class="modal-footer">--%>
+<%--                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>--%>
+<%--                                    </div>--%>
+<%--                                </div>--%>
+<%--                            </div>--%>
+<%--                        </div>--%>
+                    </td>
+                    <td class="col-sm-1"><%=attackers %> of <%=game.getMinAttackers()%>&ndash;<%=game.getAttackerLimit()%>
+                    </td>
+                    <td class="col-sm-1"><%=defenders %> of <%=game.getMinDefenders()%>&ndash;<%=game.getDefenderLimit()%>
+                    </td>
+                    <td class="col-sm-1"><%= game.getLevel()%>
+                    </td>
+                </tr>
+                <%
+                        }
+                    }
+                %>
+            </table>
+            <a id="enter" class="btn btn-primary btn-large" href="login">Log in or sign up</a>
+        </div>
+    </div>
+
+    <script>
+        $('.modal').on('shown.bs.modal', function () {
+            let codeMirrorContainer = $(this).find(".CodeMirror")[0];
+            if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+                codeMirrorContainer.CodeMirror.refresh();
+            } else {
+                let editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
+                    lineNumbers: false,
+                    readOnly: true,
+                    mode: "text/x-java"
+                });
+                editorDiff.setSize("100%", 500);
+            }
+        });
+    </script>
+</div>
+
 <%@ include file="/jsp/footer_logout.jsp" %>
 <%@ include file="/jsp/footer.jsp" %>

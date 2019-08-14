@@ -124,7 +124,7 @@
                         </div>
                     </div>
                 </td>
-                <td><%= g.getLevel().name() %>
+                <td><%= g.getLevel() %>
                 </td>
                 <td><%= g.getFormattedStartDateTime() %>
                 </td>
