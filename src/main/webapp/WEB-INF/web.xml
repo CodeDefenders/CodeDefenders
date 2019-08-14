@@ -105,15 +105,6 @@
 
     <!-- Servlets-->
     <!-- Public sites -->
-    <servlet-mapping>
-        <servlet-name>IndexPage</servlet-name>
-        <url-pattern></url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>IndexPage</servlet-name>
-        <jsp-file>/jsp/index.jsp</jsp-file>
-    </servlet>
-
     <servlet>
         <servlet-name>HelpPage</servlet-name>
         <jsp-file>/jsp/help.jsp</jsp-file>

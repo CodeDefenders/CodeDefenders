@@ -105,7 +105,8 @@ public class Constants {
     public static final String GRACE_PERIOD_MESSAGE = "Game is now in grace period.";
 
     // JSP file paths
-    public static final String LOGIN_VIEW_JSP = Paths.get("jsp", "login_view.jsp").toString();
+    public static final String INDEX_JSP = "/jsp/index.jsp";
+	public static final String LOGIN_VIEW_JSP = Paths.get("jsp", "login_view.jsp").toString();
     public static final String UTESTING_VIEW_JSP = Paths.get("jsp", "utesting_view.jsp").toString();
 
     public static final String USER_PROFILE_JSP = Paths.get("jsp", "user_profile.jsp").toString();;

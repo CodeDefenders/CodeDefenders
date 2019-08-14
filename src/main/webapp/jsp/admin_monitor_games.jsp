@@ -130,7 +130,7 @@
                 <td class="col-sm-1"><%int defenders = g.getDefenderIds().length; %><%=defenders %> of
                         <%=g.getMinDefenders()%>&ndash;<%=g.getDefenderLimit()%>
                 </td>
-                <td><%= g.getLevel().name() %>
+                <td><%= g.getLevel() %>
                 </td>
                 <td class="col-sm-2"><%= g.getFormattedStartDateTime() %>
                 </td>

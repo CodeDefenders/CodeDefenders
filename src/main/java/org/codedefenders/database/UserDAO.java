@@ -19,13 +19,17 @@
 package org.codedefenders.database;
 
 import org.codedefenders.database.DB.RSMapper;
+import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.KeyMap;
 import org.codedefenders.model.User;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * This class handles the database logic for mutants.
@@ -131,4 +135,43 @@ public class UserDAO {
         return DB.executeQueryReturnValue(query, rs -> Role.valueOf(rs.getString("Role")), DatabaseValue.of(userId));
     }
 
+    /**
+     * @return a mapping from game identifiers to the name of the game's creators.
+     */
+    public static Map<Integer, String> getGamesCreatorNames(final List<? extends AbstractGame> games) {
+        if (games.isEmpty()) {
+            return new HashMap<>();
+        }
+
+        final StringBuilder bob = new StringBuilder("(");
+        for (int i = 0; i < games.size() - 1; i++) {
+            bob.append("?,");
+        }
+        bob.append("?)");
+        final String range = bob.toString();
+
+        String query = String.join("\n",
+                "SELECT games.ID, users.Username",
+                "FROM users,games",
+                "WHERE games.ID in " + range,
+                "AND games.Creator_ID = users.User_ID",
+                ";");
+        DatabaseValue[] values = games
+                .stream()
+                .map(AbstractGame::getId)
+                .map(DatabaseValue::of)
+                .toArray(DatabaseValue[]::new);
+
+        class GameCreator {
+            int gameId; GameCreator gameId(int gameId) {this.gameId = gameId; return this;}
+            String name; GameCreator name(String name) {this.name = name; return this;}
+        }
+        final RSMapper<GameCreator> mapper = (rs) -> new GameCreator()
+                .gameId(rs.getInt("games.ID"))
+                .name(rs.getString("users.Username"));
+
+        final List<GameCreator> content = DB.executeQueryReturnList(query, mapper, values);
+
+        return content.stream().collect(Collectors.toMap(data -> data.gameId, data -> data.name));
+    }
 }

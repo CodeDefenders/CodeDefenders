@@ -22,7 +22,18 @@ package org.codedefenders.game;
  * This enumeration shows different kinds of difficulty levels a game can have.
  */
 public enum GameLevel {
-    EASY,
-    MEDIUM, // FIXME: Medium is never used.
-    HARD
+    EASY("Easy"),
+    MEDIUM("Medium"), // FIXME: Medium is never used.
+    HARD("Hard");
+
+    private final String displayName;
+
+    GameLevel(String displayName) {
+        this.displayName = displayName;
+    }
+
+    @Override
+    public String toString() {
+        return displayName;
+    }
 }
