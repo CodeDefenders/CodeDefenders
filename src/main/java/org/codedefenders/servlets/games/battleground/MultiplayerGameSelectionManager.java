@@ -18,9 +18,9 @@
  */
 package org.codedefenders.servlets.games.battleground;
 
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.PlayerDAO;
@@ -37,7 +37,6 @@ import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
-import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.model.GameCreatedEvent;
@@ -45,6 +44,7 @@ import org.codedefenders.notification.model.GameJoinedEvent;
 import org.codedefenders.notification.model.GameLeftEvent;
 import org.codedefenders.notification.model.GameStartedEvent;
 import org.codedefenders.notification.model.GameStoppedEvent;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Paths;
@@ -138,6 +138,13 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     private void createGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final int userId = userId(request);
+
+        final boolean canCreateGames = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue();
+        if (!canCreateGames) {
+            logger.warn("User {} tried to create a battleground game, but creating games is not permitted.", userId);
+            Redirect.redirectBack(request, response);
+            return;
+        }
 
         String contextPath = request.getContextPath();
 
@@ -346,6 +353,13 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
     private void joinGame(HttpServletRequest request, HttpServletResponse response) throws IOException {
         final int userId = userId(request);
+
+        final boolean canJoinGames = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue();
+        if (!canJoinGames) {
+            logger.warn("User {} tried to join a battleground game, but joining games is not permitted.", userId);
+            Redirect.redirectBack(request, response);
+            return;
+        }
 
         HttpSession session = request.getSession();
         ArrayList<String> messages = new ArrayList<>();
