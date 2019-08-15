@@ -1,6 +1,12 @@
 /* Add "AllowContact" column to users. */
 ALTER TABLE users ADD KeyMap enum('DEFAULT','SUBLIME','VIM','EMACS') NOT NULL DEFAULT 'DEFAULT';
 
+/* Replace user view to include added 'KeyMap' column */
+CREATE OR REPLACE VIEW `view_valid_users` AS
+SELECT * FROM `users`
+WHERE `User_ID` >= 5
+  AND Active = 1;
+
 /* Replace players with user data view */
 CREATE OR REPLACE VIEW `view_players_with_userdata` AS
 SELECT p.*,
