@@ -69,10 +69,10 @@ public class GameDAO {
      * @param role the queried player role.
      * @return a list of player identifiers as {@link Integer Integers}, can be empty but never {@code null}.
      */
-    public static List<Integer> getPlayersForGame(int gameId, Role role) {
+    public static List<Player> getPlayersForGame(int gameId, Role role) {
         String query = String.join("\n",
-                "SELECT ID",
-                "FROM players",
+                "SELECT *",
+                "FROM view_players_with_userdata",
                 "WHERE Game_ID = ?",
                 "  AND Role = ?",
                 "  AND Active=TRUE;");
@@ -81,7 +81,7 @@ public class GameDAO {
                 DatabaseValue.of(role.toString())
         };
 
-        return DB.executeQueryReturnList(query, rs -> rs.getInt("ID"), values);
+        return DB.executeQueryReturnList(query, PlayerDAO::playerWithUserFromRS, values);
     }
 
     /**

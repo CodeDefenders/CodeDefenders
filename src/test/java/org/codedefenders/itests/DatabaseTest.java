@@ -241,8 +241,8 @@ public class DatabaseTest {
 				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
 				.chatEnabled(true)
 				.build();
-		assertEquals(1, MultiplayerGameDAO.getMultiplayerGamesForUser(user2.getId()).size());
-		assertEquals(2, MultiplayerGameDAO.getMultiplayerGamesForUser(user1.getId()).size());
+		assertEquals(1, MultiplayerGameDAO.getActiveMultiplayerGamesWithInfoForUser(user2.getId()).size());
+		assertEquals(2, MultiplayerGameDAO.getActiveMultiplayerGamesWithInfoForUser(user1.getId()).size());
 		assertEquals(2, MultiplayerGameDAO.getJoinedMultiplayerGamesForUser(user1.getId()).size());
 		assertEquals(0, MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(user1.getId()).size());
 

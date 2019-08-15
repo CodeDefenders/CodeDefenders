@@ -35,6 +35,7 @@ import org.codedefenders.game.Test;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.input.CheckDateFormat;
@@ -66,6 +67,8 @@ public class MultiplayerGame extends AbstractGame {
     protected List<Mutant> mutants;
     protected List<Test> tests;
     */
+    private List<Player> attackers;
+    private List<Player> defenders;
     private int defenderValue;
     private int attackerValue;
     private float lineCoverage;
@@ -109,6 +112,8 @@ public class MultiplayerGame extends AbstractGame {
 
         // optional values with default values
         private GameClass cut = null;
+        private List<Player> attackers = null;
+        private List<Player> defenders = null;
         private int id = -1;
         private boolean requiresValidation = false;
         private boolean capturePlayersIntention = false;
@@ -151,6 +156,8 @@ public class MultiplayerGame extends AbstractGame {
         public Builder state(GameState state) { this.state = state; return this; }
         public Builder level(GameLevel level) { this.level = level; return this; }
         public Builder mutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) { this.mutantValidatorLevel = mutantValidatorLevel; return this; }
+        public Builder attackers(List<Player> attackers) { this.attackers = attackers; return this; }
+        public Builder defenders(List<Player> defenders) { this.defenders = defenders; return this; }
 
         public Builder withTests(boolean withTests) { this.withTests = withTests; return this; }
         public Builder withMutants(boolean withMutants) { this.withMutants = withMutants; return this; }
@@ -164,6 +171,8 @@ public class MultiplayerGame extends AbstractGame {
         this.mode = GameMode.PARTY;
 
         this.cut = builder.cut;
+        this.attackers = builder.attackers;
+        this.defenders = builder.defenders;
         this.id = builder.id;
         this.classId = builder.classId;
         this.creatorId = builder.creatorId;
@@ -213,14 +222,6 @@ public class MultiplayerGame extends AbstractGame {
 
     public int getMinDefenders() {
         return minDefenders;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-        if (this.state != GameState.FINISHED && finishDateTime < System.currentTimeMillis()) {
-            this.state = GameState.FINISHED;
-            update();
-        }
     }
 
     public int getDefenderValue() {
@@ -281,14 +282,30 @@ public class MultiplayerGame extends AbstractGame {
         return format.format(date);
     }
 
-    /**
-     * This returns the ID of the Player not of the User
-     *
-     * @return
-     */
-    public int[] getDefenderIds() {
-        // TODO Phil 27/12/18: improve this. Make getDefenderIds return List<Integer> and rename the method to 'getDefenderPlayerIds'. No need to have an array here
-        return GameDAO.getPlayersForGame(getId(), Role.DEFENDER).stream().mapToInt(Integer::intValue).toArray();
+    public Role getRole(int userId){
+        if (userId == getCreatorId()) {
+            return Role.CREATOR;
+        } else if (getDefenderPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
+            return Role.DEFENDER;
+        } else if (getAttackerPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
+            return Role.ATTACKER;
+        } else {
+            return Role.NONE;
+        }
+    }
+
+    public List<Player> getDefenderPlayers() {
+        if (defenders == null) {
+            defenders = GameDAO.getPlayersForGame(getId(), Role.DEFENDER);
+        }
+        return defenders;
+    }
+
+    public List<Player> getAttackerPlayers() {
+        if (attackers == null) {
+            attackers = GameDAO.getPlayersForGame(getId(), Role.ATTACKER);
+        }
+        return attackers;
     }
 
     /**
@@ -296,8 +313,19 @@ public class MultiplayerGame extends AbstractGame {
      *
      * @return
      */
+    @Deprecated
+    public int[] getDefenderIds() {
+        return GameDAO.getPlayersForGame(getId(), Role.DEFENDER).stream().mapToInt(Player::getId).toArray();
+    }
+
+    /**
+     * This returns the ID of the Player not of the User
+     *
+     * @return
+     */
+    @Deprecated
     public int[] getAttackerIds() {
-        return GameDAO.getPlayersForGame(getId(), Role.ATTACKER).stream().mapToInt(Integer::intValue).toArray();
+        return GameDAO.getPlayersForGame(getId(), Role.ATTACKER).stream().mapToInt(Player::getId).toArray();
     }
 
     public boolean addPlayer(int userId, Role role) {
@@ -340,9 +368,9 @@ public class MultiplayerGame extends AbstractGame {
     private boolean canJoinGame(int userId, Role role) {
         if (!requiresValidation || UserDAO.getUserById(userId).isValidated()) {
             if (role.equals(Role.ATTACKER))
-                return (attackerLimit == 0 || getAttackerIds().length < attackerLimit);
+                return (attackerLimit == 0 || getAttackerPlayers().size() < attackerLimit);
             else
-                return (defenderLimit == 0 || getDefenderIds().length < defenderLimit);
+                return (defenderLimit == 0 || getDefenderPlayers().size() < defenderLimit);
         } else {
             return false;
         }
@@ -362,6 +390,13 @@ public class MultiplayerGame extends AbstractGame {
         return MultiplayerGameDAO.updateMultiplayerGame(this);
     }
 
+    /**
+     * This method calculates the mutant score for every attacker in the game.
+     * <p>
+     * The result is a mapping of playerId to player score.
+     *
+     * @return mapping from playerId to player score.
+     */
     public HashMap<Integer, PlayerScore> getMutantScores() {
         HashMap<Integer, PlayerScore> mutantScores = new HashMap<Integer, PlayerScore>();
 
@@ -437,6 +472,13 @@ public class MultiplayerGame extends AbstractGame {
         return mutantScores;
     }
 
+    /**
+     * This method calculates the test score for every defender in the game.
+     * <p>
+     * The result is a mapping of playerId to player score.
+     *
+     * @return mapping from playerId to player score.
+     */
     public HashMap<Integer, PlayerScore> getTestScores() {
         HashMap<Integer, PlayerScore> testScores = new HashMap<>();
         HashMap<Integer, Integer> mutantsKilled = new HashMap<>();
@@ -452,7 +494,8 @@ public class MultiplayerGame extends AbstractGame {
         challengesWon.put(defendersTeamId, 0);
         challengesLost.put(defendersTeamId, 0);
 
-        for (int defenderId : getDefenderIds()) {
+        for (Player player : getDefenderPlayers()) {
+            int defenderId = player.getId();
             testScores.put(defenderId, new PlayerScore(defenderId));
             mutantsKilled.put(defenderId, 0);
             challengesOpen.put(defenderId, 0);
@@ -460,10 +503,10 @@ public class MultiplayerGame extends AbstractGame {
             challengesLost.put(defenderId, 0);
         }
 
-        int[] attackers = getAttackerIds();
         for (Test test : getTests()) {
-            if (ArrayUtils.contains(attackers, test.getPlayerId()))
+            if (getDefenderPlayers().stream().anyMatch(p -> p.getId() == test.getPlayerId())) {
                 continue;
+            }
             if (!testScores.containsKey(test.getPlayerId())) {
                 testScores.put(test.getPlayerId(), new PlayerScore(test.getPlayerId()));
                 mutantsKilled.put(test.getPlayerId(), 0);
@@ -484,9 +527,9 @@ public class MultiplayerGame extends AbstractGame {
         }
 
         for (int playerId : mutantsKilled.keySet()) {
-            if (playerId < 0 || ArrayUtils.contains(attackers, playerId))
+            if (playerId < 0 || getDefenderPlayers().stream().anyMatch(p -> p.getId() == playerId)) {
                 continue;
-
+            }
             int teamKey = defendersTeamId;
 
             PlayerScore ps = testScores.get(playerId);
@@ -590,24 +633,23 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     private void notifyAttackers(String message, EventType et) {
-
-        for (int attacker : getAttackerIds()) {
+        for (Player player : getAttackerPlayers()) {
             Event notif = new Event(-1, id,
-                    UserDAO.getUserForPlayer(attacker).getId(),
-                    message,
-                    et, EventStatus.NEW,
-                    new Timestamp(System.currentTimeMillis()));
+                player.getUser().getId(),
+                message,
+                et, EventStatus.NEW,
+                new Timestamp(System.currentTimeMillis()));
             notif.insert();
         }
     }
 
     private void notifyDefenders(String message, EventType et) {
-        for (int defender : getDefenderIds()) {
+        for (Player player : getDefenderPlayers()) {
             Event notif = new Event(-1, id,
-                    UserDAO.getUserForPlayer(defender).getId(),
-                    message,
-                    et, EventStatus.NEW,
-                    new Timestamp(System.currentTimeMillis()));
+                player.getUser().getId(),
+                message,
+                et, EventStatus.NEW,
+                new Timestamp(System.currentTimeMillis()));
             notif.insert();
         }
     }
