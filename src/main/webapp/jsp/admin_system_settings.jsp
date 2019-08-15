@@ -80,7 +80,8 @@
 
             switch (setting.getType()) {
                 case STRING_VALUE:
-                    if (setting.getName().equals(AdminSystemSettings.SETTING_NAME.SITE_NOTICE)) {%>
+                    if (setting.getName().equals(AdminSystemSettings.SETTING_NAME.SITE_NOTICE) ||
+                        setting.getName().equals(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE)) {%>
         <div class="form-group" id="<%="group_"+setting.getName().name()%>">
             <label for="<%=setting.getName().name()%>" title="<%=explanation%>"><%=readableName%>
             </label>
