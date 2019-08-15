@@ -32,12 +32,24 @@
     <div id="user-information-container">
         <h2>Profile Information</h2>
 
-        <%-- TODO actually add textual statement about which data we have --%>
-
         <h4>Played games</h4>
-        <span>
+        <p>
             You can look at your <a href="<%=request.getContextPath() + Paths.GAMES_HISTORY%>">games history</a>.
-        </span>
+        </p>
+
+        <%
+            String privacyNotice = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.PRIVACY_NOTICE).getStringValue();
+            if(!privacyNotice.isEmpty()) {
+        %>
+
+        <h4>Privacy Notice</h4>
+        <p>
+            <%=privacyNotice%>
+        </p>
+        <%
+          }
+        %>
+
     </div>
 
     <div id="update-profile-container">
