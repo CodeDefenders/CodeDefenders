@@ -615,7 +615,7 @@ SELECT p.*,
        u.AllowContact AS usersAllowContact,
        u.KeyMap       AS usersKeyMap
 FROM players AS p,
-     users AS u
+     view_valid_users AS u
 WHERE p.User_ID = u.User_ID;
 
 CREATE OR REPLACE VIEW `view_valid_tests` AS

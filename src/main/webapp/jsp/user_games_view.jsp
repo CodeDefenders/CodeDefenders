@@ -19,10 +19,9 @@
 
 --%>
 <%@ page import="org.codedefenders.game.GameState" %>
-<%@ page import="org.codedefenders.game.Role" %>
-<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserMultiplayerGameInfo" %>
+<%@ page import="org.codedefenders.model.Player" %>
 <% String pageTitle= null ; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <%
@@ -41,11 +40,10 @@
 <table id="my-games" class="table table-striped table-hover table-responsive table-paragraphs games-table">
 	<tr>
 		<th>ID</th>
-		<th>Type</th>
 		<th>Creator</th>
 		<th>Class</th>
-		<th>Attack</th>
-		<th>Defense</th>
+		<th>Attackers</th>
+		<th>Defenders</th>
 		<th>Level</th>
 		<th>Starting</th>
 		<th>Finishing</th>
@@ -58,14 +56,16 @@
 <%
 	} else {
 		for (UserMultiplayerGameInfo info : activeGames) {
+            int gameId = info.gameId();
+            List<Player> attackers = info.attackers();
+            List<Player> defenders = info.defenders();
 %>
-	<tr id="<%="game-"+info.gameId()%>">
-		<td class="col-sm-1"><%= info.gameId() %></td>
-		<td class="col-sm-1">Battlegrounds</td>
+	<tr id="<%="game-"+gameId%>">
+		<td class="col-sm-1"><%= gameId %></td>
 		<td class="col-sm-1"><%=info.creatorName()%></td>
 		<td class="col-sm-2">
-			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=info.gameId()%>"><%=info.cutAlias()%></a>
-			<div id="modalCUTFor<%=info.gameId()%>" class="modal fade" role="dialog" style="text-align: left;" >
+			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>"><%=info.cutAlias()%></a>
+			<div id="modalCUTFor<%=gameId%>" class="modal fade" role="dialog" style="text-align: left;" >
 				<div class="modal-dialog">
 					<!-- Modal content-->
 					<div class="modal-content">
@@ -75,9 +75,9 @@
 						</div>
 						<div class="modal-body">
 							<pre class="readonly-pre"><textarea class="readonly-textarea classPreview"
-																id="sut<%=info.gameId()%>"
-																name="cut<%=info.gameId()%>" cols="80"
-																rows="30"><%=info.cutSource()%></textarea></pre>
+                                                                id="sut<%=gameId%>"
+                                                                name="cut<%=gameId%>" cols="80"
+                                                                rows="30"><%=info.cutSource()%></textarea></pre>
 						</div>
 						<div class="modal-footer">
 							<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -86,10 +86,92 @@
 				</div>
 			</div>
 		</td>
-        <%int attackers = info.attackers().size();%>
-        <%int defenders = info.defenders().size();%>
-        <td class="col-sm-1"><%=attackers %> of <%=info.minAttackers()%>&ndash;<%=info.maxAttackers()%></td>
-        <td class="col-sm-1"><%=defenders %> of <%=info.minDefenders()%>&ndash;<%=info.maxDefenders()%></td>
+        <td class="col-sm-1">
+            <span><%=attackers.size()%></span>
+            <%
+                if (!attackers.isEmpty()) {
+            %>
+            <br>
+            <a href="#" data-toggle="modal" data-target="#modalAttackersFor<%=gameId%>">(Details)</a>
+            <div id="modalAttackersFor<%=gameId%>" class="modal fade" role="dialog" style="text-align: left;" >
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Attackers</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table id="game-<%=gameId%>-attackers" class="table table-striped table-hover table-responsive table-paragraphs games-table">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Points</th>
+                                </tr>
+                            <%
+                                for (Player attacker : attackers) {
+                            %>
+                                <tr>
+                                    <td class="col-sm-1"><%=attacker.getUser().getUsername()%></td>
+                                    <td class="col-sm-1"><%=attacker.getPoints()%></td>
+                                </tr>
+                            <%
+                                }
+                            %>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%
+                }
+            %>
+        </td>
+        <td class="col-sm-1">
+            <span><%=defenders.size()%> </span>
+            <%
+                if (!defenders.isEmpty()) {
+            %>
+            <br>
+            <a href="#" data-toggle="modal" data-target="#modalDefendersFor<%=gameId%>">(Details)</a>
+            <div id="modalDefendersFor<%=gameId%>" class="modal fade" role="dialog" style="text-align: left;" >
+                <div class="modal-dialog">
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Defenders</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table id="game-<%=gameId%>-defenders" class="table table-striped table-hover table-responsive table-paragraphs games-table">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Points</th>
+                                </tr>
+                                <%
+                                    for (Player defender : defenders) {
+                                %>
+                                <tr>
+                                    <td class="col-sm-1"><%=defender.getUser().getUsername()%></td>
+                                    <td class="col-sm-1"><%=defender.getPoints()%></td>
+                                </tr>
+                                <%
+                                    }
+                                %>
+                            </table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <%
+                }
+            %>
+        </td>
 		<td class="col-sm-1"><%=info.gameLevel()%></td>
 		<td class="col-sm-1"><%=info.startTime()%></td>
 		<td class="col-sm-1"><%=info.finishTime()%></td>
@@ -99,17 +181,17 @@
 					case CREATOR:
 						if (info.gameState() == GameState.CREATED) {
 %>
-			<form id="adminStartBtn-<%=info.gameId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
-				<button type="submit" class="btn btn-sm btn-primary" id="startGame-<%=info.gameId()%>" form="adminStartBtn-<%=info.gameId()%>">
+			<form id="adminStartBtn-<%=gameId%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
+				<button type="submit" class="btn btn-sm btn-primary" id="startGame-<%=gameId%>" form="adminStartBtn-<%=gameId%>">
 					Start Game
 				</button>
 				<input type="hidden" name="formType" value="startGame">
-				<input type="hidden" name="gameId" value="<%= info.gameId() %>" />
+				<input type="hidden" name="gameId" value="<%= gameId %>" />
 			</form>
 <%
 						} else {
 %>
-			<a class="btn btn-sm btn-primary" id="<%="observe-"+info.gameId()%>" href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= info.gameId() %>">
+			<a class="btn btn-sm btn-primary" id="<%="observe-"+gameId%>" href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">
                 Observe
             </a>
 <%
@@ -118,8 +200,8 @@
 					case ATTACKER:
 						if(info.gameState() != GameState.CREATED) {
 %>
-			<a class = "btn btn-sm btn-primary" id="<%="attack-"+info.gameId()%>" style="background-color: #884466;border-color: #772233;"
-			   href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= info.gameId() %>">Attack</a>
+			<a class = "btn btn-sm btn-primary" id="<%="attack-"+gameId%>" style="background-color: #884466;border-color: #772233;"
+               href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">Attack</a>
 <%
 						} else {
 %>
@@ -127,8 +209,8 @@
 			<%if (gamesJoinable) { %>
 			<form id="attLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
 				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
-				<input type="hidden" name="gameId" value="<%=info.gameId()%>">
-				<button class="btn btn-sm btn-danger" id="<%="leave-attacker-"+info.gameId()%>" type="submit" form="attLeave" value="Leave">
+				<input type="hidden" name="gameId" value="<%=gameId%>">
+				<button class="btn btn-sm btn-danger" id="<%="leave-attacker-"+gameId%>" type="submit" form="attLeave" value="Leave">
 					Leave
 				</button>
 			</form>
@@ -139,8 +221,8 @@
 					case DEFENDER:
 						if(info.gameState() != GameState.CREATED) {
 %>
-			<a class = "btn btn-sm btn-primary" id="<%="defend-"+info.gameId()%>" style="background-color: #446688;border-color: #225577"
-			   href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= info.gameId() %>">Defend</a>
+			<a class = "btn btn-sm btn-primary" id="<%="defend-"+gameId%>" style="background-color: #446688;border-color: #225577"
+               href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">Defend</a>
 <%
 						} else {
 %>
@@ -148,8 +230,8 @@
 			<%if (gamesJoinable) { %>
 			<form id="defLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
 				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
-				<input type="hidden" name="gameId" value="<%=info.gameId()%>">
-				<button class = "btn btn-sm btn-danger" id="<%="leave-defender-"+info.gameId()%>" type="submit" form="defLeave" value="Leave">
+				<input type="hidden" name="gameId" value="<%=gameId%>">
+				<button class = "btn btn-sm btn-danger" id="<%="leave-defender-"+gameId%>" type="submit" form="defLeave" value="Leave">
 					Leave
 				</button>
 			</form>
@@ -179,11 +261,10 @@
 <table class="table table-hover table-responsive table-paragraphs games-table">
 	<tr>
 		<th>ID</th>
-		<th>Type</th>
 		<th>Creator</th>
 		<th>Class</th>
-		<th>Attack</th>
-		<th>Defense</th>
+		<th>Attackers</th>
+		<th>Defenders</th>
 		<th>Level</th>
 		<th>Starting</th>
 		<th>Finishing</th>
@@ -200,7 +281,6 @@
 %>
 		<tr id="<%="game-"+info.gameId()%>">
 			<td class="col-sm-1"><%= info.gameId() %></td>
-			<td class="col-sm-1">Battlegrounds</td>
 			<td class="col-sm-1"><%=info.creatorName()%></td>
 			<td class="col-sm-2">
 				<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=info.gameId()%>">
@@ -228,10 +308,12 @@
 					</div>
 				</div>
 			</td>
-            <%int attackers = info.attackers().size();%>
-            <%int defenders = info.defenders().size();%>
-			<td class="col-sm-1"><%=attackers %> of <%=info.minAttackers()%>&ndash;<%=info.maxAttackers()%></td>
-			<td class="col-sm-1"><%=defenders %> of <%=info.minDefenders()%>&ndash;<%=info.maxDefenders()%></td>
+            <%
+                int attackers = info.attackers().size();
+                int defenders = info.defenders().size();
+            %>
+			<td class="col-sm-1"><%=attackers %></td>
+			<td class="col-sm-1"><%=defenders %></td>
 			<td class="col-sm-1"><%=info.gameLevel() %></td>
 			<td class="col-sm-1"><%=info.startTime()%></td>
             <td class="col-sm-1"><%=info.finishTime()%></td>
