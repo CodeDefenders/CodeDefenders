@@ -132,7 +132,6 @@ CREATE TABLE `games` (
   `Finish_Time` timestamp NOT NULL DEFAULT '1970-02-02 01:01:01',
   `MaxAssertionsPerTest` int(11) NOT NULL DEFAULT '2',
   `MutantValidator` enum('STRICT','MODERATE','RELAXED') NOT NULL DEFAULT 'MODERATE',
-  `MarkUncovered` tinyint(1) NOT NULL DEFAULT '0',
   `ChatEnabled` tinyint(1) DEFAULT '1',
   `Attackers_Limit` int(11) DEFAULT '0',
   `Defenders_Limit` int(11) DEFAULT '0',

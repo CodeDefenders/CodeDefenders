@@ -194,7 +194,6 @@ public class DatabaseTest {
 		assertEquals(multiplayerGameFromDB.getMinAttackers(), multiplayerGame.getMinAttackers());
 		assertEquals(multiplayerGameFromDB.getMinDefenders(), multiplayerGame.getMinDefenders());
 		assertEquals(multiplayerGameFromDB.getMaxAssertionsPerTest() , multiplayerGame.getMaxAssertionsPerTest());
-		assertEquals(multiplayerGameFromDB.isMarkUncovered() , multiplayerGame.isMarkUncovered());
 		assertEquals(multiplayerGameFromDB.isChatEnabled(), multiplayerGame.isChatEnabled());
 		assertEquals(multiplayerGameFromDB.getMutantValidatorLevel() , multiplayerGame.getMutantValidatorLevel());
 	}
@@ -218,7 +217,7 @@ public class DatabaseTest {
 		assumeTrue(mg2.insert());
 		assumeTrue(mg2.addPlayer(user1.getId(), Role.DEFENDER));
 		assertTrue(mg2.update());
-		
+
 		MultiplayerGame mg3 = new MultiplayerGame
 				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 2, 4, 4, 0, 0)
 				.state(GameState.ACTIVE)
@@ -229,7 +228,7 @@ public class DatabaseTest {
 				.chatEnabled(true)
 				.build();
 		assumeTrue(mg3.insert());
-		
+
 		assumeTrue(mg3.addPlayer(user1.getId(), Role.DEFENDER));
 		assumeTrue(mg3.addPlayer(user2.getId(), Role.ATTACKER));
 		assumeTrue(mg3.update());

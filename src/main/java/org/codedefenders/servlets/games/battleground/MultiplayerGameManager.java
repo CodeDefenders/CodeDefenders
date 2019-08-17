@@ -727,7 +727,7 @@ public class MultiplayerGameManager extends HttpServlet {
                             });
                 });
 
-        if (noneCovered.get() && !game.isMarkUncovered()) {
+        if (noneCovered.get()) {
             messages.add(Constants.MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;

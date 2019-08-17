@@ -67,7 +67,6 @@
     request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
     request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
     request.setAttribute("markEquivalent", false);
-    request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
     request.setAttribute("gameType", GameMode.PARTY);
     request.setAttribute("gameId", game.getId());

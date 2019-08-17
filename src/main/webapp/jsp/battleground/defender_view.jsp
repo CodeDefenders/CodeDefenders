@@ -51,7 +51,6 @@
 	request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
 	request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
 	request.setAttribute("markEquivalent", true);
-	request.setAttribute("markUncoveredEquivalent", game.isMarkUncovered());
 	request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
 	request.setAttribute("gameType", GameMode.PARTY);
 	request.setAttribute("gameId", game.getId());
@@ -61,7 +60,6 @@
 	// request.setAttribute("tests", game.getTests());
 	request.setAttribute("mutants", game.getMutants());
 	request.setAttribute("showEquivalenceButton", true);
-	// request.setAttribute("markUncoveredEquivalent", game.isMarkUncovered());
 	// request.setAttribute("gameType", GameMode.PARTY);
 //    request.setAttribute("gameId", game.getId());
 

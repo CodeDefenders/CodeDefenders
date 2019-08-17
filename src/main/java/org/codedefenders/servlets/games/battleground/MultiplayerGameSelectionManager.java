@@ -190,7 +190,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         float lineCoverage = getFloatParameter(request, "line_cov").orElse(1.1f);
         float mutantCoverage = getFloatParameter(request, "mutant_cov").orElse(1.1f);
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);
-        boolean markUncovered = parameterThenOrOther(request, "markUncovered", true, false);
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -230,7 +229,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         MultiplayerGame nGame = new MultiplayerGame.Builder(classId, userId, startTime, endTime, maxAssertionsPerTest, defenderLimit, attackerLimit, minDefenders, minAttackers)
                 .level(level)
                 .chatEnabled(chatEnabled)
-                .markUncovered(markUncovered)
                 .capturePlayersIntention(capturePlayersIntention)
                 .lineCoverage(lineCoverage)
                 .mutantCoverage(mutantCoverage)
