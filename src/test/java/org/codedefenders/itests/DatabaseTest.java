@@ -95,7 +95,7 @@ public class DatabaseTest {
 		cut1 = new GameClass(22345678, "MyClass", "", "", "", false, true);
 		cut2 = new GameClass(34865,"", "AliasForClass2", "", "", false, true);
 		multiplayerGame = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 5, 4, 4, 0, 0)
+				.Builder(cut1.getId(), creator.getId(), 5)
                 .level(GameLevel.EASY)
 				.defenderValue(10)
 				.attackerValue(4)
@@ -187,12 +187,7 @@ public class DatabaseTest {
 		assertTrue(multiplayerGame.insert());
 
 		MultiplayerGame multiplayerGameFromDB = MultiplayerGameDAO.getMultiplayerGame(multiplayerGame.getId());
-		assertEquals(multiplayerGameFromDB.getFormattedFinishDateTime(), multiplayerGame.getFormattedFinishDateTime());
-		assertTrue(Arrays.equals(multiplayerGameFromDB.getAttackerIds(), multiplayerGame.getAttackerIds()));
 		assertEquals(multiplayerGameFromDB.getPrize(), multiplayerGame.getPrize(), 1e-10);
-		assertEquals(multiplayerGameFromDB.getAttackerLimit(), multiplayerGame.getAttackerLimit());
-		assertEquals(multiplayerGameFromDB.getMinAttackers(), multiplayerGame.getMinAttackers());
-		assertEquals(multiplayerGameFromDB.getMinDefenders(), multiplayerGame.getMinDefenders());
 		assertEquals(multiplayerGameFromDB.getMaxAssertionsPerTest() , multiplayerGame.getMaxAssertionsPerTest());
 		assertEquals(multiplayerGameFromDB.isChatEnabled(), multiplayerGame.isChatEnabled());
 		assertEquals(multiplayerGameFromDB.getMutantValidatorLevel() , multiplayerGame.getMutantValidatorLevel());
@@ -206,7 +201,7 @@ public class DatabaseTest {
 		assumeTrue(cut1.insert());
 
 		MultiplayerGame mg2 = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 2, 4, 4, 0, 0)
+				.Builder(cut1.getId(), creator.getId(), 2)
                 .state(GameState.ACTIVE)
 				.level(GameLevel.EASY)
 				.defenderValue(10)
@@ -219,7 +214,7 @@ public class DatabaseTest {
 		assertTrue(mg2.update());
 
 		MultiplayerGame mg3 = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 2, 4, 4, 0, 0)
+				.Builder(cut1.getId(), creator.getId(), 2)
 				.state(GameState.ACTIVE)
 				.level(GameLevel.EASY)
 				.defenderValue(10)
@@ -234,7 +229,7 @@ public class DatabaseTest {
 		assumeTrue(mg3.update());
 
 		MultiplayerGame mg4 = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 2, 4, 4, 0, 0)
+				.Builder(cut1.getId(), creator.getId(), 2)
 				.level(GameLevel.EASY)
 				.defenderValue(10)
 				.attackerValue(4)
@@ -346,7 +341,7 @@ public class DatabaseTest {
 
 		// Creator must be there already
 		multiplayerGame = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), START_TIME, END_TIME, 5, 4, 4, 0, 0)
+				.Builder(cut1.getId(), creator.getId(), 5)
 				.level(GameLevel.EASY)
 				.defenderValue(10)
 				.attackerValue(4)

@@ -82,8 +82,6 @@ public class AdminCreateGames extends HttpServlet {
     private int attackersPerGame, defendersPerGame;
     private GameLevel gamesLevel;
     private GameState gamesState;
-    private long startTime;
-    private long finishTime;
     private List<MultiplayerGame> createdGames;
     private List<List<Integer>> attackerIdsList;
     private List<List<Integer>> defenderIdsList;
@@ -296,8 +294,6 @@ public class AdminCreateGames extends HttpServlet {
             defendersPerGame = Integer.parseInt(request.getParameter("defenders"));
             gamesLevel = GameLevel.valueOf(request.getParameter("gamesLevel"));
             gamesState = request.getParameter("gamesState").equals(GameState.ACTIVE.name()) ? GameState.ACTIVE : GameState.CREATED;
-            startTime = Long.parseLong(request.getParameter("startTime"));
-            finishTime = Long.parseLong(request.getParameter("finishTime"));
             maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
             mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
             chatEnabled = request.getParameter("chatEnabled") != null;
@@ -475,7 +471,7 @@ public class AdminCreateGames extends HttpServlet {
 
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
                  cutID, currentUserID, gamesLevel, gamesState,
-                startTime, finishTime, maxAssertionsPerTest, chatEnabled,
+                maxAssertionsPerTest, chatEnabled,
                 mutantValidatorLevel,
                 withTests, withMutants, //
                 capturePlayersIntention);
@@ -538,14 +534,14 @@ public class AdminCreateGames extends HttpServlet {
 
     private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame,
                                                      int cutID, int creatorID, GameLevel level, GameState state,
-                                                     long startTime, long finishTime, int maxAssertionsPerTest,
+                                                     int maxAssertionsPerTest,
                                                      boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
                                                      boolean withTests, boolean withMutants, //
                                                      boolean capturePlayersIntention
                                                      ) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
-            final MultiplayerGame game = new MultiplayerGame.Builder(cutID, creatorID, startTime, finishTime, maxAssertionsPerTest, 0, 0, 0, 0)
+            final MultiplayerGame game = new MultiplayerGame.Builder(cutID, creatorID, maxAssertionsPerTest)
                     .level(level)
                     .state(state)
                     .chatEnabled(chatEnabled)

@@ -45,8 +45,6 @@
 		<th>Attackers</th>
 		<th>Defenders</th>
 		<th>Level</th>
-		<th>Starting</th>
-		<th>Finishing</th>
 		<th></th>
 	</tr>
 <%
@@ -173,8 +171,6 @@
             %>
         </td>
 		<td class="col-sm-1"><%=info.gameLevel()%></td>
-		<td class="col-sm-1"><%=info.startTime()%></td>
-		<td class="col-sm-1"><%=info.finishTime()%></td>
 		<td class="col-sm-2">
 <%
 				switch(info.userRole()){
@@ -266,8 +262,6 @@
 		<th>Attackers</th>
 		<th>Defenders</th>
 		<th>Level</th>
-		<th>Starting</th>
-		<th>Finishing</th>
 		<th></th>
 
 	</tr>
@@ -315,25 +309,19 @@
 			<td class="col-sm-1"><%=attackers %></td>
 			<td class="col-sm-1"><%=defenders %></td>
 			<td class="col-sm-1"><%=info.gameLevel() %></td>
-			<td class="col-sm-1"><%=info.startTime()%></td>
-            <td class="col-sm-1"><%=info.finishTime()%></td>
 			<td class="col-sm-2">
-				<% if (attackers < info.maxAttackers()) { %>
 				<form id="joinGameForm_attacker_<%=info.gameId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
 					<input type="hidden" name="formType" value="joinGame">
 					<input type="hidden" name="gameId" value=<%=info.gameId()%>>
 					<input type="hidden" name="attacker" value=1>
 					<button type="submit" id="<%="join-attacker-"+info.gameId()%>" class="btn btn-primary btn-sm" style="background-color: #884466;border-color: #772233; margin-bottom: 3px;" value="Join as Attacker">Join as Attacker</button>
 				</form>
-				<% } %>
-				<% if (defenders < info.maxDefenders()) { %>
 				<form id="joinGameForm_defender_<%=info.gameId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
 					<input type="hidden" name="formType" value="joinGame">
 					<input type="hidden" name="gameId" value=<%=info.gameId()%>>
 					<input type="hidden" name="defender" value=1>
 					<button type="submit" id="<%="join-defender-"+info.gameId()%>" class="btn btn-primary btn-sm" style="background-color: #446688;border-color: #225577" value="Join as Defender">Join as Defender</button>
 				</form>
-				<% } %>
 			</td>
 		</tr>
 <%

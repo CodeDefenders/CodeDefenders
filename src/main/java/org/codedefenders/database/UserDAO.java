@@ -111,7 +111,6 @@ public class UserDAO {
                 "      FROM players, games",
                 "      WHERE players.Game_ID = games.ID",
                 "        AND (games.State = 'ACTIVE' OR games.State = 'CREATED')",
-                "        AND games.Finish_Time > NOW()",
                 "        AND players.Role IN ('ATTACKER', 'DEFENDER')",
                 "        AND Active = TRUE",
                 "    )",

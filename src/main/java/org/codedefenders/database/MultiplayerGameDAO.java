@@ -29,7 +29,6 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 
 import static org.codedefenders.database.DB.RSMapper;
@@ -60,23 +59,17 @@ public class MultiplayerGameDAO {
         int creatorId = rs.getInt("Creator_ID");
         GameState state = GameState.valueOf(rs.getString("State"));
         GameLevel level = GameLevel.valueOf(rs.getString("Level"));
-        long startTime = rs.getTimestamp("Start_Time").getTime();
-        long finishTime = rs.getTimestamp("Finish_Time").getTime();
         int maxAssertionsPerTest = rs.getInt("MaxAssertionsPerTest");
         boolean chatEnabled = rs.getBoolean("ChatEnabled");
         CodeValidatorLevel mutantValidator = CodeValidatorLevel.valueOf(rs.getString("MutantValidator"));
         boolean capturePlayersIntention = rs.getBoolean("CapturePlayersIntention");
-        int minDefenders = rs.getInt("Defenders_Needed");
-        int minAttackers = rs.getInt("Attackers_Needed");
         boolean requiresValidation = rs.getBoolean("RequiresValidation");
-        int defenderLimit = rs.getInt("Defenders_Limit");
-        int attackerLimit = rs.getInt("Attackers_Limit");
         float lineCoverage = rs.getFloat("Coverage_Goal");
         float mutantCoverage = rs.getFloat("Mutant_Goal");
         int defenderValue = rs.getInt("Defender_Value");
         int attackerValue = rs.getInt("Attacker_Value");
 
-        return new MultiplayerGame.Builder(classId, creatorId, startTime, finishTime, maxAssertionsPerTest, defenderLimit, attackerLimit, minDefenders, minAttackers)
+        return new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest)
                 .cut(cut)
                 .id(id)
                 .state(state)
@@ -144,12 +137,6 @@ public class MultiplayerGameDAO {
         float lineCoverage = game.getLineCoverage();
         float mutantCoverage = game.getMutantCoverage();
         int creatorId = game.getCreatorId();
-        int minAttackers = game.getMinAttackers();
-        int minDefenders = game.getMinDefenders();
-        int attackerLimit = game.getAttackerLimit();
-        int defenderLimit = game.getDefenderLimit();
-        long startDateTime = game.getStartDateTime();
-        long finishDateTime = game.getFinishDateTime();
         GameState state = game.getState();
         int maxAssertionsPerTest = game.getMaxAssertionsPerTest();
         boolean chatEnabled = game.isChatEnabled();
@@ -167,19 +154,13 @@ public class MultiplayerGameDAO {
                 "Coverage_Goal,",
                 "Mutant_Goal,",
                 "Creator_ID,",
-                "Attackers_Needed,",
-                "Defenders_Needed,",
-                "Attackers_Limit,",
-                "Defenders_Limit,",
-                "Start_Time,",
-                "Finish_Time,",
                 "State,",
                 "Mode,",
                 "MaxAssertionsPerTest,",
                 "ChatEnabled,",
                 "MutantValidator,",
                 "CapturePlayersIntention)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
                 DatabaseValue.of(level.name()),
@@ -189,12 +170,6 @@ public class MultiplayerGameDAO {
                 DatabaseValue.of(lineCoverage),
                 DatabaseValue.of(mutantCoverage),
                 DatabaseValue.of(creatorId),
-                DatabaseValue.of(minAttackers),
-                DatabaseValue.of(minDefenders),
-                DatabaseValue.of(attackerLimit),
-                DatabaseValue.of(defenderLimit),
-                DatabaseValue.of(new Timestamp(startDateTime)),
-                DatabaseValue.of(new Timestamp(finishDateTime)),
                 DatabaseValue.of(state.name()),
                 DatabaseValue.of(mode.name()),
                 DatabaseValue.of(maxAssertionsPerTest),
@@ -285,8 +260,7 @@ public class MultiplayerGameDAO {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM view_battleground_games",
-                "WHERE State != ?",
-                "  AND Finish_Time > NOW();");
+                "WHERE State != ?;");
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(GameState.FINISHED.name())
         };

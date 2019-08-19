@@ -81,36 +81,12 @@ public class UserMultiplayerGameInfo {
         return game.getLevel();
     }
 
-    public String startTime() {
-        return game.getFormattedStartDateTime();
-    }
-
-    public String finishTime() {
-        return game.getFormattedFinishDateTime();
-    }
-
     public List<Player> attackers() {
         return game.getAttackerPlayers();
     }
 
     public List<Player> defenders() {
         return game.getDefenderPlayers();
-    }
-
-    public int minAttackers() {
-        return game.getMinAttackers();
-    }
-
-    public int maxAttackers() {
-        return game.getAttackerLimit();
-    }
-
-    public int minDefenders() {
-        return game.getMinDefenders();
-    }
-
-    public int maxDefenders() {
-        return game.getAttackerLimit();
     }
 
     public String cutAlias() {

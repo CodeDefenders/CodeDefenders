@@ -67,8 +67,8 @@
                 <tr>
                     <th>Creator</th>
                     <th>Class</th>
-                    <th>Attack</th>
-                    <th>Defense</th>
+                    <th>Attackers</th>
+                    <th>Defenders</th>
                     <th>Level</th>
                 </tr>
                 <%
@@ -81,9 +81,9 @@
                 } else {
                     for (MultiplayerGame game : openGames) {
                     final GameClass cut = game.getCUT();
-                    int attackers = game.getAttackerIds().length;
-                    int defenders = game.getDefenderIds().length;
-                    %>
+                    int attackers = game.getAttackerPlayers().size();
+                    int defenders = game.getDefenderPlayers().size();
+                %>
                 <tr id="<%="game-"+game.getId()%>">
                     <td class="col-sm-1"><%=gameCreatorNames.get(game.getId())%></td>
                     <td class="col-sm-2">
@@ -113,9 +113,9 @@
 <%--                            </div>--%>
 <%--                        </div>--%>
                     </td>
-                    <td class="col-sm-1"><%=attackers %> of <%=game.getMinAttackers()%>&ndash;<%=game.getAttackerLimit()%>
+                    <td class="col-sm-1"><%=attackers%>
                     </td>
-                    <td class="col-sm-1"><%=defenders %> of <%=game.getMinDefenders()%>&ndash;<%=game.getDefenderLimit()%>
+                    <td class="col-sm-1"><%=defenders%>
                     </td>
                     <td class="col-sm-1"><%= game.getLevel()%>
                     </td>
