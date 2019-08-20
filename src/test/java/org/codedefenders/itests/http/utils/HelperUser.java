@@ -94,7 +94,6 @@ public class HelperUser {
 			long finishTime, // Finish time
 			int maxAssertionsPerTest, // maxAssertionsPerTest
 			int mutantValidatorLevel, // mutantValidatorLevel
-			boolean isMarkUncovered, // markUncovered
 			boolean isChatEnabled // chatEnabled
 	) throws FailingHttpStatusCodeException, IOException {
 
@@ -122,7 +121,6 @@ public class HelperUser {
 				new NameValuePair("finishTime", "" + (System.currentTimeMillis() + 24 * 60 * 60 * 1000)),
 				new NameValuePair("maxAssertionsPerTest", ""+maxAssertionsPerTest),
 				new NameValuePair("mutantValidatorLevel", ""+mutantValidatorLevel), // 0 - 1 - 2
-				new NameValuePair("markUncovered", "" + isMarkUncovered ),
 				new NameValuePair("chatEnabled", ""+isChatEnabled)));
 
 		gameUsers = browser.getPage(createGameRequest);
@@ -203,7 +201,7 @@ public class HelperUser {
 
 	/**
 	 * Returns the landing HtmlPage after joining the game
-	 * 
+	 *
 	 * @param gameID
 	 * @param isAttacker
 	 * @return
@@ -334,7 +332,7 @@ public class HelperUser {
 
 	/**
 	 * Return the Class ID
-	 * 
+	 *
 	 * @param file
 	 * @return
 	 * @throws FailingHttpStatusCodeException

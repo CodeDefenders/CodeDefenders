@@ -101,7 +101,6 @@ public class CreateBattlegroundTest extends AbstractEmptyDBSystemTest {
         driver.findElement(By.xpath("(//button[@type='button'])[3]")).click();
         driver.findElement(By.linkText("relaxed")).click();
         new Select(driver.findElement(By.id("mutantValidatorLevel"))).selectByVisibleText("relaxed");
-        driver.findElement(By.xpath("//td[@id='markUncoveredTd']/div/div/label[2]")).click();
         driver.findElement(By.id("createButton")).click();
 
         checkNrOfGames();

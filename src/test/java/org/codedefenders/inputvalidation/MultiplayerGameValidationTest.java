@@ -55,18 +55,18 @@ public class MultiplayerGameValidationTest {
 
 		String correctDate = "2018/05/01 15:40";
 		String correctDateOnlyDate = "2018/05/01 00:00";
-		
+
 		Set<ConstraintViolation<MultiplayerGame>> validateValue = null;
 		validateValue = validator.validateValue(MultiplayerGame.class, "startDateTime", correctDate);
 		System.out.println(validateValue);
 		assertEquals(0, validateValue.size());
 		Long startDate = new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(correctDate).getTime();
 		Long startDateOnlyDate = new SimpleDateFormat("yyyy/MM/dd HH:mm").parse(correctDateOnlyDate).getTime();
-		
+
 		assertNotEquals("Hours, minutes, and seconds are missing",
 				startDateOnlyDate,
 				startDate);
-		
+
 		validateValue = validator.validateValue(MultiplayerGame.class, "startDateTime", "01/10/2010");
 		System.out.println(validateValue);
 		assertEquals(1, validateValue.size());
@@ -133,8 +133,7 @@ public class MultiplayerGameValidationTest {
 		// request.getParameter("maxAssertionsPerTest"), //
 		// (request.getParameter("chatEnabled") != null),
 		// // Custom Validation
-		// request.getParameter("mutantValidatorLevel"), //
-		// (request.getParameter("markUncovered") != null) });
+		// request.getParameter("mutantValidatorLevel") }); //
 		//
 		// System.out.println("Validation messages " + violations);
 		//

@@ -32,8 +32,6 @@
 
     @param Boolean markEquivalent
         Enable marking mutants as equivalent.
-    @param Boolean markUncoveredEquivalent
-        Enable marking uncovered mutants as equivalent, only works with markEquivalent.
     @param Boolean viewDiff
         Enable viewing of the mutants diffs.
     @param List<Mutant> mutantsAlive
@@ -57,7 +55,6 @@
     List<Mutant> mutantsMarkedEquivalentTODORENAME = (List<Mutant>) request.getAttribute("mutantsMarkedEquivalent");
     List<Mutant> mutantsEquivalentTODORENAME = (List<Mutant>) request.getAttribute("mutantsEquivalent");
     Boolean markEquivalent = (Boolean) request.getAttribute("markEquivalent");
-    Boolean markUncoveredEquivalent = (Boolean) request.getAttribute("markUncoveredEquivalent");
     Boolean viewDiff = (Boolean) request.getAttribute("viewDiff");
     GameMode gameType = (GameMode) request.getAttribute("gameType");
     int gameId = (Integer) request.getAttribute("gameId");
@@ -116,10 +113,10 @@
                                 <%
                                     if (markEquivalent
                                         && m.getEquivalent().equals(Mutant.Equivalence.ASSUMED_NO)
-                                        && (markUncoveredEquivalent || m.isCovered())
-                                        && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID) {
-                                        if (gameType == GameMode.PARTY) {
-                                            if (m.getLines().size() > 1) {
+                                        && m.isCovered()
+                                        && m.getCreatorId() != Constants.DUMMY_ATTACKER_USER_ID
+                                        && gameType == GameMode.PARTY
+                                        && m.getLines().size() >= 1) {
                                                 String lineString = String.join(",", m.getLines().stream().map(String::valueOf).collect(Collectors.toList()));
                                 %>
                                 <form id="equiv" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return confirm('This will mark all player-created mutants on line(s) <%= lineString %> as equivalent. Are you sure?');">
@@ -129,8 +126,6 @@
                                     <button type="submit" class="btn btn-default btn-right">Claim Equivalent</button>
                                 </form>
                                 <%
-                                            }
-                                        }
                                     }
                                     if (m.getEquivalent().equals(Mutant.Equivalence.PENDING_TEST)){
                                 %>

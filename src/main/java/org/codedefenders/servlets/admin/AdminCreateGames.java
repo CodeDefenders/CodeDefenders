@@ -89,7 +89,6 @@ public class AdminCreateGames extends HttpServlet {
     private List<List<Integer>> defenderIdsList;
     private MultiplayerGame mg;
     private boolean chatEnabled;
-    private boolean markUncovered;
     private int maxAssertionsPerTest;
     private CodeValidatorLevel mutantValidatorLevel;
 
@@ -302,7 +301,6 @@ public class AdminCreateGames extends HttpServlet {
             maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
             mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
             chatEnabled = request.getParameter("chatEnabled") != null;
-            markUncovered = request.getParameter("markUncovered") != null;
 
             withTests = request.getParameter("withTests") != null;
             withMutants= request.getParameter("withMutants") != null;
@@ -478,7 +476,7 @@ public class AdminCreateGames extends HttpServlet {
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
                  cutID, currentUserID, gamesLevel, gamesState,
                 startTime, finishTime, maxAssertionsPerTest, chatEnabled,
-                mutantValidatorLevel, markUncovered, //
+                mutantValidatorLevel,
                 withTests, withMutants, //
                 capturePlayersIntention);
 
@@ -542,7 +540,6 @@ public class AdminCreateGames extends HttpServlet {
                                                      int cutID, int creatorID, GameLevel level, GameState state,
                                                      long startTime, long finishTime, int maxAssertionsPerTest,
                                                      boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
-                                                     boolean markUncovered, //
                                                      boolean withTests, boolean withMutants, //
                                                      boolean capturePlayersIntention
                                                      ) {
@@ -553,7 +550,6 @@ public class AdminCreateGames extends HttpServlet {
                     .state(state)
                     .chatEnabled(chatEnabled)
                     .mutantValidatorLevel(mutantValidatorLevel)
-                    .markUncovered(markUncovered)
                     .withTests(withTests)
                     .withMutants(withMutants)
                     .capturePlayersIntention(capturePlayersIntention)
