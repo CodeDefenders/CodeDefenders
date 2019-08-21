@@ -8,12 +8,16 @@ import javax.enterprise.context.ApplicationScoped;
 
 import org.codedefenders.notification.ITicketingService;
 
+/**
+ * Authenticates users' WebSocket connections generating a ticket for users and validating it when opening the
+ * connection.
+ */
 @ManagedBean
 @ApplicationScoped
 public class TicketingService implements ITicketingService {
 
     // Add duration for validity ?
-    private ConcurrentHashMap<String, Integer> tickets = new ConcurrentHashMap<String, Integer>();
+    private ConcurrentHashMap<String, Integer> tickets = new ConcurrentHashMap<>();
 
     @Override
     public synchronized String generateTicketForOwner(Integer owner) {
@@ -25,14 +29,18 @@ public class TicketingService implements ITicketingService {
 
     @Override
     public boolean validateTicket(String ticket, Integer owner) {
-        if (ticket == null || owner == null) return false;
-        return owner.equals(tickets.get(ticket));
+        if (ticket == null || owner == null) {
+            return false;
+        } else {
+            return owner.equals(tickets.get(ticket));
+        }
     }
 
     @Override
     public void invalidateTicket(String ticket) {
-        if (ticket != null)
+        if (ticket != null) {
             tickets.remove(ticket);
+        }
     }
 
 }

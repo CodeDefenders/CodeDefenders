@@ -60,15 +60,15 @@
                 // Deregister progress bar
                 var registration = {};
                 registration['type'] = "org.codedefenders.notification.web.PushSocketRegistrationEvent";
-                registration['action'] = "UNREGISTER"
+                registration['action'] = "UNREGISTER";
                 registration['gameID'] = <%=request.getAttribute("gameId")%>;
                 registration['playerID'] = <%=request.getAttribute("playerId")%>;
-                registration['target'] = "PROGRESSBAR_EVENT";
-        
+                registration['event'] = "PROGRESSBAR_EVENT";
+
                 // This ensures that connection is open. Will retry otherwise
                 sendMessage(JSON.stringify(registration));
                 console.log("Test progress bar unregistered " + JSON.stringify(registration) )
-                
+
                 break;
             }
 
@@ -82,16 +82,16 @@
         registration['type'] = "org.codedefenders.notification.web.PushSocketRegistrationEvent";
         registration['gameID'] = <%=request.getAttribute("gameId")%>;
         registration['playerID'] = <%=request.getAttribute("playerId")%>;
-        registration['target'] = "PROGRESSBAR_EVENT";
-        
+        registration['event'] = "PROGRESSBAR_EVENT";
+
         // This ensures that connection is open. Will retry otherwise
         sendMessage(JSON.stringify(registration));
         console.log("Test progress bar registered " + JSON.stringify(registration) )
-    
+
         // This will be automatically unregisterd @OnClose or via unregistration message
         notificationMessageHandlers.push(progressBarUpdateHandler);
         console.log("Progress bar handler registered")
     }
-    
+
 </script>
 

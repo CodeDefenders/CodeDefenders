@@ -13,21 +13,21 @@ import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.ITicketingService;
-import org.codedefenders.notification.model.ChatEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-
 // Since we manage here different message types we cannot have a single decoder
 // @RequestScoped -> TODO What's this?
+
+/**
+ * Communicates notifications and (game) events with the web interface through a WebSocket.
+ */
 @ServerEndpoint(value = "/notifications/{ticket}/{userId}", encoders = { NotificationEncoder.class })
 public class PushSocket {
 
@@ -43,7 +43,6 @@ public class PushSocket {
     // Authorization
     private int userId = -1;
     private String ticket;
-    private boolean validSession;
 
     // Events Handlers
     private ChatEventHandler chatEventHandler;
@@ -71,21 +70,13 @@ public class PushSocket {
         }
     }
 
-    private boolean validate(Session session, String ticket, Integer owner) throws IOException{
-        if (! ticketingServices.validateTicket(ticket, owner)){
-            logger.info("Invalid ticket for session " + session );
-            session.close( new CloseReason( CloseCodes.CANNOT_ACCEPT, "Invalid ticket"));
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     @OnOpen
     public void open(Session session, @PathParam("ticket") String ticket, @PathParam("userId") Integer userId)
             throws IOException {
 
-        if (!validate(session, ticket, userId)) {
+        if (! ticketingServices.validateTicket(ticket, userId)) {
+            logger.info("Invalid ticket for session " + session);
+            session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Invalid ticket"));
             return;
         }
 
@@ -95,6 +86,7 @@ public class PushSocket {
 
     @OnClose
     public void close(Session session) {
+        logger.info("Closing session for user: " + userId + " (ticket: " + ticket + ")");
 
         // Invalidate the ticket
         ticketingServices.invalidateTicket(this.ticket);
@@ -106,13 +98,14 @@ public class PushSocket {
             notificationService.unregister(this.chatEventHandler);
         }
         if (this.progressBarEventHandler != null) {
-            logger.info("Unregistering Progress Bar " + session);
             notificationService.unregister(this.progressBarEventHandler);
         }
     }
 
     @OnMessage
     public void onMessage(String json, Session session) {
+
+
         // TODO Create a typeAdapterFactory:
         // https://stackoverflow.com/questions/22307382/how-do-i-implement-typeadapterfactory-in-gson
 
@@ -128,7 +121,6 @@ public class PushSocket {
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        logger.error("Session " + session + " is on error. Cause: ", throwable);
+        logger.error("Session " + session + " caused an error. Cause: ", throwable);
     }
-
 }

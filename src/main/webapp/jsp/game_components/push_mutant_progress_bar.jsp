@@ -57,10 +57,10 @@
             // Deregister progress bar
             var registration = {};
             registration['type'] = "org.codedefenders.notification.web.PushSocketRegistrationEvent";
-            registration['action'] = "UNREGISTER"
+            registration['action'] = "UNREGISTER";
             registration['gameID'] = <%=request.getAttribute("gameId")%>;
             registration['playerID'] = <%=request.getAttribute("playerId")%>;
-            registration['target'] = "PROGRESSBAR_EVENT";
+            registration['event'] = "PROGRESSBAR_EVENT";
 
             // This ensures that connection is open. Will retry otherwise
             sendMessage(JSON.stringify(registration));
@@ -75,10 +75,10 @@
             // Deregister progress bar
             var registration = {};
             registration['type'] = "org.codedefenders.notification.web.PushSocketRegistrationEvent";
-            registration['action'] = "UNREGISTER"
+            registration['action'] = "UNREGISTER";
             registration['gameID'] = <%=request.getAttribute("gameId")%>;
             registration['playerID'] = <%=request.getAttribute("playerId")%>;
-            registration['target'] = "PROGRESSBAR_EVENT";
+            registration['event'] = "PROGRESSBAR_EVENT";
 
             // This ensures that connection is open. Will retry otherwise
             sendMessage(registration);
@@ -101,11 +101,11 @@
 	    sendMessage(registration);
 	    console.log("Mutant progress bar registered:");
 	    console.log(registration);
-	
+
 	    // This will be automatically unregisterd @OnClose or via unregistration message
 	    pushSocket.register(PushSocket.EventType.PROGRESSBAR, progressBarUpdateHandler);
 	    console.log("Progress bar handler registered")
 	}
-	
+
 </script>
 
