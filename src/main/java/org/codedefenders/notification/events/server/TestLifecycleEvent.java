@@ -1,4 +1,4 @@
-package org.codedefenders.notification.model;
+package org.codedefenders.notification.events.server;
 
 import org.codedefenders.game.Test;
 
@@ -7,7 +7,7 @@ import org.codedefenders.game.Test;
  */
 /* Types of test lifecycle events are a superset of TargetExecution.Target.Type
  * TODO: extend this class */
-public abstract class TestLifecycleEvent extends PushEvent {
+public abstract class TestLifecycleEvent extends ServerEvent {
     private Test test;
 
     public TestLifecycleEvent(Test test) {

@@ -1,7 +1,6 @@
-package org.codedefenders.notification.model;
+package org.codedefenders.notification.events.server;
 
 import org.codedefenders.game.AbstractGame;
-import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.User;
 
 /**

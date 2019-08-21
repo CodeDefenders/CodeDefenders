@@ -5,9 +5,9 @@ import java.io.IOException;
 import javax.websocket.EncodeException;
 import javax.websocket.Session;
 
-import org.codedefenders.notification.model.GameLifecycleEvent;
-import org.codedefenders.notification.model.MutantLifecycleEvent;
-import org.codedefenders.notification.model.TestLifecycleEvent;
+import org.codedefenders.notification.events.server.GameLifecycleEvent;
+import org.codedefenders.notification.events.server.MutantLifecycleEvent;
+import org.codedefenders.notification.events.server.TestLifecycleEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

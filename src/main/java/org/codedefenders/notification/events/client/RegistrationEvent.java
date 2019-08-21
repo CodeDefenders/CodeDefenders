@@ -1,14 +1,14 @@
-package org.codedefenders.notification.web;
+package org.codedefenders.notification.events.client;
 
 /**
- * A message sent by frontend WebSockets to register for notifications events.
+ * A message used to register for notifications events.
  * <ul>
- * <li>Events specifies a list of events the websocket wants to register to / unregister from.</li>
- * <li>Action is either {@code "register"} or {@code "unregister}" (maybe more options later?).</li>
- * <li>Other parameters depend on the type of events.</li>
+ *     <li>Events specifies a list of events the websocket wants to register to / unregister from.</li>
+ *     <li>Action is either {@code "register"} or {@code "unregister}" (maybe more options later?).</li>
+ *     <li>Other parameters depend on the type of events.</li>
  * </ul>
  */
-public class RegistrationMessage {
+public class RegistrationEvent extends ClientEvent {
     /* Required. */
     private String[] events;
     private Action action;
@@ -17,7 +17,7 @@ public class RegistrationMessage {
     private Integer gameId;
     private Integer playerId;
 
-    public RegistrationMessage(String[] events, Action action) {
+    public RegistrationEvent(String[] events, Action action) {
         this.events = events;
         this.action = action;
     }

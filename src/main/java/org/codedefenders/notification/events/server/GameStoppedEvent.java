@@ -1,7 +1,6 @@
-package org.codedefenders.notification.model;
+package org.codedefenders.notification.events.server;
 
 import org.codedefenders.game.AbstractGame;
-import org.codedefenders.model.EventStatus;
 
 /**
  * @author gambi
@@ -11,5 +10,4 @@ public class GameStoppedEvent extends GameLifecycleEvent {
     public GameStoppedEvent(AbstractGame game) {
         super(game);
     }
-
 }

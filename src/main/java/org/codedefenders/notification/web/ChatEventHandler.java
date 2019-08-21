@@ -5,7 +5,7 @@ import java.io.IOException;
 import javax.websocket.EncodeException;
 import javax.websocket.Session;
 
-import org.codedefenders.notification.model.ChatEvent;
+import org.codedefenders.notification.events.server.ServerChatEvent;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -20,7 +20,7 @@ public class ChatEventHandler {
     }
 
     @Subscribe
-    public void pushChatMessage(ChatEvent e) throws IOException, EncodeException {
+    public void pushChatMessage(ServerChatEvent e) throws IOException, EncodeException {
         if (e.hasRecipient(this.userId)) {
             // TODO
             // session.getBasicRemote().sendObject(notification);

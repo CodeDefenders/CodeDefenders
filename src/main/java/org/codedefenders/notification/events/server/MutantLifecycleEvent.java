@@ -1,4 +1,4 @@
-package org.codedefenders.notification.model;
+package org.codedefenders.notification.events.server;
 
 import org.codedefenders.game.Mutant;
 
@@ -17,5 +17,4 @@ public abstract class MutantLifecycleEvent {
     public Mutant getMutant() {
         return mutant;
     }
-
 }

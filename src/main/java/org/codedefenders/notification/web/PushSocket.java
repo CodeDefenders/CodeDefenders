@@ -1,6 +1,7 @@
 package org.codedefenders.notification.web;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
@@ -19,16 +20,39 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.ITicketingService;
+import org.codedefenders.notification.events.client.ClientChatEvent;
+import org.codedefenders.notification.events.client.ClientEvent;
+import org.codedefenders.notification.events.client.RegistrationEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// Since we manage here different message types we cannot have a single decoder
-// @RequestScoped -> TODO What's this?
-
 /**
- * Communicates notifications and (game) events with the web interface through a WebSocket.
+ * Communicates notifications and (game) events with clients through a WebSocket.
+ * <ul>
+ *     <li>Server-to-client events are located in the package events/server.</li>
+ *     <li>Client-to-server events are located in the package events/client.</li>
+ * </ul>
+ * Filtering is done by the event handlers. Therefore, server-to-client events may need to store information to filter
+ * which users will receive the message (e.g. user ids, game id, etc.).
+ * <p></p>
+ * Sent and received messages follow the following JSON format:
+ * <pre>
+ *     {
+ *         type: &lt;simple classname of the event&gt;,
+ *         data: &lt;json representation of event class&gt;
+ *     }
+ * </pre>
+ * Client-to-server events are converted to JSON automatically based on their type.
+ * <p></p>
+ * Server-to-client events are converted to JSON by the event's {@code toJson()} method.
+ * Because of this, server-to-client events may store additional information, which is omitted when sending the event to
+ * the client.
  */
-@ServerEndpoint(value = "/notifications/{ticket}/{userId}", encoders = { NotificationEncoder.class })
+// @RequestScoped -> TODO What's this?
+@ServerEndpoint(
+        value = "/notifications/{ticket}/{userId}",
+        encoders = { NotificationEncoder.class },
+        decoders = { NotificationDecoder.class })
 public class PushSocket {
 
     // @Inject
@@ -103,20 +127,17 @@ public class PushSocket {
     }
 
     @OnMessage
-    public void onMessage(String json, Session session) {
-
-
-        // TODO Create a typeAdapterFactory:
-        // https://stackoverflow.com/questions/22307382/how-do-i-implement-typeadapterfactory-in-gson
-
-        // Registration for event types
-        // PushSocketRegistrationEvent registration = new Gson().fromJson(json, PushSocketRegistrationEvent.class);
-        // this.gameEventHandler = new GameEventHandler(registration.getPlayerID(), registration.getGameID(), session);
-        // notificationService.register(gameEventHandler);
-
-        // Chat messages
-        // ChatEvent chatMessage = new Gson().fromJson(json, ChatEvent.class);
-        // notificationService.post(chatMessage);
+    public void onMessage(ClientEvent event, Session session) {
+        // TODO
+        if (event instanceof RegistrationEvent) {
+            RegistrationEvent e2 = (RegistrationEvent) event;
+            logger.info("Client registered for " + Arrays.toString(e2.getEvents()));
+        } else if (event instanceof ClientChatEvent) {
+            ClientChatEvent e2 = (ClientChatEvent) event;
+            logger.info("Client sent message: " + e2.getMessage());
+        } else {
+            logger.info("Unknown message");
+        }
     }
 
     @OnError

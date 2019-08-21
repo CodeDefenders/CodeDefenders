@@ -61,8 +61,8 @@
 
                 this.websocket.onmessage = evt => {
                     // https://stackoverflow.com/questions/7116035/parse-json-received-with-websocket-results-in-error
-                    const {type, message} = JSON.parse(evt.data.replace(/[\s\0]/g, ' '));
-                    this.dispatch(type, message);
+                    const {type, data} = JSON.parse(evt.data.replace(/[\s\0]/g, ' '));
+                    this.dispatch(type, data);
 
                     console.log(evt); // TODO: remove later
                 };
@@ -92,19 +92,19 @@
         }
 
         /* Send a message to the server. */
-        send (type, message) {
-            const data = JSON.stringify({type, message});
+        send (type, data) {
+            const message = JSON.stringify({type, data});
             this.promise.then(() => {
-                this.websocket.send(data);
+                this.websocket.send(message);
             });
         }
 
         /* Dispatch a message to the registered handlers for the type. */
-        dispatch (type, message) {
+        dispatch (type, data) {
             const list = this.handlers.get(type);
             if (list !== undefined) {
                 for (const callback of this.handlers.get(type)) {
-                    callback(message);
+                    callback(data);
                 }
             }
         }
