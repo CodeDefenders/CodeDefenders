@@ -25,7 +25,7 @@
     // Who calls this function ?
     function updateAttackForm(value){
         document.getElementById("attacker_intention").value = value;
-        /* progressBar(); */
+        progressBar();
         // Disabled for #490
         /* registerMutantProgressBar(); */
         theForm.submit();
