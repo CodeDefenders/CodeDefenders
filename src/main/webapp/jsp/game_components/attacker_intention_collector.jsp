@@ -26,7 +26,8 @@
     function updateAttackForm(value){
         document.getElementById("attacker_intention").value = value;
         /* progressBar(); */
-        registerMutantProgressBar();
+        // Disabled for #490
+        /* registerMutantProgressBar(); */
         theForm.submit();
         attackButton.disabled = true;
     }
