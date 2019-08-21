@@ -28,8 +28,7 @@ public class ProgressBarEventHandler {
             // notification.setMessage(e.getEventType());
             synchronized (session) {
                 if (session.isOpen()) {
-                    // TODO
-                    // session.getBasicRemote().sendObject(notification);
+                    session.getBasicRemote().sendObject(e);
                 } else {
                    // TODO Log this ?
                 }
@@ -46,8 +45,7 @@ public class ProgressBarEventHandler {
             // notification.setMessage(e.getEventType());
             synchronized (session) {
                 if (session.isOpen()) {
-                    // TODO
-                    // session.getBasicRemote().sendObject(notification);
+                    session.getBasicRemote().sendObject(e);
                 } else {
                     // TODO Log this ?
                 }

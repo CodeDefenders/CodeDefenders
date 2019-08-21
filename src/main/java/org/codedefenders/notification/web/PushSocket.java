@@ -28,25 +28,40 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Communicates notifications and (game) events with clients through a WebSocket.
- * <ul>
- *     <li>Server-to-client events are located in the package events/server.</li>
- *     <li>Client-to-server events are located in the package events/client.</li>
- * </ul>
- * Filtering is done by the event handlers. Therefore, server-to-client events may need to store information to filter
- * which users will receive the message (e.g. user ids, game id, etc.).
+ *
  * <p></p>
+ *
+ * <h2>Event format and types</h2>
  * Sent and received messages follow the following JSON format:
  * <pre>
- *     {
- *         type: &lt;simple classname of the event&gt;,
- *         data: &lt;json representation of event class&gt;
- *     }
+ * {
+ *     type: &lt;simple classname of the event&gt;,
+ *     data: &lt;json representation of event class&gt;
+ * }
  * </pre>
- * Client-to-server events are converted to JSON automatically based on their type.
+ * Here type is the simple class name of the class the event belongs to,
+ * and data is the data of the event, represented by objects of the class.
+ *
  * <p></p>
- * Server-to-client events are converted to JSON by the event's {@code toJson()} method.
- * Because of this, server-to-client events may store additional information, which is omitted when sending the event to
- * the client.
+ *
+ * <h2>Server-to-client events</h2>
+ * Server-to-client events are located in the package events/server.
+ * They are serialized to JSON by the event's {@code toJson()} method.
+ * Because of this, server-to-client events may store additional information,
+ * which can be omitted when sending the event to the client.
+ * <p></p>
+ * Filtering of server-to-client events is done by the event handlers.
+ * Therefore, server-to-client events may need to store information to filter
+ * which users will receive the message (e.g. user ids, game id, etc.).
+ *
+ * <p></p>
+ *
+ * <h2>Client-to-server events</h2>
+ * Client-to-server events are located in the package events/client.
+ * They are deserialized from JSON automatically based on their type.
+ * <p></p>
+ * Some of the client-to-server events may have optional attributes
+ * (e.g. {@link RegistrationEvent}).
  */
 // @RequestScoped -> TODO What's this?
 @ServerEndpoint(
@@ -128,20 +143,27 @@ public class PushSocket {
 
     @OnMessage
     public void onMessage(ClientEvent event, Session session) {
-        // TODO
+
         if (event instanceof RegistrationEvent) {
             RegistrationEvent e2 = (RegistrationEvent) event;
-            logger.info("Client registered for " + Arrays.toString(e2.getEvents()));
+            logger.info("Client registered for " + e2.getType());
         } else if (event instanceof ClientChatEvent) {
             ClientChatEvent e2 = (ClientChatEvent) event;
             logger.info("Client sent message: " + e2.getMessage());
+            // TODO
         } else {
-            logger.info("Unknown message");
+            logger.info("Unknown event");
         }
     }
 
     @OnError
     public void onError(Session session, Throwable throwable) {
         logger.error("Session " + session + " caused an error. Cause: ", throwable);
+    }
+
+    enum EventType {
+        GAME,
+        CHAT,
+        PROGRESSBAR
     }
 }

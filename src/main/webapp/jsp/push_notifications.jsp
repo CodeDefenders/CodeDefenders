@@ -18,126 +18,193 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%--
 
-    This code setups a web socket for the page. It ensures that each request is validated against
+<%--
+    Sets up a web socket for the page. It ensures that each request is validated against
     an automatically generated ticket which it matched with the user. Components wishing to receive push events
     must register proper handlers with the notifications channel.
 
+    Usage:
+        After running this script, the socket with the connection already established (or trying to establish a
+        connection if not possible) will be available under "window.pushSocket". The PushSocket class will be avalilable
+        under "window.PushSocket".
+
+        The socket automatically tries to reconnect to the server if the connection can't be established or is lost.
+        Messages sent while the connection is lost will be sent when the connection is established again.
+
+        "subscribe" and "unsubscribe" are used to subscribe to events on the server side.
+        Here, the event types are given by PushSocket.EventType (the Java class),
+        and may encompass multiple event types on the JavaScript side.
+
+        "register" and "unregister" are used to register callbacks for certain event types received by the websocket.
+        Here, the event types are given by the simple class names in the events/server package.
+
+        "send" is used to send regular events / messages to the server.
+        Here, the event types are given by the simple class names in the events/client package.
+
+        "registerWS" and "unregisterWS" are used to register to websocket-specific events.
+        Here, the event types are given by PushSocket.WSEventType (the JavaScript class).
+
+    See PushSocket's JavaDoc for more information.
+
+    @param String notification-ticket (TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME)
+        The ticket used for the WebSocket connection.
 --%>
+
 <%@ page import="org.codedefenders.notification.web.TicketingFilter"  %>
+<%@ page import="org.codedefenders.notification.events.client.RegistrationEvent" %>
+
+<script src="js/reconnecting-websocket-iife.min.js"></script>
+
+<%
+    String name = request.getServerName();
+    int port = request.getServerPort();
+    String context = request.getContextPath();
+    String ticket = (String) request.getAttribute(TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME);
+    int uid = (Integer) session.getAttribute("uid");
+%>
 
 <script type="text/javascript">
-
-    /*
-     * TODO: do we need to keep a map of event types here or should we send every event to every handler?
-     * TODO: logic to try to reconnect
-     * TODO: handle sending register/unregister events in the register/unregister methods of PushSocket?
-     */
     class PushSocket {
         constructor (url) {
+            console.log('Setting up WebSocket at ' + url + '.');
+
             this.handlers = new Map();
-            this.websocket = null;
+            this.websocket = new ReconnectingWebSocket(url);
 
-            this.promise = new Promise((resolve, reject) => {
-                console.log('Setting up WebSocket at ' + url + '.');
-                this.websocket = new WebSocket(url);
-
-                this.websocket.onopen  = evt => {
-                    this.dispatch(PushSocket.EventType.OPEN,  evt);
-                    console.log('WebSocket connection established.');
-                    resolve();
-                };
-
-                this.websocket.onerror = evt => {
-                    this.dispatch(PushSocket.EventType.ERROR, evt);
-                    console.log('WebSocket error occurred.');
-                };
-
-                this.websocket.onclose = evt => {
-                    this.dispatch(PushSocket.EventType.CLOSE, evt);
-                    console.log('WebSocket connection closed.');
-                };
-
-                this.websocket.onmessage = evt => {
-                    // https://stackoverflow.com/questions/7116035/parse-json-received-with-websocket-results-in-error
-                    const {type, data} = JSON.parse(evt.data.replace(/[\s\0]/g, ' '));
-                    this.dispatch(type, data);
-
-                    console.log(evt); // TODO: remove later
-                };
-            });
+            this.websocket.onopen  = evt => console.log('WebSocket connection established.');
+            this.websocket.onerror = evt => console.log('WebSocket error occurred.');
+            this.websocket.onclose = evt => console.log('WebSocket connection closed.');
+            this.websocket.onmessage = evt => {
+                // https://stackoverflow.com/questions/7116035/parse-json-received-with-websocket-results-in-error
+                const {type, data} = JSON.parse(evt.data.replace(/[\s\0]/g, ' '));
+                this.dispatch(type, data);
+                console.log({type, data});
+            };
         }
 
-        /* Register callback for event type. */
+        /**
+         * Registers a callback for a server event.
+         * This will send a registration message to the server if the event type is not registered on the server.
+         * @param {string} type The type to register a callback for.
+         * @param {function} callback The callback to register.
+         */
         register (type, callback) {
-            let list = this.handlers.get(type);
-            if (list === undefined) {
-                list = [];
-                this.handlers.set(type, list);
+            let callbacks = this.handlers.get(type);
+
+            if (callbacks === undefined) {
+                callbacks = [];
+                this.handlers.set(type, callbacks);
             }
 
-            list.push(callback);
+            callbacks.push(callback);
         }
 
-        /* Unregister callback for event type. */
+        /**
+         * Unregisters a callback for a server event.
+         * This will send a registration message to the server if the .
+         * @param {string} type The type to register a callback for.
+         * @param {function} callback The callback to register.
+         */
         unregister (type, callback) {
-            const list = this.handlers.get(type);
-            if (list === undefined) return;
+            const callbacks = this.handlers.get(type);
+            if (callbacks === undefined || callbacks.length === 0) {
+                console.error('Tried to unregister callback for type "' + type + "', "
+                    + 'but no callback is registered for the type.');
+                return;
+            }
 
-            const index = list.indexOf(callback);
-            if (index === undefined) return;
+            const index = callbacks.indexOf(callback);
+            if (index === -1) {
+                console.error('Tried to unregister callback for type "' + type + "', "
+                    + 'but given callback was not registered.');
+                return;
+            }
 
-            list.splice(index, 1);
+            callbacks.splice(index, 1);
         }
 
-        /* Send a message to the server. */
-        send (type, data) {
-            const message = JSON.stringify({type, data});
-            this.promise.then(() => {
-                this.websocket.send(message);
+        /**
+         * Subscribe at the server to receive events for the given type of Event.
+         * @param {string} event The type of event to subscribe to.
+         * @param {object} params Additional parameters to send to the server for registration.
+         */
+        subscribe(event, params = {}) {
+            this.send('<%=RegistrationEvent.class.getSimpleName()%>', {
+                event,
+                action: '<%=RegistrationEvent.Action.REGISTER.toString()%>',
+                ...params
             });
         }
 
-        /* Dispatch a message to the registered handlers for the type. */
+        /**
+         * Unregister at the server to stop receiving events for the given type of event.
+         * @param {string} event The type of event to unsubscribe from.
+         */
+        unsubscribe(event) {
+            this.send('<%=RegistrationEvent.class.getSimpleName()%>', {
+                event,
+                action: '<%=RegistrationEvent.Action.UNREGISTER.toString()%>',
+            })
+        }
+
+        /**
+         * Sends a message to the server.
+         * @param {string} type The type of the message.
+         * @param {object} data The data of the message.
+         */
+        send (type, data) {
+            const message = JSON.stringify({type, data});
+            this.websocket.send(message);
+        }
+
+        /**
+         * Dispatches an event to the registered handlers for the type.
+         * @param {string} type The type of the event.
+         * @param {object} data The data of the event.
+         */
         dispatch (type, data) {
-            const list = this.handlers.get(type);
-            if (list !== undefined) {
-                for (const callback of this.handlers.get(type)) {
+            const callbacks = this.handlers.get(type);
+            if (callbacks !== undefined) {
+                for (const callback of callbacks) {
                     callback(data);
                 }
             }
+        }
+
+        /**
+         *  Register a callback for a WebSocket event ('open', 'error', 'close', 'message').
+         *  @param {string} type The type to register a callback for.
+         *  @param {function} callback The callback to register.
+         */
+        registerWS (type, callback) {
+            this.websocket.addEventListener(type, callback)
+        }
+
+        /**
+         *  Unregister a callback for a WebSocket event ('open', 'error', 'close', 'message').
+         *  @param {string} type The type to register a callback for.
+         *  @param {function} callback The callback to register.
+         */
+        unregisterWS (type, callback) {
+            this.websocket.removeEventListener(type, callback)
         }
 
         get readyState () {
             return this.websocket.readyState;
         }
 
-        static get EventType () {
-            /* Enum for event types to prevent typos. */
+        static get WSEventType () {
             return {
-                OPEN: 'OPEN',
-                ERROR: 'ERROR',
-                CLOSE: 'CLOSE',
-
-                GAME: 'GAME',
-                CHAT: 'CHAT',
-                PROGRESSBAR: 'PROGRESSBAR'
-                /* ... */
+                OPEN: 'open',
+                CLOSE: 'close',
+                ERROR: 'error',
+                MESSAGE: 'message'
             };
         }
     }
 
     window.PushSocket = PushSocket;
-
-    <%
-        String name = request.getServerName();
-        int port = request.getServerPort();
-        String context = request.getContextPath();
-        String ticket = (String) request.getAttribute(TicketingFilter.TICKET_REQUEST_ATTRIBUTE_NAME);
-        int uid = (Integer) session.getAttribute("uid");
-    %>
-
     const wsUri = "ws://<%=name%>:<%=port%><%=context%>/notifications/<%=ticket%>/<%=uid%>";
     window.pushSocket = new PushSocket(wsUri);
 </script>

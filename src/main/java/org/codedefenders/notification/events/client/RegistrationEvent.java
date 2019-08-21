@@ -10,15 +10,15 @@ package org.codedefenders.notification.events.client;
  */
 public class RegistrationEvent extends ClientEvent {
     /* Required. */
-    private String[] events;
+    private String event;
     private Action action;
 
     /* Optional, depending on the events. */
     private Integer gameId;
     private Integer playerId;
 
-    public RegistrationEvent(String[] events, Action action) {
-        this.events = events;
+    public RegistrationEvent(String type, Action action) {
+        this.event = type;
         this.action = action;
     }
 
@@ -34,8 +34,8 @@ public class RegistrationEvent extends ClientEvent {
         return action;
     }
 
-    public String[] getEvents() {
-        return events;
+    public String getType() {
+        return event;
     }
 
     public Integer getGameId() {

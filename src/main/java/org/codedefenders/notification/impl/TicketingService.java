@@ -15,7 +15,6 @@ import org.codedefenders.notification.ITicketingService;
 @ManagedBean
 @ApplicationScoped
 public class TicketingService implements ITicketingService {
-
     // Add duration for validity ?
     private ConcurrentHashMap<String, Integer> tickets = new ConcurrentHashMap<>();
 

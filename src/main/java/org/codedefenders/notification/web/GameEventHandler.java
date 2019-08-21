@@ -42,24 +42,21 @@ public class GameEventHandler {
     @Subscribe
     public void pushGameEvent(GameLifecycleEvent e) throws IOException, EncodeException {
         if (this.gameId == e.getGame().getId()) {
-            // TODO
-            // session.getBasicRemote().sendObject(notification);
+            session.getBasicRemote().sendObject(e);
         }
     }
 
     @Subscribe
     public void pushGameEvent(TestLifecycleEvent e) throws IOException, EncodeException {
         if (this.playerId != e.getTest().getPlayerId()) {
-            // TODO
-            // session.getBasicRemote().sendObject(notification);
+            session.getBasicRemote().sendObject(e);
         }
     }
 
     @Subscribe
     public void pushGameEvent(MutantLifecycleEvent e) throws IOException, EncodeException {
         if (this.playerId != e.getMutant().getPlayerId()) {
-            // TODO
-            // session.getBasicRemote().sendObject(notification);
+            session.getBasicRemote().sendObject(e);
         }
     }
 
