@@ -1,7 +1,6 @@
 package org.codedefenders.notification.web;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
@@ -20,9 +19,12 @@ import javax.websocket.server.ServerEndpoint;
 
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.ITicketingService;
-import org.codedefenders.notification.events.client.ClientChatEvent;
 import org.codedefenders.notification.events.client.ClientEvent;
 import org.codedefenders.notification.events.client.RegistrationEvent;
+import org.codedefenders.notification.handling.client.ClientEventHandler;
+import org.codedefenders.notification.handling.server.ChatEventHandler;
+import org.codedefenders.notification.handling.server.GameEventHandler;
+import org.codedefenders.notification.handling.server.ProgressBarEventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,9 +68,11 @@ import org.slf4j.LoggerFactory;
 // @RequestScoped -> TODO What's this?
 @ServerEndpoint(
         value = "/notifications/{ticket}/{userId}",
-        encoders = { NotificationEncoder.class },
-        decoders = { NotificationDecoder.class })
+        encoders = { EventEncoder.class },
+        decoders = { EventDecoder.class })
 public class PushSocket {
+    // TODO Make an Inject for this
+    private static final Logger logger = LoggerFactory.getLogger(PushSocket.class);
 
     // @Inject
     private INotificationService notificationService;
@@ -76,17 +80,17 @@ public class PushSocket {
     // @Inject
     private ITicketingService ticketingServices;
 
-    // TODO Make an Inject for this
-    private static final Logger logger = LoggerFactory.getLogger(PushSocket.class);
-
     // Authorization
     private int userId = -1;
     private String ticket;
 
-    // Events Handlers
+    // Server events handlers
     private ChatEventHandler chatEventHandler;
     private GameEventHandler gameEventHandler;
     private ProgressBarEventHandler progressBarEventHandler;
+
+    // Client event handler
+    private ClientEventHandler clientEventHandler;
 
     public PushSocket() {
         try {
@@ -143,27 +147,48 @@ public class PushSocket {
 
     @OnMessage
     public void onMessage(ClientEvent event, Session session) {
-
         if (event instanceof RegistrationEvent) {
-            RegistrationEvent e2 = (RegistrationEvent) event;
-            logger.info("Client registered for " + e2.getType());
-        } else if (event instanceof ClientChatEvent) {
-            ClientChatEvent e2 = (ClientChatEvent) event;
-            logger.info("Client sent message: " + e2.getMessage());
-            // TODO
+            handleRegistrationEvent((RegistrationEvent) event, session);
         } else {
-            logger.info("Unknown event");
+            event.accept(clientEventHandler);
+        }
+    }
+
+    // TODO: create separate events for the different registrations?
+    private void handleRegistrationEvent(RegistrationEvent event, Session session) {
+        switch (event.getType()) {
+            case CHAT:
+                if (event.getUserId() != null) {
+                    chatEventHandler = new ChatEventHandler(event.getUserId(), session);
+                    notificationService.register(chatEventHandler);
+                } else {
+                    logger.warn("RegistrationEvent for progressbar is missing user id.");
+                }
+                break;
+            case GAME:
+                if (event.getPlayerId() != null && event.getGameId() != null) {
+                    gameEventHandler = new GameEventHandler(event.getPlayerId(), event.getGameId(), session);
+                    notificationService.register(chatEventHandler);
+                } else {
+                    logger.warn("RegistrationEvent for progressbar is missing game id or player id.");
+                }
+                break;
+            case PROGRESSBAR:
+                if (event.getPlayerId() != null) {
+                    progressBarEventHandler = new ProgressBarEventHandler(event.getPlayerId(), session);
+                    notificationService.register(chatEventHandler);
+                } else {
+                    logger.warn("RegistrationEvent for progressbar is missing player id.");
+                }
+                break;
+            default:
+                logger.error("Unknown enum entry.");
+                break;
         }
     }
 
     @OnError
     public void onError(Session session, Throwable throwable) {
         logger.error("Session " + session + " caused an error. Cause: ", throwable);
-    }
-
-    enum EventType {
-        GAME,
-        CHAT,
-        PROGRESSBAR
     }
 }

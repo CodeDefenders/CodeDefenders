@@ -1,5 +1,7 @@
 package org.codedefenders.notification.events.client;
 
+import org.codedefenders.notification.handling.client.ClientEventHandler;
+
 /**
  * A message used to register for notifications events.
  * <ul>
@@ -10,15 +12,16 @@ package org.codedefenders.notification.events.client;
  */
 public class RegistrationEvent extends ClientEvent {
     /* Required. */
-    private String event;
+    private EventType type;
     private Action action;
 
     /* Optional, depending on the events. */
     private Integer gameId;
     private Integer playerId;
+    private Integer userId;
 
-    public RegistrationEvent(String type, Action action) {
-        this.event = type;
+    public RegistrationEvent(EventType type, Action action) {
+        this.type = type;
         this.action = action;
     }
 
@@ -30,12 +33,16 @@ public class RegistrationEvent extends ClientEvent {
         this.playerId = playerId;
     }
 
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
     public Action getAction() {
         return action;
     }
 
-    public String getType() {
-        return event;
+    public EventType getType() {
+        return type;
     }
 
     public Integer getGameId() {
@@ -46,8 +53,23 @@ public class RegistrationEvent extends ClientEvent {
         return playerId;
     }
 
+    public Integer getUserId() {
+        return userId;
+    }
+
+    @Override
+    public void accept(ClientEventHandler visitor) {
+        throw new UnsupportedOperationException("Registration event is treated as a special event.");
+    }
+
     public enum Action {
         REGISTER,
         UNREGISTER
+    }
+
+    public enum EventType {
+        GAME,
+        CHAT,
+        PROGRESSBAR
     }
 }

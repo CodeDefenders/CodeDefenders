@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.codedefenders.notification.events.server.ServerEvent;
 
-public class NotificationEncoder implements Encoder.Text<ServerEvent> {
+public class EventEncoder implements Encoder.Text<ServerEvent> {
     @Override
     public void init(EndpointConfig endpointConfig) {
     }

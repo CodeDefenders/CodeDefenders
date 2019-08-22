@@ -10,7 +10,7 @@ import javax.websocket.DecodeException;
 import javax.websocket.Decoder;
 import javax.websocket.EndpointConfig;
 
-public class NotificationDecoder implements Decoder.Text<ClientEvent> {
+public class EventDecoder implements Decoder.Text<ClientEvent> {
     @Override
     public void init(EndpointConfig endpointConfig) {
     }

@@ -1,5 +1,7 @@
 package org.codedefenders.notification.events.client;
 
+import org.codedefenders.notification.handling.client.ClientEventHandler;
+
 /**
  * A chat message (from the in-game chat).
  */
@@ -13,5 +15,10 @@ public class ClientChatEvent extends ClientEvent {
 
     public String getMessage() {
         return message;
+    }
+
+    @Override
+    public void accept(ClientEventHandler visitor) {
+        visitor.visit(this);
     }
 }

@@ -1,4 +1,4 @@
-package org.codedefenders.notification.web;
+package org.codedefenders.notification.handling.server;
 
 import java.io.IOException;
 

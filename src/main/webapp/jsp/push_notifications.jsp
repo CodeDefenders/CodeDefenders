@@ -33,7 +33,7 @@
         Messages sent while the connection is lost will be sent when the connection is established again.
 
         "subscribe" and "unsubscribe" are used to subscribe to events on the server side.
-        Here, the event types are given by PushSocket.EventType (the Java class),
+        Here, the event types are given by RegistrationEvent.EventType,
         and may encompass multiple event types on the JavaScript side.
 
         "register" and "unregister" are used to register callbacks for certain event types received by the websocket.
@@ -126,12 +126,12 @@
 
         /**
          * Subscribe at the server to receive events for the given type of Event.
-         * @param {string} event The type of event to subscribe to.
+         * @param {string} type The type of event to subscribe to.
          * @param {object} params Additional parameters to send to the server for registration.
          */
-        subscribe(event, params = {}) {
+        subscribe(type, params = {}) {
             this.send('<%=RegistrationEvent.class.getSimpleName()%>', {
-                event,
+                type,
                 action: '<%=RegistrationEvent.Action.REGISTER.toString()%>',
                 ...params
             });
@@ -139,11 +139,11 @@
 
         /**
          * Unregister at the server to stop receiving events for the given type of event.
-         * @param {string} event The type of event to unsubscribe from.
+         * @param {string} type The type of event to unsubscribe from.
          */
-        unsubscribe(event) {
+        unsubscribe(type) {
             this.send('<%=RegistrationEvent.class.getSimpleName()%>', {
-                event,
+                type,
                 action: '<%=RegistrationEvent.Action.UNREGISTER.toString()%>',
             })
         }
