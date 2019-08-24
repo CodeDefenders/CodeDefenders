@@ -8,23 +8,25 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.model.User;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.ITicketingService;
 import org.codedefenders.notification.events.client.ClientEvent;
-import org.codedefenders.notification.events.client.RegistrationEvent;
-import org.codedefenders.notification.handling.client.ClientEventHandler;
-import org.codedefenders.notification.handling.server.ChatEventHandler;
-import org.codedefenders.notification.handling.server.GameEventHandler;
-import org.codedefenders.notification.handling.server.ProgressBarEventHandler;
+import org.codedefenders.notification.events.server.ServerEvent;
+import org.codedefenders.notification.handling.ClientEventHandler;
+import org.codedefenders.notification.events.EventNames;
+import org.codedefenders.notification.handling.ServerEventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,33 +39,21 @@ import org.slf4j.LoggerFactory;
  * Sent and received messages follow the following JSON format:
  * <pre>
  * {
- *     type: &lt;simple classname of the event&gt;,
- *     data: &lt;json representation of event class&gt;
+ *     type: &lt;event name based on the class, given by {@link EventNames}&gt;,
+ *     data: &lt;json representation of event object&gt;
  * }
  * </pre>
- * Here type is the simple class name of the class the event belongs to,
- * and data is the data of the event, represented by objects of the class.
- *
- * <p></p>
  *
  * <h2>Server-to-client events</h2>
  * Server-to-client events are located in the package events/server.
- * They are serialized to JSON by the event's {@code toJson()} method.
- * Because of this, server-to-client events may store additional information,
- * which can be omitted when sending the event to the client.
  * <p></p>
- * Filtering of server-to-client events is done by the event handlers.
- * Therefore, server-to-client events may need to store information to filter
- * which users will receive the message (e.g. user ids, game id, etc.).
+ * Filtering of server-to-client events is done by the event handlers
+ * using information (e.g. user ids) stored in the event).
  *
  * <p></p>
  *
  * <h2>Client-to-server events</h2>
  * Client-to-server events are located in the package events/client.
- * They are deserialized from JSON automatically based on their type.
- * <p></p>
- * Some of the client-to-server events may have optional attributes
- * (e.g. {@link RegistrationEvent}).
  */
 // @RequestScoped -> TODO What's this?
 @ServerEndpoint(
@@ -81,16 +71,14 @@ public class PushSocket {
     private ITicketingService ticketingServices;
 
     // Authorization
-    private int userId = -1;
+    private User user;
     private String ticket;
 
-    // Server events handlers
-    private ChatEventHandler chatEventHandler;
-    private GameEventHandler gameEventHandler;
-    private ProgressBarEventHandler progressBarEventHandler;
-
-    // Client event handler
+    // Event handler
     private ClientEventHandler clientEventHandler;
+    private ServerEventHandler serverEventHandler;
+
+    private Session session;
 
     public PushSocket() {
         try {
@@ -123,72 +111,47 @@ public class PushSocket {
             return;
         }
 
-        this.userId = userId;
+        User user = UserDAO.getUserById(userId);
+
+        if (user == null) {
+            logger.info("Invalid user id for session " + session);
+            session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Invalid user id"));
+            return;
+        }
+
+        this.user = user;
         this.ticket = ticket;
+        this.serverEventHandler = new ServerEventHandler(notificationService, this, user);
+        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandler, user);
+        this.session = session;
     }
 
     @OnClose
     public void close(Session session) {
-        logger.info("Closing session for user: " + userId + " (ticket: " + ticket + ")");
-
-        // Invalidate the ticket
+        logger.info("Closing session for user: " + user.getId() + " (ticket: " + ticket + ")");
         ticketingServices.invalidateTicket(this.ticket);
-
-        if (this.gameEventHandler != null) {
-            notificationService.unregister(this.gameEventHandler);
-        }
-        if (this.chatEventHandler != null) {
-            notificationService.unregister(this.chatEventHandler);
-        }
-        if (this.progressBarEventHandler != null) {
-            notificationService.unregister(this.progressBarEventHandler);
-        }
+        serverEventHandler.unregisterAll();
     }
 
     @OnMessage
     public void onMessage(ClientEvent event, Session session) {
-        if (event instanceof RegistrationEvent) {
-            handleRegistrationEvent((RegistrationEvent) event, session);
-        } else {
-            event.accept(clientEventHandler);
-        }
-    }
-
-    // TODO: create separate events for the different registrations?
-    private void handleRegistrationEvent(RegistrationEvent event, Session session) {
-        switch (event.getType()) {
-            case CHAT:
-                if (event.getUserId() != null) {
-                    chatEventHandler = new ChatEventHandler(event.getUserId(), session);
-                    notificationService.register(chatEventHandler);
-                } else {
-                    logger.warn("RegistrationEvent for progressbar is missing user id.");
-                }
-                break;
-            case GAME:
-                if (event.getPlayerId() != null && event.getGameId() != null) {
-                    gameEventHandler = new GameEventHandler(event.getPlayerId(), event.getGameId(), session);
-                    notificationService.register(chatEventHandler);
-                } else {
-                    logger.warn("RegistrationEvent for progressbar is missing game id or player id.");
-                }
-                break;
-            case PROGRESSBAR:
-                if (event.getPlayerId() != null) {
-                    progressBarEventHandler = new ProgressBarEventHandler(event.getPlayerId(), session);
-                    notificationService.register(chatEventHandler);
-                } else {
-                    logger.warn("RegistrationEvent for progressbar is missing player id.");
-                }
-                break;
-            default:
-                logger.error("Unknown enum entry.");
-                break;
-        }
+        event.accept(clientEventHandler);
     }
 
     @OnError
     public void onError(Session session, Throwable throwable) {
         logger.error("Session " + session + " caused an error. Cause: ", throwable);
+    }
+
+    // TODO: error handling?
+    public synchronized void sendEvent(ServerEvent event) {
+        try {
+            // TODO: asyncRemote?
+            session.getBasicRemote().sendObject(event);
+        } catch (IOException e) {
+            logger.error("Exception while sending event.", e);
+        } catch (EncodeException e) {
+            logger.error("Exception while encoding event.", e);
+        }
     }
 }

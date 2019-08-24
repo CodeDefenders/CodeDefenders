@@ -143,7 +143,7 @@ public class GameHighlightingDTO {
      * Serializes a {@link Map} as a list of lists, so that it can be used to construct an ES6 Map. <br>
      * <pre>{@code
      * var json = JSON.parse(jsonString); // e.g. [[1, "one"], [2, "two"], [3, "three"]]
-     * var map = new Map(jsonString);
+     * var map = new Map(json);
      * }</pre>
      */
     public static class MapSerializer implements JsonSerializer<Map> {

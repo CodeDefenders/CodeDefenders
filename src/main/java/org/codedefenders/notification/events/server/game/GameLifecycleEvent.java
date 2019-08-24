@@ -1,8 +1,10 @@
-package org.codedefenders.notification.events.server;
+package org.codedefenders.notification.events.server.game;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.annotations.Expose;
 import org.codedefenders.game.AbstractGame;
+import org.codedefenders.notification.events.server.ServerEvent;
 
 /**
  * Higher level LifeCycleEvent, by subscribing to this type of event one can
@@ -12,20 +14,18 @@ import org.codedefenders.game.AbstractGame;
  */
 public abstract class GameLifecycleEvent extends ServerEvent {
     private AbstractGame game;
+    @Expose private int gameId;
 
     public GameLifecycleEvent(AbstractGame game) {
         this.game = game;
+        this.gameId = game.getId();
     }
 
     public AbstractGame getGame() {
         return game;
     }
 
-    // TODO: what information is needed?
-    @Override
-    public JsonElement toJson() {
-        JsonObject obj = new JsonObject();
-        obj.addProperty("gameId", game.getId());
-        return obj;
+    public int getGameId() {
+        return gameId;
     }
 }

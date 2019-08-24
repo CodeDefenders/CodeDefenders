@@ -4,7 +4,9 @@ import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import org.codedefenders.notification.events.EventNames;
 import org.codedefenders.notification.events.server.ServerEvent;
 
 public class EventEncoder implements Encoder.Text<ServerEvent> {
@@ -18,9 +20,14 @@ public class EventEncoder implements Encoder.Text<ServerEvent> {
 
     @Override
     public String encode(ServerEvent event) {
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .serializeNulls()
+                .create();
+
         JsonObject message = new JsonObject();
-        message.addProperty("type", event.getClass().getSimpleName());
-        message.add("data", event.toJson());
-        return new Gson().toJson(message);
+        message.addProperty("type", EventNames.toServerEventName(event.getClass()));
+        message.add("data", gson.toJsonTree(event));
+        return gson.toJson(message);
     }
 }

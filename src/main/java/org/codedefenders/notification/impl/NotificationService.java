@@ -28,6 +28,7 @@ public class NotificationService implements INotificationService {
         logger.warn("Event was: " + gson.toJson(context.getEvent()));
     };
 
+    // TODO: Use AsyncEventBus?
     @SuppressWarnings("UnstableApiUsage")
     private EventBus eventBus = new EventBus(exceptionHandler);
 

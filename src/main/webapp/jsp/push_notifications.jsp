@@ -29,21 +29,13 @@
         connection if not possible) will be available under "window.pushSocket". The PushSocket class will be avalilable
         under "window.PushSocket".
 
-        The socket automatically tries to reconnect to the server if the connection can't be established or is lost.
-        Messages sent while the connection is lost will be sent when the connection is established again.
-
-        "subscribe" and "unsubscribe" are used to subscribe to events on the server side.
-        Here, the event types are given by RegistrationEvent.EventType,
-        and may encompass multiple event types on the JavaScript side.
-
-        "register" and "unregister" are used to register callbacks for certain event types received by the websocket.
-        Here, the event types are given by the simple class names in the events/server package.
-
-        "send" is used to send regular events / messages to the server.
-        Here, the event types are given by the simple class names in the events/client package.
-
-        "registerWS" and "unregisterWS" are used to register to websocket-specific events.
-        Here, the event types are given by PushSocket.WSEventType (the JavaScript class).
+        - "subscribe" and "unsubscribe" are used to subscribe to events on the server side.
+          One registration event may encompass multiple event types on the JavaScript side.
+        - "register" and "unregister" are used to register callbacks for certain event types received by the websocket.
+        - "send" is used to send regular events / messages to the server.
+        - For "register", "unregister" and "send", the event types are given by the EventNames class.
+        - "registerWS" and "unregisterWS" are used to register to websocket-specific events.
+          Here, the event types are given by PushSocket.WSEventType (the JavaScript class).
 
     See PushSocket's JavaDoc for more information.
 
@@ -52,7 +44,7 @@
 --%>
 
 <%@ page import="org.codedefenders.notification.web.TicketingFilter"  %>
-<%@ page import="org.codedefenders.notification.events.client.RegistrationEvent" %>
+<%@ page import="org.codedefenders.notification.events.client.registration.RegistrationEvent" %>
 
 <script src="js/reconnecting-websocket-iife.min.js"></script>
 
@@ -85,8 +77,7 @@
 
         /**
          * Registers a callback for a server event.
-         * This will send a registration message to the server if the event type is not registered on the server.
-         * @param {string} type The type to register a callback for.
+         * @param {string} type The type to register a callback for, use the EventNames class.
          * @param {function} callback The callback to register.
          */
         register (type, callback) {
@@ -102,8 +93,7 @@
 
         /**
          * Unregisters a callback for a server event.
-         * This will send a registration message to the server if the .
-         * @param {string} type The type to register a callback for.
+         * @param {string} type The type to register a callback for, use the EventNames class.
          * @param {function} callback The callback to register.
          */
         unregister (type, callback) {
@@ -125,32 +115,30 @@
         }
 
         /**
-         * Subscribe at the server to receive events for the given type of Event.
-         * @param {string} type The type of event to subscribe to.
+         * Subscribes at the server to receive events for the given type of Event.
+         * @param {string} type The type of event to subscribe to, use the EventNames class.
          * @param {object} params Additional parameters to send to the server for registration.
          */
         subscribe(type, params = {}) {
-            this.send('<%=RegistrationEvent.class.getSimpleName()%>', {
-                type,
+            this.send(type, {
                 action: '<%=RegistrationEvent.Action.REGISTER.toString()%>',
                 ...params
             });
         }
 
         /**
-         * Unregister at the server to stop receiving events for the given type of event.
-         * @param {string} type The type of event to unsubscribe from.
+         * Unsubscribes at the server to stop receiving events for the given type of event.
+         * @param {string} type The type of event to unsubscribe from, use the EventNames class.
          */
         unsubscribe(type) {
-            this.send('<%=RegistrationEvent.class.getSimpleName()%>', {
-                type,
+            this.send(type, {
                 action: '<%=RegistrationEvent.Action.UNREGISTER.toString()%>',
             })
         }
 
         /**
          * Sends a message to the server.
-         * @param {string} type The type of the message.
+         * @param {string} type The type of the message, use the EventNames class.
          * @param {object} data The data of the message.
          */
         send (type, data) {
@@ -160,7 +148,7 @@
 
         /**
          * Dispatches an event to the registered handlers for the type.
-         * @param {string} type The type of the event.
+         * @param {string} type The type of the event, use the EventNames class.
          * @param {object} data The data of the event.
          */
         dispatch (type, data) {
