@@ -165,6 +165,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         int attackerLimit;
         int maxAssertionsPerTest;
         CodeValidatorLevel mutantValidatorLevel;
+        Role selectedRole;
 
         try {
             startDateParam = getStringParameter(request, "start_dateTime").get();
@@ -180,6 +181,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             attackerLimit = getIntParameter(request, "attackerLimit").get();
             maxAssertionsPerTest = getIntParameter(request, "maxAssertionsPerTest").get();
             mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel").map(CodeValidatorLevel::valueOrNull).get();
+            selectedRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).get();
         } catch (NoSuchElementException e) {
             logger.error("At least one request parameter was missing or was no valid integer value.", e);
             Redirect.redirectBack(request, response);
@@ -260,6 +262,11 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         // Always add system player to send mutants and tests at runtime!
         nGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
         nGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
+
+        // Add selected role to game if the creator participates as attacker/defender
+        if (selectedRole.equals(Role.ATTACKER) || selectedRole.equals(Role.DEFENDER)) {
+            nGame.addPlayer(userId, selectedRole);
+        }
 
         int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, nGame.getId());
         int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, nGame.getId());
@@ -382,7 +389,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         Role role = game.getRole(userId);
 
-        if (role != Role.NONE) {
+        if (role == Role.ATTACKER || role == Role.DEFENDER || role == Role.OBSERVER) {
             logger.info("User {} already in the requested game. Has role {}", userId, role);
             return;
         }

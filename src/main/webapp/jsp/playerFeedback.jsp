@@ -88,8 +88,10 @@
                 </h3>
             </div>
 
-            <% boolean canSeePlayerFeedback = role.equals(Role.CREATOR) || AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SHOW_PLAYER_FEEDBACK).getBoolValue();
-            boolean canGiveFeedback = role.equals(Role.DEFENDER) || role.equals(Role.ATTACKER);
+            <%  int currentUserId = ((Integer) session.getAttribute("uid"));
+
+                boolean canSeePlayerFeedback = (currentUserId == game.getCreatorId()) || AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.SHOW_PLAYER_FEEDBACK).getBoolValue();
+                boolean canGiveFeedback = role.equals(Role.DEFENDER) || role.equals(Role.ATTACKER);
                 if (canGiveFeedback) {%>
             <ul class="nav nav-tabs">
                 <li class="active" id="provideFeedbackLink">

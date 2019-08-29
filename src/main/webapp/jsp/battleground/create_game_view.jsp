@@ -461,6 +461,21 @@
                 </td>
             </tr>
             <tr>
+                <td title="Chose your role for this game">
+                    Role selection
+                </td>
+                <td id="roleSelectionTd">
+                    <select id="roleSelection" name="roleSelection" class="form-control selectpicker"
+                            data-size="medium">
+                        <%for (Role role : Role.values()) {%>
+                        <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
+                            <%=role.name().toLowerCase()%>
+                        </option>
+                        <%}%>
+                    </select>
+                </td>
+            </tr>
+            <tr>
                 <td title="Attackers can mark uncovered lines as equivalent">
                     Mark uncovered lines as equivalent
                 </td>

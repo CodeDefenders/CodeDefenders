@@ -117,69 +117,78 @@
 		<td class="col-sm-1"><%= g.getFormattedFinishDateTime()%></td>
 		<td class="col-sm-2">
 <%
-				switch(role){
-					case CREATOR:
-						if (g.getState() == GameState.CREATED) {
+    if (g.getState() == GameState.CREATED && g.getCreatorId() == uid) {
 %>
-			<form id="adminStartBtn-<%=g.getId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
-				<button type="submit" class="btn btn-sm btn-primary" id="startGame-<%=g.getId()%>" form="adminStartBtn-<%=g.getId()%>">
-					Start Game
-				</button>
-				<input type="hidden" name="formType" value="startGame">
-				<input type="hidden" name="gameId" value="<%= g.getId() %>" />
-			</form>
-<%
-						} else {
-%>
-			<a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>" href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= g.getId() %>">Observe</a>
-<%
-						}
-					break;
-					case ATTACKER:
-						if(!g.getState().equals(GameState.CREATED)) {
-%>
-			<a class = "btn btn-sm btn-primary" id="<%="attack-"+g.getId()%>" style="background-color: #884466;border-color: #772233;"
-			   href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= g.getId() %>">Attack</a>
-<%
-						} else {
-%>
-			Joined as Attacker
-			<%if (gamesJoinable) { %>
-			<form id="attLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
-				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
-				<input type="hidden" name="gameId" value="<%=g.getId()%>">
-				<button class="btn btn-sm btn-danger" id="<%="leave-attacker-"+g.getId()%>" type="submit" form="attLeave" value="Leave">
-					Leave
-				</button>
-			</form>
-			<% } %>
-<%
-						}
-					break;
-					case DEFENDER:
-						if(!g.getState().equals(GameState.CREATED)) {
-%>
-			<a class = "btn btn-sm btn-primary" id="<%="defend-"+g.getId()%>" style="background-color: #446688;border-color: #225577"
-			   href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= g.getId() %>">Defend</a>
-<%
-						} else {
-%>
-			Joined as Defender
-			<%if (gamesJoinable) { %>
-			<form id="defLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
-				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
-				<input type="hidden" name="gameId" value="<%=g.getId()%>">
-				<button class = "btn btn-sm btn-danger" id="<%="leave-defender-"+g.getId()%>" type="submit" form="defLeave" value="Leave">
-					Leave
-				</button>
-			</form>
-			<% } %>
-<%
-						}
-					break;
-					default:
-					break;
-				}
+            <form id="adminStartBtn-<%=g.getId()%>"
+                  action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
+                <button type="submit" class="btn btn-sm btn-primary" id="startGame-<%=g.getId()%>"
+                        form="adminStartBtn-<%=g.getId()%>">
+                    Start Game
+                </button>
+                <input type="hidden" name="formType" value="startGame">
+                <input type="hidden" name="gameId" value="<%= g.getId() %>"/>
+            </form>
+            <%
+            } else { %>
+            <%
+                switch (role) {
+                    case ATTACKER:
+                        if (!g.getState().equals(GameState.CREATED)) {
+            %>
+            <a class="btn btn-sm btn-primary" id="<%="attack-"+g.getId()%>"
+               style="background-color: #884466;border-color: #772233;"
+               href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= g.getId() %>">Attack</a>
+            <%
+                        } else {
+            %>
+            Joined as Attacker
+                            <%if (gamesJoinable) { %>
+            <form id="attLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
+                <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
+                <input type="hidden" name="gameId" value="<%=g.getId()%>">
+                <button class="btn btn-sm btn-danger" id="<%="leave-attacker-"+g.getId()%>" type="submit"
+                        form="attLeave" value="Leave">
+                    Leave
+                </button>
+            </form>
+                            <% } %>
+            <%
+                        }
+                    break;
+                case DEFENDER:
+                    if (!g.getState().equals(GameState.CREATED)) {
+            %>
+            <a class="btn btn-sm btn-primary" id="<%="defend-"+g.getId()%>"
+               style="background-color: #446688;border-color: #225577"
+               href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= g.getId() %>">Defend</a>
+            <%
+                    } else {
+            %>
+            Joined as Defender
+                        <%if (gamesJoinable) { %>
+            <form id="defLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
+                <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
+                <input type="hidden" name="gameId" value="<%=g.getId()%>">
+                <button class="btn btn-sm btn-danger" id="<%="leave-defender-"+g.getId()%>" type="submit"
+                        form="defLeave" value="Leave">
+                    Leave
+                </button>
+            </form>
+                        <% } %>
+            <%
+                    }
+                    break;
+                default:
+                    if (g.getCreatorId() == uid) {
+            %>
+            <a class="btn btn-sm btn-primary" id="<%="observe-"+g.getId()%>"
+               href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= g.getId() %>">Observe</a>
+
+            <%
+                    }
+                break;
+                }
+            }
 %>
 		</td>
 	</tr>

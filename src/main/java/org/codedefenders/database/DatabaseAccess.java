@@ -209,23 +209,17 @@ public class DatabaseAccess {
                 "  ON p.Game_ID = m.ID",
                 "  AND p.Active=TRUE ",
                 "WHERE m.ID = ?",
-                "  AND (m.Creator_ID=?",
-                "   OR (p.User_ID=?",
-                "      AND p.Game_ID=?))");
+                "  AND (p.User_ID=?",
+                "      AND p.Game_ID=?)");
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(gameId),
                 DatabaseValue.of(userId),
-                DatabaseValue.of(userId),
                 DatabaseValue.of(gameId)};
-        DB.RSMapper<Role> mapper = rs -> {
-            if (rs.getInt("Creator_ID") == userId) {
-                return Role.CREATOR;
-            } else {
-                return Role.valueOrNull(rs.getString("Role"));
-            }
-        };
+
+        DB.RSMapper<Role> mapper = rs -> Role.valueOrNull(rs.getString("Role"));
+
         final Role role = DB.executeQueryReturnValue(query, mapper, values);
-        return Optional.ofNullable(role).orElse(Role.NONE);
+        return Optional.ofNullable(role).orElse(Role.OBSERVER);
     }
 
     public static void increasePlayerPoints(int points, int player) {
