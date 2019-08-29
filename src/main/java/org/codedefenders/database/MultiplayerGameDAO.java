@@ -63,7 +63,6 @@ public class MultiplayerGameDAO {
         int maxAssertionsPerTest = rs.getInt("MaxAssertionsPerTest");
         boolean chatEnabled = rs.getBoolean("ChatEnabled");
         CodeValidatorLevel mutantValidator = CodeValidatorLevel.valueOf(rs.getString("MutantValidator"));
-        boolean markUncovered = rs.getBoolean("MarkUncovered");
         boolean capturePlayersIntention = rs.getBoolean("CapturePlayersIntention");
         int minDefenders = rs.getInt("Defenders_Needed");
         int minAttackers = rs.getInt("Attackers_Needed");
@@ -83,7 +82,6 @@ public class MultiplayerGameDAO {
                 .attackerValue(attackerValue)
                 .defenderValue(defenderValue)
                 .chatEnabled(chatEnabled)
-                .markUncovered(markUncovered)
                 .capturePlayersIntention(capturePlayersIntention)
                 .mutantValidatorLevel(mutantValidator)
                 .requiresValidation(requiresValidation)
@@ -121,7 +119,6 @@ public class MultiplayerGameDAO {
         int maxAssertionsPerTest = game.getMaxAssertionsPerTest();
         boolean chatEnabled = game.isChatEnabled();
         CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
-        boolean markUncovered = game.isMarkUncovered();
         boolean capturePlayersIntention = game.isCapturePlayersIntention();
         GameMode mode = game.getMode();
 
@@ -146,9 +143,8 @@ public class MultiplayerGameDAO {
                 "MaxAssertionsPerTest,",
                 "ChatEnabled,",
                 "MutantValidator,",
-                "MarkUncovered,",
                 "CapturePlayersIntention)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
                 DatabaseValue.of(level.name()),
@@ -169,7 +165,6 @@ public class MultiplayerGameDAO {
                 DatabaseValue.of(maxAssertionsPerTest),
                 DatabaseValue.of(chatEnabled),
                 DatabaseValue.of(mutantValidatorLevel.name()),
-                DatabaseValue.of(markUncovered),
                 DatabaseValue.of(capturePlayersIntention)
         };
 

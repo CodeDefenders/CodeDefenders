@@ -85,7 +85,6 @@ public class MultiplayerGame extends AbstractGame {
     private int maxAssertionsPerTest;
     private boolean chatEnabled;
     private CodeValidatorLevel mutantValidatorLevel;
-    private boolean markUncovered;
 
     private boolean capturePlayersIntention;
 
@@ -114,7 +113,6 @@ public class MultiplayerGame extends AbstractGame {
         private boolean requiresValidation = false;
         private boolean capturePlayersIntention = false;
         private boolean chatEnabled = false;
-        private boolean markUncovered = false;
         private float lineCoverage = 1f;
         private float mutantCoverage = 1f;
         private float prize = 1f;
@@ -145,7 +143,6 @@ public class MultiplayerGame extends AbstractGame {
         public Builder requiresValidation(boolean requiresValidation) { this.requiresValidation = requiresValidation; return this; }
         public Builder capturePlayersIntention(boolean capturePlayersIntention) { this.capturePlayersIntention = capturePlayersIntention; return this; }
         public Builder chatEnabled(boolean chatEnabled) { this.chatEnabled = chatEnabled; return this; }
-        public Builder markUncovered(boolean markUncovered) { this.markUncovered = markUncovered; return this; }
         public Builder prize(float prize) { this.prize = prize; return this; }
         public Builder lineCoverage(float lineCoverage) { this.lineCoverage = lineCoverage; return this; }
         public Builder mutantCoverage(float mutantCoverage) { this.mutantCoverage = mutantCoverage; return this; }
@@ -187,7 +184,6 @@ public class MultiplayerGame extends AbstractGame {
         this.maxAssertionsPerTest = builder.maxAssertionsPerTest;
         this.chatEnabled = builder.chatEnabled;
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
-        this.markUncovered = builder.markUncovered;
         this.capturePlayersIntention = builder.capturePlayersIntention;
 
         // This is mostly a temporary patch
@@ -257,10 +253,6 @@ public class MultiplayerGame extends AbstractGame {
 
     public int getMaxAssertionsPerTest() {
         return maxAssertionsPerTest;
-    }
-
-    public boolean isMarkUncovered() {
-        return markUncovered;
     }
 
     public CodeValidatorLevel getMutantValidatorLevel() {

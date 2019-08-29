@@ -68,7 +68,6 @@
     request.setAttribute("mutantsEquivalent", new LinkedList<Mutant>());
     request.setAttribute("mutantsMarkedEquivalent", new LinkedList<Mutant>());
     request.setAttribute("markEquivalent", false);
-    request.setAttribute("markUncoveredEquivalent", false);
     request.setAttribute("viewDiff", true);
     request.setAttribute("gameType", GameMode.PUZZLE);
     request.setAttribute("gameId", game.getId());
@@ -78,9 +77,8 @@
     // request.setAttribute("tests", game.getTests());
     request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
-    // request.setAttribute("markUncoveredEquivalent", false);
     // request.setAttribute("gameType", GameMode.PUZZLE);
-//    request.setAttribute("gameId", game.getId());
+    // request.setAttribute("gameId", game.getId());
 
     /* finished_modal TODO */
 
@@ -88,7 +86,7 @@
     request.setAttribute("mutantValidatorLevel", CodeValidatorLevel.MODERATE);
 
     /* mutant_progressbar */
-//    request.setAttribute("gameId", game.getId());
+    // request.setAttribute("gameId", game.getId());
 
     final String title = puzzle.getTitle();
     final String description = puzzle.getDescription();

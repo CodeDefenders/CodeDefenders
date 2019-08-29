@@ -476,16 +476,6 @@
                 </td>
             </tr>
             <tr>
-                <td title="Attackers can mark uncovered lines as equivalent">
-                    Mark uncovered lines as equivalent
-                </td>
-                <td id="markUncoveredTd">
-                    <input type="checkbox" id="markUncovered" name="markUncovered"
-                           class="form-control" data-size="large" data-toggle="toggle" data-on="On" data-off="Off"
-                           data-onstyle="primary" data-offstyle="">
-                </td>
-            </tr>
-            <tr>
                 <td title="Players can chat with their team and with all players in the game">
                     Chat
                 </td>

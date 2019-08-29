@@ -64,7 +64,6 @@
     List<Test> testsTODORENAME = (List<Test>) request.getAttribute("tests");
     List<Mutant> mutantsTODORENAME = (List<Mutant>) request.getAttribute("mutants") ;
     Boolean showEquivalenceButton = (Boolean) request.getAttribute("showEquivalenceButton");
-    Boolean markUncoveredEquivalent = (Boolean) request.getAttribute("markUncoveredEquivalent");
     GameMode gameType = (GameMode) request.getAttribute("gameType");
     int gameId = (Integer) request.getAttribute("gameId");
 %>
@@ -88,7 +87,6 @@
 
         /* Game highlighting settings. */
         const showEquivalenceButton = Boolean(<%=showEquivalenceButton%>);
-        const markUncoveredEquivalent = Boolean(<%=markUncoveredEquivalent%>);
         const gameType = '<%=gameType.name()%>';
 
         const MutantStatuses = {
@@ -262,7 +260,7 @@
             let button = '';
             if (showEquivalenceButton
                 && status === MutantStatuses.ALIVE
-                && (markUncoveredEquivalent || testIdsPerLine.get(line))) {
+                && testIdsPerLine.get(line)) {
                 button = createEquivalenceButton(line);
             }
 

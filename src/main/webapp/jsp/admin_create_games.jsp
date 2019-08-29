@@ -788,32 +788,7 @@
                        class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
                        data-onstyle="primary" data-offstyle="" checked>
             </div>
-            <div class="col-sm-3" id="markUncoveredDiv">
-                <label class="label-normal" title="Attackers can mark uncovered lines as equivalent"
-                       for="markUncovered">
-                    Mark uncovered lines as equivalent
-                </label>
-                <input type="checkbox" id="markUncovered" name="markUncovered"
-                       class="form-control" data-size="medium" data-toggle="toggle" data-on="On" data-off="Off"
-                       data-onstyle="primary" data-offstyle="">
-            </div>
-            <div class="col-sm-2">
-                <label for="maxAssertionsPerTest" class="label-normal"
-                       title="Maximum number of assertions per test. Increase this for difficult to test classes.">Max.
-                    Assertions per Test</label>
-                <br/>
-                <input class="form-control" type="number" value="2" name="maxAssertionsPerTest"
-                       id="maxAssertionsPerTest" min=1 required/>
-            </div>
-        </div>
-        <div class="row">
-			<div class="col-sm-2">
-			</div>
-			<div class="col-sm-1">
-			</div>
-            <div class="col-sm-2">
-            </div>
-            <div class="col-sm-2">
+            <div class="col-sm-2" id="capturePlayersIntentionDiv">
                 <label class="label-normal" title="Enable Capturing Player Intention"
                        for="capturePlayersIntention">
                     Capture Players Intention
@@ -822,7 +797,14 @@
                        class="form-control" data-size="medium" data-toggle="toggle" data-on="Yes" data-off="No"
                        data-onstyle="primary" data-offstyle="">
             </div>
-            <div class="col-sm-1">
+            <div class="col-sm-1"></div>
+            <div class="col-sm-2">
+                <label for="maxAssertionsPerTest" class="label-normal"
+                       title="Maximum number of assertions per test. Increase this for difficult to test classes.">Max.
+                    Assertions per Test</label>
+                <br/>
+                <input class="form-control" type="number" value="2" name="maxAssertionsPerTest"
+                       id="maxAssertionsPerTest" min=1 required/>
             </div>
         </div>
         <br>
