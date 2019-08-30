@@ -22,10 +22,20 @@ package org.codedefenders.game;
  * This enumeration represents roles players can have in a game.
  */
 public enum Role {
-    ATTACKER,
-    DEFENDER,
-    OBSERVER,
+    ATTACKER("Attacker"),
+    DEFENDER("Defender"),
+    OBSERVER("Observer"),
     NONE;
+
+    private final String displayName;
+
+    Role() {
+        displayName = null;
+    }
+
+    Role(String displayName) {
+        this.displayName = displayName;
+    }
 
     /**
      * Similar to {@link #valueOf(String)} but returns {@code null} if
@@ -40,5 +50,10 @@ public enum Role {
         } catch (IllegalArgumentException e) {
             return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return this.displayName;
     }
 }

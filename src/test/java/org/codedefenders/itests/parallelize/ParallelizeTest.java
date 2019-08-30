@@ -94,10 +94,10 @@ public class ParallelizeTest {
 
     @Inject
     private GameManagingUtils gameManagingUtils;
-    
+
     @Inject
-    private IMutationTester mutationTester; 
-    
+    private IMutationTester mutationTester;
+
 	// PowerMock does not work with @ClassRule !!
 	// This really should be only per class, not per test... in each test we can
 	// truncate the tables ?
@@ -245,19 +245,12 @@ public class ParallelizeTest {
 		float prize = (float) 1;
 		int defenderValue = 1;
 		int attackerValue = 1;
-		int defenderLimit = 2;
-		int attackerLimit = 2;
-		int minDefenders = 1;
-		int minAttackers = 1;
-		long startDateTime = new Timestamp(System.currentTimeMillis() - 10000).getTime();
-		//
-		long finishDateTime = new Timestamp(System.currentTimeMillis() + 24 * 60 * 60 * 100 * 1000).getTime();
 
 		GameState status = GameState.ACTIVE;
 		int maxAssertionsPerTest = 2;
 		CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
 
-		final MultiplayerGame multiplayerGame = new MultiplayerGame.Builder(classId, creatorId, startDateTime, finishDateTime, maxAssertionsPerTest, defenderLimit, attackerLimit, minDefenders, minAttackers)
+		final MultiplayerGame multiplayerGame = new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest)
 				.state(status)
 				.level(level)
 				.prize(prize)
@@ -308,8 +301,8 @@ public class ParallelizeTest {
 
 		//
 
-		int defenderID = UserDAO.getUserForPlayer( battlegroundGame.getDefenderIds()[0]).getId();
-		int attackerID =  UserDAO.getUserForPlayer( battlegroundGame.getAttackerIds()[0]).getId();
+		int defenderID = battlegroundGame.getDefenderPlayers().get(0).getUser().getId();
+		int attackerID = battlegroundGame.getAttackerPlayers().get(0).getUser().getId();
 		ArrayList<String> messages = new ArrayList<>();
 
 		List<org.codedefenders.game.Test> submittedTests = new ArrayList<>();
@@ -446,8 +439,8 @@ public class ParallelizeTest {
 	public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException {
 
 		MultiplayerGame battlegroundGame = setupTestBattlegroundUsing("Lift");
-		int defenderID = battlegroundGame.getDefenderIds()[0];
-		int attackerID = battlegroundGame.getAttackerIds()[0];
+		int defenderID = battlegroundGame.getDefenderPlayers().get(0).getId();
+        int attackerID = battlegroundGame.getAttackerPlayers().get(0).getId();
 
 		// Read and submit some test- This will call AntRunner
 		// Are those saved to DB ?!

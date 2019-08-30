@@ -87,19 +87,13 @@ public class Event {
 
     private Role role;
 
-    public Event(int eventId, int gameId, int playerId, String message, String
-            eventType,
-                 String
-                         eventStatus, Timestamp timestamp) {
-        this(eventId, gameId, playerId, message, EventType.valueOf(eventType),
-                EventStatus.valueOf(eventStatus), timestamp);
+    public Event(int eventId, int gameId, int userId, String message, String eventType,
+                 String eventStatus, Timestamp timestamp) {
+        this(eventId, gameId, userId, message, EventType.valueOf(eventType), EventStatus.valueOf(eventStatus), timestamp);
     }
 
-    public Event(int eventId, int gameId, int playerId, String message,
-                 EventType
-                         eventType,
-                 EventStatus
-                         eventStatus, Timestamp timestamp) {
+    public Event(int eventId, int gameId, int userId, String message, EventType eventType,
+                 EventStatus eventStatus, Timestamp timestamp) {
         String eString = eventType.toString();
         if (eString.contains("ATTACKER")) {
             role = Role.ATTACKER;
@@ -109,7 +103,7 @@ public class Event {
             role = Role.OBSERVER;
         }
 
-        this.userId = playerId;
+        this.userId = userId;
         this.message = message;
         this.eventType = eventType;
         this.eventStatus = eventStatus;

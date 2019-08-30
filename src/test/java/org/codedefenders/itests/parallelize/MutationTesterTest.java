@@ -75,11 +75,11 @@ import static org.junit.Assert.assertEquals;
  * This test shall evaluate how Mutation Tester handle concurrent updates.
  * Problematic cases: - More than 1 tests kill the same mutant - Mutant state is
  * reset from killed to alive while setting the score
- * 
+ *
  * The problem lies in the fact that MutationTester set the state of the mutant
  * and forces it to the database, while the state of the mutants should be
  * handled by the database instead !
- * 
+ *
  * @author gambi
  *
  */
@@ -243,10 +243,8 @@ public class MutationTesterTest {
 		// System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant()
 		// Cut " + cut.getId());
 		//
-		final long startTime = System.currentTimeMillis() - 1000 * 3600;
-		final long endTime = System.currentTimeMillis() + 1000 * 3600;
 		MultiplayerGame multiplayerGame = new MultiplayerGame
-				.Builder(cut.getId(), observer.getId(), startTime, endTime, 2, 4, 4, 0, 0)
+				.Builder(cut.getId(), observer.getId(), 2)
 				.state(GameState.ACTIVE)
 				.level(GameLevel.HARD)
 				.defenderValue(10)

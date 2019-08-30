@@ -152,33 +152,13 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         ArrayList<String> messages = new ArrayList<>();
         session.setAttribute("messages", messages);
 
-        String startDateParam;
-        String startHoursParam;
-        String startMinutesParam;
-        String endDateParam;
-        String endHoursParam;
-        String endMinutesParam;
         int classId;
-        int minDefenders;
-        int defenderLimit;
-        int minAttackers;
-        int attackerLimit;
         int maxAssertionsPerTest;
         CodeValidatorLevel mutantValidatorLevel;
         Role selectedRole;
 
         try {
-            startDateParam = getStringParameter(request, "start_dateTime").get();
-            startHoursParam = getStringParameter(request, "start_hours").get();
-            startMinutesParam = getStringParameter(request, "start_minutes").get();
-            endDateParam = getStringParameter(request, "finish_dateTime").get();
-            endHoursParam = getStringParameter(request, "finish_hours").get();
-            endMinutesParam = getStringParameter(request, "finish_minutes").get();
             classId = getIntParameter(request, "class").get();
-            minDefenders = getIntParameter(request, "minDefenders").get();
-            defenderLimit = getIntParameter(request, "defenderLimit").get();
-            minAttackers = getIntParameter(request, "minAttackers").get();
-            attackerLimit = getIntParameter(request, "attackerLimit").get();
             maxAssertionsPerTest = getIntParameter(request, "maxAssertionsPerTest").get();
             mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel").map(CodeValidatorLevel::valueOrNull).get();
             selectedRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).get();
@@ -194,41 +174,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
 
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-        Set<ConstraintViolation<MultiplayerGame>> validationResults = new HashSet<>();
-
-        /*
-         * Since JSR 303 works on Beans, and we have String input
-         * values, we need to manually run the validation for them
-         */
-        String startDate = startDateParam + " " + startHoursParam + ":" + startMinutesParam;
-        String finishDate = endDateParam + " " + endHoursParam + ":" + endMinutesParam;
-        validationResults.addAll(validator.validateValue(MultiplayerGame.class, "startDateTime", startDate));
-        validationResults.addAll(validator.validateValue(MultiplayerGame.class, "finishDateTime", finishDate));
-        final long startTime;
-        final long endTime;
-        try {
-            startTime = simpleDateFormat.parse(startDate).getTime();
-            endTime = simpleDateFormat.parse(finishDate).getTime();
-        } catch (ParseException e) {
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
-        validationResults.addAll(validator.validateValue(MultiplayerGame.class, "startDateTime", startDate));
-        validationResults.addAll(validator.validateValue(MultiplayerGame.class, "finishDateTime", finishDate));
-
-//        At this point, if there's validation errors, report them to the user and abort.
-        if (!validationResults.isEmpty()) {
-            for (ConstraintViolation<MultiplayerGame> violation : validationResults) {
-                messages.add(violation.getMessage());
-            }
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
-        MultiplayerGame nGame = new MultiplayerGame.Builder(classId, userId, startTime, endTime, maxAssertionsPerTest, defenderLimit, attackerLimit, minDefenders, minAttackers)
+        MultiplayerGame nGame = new MultiplayerGame.Builder(classId, userId, maxAssertionsPerTest)
                 .level(level)
                 .chatEnabled(chatEnabled)
                 .capturePlayersIntention(capturePlayersIntention)
@@ -236,15 +182,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .mutantCoverage(mutantCoverage)
                 .mutantValidatorLevel(mutantValidatorLevel)
                 .build();
-
-        validator.validate(nGame);
-        if (!validationResults.isEmpty()) {
-            for (ConstraintViolation<MultiplayerGame> violation : validationResults) {
-                messages.add(violation.getMessage());
-            }
-            Redirect.redirectBack(request, response);
-            return;
-        }
 
         if (nGame.insert()) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
