@@ -21,7 +21,6 @@
 <%@page import="org.codedefenders.util.Constants"%>
 <%@page import="org.codedefenders.database.TestDAO"%>
 <%@page import="org.codedefenders.database.MutantDAO"%>
-<%@ page import="org.codedefenders.database.UserDAO" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.HashMap" %>
@@ -33,8 +32,8 @@
     HashMap testScores = game.getTestScores();
 
     // Those return the PlayerID not the UserID
-    int[] attackers = game.getAttackerIds();
-    int[] defenders = game.getDefenderIds();
+    final List<Player> attackers = game.getAttackerPlayers();
+    final List<Player> defenders = game.getDefenderPlayers();
 %>
 <div id="scoreboard" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
     <div class="modal-dialog">
@@ -67,36 +66,32 @@
                     <tr class="attacker header"><th>Attackers</th><th>Mutants</th><th>Alive / Killed / Equivalent</th><th>Duels Won/Lost/Ongoing</th></th><th>Total Points</th></tr>
                     <%
                     int total = 0;
-                    for (int index = 0; index < attackers.length; index++){
-                        int i = attackers[index];
-                        if (i == -1){
-                            continue;
-                        }
-                        User aUser = UserDAO.getUserForPlayer(i);
-                        
+                    for (Player attacker : attackers) {
+                        int playerId = attacker.getId();
+                        User aUser = attacker.getUser();
+                        // TODO Phil 09/08/19: Isn't this fixed by now? Why is this hack still in place?
                         // Does system attacker submitted any mutant?
                         // TODO #418: we use UserId instead of PlayerID because there's a bug in the logic which initialize the game.
                         // For system generated mutants,  mutant.playerID == userID, which is wrong...
                         if(aUser.getId() == Constants.DUMMY_ATTACKER_USER_ID && MutantDAO.getMutantsByGameAndUser(game.getId(), aUser.getId()).isEmpty() ){
                            continue;
                         }
-                        
+
                         total = 0;
-                        int counter = 0;
                         %>
                         <tr class="attacker"><td>
                                 <%=aUser.getUsername()%>
                             </td>
                             <td><%
-                                if (mutantScores.containsKey(i) && mutantScores.get(i) != null){ %>
-                                <%= ((PlayerScore)mutantScores.get(i)).getQuantity() %>
+                                if (mutantScores.containsKey(playerId) && mutantScores.get(playerId) != null){ %>
+                                <%= ((PlayerScore)mutantScores.get(playerId)).getQuantity() %>
                                 <% } else { %>
                                 0
                                 <% } %></td>
                             <td>
                                 <%
-                                    if (mutantScores.containsKey(i) && mutantScores.get(i) != null){%>
-                                <%= ((PlayerScore)mutantScores.get(i)).getMutantKillInformation() %>
+                                    if (mutantScores.containsKey(playerId) && mutantScores.get(playerId) != null){%>
+                                <%= ((PlayerScore)mutantScores.get(playerId)).getMutantKillInformation() %>
                                 <% } else { %>
                                     0 / 0 / 0
                                 <% } %>
@@ -104,20 +99,20 @@
                             <td>
                                 <!-- Equivalence duels -->
                                 <%
-                                    if (mutantScores.containsKey(i) && mutantScores.get(i) != null){
+                                    if (mutantScores.containsKey(playerId) && mutantScores.get(playerId) != null){
                                 %>
-                                <%= ((PlayerScore)mutantScores.get(i)).getDuelInformation() %>
+                                <%= ((PlayerScore)mutantScores.get(playerId)).getDuelInformation() %>
                                 <% } else { %>
                                 0 / 0 / 0
                                 <% } %>
                             </td>
                             <td>
                                 <%
-                                if (mutantScores.containsKey(i) && mutantScores.get(i) != null){
-                                    total += ((PlayerScore)mutantScores.get(i)).getTotalScore(); %>
+                                if (mutantScores.containsKey(playerId) && mutantScores.get(playerId) != null){
+                                    total += ((PlayerScore)mutantScores.get(playerId)).getTotalScore(); %>
                             <% }
-                                if (testScores.containsKey(i) && testScores.get(i) != null){
-                                    total += ((PlayerScore)testScores.get(i)).getTotalScore(); %>
+                                if (testScores.containsKey(playerId) && testScores.get(playerId) != null){
+                                    total += ((PlayerScore)testScores.get(playerId)).getTotalScore(); %>
                             <% } %>
                                 <%= total %>
                             </td>
@@ -126,7 +121,7 @@
                     }
                     total = 0;
 
-                    if (attackers.length == 0){
+                    if (attackers.isEmpty()) {
                 %><tr class="attacker"><td colspan="4"></td></tr><%
                     }
                 %>
@@ -172,13 +167,11 @@
                     </tr>
                     <tr class="defender header"><th>Defenders</th><th>Tests</th><th>Mutants Killed</th><th>Duels Won/Lost/Ongoing</th><th>Total Points</th></tr>
                     <%
-                        for (int index = 0; index < defenders.length; index++){
-                            int i = defenders[index];
-                            if (i == -1){
-                                continue;
-                            }
-                            User dUser = UserDAO.getUserForPlayer(i);
-                            
+                        for (Player defender : defenders) {
+                            int playerId = defender.getId();
+                            User dUser = defender.getUser();
+
+                            // TODO Phil 09/08/19: Isn't this fixed by now? Why is this hack still in place?
                             // XXX: Hardcoded id for system user
                             // TODO #418
                             if(dUser.getId() == Constants.DUMMY_DEFENDER_USER_ID && TestDAO.getTestsForGameAndUser(game.getId(), dUser.getId()).isEmpty() ){
@@ -191,24 +184,24 @@
                         <%=dUser.getUsername()%>
                     </td>
                         <td><%
-                            if (testScores.containsKey(i) && testScores.get(i) != null){ %>
-                                <%= ((PlayerScore)testScores.get(i)).getQuantity() %>
+                            if (testScores.containsKey(playerId) && testScores.get(playerId) != null){ %>
+                                <%= ((PlayerScore)testScores.get(playerId)).getQuantity() %>
 
                             <% } else { %>
                                 0 <% } %></td>
                         <td><%
-                            if (testScores.containsKey(i) && testScores.get(i) != null){
-                                    total += ((PlayerScore)testScores.get(i)).getTotalScore(); %>
-                            <%= ((PlayerScore)testScores.get(i)).getMutantKillInformation()%>
+                            if (testScores.containsKey(playerId) && testScores.get(playerId) != null){
+                                    total += ((PlayerScore)testScores.get(playerId)).getTotalScore(); %>
+                            <%= ((PlayerScore)testScores.get(playerId)).getMutantKillInformation()%>
                             <% } else { %>
                             0 <% } %>
                         </td>
                         <td>
                             <!-- Equivalence duels -->
                             <%
-                                if (testScores.containsKey(i) && testScores.get(i) != null){
+                                if (testScores.containsKey(playerId) && testScores.get(playerId) != null){
                             %>
-                            <%= ((PlayerScore)testScores.get(i)).getDuelInformation() %>
+                            <%= ((PlayerScore)testScores.get(playerId)).getDuelInformation() %>
                             <% } else { %>
                             0 / 0 / 0
                             <% } %>
@@ -221,7 +214,7 @@
                         }
                         total = 0;
 
-                        if (defenders.length == 0){
+                        if (defenders.isEmpty()){
                             %><tr class="defender"><td colspan="5"></td></tr><%
                         }
                     %>

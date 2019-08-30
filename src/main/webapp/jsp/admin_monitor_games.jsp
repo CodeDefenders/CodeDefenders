@@ -63,8 +63,6 @@
                 <th>Attackers</th>
                 <th>Defenders</th>
                 <th>Level</th>
-                <th>Starting</th>
-                <th>Finishing</th>
                 <th>
                     <a id="togglePlayersActive" class="btn btn-sm btn-default" title="Show list of Players for each Game.">
                         <span id = "togglePlayersActiveSpan" class="glyphicon glyphicon-alert"></span>
@@ -124,17 +122,11 @@
                 </td>
                 <td class="col-sm-1"><%= UserDAO.getUserById(g.getCreatorId()).getUsername() %>
                 </td>
-                <td class="col-sm-1"><%int attackers = g.getAttackerIds().length; %><%=attackers %> of
-                        <%=g.getMinAttackers()%>&ndash;<%=g.getAttackerLimit()%>
+                <td class="col-sm-1"><%=g.getAttackerPlayers().size()%>
                 </td>
-                <td class="col-sm-1"><%int defenders = g.getDefenderIds().length; %><%=defenders %> of
-                        <%=g.getMinDefenders()%>&ndash;<%=g.getDefenderLimit()%>
+                <td class="col-sm-1"><%=g.getDefenderPlayers().size()%>
                 </td>
                 <td><%= g.getLevel() %>
-                </td>
-                <td class="col-sm-2"><%= g.getFormattedStartDateTime() %>
-                </td>
-                <td class="col-sm-2"><%= g.getFormattedFinishDateTime() %>
                 </td>
                 <td class="col-sm-1" style="padding-top:4px; padding-bottom:4px">
                     <button class="<%=startStopButtonClass%>" type="submit" value="<%=gid%>" name="start_stop_btn"

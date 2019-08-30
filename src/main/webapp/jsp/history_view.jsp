@@ -52,8 +52,8 @@
             <td class="col-sm-2"><%= g.getId() %></td>
             <td class="col-sm-2"><%= g.getCUT().getAlias() %></td>
             <td class="col-sm-2"><%= UserDAO.getUserById(g.getCreatorId()).getUsername() %></td>
-            <td class="col-sm-1"><%= g.getAttackerIds().length %></td>
-            <td class="col-sm-1"><%= g.getDefenderIds().length %></td>
+            <td class="col-sm-1"><%= g.getAttackerPlayers().size()%></td>
+            <td class="col-sm-1"><%= g.getDefenderPlayers().size()%></td>
             <td class="col-sm-2"><%= g.getLevel() %></td>
             <td class="col-sm-2">
                 <a class="btn btn-sm btn-default" id="<%="results_"+g.getId()%>" href="<%=request.getContextPath() + Paths.BATTLEGROUND_HISTORY%>?gameId=<%= g.getId() %>">View Results</a>

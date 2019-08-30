@@ -56,18 +56,6 @@ public class CreateBattlegroundTest extends AbstractEmptyDBSystemTest {
         SeleniumTestUtils.login(driver, codeDefendersHome, "codedefenders", "codedefenderspw");
 
         driver.findElement(By.id("createBattleground")).click();
-        driver.findElement(By.id("minDefenders")).click();
-        driver.findElement(By.id("minDefenders")).clear();
-        driver.findElement(By.id("minDefenders")).sendKeys("2");
-        driver.findElement(By.id("defenderLimit")).click();
-        driver.findElement(By.id("defenderLimit")).clear();
-        driver.findElement(By.id("defenderLimit")).sendKeys("4");
-        driver.findElement(By.id("minAttackers")).click();
-        driver.findElement(By.id("minAttackers")).clear();
-        driver.findElement(By.id("minAttackers")).sendKeys("2");
-        driver.findElement(By.id("attackerLimit")).click();
-        driver.findElement(By.id("attackerLimit")).clear();
-        driver.findElement(By.id("attackerLimit")).sendKeys("4");
         driver.findElement(By.id("maxAssertionsPerTest")).click();
         driver.findElement(By.id("maxAssertionsPerTest")).clear();
         driver.findElement(By.id("maxAssertionsPerTest")).sendKeys("3");
@@ -83,18 +71,6 @@ public class CreateBattlegroundTest extends AbstractEmptyDBSystemTest {
         SeleniumTestUtils.login(driver, codeDefendersHome, "codedefenders", "codedefenderspw");
 
         driver.findElement(By.id("createBattleground")).click();
-        driver.findElement(By.id("minDefenders")).click();
-        driver.findElement(By.id("minDefenders")).clear();
-        driver.findElement(By.id("minDefenders")).sendKeys("1");
-        driver.findElement(By.id("defenderLimit")).click();
-        driver.findElement(By.id("defenderLimit")).clear();
-        driver.findElement(By.id("defenderLimit")).sendKeys("1");
-        driver.findElement(By.id("minAttackers")).click();
-        driver.findElement(By.id("minAttackers")).clear();
-        driver.findElement(By.id("minAttackers")).sendKeys("1");
-        driver.findElement(By.id("attackerLimit")).click();
-        driver.findElement(By.id("attackerLimit")).clear();
-        driver.findElement(By.id("attackerLimit")).sendKeys("1");
         driver.findElement(By.id("maxAssertionsPerTest")).click();
         driver.findElement(By.id("maxAssertionsPerTest")).clear();
         driver.findElement(By.id("maxAssertionsPerTest")).sendKeys("1");
@@ -111,18 +87,6 @@ public class CreateBattlegroundTest extends AbstractEmptyDBSystemTest {
         SeleniumTestUtils.login(driver, codeDefendersHome, "codedefenders", "codedefenderspw");
 
         driver.findElement(By.id("createBattleground")).click();
-        driver.findElement(By.id("minDefenders")).click();
-        driver.findElement(By.id("minDefenders")).clear();
-        driver.findElement(By.id("minDefenders")).sendKeys("4");
-        driver.findElement(By.id("defenderLimit")).click();
-        driver.findElement(By.id("defenderLimit")).clear();
-        driver.findElement(By.id("defenderLimit")).sendKeys("8");
-        driver.findElement(By.id("minAttackers")).click();
-        driver.findElement(By.id("minAttackers")).clear();
-        driver.findElement(By.id("minAttackers")).sendKeys("4");
-        driver.findElement(By.id("attackerLimit")).click();
-        driver.findElement(By.id("attackerLimit")).clear();
-        driver.findElement(By.id("attackerLimit")).sendKeys("8");
         driver.findElement(By.id("maxAssertionsPerTest")).click();
         driver.findElement(By.id("maxAssertionsPerTest")).clear();
         driver.findElement(By.id("maxAssertionsPerTest")).sendKeys("3");
