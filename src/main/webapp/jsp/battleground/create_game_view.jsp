@@ -467,11 +467,13 @@
                 <td id="roleSelectionTd">
                     <select id="roleSelection" name="roleSelection" class="form-control selectpicker"
                             data-size="medium">
-                        <%for (Role role : Role.values()) {%>
+                        <%for (Role role : Role.values()) {
+                            if (role != Role.NONE) { %>
                         <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
                             <%=role.name().toLowerCase()%>
                         </option>
-                        <%}%>
+                        <%  }
+                        }%>
                     </select>
                 </td>
             </tr>

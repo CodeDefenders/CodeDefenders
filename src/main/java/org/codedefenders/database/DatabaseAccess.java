@@ -22,6 +22,7 @@ import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.leaderboard.Entry;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
@@ -219,7 +220,13 @@ public class DatabaseAccess {
         DB.RSMapper<Role> mapper = rs -> Role.valueOrNull(rs.getString("Role"));
 
         final Role role = DB.executeQueryReturnValue(query, mapper, values);
-        return Optional.ofNullable(role).orElse(Role.OBSERVER);
+
+        MultiplayerGame game = MultiplayerGameDAO.getMultiplayerGame(gameId);
+        
+        if (game.getCreatorId() == userId && role == null) {
+            return Role.OBSERVER;
+        }
+        return Optional.ofNullable(role).orElse(Role.NONE);
     }
 
     public static void increasePlayerPoints(int points, int player) {

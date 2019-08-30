@@ -24,7 +24,8 @@ package org.codedefenders.game;
 public enum Role {
     ATTACKER,
     DEFENDER,
-    OBSERVER;
+    OBSERVER,
+    NONE;
 
     /**
      * Similar to {@link #valueOf(String)} but returns {@code null} if
