@@ -306,24 +306,23 @@ public class MultiplayerGameDAO {
      */
     public static List<UserMultiplayerGameInfo> getActiveMultiplayerGamesWithInfoForUser(int userId) {
         final String query = String.join("\n",
-            "SELECT DISTINCT g.*,",
-            "    u.User_ID AS `userId`,",
-            "    IF(u.User_ID = g.Creator_ID,'CREATOR', p.Role) AS `playerRole`,",
-            "    (SELECT creators.Username",
-            "       FROM view_valid_users creators",
-            "       WHERE g.Creator_ID = creators.User_ID) AS creatorName",
-            "FROM view_battleground_games AS g,",
-            "     view_valid_users u,",
-            "     players p",
-            "WHERE u.User_ID = ?",
-            "  AND (g.State = 'CREATED' OR g.State = 'ACTIVE')",
-            "  AND (u.User_ID = g.Creator_ID",
-            "    OR (u.User_ID = p.User_ID",
-            "      AND p.Game_ID = g.ID",
-            "      AND p.Active = TRUE",
-            "    )",
-            "  )",
-            ";");
+        "SELECT g.*,",
+        "  cu.User_ID as userId,",
+        "  IFNULL(p.Role, 'OBSERVER') as playerRole,",
+        "  vu.Username as creatorName",
+        "FROM view_battleground_games g",
+        "INNER JOIN view_valid_users vu",
+        "ON g.Creator_ID = vu.User_ID",
+        "INNER JOIN view_valid_users cu",
+        "ON cu.User_ID = ?",
+        "LEFT JOIN players p",
+        "ON cu.User_ID = p.User_ID",
+        "AND g.ID = p.Game_ID",
+        "WHERE",
+        "  (g.State = 'CREATED' or g.State = 'ACTIVE')",
+        "   AND(cu.User_ID = g.Creator_ID",
+        "       OR (cu.User_ID = p.User_ID AND p.Active = TRUE))",
+        "GROUP BY g.ID");
 
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::activeGameInfoFromRS, DatabaseValue.of(userId));
     }

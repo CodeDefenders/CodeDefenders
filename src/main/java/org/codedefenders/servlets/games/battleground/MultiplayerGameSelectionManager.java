@@ -324,7 +324,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         Role role = game.getRole(userId);
 
-        if (role == Role.ATTACKER || role == Role.DEFENDER || role == Role.OBSERVER) {
+        if (role != Role.NONE) {
             logger.info("User {} already in the requested game. Has role {}", userId, role);
             return;
         }
