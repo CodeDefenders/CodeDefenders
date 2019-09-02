@@ -73,6 +73,10 @@ public class UserMultiplayerGameInfo {
         return game.getId();
     }
 
+    public int creatorId() {
+        return game.getCreatorId();
+    }
+
     public GameState gameState() {
         return game.getState();
     }

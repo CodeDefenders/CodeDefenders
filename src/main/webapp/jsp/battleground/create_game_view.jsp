@@ -137,6 +137,23 @@
                 </td>
             </tr>
             <tr>
+                <td title="Chose your role for this game">
+                    Role selection
+                </td>
+                <td id="roleSelectionTd">
+                    <select id="roleSelection" name="roleSelection" class="form-control selectpicker"
+                            data-size="medium">
+                        <%for (Role role : Role.values()) {
+                            if (role != Role.NONE) { %>
+                        <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
+                            <%=role.toString()%>
+                        </option>
+                        <%  }
+                        }%>
+                    </select>
+                </td>
+            </tr>
+            <tr>
                 <td title="Players can chat with their team and with all players in the game">
                     Chat
                 </td>

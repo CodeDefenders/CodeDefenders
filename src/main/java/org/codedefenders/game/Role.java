@@ -24,7 +24,7 @@ package org.codedefenders.game;
 public enum Role {
     ATTACKER("Attacker"),
     DEFENDER("Defender"),
-    CREATOR("Creator"),
+    OBSERVER("Observer"),
     NONE;
 
     private final String displayName;

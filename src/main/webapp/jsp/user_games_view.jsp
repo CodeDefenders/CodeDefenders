@@ -172,71 +172,82 @@
         </td>
 		<td class="col-sm-1"><%=info.gameLevel()%></td>
 		<td class="col-sm-2">
-<%
-				switch(info.userRole()){
-					case CREATOR:
-						if (info.gameState() == GameState.CREATED) {
-%>
-			<form id="adminStartBtn-<%=gameId%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
-				<button type="submit" class="btn btn-sm btn-primary" id="startGame-<%=gameId%>" form="adminStartBtn-<%=gameId%>">
-					Start Game
-				</button>
-				<input type="hidden" name="formType" value="startGame">
-				<input type="hidden" name="gameId" value="<%= gameId %>" />
-			</form>
-<%
-						} else {
-%>
-			<a class="btn btn-sm btn-primary" id="<%="observe-"+gameId%>" href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">
+            <%
+                if (info.gameState() == GameState.CREATED && info.creatorId() == info.userId()) {
+            %>
+            <form id="adminStartBtn-<%=gameId%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>"
+                  method="post">
+                <button type="submit" class="btn btn-sm btn-primary" id="startGame-<%=gameId%>"
+                        form="adminStartBtn-<%=gameId%>">
+                    Start Game
+                </button>
+                <input type="hidden" name="formType" value="startGame">
+                <input type="hidden" name="gameId" value="<%= gameId %>"/>
+            </form>
+            <%
+                } else {
+                    switch (info.userRole()) {
+                        case ATTACKER:
+                            if (info.gameState() != GameState.CREATED) {
+            %>
+            <a class="btn btn-sm btn-primary" id="<%="attack-"+gameId%>"
+               style="background-color: #884466;border-color: #772233;"
+               href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">Attack</a>
+            <%
+                            } else {
+            %>
+            Joined as Attacker
+            <% if (gamesJoinable) { %>
+            <form id="attLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
+                <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
+                <input type="hidden" name="gameId" value="<%=gameId%>">
+                <button class="btn btn-sm btn-danger" id="<%="leave-attacker-"+gameId%>" type="submit" form="attLeave"
+                        value="Leave">
+                    Leave
+                </button>
+            </form>
+            <% } %>
+            <%
+                            }
+                            break;
+                        case DEFENDER:
+                    if (info.gameState() != GameState.CREATED) {
+            %>
+            <a class="btn btn-sm btn-primary" id="<%="defend-"+gameId%>"
+               style="background-color: #446688;border-color: #225577"
+               href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">Defend</a>
+            <%
+            } else {
+            %>
+            Joined as Defender
+            <%if (gamesJoinable) { %>
+            <form id="defLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
+                <input class="btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
+                <input type="hidden" name="gameId" value="<%=gameId%>">
+                <button class="btn btn-sm btn-danger" id="<%="leave-defender-"+gameId%>" type="submit" form="defLeave"
+                        value="Leave">
+                    Leave
+                </button>
+            </form>
+            <% } %>
+            <%
+                    }
+                    break;
+                case OBSERVER:
+                    if (info.creatorId() == info.userId()) {
+            %>
+            <a class="btn btn-sm btn-primary" id="<%="observe-"+gameId%>"
+               href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">
                 Observe
             </a>
-<%
-						}
-					break;
-					case ATTACKER:
-						if(info.gameState() != GameState.CREATED) {
-%>
-			<a class = "btn btn-sm btn-primary" id="<%="attack-"+gameId%>" style="background-color: #884466;border-color: #772233;"
-               href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">Attack</a>
-<%
-						} else {
-%>
-			Joined as Attacker
-			<%if (gamesJoinable) { %>
-			<form id="attLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
-				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
-				<input type="hidden" name="gameId" value="<%=gameId%>">
-				<button class="btn btn-sm btn-danger" id="<%="leave-attacker-"+gameId%>" type="submit" form="attLeave" value="Leave">
-					Leave
-				</button>
-			</form>
-			<% } %>
-<%
-						}
-					break;
-					case DEFENDER:
-						if(info.gameState() != GameState.CREATED) {
-%>
-			<a class = "btn btn-sm btn-primary" id="<%="defend-"+gameId%>" style="background-color: #446688;border-color: #225577"
-               href="<%= request.getContextPath()  + Paths.BATTLEGROUND_GAME%>?gameId=<%= gameId %>">Defend</a>
-<%
-						} else {
-%>
-			Joined as Defender
-			<%if (gamesJoinable) { %>
-			<form id="defLeave" action="<%= request.getContextPath()  + Paths.BATTLEGROUND_SELECTION%>" method="post">
-				<input class = "btn btn-sm btn-danger" type="hidden" name="formType" value="leaveGame">
-				<input type="hidden" name="gameId" value="<%=gameId%>">
-				<button class = "btn btn-sm btn-danger" id="<%="leave-defender-"+gameId%>" type="submit" form="defLeave" value="Leave">
-					Leave
-				</button>
-			</form>
-			<% } %>
-<%
-						}
-					break;
-				}
-%>
+            <%
+                            }
+                     break;
+                 default:
+                     break;
+                    }
+                }
+            %>
 		</td>
 	</tr>
 <%

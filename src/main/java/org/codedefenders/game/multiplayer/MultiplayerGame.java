@@ -216,12 +216,12 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     public Role getRole(int userId){
-        if (userId == getCreatorId()) {
-            return Role.CREATOR;
-        } else if (getDefenderPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
+        if (getDefenderPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
             return Role.DEFENDER;
         } else if (getAttackerPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
             return Role.ATTACKER;
+        } else if (userId == getCreatorId()) {
+            return Role.OBSERVER;
         } else {
             return Role.NONE;
         }
