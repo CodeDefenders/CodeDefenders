@@ -117,7 +117,7 @@
                     </td>
                     <td class="col-sm-1"><%=defenders%>
                     </td>
-                    <td class="col-sm-1"><%= game.getLevel()%>
+                    <td class="col-sm-1"><%= game.getLevel().getFormattedString()%>
                     </td>
                 </tr>
                 <%
