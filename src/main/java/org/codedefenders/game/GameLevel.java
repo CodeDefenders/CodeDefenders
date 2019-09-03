@@ -32,8 +32,7 @@ public enum GameLevel {
         this.displayName = displayName;
     }
 
-    @Override
-    public String toString() {
+    public String getFormattedString() {
         return displayName;
     }
 }

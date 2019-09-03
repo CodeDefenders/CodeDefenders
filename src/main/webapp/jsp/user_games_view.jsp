@@ -170,7 +170,7 @@
                 }
             %>
         </td>
-		<td class="col-sm-1"><%=info.gameLevel()%></td>
+		<td class="col-sm-1"><%=info.gameLevel().getFormattedString()%></td>
 		<td class="col-sm-2">
             <%
                 if (info.gameState() == GameState.CREATED && info.creatorId() == info.userId()) {
@@ -319,7 +319,7 @@
             %>
 			<td class="col-sm-1"><%=attackers %></td>
 			<td class="col-sm-1"><%=defenders %></td>
-			<td class="col-sm-1"><%=info.gameLevel() %></td>
+			<td class="col-sm-1"><%=info.gameLevel().getFormattedString() %></td>
 			<td class="col-sm-2">
 				<form id="joinGameForm_attacker_<%=info.gameId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
 					<input type="hidden" name="formType" value="joinGame">
