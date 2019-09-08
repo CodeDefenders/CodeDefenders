@@ -429,11 +429,11 @@
             <version>23.6-jre</version>
         </dependency>
 
-		<!-- Test Smell Detector -->
+		<!-- Test Smell Detector. Local dependency -->
 		<dependency>
 			<groupId>edu.rit.se.testsmells</groupId>
 			<artifactId>TestSmellDetector</artifactId>
-			<version>0.1</version>
+			<version>0.2</version>
 		</dependency>
 
 		<!-- Installer -->

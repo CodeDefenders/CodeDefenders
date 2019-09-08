@@ -41,13 +41,23 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 
+import testsmell.AbstractSmell;
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;
+import testsmell.smell.AssertionRoulette;
+import testsmell.smell.DuplicateAssert;
+import testsmell.smell.EagerTest;
+import testsmell.smell.ExceptionCatchingThrowing;
+import testsmell.smell.MagicNumberTest;
+import testsmell.smell.RedundantAssertion;
+import testsmell.smell.SensitiveEquality;
+import testsmell.smell.UnknownTest;
 
 import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
 import static org.codedefenders.util.Constants.TESTS_DIR;
@@ -176,9 +186,33 @@ public class GameManagingUtils implements IGameManagingUtils {
             backend.testOriginal(newTestDir, newTest);
             try {
                 // Detect test smell and store them to DB
-                TestSmellDetector testSmellDetector = TestSmellDetector.createTestSmellDetector();
+                /*
+                 * For the moment we hardcode the configuration of the smells here
+                 * to allow fine tuning of smells (see #426) and allow for post processing of smells
+                 * TODO: Inject TestSmellDetector using CDI
+                 */
+                List<AbstractSmell> testSmells = new ArrayList<AbstractSmell>();
+                testSmells.add(new AssertionRoulette());
+                testSmells.add(new DuplicateAssert());
+                testSmells.add(new EagerTest());
+                testSmells.add(new RedundantAssertion());
+                testSmells.add(new SensitiveEquality());
+                testSmells.add(new UnknownTest());
+                // Those two might require some love according to #426.
+                testSmells.add(new ExceptionCatchingThrowing());
+                testSmells.add(new MagicNumberTest());
+                /*
+                 * Those two are not mentioned on:
+                 * https://testsmells.github.io/pages/testsmells.html but might
+                 * become relevant later
+                 */
+                // testSmells.add(new VerboseTest());
+                // testSmells.add(new DependentTest());
+                TestSmellDetector testSmellDetector = new TestSmellDetector(testSmells);
+                //
                 TestFile testFile = new TestFile("", newTest.getJavaFile(), cut.getJavaFile());
                 testSmellDetector.detectSmells(testFile);
+                // TODO Post Process Smells: for example eagerTest returns the SmellyElements
                 TestSmellsDAO.storeSmell(newTest, testFile);
             } catch (Exception e) {
                 logger.error("Failed to generate or store test smell.", e);
