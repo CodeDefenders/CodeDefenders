@@ -180,17 +180,22 @@ public class GameManagingUtils implements IGameManagingUtils {
         // original code.
         if (compileTestTarget.status == TargetExecution.Status.SUCCESS) {
             backend.testOriginal(newTestDir, newTest);
-            try {
-                // Detect test smell
-                TestFile testFile = new TestFile("", newTest.getJavaFile(), cut.getJavaFile());
-                testSmellDetector.detectSmells(testFile);
-                // TODO Post Process Smells. See #500
-                testSmellsDAO.storeSmell(newTest, testFile);
-            } catch (Exception e) {
-                logger.error("Failed to generate or store test smell.", e);
-            }
+            detectTestSmells(newTest, cut);
         }
 
         return newTest;
+    }
+
+    // Enable testability. it can be declared also protected
+    public void detectTestSmells(Test newTest, GameClass cut){
+        try {
+            // Detect test smell
+            TestFile testFile = new TestFile("", newTest.getJavaFile(), cut.getJavaFile());
+            testSmellDetector.detectSmells(testFile);
+            // TODO Post Process Smells. See #500
+            testSmellsDAO.storeSmell(newTest, testFile);
+        } catch (Exception e) {
+            logger.error("Failed to generate or store test smell.", e);
+        }
     }
 }

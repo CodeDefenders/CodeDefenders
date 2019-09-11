@@ -422,6 +422,13 @@
                 <version>3.0.5.Final</version>
         </dependency>
 
+    	<dependency>
+                <groupId>org.jboss.weld</groupId>
+                <artifactId>weld-junit4</artifactId>
+                <version>2.0.0.Final</version>
+                <scope>test</scope>
+        </dependency>
+
         <!-- EventBus implementation, but any EventBus or MOM might work as well -->
         <dependency>
             <groupId>com.google.guava</groupId>
