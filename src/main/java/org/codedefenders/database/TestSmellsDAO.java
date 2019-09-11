@@ -39,7 +39,7 @@ import testsmell.smell.ExceptionCatchingThrowing;
 public class TestSmellsDAO {
     private static final Logger logger = LoggerFactory.getLogger(TestSmellsDAO.class);
 
-    private final static String filterSmell = new ExceptionCatchingThrowing().getSmellName();
+//    private final static String filterSmell = new ExceptionCatchingThrowing().getSmellName();
 
     /**
      * Stores all test smells of a test to the database.
@@ -58,7 +58,7 @@ public class TestSmellsDAO {
             PreparedStatement stmt = conn.prepareStatement(query);
 
             for (AbstractSmell smell : testFile.getTestSmells()) {
-                if (smell.getHasSmell() && !filterSmell.equals(smell.getSmellName())) {
+                if (smell.getHasSmell() ){ // && !filterSmell.equals(smell.getSmellName())) {
                     stmt.setInt(1, test.getId());
                     stmt.setString(2, smell.getSmellName());
                     stmt.addBatch();
