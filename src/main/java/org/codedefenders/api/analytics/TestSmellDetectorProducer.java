@@ -11,8 +11,6 @@ import testsmell.TestSmellDetector;
 import testsmell.smell.AssertionRoulette;
 import testsmell.smell.DuplicateAssert;
 import testsmell.smell.EagerTest;
-import testsmell.smell.ExceptionCatchingThrowing;
-import testsmell.smell.MagicNumberTest;
 import testsmell.smell.RedundantAssertion;
 import testsmell.smell.SensitiveEquality;
 import testsmell.smell.UnknownTest;
@@ -37,8 +35,8 @@ public class TestSmellDetectorProducer {
         testSmells.add(new SensitiveEquality());
         testSmells.add(new UnknownTest());
         // Those two might require some love according to #426.
-        testSmells.add(new ExceptionCatchingThrowing());
-        testSmells.add(new MagicNumberTest());
+        // testSmells.add(new ExceptionCatchingThrowing());
+        // testSmells.add(new MagicNumberTest());
         /*
          * Those two are not mentioned on:
          * https://testsmells.github.io/pages/testsmells.html but might become
