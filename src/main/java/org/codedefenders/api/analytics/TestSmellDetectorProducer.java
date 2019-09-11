@@ -16,17 +16,9 @@ import testsmell.smell.SensitiveEquality;
 import testsmell.smell.UnknownTest;
 
 public class TestSmellDetectorProducer {
-
-    public TestSmellDetectorProducer() {
-    }
-
+    
     // See https://stackoverflow.com/questions/2264758/resolution-of-external-3rd-party-beans-in-weld
     public @Produces @RequestScoped TestSmellDetector createTestSmellDetector() {
-        /*
-         * For the moment we hardcode the configuration of the smells here to
-         * allow fine tuning of smells (see #426) and allow for post processing
-         * of smells TODO: Inject TestSmellDetector using CDI
-         */
         List<AbstractSmell> testSmells = new ArrayList<AbstractSmell>();
         testSmells.add(new AssertionRoulette());
         testSmells.add(new DuplicateAssert());
@@ -36,6 +28,7 @@ public class TestSmellDetectorProducer {
         testSmells.add(new UnknownTest());
         // Those two might require some love according to #426.
         // testSmells.add(new ExceptionCatchingThrowing());
+        // Disabled as per #426, waiting for #500
         // testSmells.add(new MagicNumberTest());
         /*
          * Those two are not mentioned on:

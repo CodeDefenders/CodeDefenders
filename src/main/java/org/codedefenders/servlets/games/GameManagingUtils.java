@@ -181,7 +181,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                 // Detect test smell
                 TestFile testFile = new TestFile("", newTest.getJavaFile(), cut.getJavaFile());
                 testSmellDetector.detectSmells(testFile);
-                // TODO Post Process Smells: for example eagerTest returns the SmellyElements
+                // TODO Post Process Smells. See #500
                 TestSmellsDAO.storeSmell(newTest, testFile);
             } catch (Exception e) {
                 logger.error("Failed to generate or store test smell.", e);
