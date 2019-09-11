@@ -18,29 +18,40 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.game.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.annotation.ManagedBean;
+
+import org.codedefenders.game.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import testsmell.AbstractSmell;
 import testsmell.TestFile;
-import testsmell.smell.ExceptionCatchingThrowing;
 
 /**
  * This class handles the database logic for test smells.
  *
  * @author gambi
  */
+@ManagedBean
 public class TestSmellsDAO {
     private static final Logger logger = LoggerFactory.getLogger(TestSmellsDAO.class);
 
-//    private final static String filterSmell = new ExceptionCatchingThrowing().getSmellName();
-
+    private final String INSERT_SMELL_QUERY = String.join("\n",
+            "INSERT INTO test_smell (Test_ID, smell_name)",
+            "VALUES (?, ?);"
+    );
+    
+    private final String GET_SMELL_QUERY = String.join("\n",
+            "SELECT smell_name",
+            "FROM test_smell",
+            "WHERE Test_ID = ?;"
+    ); 
+    
     /**
      * Stores all test smells of a test to the database.
      *
@@ -48,14 +59,10 @@ public class TestSmellsDAO {
      * @param testFile a container for all test smells.
      * @throws UncheckedSQLException If storing test smells was not successful.
      */
-    public static void storeSmell(final Test test, final TestFile testFile) throws UncheckedSQLException {
+    public void storeSmell(final Test test, final TestFile testFile) throws UncheckedSQLException {
         try {
-            String query = String.join("\n",
-                    "INSERT INTO test_smell (Test_ID, smell_name)",
-                    "VALUES (?, ?);"
-            );
             Connection conn = DB.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(query);
+            PreparedStatement stmt = conn.prepareStatement(INSERT_SMELL_QUERY);
 
             for (AbstractSmell smell : testFile.getTestSmells()) {
                 if (smell.getHasSmell() ){ // && !filterSmell.equals(smell.getSmellName())) {
@@ -78,12 +85,7 @@ public class TestSmellsDAO {
      * @param test the given test the smells are retrieved for.
      * @return A list of all tests smells for a given test.
      */
-    public static List<String> getDetectedTestSmellsForTest(Test test) {
-        String query = String.join("\n",
-                "SELECT smell_name",
-                "FROM test_smell",
-                "WHERE Test_ID = ?;"
-        );
-        return DB.executeQueryReturnList(query, rs -> rs.getString("smell_name"), DatabaseValue.of(test.getId()));
+    public List<String> getDetectedTestSmellsForTest(Test test) {
+        return DB.executeQueryReturnList(GET_SMELL_QUERY, rs -> rs.getString("smell_name"), DatabaseValue.of(test.getId()));
     }
 }

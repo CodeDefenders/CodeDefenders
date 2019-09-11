@@ -109,6 +109,9 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private IMutationTester mutationTester;
+    
+    @Inject
+    private TestSmellsDAO testSmellsDAO;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -769,7 +772,7 @@ public class MultiplayerGameManager extends HttpServlet {
     }
 
     private void includeDetectTestSmellsInMessages(Test newTest, ArrayList<String> messages) {
-        List<String> detectedTestSmells = TestSmellsDAO.getDetectedTestSmellsForTest(newTest);
+        List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest);
         if (!detectedTestSmells.isEmpty()) {
             if (detectedTestSmells.size() == 1) {
                 messages.add("Your test has the following smell: " + detectedTestSmells.get(0));

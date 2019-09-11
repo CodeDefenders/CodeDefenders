@@ -73,6 +73,9 @@ public class GameManagingUtils implements IGameManagingUtils {
     @Inject
     private TestSmellDetector testSmellDetector;
     
+    @Inject
+    private TestSmellsDAO testSmellsDAO;
+    
     private static final Logger logger = LoggerFactory.getLogger(GameManagingUtils.class);
 
     /**
@@ -182,7 +185,7 @@ public class GameManagingUtils implements IGameManagingUtils {
                 TestFile testFile = new TestFile("", newTest.getJavaFile(), cut.getJavaFile());
                 testSmellDetector.detectSmells(testFile);
                 // TODO Post Process Smells. See #500
-                TestSmellsDAO.storeSmell(newTest, testFile);
+                testSmellsDAO.storeSmell(newTest, testFile);
             } catch (Exception e) {
                 logger.error("Failed to generate or store test smell.", e);
             }

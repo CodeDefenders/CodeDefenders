@@ -39,6 +39,11 @@
 <%
     List<Test> testsTODORENAME = (List<Test>) request.getAttribute("tests");
     List<Mutant> mutantsTODORENAME = (List<Mutant>) request.getAttribute("mutants");
+    /*
+     *   Ideally TestSmellsDAO should be injected using @Inject as it is @ManagedBean, but that proven to be not straigthforward.
+     *   Since TestSmellsDAO does not have additional dependencies we can instantiate the object here. This will work as long as no @Inject are used
+     */
+    TestSmellsDAO testSmellsDAO = new TestSmellsDAO();
 %>
 
 <div class="slider single-item">
@@ -55,7 +60,7 @@
             final String killedMuantsIdString = killedMutants.stream().map(mutant -> String.valueOf(mutant.getId())).collect(Collectors.joining(", "));
 
             // Get the smells for this test
-            final List<String> smellList = TestSmellsDAO.getDetectedTestSmellsForTest(test);
+            final List<String> smellList = testSmellsDAO.getDetectedTestSmellsForTest(test);
             final String smellHtmlList = StringUtils.join(smellList, "</br>");
             // Compute the smell level
             String smellLevel = "Good";
