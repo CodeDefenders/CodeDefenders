@@ -606,6 +606,11 @@ SELECT *
 FROM players
 WHERE `ID` >= 100;
 
+CREATE OR REPLACE VIEW `view_valid_users` AS
+SELECT * FROM `users`
+WHERE `User_ID` >= 5
+  AND Active = 1;
+
 CREATE OR REPLACE VIEW `view_players_with_userdata` AS
 SELECT p.*,
        u.Password     AS usersPassword,
@@ -630,11 +635,6 @@ WHERE tests.ClassFile IS NOT NULL
       AND ex.Target = 'TEST_ORIGINAL'
       AND ex.Status = 'SUCCESS'
   );
-
-CREATE OR REPLACE VIEW `view_valid_users` AS
-SELECT * FROM `users`
-   WHERE `User_ID` >= 5
-    AND Active = 1;
 
 --
 -- Leaderboard Views
