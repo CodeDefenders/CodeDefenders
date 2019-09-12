@@ -274,7 +274,7 @@ public class GameClass {
      * @return template for a JUnit test as a {@link String}.
      * @see #getHTMLEscapedTestTemplate()
      */
-    private String getTestTemplate() {
+    public String getTestTemplate() {
         final StringBuilder bob = new StringBuilder();
         final String classPackage = getPackage();
         if (!classPackage.isEmpty()) {

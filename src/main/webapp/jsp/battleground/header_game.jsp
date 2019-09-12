@@ -21,13 +21,11 @@
 <% pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 </div></div></div></div></div>
-<%@ page import="java.util.*" %>
-<%@ page import="org.codedefenders.game.Test" %>
-<%@ page import="org.codedefenders.game.Mutant" %>
-<%@ page import="org.codedefenders.util.Constants" %>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="static org.codedefenders.game.GameState.ACTIVE" %>
+
+<%
+    {
+        int gameId = (int) request.getAttribute("gameId");
+%>
 
 <div class="game-container">
     <nav class="nest" style="width: 100%; margin-left: 0; margin-right: auto;">
@@ -72,6 +70,11 @@
                    style="color: black; font-size: 18px; padding: 5px;">
                     <span class="glyphicon glyphicon-question-sign"></span>
                 </a>
+                <a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
+                   title="Export as a Gradle project to import into an IDE."
+                   class="btn btn-default btn-diff" id="btnProjectExport">
+                    Export Project
+                </a>
                 <a href="#" class="btn btn-default btn-diff" id="btnScoreboard" data-toggle="modal"
                    data-target="#scoreboard">Show Scoreboard</a>
                 <a href="#" class="btn btn-default btn-diff" id="btnFeedback" data-toggle="modal"
@@ -82,3 +85,6 @@
         </div>
     </nav>
     <div class="clear"></div>
+<%
+    }
+%>
