@@ -18,6 +18,19 @@
  */
 package org.codedefenders.servlets.games;
 
+import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
+import static org.codedefenders.util.Constants.TESTS_DIR;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+import javax.enterprise.context.RequestScoped;
+import javax.inject.Inject;
+
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
@@ -36,21 +49,8 @@ import org.codedefenders.validation.code.CodeValidatorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
-
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;
-
-import static org.codedefenders.util.Constants.JAVA_SOURCE_EXT;
-import static org.codedefenders.util.Constants.TESTS_DIR;
 
 /**
  * This class offers utility methods used by servlets managing active
@@ -70,6 +70,12 @@ public class GameManagingUtils implements IGameManagingUtils {
     @Inject
     private BackendExecutorService backend;
 
+    @Inject
+    private TestSmellDetector testSmellDetector;
+    
+    @Inject
+    private TestSmellsDAO testSmellsDAO;
+    
     private static final Logger logger = LoggerFactory.getLogger(GameManagingUtils.class);
 
     /**
@@ -174,17 +180,22 @@ public class GameManagingUtils implements IGameManagingUtils {
         // original code.
         if (compileTestTarget.status == TargetExecution.Status.SUCCESS) {
             backend.testOriginal(newTestDir, newTest);
-            try {
-                // Detect test smell and store them to DB
-                TestSmellDetector testSmellDetector = TestSmellDetector.createTestSmellDetector();
-                TestFile testFile = new TestFile("", newTest.getJavaFile(), cut.getJavaFile());
-                testSmellDetector.detectSmells(testFile);
-                TestSmellsDAO.storeSmell(newTest, testFile);
-            } catch (Exception e) {
-                logger.error("Failed to generate or store test smell.", e);
-            }
+            detectTestSmells(newTest, cut);
         }
 
         return newTest;
+    }
+
+    // Enable testability. it can be declared also protected
+    public void detectTestSmells(Test newTest, GameClass cut){
+        try {
+            // Detect test smell
+            TestFile testFile = new TestFile("", newTest.getJavaFile(), cut.getJavaFile());
+            testSmellDetector.detectSmells(testFile);
+            // TODO Post Process Smells. See #500
+            testSmellsDAO.storeSmell(newTest, testFile);
+        } catch (Exception e) {
+            logger.error("Failed to generate or store test smell.", e);
+        }
     }
 }

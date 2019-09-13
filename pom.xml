@@ -422,6 +422,13 @@
                 <version>3.0.5.Final</version>
         </dependency>
 
+    	<dependency>
+                <groupId>org.jboss.weld</groupId>
+                <artifactId>weld-junit4</artifactId>
+                <version>2.0.0.Final</version>
+                <scope>test</scope>
+        </dependency>
+
         <!-- EventBus implementation, but any EventBus or MOM might work as well -->
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -429,11 +436,11 @@
             <version>23.6-jre</version>
         </dependency>
 
-		<!-- Test Smell Detector -->
+		<!-- Test Smell Detector. Local dependency -->
 		<dependency>
 			<groupId>edu.rit.se.testsmells</groupId>
 			<artifactId>TestSmellDetector</artifactId>
-			<version>0.1</version>
+			<version>0.2</version>
 		</dependency>
 
 		<!-- Installer -->
