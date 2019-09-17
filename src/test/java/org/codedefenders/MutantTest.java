@@ -48,9 +48,10 @@ import difflib.PatchFailedException;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.doReturn;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({GameDAO.class, GameClassDAO.class, MultiplayerGame.class})
+@PrepareForTest({GameDAO.class, GameClassDAO.class, MultiplayerGame.class, MultiplayerGameDAO.class})
 public class MutantTest {
 
     @Rule
@@ -135,7 +136,10 @@ public class MutantTest {
         when(mockedGame.getId()).thenReturn(mockedGameID);
 
         PowerMockito.mockStatic(MultiplayerGameDAO.class);
-        when(MultiplayerGameDAO.getMultiplayerGame(mockedGameID)).thenReturn(mockedGame);
+        // This call causes the connection lookup
+        PowerMockito.when(MultiplayerGameDAO.getMultiplayerGame(mockedGameID)).thenReturn(mockedGame);
+        
+        
         when(mockedGame.getClassId()).thenReturn(1);
         PowerMockito.mockStatic(GameClassDAO.class);
         when(GameClassDAO.getClassForId(mockedClassID)).thenReturn(mockedGameClass);
