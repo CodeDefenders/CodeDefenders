@@ -84,6 +84,9 @@ public class MultiplayerGame extends AbstractGame {
     private boolean withTests;
     private boolean withMutants;
 
+    // 0 means disabled
+    private int automaticMutantEquivalenceThreshold = 0;
+
     public static class Builder {
         // mandatory values
         private final int classId;
@@ -110,6 +113,8 @@ public class MultiplayerGame extends AbstractGame {
         private boolean withTests = false;
         private boolean withMutants = false;
 
+        private int automaticMutantEquivalenceThreshold = 0;
+
         public Builder(int classId, int creatorId, int maxAssertionsPerTest) {
             this.classId = classId;
             this.creatorId = creatorId;
@@ -134,6 +139,8 @@ public class MultiplayerGame extends AbstractGame {
 
         public Builder withTests(boolean withTests) { this.withTests = withTests; return this; }
         public Builder withMutants(boolean withMutants) { this.withMutants = withMutants; return this; }
+
+        public Builder automaticMutantEquivalenceThreshold(int threshold){ this.automaticMutantEquivalenceThreshold = threshold; return this; }
 
         public MultiplayerGame build() {
             return new MultiplayerGame(this);
@@ -165,6 +172,8 @@ public class MultiplayerGame extends AbstractGame {
         // This is mostly a temporary patch
         this.withMutants = builder.withMutants;
         this.withTests = builder.withTests;
+
+        this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
     }
 
     public boolean hasSystemTests() {
@@ -213,6 +222,10 @@ public class MultiplayerGame extends AbstractGame {
 
     public boolean isCapturePlayersIntention() {
         return capturePlayersIntention;
+    }
+
+    public int getAutomaticMutantEquivalenceThreshold() {
+        return automaticMutantEquivalenceThreshold;
     }
 
     public Role getRole(int userId){
@@ -573,4 +586,5 @@ public class MultiplayerGame extends AbstractGame {
                 new Timestamp(System.currentTimeMillis()));
         notif.insert();
     }
+
 }

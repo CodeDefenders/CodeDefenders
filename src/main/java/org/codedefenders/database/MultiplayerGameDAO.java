@@ -69,6 +69,8 @@ public class MultiplayerGameDAO {
         int defenderValue = rs.getInt("Defender_Value");
         int attackerValue = rs.getInt("Attacker_Value");
 
+        int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
+
         return new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest)
                 .cut(cut)
                 .id(id)
@@ -82,6 +84,7 @@ public class MultiplayerGameDAO {
                 .requiresValidation(requiresValidation)
                 .lineCoverage(lineCoverage)
                 .mutantCoverage(mutantCoverage)
+                .automaticMutantEquivalenceThreshold( automaticMutantEquivalenceThreshold )
                 .build();
     }
 
@@ -143,6 +146,7 @@ public class MultiplayerGameDAO {
         CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
         boolean capturePlayersIntention = game.isCapturePlayersIntention();
         GameMode mode = game.getMode();
+        int automaticMutantEquivalenceThreshold = game.getAutomaticMutantEquivalenceThreshold();
 
         String query = String.join("\n",
                 "INSERT INTO games",
@@ -159,8 +163,10 @@ public class MultiplayerGameDAO {
                 "MaxAssertionsPerTest,",
                 "ChatEnabled,",
                 "MutantValidator,",
-                "CapturePlayersIntention)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "CapturePlayersIntention,",
+                "EquivalenceThreshold)",
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
                 DatabaseValue.of(level.name()),
@@ -175,7 +181,8 @@ public class MultiplayerGameDAO {
                 DatabaseValue.of(maxAssertionsPerTest),
                 DatabaseValue.of(chatEnabled),
                 DatabaseValue.of(mutantValidatorLevel.name()),
-                DatabaseValue.of(capturePlayersIntention)
+                DatabaseValue.of(capturePlayersIntention),
+                DatabaseValue.of(automaticMutantEquivalenceThreshold)
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);

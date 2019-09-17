@@ -172,6 +172,16 @@
                            data-onstyle="primary" data-offstyle="">
                 </td>
             </tr>
+            <tr>
+                <td title="Threshold for automatically triggering equivalence duels. If the value is 0 the trigger is disabled.">
+                    Automatic Equivalence Threshold
+                </td>
+                <td id="automaticEquivalenceTrigger">
+                    <input class="form-control" type="number" value="0"
+                           name="automaticEquivalenceTrigger"
+                           id="automaticEquivalenceTrigger" min=0 required/>
+                </td>
+            </tr>
             <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
             <tr>
                 <td>

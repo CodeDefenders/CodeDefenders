@@ -95,6 +95,8 @@ public class AdminCreateGames extends HttpServlet {
 
     private boolean capturePlayersIntention;
 
+    private int automaticEquivalenceTrigger;
+
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP).forward(request, response);
     }
@@ -302,6 +304,8 @@ public class AdminCreateGames extends HttpServlet {
             withMutants= request.getParameter("withMutants") != null;
 
             capturePlayersIntention = request.getParameter("capturePlayersIntention") != null;
+
+            automaticEquivalenceTrigger = Integer.parseInt(request.getParameter("automaticEquivalenceTrigger"));
         } catch (Exception e) {
             messages.add("There was a problem with the form.");
             response.sendRedirect(request.getContextPath() + "/admin");
@@ -474,7 +478,8 @@ public class AdminCreateGames extends HttpServlet {
                 maxAssertionsPerTest, chatEnabled,
                 mutantValidatorLevel,
                 withTests, withMutants, //
-                capturePlayersIntention);
+                capturePlayersIntention,
+                automaticEquivalenceTrigger);
 
         if (teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_DESCENDING) || teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_SHUFFLED)) {
             Collections.sort(attackerIDs, new ReverseDefenderScoreComparator());
@@ -537,7 +542,8 @@ public class AdminCreateGames extends HttpServlet {
                                                      int maxAssertionsPerTest,
                                                      boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
                                                      boolean withTests, boolean withMutants, //
-                                                     boolean capturePlayersIntention
+                                                     boolean capturePlayersIntention, //
+                                                     int automaticEquivalenceTrigger
                                                      ) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
@@ -549,6 +555,7 @@ public class AdminCreateGames extends HttpServlet {
                     .withTests(withTests)
                     .withMutants(withMutants)
                     .capturePlayersIntention(capturePlayersIntention)
+                    .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
                     .build();
             gameList.add(game);
         }

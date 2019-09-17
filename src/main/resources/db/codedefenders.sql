@@ -148,6 +148,7 @@ CREATE TABLE `games` (
   `HasKillMap` tinyint(1) NOT NULL DEFAULT '0',
   `CapturePlayersIntention` tinyint(1) NOT NULL DEFAULT '0',
   `Puzzle_ID` int(11) DEFAULT NULL,
+  `EquivalenceThreshold` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`),
   KEY `fk_creatorId_idx` (`Creator_ID`),
   KEY `fk_className_idx` (`Class_ID`),
