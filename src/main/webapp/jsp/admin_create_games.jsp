@@ -499,15 +499,21 @@
                 <input class="form-control" type="number" value="2" name="maxAssertionsPerTest"
                        id="maxAssertionsPerTest" min=1 required/>
             </div>
-            <div class="col-sm-2">
+        </div>
+        <br>
+        <div class="row"><!--  Start: Automatic Equivalence Duels Trigger -->
+            <div class="col-sm-6">
                 <label for="automaticEquivalenceTrigger" class="label-normal"
-                       title="Threshold for automatically triggering equivalence duels. If the value is 0 the trigger is disabled.">
-                       Automatic Equivalence Threshold</label>
-                <br/>
+                       title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
+                       Threshold for triggering equivalence duels automatically (use 0 to deactivate)"</label>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-2">
                 <input class="form-control" type="number" value="0" name="automaticEquivalenceTrigger"
                        id="automaticEquivalenceTrigger" min=0 required/>
             </div>
-        </div>
+        </div><!--  End : Automatic Equivalence Duels Trigger -->
         <br>
         <div class="row">
             <div class="col-sm-5">
