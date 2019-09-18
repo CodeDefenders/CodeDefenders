@@ -227,13 +227,17 @@ public class MultiplayerGameManager extends HttpServlet {
                 // Send the notification about the flagged mutant to attacker
                 int mutantOwnerID = aliveMutant.getPlayerId();
                 Event event = new Event(-1, game.getId(), mutantOwnerID,
-                        "One or more of your mutants survived "
+                        "One of your mutants survived "
                                 + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
-                                + "tests" + " so it was automatically flagged as equivalent.",
+                                + "tests so it was automatically claimed as equivalent.",
                         // TODO it might make sense to specify a new event type?
                         EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
                         new Timestamp(System.currentTimeMillis()));
                 event.insert();
+                /*
+                 * Register the event to DB
+                 */
+                DatabaseAccess.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
                 /*
                  * Send the notification about the flagged mutant to the game channel
                  */
