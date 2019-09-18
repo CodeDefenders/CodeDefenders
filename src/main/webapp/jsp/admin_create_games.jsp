@@ -505,7 +505,7 @@
             <div class="col-sm-6">
                 <label for="automaticEquivalenceTrigger" class="label-normal"
                        title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
-                       Threshold for triggering equivalence duels automatically (use 0 to deactivate)"</label>
+                       Threshold for triggering equivalence duels automatically (use 0 to deactivate)</label>
             </div>
         </div>
         <div class="row">
