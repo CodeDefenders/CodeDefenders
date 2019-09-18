@@ -176,10 +176,14 @@ public class MultiplayerGameManager extends HttpServlet {
         switch (action) {
             case "createMutant": {
                 createMutant(request, response, gameId, game);
+                // After creating a mutant, there's the chance that the mutant already survived enough tests
+                triggerAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "createTest": {
                 createTest(request, response, gameId, game);
+                // After a test is submitted, there's the chance that one or more mutants already survived enough tests 
+                triggerAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "reset": {
@@ -199,6 +203,51 @@ public class MultiplayerGameManager extends HttpServlet {
             default:
                 logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
+        }
+    }
+    
+    // This is package protected to enable testing
+    void triggerAutomaticMutantEquivalenceForGame(MultiplayerGame game) {
+        int threshold = game.getAutomaticMutantEquivalenceThreshold();
+        if (threshold < 1) {
+            // No need to check as this feature is disabled
+            return;
+        }
+        // Get all the live mutants in the game
+        for (Mutant aliveMutant : game.getAliveMutants()) {
+            /*
+             * If the mutant is covered by enough tests trigger the automatic
+             * equivalence duel
+             */
+            int coveringTests = aliveMutant.getCoveringTests().size();
+            if (coveringTests >= threshold) {
+                // Flag the mutant as possibly equivalent
+                aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+                aliveMutant.update();
+                // Send the notification about the flagged mutant to attacker
+                int mutantOwnerID = aliveMutant.getPlayerId();
+                Event event = new Event(-1, game.getId(), mutantOwnerID,
+                        "One of your mutants survived "
+                                + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
+                                + "tests so it was automatically claimed as equivalent.",
+                        // TODO it might make sense to specify a new event type?
+                        EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
+                        new Timestamp(System.currentTimeMillis()));
+                event.insert();
+                /*
+                 * Register the event to DB
+                 */
+                DatabaseAccess.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
+                /*
+                 * Send the notification about the flagged mutant to the game channel
+                 */
+                String flaggingChatMessage = "Code Defenders automatically flagged mutant " + aliveMutant.getId()
+                        + " as equivalent.";
+                Event gameEvent = new Event(-1, game.getId(), -1, flaggingChatMessage,
+                        EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
+                        new Timestamp(System.currentTimeMillis()));
+                gameEvent.insert();
+            }
         }
     }
 

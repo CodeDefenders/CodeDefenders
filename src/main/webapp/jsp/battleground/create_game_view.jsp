@@ -172,6 +172,25 @@
                            data-onstyle="primary" data-offstyle="">
                 </td>
             </tr>
+            <tr>
+                <td title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
+                    Threshold for Auto. Equiv. Duels
+                </td>
+                <td id="automaticEquivalenceTrigger">
+                    <input class="form-control" type="number" value="0"
+                           name="automaticEquivalenceTrigger"
+                           id="automaticEquivalenceTrigger" min=0 required/>
+                    <div id="automaticEquivalenceTriggerExplanation" class="collapse panel panel-default" style="font-size: 12px;">
+                        <%@ include file="/jsp/automatic_duels_explanation.jsp" %>
+                    </div>
+                </td>
+                <td>
+                    <a data-toggle="collapse" href="#automaticEquivalenceTriggerExplanation" style="color:black">
+                        <span class="glyphicon glyphicon-question-sign"></span>
+                    </a>
+                </td>
+            </tr>
+            <!--  -->
             <input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
             <tr>
                 <td>

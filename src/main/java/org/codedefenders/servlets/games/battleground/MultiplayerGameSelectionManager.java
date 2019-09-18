@@ -154,12 +154,14 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         int classId;
         int maxAssertionsPerTest;
+        int automaticEquivalenceTrigger;
         CodeValidatorLevel mutantValidatorLevel;
         Role selectedRole;
 
         try {
             classId = getIntParameter(request, "class").get();
             maxAssertionsPerTest = getIntParameter(request, "maxAssertionsPerTest").get();
+            automaticEquivalenceTrigger = getIntParameter(request, "automaticEquivalenceTrigger").get();
             mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel").map(CodeValidatorLevel::valueOrNull).get();
             selectedRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).get();
         } catch (NoSuchElementException e) {
@@ -181,6 +183,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .lineCoverage(lineCoverage)
                 .mutantCoverage(mutantCoverage)
                 .mutantValidatorLevel(mutantValidatorLevel)
+                .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
                 .build();
 
         if (nGame.insert()) {
