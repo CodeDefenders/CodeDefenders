@@ -77,6 +77,7 @@ public class DatabaseRule extends ExternalResource {
     @Override
     public void before() throws Exception {
         config = DBConfigurationBuilder.newBuilder();
+        config.addArg("--user=root");
         config.setPort(0); // 0 => autom. detect free port
         db = DB.newEmbeddedDB(config.build());
         db.start();
