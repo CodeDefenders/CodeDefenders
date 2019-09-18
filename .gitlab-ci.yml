@@ -21,6 +21,8 @@ test:
   stage: test
   script:
     - mvn test
+    - cat target/site/jacoco-ut/index.html | grep -o '<tfoot>.*</tfoot>'
   artifacts:
     paths:
       - target/surefire-reports/
+      - target/site/jacoco-ut/
