@@ -4,4 +4,4 @@ An alternative is to declare this color red-transparent but I am not sure this i
 text-decoration: underline;
   text-decoration-color: red;
 -------------------------------------------------- */
-.line-error { background-color: rgba(255, 0, 0, 0.4); } 
+.line-error {border-bottom: 1px dotted #ff0000;} 
