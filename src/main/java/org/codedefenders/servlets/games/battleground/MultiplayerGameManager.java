@@ -26,6 +26,7 @@ import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
+import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_ERROR_LINES;
 import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
 import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
@@ -365,8 +366,12 @@ public class MultiplayerGameManager extends HttpServlet {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
             // We escape the content of the message for new tests since user can embed there anything
             String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+            // Extract the line numbers of the errors
+            List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
+            // Store them in the session so they can be picked up later
+            session.setAttribute(SESSION_ATTRIBUTE_ERROR_LINES, errorLines);
             // We introduce our decoration
-            String decorate = decorateWithLinksToCode( escapedHtml );
+            String decorate = decorateWithLinksToCode(escapedHtml);
             messages.add( decorate );
             //
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
@@ -400,6 +405,24 @@ public class MultiplayerGameManager extends HttpServlet {
         // Clean up the session
         session.removeAttribute("selected_lines");
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
+    }
+
+    /**
+     * Return the line numbers mentioned in the error message of the compiler
+     * @param message
+     * @return
+     */
+    List<Integer> extractErrorLines(String compilerOutput) {
+        List<Integer> errorLines = new ArrayList<>();
+        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
+        for (String line : compilerOutput.split("\n")) {
+            Matcher m = p.matcher(line);
+            if (m.find()) {
+                // TODO may be not robust
+                errorLines.add( Integer.parseInt(m.group(1)));
+            }
+        }
+        return errorLines;
     }
 
     /**
@@ -504,9 +527,14 @@ public class MultiplayerGameManager extends HttpServlet {
             if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty()) {
                 // We escape the content of the message for new tests since user can embed there anything
                 String escapedHtml = StringEscapeUtils.escapeHtml(compileMutantTarget.message);
+                // Extract the line numbers of the errors
+                List<Integer> errorLines = extractErrorLines(compileMutantTarget.message);
+                // Store them in the session so they can be picked up later
+                session.setAttribute(SESSION_ATTRIBUTE_ERROR_LINES, errorLines);
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode( escapedHtml );
                 messages.add( decorate );
+                
             }
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
