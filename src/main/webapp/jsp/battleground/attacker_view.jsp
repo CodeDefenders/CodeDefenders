@@ -26,12 +26,17 @@
 <%
     String previousMutantCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
+    List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
+    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
 
     final GameClass cut = game.getCUT();
 
     /* mutant_editor */
     if (previousMutantCode != null) {
         request.setAttribute("mutantCode", previousMutantCode);
+        /* error_highlighting */
+        request.setAttribute("codeDivSelectorForError", "#newmut-div");
+        request.setAttribute("errorLines", errorLines);
     } else {
         request.setAttribute("mutantCode", cut.getAsHTMLEscapedString());
     }
@@ -59,7 +64,7 @@
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("gameType", GameMode.PARTY);
     // request.setAttribute("gameId", game.getId());
-
+    
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 
@@ -115,6 +120,7 @@
 
             <%@include file="../game_components/mutant_editor.jsp"%>
             <%@include file="../game_components/game_highlighting.jsp" %>
+            <%@include file="../game_components/error_highlighting.jsp" %>
         </form>
         <%@include file="../game_components/mutant_explanation.jsp"%>
         <%@include file="../game_components/editor_help_config_toolbar.jsp"%>

@@ -1,0 +1,7 @@
+/* Error Colors
+We do not use background to avoid interfering with coverage highlighting.
+An alternative is to declare this color red-transparent but I am not sure this is always supported
+text-decoration: underline;
+  text-decoration-color: red;
+-------------------------------------------------- */
+.line-error { background-color: rgba(255, 0, 0, 0.4); } 
