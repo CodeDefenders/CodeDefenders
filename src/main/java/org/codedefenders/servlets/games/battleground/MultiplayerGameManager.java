@@ -431,23 +431,23 @@ public class MultiplayerGameManager extends HttpServlet {
      * decoration utility, and possibly the sanitize methods to some other
      * components.
      */
-    private String decorateWithLinksToCode(String compilerOutput) {
+    String decorateWithLinksToCode(String compilerOutput) {
         StringBuffer decorated = new StringBuffer();
         Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
         for (String line : compilerOutput.split("\n")) {
             Matcher m = p.matcher(line);
             if (m.find()) {
-                // Replace the line number with the link, which contains the
-                // line number
-                String replaced = line.replaceAll("(\\[javac\\].*\\.java:)([0-9]+)(: error:.*)",
-                        "$1<a onclick=\"jumpToLine($2)\" href=\"javascript:void(0);\">$2<\\/a>$3");
-                decorated.append(replaced).append("\n");
+                // Replace the entire line with a link to the source code
+                String replacedLine = "<a onclick=\"jumpToLine("+m.group(1)+")\" href=\"javascript:void(0);\">"+line+"</a>";
+                decorated.append(replacedLine).append("\n");
             } else {
                 decorated.append(line).append("\n");
             }
         }
         return decorated.toString();
     }
+    
+    
 
     private void createMutant(HttpServletRequest request, HttpServletResponse response, int gameId, MultiplayerGame game) throws IOException {
         final int userId = ServletUtils.userId(request);
