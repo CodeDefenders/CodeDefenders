@@ -36,6 +36,8 @@
         If smaller than one or {@code null}, the code can be modified until the end.
     @param KeyMap user-keymap (session attribute)
         The user's preferred key map. Can be {@code null}.
+    @param errorLines the list of lines on which the compiler reported an error.
+        Those have to be highlighted
 --%>
 
 <% { %>
@@ -54,6 +56,7 @@
         endEditLine = null;
     }
     KeyMap keymap = ((KeyMap) session.getAttribute("user-keymap"));
+    
 %>
 <script>
     let startEditLine = <%=startEditLine%> ;

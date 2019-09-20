@@ -145,6 +145,7 @@
     <link href="css/uploadcut.css" rel="stylesheet" type="text/css" />
 
     <link href="css/game_highlighting.css" rel="stylesheet" type="text/css" />
+    <link href="css/error_highlighting.css" rel="stylesheet" type="text/css" />
 
     <script>
         $(document).ready(function() {
