@@ -209,6 +209,7 @@ CREATE TABLE `mutants` (
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Points` int(11) DEFAULT '0',
   `MutatedLines` varchar(255),
+  `KillMessage` varchar(2000) DEFAULT NULL,
   PRIMARY KEY (`Mutant_ID`),
   UNIQUE KEY `mutants_Game_ID_Class_ID_MD5_key` (`Game_ID`,`Class_ID`,`MD5`),
   KEY `fk_gameId_idx` (`Game_ID`),

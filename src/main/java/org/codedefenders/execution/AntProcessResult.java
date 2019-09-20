@@ -49,7 +49,7 @@ public class AntProcessResult {
         final String COMPILER_PREFIX = "[javac] ";
 
         StringBuilder testOutputBuilder = new StringBuilder();
-        final String TEST_PREFIX = "[junit] ";
+        final String TEST_PREFIX = "[junit]";
         final String JUNIT_RESULT_REGEX = "Tests run: (\\d+), Failures: (\\d+), Errors: (\\d+), Skipped: (\\d+), Time elapsed: ((\\d+)(\\.\\d+)?) sec";
 
         String line;

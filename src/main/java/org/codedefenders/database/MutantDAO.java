@@ -68,9 +68,11 @@ public class MutantDAO {
         int playerId = rs.getInt("Player_ID");
         int points = rs.getInt("Points");
         String md5 = rs.getString("MD5");
+        
+        String killMessage = rs.getString("KillMessage"); 
 
         Mutant mutant = new Mutant(mutantId, classId, gameId, absoluteJavaFile, absoluteClassFile, alive, equiv,
-                roundCreated, roundKilled, playerId, md5);
+                roundCreated, roundKilled, playerId, md5, killMessage );
         mutant.setScore(points);
         // since mutated lines can be null
         final String mutatedLines = rs.getString("MutatedLines");
@@ -266,6 +268,33 @@ public class MutantDAO {
         return DB.executeUpdateQuery(query, values);
     }
 
+    /**
+     * Updates a given {@link Mutant} in the database and returns whether
+     * updating was successful or not.
+     *
+     * @param mutant the given mutant as a {@link Mutant}.
+     * @return whether updating was successful or not
+     * @throws UncheckedSQLException If storing the mutant was not successful.
+     */
+    public static boolean updateMutantKillMessageForMutant(Mutant mutant) throws UncheckedSQLException {
+        int mutantId = mutant.getId();
+
+        String killMessage = mutant.getKillMessage();
+
+        String query = String.join("\n",
+            "UPDATE mutants",
+            "SET",
+            "  KillMessage=?",
+            "WHERE Mutant_ID=?;" // AND Alive=0;" maybe ?
+        );
+        DatabaseValue[] values = new DatabaseValue[]{
+            DatabaseValue.of(killMessage),
+            DatabaseValue.of(mutantId)
+        };
+
+        return DB.executeUpdateQuery(query, values);
+    }
+    
     /**
      * Stores a mapping between a {@link Mutant} and a {@link GameClass} in the database.
      *
