@@ -18,6 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="org.codedefenders.database.UserDAO"%>
+<%@page import="org.codedefenders.model.User"%>
+<%@page import="org.codedefenders.game.Test"%>
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
@@ -190,6 +193,12 @@
                         List<Mutant> sortedKilledMutants = new ArrayList<>(mutantsKilledTODORENAME);
                         sortedKilledMutants.sort(Mutant.sortByLineNumberAscending());
                         for (Mutant m : sortedKilledMutants) {
+                            
+                            Test killingTest = m.getKillingTest();
+                            User creator = UserDAO.getUserForPlayer(killingTest.getPlayerId());
+                            int killingTestID = killingTest.getId();
+                            String ownerOfKillingTest = creator.getUsername();
+                            
                     %>
                         <tr>
                             <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= m.getCreatorName() %> (uid <%= m.getCreatorId() %>)</h4>
@@ -242,8 +251,7 @@
                                         <td class="col-sm-1"><a href="#"
                                             class="btn btn-default btn-diff"
                                             id="btnMutKillMessage<%=m.getId()%>" data-toggle="modal"
-                                            data-target="#modalMutKillMessage<%=m.getId()%>">View Kill
-                                                Message</a>
+                                            data-target="#modalMutKillMessage<%=m.getId()%>">View Killing Test</a>
                                             <div id="modalMutKillMessage<%=m.getId()%>"
                                                 class="modal mutant-modal fade" role="dialog"
                                                 style="z-index: 10000;">
@@ -253,7 +261,7 @@
                                                         <div class="modal-header">
                                                             <button type="button" class="close" data-dismiss="modal">&times;</button>
                                                             <h4 class="modal-title">
-                                                                Mutant <%=m.getId()%> was killed by the following test (<%=m.getKillingTest().getId()%>)
+                                                                Mutant <%=m.getId()%> was killed by test <%=killingTestID%> submitted by <%=ownerOfKillingTest%>
                                                             </h4>
                                                         </div>
                                                         <div class="modal-body">
