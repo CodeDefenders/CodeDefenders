@@ -253,16 +253,12 @@
                                                         <div class="modal-header">
                                                             <button type="button" class="close" data-dismiss="modal">&times;</button>
                                                             <h4 class="modal-title">
-                                                                Mutant
-                                                                <%=m.getId()%>
-                                                                - Kill Message
+                                                                Mutant <%=m.getId()%> was killed by the following test (<%=m.getKillingTest().getId()%>)
                                                             </h4>
                                                         </div>
                                                         <div class="modal-body">
-                                                            <pre class="readonly-pre">
-                                                                <textarea class="mutdiff" title="mutdiff"
-                                                                    id="diff<%=m.getId()%>"><%=m.getHTMLEscapedKillMessage()%></textarea>
-                                                            </pre>
+                                                                <pre class="readonly-pre"><textarea class="utest" title="utest" cols="20" rows="10"><%=m.getKillingTest().getAsHTMLEscapedString()%></textarea></pre>
+                                                                <pre class="readonly-pre build-trace"><%=m.getHTMLEscapedKillMessage()%></pre>
                                                         </div>
                                                         <div class="modal-footer">
                                                             <button type="button" class="btn btn-default"

@@ -23,6 +23,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.database.DB;
+import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
@@ -387,6 +388,10 @@ public class Mutant implements Serializable {
 
     public String getHTMLEscapedPatchString() {
         return StringEscapeUtils.escapeHtml(getPatchString());
+    }
+    
+    public Test getKillingTest(){
+        return DatabaseAccess.getKillingTestForMutantId(id);
     }
     
     public String getKillMessage() {
