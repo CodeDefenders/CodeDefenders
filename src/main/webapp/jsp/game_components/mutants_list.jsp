@@ -265,7 +265,7 @@
                                                             </h4>
                                                         </div>
                                                         <div class="modal-body">
-                                                                <pre class="readonly-pre"><textarea class="utest" title="utest" cols="20" rows="10"><%=m.getKillingTest().getAsHTMLEscapedString()%></textarea></pre>
+                                                                <pre class="readonly-pre"><textarea class="killingTest" title="killingTest" cols="20" rows="10"><%=m.getKillingTest().getAsHTMLEscapedString()%></textarea></pre>
                                                                 <pre class="readonly-pre build-trace"><%=m.getHTMLEscapedKillMessage()%></pre>
                                                         </div>
                                                         <div class="modal-footer">
@@ -283,6 +283,18 @@
                     <% } %>
                     </tbody>
                 </table>
+                <%-- Enable syntax highlighting for the killing test textarea --%>
+                <script>
+				    var x = document.getElementsByClassName("killingTest");
+				    for (var i = 0; i < x.length; i++) {
+				        CodeMirror.fromTextArea(x[i], {
+				            lineNumbers: true,
+				            matchBrackets: true,
+				            mode: "text/x-java",
+				            readOnly: true
+				        });
+				    }
+				</script>
             <% } else {%>
                 <div class="panel panel-default" style="background: white">
                     <div class="panel-body" style="    color: gray;    text-align: center;">
