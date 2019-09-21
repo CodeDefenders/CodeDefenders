@@ -21,6 +21,7 @@ package org.codedefenders.database;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
 import org.codedefenders.game.leaderboard.Entry;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.Event;
@@ -302,6 +303,14 @@ public class DatabaseAccess {
         return Optional.ofNullable(targ).map(t -> t.testId).orElse(-1);
     }
 
+    public static Test getKillingTestForMutantId(int mutantId) {
+        int testId = getKillingTestIdForMutant(mutantId);
+        if (testId == -1) {
+            return null;
+        } else {
+            return TestDAO.getTestById(testId);
+        }
+    }
     public static Set<Mutant> getKilledMutantsForTestId(int testId) {
         String query = String.join("\n",
                 "SELECT DISTINCT m.*",

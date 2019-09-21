@@ -23,6 +23,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.database.DB;
+import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
@@ -103,6 +104,8 @@ public class Mutant implements Serializable {
     private List<Integer> lines = null;
     private transient List<String> description = null;
     private transient Patch difference = null;
+    
+    private String killMessage;
 
     /**
      * Creates a new Mutant with following attributes:
@@ -156,9 +159,10 @@ public class Mutant implements Serializable {
         score = 0;
     }
 
-    public Mutant(int mid, int classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId, String md5) {
+    public Mutant(int mid, int classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId, String md5, String killMessage) {
         this(mid, classId, gid, jFile, cFile, alive, equiv, rCreated, rKilled, playerId);
         this.md5 = md5;
+        this.killMessage = killMessage;
     }
 
     public String getCreatorName() {
@@ -385,6 +389,23 @@ public class Mutant implements Serializable {
     public String getHTMLEscapedPatchString() {
         return StringEscapeUtils.escapeHtml(getPatchString());
     }
+    
+    public Test getKillingTest(){
+        return DatabaseAccess.getKillingTestForMutantId(id);
+    }
+    
+    public String getKillMessage() {
+        if( killMessage != null ){
+            return killMessage;
+        } else {
+            return Constants.DEFAULT_KILL_MESSAGE;
+        }
+        
+    }
+    public String getHTMLEscapedKillMessage() {
+        return StringEscapeUtils.escapeHtml(getKillMessage());
+    }
+    
 
     public boolean insert() {
         try {
@@ -549,5 +570,9 @@ public class Mutant implements Serializable {
     @Override
     public String toString() {
         return "[mutantId=" + getId() + ",alive="+ isAlive() + ",equivalent=" + getEquivalent() + ",score=" + getScore() + "]";
+    }
+
+    public void setKillMessage(String message) {
+        this.killMessage = message;
     }
 }

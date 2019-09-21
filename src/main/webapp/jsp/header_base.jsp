@@ -146,6 +146,8 @@
 
     <link href="css/game_highlighting.css" rel="stylesheet" type="text/css" />
     <link href="css/error_highlighting.css" rel="stylesheet" type="text/css" />
+    
+    <link href="css/modal_dialogs.css" rel="stylesheet" type="text/css" />
 
     <script>
         $(document).ready(function() {

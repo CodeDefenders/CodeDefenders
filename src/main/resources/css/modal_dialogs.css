@@ -1,0 +1,10 @@
+.build-trace {
+    background: #000;
+    color: #c4c4c4;
+    white-space: pre;
+    overflow-x: auto;
+    font-size: 12px;
+    border-radius: 0;
+    border: 0;
+    padding: 8px;
+}

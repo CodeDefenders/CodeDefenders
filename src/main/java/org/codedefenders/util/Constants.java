@@ -173,4 +173,6 @@ public class Constants {
     public static final String REQUEST_ATTRIBUTE_PUZZLE_GAME = "active_user_puzzle_game";
 
     public static final String ATTACKER_HAS_PENDING_DUELS = "Sorry, your mutant cannot be accepted because you have pending equivalence duels !\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
+
+    public static final String DEFAULT_KILL_MESSAGE = "Sorry, no kill message available for this mutant";
 }

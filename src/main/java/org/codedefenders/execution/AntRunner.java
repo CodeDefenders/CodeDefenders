@@ -120,8 +120,9 @@ public class AntRunner implements //
         TargetExecution newExec;
 
         if (result.hasFailure()) {
-            // The test failed, i.e., it detected the mutant
-            newExec = new TargetExecution(test.getId(), mutant.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.FAIL, null);
+            // The test failed, i.e., it detected the mutant. Store JUnit output as kill message
+            String killMessage = result.getJUnitMessage();
+            newExec = new TargetExecution(test.getId(), mutant.getId(), TargetExecution.Target.TEST_MUTANT, TargetExecution.Status.FAIL, killMessage );
         } else if (result.hasError()) {
             // The test is in error, interpreted also as detecting the mutant
             String message = result.getErrorMessage();
