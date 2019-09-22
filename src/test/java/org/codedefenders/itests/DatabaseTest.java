@@ -95,7 +95,7 @@ public class DatabaseTest {
 		cut1 = new GameClass(22345678, "MyClass", "", "", "", false, true);
 		cut2 = new GameClass(34865,"", "AliasForClass2", "", "", false, true);
 		multiplayerGame = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), 5)
+				.Builder(cut1.getId(), creator.getId(), 5, CodeValidator.DEFAULT_FORCE_HAMCREST)
                 .level(GameLevel.EASY)
 				.defenderValue(10)
 				.attackerValue(4)
@@ -201,7 +201,7 @@ public class DatabaseTest {
 		assumeTrue(cut1.insert());
 
 		MultiplayerGame mg2 = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), 2)
+				.Builder(cut1.getId(), creator.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
                 .state(GameState.ACTIVE)
 				.level(GameLevel.EASY)
 				.defenderValue(10)
@@ -214,7 +214,7 @@ public class DatabaseTest {
 		assertTrue(mg2.update());
 
 		MultiplayerGame mg3 = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), 2)
+				.Builder(cut1.getId(), creator.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
 				.state(GameState.ACTIVE)
 				.level(GameLevel.EASY)
 				.defenderValue(10)
@@ -229,7 +229,7 @@ public class DatabaseTest {
 		assumeTrue(mg3.update());
 
 		MultiplayerGame mg4 = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), 2)
+				.Builder(cut1.getId(), creator.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
 				.level(GameLevel.EASY)
 				.defenderValue(10)
 				.attackerValue(4)
@@ -341,7 +341,7 @@ public class DatabaseTest {
 
 		// Creator must be there already
 		multiplayerGame = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), 5)
+				.Builder(cut1.getId(), creator.getId(), 5, CodeValidator.DEFAULT_FORCE_HAMCREST)
 				.level(GameLevel.EASY)
 				.defenderValue(10)
 				.attackerValue(4)

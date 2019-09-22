@@ -68,8 +68,9 @@ public interface IGameManagingUtils {
      * @return a {@link Test} is valid, {@code null} otherwise.
      * @throws IOException when storing the test was not successful.
      * @throws CodeValidatorException when code validation resulted in an error.
+     * 
      */
     Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory,
-            int maxNumberOfAssertions) throws IOException, CodeValidatorException;
+            int maxNumberOfAssertions, boolean forceHamcrest) throws IOException, CodeValidatorException;
 
 }

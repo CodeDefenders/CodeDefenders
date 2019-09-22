@@ -83,8 +83,10 @@ import difflib.DiffUtils;
 public class CodeValidator {
     private static Logger logger = LoggerFactory.getLogger(CodeValidator.class);
 
-    //Default number of max. allowed assertions for battleground games
+    //Default configurations: number of max. allowed assertions for battleground games
     public static final int DEFAULT_NB_ASSERTIONS = 2;
+    public static final boolean DEFAULT_FORCE_HAMCREST = false;
+    
 
     //TODO check if removing ";" makes people take advantage of using multiple statements
     public final static String[] PROHIBITED_BITWISE_OPERATORS = {"<<", ">>", ">>>", "|", "&"};
@@ -108,10 +110,10 @@ public class CodeValidator {
         }
     }
 
-    public static boolean validateTestCode(String testCode, int maxNumberOfAssertions) throws CodeValidatorException {
+    public static boolean validateTestCode(String testCode, int maxNumberOfAssertions, boolean forceHamcrest) throws CodeValidatorException {
         try {
             CompilationUnit cu = getCompilationUnitFromText(testCode);
-            return TestCodeVisitor.validFor(cu, maxNumberOfAssertions);
+            return TestCodeVisitor.validFor(cu, maxNumberOfAssertions, forceHamcrest);
         } catch (ParseException e) {
             // Parse error means this is not valid test code
             return false;

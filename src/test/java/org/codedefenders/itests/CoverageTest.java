@@ -49,6 +49,7 @@ import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
+import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Assert;
@@ -198,7 +199,7 @@ public class CoverageTest {
 		long endDate = System.currentTimeMillis() + 1000*3600;
 		// Observer creates a new MP game
 		final MultiplayerGame multiplayerGame = new MultiplayerGame
-				.Builder(cut.getId(), observer.getId(), 2)
+				.Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
 				.defenderValue(10)
 				.attackerValue(4)
 				.state(GameState.ACTIVE)

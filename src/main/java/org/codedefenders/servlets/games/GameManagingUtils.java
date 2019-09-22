@@ -143,7 +143,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     @Override
     public Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory)
             throws IOException, CodeValidatorException {
-        return createTest(gameId, classId, testText, ownerUserId, subDirectory, CodeValidator.DEFAULT_NB_ASSERTIONS);
+        return createTest(gameId, classId, testText, ownerUserId, subDirectory, CodeValidator.DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST);
     }
 
     /**
@@ -151,7 +151,7 @@ public class GameManagingUtils implements IGameManagingUtils {
      */
     @Override
     public Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory,
-            int maxNumberOfAssertions) throws IOException, CodeValidatorException {
+            int maxNumberOfAssertions, boolean forceHamcrest) throws IOException, CodeValidatorException {
         GameClass cut = GameClassDAO.getClassForId(classId);
 
         Path path = Paths.get(TESTS_DIR, subDirectory, String.valueOf(gameId), String.valueOf(ownerUserId), "original");
@@ -172,7 +172,7 @@ public class GameManagingUtils implements IGameManagingUtils {
 
         // Validate code or short circuit here
         String testCode = new String(Files.readAllBytes(Paths.get(javaFile)));
-        if (!CodeValidator.validateTestCode(testCode, maxNumberOfAssertions)) {
+        if (!CodeValidator.validateTestCode(testCode, maxNumberOfAssertions, forceHamcrest)) {
             return null;
         }
 

@@ -55,7 +55,7 @@ public class Puzzle {
      * Maximum number of allowed assertions per submitted test.
      */
     private int maxAssertionsPerTest;
-
+    private boolean forceHamcrest;
     /**
      * Validation level used to check submitted mutants.
      */
@@ -115,7 +115,7 @@ public class Puzzle {
                   int classId,
                   Role activeRole,
                   GameLevel level,
-                  int maxAssertionsPerTest,
+                  int maxAssertionsPerTest, boolean forceHamcrest,
                   CodeValidatorLevel mutantValidatorLevel,
                   Integer editableLinesStart,
                   Integer editableLinesEnd,
@@ -128,6 +128,7 @@ public class Puzzle {
         this.activeRole = activeRole;
         this.level = level;
         this.maxAssertionsPerTest = maxAssertionsPerTest;
+        this.forceHamcrest = forceHamcrest;
         this.mutantValidatorLevel = mutantValidatorLevel;
         this.editableLinesStart = editableLinesStart;
         this.editableLinesEnd = editableLinesEnd;
@@ -176,6 +177,14 @@ public class Puzzle {
 
     public void setMaxAssertionsPerTest(int maxAssertionsPerTest) {
         this.maxAssertionsPerTest = maxAssertionsPerTest;
+    }
+    
+    public boolean isForceHamcrest() {
+        return this.forceHamcrest;
+    }
+    
+    public void setForceHamcrest(boolean forceHamcrest) {
+        this.forceHamcrest = forceHamcrest;
     }
 
     public CodeValidatorLevel getMutantValidatorLevel() {

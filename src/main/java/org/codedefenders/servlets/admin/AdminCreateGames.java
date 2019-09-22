@@ -88,6 +88,7 @@ public class AdminCreateGames extends HttpServlet {
     private MultiplayerGame mg;
     private boolean chatEnabled;
     private int maxAssertionsPerTest;
+    private boolean forceHamcrest;
     private CodeValidatorLevel mutantValidatorLevel;
 
     private boolean withTests;
@@ -297,6 +298,7 @@ public class AdminCreateGames extends HttpServlet {
             gamesLevel = GameLevel.valueOf(request.getParameter("gamesLevel"));
             gamesState = request.getParameter("gamesState").equals(GameState.ACTIVE.name()) ? GameState.ACTIVE : GameState.CREATED;
             maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
+            forceHamcrest = request.getParameter("forceHamcrest") != null;
             mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
             chatEnabled = request.getParameter("chatEnabled") != null;
 
@@ -475,7 +477,8 @@ public class AdminCreateGames extends HttpServlet {
 
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
                  cutID, currentUserID, gamesLevel, gamesState,
-                maxAssertionsPerTest, chatEnabled,
+                maxAssertionsPerTest, forceHamcrest, // 
+                chatEnabled,
                 mutantValidatorLevel,
                 withTests, withMutants, //
                 capturePlayersIntention,
@@ -539,7 +542,7 @@ public class AdminCreateGames extends HttpServlet {
 
     private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame,
                                                      int cutID, int creatorID, GameLevel level, GameState state,
-                                                     int maxAssertionsPerTest,
+                                                     int maxAssertionsPerTest, boolean forceHamcrest,
                                                      boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
                                                      boolean withTests, boolean withMutants, //
                                                      boolean capturePlayersIntention, //
@@ -547,7 +550,7 @@ public class AdminCreateGames extends HttpServlet {
                                                      ) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
-            final MultiplayerGame game = new MultiplayerGame.Builder(cutID, creatorID, maxAssertionsPerTest)
+            final MultiplayerGame game = new MultiplayerGame.Builder(cutID, creatorID, maxAssertionsPerTest, forceHamcrest)
                     .level(level)
                     .state(state)
                     .chatEnabled(chatEnabled)
