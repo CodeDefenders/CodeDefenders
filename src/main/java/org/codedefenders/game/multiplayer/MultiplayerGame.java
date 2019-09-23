@@ -75,7 +75,7 @@ public class MultiplayerGame extends AbstractGame {
     private boolean requiresValidation;
     private int maxAssertionsPerTest;
     private boolean forceHamcrest;
-    
+
     private boolean chatEnabled;
     private CodeValidatorLevel mutantValidatorLevel;
 
@@ -224,7 +224,7 @@ public class MultiplayerGame extends AbstractGame {
     public boolean isForceHamcrest(){
         return forceHamcrest;
     }
-    
+
     public CodeValidatorLevel getMutantValidatorLevel() {
         return mutantValidatorLevel;
     }
@@ -426,7 +426,7 @@ public class MultiplayerGame extends AbstractGame {
         }
 
         for (Test test : getTests()) {
-            if (getDefenderPlayers().stream().anyMatch(p -> p.getId() == test.getPlayerId())) {
+            if (getAttackerPlayers().stream().anyMatch(p -> p.getId() == test.getPlayerId())) {
                 continue;
             }
             if (!testScores.containsKey(test.getPlayerId())) {
@@ -449,7 +449,7 @@ public class MultiplayerGame extends AbstractGame {
         }
 
         for (int playerId : mutantsKilled.keySet()) {
-            if (playerId < 0 || getDefenderPlayers().stream().anyMatch(p -> p.getId() == playerId)) {
+            if (playerId < 0 || getAttackerPlayers().stream().anyMatch(p -> p.getId() == playerId)) {
                 continue;
             }
             int teamKey = defendersTeamId;
