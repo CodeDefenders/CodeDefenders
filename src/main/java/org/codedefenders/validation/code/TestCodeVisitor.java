@@ -39,9 +39,15 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
+import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
+
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -81,38 +87,43 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
     private int assertionCount = 0;
     private int maxNumberOfAssertions;
 
-    static boolean validFor(CompilationUnit cu,int maxNumberOfAssertions) {
+    /**
+     * 
+     * @param cu
+     * @param maxNumberOfAssertions
+     * @return A list of validation messages. If the list is empty, the validation passed
+     * 
+     */
+    static List<String> validFor(CompilationUnit cu,int maxNumberOfAssertions) {
         TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions);
         visitor.visit(cu, null);
-        return visitor.isValid();
+        return visitor.getValidationMessages();
     }
 
     private TestCodeVisitor(int maxNumberOfAssertions) {
         this.maxNumberOfAssertions = maxNumberOfAssertions;
     }
 
-    public boolean isValid() {
+    public List<String> getValidationMessages(){
+        List<String> formattedValidationMessages = new ArrayList<>();
+        
         if (!isValid) {
-            logger.info("Test validation failed with messages: \nError: {}", String.join("\nError: ", messages));
-            return false;
+            formattedValidationMessages.add("Test validation failed with messages: \nError: " + String.join("\nError: ", messages));
         }
         if (classCount > MAX_NUMBER_OF_CLASSES) {
-            logger.info("Invalid test suite contains more than one class declaration.");
-            return false;
+            formattedValidationMessages.add("Invalid test suite contains more than one class declaration.");
         }
         if (methodCount > MAX_NUMBER_OF_METHODS) {
-            logger.info("Invalid test suite contains more than one method declaration.");
-            return false;
+            formattedValidationMessages.add("Invalid test suite contains more than one method declaration.");
         }
         if (stmtCount == MIN_NUMBER_OF_STATEMENTS) {
-            logger.info("Invalid test does not contain any valid statement.");
-            return false;
+            formattedValidationMessages.add("Invalid test does not contain any valid statement.");
         }
+        // This might be already accounted for
         if (assertionCount > maxNumberOfAssertions) {
-            logger.info("Invalid test contains more than " + maxNumberOfAssertions + " assertions");
-            return false;
+            formattedValidationMessages.add("Invalid test contains more than " + maxNumberOfAssertions + " assertions");
         }
-        return true;
+        return formattedValidationMessages;
     }
 
     @Override

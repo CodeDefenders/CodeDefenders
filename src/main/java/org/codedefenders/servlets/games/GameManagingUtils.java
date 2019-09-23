@@ -141,17 +141,7 @@ public class GameManagingUtils implements IGameManagingUtils {
      * {@inheritDoc}
      */
     @Override
-    public Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory)
-            throws IOException, CodeValidatorException {
-        return createTest(gameId, classId, testText, ownerUserId, subDirectory, CodeValidator.DEFAULT_NB_ASSERTIONS);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory,
-            int maxNumberOfAssertions) throws IOException, CodeValidatorException {
+    public Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory) throws IOException {
         GameClass cut = GameClassDAO.getClassForId(classId);
 
         Path path = Paths.get(TESTS_DIR, subDirectory, String.valueOf(gameId), String.valueOf(ownerUserId), "original");
@@ -168,12 +158,6 @@ public class GameManagingUtils implements IGameManagingUtils {
         // return null
         if (compileTestTarget == null || !compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
             return newTest;
-        }
-
-        // Validate code or short circuit here
-        String testCode = new String(Files.readAllBytes(Paths.get(javaFile)));
-        if (!CodeValidator.validateTestCode(testCode, maxNumberOfAssertions)) {
-            return null;
         }
 
         // Eventually check the test actually passes when applied to the

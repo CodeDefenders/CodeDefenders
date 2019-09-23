@@ -72,7 +72,7 @@ import difflib.DiffUtils;
 /**
  * This class offers static methods to validate code, primarily checking validity of tests and mutants.
  *
- * Use {@link #validateTestCode(String, int)} to validate test code with a boolean result value.
+ * Use {@link #validateTestCodeGetMessage(String, int)} to validate test code with a boolean result value.
  *
  * Use {@link #validateMutantGetMessage(String, String, CodeValidatorLevel)} to validate
  * mutants and get a {@link ValidationMessage} back.
@@ -108,16 +108,19 @@ public class CodeValidator {
         }
     }
 
-    public static boolean validateTestCode(String testCode, int maxNumberOfAssertions) throws CodeValidatorException {
+    // TODO Cannot use ValidationMessage as that is an ENUM type...
+    public static List<String> validateTestCodeGetMessage(String testCode, int maxNumberOfAssertions) {
         try {
             CompilationUnit cu = getCompilationUnitFromText(testCode);
             return TestCodeVisitor.validFor(cu, maxNumberOfAssertions);
         } catch (ParseException e) {
             // Parse error means this is not valid test code
-            return false;
+            return Arrays.asList( new String[]{"Invalid test. Cannot be parsed!"});
         } catch (Throwable e) {
             logger.error("Problem in validating test code \n" + testCode, e);
-            throw new CodeValidatorException("Problem in validating test code \n" + testCode, e);
+//            throw new CodeValidatorException("Problem in validating test code \n" + testCode, e);
+            return Arrays.asList( new String[]{"Invalid test. Something went wrong."});
+            
         }
     }
 

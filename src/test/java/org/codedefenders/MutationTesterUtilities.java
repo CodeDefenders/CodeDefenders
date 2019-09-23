@@ -100,7 +100,7 @@ public class MutationTesterUtilities {
                     activeGame.update();
                     System.out.println(new Date() + " MutationTesterTest.defend() " + defender.getId() + ": "
                             + messages.get(messages.size() - 1));
-                } catch (IOException | CodeValidatorException e) {
+                } catch (IOException e) {
                     logger.error(e.getMessage());
                 }
             }

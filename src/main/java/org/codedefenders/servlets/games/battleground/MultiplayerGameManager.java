@@ -85,7 +85,6 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
@@ -280,20 +279,22 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         final String testText = test.get();
 
-        // If it can be written to file and compiled, end turn. Otherwise, dont.
-        Test newTest;
-        try {
-            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest());
-        } catch (CodeValidatorException cve) {
-            messages.add(TEST_GENERIC_ERROR_MESSAGE);
+        // Do the validation even before creating the mutant
+        // TODO Here we need to account for #495
+        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest());
+        if ( !  validationMessage.isEmpty() ) {
+            messages.addAll( validationMessage );
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
 
-        // If test is null, then test did compile but codevalidator triggered
-        if (newTest == null) {
-            messages.add(String.format(TEST_INVALID_MESSAGE, game.getMaxAssertionsPerTest()));
+        // From this point on we assume that test is valid according to the rules (but it might still not compile)
+        Test newTest;
+        try {
+            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR);
+        } catch (IOException io) {
+            messages.add(TEST_GENERIC_ERROR_MESSAGE);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
@@ -312,8 +313,8 @@ public class MultiplayerGameManager extends HttpServlet {
 //                        boolean validatedKilledMutants = true;
 
             // Prepare the validation message
-            StringBuilder validationMessage = new StringBuilder();
-            validationMessage.append("Cheeky! You cannot submit a test without specifying");
+            StringBuilder userIntentionsValidationMessage = new StringBuilder();
+            userIntentionsValidationMessage.append("Cheeky! You cannot submit a test without specifying");
 
             final String selected_lines = request.getParameter("selected_lines");
             if (selected_lines != null) {
@@ -323,7 +324,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
             if (selectedLines.isEmpty()) {
                 validatedCoveredLines = false;
-                validationMessage.append(" a line to cover");
+                userIntentionsValidationMessage.append(" a line to cover");
             }
             // NOTE: We consider only covering lines at the moment
             // if (request.getParameter("selected_mutants") != null) {
@@ -341,10 +342,10 @@ public class MultiplayerGameManager extends HttpServlet {
             //
             // validationMessage.append(" a mutant to kill");
             // }
-            validationMessage.append(".");
+            userIntentionsValidationMessage.append(".");
 
             if (!validatedCoveredLines) { // || !validatedKilledMutants
-                messages.add(validationMessage.toString());
+                messages.add(userIntentionsValidationMessage.toString());
                 // Keep the test around
                 session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -490,8 +491,8 @@ public class MultiplayerGameManager extends HttpServlet {
             return;
         }
 
+        // Do the validation even before creating the mutant
         CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
-
         ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, codeValidatorLevel);
 
         if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
@@ -633,21 +634,26 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             final String testText = test.get();
-
+            
+            // TODO Duplicate code here !
             // If it can be written to file and compiled, end turn. Otherwise, dont.
-            Test newTest;
-            try {
-                newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest());
-            } catch (CodeValidatorException cve) {
-                messages.add(TEST_GENERIC_ERROR_MESSAGE);
+            
+            // Do the validation even before creating the mutant
+            // TODO Here we need to account for #495
+            List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest());
+            if ( !  validationMessage.isEmpty() ) {
+                messages.addAll( validationMessage );
                 session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
-
-            // If test is null, it compiled but codevalidator triggered
-            if (newTest == null) {
-                messages.add(String.format(TEST_INVALID_MESSAGE, game.getMaxAssertionsPerTest()));
+            
+            // If it can be written to file and compiled, end turn. Otherwise, dont.
+            Test newTest;
+            try {
+                newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR);
+            } catch (IOException io) {
+                messages.add(TEST_GENERIC_ERROR_MESSAGE);
                 session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;

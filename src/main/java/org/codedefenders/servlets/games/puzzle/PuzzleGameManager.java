@@ -40,6 +40,7 @@ import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -238,11 +239,22 @@ public class PuzzleGameManager extends HttpServlet {
 
         final ArrayList<String> messages = new ArrayList<>();
         session.setAttribute("messages", messages);
-
+        
+        // TODO Why we have testText and not escaped(testText)?
+        // Validate the test
+        // Do the validation even before creating the mutant
+        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest());
+        if ( !  validationMessage.isEmpty() ) {
+            messages.addAll( validationMessage );
+            session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
+            Redirect.redirectBack(request, response);
+            return;
+        }
+        
         final Test newTest;
         try {
-            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_PUZZLE_DIR, game.getMaxAssertionsPerTest());
-        } catch (CodeValidatorException e) {
+            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_PUZZLE_DIR);
+        } catch (IOException e) {
             messages.add(TEST_GENERIC_ERROR_MESSAGE);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
             Redirect.redirectBack(request, response);
