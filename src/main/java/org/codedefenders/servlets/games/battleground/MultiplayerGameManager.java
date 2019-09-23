@@ -283,7 +283,7 @@ public class MultiplayerGameManager extends HttpServlet {
         // If it can be written to file and compiled, end turn. Otherwise, dont.
         Test newTest;
         try {
-            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest());
+            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
         } catch (CodeValidatorException cve) {
             messages.add(TEST_GENERIC_ERROR_MESSAGE);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
@@ -637,7 +637,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             Test newTest;
             try {
-                newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest());
+                newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
             } catch (CodeValidatorException cve) {
                 messages.add(TEST_GENERIC_ERROR_MESSAGE);
                 session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));

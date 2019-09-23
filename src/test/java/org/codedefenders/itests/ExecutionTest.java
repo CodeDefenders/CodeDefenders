@@ -31,6 +31,7 @@ import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
+import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Before;
@@ -204,7 +205,7 @@ public class ExecutionTest {
         // Observer creates a new MP game
         //
         MultiplayerGame multiplayerGame = new MultiplayerGame
-            .Builder(cut.getId(), observer.getId(), 2)
+            .Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
             .state(GameState.ACTIVE)
             .level(GameLevel.EASY)
             .defenderValue(10)
