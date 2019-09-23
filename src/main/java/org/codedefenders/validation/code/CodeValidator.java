@@ -83,8 +83,10 @@ import difflib.DiffUtils;
 public class CodeValidator {
     private static Logger logger = LoggerFactory.getLogger(CodeValidator.class);
 
-    //Default number of max. allowed assertions for battleground games
+    //Default configurations: number of max. allowed assertions for battleground games
     public static final int DEFAULT_NB_ASSERTIONS = 2;
+    public static final boolean DEFAULT_FORCE_HAMCREST = false;
+    
 
     //TODO check if removing ";" makes people take advantage of using multiple statements
     public final static String[] PROHIBITED_BITWISE_OPERATORS = {"<<", ">>", ">>>", "|", "&"};
@@ -109,16 +111,14 @@ public class CodeValidator {
     }
 
     // TODO Cannot use ValidationMessage as that is an ENUM type...
-    public static List<String> validateTestCodeGetMessage(String testCode, int maxNumberOfAssertions) {
+    public static List<String> validateTestCodeGetMessage(String testCode, int maxNumberOfAssertions, boolean forceHamcrest) {
         try {
             CompilationUnit cu = getCompilationUnitFromText(testCode);
-            return TestCodeVisitor.validFor(cu, maxNumberOfAssertions);
+            return TestCodeVisitor.validFor(cu, maxNumberOfAssertions, forceHamcrest);
         } catch (ParseException e) {
-            // Parse error means this is not valid test code
-            return Arrays.asList( new String[]{"Invalid test. Cannot be parsed!"});
+            return Arrays.asList( new String[]{"Invalid test. Test cannot be parsed!"});
         } catch (Throwable e) {
             logger.error("Problem in validating test code \n" + testCode, e);
-//            throw new CodeValidatorException("Problem in validating test code \n" + testCode, e);
             return Arrays.asList( new String[]{"Invalid test. Something went wrong."});
             
         }

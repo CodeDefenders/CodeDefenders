@@ -243,7 +243,7 @@ public class PuzzleGameManager extends HttpServlet {
         // TODO Why we have testText and not escaped(testText)?
         // Validate the test
         // Do the validation even before creating the mutant
-        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest());
+        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
         if ( !  validationMessage.isEmpty() ) {
             messages.addAll( validationMessage );
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);

@@ -281,7 +281,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
         // Do the validation even before creating the mutant
         // TODO Here we need to account for #495
-        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest());
+        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
         if ( !  validationMessage.isEmpty() ) {
             messages.addAll( validationMessage );
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
@@ -637,10 +637,9 @@ public class MultiplayerGameManager extends HttpServlet {
             
             // TODO Duplicate code here !
             // If it can be written to file and compiled, end turn. Otherwise, dont.
-            
             // Do the validation even before creating the mutant
             // TODO Here we need to account for #495
-            List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest());
+            List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
             if ( !  validationMessage.isEmpty() ) {
                 messages.addAll( validationMessage );
                 session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));

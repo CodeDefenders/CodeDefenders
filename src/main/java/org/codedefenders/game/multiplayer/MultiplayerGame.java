@@ -74,6 +74,8 @@ public class MultiplayerGame extends AbstractGame {
 
     private boolean requiresValidation;
     private int maxAssertionsPerTest;
+    private boolean forceHamcrest;
+    
     private boolean chatEnabled;
     private CodeValidatorLevel mutantValidatorLevel;
 
@@ -92,6 +94,7 @@ public class MultiplayerGame extends AbstractGame {
         private final int classId;
         private final int creatorId;
         private final int maxAssertionsPerTest;
+        private final boolean forceHamcrest;
 
         // optional values with default values
         private GameClass cut = null;
@@ -115,10 +118,11 @@ public class MultiplayerGame extends AbstractGame {
 
         private int automaticMutantEquivalenceThreshold = 0;
 
-        public Builder(int classId, int creatorId, int maxAssertionsPerTest) {
+        public Builder(int classId, int creatorId, int maxAssertionsPerTest, boolean forceHamcrest) {
             this.classId = classId;
             this.creatorId = creatorId;
             this.maxAssertionsPerTest = maxAssertionsPerTest;
+            this.forceHamcrest = forceHamcrest;
         }
 
         public Builder cut(GameClass cut) { this.cut = cut; return this; }
@@ -165,6 +169,7 @@ public class MultiplayerGame extends AbstractGame {
         this.prize = builder.prize;
         this.requiresValidation = builder.requiresValidation;
         this.maxAssertionsPerTest = builder.maxAssertionsPerTest;
+        this.forceHamcrest = builder.forceHamcrest;
         this.chatEnabled = builder.chatEnabled;
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
@@ -216,6 +221,10 @@ public class MultiplayerGame extends AbstractGame {
         return maxAssertionsPerTest;
     }
 
+    public boolean isForceHamcrest(){
+        return forceHamcrest;
+    }
+    
     public CodeValidatorLevel getMutantValidatorLevel() {
         return mutantValidatorLevel;
     }

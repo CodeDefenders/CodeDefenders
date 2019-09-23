@@ -248,9 +248,11 @@ public class ParallelizeTest {
 
 		GameState status = GameState.ACTIVE;
 		int maxAssertionsPerTest = 2;
+		boolean forceHamcrest = false;
+		
 		CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
-
-		final MultiplayerGame multiplayerGame = new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest)
+		
+		final MultiplayerGame multiplayerGame = new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest, forceHamcrest)
 				.state(status)
 				.level(level)
 				.prize(prize)

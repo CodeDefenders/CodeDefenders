@@ -154,6 +154,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         int classId;
         int maxAssertionsPerTest;
+        boolean forceHamcrest;
         int automaticEquivalenceTrigger;
         CodeValidatorLevel mutantValidatorLevel;
         Role selectedRole;
@@ -161,6 +162,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         try {
             classId = getIntParameter(request, "class").get();
             maxAssertionsPerTest = getIntParameter(request, "maxAssertionsPerTest").get();
+            forceHamcrest = parameterThenOrOther(request, "forceHamcrest", true, false);
             automaticEquivalenceTrigger = getIntParameter(request, "automaticEquivalenceTrigger").get();
             mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel").map(CodeValidatorLevel::valueOrNull).get();
             selectedRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).get();
@@ -176,7 +178,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
 
-        MultiplayerGame nGame = new MultiplayerGame.Builder(classId, userId, maxAssertionsPerTest)
+        MultiplayerGame nGame = new MultiplayerGame.Builder(classId, userId, maxAssertionsPerTest, forceHamcrest)
                 .level(level)
                 .chatEnabled(chatEnabled)
                 .capturePlayersIntention(capturePlayersIntention)

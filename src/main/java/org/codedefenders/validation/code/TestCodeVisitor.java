@@ -85,23 +85,28 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
     private int methodCount = 0;
     private int stmtCount = 0;
     private int assertionCount = 0;
+    
+    // Per game configuration
     private int maxNumberOfAssertions;
+    private boolean forceHamcrest;
 
     /**
      * 
      * @param cu
      * @param maxNumberOfAssertions
+     * @param forceHamcrest
      * @return A list of validation messages. If the list is empty, the validation passed
      * 
      */
-    static List<String> validFor(CompilationUnit cu,int maxNumberOfAssertions) {
-        TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions);
+    static List<String> validFor(CompilationUnit cu,int maxNumberOfAssertions, boolean forceHamcrest) {
+        TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions, forceHamcrest);
         visitor.visit(cu, null);
         return visitor.getValidationMessages();
     }
 
-    private TestCodeVisitor(int maxNumberOfAssertions) {
+    private TestCodeVisitor(int maxNumberOfAssertions, boolean forceHamcrest) {
         this.maxNumberOfAssertions = maxNumberOfAssertions;
+        this.forceHamcrest = forceHamcrest;
     }
 
     public List<String> getValidationMessages(){
@@ -232,16 +237,39 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
 
-        final boolean anyMatch = Arrays.stream(new String[]{
+        // JUnit Assertion 
+        final boolean anyJunitAssertionMatch = Arrays.stream(new String[]{
                 "assertEquals", "assertTrue", "assertFalse", "assertNull",
-                "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals", "assertThat"})
+                "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals"})
                 .anyMatch(s -> stmt.getNameAsString().equals(s));
-        if (anyMatch) {
-            if (assertionCount++ > maxNumberOfAssertions) {
+        
+        final boolean hamcrestAssertThatMatch = Arrays.stream(new String[]{"assertThat"})
+                .anyMatch(s -> stmt.getNameAsString().equals(s));
+        
+        /*
+         * Count assertions
+         */
+        if( anyJunitAssertionMatch || hamcrestAssertThatMatch){
+            assertionCount++;
+        }
+        
+        /*
+         * If forced Hamcrest is on, then there must not be JUnit assertions 
+         * 
+         * TODO What if there's no assertions at all ? 
+         */
+        if( forceHamcrest && anyJunitAssertionMatch ){
+                messages.add("Invalid test contains JUnit assertion " + stmt.toString());
                 isValid = false;
                 return;
-            }
         }
+        
+        if (assertionCount > maxNumberOfAssertions) {
+            messages.add("Invalid test contains more assertions ("+ assertionCount + ") than the limit ("+ maxNumberOfAssertions + ")");
+            isValid = false;
+            return;
+        }
+        
         super.visit(stmt, args);
     }
 

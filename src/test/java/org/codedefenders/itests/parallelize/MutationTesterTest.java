@@ -53,6 +53,7 @@ import org.codedefenders.itests.IntegrationTest;
 import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.util.Constants;
+import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -244,7 +245,7 @@ public class MutationTesterTest {
 		// Cut " + cut.getId());
 		//
 		MultiplayerGame multiplayerGame = new MultiplayerGame
-				.Builder(cut.getId(), observer.getId(), 2)
+				.Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
 				.state(GameState.ACTIVE)
 				.level(GameLevel.HARD)
 				.defenderValue(10)

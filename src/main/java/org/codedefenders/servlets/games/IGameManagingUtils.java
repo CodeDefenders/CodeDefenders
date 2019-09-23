@@ -56,20 +56,4 @@ public interface IGameManagingUtils {
     Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory)
             throws IOException, CodeValidatorException;
 
-//    /**
-//     * Stores and validates a given test.
-//     * Calls {@link AntRunner#compileTest(File, String, int, GameClass, int)} AntRunner#compileTest()} after.
-//     *
-//     * @param gameId       the identifier of the game the test is created in.
-//     * @param classId      the identifier of the class the test is created for.
-//     * @param testText the source code of the test.
-//     * @param ownerUserId  the identifier of the user who created the mutant.
-//     * @param subDirectory the directory used for '/tests/subDirectory/gameId/userId/original'
-//     * @return a {@link Test} is valid, {@code null} otherwise.
-//     * @throws IOException when storing the test was not successful.
-//     * @throws CodeValidatorException when code validation resulted in an error.
-//     */
-//    Test createTest(int gameId, int classId, String testText, int ownerUserId, String subDirectory,
-//            int maxNumberOfAssertions) throws IOException, CodeValidatorException;
-
 }
