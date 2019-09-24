@@ -116,7 +116,9 @@ public class CodeValidator {
             CompilationUnit cu = getCompilationUnitFromText(testCode);
             return TestCodeVisitor.validFor(cu, maxNumberOfAssertions, forceHamcrest);
         } catch (ParseException e) {
-            return Arrays.asList( new String[]{"Invalid test. Test cannot be parsed!"});
+            // Pretend this never happened so we send back to the user the compiler error message
+//            return Arrays.asList( new String[]{"Invalid test. Test cannot be parsed!"});
+            return new ArrayList<>();
         } catch (Throwable e) {
             logger.error("Problem in validating test code \n" + testCode, e);
             return Arrays.asList( new String[]{"Invalid test. Something went wrong."});
