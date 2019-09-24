@@ -457,7 +457,7 @@
                 <label class="label-normal" title="Click the question sign for more information on the levels"
                        for="mutantValidatorLevel">
                     Mutant validator
-                    <a data-toggle="collapse" href="#validatorExplanation" style="color:black">
+                    <a data-toggle="modal" href="#validatorExplanation" style="color:black">
                         <span class="glyphicon glyphicon-question-sign"></span>
                     </a>
                 </label>
@@ -524,13 +524,32 @@
             </div>
         </div><!--  End : Automatic Equivalence Duels Trigger -->
         <br>
-        <div class="row">
+        <div class="modal fade" id="validatorExplanation" role="dialog"
+    aria-labelledby="validatorExplanation" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Mutant Validator Explanation</h4>
+            </div>
+
+            <div class="modal-body">
+                <%@ include file="/jsp/validator_explanation.jsp"%>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+        <%-- <div class="row">
             <div class="col-sm-5">
                 <div id="validatorExplanation" class="collapse panel panel-default" style="font-size: 12px;">
                     <%@ include file="/jsp/validator_explanation.jsp" %>
                 </div>
             </div>
-        </div>
+        </div> --%>
         <button class="btn btn-md btn-primary" type="submit" name="submit_users_btn" id="submit_users_btn" disabled>
             Stage Games
         </button>
