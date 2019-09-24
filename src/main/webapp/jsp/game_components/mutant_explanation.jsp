@@ -18,17 +18,15 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="org.codedefenders.validation.code.CodeValidatorLevel"%>
+<%@ page import="org.apache.commons.lang.StringUtils"%>
 
 <%--
-    Displays explanations about the mutant icons and the mutant validator level.
+    Displays explanations about the mutant icons and the mutant validator level as model dialog
 
     @param CodeValidatorLevel mutantValidatorLevel
         The validation level for mutants.
 --%>
-
-<% { %>
 
 <%
     CodeValidatorLevel level = (CodeValidatorLevel) request.getAttribute("mutantValidatorLevel");
@@ -38,43 +36,64 @@
 
     String levelStyling;
     switch (level) {
-        case RELAXED: levelStyling = "btn-success"; break;
-        case MODERATE: levelStyling = "btn-warning"; break;
-        case STRICT: levelStyling = "btn-danger"; break;
-        default: levelStyling = "btn-primary";
+    case RELAXED:
+        levelStyling = "btn-success";
+        break;
+    case MODERATE:
+        levelStyling = "btn-warning";
+        break;
+    case STRICT:
+        levelStyling = "btn-danger";
+        break;
+    default:
+        levelStyling = "btn-primary";
     }
 %>
-
 <div style="height: 24px;">
-    <div>
-        <span class="mutantCUTImage mutantImageAlive"></span>
-        <span class="mutantCUTLegendDesc">Live</span>
-        <span class="mutantCUTImage mutantImageKilled"></span>
-        <span class="mutantCUTLegendDesc">Killed</span>
-        <span class="mutantCUTImage mutantImageFlagged"></span>
-        <span class="mutantCUTLegendDesc">Claimed Equivalent</span>
-        <span class="mutantCUTImage mutantImageEquiv"></span>
-        <span class="mutantCUTLegendDesc">Equivalent</span>
-    </div>
+	<div>
+		<span class="mutantCUTImage mutantImageAlive"></span>
+		<span class="mutantCUTLegendDesc">Live</span>
+		<span class="mutantCUTImage mutantImageKilled"></span>
+		<span class="mutantCUTLegendDesc">Killed</span> 
+		<span class="mutantCUTImage mutantImageFlagged"></span> 
+		<span class="mutantCUTLegendDesc">Claimed Equivalent</span>
+		<span class="mutantCUTImage mutantImageEquiv"></span>
+		<span class="mutantCUTLegendDesc">Equivalent</span>
+	</div>
 
     <div style="float:right">
-        <div style="display: inline-block;"> Mutant restrictions:</div>
-        <div data-toggle="collapse" href="#validatorExplanation"
-             title="Click the question sign for more information on the levels"
-             class="<%="validatorLevelTag btn " + levelStyling%>">
-             <%= StringUtils.capitalize(level.toString().toLowerCase()) %>
+         <div style="display: inline-block;"> Mutant restrictions:</div>
+         <div title="Click the question sign for more information on the levels"
+            class="<%="validatorLevelTag btn " + levelStyling%>">
+            <%=StringUtils.capitalize(level.toString().toLowerCase())%>
         </div>
-        <div style="display: inline-block;">
-            <a data-toggle="collapse" href="#validatorExplanation" style="color:black">
-                <span class="glyphicon glyphicon-question-sign"></span>
-            </a>
-        </div>
-    </div>
+         <div style="display: inline-block;">
+             <a data-toggle="modal" href="#validatorExplanation" style="color:black">
+                 <span class="glyphicon glyphicon-question-sign"></span>
+             </a>
+         </div>
+     </div>
 </div>
 
-<div id="validatorExplanation" class="collapse panel panel-default"
-     style="margin: 25px auto; max-width: 50%;">
-    <%@ include file="/jsp/validator_explanation.jsp" %>
+<div class="modal fade" id="validatorExplanation" role="dialog"
+	aria-labelledby="validatorExplanation" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal">&times;</button>
+				<h4 class="modal-title">Mutant Validator Explanation</h4>
+			</div>
+
+			<div class="modal-body">
+				<%@ include file="/jsp/validator_explanation.jsp"%>
+			</div>
+
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
 </div>
 
-<% } %>
+
+
