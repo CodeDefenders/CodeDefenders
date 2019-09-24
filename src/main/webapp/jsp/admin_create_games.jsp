@@ -140,7 +140,7 @@
                         <tr style="background: <%= color %>">
                             <td class="col-md-2"><%= userName %>
                             </td>
-                            <td class="col-md-3"><%= lastRole %>
+                            <td class="col-md-3"><%= lastRole.getFormattedString() %>
                             </td>
                             <td class="col-md-1"><%= totalScore %>
                             </td>
@@ -190,7 +190,7 @@
 
 								</div>
 							<%-- Keep the role of the user also in the target game --%>
-								<input type="hidden" name="<%="role_" + id%>" value="<%= (attackerIds.contains(new Integer(id))) ? Role.ATTACKER : Role.DEFENDER %>"/>
+								<input type="hidden" name="<%="role_" + id%>" value="<%= (attackerIds.contains(id)) ? Role.ATTACKER.name() : Role.DEFENDER.name() %>"/>
 							</td>
                             <%-- Create the button to move it --%>
                             <td class="col-md-1">
@@ -261,7 +261,7 @@
                     int uid = Integer.valueOf(userInfo.get(0));
                     String username = userInfo.get(1);
                     String lastLogin = userInfo.get(3);
-                    String lastRole = userInfo.get(4);
+                    String lastRole = Role.valueOf(userInfo.get(4)).getFormattedString();
                     String totalScore = userInfo.get(5);
             %>
 
@@ -307,8 +307,8 @@
                     <div id="<%="role_"+uid%>" style="float: left; max-width: 120px; margin-left:2px">
                         <select name="<%="role_" + uid%>" class="form-control selectpicker" data-size="small"
                                 id="role">
-                            <option value="<%=Role.ATTACKER%>">Attacker</option>
-                            <option value="<%=Role.DEFENDER%>">Defender</option>
+                            <option value="<%=Role.ATTACKER.name()%>">Attacker</option>
+                            <option value="<%=Role.DEFENDER.name()%>">Defender</option>
                         </select>
                     </div>
                     <button class="btn btn-sm btn-primary" type="submit" value="<%=uid%>" name="userListButton"
