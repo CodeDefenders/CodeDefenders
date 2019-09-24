@@ -140,7 +140,7 @@
                         <tr style="background: <%= color %>">
                             <td class="col-md-2"><%= userName %>
                             </td>
-                            <td class="col-md-3"><%= lastRole %>
+                            <td class="col-md-3"><%= lastRole.getFormattedString() %>
                             </td>
                             <td class="col-md-1"><%= totalScore %>
                             </td>
@@ -261,7 +261,7 @@
                     int uid = Integer.valueOf(userInfo.get(0));
                     String username = userInfo.get(1);
                     String lastLogin = userInfo.get(3);
-                    String lastRole = userInfo.get(4);
+                    String lastRole = Role.valueOf(userInfo.get(4)).getFormattedString();
                     String totalScore = userInfo.get(5);
             %>
 

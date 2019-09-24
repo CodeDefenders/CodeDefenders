@@ -163,7 +163,7 @@ public class AdminCreateGames extends HttpServlet {
             createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
 
             if (selectedTempGames == null) {
-                messages.add("Please select at least one Game to insert.");
+                messages.add("Please select at least one game to insert.");
                 response.sendRedirect(request.getContextPath() + "/admin");
                 return;
             }
@@ -477,7 +477,7 @@ public class AdminCreateGames extends HttpServlet {
 
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
                  cutID, currentUserID, gamesLevel, gamesState,
-                maxAssertionsPerTest, forceHamcrest, // 
+                maxAssertionsPerTest, forceHamcrest, //
                 chatEnabled,
                 mutantValidatorLevel,
                 withTests, withMutants, //

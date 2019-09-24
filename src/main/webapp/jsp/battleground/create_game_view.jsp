@@ -156,7 +156,7 @@
                         <%for (Role role : Role.values()) {
                             if (role != Role.NONE) { %>
                         <option value=<%=role.name()%> <%=role.equals(Role.OBSERVER) ? "selected" : ""%>>
-                            <%=role.toString()%>
+                            <%=role.getFormattedString()%>
                         </option>
                         <%  }
                         }%>

@@ -52,8 +52,7 @@ public enum Role {
         }
     }
 
-    @Override
-    public String toString() {
+    public String getFormattedString() {
         return this.displayName;
     }
 }
