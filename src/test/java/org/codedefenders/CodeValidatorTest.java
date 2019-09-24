@@ -732,7 +732,7 @@ public class CodeValidatorTest {
 	}
 
 	@Test
-	public void testMissingSemiColon() throws IOException, CodeValidatorException {
+	public void testCompileErrorsShouldNotBeCatchedByValidator() throws IOException, CodeValidatorException {
 		String code = String.join("\n",
 				"public class XmlElementTest {",
 				"	",
@@ -744,7 +744,7 @@ public class CodeValidatorTest {
 				"	}",
 				"}"
 		);
-		assertFalse(CodeValidator.validateTestCodeGetMessage(code, CodeValidator.DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST).isEmpty());
+		assertTrue(CodeValidator.validateTestCodeGetMessage(code, CodeValidator.DEFAULT_NB_ASSERTIONS, CodeValidator.DEFAULT_FORCE_HAMCREST).isEmpty());
 	}
 
 	@Test
