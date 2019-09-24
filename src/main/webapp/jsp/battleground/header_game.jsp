@@ -32,8 +32,8 @@
 <div class="game-container">
     <nav class="nest" style="width: 100%; margin-left: 0; margin-right: auto;">
         <div class="crow fly">
-            <% String userRole = role.toString().toLowerCase(); %>
-            <div><h2 style="margin-top: 7px; text-transform: capitalize"><%= "Game " + game.getId() + " (" + userRole + ")" %>
+            <% String userRole = role.getFormattedString(); %>
+            <div><h2 style="margin-top: 7px"><%= "Game " + game.getId() + " (" + userRole + ")" %>
             </h2></div>
 
             <%  int userIdCurrent = ((Integer) session.getAttribute("uid"));
