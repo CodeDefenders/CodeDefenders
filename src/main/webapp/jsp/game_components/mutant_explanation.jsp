@@ -63,7 +63,9 @@
 
     <div style="float:right">
          <div style="display: inline-block;"> Mutant restrictions:</div>
-         <div title="Click the question sign for more information on the levels"
+         <div
+            data-toggle="modal" href="#validatorExplanation"  
+            title="Click the question sign for more information on the levels"
             class="<%="validatorLevelTag btn " + levelStyling%>">
             <%=StringUtils.capitalize(level.toString().toLowerCase())%>
         </div>
