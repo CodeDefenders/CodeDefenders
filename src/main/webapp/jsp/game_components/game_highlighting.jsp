@@ -234,7 +234,7 @@
                          <td>Creator</td>
                          <td align="right">ID</td>
                          <td align="right">Score</td>
-                         <td align="right">Change Lines</td>
+                         <td align="right">Changed Lines</td>
                      </tr>
                  </thead>`;
 
