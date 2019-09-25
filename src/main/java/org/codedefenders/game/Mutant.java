@@ -82,6 +82,9 @@ public class Mutant implements Serializable {
 
     private Equivalence equivalent;
 
+    // Derived and cached
+    private String summaryString;
+    
     /* Mutant Equivalence */
     public enum Equivalence {
         ASSUMED_NO, PENDING_TEST, DECLARED_YES, ASSUMED_YES, PROVEN_NO
@@ -433,6 +436,13 @@ public class Mutant implements Serializable {
         }
         return lines;
     }
+    
+    public String getSummaryString(){
+        if (summaryString == null) {
+            computeLinesAndDescription();
+        }
+        return summaryString;
+    }
 
     /**
      * Identify lines in the original source code that have been modified
@@ -444,13 +454,16 @@ public class Mutant implements Serializable {
         // This workflow is not really nice...
         List<Integer> mutatedLines = new ArrayList<>();
         description = new ArrayList<>();
-
+        
+        List<String> fragementSummary = new ArrayList<>();
+        
         Patch p = getDifferences();
         for (Delta d : p.getDeltas()) {
             Chunk chunk = d.getOriginal();
             // position starts at 0 but code readout starts at 1
             int firstLine = chunk.getPosition() + 1;
             String desc = "line " + firstLine;
+            fragementSummary.add(String.format("%d", firstLine));
             // was it one single line or several?
             mutatedLines.add(firstLine);
             int endLine = firstLine + chunk.getLines().size() - 1;
@@ -462,6 +475,8 @@ public class Mutant implements Serializable {
                     mutatedLines.add(l);
                 }
                 desc = String.format("lines %d-%d", firstLine, endLine);
+                fragementSummary.remove( fragementSummary.size() - 1);
+                fragementSummary.add( String.format("%d-%d", firstLine, endLine) );
             }
             // update mutant description
             String text;
@@ -482,6 +497,9 @@ public class Mutant implements Serializable {
         }
 
         setLines( mutatedLines );
+        
+        // Generate the summaryString
+        summaryString = String.join(",", fragementSummary);
     }
 
     public synchronized List<String> getHTMLReadout() {
