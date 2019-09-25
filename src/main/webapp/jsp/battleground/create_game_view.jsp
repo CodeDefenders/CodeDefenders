@@ -136,12 +136,9 @@
                         </option>
                         <%}%>
                     </select>
-                    <div id="validatorExplanation" class="collapse panel panel-default" style="font-size: 12px;">
-                        <%@ include file="/jsp/validator_explanation.jsp" %>
-                    </div>
                 </td>
                 <td>
-                    <a data-toggle="collapse" href="#validatorExplanation" style="color:black">
+                    <a data-toggle="modal" href="#validatorExplanation" style="color:black">
                         <span class="glyphicon glyphicon-question-sign"></span>
                     </a>
                 </td>
@@ -211,6 +208,26 @@
             </tr>
         </table>
     </form>
+    <%-- Place the modal here to avoid interference with the CSS rules of the form --%>
+    <div class="modal fade" id="validatorExplanation" role="dialog"
+        aria-labelledby="validatorExplanation" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Mutant Validator Explanation</h4>
+                </div>
+
+                <div class="modal-body">
+                    <%@ include file="/jsp/validator_explanation.jsp"%>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <%
     }
