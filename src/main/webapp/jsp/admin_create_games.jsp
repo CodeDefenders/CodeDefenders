@@ -230,8 +230,8 @@
                class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
             <tr>
-                <th><input type="checkbox" id="selectAllUsers"
-                           onchange="document.getElementById('submit_users_btn').disabled = !this.checked">
+                <th>
+                    <input type="checkbox" id="selectAllUsers" onchange="document.getElementById('submit_users_btn').disabled = document.getElementById('cut_select').selectedIndex == -1 || ! this.checked;">
                 </th>
                 <th>User ID</th>
                 <th>User</th>
