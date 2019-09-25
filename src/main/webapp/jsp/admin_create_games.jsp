@@ -515,7 +515,12 @@
             <div class="col-sm-6">
                 <label for="automaticEquivalenceTrigger" class="label-normal"
                        title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
-                       Threshold for triggering equivalence duels automatically (use 0 to deactivate)</label>
+                       Threshold for triggering equivalence duels automatically
+                       
+                       <a data-toggle="modal" href="#automaticEquivalenceTriggerExplanation" style="color:black">
+                            <span class="glyphicon glyphicon-question-sign"></span>
+                       </a>       
+                </label>
             </div>
         </div>
         <div class="row">
@@ -524,27 +529,50 @@
                        id="automaticEquivalenceTrigger" min=0 required/>
             </div>
         </div><!--  End : Automatic Equivalence Duels Trigger -->
-        <br>
-        <div class="modal fade" id="validatorExplanation" role="dialog"
-    aria-labelledby="validatorExplanation" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">Mutant Validator Explanation</h4>
-            </div>
+		<br>
+		<div class="modal fade" id="validatorExplanation" role="dialog"
+			aria-labelledby="validatorExplanation" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Mutant Validator Explanation</h4>
+					</div>
 
-            <div class="modal-body">
-                <%@ include file="/jsp/validator_explanation.jsp"%>
-            </div>
+					<div class="modal-body">
+						<%@ include file="/jsp/validator_explanation.jsp"%>
+					</div>
 
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-        <%-- <div class="row">
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="automaticEquivalenceTriggerExplanation"
+			role="dialog"
+			aria-labelledby="automaticEquivalenceTriggerExplanation"
+			aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h4 class="modal-title">Threshold for Triggering Equivalence
+							Duels Automatically Explanation</h4>
+					</div>
+
+					<div class="modal-body">
+						<%@ include file="/jsp/automatic_duels_explanation.jsp"%>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<%-- <div class="row">
             <div class="col-sm-5">
                 <div id="validatorExplanation" class="collapse panel panel-default" style="font-size: 12px;">
                     <%@ include file="/jsp/validator_explanation.jsp" %>
