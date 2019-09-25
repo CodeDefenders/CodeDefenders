@@ -187,12 +187,9 @@
                     <input class="form-control" type="number" value="0"
                            name="automaticEquivalenceTrigger"
                            id="automaticEquivalenceTrigger" min=0 required/>
-                    <div id="automaticEquivalenceTriggerExplanation" class="collapse panel panel-default" style="font-size: 12px;">
-                        <%@ include file="/jsp/automatic_duels_explanation.jsp" %>
-                    </div>
                 </td>
                 <td>
-                    <a data-toggle="collapse" href="#automaticEquivalenceTriggerExplanation" style="color:black">
+                    <a data-toggle="modal" href="#automaticEquivalenceTriggerExplanation" style="color:black">
                         <span class="glyphicon glyphicon-question-sign"></span>
                     </a>
                 </td>
@@ -208,7 +205,7 @@
             </tr>
         </table>
     </form>
-    <%-- Place the modal here to avoid interference with the CSS rules of the form --%>
+    <%-- Place the modal DIVs here to avoid interference with the CSS rules of the form --%>
     <div class="modal fade" id="validatorExplanation" role="dialog"
         aria-labelledby="validatorExplanation" aria-hidden="true">
         <div class="modal-dialog">
@@ -228,6 +225,28 @@
             </div>
         </div>
     </div>
+	<div class="modal fade" id="automaticEquivalenceTriggerExplanation"
+		role="dialog" aria-labelledby="automaticEquivalenceTriggerExplanation"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">Threshold for Triggering Equivalence
+						Duels Automatically Explanation</h4>
+				</div>
+
+				<div class="modal-body">
+					<%@ include file="/jsp/automatic_duels_explanation.jsp"%>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<%--  --%>
 </div>
 <%
     }

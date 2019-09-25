@@ -19,7 +19,6 @@
 
 --%>
 <div class="panel-body" style="padding: 10px;">
-	<b>Threshold for triggering equivalence duels automatically</b>
 	<p>This value refers to the number of tests which cover, but do not
 		kill, mutants and controls if and when equivalence duels are
 		automatically triggered.
