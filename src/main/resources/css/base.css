@@ -5375,6 +5375,7 @@ th {
 }
 html,
 body {
+  background: #fafafa;
   height: 90%; /*leave room for footer*/
   margin: 0;
 }
