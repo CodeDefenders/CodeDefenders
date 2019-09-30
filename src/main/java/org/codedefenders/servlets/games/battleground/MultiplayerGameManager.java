@@ -75,7 +75,6 @@ import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.execution.KillMap.KillMapEntry;
-import org.codedefenders.execution.KillMap.TestVsMutantCallable;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
