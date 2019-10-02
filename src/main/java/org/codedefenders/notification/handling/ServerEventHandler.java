@@ -2,7 +2,6 @@ package org.codedefenders.notification.handling;
 
 import org.apache.commons.lang.NotImplementedException;
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.game.Role;
 import org.codedefenders.model.User;

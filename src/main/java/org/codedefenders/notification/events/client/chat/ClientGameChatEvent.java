@@ -10,18 +10,18 @@ public class ClientGameChatEvent extends ClientChatEvent {
      * {@code true} if message is intended for all players,
      * {@code false} if for team members only.
      */
-    @Expose private boolean isAllChat;
+    @Expose private boolean allChat;
 
     public int getGameId() {
         return gameId;
     }
 
     public boolean isAllChat() {
-        return isAllChat;
+        return allChat;
     }
 
     public void setAllChat(boolean allChat) {
-        isAllChat = allChat;
+        this.allChat = allChat;
     }
 
     public void setGameId(int gameId) {

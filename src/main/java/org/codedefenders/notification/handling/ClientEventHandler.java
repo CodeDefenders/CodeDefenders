@@ -32,7 +32,7 @@ public class ClientEventHandler {
     public void visit(ClientGameChatEvent event) {
         Role role = DatabaseAccess.getRole(user.getId(), event.getGameId());
 
-        if (role == null) {
+        if (role == null || role == Role.NONE) {
             logger.warn("Tried to send chat message to game user is not playing in.");
             return;
         }
