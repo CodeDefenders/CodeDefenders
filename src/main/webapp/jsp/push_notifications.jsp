@@ -29,13 +29,13 @@
         connection if not possible) will be available under "window.pushSocket". The PushSocket class will be avalilable
         under "window.PushSocket".
 
-        - "subscribe" and "unsubscribe" are used to subscribe to events on the server side.
+        - "subscribe" and "unsubscribe" are used to subscribe to events from the server.
+          When called, a registration event is sent to the server.
           One registration event may encompass multiple event types on the JavaScript side.
-        - "register" and "unregister" are used to register callbacks for certain event types received by the websocket.
-        - "send" is used to send regular events / messages to the server.
+        - "register" and "unregister" are used to register callbacks for certain server events
+          or WebSocket events ('open', 'error', 'close', 'message').
+        - "send" is used to send events to the server.
         - For "register", "unregister" and "send", the event types are given by the EventNames class.
-        - "registerWS" and "unregisterWS" are used to register to websocket-specific events.
-          Here, the event types are given by PushSocket.WSEventType (the JavaScript class).
 
     See PushSocket's JavaDoc for more information.
 
@@ -45,8 +45,6 @@
 
 <%@ page import="org.codedefenders.notification.web.TicketingFilter"  %>
 <%@ page import="org.codedefenders.notification.events.client.registration.RegistrationEvent" %>
-
-<script src="js/reconnecting-websocket-iife.min.js"></script>
 
 <%
     String name = request.getServerName();
@@ -62,22 +60,41 @@
             console.log('Setting up WebSocket at ' + url + '.');
 
             this.handlers = new Map();
-            this.websocket = new ReconnectingWebSocket(url);
+            this.queue = [];
+            this.websocket = new WebSocket(url);
 
-            this.websocket.onopen  = evt => console.log('WebSocket connection established.');
-            this.websocket.onerror = evt => console.log('WebSocket error occurred.');
-            this.websocket.onclose = evt => console.log('WebSocket connection closed.');
+            this.websocket.onopen  = evt => {
+                console.log('WebSocket connection established.');
+                this.dispatch(PushSocket.WSEventType.OPEN, evt);
+                for (const event of this.queue) {
+                    this.websocket.send(JSON.stringify(event));
+                }
+                this.queue = [];
+            };
+
+            this.websocket.onerror = evt => {
+                console.error('WebSocket error occurred.');
+                this.dispatch(PushSocket.WSEventType.ERROR, evt);
+            };
+
+            this.websocket.onclose = evt => {
+                console.log('WebSocket connection closed.');
+                this.dispatch(PushSocket.WSEventType.CLOSE, evt);
+            };
+
             this.websocket.onmessage = evt => {
                 // https://stackoverflow.com/questions/7116035/parse-json-received-with-websocket-results-in-error
+                this.dispatch(PushSocket.WSEventType.MESSAGE, evt);
                 const {type, data} = JSON.parse(evt.data.replace(/[\s\0]/g, ' '));
                 this.dispatch(type, data);
-                console.log({type, data});
+                // console.log({type, data});
             };
         }
 
         /**
-         * Registers a callback for a server event.
-         * @param {string} type The type to register a callback for, use the EventNames class.
+         * Registers a callback for a server event or WebSocket event ('open', 'error', 'close', 'message').
+         * @param {string} type The type to register a callback for.
+         *                 Use the EventNames class to get the type for server events.
          * @param {function} callback The callback to register.
          */
         register (type, callback) {
@@ -92,8 +109,9 @@
         }
 
         /**
-         * Unregisters a callback for a server event.
-         * @param {string} type The type to register a callback for, use the EventNames class.
+         * Unregisters a callback for a server event or WebSocket event ('open', 'error', 'close', 'message').
+         * @param {string} type The type of callback to unregister.
+         *                 Use the EventNames class to get the type for server events.
          * @param {function} callback The callback to register.
          */
         unregister (type, callback) {
@@ -115,8 +133,10 @@
         }
 
         /**
-         * Subscribes at the server to receive events for the given type of Event.
-         * @param {string} type The type of event to subscribe to, use the EventNames class.
+         * Subscribes at the server to receive events for the given type of event.
+         * If the connection is not established, the registration message will be sent when it is.
+         * @param {string} type The type of event to subscribe to.
+         *                 Use the EventNames class to get the type for server events.
          * @param {object} params Additional parameters to send to the server for registration.
          */
         subscribe(type, params = {}) {
@@ -128,27 +148,39 @@
 
         /**
          * Unsubscribes at the server to stop receiving events for the given type of event.
-         * @param {string} type The type of event to unsubscribe from, use the EventNames class.
+         * If the connection is not established, the registration message will be sent when it is.
+         * @param {string} type The type of event to unsubscribe from.
+         *                      Use the EventNames class to get the type for server events.
+         * @param {object} params Additional parameters to send to the server for registration.
          */
-        unsubscribe(type) {
+        unsubscribe(type, params = {}) {
             this.send(type, {
                 action: '<%=RegistrationEvent.Action.UNREGISTER.toString()%>',
+                ...params
             })
         }
 
         /**
-         * Sends a message to the server.
-         * @param {string} type The type of the message, use the EventNames class.
-         * @param {object} data The data of the message.
+         * Sends a event to the server. If the connection is not established, the message will be sent when it is.
+         * @param {string} type The type of the event.
+         *                      Use the EventNames class to get the type for server events.
+         * @param {object} data The data of the event.
          */
         send (type, data) {
-            const message = JSON.stringify({type, data});
-            this.websocket.send(message);
+            const event = {type, data};
+            if (this.readyState === WebSocket.OPEN) {
+                this.websocket.send(JSON.stringify(event));
+            } else if (this.readyState === WebSocket.CONNECTING) {
+                this.queue.push(event)
+            } else {
+                console.error('Tried to send WebSocket event when the connection is closed.');
+            }
         }
 
         /**
          * Dispatches an event to the registered handlers for the type.
-         * @param {string} type The type of the event, use the EventNames class.
+         * @param {string} type The type of the event.
+         *                      Use the EventNames class to get the type for server events.
          * @param {object} data The data of the event.
          */
         dispatch (type, data) {
@@ -158,24 +190,6 @@
                     callback(data);
                 }
             }
-        }
-
-        /**
-         *  Register a callback for a WebSocket event ('open', 'error', 'close', 'message').
-         *  @param {string} type The type to register a callback for.
-         *  @param {function} callback The callback to register.
-         */
-        registerWS (type, callback) {
-            this.websocket.addEventListener(type, callback)
-        }
-
-        /**
-         *  Unregister a callback for a WebSocket event ('open', 'error', 'close', 'message').
-         *  @param {string} type The type to register a callback for.
-         *  @param {function} callback The callback to register.
-         */
-        unregisterWS (type, callback) {
-            this.websocket.removeEventListener(type, callback)
         }
 
         get readyState () {
@@ -192,7 +206,7 @@
         }
     }
 
-    window.PushSocket = PushSocket;
     const wsUri = "ws://<%=name%>:<%=port%><%=context%>/notifications/<%=ticket%>/<%=uid%>";
+    window.PushSocket = PushSocket;
     window.pushSocket = new PushSocket(wsUri);
 </script>
