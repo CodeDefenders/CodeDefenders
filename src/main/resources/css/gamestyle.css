@@ -6,7 +6,6 @@ body {
 	font-size: 14px;
 	line-height: 22px;
 	color: #424242;
-	background-color: #fafafa;
 }
 
 h2 {
@@ -147,7 +146,7 @@ body {
 	padding-top: 0px;
 	padding-left: 0px;
 	padding-right: 0px;
-	margin-bottom: 60px; /* footer height */
+	margin-bottom: 100px; /* footer height */
 	width: 100%;
 }
 
@@ -323,31 +322,6 @@ th, td {
 
 .readonly-pre .CodeMirror {
     background: #F5F5F5; /* #f7f7f7; */
-}
-
-/* Sticky footer styles
--------------------------------------------------- */
-
-.footer {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	height: 30px; /* footer height */
-	background-color: #f7f7f7;
-}
-
-.footer .container {
-	width: 100%;
-	padding: 0 15px;
-}
-
-.button.tab-link, .button.list-item{
-	/* text-transform: lowercase; */
-}
-
-.footer .container .text-muted {
-	margin: 5px 0;
 }
 
 .bigicon {
