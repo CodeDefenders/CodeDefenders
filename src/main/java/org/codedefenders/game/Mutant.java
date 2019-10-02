@@ -23,6 +23,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.codedefenders.database.DB;
+import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.DatabaseValue;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
@@ -81,6 +82,9 @@ public class Mutant implements Serializable {
 
     private Equivalence equivalent;
 
+    // Derived and cached
+    private String summaryString;
+    
     /* Mutant Equivalence */
     public enum Equivalence {
         ASSUMED_NO, PENDING_TEST, DECLARED_YES, ASSUMED_YES, PROVEN_NO
@@ -103,6 +107,8 @@ public class Mutant implements Serializable {
     private List<Integer> lines = null;
     private transient List<String> description = null;
     private transient Patch difference = null;
+    
+    private String killMessage;
 
     /**
      * Creates a new Mutant with following attributes:
@@ -156,9 +162,10 @@ public class Mutant implements Serializable {
         score = 0;
     }
 
-    public Mutant(int mid, int classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId, String md5) {
+    public Mutant(int mid, int classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId, String md5, String killMessage) {
         this(mid, classId, gid, jFile, cFile, alive, equiv, rCreated, rKilled, playerId);
         this.md5 = md5;
+        this.killMessage = killMessage;
     }
 
     public String getCreatorName() {
@@ -385,6 +392,23 @@ public class Mutant implements Serializable {
     public String getHTMLEscapedPatchString() {
         return StringEscapeUtils.escapeHtml(getPatchString());
     }
+    
+    public Test getKillingTest(){
+        return DatabaseAccess.getKillingTestForMutantId(id);
+    }
+    
+    public String getKillMessage() {
+        if( killMessage != null ){
+            return killMessage;
+        } else {
+            return Constants.DEFAULT_KILL_MESSAGE;
+        }
+        
+    }
+    public String getHTMLEscapedKillMessage() {
+        return StringEscapeUtils.escapeHtml(getKillMessage());
+    }
+    
 
     public boolean insert() {
         try {
@@ -412,6 +436,13 @@ public class Mutant implements Serializable {
         }
         return lines;
     }
+    
+    public String getSummaryString(){
+        if (summaryString == null) {
+            computeLinesAndDescription();
+        }
+        return summaryString;
+    }
 
     /**
      * Identify lines in the original source code that have been modified
@@ -423,13 +454,16 @@ public class Mutant implements Serializable {
         // This workflow is not really nice...
         List<Integer> mutatedLines = new ArrayList<>();
         description = new ArrayList<>();
-
+        
+        List<String> fragementSummary = new ArrayList<>();
+        
         Patch p = getDifferences();
         for (Delta d : p.getDeltas()) {
             Chunk chunk = d.getOriginal();
             // position starts at 0 but code readout starts at 1
             int firstLine = chunk.getPosition() + 1;
             String desc = "line " + firstLine;
+            fragementSummary.add(String.format("%d", firstLine));
             // was it one single line or several?
             mutatedLines.add(firstLine);
             int endLine = firstLine + chunk.getLines().size() - 1;
@@ -441,6 +475,8 @@ public class Mutant implements Serializable {
                     mutatedLines.add(l);
                 }
                 desc = String.format("lines %d-%d", firstLine, endLine);
+                fragementSummary.remove( fragementSummary.size() - 1);
+                fragementSummary.add( String.format("%d-%d", firstLine, endLine) );
             }
             // update mutant description
             String text;
@@ -461,6 +497,9 @@ public class Mutant implements Serializable {
         }
 
         setLines( mutatedLines );
+        
+        // Generate the summaryString
+        summaryString = String.join(",", fragementSummary);
     }
 
     public synchronized List<String> getHTMLReadout() {
@@ -549,5 +588,9 @@ public class Mutant implements Serializable {
     @Override
     public String toString() {
         return "[mutantId=" + getId() + ",alive="+ isAlive() + ",equivalent=" + getEquivalent() + ",score=" + getScore() + "]";
+    }
+
+    public void setKillMessage(String message) {
+        this.killMessage = message;
     }
 }

@@ -182,7 +182,7 @@
 
     <%if(game.isChatEnabled()) {%>
 <div id="game-notification-bar" class="min<%
-        if (role.equals(Role.CREATOR)) { %> creator<% } %>">
+        if (role.equals(Role.OBSERVER)) { %> creator<% } %>">
 <a id="notification-show-bar"><span>(<span
 id="notif-game-total-count">0</span>)</span>
 </a>

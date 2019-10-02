@@ -33,8 +33,14 @@
 	/* test_editor */
 	String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
 	request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
+	List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
+    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
+    
 	if (previousTestCode != null) {
 		request.setAttribute("testCode", previousTestCode);
+		/* error_highlighting */
+		request.setAttribute("codeDivSelectorForError", "#utest-div");
+		request.setAttribute("errorLines", errorLines);
 	} else {
 		request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
 	}
@@ -99,6 +105,7 @@
 			<input type="hidden" name="gameId" value="<%= game.getId() %>" />
 		</form>
 		<%@include file="../game_components/editor_help_config_toolbar.jsp"%>
+		<%@include file="../game_components/error_highlighting.jsp" %>
 	</div>
 </div>
 

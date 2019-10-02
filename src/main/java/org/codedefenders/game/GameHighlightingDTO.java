@@ -107,6 +107,7 @@ public class GameHighlightingDTO {
     public static class GHMutantDTO {
         private int id;
         private int score;
+        private String lines;
         private String creatorName;
         private GHMutantStatus status;
 
@@ -114,6 +115,7 @@ public class GameHighlightingDTO {
             this.id = mutant.getId();
             this.score = mutant.getScore();
             this.creatorName = mutant.getCreatorName();
+            this.lines = mutant.getSummaryString();
 
             Equivalence eq = mutant.getEquivalent();
             if (eq == Equivalence.DECLARED_YES || eq == Equivalence.ASSUMED_YES) {

@@ -181,7 +181,7 @@ public class AdminDAO {
                 "  FROM (players",
                 "    INNER JOIN games ON players.Game_ID = games.ID)",
                 "  WHERE",
-                "    (State = 'ACTIVE' OR State = 'CREATED') AND Finish_Time > NOW() AND Role IN ('ATTACKER', 'DEFENDER') AND Active = 1",
+                "    (State = 'ACTIVE' OR State = 'CREATED') AND Role IN ('ATTACKER', 'DEFENDER') AND Active = 1",
                 ")",
                 "ORDER BY lastLogin DESC, User_ID;");
         return DB.executeQueryReturnList(query, AdminDAO::uglyListUserInfoFromRS);

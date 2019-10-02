@@ -32,9 +32,33 @@
 <div class="game-container">
     <nav class="nest" style="width: 100%; margin-left: 0; margin-right: auto;">
         <div class="crow fly">
-            <% String userRole = role.toString().toLowerCase(); %>
-            <div><h2 style="margin-top: 7px; text-transform: capitalize"><%= "Game " + game.getId() + " (" + userRole + ")" %>
+            <% String userRole = role.getFormattedString(); %>
+            <div><h2 style="margin-top: 7px"><%= "Game " + game.getId() + " (" + userRole + ")" %>
             </h2></div>
+
+            <%  int userIdCurrent = ((Integer) session.getAttribute("uid"));
+                if (game.getCreatorId() == userIdCurrent) { %>
+            <div class="admin-panel col-md-12">
+                <form id="adminEndBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post" style="display: inline-block;">
+                    <button type="submit" class="btn btn-primary btn-game btn-left" id="endGame" form="adminEndBtn"
+                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
+                        End Game
+                    </button>
+                    <input type="hidden" name="formType" value="endGame">
+                    <input type="hidden" name="gameId" value="<%= game.getId() %>" />
+                </form>
+                <form id="adminStartBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post" style="display: inline-block;">
+                    <button type="submit" class="btn btn-primary btn-game" id="startGame" form="adminStartBtn"
+                        <% if (game.getState() != GameState.CREATED) { %> disabled <% } %>>
+                        Start Game
+                    </button>
+                    <input type="hidden" name="formType" value="startGame">
+                    <input type="hidden" name="gameId" value="<%= game.getId() %>" />
+                </form>
+            </div>
+
+            <% } %>
+
             <%-- This bar shows the possible interactions at game level --%>
             <div class="container">
 

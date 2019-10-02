@@ -18,14 +18,17 @@
  */
 package org.codedefenders.execution;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * @author Jose Rojas
@@ -50,8 +53,7 @@ public class AntProcessResult {
 
         StringBuilder testOutputBuilder = new StringBuilder();
         final String TEST_PREFIX = "[junit] ";
-        final String JUNIT_RESULT_REGEX = "Tests run: (\\d+), Failures: (\\d+), Errors: (\\d+), Skipped: (\\d+), Time elapsed: ((\\d+)(\\.\\d+)?) sec";
-
+        final String JUNIT_RESULT_REGEX = "Tests run: (\\d+), Failures: (\\d+), Errors: (\\d+), Skipped: (\\d+), Time elapsed: ((\\d+)((\\.|,)\\d+)?) sec";
         String line;
         try {
             Pattern pattern = Pattern.compile(JUNIT_RESULT_REGEX, Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
@@ -72,13 +74,43 @@ public class AntProcessResult {
                     compiled = true;
             }
             compilerOutput = sanitize(compilerOutputBuilder.toString());
-            testOutput = testOutputBuilder.toString();
+            testOutput = reduce(testOutputBuilder.toString());
             inputStreamText = isLog.toString();
         } catch (IOException e) {
             logger.error("Error while reading input stream", e);
         }
     }
 
+    private String reduce(String fullTestOutput){
+        // Remove redundant content.
+        StringBuffer reduced = new StringBuffer();
+        // Skip all the lines until: [junit] Testcase: test took
+        Iterator<String> lineIterator = Arrays.asList(fullTestOutput.split("\n")).iterator();
+        while( lineIterator.hasNext() ){
+            String line = lineIterator.next().trim();
+            if( line.startsWith("[junit] Testcase: test took")){
+                reduced.append( line ).append("\n");
+                break;
+            }
+        }
+        // The next line is FAILED we can skip it
+        if( lineIterator.hasNext() ){
+            lineIterator.next();
+        }
+        
+        // Add all the line until the last one
+        // "[junit] Test TestLift FAILED";
+        while( lineIterator.hasNext() ){
+            String line = lineIterator.next().trim();
+            
+            if( line.startsWith("[junit] Test ") && line.endsWith("FAILED")){
+                break;
+            }
+            reduced.append( line ).append("\n");
+        }
+        return reduced.toString();
+    }
+    
     /**
      * Sanitize the compiler output by identifying the output folder and
      * removing it from the compiler output before sending it over the clients.

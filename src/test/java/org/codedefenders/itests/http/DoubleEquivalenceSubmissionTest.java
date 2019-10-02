@@ -217,11 +217,7 @@ public class DoubleEquivalenceSubmissionTest {
 																									// it's
 																									// Lift.class
 					// new NameValuePair("level", "true"),
-					//
-					new NameValuePair("minDefenders", "1"), new NameValuePair("defenderLimit", "2"),
-					new NameValuePair("minAttackers", "1"), new NameValuePair("attackerLimit", "2"),
-					new NameValuePair("startTime", "" + (System.currentTimeMillis() - 24 * 60 * 60 * 1000)),
-					new NameValuePair("finishTime", "" + (System.currentTimeMillis() + 24 * 60 * 60 * 1000)), }));
+					}));
 
 			gameUsers = browser.getPage(createGameRequest);
 			String newGameLink = null;

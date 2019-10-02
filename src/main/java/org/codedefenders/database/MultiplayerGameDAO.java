@@ -22,12 +22,13 @@ import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.GameState;
+import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.UserMultiplayerGameInfo;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 
 import static org.codedefenders.database.DB.RSMapper;
@@ -58,23 +59,20 @@ public class MultiplayerGameDAO {
         int creatorId = rs.getInt("Creator_ID");
         GameState state = GameState.valueOf(rs.getString("State"));
         GameLevel level = GameLevel.valueOf(rs.getString("Level"));
-        long startTime = rs.getTimestamp("Start_Time").getTime();
-        long finishTime = rs.getTimestamp("Finish_Time").getTime();
         int maxAssertionsPerTest = rs.getInt("MaxAssertionsPerTest");
+        boolean forceHamcrest = rs.getBoolean("ForceHamcrest");
         boolean chatEnabled = rs.getBoolean("ChatEnabled");
         CodeValidatorLevel mutantValidator = CodeValidatorLevel.valueOf(rs.getString("MutantValidator"));
         boolean capturePlayersIntention = rs.getBoolean("CapturePlayersIntention");
-        int minDefenders = rs.getInt("Defenders_Needed");
-        int minAttackers = rs.getInt("Attackers_Needed");
         boolean requiresValidation = rs.getBoolean("RequiresValidation");
-        int defenderLimit = rs.getInt("Defenders_Limit");
-        int attackerLimit = rs.getInt("Attackers_Limit");
         float lineCoverage = rs.getFloat("Coverage_Goal");
         float mutantCoverage = rs.getFloat("Mutant_Goal");
         int defenderValue = rs.getInt("Defender_Value");
         int attackerValue = rs.getInt("Attacker_Value");
 
-        return new MultiplayerGame.Builder(classId, creatorId, startTime, finishTime, maxAssertionsPerTest, defenderLimit, attackerLimit, minDefenders, minAttackers)
+        int automaticMutantEquivalenceThreshold = rs.getInt("EquivalenceThreshold");
+
+        return new MultiplayerGame.Builder(classId, creatorId, maxAssertionsPerTest, forceHamcrest)
                 .cut(cut)
                 .id(id)
                 .state(state)
@@ -87,7 +85,41 @@ public class MultiplayerGameDAO {
                 .requiresValidation(requiresValidation)
                 .lineCoverage(lineCoverage)
                 .mutantCoverage(mutantCoverage)
+                .automaticMutantEquivalenceThreshold( automaticMutantEquivalenceThreshold )
                 .build();
+    }
+
+    /**
+     * Constructs an open {@link UserMultiplayerGameInfo}, i.e. a game the user can join,
+     * from a {@link ResultSet} entry.
+     *
+     * @param rs The {@link ResultSet}.
+     * @return The constructed battleground game information.
+     * @see RSMapper
+     */
+    static UserMultiplayerGameInfo openGameInfoFromRS(ResultSet rs) throws SQLException {
+        final int userId = rs.getInt("userId");
+        final MultiplayerGame game = multiplayerGameFromRS(rs);
+        final String creatorName = rs.getString("creatorName");
+
+        return UserMultiplayerGameInfo.forOpen(userId, game, creatorName);
+    }
+
+    /**
+     * Constructs an active {@link UserMultiplayerGameInfo}, i.e. a game the user participates in,
+     * from a {@link ResultSet} entry.
+     *
+     * @param rs The {@link ResultSet}.
+     * @return The constructed battleground game information.
+     * @see RSMapper
+     */
+    static UserMultiplayerGameInfo activeGameInfoFromRS(ResultSet rs) throws SQLException {
+        final int userId = rs.getInt("userId");
+        final MultiplayerGame game = multiplayerGameFromRS(rs);
+        final Role role = Role.valueOrNull(rs.getString("playerRole"));
+        final String creatorName = rs.getString("creatorName");
+
+        return UserMultiplayerGameInfo.forActive(userId, game, role, creatorName);
     }
 
     /**
@@ -109,18 +141,14 @@ public class MultiplayerGameDAO {
         float lineCoverage = game.getLineCoverage();
         float mutantCoverage = game.getMutantCoverage();
         int creatorId = game.getCreatorId();
-        int minAttackers = game.getMinAttackers();
-        int minDefenders = game.getMinDefenders();
-        int attackerLimit = game.getAttackerLimit();
-        int defenderLimit = game.getDefenderLimit();
-        long startDateTime = game.getStartDateTime();
-        long finishDateTime = game.getFinishDateTime();
         GameState state = game.getState();
         int maxAssertionsPerTest = game.getMaxAssertionsPerTest();
+        boolean forceHamcrest = game.isForceHamcrest();
         boolean chatEnabled = game.isChatEnabled();
         CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
         boolean capturePlayersIntention = game.isCapturePlayersIntention();
         GameMode mode = game.getMode();
+        int automaticMutantEquivalenceThreshold = game.getAutomaticMutantEquivalenceThreshold();
 
         String query = String.join("\n",
                 "INSERT INTO games",
@@ -132,19 +160,16 @@ public class MultiplayerGameDAO {
                 "Coverage_Goal,",
                 "Mutant_Goal,",
                 "Creator_ID,",
-                "Attackers_Needed,",
-                "Defenders_Needed,",
-                "Attackers_Limit,",
-                "Defenders_Limit,",
-                "Start_Time,",
-                "Finish_Time,",
                 "State,",
                 "Mode,",
                 "MaxAssertionsPerTest,",
+                "ForceHamcrest,",
                 "ChatEnabled,",
                 "MutantValidator,",
-                "CapturePlayersIntention)",
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+                "CapturePlayersIntention,",
+                "EquivalenceThreshold)",
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);");
+
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(classId),
                 DatabaseValue.of(level.name()),
@@ -154,18 +179,14 @@ public class MultiplayerGameDAO {
                 DatabaseValue.of(lineCoverage),
                 DatabaseValue.of(mutantCoverage),
                 DatabaseValue.of(creatorId),
-                DatabaseValue.of(minAttackers),
-                DatabaseValue.of(minDefenders),
-                DatabaseValue.of(attackerLimit),
-                DatabaseValue.of(defenderLimit),
-                DatabaseValue.of(new Timestamp(startDateTime)),
-                DatabaseValue.of(new Timestamp(finishDateTime)),
                 DatabaseValue.of(state.name()),
                 DatabaseValue.of(mode.name()),
                 DatabaseValue.of(maxAssertionsPerTest),
+                DatabaseValue.of(forceHamcrest),
                 DatabaseValue.of(chatEnabled),
                 DatabaseValue.of(mutantValidatorLevel.name()),
-                DatabaseValue.of(capturePlayersIntention)
+                DatabaseValue.of(capturePlayersIntention),
+                DatabaseValue.of(automaticMutantEquivalenceThreshold)
         };
 
         final int result = DB.executeUpdateQueryGetKeys(query, values);
@@ -250,8 +271,7 @@ public class MultiplayerGameDAO {
         String query = String.join("\n",
                 "SELECT *",
                 "FROM view_battleground_games",
-                "WHERE State != ?",
-                "  AND Finish_Time > NOW();");
+                "WHERE State != ?;");
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(GameState.FINISHED.name())
         };
@@ -259,54 +279,63 @@ public class MultiplayerGameDAO {
     }
 
     /**
-     * Retrieves a list of all {@link MultiplayerGame MultiplayerGames} which are joinable for a given user identifier.
+     * Retrieves a list of all {@link UserMultiplayerGameInfo UserMultiplayerGameInfos} for games which are joinable
+     * for a given user identifier.
      *
      * @param userId the user identifier the games are retrieved for.
-     * @return a list of {@link MultiplayerGame MultiplayerGames}, empty if none are found.
+     * @return a list of {@link UserMultiplayerGameInfo UserMultiplayerGameInfos}, empty if none are found.
      */
-    public static List<MultiplayerGame> getOpenMultiplayerGamesForUser(int userId) {
-        String query = String.join("\n",
-                "SELECT *" +
-                        "FROM view_battleground_games AS g",
-                "INNER JOIN (SELECT gatt.ID, sum(CASE WHEN Role = 'ATTACKER' THEN 1 ELSE 0 END) nAttackers, sum(CASE WHEN Role = 'DEFENDER' THEN 1 ELSE 0 END) nDefenders",
-                "              FROM games AS gatt LEFT JOIN players ON gatt.ID = players.Game_ID AND players.Active = TRUE GROUP BY gatt.ID) AS nplayers",
-                "  ON g.ID = nplayers.ID",
-                "WHERE g.Creator_ID!=? AND (g.State='CREATED' OR g.State='ACTIVE')",
-                "  AND (g.RequiresValidation=FALSE OR (? IN (SELECT User_ID FROM users WHERE Validated=TRUE)))",
-                "  AND g.ID NOT IN (SELECT g.ID FROM games g INNER JOIN players p ON g.ID=p.Game_ID WHERE p.User_ID=? AND p.Active=TRUE)",
-                "  AND (nplayers.nAttackers < g.Attackers_Limit OR nplayers.nDefenders < g.Defenders_Limit);");
+    public static List<UserMultiplayerGameInfo> getOpenMultiplayerGamesWithInfoForUser(int userId) {
+        final String query = String.join("\n",
+            "SELECT DISTINCT g.*,",
+            "    u.User_ID AS `userId`,",
+            "    (SELECT creators.Username",
+            "       FROM view_valid_users creators",
+            "       WHERE g.Creator_ID = creators.User_ID) AS creatorName",
+            "FROM view_battleground_games AS g,",
+            "    view_valid_users u",
+            "WHERE u.User_ID = ?",
+            "  AND (g.State = 'CREATED' OR g.State = 'ACTIVE')",
+            "  AND g.Creator_ID != u.User_ID",
+            "  AND g.ID NOT IN (SELECT ig.ID",
+            "    FROM games ig",
+            "    INNER JOIN players p ON ig.ID = p.Game_ID",
+            "    WHERE p.User_ID = u.User_ID",
+            "    AND p.Active = TRUE)",
+            ";");
 
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(userId),
-                DatabaseValue.of(userId),
-                DatabaseValue.of(userId)
-        };
-
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
+        return DB.executeQueryReturnList(query, MultiplayerGameDAO::openGameInfoFromRS, DatabaseValue.of(userId));
     }
 
+
     /**
-     * Retrieves a list of active {@link MultiplayerGame MultiplayerGames}, which are created or
-     * played by a given user.
+     * Retrieves a list of all {@link UserMultiplayerGameInfo UserMultiplayerGameInfos} for games
+     * a given user has created or joined.
      *
      * @param userId the user identifier the games are retrieved for.
-     * @return a list of {@link MultiplayerGame MultiplayerGames}, empty if none are found.
+     * @return a list of {@link UserMultiplayerGameInfo UserMultiplayerGameInfos}, empty if none are found.
      */
-    public static List<MultiplayerGame> getMultiplayerGamesForUser(int userId) {
-        String query = String.join("\n",
-                "SELECT DISTINCT m.*",
-                "FROM view_battleground_games AS m",
-                "LEFT JOIN players AS p",
-                "  ON p.Game_ID=m.ID",
-                "    AND p.Active=TRUE",
-                "WHERE (p.User_ID = ? OR m.Creator_ID = ?)",
-                "  AND m.State != ?;");
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(userId),
-                DatabaseValue.of(userId),
-                DatabaseValue.of(GameState.FINISHED.name())
-        };
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
+    public static List<UserMultiplayerGameInfo> getActiveMultiplayerGamesWithInfoForUser(int userId) {
+        final String query = String.join("\n",
+        "SELECT g.*,",
+        "  cu.User_ID as userId,",
+        "  IFNULL(p.Role, 'OBSERVER') as playerRole,",
+        "  vu.Username as creatorName",
+        "FROM view_battleground_games g",
+        "INNER JOIN view_valid_users vu",
+        "ON g.Creator_ID = vu.User_ID",
+        "INNER JOIN view_valid_users cu",
+        "ON cu.User_ID = ?",
+        "LEFT JOIN players p",
+        "ON cu.User_ID = p.User_ID",
+        "AND g.ID = p.Game_ID",
+        "WHERE",
+        "  (g.State = 'CREATED' or g.State = 'ACTIVE')",
+        "   AND(cu.User_ID = g.Creator_ID",
+        "       OR (cu.User_ID = p.User_ID AND p.Active = TRUE))",
+        "GROUP BY g.ID");
+
+        return DB.executeQueryReturnList(query, MultiplayerGameDAO::activeGameInfoFromRS, DatabaseValue.of(userId));
     }
 
     /**

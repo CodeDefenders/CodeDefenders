@@ -49,6 +49,7 @@ import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
+import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.junit.Assert;
@@ -69,13 +70,13 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ DatabaseConnection.class })
 public class CoverageTest {
-    
+
     @Inject
     private GameManagingUtils gameManagingUtils;
 
     @Inject
     private IMutationTester mutationTester;
-    
+
 	@Rule // Look for the file on the classpath
 	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
 
@@ -184,7 +185,7 @@ public class CoverageTest {
 				new FileOutputStream(jFile));
 		Files.copy( Paths.get("src/test/resources/itests/sources/ClassWithPrivateInnerClass/ClassWithPrivateInnerClass.class"),
 				new FileOutputStream(cFile));
-		
+
 		// Also "compile" and copy the inner class
 		File innerClassFile = new File(cutFolder, "ClassWithPrivateInnerClass$InnerClass.class");
 		Files.copy(
@@ -198,7 +199,7 @@ public class CoverageTest {
 		long endDate = System.currentTimeMillis() + 1000*3600;
 		// Observer creates a new MP game
 		final MultiplayerGame multiplayerGame = new MultiplayerGame
-				.Builder(cut.getId(), observer.getId(), startDate, endDate, 2, 4, 4, 0, 0)
+				.Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
 				.defenderValue(10)
 				.attackerValue(4)
 				.state(GameState.ACTIVE)
@@ -220,7 +221,7 @@ public class CoverageTest {
 		mutationTester.runAllTestsOnMutant(multiplayerGame, mutant, messages);
 		// Probably I need to store the mutant ?
 		multiplayerGame.update();
-		
+
 		// Submit the Killing test
 		//
 		// Compile and test original

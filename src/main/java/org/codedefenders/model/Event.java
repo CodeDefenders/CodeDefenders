@@ -44,7 +44,7 @@ public class Event {
     static {
         ROLE_COLORS.put(Role.ATTACKER, "#FF0000");
         ROLE_COLORS.put(Role.DEFENDER, "#0000FF");
-        ROLE_COLORS.put(Role.CREATOR, "#00FF00");
+        ROLE_COLORS.put(Role.OBSERVER, "#00FF00");
     }
 
     @Override
@@ -87,29 +87,23 @@ public class Event {
 
     private Role role;
 
-    public Event(int eventId, int gameId, int playerId, String message, String
-            eventType,
-                 String
-                         eventStatus, Timestamp timestamp) {
-        this(eventId, gameId, playerId, message, EventType.valueOf(eventType),
-                EventStatus.valueOf(eventStatus), timestamp);
+    public Event(int eventId, int gameId, int userId, String message, String eventType,
+                 String eventStatus, Timestamp timestamp) {
+        this(eventId, gameId, userId, message, EventType.valueOf(eventType), EventStatus.valueOf(eventStatus), timestamp);
     }
 
-    public Event(int eventId, int gameId, int playerId, String message,
-                 EventType
-                         eventType,
-                 EventStatus
-                         eventStatus, Timestamp timestamp) {
+    public Event(int eventId, int gameId, int userId, String message, EventType eventType,
+                 EventStatus eventStatus, Timestamp timestamp) {
         String eString = eventType.toString();
         if (eString.contains("ATTACKER")) {
             role = Role.ATTACKER;
         } else if (eString.contains("DEFENDER")) {
             role = Role.DEFENDER;
         } else {
-            role = Role.CREATOR;
+            role = Role.OBSERVER;
         }
 
-        this.userId = playerId;
+        this.userId = userId;
         this.message = message;
         this.eventType = eventType;
         this.eventStatus = eventStatus;

@@ -18,11 +18,17 @@
  */
 package org.codedefenders.servlets;
 
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.model.UserMultiplayerGameInfo;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
+import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -46,7 +52,19 @@ public class GamesOverview extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO Phil 02/01/19: extract information retrieval logic from JSP file and set information as request parameters.
+        final int userId = ServletUtils.userId(request);
+
+        List<UserMultiplayerGameInfo> activeGames = MultiplayerGameDAO.getActiveMultiplayerGamesWithInfoForUser(userId);
+        request.setAttribute("activeGames", activeGames);
+
+        List<UserMultiplayerGameInfo> openGames = MultiplayerGameDAO.getOpenMultiplayerGamesWithInfoForUser(userId);
+        request.setAttribute("openGames", openGames);
+
+        boolean gamesJoinable = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_JOINING).getBoolValue();
+        request.setAttribute("gamesJoinable", gamesJoinable);
+
+        boolean gamesCreatable = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue();
+        request.setAttribute("gamesCreatable", gamesCreatable);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher(Constants.USER_GAMES_OVERVIEW_JSP);
         dispatcher.forward(request, response);

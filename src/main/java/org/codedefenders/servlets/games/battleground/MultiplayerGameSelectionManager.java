@@ -152,34 +152,20 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         ArrayList<String> messages = new ArrayList<>();
         session.setAttribute("messages", messages);
 
-        String startDateParam;
-        String startHoursParam;
-        String startMinutesParam;
-        String endDateParam;
-        String endHoursParam;
-        String endMinutesParam;
         int classId;
-        int minDefenders;
-        int defenderLimit;
-        int minAttackers;
-        int attackerLimit;
         int maxAssertionsPerTest;
+        boolean forceHamcrest;
+        int automaticEquivalenceTrigger;
         CodeValidatorLevel mutantValidatorLevel;
+        Role selectedRole;
 
         try {
-            startDateParam = getStringParameter(request, "start_dateTime").get();
-            startHoursParam = getStringParameter(request, "start_hours").get();
-            startMinutesParam = getStringParameter(request, "start_minutes").get();
-            endDateParam = getStringParameter(request, "finish_dateTime").get();
-            endHoursParam = getStringParameter(request, "finish_hours").get();
-            endMinutesParam = getStringParameter(request, "finish_minutes").get();
             classId = getIntParameter(request, "class").get();
-            minDefenders = getIntParameter(request, "minDefenders").get();
-            defenderLimit = getIntParameter(request, "defenderLimit").get();
-            minAttackers = getIntParameter(request, "minAttackers").get();
-            attackerLimit = getIntParameter(request, "attackerLimit").get();
             maxAssertionsPerTest = getIntParameter(request, "maxAssertionsPerTest").get();
+            forceHamcrest = parameterThenOrOther(request, "forceHamcrest", true, false);
+            automaticEquivalenceTrigger = getIntParameter(request, "automaticEquivalenceTrigger").get();
             mutantValidatorLevel = getStringParameter(request, "mutantValidatorLevel").map(CodeValidatorLevel::valueOrNull).get();
+            selectedRole = getStringParameter(request, "roleSelection").map(Role::valueOrNull).get();
         } catch (NoSuchElementException e) {
             logger.error("At least one request parameter was missing or was no valid integer value.", e);
             Redirect.redirectBack(request, response);
@@ -192,57 +178,15 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
 
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-        Set<ConstraintViolation<MultiplayerGame>> validationResults = new HashSet<>();
-
-        /*
-         * Since JSR 303 works on Beans, and we have String input
-         * values, we need to manually run the validation for them
-         */
-        String startDate = startDateParam + " " + startHoursParam + ":" + startMinutesParam;
-        String finishDate = endDateParam + " " + endHoursParam + ":" + endMinutesParam;
-        validationResults.addAll(validator.validateValue(MultiplayerGame.class, "startDateTime", startDate));
-        validationResults.addAll(validator.validateValue(MultiplayerGame.class, "finishDateTime", finishDate));
-        final long startTime;
-        final long endTime;
-        try {
-            startTime = simpleDateFormat.parse(startDate).getTime();
-            endTime = simpleDateFormat.parse(finishDate).getTime();
-        } catch (ParseException e) {
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
-        validationResults.addAll(validator.validateValue(MultiplayerGame.class, "startDateTime", startDate));
-        validationResults.addAll(validator.validateValue(MultiplayerGame.class, "finishDateTime", finishDate));
-
-//        At this point, if there's validation errors, report them to the user and abort.
-        if (!validationResults.isEmpty()) {
-            for (ConstraintViolation<MultiplayerGame> violation : validationResults) {
-                messages.add(violation.getMessage());
-            }
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
-        MultiplayerGame nGame = new MultiplayerGame.Builder(classId, userId, startTime, endTime, maxAssertionsPerTest, defenderLimit, attackerLimit, minDefenders, minAttackers)
+        MultiplayerGame nGame = new MultiplayerGame.Builder(classId, userId, maxAssertionsPerTest, forceHamcrest)
                 .level(level)
                 .chatEnabled(chatEnabled)
                 .capturePlayersIntention(capturePlayersIntention)
                 .lineCoverage(lineCoverage)
                 .mutantCoverage(mutantCoverage)
                 .mutantValidatorLevel(mutantValidatorLevel)
+                .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
                 .build();
-
-        validator.validate(nGame);
-        if (!validationResults.isEmpty()) {
-            for (ConstraintViolation<MultiplayerGame> violation : validationResults) {
-                messages.add(violation.getMessage());
-            }
-            Redirect.redirectBack(request, response);
-            return;
-        }
 
         if (nGame.insert()) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
@@ -258,6 +202,11 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         // Always add system player to send mutants and tests at runtime!
         nGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
         nGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
+
+        // Add selected role to game if the creator participates as attacker/defender
+        if (selectedRole.equals(Role.ATTACKER) || selectedRole.equals(Role.DEFENDER)) {
+            nGame.addPlayer(userId, selectedRole);
+        }
 
         int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, nGame.getId());
         int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, nGame.getId());

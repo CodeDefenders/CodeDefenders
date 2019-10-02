@@ -50,7 +50,6 @@ import javax.naming.spi.InitialContextFactory;
 import org.codedefenders.database.DatabaseConnection;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.execution.IMutationTester;
-import org.codedefenders.execution.MutationTester;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
@@ -61,6 +60,7 @@ import org.codedefenders.model.User;
 import org.codedefenders.rules.DatabaseRule;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.util.Constants;
+import org.codedefenders.validation.code.CodeValidator;
 import org.codedefenders.validation.code.CodeValidatorException;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -119,7 +119,7 @@ public class ConsistencyTest {
 
 	@Inject
     private GameManagingUtils gameManagingUtils;
-	
+
 	// https://stackoverflow.com/questions/36734275/how-to-mock-initialcontext-constructor-in-unit-testing
 	// FIXME this has hardcoded values, not sure how to handle those... maybe
 	// read from the config.properties file ?
@@ -191,10 +191,10 @@ public class ConsistencyTest {
 	/**
 	 * Setup a game with an attacker and multiple defendes and check that a
 	 * mutant can be killed only once and points are reported correctly.
-	 * 
+	 *
 	 * @throws IOException
 	 * @throws CodeValidatorException
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	@Test
 	public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException, InterruptedException {
@@ -230,15 +230,13 @@ public class ConsistencyTest {
 		System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Cut " + cut.getId());
 
 		//
-		final long startTime = System.currentTimeMillis() - 1000 * 3600;
-		final long finishTime = System.currentTimeMillis() + 1000 * 3600;
 		final MultiplayerGame multiplayerGame = new MultiplayerGame
-				.Builder(cut.getId(), observer.getId(), startTime, finishTime, 2, 4, 4, 0, 0)
-				.defenderValue(10)
-				.attackerValue(4)
-				.state(GameState.ACTIVE)
-				.chatEnabled(true)
-				.build();
+                .Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
+                .state(GameState.ACTIVE)
+                .defenderValue(10)
+                .attackerValue(4)
+                .chatEnabled(true)
+                .build();
 		// Store to db
 		multiplayerGame.insert();
 
@@ -298,7 +296,7 @@ public class ConsistencyTest {
 		// Refresh the state of the mutant... since there's no refresh method, we reload the object from the DB
 		mutant = activeGame.getMutantByID(mutant.getId());
 		assertNotNull(mutant);
-		
+
 		// assertMutant is killed !
 		assertFalse("Mutant not killed", mutant.isAlive());
 

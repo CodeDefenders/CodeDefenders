@@ -88,10 +88,6 @@ public class HelperUser {
 
 	public int createNewGame(int classID, //
 			boolean isHardGame, // Level
-			int minDefenders, int maxDefenders, // Defenders
-			int minAttackers, int maxAttackers, // Attackers
-			long startTime, // Start time
-			long finishTime, // Finish time
 			int maxAssertionsPerTest, // maxAssertionsPerTest
 			int mutantValidatorLevel, // mutantValidatorLevel
 			boolean isChatEnabled // chatEnabled
@@ -113,12 +109,6 @@ public class HelperUser {
 				new NameValuePair("formType", "createGame"),
 				new NameValuePair("class", "" + classID),
 				new NameValuePair("level",  ""+ isHardGame), // TODO What happens id this is false? Of shall we omit that in that case?
-				new NameValuePair("minDefenders", "" + minDefenders),
-				new NameValuePair("defenderLimit", ""+maxDefenders),
-				new NameValuePair("minAttackers", ""+ minAttackers),
-				new NameValuePair("attackerLimit", ""+maxAttackers),
-				new NameValuePair("startTime", "" + (System.currentTimeMillis() - 24 * 60 * 60 * 1000)),
-				new NameValuePair("finishTime", "" + (System.currentTimeMillis() + 24 * 60 * 60 * 1000)),
 				new NameValuePair("maxAssertionsPerTest", ""+maxAssertionsPerTest),
 				new NameValuePair("mutantValidatorLevel", ""+mutantValidatorLevel), // 0 - 1 - 2
 				new NameValuePair("chatEnabled", ""+isChatEnabled)));
@@ -160,10 +150,6 @@ public class HelperUser {
 		createGameRequest.setRequestParameters(Arrays.asList(new NameValuePair[] {
 				new NameValuePair("formType", "createGame"), new NameValuePair("class", "" + classID), //
 				new NameValuePair("level", "true"), //
-				new NameValuePair("minDefenders", "1"), new NameValuePair("defenderLimit", "6"),
-				new NameValuePair("minAttackers", "1"), new NameValuePair("attackerLimit", "6"),
-				new NameValuePair("startTime", "" + (System.currentTimeMillis() - 24 * 60 * 60 * 1000)),
-				new NameValuePair("finishTime", "" + (System.currentTimeMillis() + 24 * 60 * 60 * 1000)),
 
 		}));
 

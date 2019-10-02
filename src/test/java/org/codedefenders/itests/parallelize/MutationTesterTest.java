@@ -18,36 +18,7 @@
  */
 package org.codedefenders.itests.parallelize;
 
-import org.codedefenders.MutationTesterUtilities;
-import org.codedefenders.database.DatabaseConnection;
-import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.execution.IMutationTester;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Role;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.itests.IntegrationTest;
-import org.codedefenders.model.User;
-import org.codedefenders.rules.DatabaseRule;
-import org.codedefenders.util.Constants;
-import org.codedefenders.validation.code.CodeValidatorException;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -69,17 +40,47 @@ import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.spi.InitialContextFactory;
 
-import static org.junit.Assert.assertEquals;
+import org.codedefenders.MutationTesterUtilities;
+import org.codedefenders.database.DatabaseConnection;
+import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.execution.IMutationTester;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.itests.IntegrationTest;
+import org.codedefenders.model.User;
+import org.codedefenders.rules.DatabaseRule;
+import org.codedefenders.util.Constants;
+import org.codedefenders.validation.code.CodeValidator;
+import org.codedefenders.validation.code.CodeValidatorException;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This test shall evaluate how Mutation Tester handle concurrent updates.
  * Problematic cases: - More than 1 tests kill the same mutant - Mutant state is
  * reset from killed to alive while setting the score
- * 
+ *
  * The problem lies in the fact that MutationTester set the state of the mutant
  * and forces it to the database, while the state of the mutants should be
  * handled by the database instead !
- * 
+ *
  * @author gambi
  *
  */
@@ -243,10 +244,8 @@ public class MutationTesterTest {
 		// System.out.println("ParallelizeAntRunnerTest.testRunAllTestsOnMutant()
 		// Cut " + cut.getId());
 		//
-		final long startTime = System.currentTimeMillis() - 1000 * 3600;
-		final long endTime = System.currentTimeMillis() + 1000 * 3600;
 		MultiplayerGame multiplayerGame = new MultiplayerGame
-				.Builder(cut.getId(), observer.getId(), startTime, endTime, 2, 4, 4, 0, 0)
+				.Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
 				.state(GameState.ACTIVE)
 				.level(GameLevel.HARD)
 				.defenderValue(10)

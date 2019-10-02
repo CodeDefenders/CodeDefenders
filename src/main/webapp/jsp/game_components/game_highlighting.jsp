@@ -234,6 +234,7 @@
                          <td>Creator</td>
                          <td align="right">ID</td>
                          <td align="right">Score</td>
+                         <td align="right">Changed Lines</td>
                      </tr>
                  </thead>`;
 
@@ -244,6 +245,7 @@
                          <td>` + mutant.creatorName + `</td>
                          <td align="right">` + mutant.id + `</td>
                          <td align="right">` + mutant.score + `</td>
+                         <td align="right">` + mutant.lines + `</td>
                      </tr>`
                 );
             }

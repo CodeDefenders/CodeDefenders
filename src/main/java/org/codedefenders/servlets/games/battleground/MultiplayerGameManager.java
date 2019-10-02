@@ -26,6 +26,7 @@ import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
 import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
+import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_ERROR_LINES;
 import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
 import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
@@ -84,7 +85,6 @@ import org.codedefenders.servlets.util.ServletUtils;
 import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorException;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
@@ -109,6 +109,9 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private IMutationTester mutationTester;
+    
+    @Inject
+    private TestSmellsDAO testSmellsDAO;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -173,10 +176,14 @@ public class MultiplayerGameManager extends HttpServlet {
         switch (action) {
             case "createMutant": {
                 createMutant(request, response, gameId, game);
+                // After creating a mutant, there's the chance that the mutant already survived enough tests
+                triggerAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "createTest": {
                 createTest(request, response, gameId, game);
+                // After a test is submitted, there's the chance that one or more mutants already survived enough tests 
+                triggerAutomaticMutantEquivalenceForGame(game);
                 return;
             }
             case "reset": {
@@ -196,6 +203,51 @@ public class MultiplayerGameManager extends HttpServlet {
             default:
                 logger.info("Action not recognised: {}", action);
                 Redirect.redirectBack(request, response);
+        }
+    }
+    
+    // This is package protected to enable testing
+    void triggerAutomaticMutantEquivalenceForGame(MultiplayerGame game) {
+        int threshold = game.getAutomaticMutantEquivalenceThreshold();
+        if (threshold < 1) {
+            // No need to check as this feature is disabled
+            return;
+        }
+        // Get all the live mutants in the game
+        for (Mutant aliveMutant : game.getAliveMutants()) {
+            /*
+             * If the mutant is covered by enough tests trigger the automatic
+             * equivalence duel
+             */
+            int coveringTests = aliveMutant.getCoveringTests().size();
+            if (coveringTests >= threshold) {
+                // Flag the mutant as possibly equivalent
+                aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
+                aliveMutant.update();
+                // Send the notification about the flagged mutant to attacker
+                int mutantOwnerID = aliveMutant.getPlayerId();
+                Event event = new Event(-1, game.getId(), mutantOwnerID,
+                        "One of your mutants survived "
+                                + (threshold == aliveMutant.getCoveringTests().size() ? "" : "more than ") + threshold
+                                + "tests so it was automatically claimed as equivalent.",
+                        // TODO it might make sense to specify a new event type?
+                        EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.NEW,
+                        new Timestamp(System.currentTimeMillis()));
+                event.insert();
+                /*
+                 * Register the event to DB
+                 */
+                DatabaseAccess.insertEquivalence(aliveMutant, Constants.DUMMY_CREATOR_USER_ID);
+                /*
+                 * Send the notification about the flagged mutant to the game channel
+                 */
+                String flaggingChatMessage = "Code Defenders automatically flagged mutant " + aliveMutant.getId()
+                        + " as equivalent.";
+                Event gameEvent = new Event(-1, game.getId(), -1, flaggingChatMessage,
+                        EventType.DEFENDER_MUTANT_CLAIMED_EQUIVALENT, EventStatus.GAME,
+                        new Timestamp(System.currentTimeMillis()));
+                gameEvent.insert();
+            }
         }
     }
 
@@ -227,20 +279,22 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         final String testText = test.get();
 
-        // If it can be written to file and compiled, end turn. Otherwise, dont.
-        Test newTest;
-        try {
-            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest());
-        } catch (CodeValidatorException cve) {
-            messages.add(TEST_GENERIC_ERROR_MESSAGE);
+        // Do the validation even before creating the mutant
+        // TODO Here we need to account for #495
+        List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
+        if ( !  validationMessage.isEmpty() ) {
+            messages.addAll( validationMessage );
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
 
-        // If test is null, then test did compile but codevalidator triggered
-        if (newTest == null) {
-            messages.add(String.format(TEST_INVALID_MESSAGE, game.getMaxAssertionsPerTest()));
+        // From this point on we assume that test is valid according to the rules (but it might still not compile)
+        Test newTest;
+        try {
+            newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR);
+        } catch (IOException io) {
+            messages.add(TEST_GENERIC_ERROR_MESSAGE);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
@@ -259,8 +313,8 @@ public class MultiplayerGameManager extends HttpServlet {
 //                        boolean validatedKilledMutants = true;
 
             // Prepare the validation message
-            StringBuilder validationMessage = new StringBuilder();
-            validationMessage.append("Cheeky! You cannot submit a test without specifying");
+            StringBuilder userIntentionsValidationMessage = new StringBuilder();
+            userIntentionsValidationMessage.append("Cheeky! You cannot submit a test without specifying");
 
             final String selected_lines = request.getParameter("selected_lines");
             if (selected_lines != null) {
@@ -270,7 +324,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
             if (selectedLines.isEmpty()) {
                 validatedCoveredLines = false;
-                validationMessage.append(" a line to cover");
+                userIntentionsValidationMessage.append(" a line to cover");
             }
             // NOTE: We consider only covering lines at the moment
             // if (request.getParameter("selected_mutants") != null) {
@@ -288,10 +342,10 @@ public class MultiplayerGameManager extends HttpServlet {
             //
             // validationMessage.append(" a mutant to kill");
             // }
-            validationMessage.append(".");
+            userIntentionsValidationMessage.append(".");
 
             if (!validatedCoveredLines) { // || !validatedKilledMutants
-                messages.add(validationMessage.toString());
+                messages.add(userIntentionsValidationMessage.toString());
                 // Keep the test around
                 session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -313,8 +367,12 @@ public class MultiplayerGameManager extends HttpServlet {
             messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
             // We escape the content of the message for new tests since user can embed there anything
             String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
+            // Extract the line numbers of the errors
+            List<Integer> errorLines = extractErrorLines(compileTestTarget.message);
+            // Store them in the session so they can be picked up later
+            session.setAttribute(SESSION_ATTRIBUTE_ERROR_LINES, errorLines);
             // We introduce our decoration
-            String decorate = decorateWithLinksToCode( escapedHtml );
+            String decorate = decorateWithLinksToCode(escapedHtml);
             messages.add( decorate );
             //
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
@@ -351,28 +409,46 @@ public class MultiplayerGameManager extends HttpServlet {
     }
 
     /**
+     * Return the line numbers mentioned in the error message of the compiler
+     * @param message
+     * @return
+     */
+    List<Integer> extractErrorLines(String compilerOutput) {
+        List<Integer> errorLines = new ArrayList<>();
+        Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
+        for (String line : compilerOutput.split("\n")) {
+            Matcher m = p.matcher(line);
+            if (m.find()) {
+                // TODO may be not robust
+                errorLines.add( Integer.parseInt(m.group(1)));
+            }
+        }
+        return errorLines;
+    }
+
+    /**
      * Add links that points to line for errors. Not sure that invoking a JS
      * function suing a link in this way is 100% safe ! XXX Consider to move the
      * decoration utility, and possibly the sanitize methods to some other
      * components.
      */
-    private String decorateWithLinksToCode(String compilerOutput) {
+    String decorateWithLinksToCode(String compilerOutput) {
         StringBuffer decorated = new StringBuffer();
         Pattern p = Pattern.compile("\\[javac\\].*\\.java:([0-9]+): error:.*");
         for (String line : compilerOutput.split("\n")) {
             Matcher m = p.matcher(line);
             if (m.find()) {
-                // Replace the line number with the link, which contains the
-                // line number
-                String replaced = line.replaceAll("(\\[javac\\].*\\.java:)([0-9]+)(: error:.*)",
-                        "$1<a onclick=\"jumpToLine($2)\" href=\"javascript:void(0);\">$2<\\/a>$3");
-                decorated.append(replaced).append("\n");
+                // Replace the entire line with a link to the source code
+                String replacedLine = "<a onclick=\"jumpToLine("+m.group(1)+")\" href=\"javascript:void(0);\">"+line+"</a>";
+                decorated.append(replacedLine).append("\n");
             } else {
                 decorated.append(line).append("\n");
             }
         }
         return decorated.toString();
     }
+    
+    
 
     private void createMutant(HttpServletRequest request, HttpServletResponse response, int gameId, MultiplayerGame game) throws IOException {
         final int userId = ServletUtils.userId(request);
@@ -415,8 +491,8 @@ public class MultiplayerGameManager extends HttpServlet {
             return;
         }
 
+        // Do the validation even before creating the mutant
         CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
-
         ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, codeValidatorLevel);
 
         if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
@@ -452,9 +528,14 @@ public class MultiplayerGameManager extends HttpServlet {
             if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty()) {
                 // We escape the content of the message for new tests since user can embed there anything
                 String escapedHtml = StringEscapeUtils.escapeHtml(compileMutantTarget.message);
+                // Extract the line numbers of the errors
+                List<Integer> errorLines = extractErrorLines(compileMutantTarget.message);
+                // Store them in the session so they can be picked up later
+                session.setAttribute(SESSION_ATTRIBUTE_ERROR_LINES, errorLines);
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode( escapedHtml );
                 messages.add( decorate );
+                
             }
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -553,21 +634,25 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             final String testText = test.get();
-
+            
+            // TODO Duplicate code here !
             // If it can be written to file and compiled, end turn. Otherwise, dont.
-            Test newTest;
-            try {
-                newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR, game.getMaxAssertionsPerTest());
-            } catch (CodeValidatorException cve) {
-                messages.add(TEST_GENERIC_ERROR_MESSAGE);
+            // Do the validation even before creating the mutant
+            // TODO Here we need to account for #495
+            List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
+            if ( !  validationMessage.isEmpty() ) {
+                messages.addAll( validationMessage );
                 session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
-
-            // If test is null, it compiled but codevalidator triggered
-            if (newTest == null) {
-                messages.add(String.format(TEST_INVALID_MESSAGE, game.getMaxAssertionsPerTest()));
+            
+            // If it can be written to file and compiled, end turn. Otherwise, dont.
+            Test newTest;
+            try {
+                newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_BATTLEGROUND_DIR);
+            } catch (IOException io) {
+                messages.add(TEST_GENERIC_ERROR_MESSAGE);
                 session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
@@ -769,7 +854,7 @@ public class MultiplayerGameManager extends HttpServlet {
     }
 
     private void includeDetectTestSmellsInMessages(Test newTest, ArrayList<String> messages) {
-        List<String> detectedTestSmells = TestSmellsDAO.getDetectedTestSmellsForTest(newTest);
+        List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest);
         if (!detectedTestSmells.isEmpty()) {
             if (detectedTestSmells.size() == 1) {
                 messages.add("Your test has the following smell: " + detectedTestSmells.get(0));

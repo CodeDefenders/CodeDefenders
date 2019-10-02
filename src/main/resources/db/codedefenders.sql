@@ -60,7 +60,8 @@ INSERT INTO settings (name, type, STRING_VALUE, INT_VALUE, BOOL_VALUE) VALUES
   ('DEBUG_MODE', 'BOOL_VALUE', NULL, NULL, FALSE),
   ('EMAIL_PASSWORD', 'STRING_VALUE', '', NULL, NULL),
   ('AUTOMATIC_KILLMAP_COMPUTATION', 'BOOL_VALUE', NULL, NULL, FALSE),
-  ('ALLOW_USER_PROFILE', 'BOOL_VALUE', NULL, NULL, TRUE);
+  ('ALLOW_USER_PROFILE', 'BOOL_VALUE', NULL, NULL, TRUE),
+  ('PRIVACY_NOTICE', 'STRING_VALUE', '', NULL, NULL);
 
 --
 -- Table structure for table `ratings`
@@ -133,6 +134,7 @@ CREATE TABLE `games` (
   `Start_Time` timestamp NOT NULL DEFAULT '1970-02-02 01:01:01',
   `Finish_Time` timestamp NOT NULL DEFAULT '1970-02-02 01:01:01',
   `MaxAssertionsPerTest` int(11) NOT NULL DEFAULT '2',
+  `ForceHamcrest` tinyint(1) DEFAULT '1',
   `MutantValidator` enum('STRICT','MODERATE','RELAXED') NOT NULL DEFAULT 'MODERATE',
   `ChatEnabled` tinyint(1) DEFAULT '1',
   `Attackers_Limit` int(11) DEFAULT '0',
@@ -147,6 +149,7 @@ CREATE TABLE `games` (
   `HasKillMap` tinyint(1) NOT NULL DEFAULT '0',
   `CapturePlayersIntention` tinyint(1) NOT NULL DEFAULT '0',
   `Puzzle_ID` int(11) DEFAULT NULL,
+  `EquivalenceThreshold` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`),
   KEY `fk_creatorId_idx` (`Creator_ID`),
   KEY `fk_className_idx` (`Class_ID`),
@@ -207,6 +210,7 @@ CREATE TABLE `mutants` (
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Points` int(11) DEFAULT '0',
   `MutatedLines` varchar(255),
+  `KillMessage` varchar(2000) DEFAULT NULL,
   PRIMARY KEY (`Mutant_ID`),
   UNIQUE KEY `mutants_Game_ID_Class_ID_MD5_key` (`Game_ID`,`Class_ID`,`MD5`),
   KEY `fk_gameId_idx` (`Game_ID`),
@@ -307,6 +311,7 @@ CREATE TABLE `puzzles` (
   `Active_Role` enum('ATTACKER','DEFENDER') NOT NULL,
   `Level` enum('EASY','HARD') DEFAULT 'HARD',
   `Max_Assertions` int(11) NOT NULL DEFAULT '2',
+  `Force_Hamcrest` tinyint(1) DEFAULT '0',
   `Mutant_Validator_Level` enum('STRICT','MODERATE','RELAXED') NOT NULL DEFAULT 'MODERATE',
   `Editable_Lines_Start` int(11) DEFAULT NULL,
   `Editable_Lines_End` int(11) DEFAULT NULL,
@@ -605,6 +610,11 @@ SELECT *
 FROM players
 WHERE `ID` >= 100;
 
+CREATE OR REPLACE VIEW `view_valid_users` AS
+SELECT * FROM `users`
+WHERE `User_ID` >= 5
+  AND Active = 1;
+
 CREATE OR REPLACE VIEW `view_players_with_userdata` AS
 SELECT p.*,
        u.Password     AS usersPassword,
@@ -615,7 +625,7 @@ SELECT p.*,
        u.AllowContact AS usersAllowContact,
        u.KeyMap       AS usersKeyMap
 FROM players AS p,
-     users AS u
+     view_valid_users AS u
 WHERE p.User_ID = u.User_ID;
 
 CREATE OR REPLACE VIEW `view_valid_tests` AS
@@ -629,11 +639,6 @@ WHERE tests.ClassFile IS NOT NULL
       AND ex.Target = 'TEST_ORIGINAL'
       AND ex.Status = 'SUCCESS'
   );
-
-CREATE OR REPLACE VIEW `view_valid_users` AS
-SELECT * FROM `users`
-   WHERE `User_ID` >= 5
-    AND Active = 1;
 
 --
 -- Leaderboard Views
@@ -671,72 +676,6 @@ CREATE OR REPLACE VIEW `view_leaderboard`
     FROM view_valid_users U
       LEFT JOIN view_attackers ON U.user_id = view_attackers.user_id
       LEFT JOIN view_defenders ON U.user_id = view_defenders.user_id;
-
-
--- Event to activate multiplayer game
--- SET @@global.event_scheduler = 1;
-
---
--- Handling equivalences after time expiration
---
-
-DROP PROCEDURE IF EXISTS proc_multiplayer_task;
-
-DELIMITER //
-CREATE PROCEDURE proc_multiplayer_task()
-BEGIN
-  -- Activate games when its start time has passed and there are sufficient players
-  UPDATE games as g
-    INNER JOIN (SELECT gatt.ID, sum(case when Role = 'ATTACKER' then 1 else 0 end) nAttackers, sum(case when Role = 'DEFENDER' then 1 else 0 end) nDefenders
-                FROM games as gatt LEFT JOIN players ON gatt.ID=players.Game_ID AND players.Active=TRUE GROUP BY gatt.ID) as nplayers
-    ON g.ID=nplayers.ID
-  SET g.State='ACTIVE'
-  WHERE g.Mode='PARTY' AND g.State='CREATED' AND g.Start_Time<=CURRENT_TIMESTAMP
-        AND g.Attackers_Needed <= nplayers.nAttackers AND g.Defenders_Needed <= nplayers.nDefenders;
-
-  UPDATE games SET State='GRACE_ONE'
-  WHERE Mode='PARTY' AND State='ACTIVE' AND Finish_Time<=DATE_ADD(NOW(), INTERVAL 1 HOUR);
-
-  UPDATE games SET State='GRACE_TWO'
-  WHERE Mode='PARTY' AND State='GRACE_ONE' AND Finish_Time<=DATE_ADD(NOW(), INTERVAL 45 MINUTE);
-
-  UPDATE games AS g
-  LEFT JOIN mutants AS m ON m.Game_ID = g.ID
-  LEFT JOIN equivalences AS e ON e.Mutant_ID = m.Mutant_ID
-  SET State='FINISHED', e.Expired = 1
-  WHERE Mode='PARTY' AND (State='GRACE_TWO' OR (State='FINISHED' AND m.Equivalent='PENDING_TEST')) AND Finish_Time<=NOW();
-
-  UPDATE equivalences AS e
-  LEFT JOIN mutants AS m ON e.Mutant_ID = m.Mutant_ID
-  SET e.Expired = 0 WHERE e.Expired = 1 AND m.Equivalent != 'PENDING_TEST';
-
-  UPDATE mutants AS m
-  LEFT JOIN equivalences AS e ON e.Mutant_ID = m.Mutant_ID
-  SET m.Points = 0, m.Equivalent = 'ASSUMED_YES' WHERE e.Expired = 1;
-
-   UPDATE players AS p
- LEFT JOIN equivalences AS ee ON ee.Defender_ID = p.ID
- SET p.Points = p.Points + (SELECT COUNT(e.ID)
-         FROM equivalences AS e
-        WHERE ee.Defender_ID = e.Defender_ID AND
-        e.Expired = 1
-        GROUP BY ee.Defender_ID
-       )
-  WHERE ee.Expired = 1;
-
-  UPDATE equivalences SET Expired = 0
-  WHERE Expired = 1;
-END //
-DELIMITER ;
-
-DROP EVENT IF EXISTS event_mp_task;
-CREATE EVENT IF NOT EXISTS event_mp_task
-  ON SCHEDULE EVERY 1 MINUTE
-  ON COMPLETION PRESERVE
-DO
-  CALL proc_multiplayer_task();
-
-
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;

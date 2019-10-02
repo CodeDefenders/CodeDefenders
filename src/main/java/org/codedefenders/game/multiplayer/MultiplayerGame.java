@@ -18,7 +18,6 @@
  */
 package org.codedefenders.game.multiplayer;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
@@ -35,14 +34,13 @@ import org.codedefenders.game.Test;
 import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
+import org.codedefenders.model.Player;
 import org.codedefenders.model.User;
 import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.codedefenders.validation.input.CheckDateFormat;
 
 import java.sql.Timestamp;
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -66,49 +64,42 @@ public class MultiplayerGame extends AbstractGame {
     protected List<Mutant> mutants;
     protected List<Test> tests;
     */
+    private List<Player> attackers;
+    private List<Player> defenders;
     private int defenderValue;
     private int attackerValue;
     private float lineCoverage;
     private float mutantCoverage;
     private float prize;
-    private int attackerLimit;
-    private int defenderLimit;
-    private int minAttackers;
-    private int minDefenders;
 
-    @CheckDateFormat(patterns = {"yyyy/MM/dd HH:mm", "yyyy/MM/dd H:m", "yyyy/MM/dd HH:m", "yyyy/MM/dd H:mm"}, message = "Invalid date format for Start Time")
-    private long startDateTime;
-
-    @CheckDateFormat(patterns = {"yyyy/MM/dd HH:mm", "yyyy/MM/dd H:m", "yyyy/MM/dd HH:m", "yyyy/MM/dd H:mm"}, message = "Invalid date format for Finish Time")
-    private long finishDateTime;
     private boolean requiresValidation;
     private int maxAssertionsPerTest;
+    private boolean forceHamcrest;
+
     private boolean chatEnabled;
     private CodeValidatorLevel mutantValidatorLevel;
 
     private boolean capturePlayersIntention;
 
-    // We need a temporary locatio where to store information about system tests
+    // We need a temporary location where to store information about system tests
     // and mutants
     private boolean withTests;
     private boolean withMutants;
 
-    private static final Format format = new SimpleDateFormat("yy/MM/dd HH:mm");
+    // 0 means disabled
+    private int automaticMutantEquivalenceThreshold = 0;
 
     public static class Builder {
         // mandatory values
         private final int classId;
         private final int creatorId;
-        private final long startDateTime;
-        private final long finishDateTime;
         private final int maxAssertionsPerTest;
-        private final int defenderLimit;
-        private final int attackerLimit;
-        private final int minimumDefenders;
-        private final int minimumAttackers;
+        private final boolean forceHamcrest;
 
         // optional values with default values
         private GameClass cut = null;
+        private List<Player> attackers = null;
+        private List<Player> defenders = null;
         private int id = -1;
         private boolean requiresValidation = false;
         private boolean capturePlayersIntention = false;
@@ -125,17 +116,13 @@ public class MultiplayerGame extends AbstractGame {
         private boolean withTests = false;
         private boolean withMutants = false;
 
-        public Builder(int classId, int creatorId, long startDateTime, long finishDateTime, int maxAssertionsPerTest,
-                       int defenderLimit, int attackerLimit, int minimumDefenders, int minimumAttackers) {
+        private int automaticMutantEquivalenceThreshold = 0;
+
+        public Builder(int classId, int creatorId, int maxAssertionsPerTest, boolean forceHamcrest) {
             this.classId = classId;
             this.creatorId = creatorId;
-            this.startDateTime = startDateTime;
-            this.finishDateTime = finishDateTime;
             this.maxAssertionsPerTest = maxAssertionsPerTest;
-            this.defenderLimit = defenderLimit;
-            this.attackerLimit = attackerLimit;
-            this.minimumDefenders = minimumDefenders;
-            this.minimumAttackers = minimumAttackers;
+            this.forceHamcrest = forceHamcrest;
         }
 
         public Builder cut(GameClass cut) { this.cut = cut; return this; }
@@ -151,9 +138,13 @@ public class MultiplayerGame extends AbstractGame {
         public Builder state(GameState state) { this.state = state; return this; }
         public Builder level(GameLevel level) { this.level = level; return this; }
         public Builder mutantValidatorLevel(CodeValidatorLevel mutantValidatorLevel) { this.mutantValidatorLevel = mutantValidatorLevel; return this; }
+        public Builder attackers(List<Player> attackers) { this.attackers = attackers; return this; }
+        public Builder defenders(List<Player> defenders) { this.defenders = defenders; return this; }
 
         public Builder withTests(boolean withTests) { this.withTests = withTests; return this; }
         public Builder withMutants(boolean withMutants) { this.withMutants = withMutants; return this; }
+
+        public Builder automaticMutantEquivalenceThreshold(int threshold){ this.automaticMutantEquivalenceThreshold = threshold; return this; }
 
         public MultiplayerGame build() {
             return new MultiplayerGame(this);
@@ -164,6 +155,8 @@ public class MultiplayerGame extends AbstractGame {
         this.mode = GameMode.PARTY;
 
         this.cut = builder.cut;
+        this.attackers = builder.attackers;
+        this.defenders = builder.defenders;
         this.id = builder.id;
         this.classId = builder.classId;
         this.creatorId = builder.creatorId;
@@ -174,14 +167,9 @@ public class MultiplayerGame extends AbstractGame {
         this.lineCoverage = builder.lineCoverage;
         this.mutantCoverage = builder.mutantCoverage;
         this.prize = builder.prize;
-        this.attackerLimit = builder.attackerLimit;
-        this.defenderLimit = builder.defenderLimit;
-        this.minAttackers = builder.minimumAttackers;
-        this.minDefenders = builder.minimumDefenders;
-        this.startDateTime = builder.startDateTime;
-        this.finishDateTime = builder.finishDateTime;
         this.requiresValidation = builder.requiresValidation;
         this.maxAssertionsPerTest = builder.maxAssertionsPerTest;
+        this.forceHamcrest = builder.forceHamcrest;
         this.chatEnabled = builder.chatEnabled;
         this.mutantValidatorLevel = builder.mutantValidatorLevel;
         this.capturePlayersIntention = builder.capturePlayersIntention;
@@ -189,6 +177,8 @@ public class MultiplayerGame extends AbstractGame {
         // This is mostly a temporary patch
         this.withMutants = builder.withMutants;
         this.withTests = builder.withTests;
+
+        this.automaticMutantEquivalenceThreshold = builder.automaticMutantEquivalenceThreshold;
     }
 
     public boolean hasSystemTests() {
@@ -197,30 +187,6 @@ public class MultiplayerGame extends AbstractGame {
 
     public boolean hasSystemMutants() {
         return this.withMutants;
-    }
-
-    public int getAttackerLimit() {
-        return attackerLimit;
-    }
-
-    public int getDefenderLimit() {
-        return defenderLimit;
-    }
-
-    public int getMinAttackers() {
-        return minAttackers;
-    }
-
-    public int getMinDefenders() {
-        return minDefenders;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-        if (this.state != GameState.FINISHED && finishDateTime < System.currentTimeMillis()) {
-            this.state = GameState.FINISHED;
-            update();
-        }
     }
 
     public int getDefenderValue() {
@@ -255,6 +221,10 @@ public class MultiplayerGame extends AbstractGame {
         return maxAssertionsPerTest;
     }
 
+    public boolean isForceHamcrest(){
+        return forceHamcrest;
+    }
+
     public CodeValidatorLevel getMutantValidatorLevel() {
         return mutantValidatorLevel;
     }
@@ -263,45 +233,38 @@ public class MultiplayerGame extends AbstractGame {
         return capturePlayersIntention;
     }
 
-    public long getStartDateTime() {
-        return startDateTime;
+    public int getAutomaticMutantEquivalenceThreshold() {
+        return automaticMutantEquivalenceThreshold;
     }
 
-    public long getFinishDateTime() {
-        return finishDateTime;
+    public Role getRole(int userId){
+        if (getDefenderPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
+            return Role.DEFENDER;
+        } else if (getAttackerPlayers().stream().anyMatch(player -> player.getUser().getId() == userId)) {
+            return Role.ATTACKER;
+        } else if (userId == getCreatorId()) {
+            return Role.OBSERVER;
+        } else {
+            return Role.NONE;
+        }
     }
 
-    public String getFormattedStartDateTime() {
-        Date date = new Date(startDateTime);
-        return format.format(date);
+    public List<Player> getDefenderPlayers() {
+        if (defenders == null) {
+            defenders = GameDAO.getPlayersForGame(getId(), Role.DEFENDER);
+        }
+        return defenders;
     }
 
-    public String getFormattedFinishDateTime() {
-        Date date = new Date(finishDateTime);
-        return format.format(date);
-    }
-
-    /**
-     * This returns the ID of the Player not of the User
-     *
-     * @return
-     */
-    public int[] getDefenderIds() {
-        // TODO Phil 27/12/18: improve this. Make getDefenderIds return List<Integer> and rename the method to 'getDefenderPlayerIds'. No need to have an array here
-        return GameDAO.getPlayersForGame(getId(), Role.DEFENDER).stream().mapToInt(Integer::intValue).toArray();
-    }
-
-    /**
-     * This returns the ID of the Player not of the User
-     *
-     * @return
-     */
-    public int[] getAttackerIds() {
-        return GameDAO.getPlayersForGame(getId(), Role.ATTACKER).stream().mapToInt(Integer::intValue).toArray();
+    public List<Player> getAttackerPlayers() {
+        if (attackers == null) {
+            attackers = GameDAO.getPlayersForGame(getId(), Role.ATTACKER);
+        }
+        return attackers;
     }
 
     public boolean addPlayer(int userId, Role role) {
-        return canJoinGame(userId, role) && addPlayerForce(userId, role);
+        return canJoinGame(userId) && addPlayerForce(userId, role);
     }
 
     public boolean addPlayerForce(int userId, Role role) {
@@ -312,19 +275,13 @@ public class MultiplayerGame extends AbstractGame {
             return false;
         }
         User u = UserDAO.getUserById(userId);
-        EventType et = role.equals(Role.ATTACKER) ? EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
+        EventType et = role == Role.ATTACKER ? EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 
-        Event e = new Event(-1, id, userId, u.getUsername() + " joined the game as " + role,
-                et, EventStatus.GAME,
-                timestamp);
+        Event e = new Event(-1, id, userId, u.getUsername() + " joined the game as " + role, et, EventStatus.GAME, timestamp);
         e.insert();
 
-        EventType notifType = role.equals(Role.ATTACKER) ?
-                EventType.ATTACKER_JOINED : EventType.DEFENDER_JOINED;
-        Event notif = new Event(-1, id, userId, "You joined a game as " + role,
-                notifType, EventStatus.NEW,
-                timestamp);
+        Event notif = new Event(-1, id, userId, "You joined a game as " + role, et, EventStatus.NEW, timestamp);
         notif.insert();
 
         return true;
@@ -337,15 +294,8 @@ public class MultiplayerGame extends AbstractGame {
         return false;
     }
 
-    private boolean canJoinGame(int userId, Role role) {
-        if (!requiresValidation || UserDAO.getUserById(userId).isValidated()) {
-            if (role.equals(Role.ATTACKER))
-                return (attackerLimit == 0 || getAttackerIds().length < attackerLimit);
-            else
-                return (defenderLimit == 0 || getDefenderIds().length < defenderLimit);
-        } else {
-            return false;
-        }
+    private boolean canJoinGame(int userId) {
+        return !requiresValidation || UserDAO.getUserById(userId).isValidated();
     }
 
     public boolean insert() {
@@ -362,6 +312,13 @@ public class MultiplayerGame extends AbstractGame {
         return MultiplayerGameDAO.updateMultiplayerGame(this);
     }
 
+    /**
+     * This method calculates the mutant score for every attacker in the game.
+     * <p>
+     * The result is a mapping of playerId to player score.
+     *
+     * @return mapping from playerId to player score.
+     */
     public HashMap<Integer, PlayerScore> getMutantScores() {
         HashMap<Integer, PlayerScore> mutantScores = new HashMap<Integer, PlayerScore>();
 
@@ -437,6 +394,13 @@ public class MultiplayerGame extends AbstractGame {
         return mutantScores;
     }
 
+    /**
+     * This method calculates the test score for every defender in the game.
+     * <p>
+     * The result is a mapping of playerId to player score.
+     *
+     * @return mapping from playerId to player score.
+     */
     public HashMap<Integer, PlayerScore> getTestScores() {
         HashMap<Integer, PlayerScore> testScores = new HashMap<>();
         HashMap<Integer, Integer> mutantsKilled = new HashMap<>();
@@ -452,7 +416,8 @@ public class MultiplayerGame extends AbstractGame {
         challengesWon.put(defendersTeamId, 0);
         challengesLost.put(defendersTeamId, 0);
 
-        for (int defenderId : getDefenderIds()) {
+        for (Player player : getDefenderPlayers()) {
+            int defenderId = player.getId();
             testScores.put(defenderId, new PlayerScore(defenderId));
             mutantsKilled.put(defenderId, 0);
             challengesOpen.put(defenderId, 0);
@@ -460,10 +425,10 @@ public class MultiplayerGame extends AbstractGame {
             challengesLost.put(defenderId, 0);
         }
 
-        int[] attackers = getAttackerIds();
         for (Test test : getTests()) {
-            if (ArrayUtils.contains(attackers, test.getPlayerId()))
+            if (getAttackerPlayers().stream().anyMatch(p -> p.getId() == test.getPlayerId())) {
                 continue;
+            }
             if (!testScores.containsKey(test.getPlayerId())) {
                 testScores.put(test.getPlayerId(), new PlayerScore(test.getPlayerId()));
                 mutantsKilled.put(test.getPlayerId(), 0);
@@ -484,9 +449,9 @@ public class MultiplayerGame extends AbstractGame {
         }
 
         for (int playerId : mutantsKilled.keySet()) {
-            if (playerId < 0 || ArrayUtils.contains(attackers, playerId))
+            if (playerId < 0 || getAttackerPlayers().stream().anyMatch(p -> p.getId() == playerId)) {
                 continue;
-
+            }
             int teamKey = defendersTeamId;
 
             PlayerScore ps = testScores.get(playerId);
@@ -590,24 +555,23 @@ public class MultiplayerGame extends AbstractGame {
     }
 
     private void notifyAttackers(String message, EventType et) {
-
-        for (int attacker : getAttackerIds()) {
+        for (Player player : getAttackerPlayers()) {
             Event notif = new Event(-1, id,
-                    UserDAO.getUserForPlayer(attacker).getId(),
-                    message,
-                    et, EventStatus.NEW,
-                    new Timestamp(System.currentTimeMillis()));
+                player.getUser().getId(),
+                message,
+                et, EventStatus.NEW,
+                new Timestamp(System.currentTimeMillis()));
             notif.insert();
         }
     }
 
     private void notifyDefenders(String message, EventType et) {
-        for (int defender : getDefenderIds()) {
+        for (Player player : getDefenderPlayers()) {
             Event notif = new Event(-1, id,
-                    UserDAO.getUserForPlayer(defender).getId(),
-                    message,
-                    et, EventStatus.NEW,
-                    new Timestamp(System.currentTimeMillis()));
+                player.getUser().getId(),
+                message,
+                et, EventStatus.NEW,
+                new Timestamp(System.currentTimeMillis()));
             notif.insert();
         }
     }
@@ -631,4 +595,5 @@ public class MultiplayerGame extends AbstractGame {
                 new Timestamp(System.currentTimeMillis()));
         notif.insert();
     }
+
 }

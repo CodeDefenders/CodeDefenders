@@ -18,6 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="org.codedefenders.database.UserDAO"%>
+<%@page import="org.codedefenders.model.User"%>
+<%@page import="org.codedefenders.game.Test"%>
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
@@ -190,6 +193,12 @@
                         List<Mutant> sortedKilledMutants = new ArrayList<>(mutantsKilledTODORENAME);
                         sortedKilledMutants.sort(Mutant.sortByLineNumberAscending());
                         for (Mutant m : sortedKilledMutants) {
+                            
+                            Test killingTest = m.getKillingTest();
+                            User creator = UserDAO.getUserForPlayer(killingTest.getPlayerId());
+                            int killingTestID = killingTest.getId();
+                            String ownerOfKillingTest = creator.getUsername();
+                            
                     %>
                         <tr>
                             <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= m.getCreatorName() %> (uid <%= m.getCreatorId() %>)</h4>
@@ -202,35 +211,90 @@
                                 <h4>points: <%=m.getScore()%></h4>
                             </td>
                             <td class="col-sm-1">
-                                <a href="#" class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>" data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View Diff</a>
-                                <div id="modalMut<%=m.getId()%>" class="modal mutant-modal fade" role="dialog"
-                                     style="z-index: 10000;">
-                                    <div class="modal-dialog">
-                                        <!-- Modal content-->
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                <h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
+                             <%-- Force buttons to be one on top the other. Maybe we can use one single button to "show details" --%>
+                                <table>
+                                    <tr role="row">
+                                       <td class="col-sm-1"><a href="#"
+                                        class="btn btn-default btn-diff" id="btnMut<%=m.getId()%>"
+                                        data-toggle="modal" data-target="#modalMut<%=m.getId()%>">View
+                                            Diff</a>
+                                            <div id="modalMut<%=m.getId()%>"
+                                                class="modal mutant-modal fade" role="dialog"
+                                                style="z-index: 10000;">
+                                                <div class="modal-dialog">
+                                                    <!-- Modal content-->
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                            <h4 class="modal-title">
+                                                                Mutant
+                                                                <%=m.getId()%>
+                                                                - Diff
+                                                            </h4>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <pre class="readonly-pre">
+                                                                <textarea class="mutdiff" title="mutdiff"
+                                                                    id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea>
+                                                            </pre>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-default"
+                                                                data-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="modal-body">
-                                                <p>Killed by
-                                                    Test <%=DatabaseAccess.getKillingTestIdForMutant(m.getId())%>
-                                                </p>
-                                                <pre class="readonly-pre"><textarea
-                                                        class="mutdiff" title="mutdiff"
-                                                        id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea></pre>
+                                        </td>
+                                    </tr>
+                                    <tr role="row">
+                                        <td class="col-sm-1"><a href="#"
+                                            class="btn btn-default btn-diff"
+                                            id="btnMutKillMessage<%=m.getId()%>" data-toggle="modal"
+                                            data-target="#modalMutKillMessage<%=m.getId()%>">View Killing Test</a>
+                                            <div id="modalMutKillMessage<%=m.getId()%>"
+                                                class="modal mutant-modal fade" role="dialog"
+                                                style="z-index: 10000;">
+                                                <div class="modal-dialog modal-lg">
+                                                    <!-- Modal content is LARGE (modal-lg) -->
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                                            <h4 class="modal-title">
+                                                                Mutant <%=m.getId()%> was killed by test <%=killingTestID%> submitted by <%=ownerOfKillingTest%>
+                                                            </h4>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                                <pre class="readonly-pre"><textarea class="killingTest" title="killingTest" cols="20" rows="10"><%=m.getKillingTest().getAsHTMLEscapedString()%></textarea></pre>
+                                                                <pre class="readonly-pre build-trace"><%=m.getHTMLEscapedKillMessage()%></pre>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-default"
+                                                                data-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </td>
+                                        </td>
+                                    </tr>
+                                </table>
+                             </td> 
                         </tr>
                     <% } %>
                     </tbody>
                 </table>
+                <%-- Enable syntax highlighting for the killing test textarea --%>
+                <script>
+				    var x = document.getElementsByClassName("killingTest");
+				    for (var i = 0; i < x.length; i++) {
+				        CodeMirror.fromTextArea(x[i], {
+				            lineNumbers: true,
+				            matchBrackets: true,
+				            mode: "text/x-java",
+				            readOnly: true
+				        });
+				    }
+				</script>
             <% } else {%>
                 <div class="panel panel-default" style="background: white">
                     <div class="panel-body" style="    color: gray;    text-align: center;">

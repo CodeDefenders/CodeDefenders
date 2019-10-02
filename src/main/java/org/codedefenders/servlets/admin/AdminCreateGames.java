@@ -82,20 +82,21 @@ public class AdminCreateGames extends HttpServlet {
     private int attackersPerGame, defendersPerGame;
     private GameLevel gamesLevel;
     private GameState gamesState;
-    private long startTime;
-    private long finishTime;
     private List<MultiplayerGame> createdGames;
     private List<List<Integer>> attackerIdsList;
     private List<List<Integer>> defenderIdsList;
     private MultiplayerGame mg;
     private boolean chatEnabled;
     private int maxAssertionsPerTest;
+    private boolean forceHamcrest;
     private CodeValidatorLevel mutantValidatorLevel;
 
     private boolean withTests;
     private boolean withMutants;
 
     private boolean capturePlayersIntention;
+
+    private int automaticEquivalenceTrigger;
 
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher(Constants.ADMIN_GAMES_JSP).forward(request, response);
@@ -162,7 +163,7 @@ public class AdminCreateGames extends HttpServlet {
             createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
 
             if (selectedTempGames == null) {
-                messages.add("Please select at least one Game to insert.");
+                messages.add("Please select at least one game to insert.");
                 response.sendRedirect(request.getContextPath() + "/admin");
                 return;
             }
@@ -296,9 +297,8 @@ public class AdminCreateGames extends HttpServlet {
             defendersPerGame = Integer.parseInt(request.getParameter("defenders"));
             gamesLevel = GameLevel.valueOf(request.getParameter("gamesLevel"));
             gamesState = request.getParameter("gamesState").equals(GameState.ACTIVE.name()) ? GameState.ACTIVE : GameState.CREATED;
-            startTime = Long.parseLong(request.getParameter("startTime"));
-            finishTime = Long.parseLong(request.getParameter("finishTime"));
             maxAssertionsPerTest = Integer.parseInt(request.getParameter("maxAssertionsPerTest"));
+            forceHamcrest = request.getParameter("forceHamcrest") != null;
             mutantValidatorLevel = CodeValidatorLevel.valueOf(request.getParameter("mutantValidatorLevel"));
             chatEnabled = request.getParameter("chatEnabled") != null;
 
@@ -306,6 +306,8 @@ public class AdminCreateGames extends HttpServlet {
             withMutants= request.getParameter("withMutants") != null;
 
             capturePlayersIntention = request.getParameter("capturePlayersIntention") != null;
+
+            automaticEquivalenceTrigger = Integer.parseInt(request.getParameter("automaticEquivalenceTrigger"));
         } catch (Exception e) {
             messages.add("There was a problem with the form.");
             response.sendRedirect(request.getContextPath() + "/admin");
@@ -475,10 +477,12 @@ public class AdminCreateGames extends HttpServlet {
 
         List<MultiplayerGame> newlyCreatedGames = createGames(nbGames, attackersPerGame, defendersPerGame,
                  cutID, currentUserID, gamesLevel, gamesState,
-                startTime, finishTime, maxAssertionsPerTest, chatEnabled,
+                maxAssertionsPerTest, forceHamcrest, //
+                chatEnabled,
                 mutantValidatorLevel,
                 withTests, withMutants, //
-                capturePlayersIntention);
+                capturePlayersIntention,
+                automaticEquivalenceTrigger);
 
         if (teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_DESCENDING) || teamAssignmentMethod.equals(TeamAssignmentMethod.SCORE_SHUFFLED)) {
             Collections.sort(attackerIDs, new ReverseDefenderScoreComparator());
@@ -538,14 +542,15 @@ public class AdminCreateGames extends HttpServlet {
 
     private static List<MultiplayerGame> createGames(int nbGames, int attackersPerGame, int defendersPerGame,
                                                      int cutID, int creatorID, GameLevel level, GameState state,
-                                                     long startTime, long finishTime, int maxAssertionsPerTest,
+                                                     int maxAssertionsPerTest, boolean forceHamcrest,
                                                      boolean chatEnabled, CodeValidatorLevel mutantValidatorLevel,
                                                      boolean withTests, boolean withMutants, //
-                                                     boolean capturePlayersIntention
+                                                     boolean capturePlayersIntention, //
+                                                     int automaticEquivalenceTrigger
                                                      ) {
         List<MultiplayerGame> gameList = new ArrayList<>();
         for (int i = 0; i < nbGames; ++i) {
-            final MultiplayerGame game = new MultiplayerGame.Builder(cutID, creatorID, startTime, finishTime, maxAssertionsPerTest, 0, 0, 0, 0)
+            final MultiplayerGame game = new MultiplayerGame.Builder(cutID, creatorID, maxAssertionsPerTest, forceHamcrest)
                     .level(level)
                     .state(state)
                     .chatEnabled(chatEnabled)
@@ -553,6 +558,7 @@ public class AdminCreateGames extends HttpServlet {
                     .withTests(withTests)
                     .withMutants(withMutants)
                     .capturePlayersIntention(capturePlayersIntention)
+                    .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
                     .build();
             gameList.add(game);
         }

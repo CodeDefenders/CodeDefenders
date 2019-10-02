@@ -490,9 +490,11 @@ public class Installer {
 
         // Default values
         int maxAssertionsPerTest = CodeValidator.DEFAULT_NB_ASSERTIONS;
+        boolean forceHamcrest = CodeValidator.DEFAULT_FORCE_HAMCREST;
+        
         CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
 
-        Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, level, maxAssertionsPerTest, mutantValidatorLevel,
+        Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, level, maxAssertionsPerTest, forceHamcrest, mutantValidatorLevel,
                 editableLinesStart, editableLinesEnd, chapterId, position, title, description);
         int puzzleId = PuzzleDAO.storePuzzle(puzzle);
 

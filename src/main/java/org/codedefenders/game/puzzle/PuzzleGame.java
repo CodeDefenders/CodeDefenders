@@ -64,6 +64,8 @@ public class PuzzleGame extends AbstractGame {
      * Maximum number of allowed assertions per submitted test.
      */
     private int maxAssertionsPerTest;
+    
+    private boolean forceHamcrest;
 
     /**
      * Validation level used to check submitted mutants.
@@ -190,6 +192,8 @@ public class PuzzleGame extends AbstractGame {
 
         /* Other game attributes */
         this.maxAssertionsPerTest = puzzle.getMaxAssertionsPerTest();
+        this.forceHamcrest = puzzle.isForceHamcrest();
+        
         this.mutantValidatorLevel = puzzle.getMutantValidatorLevel();
         this.currentRound = 1;
         this.activeRole = puzzle.getActiveRole();
@@ -208,7 +212,7 @@ public class PuzzleGame extends AbstractGame {
                       int classId,
                       GameLevel level,
                       int creatorId,
-                      int maxAssertionsPerTest,
+                      int maxAssertionsPerTest, boolean forceHamcrest,
                       CodeValidatorLevel mutantValidatorLevel,
                       GameState state,
                       int currentRound,
@@ -226,6 +230,7 @@ public class PuzzleGame extends AbstractGame {
 
         /* Other game attributes */
         this.maxAssertionsPerTest = maxAssertionsPerTest;
+        this.forceHamcrest = forceHamcrest;
         this.mutantValidatorLevel = mutantValidatorLevel;
         this.currentRound = currentRound;
         this.activeRole = activeRole;
@@ -305,6 +310,10 @@ public class PuzzleGame extends AbstractGame {
 
     public int getMaxAssertionsPerTest() {
         return maxAssertionsPerTest;
+    }
+    
+    public boolean isForceHamcrest() {
+        return forceHamcrest;
     }
 
     public CodeValidatorLevel getMutantValidatorLevel() {
@@ -392,4 +401,5 @@ public class PuzzleGame extends AbstractGame {
     public boolean update() {
         return PuzzleDAO.updatePuzzleGame(this);
     }
+
 }

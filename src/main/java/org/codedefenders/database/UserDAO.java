@@ -111,7 +111,6 @@ public class UserDAO {
                 "      FROM players, games",
                 "      WHERE players.Game_ID = games.ID",
                 "        AND (games.State = 'ACTIVE' OR games.State = 'CREATED')",
-                "        AND games.Finish_Time > NOW()",
                 "        AND players.Role IN ('ATTACKER', 'DEFENDER')",
                 "        AND Active = TRUE",
                 "    )",
@@ -120,8 +119,9 @@ public class UserDAO {
     }
 
     /**
-     * Returns the last rose the user with the given id had in any game.
+     * Returns the last rose the user with the given id had in any game or null if there's no data.
      */
+    // TODO Consider to return Role.NONE instead of null ? What's happens if rs.getString("Role") == null ?!
     public static Role getLastRoleOfUser(int userId) throws UncheckedSQLException, SQLMappingException {
         String query = String.join("\n",
                 "SELECT players.Role",

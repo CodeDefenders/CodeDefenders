@@ -66,7 +66,7 @@
             %><%@ include file="/jsp/battleground/defender_view.jsp" %>
             <%
             break;
-        case CREATOR:
+        case OBSERVER:
             %><%@ include file="/jsp/battleground/creator_view.jsp" %><%
             break;
         default:

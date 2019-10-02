@@ -39,6 +39,7 @@ import java.util.List;
 import javax.enterprise.inject.Alternative;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.game.AbstractGame;
@@ -267,6 +268,8 @@ public class MutationTester implements IMutationTester {
 
         logger.info("Test {} killed Mutant {}", test.getId(), mutant.getId());
         test.killMutant();
+        mutant.setKillMessage( executedTarget.message );
+        MutantDAO.updateMutantKillMessageForMutant(mutant);
         return true;
     }
 
