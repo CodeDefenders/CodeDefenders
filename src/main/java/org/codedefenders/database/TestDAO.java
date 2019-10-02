@@ -21,6 +21,7 @@ package org.codedefenders.database;
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
+import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
@@ -172,6 +173,26 @@ public class TestDAO {
         result.addAll(DB.executeQueryReturnList(systemDefenderQuery, TestDAO::testFromRS, values));
 
         return result;
+    }
+    
+    public static List<Test> getValidTestsForGameSubmittedAfterMutant(int gameId, boolean defendersOnly,
+            Mutant aliveMutant) {
+        /*
+         * ATM, we do not consider system generated tests, as they will be
+         * automatically ruled out by the timestamp Unless, we allow new system
+         * tests to be submitted also after the game started (#102)
+         */
+        // TODO Not sure if using table 'mutants' here is correct or we
+        // need to use some view instead...
+        String query = String.join("\n", 
+                "SELECT t.*", 
+                "FROM view_valid_tests t", 
+                (defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : ""), 
+                "WHERE t.Timestamp >= (select mutants.Timestamp from mutants where mutants.Mutant_ID = ? ) AND t.Game_ID=? ",
+                (defendersOnly ? "AND pl.Role='DEFENDER';" : ";"));
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS, 
+                DatabaseValue.of(aliveMutant.getId()),
+                DatabaseValue.of(gameId));
     }
 
     /**
@@ -362,4 +383,5 @@ public class TestDAO {
 
         return DB.executeUpdateQuery(query, values);
     }
+
 }
