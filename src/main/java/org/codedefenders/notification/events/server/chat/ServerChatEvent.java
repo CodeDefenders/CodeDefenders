@@ -7,13 +7,7 @@ import org.codedefenders.notification.events.server.ServerEvent;
 public abstract class ServerChatEvent extends ServerEvent {
     @Expose private int senderId;
     @Expose private String senderName;
-    @Expose private String message; // TODO Escaping, size limit, etc..
-
-    public ServerChatEvent(User user, String message) {
-        this.senderId = user.getId();
-        this.senderName = user.getUsername();
-        this.message = message;
-    }
+    @Expose private String message; // TODO: Escaping, size limit, etc..
 
     public int getSenderId() {
         return senderId;
@@ -25,5 +19,17 @@ public abstract class ServerChatEvent extends ServerEvent {
 
     public String getMessage() {
         return message;
+    }
+
+    public void setSenderId(int senderId) {
+        this.senderId = senderId;
+    }
+
+    public void setSenderName(String senderName) {
+        this.senderName = senderName;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

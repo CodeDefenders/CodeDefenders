@@ -24,89 +24,106 @@
 
 <%-- Set request attributes for the components. --%>
 <%
-	/* class_viewer */
-	final GameClass cut = game.getCUT();
-	request.setAttribute("className", cut.getBaseName());
-	request.setAttribute("classCode", cut.getAsHTMLEscapedString());
-	request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
+    /* class_viewer */
+    final GameClass cut = game.getCUT();
+    request.setAttribute("className", cut.getBaseName());
+    request.setAttribute("classCode", cut.getAsHTMLEscapedString());
+    request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
-	/* test_editor */
-	String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-	request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
-	List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
+    /* test_editor */
+    String previousTestCode = (String) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
+    request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
+    List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
 
-	if (previousTestCode != null) {
-		request.setAttribute("testCode", previousTestCode);
-		/* error_highlighting */
-		request.setAttribute("codeDivSelectorForError", "#utest-div");
-		request.setAttribute("errorLines", errorLines);
-	} else {
-		request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
-	}
-	request.setAttribute("mockingEnabled", cut.isMockingEnabled());
-	request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
+    if (previousTestCode != null) {
+        request.setAttribute("testCode", previousTestCode);
+        /* error_highlighting */
+        request.setAttribute("codeDivSelectorForError", "#utest-div");
+        request.setAttribute("errorLines", errorLines);
+    } else {
+        request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
+    }
+    request.setAttribute("mockingEnabled", cut.isMockingEnabled());
+    request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
 
-	/* tests_carousel */
-	request.setAttribute("tests", game.getTests());
-	request.setAttribute("mutants", game.getMutants());
+    /* tests_carousel */
+    request.setAttribute("tests", game.getTests());
+    request.setAttribute("mutants", game.getMutants());
 
-	/* mutants_list */
-	request.setAttribute("mutantsAlive", game.getAliveMutants());
-	request.setAttribute("mutantsKilled", game.getKilledMutants());
-	request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
-	request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
-	request.setAttribute("markEquivalent", true);
-	request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
-	request.setAttribute("gameType", GameMode.PARTY);
-	request.setAttribute("gameId", game.getId());
+    /* mutants_list */
+    request.setAttribute("mutantsAlive", game.getAliveMutants());
+    request.setAttribute("mutantsKilled", game.getKilledMutants());
+    request.setAttribute("mutantsEquivalent", game.getMutantsMarkedEquivalent());
+    request.setAttribute("mutantsMarkedEquivalent", game.getMutantsMarkedEquivalentPending());
+    request.setAttribute("markEquivalent", true);
+    request.setAttribute("viewDiff", game.getLevel() == GameLevel.EASY);
+    request.setAttribute("gameType", GameMode.PARTY);
+    request.setAttribute("gameId", game.getId());
 
-	/* game_highlighting */
-	request.setAttribute("codeDivSelector", "#cut-div");
-	// request.setAttribute("tests", game.getTests());
-	request.setAttribute("mutants", game.getMutants());
-	request.setAttribute("showEquivalenceButton", true);
-	// request.setAttribute("gameType", GameMode.PARTY);
+    /* game_highlighting */
+    request.setAttribute("codeDivSelector", "#cut-div");
+    // request.setAttribute("tests", game.getTests());
+    request.setAttribute("mutants", game.getMutants());
+    request.setAttribute("showEquivalenceButton", true);
+    // request.setAttribute("gameType", GameMode.PARTY);
 //    request.setAttribute("gameId", game.getId());
 
-	/* mutant_explanation */
-	request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
+    /* mutant_explanation */
+    request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 
-	/* test_progressbar */
-//	request.setAttribute("gameId", game.getId());
+    /* test_progressbar */
+//    request.setAttribute("gameId", game.getId());
 %>
 
 <!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
 <div class="row">
-	<div class="col-md-6" id="cut-div">
-		<h3>Class Under Test</h3>
-		<%@include file="../game_components/class_viewer.jsp"%>
-		<%@include file="../game_components/game_highlighting.jsp" %>
-		<%@include file="../game_components/mutant_explanation.jsp"%>
-	</div>
+    <div class="col-md-6" id="cut-div">
+        <h3>Class Under Test</h3>
+        <%@include file="../game_components/class_viewer.jsp"%>
+        <%@include file="../game_components/game_highlighting.jsp" %>
+        <%@include file="../game_components/mutant_explanation.jsp"%>
+    </div>
 
-	<div class="col-md-6" id="utest-div">
-		<%--<%@include file="../game_components/test_progress_bar.jsp"%>--%>
-		<jsp:include page="../game_components/push_test_progress_bar.jsp"/>
+    <div class="col-md-6" id="utest-div">
+        <%--<%@include file="../game_components/test_progress_bar.jsp"%>--%>
+        <jsp:include page="../game_components/push_test_progress_bar.jsp"/>
 
-		<%-- TODO Why progress bar here is handled differently than mutant submission ?! --%>
-		<%-- TODO: change back to registerTestProgressBar() --%>
-		<h3>Write a new JUnit test here
-			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
-                onClick="testProgressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
+        <script>
+            window.submitTest = function (form) {
+                $.ajax({
+                    type: "POST",
+                    url: "<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>",
+                    data: {
+                        gameId: <%=game.getId()%>,
+                        formType: 'createTest',
+                        test: editorTest.getValue()
+                    },
+                    success: function() {
+                        console.log("-------- DONE -----------");
+                    }
+                });
+            };
+        </script>
+
+        <%-- TODO Why progress bar here is handled differently than mutant submission ?! --%>
+        <%-- TODO: change back to registerTestProgressBar() --%>
+        <h3>Write a new JUnit test here
+            <button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
+                onClick="window.testProgressBar(); window.submitTest(this.form); this.disabled = true; this.value = 'Defending...';"
                 <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-				Defend!
-			</button>
-		</h3>
+                Defend!
+            </button>
+        </h3>
 
-		<form id="def" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post">
-			<%@include file="../game_components/test_editor.jsp"%>
-			<input type="hidden" name="formType" value="createTest">
-			<input type="hidden" name="gameId" value="<%= game.getId() %>" />
-		</form>
-		<%@include file="../game_components/editor_help_config_toolbar.jsp"%>
-		<%@include file="../game_components/error_highlighting.jsp" %>
-	</div>
+        <form id="def" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post" onsubmit="return false;">
+            <%@include file="../game_components/test_editor.jsp"%>
+            <input type="hidden" name="formType" value="createTest">
+            <input type="hidden" name="gameId" value="<%= game.getId() %>" />
+        </form>
+        <%@include file="../game_components/editor_help_config_toolbar.jsp"%>
+        <%@include file="../game_components/error_highlighting.jsp" %>
+    </div>
 </div>
 
 </div> <%-- TODO move the whole div here after changing the header --%>
@@ -115,7 +132,7 @@
     <div class="col-md-6" id="mutants-div">
         <h3>Existing Mutants</h3>
         <%@include file="../game_components/mutants_list.jsp"%>
-	</div>
+    </div>
 
     <div class="col-md-6">
         <h3>JUnit tests </h3>

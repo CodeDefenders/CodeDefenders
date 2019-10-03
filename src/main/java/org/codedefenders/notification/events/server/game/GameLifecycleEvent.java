@@ -1,9 +1,6 @@
 package org.codedefenders.notification.events.server.game;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import com.google.gson.annotations.Expose;
-import org.codedefenders.game.AbstractGame;
 import org.codedefenders.notification.events.server.ServerEvent;
 
 /**
@@ -13,19 +10,13 @@ import org.codedefenders.notification.events.server.ServerEvent;
  * @author gambi
  */
 public abstract class GameLifecycleEvent extends ServerEvent {
-    private AbstractGame game;
     @Expose private int gameId;
-
-    public GameLifecycleEvent(AbstractGame game) {
-        this.game = game;
-        this.gameId = game.getId();
-    }
-
-    public AbstractGame getGame() {
-        return game;
-    }
 
     public int getGameId() {
         return gameId;
+    }
+
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
     }
 }

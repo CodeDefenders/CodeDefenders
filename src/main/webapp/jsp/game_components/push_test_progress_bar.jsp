@@ -55,6 +55,7 @@
             progress.id = 'progress-bar';
             progress.style['height'] = '40px';
             progress.style['font-size'] = '30px';
+            progress.style['margin'] = '5px';
             progress.innerHTML = `<div class="progress-bar" role="progressbar"
                 style="font-size: 15px; line-height: 40px;"
                 aria-valuemin="0" aria-valuemax="100"></div>`;
@@ -63,7 +64,7 @@
             updateTestProgressBar('16', 'Submitting Test');
 
             const form = document.getElementById('logout');
-            form.parentNode.insertBefore(progressBar, form.nextSibling);
+            form.parentNode.insertBefore(progress, form.nextSibling);
         };
 
         <%--
@@ -73,41 +74,27 @@
         --%>
 
         const onTestSubmitted = function (data) {
-            updateTestProgressBar('33', 'Compiling Test');
-        };
-
-        const onTestCompiled = function (data) {
-            if (data.success) {
-                updateTestProgressBar('50', 'Validating Test');
-            } else {
-                // TODO
-            }
+            updateTestProgressBar('33', 'Validating Test');
         };
 
         const onTestValidated = function (data) {
             if (data.success) {
-                updateTestProgressBar('66', 'Running Test Against Mutants');
+                updateTestProgressBar('50', 'Compiling Test');
             } else {
                 // TODO
             }
+        };
+
+        const onTestCompiled = function (data) {
+            updateTestProgressBar('66', 'Running Test Against Original');
         };
 
         const onTestTestedOriginal = function (data) {
-            if (data.survived) {
-                updateTestProgressBar('83', 'Test Survived!');
-            } else {
-                // TODO
-                updateTestProgressBar('83', 'Test was Killed!');
-            }
+            updateTestProgressBar('83', 'Running Test Against Mutants');
         };
 
         const onTestTestedMutants = function (data) {
-            if (data.numKilled > 0) {
-                updateTestProgressBar('100', 'Test Killed ' + data.numKilled + ' Mutants!');
-            } else {
-                // TODO
-                updateTestProgressBar('100', 'Test Did Not Kill Any Mutants Yet!');
-            }
+            updateTestProgressBar('100', 'Done');
         };
 
         const registerTestProgressBar = function () {

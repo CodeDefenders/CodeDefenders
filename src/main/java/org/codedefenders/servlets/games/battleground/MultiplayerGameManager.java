@@ -49,6 +49,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
@@ -79,6 +80,11 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
+import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
+import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
+import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
+import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -109,9 +115,12 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private IMutationTester mutationTester;
-    
+
     @Inject
     private TestSmellsDAO testSmellsDAO;
+
+    @Inject
+    INotificationService notificationService;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -182,7 +191,7 @@ public class MultiplayerGameManager extends HttpServlet {
             }
             case "createTest": {
                 createTest(request, response, gameId, game);
-                // After a test is submitted, there's the chance that one or more mutants already survived enough tests 
+                // After a test is submitted, there's the chance that one or more mutants already survived enough tests
                 triggerAutomaticMutantEquivalenceForGame(game);
                 return;
             }
@@ -205,7 +214,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 Redirect.redirectBack(request, response);
         }
     }
-    
+
     // This is package protected to enable testing
     void triggerAutomaticMutantEquivalenceForGame(MultiplayerGame game) {
         int threshold = game.getAutomaticMutantEquivalenceThreshold();
@@ -270,6 +279,7 @@ public class MultiplayerGameManager extends HttpServlet {
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
+
         // Get the text submitted by the user.
         final Optional<String> test = ServletUtils.getStringParameter(request, "test");
         if (!test.isPresent()) {
@@ -279,11 +289,26 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         final String testText = test.get();
 
+        TestSubmittedEvent tse = new TestSubmittedEvent();
+        tse.setGameId(gameId);
+        tse.setUserId(userId);
+        notificationService.post(tse);
+
         // Do the validation even before creating the mutant
         // TODO Here we need to account for #495
         List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
-        if ( !  validationMessage.isEmpty() ) {
-            messages.addAll( validationMessage );
+
+        boolean success = validationMessage.isEmpty();
+
+        TestValidatedEvent tve = new TestValidatedEvent();
+        tve.setGameId(gameId);
+        tve.setUserId(userId);
+        tve.setSuccess(success);
+        tve.setValidationMessage(success ? null : String.join("", validationMessage));
+        notificationService.post(tve);
+
+        if (!success) {
+            messages.addAll(validationMessage);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
@@ -373,7 +398,7 @@ public class MultiplayerGameManager extends HttpServlet {
             session.setAttribute(SESSION_ATTRIBUTE_ERROR_LINES, errorLines);
             // We introduce our decoration
             String decorate = decorateWithLinksToCode(escapedHtml);
-            messages.add( decorate );
+            messages.add(decorate);
             //
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -403,6 +428,11 @@ public class MultiplayerGameManager extends HttpServlet {
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
 
+        TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
+        ttme.setGameId(gameId);
+        ttme.setUserId(userId);
+        notificationService.post(ttme);
+
         // Clean up the session
         session.removeAttribute("selected_lines");
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -410,7 +440,6 @@ public class MultiplayerGameManager extends HttpServlet {
 
     /**
      * Return the line numbers mentioned in the error message of the compiler
-     * @param message
      * @return
      */
     List<Integer> extractErrorLines(String compilerOutput) {
@@ -447,8 +476,8 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         return decorated.toString();
     }
-    
-    
+
+
 
     private void createMutant(HttpServletRequest request, HttpServletResponse response, int gameId, MultiplayerGame game) throws IOException {
         final int userId = ServletUtils.userId(request);
@@ -535,7 +564,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode( escapedHtml );
                 messages.add( decorate );
-                
+
             }
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -634,7 +663,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             final String testText = test.get();
-            
+
             // TODO Duplicate code here !
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             // Do the validation even before creating the mutant
@@ -646,7 +675,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
-            
+
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             Test newTest;
             try {

@@ -55,6 +55,7 @@
             progress.id = 'progress-bar';
             progress.style['height'] = '40px';
             progress.style['font-size'] = '30px';
+            progress.style['margin'] = '5px';
             progress.innerHTML = `<div class="progress-bar" role="progressbar"
                 style="font-size: 15px; line-height: 40px;"
                 aria-valuemin="0" aria-valuemax="100"></div>`;
@@ -63,7 +64,7 @@
             updateMutantProgressBar('16', 'Submitting Test');
 
             const form = document.getElementById('logout');
-            form.parentNode.insertBefore(progressBar, form.nextSibling);
+            form.parentNode.insertBefore(progress, form.nextSibling);
         };
 
         <%--

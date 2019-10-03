@@ -12,21 +12,27 @@ import java.io.IOException;
 public class MutantProgressBarEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(MutantProgressBarEventHandler.class);
 
-    private final PushSocket socket;
-    private int playerId;
+    private PushSocket socket;
+    private int gameId;
+    private int userId;
 
-    public MutantProgressBarEventHandler(PushSocket socket, int playerId) {
+    public MutantProgressBarEventHandler(PushSocket socket, int gameId, int userId) {
         this.socket = socket;
-        this.playerId = playerId;
+        this.gameId = gameId;
+        this.userId = userId;
     }
 
-    public int getPlayerId() {
-        return playerId;
+    public int getGameId() {
+        return gameId;
+    }
+
+    public int getUserId() {
+        return userId;
     }
 
     @Subscribe
     public void updateProgressBar(MutantLifecycleEvent event) throws IOException, EncodeException {
-        if (this.playerId == event.getMutant().getPlayerId()) {
+        if (this.gameId == event.getGameId() || this.userId == event.getUserId()) {
             socket.sendEvent(event);
         }
     }

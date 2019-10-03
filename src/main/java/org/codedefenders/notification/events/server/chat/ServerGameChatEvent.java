@@ -18,13 +18,6 @@ public class ServerGameChatEvent extends ServerChatEvent {
 
     private int gameId;
 
-    public ServerGameChatEvent(User user, String message, int gameId, Role role, boolean isAllChat) {
-        super(user, message);
-        this.gameId = gameId;
-        this.role = role;
-        this.isAllChat = isAllChat;
-    }
-
     public int getGameId() {
         return gameId;
     }
@@ -35,5 +28,17 @@ public class ServerGameChatEvent extends ServerChatEvent {
 
     public boolean isAllChat() {
         return isAllChat;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public void setAllChat(boolean allChat) {
+        isAllChat = allChat;
+    }
+
+    public void setGameId(int gameId) {
+        this.gameId = gameId;
     }
 }

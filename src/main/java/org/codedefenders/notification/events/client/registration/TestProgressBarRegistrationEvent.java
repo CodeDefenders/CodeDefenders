@@ -10,8 +10,8 @@ import org.codedefenders.notification.handling.ClientEventHandler;
  * This includes:
  * <ul>
  * <li>{@link TestSubmittedEvent}</li>
- * <li>{@link TestCompiledEvent}</li>
  * <li>{@link TestValidatedEvent}</li>
+ * <li>{@link TestCompiledEvent}</li>
  * <li>{@link TestTestedOriginalEvent}</li>
  * <li>{@link TestTestedMutantsEvent}</li>
  * </ul>

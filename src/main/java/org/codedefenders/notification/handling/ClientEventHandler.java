@@ -37,12 +37,14 @@ public class ClientEventHandler {
             return;
         }
 
-        ServerGameChatEvent serverEvent = new ServerGameChatEvent(
-                user,
-                event.getMessage(),
-                event.getGameId(),
-                role,
-                event.isAllChat());
+        ServerGameChatEvent serverEvent = new ServerGameChatEvent();
+        serverEvent.setMessage(event.getMessage());
+        serverEvent.setSenderId(user.getId());
+        serverEvent.setSenderName(user.getUsername());
+        serverEvent.setAllChat(event.isAllChat());
+        serverEvent.setGameId(event.getGameId());
+        serverEvent.setRole(role);
+
         notificationService.post(serverEvent);
     }
 

@@ -61,18 +61,12 @@ public class ServerEventHandler {
     }
 
     public void handleRegistrationEvent(MutantProgressBarRegistrationEvent event) {
-        int playerId = PlayerDAO.getPlayerIdForUserAndGame(user.getId(), event.getGameId());
-        if (playerId == -1) {
-            logger.warn("Tried to register/unregister for events for a game the user is not playing in.");
-            return;
-        }
-
         if (event.getAction() == RegistrationEvent.Action.REGISTER) {
             if (mutantProgressBarEventHandler != null) {
                 logger.warn("Tried to register event handler when handler for this type already registered.");
                 return;
             }
-            mutantProgressBarEventHandler = new MutantProgressBarEventHandler(socket, playerId);
+            mutantProgressBarEventHandler = new MutantProgressBarEventHandler(socket, event.getGameId(), user.getId());
             notificationService.register(mutantProgressBarEventHandler);
 
         } else if (event.getAction() == RegistrationEvent.Action.UNREGISTER) {
@@ -80,7 +74,7 @@ public class ServerEventHandler {
                 logger.warn("Tried to unregister event handler that is not registered.");
                 return;
             }
-            if (playerId != mutantProgressBarEventHandler.getPlayerId()) {
+            if (event.getGameId() != testProgressBarEventHandler.getGameId()) {
                 logger.warn("Unregistered event handler with different values as registered.");
             }
             notificationService.unregister(mutantProgressBarEventHandler);
@@ -89,18 +83,12 @@ public class ServerEventHandler {
     }
 
     public void handleRegistrationEvent(TestProgressBarRegistrationEvent event) {
-        int playerId = PlayerDAO.getPlayerIdForUserAndGame(user.getId(), event.getGameId());
-        if (playerId == -1) {
-            logger.warn("Tried to register/unregister for events for a game the user is not playing in.");
-            return;
-        }
-
         if (event.getAction() == RegistrationEvent.Action.REGISTER) {
             if (testProgressBarEventHandler != null) {
                 logger.warn("Tried to register event handler when handler for this type already registered.");
                 return;
             }
-            testProgressBarEventHandler = new TestProgressBarEventHandler(socket, playerId);
+            testProgressBarEventHandler = new TestProgressBarEventHandler(socket, event.getGameId(), user.getId());
             notificationService.register(testProgressBarEventHandler);
 
         } else if (event.getAction() == RegistrationEvent.Action.UNREGISTER) {
@@ -108,7 +96,7 @@ public class ServerEventHandler {
                 logger.warn("Tried to unregister event handler that is not registered.");
                 return;
             }
-            if (playerId != testProgressBarEventHandler.getPlayerId()) {
+            if (event.getGameId() != testProgressBarEventHandler.getGameId()) {
                 logger.warn("Unregistered event handler with different values as registered.");
             }
             notificationService.unregister(testProgressBarEventHandler);

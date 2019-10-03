@@ -286,7 +286,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         /*
          * Publish the event that a new game started
          */
-        notificationService.post(new GameCreatedEvent(nGame));
+        GameCreatedEvent gce = new GameCreatedEvent();
+        gce.setGameId(nGame.getId());
+        notificationService.post(gce);
 
 
         // Redirect to admin interface
@@ -345,7 +347,11 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 /*
                  * Publish the event about the user
                  */
-                notificationService.post(new GameJoinedEvent(game, user));
+                GameJoinedEvent gje = new GameJoinedEvent();
+                gje.setGameId(game.getId());
+                gje.setUserId(user.getId());
+                gje.setUserName(user.getUsername());
+                notificationService.post(gje);
 
                 response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             } else {
@@ -359,7 +365,11 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 /*
                  * Publish the event about the user
                  */
-                notificationService.post(new GameJoinedEvent(game, user));
+                GameJoinedEvent gje = new GameJoinedEvent();
+                gje.setGameId(game.getId());
+                gje.setUserId(userId);
+                gje.setUserName(user.getUsername());
+                notificationService.post(gje);
 
                 response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             } else {
@@ -417,8 +427,11 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
          * Publish the event about the user
          */
         User user = UserDAO.getUserById(userId);
-        notificationService.post(new GameLeftEvent(game, user));
 
+        GameLeftEvent gle = new GameLeftEvent();
+        gle.setGameId(game.getId());
+        gle.setUserId(user.getId());
+        gle.setUserName(user.getUsername());
 
         response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
     }
@@ -447,7 +460,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         /*
          * Publish the event about the user
          */
-        notificationService.post(new GameStartedEvent(game));
+        GameStartedEvent gse = new GameStartedEvent();
+        gse.setGameId(game.getId());
+        notificationService.post(gse);
 
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
     }
@@ -478,7 +493,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             /*
              * Publish the event about the user
              */
-            notificationService.post(new GameStoppedEvent(game));
+            GameStoppedEvent gse = new GameStoppedEvent();
+            gse.setGameId(game.getId());
+            notificationService.post(gse);
 
             response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_SELECTION);
         } else {

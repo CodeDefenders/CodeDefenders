@@ -1,24 +1,10 @@
 package org.codedefenders.notification.events.server.game;
 
 import com.google.gson.annotations.Expose;
-import org.codedefenders.game.AbstractGame;
-import org.codedefenders.model.User;
 
 public class GameJoinedEvent extends GameLifecycleEvent {
-    private User user;
     @Expose private int userId;
     @Expose private String userName;
-
-    public GameJoinedEvent(AbstractGame game, User user) {
-        super(game);
-        this.user = user;
-        this.userId = user.getId();
-        this.userName = user.getUsername();
-    }
-
-    public User getUser() {
-        return user;
-    }
 
     public int getUserId() {
         return userId;
@@ -26,5 +12,13 @@ public class GameJoinedEvent extends GameLifecycleEvent {
 
     public String getUserName() {
         return userName;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

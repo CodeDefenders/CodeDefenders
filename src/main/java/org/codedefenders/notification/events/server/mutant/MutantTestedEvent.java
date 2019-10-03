@@ -1,19 +1,11 @@
 package org.codedefenders.notification.events.server.mutant;
 
 import com.google.gson.annotations.Expose;
-import org.codedefenders.game.Mutant;
 
 public class MutantTestedEvent extends MutantLifecycleEvent {
     @Expose private boolean survived;
     @Expose private int numTests;
     @Expose private int numKilled;
-
-    public MutantTestedEvent(Mutant mutant, boolean survived, int numTests, int numKilled) {
-        super(mutant);
-        this.survived = survived;
-        this.numTests = numTests;
-        this.numKilled = numKilled;
-    }
 
     public boolean isSurvived() {
         return survived;
@@ -25,5 +17,17 @@ public class MutantTestedEvent extends MutantLifecycleEvent {
 
     public int getNumKilled() {
         return numKilled;
+    }
+
+    public void setSurvived(boolean survived) {
+        this.survived = survived;
+    }
+
+    public void setNumTests(int numTests) {
+        this.numTests = numTests;
+    }
+
+    public void setNumKilled(int numKilled) {
+        this.numKilled = numKilled;
     }
 }
