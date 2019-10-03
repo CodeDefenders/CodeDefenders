@@ -18,80 +18,129 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.model.NotificationType"%>
+<%@ page import="org.codedefenders.notification.events.EventNames" %>
+<%@ page import="org.codedefenders.notification.events.client.registration.TestProgressBarRegistrationEvent" %>
+<%@ page import="org.codedefenders.notification.events.server.test.TestSubmittedEvent" %>
+<%@ page import="org.codedefenders.notification.events.server.test.TestCompiledEvent" %>
+<%@ page import="org.codedefenders.notification.events.server.test.TestValidatedEvent" %>
+<%@ page import="org.codedefenders.notification.events.server.test.TestTestedOriginalEvent" %>
+<%@ page import="org.codedefenders.notification.events.server.test.TestTestedMutantsEvent" %>
+
+<%--
+    Adds a JavaScript function testProgressBar() that inserts and updates a progressbar showing the status of the last
+    submitted test. The progressbar is inserted after #logout. It gets progressbar updates from the WebSocket.
+
+    @param Integer gameId
+        The id of the game.
+--%>
+
+<%-- TODO: put the progressbar into the html and just reference it here? --%>
 
 <script>
-    // Define the handler for the progress bar message and register that to websocket
-    var progressBarUpdateHandler = function(message) {
-        // Do we need to remove the bar or it will go away by itself ?
-        if (message['type'] == 'PROGRESSBAR') {
-            console.log("Got event for progress bar" + message)
-            var progressBar = document.getElementById("progress-bar");
-            // Create the Div to host the progress bar if that's not there
-            if (progressBar == null) {
-                // Load the progress bar
-                progressBar = document.createElement('div');
-                progressBar.setAttribute('class', 'progress');
-                progressBar.setAttribute('id', 'progress-bar');
-                progressBar.setAttribute('style',
-                        'height: 40px; font-size: 30px');
-                var form = document.getElementById('logout');
-                // Insert progress bar right under logout... this will conflicts with the other push-events
-                form.parentNode.insertBefore(progressBar, form.nextSibling);
-            }
-            // Update the message in the progress bar
-            switch (message['message']) {
-            case 'NEW_TEST':
-            	progressBar.innerHTML = '<div class="progress-bar progress-bar-info" role="progressbar" style="width: 25%; font-size: 15px; line-height: 40px;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Validating and Compiling the Test</div>';
-                break;
-            case 'COMPILE_TEST': // After test is compiled
-            	progressBar.innerHTML='<div class="progress-bar progress-bar-info" role="progressbar" style="width: 50%; font-size: 15px; line-height: 40px;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">Running Test Against Original</div>';
-                break;
-            case "TEST_ORIGINAL": // After testing original
-            	progressBar.innerHTML='<div class="progress-bar progress-bar-success" role="progressbar" style="width: 75%; font-size: 15px; line-height: 40px;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">Running Test Against first Mutant</div>';
-                break;
-            case "TEST_MUTANT":
-            	progressBar.innerHTML='<div class="progress-bar progress-bar-success" role="progressbar" style="width: 90%; font-size: 15px; line-height: 40px;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">Running Test Against more Mutants</div>';
-                break;
-            case 'TEST_DONE':
-            	progressBar.innerHTML='<div class="progress-bar progress-bar-success" role="progressbar" style="width: 100%; font-size: 15px; line-height: 40px;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Running Test Against more Mutants</div>';
-            	// Remove the bar from the DOM
-                progressBar.parentNode.removeChild(progressBar);
-                // Deregister progress bar
-                var registration = {};
-                registration['type'] = "org.codedefenders.notification.web.PushSocketRegistrationEvent";
-                registration['action'] = "UNREGISTER";
-                registration['gameID'] = <%=request.getAttribute("gameId")%>;
-                registration['playerID'] = <%=request.getAttribute("playerId")%>;
-                registration['event'] = "PROGRESSBAR_EVENT";
+    /* Wrap in a function so it has it's own scope. */
+    (function () {
 
-                // This ensures that connection is open. Will retry otherwise
-                sendMessage(JSON.stringify(registration));
-                console.log("Test progress bar unregistered " + JSON.stringify(registration) )
+        let progress;
+        let progressBar;
 
-                break;
-            }
-
+        function updateTestProgressBar (progress, text) {
+            progressBar.setAttribute('aria-valuenow', progress);
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = text;
         }
-    }
 
-    // Send a registration messaget to the WebSocket
-    // Registration is done while submitting the mutant
-    function registerTestProgressBar(){
-        var registration = {};
-        registration['type'] = "org.codedefenders.notification.web.PushSocketRegistrationEvent";
-        registration['gameID'] = <%=request.getAttribute("gameId")%>;
-        registration['playerID'] = <%=request.getAttribute("playerId")%>;
-        registration['event'] = "PROGRESSBAR_EVENT";
+        const insertTestProgressBar = function () {
+            progress = document.createElement('div');
+            progress.classList.add('progress');
+            progress.id = 'progress-bar';
+            progress.style['height'] = '40px';
+            progress.style['font-size'] = '30px';
+            progress.innerHTML = `<div class="progress-bar" role="progressbar"
+                style="font-size: 15px; line-height: 40px;"
+                aria-valuemin="0" aria-valuemax="100"></div>`;
+            progressBar = progress.children[0];
 
-        // This ensures that connection is open. Will retry otherwise
-        sendMessage(JSON.stringify(registration));
-        console.log("Test progress bar registered " + JSON.stringify(registration) )
+            updateTestProgressBar('16', 'Submitting Test');
 
-        // This will be automatically unregisterd @OnClose or via unregistration message
-        notificationMessageHandlers.push(progressBarUpdateHandler);
-        console.log("Progress bar handler registered")
-    }
+            const form = document.getElementById('logout');
+            form.parentNode.insertBefore(progressBar, form.nextSibling);
+        };
 
+        <%--
+        function removeTestProgressBar () {
+            progress.parentNode.removeChild(progress);
+        }
+        --%>
+
+        const onTestSubmitted = function (data) {
+            updateTestProgressBar('33', 'Compiling Test');
+        };
+
+        const onTestCompiled = function (data) {
+            if (data.success) {
+                updateTestProgressBar('50', 'Validating Test');
+            } else {
+                // TODO
+            }
+        };
+
+        const onTestValidated = function (data) {
+            if (data.success) {
+                updateTestProgressBar('66', 'Running Test Against Mutants');
+            } else {
+                // TODO
+            }
+        };
+
+        const onTestTestedOriginal = function (data) {
+            if (data.survived) {
+                updateTestProgressBar('83', 'Test Survived!');
+            } else {
+                // TODO
+                updateTestProgressBar('83', 'Test was Killed!');
+            }
+        };
+
+        const onTestTestedMutants = function (data) {
+            if (data.numKilled > 0) {
+                updateTestProgressBar('100', 'Test Killed ' + data.numKilled + ' Mutants!');
+            } else {
+                // TODO
+                updateTestProgressBar('100', 'Test Did Not Kill Any Mutants Yet!');
+            }
+        };
+
+        const registerTestProgressBar = function () {
+            pushSocket.subscribe('<%=EventNames.toClientEventName(TestProgressBarRegistrationEvent.class)%>', {
+                gameId: ${requestScope.gameId}
+            });
+
+            pushSocket.register('<%=EventNames.toServerEventName(TestSubmittedEvent.class)%>',      onTestSubmitted);
+            pushSocket.register('<%=EventNames.toServerEventName(TestCompiledEvent.class)%>',       onTestCompiled);
+            pushSocket.register('<%=EventNames.toServerEventName(TestValidatedEvent.class)%>',      onTestValidated);
+            pushSocket.register('<%=EventNames.toServerEventName(TestTestedOriginalEvent.class)%>', onTestTestedOriginal);
+            pushSocket.register('<%=EventNames.toServerEventName(TestTestedMutantsEvent.class)%>',  onTestTestedMutants);
+        };
+
+        <%--
+        const unregisterTestProgressBar = function () {
+            pushSocket.unsubscribe('<%=EventNames.toClientEventName(TestProgressBarRegistrationEvent.class)%>', {
+                playerId: ${requestScope.playerId}
+            });
+
+            pushSocket.unregister('<%=EventNames.toServerEventName(TestSubmittedEvent.class)%>',      onTestSubmitted);
+            pushSocket.unregister('<%=EventNames.toServerEventName(TestCompiledEvent.class)%>',       onTestCompiled);
+            pushSocket.unregister('<%=EventNames.toServerEventName(TestValidatedEvent.class)%>',      onTestValidated);
+            pushSocket.unregister('<%=EventNames.toServerEventName(TestTestedOriginalEvent.class)%>', onTestTestedOriginal);
+            pushSocket.unregister('<%=EventNames.toServerEventName(TestTestedMutantsEvent.class)%>',  onTestTestedMutants);
+        };
+        --%>
+
+        window.testProgressBar = function () {
+            insertTestProgressBar();
+            registerTestProgressBar();
+        };
+    })();
 </script>
+
 

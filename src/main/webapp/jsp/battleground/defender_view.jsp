@@ -35,7 +35,7 @@
 	request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
 	List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
-    
+
 	if (previousTestCode != null) {
 		request.setAttribute("testCode", previousTestCode);
 		/* error_highlighting */
@@ -86,14 +86,14 @@
 	</div>
 
 	<div class="col-md-6" id="utest-div">
-		<%@include file="../game_components/test_progress_bar.jsp"%>
-		<%--<%@include file="../game_components/push_test_progress_bar.jsp"%>--%>
+		<%--<%@include file="../game_components/test_progress_bar.jsp"%>--%>
+		<jsp:include page="../game_components/push_test_progress_bar.jsp"/>
 
 		<%-- TODO Why progress bar here is handled differently than mutant submission ?! --%>
 		<%-- TODO: change back to registerTestProgressBar() --%>
 		<h3>Write a new JUnit test here
 			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
-                onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
+                onClick="testProgressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
                 <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
 				Defend!
 			</button>
