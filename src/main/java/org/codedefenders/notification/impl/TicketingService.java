@@ -1,5 +1,6 @@
 package org.codedefenders.notification.impl;
 
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -20,7 +21,7 @@ public class TicketingService implements ITicketingService {
 
     @Override
     public synchronized String generateTicketForOwner(Integer owner) {
-        // TODO Validate. Owner cannot be null !
+        Objects.requireNonNull(owner);
         String ticket = UUID.randomUUID().toString();
         tickets.put(ticket, owner);
         return ticket;

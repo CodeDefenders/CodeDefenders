@@ -73,6 +73,7 @@ public class PushSocket {
     // Authorization
     private User user;
     private String ticket;
+    private boolean open;
 
     // Event handler
     private ClientEventHandler clientEventHandler;
@@ -99,6 +100,8 @@ public class PushSocket {
         } catch (NamingException e) {
             e.printStackTrace();
         }
+
+        open = false;
     }
 
     @OnOpen
@@ -124,13 +127,18 @@ public class PushSocket {
         this.serverEventHandler = new ServerEventHandler(notificationService, this, user);
         this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandler, user);
         this.session = session;
+
+        open = true;
     }
 
     @OnClose
     public void close(Session session) {
-        logger.info("Closing session for user: " + user.getId() + " (ticket: " + ticket + ")");
-        ticketingServices.invalidateTicket(this.ticket);
-        serverEventHandler.unregisterAll();
+        /* Close is called before open when the connection is denied. */
+        if (open) {
+            logger.info("Closing session for user: " + user.getId() + " (ticket: " + ticket + ")");
+            ticketingServices.invalidateTicket(this.ticket);
+            serverEventHandler.unregisterAll();
+        }
     }
 
     @OnMessage
