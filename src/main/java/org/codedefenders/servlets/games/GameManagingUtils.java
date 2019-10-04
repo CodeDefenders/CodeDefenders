@@ -80,7 +80,7 @@ public class GameManagingUtils implements IGameManagingUtils {
     private TestSmellsDAO testSmellsDAO;
 
     @Inject
-    INotificationService notificationService;
+    private INotificationService notificationService;
 
     private static final Logger logger = LoggerFactory.getLogger(GameManagingUtils.class);
 

@@ -20,6 +20,7 @@ import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.ClassCompilerService;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.jboss.weld.junit4.WeldInitiator;
 import org.junit.Assert;
@@ -62,8 +63,14 @@ public class GameManagingUtilsTest {
 
     @Rule
     public WeldInitiator weld = WeldInitiator
-            .from(GameManagingUtils.class, GameManagingUtilsTest.class, TestSmellDetectorProducer.class).inject(this)
-            .activate(RequestScoped.class).build();// ofTestPackage();
+            .from(GameManagingUtils.class,
+                    GameManagingUtilsTest.class,
+                    TestSmellDetectorProducer.class,
+                    NotificationService.class)
+            .inject(this)
+            .activate(RequestScoped.class)
+            .activate(ApplicationScoped.class)
+            .build();// ofTestPackage();
 
     @ApplicationScoped
     @Produces
@@ -86,11 +93,11 @@ public class GameManagingUtilsTest {
 
     @Inject
     // Testing configuration ?
-    public GameManagingUtils gameManagingUtils;
+    private GameManagingUtils gameManagingUtils;
 
     private GameClass createMockedCUT() throws IOException {
         String originalCode = "" //
-                + "public class Lift {" + "\n" // 
+                + "public class Lift {" + "\n" //
                 + "private int topFloor;" + "\n"//
                 + "private int currentFloor=0;" + "\n"//
                 + "public Lift(int highestFloor) { this.topFloor = highestFloor;}" + "\n" //
