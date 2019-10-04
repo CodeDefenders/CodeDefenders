@@ -148,6 +148,8 @@
 								<include>**/*.css</include>
 								<include>images/*.*</include>
 								<include>papers/*.*</include>
+                                <include>project-exporter/*</include>
+                                <include>project-exporter/gradle/wrapper/*</include>
 								<include>fonts/*.*</include>
 								<include>codemirror/**.*</include>
 								<include>codemirror/bin/*</include>

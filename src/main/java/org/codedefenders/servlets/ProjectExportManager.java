@@ -7,7 +7,6 @@ import org.codedefenders.game.Role;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Constants;
 import org.codedefenders.util.ZipFileUtils;
 
 import java.io.IOException;
@@ -42,7 +41,7 @@ public class ProjectExportManager extends HttpServlet {
 
     private static final Path mainDir = Paths.get("src/main/java");
     private static final Path testDir = Paths.get("src/test/java");
-    private static final Path gradleDir = Paths.get(Constants.DATA_DIR).resolve("project-exporter");
+    private static final Path exporterDir = Paths.get("project-exporter");
 
     private static final String[] gradleFiles = {
         "build.gradle",
@@ -91,6 +90,7 @@ public class ProjectExportManager extends HttpServlet {
             files.put(filePath, fileContent);
         }
 
+        Path gradleDir = Paths.get(getServletContext().getRealPath("/")).resolve(exporterDir);
         for (String gradleFilePath : gradleFiles) {
             byte[] fileContent = Files.readAllBytes(gradleDir.resolve(gradleFilePath));
             files.put(gradleFilePath, fileContent);
@@ -106,4 +106,5 @@ public class ProjectExportManager extends HttpServlet {
         out.flush();
         out.close();
     }
+
 }
