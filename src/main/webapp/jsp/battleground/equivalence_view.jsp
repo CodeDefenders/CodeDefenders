@@ -61,7 +61,13 @@
 <div class="row">
     <div class="col-md-6" id="equivmut-div">
         <%@include file="../game_components/test_progress_bar.jsp"%>
-        <h3>Mutant <%= equivMutant.getId() %> Claimed Equivalent by <%= equivDefender.getUsername() %></h3>
+        <h3>Mutant <%= equivMutant.getId() %>
+        <!-- check for automatically triggered equivalence duels (IDs less than 100 are dedicated for system users) -->
+        <% if (equivDefender.getId() > 100) { %>
+            claimed equivalent by <%= equivDefender.getUsername() %></h3>
+        <% } else { %>
+            automatically claimed equivalent</h3>
+        <% } %>
 
         <div style="border: 5px dashed #f00; border-radius: 10px; width: 100%; padding: 10px;">
             <p><%=String.join("\n", equivMutant.getHTMLReadout())%></p>
