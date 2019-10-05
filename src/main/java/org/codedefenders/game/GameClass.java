@@ -286,8 +286,8 @@ public class GameClass {
             // Additional import are already in the form of 'import X.Y.Z;\n'
             bob.append(additionalImport); // no \n required
         }
-        bob.append("\n");
 
+        // basic imports contains a new line between dynamic and static imports
         for (String importEntry : BASIC_IMPORTS) {
             bob.append(importEntry).append("\n");
         }
@@ -331,7 +331,9 @@ public class GameClass {
         for (int i = 0; i < templateLines.length; i++) {
             Matcher matcher = TEST_METHOD_PATTERN.matcher(templateLines[i]);
             if (matcher.find()) {
-                return i + 1;
+                // +1 because line index starts at 1
+                // +1 because the next line should be editable
+                return i + 2;
             }
         }
         logger.warn("Test template for {} does not contain valid test method.", name);
