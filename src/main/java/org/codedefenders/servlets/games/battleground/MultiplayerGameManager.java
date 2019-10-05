@@ -109,7 +109,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private IMutationTester mutationTester;
-    
+
     @Inject
     private TestSmellsDAO testSmellsDAO;
 
@@ -144,6 +144,10 @@ public class MultiplayerGameManager extends HttpServlet {
                 .filter(m -> m.getPlayerId() == playerId)
                 .findFirst()
                 .ifPresent(mutant -> {
+                    int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
+                    User defender = UserDAO.getUserForPlayer(defenderId);
+
+                    request.setAttribute("equivDefender", defender);
                     request.setAttribute("equivMutant", mutant);
                     request.setAttribute("openEquivalenceDuel", true);
                 });
@@ -182,7 +186,7 @@ public class MultiplayerGameManager extends HttpServlet {
             }
             case "createTest": {
                 createTest(request, response, gameId, game);
-                // After a test is submitted, there's the chance that one or more mutants already survived enough tests 
+                // After a test is submitted, there's the chance that one or more mutants already survived enough tests
                 triggerAutomaticMutantEquivalenceForGame(game);
                 return;
             }
@@ -205,7 +209,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 Redirect.redirectBack(request, response);
         }
     }
-    
+
     // This is package protected to enable testing
     void triggerAutomaticMutantEquivalenceForGame(MultiplayerGame game) {
         int threshold = game.getAutomaticMutantEquivalenceThreshold();
@@ -447,8 +451,8 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         return decorated.toString();
     }
-    
-    
+
+
 
     private void createMutant(HttpServletRequest request, HttpServletResponse response, int gameId, MultiplayerGame game) throws IOException {
         final int userId = ServletUtils.userId(request);
@@ -535,7 +539,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode( escapedHtml );
                 messages.add( decorate );
-                
+
             }
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -634,7 +638,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             final String testText = test.get();
-            
+
             // TODO Duplicate code here !
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             // Do the validation even before creating the mutant
@@ -646,7 +650,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
-            
+
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             Test newTest;
             try {
