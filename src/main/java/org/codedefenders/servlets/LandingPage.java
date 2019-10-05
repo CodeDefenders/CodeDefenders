@@ -24,7 +24,7 @@ import static org.codedefenders.servlets.util.ServletUtils.ctx;
  * {@code GET} requests redirects to a landing page, depending whether
  * the requesting user is logged in or not.
  * <p>
- * Serves under {@code /games/overview}.
+ * Serves under {@code /}.
  *
  * @author <a href="https://github.com/werli">Phil Werli<a/>
  * @see org.codedefenders.util.Paths#LANDING_PAGE
