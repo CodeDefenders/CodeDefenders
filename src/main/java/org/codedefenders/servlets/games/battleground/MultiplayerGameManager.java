@@ -42,6 +42,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -49,6 +50,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
@@ -64,6 +66,7 @@ import org.codedefenders.database.IntentionDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.database.TestDAO;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.IMutationTester;
@@ -217,10 +220,28 @@ public class MultiplayerGameManager extends HttpServlet {
         for (Mutant aliveMutant : game.getAliveMutants()) {
             /*
              * If the mutant is covered by enough tests trigger the automatic
-             * equivalence duel
+             * equivalence duel. Consider ONLY the coveringTests submitted after the mutant was created
              */
-            int coveringTests = aliveMutant.getCoveringTests().size();
-            if (coveringTests >= threshold) {
+            // TODO Ideally one would use something like this. Howevever, no Test nor Mutant have the timestamp attribute, despite this attribute is set in the DB
+//            int coveringTests = aliveMutant.getCoveringTests().stream().filter( t -> t.getTimestamp().before( aliveMutant.getTimestamp())).count();
+            // Take the intersection of the two sets: to obtain the covering but submitted after
+            // TODO Since Test does not re-implement hash and equalsTo this does not work !
+            // allCoveringTests.retainAll( testSubmittedAfterMutant );
+            
+            Set<Integer> allCoveringTests = aliveMutant.getCoveringTests().stream()
+                    .map(t ->  t.getId() )
+                    .collect(Collectors.toSet());
+
+            boolean considerOnlydefenders = false;
+            Set<Integer> testSubmittedAfterMutant = TestDAO.getValidTestsForGameSubmittedAfterMutant(game.getId(), considerOnlydefenders, aliveMutant).stream()
+                    .map(t ->  t.getId() )
+                    .collect(Collectors.toSet());
+
+            allCoveringTests.retainAll( testSubmittedAfterMutant );
+            
+            int numberOfCoveringTestsSubmittedAfterMutant = allCoveringTests.size();
+            
+            if (numberOfCoveringTestsSubmittedAfterMutant  >= threshold) {
                 // Flag the mutant as possibly equivalent
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                 aliveMutant.update();
