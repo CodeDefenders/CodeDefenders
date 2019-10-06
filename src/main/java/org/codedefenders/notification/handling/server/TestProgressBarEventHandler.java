@@ -9,8 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.websocket.EncodeException;
 import java.io.IOException;
+import java.util.Objects;
 
-public class TestProgressBarEventHandler {
+public class TestProgressBarEventHandler implements ServerEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(TestProgressBarEventHandler.class);
 
     private final PushSocket socket;
@@ -36,5 +37,23 @@ public class TestProgressBarEventHandler {
         if (this.gameId == event.getGameId() || this.userId == event.getUserId()) {
             socket.sendEvent(event);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        TestProgressBarEventHandler that = (TestProgressBarEventHandler) o;
+        return gameId == that.gameId
+                && userId == that.userId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gameId, userId);
     }
 }

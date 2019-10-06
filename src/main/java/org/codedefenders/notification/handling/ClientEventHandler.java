@@ -17,23 +17,24 @@ public class ClientEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(ClientEventHandler.class);
 
     private INotificationService notificationService;
-    private ServerEventHandler serverEventHandler;
+    private ServerEventHandlerContainer serverEventHandlerContainer;
     private User user;
 
     public ClientEventHandler(
             INotificationService notificationService,
-            ServerEventHandler serverEventHandler,
+            ServerEventHandlerContainer serverEventHandlerContainer,
             User user) {
         this.notificationService = notificationService;
-        this.serverEventHandler = serverEventHandler;
+        this.serverEventHandlerContainer = serverEventHandlerContainer;
         this.user = user;
     }
 
     public void visit(ClientGameChatEvent event) {
         Role role = DatabaseAccess.getRole(user.getId(), event.getGameId());
 
-        if (role == null || role == Role.NONE) {
-            logger.warn("Tried to send chat message to game user is not playing in.");
+        if (role == null) {
+            logger.warn("User {} tried to send chat message to game {}, which the user is not playing in.",
+                    user.getId(), event.getGameId());
             return;
         }
 
@@ -49,18 +50,18 @@ public class ClientEventHandler {
     }
 
     public void visit(GameChatRegistrationEvent event) {
-        serverEventHandler.handleRegistrationEvent(event);
+        serverEventHandlerContainer.handleRegistrationEvent(event);
     }
 
     public void visit(MutantProgressBarRegistrationEvent event) {
-        serverEventHandler.handleRegistrationEvent(event);
+        serverEventHandlerContainer.handleRegistrationEvent(event);
     }
 
     public void visit(TestProgressBarRegistrationEvent event) {
-        serverEventHandler.handleRegistrationEvent(event);
+        serverEventHandlerContainer.handleRegistrationEvent(event);
     }
 
     public void visit(GameLifecycleRegistrationEvent event) {
-        serverEventHandler.handleRegistrationEvent(event);
+        serverEventHandlerContainer.handleRegistrationEvent(event);
     }
 }

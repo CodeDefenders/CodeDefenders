@@ -8,8 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.websocket.EncodeException;
 import java.io.IOException;
+import java.util.Objects;
 
-public class MutantProgressBarEventHandler {
+public class MutantProgressBarEventHandler implements ServerEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(MutantProgressBarEventHandler.class);
 
     private PushSocket socket;
@@ -35,5 +36,23 @@ public class MutantProgressBarEventHandler {
         if (this.gameId == event.getGameId() || this.userId == event.getUserId()) {
             socket.sendEvent(event);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        MutantProgressBarEventHandler that = (MutantProgressBarEventHandler) o;
+        return gameId == that.gameId
+                && userId == that.userId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gameId, userId);
     }
 }

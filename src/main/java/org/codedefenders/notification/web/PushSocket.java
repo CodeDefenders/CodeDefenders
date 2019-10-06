@@ -26,7 +26,7 @@ import org.codedefenders.notification.events.client.ClientEvent;
 import org.codedefenders.notification.events.server.ServerEvent;
 import org.codedefenders.notification.handling.ClientEventHandler;
 import org.codedefenders.notification.events.EventNames;
-import org.codedefenders.notification.handling.ServerEventHandler;
+import org.codedefenders.notification.handling.ServerEventHandlerContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +77,7 @@ public class PushSocket {
 
     // Event handler
     private ClientEventHandler clientEventHandler;
-    private ServerEventHandler serverEventHandler;
+    private ServerEventHandlerContainer serverEventHandlerContainer;
 
     private Session session;
 
@@ -124,8 +124,8 @@ public class PushSocket {
 
         this.user = user;
         this.ticket = ticket;
-        this.serverEventHandler = new ServerEventHandler(notificationService, this, user);
-        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandler, user);
+        this.serverEventHandlerContainer = new ServerEventHandlerContainer(notificationService, this, user);
+        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer, user);
         this.session = session;
 
         open = true;
@@ -137,7 +137,7 @@ public class PushSocket {
         if (open) {
             logger.info("Closing session for user: " + user.getId() + " (ticket: " + ticket + ")");
             ticketingServices.invalidateTicket(this.ticket);
-            serverEventHandler.unregisterAll();
+            serverEventHandlerContainer.unregisterAll();
         }
     }
 

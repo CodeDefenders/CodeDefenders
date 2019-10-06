@@ -9,8 +9,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.websocket.EncodeException;
 import java.io.IOException;
+import java.util.Objects;
 
-public class GameChatEventHandler {
+public class GameChatEventHandler implements ServerEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(GameChatEventHandler.class);
 
     private PushSocket socket;
@@ -36,5 +37,23 @@ public class GameChatEventHandler {
         if (event.getGameId() == this.gameId && (event.isAllChat() || event.getRole() == role)) {
             socket.sendEvent(event);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        GameChatEventHandler that = (GameChatEventHandler) o;
+        return gameId == that.gameId
+                && role == that.role;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(gameId, role);
     }
 }
