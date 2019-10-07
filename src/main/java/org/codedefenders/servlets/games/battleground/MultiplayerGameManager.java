@@ -71,10 +71,7 @@ import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Role;
-import org.codedefenders.game.Test;
+import org.codedefenders.game.*;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
 import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.DefenderIntention;
@@ -112,7 +109,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private IMutationTester mutationTester;
-    
+
     @Inject
     private TestSmellsDAO testSmellsDAO;
 
@@ -185,7 +182,7 @@ public class MultiplayerGameManager extends HttpServlet {
             }
             case "createTest": {
                 createTest(request, response, gameId, game);
-                // After a test is submitted, there's the chance that one or more mutants already survived enough tests 
+                // After a test is submitted, there's the chance that one or more mutants already survived enough tests
                 triggerAutomaticMutantEquivalenceForGame(game);
                 return;
             }
@@ -208,7 +205,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 Redirect.redirectBack(request, response);
         }
     }
-    
+
     // This is package protected to enable testing
     void triggerAutomaticMutantEquivalenceForGame(MultiplayerGame game) {
         int threshold = game.getAutomaticMutantEquivalenceThreshold();
@@ -227,7 +224,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // Take the intersection of the two sets: to obtain the covering but submitted after
             // TODO Since Test does not re-implement hash and equalsTo this does not work !
             // allCoveringTests.retainAll( testSubmittedAfterMutant );
-            
+
             Set<Integer> allCoveringTests = aliveMutant.getCoveringTests().stream()
                     .map(t ->  t.getId() )
                     .collect(Collectors.toSet());
@@ -238,9 +235,9 @@ public class MultiplayerGameManager extends HttpServlet {
                     .collect(Collectors.toSet());
 
             allCoveringTests.retainAll( testSubmittedAfterMutant );
-            
+
             int numberOfCoveringTestsSubmittedAfterMutant = allCoveringTests.size();
-            
+
             if (numberOfCoveringTestsSubmittedAfterMutant  >= threshold) {
                 // Flag the mutant as possibly equivalent
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
@@ -431,7 +428,6 @@ public class MultiplayerGameManager extends HttpServlet {
 
     /**
      * Return the line numbers mentioned in the error message of the compiler
-     * @param message
      * @return
      */
     List<Integer> extractErrorLines(String compilerOutput) {
@@ -468,8 +464,8 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         return decorated.toString();
     }
-    
-    
+
+
 
     private void createMutant(HttpServletRequest request, HttpServletResponse response, int gameId, MultiplayerGame game) throws IOException {
         final int userId = ServletUtils.userId(request);
@@ -556,7 +552,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 // We introduce our decoration
                 String decorate = decorateWithLinksToCode( escapedHtml );
                 messages.add( decorate );
-                
+
             }
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -655,7 +651,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
             final String testText = test.get();
-            
+
             // TODO Duplicate code here !
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             // Do the validation even before creating the mutant
@@ -667,7 +663,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
             }
-            
+
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             Test newTest;
             try {

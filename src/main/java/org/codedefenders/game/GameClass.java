@@ -31,14 +31,12 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -48,33 +46,6 @@ import java.util.stream.IntStream;
  * modifying it or creating test cases for it.
  */
 public class GameClass {
-
-    public final static List<String> BASIC_IMPORTS;
-    public final static List<String> MOCKITO_IMPORTS;
-
-    static {
-        BASIC_IMPORTS = Collections.unmodifiableList(
-                Arrays.asList(
-                        // Enable JUnit
-                        "import org.junit.*;",
-                        // Additional empty line to match IntelliJ import formatting.
-                        "",
-                        // Enable easy Assertions
-                        "import static org.junit.Assert.*;",
-                        // Enable Hamcrest assertThat
-                        "import static org.hamcrest.MatcherAssert.assertThat;",
-                        // Enable Hamcrest basic Matchers
-                        "import static org.hamcrest.Matchers.*;"
-                )
-        );
-        MOCKITO_IMPORTS =
-                Collections.unmodifiableList(
-                        Arrays.asList(
-                                // Enable Mockito
-                                "import static org.mockito.Mockito.*;"
-                        )
-                );
-    }
 
     private static final Logger logger = LoggerFactory.getLogger(GameClass.class);
 
@@ -90,15 +61,14 @@ public class GameClass {
 
     private boolean isActive;
 
+    private boolean visitedCode = false;
     private Set<String> additionalImports = new HashSet<>();
     // Store begin and end line which corresponds to uncoverable non-initializad fields
     private List<Integer> linesOfCompileTimeConstants = new ArrayList<>();
     private List<Integer> linesOfNonCoverableCode = new ArrayList<>();
     private List<Integer> nonInitializedFields = new ArrayList<>();
-    //
     private List<Integer> emptyLines = new ArrayList<>();
     private Map<Integer, Integer> linesCoveringEmptyLines = new HashMap<>();
-
     private List<Range<Integer>> linesOfMethods = new ArrayList<>();
     private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
     private List<Range<Integer>> linesOfClosingBrackets = new ArrayList<>();
@@ -125,8 +95,6 @@ public class GameClass {
         this.classFile = cFile;
         this.isMockingEnabled = isMockingEnabled;
         this.isActive = true;
-
-        visitCode();
     }
 
     public static GameClass ofPuzzleWithId(int id, String name, String alias, String javaFilePath, String classFilePath, boolean isMockingEnabled) {
@@ -143,16 +111,19 @@ public class GameClass {
     }
 
     private void visitCode() {
-        final CodeAnalysisResult visit = ClassCodeAnalyser.visitCode(this.name, this.getSourceCode());
-        this.additionalImports.addAll(visit.getAdditionalImports());
-        this.linesOfCompileTimeConstants.addAll(visit.getCompileTimeConstants());
-        this.linesOfNonCoverableCode.addAll(visit.getNonCoverableCode());
-        this.nonInitializedFields.addAll(visit.getNonInitializedFields());
-        this.linesOfMethods.addAll(visit.getMethods());
-        this.linesOfMethodSignatures.addAll(visit.getMethodSignatures());
-        this.linesOfClosingBrackets.addAll(visit.getClosingBrackets());
-        this.emptyLines.addAll(visit.getEmptyLines());
-        this.linesCoveringEmptyLines.putAll(visit.getLinesCoveringEmptyLines());
+        if (!this.visitedCode) {
+            final CodeAnalysisResult visit = ClassCodeAnalyser.visitCode(this.name, this.getSourceCode());
+            this.additionalImports.addAll(visit.getAdditionalImports());
+            this.linesOfCompileTimeConstants.addAll(visit.getCompileTimeConstants());
+            this.linesOfNonCoverableCode.addAll(visit.getNonCoverableCode());
+            this.nonInitializedFields.addAll(visit.getNonInitializedFields());
+            this.linesOfMethods.addAll(visit.getMethods());
+            this.linesOfMethodSignatures.addAll(visit.getMethodSignatures());
+            this.linesOfClosingBrackets.addAll(visit.getClosingBrackets());
+            this.emptyLines.addAll(visit.getEmptyLines());
+            this.linesCoveringEmptyLines.putAll(visit.getLinesCoveringEmptyLines());
+            this.visitedCode = true;
+        }
     }
 
     /**
@@ -200,6 +171,7 @@ public class GameClass {
      * @return
      */
     public Set<String> getAdditionalImports() {
+        visitCode();
         return new HashSet<>(additionalImports);
     }
 
@@ -274,38 +246,12 @@ public class GameClass {
      * @return template for a JUnit test as a {@link String}.
      * @see #getHTMLEscapedTestTemplate()
      */
-    private String getTestTemplate() {
-        final StringBuilder bob = new StringBuilder();
-        final String classPackage = getPackage();
-        if (!classPackage.isEmpty()) {
-            bob.append(String.format("package %s;\n", classPackage));
-            bob.append("\n");
-        }
-
-        for (String additionalImport : this.additionalImports) {
-            // Additional import are already in the form of 'import X.Y.Z;\n'
-            bob.append(additionalImport); // no \n required
-        }
-
-        // basic imports contains a new line between dynamic and static imports
-        for (String importEntry : BASIC_IMPORTS) {
-            bob.append(importEntry).append("\n");
-        }
-
-        if (this.isMockingEnabled) {
-            for (String importEntry : MOCKITO_IMPORTS) {
-                bob.append(importEntry).append("\n");
-            }
-        }
-        bob.append("\n");
-
-        bob.append(String.format("public class Test%s {\n", getBaseName()))
-                .append("    @Test(timeout = 4000)\n")
-                .append("    public void test() throws Throwable {\n")
-                .append("        // test here!\n")
-                .append("    }\n")
-                .append("}");
-        return bob.toString();
+    public String getTestTemplate() {
+        return TestTemplate.build(this)
+                .testingFramework(TestingFramework.JUNIT4)
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
+                .mockingEnabled(isMockingEnabled())
+                .get().getCode();
     }
 
     /**
@@ -327,17 +273,11 @@ public class GameClass {
      * @see #getTestTemplate()
      */
     public int getTestTemplateFirstEditLine() {
-        String[] templateLines = getTestTemplate().split("\n");
-        for (int i = 0; i < templateLines.length; i++) {
-            Matcher matcher = TEST_METHOD_PATTERN.matcher(templateLines[i]);
-            if (matcher.find()) {
-                // +1 because line index starts at 1
-                // +1 because the next line should be editable
-                return i + 2;
-            }
-        }
-        logger.warn("Test template for {} does not contain valid test method.", name);
-        return -1;
+        return TestTemplate.build(this)
+                .testingFramework(TestingFramework.JUNIT4)
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
+                .mockingEnabled(isMockingEnabled())
+                .get().getEditableLinesStart();
     }
 
     /**
@@ -345,6 +285,7 @@ public class GameClass {
      * Can be empty, but never {@code null}.
      */
     public List<Integer> getNonInitializedFields() {
+        visitCode();
         Collections.sort(this.nonInitializedFields);
         return Collections.unmodifiableList(this.nonInitializedFields);
     }
@@ -354,6 +295,7 @@ public class GameClass {
      * Can be empty, but never {@code null}.
      */
     public List<Integer> getMethodSignatures() {
+        visitCode();
         return this.linesOfMethodSignatures
                 .stream()
                 .flatMap(range -> IntStream.rangeClosed(range.getMinimum(), range.getMaximum()).boxed())
@@ -366,6 +308,7 @@ public class GameClass {
      * Can be empty, but never {@code null}.
      */
     public List<Integer> getNonCoverableCode() {
+        visitCode();
         return linesOfNonCoverableCode;
     }
 
@@ -377,6 +320,7 @@ public class GameClass {
      * Can be empty, but never {@code null}.
      */
     public List<Integer> getCompileTimeConstants() {
+        visitCode();
         return Collections.unmodifiableList(linesOfCompileTimeConstants);
     }
 
@@ -388,6 +332,7 @@ public class GameClass {
      * Can be empty, but never {@code null}.
      */
     public List<Integer> getMethodSignaturesForLine(Integer line) {
+        visitCode();
         final List<Integer> collect = linesOfMethods
                 .stream()
                 .filter(method -> method.contains(line))
@@ -406,6 +351,7 @@ public class GameClass {
      * {@link Integer Integers}. Can be empty, but never {@code null}.
      */
     public List<Integer> getClosingBracketForLine(Integer line) {
+        visitCode();
         final List<Integer> collect = linesOfClosingBrackets
                 .stream()
                 .filter(integerRange -> integerRange.contains(line))
@@ -420,6 +366,7 @@ public class GameClass {
      * can be covered if it belongs to a method and is followed by a covered line (either empty or not)
      */
     public List<Integer> getCoveredEmptyLines(List<Integer> alreadyCoveredLines) {
+        visitCode();
         List<Integer> collect = new ArrayList<>();
         for (Range<Integer> linesOfMethod : linesOfMethods) {
             for (int line = linesOfMethod.getMinimum(); line < linesOfMethod.getMaximum(); line++) {

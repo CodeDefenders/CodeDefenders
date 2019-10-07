@@ -18,117 +18,92 @@
  */
 package org.codedefenders.coverage;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertThat;
+
 import org.codedefenders.game.GameClass;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
 
-import static org.junit.Assert.assertEquals;
-
 public class GameClassTest {
+
+    private void assertEditableLineCorrect(GameClass gc) {
+        int editableLineNr = gc.getTestTemplateFirstEditLine();
+        String editableLine = gc.getTestTemplate().split("\n")[editableLineNr - 1]; // lines are one-indexed
+        assertThat(editableLine, containsString("test here"));
+    }
 
     @Test
     public void testGetTestTemplateFirstEditLinePlainClass() {
         String name = "Lift";
         String alias = "Lift";
-        String jFile = "src/test/resources/itests/sources/Lift/Lift.java";
-        String cFile = "";
+        String javaFile = "src/test/resources/itests/sources/Lift/Lift.java";
+        String classFile = "";
 
-        GameClass gc = new GameClass(name, alias, jFile, cFile);
+        GameClass gc = new GameClass(name, alias, javaFile, classFile);
 
-        int expectedFirstEditableLine = GameClass.BASIC_IMPORTS.size() + gc.getAdditionalImports().size();
-
-        // Zero-index offset, 1 blank line, class declaration, @Test annotation, test method signature
-        expectedFirstEditableLine += 5;
-
-        assertEquals(expectedFirstEditableLine, gc.getTestTemplateFirstEditLine());
+        assertEditableLineCorrect(gc);
     }
 
     @Test
     public void testGetTestTemplateFirstEditLineWithPackage() throws Exception {
-
         // Package information
         String name = "my.little.test.Lift";
         String alias = "Lift";
-        String jFile = "src/test/resources/itests/sources/Lift/Lift.java";
-        String cFile = "";
+        String javaFile = "src/test/resources/itests/sources/Lift/Lift.java";
+        String classFile = "";
 
-        GameClass gc = new GameClass(name, alias, jFile, cFile);
+        GameClass gc = new GameClass(name, alias, javaFile, classFile);
 
-        int expectedFirstEditableLine = GameClass.BASIC_IMPORTS.size() + gc.getAdditionalImports().size();
-
-        // Zero-index offset, 1 blank line, class declaration, @Test annotation, test method signature
-        expectedFirstEditableLine += 5;
-
-        // Package + blank line
-        expectedFirstEditableLine += 2;
-
-        assertEquals(expectedFirstEditableLine, gc.getTestTemplateFirstEditLine());
+        assertEditableLineCorrect(gc);
+        assertThat(gc.getTestTemplate(), containsString("package"));
     }
 
     @Test
     public void testGetTestTemplateFirstEditLineWithMockingEnabled() throws Exception {
-
         String name = "Lift";
         String alias = "Lift";
-        String jFile = "src/test/resources/itests/sources/Lift/Lift.java";
-        String cFile = "";
+        String javaFile = "src/test/resources/itests/sources/Lift/Lift.java";
+        String classFile = "";
 
-        GameClass gc = new GameClass(name, alias, jFile, cFile);
+        GameClass gc = new GameClass(name, alias, javaFile, classFile);
 
-        int expectedFirstEditableLine = GameClass.BASIC_IMPORTS.size() + gc.getAdditionalImports().size();
-
-        // Zero-index offset, 1 blank line, class declaration, @Test annotation, test method signature
-        expectedFirstEditableLine += 5;
-
-        // set private field isMockingEnabled to true
         final Field mockingField = gc.getClass().getDeclaredField("isMockingEnabled");
         mockingField.setAccessible(true);
         mockingField.set(gc, true);
-        expectedFirstEditableLine += GameClass.MOCKITO_IMPORTS.size();
 
-        assertEquals(expectedFirstEditableLine, gc.getTestTemplateFirstEditLine());
+        assertEditableLineCorrect(gc);
+        assertThat(gc.getTestTemplate(), containsString("mock"));
     }
 
     @Test
     public void testGetTestTemplateFirstEditLineWith2Imports() {
         String name = "Option";
         String alias = "Option";
-        String jFile = "src/test/resources/itests/sources/Option/Option.java";
-        String cFile = "";
+        String javaFile = "src/test/resources/itests/sources/Option/Option.java";
+        String classFile = "";
 
-        GameClass gc = new GameClass(name, alias, jFile, cFile);
+        GameClass gc = new GameClass(name, alias, javaFile, classFile);
 
-        int expectedFirstEditableLine = GameClass.BASIC_IMPORTS.size() + gc.getAdditionalImports().size();
-
-        // Zero-index offset, 1 blank line, class declaration, @Test annotation, test method signature
-        expectedFirstEditableLine += 5;
-
-        assertEquals(expectedFirstEditableLine, gc.getTestTemplateFirstEditLine());
+        assertEditableLineCorrect(gc);
+        assertThat(gc.getTestTemplate(), containsString("import java.util.List;"));
     }
 
     @Test
     public void testGetTestTemplateFirstEditLineWith4ImportsPackageAndMocking() throws Exception {
         String name = "my.little.test.XmlElement";
         String alias = "XmlElement";
-        String jFile = "src/test/resources/itests/sources/XmlElement/XmlElement.java";
-        String cFile = "";
+        String javaFile = "src/test/resources/itests/sources/XmlElement/XmlElement.java";
+        String classFile = "";
 
-        GameClass gc = new GameClass(name, alias, jFile, cFile);
+        GameClass gc = new GameClass(name, alias, javaFile, classFile);
 
-        int expectedFirstEditableLine = GameClass.BASIC_IMPORTS.size() + gc.getAdditionalImports().size();
-
-        // Zero-index offset, 1 blank line, class declaration, @Test annotation, test method signature
-        expectedFirstEditableLine += 5;
-        // Package + blank line
-        expectedFirstEditableLine += 2;
-
-        // set private field isMockingEnabled to true
         final Field mockingField = gc.getClass().getDeclaredField("isMockingEnabled");
         mockingField.setAccessible(true);
         mockingField.set(gc, true);
-        expectedFirstEditableLine += GameClass.MOCKITO_IMPORTS.size();
 
-        assertEquals(expectedFirstEditableLine, gc.getTestTemplateFirstEditLine());
+        assertEditableLineCorrect(gc);
+        assertThat(gc.getTestTemplate(), containsString("import java.util.Vector;"));
     }
 }
