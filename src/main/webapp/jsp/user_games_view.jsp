@@ -317,23 +317,33 @@
                 int attackers = info.attackers().size();
                 int defenders = info.defenders().size();
             %>
-			<td class="col-sm-1"><%=attackers %></td>
-			<td class="col-sm-1"><%=defenders %></td>
-			<td class="col-sm-1"><%=info.gameLevel().getFormattedString() %></td>
-			<td class="col-sm-2">
-				<form id="joinGameForm_attacker_<%=info.gameId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
-					<input type="hidden" name="formType" value="joinGame">
-					<input type="hidden" name="gameId" value=<%=info.gameId()%>>
-					<input type="hidden" name="attacker" value=1>
-					<button type="submit" id="<%="join-attacker-"+info.gameId()%>" class="btn btn-primary btn-sm" style="background-color: #884466;border-color: #772233; margin-bottom: 3px;" value="Join as Attacker">Join as Attacker</button>
-				</form>
-				<form id="joinGameForm_defender_<%=info.gameId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
-					<input type="hidden" name="formType" value="joinGame">
-					<input type="hidden" name="gameId" value=<%=info.gameId()%>>
-					<input type="hidden" name="defender" value=1>
-					<button type="submit" id="<%="join-defender-"+info.gameId()%>" class="btn btn-primary btn-sm" style="background-color: #446688;border-color: #225577" value="Join as Defender">Join as Defender</button>
-				</form>
-			</td>
+            <td class="col-sm-2">
+                <form id="joinGameForm_attacker_<%=info.gameId()%>"
+                      action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
+                    <input type="hidden" name="formType" value="joinGame">
+                    <input type="hidden" name="gameId" value=<%=info.gameId()%>>
+                    <input type="hidden" name="attacker" value=1>
+                    <%=attackers %>
+                    <button type="submit" id="<%="join-attacker-"+info.gameId()%>" class="btn btn-primary btn-sm"
+                            style="background-color: #884466;border-color: #772233; margin: 0 0 0 5px; padding: 3px 7px;"
+                            value="Join as Attacker">Join
+                    </button>
+                </form>
+            </td>
+            <td class="col-sm-2">
+                <form id="joinGameForm_defender_<%=info.gameId()%>"
+                      action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
+                    <input type="hidden" name="formType" value="joinGame">
+                    <input type="hidden" name="gameId" value=<%=info.gameId()%>>
+                    <input type="hidden" name="defender" value=1>
+                    <%=defenders %>
+                    <button type="submit" id="<%="join-defender-"+info.gameId()%>" class="btn btn-primary btn-sm"
+                            style="background-color: #446688;border-color: #225577; margin: 0 0 0 5px; padding: 3px 7px;"
+                            value="Join as Defender">Join
+                    </button>
+                </form>
+            </td>
+            <td class="col-sm-1"><%=info.gameLevel().getFormattedString() %></td>
 		</tr>
 <%
         } // Closes FOR
