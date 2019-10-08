@@ -337,7 +337,7 @@ public class KillMap {
     public static KillMap forMutantValidation(List<Test> tests, Mutant mutant, int classId) {
         List<KillMapEntry> entries = new ArrayList<>();
         KillMap killmap = new KillMap(tests, Arrays.asList(new Mutant[] { mutant }), classId, entries);
-        logger.info("Validating mutant {} using custom killmap (partial results are stored in the db) usingn: {} tests", mutant, tests.size());
+        logger.debug("Validating mutant {} using custom killmap (partial results are stored in the db) using: {} tests", mutant, tests.size());
 
         // TODO this creates a surge in the load as the number of executor services might grow 
         // by refactoring this into a CDI we should be able to easily control the situation and queue jobs. 

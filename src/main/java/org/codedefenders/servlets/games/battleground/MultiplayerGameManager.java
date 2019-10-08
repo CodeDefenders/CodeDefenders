@@ -33,20 +33,20 @@ import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
@@ -62,6 +62,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.IntentionDAO;
 import org.codedefenders.database.KillmapDAO;
@@ -87,6 +88,8 @@ import org.codedefenders.model.Event;
 import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -924,6 +927,8 @@ public class MultiplayerGameManager extends HttpServlet {
     }
     
     /**
+     * Selects a max of AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD tests randomly sampled
+     * which cover the mutant but belongs to other games and executes them against the mutant.
      * 
      * @param mutantToValidate
      * @return whether the mutant is killable or not/cannot be validated 
@@ -931,28 +936,28 @@ public class MultiplayerGameManager extends HttpServlet {
     boolean isMutantKillableByOtherTests(Mutant mutantToValidate){
         // Get all the covering tests of this mutant which do not belong to this game
         int classId = mutantToValidate.getClassId();
-        //
         List<Test> tests = TestDAO.getValidTestsForClass(classId);
-        
-        // Filter tests by game.
+
+        // Remove tests which belong to the same game as the mutant
         Iterator<Test> iterator = tests.iterator();
         while( iterator.hasNext() ){
             Test test = iterator.next();
             if( test.getGameId() == mutantToValidate.getGameId() ){
                 iterator.remove();
             } 
-            // TODO NOTE: This seems to be broken, let's consider all of them and let KillMap filter tests out
-//            else if( ! test.isMutantCovered( mutantToValidate )){
-//                // TODO Why is this check returning the opposite result?
-//                logger.info("Valid test {} does not cover mutant: {}", test, mutantToValidate);
-//                iterator.remove();
-//            }
         }
-        logger.info("Validating the mutant with {} tests:\n{}", tests.size(), tests );
+
+        // Select a random subset to do the validation
+        // TODO Define a mutant selection strategy interface. For the moment we use a basic random selection.
+        int maxTestsThatCanBeRunForValidatingTheDuel = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD).getIntValue();
+        Collections.shuffle( tests , new SecureRandom( ));
+        List<Test> selectedTests = tests.stream().limit(maxTestsThatCanBeRunForValidatingTheDuel).collect(Collectors.toList());
+        
+        logger.debug("Validating the mutant with {} selected tests:\n{}", selectedTests.size(), selectedTests );
         
 
         // At the moment this is purposely blocking. This is the dumbest, but safest way to deal with it while we design a better solution.
-        KillMap killmap = KillMap.forMutantValidation(tests, mutantToValidate, classId);
+        KillMap killmap = KillMap.forMutantValidation(selectedTests, mutantToValidate, classId);
         
         if( killmap == null ){
             // There was an error we cannot empirically prove the mutant was killable.
