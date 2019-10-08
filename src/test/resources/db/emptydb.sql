@@ -59,7 +59,9 @@ INSERT INTO settings (name, type, STRING_VALUE, INT_VALUE, BOOL_VALUE) VALUES
   ('EMAILS_ENABLED', 'BOOL_VALUE', NULL, NULL, FALSE),
   ('DEBUG_MODE', 'BOOL_VALUE', NULL, NULL, FALSE),
   ('EMAIL_PASSWORD', 'STRING_VALUE', '', NULL, NULL),
-  ('AUTOMATIC_KILLMAP_COMPUTATION', 'BOOL_VALUE', NULL, NULL, FALSE);
+  ('AUTOMATIC_KILLMAP_COMPUTATION', 'BOOL_VALUE', NULL, NULL, FALSE),
+  ('ALLOW_USER_PROFILE', 'BOOL_VALUE', NULL, NULL, TRUE),
+  ('PRIVACY_NOTICE', 'STRING_VALUE', '', NULL, NULL);
 
 --
 -- Table structure for table `ratings`
@@ -91,6 +93,9 @@ CREATE TABLE `classes` (
   `AiPrepared` tinyint(1) DEFAULT '0',
   `RequireMocking` tinyint(1) DEFAULT '0',
   `Puzzle` tinyint(1) NOT NULL DEFAULT '0',
+  `Active` tinyint(1) NOT NULL DEFAULT '1',
+  `TestingFramework` ENUM('JUNIT4', 'JUNIT5') NOT NULL DEFAULT 'JUNIT4_HAMCREST',
+  `AssertionLibrary` ENUM('JUNIT4', 'JUNIT5', 'HAMCREST', 'JUNIT4_HAMCREST', 'JUNIT5_HAMCREST') NOT NULL DEFAULT 'JUNIT4_HAMCREST',
   PRIMARY KEY (`Class_ID`),
   UNIQUE KEY `classes_Alias_uindex` (`Alias`)
 ) AUTO_INCREMENT=100;
@@ -131,6 +136,7 @@ CREATE TABLE `games` (
   `Start_Time` timestamp NOT NULL DEFAULT '1970-02-02 01:01:01',
   `Finish_Time` timestamp NOT NULL DEFAULT '1970-02-02 01:01:01',
   `MaxAssertionsPerTest` int(11) NOT NULL DEFAULT '2',
+  `ForceHamcrest` tinyint(1) DEFAULT '1',
   `MutantValidator` enum('STRICT','MODERATE','RELAXED') NOT NULL DEFAULT 'MODERATE',
   `ChatEnabled` tinyint(1) DEFAULT '1',
   `Attackers_Limit` int(11) DEFAULT '0',
@@ -139,12 +145,13 @@ CREATE TABLE `games` (
   `CurrentRound` tinyint(4) NOT NULL DEFAULT '1',
   `FinalRound` tinyint(4) NOT NULL DEFAULT '5',
   `ActiveRole` enum('ATTACKER','DEFENDER') NOT NULL DEFAULT 'ATTACKER',
-  `Mode` enum('SINGLE','DUEL','PARTY','UTESTING','PUZZLE') NOT NULL DEFAULT 'DUEL',
+  `Mode` enum('SINGLE','DUEL','PARTY','UTESTING','PUZZLE') NOT NULL DEFAULT 'PARTY',
   `RequiresValidation` tinyint(1) NOT NULL DEFAULT '0',
   `IsAIDummyGame` tinyint(1) NOT NULL DEFAULT '0',
   `HasKillMap` tinyint(1) NOT NULL DEFAULT '0',
   `CapturePlayersIntention` tinyint(1) NOT NULL DEFAULT '0',
   `Puzzle_ID` int(11) DEFAULT NULL,
+  `EquivalenceThreshold` int(11) NOT NULL DEFAULT 0,
   PRIMARY KEY (`ID`),
   KEY `fk_creatorId_idx` (`Creator_ID`),
   KEY `fk_className_idx` (`Class_ID`),
@@ -205,6 +212,7 @@ CREATE TABLE `mutants` (
   `Timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `Points` int(11) DEFAULT '0',
   `MutatedLines` varchar(255),
+  `KillMessage` varchar(2000) DEFAULT NULL,
   PRIMARY KEY (`Mutant_ID`),
   UNIQUE KEY `mutants_Game_ID_Class_ID_MD5_key` (`Game_ID`,`Class_ID`,`MD5`),
   KEY `fk_gameId_idx` (`Game_ID`),
@@ -305,6 +313,7 @@ CREATE TABLE `puzzles` (
   `Active_Role` enum('ATTACKER','DEFENDER') NOT NULL,
   `Level` enum('EASY','HARD') DEFAULT 'HARD',
   `Max_Assertions` int(11) NOT NULL DEFAULT '2',
+  `Force_Hamcrest` tinyint(1) DEFAULT '0',
   `Mutant_Validator_Level` enum('STRICT','MODERATE','RELAXED') NOT NULL DEFAULT 'MODERATE',
   `Editable_Lines_Start` int(11) DEFAULT NULL,
   `Editable_Lines_End` int(11) DEFAULT NULL,
@@ -421,6 +430,8 @@ CREATE TABLE `users` (
   `Email` varchar(150) NOT NULL,
   `Validated` tinyint(1) NOT NULL DEFAULT '0',
   `Active` tinyint(1) NOT NULL DEFAULT '1',
+  `AllowContact` tinyint(1) NOT NULL DEFAULT '0',
+  `KeyMap` enum('DEFAULT','SUBLIME','VIM','EMACS') NOT NULL DEFAULT 'DEFAULT',
   `pw_reset_timestamp` timestamp NULL DEFAULT NULL,
   `pw_reset_secret` varchar(254) DEFAULT NULL,
   PRIMARY KEY (`User_ID`),
@@ -556,25 +567,34 @@ VALUES
   ('GAME_PLAYER_LEFT','@event_user left the game'),
   ('GAME_STARTED','The game has started!');
 
+CREATE OR REPLACE VIEW `view_active_classes` AS
+SELECT *
+FROM classes
+WHERE Active = 1;
+
 CREATE OR REPLACE VIEW `view_playable_classes` AS
 SELECT *
-FROM `classes`
+FROM `view_active_classes`
 WHERE Puzzle = 0;
 
 CREATE OR REPLACE VIEW `view_puzzle_classes` AS
 SELECT *
-FROM `classes`
+FROM `view_active_classes`
 WHERE Puzzle = 1;
 
 CREATE OR REPLACE VIEW `view_battleground_games` AS
-SELECT *
-FROM games
-WHERE Mode = 'PARTY';
+SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.Active
+FROM games,
+     classes
+WHERE Mode = 'PARTY'
+  AND games.Class_ID = classes.Class_ID;
 
 CREATE OR REPLACE VIEW `view_puzzle_games` AS
-SELECT *
-FROM games
-WHERE Mode = 'PUZZLE';
+SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.Active
+FROM games,
+     classes
+WHERE Mode = 'PUZZLE'
+  AND games.Class_ID = classes.Class_ID;
 
 CREATE OR REPLACE VIEW `view_mutants_with_user` AS
 SELECT mutants.*, users.*
@@ -592,15 +612,22 @@ SELECT *
 FROM players
 WHERE `ID` >= 100;
 
+CREATE OR REPLACE VIEW `view_valid_users` AS
+SELECT * FROM `users`
+WHERE `User_ID` >= 5
+  AND Active = 1;
+
 CREATE OR REPLACE VIEW `view_players_with_userdata` AS
 SELECT p.*,
-       u.Password  AS usersPassword,
-       u.Username  AS usersUsername,
-       u.Email     AS usersEmail,
-       u.Validated AS usersValidated,
-       u.Active    AS usersActive
+       u.Password     AS usersPassword,
+       u.Username     AS usersUsername,
+       u.Email        AS usersEmail,
+       u.Validated    AS usersValidated,
+       u.Active       AS usersActive,
+       u.AllowContact AS usersAllowContact,
+       u.KeyMap       AS usersKeyMap
 FROM players AS p,
-     users AS u
+     view_valid_users AS u
 WHERE p.User_ID = u.User_ID;
 
 CREATE OR REPLACE VIEW `view_valid_tests` AS
@@ -614,10 +641,6 @@ WHERE tests.ClassFile IS NOT NULL
       AND ex.Target = 'TEST_ORIGINAL'
       AND ex.Status = 'SUCCESS'
   );
-
-CREATE OR REPLACE VIEW `view_valid_users`
-AS SELECT * FROM `users`
-   WHERE `User_ID` >= 5;
 
 --
 -- Leaderboard Views
@@ -655,8 +678,8 @@ CREATE OR REPLACE VIEW `view_leaderboard`
     FROM view_valid_users U
       LEFT JOIN view_attackers ON U.user_id = view_attackers.user_id
       LEFT JOIN view_defenders ON U.user_id = view_defenders.user_id;
+
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
 /*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
