@@ -70,10 +70,10 @@
                 <a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
                    title="Export as a Gradle project to import into an IDE."
                    class="btn btn-default btn-diff" id="btnProjectExport">
-                    Export Project
+                    Export
                 </a>
                 <a href="#" class="btn btn-default btn-diff" id="btnScoreboard" data-toggle="modal"
-                   data-target="#scoreboard">Show Scoreboard</a>
+                   data-target="#scoreboard">Scoreboard</a>
                 <a href="#" class="btn btn-default btn-diff" id="btnFeedback" data-toggle="modal"
                    data-target="#playerFeedback">
                     Feedback
