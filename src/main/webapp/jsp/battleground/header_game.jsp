@@ -37,22 +37,19 @@
             <%  int userIdCurrent = ((Integer) session.getAttribute("uid"));
                 if (game.getCreatorId() == userIdCurrent) { %>
             <div class="admin-panel col-md-12">
+                <% if (game.getState() == GameState.ACTIVE) { %>
                 <form id="adminEndBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post" style="display: inline-block;">
-                    <button type="submit" class="btn btn-primary btn-game btn-left" id="endGame" form="adminEndBtn"
-                        <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
-                        End Game
-                    </button>
+                    <button type="submit" class="btn btn-primary btn-game btn-left" id="endGame" form="adminEndBtn">End Game</button>
                     <input type="hidden" name="formType" value="endGame">
                     <input type="hidden" name="gameId" value="<%= game.getId() %>" />
                 </form>
+                <% } else if (game.getState() == GameState.CREATED) { %>
                 <form id="adminStartBtn" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post" style="display: inline-block;">
-                    <button type="submit" class="btn btn-primary btn-game" id="startGame" form="adminStartBtn"
-                        <% if (game.getState() != GameState.CREATED) { %> disabled <% } %>>
-                        Start Game
-                    </button>
+                    <button type="submit" class="btn btn-primary btn-game" id="startGame" form="adminStartBtn">Start Game</button>
                     <input type="hidden" name="formType" value="startGame">
                     <input type="hidden" name="gameId" value="<%= game.getId() %>" />
                 </form>
+                <% } %>
             </div>
 
             <% } %>
@@ -73,10 +70,10 @@
                 <a href="<%=request.getContextPath() + Paths.PROJECT_EXPORT%>?gameId=<%=gameId%>"
                    title="Export as a Gradle project to import into an IDE."
                    class="btn btn-default btn-diff" id="btnProjectExport">
-                    Export Project
+                    Export
                 </a>
                 <a href="#" class="btn btn-default btn-diff" id="btnScoreboard" data-toggle="modal"
-                   data-target="#scoreboard">Show Scoreboard</a>
+                   data-target="#scoreboard">Scoreboard</a>
                 <a href="#" class="btn btn-default btn-diff" id="btnFeedback" data-toggle="modal"
                    data-target="#playerFeedback">
                     Feedback
