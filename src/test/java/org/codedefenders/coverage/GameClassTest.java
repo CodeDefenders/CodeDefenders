@@ -38,7 +38,7 @@ public class GameClassTest {
 
         int expectedFirstEditableLine = GameClass.BASIC_IMPORTS.size() + gc.getAdditionalImports().size();
 
-        // Zero-index offset, 2 blank lines, class declaration, @Test annotation, test method signature
+        // Zero-index offset, 1 blank line, class declaration, @Test annotation, test method signature
         expectedFirstEditableLine += 5;
 
         assertEquals(expectedFirstEditableLine, gc.getTestTemplateFirstEditLine());
@@ -57,7 +57,7 @@ public class GameClassTest {
 
         int expectedFirstEditableLine = GameClass.BASIC_IMPORTS.size() + gc.getAdditionalImports().size();
 
-        // Zero-index offset, 2 blank lines, class declaration, @Test annotation, test method signature
+        // Zero-index offset, 1 blank line, class declaration, @Test annotation, test method signature
         expectedFirstEditableLine += 5;
 
         // Package + blank line
@@ -78,7 +78,7 @@ public class GameClassTest {
 
         int expectedFirstEditableLine = GameClass.BASIC_IMPORTS.size() + gc.getAdditionalImports().size();
 
-        // Zero-index offset, 2 blank lines, class declaration, @Test annotation, test method signature
+        // Zero-index offset, 1 blank line, class declaration, @Test annotation, test method signature
         expectedFirstEditableLine += 5;
 
         // set private field isMockingEnabled to true
@@ -101,7 +101,7 @@ public class GameClassTest {
 
         int expectedFirstEditableLine = GameClass.BASIC_IMPORTS.size() + gc.getAdditionalImports().size();
 
-        // Zero-index offset, 2 blank lines, class declaration, @Test annotation, test method signature
+        // Zero-index offset, 1 blank line, class declaration, @Test annotation, test method signature
         expectedFirstEditableLine += 5;
 
         assertEquals(expectedFirstEditableLine, gc.getTestTemplateFirstEditLine());
@@ -118,7 +118,7 @@ public class GameClassTest {
 
         int expectedFirstEditableLine = GameClass.BASIC_IMPORTS.size() + gc.getAdditionalImports().size();
 
-        // Zero-index offset, 2 blank lines, class declaration, @Test annotation, test method signature
+        // Zero-index offset, 1 blank line, class declaration, @Test annotation, test method signature
         expectedFirstEditableLine += 5;
         // Package + blank line
         expectedFirstEditableLine += 2;

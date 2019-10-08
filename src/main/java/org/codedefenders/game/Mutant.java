@@ -308,6 +308,7 @@ public class Mutant implements Serializable {
         return false;
     }
 
+    // This might return several instances of the same test since Test does not implement hash and equalsTo
     public Set<Test> getCoveringTests() {
         Set<Test> coveringTests = new LinkedHashSet<>();
 
