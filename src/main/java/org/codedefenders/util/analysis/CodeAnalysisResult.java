@@ -19,12 +19,10 @@
 package org.codedefenders.util.analysis;
 
 import org.apache.commons.lang3.Range;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameClass.MethodInfo;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Container for lines or ranges of lines used for the {@link ClassCodeAnalyser}.
@@ -45,24 +43,60 @@ public class CodeAnalysisResult {
     private final Set<Integer> emptyLines = new HashSet<>();
     private final Map<Integer, Integer> linesCoveringEmptyLines = new HashMap<>();
 
-    CodeAnalysisResult imported(String imported) { this.additionalImports.add(imported); return this; }
+    private final List<MethodInfo> methodInfos = new ArrayList<>();
 
-    CodeAnalysisResult compileTimeConstant(Integer line) { this.compileTimeConstants.add(line); return this; }
+    CodeAnalysisResult imported(String imported) {
+        this.additionalImports.add(imported);
+        return this;
+    }
 
-    CodeAnalysisResult nonCoverableCode(Integer line) { this.nonCoverableCode.add(line); return this; }
+    CodeAnalysisResult compileTimeConstant(Integer line) {
+        this.compileTimeConstants.add(line);
+        return this;
+    }
 
-    CodeAnalysisResult nonInitializedField(Integer line) { this.nonInitializedFields.add(line); return this; }
+    CodeAnalysisResult nonCoverableCode(Integer line) {
+        this.nonCoverableCode.add(line);
+        return this;
+    }
 
-    CodeAnalysisResult methodSignatures(Range<Integer> lines) { this.methodSignatures.add(lines); return this; }
+    CodeAnalysisResult nonInitializedField(Integer line) {
+        this.nonInitializedFields.add(line);
+        return this;
+    }
 
-    CodeAnalysisResult methods(Range<Integer> lines) { this.methods.add(lines); return this; }
+    CodeAnalysisResult methodSignatures(Range<Integer> lines) {
+        this.methodSignatures.add(lines);
+        return this;
+    }
 
-    CodeAnalysisResult closingBracket(Range<Integer> lines) { this.closingBrackets.add(lines); return this; }
+    CodeAnalysisResult methods(Range<Integer> lines) {
+        this.methods.add(lines);
+        return this;
+    }
 
-    CodeAnalysisResult emptyLine(Integer line) { this.emptyLines.add(line); return this; }
+    CodeAnalysisResult closingBracket(Range<Integer> lines) {
+        this.closingBrackets.add(lines);
+        return this;
+    }
 
-    CodeAnalysisResult lineCoversEmptyLine(Integer coveringLine, Integer emptyLine) { this.linesCoveringEmptyLines.put( emptyLine,  coveringLine); return this; }
+    CodeAnalysisResult emptyLine(Integer line) {
+        this.emptyLines.add(line);
+        return this;
+    }
 
+    CodeAnalysisResult lineCoversEmptyLine(Integer coveringLine, Integer emptyLine) {
+        this.linesCoveringEmptyLines.put(emptyLine, coveringLine);
+        return this;
+    }
+
+    CodeAnalysisResult methodInfo(Range<Integer> lines, String signature) {
+        MethodInfo methodInfo = new MethodInfo();
+        methodInfo.lines = lines;
+        methodInfo.signature = signature;
+        this.methodInfos.add(methodInfo);
+        return this;
+    }
 
     public Set<String> getAdditionalImports() {
         return additionalImports;
@@ -99,4 +133,9 @@ public class CodeAnalysisResult {
     public Map<Integer, Integer> getLinesCoveringEmptyLines() {
         return linesCoveringEmptyLines;
     }
+
+    public List<MethodInfo> getMethodInfos() {
+        return methodInfos;
+    }
 }
+

@@ -266,8 +266,13 @@ public class ClassCodeAnalyser {
                 // method signatures are non coverable
                 result.nonCoverableCode(line);
             }
+
+            String signature = md.getDeclarationAsString(false, false, false);
+            signature = signature.substring(signature.indexOf(' ') + 1); // Remove return type
+
             result.methodSignatures(Range.between(methodBegin, methodBodyBegin));
             result.methods(Range.between(methodBegin, methodEnd));
+            result.methodInfo(Range.between(methodBegin, methodEnd), signature);
         }
 
         private static void extractResultsFromConstructorDeclaration(ConstructorDeclaration cd, CodeAnalysisResult result) {
@@ -281,8 +286,11 @@ public class ClassCodeAnalyser {
                 result.nonCoverableCode(line);
             }
 
+            String signature = cd.getDeclarationAsString(false, false, false);
+
             result.methodSignatures(Range.between(constructorBegin, constructorBodyBegin));
             result.methods(Range.between(constructorBegin, constructorEnd));
+            result.methodInfo(Range.between(constructorBegin, constructorEnd), signature);
         }
     }
 }
