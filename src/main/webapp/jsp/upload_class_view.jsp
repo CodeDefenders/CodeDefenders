@@ -21,12 +21,13 @@
 <%@ page import="org.codedefenders.database.FeedbackDAO" %>
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.game.*" %>
 <% String pageTitle=null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div>
 	<div class="w-100 up">
 		<h2>Upload Class</h2>
-		<div id="divUpload" >
+		<div id="divUpload">
 			<form id="formUpload" action="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>" class="form-upload" method="post" enctype="multipart/form-data">
 				<span class="label label-danger" id="invalid_alias" style="color: white;visibility: hidden">Name with no whitespaces or special characters.</span>
 				<input id="classAlias" onkeyup="validateAlias()" name="classAlias" type="text" class="form-control" placeholder="Optional class alias, otherwise class name is used" >
@@ -41,10 +42,38 @@
 					<br>
 					<span>The class used for games. Mutants are created from and tests are created for this class.</span>
 				</div>
+                <br>
+
+				<div class="form-group">
+					<label for="testingFramework" title="The testing framework used to write tests for this class.">
+						Testing Framework
+					</label>
+					<select id="testingFramework" name="testingFramework" class="form-control" data-size="small" required>
+						<%for (TestingFramework tf : TestingFramework.values()) {%>
+						<option value="<%=tf.name()%>" <%=tf == TestingFramework.JUNIT4 ? "selected" : ""%>>
+							<%=tf.getDescription()%>
+						</option>
+						<%}%>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="assertionLibrary" title="The assertion library used to write tests for this class.">
+						Assertion Library
+					</label>
+					<select id="assertionLibrary" name="assertionLibrary" class="form-control" data-size="small" required>
+						<%for (AssertionLibrary al : AssertionLibrary.values()) {%>
+						<option value="<%=al.name()%>" <%=al == AssertionLibrary.JUNIT4_HAMCREST ? "selected" : ""%>>
+							<%=al.getDescription()%>
+						</option>
+						<%}%>
+					</select>
+				</div>
 
 				<button class="btn btn-light" type="button" data-toggle="collapse" data-target="#collapseAdvanced" aria-expanded="false" aria-controls="collapseExample">
 					Advanced upload options...
 				</button>
+
+
             <span class="border border-primary">
                     <div class="collapse" id="collapseAdvanced">
                         <div>
@@ -85,7 +114,9 @@
                     </div>
                 </span>
 				<span class="submit-button">
-					<input id="upload" type="submit" class="fileinput-upload-button" value="Upload" onClick="this.form.submit(); this.disabled=true; this.value='Uploading...';"/>
+					<button id="upload" type="submit" class="fileinput-upload-button btn btn-light">
+						Upload
+					</button>
 				</span>
 
 				<input type="hidden" value="<%=request.getParameter("fromAdmin")%>" name="fromAdmin">
@@ -125,6 +156,8 @@
 					<th>Available dependencies/tests/mutants</th>
 					<th>Mutation Difficulty</th>
 					<th>Testing Difficulty</th>
+					<th>Testing Framework</th>
+					<th>Assertion Library</th>
 				</tr>
 				</thead>
 				<tbody>
@@ -166,7 +199,7 @@
 							<td><%=GameClassDAO.getMappedDependencyIdsForClassId(c.getId()).size()%>/<%=GameClassDAO.getMappedTestIdsForClassId(c.getId()).size()%>/<%=GameClassDAO.getMappedMutantIdsForClassId(c.getId()).size()%></td>
 							<td><%=mutationDiff > 0 ? String.valueOf(mutationDiff) : ""%></td>
 							<td><%=testingDiff > 0 ? String.valueOf(testingDiff) : ""%></td>
-							<!--
+							<%--
 							<td>
 								<form id="aiPrepButton<%= c.getId() %>" action="<%=request.getContextPath() + Paths.AI_PREPARER%>" method="post" >
 									<button type="submit" class="btn btn-primary btn-game btn-right" form="aiPrepButton<%= c.getId() %>" onClick="this.form.submit(); this.disabled=true; this.value='Preparing...';"
@@ -177,7 +210,9 @@
 									<input type="hidden" name="cutID" value="<%= c.getId() %>" />
 								</form>
 							</td>
-							-->
+							--%>
+							<td><%=c.getTestingFramework().getDescription()%></td>
+							<td><%=c.getAssertionLibrary().getDescription()%></td>
 						</tr>
 					<% } %>
 				</tbody>
