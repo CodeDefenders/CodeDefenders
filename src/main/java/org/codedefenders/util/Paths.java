@@ -46,6 +46,9 @@ public class Paths {
     public static final String GAMES_HISTORY = "/games/history";
     public static final String CLASS_UPLOAD = "/class-upload";
 
+    public static final String PROJECT_EXPORT = "/project-export";
+
+
     public static final String BATTLEGROUND_GAME = "/multiplayergame";
     public static final String BATTLEGROUND_HISTORY = "/multiplayer/history";
     public static final String BATTLEGROUND_SELECTION = "/multiplayer/games";

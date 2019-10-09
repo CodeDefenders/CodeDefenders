@@ -144,6 +144,10 @@ public class MultiplayerGameManager extends HttpServlet {
                 .filter(m -> m.getPlayerId() == playerId)
                 .findFirst()
                 .ifPresent(mutant -> {
+                    int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
+                    User defender = UserDAO.getUserForPlayer(defenderId);
+
+                    request.setAttribute("equivDefender", defender);
                     request.setAttribute("equivMutant", mutant);
                     request.setAttribute("openEquivalenceDuel", true);
                 });
