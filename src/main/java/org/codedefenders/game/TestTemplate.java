@@ -55,8 +55,6 @@ public class TestTemplate {
         return mockingEnabled;
     }
 
-
-
     public static class Builder {
         private static final String[] JUNIT4_IMPORTS = new String[]{
                 "import org.junit.Test;\n"
@@ -99,13 +97,11 @@ public class TestTemplate {
                 "    public void test() throws Throwable {\n"
         };
 
-
-
         private GameClass clazz;
         private TestingFramework testingFramework;
         private AssertionLibrary assertionLibrary;
         // private MockingLibrary mockingLibrary;
-        private boolean mockingEnabled;
+        private Boolean mockingEnabled;
 
         private StringBuilder code;
         private int lastLineNr;
@@ -137,8 +133,6 @@ public class TestTemplate {
         //     this.mockingLibrary = mockingLibrary;
         //     return this;
         // }
-
-
 
         private void appendLines(String... lines) {
             for (String line : lines) {
@@ -178,9 +172,9 @@ public class TestTemplate {
                 case JUNIT4:
                     appendLines(JUNIT4_IMPORTS);
                     break;
-                case JUNIT5:
-                    appendLines(JUNIT5_IMPORTS);
-                    break;
+                // case JUNIT5:
+                //     appendLines(JUNIT5_IMPORTS);
+                //     break;
                 default:
                     throw new IllegalArgumentException("No imports implemented for " + testingFramework.name() + ".");
             }
@@ -239,9 +233,9 @@ public class TestTemplate {
                 case JUNIT4:
                     appendLines(JUNIT4_TEST_DECLARATION);
                     break;
-                case JUNIT5:
-                    appendLines(JUNIT5_TEST_DECLARATION);
-                    break;
+                // case JUNIT5:
+                //     appendLines(JUNIT5_TEST_DECLARATION);
+                //     break;
                 default:
                     throw new IllegalArgumentException("No test method implemented for " + testingFramework.name() + ".");
             }
@@ -250,13 +244,13 @@ public class TestTemplate {
             testCodeLine = lastLineNr;
             appendLines("    }\n");
             appendLines("}");
-            // TODO: appendLines("}\n") and add a last editable line to the test editor;
+            // TODO: appendLines("}\n") and make one more line editable in the test editor?
         }
 
         public TestTemplate get() {
             // if (testingFramework == null || assertionLibrary == null || mockingLibrary == null) {
-            if (testingFramework == null || assertionLibrary == null) {
-                throw new IllegalStateException("Be sure to define a testing framework and an assertion library.");
+            if (testingFramework == null || assertionLibrary == null || mockingEnabled == null) {
+                throw new IllegalStateException("Missing information.");
             }
 
             addPackage();
