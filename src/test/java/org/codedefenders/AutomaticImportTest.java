@@ -18,82 +18,89 @@
  */
 package org.codedefenders;
 
-import org.codedefenders.game.GameClass;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 
+import org.codedefenders.game.GameClass;
+
 public class AutomaticImportTest {
 
-	@org.junit.Test
-	public void testAutomaticImportOfMockitoIfEnabled() {
-		GameClass gc = new GameClass("Lift", "Lift", "src/test/resources/itests/sources/Lift/Lift.java",
-				"src/test/resources/itests/sources/Lift/Lift.class", true);
+    @org.junit.Test
+    public void testAutomaticImportOfMockitoIfEnabled() {
+        GameClass gc = GameClass.build()
+                .name("Lift")
+                .alias("Lift")
+                .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
+                .classFile("src/test/resources/itests/sources/Lift/Lift.class")
+                .mockingEnabled(true)
+                .create();
 
-		String testTemplate = gc.getHTMLEscapedTestTemplate();
-		assertThat(testTemplate, containsString("import static org.mockito.Mockito.*;"));
-	}
+        String testTemplate = gc.getHTMLEscapedTestTemplate();
+        assertThat(testTemplate, containsString("mockito"));
+    }
 
-	@org.junit.Test
-	public void testNoAutomaticImportOfMockitoIfDisabled() {
-		GameClass gc = new GameClass("Lift", "Lift", "src/test/resources/itests/sources/Lift/Lift.java",
-				"src/test/resources/itests/sources/Lift/Lift.class", false);
+    @org.junit.Test
+    public void testNoAutomaticImportOfMockitoIfDisabled() {
+        GameClass gc = GameClass.build()
+                .name("Lift")
+                .alias("Lift")
+                .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
+                .classFile("src/test/resources/itests/sources/Lift/Lift.class")
+                .mockingEnabled(false)
+                .create();
 
-		String testTemplate = gc.getHTMLEscapedTestTemplate();
-		assertThat(testTemplate, not(containsString("import static org.mockito.Mockito.*;")));
-	}
+        String testTemplate = gc.getHTMLEscapedTestTemplate();
+        assertThat(testTemplate, not(containsString("mockito")));
+    }
 
-	@org.junit.Test
-	public void testAutomaticImportOnlyPrimitive() {
-		GameClass gc = new GameClass("Lift", "Lift", "src/test/resources/itests/sources/Lift/Lift.java",
-				"src/test/resources/itests/sources/Lift/Lift.class",
-				true); // Including mocking
+    @org.junit.Test
+    public void testAutomaticImportOnlyPrimitive() {
+        GameClass gc = GameClass.build()
+                .name("Lift")
+                .alias("Lift")
+                .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
+                .classFile("src/test/resources/itests/sources/Lift/Lift.class")
+                .mockingEnabled(true)
+                .create();
 
-		String testTemplate = gc.getHTMLEscapedTestTemplate();
-		assertThat(testTemplate,
-				allOf(
-						containsString("import static org.mockito.Mockito.*;"),
-						containsString("import static org.junit.Assert.*;"),
-						containsString("import static org.hamcrest.MatcherAssert.assertThat;"),
-                        containsString("import static org.hamcrest.Matchers.*;"),
-						containsString("import org.junit.*;")
-				));
-		// We need -1 to get rid of the last token
-		int expectedImports = 5;
-		int actualImports = testTemplate.split("import").length - 1;
-		assertEquals( "The test template has the wrong number of imports", expectedImports, actualImports );
-	}
+        String testTemplate = gc.getHTMLEscapedTestTemplate();
+        assertThat(testTemplate, allOf(
+                containsString("junit"),
+                containsString("hamcrest"),
+                containsString("mockito")));
+        // We need -1 to get rid of the last token
+        int expectedImports = 5;
+        int actualImports = testTemplate.split("import").length - 1;
+        assertEquals("The test template has the wrong number of imports", expectedImports, actualImports);
+    }
 
-	@org.junit.Test
-	public void testAutomaticImport() {
-		GameClass gc = new GameClass("XmlElement", "XmlElement",
-				"src/test/resources/itests/sources/XmlElement/XmlElement.java",
-				"src/test/resources/itests/sources/XmlElement/XmlElement.class",
-				true); // Including mocking
+    @org.junit.Test
+    public void testAutomaticImport() {
+        GameClass gc = GameClass.build()
+                .name("XmlElement")
+                .alias("XmlElement")
+                .javaFile("src/test/resources/itests/sources/XmlElement/XmlElement.java")
+                .classFile("src/test/resources/itests/sources/XmlElement/XmlElement.class")
+                .mockingEnabled(true)
+                .create();
 
-		String testTemplate = gc.getHTMLEscapedTestTemplate();
+        String testTemplate = gc.getHTMLEscapedTestTemplate();
 
-		
-		assertThat(testTemplate,
-				allOf(
-						containsString("import static org.mockito.Mockito.*;"),
-						containsString("import static org.junit.Assert.*;"),
-						containsString("import static org.hamcrest.MatcherAssert.assertThat;"),
-						containsString("import static org.hamcrest.Matchers.*;"),
-						containsString("import org.junit.*;"),
-						containsString("import java.util.Enumeration;"),
-						containsString("import java.util.Hashtable;"),
-						containsString("import java.util.Iterator;"),
-						containsString("import java.util.List;"),
-						containsString("import java.util.Vector;")
-						)
-				);
-		int expectedImports = 10;
-		int actualImports = testTemplate.split("import").length - 1;
-		
-		assertEquals( "The test template has the wrong number of imports", expectedImports, actualImports);
-	}
+        assertThat(testTemplate, allOf(
+                containsString("junit"),
+                containsString("hamcrest"),
+                containsString("mockito"),
+                containsString("import java.util.Enumeration;"),
+                containsString("import java.util.Hashtable;"),
+                containsString("import java.util.Iterator;"),
+                containsString("import java.util.List;"),
+                containsString("import java.util.Vector;")));
+        int expectedImports = 10;
+        int actualImports = testTemplate.split("import").length - 1;
+
+        assertEquals("The test template has the wrong number of imports", expectedImports, actualImports);
+    }
 }

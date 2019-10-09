@@ -36,10 +36,7 @@ import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.execution.LineCoverageGenerator;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.LineCoverage;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
+import org.codedefenders.game.*;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
@@ -130,6 +127,8 @@ public class ClassUploadManager extends HttpServlet {
         final List<CompiledClass> compiledClasses = new LinkedList<>();
 
         boolean isMockingEnabled = false;
+        TestingFramework testingFramework = null;
+        AssertionLibrary assertionLibrary = null;
         boolean shouldPrepareAI = false;
 
         // Alias of the CUT
@@ -187,6 +186,12 @@ public class ClassUploadManager extends HttpServlet {
                     break;
                 case "enableMocking":
                     isMockingEnabled = true;
+                    break;
+                case "testingFramework":
+                    testingFramework = TestingFramework.valueOf(fieldValue);
+                    break;
+                case "assertionLibrary":
+                    assertionLibrary = AssertionLibrary.valueOf(fieldValue);
                     break;
                 default:
                     logger.warn("Unrecognized parameter: " + fieldName);
@@ -424,7 +429,16 @@ public class ClassUploadManager extends HttpServlet {
             return;
         }
 
-        cut = new GameClass(classQualifiedName, classAlias, cutJavaFilePath, cutClassFilePath, isMockingEnabled);
+        cut = GameClass.build()
+                .name(classQualifiedName)
+                .alias(classAlias)
+                .javaFile(cutJavaFilePath)
+                .classFile(cutClassFilePath)
+                .mockingEnabled(isMockingEnabled)
+                .testingFramework(testingFramework)
+                .assertionLibrary(assertionLibrary)
+                .create();
+
         try {
             cutId = GameClassDAO.storeClass(cut);
         } catch (Exception e) {

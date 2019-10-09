@@ -24,8 +24,6 @@ import static org.junit.Assert.assertThat;
 import org.codedefenders.game.GameClass;
 import org.junit.Test;
 
-import java.lang.reflect.Field;
-
 public class GameClassTest {
 
     private void assertEditableLineCorrect(GameClass gc) {
@@ -36,25 +34,24 @@ public class GameClassTest {
 
     @Test
     public void testGetTestTemplateFirstEditLinePlainClass() {
-        String name = "Lift";
-        String alias = "Lift";
-        String javaFile = "src/test/resources/itests/sources/Lift/Lift.java";
-        String classFile = "";
-
-        GameClass gc = new GameClass(name, alias, javaFile, classFile);
+        GameClass gc = GameClass.build()
+                .name("Lift")
+                .alias("Lift")
+                .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
+                .classFile("")
+                .create();
 
         assertEditableLineCorrect(gc);
     }
 
     @Test
     public void testGetTestTemplateFirstEditLineWithPackage() throws Exception {
-        // Package information
-        String name = "my.little.test.Lift";
-        String alias = "Lift";
-        String javaFile = "src/test/resources/itests/sources/Lift/Lift.java";
-        String classFile = "";
-
-        GameClass gc = new GameClass(name, alias, javaFile, classFile);
+        GameClass gc = GameClass.build()
+                .name("my.little.test.Lift")
+                .alias("Lift")
+                .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
+                .classFile("")
+                .create();
 
         assertEditableLineCorrect(gc);
         assertThat(gc.getTestTemplate(), containsString("package"));
@@ -62,16 +59,13 @@ public class GameClassTest {
 
     @Test
     public void testGetTestTemplateFirstEditLineWithMockingEnabled() throws Exception {
-        String name = "Lift";
-        String alias = "Lift";
-        String javaFile = "src/test/resources/itests/sources/Lift/Lift.java";
-        String classFile = "";
-
-        GameClass gc = new GameClass(name, alias, javaFile, classFile);
-
-        final Field mockingField = gc.getClass().getDeclaredField("isMockingEnabled");
-        mockingField.setAccessible(true);
-        mockingField.set(gc, true);
+        GameClass gc = GameClass.build()
+                .name("Lift")
+                .alias("Lift")
+                .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
+                .classFile("")
+                .mockingEnabled(true)
+                .create();
 
         assertEditableLineCorrect(gc);
         assertThat(gc.getTestTemplate(), containsString("mock"));
@@ -79,12 +73,13 @@ public class GameClassTest {
 
     @Test
     public void testGetTestTemplateFirstEditLineWith2Imports() {
-        String name = "Option";
-        String alias = "Option";
-        String javaFile = "src/test/resources/itests/sources/Option/Option.java";
-        String classFile = "";
-
-        GameClass gc = new GameClass(name, alias, javaFile, classFile);
+        GameClass gc = GameClass.build()
+                .name("Option")
+                .alias("Option")
+                .javaFile("src/test/resources/itests/sources/Option/Option.java")
+                .classFile("")
+                .mockingEnabled(true)
+                .create();
 
         assertEditableLineCorrect(gc);
         assertThat(gc.getTestTemplate(), containsString("import java.util.List;"));
@@ -92,16 +87,13 @@ public class GameClassTest {
 
     @Test
     public void testGetTestTemplateFirstEditLineWith4ImportsPackageAndMocking() throws Exception {
-        String name = "my.little.test.XmlElement";
-        String alias = "XmlElement";
-        String javaFile = "src/test/resources/itests/sources/XmlElement/XmlElement.java";
-        String classFile = "";
-
-        GameClass gc = new GameClass(name, alias, javaFile, classFile);
-
-        final Field mockingField = gc.getClass().getDeclaredField("isMockingEnabled");
-        mockingField.setAccessible(true);
-        mockingField.set(gc, true);
+        GameClass gc = GameClass.build()
+                .name("my.little.test.XmlElement")
+                .alias("XmlElement")
+                .javaFile("src/test/resources/itests/sources/XmlElement/XmlElement.java")
+                .classFile("")
+                .mockingEnabled(true)
+                .create();
 
         assertEditableLineCorrect(gc);
         assertThat(gc.getTestTemplate(), containsString("import java.util.Vector;"));
