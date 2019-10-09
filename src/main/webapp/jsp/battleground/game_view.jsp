@@ -23,6 +23,9 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
+<%@ page import="org.codedefenders.game.GameState" %>
 <%
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     int userId = ServletUtils.userId(request); // required for playerFeedback, too

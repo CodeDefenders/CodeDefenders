@@ -93,12 +93,12 @@ public class UserMultiplayerGameInfo {
         return game.getDefenderPlayers();
     }
 
-    public String cutAlias() {
-        return game.getCUT().getAlias();
+    public int cutId() {
+        return game.getCUT().getId();
     }
 
-    public String cutSource() {
-        return game.getCUT().getAsHTMLEscapedString();
+    public String cutAlias() {
+        return game.getCUT().getAlias();
     }
 
     private enum Type {
