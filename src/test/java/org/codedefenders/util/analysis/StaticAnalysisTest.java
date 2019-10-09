@@ -19,7 +19,9 @@
 package org.codedefenders.util.analysis;
 
 import org.apache.commons.lang3.Range;
+import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.TestingFramework;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -226,18 +228,12 @@ public class StaticAnalysisTest {
                 .alias("Lift")
                 .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
                 .classFile("src/test/resources/itests/sources/Lift/Lift.class")
+                .testingFramework(TestingFramework.JUNIT4)
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
                 .create();
 
-        String testTemplate = gc.getHTMLEscapedTestTemplate();
-        assertThat(testTemplate, allOf(
-                containsString("junit"),
-                containsString("hamcrest")
-        ));
-
-        // We need -1 to get rid of the last token
-        int expectedImports = 4;
-        int actualImports = testTemplate.split("import").length - 1;
-        assertEquals("The test template has the wrong number of imports", expectedImports, actualImports);
+        assertEquals("The test template has the wrong number of imports",
+                gc.getAdditionalImports().size(), 0);
     }
 
     @Test
@@ -249,19 +245,7 @@ public class StaticAnalysisTest {
                 .classFile("src/test/resources/itests/sources/XmlElement/XmlElement.class")
                 .create();
 
-        String testTemplate = gc.getHTMLEscapedTestTemplate();
-
-        assertThat(testTemplate, allOf(
-                containsString("junit"),
-                containsString("hamcrest"),
-                containsString("import java.util.Enumeration;"),
-                containsString("import java.util.Hashtable;"),
-                containsString("import java.util.Iterator;"),
-                containsString("import java.util.List;"),
-                containsString("import java.util.Vector;")));
-
-        int expectedImports = 9;
-        int actualImports = testTemplate.split("import").length - 1;
-        assertEquals("The test template has the wrong number of imports", expectedImports, actualImports);
+        assertEquals("The test template has the wrong number of imports",
+                gc.getAdditionalImports().size(), 5);
     }
 }

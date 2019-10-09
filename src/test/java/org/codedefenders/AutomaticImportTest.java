@@ -24,7 +24,9 @@ import static org.hamcrest.core.AllOf.allOf;
 import static org.hamcrest.core.StringContains.containsString;
 import static org.junit.Assert.assertEquals;
 
+import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.TestingFramework;
 
 public class AutomaticImportTest {
 
@@ -36,6 +38,8 @@ public class AutomaticImportTest {
                 .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
                 .classFile("src/test/resources/itests/sources/Lift/Lift.class")
                 .mockingEnabled(true)
+                .testingFramework(TestingFramework.JUNIT4)
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
                 .create();
 
         String testTemplate = gc.getHTMLEscapedTestTemplate();
@@ -50,6 +54,8 @@ public class AutomaticImportTest {
                 .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
                 .classFile("src/test/resources/itests/sources/Lift/Lift.class")
                 .mockingEnabled(false)
+                .testingFramework(TestingFramework.JUNIT4)
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
                 .create();
 
         String testTemplate = gc.getHTMLEscapedTestTemplate();
@@ -64,6 +70,8 @@ public class AutomaticImportTest {
                 .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
                 .classFile("src/test/resources/itests/sources/Lift/Lift.class")
                 .mockingEnabled(true)
+                .testingFramework(TestingFramework.JUNIT4)
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
                 .create();
 
         String testTemplate = gc.getHTMLEscapedTestTemplate();
@@ -84,6 +92,8 @@ public class AutomaticImportTest {
                 .alias("XmlElement")
                 .javaFile("src/test/resources/itests/sources/XmlElement/XmlElement.java")
                 .classFile("src/test/resources/itests/sources/XmlElement/XmlElement.class")
+                .testingFramework(TestingFramework.JUNIT4)
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
                 .mockingEnabled(true)
                 .create();
 
