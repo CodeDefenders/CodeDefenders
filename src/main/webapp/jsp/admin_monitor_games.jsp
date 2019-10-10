@@ -110,8 +110,8 @@
                                 <div class="modal-body">
                                     <pre class="readonly-pre"><textarea
                                             class="readonly-textarea classPreview"
-                                            id="sut<%=gid%>" name="cut<%=gid%>" cols="80"
-                                            rows="30"><%=cut.getAsHTMLEscapedString()%></textarea></pre>
+                                            id="sut<%=gid%>" name="cut<%=g.getCUT().getId()%>" cols="80"
+                                            rows="30"></textarea></pre>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -307,16 +307,18 @@
             });
 
             $('.modal').on('shown.bs.modal', function () {
-                var codeMirrorContainer = $(this).find(".CodeMirror")[0];
+                let codeMirrorContainer = $(this).find(".CodeMirror")[0];
                 if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
                     codeMirrorContainer.CodeMirror.refresh();
                 } else {
-                    var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
+                    let textarea = $(this).find('textarea')[0];
+                    let editor = CodeMirror.fromTextArea(textarea, {
                         lineNumbers: false,
                         readOnly: true,
                         mode: "text/x-java"
                     });
-                    editorDiff.setSize("100%", 500);
+                    editor.setSize("100%", 500);
+                    ClassAPI.getAndSetEditorValue(textarea, editor);
                 }
             });
         </script>

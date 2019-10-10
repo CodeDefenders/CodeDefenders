@@ -122,30 +122,29 @@
             </li>
 
         </ul>
-        <pre class="readonly-pre"><textarea class="utest" title="utest" cols="20"
-                                            rows="10"><%=test.getAsHTMLEscapedString()%></textarea></pre>
+        <pre class="readonly-pre"><textarea class="utest" title="utest" name="preview-<%=test.getId()%>" cols="20" rows="10"><%=test.getAsHTMLEscapedString()%></textarea></pre>
     </div>
     <%  } %>
 </div>
 
 <script>
-    var x = document.getElementsByClassName("utest");
-    for (var i = 0; i < x.length; i++) {
-        CodeMirror.fromTextArea(x[i], {
+    for (let textarea of document.getElementsByClassName("utest")) {
+        let editor = CodeMirror.fromTextArea(textarea, {
             lineNumbers: true,
             matchBrackets: true,
             mode: "text/x-java",
             readOnly: true
         });
+        // Potential ajax calls, but the carousel seems to require all DOM nodes to be present to be rendered correctly.
+        // TestAPI.getAndSetEditorValue(textarea, editor);
     }
-</script>
-<%-- Activate the popover thingy --%>
-<script>
-$(function () {
-	  $('[data-toggle="popover"]').popover({
-		  trigger: 'focus'
-	  })
-})
+
+    <%-- Activate the popover thingy --%>
+    $(function () {
+        $('[data-toggle="popover"]').popover({
+            trigger: 'focus'
+        })
+    });
 
 </script>
 <% } %>

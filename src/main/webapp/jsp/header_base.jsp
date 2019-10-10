@@ -139,14 +139,18 @@
     <!-- MultiplayerGame -->
     <link href="css/gamestyle.css" rel="stylesheet" type="text/css" />
     <link href="css/notification-style.css" rel="stylesheet" type="text/css" />
-    <script type="text/javascript" src="js/messaging.js"></script>
+    <script type="text/javascript" src="js/codedefenders/messaging.js"></script>
+
+    <script type="text/javascript" src="js/codedefenders/class-info-api.js"></script>
+    <script type="text/javascript" src="js/codedefenders/test-info-api.js"></script>
+    <script type="text/javascript" src="js/codedefenders/mutant-info-api.js"></script>
 
     <!-- Upload page -->
     <link href="css/uploadcut.css" rel="stylesheet" type="text/css" />
 
     <link href="css/game_highlighting.css" rel="stylesheet" type="text/css" />
     <link href="css/error_highlighting.css" rel="stylesheet" type="text/css" />
-    
+
     <link href="css/modal_dialogs.css" rel="stylesheet" type="text/css" />
 
     <script>
