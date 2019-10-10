@@ -13,8 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.codedefenders.notification.ITicketingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TicketingFilter implements Filter {
+    private static final Logger logger = LoggerFactory.getLogger(TicketingFilter.class);
 
     public static final String TICKET_REQUEST_ATTRIBUTE_NAME = "notification-ticket";
 
@@ -44,8 +47,8 @@ public class TicketingFilter implements Filter {
                  */
                 String ticket = ticketingService.generateTicketForOwner(userId);
                 request.setAttribute(TICKET_REQUEST_ATTRIBUTE_NAME, ticket);
-                System.out.println("TicketingFilter.doFilter() Registering ticket " + ticket + " for " + userId
-                        + " from " + httpReq.getRequestURI());
+
+                logger.debug("Registering toket {} for {} from {}.", ticket, userId, httpReq.getRequestURI());
 
                 chain.doFilter(request, response);
             } else {

@@ -65,20 +65,6 @@
 				"pageLength": 50
 			} );
 		} );
-
-		$('.modal').on('shown.bs.modal', function() {
-			var codeMirrorContainer = $(this).find(".CodeMirror")[0];
-			if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-				codeMirrorContainer.CodeMirror.refresh();
-			} else {
-				var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
-					lineNumbers: false,
-					readOnly: true,
-					mode: "text/x-java"
-				});
-				editorDiff.setSize("100%", 500);
-			}
-		});
 	</script>
 
 </div>
