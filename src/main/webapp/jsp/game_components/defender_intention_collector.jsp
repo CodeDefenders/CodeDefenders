@@ -25,10 +25,10 @@ var sLine = null; // Primary Target
 var theForm = document.getElementById('def');
 
 // prepend note for line selection above CUT
-var lineChooseNote = "<span id='lineChooseNote' class='panel panel-default' style='padding: 5px; margin-left: 10px; color: #00289c'>" +
+var lineChooseNote = "<span id='lineChooseNote' class='panel panel-default' style='padding: 5px; margin-left: 20px; color: #00289c'>" +
     "<i class='glyphicon glyphicon-arrow-down' style='margin: 5px 3px 20px 0'></i>" +
     "Indicate which line you are defending to enable test editor</span>";
-$('#cut-div .CodeMirror.cm-s-default').prepend(lineChooseNote);
+$(lineChooseNote).insertAfter('#cut-div h3');
 
 function toggleDefend() {
 	var input = document.getElementById('selected_lines');
@@ -78,26 +78,30 @@ theForm.appendChild(input);
 <!-- Update Left Code Mirror to enable line selection on gutter -->
 var editor = document.querySelector('#sut').nextSibling.CodeMirror;
 
-editor.on("gutterClick", function(cm, n) {
-  if(isLineSelected()){
-		if(sLine != n + 1) {
-			// DeSelect the previously selected line if any
-			cm.setGutterMarker(sLine - 1, "CodeMirror-linenumbers", null);
-  		}
-  }
-  // Toogle the new one
-  var info = cm.lineInfo(n);
-  var markers = info.gutterMarkers || (info.gutterMarkers = {});
-  var value = markers["CodeMirror-linenumbers"];
-  if (value != null) {
-	  cm.setGutterMarker(n, "CodeMirror-linenumbers", null);
-  } else {
-	  cm.setGutterMarker(n, "CodeMirror-linenumbers", makeMarker());
-  }
+editor.on("gutterClick", function (cm, n) {
+    if (isLineSelected()) {
+        if (sLine != n + 1) {
+            // DeSelect the previously selected line if any
+            cm.setGutterMarker(sLine - 1, "CodeMirror-linenumbers", null);
+        }
+    }
+    // Toogle the new one
+    var info = cm.lineInfo(n);
+    var markers = info.gutterMarkers || (info.gutterMarkers = {});
+    var value = markers["CodeMirror-linenumbers"];
+    if (value != null) {
+        cm.setGutterMarker(n, "CodeMirror-linenumbers", null);
+    } else {
+        cm.setGutterMarker(n, "CodeMirror-linenumbers", makeMarker());
+    }
 
-  selectLine(n+1);
-  toggleLineChooseNote();
-  addIntentionClass();
+    selectLine(n + 1);
+    toggleLineChooseNote();
+
+    // wait for the linenumbers to render before adding/removing a styling class
+    setTimeout(function () {
+        toggleIntentionClass();
+    });
 });
 
 function makeMarker() {
@@ -107,7 +111,7 @@ function makeMarker() {
   return marker;
 }
 
-addIntentionClass();
+toggleIntentionClass();
 // Trigger the logic that updates the UI at last
 toggleDefend();
 
@@ -120,8 +124,8 @@ selectLine(selectedLine); // +1
 editor.setGutterMarker(selectedLine-1, "CodeMirror-linenumbers", makeMarker());
 <%}%>
 
-function addIntentionClass() {
-    $('#cut-div .CodeMirror-linenumber').each(function() {
+function toggleIntentionClass() {
+    $('#cut-div .CodeMirror-gutter-elt').each(function() {
         if (!isLineSelected()) {
             $(this).addClass('linenumber-intention');
         } else {
