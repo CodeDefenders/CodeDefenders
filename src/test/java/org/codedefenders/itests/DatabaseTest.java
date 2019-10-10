@@ -83,435 +83,448 @@ import static org.junit.Assume.assumeTrue;
 @PrepareForTest({ DatabaseConnection.class, CodeValidator.class })
 public class DatabaseTest {
     private static long START_TIME = (int) 1e15;
-	private static long END_TIME = (int) 1e30;
+    private static long END_TIME = (int) 1e30;
 
-	@Before // BeforeClass has to be static...
-	public void createEntities() {
-		user1 = new User("FREE_USERNAME", User.encodePassword("TEST_PASSWORD"), "TESTMAIL@TEST.TEST");
-		user2 = new User("FREE_USERNAME2", User.encodePassword("TEST_PASSWORD2"), "TESTMAIL@TEST.TEST2");
+    @Before // BeforeClass has to be static...
+    public void createEntities() {
+        user1 = new User("FREE_USERNAME", User.encodePassword("TEST_PASSWORD"), "TESTMAIL@TEST.TEST");
+        user2 = new User("FREE_USERNAME2", User.encodePassword("TEST_PASSWORD2"), "TESTMAIL@TEST.TEST2");
 
-		creator = new User(20000, "FREE_USERNAME3", User.encodePassword("TEST_PASSWORD3"), "TESTMAIL@TEST.TEST3");
+        creator = new User(20000, "FREE_USERNAME3", User.encodePassword("TEST_PASSWORD3"), "TESTMAIL@TEST.TEST3");
 
-		cut1 = new GameClass(22345678, "MyClass", "", "", "", false, true);
-		cut2 = new GameClass(34865,"", "AliasForClass2", "", "", false, true);
-		multiplayerGame = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), 5, CodeValidator.DEFAULT_FORCE_HAMCREST)
+        cut1 = GameClass.build()
+                .id(22345678)
+                .name("MyClass")
+                .alias("")
+                .javaFile("")
+                .classFile("")
+                .create();
+
+        cut1 = GameClass.build()
+                .id(34865)
+                .name("")
+                .alias("AliasForClass2")
+                .javaFile("")
+                .classFile("")
+                .create();
+
+        multiplayerGame = new MultiplayerGame
+                .Builder(cut1.getId(), creator.getId(), 5, CodeValidator.DEFAULT_FORCE_HAMCREST)
                 .level(GameLevel.EASY)
-				.defenderValue(10)
-				.attackerValue(4)
-				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
-				.chatEnabled(true)
-				.build();
-	}
+                .defenderValue(10)
+                .attackerValue(4)
+                .mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+                .chatEnabled(true)
+                .build();
+    }
 
-	// This will re-create the same DB from scratch every time... is this really
-	// necessary ?! THIS IS NOT ACTUALLY THE CASE. I SUSPECT THAT THE RULE CREATES ONLY ONCE THE DB
-	@Rule
-	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
+    // This will re-create the same DB from scratch every time... is this really
+    // necessary ?! THIS IS NOT ACTUALLY THE CASE. I SUSPECT THAT THE RULE CREATES ONLY ONCE THE DB
+    @Rule
+    public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql");
 
-	@Before
-	public void mockDBConnections() throws Exception {
-		PowerMockito.mockStatic(DatabaseConnection.class);
-		PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
-			public Connection answer(InvocationOnMock invocation) throws SQLException {
-				// Return a new connection from the rule instead
-				return db.getConnection();
-			}
-		});
-	}
+    @Before
+    public void mockDBConnections() throws Exception {
+        PowerMockito.mockStatic(DatabaseConnection.class);
+        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
+            public Connection answer(InvocationOnMock invocation) throws SQLException {
+                // Return a new connection from the rule instead
+                return db.getConnection();
+            }
+        });
+    }
 
-	private User creator;
-	private User user1;
-	private User user2;
+    private User creator;
+    private User user1;
+    private User user2;
 
-	private MultiplayerGame multiplayerGame;
+    private MultiplayerGame multiplayerGame;
 
-	private GameClass cut1;
-	private GameClass cut2;
-	private Mutant mutant1;
-	private org.codedefenders.game.Test test;
+    private GameClass cut1;
+    private GameClass cut2;
+    private Mutant mutant1;
+    private org.codedefenders.game.Test test;
 
 
-	@Test
-	public void testInsertUser() throws Exception {
-		assertTrue(user1.insert());
-		User userFromDB = UserDAO.getUserById(user1.getId());
-		assertEquals(user1.getId(), userFromDB.getId());
-		assertEquals(user1.getUsername(), userFromDB.getUsername());
-		assertEquals(user1.getEmail(), userFromDB.getEmail());
-		// FIXME this is never written to the DB
-		// assertEquals(user1.isValidated(), userFromDB.isValidated());
-		assertTrue(User.passwordMatches("TEST_PASSWORD", userFromDB.getEncodedPassword()));
-		assertNotEquals("Password should not be stored in plain text", "TEST_PASSWORD", userFromDB.getEncodedPassword());
-		// FIXME Split this in two tests
-		// assertFalse("Inserting a user twice should fail", user1.insert());
-	}
+    @Test
+    public void testInsertUser() throws Exception {
+        assertTrue(user1.insert());
+        User userFromDB = UserDAO.getUserById(user1.getId());
+        assertEquals(user1.getId(), userFromDB.getId());
+        assertEquals(user1.getUsername(), userFromDB.getUsername());
+        assertEquals(user1.getEmail(), userFromDB.getEmail());
+        // FIXME this is never written to the DB
+        // assertEquals(user1.isValidated(), userFromDB.isValidated());
+        assertTrue(User.passwordMatches("TEST_PASSWORD", userFromDB.getEncodedPassword()));
+        assertNotEquals("Password should not be stored in plain text", "TEST_PASSWORD", userFromDB.getEncodedPassword());
+        // FIXME Split this in two tests
+        // assertFalse("Inserting a user twice should fail", user1.insert());
+    }
 
-	@Test
-	public void testUpdateUser() {
-		assumeTrue(user1.insert());
+    @Test
+    public void testUpdateUser() {
+        assumeTrue(user1.insert());
 
-		user1.setEncodedPassword(User.encodePassword("TEST_PASSWORD" + "_new"));
-		user1.setUsername(user1.getUsername() + "_new");
-		user1.setEmail(user1.getEmail() + "_new");
+        user1.setEncodedPassword(User.encodePassword("TEST_PASSWORD" + "_new"));
+        user1.setUsername(user1.getUsername() + "_new");
+        user1.setEmail(user1.getEmail() + "_new");
 
-		assertTrue(user1.update());
-		User userFromDB = UserDAO.getUserById(user1.getId());
-		assertEquals(user1.getId(), userFromDB.getId());
-		assertEquals(user1.getUsername(), userFromDB.getUsername());
-		assertEquals(user1.getEmail(), userFromDB.getEmail());
-		assertEquals(user1.getEncodedPassword(), userFromDB.getEncodedPassword());
-	}
+        assertTrue(user1.update());
+        User userFromDB = UserDAO.getUserById(user1.getId());
+        assertEquals(user1.getId(), userFromDB.getId());
+        assertEquals(user1.getUsername(), userFromDB.getUsername());
+        assertEquals(user1.getEmail(), userFromDB.getEmail());
+        assertEquals(user1.getEncodedPassword(), userFromDB.getEncodedPassword());
+    }
 
-	@Test
-	public void testInsertClasses() throws Exception {
-		assertEquals(0, GameClassDAO.getAllPlayableClasses().size());
+    @Test
+    public void testInsertClasses() throws Exception {
+        assertEquals(0, GameClassDAO.getAllPlayableClasses().size());
 
-		assertTrue("Should have inserted class", cut1.insert());
-		assertEquals(1, GameClassDAO.getAllPlayableClasses().size());
+        assertTrue("Should have inserted class", cut1.insert());
+        assertEquals(1, GameClassDAO.getAllPlayableClasses().size());
 
-		assertTrue("Should have inserted class", cut2.insert());
-		assertEquals(2, GameClassDAO.getAllPlayableClasses().size());
-		PowerMockito.verifyStatic();
-	}
+        assertTrue("Should have inserted class", cut2.insert());
+        assertEquals(2, GameClassDAO.getAllPlayableClasses().size());
+        PowerMockito.verifyStatic();
+    }
 
-	@Test
-	public void testInsertGame() throws Exception {
-		assumeTrue(creator.insert());
-		assumeTrue(user1.insert());
-		assumeTrue(cut1.insert());
+    @Test
+    public void testInsertGame() throws Exception {
+        assumeTrue(creator.insert());
+        assumeTrue(user1.insert());
+        assumeTrue(cut1.insert());
 
-		Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
-		// multiplayerGame.classId = cut1.getId();
+        Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
+        // multiplayerGame.classId = cut1.getId();
 
-		assertTrue(multiplayerGame.insert());
+        assertTrue(multiplayerGame.insert());
 
-		MultiplayerGame multiplayerGameFromDB = MultiplayerGameDAO.getMultiplayerGame(multiplayerGame.getId());
-		assertEquals(multiplayerGameFromDB.getPrize(), multiplayerGame.getPrize(), 1e-10);
-		assertEquals(multiplayerGameFromDB.getMaxAssertionsPerTest() , multiplayerGame.getMaxAssertionsPerTest());
-		assertEquals(multiplayerGameFromDB.isChatEnabled(), multiplayerGame.isChatEnabled());
-		assertEquals(multiplayerGameFromDB.getMutantValidatorLevel() , multiplayerGame.getMutantValidatorLevel());
-	}
+        MultiplayerGame multiplayerGameFromDB = MultiplayerGameDAO.getMultiplayerGame(multiplayerGame.getId());
+        assertEquals(multiplayerGameFromDB.getPrize(), multiplayerGame.getPrize(), 1e-10);
+        assertEquals(multiplayerGameFromDB.getMaxAssertionsPerTest() , multiplayerGame.getMaxAssertionsPerTest());
+        assertEquals(multiplayerGameFromDB.isChatEnabled(), multiplayerGame.isChatEnabled());
+        assertEquals(multiplayerGameFromDB.getMutantValidatorLevel() , multiplayerGame.getMutantValidatorLevel());
+    }
 
-	@Test
-	public void testGameLists() {
-		assumeTrue(creator.insert());
-		assumeTrue(user1.insert());
-		assumeTrue(user2.insert());
-		assumeTrue(cut1.insert());
+    @Test
+    public void testGameLists() {
+        assumeTrue(creator.insert());
+        assumeTrue(user1.insert());
+        assumeTrue(user2.insert());
+        assumeTrue(cut1.insert());
 
-		MultiplayerGame mg2 = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
+        MultiplayerGame mg2 = new MultiplayerGame
+                .Builder(cut1.getId(), creator.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
                 .state(GameState.ACTIVE)
-				.level(GameLevel.EASY)
-				.defenderValue(10)
-				.attackerValue(4)
-				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
-				.chatEnabled(true)
-				.build();
-		assumeTrue(mg2.insert());
-		assumeTrue(mg2.addPlayer(user1.getId(), Role.DEFENDER));
-		assertTrue(mg2.update());
+                .level(GameLevel.EASY)
+                .defenderValue(10)
+                .attackerValue(4)
+                .mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+                .chatEnabled(true)
+                .build();
+        assumeTrue(mg2.insert());
+        assumeTrue(mg2.addPlayer(user1.getId(), Role.DEFENDER));
+        assertTrue(mg2.update());
 
-		MultiplayerGame mg3 = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
-				.state(GameState.ACTIVE)
-				.level(GameLevel.EASY)
-				.defenderValue(10)
-				.attackerValue(4)
-				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
-				.chatEnabled(true)
-				.build();
-		assumeTrue(mg3.insert());
+        MultiplayerGame mg3 = new MultiplayerGame
+                .Builder(cut1.getId(), creator.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
+                .state(GameState.ACTIVE)
+                .level(GameLevel.EASY)
+                .defenderValue(10)
+                .attackerValue(4)
+                .mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+                .chatEnabled(true)
+                .build();
+        assumeTrue(mg3.insert());
 
-		assumeTrue(mg3.addPlayer(user1.getId(), Role.DEFENDER));
-		assumeTrue(mg3.addPlayer(user2.getId(), Role.ATTACKER));
-		assumeTrue(mg3.update());
+        assumeTrue(mg3.addPlayer(user1.getId(), Role.DEFENDER));
+        assumeTrue(mg3.addPlayer(user2.getId(), Role.ATTACKER));
+        assumeTrue(mg3.update());
 
-		MultiplayerGame mg4 = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
-				.level(GameLevel.EASY)
-				.defenderValue(10)
-				.attackerValue(4)
-				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
-				.chatEnabled(true)
-				.build();
-		assertEquals(1, MultiplayerGameDAO.getActiveMultiplayerGamesWithInfoForUser(user2.getId()).size());
-		assertEquals(2, MultiplayerGameDAO.getActiveMultiplayerGamesWithInfoForUser(user1.getId()).size());
-		assertEquals(2, MultiplayerGameDAO.getJoinedMultiplayerGamesForUser(user1.getId()).size());
-		assertEquals(0, MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(user1.getId()).size());
+        MultiplayerGame mg4 = new MultiplayerGame
+                .Builder(cut1.getId(), creator.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
+                .level(GameLevel.EASY)
+                .defenderValue(10)
+                .attackerValue(4)
+                .mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+                .chatEnabled(true)
+                .build();
+        assertEquals(1, MultiplayerGameDAO.getActiveMultiplayerGamesWithInfoForUser(user2.getId()).size());
+        assertEquals(2, MultiplayerGameDAO.getActiveMultiplayerGamesWithInfoForUser(user1.getId()).size());
+        assertEquals(2, MultiplayerGameDAO.getJoinedMultiplayerGamesForUser(user1.getId()).size());
+        assertEquals(0, MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(user1.getId()).size());
 
-		assumeTrue(mg4.insert());
-		assumeTrue(mg4.addPlayer(user1.getId(), Role.DEFENDER));
-		mg4.setState(GameState.FINISHED);
-		assertTrue(mg4.update());
+        assumeTrue(mg4.insert());
+        assumeTrue(mg4.addPlayer(user1.getId(), Role.DEFENDER));
+        mg4.setState(GameState.FINISHED);
+        assertTrue(mg4.update());
 
-		assertEquals(1, MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(user1.getId()).size());
-	}
+        assertEquals(1, MultiplayerGameDAO.getFinishedMultiplayerGamesForUser(user1.getId()).size());
+    }
 
-	@Test
-	public void testInsertPlayer() throws Exception {
-		assumeTrue(creator.insert());
-		assumeTrue(user1.insert());
-		assumeTrue(cut1.insert());
+    @Test
+    public void testInsertPlayer() throws Exception {
+        assumeTrue(creator.insert());
+        assumeTrue(user1.insert());
+        assumeTrue(cut1.insert());
 
-		Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
-		// multiplayerGame.classId = cut1.getId();
+        Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
+        // multiplayerGame.classId = cut1.getId();
 
-		assertTrue(multiplayerGame.insert());
-		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
-		int playerID = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
-		assertTrue(playerID > 0);
-		assertEquals(UserDAO.getUserForPlayer(playerID).getId(), user1.getId());
-		assertTrue(GameDAO.getPlayersForGame(multiplayerGame.getId(), Role.DEFENDER).size() > 0);
-		assertEquals(DatabaseAccess.getPlayerPoints(playerID), 0);
-		DatabaseAccess.increasePlayerPoints(13, playerID);
-		assertEquals(DatabaseAccess.getPlayerPoints(playerID), 13);
-	}
+        assertTrue(multiplayerGame.insert());
+        assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
+        int playerID = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
+        assertTrue(playerID > 0);
+        assertEquals(UserDAO.getUserForPlayer(playerID).getId(), user1.getId());
+        assertTrue(GameDAO.getPlayersForGame(multiplayerGame.getId(), Role.DEFENDER).size() > 0);
+        assertEquals(DatabaseAccess.getPlayerPoints(playerID), 0);
+        DatabaseAccess.increasePlayerPoints(13, playerID);
+        assertEquals(DatabaseAccess.getPlayerPoints(playerID), 13);
+    }
 
-	@Test
-	public void testInsertMutant() throws Exception {
-		PowerMockito.mockStatic(CodeValidator.class);
-		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE1")).thenReturn("MD5_1");
-		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE2")).thenReturn("MD5_2");
+    @Test
+    public void testInsertMutant() throws Exception {
+        PowerMockito.mockStatic(CodeValidator.class);
+        PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE1")).thenReturn("MD5_1");
+        PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE2")).thenReturn("MD5_2");
 
-		assumeTrue(creator.insert());
-		assumeTrue(user1.insert());
-		assumeTrue(cut2.insert());
+        assumeTrue(creator.insert());
+        assumeTrue(user1.insert());
+        assumeTrue(cut2.insert());
 
-		Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
-		// multiplayerGame.classId = cut2.getId();
+        Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
+        // multiplayerGame.classId = cut2.getId();
 
-		assertTrue(multiplayerGame.insert());
-		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
+        assertTrue(multiplayerGame.insert());
+        assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
-		int gid = multiplayerGame.getId();
-		int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), gid);
-		int cutID = cut2.getId();
-		mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
-				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
-		Mutant mutant2 = new Mutant(100, cutID, gid, "TEST_J_FILE2", "TEST_C_FILE2", false,
-				Mutant.Equivalence.ASSUMED_YES, 2, 2, pid);
-		assertTrue(mutant1.insert());
-		assertTrue(mutant2.insert());
-		Mutant[] ml = { mutant1, mutant2 };
-		assertTrue(Arrays.equals(MutantDAO.getValidMutantsForPlayer(pid).toArray(), ml));
-		assertTrue(Arrays.equals(MutantDAO.getValidMutantsForGame(gid).toArray(), ml));
-	}
+        int gid = multiplayerGame.getId();
+        int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), gid);
+        int cutID = cut2.getId();
+        mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
+                Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
+        Mutant mutant2 = new Mutant(100, cutID, gid, "TEST_J_FILE2", "TEST_C_FILE2", false,
+                Mutant.Equivalence.ASSUMED_YES, 2, 2, pid);
+        assertTrue(mutant1.insert());
+        assertTrue(mutant2.insert());
+        Mutant[] ml = { mutant1, mutant2 };
+        assertTrue(Arrays.equals(MutantDAO.getValidMutantsForPlayer(pid).toArray(), ml));
+        assertTrue(Arrays.equals(MutantDAO.getValidMutantsForGame(gid).toArray(), ml));
+    }
 
-	@Test
-	public void testDoubleUpdateMutant() throws Exception {
-		PowerMockito.mockStatic(CodeValidator.class);
-		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE1")).thenReturn("MD5_1");
-		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE2")).thenReturn("MD5_2");
+    @Test
+    public void testDoubleUpdateMutant() throws Exception {
+        PowerMockito.mockStatic(CodeValidator.class);
+        PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE1")).thenReturn("MD5_1");
+        PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE2")).thenReturn("MD5_2");
 
-		assumeTrue(creator.insert());
-		assumeTrue(user1.insert());
-		assumeTrue(cut2.insert());
+        assumeTrue(creator.insert());
+        assumeTrue(user1.insert());
+        assumeTrue(cut2.insert());
 
-		Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
-		// multiplayerGame.classId = cut2.getId();
+        Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
+        // multiplayerGame.classId = cut2.getId();
 
-		assertTrue(multiplayerGame.insert());
-		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
+        assertTrue(multiplayerGame.insert());
+        assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
-		int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
-		int cutID = cut2.getId();
+        int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
+        int cutID = cut2.getId();
         Mutant mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
-				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
+                Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
 
-		assertTrue(mutant1.insert());
+        assertTrue(mutant1.insert());
 
-		assertTrue(mutant1.kill(Equivalence.ASSUMED_NO));
-		//
-		assertFalse(mutant1.kill(Equivalence.ASSUMED_NO));
-		assertFalse(mutant1.kill(Equivalence.ASSUMED_NO));
-	}
+        assertTrue(mutant1.kill(Equivalence.ASSUMED_NO));
+        //
+        assertFalse(mutant1.kill(Equivalence.ASSUMED_NO));
+        assertFalse(mutant1.kill(Equivalence.ASSUMED_NO));
+    }
 
-	@Test
-	public void testCannotUpdateKilledMutant() throws Exception {
-		PowerMockito.mockStatic(CodeValidator.class);
-		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE1")).thenReturn("MD5_1");
-		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE2")).thenReturn("MD5_2");
+    @Test
+    public void testCannotUpdateKilledMutant() throws Exception {
+        PowerMockito.mockStatic(CodeValidator.class);
+        PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE1")).thenReturn("MD5_1");
+        PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE2")).thenReturn("MD5_2");
 
-		assumeTrue(creator.insert());
-		assumeTrue(user1.insert());
-		assumeTrue(cut2.insert());
+        assumeTrue(creator.insert());
+        assumeTrue(user1.insert());
+        assumeTrue(cut2.insert());
 
 
-		// Creator must be there already
-		multiplayerGame = new MultiplayerGame
-				.Builder(cut1.getId(), creator.getId(), 5, CodeValidator.DEFAULT_FORCE_HAMCREST)
-				.level(GameLevel.EASY)
-				.defenderValue(10)
-				.attackerValue(4)
-				.mutantValidatorLevel(CodeValidatorLevel.MODERATE)
-				.chatEnabled(true)
-				.build();
-		// Why this ?
-		Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
-		// multiplayerGame.classId = cut2.getId();
+        // Creator must be there already
+        multiplayerGame = new MultiplayerGame
+                .Builder(cut1.getId(), creator.getId(), 5, CodeValidator.DEFAULT_FORCE_HAMCREST)
+                .level(GameLevel.EASY)
+                .defenderValue(10)
+                .attackerValue(4)
+                .mutantValidatorLevel(CodeValidatorLevel.MODERATE)
+                .chatEnabled(true)
+                .build();
+        // Why this ?
+        Whitebox.setInternalState(multiplayerGame, "classId", cut2.getId());
+        // multiplayerGame.classId = cut2.getId();
 
-		assertTrue(multiplayerGame.insert());
-		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
+        assertTrue(multiplayerGame.insert());
+        assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.ATTACKER));
 
-		int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
-		int cutID = cut2.getId();
+        int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
+        int cutID = cut2.getId();
         Mutant mutant1 = new Mutant(99, cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
-				Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
+                Mutant.Equivalence.ASSUMED_NO, 1, 99, pid);
 
-		assertTrue(mutant1.insert());
-		// Kill the mutant
-		assertTrue(mutant1.kill(Equivalence.ASSUMED_NO));
-		int score = mutant1.getScore();
-		// Prevent score update
-		mutant1.setScore( 10 );
-		assertFalse(mutant1.update());
-		//
+        assertTrue(mutant1.insert());
+        // Kill the mutant
+        assertTrue(mutant1.kill(Equivalence.ASSUMED_NO));
+        int score = mutant1.getScore();
+        // Prevent score update
+        mutant1.setScore( 10 );
+        assertFalse(mutant1.update());
+        //
 
-		Mutant storedMutant = MutantDAO.getMutantById( mutant1.getId() );
-		assertEquals("Score does not match", score, storedMutant.getScore());
-		//
-		assertEquals(mutant1, storedMutant);
-	}
+        Mutant storedMutant = MutantDAO.getMutantById( mutant1.getId() );
+        assertEquals("Score does not match", score, storedMutant.getScore());
+        //
+        assertEquals(mutant1, storedMutant);
+    }
 
-	@Test
-	public void testInsertTest() throws Exception {
-		assumeTrue(creator.insert());
-		assumeTrue(user1.insert());
-		assumeTrue(cut1.insert());
+    @Test
+    public void testInsertTest() throws Exception {
+        assumeTrue(creator.insert());
+        assumeTrue(user1.insert());
+        assumeTrue(cut1.insert());
 
-		Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
-		// multiplayerGame.classId = cut1.getId();
+        Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
+        // multiplayerGame.classId = cut1.getId();
 
-		assertTrue(multiplayerGame.insert());
-		assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
+        assertTrue(multiplayerGame.insert());
+        assertTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
 
-		int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
-		test = new org.codedefenders.game.Test(99, cut1.getId(), multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10, pid);
-		test.setPlayerId(pid);
+        int pid = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
+        test = new org.codedefenders.game.Test(99, cut1.getId(), multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10, pid);
+        test.setPlayerId(pid);
 
-		assertTrue(test.insert());
-		org.codedefenders.game.Test testFromDB = TestDAO.getTestById(test.getId());
-		assertEquals(testFromDB.getJavaFile(), test.getJavaFile());
-		assertEquals(testFromDB.getClassFile(), test.getClassFile());
-		assertEquals(testFromDB.getGameId(), test.getGameId());
-		assertEquals(testFromDB.getPlayerId(), test.getPlayerId());
+        assertTrue(test.insert());
+        org.codedefenders.game.Test testFromDB = TestDAO.getTestById(test.getId());
+        assertEquals(testFromDB.getJavaFile(), test.getJavaFile());
+        assertEquals(testFromDB.getClassFile(), test.getClassFile());
+        assertEquals(testFromDB.getGameId(), test.getGameId());
+        assertEquals(testFromDB.getPlayerId(), test.getPlayerId());
 
-		LineCoverage lc = new LineCoverage();
-		test.setLineCoverage(lc);
-		test.setScore(17);
-		assertTrue(test.update());
+        LineCoverage lc = new LineCoverage();
+        test.setLineCoverage(lc);
+        test.setScore(17);
+        assertTrue(test.update());
 
-		testFromDB = TestDAO.getTestById(test.getId());
-		assertEquals(testFromDB.getScore(), test.getScore());
-		assertEquals(testFromDB.getLineCoverage().getLinesCovered(), test.getLineCoverage().getLinesCovered());
-		assertEquals(testFromDB.getLineCoverage().getLinesUncovered(), test.getLineCoverage().getLinesUncovered());
-	}
+        testFromDB = TestDAO.getTestById(test.getId());
+        assertEquals(testFromDB.getScore(), test.getScore());
+        assertEquals(testFromDB.getLineCoverage().getLinesCovered(), test.getLineCoverage().getLinesCovered());
+        assertEquals(testFromDB.getLineCoverage().getLinesUncovered(), test.getLineCoverage().getLinesUncovered());
+    }
 
-	@Ignore
-	@Test
-	public void testEquivalences() throws Exception {
+    @Ignore
+    @Test
+    public void testEquivalences() throws Exception {
 
-		testInsertMutant();
+        testInsertMutant();
 
-		assumeTrue(user2.insert());
-		assumeTrue(multiplayerGame.addPlayer(user2.getId(), Role.DEFENDER));
+        assumeTrue(user2.insert());
+        assumeTrue(multiplayerGame.addPlayer(user2.getId(), Role.DEFENDER));
 
-		int pid = PlayerDAO.getPlayerIdForUserAndGame(user2.getId(), multiplayerGame.getId());
-		assertTrue(DatabaseAccess.insertEquivalence(mutant1, pid));
-		assertEquals(DatabaseAccess.getEquivalentDefenderId(mutant1), pid);
-	}
+        int pid = PlayerDAO.getPlayerIdForUserAndGame(user2.getId(), multiplayerGame.getId());
+        assertTrue(DatabaseAccess.insertEquivalence(mutant1, pid));
+        assertEquals(DatabaseAccess.getEquivalentDefenderId(mutant1), pid);
+    }
 
-	@Test
-	public void testTargetExecutions() throws Exception {
-		PowerMockito.mockStatic(CodeValidator.class);
-		PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE1")).thenReturn("MD5_1");
+    @Test
+    public void testTargetExecutions() throws Exception {
+        PowerMockito.mockStatic(CodeValidator.class);
+        PowerMockito.when(CodeValidator.getMD5FromFile("TEST_J_FILE1")).thenReturn("MD5_1");
 
-		assumeTrue(creator.insert());
-		assumeTrue(user1.insert());
-		assumeTrue(user2.insert());
-		assumeTrue(cut1.insert());
-		Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
-		// multiplayerGame.classId = cut1.getId();
-		assumeTrue(multiplayerGame.insert());
-		assumeTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
-		assertTrue(multiplayerGame.addPlayer(user2.getId(), Role.ATTACKER));
+        assumeTrue(creator.insert());
+        assumeTrue(user1.insert());
+        assumeTrue(user2.insert());
+        assumeTrue(cut1.insert());
+        Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
+        // multiplayerGame.classId = cut1.getId();
+        assumeTrue(multiplayerGame.insert());
+        assumeTrue(multiplayerGame.addPlayer(user1.getId(), Role.DEFENDER));
+        assertTrue(multiplayerGame.addPlayer(user2.getId(), Role.ATTACKER));
 
-		//
-		int pidDefender = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
-		test = new org.codedefenders.game.Test(99, cut1.getId(), multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10,
-				pidDefender);
-		test.setPlayerId(pidDefender);
-		assumeTrue(test.insert());
-		LineCoverage lc = new LineCoverage();
-		test.setLineCoverage(lc);
-		test.setScore(17);
-		assumeTrue(test.update());
+        //
+        int pidDefender = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
+        test = new org.codedefenders.game.Test(99, cut1.getId(), multiplayerGame.getId(), "TEST_J_FILE", "TEST_C_FILE", 1, 10,
+                pidDefender);
+        test.setPlayerId(pidDefender);
+        assumeTrue(test.insert());
+        LineCoverage lc = new LineCoverage();
+        test.setLineCoverage(lc);
+        test.setScore(17);
+        assumeTrue(test.update());
 
-		//
-		int pidAttacker = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
-		int cutID = cut1.getId();
+        //
+        int pidAttacker = PlayerDAO.getPlayerIdForUserAndGame(user1.getId(), multiplayerGame.getId());
+        int cutID = cut1.getId();
 
         Mutant mutant1 = new Mutant(999,  cutID, multiplayerGame.getId(), "TEST_J_FILE1", "TEST_C_FILE1", true,
-				Mutant.Equivalence.ASSUMED_NO, 1, 99, pidAttacker);
-		assertTrue(mutant1.insert());
+                Mutant.Equivalence.ASSUMED_NO, 1, 99, pidAttacker);
+        assertTrue(mutant1.insert());
 
-		// Leave the ID in the constructor
-		TargetExecution te = new TargetExecution(1, test.getId(), mutant1.getId(),
-				TargetExecution.Target.TEST_EQUIVALENCE, TargetExecution.Status.SUCCESS, "msg", Timestamp.valueOf("1995-03-27 12:08:00"));
-		assertTrue(te.insert());
-		TargetExecution teFromDB = TargetExecutionDAO.getTargetExecutionForPair(test.getId(), mutant1.getId());
-		assertEquals(te.message, teFromDB.message);
-		assertEquals(te.status, teFromDB.status);
-		assertEquals(te.target, teFromDB.target);
-		assertEquals(te.mutantId, teFromDB.mutantId);
-		assertEquals(te.testId, teFromDB.testId);
-	}
+        // Leave the ID in the constructor
+        TargetExecution te = new TargetExecution(1, test.getId(), mutant1.getId(),
+                TargetExecution.Target.TEST_EQUIVALENCE, TargetExecution.Status.SUCCESS, "msg", Timestamp.valueOf("1995-03-27 12:08:00"));
+        assertTrue(te.insert());
+        TargetExecution teFromDB = TargetExecutionDAO.getTargetExecutionForPair(test.getId(), mutant1.getId());
+        assertEquals(te.message, teFromDB.message);
+        assertEquals(te.status, teFromDB.status);
+        assertEquals(te.target, teFromDB.target);
+        assertEquals(te.mutantId, teFromDB.mutantId);
+        assertEquals(te.testId, teFromDB.testId);
+    }
 
-	@Test
-	public void testEvents() throws Exception { // TODO figure out why table
-												// events does not have foreign
-												// keys
-		testInsertPlayer();
-		int pid = PlayerDAO.getPlayerIdForUserAndGame(user2.getId(), multiplayerGame.getId());
-		Timestamp ts = Timestamp.valueOf("1995-03-27 12:08:00");
-		Event ev = new Event(1, multiplayerGame.getId(), pid, "message", EventType.ATTACKER_MESSAGE, EventStatus.GAME,
-				ts);
-		assertTrue(ev.insert());
-		assertEquals(DatabaseAccess.getEventsForGame(multiplayerGame.getId()).size(), 2);
-		assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), 0, Role.DEFENDER).size(), 1);
-		assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), 0, Role.ATTACKER).size(), 2);
-		assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), (int) 1E20, Role.ATTACKER).size(), 0);
-	}
+    @Test
+    public void testEvents() throws Exception { // TODO figure out why table events does not have foreign keys
 
-	@Test
-	public void testRatings() {
-		assumeTrue(creator.insert());
-		assumeTrue(user1.insert());
-		assumeTrue(cut1.insert());
-		Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
-		assumeTrue(multiplayerGame.insert());
+        testInsertPlayer();
+        int pid = PlayerDAO.getPlayerIdForUserAndGame(user2.getId(), multiplayerGame.getId());
+        Timestamp ts = Timestamp.valueOf("1995-03-27 12:08:00");
+        Event ev = new Event(1, multiplayerGame.getId(), pid, "message", EventType.ATTACKER_MESSAGE, EventStatus.GAME,
+                ts);
+        assertTrue(ev.insert());
+        assertEquals(DatabaseAccess.getEventsForGame(multiplayerGame.getId()).size(), 2);
+        assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), 0, Role.DEFENDER).size(), 1);
+        assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), 0, Role.ATTACKER).size(), 2);
+        assertEquals(DatabaseAccess.getNewEventsForGame(multiplayerGame.getId(), (int) 1E20, Role.ATTACKER).size(), 0);
+    }
 
-		Integer[] ratings = IntStream.rangeClosed(Feedback.MIN_RATING, Feedback.MAX_RATING).boxed().toArray(Integer[]::new);
-		assertTrue("Feedback could not be inserted",
-				FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), Arrays.asList(ratings)));
+    @Test
+    public void testRatings() {
+        assumeTrue(creator.insert());
+        assumeTrue(user1.insert());
+        assumeTrue(cut1.insert());
+        Whitebox.setInternalState(multiplayerGame, "classId", cut1.getId());
+        assumeTrue(multiplayerGame.insert());
 
-		List<Integer> feedbackValues = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
-		assertNotNull(feedbackValues);
-		Integer[] ratingsFromDB = feedbackValues.toArray(new Integer[0]);
+        Integer[] ratings = IntStream.rangeClosed(Feedback.MIN_RATING, Feedback.MAX_RATING).boxed().toArray(Integer[]::new);
+        assertTrue("Feedback could not be inserted",
+                FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), Arrays.asList(ratings)));
 
-		assertArrayEquals(ratings, ratingsFromDB);
+        List<Integer> feedbackValues = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
+        assertNotNull(feedbackValues);
+        Integer[] ratingsFromDB = feedbackValues.toArray(new Integer[0]);
 
-		Integer[] updatedRatings = IntStream.generate(() -> new Random().nextInt(Feedback.MAX_RATING)).limit(7).boxed().toArray(Integer[]::new);
+        assertArrayEquals(ratings, ratingsFromDB);
 
-		List<Integer> updatedRatingsList = Arrays.asList(updatedRatings);
-		assertTrue("Feedback could not be updated",
-				FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), updatedRatingsList));
+        Integer[] updatedRatings = IntStream.generate(() -> new Random().nextInt(Feedback.MAX_RATING)).limit(7).boxed().toArray(Integer[]::new);
 
-		List<Integer> feedbackValues2 = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
-		assertNotNull(feedbackValues2);
-		Integer[] updatedRatingsFromDB = feedbackValues2.toArray(new Integer[0]);
-		assertArrayEquals(updatedRatings, updatedRatingsFromDB);
-	}
+        List<Integer> updatedRatingsList = Arrays.asList(updatedRatings);
+        assertTrue("Feedback could not be updated",
+                FeedbackDAO.storeFeedback(multiplayerGame.getId(), user1.getId(), updatedRatingsList));
+
+        List<Integer> feedbackValues2 = FeedbackDAO.getFeedbackValues(multiplayerGame.getId(), user1.getId());
+        assertNotNull(feedbackValues2);
+        Integer[] updatedRatingsFromDB = feedbackValues2.toArray(new Integer[0]);
+        assertArrayEquals(updatedRatings, updatedRatingsFromDB);
+    }
 }

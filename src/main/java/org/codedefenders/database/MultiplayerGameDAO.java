@@ -53,7 +53,9 @@ public class MultiplayerGameDAO {
         if (mode != GameMode.PARTY) {
             return null;
         }
+
         GameClass cut = GameClassDAO.gameClassFromRS(rs);
+
         int id = rs.getInt("ID");
         int classId = rs.getInt("Class_ID");
         int creatorId = rs.getInt("Creator_ID");

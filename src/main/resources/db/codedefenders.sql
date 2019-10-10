@@ -95,6 +95,8 @@ CREATE TABLE `classes` (
   `RequireMocking` tinyint(1) DEFAULT '0',
   `Puzzle` tinyint(1) NOT NULL DEFAULT '0',
   `Active` tinyint(1) NOT NULL DEFAULT '1',
+  `TestingFramework` ENUM('JUNIT4', 'JUNIT5') NOT NULL DEFAULT 'JUNIT4',
+  `AssertionLibrary` ENUM('JUNIT4', 'JUNIT5', 'HAMCREST', 'JUNIT4_HAMCREST', 'JUNIT5_HAMCREST') NOT NULL DEFAULT 'JUNIT4_HAMCREST',
   PRIMARY KEY (`Class_ID`),
   UNIQUE KEY `classes_Alias_uindex` (`Alias`)
 ) AUTO_INCREMENT=100;
@@ -582,14 +584,14 @@ FROM `view_active_classes`
 WHERE Puzzle = 1;
 
 CREATE OR REPLACE VIEW `view_battleground_games` AS
-SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.Active
+SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active
 FROM games,
      classes
 WHERE Mode = 'PARTY'
   AND games.Class_ID = classes.Class_ID;
 
 CREATE OR REPLACE VIEW `view_puzzle_games` AS
-SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.Active
+SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active
 FROM games,
      classes
 WHERE Mode = 'PUZZLE'

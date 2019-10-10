@@ -239,7 +239,7 @@ public class MultiplayerGameManager extends HttpServlet {
             // Take the intersection of the two sets: to obtain the covering but submitted after
             // TODO Since Test does not re-implement hash and equalsTo this does not work !
             // allCoveringTests.retainAll( testSubmittedAfterMutant );
-            
+
             Set<Integer> allCoveringTests = aliveMutant.getCoveringTests().stream()
                     .map(t ->  t.getId() )
                     .collect(Collectors.toSet());
@@ -250,9 +250,9 @@ public class MultiplayerGameManager extends HttpServlet {
                     .collect(Collectors.toSet());
 
             allCoveringTests.retainAll( testSubmittedAfterMutant );
-            
+
             int numberOfCoveringTestsSubmittedAfterMutant = allCoveringTests.size();
-            
+
             if (numberOfCoveringTestsSubmittedAfterMutant  >= threshold) {
                 // Flag the mutant as possibly equivalent
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
@@ -443,7 +443,6 @@ public class MultiplayerGameManager extends HttpServlet {
 
     /**
      * Return the line numbers mentioned in the error message of the compiler
-     * @param message
      * @return
      */
     List<Integer> extractErrorLines(String compilerOutput) {

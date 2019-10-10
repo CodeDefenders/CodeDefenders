@@ -13,12 +13,7 @@ import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.LineCoverageGenerator;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.GameLevel;
-import org.codedefenders.game.LineCoverage;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Role;
-import org.codedefenders.game.Test;
+import org.codedefenders.game.*;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.util.Constants;
@@ -290,11 +285,17 @@ public class Installer {
         String cutClassFilePath = Compiler.compileJavaFileForContent(cutJavaFilePath, fileContent);
         String classQualifiedName = FileUtils.getFullyQualifiedName(cutClassFilePath);
 
-        // Store the CUT
-        boolean isMockingEnabled = false;
-        GameClass cut = new GameClass(classQualifiedName, classAlias, cutJavaFilePath, cutClassFilePath, isMockingEnabled);
-        cut.insert();
+        GameClass cut = GameClass.build()
+                .name(classQualifiedName)
+                .alias(classAlias)
+                .javaFile(cutJavaFilePath)
+                .classFile(cutClassFilePath)
+                .mockingEnabled(false) // TODO: dont't use a default value
+                .testingFramework(TestingFramework.JUNIT4) // TODO: dont't use a default value
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST) // TODO: dont't use a default value
+                .create();
 
+        cut.insert();
         logger.info("installCut(): Stored Class " + cut.getId() + " to " + cutJavaFilePath);
 
         installedCuts.put(classAlias, cut);
@@ -463,7 +464,8 @@ public class Installer {
         String puzzleAlias = cutAlias + "_puzzle_" + puzzleAliasExt;
 
         // Create a puzzle cut with another alias for this puzzle
-        GameClass puzzleClass = GameClass.ofPuzzle(cut.getName(), puzzleAlias, cut.getJavaFile(), cut.getClassFile(), cut.isMockingEnabled());
+        GameClass puzzleClass = GameClass.ofPuzzle(cut, cutAlias);
+
         int puzzleClassId = GameClassDAO.storeClass(puzzleClass);
         logger.info("installPuzzle(); Created Puzzle Class " + puzzleClassId);
 
@@ -491,7 +493,7 @@ public class Installer {
         // Default values
         int maxAssertionsPerTest = CodeValidator.DEFAULT_NB_ASSERTIONS;
         boolean forceHamcrest = CodeValidator.DEFAULT_FORCE_HAMCREST;
-        
+
         CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
 
         Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, level, maxAssertionsPerTest, forceHamcrest, mutantValidatorLevel,
