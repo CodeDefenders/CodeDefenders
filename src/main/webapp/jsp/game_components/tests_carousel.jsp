@@ -26,6 +26,8 @@
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.Set" %>
 <%@ page import="java.util.stream.Collectors" %>
+<%@ page import="org.codedefenders.game.TestCarousel" %>
+<%@ page import="org.codedefenders.game.TestCarousel.TestCarouselInfo" %>
 
 <%--
     Displays a list of tests in a one-item slider.
@@ -46,6 +48,7 @@
     TestSmellsDAO testSmellsDAO = new TestSmellsDAO();
 %>
 
+<%--
 <div class="slider single-item">
 
     <% if (testsTODORENAME.isEmpty()) { %>
@@ -77,7 +80,6 @@
 			if(smellList.size() >= 5 ){
 				smellLevel = "A lot";
                 smellColor = "btn-dark";
-
             }
     %>
 
@@ -139,14 +141,106 @@
         });
     }
 </script>
-<%-- Activate the popover thingy --%>
+
+<!-- Activate the popover thingy -->
 <script>
 $(function () {
 	  $('[data-toggle="popover"]').popover({
 		  trigger: 'focus'
 	  })
 })
-
 </script>
+
+--%>
+
+<%
+    TestCarousel testCarousel = new TestCarousel(cut, testsTODORENAME);
+    List<TestCarouselInfo> infos = testCarousel.getInfos();
+
+%>
+
+<style type="text/css">
+    #tests-accordion {
+        margin-bottom: 0;
+    }
+
+    #tests-accordion .panel-heading {
+        padding-top: .75ex;
+        padding-bottom: .75ex;
+    }
+
+    #tests-accordion .panel-title.ta-covered {
+        color: black;
+    }
+
+    #tests-accordion .panel-title:not(.ta-covered) {
+        color: grey;
+    }
+</style>
+
+<div class="panel panel-default">
+    <%--
+    <div class="panel-heading">
+        Tests
+    </div>
+    --%>
+    <div class="panel-body" id="tests">
+        <div class="panel-group" id="tests-accordion">
+            <%
+                int index = -1;
+                for (TestCarouselInfo info : infos) {
+                    index++;
+            %>
+                <div class="panel panel-default">
+                    <div class="panel-heading" id="heading-<%=index%>">
+                        <a role="button" data-toggle="collapse" aria-expanded="false"
+                                href="#collapse-<%=index%>"
+                                aria-controls="collapse-<%=index%>"
+                                class="panel-title <%=info.getCoveringTests().isEmpty() ? "" : "ta-covered"%>">
+                            <%=info.getDescription()%>
+                        </a>
+                    </div>
+                    <div class="panel-collapse collapse" data-parent="#tests-accordion"
+                            id="collapse-<%=index%>"
+                            aria-labelledby="heading-<%=index%>">
+                        <div class="panel-body">
+                            <table id="table-<%=index%>" class="table table-sm"></table>
+                        </div>
+                    </div>
+                </div>
+            <%
+                }
+            %>
+        </div>
+    </div>
+</div>
+
+<script>
+    for (let i = 1; i <= 8; i++) {
+        const coveringTests = tests.data.filter(test => test.covers.includes(i));
+        $(`#table-${i}`).DataTable({
+            data: coveringTests,
+            columns: [
+                { data: null,      defaultContent: '' },
+                { data: id,        title: '' },
+                { data: player,    title: '' },
+                { data: covered,   title: '' },
+                { data: killed,    title: '' },
+                { data: points,    title: '' },
+                { data: smells,    title: '' },
+                { data: null,      defaultContent: '<a class="btn btn-outline-secondary btn-sm">Show</a>' }
+            ],
+            scrollY: '400px',
+            scrollCollapse: true,
+            paging: false,
+            dom: 't',
+            language: {emptyTable: 'No tests cover this method.'}
+        });
+        if (coveringTests.length > 0) {
+            $(`#heading-${i} a`).append(`<y>(${coveringTests.length})</y>`);
+        }
+    }
+ </script>
+
 <% } %>
 

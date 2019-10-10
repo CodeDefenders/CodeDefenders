@@ -174,7 +174,7 @@ public class TestDAO {
 
         return result;
     }
-    
+
     public static List<Test> getValidTestsForGameSubmittedAfterMutant(int gameId, boolean defendersOnly,
             Mutant aliveMutant) {
         /*
@@ -184,13 +184,13 @@ public class TestDAO {
          */
         // TODO Not sure if using table 'mutants' here is correct or we
         // need to use some view instead...
-        String query = String.join("\n", 
-                "SELECT t.*", 
-                "FROM view_valid_tests t", 
-                (defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : ""), 
+        String query = String.join("\n",
+                "SELECT t.*",
+                "FROM view_valid_tests t",
+                (defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : ""),
                 "WHERE t.Timestamp >= (select mutants.Timestamp from mutants where mutants.Mutant_ID = ? ) AND t.Game_ID=? ",
                 (defendersOnly ? "AND pl.Role='DEFENDER';" : ";"));
-        return DB.executeQueryReturnList(query, TestDAO::testFromRS, 
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS,
                 DatabaseValue.of(aliveMutant.getId()),
                 DatabaseValue.of(gameId));
     }
@@ -254,8 +254,8 @@ public class TestDAO {
         String linesUncovered = "";
 
         if (lineCoverage != null) {
-            linesCovered = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
-            linesUncovered = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
+            linesCovered = lineCoverage.getLinesCovered().stream().sorted().map(Object::toString).collect(Collectors.joining(","));
+            linesUncovered = lineCoverage.getLinesUncovered().stream().sorted().map(Object::toString).collect(Collectors.joining(","));
         }
 
         String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, MutantsKilled, Player_ID, Points, Class_ID, Lines_Covered, Lines_Uncovered) VALUES (?,?,?,?,?,?,?,?,?,?);";

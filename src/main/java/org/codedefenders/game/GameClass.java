@@ -102,7 +102,7 @@ public class GameClass {
     private List<Range<Integer>> linesOfMethods = new ArrayList<>();
     private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
     private List<Range<Integer>> linesOfClosingBrackets = new ArrayList<>();
-    private List<MethodInfo> methodInfos = new ArrayList<>();
+    private List<TestCarousel.TestCarouselInfo> testCarouselInfos = new ArrayList<>();
 
     /**
      * The source code of this Java class. Used as an instance attribute so the file content only needs to be read once.
@@ -154,7 +154,7 @@ public class GameClass {
         this.linesOfClosingBrackets.addAll(visit.getClosingBrackets());
         this.emptyLines.addAll(visit.getEmptyLines());
         this.linesCoveringEmptyLines.putAll(visit.getLinesCoveringEmptyLines());
-        this.methodInfos.addAll(visit.getMethodInfos());
+        this.testCarouselInfos.addAll(visit.getTestCarouselInfos());
     }
 
     /**
@@ -435,8 +435,8 @@ public class GameClass {
         return Collections.unmodifiableList(collect);
     }
 
-    public List<MethodInfo> getMethodInfos() {
-        return Collections.unmodifiableList(methodInfos);
+    public List<TestCarousel.TestCarouselInfo> getTestCarouselInfos() {
+        return Collections.unmodifiableList(testCarouselInfos);
     }
 
     @Override
@@ -444,8 +444,4 @@ public class GameClass {
         return "[id=" + id + ",name=" + name + ",alias=" + alias + "]";
     }
 
-    public static class MethodInfo {
-        public Range<Integer> lines;
-        public String signature;
-    }
 }
