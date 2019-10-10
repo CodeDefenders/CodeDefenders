@@ -18,12 +18,18 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="org.codedefenders.servlets.util.ServletUtils"%>
+<%@page import="org.codedefenders.game.multiplayer.MultiplayerGame"%>
+<%@page import="org.codedefenders.util.Paths"%>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.model.NotificationType" %>
 
 <%
     {
     int gameId = (Integer) request.getAttribute("gameId");
+    MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+    int userId = ServletUtils.userId(request); // required for playerFeedback, too
+    Role role = game.getRole(userId); // required for header_game, too
 %>
 <script>
     //If the user is logged in, start receiving notifications
