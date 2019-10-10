@@ -34,6 +34,11 @@
 <script>
     var receivedMessage = []
     
+    // Scroll down "a lot"
+    var scrollToBottom = function(view){
+    	view.scrollTop(1E10)
+    }
+    
     var refreshTheChatWindows = function(sortedMessagesToDisplay){
         
         var total = sortedMessagesToDisplay.length
@@ -51,14 +56,16 @@
         for (var index = 0; index < total; index++) {
         	
             if (sortedMessagesToDisplay[index].eventType == "DEFENDER_MESSAGE"){
-            	
             	defendView.append("<p><span class=\"event\">" + sortedMessagesToDisplay[index].parsedMessage + "</span></p>")
-                 
+            	scrollToBottom(defendView);
+                                 
             } else if (sortedMessagesToDisplay[index].eventType == "ATTACKER_MESSAGE"){
             	attackView.append("<p><span class=\"event\">" + sortedMessagesToDisplay[index].parsedMessage + "</span></p>")
+            	scrollToBottom(attackView);
                 
             } else {
             	gameView.append("<p><span class=\"event\">" + sortedMessagesToDisplay[index].parsedMessage + "</span></p>")
+            	scrollToBottom(gameView);
             }
         }
     } 
@@ -76,8 +83,6 @@
             receivedMessage.sort(function (a, b) {
                 return a.time - b.time;
             });
-            
-            console.log("New messages " + r )
             
             refreshTheChatWindows( receivedMessage );
             
