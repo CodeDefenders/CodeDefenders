@@ -18,16 +18,14 @@
  */
 package org.codedefenders.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.annotation.ManagedBean;
-
 import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.ManagedBean;
 
 import testsmell.AbstractSmell;
 import testsmell.TestFile;
@@ -60,25 +58,15 @@ public class TestSmellsDAO {
      * @throws UncheckedSQLException If storing test smells was not successful.
      */
     public void storeSmell(final Test test, final TestFile testFile) throws UncheckedSQLException {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = null;
-        try {
-            stmt = conn.prepareStatement(INSERT_SMELL_QUERY);
-            for (AbstractSmell smell : testFile.getTestSmells()) {
-                if (smell.getHasSmell() ){ // && !filterSmell.equals(smell.getSmellName())) {
-                    stmt.setInt(1, test.getId());
-                    stmt.setString(2, smell.getSmellName());
-                    stmt.addBatch();
-                }
-            }
+        final List<AbstractSmell> testSmells = testFile.getTestSmells()
+                .stream()
+                .filter(AbstractSmell::getHasSmell)
+                .collect(Collectors.toList());
 
-            stmt.executeBatch(); // Execute every 1000 items.
-        } catch (SQLException e) {
-            logger.warn("Cannot store smell to database ", e);
-            throw new UncheckedSQLException("Could not store test smell to database.");
-        } finally {
-            DB.cleanup(conn, stmt);
-        }
+        DB.executeBatchQueryReturnKeys(INSERT_SMELL_QUERY, testSmells, smell -> new DatabaseValue[]{
+                DatabaseValue.of(test.getId()),
+                DatabaseValue.of(smell.getSmellName())
+        });
     }
 
     /**

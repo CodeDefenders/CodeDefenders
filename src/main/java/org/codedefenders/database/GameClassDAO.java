@@ -406,8 +406,7 @@ public class GameClassDAO {
         DB.executeUpdateQuery(query5, DatabaseValue.of(id));
         DB.executeUpdateQuery(query6, DatabaseValue.of(id));
 
-        final String query = "DELETE FROM classes WHERE Class_ID = ?;";
-        return DB.executeUpdateQuery(query, DatabaseValue.of(id));
+        return removeClassForId(id);
     }
 
     /**

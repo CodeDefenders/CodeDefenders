@@ -529,7 +529,7 @@ public class Installer {
                 KillmapDAO.insertKillMapEntry(entry, puzzleClassId);
             }
         } catch (InterruptedException | ExecutionException e) {
-            logger.error("Could error while calculating killmap for successfully installed puzzle.", e);
+            logger.error("Error while calculating killmap for successfully installed puzzle.", e);
         }
     }
 }
