@@ -82,9 +82,9 @@
 %>
 
 <%@ include file="/jsp/battleground/header_game.jsp" %>
-<%@ include file="/jsp/scoring_tooltip.jsp" %>
-<%@ include file="/jsp/playerFeedback.jsp" %>
-<%@ include file="/jsp/battleground/game_scoreboard.jsp" %>
+<jsp:include page="/jsp/scoring_tooltip.jsp"/>
+<jsp:include page="/jsp/playerFeedback.jsp"/>
+<jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
 
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6">

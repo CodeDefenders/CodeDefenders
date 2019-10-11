@@ -141,7 +141,7 @@
     </div>
 </div>
 
-<%@include file="../game_components/editor_help_config_modal.jsp"%>
+<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <%@include file="../footer_game.jsp" %>
 
