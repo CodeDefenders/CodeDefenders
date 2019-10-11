@@ -18,11 +18,14 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="org.codedefenders.game.Role"%>
+<%@page import="org.codedefenders.util.Paths"%>
+<%@page import="java.util.Optional"%>
+<%@page import="org.codedefenders.game.multiplayer.MultiplayerGame"%>
+<%@ page import="org.codedefenders.game.GameMode" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
-
-<% { %>
 
 <%
     String pageTitle="Game History";
@@ -48,6 +51,9 @@
 
 <%-- Set request attributes for the components. --%>
 <%
+     /* playerFeedback and scoreboard */ 
+    request.setAttribute("game", game);
+
     /* class_viewer */
     final GameClass cut = game.getCUT();
     request.setAttribute("className", cut.getBaseName());
@@ -80,12 +86,12 @@
     // request.setAttribute("gameType", GameMode.PARTY);
 //    request.setAttribute("gameId", game.getId());
 %>
-
 <%@ include file="/jsp/battleground/header_game.jsp" %>
-<%@ include file="/jsp/scoring_tooltip.jsp" %>
-<%@ include file="/jsp/playerFeedback.jsp" %>
-<%@ include file="/jsp/battleground/game_scoreboard.jsp" %>
-
+ 
+<jsp:include page="/jsp/scoring_tooltip.jsp"/>
+<jsp:include page="/jsp/playerFeedback.jsp"/>
+<jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
+ 
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6">
         <div id="mutants-div">
@@ -106,7 +112,5 @@
         <%@include file="../game_components/mutant_explanation.jsp"%>
     </div>
 </div>
-
-<% } %>
 
 <%@ include file="/jsp/battleground/footer_game.jsp" %>
