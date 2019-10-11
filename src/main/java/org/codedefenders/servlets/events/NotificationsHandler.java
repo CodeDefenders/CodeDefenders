@@ -185,7 +185,7 @@ public class NotificationsHandler extends HttpServlet {
 
         final String username = UserDAO.getUserById(userId).getUsername();
         for (Event e : events) {
-            e.setCurrentUserName("@" + username);
+            e.setCurrentUserName(username);
             e.parse(e.getEventStatus() == EventStatus.GAME);
         }
 
@@ -238,7 +238,7 @@ public class NotificationsHandler extends HttpServlet {
 
         final String username = UserDAO.getUserById(userId).getUsername();
         for (Event e : events) {
-            e.setCurrentUserName("@" + username);
+            e.setCurrentUserName(username);
             e.parse(e.getEventStatus() == EventStatus.GAME);
         }
 
@@ -275,7 +275,7 @@ public class NotificationsHandler extends HttpServlet {
         // DatabaseAccess#getNewEventsForUser(int, long) never returns null, so no need for extra check
         final List<Event> events = DatabaseAccess.getNewEventsForUser(userId, timestamp)
                 .stream()
-                .peek(event -> event.setCurrentUserName("@" + username))
+                .peek(event -> event.setCurrentUserName(username))
                 .peek(event -> event.parse(event.getEventStatus() == EventStatus.GAME))
                 .collect(Collectors.toList());
 
