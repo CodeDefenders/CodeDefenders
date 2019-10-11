@@ -185,11 +185,6 @@ public class User {
         this.keyMap = keyMap;
     }
 
-    public String printFriendly(String color) {
-        return "<span style='color: " + color + "'>@" + getUsername() +
-                "</span>";
-    }
-
     public static String encodePassword(String password) {
         return new BCryptPasswordEncoder().encode(password);
     }
