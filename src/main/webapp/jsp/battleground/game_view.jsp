@@ -47,10 +47,11 @@
 <%-- Show the mail icon with counts of unread notifications: requires push_notifications.jsp --%>
 <%--<%@ include file="/jsp/push_chat_notifications.jsp"%>--%>
 
-<%@ include file="/jsp/scoring_tooltip.jsp" %>
-<%@ include file="/jsp/playerFeedback.jsp" %>
-<%@ include file="/jsp/battleground/game_scoreboard.jsp" %>
-<%@ include file="/jsp/game_components/editor_help_config_modal.jsp" %>
+<jsp:include page="/jsp/scoring_tooltip.jsp"/>
+<jsp:include page="/jsp/playerFeedback.jsp"/>
+<jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
+<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
+
 <div class="crow fly no-gutter up">
 <%
     messages = new ArrayList<>();
