@@ -18,22 +18,18 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="org.apache.commons.lang.StringUtils"%>
 <%@page import="org.codedefenders.database.TestSmellsDAO"%>
-<%@page import="org.codedefenders.database.UserDAO"%>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
-<%@ page import="org.codedefenders.model.User" %>
-<%@ page import="java.util.Set" %>
-<%@ page import="java.util.stream.Collectors" %>
 <%@ page import="org.codedefenders.game.TestCarousel" %>
-<%@ page import="org.codedefenders.game.TestCarousel.TestCarouselInfo" %>
+<%@ page import="org.codedefenders.game.TestCarousel.TCMethodDescription" %>
 
 <%--
     Displays a list of tests in a one-item slider.
 
     @param List<Test> tests
         The tests to display.
+    // TODO: new parameters
 --%>
 
 <% { %>
@@ -154,12 +150,17 @@ $(function () {
 --%>
 
 <%
-    TestCarousel testCarousel = new TestCarousel(cut, testsTODORENAME);
-    List<TestCarouselInfo> infos = testCarousel.getInfos();
+    TestCarousel testCarousel = new TestCarousel(cut, testsTODORENAME, mutantsTODORENAME);
+    List<TCMethodDescription> infos = testCarousel.getInfos();
 
+    Gson gson = new GsonBuilder().registerTypeAdapter(Map.class, new JSONUtils.MapSerializer()).create();
+    String tcString = gson.toJson(testCarousel);
 %>
 
 <style type="text/css">
+    <%-- Prefix all classes with "tc-" to avoid conflicts.
+    We probably want to extract some common CSS when we finally tackle the CSS issue. --%>
+
     #tests-accordion {
         margin-bottom: 0;
     }
@@ -169,12 +170,28 @@ $(function () {
         padding-bottom: .75ex;
     }
 
+    #tests-accordion .panel-body {
+        padding: 0;
+    }
+
+    #tests-accordion thead {
+        display: none;
+    }
+
+    #tests-accordion .dataTables_scrollHead {
+        display: none;
+    }
+
     #tests-accordion .panel-title.ta-covered {
         color: black;
     }
 
     #tests-accordion .panel-title:not(.ta-covered) {
         color: grey;
+    }
+
+    #tests-accordion .tc-column-name {
+        color: #B0B0B0;
     }
 </style>
 
@@ -188,7 +205,7 @@ $(function () {
         <div class="panel-group" id="tests-accordion">
             <%
                 int index = -1;
-                for (TestCarouselInfo info : infos) {
+                for (TCMethodDescription info : infos) {
                     index++;
             %>
                 <div class="panel panel-default">
@@ -216,31 +233,87 @@ $(function () {
 </div>
 
 <script>
-    for (let i = 1; i <= 8; i++) {
-        const coveringTests = tests.data.filter(test => test.covers.includes(i));
-        $(`#table-${i}`).DataTable({
-            data: coveringTests,
-            columns: [
-                { data: null,      defaultContent: '' },
-                { data: id,        title: '' },
-                { data: player,    title: '' },
-                { data: covered,   title: '' },
-                { data: killed,    title: '' },
-                { data: points,    title: '' },
-                { data: smells,    title: '' },
-                { data: null,      defaultContent: '<a class="btn btn-outline-secondary btn-sm">Show</a>' }
-            ],
-            scrollY: '400px',
-            scrollCollapse: true,
-            paging: false,
-            dom: 't',
-            language: {emptyTable: 'No tests cover this method.'}
-        });
-        if (coveringTests.length > 0) {
-            $(`#heading-${i} a`).append(`<y>(${coveringTests.length})</y>`);
+    // TODO: only generate the table when panel is opened?
+
+    /* Wrap in a function so it has it's own scope. */
+    (function () {
+
+        /* Game highlighting data. */
+        const tc_data = JSON.parse(`<%=tcString%>`);
+        const methodDescriptions = tc_data.methodDescriptions;
+        const tests = new Map(tc_data.tests);
+
+        const genId = function (row) {
+            return '<span class="tc-column-name">ID:</span> ' + row.id;
+        };
+
+        const genCreator = function (row) {
+            return row.creatorName + ' (' + row.creatorId + ')';
+        };
+
+        const genCoveredMutants = function (row) {
+            return '<span class="tc-column-name">Covered:</span> ' + row.numCoveredMutants;
+            // TODO: hoverabe link
+        };
+
+        const genKilledMutants = function (row) {
+            return '<span class="tc-column-name">Killed:</span> ' + row.numKilledMutants;
+            // TODO: hoverabe link
+        };
+
+        const genPoints = function (row) {
+            return '<span class="tc-column-name">Points:</span> ' + row.points;
+        };
+
+        const genSmellButton = function (row) {
+            return ''; // TODO
+        };
+
+        const genShowButton = function (row) {
+            const btn = document.createElement('button');
+            btn.classList.add('tc-btn');
+            btn.classList.add('btn');
+            btn.classList.add('btn-primary');
+            btn.innerText = 'Show';
+            btn.onclick = () => showTest(row.id);
+            return btn;
+        };
+
+        const showTest = function (id) {
+            console.log('this would show test ' + id); // TODO
+        };
+
+        let index = -1;
+        for (const methodDescription of methodDescriptions) {
+            index++;
+
+            const coveringTests = methodDescription.coveringTestIds.map(id => tests.get(id));
+
+            $('#table-' + index).DataTable({
+                data: coveringTests,
+                columns: [
+                    { data: genId, title: '' },
+                    { data: genCreator, title: '' },
+                    { data: genCoveredMutants, title: '' },
+                    { data: genKilledMutants, title: '' },
+                    { data: genPoints, title: '' },
+                    { data: genSmellButton, title: '' },
+                    { data: genShowButton, title: '' }
+                ],
+                scrollY: '400px',
+                scrollCollapse: true,
+                paging: false,
+                dom: 't',
+                language: {emptyTable: 'No tests cover this method.'}
+            });
+            <%-- TODO
+            if (coveringTests.length > 0) {
+                $(`#heading-${i} a`).append(`<y>(${coveringTests.length})</y>`);
+            }
+            --%>
         }
-    }
- </script>
+    }());
+</script>
 
 <% } %>
 

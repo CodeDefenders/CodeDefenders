@@ -271,7 +271,7 @@ public class ClassCodeAnalyser {
 
             result.methodSignatures(Range.between(methodBegin, methodBodyBegin));
             result.methods(Range.between(methodBegin, methodEnd));
-            result.testCarouselInfo(signature, methodBegin, methodEnd);
+            result.testCarouselMethodDescription(signature, methodBegin, methodEnd);
         }
 
         private static void extractResultsFromConstructorDeclaration(ConstructorDeclaration cd, CodeAnalysisResult result) {
@@ -286,7 +286,7 @@ public class ClassCodeAnalyser {
             }
 
             String signature = cd.getDeclarationAsString(false, false, false);
-            result.testCarouselInfo(signature, constructorBegin, constructorEnd);
+            result.testCarouselMethodDescription(signature, constructorBegin, constructorEnd);
 
             result.methodSignatures(Range.between(constructorBegin, constructorBodyBegin));
             result.methods(Range.between(constructorBegin, constructorEnd));

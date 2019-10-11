@@ -35,22 +35,22 @@ public class GameHighlightingDTO {
     /**
      * Maps line numbers to the mutant ids of mutants that modify the line.
      */
-    public Map<Integer, List<Integer>> mutantIdsPerLine;
+    @Expose public Map<Integer, List<Integer>> mutantIdsPerLine;
 
     /**
      * Maps line numbers to the test ids of tests that cover the line.
      */
-    public Map<Integer, List<Integer>> testIdsPerLine;
+    @Expose public Map<Integer, List<Integer>> testIdsPerLine;
 
     /**
      * Maps test ids to mutants.
      */
-    public Map<Integer, GHMutantDTO> mutants;
+    @Expose public Map<Integer, GHMutantDTO> mutants;
 
     /**
-     * Maps test ids to tests..
+     * Maps test ids to tests.
      */
-    public Map<Integer, GHTestDTO> tests;
+    @Expose public Map<Integer, GHTestDTO> tests;
 
     /**
      * Constructs the game highlighting data from the list of mutants and the list of tests in the game.

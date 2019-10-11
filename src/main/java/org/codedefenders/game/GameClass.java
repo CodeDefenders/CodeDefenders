@@ -102,7 +102,7 @@ public class GameClass {
     private List<Range<Integer>> linesOfMethods = new ArrayList<>();
     private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
     private List<Range<Integer>> linesOfClosingBrackets = new ArrayList<>();
-    private List<TestCarousel.TestCarouselInfo> testCarouselInfos = new ArrayList<>();
+    private List<TestCarousel.TCMethodDescription> testCarouselMethodDescriptions = new ArrayList<>();
 
     /**
      * The source code of this Java class. Used as an instance attribute so the file content only needs to be read once.
@@ -154,7 +154,7 @@ public class GameClass {
         this.linesOfClosingBrackets.addAll(visit.getClosingBrackets());
         this.emptyLines.addAll(visit.getEmptyLines());
         this.linesCoveringEmptyLines.putAll(visit.getLinesCoveringEmptyLines());
-        this.testCarouselInfos.addAll(visit.getTestCarouselInfos());
+        this.testCarouselMethodDescriptions.addAll(visit.getTestCarouselMethodDescriptions());
     }
 
     /**
@@ -435,8 +435,8 @@ public class GameClass {
         return Collections.unmodifiableList(collect);
     }
 
-    public List<TestCarousel.TestCarouselInfo> getTestCarouselInfos() {
-        return Collections.unmodifiableList(testCarouselInfos);
+    public List<TestCarousel.TCMethodDescription> getTestCarouselMethodDescriptions() {
+        return Collections.unmodifiableList(testCarouselMethodDescriptions);
     }
 
     @Override
