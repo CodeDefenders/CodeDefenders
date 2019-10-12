@@ -29,6 +29,7 @@
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <%--
     Displays three tabs with a list of alive, killed and equivalent mutants respectively.
@@ -193,12 +194,12 @@
                         List<Mutant> sortedKilledMutants = new ArrayList<>(mutantsKilledTODORENAME);
                         sortedKilledMutants.sort(Mutant.sortByLineNumberAscending());
                         for (Mutant m : sortedKilledMutants) {
-                            
+
                             Test killingTest = m.getKillingTest();
                             User creator = UserDAO.getUserForPlayer(killingTest.getPlayerId());
                             int killingTestID = killingTest.getId();
                             String ownerOfKillingTest = creator.getUsername();
-                            
+
                     %>
                         <tr>
                             <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= m.getCreatorName() %> (uid <%= m.getCreatorId() %>)</h4>
@@ -278,7 +279,7 @@
                                         </td>
                                     </tr>
                                 </table>
-                             </td> 
+                             </td>
                         </tr>
                     <% } %>
                     </tbody>
