@@ -365,7 +365,7 @@ public class Mutant implements Serializable {
         difference = DiffUtils.diff(sutLines, mutantLines);
     }
 
-    private String getPatchString() {
+    public String getPatchString() {
         GameClass sut = GameClassDAO.getClassForGameId(gameId);
         if( sut == null ){
             // in this case gameId might have been -1 (upload)

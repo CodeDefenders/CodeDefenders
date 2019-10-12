@@ -31,16 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -156,6 +147,7 @@ public class GameClass {
             this.linesOfClosingBrackets.addAll(visit.getClosingBrackets());
             this.emptyLines.addAll(visit.getEmptyLines());
             this.linesCoveringEmptyLines.putAll(visit.getLinesCoveringEmptyLines());
+            this.testCarouselMethodDescriptions.addAll(visit.getTestCarouselMethodDescriptions());
             this.visitedCode = true;
         }
     }

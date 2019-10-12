@@ -58,7 +58,7 @@ public class GameClassAPI extends HttpServlet {
         root.add("id", gson.toJsonTree(gameClass.getId(), Integer.class));
         root.add("name", gson.toJsonTree(gameClass.getName(), String.class));
         root.add("alias", gson.toJsonTree(gameClass.getAlias(), String.class));
-        root.add("source", gson.toJsonTree(gameClass.getAsHTMLEscapedString(), String.class));
+        root.add("source", gson.toJsonTree(gameClass.getSourceCode(), String.class));
 
         return gson.toJson(root);
 
