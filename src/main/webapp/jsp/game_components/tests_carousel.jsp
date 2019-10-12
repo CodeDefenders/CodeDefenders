@@ -170,6 +170,7 @@
         const tc_data = JSON.parse(`<%=tcString%>`);
         const categories = tc_data.categories;
         const tests = new Map(tc_data.tests);
+        const testModals = new Map();
 
         const genId             = row => 'Test ' + row.id;
         const genCreator        = row => <%-- '<span class="tc-column-name">Creator:</span> ' + --%> row.creatorName;
@@ -200,7 +201,7 @@
             return dataTable.row(row).data();
         };
 
-        const setupPopovers = function (jqElements, getData, emptyHeading, nonEmptyHeading, emptyBody, nonEmptyBody) {
+        const setupPopovers = function (jqElements, getData, genHeading, genBody) {
             jqElements.popover({
                 container: document.body,
                 template:
@@ -214,15 +215,11 @@
                 html: true,
                 title: function () {
                     const data = getData(this);
-                    return data.length > 0
-                        ? emptyHeading(data)
-                        : nonEmptyHeading(data);
+                    return genHeading(data);
                 },
                 content: function () {
                     const data = getData(this);
-                    return data.length > 0
-                        ? emptyBody(data)
-                        : nonEmptyBody(data);
+                    return genBody(data);
                 }
             });
         };
@@ -265,52 +262,87 @@
 
             tableElement.on('click', '.tc-view-button', function () {
                 const testId = rowData(this, dataTable).id;
-                <%--
-                                        <div class="modal-dialog">
-                                            <!-- Modal content-->
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                                    <h4 class="modal-title">Mutant <%=m.getId()%> - Diff</h4>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <pre class="readonly-pre"><textarea
-                                                            class="mutdiff" title="mutdiff"
-                                                            id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea></pre>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                                </div>
-                                            </div>
-                                        </div>
-                --%>
+                let modal = testModals.get(testId);
+
+                if (modal !== undefined) {
+                    modal.modal('show');
+                    return;
+                }
+
+                modal = $(
+                `<div class="modal mutant-modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">Test ` + testId + `</h4>
+                            </div>
+                            <div class="modal-body">
+                                <pre class="readonly-pre"><textarea id="test-` + testId + `" name="test-` + testId + `"></textarea></pre>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`);
+                modal.appendTo(document.body);
+
+                const textarea = modal.find('textarea').get(0);
+                const editor = CodeMirror.fromTextArea(textarea, {
+                     lineNumbers: true,
+                     matchBrackets: true,
+                     mode: "text/x-java",
+                     readOnly: true
+                 });
+
+                <%-- TODO: Is there a better solution for this. --%>
+                new MutationObserver((mutations, observer) => {
+                    for (const mutation of mutations) {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                            editor.refresh();
+                            observer.disconnect();
+                        }
+                    }
+                }).observe(modal.get(0), {attributes: true});
+
+                testModals.set(testId, modal);
+
+                TestAPI.getAndSetEditorValue(textarea, editor);
+                modal.modal('show');
             });
 
             setupPopovers(
                 tableElement.find('.tc-covered-link'),
                 that => rowData(that, dataTable).coveredMutantIds,
-                data => 'Covered Mutants',
-                data => null,
-                data => data.join(', '),
-                data => null
+                coveredIds => coveredIds.length > 0
+                    ? 'Covered Mutants'
+                    : null,
+                coveredIds => coveredIds.length > 0
+                    ? coveredIds.join(', ')
+                    : null,
             );
 
             setupPopovers(
                 tableElement.find('.tc-killed-link'),
                 that => rowData(that, dataTable).killedMutantIds,
-                data => 'Killed Mutants',
-                data => null,
-                data => data.join(', '),
-                data => null
+                killedIds => killedIds.length > 0
+                    ? 'Killed Mutants'
+                    : null,
+                killedIds => killedIds.length > 0
+                    ? killedIds.join(', ')
+                    : null,
             );
 
             setupPopovers(
                 tableElement.find('.tc-smells-link'),
                 that => rowData(that, dataTable).smells,
-                data => 'This test smells of',
-                data => null,
-                data => data.join('<br>'),
-                data => 'This test does not have any smells.'
+                smells => smells.length > 0
+                    ? 'This test smells of'
+                    : null,
+                smells => smells.length > 0
+                    ? smells.join('<br>')
+                    : 'This test does not have any smells.'
             );
         }
     }());
