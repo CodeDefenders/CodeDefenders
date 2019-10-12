@@ -18,10 +18,7 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.game.AbstractGame;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
+import org.codedefenders.game.*;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.model.GameClassInfo;
 import org.codedefenders.util.FileUtils;
@@ -62,9 +59,21 @@ public class GameClassDAO {
         String absoluteJavaFile = FileUtils.getAbsoluteDataPath(javaFile).toString();
         String absoluteClassFile = FileUtils.getAbsoluteDataPath(classFile).toString();
         boolean requireMocking = rs.getBoolean("RequireMocking");
+        TestingFramework testingFramework = TestingFramework.valueOf(rs.getString("TestingFramework"));
+        AssertionLibrary assertionLibrary = AssertionLibrary.valueOf(rs.getString("AssertionLibrary"));
         boolean isActive = rs.getBoolean("Active");
 
-        return new GameClass(classId , name, alias, absoluteJavaFile, absoluteClassFile, requireMocking, isActive);
+        return GameClass.build()
+                .id(classId)
+                .name(name)
+                .alias(alias)
+                .javaFile(absoluteJavaFile)
+                .classFile(absoluteClassFile)
+                .mockingEnabled(requireMocking)
+                .testingFramework(testingFramework)
+                .assertionLibrary(assertionLibrary)
+                .active(isActive)
+                .create();
     }
 
     /**
@@ -284,16 +293,31 @@ public class GameClassDAO {
         String relativeJavaFile = FileUtils.getRelativeDataPath(cut.getJavaFile()).toString();
         String relativeClassFile = FileUtils.getRelativeDataPath(cut.getClassFile()).toString();
         boolean isMockingEnabled = cut.isMockingEnabled();
+        TestingFramework testingFramework = cut.getTestingFramework();
+        AssertionLibrary assertionLibrary = cut.getAssertionLibrary();
         boolean isPuzzleClass = cut.isPuzzleClass();
         boolean isActive = cut.isActive();
 
-        String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile, RequireMocking, Puzzle, Active) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        String query = String.join("",
+                "INSERT INTO classes (",
+                "Name,",
+                "Alias,",
+                "JavaFile,",
+                "ClassFile,",
+                "RequireMocking,",
+                "TestingFramework,",
+                "AssertionLibrary,",
+                "Puzzle,",
+                "Active",
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(name),
                 DatabaseValue.of(alias),
                 DatabaseValue.of(relativeJavaFile),
                 DatabaseValue.of(relativeClassFile),
                 DatabaseValue.of(isMockingEnabled),
+                DatabaseValue.of(testingFramework.name()),
+                DatabaseValue.of(assertionLibrary.name()),
                 DatabaseValue.of(isPuzzleClass),
                 DatabaseValue.of(isActive)
         };
@@ -382,8 +406,7 @@ public class GameClassDAO {
         DB.executeUpdateQuery(query5, DatabaseValue.of(id));
         DB.executeUpdateQuery(query6, DatabaseValue.of(id));
 
-        final String query = "DELETE FROM classes WHERE Class_ID = ?;";
-        return DB.executeUpdateQuery(query, DatabaseValue.of(id));
+        return removeClassForId(id);
     }
 
     /**

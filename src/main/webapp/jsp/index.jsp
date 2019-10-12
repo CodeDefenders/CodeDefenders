@@ -88,30 +88,6 @@
                     <td class="col-sm-1"><%=gameCreatorNames.get(game.getId())%></td>
                     <td class="col-sm-2">
                         <span><%=cut.getAlias()%></span>
-<%--                        <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=game.getId()%>">--%>
-<%--                            <%=cut.getAlias()%>--%>
-<%--                        </a>--%>
-<%--                        <div id="modalCUTFor<%=game.getId()%>" class="modal" role="dialog" style="text-align: left;">--%>
-<%--                            <div class="modal-dialog">--%>
-<%--                                <!-- Modal content-->--%>
-<%--                                <div class="modal-content">--%>
-<%--                                    <div class="modal-header">--%>
-<%--                                        <button type="button" class="close" data-dismiss="modal">&times;</button>--%>
-<%--                                        <h4 class="modal-title"><%=cut.getAlias()%></h4>--%>
-<%--                                    </div>--%>
-<%--                                    <div class="modal-body">--%>
-<%--                                        <pre class="readonly-pre"><textarea--%>
-<%--                                                class="readonly-textarea classPreview"--%>
-<%--                                                id="sut<%=game.getId()%>"--%>
-<%--                                                name="cut<%=game.getId()%>" cols="80"--%>
-<%--                                                rows="30"><%=cut.getAsHTMLEscapedString()%></textarea></pre>--%>
-<%--                                    </div>--%>
-<%--                                    <div class="modal-footer">--%>
-<%--                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>--%>
-<%--                                    </div>--%>
-<%--                                </div>--%>
-<%--                            </div>--%>
-<%--                        </div>--%>
                     </td>
                     <td class="col-sm-1"><%=attackers%>
                     </td>
@@ -128,21 +104,6 @@
             <a id="enter" class="btn btn-primary btn-large" href="login">Log in or sign up</a>
         </div>
     </div>
-
-    <script>
-        $('.modal').on('shown.bs.modal', function () {
-            let codeMirrorContainer = $(this).find(".CodeMirror")[0];
-            if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
-                codeMirrorContainer.CodeMirror.refresh();
-            } else {
-                let editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
-                    lineNumbers: false,
-                    readOnly: true,
-                    mode: "text/x-java"
-                });
-                editorDiff.setSize("100%", 500);
-            }
-        });
     </script>
 </div>
 

@@ -24,7 +24,7 @@ import testsmell.Util;
  * NOTE: This is an extended copy of the EagerTest.class. I tried to use
  * inheritance but the check on the test smell is buried into the private
  * visitor class that implements the analysis.
- * 
+ *
  * @author gambi
  *
  */
@@ -58,8 +58,6 @@ public class ConfigurableEagerTest extends AbstractSmell {
      */
     @Override
     public boolean getHasSmell() {
-        System.out
-                .println("EagerTest.getHasSmell(): " + smellyElementList.stream().filter(x -> x.getHasSmell()).count());
         return smellyElementList.stream().filter(x -> x.getHasSmell()).count() >= 1;
     }
 

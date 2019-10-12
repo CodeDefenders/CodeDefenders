@@ -68,8 +68,8 @@ public class MutantDAO {
         int playerId = rs.getInt("Player_ID");
         int points = rs.getInt("Points");
         String md5 = rs.getString("MD5");
-        
-        String killMessage = rs.getString("KillMessage"); 
+
+        String killMessage = rs.getString("KillMessage");
 
         Mutant mutant = new Mutant(mutantId, classId, gameId, absoluteJavaFile, absoluteClassFile, alive, equiv,
                 roundCreated, roundKilled, playerId, md5, killMessage );
@@ -294,7 +294,7 @@ public class MutantDAO {
 
         return DB.executeUpdateQuery(query, values);
     }
-    
+
     /**
      * Stores a mapping between a {@link Mutant} and a {@link GameClass} in the database.
      *
@@ -313,6 +313,7 @@ public class MutantDAO {
         };
         return DB.executeUpdateQuery(query, values);
     }
+
 
     /**
      * Removes a mutant for a given identifier.
@@ -356,7 +357,6 @@ public class MutantDAO {
                 "DELETE FROM mutant_uploaded_with_class",
                 "WHERE Mutant_ID in " + range
         );
-
         // Hack to make sure all values are listed in both 'ranges'.
         mutants.addAll(new LinkedList<>(mutants));
         DatabaseValue[] values = mutants.stream().map(DatabaseValue::of).toArray(DatabaseValue[]::new);

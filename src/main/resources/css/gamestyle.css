@@ -461,3 +461,13 @@ nav li a {
 .paper_venue {
 	font-style: italic;
 }
+
+
+.linenumber-intention {
+    color: #003b56;
+}
+
+.linenumber-intention:hover, .linenumber-intention:active {
+    cursor: pointer;
+    color: #049adb;
+}

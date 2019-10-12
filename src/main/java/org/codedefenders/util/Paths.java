@@ -79,4 +79,7 @@ public class Paths {
     public static final String API_ANALYTICS_CLASSES = "/admin/api/classes";
     public static final String API_ANALYTICS_KILLMAP = "/admin/api/killmap";
     public static final String API_KILLMAP_MANAGEMENT = "/admin/api/killmapmanagement";
+    public static final String API_CLASS = "/api/class";
+    public static final String API_TEST = "/api/test";
+    public static final String API_MUTANT = "/api/mutant";
 }

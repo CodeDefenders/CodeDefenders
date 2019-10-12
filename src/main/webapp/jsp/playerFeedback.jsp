@@ -18,6 +18,10 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="java.util.List"%>
+<%@page import="org.codedefenders.util.Paths"%>
+<%@page import="org.codedefenders.servlets.util.ServletUtils"%>
+<%@page import="org.codedefenders.game.multiplayer.MultiplayerGame"%>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.database.FeedbackDAO" %>
 <%@ page import="org.codedefenders.game.Role" %>
@@ -29,6 +33,9 @@
 <%
 {
     int gameId = (Integer) request.getAttribute("gameId");
+    MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+    int userId = ServletUtils.userId(request); // required for playerFeedback, too
+    Role role = game.getRole(userId); // required for header_game, too
 %>
 <div id="playerFeedback" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
 

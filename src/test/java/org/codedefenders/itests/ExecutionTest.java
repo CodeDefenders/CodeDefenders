@@ -200,20 +200,27 @@ public class ExecutionTest {
                 new FileOutputStream(jFile));
         Files.copy(Paths.get("src/test/resources/itests/sources/XmlElement/XmlElement.class"),
                 new FileOutputStream(cFile));
-        GameClass cut = new GameClass("XmlElement", "XmlElement", jFile.getAbsolutePath(), cFile.getAbsolutePath());
+
+        GameClass cut = GameClass.build()
+                .name("XmlElement")
+                .alias("XmlElement")
+                .javaFile(jFile.getAbsolutePath())
+                .classFile(cFile.getAbsolutePath())
+                .create();
         cut.insert();
+
         // Observer creates a new MP game
-        //
         MultiplayerGame multiplayerGame = new MultiplayerGame
-            .Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
-            .state(GameState.ACTIVE)
-            .level(GameLevel.EASY)
-            .defenderValue(10)
-            .attackerValue(4)
-            .mutantValidatorLevel(CodeValidatorLevel.STRICT)
-            .chatEnabled(true)
-            .build();
+                .Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
+                .state(GameState.ACTIVE)
+                .level(GameLevel.EASY)
+                .defenderValue(10)
+                .attackerValue(4)
+                .mutantValidatorLevel(CodeValidatorLevel.STRICT)
+                .chatEnabled(true)
+                .build();
         multiplayerGame.insert();
+
         System.out.println("ExecutionTest.testMutant9559() CREATED GAME " + multiplayerGame.getId());
         // Attacker and Defender join the game.
         multiplayerGame.addPlayer(defender.getId(), Role.DEFENDER);

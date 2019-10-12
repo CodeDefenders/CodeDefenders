@@ -18,7 +18,9 @@
  */
 package org.codedefenders.database;
 
+import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.execution.KillMap;
+import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.execution.KillMapProcessor;
 import org.codedefenders.game.GameMode;
 import org.codedefenders.game.Mutant;
@@ -26,9 +28,6 @@ import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -70,33 +69,25 @@ public class KillmapDAO {
     /**
      * Helper method to retrieve killmap entries from the database.
      */
-    private static List<KillMap.KillMapEntry> getKillMapEntries(List<Test> tests, List<Mutant> mutants,
-                                                                String query, DatabaseValue... values) throws UncheckedSQLException, SQLMappingException {
-        Connection conn = DB.getConnection();
-        PreparedStatement stmt = DB.createPreparedStatement(conn, query, values);
-        try {
-            stmt.setFetchSize(Integer.MIN_VALUE);
-        } catch (SQLException e) {
-            logger.error("Caught SQL exception while trying to set fetch size.", e);
-            throw new UncheckedSQLException("Caught SQL exception while trying to set fetch size.", e);
-        }
-
+    private static List<KillMapEntry> getKillMapEntries(List<Test> tests, List<Mutant> mutants,
+                                                        String query, DatabaseValue... values) throws UncheckedSQLException, SQLMappingException {
         /* Set up mapping from test id to test / mutant id to mutant. */
         Map<Integer, Test> testMap = tests.stream().collect(Collectors.toMap(Test::getId, t -> t));
         Map<Integer, Mutant> mutantMap = mutants.stream().collect(Collectors.toMap(Mutant::getId, m -> m));
 
-        return DB.executeQueryReturnList(conn, stmt, rs -> {
+        final RSMapper<KillMapEntry> mapper = rs -> {
             int testId = rs.getInt("Test_ID");
             int mutantId = rs.getInt("Mutant_ID");
             String status = rs.getString("Status");
-            return new KillMap.KillMapEntry(testMap.get(testId), mutantMap.get(mutantId), KillMap.KillMapEntry.Status.valueOf(status));
-        });
+            return new KillMapEntry(testMap.get(testId), mutantMap.get(mutantId), KillMapEntry.Status.valueOf(status));
+        };
+        return DB.executeQueryReturnListWithFetchSize(query, Integer.MIN_VALUE, mapper, values);
     }
 
     /**
      * Returns the killmap entries for the given game.
      */
-    public static List<KillMap.KillMapEntry> getKillMapEntriesForGame(int gameId) {
+    public static List<KillMapEntry> getKillMapEntriesForGame(int gameId) {
         String query = String.join("\n",
                 "SELECT killmap.*",
                 "FROM killmap",
@@ -111,7 +102,7 @@ public class KillmapDAO {
     /**
      * Returns the killmap entries for the given class.
      */
-    public static List<KillMap.KillMapEntry> getKillMapEntriesForClass(int classId) {
+    public static List<KillMapEntry> getKillMapEntriesForClass(int classId) {
         String query = String.join("\n",
                 "SELECT killmap.*",
                 "FROM killmap",
@@ -126,7 +117,7 @@ public class KillmapDAO {
     /**
      * Inserts a killmap entry into the database.
      */
-    public static boolean insertKillMapEntry(KillMap.KillMapEntry entry, int classId) {
+    public static boolean insertKillMapEntry(KillMapEntry entry, int classId) {
         String query = String.join("\n",
                 "INSERT INTO killmap (Class_ID,Game_ID,Test_ID,Mutant_ID,Status)",
                 "VALUES (?,?,?,?,?)",

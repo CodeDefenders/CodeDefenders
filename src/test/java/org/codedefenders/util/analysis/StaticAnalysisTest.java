@@ -19,7 +19,9 @@
 package org.codedefenders.util.analysis;
 
 import org.apache.commons.lang3.Range;
+import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
+import org.codedefenders.game.TestingFramework;
 import org.junit.Assume;
 import org.junit.Test;
 
@@ -152,9 +154,12 @@ public class StaticAnalysisTest {
 
     @Test
     public void testTestCoverUnitializedFields() {
-        GameClass gc = new GameClass("XmlElement", "XmlElement",
-                "src/test/resources/itests/sources/XmlElement/XmlElement.java",
-                "src/test/resources/itests/sources/XmlElement/XmlElement.class");
+        GameClass gc = GameClass.build()
+                .name("XmlElement")
+                .alias("XmlElement")
+                .javaFile("src/test/resources/itests/sources/XmlElement/XmlElement.java")
+                .classFile("src/test/resources/itests/sources/XmlElement/XmlElement.class")
+                .create();
 
         Integer[] expected = {12, 14, 16, 18, 20};
         assertArrayEquals(expected, gc.getNonInitializedFields().toArray());
@@ -162,8 +167,12 @@ public class StaticAnalysisTest {
 
     @Test
     public void testTestCoverUnitializedFieldsInnerStaticClass() {
-        GameClass gc = new GameClass("IntHashMap", "IntHashMap",
-                "src/test/resources/itests/sources/IntHashMap/IntHashMap.java", "");
+        GameClass gc = GameClass.build()
+                .name("IntHashMap")
+                .alias("IntHashMap")
+                .javaFile("src/test/resources/itests/sources/IntHashMap/IntHashMap.java")
+                .classFile("")
+                .create();
 
         Integer[] expected = {9, 14, 20, 25, 32, 33, 34, 35};
         assertArrayEquals(expected, gc.getNonInitializedFields().toArray());
@@ -171,8 +180,12 @@ public class StaticAnalysisTest {
 
     @Test
     public void testMethodSignatureAreUncoverableLines() {
-        GameClass gc = new GameClass("IntHashMap", "IntHashMap",
-                "src/test/resources/itests/sources/IntHashMap/IntHashMap.java", "");
+        GameClass gc = GameClass.build()
+                .name("IntHashMap")
+                .alias("IntHashMap")
+                .javaFile("src/test/resources/itests/sources/IntHashMap/IntHashMap.java")
+                .classFile("")
+                .create();
 
         Integer[] expected = {45, 57, 69, 82, 104, 114, 135, 162, 175, 196, 217, 254, 293, 316};
         assertArrayEquals(expected, gc.getMethodSignatures().toArray());
@@ -180,8 +193,12 @@ public class StaticAnalysisTest {
 
     @Test
     public void testMethodsSignaturesForLine() {
-        GameClass gc = new GameClass("IntHashMap", "IntHashMap",
-                "src/test/resources/itests/sources/IntHashMap/IntHashMap.java", "");
+        GameClass gc = GameClass.build()
+                .name("IntHashMap")
+                .alias("IntHashMap")
+                .javaFile("src/test/resources/itests/sources/IntHashMap/IntHashMap.java")
+                .classFile("")
+                .create();
 
         assertTrue(gc.getMethodSignaturesForLine(9).isEmpty());
         assertArrayEquals(new Integer[]{45}, gc.getMethodSignaturesForLine(47).toArray()); // constructor of inner static class
@@ -191,8 +208,12 @@ public class StaticAnalysisTest {
 
     @Test
     public void testClosingBracketsForLineInIfStatement() {
-        GameClass gc = new GameClass("IntHashMap", "IntHashMap",
-                "src/test/resources/itests/sources/IntHashMap/IntHashMap.java", "");
+        GameClass gc = GameClass.build()
+                .name("IntHashMap")
+                .alias("IntHashMap")
+                .javaFile("src/test/resources/itests/sources/IntHashMap/IntHashMap.java")
+                .classFile("")
+                .create();
 
         assertArrayEquals(new Integer[]{92}, gc.getClosingBracketForLine(91).toArray());
         assertArrayEquals(new Integer[]{264}, gc.getClosingBracketForLine(261).toArray());
@@ -202,45 +223,29 @@ public class StaticAnalysisTest {
 
     @Test
     public void testTestTemplateAutomaticImportOnlyPrimitive() {
-        GameClass gc = new GameClass("Lift", "Lift",
-                "src/test/resources/itests/sources/Lift/Lift.java",
-                "src/test/resources/itests/sources/Lift/Lift.class");
+        GameClass gc = GameClass.build()
+                .name("Lift")
+                .alias("Lift")
+                .javaFile("src/test/resources/itests/sources/Lift/Lift.java")
+                .classFile("src/test/resources/itests/sources/Lift/Lift.class")
+                .testingFramework(TestingFramework.JUNIT4)
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST)
+                .create();
 
-        String testTemplate = gc.getHTMLEscapedTestTemplate();
-        assertThat(testTemplate, allOf(
-                containsString("import static org.junit.Assert.*;"),
-                containsString("import static org.hamcrest.MatcherAssert.assertThat;"),
-                containsString("import static org.hamcrest.Matchers.*;"),
-                containsString("import org.junit.*;")
-        ));
-        
-        // We need -1 to get rid of the last token
-        int expectedImports = 4;
-        int actualImports = testTemplate.split("import").length - 1;
-        assertEquals("The test template has the wrong number of imports", expectedImports, actualImports);
+        assertEquals("The test template has the wrong number of imports",
+                gc.getAdditionalImports().size(), 0);
     }
 
     @Test
     public void testTestTemplateAutomaticImport() {
-        GameClass gc = new GameClass("XmlElement", "XmlElement",
-                "src/test/resources/itests/sources/XmlElement/XmlElement.java",
-                "src/test/resources/itests/sources/XmlElement/XmlElement.class");
+        GameClass gc = GameClass.build()
+                .name("XmlElement")
+                .alias("XmlElement")
+                .javaFile("src/test/resources/itests/sources/XmlElement/XmlElement.java")
+                .classFile("src/test/resources/itests/sources/XmlElement/XmlElement.class")
+                .create();
 
-        String testTemplate = gc.getHTMLEscapedTestTemplate();
-
-        assertThat(testTemplate, allOf(
-                containsString("import static org.junit.Assert.*;"),
-                containsString("import org.junit.*;"),
-                containsString("import static org.hamcrest.MatcherAssert.assertThat;"),
-                containsString("import static org.hamcrest.Matchers.*;"),
-                containsString("import java.util.Enumeration;"),
-                containsString("import java.util.Hashtable;"),
-                containsString("import java.util.Iterator;"),
-                containsString("import java.util.List;"),
-                containsString("import java.util.Vector;")));
-
-        int expectedImports = 9;
-        int actualImports = testTemplate.split("import").length - 1;
-        assertEquals("The test template has the wrong number of imports", expectedImports, actualImports);
+        assertEquals("The test template has the wrong number of imports",
+                gc.getAdditionalImports().size(), 5);
     }
 }

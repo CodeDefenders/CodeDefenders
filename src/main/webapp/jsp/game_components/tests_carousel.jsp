@@ -152,7 +152,16 @@
 </div>
 
 <script>
-    <%-- TODO: only generate the table when panel is opened? --%>
+    for (let textarea of document.getElementsByClassName("utest")) {
+        let editor = CodeMirror.fromTextArea(textarea, {
+            lineNumbers: true,
+            matchBrackets: true,
+            mode: "text/x-java",
+            readOnly: true
+        });
+        // Potential ajax calls, but the carousel seems to require all DOM nodes to be present to be rendered correctly.
+        // TestAPI.getAndSetEditorValue(textarea, editor);
+    }
 
     /* Wrap in a function so it has it's own scope. */
     (function () {
@@ -306,6 +315,5 @@
         }
     }());
 </script>
-
 <% } %>
 
