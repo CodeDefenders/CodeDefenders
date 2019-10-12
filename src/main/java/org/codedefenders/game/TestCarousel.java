@@ -16,37 +16,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class TestCarousel {
-    @Expose private List<TCMethodDescription> methodDescriptions;
+    @Expose private List<TestCarouselCategory> categories;
     @Expose private Map<Integer, TCTestDTO> tests;
 
     public TestCarousel(GameClass cut, List<Test> testsList, List<Mutant> mutantsList) {
-        this.tests = new HashMap<>();
+        tests = new HashMap<>();
         for (Test test : testsList) {
-            this.tests.put(test.getId(), new TCTestDTO(test, mutantsList));
+            tests.put(test.getId(), new TCTestDTO(test, mutantsList));
         }
 
-        List<TCMethodDescription> actualMethodInfos = cut.getTestCarouselMethodDescriptions();
+        TestCarouselCategory allTests = new TestCarouselCategory("All Tests", -1, -1);
+        allTests.testIds.addAll(tests.keySet());
+        List<TestCarouselCategory> methods = cut.getTestCarouselMethodDescriptions();
+        categories = new ArrayList<>();
+        categories.add(allTests);
+        categories.addAll(methods);
 
         /* Map ranges of methods to their test carousel infos. */
         @SuppressWarnings("UnstableApiUsage")
-        RangeMap<Integer, TCMethodDescription> methodRanges = TreeRangeMap.create();
-        for (TCMethodDescription TCMethodDescription : actualMethodInfos) {
-            methodRanges.put(Range.closed(TCMethodDescription.startLine, TCMethodDescription.endLine), TCMethodDescription);
+        RangeMap<Integer, TestCarouselCategory> methodRanges = TreeRangeMap.create();
+        for (TestCarouselCategory method : methods) {
+            methodRanges.put(Range.closed(method.startLine, method.endLine), method);
         }
 
         Range<Integer> beforeFirst = Range.closedOpen(0, methodRanges.span().lowerEndpoint());
-
-        /* Represents code outside of methods. */
-        TCMethodDescription outsideMethods = new TCMethodDescription(
-                "Code Outside Of Methods",
-                beforeFirst.lowerEndpoint(),
-                beforeFirst.upperEndpoint());
-
-        methodDescriptions = new ArrayList<>();
-        methodDescriptions.add(outsideMethods);
-        methodDescriptions.addAll(cut.getTestCarouselMethodDescriptions());
 
         /* For every test, go through all covered lines and find the methods that are covered by it. */
         for (Test test : testsList) {
@@ -61,64 +57,65 @@ public class TestCarousel {
                     continue;
                 }
 
-                Entry<Range<Integer>, TCMethodDescription> entry = methodRanges.getEntry(line);
+                Entry<Range<Integer>, TestCarouselCategory> entry = methodRanges.getEntry(line);
 
-                /* Line does not belong to any method -> outside methods. */
+                /* Line does not belong to any method. */
                 if (entry == null) {
-                    outsideMethods.coveringTestIds.add(test.getId());
                     lastRange = beforeFirst;
 
-                    /* Line belongs to a method. */
+                /* Line belongs to a method. */
                 } else {
                     lastRange = entry.getKey();
-                    entry.getValue().coveringTestIds.add(test.getId());
+                    entry.getValue().testIds.add(test.getId());
                 }
             }
         }
     }
 
-    public List<TCMethodDescription> getInfos() {
-        return Collections.unmodifiableList(methodDescriptions);
+    public List<TestCarouselCategory> getInfos() {
+        return Collections.unmodifiableList(categories);
     }
 
-    public static class TCMethodDescription {
+    public static class TestCarouselCategory {
         @Expose private String description;
         private int startLine;
         private int endLine;
-        @Expose private Set<Integer> coveringTestIds;
+        @Expose private Set<Integer> testIds;
 
-        public TCMethodDescription(String description, int startLine, int endLine) {
+        public TestCarouselCategory(String description, int startLine, int endLine) {
             this.description = description;
             this.startLine = startLine;
             this.endLine = endLine;
-            this.coveringTestIds = new HashSet<>();
+            this.testIds = new HashSet<>();
         }
 
         public String getDescription() {
             return description;
         }
 
-        public Set<Integer> getCoveringTests() {
-            return Collections.unmodifiableSet(coveringTestIds);
+        public Set<Integer> getTestIds() {
+            return Collections.unmodifiableSet(testIds);
         }
     }
 
     public static class TCTestDTO {
         @Expose private int id;
-        @Expose private int creatorId;
         @Expose private String creatorName;
-        @Expose private int numCoveredMutants;
-        @Expose private int numKilledMutants;
+        @Expose private List<Integer> coveredMutantIds;
+        @Expose private List<Integer> killedMutantIds;
         @Expose private int points;
         @Expose private List<String> smells;
 
         public TCTestDTO(Test test, List<Mutant> mutants) {
             User creator = UserDAO.getUserForPlayer(test.getPlayerId());
             this.id = test.getId();
-            this.creatorId = creator.getId();
             this.creatorName = creator.getUsername();
-            this.numCoveredMutants = test.getCoveredMutants(mutants).size();
-            this.numCoveredMutants = test.getKilledMutants().size(); // TODO: very slow, pass mutants like in getCoveredMutants
+            this.coveredMutantIds = test.getCoveredMutants(mutants).stream()
+                    .map(Mutant::getId)
+                    .collect(Collectors.toList());
+            this.killedMutantIds = test.getKilledMutants().stream()
+                    .map(Mutant::getId)
+                    .collect(Collectors.toList());
             this.points = test.getScore();
             this.smells = (new TestSmellsDAO()).getDetectedTestSmellsForTest(test);
         }

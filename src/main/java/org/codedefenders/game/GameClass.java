@@ -26,6 +26,7 @@ import org.codedefenders.model.Dependency;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.analysis.ClassCodeAnalyser;
 import org.codedefenders.util.analysis.CodeAnalysisResult;
+import org.codedefenders.game.TestCarousel.TestCarouselCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -102,7 +103,7 @@ public class GameClass {
     private List<Range<Integer>> linesOfMethods = new ArrayList<>();
     private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
     private List<Range<Integer>> linesOfClosingBrackets = new ArrayList<>();
-    private List<TestCarousel.TCMethodDescription> testCarouselMethodDescriptions = new ArrayList<>();
+    private List<TestCarousel.TestCarouselCategory> testCarouselMethodDescriptions = new ArrayList<>();
 
     /**
      * The source code of this Java class. Used as an instance attribute so the file content only needs to be read once.
@@ -435,7 +436,7 @@ public class GameClass {
         return Collections.unmodifiableList(collect);
     }
 
-    public List<TestCarousel.TCMethodDescription> getTestCarouselMethodDescriptions() {
+    public List<TestCarouselCategory> getTestCarouselMethodDescriptions() {
         return Collections.unmodifiableList(testCarouselMethodDescriptions);
     }
 
