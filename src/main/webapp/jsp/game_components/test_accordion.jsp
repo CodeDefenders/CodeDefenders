@@ -313,7 +313,11 @@
                 scrollCollapse: true,
                 paging: false,
                 dom: 't',
-                language: {emptyTable: 'No tests cover this method.'}
+                language: {
+                    emptyTable: category.id === 'all'
+                        ? 'No tests.'
+                        : 'No tests cover this method.'
+                }
             });
 
             /* Assign function to the "View" buttons. */
