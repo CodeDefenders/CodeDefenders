@@ -464,7 +464,7 @@ public class Installer {
         String puzzleAlias = cutAlias + "_puzzle_" + puzzleAliasExt;
 
         // Create a puzzle cut with another alias for this puzzle
-        GameClass puzzleClass = GameClass.ofPuzzle(cut, cutAlias);
+        GameClass puzzleClass = GameClass.ofPuzzle(cut, puzzleAlias);
 
         int puzzleClassId = GameClassDAO.storeClass(puzzleClass);
         logger.info("installPuzzle(); Created Puzzle Class " + puzzleClassId);

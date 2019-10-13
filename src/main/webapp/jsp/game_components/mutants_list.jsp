@@ -25,6 +25,7 @@
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <%--
     Displays three tabs with a list of alive, killed and equivalent mutants respectively.

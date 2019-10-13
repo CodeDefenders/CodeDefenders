@@ -58,7 +58,7 @@ public class MutantAPI extends HttpServlet {
         root.add("id", gson.toJsonTree(mutant.getId(), Integer.class));
         root.add("playerId", gson.toJsonTree(mutant.getPlayerId(), Integer.class));
         root.add("gameId", gson.toJsonTree(mutant.getGameId(), Integer.class));
-        root.add("diff", gson.toJsonTree(mutant.getHTMLEscapedPatchString(), String.class));
+        root.add("diff", gson.toJsonTree(mutant.getPatchString(), String.class));
 
         return gson.toJson(root);
 

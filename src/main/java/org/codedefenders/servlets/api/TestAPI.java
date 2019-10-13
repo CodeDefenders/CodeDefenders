@@ -58,7 +58,7 @@ public class TestAPI extends HttpServlet {
         root.add("id", gson.toJsonTree(test.getId(), Integer.class));
         root.add("playerId", gson.toJsonTree(test.getPlayerId(), Integer.class));
         root.add("gameId", gson.toJsonTree(test.getGameId(), Integer.class));
-        root.add("source", gson.toJsonTree(test.getAsHTMLEscapedString(), String.class));
+        root.add("source", gson.toJsonTree(test.getAsString(), String.class));
 
         return gson.toJson(root);
 

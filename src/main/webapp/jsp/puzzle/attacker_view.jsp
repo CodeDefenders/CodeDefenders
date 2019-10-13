@@ -61,7 +61,9 @@
     request.setAttribute("startEditLine", puzzle.getEditableLinesStart());
     request.setAttribute("endEditLine", puzzle.getEditableLinesEnd());
 
-    /* tests_carousel */
+    /* test_accordion */
+    request.setAttribute("cut", cut);
+    request.setAttribute("mutants", game.getMutants());
     request.setAttribute("tests", game.getTests());
 
     /* mutants_list */
@@ -77,7 +79,7 @@
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
     // request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
+    // request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("gameType", GameMode.PUZZLE);
     // request.setAttribute("gameId", game.getId());
@@ -109,7 +111,7 @@
         <% if (game.getLevel() == GameLevel.EASY) { %>
         <div id="tests-div">
             <h3>JUnit tests</h3>
-            <%@include file="../game_components/tests_carousel.jsp"%>
+            <jsp:include page="/jsp/game_components/test_accordion.jsp"/>
         </div>
         <% } %>
     </div>

@@ -26,13 +26,12 @@ import org.codedefenders.model.Dependency;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.analysis.ClassCodeAnalyser;
 import org.codedefenders.util.analysis.CodeAnalysisResult;
+import org.codedefenders.game.TestAccordionDTO.TestAccordionCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -68,6 +67,7 @@ public class GameClass {
     private List<Range<Integer>> linesOfMethods = new ArrayList<>();
     private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
     private List<Range<Integer>> linesOfClosingBrackets = new ArrayList<>();
+    private List<TestAccordionCategory> testAccordionMethodDescriptions = new ArrayList<>();
 
     private TestTemplate testTemplate;
 
@@ -147,6 +147,7 @@ public class GameClass {
             this.linesOfClosingBrackets.addAll(visit.getClosingBrackets());
             this.emptyLines.addAll(visit.getEmptyLines());
             this.linesCoveringEmptyLines.putAll(visit.getLinesCoveringEmptyLines());
+            this.testAccordionMethodDescriptions.addAll(visit.getTestAccordionMethodDescriptions());
             this.visitedCode = true;
         }
     }
@@ -413,6 +414,11 @@ public class GameClass {
             }
         }
         return Collections.unmodifiableList(collect);
+    }
+
+    public List<TestAccordionCategory> getTestAccordionMethodDescriptions() {
+        visitCode();
+        return Collections.unmodifiableList(testAccordionMethodDescriptions);
     }
 
     @Override

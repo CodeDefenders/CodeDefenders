@@ -254,8 +254,8 @@ public class TestDAO {
         String linesUncovered = "";
 
         if (lineCoverage != null) {
-            linesCovered = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
-            linesUncovered = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
+            linesCovered = lineCoverage.getLinesCovered().stream().sorted().map(Object::toString).collect(Collectors.joining(","));
+            linesUncovered = lineCoverage.getLinesUncovered().stream().sorted().map(Object::toString).collect(Collectors.joining(","));
         }
 
         String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, MutantsKilled, Player_ID, Points, Class_ID, Lines_Covered, Lines_Uncovered) VALUES (?,?,?,?,?,?,?,?,?,?);";

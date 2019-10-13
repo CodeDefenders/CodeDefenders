@@ -43,7 +43,8 @@
     request.setAttribute("mutantName", cut.getBaseName());
     request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
-    /* tests_carousel */
+    /* test_accordion */
+    request.setAttribute("cut", cut);
     request.setAttribute("tests", game.getTests());
     request.setAttribute("mutants", game.getMutants());
 
@@ -64,7 +65,7 @@
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("gameType", GameMode.PARTY);
     // request.setAttribute("gameId", game.getId());
-    
+
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 
@@ -83,7 +84,7 @@
         <% if (game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED)) { %>
             <div id="tests-div">
                 <h3>JUnit tests </h3>
-                <%@include file="../game_components/tests_carousel.jsp"%>
+                <jsp:include page="/jsp/game_components/test_accordion.jsp"/>
             </div>
         <% } %>
     </div>

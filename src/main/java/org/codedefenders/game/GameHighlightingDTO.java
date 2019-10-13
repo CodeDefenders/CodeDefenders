@@ -18,14 +18,13 @@
  */
 package org.codedefenders.game;
 
-import java.lang.reflect.Type;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.annotations.Expose;
 import org.codedefenders.game.Mutant.Equivalence;
 
 /**
@@ -36,22 +35,22 @@ public class GameHighlightingDTO {
     /**
      * Maps line numbers to the mutant ids of mutants that modify the line.
      */
-    private Map<Integer, List<Integer>> mutantIdsPerLine;
+    @Expose public Map<Integer, List<Integer>> mutantIdsPerLine;
 
     /**
      * Maps line numbers to the test ids of tests that cover the line.
      */
-    private Map<Integer, List<Integer>> testIdsPerLine;
+    @Expose public Map<Integer, List<Integer>> testIdsPerLine;
 
     /**
      * Maps test ids to mutants.
      */
-    private Map<Integer, GHMutantDTO> mutants;
+    @Expose public Map<Integer, GHMutantDTO> mutants;
 
     /**
-     * Maps test ids to tests..
+     * Maps test ids to tests.
      */
-    private Map<Integer, GHTestDTO> tests;
+    @Expose public Map<Integer, GHTestDTO> tests;
 
     /**
      * Constructs the game highlighting data from the list of mutants and the list of tests in the game.
@@ -105,11 +104,11 @@ public class GameHighlightingDTO {
      * Represents a mutant for the game highlighting.
      */
     public static class GHMutantDTO {
-        private int id;
-        private int score;
-        private String lines;
-        private String creatorName;
-        private GHMutantStatus status;
+        @Expose public int id;
+        @Expose public int score;
+        @Expose public String lines;
+        @Expose public String creatorName;
+        @Expose public GHMutantStatus status;
 
         public GHMutantDTO(Mutant mutant) {
             this.id = mutant.getId();
@@ -134,32 +133,10 @@ public class GameHighlightingDTO {
      * Represents a test for the game highlighting.
      */
     public static class GHTestDTO {
-        private int id;
+        @Expose public int id;
 
         public GHTestDTO(Test test) {
             this.id = test.getId();
-        }
-    }
-
-    /**
-     * Serializes a {@link Map} as a list of lists, so that it can be used to construct an ES6 Map. <br>
-     * <pre>{@code
-     * var json = JSON.parse(jsonString); // e.g. [[1, "one"], [2, "two"], [3, "three"]]
-     * var map = new Map(jsonString);
-     * }</pre>
-     */
-    public static class MapSerializer implements JsonSerializer<Map> {
-        @Override
-        public JsonElement serialize(Map map, Type type, JsonSerializationContext jsonSerializationContext) {
-            JsonArray outerArray = new JsonArray();
-            for (Object obj : map.entrySet()) {
-                Map.Entry entry = (Map.Entry) obj;
-                JsonArray innerArray = new JsonArray();
-                innerArray.add(jsonSerializationContext.serialize(entry.getKey()));
-                innerArray.add(jsonSerializationContext.serialize(entry.getValue()));
-                outerArray.add(innerArray);
-            }
-            return outerArray;
         }
     }
 }

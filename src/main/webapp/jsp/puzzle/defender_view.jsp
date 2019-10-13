@@ -61,9 +61,10 @@
     request.setAttribute("mockingEnabled", false);
     request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
 
-    /* tests_carousel */
+    /* test_accordion */
+    request.setAttribute("cut", cut);
     request.setAttribute("tests", game.getTests());
-//    request.setAttribute("mutants", game.getMutants());
+    request.setAttribute("mutants", game.getMutants());
 
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());
@@ -78,7 +79,7 @@
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
     // request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
+    // request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", true);
     // request.setAttribute("gameType", GameMode.PUZZLE);
     // request.setAttribute("gameId", game.getId());
@@ -137,7 +138,7 @@
 
         <div class="col-md-6">
             <h3>JUnit tests</h3>
-            <%@include file="../game_components/tests_carousel.jsp" %>
+            <jsp:include page="/jsp/game_components/test_accordion.jsp"/>
         </div>
     </div>
 </div>
