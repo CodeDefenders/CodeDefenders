@@ -7,16 +7,24 @@ import com.google.gson.annotations.Expose;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * Computes and saves data for the test accordion.
  */
 public class TestAccordionDTO {
-
     /**
      * The categories of the test accordion, in sorted order.
      * One category containing all tests and one category for each method of the class,
@@ -49,6 +57,10 @@ public class TestAccordionDTO {
         List<TestAccordionCategory> methods = cut.getTestAccordionMethodDescriptions();
         categories.add(allTests);
         categories.addAll(methods);
+
+        if (methods.isEmpty()) {
+            return;
+        }
 
         /* Map ranges of methods to their test accordion infos. */
         @SuppressWarnings("UnstableApiUsage")

@@ -417,6 +417,7 @@ public class GameClass {
     }
 
     public List<TestAccordionCategory> getTestAccordionMethodDescriptions() {
+        visitCode();
         return Collections.unmodifiableList(testAccordionMethodDescriptions);
     }
 
