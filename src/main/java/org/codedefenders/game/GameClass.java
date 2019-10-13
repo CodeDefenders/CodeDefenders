@@ -26,7 +26,7 @@ import org.codedefenders.model.Dependency;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.analysis.ClassCodeAnalyser;
 import org.codedefenders.util.analysis.CodeAnalysisResult;
-import org.codedefenders.game.TestCarouselDTO.TestCarouselCategory;
+import org.codedefenders.game.TestAccordionDTO.TestAccordionCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +67,7 @@ public class GameClass {
     private List<Range<Integer>> linesOfMethods = new ArrayList<>();
     private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
     private List<Range<Integer>> linesOfClosingBrackets = new ArrayList<>();
-    private List<TestCarouselDTO.TestCarouselCategory> testCarouselMethodDescriptions = new ArrayList<>();
+    private List<TestAccordionCategory> testAccordionMethodDescriptions = new ArrayList<>();
 
     private TestTemplate testTemplate;
 
@@ -147,7 +147,7 @@ public class GameClass {
             this.linesOfClosingBrackets.addAll(visit.getClosingBrackets());
             this.emptyLines.addAll(visit.getEmptyLines());
             this.linesCoveringEmptyLines.putAll(visit.getLinesCoveringEmptyLines());
-            this.testCarouselMethodDescriptions.addAll(visit.getTestCarouselMethodDescriptions());
+            this.testAccordionMethodDescriptions.addAll(visit.getTestAccordionMethodDescriptions());
             this.visitedCode = true;
         }
     }
@@ -416,8 +416,8 @@ public class GameClass {
         return Collections.unmodifiableList(collect);
     }
 
-    public List<TestCarouselCategory> getTestCarouselMethodDescriptions() {
-        return Collections.unmodifiableList(testCarouselMethodDescriptions);
+    public List<TestAccordionCategory> getTestAccordionMethodDescriptions() {
+        return Collections.unmodifiableList(testAccordionMethodDescriptions);
     }
 
     @Override

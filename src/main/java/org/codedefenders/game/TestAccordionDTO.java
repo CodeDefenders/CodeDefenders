@@ -13,47 +13,47 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 /**
- * Computes and saves data for the test carousel.
+ * Computes and saves data for the test accordion.
  */
-public class TestCarouselDTO {
+public class TestAccordionDTO {
 
     /**
-     * The categories of the test carousel, in sorted order.
+     * The categories of the test accordion, in sorted order.
      * One category containing all tests and one category for each method of the class,
      * containing the tests that cover the method.
      */
-    @Expose private List<TestCarouselCategory> categories;
+    @Expose private List<TestAccordionCategory> categories;
 
     /**
      * Maps test ids to tests.
      */
-    @Expose private Map<Integer, TCTestDTO> tests;
+    @Expose private Map<Integer, TATestDTO> tests;
 
     /**
-     * Constructs the test carousel data.
+     * Constructs the test accordion data.
      * @param cut The class the tests and mutants belong to.
      * @param testsList The tests.
      * @param mutantsList The mutants.
      */
-    public TestCarouselDTO(GameClass cut, List<Test> testsList, List<Mutant> mutantsList) {
+    public TestAccordionDTO(GameClass cut, List<Test> testsList, List<Mutant> mutantsList) {
         tests = new HashMap<>();
         categories = new ArrayList<>();
 
         for (Test test : testsList) {
-            tests.put(test.getId(), new TCTestDTO(test, mutantsList));
+            tests.put(test.getId(), new TATestDTO(test, mutantsList));
         }
 
-        TestCarouselCategory allTests = new TestCarouselCategory("All Tests", "all");
+        TestAccordionCategory allTests = new TestAccordionCategory("All Tests", "all");
         allTests.addTestIds(tests.keySet());
 
-        List<TestCarouselCategory> methods = cut.getTestCarouselMethodDescriptions();
+        List<TestAccordionCategory> methods = cut.getTestAccordionMethodDescriptions();
         categories.add(allTests);
         categories.addAll(methods);
 
-        /* Map ranges of methods to their test carousel infos. */
+        /* Map ranges of methods to their test accordion infos. */
         @SuppressWarnings("UnstableApiUsage")
-        RangeMap<Integer, TestCarouselCategory> methodRanges = TreeRangeMap.create();
-        for (TestCarouselCategory method : methods) {
+        RangeMap<Integer, TestAccordionCategory> methodRanges = TreeRangeMap.create();
+        for (TestAccordionCategory method : methods) {
             methodRanges.put(Range.closed(method.startLine, method.endLine), method);
         }
 
@@ -72,7 +72,7 @@ public class TestCarouselDTO {
                     continue;
                 }
 
-                Entry<Range<Integer>, TestCarouselCategory> entry = methodRanges.getEntry(line);
+                Entry<Range<Integer>, TestAccordionCategory> entry = methodRanges.getEntry(line);
 
                 /* Line does not belong to any method. */
                 if (entry == null) {
@@ -88,30 +88,30 @@ public class TestCarouselDTO {
     }
 
     /**
-     * Returns the categories of the test carousel.
-     * @return The categories of the test carousel.
+     * Returns the categories of the test accordion.
+     * @return The categories of the test accordion.
      */
-    public List<TestCarouselCategory> getCategories() {
+    public List<TestAccordionCategory> getCategories() {
         return Collections.unmodifiableList(categories);
     }
 
     /**
-     * Represents a category (accordion section) of the test carousel.
+     * Represents a category (accordion section) of the test accordion.
      */
-    public static class TestCarouselCategory {
+    public static class TestAccordionCategory {
         @Expose private String description;
         private Integer startLine;
         private Integer endLine;
         @Expose private Set<Integer> testIds;
         @Expose private String id;
 
-        public TestCarouselCategory(String description, String id) {
+        public TestAccordionCategory(String description, String id) {
             this.description = description;
             this.testIds = new HashSet<>();
             this.id = id;
         }
 
-        public TestCarouselCategory(String description, int startLine, int endLine, String id) {
+        public TestAccordionCategory(String description, int startLine, int endLine, String id) {
             this(description, id);
             this.startLine = startLine;
             this.endLine = endLine;
@@ -139,9 +139,9 @@ public class TestCarouselDTO {
     }
 
     /**
-     * Represents a test for the test carousel.
+     * Represents a test for the test accordion.
      */
-    public static class TCTestDTO {
+    public static class TATestDTO {
         @Expose private int id;
         @Expose private String creatorName;
         @Expose private List<Integer> coveredMutantIds;
@@ -149,7 +149,7 @@ public class TestCarouselDTO {
         @Expose private int points;
         @Expose private List<String> smells;
 
-        public TCTestDTO(Test test, List<Mutant> mutants) {
+        public TATestDTO(Test test, List<Mutant> mutants) {
             User creator = UserDAO.getUserForPlayer(test.getPlayerId());
             this.id = test.getId();
             this.creatorName = creator.getUsername();

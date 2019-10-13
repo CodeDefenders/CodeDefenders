@@ -20,8 +20,8 @@
 --%>
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
-<%@ page import="org.codedefenders.game.TestCarouselDTO" %>
-<%@ page import="org.codedefenders.game.TestCarouselDTO.TestCarouselCategory" %>
+<%@ page import="org.codedefenders.game.TestAccordionDTO" %>
+<%@ page import="org.codedefenders.game.TestAccordionDTO.TestAccordionCategory" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.google.gson.GsonBuilder" %>
 <%@ page import="java.util.Map" %>
@@ -50,11 +50,11 @@
     List<Mutant> mutants = (List<Mutant>) request.getAttribute("mutants");
     GameClass cut = (GameClass) request.getAttribute("cut");
 
-    TestCarouselDTO testCarousel = new TestCarouselDTO(cut, tests, mutants);
-    List<TestCarouselCategory> categories = testCarousel.getCategories();
+    TestAccordionDTO testAccordion = new TestAccordionDTO(cut, tests, mutants);
+    List<TestAccordionCategory> categories = testAccordion.getCategories();
 
     Gson gson = new GsonBuilder().registerTypeAdapter(Map.class, new JSONUtils.MapSerializer()).create();
-    String tcString = gson.toJson(testCarousel);
+    String tcString = gson.toJson(testAccordion);
 %>
 
 <style type="text/css">
@@ -123,7 +123,7 @@
     <div class="panel-body" id="tests">
         <div class="panel-group" id="tests-accordion">
             <%
-                for (TestCarouselCategory category : categories) {
+                for (TestAccordionCategory category : categories) {
             %>
                 <div class="panel panel-default">
                     <div class="panel-heading" id="tc-heading-<%=category.getId()%>">
@@ -154,7 +154,7 @@
     /* Wrap in a function so it has it's own scope. */
     (function () {
 
-        /** Test carousel data. */
+        /** Test accordion data. */
         const tc_data = JSON.parse(`<%=tcString%>`);
 
         /** A description and list of test ids for each category (method). */

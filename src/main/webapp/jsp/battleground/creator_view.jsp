@@ -28,7 +28,7 @@
 	request.setAttribute("classCode", cut.getAsHTMLEscapedString());
 	request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
-	/* tests_carousel */
+	/* test_accordion */
 	request.setAttribute("cut", cut);
 	request.setAttribute("mutants", game.getMutants());
 	request.setAttribute("tests", game.getTests());
@@ -66,7 +66,7 @@
 
 		<div id="tests-div">
 			<h3>JUnit tests </h3>
-			<jsp:include page="../game_components/tests_carousel.jsp"/>
+			<jsp:include page="../game_components/test_accordion.jsp"/>
 		</div>
 	</div>
 

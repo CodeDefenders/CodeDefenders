@@ -51,7 +51,7 @@
 
 <%-- Set request attributes for the components. --%>
 <%
-     /* playerFeedback and scoreboard */ 
+     /* playerFeedback and scoreboard */
     request.setAttribute("game", game);
 
     /* class_viewer */
@@ -63,7 +63,7 @@
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 
-    /* tests_carousel */
+    /* test_accordion */
     request.setAttribute("cut", cut);
     request.setAttribute("tests", game.getTests());
     request.setAttribute("mutants", game.getMutants());
@@ -88,11 +88,11 @@
 //    request.setAttribute("gameId", game.getId());
 %>
 <%@ include file="/jsp/battleground/header_game.jsp" %>
- 
+
 <jsp:include page="/jsp/scoring_tooltip.jsp"/>
 <jsp:include page="/jsp/playerFeedback.jsp"/>
 <jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
- 
+
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6">
         <div id="mutants-div">
@@ -102,7 +102,7 @@
 
         <div id="tests-div">
             <h3>JUnit tests </h3>
-            <jsp:include page="../game_components/tests_carousel.jsp"/>
+            <jsp:include page="../game_components/test_accordion.jsp"/>
         </div>
     </div>
 

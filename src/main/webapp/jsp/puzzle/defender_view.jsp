@@ -60,10 +60,10 @@
     request.setAttribute("mockingEnabled", false);
     request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
 
-    /* tests_carousel */
+    /* test_accordion */
     request.setAttribute("cut", cut);
     request.setAttribute("tests", game.getTests());
-    // request.setAttribute("mutants", game.getMutants());
+    request.setAttribute("mutants", game.getMutants());
 
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());
@@ -137,7 +137,7 @@
 
         <div class="col-md-6">
             <h3>JUnit tests</h3>
-            <jsp:include page="../game_components/tests_carousel.jsp"/>
+            <jsp:include page="../game_components/test_accordion.jsp"/>
         </div>
     </div>
 </div>

@@ -43,7 +43,7 @@
     request.setAttribute("mutantName", cut.getBaseName());
     request.setAttribute("dependencies", cut.getHTMLEscapedDependencyCode());
 
-    /* tests_carousel */
+    /* test_accordion */
     request.setAttribute("cut", cut);
     request.setAttribute("tests", game.getTests());
     request.setAttribute("mutants", game.getMutants());
@@ -84,7 +84,7 @@
         <% if (game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED)) { %>
             <div id="tests-div">
                 <h3>JUnit tests </h3>
-                <jsp:include page="../game_components/tests_carousel.jsp"/>
+                <jsp:include page="../game_components/test_accordion.jsp"/>
             </div>
         <% } %>
     </div>
