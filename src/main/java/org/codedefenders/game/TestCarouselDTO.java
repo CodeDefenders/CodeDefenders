@@ -8,30 +8,45 @@ import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-public class TestCarousel {
+/**
+ * Computes and saves data for the test carousel.
+ */
+public class TestCarouselDTO {
+
+    /**
+     * The categories of the test carousel, in sorted order.
+     * One category containing all tests and one category for each method of the class,
+     * containing the tests that cover the method.
+     */
     @Expose private List<TestCarouselCategory> categories;
+
+    /**
+     * Maps test ids to tests.
+     */
     @Expose private Map<Integer, TCTestDTO> tests;
 
-    public TestCarousel(GameClass cut, List<Test> testsList, List<Mutant> mutantsList) {
+    /**
+     * Constructs the test carousel data.
+     * @param cut The class the tests and mutants belong to.
+     * @param testsList The tests.
+     * @param mutantsList The mutants.
+     */
+    public TestCarouselDTO(GameClass cut, List<Test> testsList, List<Mutant> mutantsList) {
         tests = new HashMap<>();
+        categories = new ArrayList<>();
+
         for (Test test : testsList) {
             tests.put(test.getId(), new TCTestDTO(test, mutantsList));
         }
 
-        TestCarouselCategory allTests = new TestCarouselCategory("All Tests", -1, -1);
-        allTests.testIds.addAll(tests.keySet());
+        TestCarouselCategory allTests = new TestCarouselCategory("All Tests", "all");
+        allTests.addTestIds(tests.keySet());
+
         List<TestCarouselCategory> methods = cut.getTestCarouselMethodDescriptions();
-        categories = new ArrayList<>();
         categories.add(allTests);
         categories.addAll(methods);
 
@@ -66,27 +81,48 @@ public class TestCarousel {
                 /* Line belongs to a method. */
                 } else {
                     lastRange = entry.getKey();
-                    entry.getValue().testIds.add(test.getId());
+                    entry.getValue().addTestId(test.getId());
                 }
             }
         }
     }
 
-    public List<TestCarouselCategory> getInfos() {
+    /**
+     * Returns the categories of the test carousel.
+     * @return The categories of the test carousel.
+     */
+    public List<TestCarouselCategory> getCategories() {
         return Collections.unmodifiableList(categories);
     }
 
+    /**
+     * Represents a category (accordion section) of the test carousel.
+     */
     public static class TestCarouselCategory {
         @Expose private String description;
-        private int startLine;
-        private int endLine;
+        private Integer startLine;
+        private Integer endLine;
         @Expose private Set<Integer> testIds;
+        @Expose private String id;
 
-        public TestCarouselCategory(String description, int startLine, int endLine) {
+        public TestCarouselCategory(String description, String id) {
             this.description = description;
+            this.testIds = new HashSet<>();
+            this.id = id;
+        }
+
+        public TestCarouselCategory(String description, int startLine, int endLine, String id) {
+            this(description, id);
             this.startLine = startLine;
             this.endLine = endLine;
-            this.testIds = new HashSet<>();
+        }
+
+        public void addTestId(int testId) {
+            this.testIds.add(testId);
+        }
+
+        public void addTestIds(Collection<Integer> testIds) {
+            this.testIds.addAll(testIds);
         }
 
         public String getDescription() {
@@ -96,8 +132,15 @@ public class TestCarousel {
         public Set<Integer> getTestIds() {
             return Collections.unmodifiableSet(testIds);
         }
+
+        public String getId() {
+            return id;
+        }
     }
 
+    /**
+     * Represents a test for the test carousel.
+     */
     public static class TCTestDTO {
         @Expose private int id;
         @Expose private String creatorName;

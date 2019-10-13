@@ -19,7 +19,7 @@
 package org.codedefenders.util.analysis;
 
 import org.apache.commons.lang3.Range;
-import org.codedefenders.game.TestCarousel.TestCarouselCategory;
+import org.codedefenders.game.TestCarouselDTO.TestCarouselCategory;
 
 import java.util.*;
 
@@ -42,6 +42,7 @@ public class CodeAnalysisResult {
     private final Set<Integer> emptyLines = new HashSet<>();
     private final Map<Integer, Integer> linesCoveringEmptyLines = new HashMap<>();
 
+    private int currentMethodIndex = 0;
     private final List<TestCarouselCategory> methodDescriptions = new ArrayList<>();
 
     CodeAnalysisResult imported(String imported) {
@@ -90,7 +91,11 @@ public class CodeAnalysisResult {
     }
 
     CodeAnalysisResult testCarouselMethodDescription(String signature, int startLine, int endLine) {
-        this.methodDescriptions.add(new TestCarouselCategory(signature, startLine, endLine));
+        this.methodDescriptions.add(new TestCarouselCategory(
+                signature,
+                startLine,
+                endLine,
+                String.valueOf(currentMethodIndex++)));
         return this;
     }
 

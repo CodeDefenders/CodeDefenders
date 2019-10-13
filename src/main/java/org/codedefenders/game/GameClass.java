@@ -26,7 +26,7 @@ import org.codedefenders.model.Dependency;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.analysis.ClassCodeAnalyser;
 import org.codedefenders.util.analysis.CodeAnalysisResult;
-import org.codedefenders.game.TestCarousel.TestCarouselCategory;
+import org.codedefenders.game.TestCarouselDTO.TestCarouselCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +67,7 @@ public class GameClass {
     private List<Range<Integer>> linesOfMethods = new ArrayList<>();
     private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
     private List<Range<Integer>> linesOfClosingBrackets = new ArrayList<>();
-    private List<TestCarousel.TestCarouselCategory> testCarouselMethodDescriptions = new ArrayList<>();
+    private List<TestCarouselDTO.TestCarouselCategory> testCarouselMethodDescriptions = new ArrayList<>();
 
     private TestTemplate testTemplate;
 
