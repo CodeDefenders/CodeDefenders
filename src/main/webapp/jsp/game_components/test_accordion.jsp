@@ -54,11 +54,11 @@
     List<TestAccordionCategory> categories = testAccordion.getCategories();
 
     Gson gson = new GsonBuilder().registerTypeAdapter(Map.class, new JSONUtils.MapSerializer()).create();
-    String tcString = gson.toJson(testAccordion);
+    String taString = gson.toJson(testAccordion);
 %>
 
 <style type="text/css">
-    <%-- Prefix all classes with "tc-" to avoid conflicts.
+    <%-- Prefix all classes with "ta-" to avoid conflicts.
     We probably want to extract some common CSS when we finally tackle the CSS issue. --%>
 
     #tests-accordion {
@@ -86,35 +86,35 @@
         vertical-align: middle;
     }
 
-    #tests-accordion .panel-title.tc-covered {
+    #tests-accordion .panel-title.ta-covered {
         color: black;
     }
 
-    #tests-accordion .panel-title:not(.tc-covered) {
+    #tests-accordion .panel-title:not(.ta-covered) {
         color: #B0B0B0;
     }
 
-    #tests-accordion .tc-test-count {
+    #tests-accordion .ta-test-count {
         color: #909090;
     }
 
-    #tests-accordion .tc-column-name {
+    #tests-accordion .ta-column-name {
         color: #B0B0B0;
     }
 
-    #tests-accordion .tc-covered-link {
+    #tests-accordion .ta-covered-link {
         color: inherit;
     }
 
-    #tests-accordion .tc-covered-link:hover {
+    #tests-accordion .ta-covered-link:hover {
         text-decoration: none;
     }
 
-    #tests-accordion .tc-killed-link {
+    #tests-accordion .ta-killed-link {
         color: inherit;
     }
 
-    #tests-accordion .tc-killed-link:hover {
+    #tests-accordion .ta-killed-link:hover {
         text-decoration: none;
     }
 </style>
@@ -126,20 +126,20 @@
                 for (TestAccordionCategory category : categories) {
             %>
                 <div class="panel panel-default">
-                    <div class="panel-heading" id="tc-heading-<%=category.getId()%>">
+                    <div class="panel-heading" id="ta-heading-<%=category.getId()%>">
                         <a role="button" data-toggle="collapse" aria-expanded="false"
-                                href="#tc-collapse-<%=category.getId()%>"
-                                aria-controls="tc-collapse-<%=category.getId()%>"
-                                class="panel-title <%=category.getTestIds().isEmpty() ? "" : "tc-covered"%>">
+                                href="#ta-collapse-<%=category.getId()%>"
+                                aria-controls="ta-collapse-<%=category.getId()%>"
+                                class="panel-title <%=category.getTestIds().isEmpty() ? "" : "ta-covered"%>">
                             <%=category.getDescription()%>
-                            <span class="tc-test-count"><%="(" + category.getTestIds().size() + ")"%></span>
+                            <span class="ta-test-count"><%="(" + category.getTestIds().size() + ")"%></span>
                         </a>
                     </div>
                     <div class="panel-collapse collapse" data-parent="#tests-accordion"
-                            id="tc-collapse-<%=category.getId()%>"
-                            aria-labelledby="tc-heading-<%=category.getId()%>">
+                            id="ta-collapse-<%=category.getId()%>"
+                            aria-labelledby="ta-heading-<%=category.getId()%>">
                         <div class="panel-body">
-                            <table id="tc-table-<%=category.getId()%>" class="table table-sm"></table>
+                            <table id="ta-table-<%=category.getId()%>" class="table table-sm"></table>
                         </div>
                     </div>
                 </div>
@@ -155,24 +155,24 @@
     (function () {
 
         /** Test accordion data. */
-        const tc_data = JSON.parse(`<%=tcString%>`);
+        const ta_data = JSON.parse(`<%=taString%>`);
 
         /** A description and list of test ids for each category (method). */
-        const categories = tc_data.categories; //
+        const categories = ta_data.categories; //
 
         /** Maps test ids to their DTO representation. */
-        const tests = new Map(tc_data.tests);
+        const tests = new Map(ta_data.tests);
 
         /** Maps test ids to modals that show the tests' code. */
         const testModals = new Map();
 
         /* Functions to generate table columns. */
         const genId             = row => 'Test ' + row.id;
-        const genCreator        = row => <%-- '<span class="tc-column-name">Creator:</span> ' + --%> row.creatorName;
-        const genPoints         = row => '<span class="tc-column-name">Points:</span> '  + row.points;
-        const genCoveredMutants = row => '<a class="tc-covered-link"><span class="tc-column-name">Covered:</span> ' + row.coveredMutantIds.length + '</a>';;
-        const genKilledMutants  = row => '<a class="tc-killed-link"><span class="tc-column-name">Killed:</span> ' + row.killedMutantIds.length + '</a>';
-        const genViewButton     = row => '<button class="tc-view-button btn btn-ssm btn-primary">View</button>';
+        const genCreator        = row => <%-- '<span class="ta-column-name">Creator:</span> ' + --%> row.creatorName;
+        const genPoints         = row => '<span class="ta-column-name">Points:</span> '  + row.points;
+        const genCoveredMutants = row => '<a class="ta-covered-link"><span class="ta-column-name">Covered:</span> ' + row.coveredMutantIds.length + '</a>';;
+        const genKilledMutants  = row => '<a class="ta-killed-link"><span class="ta-column-name">Killed:</span> ' + row.killedMutantIds.length + '</a>';
+        const genViewButton     = row => '<button class="ta-view-button btn btn-ssm btn-primary">View</button>';
         const genSmells         = row => {
             const numSmells = row.smells.length;
             let smellLevel;
@@ -187,8 +187,8 @@
                 smellLevel = 'Good';
                 smellColor = 'btn-success';
             }
-            return <%-- '<span class="tc-column-name">Smells:</span> '
-                + --%> '<a class="tc-smells-link btn btn-ssm ' + smellColor + '">' + smellLevel + '</a>';
+            return <%-- '<span class="ta-column-name">Smells:</span> '
+                + --%> '<a class="ta-smells-link btn btn-ssm ' + smellColor + '">' + smellLevel + '</a>';
         };
 
         /**
@@ -268,7 +268,7 @@
             const textarea = modal.find('textarea').get(0);
             const editor = CodeMirror.fromTextArea(textarea, {
                 lineNumbers: true,
-                matchBrackets: true,
+                matahBrackets: true,
                 mode: "text/x-java",
                 readOnly: true
             });
@@ -296,7 +296,7 @@
                 .map(tests.get, tests);
 
             /* Create the DataTable. */
-            const tableElement = $('#tc-table-' + category.id);
+            const tableElement = $('#ta-table-' + category.id);
             const dataTable = tableElement.DataTable({
                 data: rows,
                 columns: [
@@ -317,13 +317,13 @@
             });
 
             /* Assign function to the "View" buttons. */
-            tableElement.on('click', '.tc-view-button', function () {
+            tableElement.on('click', '.ta-view-button', function () {
                 const testId = rowData(this, dataTable).id;
                 viewTestModal(testId);
             });
 
             setupPopovers(
-                tableElement.find('.tc-covered-link'),
+                tableElement.find('.ta-covered-link'),
                 that => rowData(that, dataTable).coveredMutantIds,
                 coveredIds => coveredIds.length > 0
                     ? 'Covered Mutants'
@@ -334,7 +334,7 @@
             );
 
             setupPopovers(
-                tableElement.find('.tc-killed-link'),
+                tableElement.find('.ta-killed-link'),
                 that => rowData(that, dataTable).killedMutantIds,
                 killedIds => killedIds.length > 0
                     ? 'Killed Mutants'
@@ -345,7 +345,7 @@
             );
 
             setupPopovers(
-                tableElement.find('.tc-smells-link'),
+                tableElement.find('.ta-smells-link'),
                 that => rowData(that, dataTable).smells,
                 smells => smells.length > 0
                     ? 'This test smells of'
