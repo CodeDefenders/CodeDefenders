@@ -25,6 +25,8 @@
 <%@ page import="static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME" %>
 <%@ page import="static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT" %>
 <%@ page import="java.util.LinkedList" %>
+<%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
 
 <%--
     Puzzle game view for a attacker. Retrieves the given puzzle game
@@ -105,7 +107,7 @@
     <div class="col-md-6">
         <div id="mutants-div">
             <h3>Mutants</h3>
-            <%@include file="../game_components/mutants_list.jsp"%>
+            <jsp:include page="/jsp/game_components/mutants_list.jsp"/>
         </div>
 
         <% if (game.getLevel() == GameLevel.EASY) { %>
@@ -117,7 +119,7 @@
     </div>
 
     <div class="col-md-6" id="cut-div">
-        <%@include file="../game_components/mutant_progress_bar.jsp"%>
+        <%@include file="/jsp/game_components/mutant_progress_bar.jsp"%>
         <h3 style="margin-bottom: 0;">Create a mutant here</h3>
 
         <form id="reset" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
@@ -137,16 +139,16 @@
             <input type="hidden" name="formType" value="createMutant">
             <input type="hidden" name="gameId" value="<%= game.getId() %>">
 
-            <%@include file="../game_components/mutant_editor.jsp"%>
-            <%@include file="../game_components/game_highlighting.jsp" %>
+            <%@include file="/jsp/game_components/mutant_editor.jsp"%>
+            <%@include file="/jsp/game_components/game_highlighting.jsp"%>
         </form>
-        <%@include file="../game_components/mutant_explanation.jsp"%>
-        <%@include file="../game_components/editor_help_config_toolbar.jsp"%>
+        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
+        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
     </div>
 </div>
 
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
-<%@include file="../footer_game.jsp"%>
+<%@include file="/jsp/footer_game.jsp"%>
 
 <% } %>
