@@ -288,8 +288,10 @@
             Map<Integer, PlayerScore> attackerScores = info.getMutantScores();
             Map<Integer, PlayerScore> defenderScores = info.getTestScores();
 %>
-		<tr id="game-<%=gameId%>" class="toggle-details">
-			<td class="col-sm-1"><%=gameId%></td>
+		<tr id="game-<%=gameId%>">
+			<td id="toggle-game-<%=gameId%>"
+                class="col-sm-1 toggle-details toggle-details-icon glyphicon glyphicon-chevron-right">
+                <span style="margin-left: 10px"><%=gameId%></span></td>
 			<td class="col-sm-1"><%=info.creatorName()%></td>
 			<td class="col-sm-2">
 				<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>">
@@ -345,7 +347,7 @@
             </td>
             <td class="col-sm-1"><%=info.gameLevel().getFormattedString() %></td>
 		</tr>
-        <tr id="game-detais-<%=gameId%>" class="game-<%=gameId%>" style="display: none">
+        <tr id="game-detais-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
             <td colspan="6">
                 <table class="table-child-details" style="display: inline; margin-right: 15px">
                     <thead>
@@ -489,14 +491,18 @@
 			}
 		});
 
-        $('#tableOpenGames tr.toggle-details').on('click', function () {
+        $('table td.toggle-details').on('click', function () {
             var id = '.' + $(this).attr('id');
             if ($(id).is(':visible')) {
+                $(this).removeClass('glyphicon-chevron-down');
+                $(this).addClass('glyphicon-chevron-right');
                 $(id).hide()
             } else {
+                $(this).removeClass('glyphicon-chevron-right');
+                $(this).addClass('glyphicon-chevron-down');
                 $(id).show()
             }
-        })
+        });
 	</script>
 
 </div>
