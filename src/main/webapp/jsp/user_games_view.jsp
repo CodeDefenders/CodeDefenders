@@ -87,89 +87,9 @@
 		</td>
         <td class="col-sm-1">
             <span><%=attackers.size()%></span>
-            <%
-                if (!attackers.isEmpty()) {
-            %>
-            <br>
-            <a href="#" data-toggle="modal" data-target="#modalAttackersFor<%=gameId%>">(Details)</a>
-            <div id="modalAttackersFor<%=gameId%>" class="modal fade" role="dialog" style="text-align: left;" >
-                <div class="modal-dialog">
-                    <!-- Modal content-->
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Attackers</h4>
-                        </div>
-                        <div class="modal-body">
-                            <table id="game-<%=gameId%>-attackers" class="table table-striped table-hover table-responsive table-paragraphs games-table">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Points</th>
-                                </tr>
-                            <%
-                                for (Player attacker : attackers) {
-                            %>
-                                <tr>
-                                    <td class="col-sm-1"><%=attacker.getUser().getUsername()%></td>
-                                    <td class="col-sm-1"><%=attacker.getPoints()%></td>
-                                </tr>
-                            <%
-                                }
-                            %>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <%
-                }
-            %>
         </td>
         <td class="col-sm-1">
             <span><%=defenders.size()%> </span>
-            <%
-                if (!defenders.isEmpty()) {
-            %>
-            <br>
-            <a href="#" data-toggle="modal" data-target="#modalDefendersFor<%=gameId%>">(Details)</a>
-            <div id="modalDefendersFor<%=gameId%>" class="modal fade" role="dialog" style="text-align: left;" >
-                <div class="modal-dialog">
-                    <!-- Modal content-->
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Defenders</h4>
-                        </div>
-                        <div class="modal-body">
-                            <table id="game-<%=gameId%>-defenders" class="table table-striped table-hover table-responsive table-paragraphs games-table">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Points</th>
-                                </tr>
-                                <%
-                                    for (Player defender : defenders) {
-                                %>
-                                <tr>
-                                    <td class="col-sm-1"><%=defender.getUser().getUsername()%></td>
-                                    <td class="col-sm-1"><%=defender.getPoints()%></td>
-                                </tr>
-                                <%
-                                    }
-                                %>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <%
-                }
-            %>
         </td>
 		<td class="col-sm-1"><%=info.gameLevel().getFormattedString()%></td>
 		<td class="col-sm-2">
