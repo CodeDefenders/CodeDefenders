@@ -194,10 +194,15 @@
                 </tr>
                 </thead>
                 <tbody>
-                <% for (Player attacker : attackers) {
-                    int playerId = attacker.getId();
-                    PlayerScore playerScores = attackerScores.get(playerId);
-                    boolean scoresExists = attackerScores.containsKey(playerId) && attackerScores.get(playerId) != null;
+                <% if(attackers.isEmpty()){ %>
+                <tr>
+                    <td colspan="4">There are no Attackers</td>
+                </tr>
+                <% } else {
+                    for (Player attacker : attackers) {
+                        int playerId = attacker.getId();
+                        PlayerScore playerScores = attackerScores.get(playerId);
+                        boolean scoresExists = attackerScores.containsKey(playerId) && attackerScores.get(playerId) != null;
                 %>
                 <tr>
                     <td>
@@ -226,7 +231,8 @@
                         <% } %>
                     </td>
                 </tr>
-                <% } %>
+                <% }
+                } %>
                 </tbody>
             </table>
             <table class="table-child-details" style="display: inline; margin-left: 15px">
@@ -247,10 +253,15 @@
                 </tr>
                 </thead>
                 <tbody>
-                <% for (Player defender : defenders) {
-                    int playerId = defender.getId();
-                    PlayerScore playerScores = defenderScores.get(playerId);
-                    boolean scoresExists = defenderScores.containsKey(playerId) && defenderScores.get(playerId) != null;
+                <% if(defenders.isEmpty()){ %>
+                <tr>
+                    <td colspan="4">There are no Defenders</td>
+                </tr>
+                <% } else {
+                    for (Player defender : defenders) {
+                        int playerId = defender.getId();
+                        PlayerScore playerScores = defenderScores.get(playerId);
+                        boolean scoresExists = defenderScores.containsKey(playerId) && defenderScores.get(playerId) != null;
                 %>
                 <tr>
                     <td>
@@ -278,7 +289,8 @@
                         <% } %>
                     </td>
                 </tr>
-                <% } %>
+                <% }
+                } %>
                 </tbody>
             </table>
         </td>
@@ -400,7 +412,12 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% for (Player attacker : attackers) {
+                        <% if(attackers.isEmpty()){ %>
+                            <tr>
+                                <td colspan="4">There are no Attackers. Go Join!</td>
+                            </tr>
+                        <% } else {
+                            for (Player attacker : attackers) {
                             int playerId = attacker.getId();
                             PlayerScore playerScores = attackerScores.get(playerId);
                             boolean scoresExists = attackerScores.containsKey(playerId) && attackerScores.get(playerId) != null;
@@ -432,7 +449,8 @@
                                     <% } %>
                                 </td>
                             </tr>
-                        <% } %>
+                        <% }
+                        } %>
                     </tbody>
                 </table>
                 <table class="table-child-details" style="display: inline; margin-left: 15px">
@@ -453,7 +471,11 @@
                         </tr>
                     </thead>
                     <tbody>
-                    <% for (Player defender : defenders) {
+                    <% if(defenders.isEmpty()){ %>
+                    <tr>
+                        <td colspan="4">There are no Defenders. Go Join!</td>
+                    </tr>
+                    <% } else { for (Player defender : defenders) {
                         int playerId = defender.getId();
                         PlayerScore playerScores = defenderScores.get(playerId);
                         boolean scoresExists = defenderScores.containsKey(playerId) && defenderScores.get(playerId) != null;
@@ -484,7 +506,8 @@
                                 <% } %>
                             </td>
                         </tr>
-                    <% } %>
+                    <% }
+                    } %>
                     </tbody>
                 </table>
             </td>
