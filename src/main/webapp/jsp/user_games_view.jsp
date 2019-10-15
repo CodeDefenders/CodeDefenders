@@ -546,6 +546,8 @@
                 });
                 editor.setSize("100%", 500);
                 ClassAPI.getAndSetEditorValue(textarea, editor);
+            }
+        });
 
         $('table td.toggle-details').on('click', function () {
             var id = '.' + $(this).attr('id');
