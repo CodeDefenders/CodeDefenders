@@ -40,6 +40,7 @@
         Those have to be highlighted
 --%>
 
+<%@ page import="org.codedefenders.model.KeyMap" %>
 <% { %>
 
 <%
@@ -56,7 +57,6 @@
         endEditLine = null;
     }
     KeyMap keymap = ((KeyMap) session.getAttribute("user-keymap"));
-    
 %>
 <script>
     let startEditLine = <%=startEditLine%> ;

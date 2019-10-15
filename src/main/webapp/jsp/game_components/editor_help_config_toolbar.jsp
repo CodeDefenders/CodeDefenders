@@ -1,4 +1,5 @@
 <%@ page import="org.codedefenders.model.KeyMap" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <%
     {

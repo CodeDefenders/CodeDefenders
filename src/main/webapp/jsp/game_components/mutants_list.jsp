@@ -19,10 +19,12 @@
 
 --%>
 <%@page import="org.codedefenders.database.UserDAO"%>
-<%@page import="org.codedefenders.model.User"%>
-<%@page import="org.codedefenders.game.Test"%>
-<%@ page import="org.codedefenders.game.GameMode" %>
-<%@ page import="org.codedefenders.game.Mutant" %>
+<%@page import="org.codedefenders.game.GameMode"%>
+<%@page import="org.codedefenders.game.Mutant"%>
+<%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.stream.Collectors" %>
@@ -190,12 +192,6 @@
                         List<Mutant> sortedKilledMutants = new ArrayList<>(mutantsKilledTODORENAME);
                         sortedKilledMutants.sort(Mutant.sortByLineNumberAscending());
                         for (Mutant m : sortedKilledMutants) {
-
-                            Test killingTest = m.getKillingTest();
-                            User creator = UserDAO.getUserForPlayer(killingTest.getPlayerId());
-                            int killingTestID = killingTest.getId();
-                            String ownerOfKillingTest = creator.getUsername();
-
                     %>
                         <tr>
                             <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= m.getCreatorName() %> (uid <%= m.getCreatorId() %>)</h4>
@@ -244,6 +240,13 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    <%
+                                        Test killingTest = m.getKillingTest();
+                                        if (killingTest != null) {
+                                            User creator = UserDAO.getUserForPlayer(killingTest.getPlayerId());
+                                            int killingTestID = killingTest.getId();
+                                            String ownerOfKillingTest = creator.getUsername();
+                                    %>
                                     <tr role="row">
                                         <td class="col-sm-1"><a href="#"
                                             class="btn btn-default btn-diff"
@@ -274,10 +277,15 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    <%
+                                        }
+                                    %>
                                 </table>
                              </td>
                         </tr>
-                    <% } %>
+                    <%
+                        }
+                    %>
                     </tbody>
                 </table>
             <% } else {%>
