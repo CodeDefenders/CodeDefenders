@@ -26,20 +26,12 @@ import org.codedefenders.model.Dependency;
 import org.codedefenders.util.FileUtils;
 import org.codedefenders.util.analysis.ClassCodeAnalyser;
 import org.codedefenders.util.analysis.CodeAnalysisResult;
+import org.codedefenders.game.TestAccordionDTO.TestAccordionCategory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -49,115 +41,120 @@ import java.util.stream.IntStream;
  */
 public class GameClass {
 
-    public final static List<String> BASIC_IMPORTS;
-    public final static List<String> MOCKITO_IMPORTS;
-
-    static {
-        BASIC_IMPORTS = Collections.unmodifiableList(
-                Arrays.asList(
-                        // Enable JUnit
-                        "import org.junit.*;",
-                        // Additional empty line to match IntelliJ import formatting.
-                        "",
-                        // Enable easy Assertions
-                        "import static org.junit.Assert.*;",
-                        // Enable Hamcrest assertThat
-                        "import static org.hamcrest.MatcherAssert.assertThat;",
-                        // Enable Hamcrest basic Matchers
-                        "import static org.hamcrest.Matchers.*;"
-                )
-        );
-        MOCKITO_IMPORTS =
-                Collections.unmodifiableList(
-                        Arrays.asList(
-                                // Enable Mockito
-                                "import static org.mockito.Mockito.*;"
-                        )
-                );
-    }
-
     private static final Logger logger = LoggerFactory.getLogger(GameClass.class);
 
-    private int id;
+    private Integer id;
     private String name; // fully qualified name
     private String alias;
     private String javaFile;
     private String classFile;
 
     private boolean isMockingEnabled;
+    private TestingFramework testingFramework;
+    private AssertionLibrary assertionLibrary;
 
     private boolean isPuzzleClass;
-
     private boolean isActive;
 
+    private boolean visitedCode = false;
     private Set<String> additionalImports = new HashSet<>();
-    // Store begin and end line which corresponds to uncoverable non-initializad fields
+    // Store begin and end line which corresponds to uncoverable non-initialized fields
     private List<Integer> linesOfCompileTimeConstants = new ArrayList<>();
     private List<Integer> linesOfNonCoverableCode = new ArrayList<>();
     private List<Integer> nonInitializedFields = new ArrayList<>();
-    //
     private List<Integer> emptyLines = new ArrayList<>();
     private Map<Integer, Integer> linesCoveringEmptyLines = new HashMap<>();
-
     private List<Range<Integer>> linesOfMethods = new ArrayList<>();
     private List<Range<Integer>> linesOfMethodSignatures = new ArrayList<>();
     private List<Range<Integer>> linesOfClosingBrackets = new ArrayList<>();
+    private List<TestAccordionCategory> testAccordionMethodDescriptions = new ArrayList<>();
+
+    private TestTemplate testTemplate;
 
     /**
      * The source code of this Java class. Used as an instance attribute so the file content only needs to be read once.
      */
     private String sourceCode;
 
-    public GameClass(String name, String alias, String jFile, String cFile) {
-        this(name, alias, jFile, cFile, false);
+    /**
+     * Build a new GameClass instance.
+     * <p></p>
+     * Required values are:
+     * <ul>
+     *     <li>name</li>
+     *     <li>alias</li>
+     *     <li>javaFile</li>
+     *     <li>classFile</li>
+     * </ul>
+     * <p></p>
+     * Default values are:
+     * <ul>
+     *     <li>isMockingEnabled = false</li>
+     *     <li>isPuzzleClass = false</li>
+     *     <li>isActive = true</li>
+     * </ul>
+     * @return A GameClass builder.
+     */
+    public static Builder build() {
+        return new Builder();
     }
 
-    public GameClass(int id, String name, String alias, String jFile, String cFile, boolean isMockingEnabled, boolean isActive) {
-        this(name, alias, jFile, cFile, isMockingEnabled);
-        this.id = id;
-        this.isActive = isActive;
+    private GameClass(Builder builder) {
+        Objects.requireNonNull(builder.name);
+        Objects.requireNonNull(builder.alias);
+        Objects.requireNonNull(builder.javaFile);
+        Objects.requireNonNull(builder.classFile);
+        this.id = builder.id;
+        this.name = builder.name;
+        this.alias = builder.alias;
+        this.javaFile = builder.javaFile;
+        this.classFile = builder.classFile;
+        this.isMockingEnabled = builder.isMockingEnabled;
+        this.testingFramework = builder.testingFramework;
+        this.assertionLibrary = builder.assertionLibrary;
+        this.isPuzzleClass = builder.isPuzzleClass;
+        this.isActive = builder.isActive;
     }
 
-    public GameClass(String name, String alias, String jFile, String cFile, boolean isMockingEnabled) {
-        this.name = name;
-        this.alias = alias;
-        this.javaFile = jFile;
-        this.classFile = cFile;
-        this.isMockingEnabled = isMockingEnabled;
-        this.isActive = true;
-
-        visitCode();
-    }
-
-    public static GameClass ofPuzzleWithId(int id, String name, String alias, String javaFilePath, String classFilePath, boolean isMockingEnabled) {
-        GameClass gameClass = ofPuzzle(name, alias, javaFilePath, classFilePath, isMockingEnabled);
-        gameClass.id = id;
-        return gameClass;
-    }
-
-    public static GameClass ofPuzzle(String name, String alias, String javaFilePath, String classFilePath, boolean isMockingEnabled) {
-        GameClass gameClass = new GameClass(name, alias, javaFilePath, classFilePath, isMockingEnabled);
-        gameClass.isPuzzleClass = true;
-        gameClass.isActive = true;
-        return gameClass;
+    /**
+     * Creates a new puzzle class from an existing class.
+     * @param other The other class.
+     * @param newAlias A new alias for the puzzle class.
+     * @return The new puzzle class.
+     */
+    public static GameClass ofPuzzle(GameClass other, String newAlias) {
+        return GameClass.build()
+                .name(other.getName())
+                .javaFile(other.getJavaFile())
+                .classFile(other.getClassFile())
+                .mockingEnabled(other.isMockingEnabled())
+                .testingFramework(other.getTestingFramework())
+                .assertionLibrary(other.getAssertionLibrary())
+                .alias(newAlias)
+                .puzzleClass(true)
+                .create();
     }
 
     private void visitCode() {
-        final CodeAnalysisResult visit = ClassCodeAnalyser.visitCode(this.name, this.getSourceCode());
-        this.additionalImports.addAll(visit.getAdditionalImports());
-        this.linesOfCompileTimeConstants.addAll(visit.getCompileTimeConstants());
-        this.linesOfNonCoverableCode.addAll(visit.getNonCoverableCode());
-        this.nonInitializedFields.addAll(visit.getNonInitializedFields());
-        this.linesOfMethods.addAll(visit.getMethods());
-        this.linesOfMethodSignatures.addAll(visit.getMethodSignatures());
-        this.linesOfClosingBrackets.addAll(visit.getClosingBrackets());
-        this.emptyLines.addAll(visit.getEmptyLines());
-        this.linesCoveringEmptyLines.putAll(visit.getLinesCoveringEmptyLines());
+        if (!this.visitedCode) {
+            final CodeAnalysisResult visit = ClassCodeAnalyser.visitCode(this.name, this.getSourceCode());
+            this.additionalImports.addAll(visit.getAdditionalImports());
+            this.linesOfCompileTimeConstants.addAll(visit.getCompileTimeConstants());
+            this.linesOfNonCoverableCode.addAll(visit.getNonCoverableCode());
+            this.nonInitializedFields.addAll(visit.getNonInitializedFields());
+            this.linesOfMethods.addAll(visit.getMethods());
+            this.linesOfMethodSignatures.addAll(visit.getMethodSignatures());
+            this.linesOfClosingBrackets.addAll(visit.getClosingBrackets());
+            this.emptyLines.addAll(visit.getEmptyLines());
+            this.linesCoveringEmptyLines.putAll(visit.getLinesCoveringEmptyLines());
+            this.testAccordionMethodDescriptions.addAll(visit.getTestAccordionMethodDescriptions());
+            this.visitedCode = true;
+        }
     }
 
     /**
      * Calls {@link GameClassDAO} to insert this {@link GameClass} instance into the database.
-     * <p>
+     * <p></p>
      * Updates the identifier of the called instance.
      *
      * @return {@code true} if insertion was successful, {@code false} otherwise.
@@ -195,11 +192,10 @@ public class GameClass {
     }
 
     /**
-     * Returns a copy of the additional import statements computed for this class
-     *
-     * @return
+     * Returns a copy of the additional import statements computed for this class.
      */
     public Set<String> getAdditionalImports() {
+        visitCode();
         return new HashSet<>(additionalImports);
     }
 
@@ -212,11 +208,19 @@ public class GameClass {
     }
 
     public boolean isMockingEnabled() {
-        return this.isMockingEnabled;
+        return isMockingEnabled;
+    }
+
+    public TestingFramework getTestingFramework() {
+        return testingFramework;
+    }
+
+    public AssertionLibrary getAssertionLibrary() {
+        return assertionLibrary;
     }
 
     public boolean isPuzzleClass() {
-        return this.isPuzzleClass;
+        return isPuzzleClass;
     }
 
     public boolean isActive() {
@@ -262,12 +266,20 @@ public class GameClass {
                 .collect(Collectors.toMap(FileUtils::extractFileNameNoExtension, FileUtils::readJavaFileWithDefaultHTMLEscaped));
     }
 
+    private void createTestTemplate() {
+        this.testTemplate = TestTemplate.build(this)
+                .testingFramework(getTestingFramework())
+                .assertionLibrary(getAssertionLibrary())
+                .mockingEnabled(isMockingEnabled())
+                .get();
+    }
+
     /**
      * Generates and returns a template for a JUnit test.
-     * <p>
+     * <p></p>
      * Be aware that this template is not HTML escaped.
      * Please use {@link #getHTMLEscapedTestTemplate()}.
-     * <p>
+     * <p></p>
      * Apart from the additional imports, the template is
      * formatted based on the default IntelliJ formatting.
      *
@@ -275,37 +287,10 @@ public class GameClass {
      * @see #getHTMLEscapedTestTemplate()
      */
     public String getTestTemplate() {
-        final StringBuilder bob = new StringBuilder();
-        final String classPackage = getPackage();
-        if (!classPackage.isEmpty()) {
-            bob.append(String.format("package %s;\n", classPackage));
-            bob.append("\n");
+        if (testTemplate == null) {
+            createTestTemplate();
         }
-
-        for (String additionalImport : this.additionalImports) {
-            // Additional import are already in the form of 'import X.Y.Z;\n'
-            bob.append(additionalImport); // no \n required
-        }
-
-        // basic imports contains a new line between dynamic and static imports
-        for (String importEntry : BASIC_IMPORTS) {
-            bob.append(importEntry).append("\n");
-        }
-
-        if (this.isMockingEnabled) {
-            for (String importEntry : MOCKITO_IMPORTS) {
-                bob.append(importEntry).append("\n");
-            }
-        }
-        bob.append("\n");
-
-        bob.append(String.format("public class Test%s {\n", getBaseName()))
-                .append("    @Test(timeout = 4000)\n")
-                .append("    public void test() throws Throwable {\n")
-                .append("        // test here!\n")
-                .append("    }\n")
-                .append("}");
-        return bob.toString();
+        return testTemplate.getCode();
     }
 
     /**
@@ -314,8 +299,6 @@ public class GameClass {
     public String getHTMLEscapedTestTemplate() {
         return StringEscapeUtils.escapeHtml(getTestTemplate());
     }
-
-    private final static Pattern TEST_METHOD_PATTERN = Pattern.compile(".*public void test\\(\\) throws Throwable.*");
 
     /**
      * Returns the index of first editable line of this class
@@ -327,17 +310,10 @@ public class GameClass {
      * @see #getTestTemplate()
      */
     public int getTestTemplateFirstEditLine() {
-        String[] templateLines = getTestTemplate().split("\n");
-        for (int i = 0; i < templateLines.length; i++) {
-            Matcher matcher = TEST_METHOD_PATTERN.matcher(templateLines[i]);
-            if (matcher.find()) {
-                // +1 because line index starts at 1
-                // +1 because the next line should be editable
-                return i + 2;
-            }
+        if (testTemplate == null) {
+            createTestTemplate();
         }
-        logger.warn("Test template for {} does not contain valid test method.", name);
-        return -1;
+        return testTemplate.getEditableLinesStart();
     }
 
     /**
@@ -345,6 +321,7 @@ public class GameClass {
      * Can be empty, but never {@code null}.
      */
     public List<Integer> getNonInitializedFields() {
+        visitCode();
         Collections.sort(this.nonInitializedFields);
         return Collections.unmodifiableList(this.nonInitializedFields);
     }
@@ -354,6 +331,7 @@ public class GameClass {
      * Can be empty, but never {@code null}.
      */
     public List<Integer> getMethodSignatures() {
+        visitCode();
         return this.linesOfMethodSignatures
                 .stream()
                 .flatMap(range -> IntStream.rangeClosed(range.getMinimum(), range.getMaximum()).boxed())
@@ -366,6 +344,7 @@ public class GameClass {
      * Can be empty, but never {@code null}.
      */
     public List<Integer> getNonCoverableCode() {
+        visitCode();
         return linesOfNonCoverableCode;
     }
 
@@ -377,6 +356,7 @@ public class GameClass {
      * Can be empty, but never {@code null}.
      */
     public List<Integer> getCompileTimeConstants() {
+        visitCode();
         return Collections.unmodifiableList(linesOfCompileTimeConstants);
     }
 
@@ -388,6 +368,7 @@ public class GameClass {
      * Can be empty, but never {@code null}.
      */
     public List<Integer> getMethodSignaturesForLine(Integer line) {
+        visitCode();
         final List<Integer> collect = linesOfMethods
                 .stream()
                 .filter(method -> method.contains(line))
@@ -406,6 +387,7 @@ public class GameClass {
      * {@link Integer Integers}. Can be empty, but never {@code null}.
      */
     public List<Integer> getClosingBracketForLine(Integer line) {
+        visitCode();
         final List<Integer> collect = linesOfClosingBrackets
                 .stream()
                 .filter(integerRange -> integerRange.contains(line))
@@ -420,6 +402,7 @@ public class GameClass {
      * can be covered if it belongs to a method and is followed by a covered line (either empty or not)
      */
     public List<Integer> getCoveredEmptyLines(List<Integer> alreadyCoveredLines) {
+        visitCode();
         List<Integer> collect = new ArrayList<>();
         for (Range<Integer> linesOfMethod : linesOfMethods) {
             for (int line = linesOfMethod.getMinimum(); line < linesOfMethod.getMaximum(); line++) {
@@ -433,9 +416,89 @@ public class GameClass {
         return Collections.unmodifiableList(collect);
     }
 
+    public List<TestAccordionCategory> getTestAccordionMethodDescriptions() {
+        visitCode();
+        return Collections.unmodifiableList(testAccordionMethodDescriptions);
+    }
+
     @Override
     public String toString() {
         return "[id=" + id + ",name=" + name + ",alias=" + alias + "]";
     }
 
+    public static class Builder {
+        private Integer id;
+        private String name; // fully qualified name
+        private String alias;
+        private String javaFile;
+        private String classFile;
+
+        private boolean isMockingEnabled;
+        private TestingFramework testingFramework;
+        private AssertionLibrary assertionLibrary;
+
+        private boolean isPuzzleClass;
+        private boolean isActive;
+
+        private Builder() {
+            this.id = null;
+            this.isMockingEnabled = false;
+            this.isPuzzleClass = false;
+            this.isActive = true;
+        }
+
+        public Builder id(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public Builder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public Builder alias(String alias) {
+            this.alias = alias;
+            return this;
+        }
+
+        public Builder javaFile(String javaFile) {
+            this.javaFile = javaFile;
+            return this;
+        }
+
+        public Builder classFile(String classFile) {
+            this.classFile = classFile;
+            return this;
+        }
+
+        public Builder mockingEnabled(boolean isMockingEnabled) {
+            this.isMockingEnabled = isMockingEnabled;
+            return this;
+        }
+
+        public Builder testingFramework(TestingFramework testingFramework) {
+            this.testingFramework = testingFramework;
+            return this;
+        }
+
+        public Builder assertionLibrary(AssertionLibrary assertionLibrary) {
+            this.assertionLibrary = assertionLibrary;
+            return this;
+        }
+
+        public Builder puzzleClass(boolean isPuzzleClass) {
+            this.isPuzzleClass = isPuzzleClass;
+            return this;
+        }
+
+        public Builder active(boolean isActive) {
+            this.isActive = isActive;
+            return this;
+        }
+
+        public GameClass create() {
+            return new GameClass(this);
+        }
+    }
 }

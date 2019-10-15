@@ -1,5 +1,5 @@
 <project default="" basedir="." xmlns:jacoco="antlib:org.jacoco.ant">
-	<property name="java.sdk" value="1.7"/>
+	<property name="java.sdk" value="${java.version}"/>
 
 	<description>
 		Build File to handle mutation tests for a particular class
@@ -15,23 +15,38 @@
 	<property name="ai.mutants.dir" value="${codedef.home}/ai/mutants"/>
 	<property name="ai.cuts.dir" value="${codedef.home}/ai/cuts"/>
 	<property name="cuts.deps" value="${codedef.home}/deps"/>
+	<property name="java.target.version" value="1.8"/>
 
 	<path id="nocut.cp">
-		<pathelement path="${codedef.home}/lib/junit-4.12.jar"/>
 		<pathelement path="${codedef.home}/lib/hamcrest-all-1.3.jar"/>
-		<pathelement path="${major.home}/config/config.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-4.12.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-jupiter-api-5.5.2.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-jupiter-engine-5.5.2.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-platform-commons-1.5.2.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-platform-engine-1.5.2.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-platform-launcher-1.5.2.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-vintage-engine-5.5.2.jar"/>
 		<pathelement path="${codedef.home}/lib/mockito-all-1.9.5.jar"/>
+		<pathelement path="${codedef.home}/lib/opentest4j-1.2.0.jar"/>
+		<pathelement path="${major.home}/config/config.jar"/>
 		<pathelement path="${cuts.deps}"/>
 	</path>
 
 	<path id="test.cp">
-		<pathelement path="${codedef.home}/lib/junit-4.12.jar"/>
 		<pathelement path="${codedef.home}/lib/hamcrest-all-1.3.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-4.12.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-jupiter-api-5.5.2.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-jupiter-engine-5.5.2.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-platform-commons-1.5.2.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-platform-engine-1.5.2.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-platform-launcher-1.5.2.jar"/>
+		<pathelement path="${codedef.home}/lib/junit-vintage-engine-5.5.2.jar"/>
+		<pathelement path="${codedef.home}/lib/mockito-all-1.9.5.jar"/>
+		<pathelement path="${codedef.home}/lib/opentest4j-1.2.0.jar"/>
+		<pathelement path="${codedef.home}/lib/org.jacoco.agent-0.7.7.201606060606.jar"/>
 		<pathelement path="${codedef.home}/lib/org.jacoco.ant-0.7.7.201606060606.jar"/>
 		<pathelement path="${codedef.home}/lib/org.jacoco.core-0.7.7.201606060606.jar"/>
-		<pathelement path="${codedef.home}/lib/org.jacoco.agent-0.7.7.201606060606.jar"/>
 		<pathelement path="${codedef.home}/lib/org.jacoco.report-0.7.7.201606060606.jar"/>
-		<pathelement path="${codedef.home}/lib/mockito-all-1.9.5.jar"/>
 		<pathelement path="${major.home}/config/config.jar"/>
 		<pathelement path="${cut.dir}"/>
 		<pathelement path="${cuts.deps}"/>
@@ -47,20 +62,20 @@
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-cut" description="compile a class under test">
-		<javac srcdir="${cut.dir}" destdir="${cut.dir}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false" listfiles="yes" fork="yes"
+		<javac srcdir="${cut.dir}" destdir="${cut.dir}" target="${java.target.version}" source="${java.target.version}" classpathref="test.cp" includeantruntime="false" listfiles="yes" fork="yes"
 			   debug="true" nowarn="true" />
 	</target>
 
 	<!-- requires mutant to compile only -->
 	<target name="compile-mutant" description="compile a single mutant">
-		<javac srcdir="${mutant.file}" destdir="${mutant.file}" target="1.7" classpathref="nocut.cp" source="1.7" includeantruntime="false"
+		<javac srcdir="${mutant.file}" destdir="${mutant.file}" target="${java.target.version}" classpathref="nocut.cp" source="${java.target.version}" includeantruntime="false"
 		   debug="true" nowarn="true" />
 	</target>
 
 	<!-- requires test to compile, and the classname of the file you are testing -->
 	<target name="compile-test" description="compile a single test">
 		<!--<classpath refid="test.cp" />-->
-		<javac srcdir="${test.file}" destdir="${test.file}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false"
+		<javac srcdir="${test.file}" destdir="${test.file}" target="${java.target.version}" source="${java.target.version}" classpathref="test.cp" includeantruntime="false"
 			   debug="true" nowarn="true" />
 	</target>
 
@@ -125,7 +140,7 @@
 	</target>
 
 	<target name="compile-gen-tests" description="compile a generated test suite">
-		<javac srcdir="${ai.tests.dir}/${classalias}" destdir="${ai.tests.dir}/${classalias}" target="1.7" source="1.7" classpathref="test.cp" includeantruntime="false"
+		<javac srcdir="${ai.tests.dir}/${classalias}" destdir="${ai.tests.dir}/${classalias}" target="${java.target.version}" source="${java.target.version}" classpathref="test.cp" includeantruntime="false"
 			   debug="true" nowarn="true" />
 	</target>
 
@@ -135,7 +150,7 @@
 		<javac
 				srcdir="${test.file}"
 				destdir="${mutant.test.file}"
-				target="1.7" source="1.7"
+				target="${java.target.version}" source="${java.target.version}"
 				classpathref="nocut.cp"
 				classpath="${mutant.file}"
 				includeantruntime="false"

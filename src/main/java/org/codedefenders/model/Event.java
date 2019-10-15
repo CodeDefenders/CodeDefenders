@@ -127,9 +127,12 @@ public class Event {
 
         if (procMessage.contains("@event_user")) {
             User user = getUser();
-            procMessage = procMessage.replace("@event_user",
-                    user != null ? user.printFriendly(ROLE_COLORS.get(role)) :
-                            "<span style='color:#000000'>@Unknown</span>");
+            
+            String userLabel = ( user == null ) ? "Unknown" :
+                (user.getUsername().equals( currentUserName )) ? "You" : user.getUsername();
+            String color = ( user == null ) ? "#000000": ROLE_COLORS.get(role);
+            
+            procMessage = procMessage.replace("@event_user", "<span style='color: " + color + "'>@"+userLabel+"</span>");
         }
 
         if (procMessage.contains("@chat_message")) {
@@ -139,11 +142,6 @@ public class Event {
             procMessage = "<span style='font-style: italic; font-weight: " +
                     "bold;'>" + procMessage +
                     "</span>";
-        }
-
-        if (currentUserName.length() > 0 && procMessage.contains
-                (currentUserName)) {
-            procMessage = procMessage.replace(currentUserName, "@You");
         }
 
         return procMessage;

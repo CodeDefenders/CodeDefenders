@@ -23,6 +23,9 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 <%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
+<%@ page import="org.codedefenders.game.GameState" %>
 <%
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     int userId = ServletUtils.userId(request); // required for playerFeedback, too
@@ -44,10 +47,11 @@
 <%-- Show the mail icon with counts of unread notifications: requires push_notifications.jsp --%>
 <%--<%@ include file="/jsp/push_chat_notifications.jsp"%>--%>
 
-<%@ include file="/jsp/scoring_tooltip.jsp" %>
-<%@ include file="/jsp/playerFeedback.jsp" %>
-<%@ include file="/jsp/battleground/game_scoreboard.jsp" %>
-<%@ include file="/jsp/game_components/editor_help_config_modal.jsp" %>
+<jsp:include page="/jsp/scoring_tooltip.jsp"/>
+<jsp:include page="/jsp/playerFeedback.jsp"/>
+<jsp:include page="/jsp/battleground/game_scoreboard.jsp"/>
+<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
+
 <div class="crow fly no-gutter up">
 <%
     messages = new ArrayList<>();
@@ -88,5 +92,6 @@ if (game.isCapturePlayersIntention()) {
 	}
 }
 %>
-<%-- <%@ include file="/jsp/game_notifications.jsp"%> --%>
+<!-- This corresponds to dispatcher.Dispatch -->
+<jsp:include page="/jsp/game_notifications.jsp"/>
 <%@ include file="/jsp/battleground/footer_game.jsp" %>

@@ -18,6 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="org.codedefenders.game.multiplayer.MultiplayerGame"%>
+<%@page import="org.codedefenders.model.Player"%>
+<%@page import="java.util.List"%>
 <%@page import="org.codedefenders.util.Constants"%>
 <%@page import="org.codedefenders.database.TestDAO"%>
 <%@page import="org.codedefenders.database.MutantDAO"%>
@@ -26,9 +29,10 @@
 <%@ page import="java.util.HashMap" %>
 <%
 
+
+    MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+
     HashMap mutantScores = game.getMutantScores();
-
-
     HashMap testScores = game.getTestScores();
 
     // Those return the PlayerID not the UserID

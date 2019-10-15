@@ -221,7 +221,7 @@ public class Test {
         return DatabaseAccess.getKilledMutantsForTestId(id);
     }
 
-    private String getAsString() {
+    public String getAsString() {
         return FileUtils.readJavaFileWithDefault(Paths.get(javaFile));
     }
 

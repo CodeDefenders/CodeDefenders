@@ -112,8 +112,8 @@
                                 <div class="modal-body">
                                     <pre class="readonly-pre"><textarea
                                             class="readonly-textarea classPreview"
-                                            id="sut<%=g.getId()%>" name="cut<%=g.getId()%>" cols="80"
-                                            rows="30"><%=cut.getAsHTMLEscapedString()%></textarea></pre>
+                                            id="sut<%=g.getId()%>" name="cut<%=g.getCUT().getId()%>" cols="80"
+                                            rows="30"></textarea></pre>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -133,7 +133,7 @@
                                 String userName = UserDAO.getUserById(id).getUsername();
                                 //Timestamp ts = AdminDAO.getLastLogin(aid);
                                 Role lastRole = UserDAO.getLastRoleOfUser(id);
-                                lastRole = (lastRole != null ) ? lastRole : Role.NONE; 
+                                lastRole = (lastRole != null ) ? lastRole : Role.NONE;
                                 Entry score = AdminDAO.getScore(id);
                                 int totalScore = score.getTotalPoints();
                                 String color = attackerIds.contains(id) ? "#edcece" : "#ced6ed";
@@ -262,7 +262,7 @@
                     int uid = Integer.valueOf(userInfo.get(0));
                     String username = userInfo.get(1);
                     String lastLogin = userInfo.get(3);
-                    String lastRole = ( userInfo.get(4) != null ) ?  Role.valueOf(userInfo.get(4)).getFormattedString() : Role.NONE.getFormattedString(); 
+                    String lastRole = ( userInfo.get(4) != null ) ?  Role.valueOf(userInfo.get(4)).getFormattedString() : Role.NONE.getFormattedString();
                     String totalScore = userInfo.get(5);
             %>
 
@@ -516,10 +516,10 @@
                 <label for="automaticEquivalenceTrigger" class="label-normal"
                        title="Threshold for triggering equivalence duels automatically (use 0 to deactivate)">
                        Threshold for triggering equivalence duels automatically
-                       
+
                        <a data-toggle="modal" href="#automaticEquivalenceTriggerExplanation" style="color:black">
                             <span class="glyphicon glyphicon-question-sign"></span>
-                       </a>       
+                       </a>
                 </label>
             </div>
         </div>
@@ -699,16 +699,18 @@
             });
 
             $('.modal').on('shown.bs.modal', function () {
-                var codeMirrorContainer = $(this).find(".CodeMirror")[0];
+                let codeMirrorContainer = $(this).find(".CodeMirror")[0];
                 if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
                     codeMirrorContainer.CodeMirror.refresh();
                 } else {
-                    var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
+                    let textarea = $(this).find('textarea')[0];
+                    let editor = CodeMirror.fromTextArea(textarea, {
                         lineNumbers: false,
                         readOnly: true,
                         mode: "text/x-java"
                     });
-                    editorDiff.setSize("100%", 500);
+                    editor.setSize("100%", 500);
+                    ClassAPI.getAndSetEditorValue(textarea, editor);
                 }
             });
         </script>

@@ -81,234 +81,233 @@ import org.powermock.modules.junit4.PowerMockRunner;
 @PrepareForTest({ DatabaseConnection.class }) // , mutationTester.class })
 public class ConsistencyTest {
 
-	// PowerMock does not work with @ClassRule !!
-	// This really should be only per class, not per test... in each test we can
-	// truncate the tables ?
-	@Rule
-	public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql"); //, "useAffectedRows=true");
+    // PowerMock does not work with @ClassRule !!
+    // This really should be only per class, not per test... in each test we can
+    // truncate the tables ?
+    @Rule
+    public DatabaseRule db = new DatabaseRule("defender", "db/emptydb.sql"); //, "useAffectedRows=true");
 
-	@Inject
+    @Inject
     private IMutationTester mutationTester;
-	//
-	private static File codedefendersHome;
+    //
+    private static File codedefendersHome;
 
-	// PROBLEM: @ClassRule cannot be used with PowerMock ...
-	@BeforeClass
-	public static void setupEnvironment() throws IOException {
-		codedefendersHome = Files.createTempDirectory("integration-tests").toFile();
-		codedefendersHome.deleteOnExit();
-	}
+    // PROBLEM: @ClassRule cannot be used with PowerMock ...
+    @BeforeClass
+    public static void setupEnvironment() throws IOException {
+        codedefendersHome = Files.createTempDirectory("integration-tests").toFile();
+        codedefendersHome.deleteOnExit();
+    }
 
-	@Before
-	public void mockDBConnections() throws Exception {
-		PowerMockito.mockStatic(DatabaseConnection.class);
-		PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
-			public Connection answer(InvocationOnMock invocation) throws SQLException {
-				// Return a new connection from the rule instead
-				return db.getConnection();
-			}
-		});
-	}
+    @Before
+    public void mockDBConnections() throws Exception {
+        PowerMockito.mockStatic(DatabaseConnection.class);
+        PowerMockito.when(DatabaseConnection.getConnection()).thenAnswer(new Answer<Connection>() {
+            public Connection answer(InvocationOnMock invocation) throws SQLException {
+                // Return a new connection from the rule instead
+                return db.getConnection();
+            }
+        });
+    }
 
-	// CUT
-	private IMutationTester tester;
+    // CUT
+    private IMutationTester tester;
 
-	// We use the "real ant runner" but we need to provide a mock to Context
-	@Mock
-	private InitialContextFactory mockedFactory;
+    // We use the "real ant runner" but we need to provide a mock to Context
+    @Mock
+    private InitialContextFactory mockedFactory;
 
-	@Inject
+    @Inject
     private GameManagingUtils gameManagingUtils;
 
-	// https://stackoverflow.com/questions/36734275/how-to-mock-initialcontext-constructor-in-unit-testing
-	// FIXME this has hardcoded values, not sure how to handle those... maybe
-	// read from the config.properties file ?
-	public static class MyContextFactory implements InitialContextFactory {
-		@Override
-		public Context getInitialContext(Hashtable<?, ?> environment) throws NamingException {
-			System.out.println("ParallelizeAntRunnerTest.MyContextFactory.getInitialContext()");
-			InitialContext mockedInitialContext = PowerMockito.mock(InitialContext.class);
-			NamingEnumeration<NameClassPair> mockedEnumeration = PowerMockito.mock(NamingEnumeration.class);
-			// Look at this again ...
-			PowerMockito.mockStatic(NamingEnumeration.class);
-			//
-			PowerMockito.when(mockedEnumeration.hasMore()).thenReturn(true, true, true, true, false);
-			PowerMockito.when(mockedEnumeration.next()).thenReturn(
-					new NameClassPair("data.dir", String.class.getName()),
-					new NameClassPair("parallelize", String.class.getName()),
-					new NameClassPair("mutant.coverage", String.class.getName()),
-					new NameClassPair("ant.home", String.class.getName())//
-			);
-			//
-			PowerMockito.when(mockedInitialContext.toString()).thenReturn("Mocked Initial Context");
-			PowerMockito.when(mockedInitialContext.list("java:/comp/env")).thenReturn(mockedEnumeration);
-			//
-			Context mockedEnvironmentContext = PowerMockito.mock(Context.class);
-			PowerMockito.when(mockedInitialContext.lookup("java:/comp/env")).thenReturn(mockedEnvironmentContext);
+    // https://stackoverflow.com/questions/36734275/how-to-mock-initialcontext-constructor-in-unit-testing
+    // FIXME this has hardcoded values, not sure how to handle those... maybe
+    // read from the config.properties file ?
+    public static class MyContextFactory implements InitialContextFactory {
+        @Override
+        public Context getInitialContext(Hashtable<?, ?> environment) throws NamingException {
+            System.out.println("ParallelizeAntRunnerTest.MyContextFactory.getInitialContext()");
+            InitialContext mockedInitialContext = PowerMockito.mock(InitialContext.class);
+            NamingEnumeration<NameClassPair> mockedEnumeration = PowerMockito.mock(NamingEnumeration.class);
+            // Look at this again ...
+            PowerMockito.mockStatic(NamingEnumeration.class);
+            //
+            PowerMockito.when(mockedEnumeration.hasMore()).thenReturn(true, true, true, true, false);
+            PowerMockito.when(mockedEnumeration.next()).thenReturn(
+                    new NameClassPair("data.dir", String.class.getName()),
+                    new NameClassPair("parallelize", String.class.getName()),
+                    new NameClassPair("mutant.coverage", String.class.getName()),
+                    new NameClassPair("ant.home", String.class.getName())//
+            );
+            //
+            PowerMockito.when(mockedInitialContext.toString()).thenReturn("Mocked Initial Context");
+            PowerMockito.when(mockedInitialContext.list("java:/comp/env")).thenReturn(mockedEnumeration);
+            //
+            Context mockedEnvironmentContext = PowerMockito.mock(Context.class);
+            PowerMockito.when(mockedInitialContext.lookup("java:/comp/env")).thenReturn(mockedEnvironmentContext);
 
-			PowerMockito.when(mockedEnvironmentContext.lookup("mutant.coverage")).thenReturn("enabled");
-			// FIXMED
-			PowerMockito.when(mockedEnvironmentContext.lookup("parallelize")).thenReturn("enabled");
-			//
-			PowerMockito.when(mockedEnvironmentContext.lookup("data.dir"))
-					.thenReturn(codedefendersHome.getAbsolutePath());
+            PowerMockito.when(mockedEnvironmentContext.lookup("mutant.coverage")).thenReturn("enabled");
+            // FIXMED
+            PowerMockito.when(mockedEnvironmentContext.lookup("parallelize")).thenReturn("enabled");
+            //
+            PowerMockito.when(mockedEnvironmentContext.lookup("data.dir"))
+                    .thenReturn(codedefendersHome.getAbsolutePath());
 
-			PowerMockito.when(mockedEnvironmentContext.lookup("ant.home")).thenReturn("/usr/local");
-			//
-			return mockedInitialContext;
-		}
-	}
+            PowerMockito.when(mockedEnvironmentContext.lookup("ant.home")).thenReturn("/usr/local");
+            //
+            return mockedInitialContext;
+        }
+    }
 
-	@Before
-	public void setupClass() throws IOException {
-		// Initialize this as mock class
-		MockitoAnnotations.initMocks(this);
-		// Be sure to setup the "java.naming.factory.initial" to the inner
-		// MyContextFactory class
-		System.setProperty("java.naming.factory.initial", this.getClass().getCanonicalName() + "$MyContextFactory");
-		//
-		// Recreate codedefenders' folders
-		boolean isCreated = false;
-		isCreated = (new File(Constants.MUTANTS_DIR)).mkdirs() || (new File(Constants.MUTANTS_DIR)).exists();
-		System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
-		isCreated = (new File(Constants.CUTS_DIR)).mkdirs() || (new File(Constants.CUTS_DIR)).exists();
-		System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
-		isCreated = (new File(Constants.TESTS_DIR)).mkdirs() || (new File(Constants.TESTS_DIR)).exists();
-		System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
-		//
-		// Setup the environment
-		Files.createSymbolicLink(new File(Constants.DATA_DIR, "build.xml").toPath(),
-				Paths.get(new File("src/test/resources/itests/build.xml").getAbsolutePath()));
+    @Before
+    public void setupClass() throws IOException {
+        // Initialize this as mock class
+        MockitoAnnotations.initMocks(this);
+        // Be sure to setup the "java.naming.factory.initial" to the inner
+        // MyContextFactory class
+        System.setProperty("java.naming.factory.initial", this.getClass().getCanonicalName() + "$MyContextFactory");
+        //
+        // Recreate codedefenders' folders
+        boolean isCreated = false;
+        isCreated = (new File(Constants.MUTANTS_DIR)).mkdirs() || (new File(Constants.MUTANTS_DIR)).exists();
+        System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
+        isCreated = (new File(Constants.CUTS_DIR)).mkdirs() || (new File(Constants.CUTS_DIR)).exists();
+        System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
+        isCreated = (new File(Constants.TESTS_DIR)).mkdirs() || (new File(Constants.TESTS_DIR)).exists();
+        System.out.println("ParallelizeAntRunnerTest.setupClass() " + isCreated);
+        //
+        // Setup the environment
+        Files.createSymbolicLink(new File(Constants.DATA_DIR, "build.xml").toPath(),
+                Paths.get(new File("src/test/resources/itests/build.xml").getAbsolutePath()));
 
-		Files.createSymbolicLink(new File(Constants.DATA_DIR, "security.policy").toPath(),
-				Paths.get(new File("src/test/resources/itests/relaxed.security.policy").getAbsolutePath()));
+        Files.createSymbolicLink(new File(Constants.DATA_DIR, "security.policy").toPath(),
+                Paths.get(new File("src/test/resources/itests/relaxed.security.policy").getAbsolutePath()));
 
-		Files.createSymbolicLink(new File(Constants.DATA_DIR, "lib").toPath(),
-				Paths.get(new File("src/test/resources/itests/lib").getAbsolutePath()));
+        Files.createSymbolicLink(new File(Constants.DATA_DIR, "lib").toPath(),
+                Paths.get(new File("src/test/resources/itests/lib").getAbsolutePath()));
 
-	}
+    }
 
-	/**
-	 * Setup a game with an attacker and multiple defendes and check that a
-	 * mutant can be killed only once and points are reported correctly.
-	 *
-	 * @throws IOException
-	 * @throws CodeValidatorException
-	 * @throws InterruptedException
-	 */
-	@Test
-	public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException, InterruptedException {
-		User observer = new User("observer", User.encodePassword("password"), "demo@observer.com");
-		observer.insert();
-		//
-		System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Observer " + observer.getId());
-		User attacker = new User("demoattacker", User.encodePassword("password"), "demo@attacker.com");
-		attacker.insert();
-		System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Attacker" + attacker.getId());
-		//
-		// Create 3 defenders
-		//
-		User[] defenders = new User[3];
-		for (int i = 0; i < defenders.length; i++) {
-			defenders[i] = new User("demodefender" + i, User.encodePassword("password"), "demo"+i+"@defender.com");
-			defenders[i].insert();
-			System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Defender " + defenders[i].getId());
-		}
+    /**
+     * Setup a game with an attacker and multiple defendes and check that a
+     * mutant can be killed only once and points are reported correctly.
+     *
+     * @throws IOException
+     * @throws CodeValidatorException
+     * @throws InterruptedException
+     */
+    @Test
+    public void testRunAllTestsOnMutant() throws IOException, CodeValidatorException, InterruptedException {
+        User observer = new User("observer", User.encodePassword("password"), "demo@observer.com");
+        observer.insert();
+        //
+        System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Observer " + observer.getId());
+        User attacker = new User("demoattacker", User.encodePassword("password"), "demo@attacker.com");
+        attacker.insert();
+        System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Attacker" + attacker.getId());
+        //
+        // Create 3 defenders
+        //
+        User[] defenders = new User[3];
+        for (int i = 0; i < defenders.length; i++) {
+            defenders[i] = new User("demodefender" + i, User.encodePassword("password"), "demo"+i+"@defender.com");
+            defenders[i].insert();
+            System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Defender " + defenders[i].getId());
+        }
 
-		// Upload the Class Under test - Maybe better use Classloader
-		File cutFolder = new File(Constants.CUTS_DIR, "Lift");
-		cutFolder.mkdirs();
-		File jFile = new File(cutFolder, "Lift.java");
-		File cFile = new File(cutFolder, "Lift.class");
+        // Upload the Class Under test - Maybe better use Classloader
+        File cutFolder = new File(Constants.CUTS_DIR, "Lift");
+        cutFolder.mkdirs();
+        File jFile = new File(cutFolder, "Lift.java");
+        File cFile = new File(cutFolder, "Lift.class");
 
-		Files.copy(Paths.get("src/test/resources/itests/sources/Lift/Lift.java"), new FileOutputStream(jFile));
-		Files.copy(Paths.get("src/test/resources/itests/sources/Lift/Lift.class"), new FileOutputStream(cFile));
+        Files.copy(Paths.get("src/test/resources/itests/sources/Lift/Lift.java"), new FileOutputStream(jFile));
+        Files.copy(Paths.get("src/test/resources/itests/sources/Lift/Lift.class"), new FileOutputStream(cFile));
 
-		///
-		GameClass cut = new GameClass("Lift", "Lift", jFile.getAbsolutePath(), cFile.getAbsolutePath());
-		cut.insert();
-		System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Cut " + cut.getId());
+        GameClass cut = GameClass.build()
+                .name("Lift")
+                .alias("Lift")
+                .javaFile(jFile.getAbsolutePath())
+                .classFile(cFile.getAbsolutePath())
+                .create();
+        cut.insert();
+        System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Cut " + cut.getId());
 
-		//
-		final MultiplayerGame multiplayerGame = new MultiplayerGame
+        final MultiplayerGame multiplayerGame = new MultiplayerGame
                 .Builder(cut.getId(), observer.getId(), 2, CodeValidator.DEFAULT_FORCE_HAMCREST)
                 .state(GameState.ACTIVE)
                 .defenderValue(10)
                 .attackerValue(4)
                 .chatEnabled(true)
                 .build();
-		// Store to db
-		multiplayerGame.insert();
+        // Store to db
+        multiplayerGame.insert();
 
-		// Attacker and Defender must join the game. Those calls update also the
-		// db
-		multiplayerGame.addPlayer(attacker.getId(), Role.ATTACKER);
-		//
-		for (User defender : defenders) {
-			multiplayerGame.addPlayer(defender.getId(), Role.DEFENDER);
-		}
+        // Attacker and Defender must join the game. Those calls update also the db
+        multiplayerGame.addPlayer(attacker.getId(), Role.ATTACKER);
+        for (User defender : defenders) {
+            multiplayerGame.addPlayer(defender.getId(), Role.DEFENDER);
+        }
 
-		System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Game " + multiplayerGame.getId());
+        System.out.println("ConsistencyTest.testRunAllTestsOnMutant() Game " + multiplayerGame.getId());
 
-		MultiplayerGame activeGame = MultiplayerGameDAO.getMultiplayerGame(multiplayerGame.getId());
-		assertEquals("Cannot find the right active game", multiplayerGame.getId(), activeGame.getId());
+        MultiplayerGame activeGame = MultiplayerGameDAO.getMultiplayerGame(multiplayerGame.getId());
+        assertEquals("Cannot find the right active game", multiplayerGame.getId(), activeGame.getId());
 
-		// Attack
-		String mutantText = new String(
-				Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
-				Charset.defaultCharset());
-		Mutant mutant = gameManagingUtils.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
-				attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
+        // Attack
+        String mutantText = new String(
+                Files.readAllBytes(new File("src/test/resources/itests/mutants/Lift/MutantLift1.java").toPath()),
+                Charset.defaultCharset());
+        Mutant mutant = gameManagingUtils.createMutant(activeGame.getId(), activeGame.getClassId(), mutantText,
+                attacker.getId(), Constants.MODE_BATTLEGROUND_DIR);
 
-		// Generate the tests for the clients
-		String testText = new String(
-				Files.readAllBytes(new File("src/test/resources/itests/tests/KillingTestLift.java").toPath()),
-				Charset.defaultCharset());
-		//
-		List<org.codedefenders.game.Test> tests = new ArrayList<>();
-		for (final User defender : defenders) {
-			tests.add(gameManagingUtils.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(),
-					Constants.MODE_BATTLEGROUND_DIR));
-		}
-		System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + tests);
-		// List<org.codedefenders.game.Test> theTests = activeGame.getTests(true);
-		System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + activeGame.getTests(true));
+        // Generate the tests for the clients
+        String testText = new String(
+                Files.readAllBytes(new File("src/test/resources/itests/tests/KillingTestLift.java").toPath()),
+                Charset.defaultCharset());
+        //
+        List<org.codedefenders.game.Test> tests = new ArrayList<>();
+        for (final User defender : defenders) {
+            tests.add(gameManagingUtils.createTest(activeGame.getId(), activeGame.getClassId(), testText, defender.getId(),
+                    Constants.MODE_BATTLEGROUND_DIR));
+        }
+        System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + tests);
+        // List<org.codedefenders.game.Test> theTests = activeGame.getTests(true);
+        System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() tests " + activeGame.getTests(true));
 
-		// Now "submit the tests in parallel"
+        // Now "submit the tests in parallel"
 
-		ExecutorService executorService = Executors.newFixedThreadPool(defenders.length);
+        ExecutorService executorService = Executors.newFixedThreadPool(defenders.length);
 
-		for (final org.codedefenders.game.Test newTest : tests) {
+        for (final org.codedefenders.game.Test newTest : tests) {
+            executorService.submit(new Runnable() {
+                @Override
+                public void run() {
+                    System.out.println("Submit test " + newTest.getId());
+                    mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, new ArrayList<>());
+                    activeGame.update();
+                }
+            });
+        }
+        executorService.shutdown();
+        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
 
-			executorService.submit(new Runnable() {
+        // Refresh the state of the mutant... since there's no refresh method, we reload the object from the DB
+        mutant = activeGame.getMutantByID(mutant.getId());
+        assertNotNull(mutant);
 
-				@Override
-				public void run() {
-					System.out.println("Submit test " + newTest.getId());
-					mutationTester.runTestOnAllMultiplayerMutants(activeGame, newTest, new ArrayList<>());
-					activeGame.update();
-				}
-			});
-		}
-		executorService.shutdown();
-		executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+        // assertMutant is killed !
+        assertFalse("Mutant not killed", mutant.isAlive());
 
-		// Refresh the state of the mutant... since there's no refresh method, we reload the object from the DB
-		mutant = activeGame.getMutantByID(mutant.getId());
-		assertNotNull(mutant);
+        int totalKilled = 0;
+        for (final org.codedefenders.game.Test newTest : tests) {
+            System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() " + newTest.getMutantsKilled());
+            totalKilled = totalKilled + newTest.getMutantsKilled();
+        }
+        assertEquals("Mutant killed multiple times !", 1, totalKilled);
+        // Assert
+        // List<org.codedefenders.game.Test> tests = activeGame.getTests(true); //
 
-		// assertMutant is killed !
-		assertFalse("Mutant not killed", mutant.isAlive());
-
-		int totalKilled = 0;
-		for (final org.codedefenders.game.Test newTest : tests) {
-			System.out.println("ReplayGame232Test.testRunAllTestsOnMutant() " + newTest.getMutantsKilled());
-			totalKilled = totalKilled + newTest.getMutantsKilled();
-		}
-		assertEquals("Mutant killed multiple times !", 1, totalKilled);
-		// Assert
-		// List<org.codedefenders.game.Test> tests = activeGame.getTests(true); //
-
-	}
+    }
 
 }
