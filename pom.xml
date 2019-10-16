@@ -219,6 +219,10 @@
 			      <exclude>src/test/resources/**</exclude>
 			      <exclude>installation/puzzles/**</exclude>
 			      <exclude>local-repo/**</exclude>
+			      <exclude>.editorconfig</exclude>
+			      <exclude>.gitlab-ci.yml</exclude>
+			      <exclude>src/main/resources/codemirror/**</exclude>
+			      <exclude>src/main/resources/js/libs/**</exclude>
 			    </excludes>
 			  </configuration>
 			</plugin>

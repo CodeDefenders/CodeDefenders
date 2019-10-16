@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016-2019 Code Defenders contributors
- * <p>
+ *
  * This file is part of Code Defenders.
  *
  * Code Defenders is free software: you can redistribute it and/or modify
