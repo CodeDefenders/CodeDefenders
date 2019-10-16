@@ -135,6 +135,29 @@ public class KillmapDAO {
         return DB.executeUpdateQuery(query, values);
     }
 
+    /**
+     * Inserts many killmap entries into the database.
+     */
+    public static void insertManyKillMapEntries(List<KillMapEntry> entries, int classId) {
+        String query = String.join("\n",
+            "INSERT INTO killmap (Class_ID,Game_ID,Test_ID,Mutant_ID,Status)",
+            "VALUES (?,?,?,?,?)",
+            "ON DUPLICATE KEY UPDATE Status = VALUES(Status);");
+
+        final DB.DBVExtractor<KillMapEntry> dbvExtractor = entry -> {
+            int testGameId = entry.test.getGameId();
+            int mutantGameId = entry.mutant.getGameId();
+            return new DatabaseValue[]{
+                DatabaseValue.of(classId),
+                DatabaseValue.of(testGameId == mutantGameId ? testGameId : null),
+                DatabaseValue.of(entry.test.getId()),
+                DatabaseValue.of(entry.mutant.getId()),
+                DatabaseValue.of(entry.status.name()),
+            };
+        };
+        DB.executeBatchQueryReturnKeys(query, entries, dbvExtractor);
+    }
+
     public static boolean removeKillmapsByIds(KillMap.KillMapType killmapType, List<Integer> ids) {
         if (ids.isEmpty()) {
             return true;
