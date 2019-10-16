@@ -8,7 +8,12 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoField;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -39,7 +44,14 @@ public class LandingPage extends HttpServlet {
             response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
         } else {
             // User logged not in? Show him the landing page.
-            final List<MultiplayerGame> availableMultiplayerGames = MultiplayerGameDAO.getAvailableMultiplayerGames();
+            List<MultiplayerGame> availableMultiplayerGames = MultiplayerGameDAO.getAvailableMultiplayerGames();
+            Collections.shuffle(availableMultiplayerGames, new Random(LocalDate.now().getLong(ChronoField.EPOCH_DAY)));
+            availableMultiplayerGames = availableMultiplayerGames
+                    .stream()
+                    .filter(game -> game.getDefenderPlayers().size() != 0 && game.getAttackerPlayers().size() != 0)
+                    .limit(10)
+                    .collect(Collectors.toList());
+
             request.setAttribute("openMultiplayerGames", availableMultiplayerGames);
 
             request.setAttribute("gameCreatorNames", UserDAO.getGamesCreatorNames(availableMultiplayerGames));
