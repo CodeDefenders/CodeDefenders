@@ -4,8 +4,10 @@ import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.game.multiplayer.PlayerScore;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class contains information about a {@link MultiplayerGame} from the view of a single {@link User}.
@@ -99,6 +101,14 @@ public class UserMultiplayerGameInfo {
 
     public String cutAlias() {
         return game.getCUT().getAlias();
+    }
+
+    public Map<Integer, PlayerScore> getMutantScores() {
+        return game.getMutantScores();
+    }
+
+    public Map<Integer, PlayerScore> getTestScores() {
+        return game.getTestScores();
     }
 
     private enum Type {

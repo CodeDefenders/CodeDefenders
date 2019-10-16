@@ -22,6 +22,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserMultiplayerGameInfo" %>
 <%@ page import="org.codedefenders.model.Player" %>
+<%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <% String pageTitle= null ; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <%
@@ -57,9 +58,12 @@
             int gameId = info.gameId();
             List<Player> attackers = info.attackers();
             List<Player> defenders = info.defenders();
+            Map<Integer, PlayerScore> attackerScores = info.getMutantScores();
+            Map<Integer, PlayerScore> defenderScores = info.getTestScores();
 %>
 	<tr id="<%="game-"+gameId%>">
-		<td class="col-sm-1"><%= gameId %></td>
+        <td id="toggle-game-<%=gameId%>" class="col-sm-1 toggle-details">
+            <span style="margin-right: 5px" class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"> </span><%=gameId%></td>
 		<td class="col-sm-1"><%=info.creatorName()%></td>
 		<td class="col-sm-2">
 			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>"><%=info.cutAlias()%></a>
@@ -86,89 +90,9 @@
 		</td>
         <td class="col-sm-1">
             <span><%=attackers.size()%></span>
-            <%
-                if (!attackers.isEmpty()) {
-            %>
-            <br>
-            <a href="#" data-toggle="modal" data-target="#modalAttackersFor<%=gameId%>">(Details)</a>
-            <div id="modalAttackersFor<%=gameId%>" class="modal fade" role="dialog" style="text-align: left;" >
-                <div class="modal-dialog">
-                    <!-- Modal content-->
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Attackers</h4>
-                        </div>
-                        <div class="modal-body">
-                            <table id="game-<%=gameId%>-attackers" class="table table-striped table-hover table-responsive table-paragraphs games-table">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Points</th>
-                                </tr>
-                            <%
-                                for (Player attacker : attackers) {
-                            %>
-                                <tr>
-                                    <td class="col-sm-1"><%=attacker.getUser().getUsername()%></td>
-                                    <td class="col-sm-1"><%=attacker.getPoints()%></td>
-                                </tr>
-                            <%
-                                }
-                            %>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <%
-                }
-            %>
         </td>
         <td class="col-sm-1">
             <span><%=defenders.size()%> </span>
-            <%
-                if (!defenders.isEmpty()) {
-            %>
-            <br>
-            <a href="#" data-toggle="modal" data-target="#modalDefendersFor<%=gameId%>">(Details)</a>
-            <div id="modalDefendersFor<%=gameId%>" class="modal fade" role="dialog" style="text-align: left;" >
-                <div class="modal-dialog">
-                    <!-- Modal content-->
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Defenders</h4>
-                        </div>
-                        <div class="modal-body">
-                            <table id="game-<%=gameId%>-defenders" class="table table-striped table-hover table-responsive table-paragraphs games-table">
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Points</th>
-                                </tr>
-                                <%
-                                    for (Player defender : defenders) {
-                                %>
-                                <tr>
-                                    <td class="col-sm-1"><%=defender.getUser().getUsername()%></td>
-                                    <td class="col-sm-1"><%=defender.getPoints()%></td>
-                                </tr>
-                                <%
-                                    }
-                                %>
-                            </table>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <%
-                }
-            %>
         </td>
 		<td class="col-sm-1"><%=info.gameLevel().getFormattedString()%></td>
 		<td class="col-sm-2">
@@ -250,6 +174,128 @@
             %>
 		</td>
 	</tr>
+    <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
+        <td colspan="7">
+            <table class="table-child-details" style="display: inline; margin-right: 15px">
+                <thead>
+                <tr>
+                    <th>
+                        Attacker
+                    </th>
+                    <th>
+                        Mutants
+                    </th>
+                    <th>
+                        Alive
+                    </th>
+                    <th>
+                        Points
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <% if(attackers.isEmpty()){ %>
+                <tr>
+                    <td colspan="4">There are no Attackers</td>
+                </tr>
+                <% } else {
+                    for (Player attacker : attackers) {
+                        int playerId = attacker.getId();
+                        PlayerScore playerScores = attackerScores.get(playerId);
+                        boolean scoresExists = attackerScores.containsKey(playerId) && attackerScores.get(playerId) != null;
+                %>
+                <tr>
+                    <td>
+                        <%=attacker.getUser().getUsername()%>
+                    </td>
+                    <td>
+                        <% if (scoresExists) { %>
+                        <%=playerScores.getQuantity() %>
+                        <% } else { %>
+                        0
+                        <% } %>
+                    </td>
+                    <td>
+                        <% if (scoresExists) { %>
+                        <%-- Well it is a string ... So split it to get the alive Mutants--%>
+                        <%=playerScores.getMutantKillInformation().split("/")[0]%>
+                        <% } else { %>
+                        0
+                        <% } %>
+                    </td>
+                    <td>
+                        <% if (scoresExists) { %>
+                        <%=playerScores.getTotalScore()%>
+                        <% } else { %>
+                        0
+                        <% } %>
+                    </td>
+                </tr>
+                <% }
+                } %>
+                </tbody>
+            </table>
+            <table class="table-child-details" style="display: inline; margin-left: 15px">
+                <thead>
+                <tr>
+                    <th>
+                        Defender
+                    </th>
+                    <th>
+                        Tests
+                    </th>
+                    <th>
+                        Mutants killed
+                    </th>
+                    <th>
+                        Points
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                <% if(defenders.isEmpty()){ %>
+                <tr>
+                    <td colspan="4">There are no Defenders</td>
+                </tr>
+                <% } else {
+                    for (Player defender : defenders) {
+                        int playerId = defender.getId();
+                        PlayerScore playerScores = defenderScores.get(playerId);
+                        boolean scoresExists = defenderScores.containsKey(playerId) && defenderScores.get(playerId) != null;
+                %>
+                <tr>
+                    <td>
+                        <%=defender.getUser().getUsername()%>
+                    </td>
+                    <td>
+                        <% if (scoresExists) { %>
+                        <%=playerScores.getQuantity() %>
+                        <% } else { %>
+                        0
+                        <% } %>
+                    </td>
+                    <td>
+                        <% if (scoresExists) { %>
+                        <%=playerScores.getMutantKillInformation()%>
+                        <% } else { %>
+                        0
+                        <% } %>
+                    </td>
+                    <td>
+                        <% if (scoresExists) { %>
+                        <%=playerScores.getTotalScore()%>
+                        <% } else { %>
+                        0
+                        <% } %>
+                    </td>
+                </tr>
+                <% }
+                } %>
+                </tbody>
+            </table>
+        </td>
+
+    </tr>
 <%
 		} // Closes FOR
 	} // Closes ELSE
@@ -265,7 +311,7 @@
 
 <%if (gamesJoinable) { %>
 <h2 class="full-width page-title">Open Games</h2>
-<table class="table table-hover table-responsive table-paragraphs games-table">
+<table id="tableOpenGames" class="table table-striped table-hover table-responsive table-paragraphs games-table">
 	<tr>
 		<th>ID</th>
 		<th>Creator</th>
@@ -273,8 +319,6 @@
 		<th>Attackers</th>
 		<th>Defenders</th>
 		<th>Level</th>
-		<th></th>
-
 	</tr>
 <%
 	if (openGames.isEmpty()) {
@@ -283,15 +327,21 @@
 <%
 	} else {
         for (UserMultiplayerGameInfo info : openGames) {
+            int gameId = info.gameId();
+            List<Player> attackers = info.attackers();
+            List<Player> defenders = info.defenders();
+            Map<Integer, PlayerScore> attackerScores = info.getMutantScores();
+            Map<Integer, PlayerScore> defenderScores = info.getTestScores();
 %>
-		<tr id="<%="game-"+info.gameId()%>">
-			<td class="col-sm-1"><%= info.gameId() %></td>
+		<tr id="game-<%=gameId%>">
+			<td id="toggle-game-<%=gameId%>" class="col-sm-1 toggle-details">
+                <span style="margin-right: 5px" class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"> </span><%=gameId%></td>
 			<td class="col-sm-1"><%=info.creatorName()%></td>
 			<td class="col-sm-2">
-				<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=info.gameId()%>">
+				<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>">
 					<%=info.cutAlias()%>
 				</a>
-				<div id="modalCUTFor<%=info.gameId()%>" class="modal fade" role="dialog" style="text-align: left;" >
+				<div id="modalCUTFor<%=gameId%>" class="modal fade" role="dialog" style="text-align: left;" >
 					<div class="modal-dialog">
 						<!-- Modal content-->
 						<div class="modal-content">
@@ -313,28 +363,155 @@
 					</div>
 				</div>
 			</td>
-            <%
-                int attackers = info.attackers().size();
-                int defenders = info.defenders().size();
-            %>
-			<td class="col-sm-1"><%=attackers %></td>
-			<td class="col-sm-1"><%=defenders %></td>
-			<td class="col-sm-1"><%=info.gameLevel().getFormattedString() %></td>
-			<td class="col-sm-2">
-				<form id="joinGameForm_attacker_<%=info.gameId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
-					<input type="hidden" name="formType" value="joinGame">
-					<input type="hidden" name="gameId" value=<%=info.gameId()%>>
-					<input type="hidden" name="attacker" value=1>
-					<button type="submit" id="<%="join-attacker-"+info.gameId()%>" class="btn btn-primary btn-sm" style="background-color: #884466;border-color: #772233; margin-bottom: 3px;" value="Join as Attacker">Join as Attacker</button>
-				</form>
-				<form id="joinGameForm_defender_<%=info.gameId()%>" action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
-					<input type="hidden" name="formType" value="joinGame">
-					<input type="hidden" name="gameId" value=<%=info.gameId()%>>
-					<input type="hidden" name="defender" value=1>
-					<button type="submit" id="<%="join-defender-"+info.gameId()%>" class="btn btn-primary btn-sm" style="background-color: #446688;border-color: #225577" value="Join as Defender">Join as Defender</button>
-				</form>
-			</td>
+            <td class="col-sm-2">
+                <form id="joinGameForm_attacker_<%=gameId%>"
+                      action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
+                    <input type="hidden" name="formType" value="joinGame">
+                    <input type="hidden" name="gameId" value=<%=info.gameId()%>>
+                    <input type="hidden" name="attacker" value=1>
+                    <%=attackers.size()%>
+                    <button type="submit" id="<%="join-attacker-"+info.gameId()%>" class="btn btn-primary btn-sm"
+                            style="background-color: #884466;border-color: #772233; margin: 0 0 0 5px; padding: 3px 7px;"
+                            value="Join as Attacker">Join
+                    </button>
+                </form>
+            </td>
+            <td class="col-sm-2">
+                <form id="joinGameForm_defender_<%=gameId%>"
+                      action="<%=request.getContextPath() + Paths.BATTLEGROUND_SELECTION%>" method="post">
+                    <input type="hidden" name="formType" value="joinGame">
+                    <input type="hidden" name="gameId" value=<%=gameId%>>
+                    <input type="hidden" name="defender" value=1>
+                    <%=defenders.size() %>
+                    <button type="submit" id="<%="join-defender-"+gameId%>" class="btn btn-primary btn-sm"
+                            style="background-color: #446688;border-color: #225577; margin: 0 0 0 5px; padding: 3px 7px;"
+                            value="Join as Defender">Join
+                    </button>
+                </form>
+            </td>
+            <td class="col-sm-1"><%=info.gameLevel().getFormattedString() %></td>
 		</tr>
+        <tr id="game-detais-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
+            <td colspan="6">
+                <table class="table-child-details" style="display: inline; margin-right: 15px">
+                    <thead>
+                        <tr>
+                            <th>
+                                Attacker
+                            </th>
+                            <th>
+                                Mutants
+                            </th>
+                            <th>
+                                Alive
+                            </th>
+                            <th>
+                                Points
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(attackers.isEmpty()){ %>
+                            <tr>
+                                <td colspan="4">There are no Attackers. Go Join!</td>
+                            </tr>
+                        <% } else {
+                            for (Player attacker : attackers) {
+                            int playerId = attacker.getId();
+                            PlayerScore playerScores = attackerScores.get(playerId);
+                            boolean scoresExists = attackerScores.containsKey(playerId) && attackerScores.get(playerId) != null;
+                            %>
+                            <tr>
+                                <td>
+                                    <%=attacker.getUser().getUsername()%>
+                                </td>
+                                <td>
+                                    <% if (scoresExists) { %>
+                                    <%=playerScores.getQuantity() %>
+                                    <% } else { %>
+                                    0
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (scoresExists) { %>
+                                    <%-- Well it is a string ... So split it to get the alive Mutants--%>
+                                    <%=playerScores.getMutantKillInformation().split("/")[0]%>
+                                    <% } else { %>
+                                    0
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <% if (scoresExists) { %>
+                                    <%=playerScores.getTotalScore()%>
+                                    <% } else { %>
+                                    0
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }
+                        } %>
+                    </tbody>
+                </table>
+                <table class="table-child-details" style="display: inline; margin-left: 15px">
+                    <thead>
+                        <tr>
+                            <th>
+                                Defender
+                            </th>
+                            <th>
+                                Tests
+                            </th>
+                            <th>
+                                Mutants killed
+                            </th>
+                            <th>
+                                Points
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <% if(defenders.isEmpty()){ %>
+                    <tr>
+                        <td colspan="4">There are no Defenders. Go Join!</td>
+                    </tr>
+                    <% } else { for (Player defender : defenders) {
+                        int playerId = defender.getId();
+                        PlayerScore playerScores = defenderScores.get(playerId);
+                        boolean scoresExists = defenderScores.containsKey(playerId) && defenderScores.get(playerId) != null;
+                    %>
+                        <tr>
+                            <td>
+                                <%=defender.getUser().getUsername()%>
+                            </td>
+                            <td>
+                                <% if (scoresExists) { %>
+                                <%=playerScores.getQuantity() %>
+                                <% } else { %>
+                                0
+                                <% } %>
+                            </td>
+                            <td>
+                                <% if (scoresExists) { %>
+                                <%=playerScores.getMutantKillInformation()%>
+                                <% } else { %>
+                                0
+                                <% } %>
+                            </td>
+                            <td>
+                                <% if (scoresExists) { %>
+                                <%=playerScores.getTotalScore()%>
+                                <% } else { %>
+                                0
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }
+                    } %>
+                    </tbody>
+                </table>
+            </td>
+
+        </tr>
 <%
         } // Closes FOR
     } // Closes ELSE
@@ -368,6 +545,19 @@
                 });
                 editor.setSize("100%", 500);
                 ClassAPI.getAndSetEditorValue(textarea, editor);
+            }
+        });
+
+        $('table td.toggle-details').on('click', function () {
+            var id = '.' + $(this).attr('id');
+            if ($(id).is(':visible')) {
+                $(this).find('span').removeClass('glyphicon-chevron-down');
+                $(this).find('span').addClass('glyphicon-chevron-right');
+                $(id).hide()
+            } else {
+                $(this).find('span').removeClass('glyphicon-chevron-right');
+                $(this).find('span').addClass('glyphicon-chevron-down');
+                $(id).show()
             }
         });
 	</script>
