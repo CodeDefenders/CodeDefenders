@@ -11,10 +11,29 @@ cache:
   paths:
     - .m2/repository/
     - target/
+    - ./config.properties
 
 build:
   stage: build
   script:
+    - |
+      printf "data.dir=
+      ant.home=
+      db.url=
+      db.username=
+      db.password=
+      cluster.mode=disabled
+      cluster.java.home=
+      cluster.reservation.name=
+      cluster.timeout=2
+      forceLocalExecution=enabled
+      parallelize=disabled
+      mutant.coverage=enabled
+      block.attacker=enabled
+      tomcat.username=
+      tomcat.password=
+      tomcat.url=
+      tomcat.path=" | tee config.properties
     - mvn clean compile
 
 test:
