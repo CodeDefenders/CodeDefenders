@@ -180,7 +180,7 @@
                 <thead>
                 <tr>
                     <th>
-                        User
+                        Attacker
                     </th>
                     <th>
                         Mutants
@@ -239,7 +239,7 @@
                 <thead>
                 <tr>
                     <th>
-                        User
+                        Defender
                     </th>
                     <th>
                         Tests
@@ -398,7 +398,7 @@
                     <thead>
                         <tr>
                             <th>
-                                User
+                                Attacker
                             </th>
                             <th>
                                 Mutants
@@ -457,7 +457,7 @@
                     <thead>
                         <tr>
                             <th>
-                                User
+                                Defender
                             </th>
                             <th>
                                 Tests
