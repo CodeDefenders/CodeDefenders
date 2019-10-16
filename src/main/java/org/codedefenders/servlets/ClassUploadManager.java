@@ -496,10 +496,7 @@ public class ClassUploadManager extends HttpServlet {
             // game, hence its if, which is needed instead inside mutants and
             // tests
             KillMap killMap = KillMap.forCustom(tests, mutants, cutId, new ArrayList<>());
-            for (KillMapEntry entry : killMap.getEntries()) {
-                // TODO Phil 04/12/18: Batch insert instead of insert in a for loop
-                KillmapDAO.insertKillMapEntry(entry, cutId);
-            }
+            KillmapDAO.insertManyKillMapEntries(killMap.getEntries(), cutId);
         } catch (InterruptedException | ExecutionException e) {
             logger.error("Could error while calculating killmap for successfully uploaded class.", e);
         }

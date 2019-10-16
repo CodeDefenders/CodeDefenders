@@ -13,7 +13,14 @@ import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.LineCoverageGenerator;
-import org.codedefenders.game.*;
+import org.codedefenders.game.AssertionLibrary;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.GameLevel;
+import org.codedefenders.game.LineCoverage;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.util.Constants;
@@ -244,9 +251,9 @@ public class Installer {
         ic.createSubcontext("java:comp/env/codedefenders");
 
         // Alessio: Maybe there a better way to do it...
-        for (String pName : configurations.stringPropertyNames()) {
-            logger.info("Setting java:comp/env/codedefenders/" + pName + " = " + configurations.get(pName));
-            ic.bind("java:comp/env/codedefenders/" + pName, configurations.get(pName));
+        for (String propName : configurations.stringPropertyNames()) {
+            logger.info("Setting java:comp/env/codedefenders/" + propName + " = " + configurations.get(propName));
+            ic.bind("java:comp/env/codedefenders/" + propName, configurations.get(propName));
         }
 
         ic.createSubcontext("java:comp/env/jdbc");
@@ -501,7 +508,6 @@ public class Installer {
         int puzzleId = PuzzleDAO.storePuzzle(puzzle);
 
         List<Mutant> puzzleMutants = new ArrayList<>();
-        // TODO batch insert
         for (Mutant m : originalMutants) {
             Mutant puzzleMutant = new Mutant(m.getJavaFile(), m.getClassFile(), m.getMd5(), puzzleClassId);
             puzzleMutant.insert();
@@ -511,7 +517,6 @@ public class Installer {
         }
 
         List<Test> puzzleTests = new ArrayList<>();
-        // TODO batch insert
         for (Test t : originalTests) {
             Test puzzleTest = new Test(t.getJavaFile(), t.getClassFile(), puzzleClassId, t.getLineCoverage());
             puzzleTest.insert();
@@ -524,10 +529,7 @@ public class Installer {
 
         try {
             KillMap killMap = KillMap.forCustom(puzzleTests, puzzleMutants, puzzleClassId, new ArrayList<>());
-            for (KillMap.KillMapEntry entry : killMap.getEntries()) {
-                // TODO Phil 04/12/18: Batch insert instead of insert in a for loop
-                KillmapDAO.insertKillMapEntry(entry, puzzleClassId);
-            }
+            KillmapDAO.insertManyKillMapEntries(killMap.getEntries(), puzzleClassId);
         } catch (InterruptedException | ExecutionException e) {
             logger.error("Error while calculating killmap for successfully installed puzzle.", e);
         }
