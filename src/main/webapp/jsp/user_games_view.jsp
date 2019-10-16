@@ -62,8 +62,8 @@
             Map<Integer, PlayerScore> defenderScores = info.getTestScores();
 %>
 	<tr id="<%="game-"+gameId%>">
-        <td id="toggle-game-<%=gameId%>" class="col-sm-1 toggle-details toggle-details-icon glyphicon glyphicon-chevron-right"><span
-            style="margin-left: 10px"><%=gameId%></span></td>
+        <td id="toggle-game-<%=gameId%>" class="col-sm-1 toggle-details">
+            <span style="margin-right: 5px" class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"> </span><%=gameId%></td>
 		<td class="col-sm-1"><%=info.creatorName()%></td>
 		<td class="col-sm-2">
 			<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>"><%=info.cutAlias()%></a>
@@ -311,7 +311,7 @@
 
 <%if (gamesJoinable) { %>
 <h2 class="full-width page-title">Open Games</h2>
-<table id="tableOpenGames" class="table table-hover table-responsive table-paragraphs games-table">
+<table id="tableOpenGames" class="table table-striped table-hover table-responsive table-paragraphs games-table">
 	<tr>
 		<th>ID</th>
 		<th>Creator</th>
@@ -334,9 +334,8 @@
             Map<Integer, PlayerScore> defenderScores = info.getTestScores();
 %>
 		<tr id="game-<%=gameId%>">
-			<td id="toggle-game-<%=gameId%>"
-                class="col-sm-1 toggle-details toggle-details-icon glyphicon glyphicon-chevron-right">
-                <span style="margin-left: 10px"><%=gameId%></span></td>
+			<td id="toggle-game-<%=gameId%>" class="col-sm-1 toggle-details">
+                <span style="margin-right: 5px" class="toggle-details-icon glyphicon glyphicon-chevron-right text-muted"> </span><%=gameId%></td>
 			<td class="col-sm-1"><%=info.creatorName()%></td>
 			<td class="col-sm-2">
 				<a href="#" data-toggle="modal" data-target="#modalCUTFor<%=gameId%>">
@@ -552,12 +551,12 @@
         $('table td.toggle-details').on('click', function () {
             var id = '.' + $(this).attr('id');
             if ($(id).is(':visible')) {
-                $(this).removeClass('glyphicon-chevron-down');
-                $(this).addClass('glyphicon-chevron-right');
+                $(this).find('span').removeClass('glyphicon-chevron-down');
+                $(this).find('span').addClass('glyphicon-chevron-right');
                 $(id).hide()
             } else {
-                $(this).removeClass('glyphicon-chevron-right');
-                $(this).addClass('glyphicon-chevron-down');
+                $(this).find('span').removeClass('glyphicon-chevron-right');
+                $(this).find('span').addClass('glyphicon-chevron-down');
                 $(id).show()
             }
         });
