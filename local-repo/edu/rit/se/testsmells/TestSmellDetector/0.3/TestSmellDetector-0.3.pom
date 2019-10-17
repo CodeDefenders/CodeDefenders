@@ -6,7 +6,7 @@
 
     <groupId>edu.rit.se.testsmells</groupId>
     <artifactId>TestSmellDetector</artifactId>
-    <version>0.2</version>
+    <version>0.3</version>
     <build>
         <plugins>
             <plugin>
