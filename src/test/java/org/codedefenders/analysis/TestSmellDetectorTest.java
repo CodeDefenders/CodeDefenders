@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 
-import org.codedefenders.testsmells.LooseUnknownTest;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +30,7 @@ import org.junit.rules.TemporaryFolder;
 import testsmell.AbstractSmell;
 import testsmell.TestFile;
 import testsmell.TestSmellDetector;
+import testsmell.smell.UnknownTest;
 
 public class TestSmellDetectorTest {
 
@@ -95,7 +95,7 @@ public class TestSmellDetectorTest {
         testSmellDetector.detectSmells(testSmellFile);
         
         for( AbstractSmell smell : testSmellFile.getTestSmells()){
-            if( smell instanceof LooseUnknownTest ){
+            if( smell instanceof UnknownTest ){
                 Assert.assertTrue( smell.getHasSmell() );
             }
             
