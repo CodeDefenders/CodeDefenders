@@ -98,6 +98,17 @@
         <param-value>***REMOVED***</param-value>
     </context-param>
 
+    <!-- Filters - the order is important -->
+    <filter-mapping>
+        <filter-name>LoginFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>TicketingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!-- Filters end -->
+
     <!-- Servlets-->
     <!-- Public sites -->
     <servlet>
@@ -135,26 +146,6 @@
         <servlet-name>StudyOverview</servlet-name>
         <jsp-file>/jsp/study.jsp</jsp-file>
     </servlet>
-
-    <!-- Login Authentication start -->
-    <filter>
-        <filter-name>LoginFilter</filter-name>
-        <filter-class>org.codedefenders.servlets.auth.LoginFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>LoginFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    <!-- Ticketing. Must come after Login  -->
-    <filter>
-        <filter-name>TicketingFilter</filter-name>
-        <filter-class>org.codedefenders.notification.web.TicketingFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>TicketingFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    <!-- Login Authentication end -->
 
     <!-- Misc start-->
     <servlet-mapping>

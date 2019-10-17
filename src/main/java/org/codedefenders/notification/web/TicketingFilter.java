@@ -27,13 +27,16 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.codedefenders.notification.ITicketingService;
+import org.codedefenders.util.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@WebFilter(filterName = "TicketingFilter")
 public class TicketingFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(TicketingFilter.class);
 
@@ -66,7 +69,7 @@ public class TicketingFilter implements Filter {
                 String ticket = ticketingService.generateTicketForOwner(userId);
                 request.setAttribute(TICKET_REQUEST_ATTRIBUTE_NAME, ticket);
 
-                logger.debug("Registering toket {} for {} from {}.", ticket, userId, httpReq.getRequestURI());
+                logger.debug("Registering ticket {} for {} from {}.", ticket, userId, httpReq.getRequestURI());
 
                 chain.doFilter(request, response);
             } else {
@@ -124,7 +127,7 @@ public class TicketingFilter implements Filter {
         /*
          * List here the pages which require the web socket !
          */
-        if (path.startsWith(context + "/multiplayergame")) {
+        if (path.startsWith(context + Paths.BATTLEGROUND_GAME)) {
             return true;
         } else {
             return false;
