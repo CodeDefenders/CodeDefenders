@@ -98,11 +98,6 @@
         <param-value>***REMOVED***</param-value>
     </context-param>
 
-    <!--System listener-->
-    <listener>
-        <listener-class>org.codedefenders.SystemStartStop</listener-class>
-    </listener>
-
     <!-- Servlets-->
     <!-- Public sites -->
     <servlet>
