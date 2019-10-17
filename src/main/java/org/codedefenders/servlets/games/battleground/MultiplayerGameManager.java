@@ -37,11 +37,9 @@ import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAG
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 
 import java.io.IOException;
-import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -73,13 +71,14 @@ import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.IMutationTester;
 import org.codedefenders.execution.KillMap;
-import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.execution.KillMap.KillMapEntry;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.game.tcs.ITestCaseSelector;
 import org.codedefenders.model.AttackerIntention;
 import org.codedefenders.model.DefenderIntention;
 import org.codedefenders.model.Event;
@@ -120,6 +119,9 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private TestSmellsDAO testSmellsDAO;
+
+    @Inject
+    private ITestCaseSelector regressionTestCaseSelector;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -959,9 +961,8 @@ public class MultiplayerGameManager extends HttpServlet {
         // Select a random subset to do the validation
         // TODO Define a mutant selection strategy interface. For the moment we use a basic random selection.
         int maxTestsThatCanBeRunForValidatingTheDuel = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD).getIntValue();
-        Collections.shuffle( tests , new SecureRandom( ));
-        List<Test> selectedTests = tests.stream().limit(maxTestsThatCanBeRunForValidatingTheDuel).collect(Collectors.toList());
 
+        List<Test> selectedTests = regressionTestCaseSelector.select( tests, maxTestsThatCanBeRunForValidatingTheDuel );
         logger.debug("Validating the mutant with {} selected tests:\n{}", selectedTests.size(), selectedTests );
 
 
