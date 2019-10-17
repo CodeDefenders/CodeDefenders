@@ -359,7 +359,7 @@
             <% } else {%>
             <div class="panel panel-default" style="background: white">
                 <div class="panel-body" style="    color: gray;    text-align: center;">
-                    No mutants killed.
+                    No mutants flagged as equivalent.
                 </div>
             </div>
             <% } %>
