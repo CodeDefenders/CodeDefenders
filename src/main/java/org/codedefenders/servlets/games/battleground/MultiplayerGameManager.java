@@ -64,6 +64,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.IntentionDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
@@ -655,7 +656,8 @@ public class MultiplayerGameManager extends HttpServlet {
                     
                     DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
                     messages.add( message );
-
+                        
+                    // Notify the attacker
                     Event notifEquiv = new Event(-1, game.getId(),
                             userId,
                             notification, 
@@ -663,6 +665,16 @@ public class MultiplayerGameManager extends HttpServlet {
                             new Timestamp(System.currentTimeMillis()));
                     notifEquiv.insert();
 
+                    // Notify the defender which triggered the duel about it !
+                    if (isMutantKillable) {
+                        int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
+                        notification = eventUser.getUsername() + " accepts that the mutant " + m.getId()
+                                + "that you claimed equivalent is equivalent, but that mutant was killable.";
+                        Event notifDefenderEquiv = new Event(-1, game.getId(), defenderId, notification,
+                                EventType.GAME_MESSAGE_DEFENDER, EventStatus.GAME,
+                                new Timestamp(System.currentTimeMillis()));
+                        notifDefenderEquiv.insert();
+                    }
                     
                     
                     response.sendRedirect(request.getContextPath() + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
