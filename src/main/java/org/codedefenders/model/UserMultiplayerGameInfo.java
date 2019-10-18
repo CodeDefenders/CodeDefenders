@@ -45,11 +45,13 @@ public class UserMultiplayerGameInfo {
     private String creatorName;
 
     /**
-     * Use {@link #forOpen(int, MultiplayerGame, String) forActive()} and
-     * {@link #forActive(int, MultiplayerGame, Role, String) forOpen()} methods.
-     *
+     * Use {@link #forOpen(int, MultiplayerGame, String) forActive()},
+     * {@link #forActive(int, MultiplayerGame, Role, String) forOpen()} and
+     * {@link #forFinished(int, MultiplayerGame, String) forFinished()}
+     * methods instead
      */
-    private UserMultiplayerGameInfo() {}
+    private UserMultiplayerGameInfo() {
+    }
 
     public static UserMultiplayerGameInfo forActive(int userId, MultiplayerGame game, Role role, String creatorName) {
         UserMultiplayerGameInfo info = new UserMultiplayerGameInfo();
@@ -65,6 +67,16 @@ public class UserMultiplayerGameInfo {
     public static UserMultiplayerGameInfo forOpen(int userId, MultiplayerGame game, String creatorName) {
         UserMultiplayerGameInfo info = new UserMultiplayerGameInfo();
         info.type = Type.OPEN;
+        info.userId = userId;
+        info.game = game;
+        info.creatorName = creatorName;
+
+        return info;
+    }
+
+    public static UserMultiplayerGameInfo forFinished(int userId, MultiplayerGame game, String creatorName) {
+        UserMultiplayerGameInfo info = new UserMultiplayerGameInfo();
+        info.type = Type.FINISHED;
         info.userId = userId;
         info.game = game;
         info.creatorName = creatorName;
@@ -137,6 +149,10 @@ public class UserMultiplayerGameInfo {
         /**
          * The user could join this game.
          */
-        OPEN
+        OPEN,
+        /**
+         * The user part of this game, but it is now finished.
+         */
+        FINISHED
     }
 }

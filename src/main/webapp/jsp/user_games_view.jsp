@@ -391,7 +391,7 @@
             </td>
             <td class="col-sm-1"><%=info.gameLevel().getFormattedString() %></td>
 		</tr>
-        <tr id="game-detais-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
+        <tr id="game-details-<%=gameId%>" class="toggle-game-<%=gameId%>" style="display: none">
             <td colspan="6">
                 <table class="table-child-details" style="display: inline; margin-right: 15px">
                     <thead>
@@ -549,7 +549,7 @@
         });
 
         $('table td.toggle-details').on('click', function () {
-            var id = '.' + $(this).attr('id');
+            let id = '.' + $(this).attr('id');
             if ($(id).is(':visible')) {
                 $(this).find('span').removeClass('glyphicon-chevron-down');
                 $(this).find('span').addClass('glyphicon-chevron-right');
