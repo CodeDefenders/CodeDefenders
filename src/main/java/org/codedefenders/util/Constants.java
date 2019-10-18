@@ -145,7 +145,7 @@ public class Constants {
     public static final String TEST_KILLED_CLAIMED_MUTANT_MESSAGE = "Yay, your test killed the allegedly equivalent mutant. You won the duel!";
     public static final String TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE = "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel.";
     public static final String TEST_SUBMITTED_MESSAGE = "Test submitted and ready to kill mutants!";
-    public static final String TEST_KILLED_ZERO_MESSAGE = "Your test did not kill any mutant, just yet.";
+    public static final String TEST_KILLED_ZERO_MESSAGE = "Your test did not kill any mutants, just yet.";
     public static final String TEST_KILLED_LAST_MESSAGE = "Great, your test killed the last mutant!";
     public static final String TEST_KILLED_ONE_MESSAGE = "Great, your test killed a mutant!";
     public static final String TEST_KILLED_N_MESSAGE = "Awesome! Your test killed %d mutants!"; // number of mutants
