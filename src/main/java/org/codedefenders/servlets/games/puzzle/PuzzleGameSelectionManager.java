@@ -94,16 +94,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
      * @throws IOException when redirecting fails.
      */
     static void createGame(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        final HttpSession session = request.getSession();
         final int userId = ServletUtils.userId(request);
-
-        final boolean canCreateGames = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue();
-        if (!canCreateGames) {
-            logger.warn("User {} tried to create a puzzle game, but creating games is not permitted.", userId);
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
         final Optional<Integer> puzzleId = getIntParameter(request, "puzzleId");
         if (!puzzleId.isPresent()) {
             logger.error("Failed to retrieve puzzleId from request.");
