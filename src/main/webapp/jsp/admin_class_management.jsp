@@ -83,7 +83,11 @@
                 <td class="col-sm-2"><%= isPuzzle ? "Yes" : "No" %>
                 </td>
                 <%
-                    if (deletable) {
+                    if (deletable && isPuzzle) { // Temporary fix until #572 is done.
+                %>
+                <td style="padding-top:4px; padding-bottom:4px"/>
+                <%
+                    } else if (deletable) {
                 %>
                 <td style="padding-top:4px; padding-bottom:4px">
                     <form id="manageClass_<%=classId%>" action="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>" method="post">
@@ -96,10 +100,6 @@
                         </button>
                     </form>
                 </td>
-                <%
-                } else if (isPuzzle){ // Temporary fix until #572 is done.
-                %>
-                <td style="padding-top:4px; padding-bottom:4px"/>
                 <%
                     } else { // not deletable, so set as inactive
                 %>

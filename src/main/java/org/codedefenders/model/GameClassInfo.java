@@ -44,6 +44,6 @@ public class GameClassInfo {
     }
 
     public boolean isDeletable() {
-        return gamesWithClass == 0;
+        return gameClass.isActive() && gamesWithClass == 0;
     }
 }
