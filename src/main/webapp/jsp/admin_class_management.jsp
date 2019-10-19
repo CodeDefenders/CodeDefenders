@@ -41,7 +41,7 @@
                 <th>Alias</th>
                 <th>Games w/ class</th>
                 <th>Limited to puzzles?</th>
-                <th></th>
+                <th>Delete / Set as inactive</th>
             </tr>
             </thead>
             <tbody>
@@ -68,7 +68,6 @@
                     boolean active = classInfo.getGameClass().isActive();
                     int gamesWithClass = classInfo.getGamesWithClass();
                     boolean deletable = classInfo.isDeletable();
-                    // TODO Phil 24/06/19: add ajax call for class file content when clicking on the name
             %>
 
             <tr id="<%="class_row_"+classId%>" <%=active ? "" : "class=\"danger\""%>>
@@ -76,7 +75,31 @@
                 </td>
                 <td class="col-sm-2"><%= name %>
                 </td>
-                <td class="col-sm-1"><%= alias %>
+                <td class="col-sm-2">
+                    <a href="#" data-toggle="modal" data-target="#modalCUTFor<%=classId%>">
+                        <%=alias%>
+                    </a>
+                    <div id="modalCUTFor<%=classId%>" class="modal fade" role="dialog" style="text-align: left;" >
+                        <div class="modal-dialog">
+                            <!-- Modal content-->
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title"><%=alias%></h4>
+                                </div>
+                                <div class="modal-body">
+                                <pre class="readonly-pre"><textarea
+                                    class="readonly-textarea classPreview"
+                                    id="sut<%=classId%>"
+                                    name="cut<%=classId%>" cols="80"
+                                    rows="30"></textarea></pre>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </td>
                 <td class="col-sm-1"><%= gamesWithClass %>
                 </td>
@@ -128,24 +151,21 @@
         </table>
 
         <script>
-            $(document).ready(function () {
-                $('[data-toggle="tooltip"]').tooltip();
-
-                $('#tableUsers').DataTable({
-                    pagingType: "full_numbers",
-                    lengthChange: false,
-                    searching: true,
-                    order: [[4, "desc"]],
-                    "columnDefs": [{
-                        "targets": 5,
-                        "orderable": false
-                    }, {
-                        "targets": 6,
-                        "orderable": false
-                    }]
-                });
-            })
-            ;
+            $('.modal').on('shown.bs.modal', function() {
+                let codeMirrorContainer = $(this).find(".CodeMirror")[0];
+                if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+                    codeMirrorContainer.CodeMirror.refresh();
+                } else {
+                    let textarea = $(this).find('textarea')[0];
+                    let editor = CodeMirror.fromTextArea(textarea, {
+                        lineNumbers: false,
+                        readOnly: true,
+                        mode: "text/x-java"
+                    });
+                    editor.setSize("100%", 500);
+                    ClassAPI.getAndSetEditorValue(textarea, editor);
+                }
+            });
         </script>
 </div>
 <%@ include file="/jsp/footer.jsp" %>
