@@ -97,6 +97,10 @@
                     </form>
                 </td>
                 <%
+                } else if (isPuzzle){ // Temporary fix until #572 is done.
+                %>
+                <td style="padding-top:4px; padding-bottom:4px"/>
+                <%
                     } else { // not deletable, so set as inactive
                 %>
                 <td style="padding-top:4px; padding-bottom:4px">
