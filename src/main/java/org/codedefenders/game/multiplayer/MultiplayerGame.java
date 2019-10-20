@@ -471,24 +471,26 @@ public class MultiplayerGame extends AbstractGame {
 
             int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
             challengesLost.put(defenderId, challengesLost.get(defenderId) + 1);
-            challengesLost.put(defendersTeamId, challengesLost.get(defendersTeamId) + 1);
+            if(defenderId != defendersTeamId)
+                challengesLost.put(defendersTeamId, challengesLost.get(defendersTeamId) + 1);
         }
         for (Mutant m : getMutantsMarkedEquivalent()) {
             int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
             challengesWon.put(defenderId, challengesWon.get(defenderId) + 1);
-            challengesWon.put(defendersTeamId, challengesWon.get(defendersTeamId) + 1);
+            if(defenderId != defendersTeamId)
+                challengesWon.put(defendersTeamId, challengesWon.get(defendersTeamId) + 1);
         }
         for (Mutant m : getMutantsMarkedEquivalentPending()) {
             int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
             challengesOpen.put(defenderId, challengesOpen.get(defenderId) + 1);
-            challengesOpen.put(defendersTeamId, challengesOpen.get(defendersTeamId) + 1);
+            if(defenderId != defendersTeamId)
+                challengesOpen.put(defendersTeamId, challengesOpen.get(defendersTeamId) + 1);
         }
 
         for (int playerId : testScores.keySet()) {
             testScores.get(playerId).setDuelInformation(challengesWon.get(playerId) + " / " + challengesLost.get(playerId) + " / " + challengesOpen.get((playerId)));
         }
         testScores.get(defendersTeamId).setDuelInformation(challengesWon.get(defendersTeamId) + " / " + challengesLost.get(defendersTeamId) + " / " + challengesOpen.get((defendersTeamId)));
-
         for (int i : mutantsKilled.keySet()) {
             PlayerScore ps = testScores.get(i);
             ps.setMutantKillInformation("" + mutantsKilled.get(i));
