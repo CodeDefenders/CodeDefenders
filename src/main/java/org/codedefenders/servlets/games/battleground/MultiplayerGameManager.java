@@ -18,47 +18,6 @@
  */
 package org.codedefenders.servlets.games.battleground;
 
-import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
-import static org.codedefenders.servlets.util.ServletUtils.ctx;
-import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
-import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
-import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
-import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_ERROR_LINES;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
-import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
@@ -96,6 +55,46 @@ import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.codedefenders.validation.code.ValidationMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
+import static org.codedefenders.servlets.util.ServletUtils.ctx;
+import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
+import static org.codedefenders.util.Constants.MODE_BATTLEGROUND_DIR;
+import static org.codedefenders.util.Constants.MUTANT_COMPILED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_CREATION_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_DUPLICATED_MESSAGE;
+import static org.codedefenders.util.Constants.MUTANT_UNCOMPILABLE_MESSAGE;
+import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_ERROR_LINES;
+import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT;
+import static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
+import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 
 /**
  * This {@link HttpServlet} handles retrieval and in-game management for {@link MultiplayerGame battleground games}.
@@ -643,7 +642,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
                     String message = Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE;
                     String notification = eventUser.getUsername() + " accepts that their mutant " + m.getId() + " is equivalent.";
-                    if( isMutantKillable ){
+                    if (isMutantKillable) {
                         logger.warn("Mutant {} was accepted as equivalence but it is killable", m);
                         message = message + " " + " However, the mutant was killable !";
                         notification = notification + " " + " However, the mutant was killable !";
@@ -780,7 +779,7 @@ public class MultiplayerGameManager extends HttpServlet {
                                 " lost an equivalence duel. Mutant " + mPending.getId() +
                                 " is assumed equivalent.";
 
-                        if( isMutantKillable ){
+                        if (isMutantKillable) {
                             notification = notification + " " + "However, the mutant was killable !";
                         }
 
@@ -802,7 +801,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
             } else {
                 String message = TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
-                if ( isMutantKillable ){
+                if (isMutantKillable) {
                     message = message + " " + "Unfortunately, the mutant was killable !";
                 }
                 messages.add(message);
@@ -944,39 +943,33 @@ public class MultiplayerGameManager extends HttpServlet {
      * @param mutantToValidate
      * @return whether the mutant is killable or not/cannot be validated
      */
-    boolean isMutantKillableByOtherTests(Mutant mutantToValidate){
+    boolean isMutantKillableByOtherTests(Mutant mutantToValidate) {
+        int maxTestsThatCanBeRunForValidatingTheDuel = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD).getIntValue();
+        if (maxTestsThatCanBeRunForValidatingTheDuel <= 0) {
+            return false;
+        }
+
         // Get all the covering tests of this mutant which do not belong to this game
         int classId = mutantToValidate.getClassId();
         List<Test> tests = TestDAO.getValidTestsForClass(classId);
 
         // Remove tests which belong to the same game as the mutant
-        Iterator<Test> iterator = tests.iterator();
-        while( iterator.hasNext() ){
-            Test test = iterator.next();
-            if( test.getGameId() == mutantToValidate.getGameId() ){
-                iterator.remove();
-            }
-        }
+        tests.removeIf(test -> test.getGameId() == mutantToValidate.getGameId());
 
-        // Select a random subset to do the validation
-        // TODO Define a mutant selection strategy interface. For the moment we use a basic random selection.
-        int maxTestsThatCanBeRunForValidatingTheDuel = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD).getIntValue();
-
-        List<Test> selectedTests = regressionTestCaseSelector.select( tests, maxTestsThatCanBeRunForValidatingTheDuel );
-        logger.debug("Validating the mutant with {} selected tests:\n{}", selectedTests.size(), selectedTests );
-
+        List<Test> selectedTests = regressionTestCaseSelector.select(tests, maxTestsThatCanBeRunForValidatingTheDuel);
+        logger.debug("Validating the mutant with {} selected tests:\n{}", selectedTests.size(), selectedTests);
 
         // At the moment this is purposely blocking. This is the dumbest, but safest way to deal with it while we design a better solution.
         KillMap killmap = KillMap.forMutantValidation(selectedTests, mutantToValidate, classId);
 
-        if( killmap == null ){
+        if (killmap == null) {
             // There was an error we cannot empirically prove the mutant was killable.
             logger.warn("An error prevents validation of mutant {}", mutantToValidate);
             return false;
         } else {
-            for(KillMapEntry killMapEntry : killmap.getEntries()){
-                if( killMapEntry.status.equals( KillMapEntry.Status.KILL) ||
-                        killMapEntry.status.equals( KillMapEntry.Status.ERROR)){
+            for (KillMapEntry killMapEntry : killmap.getEntries()) {
+                if (killMapEntry.status.equals(KillMapEntry.Status.KILL)
+                    || killMapEntry.status.equals(KillMapEntry.Status.ERROR)) {
                     return true;
                 }
             }
