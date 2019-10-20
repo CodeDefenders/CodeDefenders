@@ -64,11 +64,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.GameDAO;
 import org.codedefenders.database.IntentionDAO;
-import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.TestDAO;
@@ -90,7 +87,6 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
-import org.codedefenders.servlets.admin.AdminSystemSettings.SettingsDTO;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -638,11 +634,11 @@ public class MultiplayerGameManager extends HttpServlet {
             for (Mutant m : mutantsPending) {
                 if (m.getId() == mutantId && m.getPlayerId() == playerId) {
                     User eventUser = UserDAO.getUserById(userId);
-                    
-                    
+
+
                     // Here we check if the accepted equivalence is "possibly" equivalent
                     boolean isMutantKillable = isMutantKillableByOtherTests( m );
-                    
+
                     String message = Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE;
                     String notification = eventUser.getUsername() + " accepts that their mutant " + m.getId() + " is equivalent.";
                     if( isMutantKillable ){
@@ -650,17 +646,17 @@ public class MultiplayerGameManager extends HttpServlet {
                         message = message + " " + " However, the mutant was killable !";
                         notification = notification + " " + " However, the mutant was killable !";
                     }
-                    
-                    // At this point we where not able to kill the mutant will all the covering tests on the same class from different games 
+
+                    // At this point we where not able to kill the mutant will all the covering tests on the same class from different games
                     m.kill(Mutant.Equivalence.DECLARED_YES);
-                    
+
                     DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
                     messages.add( message );
-                        
+
                     // Notify the attacker
                     Event notifEquiv = new Event(-1, game.getId(),
                             userId,
-                            notification, 
+                            notification,
                             EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
                     notifEquiv.insert();
@@ -675,8 +671,8 @@ public class MultiplayerGameManager extends HttpServlet {
                                 new Timestamp(System.currentTimeMillis()));
                         notifDefenderEquiv.insert();
                     }
-                    
-                    
+
+
                     response.sendRedirect(request.getContextPath() + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                     return;
                 }
@@ -756,16 +752,14 @@ public class MultiplayerGameManager extends HttpServlet {
             boolean killedClaimed = false;
             int killedOthers = 0;
             boolean isMutantKillable = false;
-            
+
             for (Mutant mPending : mutantsPendingTests) {
-                
+
                 // TODO: Doesnt distinguish between failing because the test didnt run at all and failing because it detected the mutant
                 mutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
-                
+
                 if (mPending.getEquivalent() == Mutant.Equivalence.PROVEN_NO) {
                     logger.debug("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
-                    // TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points added.
-                    newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
                     final String message = UserDAO.getUserById(userId).getUsername() + " killed mutant " + mPending.getId() + " in an equivalence duel.";
                     Event notif = new Event(-1, gameId, userId, message, EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
@@ -776,21 +770,21 @@ public class MultiplayerGameManager extends HttpServlet {
                         killedOthers++;
                     }
                 } else { // ASSUMED_YES
-                    
+
                     if (mPending.getId() == mutantId) {
                         // Here we check if the accepted equivalence is "possibly" equivalent
                         isMutantKillable = isMutantKillableByOtherTests( mPending );
                         String notification = UserDAO.getUserById(userId).getUsername() +
                                 " lost an equivalence duel. Mutant " + mPending.getId() +
                                 " is assumed equivalent.";
-                        
+
                         if( isMutantKillable ){
                             notification = notification + " " + "However, the mutant was killable !";
                         }
-                        
+
                         // only kill the one mutant that was claimed
                         mPending.kill(ASSUMED_YES);
-                        
+
                         Event notif = new Event(-1, gameId, userId, notification,
                                 EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                                 new Timestamp(System.currentTimeMillis()));
@@ -798,10 +792,10 @@ public class MultiplayerGameManager extends HttpServlet {
 
                     }
                     logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent", newTest.getId(), mPending.getId());
-                    
+
                 }
             }
-            
+
             if (killedClaimed) {
                 messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
             } else {
@@ -940,13 +934,13 @@ public class MultiplayerGameManager extends HttpServlet {
             }
         }
     }
-    
+
     /**
      * Selects a max of AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD tests randomly sampled
      * which cover the mutant but belongs to other games and executes them against the mutant.
-     * 
+     *
      * @param mutantToValidate
-     * @return whether the mutant is killable or not/cannot be validated 
+     * @return whether the mutant is killable or not/cannot be validated
      */
     boolean isMutantKillableByOtherTests(Mutant mutantToValidate){
         // Get all the covering tests of this mutant which do not belong to this game
@@ -959,7 +953,7 @@ public class MultiplayerGameManager extends HttpServlet {
             Test test = iterator.next();
             if( test.getGameId() == mutantToValidate.getGameId() ){
                 iterator.remove();
-            } 
+            }
         }
 
         // Select a random subset to do the validation
@@ -967,23 +961,23 @@ public class MultiplayerGameManager extends HttpServlet {
         int maxTestsThatCanBeRunForValidatingTheDuel = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD).getIntValue();
         Collections.shuffle( tests , new SecureRandom( ));
         List<Test> selectedTests = tests.stream().limit(maxTestsThatCanBeRunForValidatingTheDuel).collect(Collectors.toList());
-        
+
         logger.debug("Validating the mutant with {} selected tests:\n{}", selectedTests.size(), selectedTests );
-        
+
 
         // At the moment this is purposely blocking. This is the dumbest, but safest way to deal with it while we design a better solution.
         KillMap killmap = KillMap.forMutantValidation(selectedTests, mutantToValidate, classId);
-        
+
         if( killmap == null ){
             // There was an error we cannot empirically prove the mutant was killable.
             logger.warn("An error prevents validation of mutant {}", mutantToValidate);
             return false;
         } else {
             for(KillMapEntry killMapEntry : killmap.getEntries()){
-                if( killMapEntry.status.equals( KillMapEntry.Status.KILL) || 
+                if( killMapEntry.status.equals( KillMapEntry.Status.KILL) ||
                         killMapEntry.status.equals( KillMapEntry.Status.ERROR)){
                     return true;
-                } 
+                }
             }
         }
         return false;
