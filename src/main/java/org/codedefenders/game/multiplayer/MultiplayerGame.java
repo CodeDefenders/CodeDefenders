@@ -379,6 +379,9 @@ public class MultiplayerGame extends AbstractGame {
                 if (mm.getEquivalent().equals(PROVEN_NO)) {
                     duelsWon.put(mm.getPlayerId(), duelsWon.get(mm.getPlayerId()) + 1);
                     duelsWon.put(-1, duelsWon.get(-1) + 1);
+                    // Actually adds points for the player and the team
+                    ps.increaseTotalScore(1);
+                    ts.increaseTotalScore(1);
                 }
             }
 
