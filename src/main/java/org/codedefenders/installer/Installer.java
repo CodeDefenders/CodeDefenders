@@ -318,6 +318,8 @@ public class Installer {
                 .mockingEnabled(false) // TODO: dont't use a default value
                 .testingFramework(TestingFramework.JUNIT4) // TODO: dont't use a default value
                 .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST) // TODO: dont't use a default value
+                .puzzleClass(true)
+                .active(false)
                 .create();
 
         cut.insert();

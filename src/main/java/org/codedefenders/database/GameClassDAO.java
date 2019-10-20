@@ -62,6 +62,7 @@ public class GameClassDAO {
         TestingFramework testingFramework = TestingFramework.valueOf(rs.getString("TestingFramework"));
         AssertionLibrary assertionLibrary = AssertionLibrary.valueOf(rs.getString("AssertionLibrary"));
         boolean isActive = rs.getBoolean("Active");
+        boolean isPuzzleClass = rs.getBoolean("Puzzle");
 
         return GameClass.build()
                 .id(classId)
@@ -73,6 +74,7 @@ public class GameClassDAO {
                 .testingFramework(testingFramework)
                 .assertionLibrary(assertionLibrary)
                 .active(isActive)
+                .puzzleClass(isPuzzleClass)
                 .create();
     }
 
