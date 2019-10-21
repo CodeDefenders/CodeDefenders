@@ -40,7 +40,6 @@
                 <th>Name</th>
                 <th>Alias</th>
                 <th>Games w/ class</th>
-                <th>Limited to puzzles?</th>
                 <th>Delete / Set as inactive</th>
             </tr>
             </thead>
@@ -64,7 +63,6 @@
                     int classId = classInfo.getGameClass().getId();
                     String name = classInfo.getGameClass().getName();
                     String alias = classInfo.getGameClass().getAlias();
-                    boolean isPuzzle = classInfo.getGameClass().isPuzzleClass();
                     boolean active = classInfo.getGameClass().isActive();
                     int gamesWithClass = classInfo.getGamesWithClass();
                     boolean deletable = classInfo.isDeletable();
@@ -101,18 +99,12 @@
                         </div>
                     </div>
                 </td>
-                <td class="col-sm-1"><%= gamesWithClass %>
-                </td>
-                <td class="col-sm-2"><%= isPuzzle ? "Yes" : "No" %>
+                <td class="col-sm-2"><%= gamesWithClass %>
                 </td>
                 <%
-                    if (deletable && isPuzzle) { // Temporary fix until #572 is done.
+                    if (deletable) {
                 %>
-                <td style="padding-top:4px; padding-bottom:4px"/>
-                <%
-                    } else if (deletable) {
-                %>
-                <td style="padding-top:4px; padding-bottom:4px">
+                <td class="col-sm-2" style="padding-top:4px; padding-bottom:4px">
                     <form id="manageClass_<%=classId%>" action="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>" method="post">
                         <input type="hidden" name="formType" value="classRemoval">
 
@@ -126,7 +118,7 @@
                 <%
                     } else { // not deletable, so set as inactive
                 %>
-                <td style="padding-top:4px; padding-bottom:4px">
+                <td class="col-sm-2" style="padding-top:4px; padding-bottom:4px">
                     <form id="manageClass_<%=classId%>" action="<%=request.getContextPath() + Paths.ADMIN_CLASSES%>" method="post">
                         <input type="hidden" name="formType" value="classInactive">
 
