@@ -70,15 +70,15 @@ public class TicketingFilter implements Filter {
         try {
             String[] tokens = request.getRequestURL().toString().split("/");
             String ticket = tokens[tokens.length - 2];
-            Integer userId = Integer.valueOf(tokens[tokens.length - 1]);
+            int userId = Integer.parseInt(tokens[tokens.length - 1]);
             if (!ticketingService.validateTicket(ticket, userId)) {
                 logger.warn("Ticket " + ticket + " for user " + userId + " is not valid.");
                 return false;
             } else {
                 return true;
             }
-        } catch (Throwable t) {
-            logger.warn("Invalid WebSocket URL.");
+        } catch (IndexOutOfBoundsException | NumberFormatException | NullPointerException e) {
+            logger.warn("Invalid WebSocket URL.", e);
             return false;
         }
     }
