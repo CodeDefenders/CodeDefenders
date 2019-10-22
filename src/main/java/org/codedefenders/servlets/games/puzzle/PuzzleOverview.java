@@ -49,7 +49,7 @@ import javax.servlet.http.HttpServletResponse;
  * <p>
  * Serves under {@code /puzzles}.
  *
- * @author <a href=https://github.com/werli>Phil Werli<a/>
+ * @author <a href=https://github.com/werli>Phil Werli</a>
  * @see PuzzleGameSelectionManager
  * @see PuzzleGame
  * @see org.codedefenders.util.Paths#PUZZLE_OVERVIEW

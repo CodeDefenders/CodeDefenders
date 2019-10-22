@@ -40,7 +40,7 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 /**
  * This class handles the database logic for tests.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see Test
  */
 public class TestDAO {

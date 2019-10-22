@@ -28,7 +28,7 @@ import java.util.*;
  * <p>
  * Setter methods can be chained.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see ClassCodeAnalyser
  */
 public class CodeAnalysisResult {

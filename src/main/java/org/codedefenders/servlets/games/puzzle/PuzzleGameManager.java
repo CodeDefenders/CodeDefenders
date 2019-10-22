@@ -84,7 +84,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * Serves under {@code /puzzlegame}.
  *
- * @author <a href=https://github.com/werli>Phil Werli<a/>
+ * @author <a href=https://github.com/werli>Phil Werli</a>
  * @see PuzzleGameSelectionManager
  * @see PuzzleGame
  * @see org.codedefenders.util.Paths#PUZZLE_GAME
@@ -239,7 +239,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         final ArrayList<String> messages = new ArrayList<>();
         session.setAttribute("messages", messages);
-        
+
         // TODO Why we have testText and not escaped(testText)?
         // Validate the test
         // Do the validation even before creating the mutant
@@ -250,7 +250,7 @@ public class PuzzleGameManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        
+
         final Test newTest;
         try {
             newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_PUZZLE_DIR);

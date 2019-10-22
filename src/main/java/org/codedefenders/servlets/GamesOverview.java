@@ -44,7 +44,7 @@ import javax.servlet.http.HttpServletResponse;
  * <p>
  * Serves under {@code /games/overview}.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see PuzzleOverview
  * @see org.codedefenders.util.Paths#GAMES_OVERVIEW
  */

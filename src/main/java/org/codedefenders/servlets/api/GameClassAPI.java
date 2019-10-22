@@ -44,7 +44,7 @@ import javax.servlet.http.HttpServletResponse;
  * <p>
  * Serves on path: {@code /api/class}.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see org.codedefenders.util.Paths#API_CLASS
  */
 @WebServlet("/api/class")

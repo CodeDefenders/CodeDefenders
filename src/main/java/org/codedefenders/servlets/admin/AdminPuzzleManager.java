@@ -55,11 +55,11 @@ import javax.servlet.http.HttpSession;
  * <p>
  * Serves under {@code /admin/puzzles}.
  *
- * @author <a href=https://github.com/werli>Phil Werli<a/>
+ * @author <a href=https://github.com/werli>Phil Werli</a>
  */
 public class AdminPuzzleManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleManager.class);
-    
+
     @Inject
     private BackendExecutorService backend;
 

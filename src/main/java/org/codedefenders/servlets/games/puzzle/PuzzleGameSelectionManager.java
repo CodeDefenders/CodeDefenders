@@ -53,7 +53,7 @@ import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
  * <p>
  * Serves under {@code /puzzle/games}.
  *
- * @author <a href=https://github.com/werli>Phil Werli<a/>
+ * @author <a href=https://github.com/werli>Phil Werli</a>
  * @see PuzzleGameManager
  * @see PuzzleGame
  */

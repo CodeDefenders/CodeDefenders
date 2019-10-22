@@ -90,7 +90,7 @@ import javax.sql.DataSource;
  * installer can be called programmatically inside code defenders.
  *
  * @author gambi
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class Installer {
 

@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * This class handles the database logic for dependencies.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see Dependency
  */
 public class DependencyDAO {
