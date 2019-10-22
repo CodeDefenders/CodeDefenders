@@ -42,7 +42,7 @@ import java.util.zip.ZipOutputStream;
  * This class offers static utility classes for creating and
  * reading {@code .zip} files.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class ZipFileUtils {
     private static final Logger logger = LoggerFactory.getLogger(ZipFileUtils.class);

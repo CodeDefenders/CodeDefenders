@@ -35,7 +35,7 @@ import org.codedefenders.servlets.games.puzzle.PuzzleOverview;
  * Implements {@link Comparable} by comparing the identifiers of the
  * puzzles, retrieved from {@link #getPuzzleId()}.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see PuzzleChapterEntry
  */
 public class PuzzleEntry implements Comparable {

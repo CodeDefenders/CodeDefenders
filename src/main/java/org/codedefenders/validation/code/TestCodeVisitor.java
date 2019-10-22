@@ -58,7 +58,7 @@ import com.github.javaparser.printer.PrettyPrinterConfiguration;
  *
  * @author Jose Rojas
  * @author gambi
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 // Does this really need to short-circuit at the first error?
 class TestCodeVisitor extends VoidVisitorAdapter<Void> {
@@ -76,18 +76,18 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
     private int methodCount = 0;
     private int stmtCount = 0;
     private int assertionCount = 0;
-    
+
     // Per game configuration
     private int maxNumberOfAssertions;
     private boolean forceHamcrest;
 
     /**
-     * 
+     *
      * @param cu
      * @param maxNumberOfAssertions
      * @param forceHamcrest
      * @return A list of validation messages. If the list is empty, the validation passed
-     * 
+     *
      */
     static List<String> validFor(CompilationUnit cu,int maxNumberOfAssertions, boolean forceHamcrest) {
         TestCodeVisitor visitor = new TestCodeVisitor(maxNumberOfAssertions, forceHamcrest);
@@ -103,7 +103,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
 
     public List<String> buildValidationMessages(){
         List<String> formattedValidationMessages = new ArrayList<>();
-        
+
         if (classCount > MAX_NUMBER_OF_CLASSES) {
             formattedValidationMessages.add("Invalid test suite contains more than one class declaration.");
         }
@@ -116,7 +116,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
             isValid = false;
             messages.add("Test does not contain any valid statement.");
         }
-        
+
         if (!isValid) {
             formattedValidationMessages.add("The submitted test is not valid:\n" + String.join("\n", "\t-" + messages));
         }
@@ -128,7 +128,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         if (!isValid) {
             return;
         }
-        
+
         if (classCount++ > MAX_NUMBER_OF_CLASSES) {
             isValid = false;
             return;
@@ -141,7 +141,7 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
         if (!isValid) {
             return;
         }
-        
+
         if (methodCount++ > MAX_NUMBER_OF_METHODS) {
             isValid = false;
             return;
@@ -267,22 +267,22 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
             return;
         }
 
-        // JUnit Assertion 
+        // JUnit Assertion
         final boolean anyJunitAssertionMatch = Arrays.stream(new String[]{
                 "assertEquals", "assertTrue", "assertFalse", "assertNull",
                 "assertNotNull", "assertSame", "assertNotSame", "assertArrayEquals"})
                 .anyMatch(s -> stmt.getNameAsString().equals(s));
-        
+
         final boolean hamcrestAssertThatMatch = Arrays.stream(new String[]{"assertThat"})
                 .anyMatch(s -> stmt.getNameAsString().equals(s));
-        
+
         /*
          * Count assertions
          */
         if( anyJunitAssertionMatch || hamcrestAssertThatMatch){
             assertionCount++;
         }
-        
+
         /*
          * If forced Hamcrest is on, then there must not be JUnit assertions 
          * 
@@ -293,13 +293,13 @@ class TestCodeVisitor extends VoidVisitorAdapter<Void> {
                 isValid = false;
                 return;
         }
-        
+
         if (assertionCount > maxNumberOfAssertions) {
             messages.add("Test contains more than "+ maxNumberOfAssertions + " assertions");
             isValid = false;
             return;
         }
-        
+
         super.visit(stmt, args);
     }
 

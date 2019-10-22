@@ -30,7 +30,7 @@ import java.sql.Timestamp;
 /**
  * This class handles the database logic for target executions.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see TargetExecution
  */
 public class TargetExecutionDAO {

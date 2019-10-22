@@ -32,7 +32,7 @@ import static org.junit.Assert.fail;
  * Tests the {@link DatabaseValue} implementation for {@code null} values
  * and all possible types as well as impossible types.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class DatabaseValueTest {
 

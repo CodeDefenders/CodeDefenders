@@ -50,7 +50,7 @@ if (!visitor.isValid()) {
  }</code></pre>
  *
  * @author Jose Rojas
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 class MutationVisitor extends ModifierVisitor<Void> {
     private static final Logger logger = LoggerFactory.getLogger(MutationVisitor.class);

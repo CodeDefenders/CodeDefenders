@@ -51,7 +51,7 @@ import javax.servlet.http.HttpSession;
  * Serves on path: {@code /profile}.
  * @see org.codedefenders.util.Paths#USER_PROFILE
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class UserProfileManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(UserProfileManager.class);

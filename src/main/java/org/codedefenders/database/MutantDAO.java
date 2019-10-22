@@ -37,7 +37,7 @@ import java.util.stream.Stream;
 /**
  * This class handles the database logic for mutants.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see Mutant
  */
 public class MutantDAO {

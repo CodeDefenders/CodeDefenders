@@ -49,7 +49,7 @@ import static org.codedefenders.servlets.util.ServletUtils.ctx;
  * <p>
  * Serves under {@code /}.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see org.codedefenders.util.Paths#LANDING_PAGE
  */
 @WebServlet("")

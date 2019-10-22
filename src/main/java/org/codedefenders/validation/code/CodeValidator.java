@@ -78,7 +78,7 @@ import difflib.DiffUtils;
  * mutants and get a {@link ValidationMessage} back.
  *
  * @author Jose Rojas
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class CodeValidator {
     private static Logger logger = LoggerFactory.getLogger(CodeValidator.class);
@@ -86,7 +86,7 @@ public class CodeValidator {
     //Default configurations: number of max. allowed assertions for battleground games
     public static final int DEFAULT_NB_ASSERTIONS = 2;
     public static final boolean DEFAULT_FORCE_HAMCREST = false;
-    
+
 
     //TODO check if removing ";" makes people take advantage of using multiple statements
     public final static String[] PROHIBITED_BITWISE_OPERATORS = {"<<", ">>", ">>>", "|", "&"};
@@ -122,7 +122,7 @@ public class CodeValidator {
         } catch (Throwable e) {
             logger.error("Problem in validating test code \n" + testCode, e);
             return Arrays.asList( new String[]{"Invalid test. Something went wrong."});
-            
+
         }
     }
 

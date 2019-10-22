@@ -36,7 +36,7 @@ import static org.codedefenders.database.DB.RSMapper;
 /**
  * This class handles the database logic for multiplayer games.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see MultiplayerGame
  */
 public class MultiplayerGameDAO {

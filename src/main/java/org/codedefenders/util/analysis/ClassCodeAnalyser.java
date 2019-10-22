@@ -49,7 +49,7 @@ import com.github.javaparser.printer.PrettyPrinterConfiguration;
  * using the {@link #visitCode(String, String) visitCode} method.
  * Stores results in a {@link CodeAnalysisResult} instance and returns it.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see ResultVisitor
  * @see CodeAnalysisResult
  */

@@ -26,7 +26,7 @@ import java.sql.Timestamp;
  * This class serves as a container class for {@link User Users} and
  * additional information.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class UserInfo {
     private User user;

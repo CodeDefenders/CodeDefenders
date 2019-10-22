@@ -21,7 +21,7 @@ package org.codedefenders.model;
 /**
  * This class represents key maps users can choose from.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public enum KeyMap {
     DEFAULT("default"),

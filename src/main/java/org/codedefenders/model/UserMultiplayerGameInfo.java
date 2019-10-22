@@ -34,7 +34,7 @@ import java.util.Map;
  * game creator's name. {@link Type} also specifies whether the user is already active in this game
  * ({@link Type#ACTIVE}) or can join this game ({@link Type#OPEN}).
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class UserMultiplayerGameInfo {
     private Type type;
