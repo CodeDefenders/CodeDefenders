@@ -28,44 +28,8 @@ var theForm = document.getElementById('def');
 var lineChooseNote = "<span id='lineChooseNote' class='panel panel-default' style='padding: 5px; margin-left: 20px; color: #00289c'>" +
     "<i class='glyphicon glyphicon-arrow-down' style='margin: 5px 3px 20px 0'></i>" +
     "Indicate which line you are defending to enable test editor</span>";
+
 $(lineChooseNote).insertAfter('#cut-div h3');
-
-function toggleDefend() {
-	var input = document.getElementById('selected_lines');
-	var submitTestButton = document.getElementById('submitTest');
-	if( sLine == null ) {
-		// When no lines are selected hide code mirror and display the alternative text instead
-		// Disable the button
-		submitTestButton.disabled = true;
-		// Standard text
-		submitTestButton.innerText = "Defend !";
-
-        $('#def pre').addClass('readonly-pre');
-
-        // Update the value of the hidden field
-		input.setAttribute("value", "");
-	} else {
-		// Enable the button
-		submitTestButton.disabled = false;
-		// Update the text inside the Defend button to show the selected line as well
-		submitTestButton.innerText = "Defend Line " + sLine + " !";
-
-        $('#def pre').removeClass('readonly-pre');
-
-        // Update the value of the hidden field
-		input.setAttribute("value", sLine);
-	}
-}
-
-function selectLine(lineNumber){
-	if( sLine == lineNumber ){
-		sLine = null;
-	} else {
-		sLine = lineNumber;
-	}
-	// Update UI
-	toggleDefend();
-}
 
 var input = document.createElement("input");
 input.setAttribute("type", "hidden");
@@ -77,6 +41,21 @@ theForm.appendChild(input);
 
 <!-- Update Left Code Mirror to enable line selection on gutter -->
 var editor = document.querySelector('#sut').nextSibling.CodeMirror;
+
+toggleIntentionClass();
+// Trigger the logic that updates the UI at last
+toggleDefend();
+
+// If we there's lines to "pre-select" we do it now
+<%if (session.getAttribute("selected_lines") != null) {%>
+console.log("setting value for selected_lines "+<%=session.getAttribute("selected_lines")%> );
+input.setAttribute("value", "<%=session.getAttribute("selected_lines")%>");
+selectedLine = parseInt(<%=session.getAttribute("selected_lines")%>);
+selectLine(selectedLine); // +1
+toggleLineChooseNote();
+toggleIntentionClass();
+editor.setGutterMarker(selectedLine-1, "CodeMirror-linenumbers", makeMarker());
+<%}%>
 
 editor.on("gutterClick", function (cm, n) {
     if (isLineSelected()) {
@@ -105,24 +84,48 @@ editor.on("gutterClick", function (cm, n) {
 });
 
 function makeMarker() {
-  var marker = document.createElement("div");
-   marker.style.color = "#002cae";
-  marker.innerHTML = "<span class=\"glyphicon glyphicon-triangle-right marker\" aria-hidden=\"true\"> </span>";
-  return marker;
+    var marker = document.createElement("div");
+    marker.style.color = "#002cae";
+    marker.innerHTML = "<span class=\"glyphicon glyphicon-triangle-right marker\" aria-hidden=\"true\"> </span>";
+    return marker;
 }
 
-toggleIntentionClass();
-// Trigger the logic that updates the UI at last
-toggleDefend();
+function selectLine(lineNumber){
+    if( sLine == lineNumber ){
+        sLine = null;
+    } else {
+        sLine = lineNumber;
+    }
+    // Update UI
+    toggleDefend();
+}
 
-// If we there's lines to "pre-select" we do it now
-<%if (session.getAttribute("selected_lines") != null) {%>
-console.log("setting value for selected_lines "+<%=session.getAttribute("selected_lines")%> );
-input.setAttribute("value", "<%=session.getAttribute("selected_lines")%>");
-selectedLine = parseInt(<%=session.getAttribute("selected_lines")%>);
-selectLine(selectedLine); // +1
-editor.setGutterMarker(selectedLine-1, "CodeMirror-linenumbers", makeMarker());
-<%}%>
+function toggleDefend() {
+    var input = document.getElementById('selected_lines');
+    var submitTestButton = document.getElementById('submitTest');
+    if( sLine == null ) {
+        // When no lines are selected hide code mirror and display the alternative text instead
+        // Disable the button
+        submitTestButton.disabled = true;
+        // Standard text
+        submitTestButton.innerText = "Defend !";
+
+        $('#def pre').addClass('readonly-pre');
+
+        // Update the value of the hidden field
+        input.setAttribute("value", "");
+    } else {
+        // Enable the button
+        submitTestButton.disabled = false;
+        // Update the text inside the Defend button to show the selected line as well
+        submitTestButton.innerText = "Defend Line " + sLine + " !";
+
+        $('#def pre').removeClass('readonly-pre');
+
+        // Update the value of the hidden field
+        input.setAttribute("value", sLine);
+    }
+}
 
 function toggleIntentionClass() {
     $('#cut-div .CodeMirror-gutter-elt').each(function() {
