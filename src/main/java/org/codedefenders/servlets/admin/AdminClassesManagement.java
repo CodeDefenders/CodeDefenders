@@ -39,8 +39,10 @@ import javax.servlet.http.HttpSession;
 
 /**
  * This {@link HttpServlet} handles admin requests for managing {@link org.codedefenders.game.GameClass GameClasses}.
+ *
  * <p>
  * Serves on path: {@code /admin/classes}.
+ *
  * @see Paths#ADMIN_CLASSES
  */
 public class AdminClassesManagement extends HttpServlet {
@@ -60,8 +62,8 @@ public class AdminClassesManagement extends HttpServlet {
         session.setAttribute("messages", messages);
 
         final String formType = ServletUtils.formType(request);
-		switch (formType) {
-			case "classInactive": {
+        switch (formType) {
+            case "classInactive": {
                 final Optional<Integer> classId = ServletUtils.getIntParameter(request, "classId");
                 if (!classId.isPresent()) {
                     logger.warn("Setting class as inactive failed. Missing request parameter 'classId'.");
@@ -100,17 +102,17 @@ public class AdminClassesManagement extends HttpServlet {
                 }
                 break;
             }
-			default:
+            default:
                 logger.error("Action {" + formType + "} not recognised.");
                 break;
-		}
+        }
 
         response.sendRedirect(request.getContextPath() + Paths.ADMIN_CLASSES);
     }
 
     private boolean setClassInactive(int classId) {
         final GameClass gameClass = GameClassDAO.getClassForId(classId);
-        if (gameClass == null) {
+        if (gameClass == null || gameClass.isPuzzleClass()) {
             return false;
         }
         gameClass.setActive(false);
@@ -119,6 +121,9 @@ public class AdminClassesManagement extends HttpServlet {
 
     private boolean forceRemoveClass(int classId) {
         final GameClass gameClass = GameClassDAO.getClassForId(classId);
+        if (gameClass == null || gameClass.isPuzzleClass()) {
+            return false;
+        }
 
         final boolean removalSuccess = GameClassDAO.forceRemoveClassForId(classId);
         if (!removalSuccess) {

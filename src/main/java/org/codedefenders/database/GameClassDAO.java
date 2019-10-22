@@ -122,7 +122,7 @@ public class GameClassDAO {
     }
 
     /**
-     * Retrieves <b>all</b>game classes in a {@link List}. Even non-playable or
+     * Retrieves all (excluding puzzle) game classes in a {@link List}. Even non-playable or
      * inactive classes. These classes should never be shown to non-admin users, use
      * {@link #getAllPlayableClasses()} instead.
      * <p>
@@ -134,6 +134,7 @@ public class GameClassDAO {
         String query = String.join("\n",
                 "SELECT classes.*, (SELECT COUNT(games.ID) from games WHERE games.Class_ID = classes.Class_ID) as games_count",
                 "FROM classes",
+                "WHERE Puzzle != 1",
                 "GROUP BY classes.Class_ID;"
         );
 
