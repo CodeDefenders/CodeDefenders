@@ -60,11 +60,13 @@ public class Paths {
     public static final String ADMIN_PAGE = "/admin";
     public static final String ADMIN_GAMES = "/admin/games";
     public static final String ADMIN_MONITOR = "/admin/monitor";
-    public static final String ADMIN_PUZZLES = "/admin/puzzles";
     public static final String ADMIN_CLASSES = "/admin/classes";
     public static final String ADMIN_USERS = "/admin/users";
     public static final String ADMIN_SETTINGS = "/admin/settings";
     public static final String ADMIN_KILLMAPS = "/admin/killmaps";
+
+    public static final String ADMIN_PUZZLE_MANAGEMENT = "/admin/puzzles/management";
+    public static final String ADMIN_PUZZLE_UPLOAD = "/admin/puzzles/upload";
 
     public static final String ADMIN_ANALYTICS_USERS = "/admin/analytics/users";
     public static final String ADMIN_ANALYTICS_CLASSES = "/admin/analytics/classes";
