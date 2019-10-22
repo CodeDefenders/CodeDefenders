@@ -61,7 +61,13 @@
 
             this.handlers = new Map();
             this.queue = [];
-            this.websocket = new WebSocket(url);
+            this.url = url;
+
+            this._initWebSocket();
+        }
+
+        _initWebSocket () {
+            this.websocket = new WebSocket(this.url);
 
             this.websocket.onopen  = evt => {
                 console.log('WebSocket connection established.');
@@ -89,6 +95,14 @@
                 this.dispatch(type, data);
                 // console.log({type, data});
             };
+        }
+
+        /**
+         * Closes the WebSocket, if not already closed, and reconnects it.
+         */
+        reconnect () {
+            this.websocket.close(1000, 'Reconnecting');
+            this._initWebSocket();
         }
 
         /**
@@ -163,7 +177,7 @@
         /**
          * Sends a event to the server. If the connection is not established, the message will be sent when it is.
          * @param {string} type The type of the event.
-         *                      Use the EventNames class to get the type for server events.
+         *                      Use the EventNames class to get the type for client events.
          * @param {object} data The data of the event.
          */
         send (type, data) {
@@ -180,7 +194,7 @@
         /**
          * Dispatches an event to the registered handlers for the type.
          * @param {string} type The type of the event.
-         *                      Use the EventNames class to get the type for server events.
+         *                      Use the EventNames class to get the type for client events.
          * @param {object} data The data of the event.
          */
         dispatch (type, data) {

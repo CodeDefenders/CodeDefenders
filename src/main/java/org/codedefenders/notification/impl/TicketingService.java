@@ -3,10 +3,9 @@ package org.codedefenders.notification.impl;
 import static java.time.temporal.ChronoUnit.HOURS;
 
 import java.time.Instant;
-import java.util.Iterator;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
@@ -28,7 +27,7 @@ public class TicketingService implements ITicketingService {
     /**
      * Stores tickets in the order they are generated.
      */
-    private ConcurrentLinkedDeque<Ticket> ticketsDeque = new ConcurrentLinkedDeque<>();
+    private ConcurrentLinkedQueue<Ticket> ticketsQueue = new ConcurrentLinkedQueue<>();
 
     @Override
     public synchronized String generateTicketForOwner(int owner) {
@@ -36,7 +35,7 @@ public class TicketingService implements ITicketingService {
 
         Ticket ticket = new Ticket(ticketStr, owner);
         tickets.put(ticketStr, ticket);
-        ticketsDeque.addLast(ticket);
+        ticketsQueue.offer(ticket);
 
         timeoutTickets();
 
@@ -63,13 +62,13 @@ public class TicketingService implements ITicketingService {
      */
     private void timeoutTickets() {
         Instant now = Instant.now();
-        for (Iterator<Ticket> it = ticketsDeque.iterator(); it.hasNext(); ) {
-            Ticket ticket = it.next();
+        while (!ticketsQueue.isEmpty()) {
+            Ticket ticket = ticketsQueue.peek();
             if (HOURS.between(ticket.timestamp, now) >= 1) {
                 if (ticket.valid) {
                     invalidateTicket(ticket.ticket);
                 }
-                it.remove();
+                ticketsQueue.poll();
             } else {
                 break;
             }

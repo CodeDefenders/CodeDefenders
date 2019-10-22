@@ -105,7 +105,7 @@ public class PushSocket {
     }
 
     @OnOpen
-    public void open(Session session, @PathParam("ticket") String ticket, @PathParam("userId") Integer userId)
+    public synchronized void open(Session session, @PathParam("ticket") String ticket, @PathParam("userId") Integer userId)
             throws IOException {
 
         if (! ticketingServices.validateTicket(ticket, userId)) {
@@ -132,17 +132,19 @@ public class PushSocket {
     }
 
     @OnClose
-    public void close(Session session) {
+    public synchronized void close(Session session) {
         /* Close is called before open when the connection is denied. */
         if (open) {
             logger.info("Closing session for user: " + user.getId() + " (ticket: " + ticket + ")");
-            ticketingServices.invalidateTicket(this.ticket);
+            /* Don't invalidate tickets on close, because the connection is opened multiple times
+               for progress-bars on Firefox. */
+            // ticketingServices.invalidateTicket(this.ticket);
             serverEventHandlerContainer.unregisterAll();
         }
     }
 
     @OnMessage
-    public void onMessage(ClientEvent event, Session session) {
+    public synchronized void onMessage(ClientEvent event, Session session) {
         event.accept(clientEventHandler);
     }
 
