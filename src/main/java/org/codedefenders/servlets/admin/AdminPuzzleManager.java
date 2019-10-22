@@ -42,6 +42,7 @@ import java.util.zip.ZipFile;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,6 +58,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author <a href=https://github.com/werli>Phil Werli</a>
  */
+@WebServlet("/admin/puzzles")
 public class AdminPuzzleManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminPuzzleManager.class);
 

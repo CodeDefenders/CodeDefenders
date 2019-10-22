@@ -65,6 +65,7 @@ import java.util.zip.ZipFile;
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -83,6 +84,7 @@ import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
  * Serves on path: {@code /class-upload}.
  * @see org.codedefenders.util.Paths#CLASS_UPLOAD
  */
+@WebServlet("/class-upload")
 public class ClassUploadManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(ClassUploadManager.class);
 

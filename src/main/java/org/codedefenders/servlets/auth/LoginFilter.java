@@ -34,6 +34,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -43,6 +44,7 @@ import javax.servlet.http.HttpSession;
  * If the user accesses such a page and is not logged in, they are redirected to the login page.
  * If the user accesses such a page and is logged in, HTTP header fields are set to disable caching.
  */
+@WebFilter(filterName = "LoginFilter")
 public class LoginFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(LoginFilter.class);
 

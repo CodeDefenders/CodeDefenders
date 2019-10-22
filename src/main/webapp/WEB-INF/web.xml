@@ -98,10 +98,16 @@
         <param-value>***REMOVED***</param-value>
     </context-param>
 
-    <!--System listener-->
-    <listener>
-        <listener-class>org.codedefenders.SystemStartStop</listener-class>
-    </listener>
+    <!-- Filters - the order is important -->
+    <filter-mapping>
+        <filter-name>LoginFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>TicketingFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!-- Filters end -->
 
     <!-- Servlets-->
     <!-- Public sites -->
@@ -141,65 +147,7 @@
         <jsp-file>/jsp/study.jsp</jsp-file>
     </servlet>
 
-    <!-- Login Authentication start -->
-    <filter>
-        <filter-name>LoginFilter</filter-name>
-        <filter-class>org.codedefenders.servlets.auth.LoginFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>LoginFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-    <!-- Ticketing. Must come after Login  -->
-    <filter>
-        <filter-name>TicketingFilter</filter-name>
-        <filter-class>org.codedefenders.notification.web.TicketingFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>TicketingFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
-
-    <servlet-mapping>
-        <servlet-name>LoginManager</servlet-name>
-        <url-pattern>/login</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>LoginManager</servlet-name>
-        <servlet-class>org.codedefenders.servlets.auth.LoginManager</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>LogoutManager</servlet-name>
-        <url-pattern>/logout</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>LogoutManager</servlet-name>
-        <servlet-class>org.codedefenders.servlets.auth.LogoutManager</servlet-class>
-    </servlet>
-    <!-- Login Authentication end -->
-
-    <!-- User management start-->
-    <servlet-mapping>
-        <servlet-name>UserProfile</servlet-name>
-        <url-pattern>/profile</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>UserProfile</servlet-name>
-        <servlet-class>org.codedefenders.servlets.UserProfileManager</servlet-class>
-    </servlet>
-    <!-- User management end-->
-
     <!-- Misc start-->
-    <servlet-mapping>
-        <servlet-name>GameOverview</servlet-name>
-        <url-pattern>/games/overview</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>GameOverview</servlet-name>
-        <servlet-class>org.codedefenders.servlets.GamesOverview</servlet-class>
-    </servlet>
-
     <servlet-mapping>
         <servlet-name>GameHistory</servlet-name>
         <url-pattern>/games/history</url-pattern>
@@ -207,15 +155,6 @@
     <servlet>
         <servlet-name>GameHistory</servlet-name>
         <jsp-file>/jsp/history_view.jsp</jsp-file>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>ClassUpload</servlet-name>
-        <url-pattern>/class-upload</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>ClassUpload</servlet-name>
-        <servlet-class>org.codedefenders.servlets.ClassUploadManager</servlet-class>
     </servlet>
 
     <servlet-mapping>
@@ -229,23 +168,6 @@
     <!-- Misc end-->
 
     <!-- Battleground mode servlets start -->
-    <servlet-mapping>
-        <servlet-name>BattlegroundSelection</servlet-name>
-        <url-pattern>/multiplayer/games</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>BattlegroundSelection</servlet-name>
-        <servlet-class>org.codedefenders.servlets.games.battleground.MultiplayerGameSelectionManager</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>BattlegroundManager</servlet-name>
-        <url-pattern>/multiplayergame</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>BattlegroundManager</servlet-name>
-        <servlet-class>org.codedefenders.servlets.games.battleground.MultiplayerGameManager</servlet-class>
-    </servlet>
 
     <servlet-mapping>
         <servlet-name>BattlegroundHistoryPage</servlet-name>
@@ -265,210 +187,6 @@
         <jsp-file>/jsp/battleground/create_game_view.jsp</jsp-file>
     </servlet>
     <!-- Battleground mode servlets end -->
-
-    <!-- Puzzle mode start-->
-    <servlet-mapping>
-        <servlet-name>PuzzleOverview</servlet-name>
-        <url-pattern>/puzzles</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>PuzzleOverview</servlet-name>
-        <servlet-class>org.codedefenders.servlets.games.puzzle.PuzzleOverview</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>PuzzleGame</servlet-name>
-        <url-pattern>/puzzlegame</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>PuzzleGame</servlet-name>
-        <servlet-class>org.codedefenders.servlets.games.puzzle.PuzzleGameManager</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>PuzzleGameSelection</servlet-name>
-        <url-pattern>/puzzle/games</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>PuzzleGameSelection</servlet-name>
-        <servlet-class>org.codedefenders.servlets.games.puzzle.PuzzleGameSelectionManager</servlet-class>
-    </servlet>
-    <!-- Puzzle mode end-->
-
-    <!-- APIs start -->
-    <servlet>
-        <servlet-name>NotificationAPI</servlet-name>
-        <servlet-class>org.codedefenders.servlets.events.NotificationsHandler</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>NotificationAPI</servlet-name>
-        <url-pattern>/api/notifications</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>MessageAPI</servlet-name>
-        <servlet-class>org.codedefenders.servlets.events.MessageManager</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>MessageAPI</servlet-name>
-        <url-pattern>/api/messages</url-pattern>
-    </servlet-mapping>
-
-    <servlet>
-        <servlet-name>MutantAPI</servlet-name>
-        <servlet-class>org.codedefenders.servlets.games.MutantManager</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>MutantAPI</servlet-name>
-        <url-pattern>/api/game_mutants</url-pattern>
-    </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>SendEmailAPI</servlet-name>
-        <url-pattern>/api/sendmail</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>SendEmailAPI</servlet-name>
-        <servlet-class>org.codedefenders.servlets.SendEmail</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>FeedbackAPI</servlet-name>
-        <url-pattern>/api/feedback</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>FeedbackAPI</servlet-name>
-        <servlet-class>org.codedefenders.servlets.FeedbackManager</servlet-class>
-    </servlet>
-    <!-- APIs end -->
-
-    <!-- Admin pages start -->
-    <servlet-mapping>
-        <servlet-name>AdminCreateGames</servlet-name>
-        <url-pattern>/admin</url-pattern>
-        <url-pattern>/admin/games</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminCreateGames</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.AdminCreateGames</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AdminMonitorGames</servlet-name>
-        <url-pattern>/admin/monitor</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminMonitorGames</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.AdminMonitorGames</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AdminUserManagement</servlet-name>
-        <url-pattern>/admin/users</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminUserManagement</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.AdminUserManagement</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AdminClassesManagement</servlet-name>
-        <url-pattern>/admin/classes</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminClassesManagement</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.AdminClassesManagement</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AdminPuzzles</servlet-name>
-        <url-pattern>/admin/puzzles</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminPuzzles</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.AdminPuzzleManager</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AdminSettings</servlet-name>
-        <url-pattern>/admin/settings</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminSettings</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.AdminSystemSettings</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AdminKillmapManagement</servlet-name>
-        <url-pattern>/admin/killmaps/*</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminKillmapManagement</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.AdminKillmapManagement</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AdminAnalyticsUsers</servlet-name>
-        <url-pattern>/admin/analytics/users</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminAnalyticsUsers</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.AdminAnalyticsUsers</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AdminAnalyticsClasses</servlet-name>
-        <url-pattern>/admin/analytics/classes</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminAnalyticsClasses</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.AdminAnalyticsClasses</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AdminAnalyticsKillMaps</servlet-name>
-        <url-pattern>/admin/analytics/killmaps</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminAnalyticsKillMaps</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.AdminAnalyticsKillMaps</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AdminAnalyticsUsersApi</servlet-name>
-        <url-pattern>/admin/api/users</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminAnalyticsUsersApi</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.api.AdminAnalyticsUsersApi</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AdminAnalyticsClassesApi</servlet-name>
-        <url-pattern>/admin/api/classes</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminAnalyticsClassesApi</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.api.AdminAnalyticsClassesApi</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AdminAnalyticsKillmapsApi</servlet-name>
-        <url-pattern>/admin/api/killmap</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminAnalyticsKillmapsApi</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.api.AdminAnalyticsKillMapsApi</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>AdminKillmapManagementApi</servlet-name>
-        <url-pattern>/admin/api/killmapmanagement</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>AdminKillmapManagementApi</servlet-name>
-        <servlet-class>org.codedefenders.servlets.admin.api.AdminKillmapManagementApi</servlet-class>
-    </servlet>
-    <!-- Admin pages end -->
 
     <error-page>
         <location>/jsp/error_page_404.jsp</location>
