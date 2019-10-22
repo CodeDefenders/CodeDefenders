@@ -56,15 +56,21 @@
             progress.style['height'] = '40px';
             progress.style['font-size'] = '30px';
             progress.style['margin'] = '5px';
+
             progress.innerHTML = `<div class="progress-bar" role="progressbar"
                 style="font-size: 15px; line-height: 40px;"
                 aria-valuemin="0" aria-valuemax="100"></div>`;
             progressBar = progress.children[0];
 
-            updateTestProgressBar('16', 'Submitting Test');
+            /* Disable animation because the animation can't finish after the POST is finished. */
+            progressBar.style['-webkit-transition'] = 'none';
+            progressBar.style['-o-transition'] = 'none';
+            progressBar.style['transition'] = 'none';
 
             const form = document.getElementById('logout');
             form.parentNode.insertBefore(progress, form.nextSibling);
+
+            updateTestProgressBar('16', 'Submitting Test');
         };
 
         <%--
@@ -81,16 +87,24 @@
             if (data.success) {
                 updateTestProgressBar('50', 'Compiling Test');
             } else {
-                // TODO
+                updateTestProgressBar('100', 'Test Is Not Valid');
             }
         };
 
         const onTestCompiled = function (data) {
-            updateTestProgressBar('66', 'Running Test Against Original');
+            if (data.success) {
+                updateTestProgressBar('66', 'Running Test Against Original');
+            } else {
+                updateTestProgressBar('100', 'Test Did Not Compile');
+            }
         };
 
         const onTestTestedOriginal = function (data) {
-            updateTestProgressBar('83', 'Running Test Against Mutants');
+            if (data.success) {
+                updateTestProgressBar('83', 'Running Test Against Mutants');
+            } else {
+                updateTestProgressBar('100', 'Test Failed Against Original');
+            }
         };
 
         const onTestTestedMutants = function (data) {
@@ -112,7 +126,7 @@
         <%--
         const unregisterTestProgressBar = function () {
             pushSocket.unsubscribe('<%=EventNames.toClientEventName(TestProgressBarRegistrationEvent.class)%>', {
-                playerId: ${requestScope.playerId}
+                gameId: ${requestScope.gameId}
             });
 
             pushSocket.unregister('<%=EventNames.toServerEventName(TestSubmittedEvent.class)%>',      onTestSubmitted);
@@ -126,6 +140,14 @@
         window.testProgressBar = function () {
             insertTestProgressBar();
             registerTestProgressBar();
+
+            /* Reconnect on close, because on Firefox the WebSocket connection gets closed on POST. */
+            const reconnect = () => {
+                pushSocket.reconnect();
+                registerTestProgressBar();
+                pushSocket.unregister(PushSocket.WSEventType.CLOSE, reconnect);
+            };
+            pushSocket.register(PushSocket.WSEventType.CLOSE, reconnect);
         };
     })();
 </script>
