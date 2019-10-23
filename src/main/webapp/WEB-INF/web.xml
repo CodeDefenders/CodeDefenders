@@ -149,15 +149,6 @@
 
     <!-- Misc start-->
     <servlet-mapping>
-        <servlet-name>GameHistory</servlet-name>
-        <url-pattern>/games/history</url-pattern>
-    </servlet-mapping>
-    <servlet>
-        <servlet-name>GameHistory</servlet-name>
-        <jsp-file>/jsp/history_view.jsp</jsp-file>
-    </servlet>
-
-    <servlet-mapping>
         <servlet-name>Leaderboard</servlet-name>
         <url-pattern>/leaderboard</url-pattern>
     </servlet-mapping>
