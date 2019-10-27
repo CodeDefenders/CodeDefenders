@@ -34,81 +34,40 @@
         The id of the game.
 --%>
 
-<%-- TODO: put the progressbar into the html and just reference it here? --%>
-
 <script>
     /* Wrap in a function so it has it's own scope. */
     (function () {
 
-        let progress;
-        let progressBar;
-
-        function updateTestProgressBar (progress, text) {
-            progressBar.setAttribute('aria-valuenow', progress);
-            progressBar.style.width = progress + '%';
-            progressBar.textContent = text;
-        }
-
-        const insertTestProgressBar = function () {
-            progress = document.createElement('div');
-            progress.classList.add('progress');
-            progress.id = 'progress-bar';
-            progress.style['height'] = '40px';
-            progress.style['font-size'] = '30px';
-            progress.style['margin'] = '5px';
-
-            progress.innerHTML = `<div class="progress-bar" role="progressbar"
-                style="font-size: 15px; line-height: 40px;"
-                aria-valuemin="0" aria-valuemax="100"></div>`;
-            progressBar = progress.children[0];
-
-            /* Disable animation because the animation can't finish after the POST is finished. */
-            progressBar.style['-webkit-transition'] = 'none';
-            progressBar.style['-o-transition'] = 'none';
-            progressBar.style['transition'] = 'none';
-
-            const form = document.getElementById('logout');
-            form.parentNode.insertBefore(progress, form.nextSibling);
-
-            updateTestProgressBar('16', 'Submitting Test');
-        };
-
-        <%--
-        function removeTestProgressBar () {
-            progress.parentNode.removeChild(progress);
-        }
-        --%>
-
         const onTestSubmitted = function (data) {
-            updateTestProgressBar('33', 'Validating Test');
+            setProgress(33, 'Validating Test');
         };
 
         const onTestValidated = function (data) {
             if (data.success) {
-                updateTestProgressBar('50', 'Compiling Test');
+                setProgress(50, 'Compiling Test');
             } else {
-                updateTestProgressBar('100', 'Test Is Not Valid');
+                setProgress(100, 'Test Is Not Valid');
             }
         };
 
         const onTestCompiled = function (data) {
             if (data.success) {
-                updateTestProgressBar('66', 'Running Test Against Original');
+                setProgress(66, 'Running Test Against Original');
             } else {
-                updateTestProgressBar('100', 'Test Did Not Compile');
+                setProgress(100, 'Test Did Not Compile');
             }
         };
 
         const onTestTestedOriginal = function (data) {
             if (data.success) {
-                updateTestProgressBar('83', 'Running Test Against Mutants');
+                setProgress(83, 'Running Test Against Mutants');
             } else {
-                updateTestProgressBar('100', 'Test Failed Against Original');
+                setProgress(100, 'Test Failed Against Original');
             }
         };
 
         const onTestTestedMutants = function (data) {
-            updateTestProgressBar('100', 'Done');
+            setProgress(100, 'Done');
         };
 
         const registerTestProgressBar = function () {
@@ -138,7 +97,7 @@
         --%>
 
         window.testProgressBar = function () {
-            insertTestProgressBar();
+            setProgress('16', 'Submitting Test');
             registerTestProgressBar();
 
             /* Reconnect on close, because on Firefox the WebSocket connection gets closed on POST. */
@@ -149,6 +108,7 @@
             };
             pushSocket.register(PushSocket.WSEventType.CLOSE, reconnect);
         };
+
     })();
 </script>
 

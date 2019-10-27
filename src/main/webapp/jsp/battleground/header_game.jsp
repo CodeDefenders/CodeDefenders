@@ -29,6 +29,8 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="static org.codedefenders.game.GameState.ACTIVE" %>
 
+<jsp:include page="/jsp/game_components/progress_bar_common.jsp"/>
+
 <div class="game-container">
     <nav class="nest" style="width: 100%; margin-left: 0; margin-right: auto;">
         <div class="crow fly">
