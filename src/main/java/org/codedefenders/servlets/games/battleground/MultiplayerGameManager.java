@@ -33,7 +33,6 @@ import static org.codedefenders.util.Constants.TEST_DID_NOT_COMPILE_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
-import static org.codedefenders.util.Constants.TEST_INVALID_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 
@@ -49,7 +48,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
@@ -81,7 +79,11 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
 import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
+import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
 import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
 import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
 import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
 import org.codedefenders.notification.events.server.test.TestValidatedEvent;
@@ -298,16 +300,16 @@ public class MultiplayerGameManager extends HttpServlet {
         // TODO Here we need to account for #495
         List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
 
-        boolean success = validationMessage.isEmpty();
+        boolean validationSuccess = validationMessage.isEmpty();
 
         TestValidatedEvent tve = new TestValidatedEvent();
         tve.setGameId(gameId);
         tve.setUserId(userId);
-        tve.setSuccess(success);
-        tve.setValidationMessage(success ? null : String.join("", validationMessage));
+        tve.setSuccess(validationSuccess);
+        tve.setValidationMessage(validationSuccess ? null : String.join("", validationMessage));
         notificationService.post(tve);
 
-        if (!success) {
+        if (!validationSuccess) {
             messages.addAll(validationMessage);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -520,18 +522,41 @@ public class MultiplayerGameManager extends HttpServlet {
             return;
         }
 
+        MutantSubmittedEvent mse = new MutantSubmittedEvent();
+        mse.setGameId(gameId);
+        mse.setUserId(userId);
+        notificationService.post(mse);
+
         // Do the validation even before creating the mutant
         CodeValidatorLevel codeValidatorLevel = game.getMutantValidatorLevel();
         ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, codeValidatorLevel);
+        boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
 
-        if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
+        MutantValidatedEvent mve = new MutantValidatedEvent();
+        mve.setGameId(gameId);
+        mve.setUserId(userId);
+        mve.setSuccess(validationSuccess);
+        mve.setValidationMessage(validationSuccess ? null : validationMessage.get());
+        notificationService.post(mve);
+
+        if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
             messages.add(validationMessage.get());
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
+
         Mutant existingMutant = gameManagingUtils.existingMutant(gameId, mutantText);
-        if (existingMutant != null) {
+        boolean duplicateCheckSuccess = existingMutant == null;
+
+        MutantDuplicateCheckedEvent mdce = new MutantDuplicateCheckedEvent();
+        mdce.setGameId(gameId);
+        mdce.setUserId(userId);
+        mdce.setSuccess(duplicateCheckSuccess);
+        mdce.setDuplicateId(duplicateCheckSuccess ? null : existingMutant.getId());
+        notificationService.post(mdce);
+
+        if (!duplicateCheckSuccess) {
             messages.add(MUTANT_DUPLICATED_MESSAGE);
             TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
             if (existingMutantTarget != null && existingMutantTarget.status != TargetExecution.Status.SUCCESS
@@ -542,28 +567,44 @@ public class MultiplayerGameManager extends HttpServlet {
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
+
         Mutant newMutant = gameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, userId, MODE_BATTLEGROUND_DIR);
         if (newMutant == null) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
-            logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}", gameId, game.getClassId(), userId, mutantText);
+            logger.debug("Error creating mutant. Game: {}, Class: {}, User: {}, Mutant: {}", gameId, game.getClassId(), userId, mutantText);
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
         }
-        TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
-        if (compileMutantTarget == null || compileMutantTarget.status != TargetExecution.Status.SUCCESS) {
+
+        TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant,
+                TargetExecution.Target.COMPILE_MUTANT);
+        boolean compileSuccess = compileMutantTarget != null
+                && compileMutantTarget.status == TargetExecution.Status.SUCCESS;
+        String errorMessage = (compileMutantTarget != null
+                && compileMutantTarget.message != null
+                && !compileMutantTarget.message.isEmpty())
+                ? compileMutantTarget.message : null;
+
+        MutantCompiledEvent mce = new MutantCompiledEvent();
+        mce.setGameId(gameId);
+        mce.setUserId(userId);
+        mce.setSuccess(compileSuccess);
+        mce.setErrorMessage(errorMessage);
+
+        if (!compileSuccess) {
             messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
             // There's a ton of defensive programming here...
-            if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty()) {
+            if (errorMessage != null) {
                 // We escape the content of the message for new tests since user can embed there anything
-                String escapedHtml = StringEscapeUtils.escapeHtml(compileMutantTarget.message);
+                String escapedHtml = StringEscapeUtils.escapeHtml(errorMessage);
                 // Extract the line numbers of the errors
-                List<Integer> errorLines = extractErrorLines(compileMutantTarget.message);
+                List<Integer> errorLines = extractErrorLines(errorMessage);
                 // Store them in the session so they can be picked up later
                 session.setAttribute(SESSION_ATTRIBUTE_ERROR_LINES, errorLines);
                 // We introduce our decoration
-                String decorate = decorateWithLinksToCode( escapedHtml );
-                messages.add( decorate );
+                String decorate = decorateWithLinksToCode(escapedHtml);
+                messages.add(decorate);
 
             }
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, StringEscapeUtils.escapeHtml(mutantText));
@@ -578,6 +619,11 @@ public class MultiplayerGameManager extends HttpServlet {
         notif.insert();
         mutationTester.runAllTestsOnMutant(game, newMutant, messages);
         game.update();
+
+        MutantTestedEvent mte = new MutantTestedEvent();
+        mte.setGameId(gameId);
+        mte.setUserId(userId);
+        notificationService.post(mte);
 
         if (game.isCapturePlayersIntention()) {
             AttackerIntention intention = AttackerIntention.fromString(request.getParameter("attacker_intention"));

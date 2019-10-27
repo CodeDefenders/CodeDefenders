@@ -25,6 +25,7 @@
 <%@ page import="org.codedefenders.notification.events.server.mutant.MutantValidatedEvent" %>
 <%@ page import="org.codedefenders.notification.events.server.mutant.MutantCompiledEvent" %>
 <%@ page import="org.codedefenders.notification.events.server.mutant.MutantTestedEvent" %>
+<%@ page import="org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent" %>
 
 <%--
     Adds a JavaScript function mutantProgressBar() that inserts and updates a progressbar showing the status of the last
@@ -34,71 +35,43 @@
         The id of the game.
 --%>
 
-<%-- TODO: put the progressbar into the html and just reference it here? --%>
-
 <script>
     /* Wrap in a function so it has it's own scope. */
     (function () {
 
-        let progress;
-        let progressBar;
-
-        function updateMutantProgressBar (progress, text) {
-            progressBar.setAttribute('aria-valuenow', progress);
-            progressBar.style.width = progress + '%';
-            progressBar.textContent = text;
-        }
-
-        const insertMutantProgressBar = function () {
-            progress = document.createElement('div');
-            progress.classList.add('progress');
-            progress.id = 'progress-bar';
-            progress.style['height'] = '40px';
-            progress.style['font-size'] = '30px';
-            progress.style['margin'] = '5px';
-            progress.innerHTML = `<div class="progress-bar" role="progressbar"
-                style="font-size: 15px; line-height: 40px;"
-                aria-valuemin="0" aria-valuemax="100"></div>`;
-            progressBar = progress.children[0];
-
-            updateMutantProgressBar('16', 'Submitting Test');
-
-            const form = document.getElementById('logout');
-            form.parentNode.insertBefore(progress, form.nextSibling);
-        };
-
-        <%--
-        function removeMutantProgressBar () {
-            progress.parentNode.removeChild(progress);
-        }
-        --%>
-
         const onMutantSubmitted = function (data) {
-            updateMutantProgressBar('40', 'Validating Mutant');
+            setProgress(33, 'Validating Mutant');
         };
 
         const onMutantValidated = function (data) {
             if (data.success) {
-                updateMutantProgressBar('60', 'Compiling Mutant');
+                setProgress(50, 'Checking For Duplicate Mutants');
             } else {
-                // TODO
+                setProgress(100, 'Mutant Is Not Valid');
+            }
+        };
+
+        const onDuplicateChecked = function (data) {
+            if (data.success) {
+                setProgress(66, 'Compiling Mutant');
+            } else {
+                setProgress(100, 'Found Duplicate Mutant');
             }
         };
 
         const onMutantCompiled = function (data) {
             if (data.success) {
-                updateMutantProgressBar('80', 'Running Tests Against Mutant');
+                setProgress(83, 'Running Tests Against Mutant');
             } else {
-                // TODO
+                setProgress(100, 'Mutant Did Not Compile');
             }
         };
 
         const onMutantTested = function (data) {
             if (data.survived) {
-                updateMutantProgressBar('100', 'Mutant Survived!');
+                setProgress(100, 'Mutant Survived');
             } else {
-                // TODO
-                updateMutantProgressBar('100', 'Mutant Killed!');
+                setProgress(100, 'Mutant Killed');
             }
         };
 
@@ -108,9 +81,10 @@
             });
 
             pushSocket.register('<%=EventNames.toServerEventName(MutantSubmittedEvent.class)%>', onMutantSubmitted);
-            pushSocket.register('<%=EventNames.toServerEventName(MutantCompiledEvent.class)%>',  onMutantCompiled);
             pushSocket.register('<%=EventNames.toServerEventName(MutantValidatedEvent.class)%>', onMutantValidated);
-            pushSocket.register('<%=EventNames.toServerEventName(MutantTestedEvent.class)%>',    onMutantTested);
+            pushSocket.register('<%=EventNames.toServerEventName(MutantDuplicateCheckedEvent.class)%>', onDuplicateChecked);
+            pushSocket.register('<%=EventNames.toServerEventName(MutantCompiledEvent.class)%>', onMutantCompiled);
+            pushSocket.register('<%=EventNames.toServerEventName(MutantTestedEvent.class)%>', onMutantTested);
         };
 
         <%--
@@ -120,16 +94,26 @@
             });
 
             pushSocket.unregister('<%=EventNames.toServerEventName(MutantSubmittedEvent.class)%>', onMutantSubmitted);
-            pushSocket.unregister('<%=EventNames.toServerEventName(MutantCompiledEvent.class)%>',  onMutantCompiled);
+            pushSocket.unregister('<%=EventNames.toServerEventName(MutantCompiledEvent.class)%>', onMutantCompiled);
+            pushSocket.register('<%=EventNames.toServerEventName(MutantDuplicateCheckedEvent.class)%>', onDuplicateChecked);
             pushSocket.unregister('<%=EventNames.toServerEventName(MutantValidatedEvent.class)%>', onMutantValidated);
-            pushSocket.unregister('<%=EventNames.toServerEventName(MutantTestedEvent.class)%>',    onMutantTested);
+            pushSocket.unregister('<%=EventNames.toServerEventName(MutantTestedEvent.class)%>', onMutantTested);
         };
         --%>
 
         window.mutantProgressBar = function () {
-            insertMutantProgressBar();
+            setProgress(16, 'Submitting Mutant');
             registerMutantProgressBar();
+
+            /* Reconnect on close, because on Firefox the WebSocket connection gets closed on POST. */
+            const reconnect = () => {
+                pushSocket.reconnect();
+                registerMutantProgressBar();
+                pushSocket.unregister(PushSocket.WSEventType.CLOSE, reconnect);
+            };
+            pushSocket.register(PushSocket.WSEventType.CLOSE, reconnect);
         }
+
     })();
 </script>
 
