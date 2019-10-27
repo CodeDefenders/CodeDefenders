@@ -68,11 +68,14 @@
         };
 
         const onMutantTested = function (data) {
+            setProgress(100, 'Done');
+            <%--
             if (data.survived) {
                 setProgress(100, 'Mutant Survived');
             } else {
                 setProgress(100, 'Mutant Killed');
             }
+            --%>
         };
 
         const registerMutantProgressBar = function () {

@@ -4,32 +4,23 @@ import com.google.gson.annotations.Expose;
 
 public class MutantTestedEvent extends MutantLifecycleEvent {
     /* TODO: enable once the MutationTester (and similar) methods return a result instead of void.
-    @Expose private boolean survived;
     @Expose private int numTests;
-    @Expose private int numKilled;
-
-    public boolean isSurvived() {
-        return survived;
-    }
+    @Expose private int numTested;
 
     public int getNumTests() {
         return numTests;
     }
 
-    public int getNumKilled() {
-        return numKilled;
-    }
-
-    public void setSurvived(boolean survived) {
-        this.survived = survived;
+    public int getNumTested() {
+        return numTested;
     }
 
     public void setNumTests(int numTests) {
         this.numTests = numTests;
     }
 
-    public void setNumKilled(int numKilled) {
-        this.numKilled = numKilled;
+    public void setNumTested(int numTested) {
+        this.numTested = numTested;
     }
     */
 }

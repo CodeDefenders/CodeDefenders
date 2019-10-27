@@ -85,6 +85,7 @@
                 });
             </script>
 
+            <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
             <h3>Not equivalent? Write a killing test here:</h3>
             <form id="equivalenceForm" action="<%= request.getContextPath() + Paths.BATTLEGROUND_GAME %>" method="post">
                 <input type="hidden" name="formType" value="resolveEquivalence">
@@ -93,8 +94,10 @@
 
                 <%@include file="../game_components/test_editor.jsp"%>
 
-                <button class="btn btn-danger btn-left" name="acceptEquivalent" type="submit" onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');">Accept Equivalence</button>
-                <button class="btn btn-primary btn-game btn-right" name="rejectEquivalent" type="submit" onclick="progressBar(); return true;">Submit Killing Test</button>
+                <button class="btn btn-danger btn-left" name="acceptEquivalent" type="submit"
+                        onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');">Accept Equivalence</button>
+                <button class="btn btn-primary btn-game btn-right" name="rejectEquivalent" type="submit"
+                        onclick="testProgressBar(); return true;">Submit Killing Test</button>
 
                 <div>
                     Note: If the game finishes with this equivalence unsolved, you will lose points!

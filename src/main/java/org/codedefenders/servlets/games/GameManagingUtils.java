@@ -164,6 +164,7 @@ public class GameManagingUtils implements IGameManagingUtils {
         TestCompiledEvent tce = new TestCompiledEvent();
         tce.setGameId(gameId);
         tce.setUserId(ownerUserId);
+        tce.setTestId(newTest.getId());
         tce.setSuccess(compileSuccess);
         tce.setErrorMessage(compileSuccess ? null : compileTestTarget.message);
         notificationService.post(tce);
@@ -182,6 +183,7 @@ public class GameManagingUtils implements IGameManagingUtils {
             TestTestedOriginalEvent ttoe = new TestTestedOriginalEvent();
             ttoe.setGameId(gameId);
             ttoe.setUserId(ownerUserId);
+            ttoe.setTestId(newTest.getId());
             ttoe.setSuccess(testOriginalSuccess);
             ttoe.setErrorMessage(testOriginalSuccess ? null : compileTestTarget.message);
             notificationService.post(ttoe);

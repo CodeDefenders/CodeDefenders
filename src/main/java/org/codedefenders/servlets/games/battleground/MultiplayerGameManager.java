@@ -299,14 +299,13 @@ public class MultiplayerGameManager extends HttpServlet {
         // Do the validation even before creating the mutant
         // TODO Here we need to account for #495
         List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
-
         boolean validationSuccess = validationMessage.isEmpty();
 
         TestValidatedEvent tve = new TestValidatedEvent();
         tve.setGameId(gameId);
         tve.setUserId(userId);
         tve.setSuccess(validationSuccess);
-        tve.setValidationMessage(validationSuccess ? null : String.join("", validationMessage));
+        tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
         notificationService.post(tve);
 
         if (!validationSuccess) {
@@ -589,6 +588,7 @@ public class MultiplayerGameManager extends HttpServlet {
         MutantCompiledEvent mce = new MutantCompiledEvent();
         mce.setGameId(gameId);
         mce.setUserId(userId);
+        mce.setMutantId(newMutant.getId());
         mce.setSuccess(compileSuccess);
         mce.setErrorMessage(errorMessage);
 
@@ -623,6 +623,7 @@ public class MultiplayerGameManager extends HttpServlet {
         MutantTestedEvent mte = new MutantTestedEvent();
         mte.setGameId(gameId);
         mte.setUserId(userId);
+        mte.setMutantId(newMutant.getId());
         notificationService.post(mte);
 
         if (game.isCapturePlayersIntention()) {
@@ -710,13 +711,27 @@ public class MultiplayerGameManager extends HttpServlet {
             }
             final String testText = test.get();
 
+            TestSubmittedEvent tse = new TestSubmittedEvent();
+            tse.setGameId(gameId);
+            tse.setUserId(userId);
+            notificationService.post(tse);
+
             // TODO Duplicate code here !
             // If it can be written to file and compiled, end turn. Otherwise, dont.
             // Do the validation even before creating the mutant
             // TODO Here we need to account for #495
             List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
-            if ( !  validationMessage.isEmpty() ) {
-                messages.addAll( validationMessage );
+            boolean validationSuccess = validationMessage.isEmpty();
+
+            TestValidatedEvent tve = new TestValidatedEvent();
+            tve.setGameId(gameId);
+            tve.setUserId(userId);
+            tve.setSuccess(validationSuccess);
+            tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
+            notificationService.post(tve);
+
+            if (!validationSuccess) {
+                messages.addAll(validationMessage);
                 session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
@@ -733,6 +748,7 @@ public class MultiplayerGameManager extends HttpServlet {
                 return;
             }
 
+            /* TODO: Why not check this in the beginning? */
             final Optional<Integer> equivMutantId = ServletUtils.getIntParameter(request, "equivMutantId");
             if (!equivMutantId.isPresent()) {
                 logger.info("Missing equivMutantId parameter.");
@@ -774,6 +790,7 @@ public class MultiplayerGameManager extends HttpServlet {
             for (Mutant mPending : mutantsPendingTests) {
                 // TODO: Doesnt distinguish between failing because the test didnt run at all and failing because it detected the mutant
                 mutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
+
                 if (mPending.getEquivalent() == Mutant.Equivalence.PROVEN_NO) {
                     logger.debug("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
                     // TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points added.
@@ -817,6 +834,13 @@ public class MultiplayerGameManager extends HttpServlet {
                     messages.add(String.format("...however, your test killed other %d claimed mutants!", killedOthers));
                 }
             }
+
+            TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
+            ttme.setGameId(gameId);
+            ttme.setUserId(userId);
+            ttme.setTestId(newTest.getId());
+            notificationService.post(ttme);
+
             newTest.update();
             game.update();
             logger.info("Resolving equivalence was handled successfully");

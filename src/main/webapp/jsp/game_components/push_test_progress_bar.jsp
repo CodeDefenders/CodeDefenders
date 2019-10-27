@@ -38,35 +38,35 @@
     /* Wrap in a function so it has it's own scope. */
     (function () {
 
-        const onTestSubmitted = function (data) {
+        const onTestSubmitted = function (e) {
             setProgress(33, 'Validating Test');
         };
 
-        const onTestValidated = function (data) {
-            if (data.success) {
+        const onTestValidated = function (e) {
+            if (e.success) {
                 setProgress(50, 'Compiling Test');
             } else {
                 setProgress(100, 'Test Is Not Valid');
             }
         };
 
-        const onTestCompiled = function (data) {
-            if (data.success) {
+        const onTestCompiled = function (e) {
+            if (e.success) {
                 setProgress(66, 'Running Test Against Original');
             } else {
                 setProgress(100, 'Test Did Not Compile');
             }
         };
 
-        const onTestTestedOriginal = function (data) {
-            if (data.success) {
+        const onTestTestedOriginal = function (e) {
+            if (e.success) {
                 setProgress(83, 'Running Test Against Mutants');
             } else {
                 setProgress(100, 'Test Failed Against Original');
             }
         };
 
-        const onTestTestedMutants = function (data) {
+        const onTestTestedMutants = function (e) {
             setProgress(100, 'Done');
         };
 
@@ -75,11 +75,11 @@
                 gameId: ${requestScope.gameId}
             });
 
-            pushSocket.register('<%=EventNames.toServerEventName(TestSubmittedEvent.class)%>',      onTestSubmitted);
-            pushSocket.register('<%=EventNames.toServerEventName(TestCompiledEvent.class)%>',       onTestCompiled);
-            pushSocket.register('<%=EventNames.toServerEventName(TestValidatedEvent.class)%>',      onTestValidated);
+            pushSocket.register('<%=EventNames.toServerEventName(TestSubmittedEvent.class)%>', onTestSubmitted);
+            pushSocket.register('<%=EventNames.toServerEventName(TestCompiledEvent.class)%>', onTestCompiled);
+            pushSocket.register('<%=EventNames.toServerEventName(TestValidatedEvent.class)%>', onTestValidated);
             pushSocket.register('<%=EventNames.toServerEventName(TestTestedOriginalEvent.class)%>', onTestTestedOriginal);
-            pushSocket.register('<%=EventNames.toServerEventName(TestTestedMutantsEvent.class)%>',  onTestTestedMutants);
+            pushSocket.register('<%=EventNames.toServerEventName(TestTestedMutantsEvent.class)%>', onTestTestedMutants);
         };
 
         <%--
@@ -88,16 +88,16 @@
                 gameId: ${requestScope.gameId}
             });
 
-            pushSocket.unregister('<%=EventNames.toServerEventName(TestSubmittedEvent.class)%>',      onTestSubmitted);
-            pushSocket.unregister('<%=EventNames.toServerEventName(TestCompiledEvent.class)%>',       onTestCompiled);
-            pushSocket.unregister('<%=EventNames.toServerEventName(TestValidatedEvent.class)%>',      onTestValidated);
+            pushSocket.unregister('<%=EventNames.toServerEventName(TestSubmittedEvent.class)%>', onTestSubmitted);
+            pushSocket.unregister('<%=EventNames.toServerEventName(TestCompiledEvent.class)%>', onTestCompiled);
+            pushSocket.unregister('<%=EventNames.toServerEventName(TestValidatedEvent.class)%>', onTestValidated);
             pushSocket.unregister('<%=EventNames.toServerEventName(TestTestedOriginalEvent.class)%>', onTestTestedOriginal);
-            pushSocket.unregister('<%=EventNames.toServerEventName(TestTestedMutantsEvent.class)%>',  onTestTestedMutants);
+            pushSocket.unregister('<%=EventNames.toServerEventName(TestTestedMutantsEvent.class)%>', onTestTestedMutants);
         };
         --%>
 
         window.testProgressBar = function () {
-            setProgress('16', 'Submitting Test');
+            setProgress(16, 'Submitting Test');
             registerTestProgressBar();
 
             /* Reconnect on close, because on Firefox the WebSocket connection gets closed on POST. */
