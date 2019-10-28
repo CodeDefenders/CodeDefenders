@@ -36,10 +36,7 @@ import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.execution.LineCoverageGenerator;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.LineCoverage;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
+import org.codedefenders.game.*;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
@@ -68,6 +65,7 @@ import java.util.zip.ZipFile;
 import javax.inject.Inject;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -86,6 +84,7 @@ import static org.codedefenders.util.Constants.CUTS_TESTS_DIR;
  * Serves on path: {@code /class-upload}.
  * @see org.codedefenders.util.Paths#CLASS_UPLOAD
  */
+@WebServlet("/class-upload")
 public class ClassUploadManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(ClassUploadManager.class);
 
@@ -130,6 +129,8 @@ public class ClassUploadManager extends HttpServlet {
         final List<CompiledClass> compiledClasses = new LinkedList<>();
 
         boolean isMockingEnabled = false;
+        TestingFramework testingFramework = null;
+        AssertionLibrary assertionLibrary = null;
         boolean shouldPrepareAI = false;
 
         // Alias of the CUT
@@ -187,6 +188,12 @@ public class ClassUploadManager extends HttpServlet {
                     break;
                 case "enableMocking":
                     isMockingEnabled = true;
+                    break;
+                case "testingFramework":
+                    testingFramework = TestingFramework.valueOf(fieldValue);
+                    break;
+                case "assertionLibrary":
+                    assertionLibrary = AssertionLibrary.valueOf(fieldValue);
                     break;
                 default:
                     logger.warn("Unrecognized parameter: " + fieldName);
@@ -424,7 +431,16 @@ public class ClassUploadManager extends HttpServlet {
             return;
         }
 
-        cut = new GameClass(classQualifiedName, classAlias, cutJavaFilePath, cutClassFilePath, isMockingEnabled);
+        cut = GameClass.build()
+                .name(classQualifiedName)
+                .alias(classAlias)
+                .javaFile(cutJavaFilePath)
+                .classFile(cutClassFilePath)
+                .mockingEnabled(isMockingEnabled)
+                .testingFramework(testingFramework)
+                .assertionLibrary(assertionLibrary)
+                .create();
+
         try {
             cutId = GameClassDAO.storeClass(cut);
         } catch (Exception e) {
@@ -482,10 +498,7 @@ public class ClassUploadManager extends HttpServlet {
             // game, hence its if, which is needed instead inside mutants and
             // tests
             KillMap killMap = KillMap.forCustom(tests, mutants, cutId, new ArrayList<>());
-            for (KillMapEntry entry : killMap.getEntries()) {
-                // TODO Phil 04/12/18: Batch insert instead of insert in a for loop
-                KillmapDAO.insertKillMapEntry(entry, cutId);
-            }
+            KillmapDAO.insertManyKillMapEntries(killMap.getEntries(), cutId);
         } catch (InterruptedException | ExecutionException e) {
             logger.error("Could error while calculating killmap for successfully uploaded class.", e);
         }

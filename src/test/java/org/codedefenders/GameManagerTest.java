@@ -18,7 +18,8 @@
  */
 package org.codedefenders;
 
-import org.codedefenders.game.GameClass;
+import static org.junit.Assert.assertEquals;
+
 import org.codedefenders.util.FileUtils;
 import org.junit.Test;
 
@@ -27,70 +28,57 @@ import java.io.IOException;
 
 import javax.servlet.ServletException;
 
-import static org.junit.Assert.assertEquals;
-
-
 /**
  * @author Jose Rojas
  */
 public class GameManagerTest {
-	@Test
-	public void testGetNextSubDirEmpty() throws IOException {
-		File folder = getCleanTmpGameDir(1);
-		assertEquals(folder.getAbsolutePath() + File.separator + "00000001", FileUtils.getNextSubDir(folder.toPath()).getAbsolutePath());
-	}
+    @Test
+    public void testGetNextSubDirEmpty() throws IOException {
+        File folder = getCleanTmpGameDir(1);
+        assertEquals(folder.getAbsolutePath() + File.separator + "00000001", FileUtils.getNextSubDir(folder.toPath()).getAbsolutePath());
+    }
 
-	@Test
-	public void testGetNextSubDirNonEmpty() throws IOException {
-		File folder = getCleanTmpGameDir(1);
-		File subfolder = new File(folder.getAbsolutePath() + File.separator + "00000001");
-		subfolder.delete();
-		subfolder.mkdir();
-		assertEquals(folder.getAbsolutePath() + File.separator + "00000002", FileUtils.getNextSubDir(folder.toPath()).getAbsolutePath());
-	}
+    @Test
+    public void testGetNextSubDirNonEmpty() throws IOException {
+        File folder = getCleanTmpGameDir(1);
+        File subfolder = new File(folder.getAbsolutePath() + File.separator + "00000001");
+        subfolder.delete();
+        subfolder.mkdir();
+        assertEquals(folder.getAbsolutePath() + File.separator + "00000002", FileUtils.getNextSubDir(folder.toPath()).getAbsolutePath());
+    }
 
-	@Test
-	public void testGetNextSubDirTwo() throws IOException {
-		File folder = getCleanTmpGameDir(1);
-		File subfolder = new File(folder.getAbsolutePath() + File.separator + "00000001");
-		subfolder.delete();
-		subfolder.mkdir();
-		File subfolder2 = new File(folder.getAbsolutePath() + File.separator + "00000002");
-		subfolder2.delete();
-		subfolder2.mkdir();
-		assertEquals(folder.getAbsolutePath() + File.separator + "00000003", FileUtils.getNextSubDir(folder.toPath()).getAbsolutePath());
-	}
+    @Test
+    public void testGetNextSubDirTwo() throws IOException {
+        File folder = getCleanTmpGameDir(1);
+        File subfolder = new File(folder.getAbsolutePath() + File.separator + "00000001");
+        subfolder.delete();
+        subfolder.mkdir();
+        File subfolder2 = new File(folder.getAbsolutePath() + File.separator + "00000002");
+        subfolder2.delete();
+        subfolder2.mkdir();
+        assertEquals(folder.getAbsolutePath() + File.separator + "00000003", FileUtils.getNextSubDir(folder.toPath()).getAbsolutePath());
+    }
 
-	@Test
-	public void testGetNextSubDirMore() throws IOException, ServletException {
-		File folder = getCleanTmpGameDir(1);
-		File subfolder = new File(folder.getAbsolutePath() + File.separator + "00000001");
-		subfolder.delete();
-		subfolder.mkdir();
-		File subfolder2 = new File(folder.getAbsolutePath() + File.separator + "00000002");
-		subfolder2.delete();
-		subfolder2.mkdir();
-		File subfolder3 = new File(folder.getAbsolutePath() + File.separator + "foo");
-		subfolder3.delete();
-		subfolder3.mkdir();
-		assertEquals(folder.getAbsolutePath() + File.separator + "00000003", FileUtils.getNextSubDir(folder.toPath()).getAbsolutePath());
-	}
+    @Test
+    public void testGetNextSubDirMore() throws IOException, ServletException {
+        File folder = getCleanTmpGameDir(1);
+        File subfolder = new File(folder.getAbsolutePath() + File.separator + "00000001");
+        subfolder.delete();
+        subfolder.mkdir();
+        File subfolder2 = new File(folder.getAbsolutePath() + File.separator + "00000002");
+        subfolder2.delete();
+        subfolder2.mkdir();
+        File subfolder3 = new File(folder.getAbsolutePath() + File.separator + "foo");
+        subfolder3.delete();
+        subfolder3.mkdir();
+        assertEquals(folder.getAbsolutePath() + File.separator + "00000003", FileUtils.getNextSubDir(folder.toPath()).getAbsolutePath());
+    }
 
-	private File getCleanTmpGameDir(int gameId) throws IOException {
-		File folder = new File(org.apache.commons.io.FileUtils.getTempDirectory().getAbsolutePath() + File.separator + "testCodeDefenders" + File.separator + gameId);
-		folder.delete();
-		folder.mkdirs();
-		org.apache.commons.io.FileUtils.cleanDirectory(folder);
-		return folder;
-	}
-
-	@Test
-	public void testSUTClass(){
-		assertEquals("Foo", new GameClass("Foo", "Foo", "" , "").getBaseName());
-		assertEquals("Foo", new GameClass("org.Foo", "Foo2", "" , "").getBaseName());
-		assertEquals("Foo", new GameClass("org.foo.bar.algo.mas.Foo", "Foo3", "" , "").getBaseName());
-		assertEquals("", new GameClass("Foo", "Foo4", "" , "").getPackage());
-		assertEquals("org", new GameClass("org.Foo", "Foo5", "" , "").getPackage());
-		assertEquals("org.foo.bar", new GameClass("org.foo.bar.Foo", "Foo6", "" , "").getPackage());
-	}
+    private File getCleanTmpGameDir(int gameId) throws IOException {
+        File folder = new File(org.apache.commons.io.FileUtils.getTempDirectory().getAbsolutePath() + File.separator + "testCodeDefenders" + File.separator + gameId);
+        folder.delete();
+        folder.mkdirs();
+        org.apache.commons.io.FileUtils.cleanDirectory(folder);
+        return folder;
+    }
 }

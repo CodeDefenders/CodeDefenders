@@ -1,6 +1,5 @@
 <%--
 
-
     Copyright (C) 2016-2018 Code Defenders contributors
 
     This file is part of Code Defenders.
@@ -119,4 +118,3 @@
 
     })();
 </script>
-

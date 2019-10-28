@@ -53,6 +53,7 @@ import java.util.Map;
 import java.util.Random;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,6 +62,7 @@ import javax.servlet.http.HttpSession;
 import static org.codedefenders.util.Constants.DUMMY_ATTACKER_USER_ID;
 import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 
+@WebServlet(urlPatterns = {"/admin", "/admin/games"})
 public class AdminCreateGames extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminCreateGames.class);
 

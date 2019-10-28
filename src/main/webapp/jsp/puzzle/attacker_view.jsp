@@ -18,11 +18,15 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="org.codedefenders.game.GameState"%>
+<%@page import="org.codedefenders.game.GameLevel"%>
 <%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 <%@ page import="static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME" %>
 <%@ page import="static org.codedefenders.util.Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT" %>
 <%@ page import="java.util.LinkedList" %>
+<%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
 
 <%--
     Puzzle game view for a attacker. Retrieves the given puzzle game
@@ -35,6 +39,7 @@
 <%@ include file="/jsp/header_main.jsp"%>
 
 </div></div></div></div></div>
+
 <div class="game-container">
 
 <% { %>
@@ -59,7 +64,9 @@
     request.setAttribute("startEditLine", puzzle.getEditableLinesStart());
     request.setAttribute("endEditLine", puzzle.getEditableLinesEnd());
 
-    /* tests_carousel */
+    /* test_accordion */
+    request.setAttribute("cut", cut);
+    request.setAttribute("mutants", game.getMutants());
     request.setAttribute("tests", game.getTests());
 
     /* mutants_list */
@@ -75,7 +82,7 @@
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
     // request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
+    // request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", false);
     // request.setAttribute("gameType", GameMode.PUZZLE);
     // request.setAttribute("gameId", game.getId());
@@ -92,6 +99,8 @@
     final String description = puzzle.getDescription();
 %>
 
+<jsp:include page="/jsp/push_notifications.jsp"/>
+
     <div class="row" style="padding: 0px 15px;">
         <h4 class="col-md-2"><b><%=title%></b></h4>
         <h4><%=description%></h4>
@@ -101,13 +110,13 @@
     <div class="col-md-6">
         <div id="mutants-div">
             <h3>Mutants</h3>
-            <%@include file="../game_components/mutants_list.jsp"%>
+            <jsp:include page="/jsp/game_components/mutants_list.jsp"/>
         </div>
 
         <% if (game.getLevel() == GameLevel.EASY) { %>
         <div id="tests-div">
             <h3>JUnit tests</h3>
-            <%@include file="../game_components/tests_carousel.jsp"%>
+            <jsp:include page="/jsp/game_components/test_accordion.jsp"/>
         </div>
         <% } %>
     </div>
@@ -134,16 +143,16 @@
             <input type="hidden" name="formType" value="createMutant">
             <input type="hidden" name="gameId" value="<%= game.getId() %>">
 
-            <%@include file="../game_components/mutant_editor.jsp"%>
-            <%@include file="../game_components/game_highlighting.jsp" %>
+            <%@include file="/jsp/game_components/mutant_editor.jsp"%>
+            <%@include file="/jsp/game_components/game_highlighting.jsp"%>
         </form>
-        <%@include file="../game_components/mutant_explanation.jsp"%>
-        <%@include file="../game_components/editor_help_config_toolbar.jsp"%>
+        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
+        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
     </div>
 </div>
 
-<%@include file="../game_components/editor_help_config_modal.jsp"%>
+<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
-<%@include file="../footer_game.jsp"%>
+<%@include file="/jsp/footer_game.jsp"%>
 
 <% } %>

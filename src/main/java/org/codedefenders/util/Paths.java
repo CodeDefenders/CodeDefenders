@@ -46,6 +46,9 @@ public class Paths {
     public static final String GAMES_HISTORY = "/games/history";
     public static final String CLASS_UPLOAD = "/class-upload";
 
+    public static final String PROJECT_EXPORT = "/project-export";
+
+
     public static final String BATTLEGROUND_GAME = "/multiplayergame";
     public static final String BATTLEGROUND_HISTORY = "/multiplayer/history";
     public static final String BATTLEGROUND_SELECTION = "/multiplayer/games";
@@ -76,4 +79,7 @@ public class Paths {
     public static final String API_ANALYTICS_CLASSES = "/admin/api/classes";
     public static final String API_ANALYTICS_KILLMAP = "/admin/api/killmap";
     public static final String API_KILLMAP_MANAGEMENT = "/admin/api/killmapmanagement";
+    public static final String API_CLASS = "/api/class";
+    public static final String API_TEST = "/api/test";
+    public static final String API_MUTANT = "/api/mutant";
 }

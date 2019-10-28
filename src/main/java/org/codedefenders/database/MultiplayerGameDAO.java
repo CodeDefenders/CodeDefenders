@@ -36,7 +36,7 @@ import static org.codedefenders.database.DB.RSMapper;
 /**
  * This class handles the database logic for multiplayer games.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see MultiplayerGame
  */
 public class MultiplayerGameDAO {
@@ -53,7 +53,9 @@ public class MultiplayerGameDAO {
         if (mode != GameMode.PARTY) {
             return null;
         }
+
         GameClass cut = GameClassDAO.gameClassFromRS(rs);
+
         int id = rs.getInt("ID");
         int classId = rs.getInt("Class_ID");
         int creatorId = rs.getInt("Creator_ID");
@@ -120,6 +122,22 @@ public class MultiplayerGameDAO {
         final String creatorName = rs.getString("creatorName");
 
         return UserMultiplayerGameInfo.forActive(userId, game, role, creatorName);
+    }
+
+    /**
+     * Constructs an active {@link UserMultiplayerGameInfo}, i.e. a game the user did participate,
+     * from a {@link ResultSet} entry.
+     *
+     * @param rs The {@link ResultSet}.
+     * @return The constructed battleground game information.
+     * @see RSMapper
+     */
+    static UserMultiplayerGameInfo finishedGameInfoFromRS(ResultSet rs) throws SQLException {
+        final int userId = rs.getInt("userId");
+        final MultiplayerGame game = multiplayerGameFromRS(rs);
+        final String creatorName = rs.getString("creatorName");
+
+        return UserMultiplayerGameInfo.forFinished(userId, game, creatorName);
     }
 
     /**
@@ -317,23 +335,22 @@ public class MultiplayerGameDAO {
      */
     public static List<UserMultiplayerGameInfo> getActiveMultiplayerGamesWithInfoForUser(int userId) {
         final String query = String.join("\n",
-        "SELECT g.*,",
-        "  cu.User_ID as userId,",
-        "  IFNULL(p.Role, 'OBSERVER') as playerRole,",
-        "  vu.Username as creatorName",
-        "FROM view_battleground_games g",
-        "INNER JOIN view_valid_users vu",
-        "ON g.Creator_ID = vu.User_ID",
-        "INNER JOIN view_valid_users cu",
-        "ON cu.User_ID = ?",
-        "LEFT JOIN players p",
-        "ON cu.User_ID = p.User_ID",
-        "AND g.ID = p.Game_ID",
-        "WHERE",
-        "  (g.State = 'CREATED' or g.State = 'ACTIVE')",
-        "   AND(cu.User_ID = g.Creator_ID",
-        "       OR (cu.User_ID = p.User_ID AND p.Active = TRUE))",
-        "GROUP BY g.ID");
+            "SELECT g.*,",
+            "       cu.User_ID                 as userId,",
+            "       IFNULL(p.Role, 'OBSERVER') as playerRole,",
+            "       vu.Username                as creatorName",
+            "FROM view_battleground_games g",
+            "         INNER JOIN view_valid_users vu",
+            "                    ON g.Creator_ID = vu.User_ID",
+            "         INNER JOIN view_valid_users cu",
+            "                    ON cu.User_ID = ?",
+            "         LEFT JOIN players p",
+            "                   ON cu.User_ID = p.User_ID",
+            "                       AND g.ID = p.Game_ID",
+            "WHERE (g.State = 'CREATED' or g.State = 'ACTIVE')",
+            "  AND (cu.User_ID = g.Creator_ID",
+            "    OR (cu.User_ID = p.User_ID AND p.Active = TRUE))",
+            "GROUP BY g.ID;");
 
         return DB.executeQueryReturnList(query, MultiplayerGameDAO::activeGameInfoFromRS, DatabaseValue.of(userId));
     }
@@ -360,27 +377,31 @@ public class MultiplayerGameDAO {
     }
 
     /**
-     * Retrieves a list of {@link MultiplayerGame MultiplayerGames}, which were created or
-     * played by a given user.
+     * Retrieves a list of {@link UserMultiplayerGameInfo UserMultiplayerGameInfo objects},
+     * which were created or played by a given user, but are finished
      *
      * @param userId the user identifier the games are retrieved for.
-     * @return a list of {@link MultiplayerGame MultiplayerGames}, empty if none are found.
+     * @return a list of {@link UserMultiplayerGameInfo UserMultiplayerGameInfos}, empty if none are found.
      */
-    public static List<MultiplayerGame> getFinishedMultiplayerGamesForUser(int userId) {
-        String query = String.join("\n",
-                "SELECT DISTINCT m.* ",
-                "FROM view_battleground_games AS m ",
-                "LEFT JOIN players AS p ON p.Game_ID = m.ID ",
-                "  AND p.Active = TRUE",
-                "WHERE (p.User_ID = ? OR m.Creator_ID = ?)",
-                "  AND m.State = ?;");
-
-        DatabaseValue[] values = new DatabaseValue[]{
-                DatabaseValue.of(userId),
-                DatabaseValue.of(userId),
-                DatabaseValue.of(GameState.FINISHED.name())
-        };
-        return DB.executeQueryReturnList(query, MultiplayerGameDAO::multiplayerGameFromRS, values);
+    public static List<UserMultiplayerGameInfo> getFinishedMultiplayerGamesForUser(int userId) {
+        final String query = String.join("\n",
+            "SELECT g.*,",
+            "       cu.User_ID                 as userId,",
+            "       IFNULL(p.Role, 'OBSERVER') as playerRole,",
+            "       vu.Username                as creatorName",
+            "FROM view_battleground_games g",
+            "         INNER JOIN view_valid_users vu",
+            "                    ON g.Creator_ID = vu.User_ID",
+            "         INNER JOIN view_valid_users cu",
+            "                    ON cu.User_ID = ?",
+            "         LEFT JOIN players p",
+            "                   ON cu.User_ID = p.User_ID",
+            "                       AND g.ID = p.Game_ID",
+            "WHERE (g.State = 'FINISHED'",
+            "    AND (cu.User_ID = g.Creator_ID",
+            "        OR (cu.User_ID = p.User_ID AND p.Active = TRUE)))",
+            "GROUP BY g.ID;");
+        return DB.executeQueryReturnList(query, MultiplayerGameDAO::finishedGameInfoFromRS, DatabaseValue.of(userId));
     }
 
     /**

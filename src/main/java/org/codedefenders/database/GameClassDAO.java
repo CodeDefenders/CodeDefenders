@@ -18,10 +18,7 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.game.AbstractGame;
-import org.codedefenders.game.GameClass;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Test;
+import org.codedefenders.game.*;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.model.GameClassInfo;
 import org.codedefenders.util.FileUtils;
@@ -39,7 +36,7 @@ import static org.codedefenders.database.DB.RSMapper;
 /**
  * This class handles the database logic for Java classes.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see GameClass
  * @see GameClassInfo
  */
@@ -62,9 +59,23 @@ public class GameClassDAO {
         String absoluteJavaFile = FileUtils.getAbsoluteDataPath(javaFile).toString();
         String absoluteClassFile = FileUtils.getAbsoluteDataPath(classFile).toString();
         boolean requireMocking = rs.getBoolean("RequireMocking");
+        TestingFramework testingFramework = TestingFramework.valueOf(rs.getString("TestingFramework"));
+        AssertionLibrary assertionLibrary = AssertionLibrary.valueOf(rs.getString("AssertionLibrary"));
         boolean isActive = rs.getBoolean("Active");
+        boolean isPuzzleClass = rs.getBoolean("Puzzle");
 
-        return new GameClass(classId , name, alias, absoluteJavaFile, absoluteClassFile, requireMocking, isActive);
+        return GameClass.build()
+                .id(classId)
+                .name(name)
+                .alias(alias)
+                .javaFile(absoluteJavaFile)
+                .classFile(absoluteClassFile)
+                .mockingEnabled(requireMocking)
+                .testingFramework(testingFramework)
+                .assertionLibrary(assertionLibrary)
+                .active(isActive)
+                .puzzleClass(isPuzzleClass)
+                .create();
     }
 
     /**
@@ -111,7 +122,7 @@ public class GameClassDAO {
     }
 
     /**
-     * Retrieves <b>all</b>game classes in a {@link List}. Even non-playable or
+     * Retrieves all (excluding puzzle) game classes in a {@link List}. Even non-playable or
      * inactive classes. These classes should never be shown to non-admin users, use
      * {@link #getAllPlayableClasses()} instead.
      * <p>
@@ -123,6 +134,7 @@ public class GameClassDAO {
         String query = String.join("\n",
                 "SELECT classes.*, (SELECT COUNT(games.ID) from games WHERE games.Class_ID = classes.Class_ID) as games_count",
                 "FROM classes",
+                "WHERE Puzzle != 1",
                 "GROUP BY classes.Class_ID;"
         );
 
@@ -284,16 +296,31 @@ public class GameClassDAO {
         String relativeJavaFile = FileUtils.getRelativeDataPath(cut.getJavaFile()).toString();
         String relativeClassFile = FileUtils.getRelativeDataPath(cut.getClassFile()).toString();
         boolean isMockingEnabled = cut.isMockingEnabled();
+        TestingFramework testingFramework = cut.getTestingFramework();
+        AssertionLibrary assertionLibrary = cut.getAssertionLibrary();
         boolean isPuzzleClass = cut.isPuzzleClass();
         boolean isActive = cut.isActive();
 
-        String query = "INSERT INTO classes (Name, Alias, JavaFile, ClassFile, RequireMocking, Puzzle, Active) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        String query = String.join("",
+                "INSERT INTO classes (",
+                "Name,",
+                "Alias,",
+                "JavaFile,",
+                "ClassFile,",
+                "RequireMocking,",
+                "TestingFramework,",
+                "AssertionLibrary,",
+                "Puzzle,",
+                "Active",
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(name),
                 DatabaseValue.of(alias),
                 DatabaseValue.of(relativeJavaFile),
                 DatabaseValue.of(relativeClassFile),
                 DatabaseValue.of(isMockingEnabled),
+                DatabaseValue.of(testingFramework.name()),
+                DatabaseValue.of(assertionLibrary.name()),
                 DatabaseValue.of(isPuzzleClass),
                 DatabaseValue.of(isActive)
         };
@@ -382,8 +409,7 @@ public class GameClassDAO {
         DB.executeUpdateQuery(query5, DatabaseValue.of(id));
         DB.executeUpdateQuery(query6, DatabaseValue.of(id));
 
-        final String query = "DELETE FROM classes WHERE Class_ID = ?;";
-        return DB.executeUpdateQuery(query, DatabaseValue.of(id));
+        return removeClassForId(id);
     }
 
     /**

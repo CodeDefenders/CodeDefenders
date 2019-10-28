@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016-2019 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.codedefenders.testsmells;
 
 import java.io.FileNotFoundException;
@@ -24,7 +42,7 @@ import testsmell.Util;
  * NOTE: This is an extended copy of the EagerTest.class. I tried to use
  * inheritance but the check on the test smell is buried into the private
  * visitor class that implements the analysis.
- * 
+ *
  * @author gambi
  *
  */
@@ -58,8 +76,6 @@ public class ConfigurableEagerTest extends AbstractSmell {
      */
     @Override
     public boolean getHasSmell() {
-        System.out
-                .println("EagerTest.getHasSmell(): " + smellyElementList.stream().filter(x -> x.getHasSmell()).count());
         return smellyElementList.stream().filter(x -> x.getHasSmell()).count() >= 1;
     }
 

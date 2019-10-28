@@ -32,6 +32,12 @@
         <property name="eachLine" value="true"/>
     </module>
 
+    <module name="LineLength">
+        <property name="fileExtensions" value="java"/>
+        <property name="max" value="120"/>
+        <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
+    </module>
+
     <module name="TreeWalker">
         <module name="OuterTypeFilename"/>
         <module name="IllegalTokenText">
@@ -45,10 +51,6 @@
             <property name="allowEscapesForControlCharacters" value="true"/>
             <property name="allowByTailComment" value="true"/>
             <property name="allowNonPrintableEscapes" value="true"/>
-        </module>
-        <module name="LineLength">
-            <property name="max" value="120"/>
-            <property name="ignorePattern" value="^package.*|^import.*|a href|href|http://|https://|ftp://"/>
         </module>
         <module name="AvoidStarImport"/>
         <module name="OneTopLevelClass"/>
@@ -228,6 +230,7 @@
             <property name="allowSamelineMultipleAnnotations" value="true"/>
         </module>
         <module name="NonEmptyAtclauseDescription"/>
+        <module name="InvalidJavadocPosition"/>
         <module name="JavadocTagContinuationIndentation"/>
         <module name="SummaryJavadoc">
             <property name="forbiddenSummaryFragments"
@@ -264,5 +267,29 @@
             <property name="exceptionVariableName" value="expected"/>
         </module>
         <module name="CommentsIndentation"/>
+
+
+
+        <module name="MemberName">
+            <property name="format" value="^((?!ID).)*$"/>
+            <message key="name.invalidPattern"
+                     value="'ID' should be written as 'Id'."/>
+        </module>
+        <module name="ParameterName">
+            <property name="format" value="^((?!ID).)*$"/>
+            <message key="name.invalidPattern"
+                     value="'ID' should be written as 'Id'."/>
+        </module>
+        <module name="LambdaParameterName">
+            <property name="format" value="^((?!ID).)*$"/>
+            <message key="name.invalidPattern"
+                     value="'ID' should be written as 'Id'."/>
+        </module>
+        <module name="LocalVariableName">
+            <property name="tokens" value="VARIABLE_DEF"/>
+            <property name="format" value="^((?!ID).)*$"/>
+            <message key="name.invalidPattern"
+                     value="'ID' should be written as 'Id'."/>
+        </module>
     </module>
 </module>

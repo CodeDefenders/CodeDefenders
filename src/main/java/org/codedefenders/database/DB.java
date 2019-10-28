@@ -29,6 +29,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 public class DB {
     private static ConnectionPool connPool = ConnectionPool.instance();
     private static final Logger logger = LoggerFactory.getLogger(DB.class);
@@ -54,25 +56,8 @@ public class DB {
             stmt = conn.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
             int count = 1;
             for (DatabaseValue value : values) {
-                final DatabaseValue.Type type = value.getType();
-                switch (type) {
-                    case NULL:
-                        stmt.setNull(count++, type.typeValue);
-                        break;
-                    case BOOLEAN:
-                    case INT:
-                    case STRING:
-                    case LONG:
-                    case FLOAT:
-                    case TIMESTAMP:
-                        stmt.setObject(count++, value.getValue(), type.typeValue);
-                        break;
-                    default:
-                        final IllegalArgumentException e =
-                                new IllegalArgumentException("Unknown database value type: " + type);
-                        logger.error("Failed to create prepared statement due to unknown database value type.", e);
-                        throw e;
-                }
+                assignDatabaseValue(stmt, value, count);
+                count++;
             }
         } catch (SQLException se) {
             logger.error("SQLException while creating prepared statement. Query was:\n\t" + query, se);
@@ -80,6 +65,28 @@ public class DB {
             throw new UncheckedSQLException(se);
         }
         return stmt;
+    }
+
+    private static void assignDatabaseValue(PreparedStatement stmt, DatabaseValue value, int position) throws SQLException {
+        final DatabaseValue.Type type = value.getType();
+        switch (type) {
+            case NULL:
+                stmt.setNull(position, type.typeValue);
+                break;
+            case BOOLEAN:
+            case INT:
+            case STRING:
+            case LONG:
+            case FLOAT:
+            case TIMESTAMP:
+                stmt.setObject(position, value.getValue(), type.typeValue);
+                break;
+            default:
+                final IllegalArgumentException e =
+                        new IllegalArgumentException("Unknown database value type: " + type);
+                logger.error("Failed to create prepared statement due to unknown database value type.", e);
+                throw e;
+        }
     }
 
     public static boolean executeUpdate(PreparedStatement stmt, Connection conn) {
@@ -148,8 +155,8 @@ public class DB {
      * @return The first result of the query, or {@code null} if the query had no result.
      * @throws UncheckedSQLException If a {@link SQLException} is thrown while executing the query
      *                               or advancing the {@link ResultSet}.
-     * @throws SQLMappingException   If there is something wrong with the query result, and the result can not properly be
-     *                               extracted from it.
+     * @throws SQLMappingException   If there is something wrong with the query result, and the result can
+     *                               not properly be extracted from it.
      * @see RSMapper
      */
     static <T> T executeQueryReturnValue(String query, RSMapper<T> mapper, DatabaseValue... params)
@@ -172,8 +179,8 @@ public class DB {
      * @return The first result of the query, or {@code null} if the query had no result.
      * @throws UncheckedSQLException If a {@link SQLException} is thrown while executing the query
      *                               or advancing the {@link ResultSet}.
-     * @throws SQLMappingException   If there is something wrong with the query result, and the result can not properly be
-     *                               extracted from it.
+     * @throws SQLMappingException   If there is something wrong with the query result, and the result can
+     *                               not properly be extracted from it.
      * @see RSMapper
      */
     private static <T> T executeQueryReturnValue(Connection conn, PreparedStatement stmt, RSMapper<T> mapper)
@@ -213,8 +220,8 @@ public class DB {
      * @return The results of the query, as a {@link List}. Will never be null.
      * @throws UncheckedSQLException If a {@link SQLException} is thrown while executing the query
      *                               or advancing the {@link ResultSet}.
-     * @throws SQLMappingException   If there is something wrong with the query result, and the result can not properly be
-     *                               extracted from it.
+     * @throws SQLMappingException   If there is something wrong with the query result, and the result can
+     *                               not properly be extracted from it.
      * @see RSMapper
      */
     static <T> List<T> executeQueryReturnList(String query, RSMapper<T> mapper, DatabaseValue... params)
@@ -230,6 +237,38 @@ public class DB {
      * Executes a database query, then uses a mapper function to extract the values from the query result.
      * Cleans up the database connection and statement afterwards.
      *
+     * @param query  The query.
+     * @param fetchSize The statement fetch size.
+     * @param mapper The mapper function.
+     * @param params The parameters for the query.
+     * @param <T>    The type of value to be queried.
+     * @return The results of the query, as a {@link List}. Will never be null.
+     * @throws UncheckedSQLException If a {@link SQLException} is thrown while executing the query
+     *                               or advancing the {@link ResultSet}.
+     * @throws SQLMappingException   If there is something wrong with the query result, and the result can
+     *                               not properly be extracted from it.
+     * @see RSMapper
+     * @see Statement#setFetchSize(int)
+     */
+    static <T> List<T> executeQueryReturnListWithFetchSize(String query, int fetchSize, RSMapper<T> mapper, DatabaseValue... params)
+        throws UncheckedSQLException, SQLMappingException {
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = DB.createPreparedStatement(conn, query, params);
+        try {
+            stmt.setFetchSize(fetchSize);
+        } catch (SQLException e) {
+            logger.error("Caught SQL exception while trying to set fetch size.", e);
+            throw new UncheckedSQLException("Caught SQL exception while trying to set fetch size.", e);
+        }
+
+        return executeQueryReturnList(conn, stmt, mapper);
+    }
+
+    /**
+     * Executes a database query, then uses a mapper function to extract the values from the query result.
+     * Cleans up the database connection and statement afterwards.
+     *
      * @param conn   The database connection.
      * @param stmt   THe prepared database statement.
      * @param mapper The mapper function.
@@ -237,12 +276,11 @@ public class DB {
      * @return The results of the query, as a {@link List}. Will never be null.
      * @throws UncheckedSQLException If a {@link SQLException} is thrown while executing the query
      *                               or advancing the {@link ResultSet}.
-     * @throws SQLMappingException   If there is something wrong with the query result, and the result can not properly be
-     *                               extracted from it.
+     * @throws SQLMappingException   If there is something wrong with the query result, and the result can
+     *                               not properly be extracted from it.
      * @see RSMapper
      */
-    // TODO Phil 28/12/18: would love to have this private so everyone uses {@link #executeQueryReturnList(String, RSMapper, DatabaseValue...}
-    static <T> List<T> executeQueryReturnList(Connection conn, PreparedStatement stmt, RSMapper<T> mapper)
+    private static <T> List<T> executeQueryReturnList(Connection conn, PreparedStatement stmt, RSMapper<T> mapper)
             throws UncheckedSQLException, SQLMappingException {
 
         try {
@@ -275,4 +313,62 @@ public class DB {
         }
     }
 
+    /**
+     * Provides a way to extract {@link DatabaseValue database values} from an element of given type {@code T}.
+     * It should never return {@code null}. If no values are extracted, an empty array should be returned.
+     *
+     * @param <T> The class to extract the {@link DatabaseValue DatabaseValues} from.
+     */
+    @FunctionalInterface
+    interface DBVExtractor<T> {
+        @NotNull
+        DatabaseValue[] extractValues(@NotNull T element);
+    }
+
+    /**
+     * Prepares a statement for batch execution for elements of a given list.
+     * {@link DatabaseValue Database values} for the prepared statement are extracted using a {@link DBVExtractor}.
+     * Executes the batch statement, collects generated keys and returns them.
+     * Cleans up the database connection and statement afterwards.
+     *
+     * @param query the query to be executed multiple times.
+     * @param elements a list of elements which the query is executed for.
+     * @param valueExtractor extracts {@link DatabaseValue DatabaseValues} from an element of type {@code T} .
+     * @param <T> the type of the elements used for the query.
+     * @return a list of generated keys in the same order as the given list of elements.
+     */
+    static <T> List<Integer> executeBatchQueryReturnKeys(String query, List<T> elements, DBVExtractor<T> valueExtractor)
+        throws UncheckedSQLException, SQLMappingException {
+
+        Connection conn = DB.getConnection();
+        PreparedStatement stmt = null;
+
+        try {
+            stmt = DB.createPreparedStatement(conn, query);
+            for (T element : elements) {
+                final DatabaseValue[] values = valueExtractor.extractValues(element);
+
+                for (int position = 0; position < values.length; position++) {
+                    final DatabaseValue value = values[position];
+                    assignDatabaseValue(stmt, value, position + 1); // parameter index starts at 1
+                }
+
+                stmt.addBatch();
+            }
+
+            stmt.executeBatch();
+
+            final ResultSet rs = stmt.getGeneratedKeys();
+            final List<Integer> generatedIds = new ArrayList<>();
+            while (rs.next()) {
+                generatedIds.add(rs.getInt(1));
+            }
+            return generatedIds;
+        } catch (SQLException e) {
+            logger.error("SQL exception while executing query.", e);
+            throw new UncheckedSQLException("SQL exception while executing query.", e);
+        } finally {
+            DB.cleanup(conn, stmt);
+        }
+    }
 }

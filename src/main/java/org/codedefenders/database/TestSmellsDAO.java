@@ -18,16 +18,14 @@
  */
 package org.codedefenders.database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.annotation.ManagedBean;
-
 import org.codedefenders.game.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.ManagedBean;
 
 import testsmell.AbstractSmell;
 import testsmell.TestFile;
@@ -45,13 +43,13 @@ public class TestSmellsDAO {
             "INSERT INTO test_smell (Test_ID, smell_name)",
             "VALUES (?, ?);"
     );
-    
+
     private final String GET_SMELL_QUERY = String.join("\n",
             "SELECT smell_name",
             "FROM test_smell",
             "WHERE Test_ID = ?;"
-    ); 
-    
+    );
+
     /**
      * Stores all test smells of a test to the database.
      *
@@ -60,23 +58,15 @@ public class TestSmellsDAO {
      * @throws UncheckedSQLException If storing test smells was not successful.
      */
     public void storeSmell(final Test test, final TestFile testFile) throws UncheckedSQLException {
-        try {
-            Connection conn = DB.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(INSERT_SMELL_QUERY);
+        final List<AbstractSmell> testSmells = testFile.getTestSmells()
+                .stream()
+                .filter(AbstractSmell::getHasSmell)
+                .collect(Collectors.toList());
 
-            for (AbstractSmell smell : testFile.getTestSmells()) {
-                if (smell.getHasSmell() ){ // && !filterSmell.equals(smell.getSmellName())) {
-                    stmt.setInt(1, test.getId());
-                    stmt.setString(2, smell.getSmellName());
-                    stmt.addBatch();
-                }
-            }
-
-            stmt.executeBatch(); // Execute every 1000 items.
-        } catch (SQLException e) {
-            logger.warn("Cannot store smell to database ", e);
-            throw new UncheckedSQLException("Could not store test smell to database.");
-        }
+        DB.executeBatchQueryReturnKeys(INSERT_SMELL_QUERY, testSmells, smell -> new DatabaseValue[]{
+                DatabaseValue.of(test.getId()),
+                DatabaseValue.of(smell.getSmellName())
+        });
     }
 
     /**

@@ -1,11 +1,11 @@
 # CodeDefenders data directory
-data.dir=
+data.dir=/var/lib/codedefenders
 # Ant Home on local machine
-ant.home=
+ant.home=/usr/share/ant
 # JDBC Connection url to database
-db.url=
+db.url=jdbc:mysql://127.0.0.1:3306/codedefenders
 # database access data
-db.username=
+db.username=codedefenders
 db.password=
 
 # Cluster Setting
@@ -29,8 +29,9 @@ mutant.coverage=enabled
 block.attacker=enabled
 
 # Tomcat data for the deployment
-tomcat.username=
+tomcat.username=manager
 tomcat.password=
 # Deployment URL ,looks like http://<domain>:<port>/manager/text
-tomcat.url=
-tomcat.path=
+tomcat.url=http://127.0.0.1:8080/manager/text
+# The URL path to deploy the web application
+tomcat.path=/

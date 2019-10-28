@@ -24,7 +24,7 @@ package org.codedefenders.validation.code;
  * <p>
  * Use {@link #get()} to retrieve the message as a {@link String}.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public enum ValidationMessage {
     // Generic error message.

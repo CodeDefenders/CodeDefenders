@@ -18,6 +18,76 @@
  */
 package org.codedefenders.servlets.games.battleground;
 
+import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.database.AdminDAO;
+import org.codedefenders.database.DatabaseAccess;
+import org.codedefenders.database.IntentionDAO;
+import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.database.TestDAO;
+import org.codedefenders.database.TestSmellsDAO;
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.execution.IMutationTester;
+import org.codedefenders.execution.KillMap;
+import org.codedefenders.execution.KillMap.KillMapEntry;
+import org.codedefenders.execution.TargetExecution;
+import org.codedefenders.game.GameState;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Role;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.game.tcs.ITestCaseSelector;
+import org.codedefenders.model.AttackerIntention;
+import org.codedefenders.model.DefenderIntention;
+import org.codedefenders.model.Event;
+import org.codedefenders.model.EventStatus;
+import org.codedefenders.model.EventType;
+import org.codedefenders.model.User;
+import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
+import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
+import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
+import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
+import org.codedefenders.notification.events.server.test.TestValidatedEvent;
+import org.codedefenders.servlets.admin.AdminSystemSettings;
+import org.codedefenders.servlets.games.GameManagingUtils;
+import org.codedefenders.servlets.util.Redirect;
+import org.codedefenders.servlets.util.ServletUtils;
+import org.codedefenders.util.Constants;
+import org.codedefenders.util.Paths;
+import org.codedefenders.validation.code.CodeValidator;
+import org.codedefenders.validation.code.CodeValidatorLevel;
+import org.codedefenders.validation.code.ValidationMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import static org.codedefenders.game.Mutant.Equivalence.ASSUMED_YES;
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.util.Constants.GRACE_PERIOD_MESSAGE;
@@ -36,68 +106,6 @@ import static org.codedefenders.util.Constants.TEST_GENERIC_ERROR_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_KILLED_CLAIMED_MUTANT_MESSAGE;
 import static org.codedefenders.util.Constants.TEST_PASSED_ON_CUT_MESSAGE;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.inject.Inject;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.codedefenders.database.DatabaseAccess;
-import org.codedefenders.database.IntentionDAO;
-import org.codedefenders.database.MultiplayerGameDAO;
-import org.codedefenders.database.PlayerDAO;
-import org.codedefenders.database.TargetExecutionDAO;
-import org.codedefenders.database.TestSmellsDAO;
-import org.codedefenders.database.UserDAO;
-import org.codedefenders.execution.IMutationTester;
-import org.codedefenders.execution.TargetExecution;
-import org.codedefenders.game.GameState;
-import org.codedefenders.game.Mutant;
-import org.codedefenders.game.Role;
-import org.codedefenders.game.Test;
-import org.codedefenders.game.multiplayer.MultiplayerGame;
-import org.codedefenders.model.AttackerIntention;
-import org.codedefenders.model.DefenderIntention;
-import org.codedefenders.model.Event;
-import org.codedefenders.model.EventStatus;
-import org.codedefenders.model.EventType;
-import org.codedefenders.model.User;
-import org.codedefenders.notification.INotificationService;
-import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
-import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
-import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
-import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
-import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
-import org.codedefenders.notification.events.server.test.TestValidatedEvent;
-import org.codedefenders.servlets.games.GameManagingUtils;
-import org.codedefenders.servlets.util.Redirect;
-import org.codedefenders.servlets.util.ServletUtils;
-import org.codedefenders.util.Constants;
-import org.codedefenders.util.Paths;
-import org.codedefenders.validation.code.CodeValidator;
-import org.codedefenders.validation.code.CodeValidatorLevel;
-import org.codedefenders.validation.code.ValidationMessage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * This {@link HttpServlet} handles retrieval and in-game management for {@link MultiplayerGame battleground games}.
  * <p>
@@ -108,6 +116,7 @@ import org.slf4j.LoggerFactory;
  *
  * @see org.codedefenders.util.Paths#BATTLEGROUND_GAME
  */
+@WebServlet("/multiplayergame")
 public class MultiplayerGameManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(MultiplayerGameManager.class);
@@ -123,6 +132,9 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     INotificationService notificationService;
+
+    @Inject
+    private ITestCaseSelector regressionTestCaseSelector;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -155,6 +167,10 @@ public class MultiplayerGameManager extends HttpServlet {
                 .filter(m -> m.getPlayerId() == playerId)
                 .findFirst()
                 .ifPresent(mutant -> {
+                    int defenderId = DatabaseAccess.getEquivalentDefenderId(mutant);
+                    User defender = UserDAO.getUserForPlayer(defenderId);
+
+                    request.setAttribute("equivDefender", defender);
                     request.setAttribute("equivMutant", mutant);
                     request.setAttribute("openEquivalenceDuel", true);
                 });
@@ -228,10 +244,28 @@ public class MultiplayerGameManager extends HttpServlet {
         for (Mutant aliveMutant : game.getAliveMutants()) {
             /*
              * If the mutant is covered by enough tests trigger the automatic
-             * equivalence duel
+             * equivalence duel. Consider ONLY the coveringTests submitted after the mutant was created
              */
-            int coveringTests = aliveMutant.getCoveringTests().size();
-            if (coveringTests >= threshold) {
+            // TODO Ideally one would use something like this. Howevever, no Test nor Mutant have the timestamp attribute, despite this attribute is set in the DB
+//            int coveringTests = aliveMutant.getCoveringTests().stream().filter( t -> t.getTimestamp().before( aliveMutant.getTimestamp())).count();
+            // Take the intersection of the two sets: to obtain the covering but submitted after
+            // TODO Since Test does not re-implement hash and equalsTo this does not work !
+            // allCoveringTests.retainAll( testSubmittedAfterMutant );
+
+            Set<Integer> allCoveringTests = aliveMutant.getCoveringTests().stream()
+                    .map(t ->  t.getId() )
+                    .collect(Collectors.toSet());
+
+            boolean considerOnlydefenders = false;
+            Set<Integer> testSubmittedAfterMutant = TestDAO.getValidTestsForGameSubmittedAfterMutant(game.getId(), considerOnlydefenders, aliveMutant).stream()
+                    .map(t ->  t.getId() )
+                    .collect(Collectors.toSet());
+
+            allCoveringTests.retainAll( testSubmittedAfterMutant );
+
+            int numberOfCoveringTestsSubmittedAfterMutant = allCoveringTests.size();
+
+            if (numberOfCoveringTestsSubmittedAfterMutant  >= threshold) {
                 // Flag the mutant as possibly equivalent
                 aliveMutant.setEquivalent(Mutant.Equivalence.PENDING_TEST);
                 aliveMutant.update();
@@ -535,10 +569,9 @@ public class MultiplayerGameManager extends HttpServlet {
         mve.setGameId(gameId);
         mve.setUserId(userId);
         mve.setSuccess(validationSuccess);
-        mve.setValidationMessage(validationSuccess ? null : validationMessage.get());
         notificationService.post(mve);
 
-        if (!validationSuccess) {
+        if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
             // Mutant is either the same as the CUT or it contains invalid code
             messages.add(validationMessage.get());
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -680,19 +713,45 @@ public class MultiplayerGameManager extends HttpServlet {
 
             for (Mutant m : mutantsPending) {
                 if (m.getId() == mutantId && m.getPlayerId() == playerId) {
-                    m.kill(Mutant.Equivalence.DECLARED_YES);
-                    DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
-                    messages.add(Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE);
-
                     User eventUser = UserDAO.getUserById(userId);
 
+
+                    // Here we check if the accepted equivalence is "possibly" equivalent
+                    boolean isMutantKillable = isMutantKillableByOtherTests( m );
+
+                    String message = Constants.MUTANT_ACCEPTED_EQUIVALENT_MESSAGE;
+                    String notification = eventUser.getUsername() + " accepts that their mutant " + m.getId() + " is equivalent.";
+                    if (isMutantKillable) {
+                        logger.warn("Mutant {} was accepted as equivalence but it is killable", m);
+                        message = message + " " + " However, the mutant was killable !";
+                        notification = notification + " " + " However, the mutant was killable !";
+                    }
+
+                    // At this point we where not able to kill the mutant will all the covering tests on the same class from different games
+                    m.kill(Mutant.Equivalence.DECLARED_YES);
+
+                    DatabaseAccess.increasePlayerPoints(1, DatabaseAccess.getEquivalentDefenderId(m));
+                    messages.add( message );
+
+                    // Notify the attacker
                     Event notifEquiv = new Event(-1, game.getId(),
                             userId,
-                            eventUser.getUsername() +
-                                    " accepts that their mutant " + m.getId() + " is equivalent.",
+                            notification,
                             EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
                     notifEquiv.insert();
+
+                    // Notify the defender which triggered the duel about it !
+                    if (isMutantKillable) {
+                        int defenderId = DatabaseAccess.getEquivalentDefenderId(m);
+                        notification = eventUser.getUsername() + " accepts that the mutant " + m.getId()
+                                + "that you claimed equivalent is equivalent, but that mutant was killable.";
+                        Event notifDefenderEquiv = new Event(-1, game.getId(), defenderId, notification,
+                                EventType.GAME_MESSAGE_DEFENDER, EventStatus.GAME,
+                                new Timestamp(System.currentTimeMillis()));
+                        notifDefenderEquiv.insert();
+                    }
+
 
                     response.sendRedirect(request.getContextPath() + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                     return;
@@ -787,14 +846,15 @@ public class MultiplayerGameManager extends HttpServlet {
             List<Mutant> mutantsPendingTests = game.getMutantsMarkedEquivalentPending();
             boolean killedClaimed = false;
             int killedOthers = 0;
+            boolean isMutantKillable = false;
+
             for (Mutant mPending : mutantsPendingTests) {
+
                 // TODO: Doesnt distinguish between failing because the test didnt run at all and failing because it detected the mutant
                 mutationTester.runEquivalenceTest(newTest, mPending); // updates mPending
 
                 if (mPending.getEquivalent() == Mutant.Equivalence.PROVEN_NO) {
                     logger.debug("Test {} killed mutant {} and proved it non-equivalent", newTest.getId(), mPending.getId());
-                    // TODO Phil 23/09/18: comment below doesn't make sense, literally 0 points added.
-                    newTest.updateScore(0); // score 2 points for proving a mutant non-equivalent
                     final String message = UserDAO.getUserById(userId).getUsername() + " killed mutant " + mPending.getId() + " in an equivalence duel.";
                     Event notif = new Event(-1, gameId, userId, message, EventType.ATTACKER_MUTANT_KILLED_EQUIVALENT, EventStatus.GAME,
                             new Timestamp(System.currentTimeMillis()));
@@ -805,34 +865,46 @@ public class MultiplayerGameManager extends HttpServlet {
                         killedOthers++;
                     }
                 } else { // ASSUMED_YES
+
                     if (mPending.getId() == mutantId) {
-                        // only kill the one mutant that was claimed
-                        mPending.kill(ASSUMED_YES);
-                        final String message = UserDAO.getUserById(userId).getUsername() +
+                        // Here we check if the accepted equivalence is "possibly" equivalent
+                        isMutantKillable = isMutantKillableByOtherTests( mPending );
+                        String notification = UserDAO.getUserById(userId).getUsername() +
                                 " lost an equivalence duel. Mutant " + mPending.getId() +
                                 " is assumed equivalent.";
-                        Event notif = new Event(-1, gameId, userId, message,
+
+                        if (isMutantKillable) {
+                            notification = notification + " " + "However, the mutant was killable !";
+                        }
+
+                        // only kill the one mutant that was claimed
+                        mPending.kill(ASSUMED_YES);
+
+                        Event notif = new Event(-1, gameId, userId, notification,
                                 EventType.DEFENDER_MUTANT_EQUIVALENT, EventStatus.GAME,
                                 new Timestamp(System.currentTimeMillis()));
                         notif.insert();
+
                     }
                     logger.debug("Test {} failed to kill mutant {}, hence mutant is assumed equivalent", newTest.getId(), mPending.getId());
+
                 }
             }
+
             if (killedClaimed) {
                 messages.add(TEST_KILLED_CLAIMED_MUTANT_MESSAGE);
-                if (killedOthers == 1) {
-                    messages.add("...and it also killed another claimed mutant!");
-                } else if (killedOthers > 1) {
-                    messages.add(String.format("...and it also killed other %d claimed mutants!", killedOthers));
-                }
             } else {
-                messages.add(TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE);
-                if (killedOthers == 1) {
-                    messages.add("...however, your test did kill another claimed mutant!");
-                } else if (killedOthers > 1) {
-                    messages.add(String.format("...however, your test killed other %d claimed mutants!", killedOthers));
+                String message = TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE;
+                if (isMutantKillable) {
+                    message = message + " " + "Unfortunately, the mutant was killable !";
                 }
+                messages.add(message);
+            }
+
+            if (killedOthers == 1) {
+                messages.add("Additionally, your test did kill another claimed mutant!");
+            } else if (killedOthers > 1) {
+                messages.add(String.format("Additionally, your test killed other %d claimed mutants!", killedOthers));
             }
 
             TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
@@ -962,5 +1034,46 @@ public class MultiplayerGameManager extends HttpServlet {
                 messages.add("Your test has the following smells: " + join);
             }
         }
+    }
+
+    /**
+     * Selects a max of AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD tests randomly sampled
+     * which cover the mutant but belongs to other games and executes them against the mutant.
+     *
+     * @param mutantToValidate
+     * @return whether the mutant is killable or not/cannot be validated
+     */
+    boolean isMutantKillableByOtherTests(Mutant mutantToValidate) {
+        int maxTestsThatCanBeRunForValidatingTheDuel = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.FAILED_DUEL_VALIDATION_THRESHOLD).getIntValue();
+        if (maxTestsThatCanBeRunForValidatingTheDuel <= 0) {
+            return false;
+        }
+
+        // Get all the covering tests of this mutant which do not belong to this game
+        int classId = mutantToValidate.getClassId();
+        List<Test> tests = TestDAO.getValidTestsForClass(classId);
+
+        // Remove tests which belong to the same game as the mutant
+        tests.removeIf(test -> test.getGameId() == mutantToValidate.getGameId());
+
+        List<Test> selectedTests = regressionTestCaseSelector.select(tests, maxTestsThatCanBeRunForValidatingTheDuel);
+        logger.debug("Validating the mutant with {} selected tests:\n{}", selectedTests.size(), selectedTests);
+
+        // At the moment this is purposely blocking. This is the dumbest, but safest way to deal with it while we design a better solution.
+        KillMap killmap = KillMap.forMutantValidation(selectedTests, mutantToValidate, classId);
+
+        if (killmap == null) {
+            // There was an error we cannot empirically prove the mutant was killable.
+            logger.warn("An error prevents validation of mutant {}", mutantToValidate);
+            return false;
+        } else {
+            for (KillMapEntry killMapEntry : killmap.getEntries()) {
+                if (killMapEntry.status.equals(KillMapEntry.Status.KILL)
+                    || killMapEntry.status.equals(KillMapEntry.Status.ERROR)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

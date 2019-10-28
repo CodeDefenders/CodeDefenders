@@ -181,6 +181,8 @@
     <input type="hidden" name="formType" value="logOut">
 </form>
 
+<jsp:include page="/jsp/game_components/progress_bar_common.jsp"/>
+
 <%
     ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
     request.getSession().removeAttribute("messages");

@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.util.Optional;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,10 +54,11 @@ import static org.codedefenders.util.Constants.REQUEST_ATTRIBUTE_PUZZLE_GAME;
  * <p>
  * Serves under {@code /puzzle/games}.
  *
- * @author <a href=https://github.com/werli>Phil Werli<a/>
+ * @author <a href=https://github.com/werli>Phil Werli</a>
  * @see PuzzleGameManager
  * @see PuzzleGame
  */
+@WebServlet("/puzzle/games")
 public class PuzzleGameSelectionManager extends HttpServlet {
     private static Logger logger = LoggerFactory.getLogger(PuzzleGameSelectionManager.class);
 
@@ -94,16 +96,7 @@ public class PuzzleGameSelectionManager extends HttpServlet {
      * @throws IOException when redirecting fails.
      */
     static void createGame(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        final HttpSession session = request.getSession();
         final int userId = ServletUtils.userId(request);
-
-        final boolean canCreateGames = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.GAME_CREATION).getBoolValue();
-        if (!canCreateGames) {
-            logger.warn("User {} tried to create a puzzle game, but creating games is not permitted.", userId);
-            Redirect.redirectBack(request, response);
-            return;
-        }
-
         final Optional<Integer> puzzleId = getIntParameter(request, "puzzleId");
         if (!puzzleId.isPresent()) {
             logger.error("Failed to retrieve puzzleId from request.");

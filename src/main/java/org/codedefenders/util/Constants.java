@@ -113,11 +113,13 @@ public class Constants {
 
     public static final String BATTLEGROUND_GAME_VIEW_JSP = "/jsp/battleground/game_view.jsp";
 
+
     public static final String PUZZLE_OVERVIEW_VIEW_JSP = "/jsp/puzzle/puzzle_overview.jsp";
     public static final String PUZZLE_GAME_ATTACKER_VIEW_JSP = "/jsp/puzzle/attacker_view.jsp";
     public static final String PUZZLE_GAME_DEFENDER_VIEW_JSP = "/jsp/puzzle/defender_view.jsp";
 
     public static final String USER_GAMES_OVERVIEW_JSP = "/jsp/user_games_view.jsp";
+    public static final String GAMES_HISTORY_JSP = "/jsp/games_history.jsp";
     public static final String CLASS_UPLOAD_VIEW_JSP = "/jsp/upload_class_view.jsp";
 
     public static final String ADMIN_USER_JSP = "/jsp/admin_user_mgmt.jsp";
@@ -145,7 +147,7 @@ public class Constants {
     public static final String TEST_KILLED_CLAIMED_MUTANT_MESSAGE = "Yay, your test killed the allegedly equivalent mutant. You won the duel!";
     public static final String TEST_DID_NOT_KILL_CLAIMED_MUTANT_MESSAGE = "Oh no, your test did not kill the possibly equivalent mutant! You lost the duel.";
     public static final String TEST_SUBMITTED_MESSAGE = "Test submitted and ready to kill mutants!";
-    public static final String TEST_KILLED_ZERO_MESSAGE = "Your test did not kill any mutant, just yet.";
+    public static final String TEST_KILLED_ZERO_MESSAGE = "Your test has not killed any mutants, just yet.";
     public static final String TEST_KILLED_LAST_MESSAGE = "Great, your test killed the last mutant!";
     public static final String TEST_KILLED_ONE_MESSAGE = "Great, your test killed a mutant!";
     public static final String TEST_KILLED_N_MESSAGE = "Awesome! Your test killed %d mutants!"; // number of mutants
@@ -158,7 +160,7 @@ public class Constants {
     public static final String MUTANT_CREATION_ERROR_MESSAGE = "Oops! Something went wrong and the mutant was not created.";
     public static final String MUTANT_DUPLICATED_MESSAGE = "Sorry, your mutant already exists in this game!";
     public static final String MUTANT_CLAIMED_EQUIVALENT_MESSAGE = "Mutant claimed as equivalent, waiting for attacker to respond.";
-    public static final String MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE = "Something went wrong claiming equivalent mutant"; // TODO: How?
+    public static final String MUTANT_CLAIMED_EQUIVALENT_ERROR_MESSAGE = "Something went wrong claiming an equivalent mutant"; // TODO: How?
     public static final String MUTANT_CANT_BE_CLAIMED_EQUIVALENT_MESSAGE = "Cheeky! You cannot claim equivalence on untested lines!";
     public static final String MUTANT_KILLED_BY_TEST_MESSAGE = "Test %d killed your mutant. Better luck with the next one!"; // test
     public static final String MUTANT_SUBMITTED_MESSAGE = "Mutant submitted, may the force be with it.";
@@ -172,7 +174,7 @@ public class Constants {
     // Request attributes
     public static final String REQUEST_ATTRIBUTE_PUZZLE_GAME = "active_user_puzzle_game";
 
-    public static final String ATTACKER_HAS_PENDING_DUELS = "Sorry, your mutant cannot be accepted because you have pending equivalence duels !\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
+    public static final String ATTACKER_HAS_PENDING_DUELS = "Sorry, your mutant cannot be accepted because you have pending equivalence duels!\nNo worries your mutant would be there ready to be submitted once you solve all your equivalence duels.";
 
     public static final String DEFAULT_KILL_MESSAGE = "Sorry, no kill message available for this mutant";
 }

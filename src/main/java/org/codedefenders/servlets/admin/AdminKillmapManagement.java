@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -75,6 +76,7 @@ import static org.codedefenders.util.MessageUtils.addMessage;
  *      <li>ids: either a comma separated list or a JSON array of class/game ids</li>
  * </ul>
  */
+@WebServlet("/admin/killmaps/*")
 public class AdminKillmapManagement extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminKillmapManagement.class);
 

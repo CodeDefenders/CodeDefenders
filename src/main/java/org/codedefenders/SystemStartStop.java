@@ -21,12 +21,14 @@ package org.codedefenders;
 import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.annotation.WebListener;
 
 import org.codedefenders.database.ConnectionPool;
 import org.codedefenders.execution.ThreadPoolManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@WebListener
 public class SystemStartStop implements ServletContextListener {
     private static final Logger logger = LoggerFactory.getLogger(SystemStartStop.class);
 

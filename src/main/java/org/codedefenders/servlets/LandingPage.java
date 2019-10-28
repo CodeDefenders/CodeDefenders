@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016-2019 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.codedefenders.servlets;
 
 import org.codedefenders.database.MultiplayerGameDAO;
@@ -8,7 +26,12 @@ import org.codedefenders.util.Constants;
 import org.codedefenders.util.Paths;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.temporal.ChronoField;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -24,9 +47,9 @@ import static org.codedefenders.servlets.util.ServletUtils.ctx;
  * {@code GET} requests redirects to a landing page, depending whether
  * the requesting user is logged in or not.
  * <p>
- * Serves under {@code /games/overview}.
+ * Serves under {@code /}.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see org.codedefenders.util.Paths#LANDING_PAGE
  */
 @WebServlet("")
@@ -39,7 +62,14 @@ public class LandingPage extends HttpServlet {
             response.sendRedirect(ctx(request) + Paths.GAMES_OVERVIEW);
         } else {
             // User logged not in? Show him the landing page.
-            final List<MultiplayerGame> availableMultiplayerGames = MultiplayerGameDAO.getAvailableMultiplayerGames();
+            List<MultiplayerGame> availableMultiplayerGames = MultiplayerGameDAO.getAvailableMultiplayerGames();
+            Collections.shuffle(availableMultiplayerGames, new Random(LocalDate.now().getLong(ChronoField.EPOCH_DAY)));
+            availableMultiplayerGames = availableMultiplayerGames
+                    .stream()
+                    .filter(game -> game.getDefenderPlayers().size() != 0 && game.getAttackerPlayers().size() != 0)
+                    .limit(10)
+                    .collect(Collectors.toList());
+
             request.setAttribute("openMultiplayerGames", availableMultiplayerGames);
 
             request.setAttribute("gameCreatorNames", UserDAO.getGamesCreatorNames(availableMultiplayerGames));

@@ -33,7 +33,7 @@ import java.util.TreeSet;
  * Implements {@link Comparable} by comparing the positions of the
  * puzzle chapters.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see PuzzleEntry
  */
 public class PuzzleChapterEntry implements Comparable {

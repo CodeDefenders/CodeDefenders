@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -52,6 +53,7 @@ import javax.servlet.http.HttpSession;
  * Serves on path: {@code /api/notifications}.
  * @see org.codedefenders.util.Paths#API_NOTIFICATION
  */
+@WebServlet("/api/notifications")
 public class NotificationsHandler extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(NotificationsHandler.class);
     private static final Gson gson = new Gson();
@@ -185,7 +187,7 @@ public class NotificationsHandler extends HttpServlet {
 
         final String username = UserDAO.getUserById(userId).getUsername();
         for (Event e : events) {
-            e.setCurrentUserName("@" + username);
+            e.setCurrentUserName(username);
             e.parse(e.getEventStatus() == EventStatus.GAME);
         }
 
@@ -238,7 +240,7 @@ public class NotificationsHandler extends HttpServlet {
 
         final String username = UserDAO.getUserById(userId).getUsername();
         for (Event e : events) {
-            e.setCurrentUserName("@" + username);
+            e.setCurrentUserName(username);
             e.parse(e.getEventStatus() == EventStatus.GAME);
         }
 
@@ -275,7 +277,7 @@ public class NotificationsHandler extends HttpServlet {
         // DatabaseAccess#getNewEventsForUser(int, long) never returns null, so no need for extra check
         final List<Event> events = DatabaseAccess.getNewEventsForUser(userId, timestamp)
                 .stream()
-                .peek(event -> event.setCurrentUserName("@" + username))
+                .peek(event -> event.setCurrentUserName(username))
                 .peek(event -> event.parse(event.getEventStatus() == EventStatus.GAME))
                 .collect(Collectors.toList());
 

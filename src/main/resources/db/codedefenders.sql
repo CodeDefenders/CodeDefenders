@@ -61,7 +61,8 @@ INSERT INTO settings (name, type, STRING_VALUE, INT_VALUE, BOOL_VALUE) VALUES
   ('EMAIL_PASSWORD', 'STRING_VALUE', '', NULL, NULL),
   ('AUTOMATIC_KILLMAP_COMPUTATION', 'BOOL_VALUE', NULL, NULL, FALSE),
   ('ALLOW_USER_PROFILE', 'BOOL_VALUE', NULL, NULL, TRUE),
-  ('PRIVACY_NOTICE', 'STRING_VALUE', '', NULL, NULL);
+  ('PRIVACY_NOTICE', 'STRING_VALUE', '', NULL, NULL),
+  ('FAILED_DUEL_VALIDATION_THRESHOLD', 'INT_VALUE', NULL, 20, NULL);
 
 --
 -- Table structure for table `ratings`
@@ -94,6 +95,8 @@ CREATE TABLE `classes` (
   `RequireMocking` tinyint(1) DEFAULT '0',
   `Puzzle` tinyint(1) NOT NULL DEFAULT '0',
   `Active` tinyint(1) NOT NULL DEFAULT '1',
+  `TestingFramework` ENUM('JUNIT4', 'JUNIT5') NOT NULL DEFAULT 'JUNIT4',
+  `AssertionLibrary` ENUM('JUNIT4', 'JUNIT5', 'HAMCREST', 'JUNIT4_HAMCREST', 'JUNIT5_HAMCREST') NOT NULL DEFAULT 'JUNIT4_HAMCREST',
   PRIMARY KEY (`Class_ID`),
   UNIQUE KEY `classes_Alias_uindex` (`Alias`)
 ) AUTO_INCREMENT=100;
@@ -581,14 +584,14 @@ FROM `view_active_classes`
 WHERE Puzzle = 1;
 
 CREATE OR REPLACE VIEW `view_battleground_games` AS
-SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.Active
+SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle
 FROM games,
      classes
 WHERE Mode = 'PARTY'
   AND games.Class_ID = classes.Class_ID;
 
 CREATE OR REPLACE VIEW `view_puzzle_games` AS
-SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.Active
+SELECT games.*, classes.Name, classes.JavaFile, classes.ClassFile, classes.Alias, classes.RequireMocking, classes.TestingFramework, classes.AssertionLibrary, classes.Active, classes.Puzzle
 FROM games,
      classes
 WHERE Mode = 'PUZZLE'

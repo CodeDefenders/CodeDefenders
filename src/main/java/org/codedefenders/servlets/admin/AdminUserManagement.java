@@ -40,6 +40,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -51,6 +52,7 @@ import javax.servlet.http.HttpSession;
  * Serves on path: {@code /admin/users}.
  * @see org.codedefenders.util.Paths#ADMIN_USERS
  */
+@WebServlet("/admin/users")
 public class AdminUserManagement extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminUserManagement.class);
 

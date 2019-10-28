@@ -31,11 +31,13 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+@WebServlet("/api/feedback")
 public class FeedbackManager extends HttpServlet {
 
     private static final Logger logger = LoggerFactory.getLogger(FeedbackManager.class);

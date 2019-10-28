@@ -35,7 +35,7 @@
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_TEST);
     List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
-
+    
     if (previousTestCode != null) {
         request.setAttribute("testCode", previousTestCode);
         /* error_highlighting */
@@ -47,7 +47,8 @@
     request.setAttribute("mockingEnabled", cut.isMockingEnabled());
     request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
 
-    /* tests_carousel */
+    /* test_accordion */
+    request.setAttribute("cut", cut);
     request.setAttribute("tests", game.getTests());
     request.setAttribute("mutants", game.getMutants());
 
@@ -116,7 +117,7 @@
 
     <div class="col-md-6">
         <h3>JUnit tests </h3>
-        <%@include file="../game_components/tests_carousel.jsp"%>
+        <jsp:include page="/jsp/game_components/test_accordion.jsp"/>
     </div>
 </div>
 

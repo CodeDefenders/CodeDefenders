@@ -84,7 +84,7 @@ public class Mutant implements Serializable {
 
     // Derived and cached
     private String summaryString;
-    
+
     /* Mutant Equivalence */
     public enum Equivalence {
         ASSUMED_NO, PENDING_TEST, DECLARED_YES, ASSUMED_YES, PROVEN_NO
@@ -107,7 +107,7 @@ public class Mutant implements Serializable {
     private List<Integer> lines = null;
     private transient List<String> description = null;
     private transient Patch difference = null;
-    
+
     private String killMessage;
 
     /**
@@ -308,6 +308,7 @@ public class Mutant implements Serializable {
         return false;
     }
 
+    // This might return several instances of the same test since Test does not implement hash and equalsTo
     public Set<Test> getCoveringTests() {
         Set<Test> coveringTests = new LinkedHashSet<>();
 
@@ -364,7 +365,7 @@ public class Mutant implements Serializable {
         difference = DiffUtils.diff(sutLines, mutantLines);
     }
 
-    private String getPatchString() {
+    public String getPatchString() {
         GameClass sut = GameClassDAO.getClassForGameId(gameId);
         if( sut == null ){
             // in this case gameId might have been -1 (upload)
@@ -392,23 +393,23 @@ public class Mutant implements Serializable {
     public String getHTMLEscapedPatchString() {
         return StringEscapeUtils.escapeHtml(getPatchString());
     }
-    
+
     public Test getKillingTest(){
         return DatabaseAccess.getKillingTestForMutantId(id);
     }
-    
+
     public String getKillMessage() {
         if( killMessage != null ){
             return killMessage;
         } else {
             return Constants.DEFAULT_KILL_MESSAGE;
         }
-        
+
     }
     public String getHTMLEscapedKillMessage() {
         return StringEscapeUtils.escapeHtml(getKillMessage());
     }
-    
+
 
     public boolean insert() {
         try {
@@ -436,7 +437,7 @@ public class Mutant implements Serializable {
         }
         return lines;
     }
-    
+
     public String getSummaryString(){
         if (summaryString == null) {
             computeLinesAndDescription();
@@ -454,9 +455,9 @@ public class Mutant implements Serializable {
         // This workflow is not really nice...
         List<Integer> mutatedLines = new ArrayList<>();
         description = new ArrayList<>();
-        
+
         List<String> fragementSummary = new ArrayList<>();
-        
+
         Patch p = getDifferences();
         for (Delta d : p.getDeltas()) {
             Chunk chunk = d.getOriginal();
@@ -497,7 +498,7 @@ public class Mutant implements Serializable {
         }
 
         setLines( mutatedLines );
-        
+
         // Generate the summaryString
         summaryString = String.join(",", fragementSummary);
     }

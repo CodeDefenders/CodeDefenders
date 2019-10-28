@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2016-2019 Code Defenders contributors
- * <p>
+ *
  * This file is part of Code Defenders.
  *
  * Code Defenders is free software: you can redistribute it and/or modify
@@ -19,27 +19,33 @@
 package org.codedefenders.util;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 /**
  * This class offers static utility classes for creating and
  * reading {@code .zip} files.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class ZipFileUtils {
+    private static final Logger logger = LoggerFactory.getLogger(ZipFileUtils.class);
 
     /**
      * Creates a {@link ZipFile} object for a given {@code byte[]}.
@@ -131,7 +137,7 @@ public class ZipFileUtils {
                     Files.createDirectory(filePath);
                 } else {
                     final InputStreamReader in = new InputStreamReader(zipFile.getInputStream(zipEntry));
-                    final byte[] content = IOUtils.toByteArray(in, Charset.forName("UTF-8"));
+                    final byte[] content = IOUtils.toByteArray(in, StandardCharsets.UTF_8);
                     final Path file = Files.createFile(filePath);
                     Files.write(file, content);
                 }
@@ -147,5 +153,34 @@ public class ZipFileUtils {
         }
         return tempDirectory;
 
+    }
+
+    /**
+     * Creates a ZIP file and returns the bytes for a given mapping of file name to file content.
+     *
+     * @param files the file map from name to content.
+     * @return the bytes of a ZIP file
+     * @throws IOException when creating the zip file fails at any point.
+     */
+    public static byte[] zipFiles(Map<String, byte[]> files) throws IOException {
+        final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        final ZipOutputStream zos = new ZipOutputStream(baos);
+
+        for (String fileName : files.keySet()) {
+            final ZipEntry e = new ZipEntry(fileName);
+            try {
+                zos.putNextEntry(e);
+                zos.write(files.get(fileName));
+                zos.closeEntry();
+            } catch (Exception entryException) {
+                logger.error("Failed to add file to ZIP file.", entryException);
+            }
+        }
+        zos.finish();
+        zos.close();
+
+        final byte[] bytes = baos.toByteArray();
+        baos.close();
+        return bytes;
     }
 }

@@ -43,6 +43,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.TestDAO;
+import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
@@ -169,14 +170,10 @@ public class KillMap {
      * @throws InterruptedException If the computation is interrupted.
      * @throws ExecutionException If an error occurred during an execution.
      */
-    private void compute() throws InterruptedException, ExecutionException {
+    private void compute(ExecutorService executor) throws InterruptedException, ExecutionException {
         Instant startTime = Instant.now();
 
         List<Future<KillMapEntry>> executionResults = new LinkedList<>();
-
-        ExecutorService executor = PARALLELIZE
-                ? Executors.newFixedThreadPool(NUM_THREADS)
-                : Executors.newSingleThreadExecutor();
 
         if (Thread.currentThread().isInterrupted()) {
             executor.shutdownNow();
@@ -235,7 +232,14 @@ public class KillMap {
             synchronized (KillMap.class) {
                 logger.info(String.format("Computing killmap for %s game %d: %d tests, %d mutants, %d entries provided",
                         game.getMode(), game.getId(), tests.size(), mutants.size(), entries.size()));
-                killmap.compute();
+                
+                // TODO refactor this into a CDI
+                ExecutorService executor = PARALLELIZE
+                        ? Executors.newFixedThreadPool(NUM_THREADS)
+                        : Executors.newSingleThreadExecutor();
+                        
+                killmap.compute(executor);
+                
                 if (game.isFinished()) {
                     KillmapDAO.setHasKillMap(game.getId(), true);
                 }
@@ -266,7 +270,12 @@ public class KillMap {
             synchronized (KillMap.class) {
                 logger.info(String.format("Computing killmap for class %d: %d tests, %d mutants, %d entries provided",
                         classId, tests.size(), mutants.size(), entries.size()));
-                killmap.compute();
+             // TODO refactor this into a CDI
+                ExecutorService executor = PARALLELIZE
+                        ? Executors.newFixedThreadPool(NUM_THREADS)
+                        : Executors.newSingleThreadExecutor();
+                        
+                killmap.compute(executor);
             }
         } else {
             logger.info("Killmap for class " + classId + " already computed");
@@ -298,7 +307,12 @@ public class KillMap {
                 synchronized (KillMap.class) {
                     logger.info(String.format("Computing custom killmap (class %d): %d tests, %d mutants, %d entries provided",
                             classId, tests.size(), mutants.size(), entries.size()));
-                    killmap.compute();
+                 // TODO refactor this into a CDI
+                    ExecutorService executor = PARALLELIZE
+                            ? Executors.newFixedThreadPool(NUM_THREADS)
+                            : Executors.newSingleThreadExecutor();
+                            
+                    killmap.compute(executor);
                 }
             } else {
                 logger.info("Custom killmap for class " + classId + " already computed");
@@ -306,6 +320,39 @@ public class KillMap {
 
             return killmap;
         }
+    }
+    
+    /**
+     * Returns the killmap for the given tests against a mutant to validate if the claimed equivalent mutant is killable.
+     * 
+     * The tests and mutants must belong to the same class (with the same class id).
+     * 
+     * <bf>This operation is blocking and may take a long time</bf>
+     *
+     * @param tests The tests used for the validation.
+     * @param mutant The mutant to validate.
+     * @param classId The class id of the class the tests and mutants belong to.
+     * 
+     */
+    public static KillMap forMutantValidation(List<Test> tests, Mutant mutant, int classId) {
+        List<KillMapEntry> entries = new ArrayList<>();
+        KillMap killmap = new KillMap(tests, Arrays.asList(new Mutant[] { mutant }), classId, entries);
+        logger.debug("Validating mutant {} using custom killmap (partial results are stored in the db) using: {} tests", mutant, tests.size());
+
+        // TODO this creates a surge in the load as the number of executor services might grow 
+        // by refactoring this into a CDI we should be able to easily control the situation and queue jobs. 
+        ExecutorService executor = PARALLELIZE
+                ? Executors.newFixedThreadPool(NUM_THREADS)
+                : Executors.newSingleThreadExecutor();
+           
+        try {
+            killmap.compute(executor);
+        } catch (InterruptedException | ExecutionException e) {
+            logger.error("Exception while validating mutant {} using custom killmap", e);
+            return null;
+        }
+
+        return killmap;
     }
 
     /**

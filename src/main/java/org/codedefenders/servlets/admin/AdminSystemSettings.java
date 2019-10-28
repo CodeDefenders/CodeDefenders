@@ -27,11 +27,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+@WebServlet("/admin/settings")
+// TODO Does this enable CDI using @Property@Inject ?
 public class AdminSystemSettings extends HttpServlet {
 
     public enum SETTING_NAME {
@@ -154,7 +157,14 @@ public class AdminSystemSettings extends HttpServlet {
             public String toString() {
                 return "Let users view and edit their profile.";
             }
+        },
+        FAILED_DUEL_VALIDATION_THRESHOLD {
+            @Override
+            public String toString() {
+                return "The maximum number of tests that will run to validate a lost equivalence duel.";
+            }
         }
+
     }
 
     public enum SETTING_TYPE {

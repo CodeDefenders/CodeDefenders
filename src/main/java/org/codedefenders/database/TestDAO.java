@@ -21,6 +21,7 @@ package org.codedefenders.database;
 import org.codedefenders.database.DB.RSMapper;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.LineCoverage;
+import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Test;
 import org.codedefenders.util.FileUtils;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 /**
  * This class handles the database logic for tests.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see Test
  */
 public class TestDAO {
@@ -174,6 +175,26 @@ public class TestDAO {
         return result;
     }
 
+    public static List<Test> getValidTestsForGameSubmittedAfterMutant(int gameId, boolean defendersOnly,
+            Mutant aliveMutant) {
+        /*
+         * ATM, we do not consider system generated tests, as they will be
+         * automatically ruled out by the timestamp Unless, we allow new system
+         * tests to be submitted also after the game started (#102)
+         */
+        // TODO Not sure if using table 'mutants' here is correct or we
+        // need to use some view instead...
+        String query = String.join("\n",
+                "SELECT t.*",
+                "FROM view_valid_tests t",
+                (defendersOnly ? "INNER JOIN players pl on t.Player_ID = pl.ID" : ""),
+                "WHERE t.Timestamp >= (select mutants.Timestamp from mutants where mutants.Mutant_ID = ? ) AND t.Game_ID=? ",
+                (defendersOnly ? "AND pl.Role='DEFENDER';" : ";"));
+        return DB.executeQueryReturnList(query, TestDAO::testFromRS,
+                DatabaseValue.of(aliveMutant.getId()),
+                DatabaseValue.of(gameId));
+    }
+
     /**
      * Returns the valid {@link Test Tests} from the games played on the given class.
      * Valid tests are compilable and do not fail when executed against the original class.
@@ -233,8 +254,8 @@ public class TestDAO {
         String linesUncovered = "";
 
         if (lineCoverage != null) {
-            linesCovered = lineCoverage.getLinesCovered().stream().map(Object::toString).collect(Collectors.joining(","));
-            linesUncovered = lineCoverage.getLinesUncovered().stream().map(Object::toString).collect(Collectors.joining(","));
+            linesCovered = lineCoverage.getLinesCovered().stream().sorted().map(Object::toString).collect(Collectors.joining(","));
+            linesUncovered = lineCoverage.getLinesUncovered().stream().sorted().map(Object::toString).collect(Collectors.joining(","));
         }
 
         String query = "INSERT INTO tests (JavaFile, ClassFile, Game_ID, RoundCreated, MutantsKilled, Player_ID, Points, Class_ID, Lines_Covered, Lines_Uncovered) VALUES (?,?,?,?,?,?,?,?,?,?);";
@@ -362,4 +383,5 @@ public class TestDAO {
 
         return DB.executeUpdateQuery(query, values);
     }
+
 }

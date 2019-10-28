@@ -1,11 +1,31 @@
+/*
+ * Copyright (C) 2016-2019 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.codedefenders.model;
 
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.multiplayer.MultiplayerGame;
+import org.codedefenders.game.multiplayer.PlayerScore;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class contains information about a {@link MultiplayerGame} from the view of a single {@link User}.
@@ -14,7 +34,7 @@ import java.util.List;
  * game creator's name. {@link Type} also specifies whether the user is already active in this game
  * ({@link Type#ACTIVE}) or can join this game ({@link Type#OPEN}).
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class UserMultiplayerGameInfo {
     private Type type;
@@ -25,11 +45,13 @@ public class UserMultiplayerGameInfo {
     private String creatorName;
 
     /**
-     * Use {@link #forOpen(int, MultiplayerGame, String) forActive()} and
-     * {@link #forActive(int, MultiplayerGame, Role, String) forOpen()} methods.
-     *
+     * Use {@link #forOpen(int, MultiplayerGame, String) forActive()},
+     * {@link #forActive(int, MultiplayerGame, Role, String) forOpen()} and
+     * {@link #forFinished(int, MultiplayerGame, String) forFinished()}
+     * methods instead
      */
-    private UserMultiplayerGameInfo() {}
+    private UserMultiplayerGameInfo() {
+    }
 
     public static UserMultiplayerGameInfo forActive(int userId, MultiplayerGame game, Role role, String creatorName) {
         UserMultiplayerGameInfo info = new UserMultiplayerGameInfo();
@@ -45,6 +67,16 @@ public class UserMultiplayerGameInfo {
     public static UserMultiplayerGameInfo forOpen(int userId, MultiplayerGame game, String creatorName) {
         UserMultiplayerGameInfo info = new UserMultiplayerGameInfo();
         info.type = Type.OPEN;
+        info.userId = userId;
+        info.game = game;
+        info.creatorName = creatorName;
+
+        return info;
+    }
+
+    public static UserMultiplayerGameInfo forFinished(int userId, MultiplayerGame game, String creatorName) {
+        UserMultiplayerGameInfo info = new UserMultiplayerGameInfo();
+        info.type = Type.FINISHED;
         info.userId = userId;
         info.game = game;
         info.creatorName = creatorName;
@@ -93,12 +125,20 @@ public class UserMultiplayerGameInfo {
         return game.getDefenderPlayers();
     }
 
+    public int cutId() {
+        return game.getCUT().getId();
+    }
+
     public String cutAlias() {
         return game.getCUT().getAlias();
     }
 
-    public String cutSource() {
-        return game.getCUT().getAsHTMLEscapedString();
+    public Map<Integer, PlayerScore> getMutantScores() {
+        return game.getMutantScores();
+    }
+
+    public Map<Integer, PlayerScore> getTestScores() {
+        return game.getTestScores();
     }
 
     private enum Type {
@@ -109,6 +149,10 @@ public class UserMultiplayerGameInfo {
         /**
          * The user could join this game.
          */
-        OPEN
+        OPEN,
+        /**
+         * The user part of this game, but it is now finished.
+         */
+        FINISHED
     }
 }

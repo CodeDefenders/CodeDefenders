@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.Range;
-import org.apache.xerces.util.SynchronizedSymbolTable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +49,7 @@ import com.github.javaparser.printer.PrettyPrinterConfiguration;
  * using the {@link #visitCode(String, String) visitCode} method.
  * Stores results in a {@link CodeAnalysisResult} instance and returns it.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see ResultVisitor
  * @see CodeAnalysisResult
  */
@@ -113,8 +112,8 @@ public class ClassCodeAnalyser {
             nonEmptyLines.add(blockEnd);
 
             // Lines which contain comments are not empty
-            for(Comment c : n.getAllContainedComments()){
-                for(int line = c.getBegin().get().line; line <= c.getEnd().get().line; line ++ ){
+            for (Comment c : n.getAllContainedComments()) {
+                for (int line = c.getBegin().get().line; line <= c.getEnd().get().line; line++) {
                     nonEmptyLines.add( line );
                 }
             }
@@ -123,12 +122,12 @@ public class ClassCodeAnalyser {
             NodeList<Statement> statements = n.getStatements();
             if (!statements.isEmpty()) {
                 // Lines which contain statements (and are not block themselves) are not empty
-                for( Statement s : statements ){
-                    if( s instanceof BlockStmt ){
+                for (Statement s : statements) {
+                    if (s instanceof BlockStmt) {
                         continue;
                     }
-                    for(int line = s.getBegin().get().line; line <= s.getEnd().get().line; line ++ ){
-                        nonEmptyLines.add( line );
+                    for (int line = s.getBegin().get().line; line <= s.getEnd().get().line; line++) {
+                        nonEmptyLines.add(line);
                     }
                 }
 
@@ -141,8 +140,8 @@ public class ClassCodeAnalyser {
 
                 Set<Integer> emptyLines = new HashSet<>();
                 // At this point we get empty lines by difference by removing from the block all the non empty lines
-                for( int line = blockStart; line <= blockEnd; line ++ ){
-                    if( nonEmptyLines.contains( line ) ){
+                for (int line = blockStart; line <= blockEnd; line++) {
+                    if (nonEmptyLines.contains(line)) {
                         continue;
                     }
                     result.emptyLine(line);
@@ -151,17 +150,17 @@ public class ClassCodeAnalyser {
 
                 // We finally found the lines which can cover those empty lines by looking at the first non-empty, non-comment statement
                 // If that is covered, then the empty is covered. TODO Not sure how we handle the '{' opening the blocks tho.
-                for(int emptyLine : emptyLines){
+                for (int emptyLine : emptyLines) {
                     // By default the end of the block which directly contains the empty line is the statement which can cover it
                     int coveringLine = blockEnd;
-                    for( Statement s : statements ){
+                    for (Statement s : statements) {
                         int sStart = s.getBegin().get().line;
-                        if( sStart < emptyLine ){
+                        if (sStart < emptyLine) {
                             // Skip statements that are before the empty line
                             continue;
                         } else {
                             // This works because statements are not empty and are not comments
-                            if( sStart <= coveringLine ){
+                            if (sStart <= coveringLine) {
                                 coveringLine = sStart;
                             }
                         }
@@ -266,8 +265,13 @@ public class ClassCodeAnalyser {
                 // method signatures are non coverable
                 result.nonCoverableCode(line);
             }
+
+            String signature = md.getDeclarationAsString(false, false, false);
+            signature = signature.substring(signature.indexOf(' ') + 1); // Remove return type
+
             result.methodSignatures(Range.between(methodBegin, methodBodyBegin));
             result.methods(Range.between(methodBegin, methodEnd));
+            result.testAccordionMethodDescription(signature, methodBegin, methodEnd);
         }
 
         private static void extractResultsFromConstructorDeclaration(ConstructorDeclaration cd, CodeAnalysisResult result) {
@@ -280,6 +284,9 @@ public class ClassCodeAnalyser {
                 // constructor signatures are non coverable
                 result.nonCoverableCode(line);
             }
+
+            String signature = cd.getDeclarationAsString(false, false, false);
+            result.testAccordionMethodDescription(signature, constructorBegin, constructorEnd);
 
             result.methodSignatures(Range.between(constructorBegin, constructorBodyBegin));
             result.methods(Range.between(constructorBegin, constructorEnd));

@@ -37,7 +37,7 @@ import static org.mockito.BDDMockito.given;
 /**
  * Tests the {@link DB#createPreparedStatement} implementations.
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ConnectionPool.class})

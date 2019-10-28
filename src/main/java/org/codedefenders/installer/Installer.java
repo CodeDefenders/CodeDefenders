@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2016-2019 Code Defenders contributors
+ *
+ * This file is part of Code Defenders.
+ *
+ * Code Defenders is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or (at
+ * your option) any later version.
+ *
+ * Code Defenders is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.codedefenders.installer;
 
 import com.lexicalscope.jewel.cli.CliFactory;
@@ -13,12 +31,14 @@ import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.execution.Compiler;
 import org.codedefenders.execution.KillMap;
 import org.codedefenders.execution.LineCoverageGenerator;
+import org.codedefenders.game.AssertionLibrary;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.LineCoverage;
 import org.codedefenders.game.Mutant;
 import org.codedefenders.game.Role;
 import org.codedefenders.game.Test;
+import org.codedefenders.game.TestingFramework;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.util.Constants;
@@ -70,7 +90,7 @@ import javax.sql.DataSource;
  * installer can be called programmatically inside code defenders.
  *
  * @author gambi
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  */
 public class Installer {
 
@@ -249,9 +269,9 @@ public class Installer {
         ic.createSubcontext("java:comp/env/codedefenders");
 
         // Alessio: Maybe there a better way to do it...
-        for (String pName : configurations.stringPropertyNames()) {
-            logger.info("Setting java:comp/env/codedefenders/" + pName + " = " + configurations.get(pName));
-            ic.bind("java:comp/env/codedefenders/" + pName, configurations.get(pName));
+        for (String propName : configurations.stringPropertyNames()) {
+            logger.info("Setting java:comp/env/codedefenders/" + propName + " = " + configurations.get(propName));
+            ic.bind("java:comp/env/codedefenders/" + propName, configurations.get(propName));
         }
 
         ic.createSubcontext("java:comp/env/jdbc");
@@ -290,11 +310,19 @@ public class Installer {
         String cutClassFilePath = Compiler.compileJavaFileForContent(cutJavaFilePath, fileContent);
         String classQualifiedName = FileUtils.getFullyQualifiedName(cutClassFilePath);
 
-        // Store the CUT
-        boolean isMockingEnabled = false;
-        GameClass cut = new GameClass(classQualifiedName, classAlias, cutJavaFilePath, cutClassFilePath, isMockingEnabled);
-        cut.insert();
+        GameClass cut = GameClass.build()
+                .name(classQualifiedName)
+                .alias(classAlias)
+                .javaFile(cutJavaFilePath)
+                .classFile(cutClassFilePath)
+                .mockingEnabled(false) // TODO: dont't use a default value
+                .testingFramework(TestingFramework.JUNIT4) // TODO: dont't use a default value
+                .assertionLibrary(AssertionLibrary.JUNIT4_HAMCREST) // TODO: dont't use a default value
+                .puzzleClass(true)
+                .active(false)
+                .create();
 
+        cut.insert();
         logger.info("installCut(): Stored Class " + cut.getId() + " to " + cutJavaFilePath);
 
         installedCuts.put(classAlias, cut);
@@ -463,7 +491,8 @@ public class Installer {
         String puzzleAlias = cutAlias + "_puzzle_" + puzzleAliasExt;
 
         // Create a puzzle cut with another alias for this puzzle
-        GameClass puzzleClass = GameClass.ofPuzzle(cut.getName(), puzzleAlias, cut.getJavaFile(), cut.getClassFile(), cut.isMockingEnabled());
+        GameClass puzzleClass = GameClass.ofPuzzle(cut, puzzleAlias);
+
         int puzzleClassId = GameClassDAO.storeClass(puzzleClass);
         logger.info("installPuzzle(); Created Puzzle Class " + puzzleClassId);
 
@@ -491,7 +520,7 @@ public class Installer {
         // Default values
         int maxAssertionsPerTest = CodeValidator.DEFAULT_NB_ASSERTIONS;
         boolean forceHamcrest = CodeValidator.DEFAULT_FORCE_HAMCREST;
-        
+
         CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.MODERATE;
 
         Puzzle puzzle = new Puzzle(-1, puzzleClassId, activeRole, level, maxAssertionsPerTest, forceHamcrest, mutantValidatorLevel,
@@ -499,7 +528,6 @@ public class Installer {
         int puzzleId = PuzzleDAO.storePuzzle(puzzle);
 
         List<Mutant> puzzleMutants = new ArrayList<>();
-        // TODO batch insert
         for (Mutant m : originalMutants) {
             Mutant puzzleMutant = new Mutant(m.getJavaFile(), m.getClassFile(), m.getMd5(), puzzleClassId);
             puzzleMutant.insert();
@@ -509,7 +537,6 @@ public class Installer {
         }
 
         List<Test> puzzleTests = new ArrayList<>();
-        // TODO batch insert
         for (Test t : originalTests) {
             Test puzzleTest = new Test(t.getJavaFile(), t.getClassFile(), puzzleClassId, t.getLineCoverage());
             puzzleTest.insert();
@@ -522,12 +549,9 @@ public class Installer {
 
         try {
             KillMap killMap = KillMap.forCustom(puzzleTests, puzzleMutants, puzzleClassId, new ArrayList<>());
-            for (KillMap.KillMapEntry entry : killMap.getEntries()) {
-                // TODO Phil 04/12/18: Batch insert instead of insert in a for loop
-                KillmapDAO.insertKillMapEntry(entry, puzzleClassId);
-            }
+            KillmapDAO.insertManyKillMapEntries(killMap.getEntries(), puzzleClassId);
         } catch (InterruptedException | ExecutionException e) {
-            logger.error("Could error while calculating killmap for successfully installed puzzle.", e);
+            logger.error("Error while calculating killmap for successfully installed puzzle.", e);
         }
     }
 }

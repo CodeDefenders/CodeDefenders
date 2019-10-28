@@ -24,6 +24,7 @@
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.util.JSONUtils" %>
 
 <%--
     Adds highlighting of coverage (green lines) and mutants (gutter icons) to a CodeMirror editor.
@@ -70,7 +71,7 @@
 
 <%
     GameHighlightingDTO gh = new GameHighlightingDTO(mutantsTODORENAME, testsTODORENAME);
-    Gson gson = new GsonBuilder().registerTypeAdapter(Map.class, new GameHighlightingDTO.MapSerializer()).create();
+    Gson gson = new GsonBuilder().registerTypeAdapter(Map.class, new JSONUtils.MapSerializer()).create();
     String ghString = gson.toJson(gh);
 %>
 

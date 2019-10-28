@@ -299,6 +299,8 @@ public class MutationTester implements IMutationTester {
             if (mutant.kill(PROVEN_NO)) {
                 logger.info("Test {} kills mutant {} and resolve equivalence.", test.getId(), mutant.getId());
                 test.killMutant();
+                mutant.setKillMessage( executedTarget.message );
+                MutantDAO.updateMutantKillMessageForMutant(mutant);
             } else {
                 logger.info(
                         "Test {} would have killed Mutant {} and resolve equivalence, but Mutant {} was alredy dead. No need to resolve equivalence.!",

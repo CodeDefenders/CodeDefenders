@@ -18,6 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@page import="org.codedefenders.game.GameState"%>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 <%@ page import="static org.codedefenders.util.Constants.*" %>
 <%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
@@ -60,9 +61,10 @@
     request.setAttribute("mockingEnabled", false);
     request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
 
-    /* tests_carousel */
+    /* test_accordion */
+    request.setAttribute("cut", cut);
     request.setAttribute("tests", game.getTests());
-//    request.setAttribute("mutants", game.getMutants());
+    request.setAttribute("mutants", game.getMutants());
 
     /* mutants_list */
     request.setAttribute("mutantsAlive", game.getAliveMutants());
@@ -77,7 +79,7 @@
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
     // request.setAttribute("tests", game.getTests());
-    request.setAttribute("mutants", game.getMutants());
+    // request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", true);
     // request.setAttribute("gameType", GameMode.PUZZLE);
     // request.setAttribute("gameId", game.getId());
@@ -92,6 +94,7 @@
     final String description = puzzle.getDescription();
 %>
 
+<jsp:include page="/jsp/push_notifications.jsp"/>
 
 <div class="game-container">
     <div class="row" style="padding: 0px 15px;">
@@ -136,12 +139,12 @@
 
         <div class="col-md-6">
             <h3>JUnit tests</h3>
-            <%@include file="../game_components/tests_carousel.jsp" %>
+            <jsp:include page="/jsp/game_components/test_accordion.jsp"/>
         </div>
     </div>
 </div>
 
-<%@include file="../game_components/editor_help_config_modal.jsp"%>
+<jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
 <%@include file="../footer_game.jsp" %>
 

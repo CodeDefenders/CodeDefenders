@@ -31,7 +31,7 @@ import java.util.Optional;
  * This class handles the database logic for players.
  * A
  *
- * @author <a href="https://github.com/werli">Phil Werli<a/>
+ * @author <a href="https://github.com/werli">Phil Werli</a>
  * @see Player
  */
 public class PlayerDAO {

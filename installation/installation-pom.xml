@@ -2,50 +2,102 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<powermock.version>1.6.1</powermock.version>
-		<config.properties>config.properties</config.properties>
-	</properties>
+
 	<groupId>codedefenders</groupId>
 	<artifactId>codedefenders-installation</artifactId>
 	<version>1.0-SNAPSHOT</version>
+
+	<properties>
+		<config.properties>config.properties</config.properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+		<powermock.version>1.6.1</powermock.version>
+		<jacoco.version>0.7.7.201606060606</jacoco.version>
+		<hamcrest.version>1.3</hamcrest.version>
+		<mockito.version>1.9.5</mockito.version>
+		<junit4.version>4.12</junit4.version>
+		<junit5.version>5.5.2</junit5.version>
+		<junit5.platform.version>1.5.2</junit5.platform.version>
+		<opentest4j.version>1.2.0</opentest4j.version>
+	</properties>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.jacoco</groupId>
 			<artifactId>jacoco-maven-plugin</artifactId>
-			<version>0.7.7.201606060606</version>
+			<version>${jacoco.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.jacoco</groupId>
 			<artifactId>org.jacoco.ant</artifactId>
-			<version>0.7.7.201606060606</version>
+			<version>${jacoco.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.12</version>
+			<version>${junit4.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-all</artifactId>
-			<version>1.3</version>
+			<version>${hamcrest.version}</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-			<version>1.9.5</version>
+			<version>${mockito.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit5.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit5.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-commons</artifactId>
+			<version>${junit5.platform.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-engine</artifactId>
+			<version>${junit5.platform.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-launcher</artifactId>
+			<version>${junit5.platform.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<version>${junit5.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.opentest4j</groupId>
+			<artifactId>opentest4j</artifactId>
+			<version>${opentest4j.version}</version>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<filters>
-			<!-- This enables to read properties from this file and automagically 
+			<!-- This enables to read properties from this file and automagically
 				put their values in other files. For example, we use that to update: context.xml -->
 			<filter>${config.properties}</filter>
 		</filters>
@@ -130,7 +182,7 @@
 				<version>3.0.0</version>
 				<executions>
 					<execution>
-						<!-- <id>copy-dependencies</id> <phase>package</phase> <goals> <goal>copy-dependencies</goal> 
+						<!-- <id>copy-dependencies</id> <phase>package</phase> <goals> <goal>copy-dependencies</goal>
 							</goals> -->
 						<id>copy</id>
 						<phase>package</phase>
@@ -143,49 +195,98 @@
 								<artifactItem>
 									<groupId>junit</groupId>
 									<artifactId>junit</artifactId>
-									<version>4.12</version>
+									<version>${junit4.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.hamcrest</groupId>
 									<artifactId>hamcrest-all</artifactId>
-									<version>1.3</version>
+									<version>${hamcrest.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.mockito</groupId>
 									<artifactId>mockito-all</artifactId>
-									<version>1.9.5</version>
+									<version>${mockito.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.jacoco</groupId>
 									<artifactId>org.jacoco.agent</artifactId>
-									<version>0.7.7.201606060606</version>
+									<version>${jacoco.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.jacoco</groupId>
 									<artifactId>org.jacoco.ant</artifactId>
-									<version>0.7.7.201606060606</version>
+									<version>${jacoco.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.jacoco</groupId>
 									<artifactId>org.jacoco.core</artifactId>
-									<version>0.7.7.201606060606</version>
+									<version>${jacoco.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 								</artifactItem>
 								<artifactItem>
 									<groupId>org.jacoco</groupId>
 									<artifactId>org.jacoco.report</artifactId>
-									<version>0.7.7.201606060606</version>
+									<version>${jacoco.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.junit.jupiter</groupId>
+									<artifactId>junit-jupiter-api</artifactId>
+									<version>${junit5.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.junit.jupiter</groupId>
+									<artifactId>junit-jupiter-engine</artifactId>
+									<version>${junit5.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.junit.platform</groupId>
+									<artifactId>junit-platform-commons</artifactId>
+									<version>${junit5.platform.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.junit.platform</groupId>
+									<artifactId>junit-platform-engine</artifactId>
+									<version>${junit5.platform.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.junit.platform</groupId>
+									<artifactId>junit-platform-launcher</artifactId>
+									<version>${junit5.platform.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.junit.vintage</groupId>
+									<artifactId>junit-vintage-engine</artifactId>
+									<version>${junit5.version}</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+								</artifactItem>
+								<artifactItem>
+									<groupId>org.opentest4j</groupId>
+									<artifactId>opentest4j</artifactId>
+									<version>${opentest4j.version}</version>
 									<type>jar</type>
 									<overWrite>false</overWrite>
 								</artifactItem>

@@ -19,16 +19,15 @@
 
 --%>
 <%@page import="org.codedefenders.database.UserDAO"%>
-<%@page import="org.codedefenders.model.User"%>
-<%@page import="org.codedefenders.game.Test"%>
-<%@ page import="org.codedefenders.database.DatabaseAccess" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.game.GameLevel" %>
-<%@ page import="org.codedefenders.game.GameMode" %>
-<%@ page import="org.codedefenders.game.GameState" %>
-<%@ page import="org.codedefenders.game.Mutant" %>
+<%@page import="org.codedefenders.game.GameMode"%>
+<%@page import="org.codedefenders.game.Mutant"%>
+<%@ page import="org.codedefenders.game.Test" %>
+<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.stream.Collectors" %>
 
 <%--
     Displays three tabs with a list of alive, killed and equivalent mutants respectively.
@@ -150,7 +149,7 @@
                                                 <div class="modal-body">
                                                     <pre class="readonly-pre"><textarea
                                                             class="mutdiff" title="mutdiff"
-                                                            id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea></pre>
+                                                            id="diff<%=m.getId()%>" name="diff<%=m.getId()%>"></textarea></pre>
                                                 </div>
                                                 <div class="modal-footer">
                                                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -193,12 +192,6 @@
                         List<Mutant> sortedKilledMutants = new ArrayList<>(mutantsKilledTODORENAME);
                         sortedKilledMutants.sort(Mutant.sortByLineNumberAscending());
                         for (Mutant m : sortedKilledMutants) {
-                            
-                            Test killingTest = m.getKillingTest();
-                            User creator = UserDAO.getUserForPlayer(killingTest.getPlayerId());
-                            int killingTestID = killingTest.getId();
-                            String ownerOfKillingTest = creator.getUsername();
-                            
                     %>
                         <tr>
                             <td class="col-sm-1"><h4>Mutant <%= m.getId() %> | Creator: <%= m.getCreatorName() %> (uid <%= m.getCreatorId() %>)</h4>
@@ -235,7 +228,7 @@
                                                         <div class="modal-body">
                                                             <pre class="readonly-pre">
                                                                 <textarea class="mutdiff" title="mutdiff"
-                                                                    id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea>
+                                                                    id="diff<%=m.getId()%>" name="diff<%=m.getId()%>"></textarea>
                                                             </pre>
                                                         </div>
                                                         <div class="modal-footer">
@@ -247,13 +240,20 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    <%
+                                        Test killingTest = m.getKillingTest();
+                                        if (killingTest != null) {
+                                            User creator = UserDAO.getUserForPlayer(killingTest.getPlayerId());
+                                            int killingTestID = killingTest.getId();
+                                            String ownerOfKillingTest = creator.getUsername();
+                                    %>
                                     <tr role="row">
                                         <td class="col-sm-1"><a href="#"
                                             class="btn btn-default btn-diff"
                                             id="btnMutKillMessage<%=m.getId()%>" data-toggle="modal"
                                             data-target="#modalMutKillMessage<%=m.getId()%>">View Killing Test</a>
                                             <div id="modalMutKillMessage<%=m.getId()%>"
-                                                class="modal mutant-modal fade" role="dialog"
+                                                class="modal killingtest-modal fade" role="dialog"
                                                 style="z-index: 10000;">
                                                 <div class="modal-dialog modal-lg">
                                                     <!-- Modal content is LARGE (modal-lg) -->
@@ -265,7 +265,7 @@
                                                             </h4>
                                                         </div>
                                                         <div class="modal-body">
-                                                                <pre class="readonly-pre"><textarea class="killingTest" title="killingTest" cols="20" rows="10"><%=m.getKillingTest().getAsHTMLEscapedString()%></textarea></pre>
+                                                                <pre class="readonly-pre"><textarea class="killingTest" title="killingTest" name="killingTest-<%=killingTestID%>" cols="20" rows="10"></textarea></pre>
                                                                 <pre class="readonly-pre build-trace"><%=m.getHTMLEscapedKillMessage()%></pre>
                                                         </div>
                                                         <div class="modal-footer">
@@ -277,24 +277,17 @@
                                             </div>
                                         </td>
                                     </tr>
+                                    <%
+                                        }
+                                    %>
                                 </table>
-                             </td> 
+                             </td>
                         </tr>
-                    <% } %>
+                    <%
+                        }
+                    %>
                     </tbody>
                 </table>
-                <%-- Enable syntax highlighting for the killing test textarea --%>
-                <script>
-				    var x = document.getElementsByClassName("killingTest");
-				    for (var i = 0; i < x.length; i++) {
-				        CodeMirror.fromTextArea(x[i], {
-				            lineNumbers: true,
-				            matchBrackets: true,
-				            mode: "text/x-java",
-				            readOnly: true
-				        });
-				    }
-				</script>
             <% } else {%>
                 <div class="panel panel-default" style="background: white">
                     <div class="panel-body" style="    color: gray;    text-align: center;">
@@ -349,7 +342,7 @@
                                     <div class="modal-body">
                                                     <pre class="readonly-pre"><textarea
                                                             class="mutdiff" title="mutdiff"
-                                                            id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea></pre>
+                                                            id="diff<%=m.getId()%>" name="diff<%=m.getId()%>"></textarea></pre>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -366,7 +359,7 @@
             <% } else {%>
             <div class="panel panel-default" style="background: white">
                 <div class="panel-body" style="    color: gray;    text-align: center;">
-                    No mutants killed.
+                    No mutants flagged as equivalent.
                 </div>
             </div>
             <% } %>
@@ -417,7 +410,7 @@
                                             <div class="modal-body">
                                                     <pre class="readonly-pre"><textarea
                                                             class="mutdiff" title="mutdiff"
-                                                            id="diff<%=m.getId()%>"><%=m.getHTMLEscapedPatchString()%></textarea></pre>
+                                                            id="diff<%=m.getId()%>" name="diff<%=m.getId()%>"></textarea></pre>
                                             </div>
                                             <div class="modal-footer">
                                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -443,16 +436,34 @@
 
 <script>
     $('.mutant-modal').on('shown.bs.modal', function() {
-        var codeMirrorContainer = $(this).find(".CodeMirror")[0];
+        let codeMirrorContainer = $(this).find(".CodeMirror")[0];
         if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
             codeMirrorContainer.CodeMirror.refresh();
         } else {
-            var editorDiff = CodeMirror.fromTextArea($(this).find('textarea')[0], {
+            let textarea = $(this).find('textarea')[0];
+            let editorDiff = CodeMirror.fromTextArea(textarea, {
                 lineNumbers: false,
                 mode: "text/x-diff",
                 readOnly: true /* onCursorActivity: null */
             });
-            editorDiff.setSize("100%", 500);
+            MutantAPI.getAndSetEditorValueWithDiff(textarea, editorDiff);
+        }
+    });
+
+    <%-- Enable syntax highlighting for the killing test textarea --%>
+    $('.killingtest-modal').on('shown.bs.modal', function() {
+        let codeMirrorContainer = $(this).find(".CodeMirror")[0];
+        if (codeMirrorContainer && codeMirrorContainer.CodeMirror) {
+            codeMirrorContainer.CodeMirror.refresh();
+        } else {
+            let textarea = $(this).find('textarea')[0];
+            let editorDiff = CodeMirror.fromTextArea(textarea, {
+                lineNumbers: true,
+                matchBrackets: true,
+                mode: "text/x-java",
+                readOnly: true
+            });
+            TestAPI.getAndSetEditorValue(textarea, editorDiff);
         }
     });
 </script>
