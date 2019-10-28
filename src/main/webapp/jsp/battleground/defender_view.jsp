@@ -67,13 +67,13 @@
     request.setAttribute("mutants", game.getMutants());
     request.setAttribute("showEquivalenceButton", true);
     // request.setAttribute("gameType", GameMode.PARTY);
-//    request.setAttribute("gameId", game.getId());
+    // request.setAttribute("gameId", game.getId());
 
     /* mutant_explanation */
     request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 
     /* test_progressbar */
-//    request.setAttribute("gameId", game.getId());
+    // request.setAttribute("gameId", game.getId());
 %>
 
 <!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
@@ -86,10 +86,8 @@
     </div>
 
     <div class="col-md-6" id="utest-div">
-        <%--<%@include file="../game_components/test_progress_bar.jsp"%>--%>
-        <jsp:include page="../game_components/push_test_progress_bar.jsp"/>
 
-        <%-- TODO Why progress bar here is handled differently than mutant submission ?! --%>
+        <jsp:include page="/jsp/game_components/push_test_progress_bar.jsp"/>
         <h3>Write a new JUnit test here
             <button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
                 onClick="window.testProgressBar(); this.form.submit(); this.disabled = true; this.value = 'Defending...';"

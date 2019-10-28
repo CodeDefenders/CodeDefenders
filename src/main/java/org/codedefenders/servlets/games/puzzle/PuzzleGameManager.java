@@ -66,6 +66,15 @@ import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
 import org.codedefenders.game.puzzle.solving.MutantSolvingStrategy;
 import org.codedefenders.game.puzzle.solving.TestSolvingStrategy;
+import org.codedefenders.notification.INotificationService;
+import org.codedefenders.notification.events.server.mutant.MutantCompiledEvent;
+import org.codedefenders.notification.events.server.mutant.MutantDuplicateCheckedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantSubmittedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantTestedEvent;
+import org.codedefenders.notification.events.server.mutant.MutantValidatedEvent;
+import org.codedefenders.notification.events.server.test.TestSubmittedEvent;
+import org.codedefenders.notification.events.server.test.TestTestedMutantsEvent;
+import org.codedefenders.notification.events.server.test.TestValidatedEvent;
 import org.codedefenders.servlets.games.GameManagingUtils;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -97,6 +106,9 @@ public class PuzzleGameManager extends HttpServlet {
 
     @Inject
     private IMutationTester mutationTester;
+
+    @Inject
+    INotificationService notificationService;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -237,20 +249,34 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
+        TestSubmittedEvent tse = new TestSubmittedEvent();
+        tse.setGameId(gameId);
+        tse.setUserId(userId);
+        notificationService.post(tse);
+
         final ArrayList<String> messages = new ArrayList<>();
         session.setAttribute("messages", messages);
-        
+
         // TODO Why we have testText and not escaped(testText)?
         // Validate the test
         // Do the validation even before creating the mutant
         List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
-        if ( !  validationMessage.isEmpty() ) {
-            messages.addAll( validationMessage );
+        boolean validationSuccess = validationMessage.isEmpty();
+
+        TestValidatedEvent tve = new TestValidatedEvent();
+        tve.setGameId(gameId);
+        tve.setUserId(userId);
+        tve.setSuccess(validationSuccess);
+        tve.setValidationMessage(validationSuccess ? null : String.join("\n", validationMessage));
+        notificationService.post(tve);
+
+        if (!validationSuccess) {
+            messages.addAll(validationMessage);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
             Redirect.redirectBack(request, response);
             return;
         }
-        
+
         final Test newTest;
         try {
             newTest = gameManagingUtils.createTest(gameId, game.getClassId(), testText, userId, MODE_PUZZLE_DIR);
@@ -289,6 +315,11 @@ public class PuzzleGameManager extends HttpServlet {
         session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST);
 
         mutationTester.runTestOnAllMutants(game, newTest, messages);
+
+        TestTestedMutantsEvent ttme = new TestTestedMutantsEvent();
+        ttme.setGameId(gameId);
+        ttme.setUserId(userId);
+        notificationService.post(ttme);
 
         // may be // final TestSolvingStrategy solving = Testgame.getTestSolver();
         final TestSolvingStrategy solver = TestSolvingStrategy.get(TestSolvingStrategy.Types.KILLED_ALL_MUTANTS.name());
@@ -369,20 +400,44 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
+        MutantSubmittedEvent mse = new MutantSubmittedEvent();
+        mse.setGameId(gameId);
+        mse.setUserId(userId);
+        notificationService.post(mse);
+
         final CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
 
         final ArrayList<String> messages = new ArrayList<>();
         session.setAttribute("messages", messages);
 
         ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
-        if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
+        boolean validationSuccess = validationMessage == ValidationMessage.MUTANT_VALIDATION_SUCCESS;
+
+        MutantValidatedEvent mve = new MutantValidatedEvent();
+        mve.setGameId(gameId);
+        mve.setUserId(userId);
+        mve.setSuccess(validationSuccess);
+        mve.setValidationMessage(validationSuccess ? null : validationMessage.get());
+        notificationService.post(mve);
+
+        if (!validationSuccess) {
             // Mutant is either the same as the CUT or it contains invalid code
             messages.add(validationMessage.get());
             Redirect.redirectBack(request, response);
             return;
         }
+
         final Mutant existingMutant = gameManagingUtils.existingMutant(gameId, mutantText);
-        if (existingMutant != null) {
+        boolean duplicateCheckSuccess = existingMutant == null;
+
+        MutantDuplicateCheckedEvent mdce = new MutantDuplicateCheckedEvent();
+        mdce.setGameId(gameId);
+        mdce.setUserId(userId);
+        mdce.setSuccess(duplicateCheckSuccess);
+        mdce.setDuplicateId(duplicateCheckSuccess ? null : existingMutant.getId());
+        notificationService.post(mdce);
+
+        if (!duplicateCheckSuccess) {
             messages.add(MUTANT_DUPLICATED_MESSAGE);
             TargetExecution existingMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(existingMutant, TargetExecution.Target.COMPILE_MUTANT);
             if (existingMutantTarget != null && !existingMutantTarget.status.equals(TargetExecution.Status.SUCCESS)
@@ -393,6 +448,7 @@ public class PuzzleGameManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
+
         final Mutant newMutant = gameManagingUtils.createMutant(gameId, game.getClassId(), mutantText, userId, MODE_PUZZLE_DIR);
         if (newMutant == null) {
             messages.add(MUTANT_CREATION_ERROR_MESSAGE);
@@ -402,11 +458,26 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        final TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
-        if (compileMutantTarget == null || !compileMutantTarget.status.equals(TargetExecution.Status.SUCCESS)) {
+        final TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant,
+                TargetExecution.Target.COMPILE_MUTANT);
+        boolean compileSuccess = compileMutantTarget != null
+                && compileMutantTarget.status == TargetExecution.Status.SUCCESS;
+        String errorMessage = (compileMutantTarget != null
+                && compileMutantTarget.message != null
+                && !compileMutantTarget.message.isEmpty())
+                ? compileMutantTarget.message : null;
+
+        MutantCompiledEvent mce = new MutantCompiledEvent();
+        mce.setGameId(gameId);
+        mce.setUserId(userId);
+        mce.setMutantId(newMutant.getId());
+        mce.setSuccess(compileSuccess);
+        mce.setErrorMessage(errorMessage);
+
+        if (!compileSuccess) {
             messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
-            if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty()) {
-                messages.add(compileMutantTarget.message);
+            if (errorMessage != null) {
+                messages.add(errorMessage);
             }
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT, mutantText);
             Redirect.redirectBack(request, response);
@@ -416,6 +487,12 @@ public class PuzzleGameManager extends HttpServlet {
         messages.add(MUTANT_COMPILED_MESSAGE);
         session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
         mutationTester.runAllTestsOnMutant(game, newMutant, messages);
+
+        MutantTestedEvent mte = new MutantTestedEvent();
+        mte.setGameId(gameId);
+        mte.setUserId(userId);
+        mte.setMutantId(newMutant.getId());
+        notificationService.post(mte);
 
         // may be // final MutantSolvingStrategy solving = game.getMutantSolver();
         final MutantSolvingStrategy solver = MutantSolvingStrategy.get(MutantSolvingStrategy.Types.SURVIVED_ALL_MUTANTS.name());
