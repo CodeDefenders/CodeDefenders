@@ -42,6 +42,7 @@
         request.setAttribute("testCode", cut.getHTMLEscapedTestTemplate());
     }
     request.setAttribute("mockingEnabled", cut.isMockingEnabled());
+    request.setAttribute("startEditLine", cut.getTestTemplateFirstEditLine());
 
     /* game_highlighting */
     request.setAttribute("codeDivSelector", "#cut-div");
