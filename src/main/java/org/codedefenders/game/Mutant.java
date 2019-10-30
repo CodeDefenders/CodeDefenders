@@ -149,7 +149,6 @@ public class Mutant implements Serializable {
         this.alive = alive;
         this.equivalent = Equivalence.ASSUMED_NO;
         this.playerId = playerId;
-        this.md5 = CodeValidator.getMD5FromFile(jFile); // TODO: This may be null
     }
 
     public Mutant(int mid, int classId, int gid, String jFile, String cFile, boolean alive, Equivalence equiv, int rCreated, int rKilled, int playerId) {
@@ -220,6 +219,9 @@ public class Mutant implements Serializable {
     }
 
     public String getMd5() {
+        if (this.md5 == null) {
+            this.md5 = CodeValidator.getMD5FromFile(getJavaFile()); // TODO: This may be null
+        }
         return md5;
     }
 
@@ -523,7 +525,7 @@ public class Mutant implements Serializable {
                 .append(gameId, mutant.gameId)
                 .append(playerId, mutant.playerId)
                 .append(javaFile, mutant.javaFile)
-                .append(md5, mutant.md5)
+                .append(getMd5(), mutant.getMd5())
                 .append(classFile, mutant.classFile)
                 .isEquals();
     }
@@ -535,7 +537,7 @@ public class Mutant implements Serializable {
                 .append(gameId)
                 .append(playerId)
                 .append(javaFile)
-                .append(md5)
+                .append(getMd5())
                 .append(classFile)
                 .toHashCode();
     }

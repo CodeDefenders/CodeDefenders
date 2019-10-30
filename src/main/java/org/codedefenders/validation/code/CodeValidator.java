@@ -37,6 +37,7 @@ import com.github.javaparser.ast.visitor.ModifierVisitor;
 import com.github.javaparser.ast.visitor.Visitable;
 import com.github.javaparser.printer.PrettyPrinterConfiguration;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.bitbucket.cowwoc.diffmatchpatch.DiffMatchPatch;
 import org.codedefenders.game.Mutant;
 import org.slf4j.Logger;
@@ -72,7 +73,7 @@ import difflib.DiffUtils;
 /**
  * This class offers static methods to validate code, primarily checking validity of tests and mutants.
  *
- * Use {@link #validateTestCodeGetMessage(String, int)} to validate test code with a boolean result value.
+ * Use {@link #validateTestCodeGetMessage(String, int, boolean)} to validate test code with a boolean result value.
  *
  * Use {@link #validateMutantGetMessage(String, String, CodeValidatorLevel)} to validate
  * mutants and get a {@link ValidationMessage} back.
@@ -121,7 +122,7 @@ public class CodeValidator {
             return new ArrayList<>();
         } catch (Throwable e) {
             logger.error("Problem in validating test code \n" + testCode, e);
-            return Arrays.asList( new String[]{"Invalid test. Something went wrong."});
+            return Arrays.asList(new String[]{"Invalid test. Something went wrong."});
 
         }
     }
@@ -235,9 +236,6 @@ public class CodeValidator {
 
     /**
      * Check if the mutation introduce a change to the package declaration of the mutant
-     *
-     * @param word_changes
-     * @return
      */
     private static boolean containsChangesToPackageDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
         return ! originalCU.getPackageDeclaration().equals( mutatedCU.getPackageDeclaration() );
@@ -259,9 +257,6 @@ public class CodeValidator {
 
     /**
      * Check if the mutation introduce a change to a class declaration in the mutant
-     *
-     * @param word_changes
-     * @return
      */
     private static boolean containsChangesToClassDeclarations(CompilationUnit originalCU, CompilationUnit mutatedCU) {
         Map<String, EnumSet> originalTypes = new HashMap<>();
@@ -279,9 +274,6 @@ public class CodeValidator {
 
     /**
      * Check if the mutation introduce a change to an instanceof condition
-     *
-     * @param word_changes
-     * @return
      */
     private static boolean containsInstanceOfChanges(CompilationUnit originalCU, CompilationUnit mutatedCU) {
         final List<ReferenceType> instanceOfInsideOriginal = new ArrayList<>();
@@ -341,16 +333,8 @@ public class CodeValidator {
     }
 
     public static String getMD5FromText(String code) {
-        // Parse the code and output the string without the comment.
-        // This string should be already normalized
-        try {
-            return org.apache.commons.codec.digest.DigestUtils
-                    .md5Hex(getCompilationUnitFromText(code).toString( new PrettyPrinterConfiguration().setPrintComments(false)));
-        } catch ( IOException | ParseException e) {
-            // Ignore this
-        }
-        // if the code does not compile there's no point to try to remove the comments
-        return org.apache.commons.codec.digest.DigestUtils.md5Hex(code);
+        String cleanedCode = code.replaceAll("\\s+", "");
+        return DigestUtils.md5Hex(cleanedCode);
     }
 
     private static List<DiffMatchPatch.Diff> tokenDiff(String orig, String mutated) {
