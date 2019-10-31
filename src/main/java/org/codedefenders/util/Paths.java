@@ -20,9 +20,10 @@ package org.codedefenders.util;
 
 /**
  * This class contains URL path constants.
+ *
  * <p>
- * If one path has to be adjusted, it has to be adjusted in the {@code web.xml}
- * servlet mapping configuration, too.
+ * If one path has to be adjusted, it has to be adjusted in the
+ * specific servlet configuration, too.
  */
 public class Paths {
 
@@ -77,11 +78,15 @@ public class Paths {
     public static final String API_MUTANTS = "/api/game_mutants";
     public static final String API_FEEDBACK = "/api/feedback";
     public static final String API_SEND_EMAIL = "/api/sendmail";
+    public static final String API_CLASS = "/api/class";
+    public static final String API_TEST = "/api/test";
+    public static final String API_MUTANT = "/api/mutant";
+
     public static final String API_ANALYTICS_USERS = "/admin/api/users";
     public static final String API_ANALYTICS_CLASSES = "/admin/api/classes";
     public static final String API_ANALYTICS_KILLMAP = "/admin/api/killmap";
     public static final String API_KILLMAP_MANAGEMENT = "/admin/api/killmapmanagement";
-    public static final String API_CLASS = "/api/class";
-    public static final String API_TEST = "/api/test";
-    public static final String API_MUTANT = "/api/mutant";
+    public static final String API_ADMIN_PUZZLES_ALL = "/admin/api/puzzles";
+    public static final String API_ADMIN_PUZZLE = "/admin/api/puzzles/puzzle";
+    public static final String API_ADMIN_PUZZLECHAPTER = "/admin/api/puzzles/chapter";
 }
