@@ -79,6 +79,7 @@
             </ul>
             <ul>
                 <li>Ben Clegg (The University of Sheffield)</li>
+                <li>Alexander Degenhart (University of Passau)</li>
                 <li>Sabina Galdobin (University of Passau)</li>
                 <li><a href="http://www.fim.uni-passau.de/lehrstuhl-fuer-software-engineering-ii/">Alessio Gambi (University of Passau)</a></li>
                 <li>Marvin Kreis (University of Passau)</li>
