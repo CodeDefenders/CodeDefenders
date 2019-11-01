@@ -33,7 +33,7 @@
 		<div class="row-fluid">
 			<ul class="papercite_bibliography">
 				<li>
-					<a href="papers/SIGCSE19_Course.pdf" title='Download PDF'>
+					<a href="http://study.code-defenders.org/papers/SIGCSE19_Course.pdf" title='Download PDF'>
 						<img src='images/pdf.png' alt="[PDF]"/>
 					</a>
 					Gordon Fraser, Alessio Gambi, Marvin Kreis and Jos&eacute; Miguel Rojas.
@@ -53,7 +53,7 @@
 					</div>
 				</li>
 				<li>
-					<a href="papers/ECSEE18_Course.pdf" title='Download PDF'>
+					<a href="http://study.code-defenders.org/papers/ECSEE18_Course.pdf" title='Download PDF'>
 						<img src='images/pdf.png' alt="[PDF]"/>
 					</a>
 					Gordon Fraser, Alessio Gambi, Jos&eacute; Miguel Rojas.
@@ -73,7 +73,7 @@
 					</div>
 				</li>
 				<li>
-					<a href="papers/ICSE17_Education.pdf" title='Download PDF'>
+					<a href="http://study.code-defenders.org/papers/ICSE17_Education.pdf" title='Download PDF'>
 						<img src='images/pdf.png' alt="[PDF]"/>
 					</a>
 					Benjamin Clegg, Jos&eacute; Miguel Rojas, Gordon Fraser.
@@ -93,7 +93,7 @@
 					</div>
 				</li>
 				<li>
-					<a href="papers/ICSE17_CodeDefendersStudy.pdf" title='Download PDF'>
+					<a href="http://study.code-defenders.org/papers/ICSE17_CodeDefendersStudy.pdf" title='Download PDF'>
 						<img src='images/pdf.png' alt="[PDF]"/>
 					</a>
 					Jos&eacute; Miguel Rojas, Thomas White, Benjamin Clegg and Gordon Fraser.
@@ -112,7 +112,7 @@
 					</div>
 				</li>
 				<li>
-					<a href="papers/PPIG16_TeachingTesting.pdf" title='Download PDF'>
+					<a href="http://study.code-defenders.org/papers/PPIG16_TeachingTesting.pdf" title='Download PDF'>
 						<img src='images/pdf.png' alt="[PDF]"/>
 					</a>
 					Jos&eacute; Miguel Rojas and Gordon Fraser.
@@ -129,7 +129,7 @@
 					</div>
 				</li>
 				<li>
-					<a href="papers/ECSEE16_MutationEducation.pdf" title='Download PDF'>
+					<a href="http://study.code-defenders.org/papers/ECSEE16_MutationEducation.pdf" title='Download PDF'>
 						<img src='images/pdf.png' alt="[PDF]"/>
 					</a>
 					Jos&eacute; Miguel Rojas and Gordon Fraser.
@@ -148,7 +148,7 @@
 					</div>
 				</li>
 				<li>
-					<a href="papers/Mutation16_CodeDefenders.pdf" title='Download PDF'>
+					<a href="http://study.code-defenders.org/papers/aMutation16_CodeDefenders.pdf" title='Download PDF'>
 						<img src='images/pdf.png' alt="[PDF]"/>
 					</a>
 					Jos&eacute; Miguel Rojas and Gordon Fraser.
