@@ -25,7 +25,7 @@ COPY --from=git /CodeDefenders /CodeDefenders
 WORKDIR /CodeDefenders
 
 # Build Code Defenders for Docker using config.properties@docker
-RUN cp config.properties@docker config.properties && \
+RUN cp config.properties@docker.example config.properties && \
 	mvn clean compile package war:war -DskipTests
 
 # Run the file system setup script
