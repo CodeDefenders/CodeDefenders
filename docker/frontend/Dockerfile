@@ -45,11 +45,15 @@ RUN rm -rf /usr/local/tomcat/webapps/docs
 RUN rm -rf /usr/local/tomcat/webapps/examples
 RUN rm -rf /usr/local/tomcat/webapps/host-manager
 
-# Enable remove access to admin - THIS IS FIXED
-COPY context.xml /usr/local/tomcat/webapps/manager/META-INF/context.xml
+# Copy template config files
+COPY templates /usr/local/tomcat/templates
 
 # Install codedefenders in tomcat
 COPY --from=build /CodeDefenders/target/codedefenders.war /usr/local/tomcat/webapps/codedefenders.war
+RUN cd /usr/local/tomcat/webapps \
+  && unzip codedefenders.war -d codedefenders \
+  && cp codedefenders/META-INF/context.xml ../templates/codedefenders-context.xml \
+  && rm -f codedefenders.war
 
 # Copy the data directory from build
 COPY --from=build /codedefenders/ /codedefenders/
@@ -58,17 +62,6 @@ COPY --from=build /codedefenders/ /codedefenders/
 RUN apt-get update && apt-get install -y \
 	ant
 
-## TODO Include ENV variables for configuring access to tomcat, db and such here
-# Define admin roles in tomcat - TODO Use provided args ! Probably use CMD and sed to replace or cat
-COPY tomcat-users.xml /usr/local/tomcat/conf/tomcat-users.xml
-
-## TODO Replace tomcat users and password from ARGS
-
-ARG tomcat_password
-ARG tomcat_user
-
-ENV tomcat_password=${tomcat_password}
-ENV tomcat_user=${tomcat_user}
 
 COPY --from=git /CodeDefenders/.git-data /.git-data
 
@@ -77,4 +70,7 @@ LABEL maintainer="alessio.gambi@uni-passau.de"
 #LABEL codedefenders.release.date=$RELEASE_DATE
 
 EXPOSE 8080
+
+COPY docker-entrypoint.sh /usr/local/bin/
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["catalina.sh", "run"]
