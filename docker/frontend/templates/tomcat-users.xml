@@ -6,6 +6,4 @@
   <role rolename="manager"/>
   <role rolename="manager-gui"/>
   <role rolename="admin"/>
-  <user username="user" password="password" roles="admin,manager,manager-gui"/>
-  <user username="tomcat" password="s3cret" roles="manager-gui,admin-gui"/>
 </tomcat-users>

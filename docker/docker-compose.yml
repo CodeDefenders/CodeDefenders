@@ -20,6 +20,12 @@ services:
       args:
         RELEASE_VERSION: ${RELEASE_VERSION}
     restart: always
+    environment:
+      CODEDEF_MANAGER_USERNAME: user
+      CODEDEF_MANAGER_PASSWORD: password
+      CODEDEF_MANAGER_ALLOWED_REMOTE_ADDR_REGEXP: ${ALLOWED_REMOTE_ADDR_REGEXP}
+      CODEDEF_ADMIN_USERNAME: admin
+      CODEDEF_ADMIN_PASSWORD: password
     links:
       - db
     volumes:
