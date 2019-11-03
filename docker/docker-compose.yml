@@ -15,7 +15,10 @@ services:
 
   # Tomcat nodes. We do not expose directly their ports to the outside
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        RELEASE_VERSION: ${RELEASE_VERSION}
     restart: always
     links:
       - db
