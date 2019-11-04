@@ -20,10 +20,11 @@ package org.codedefenders.game.puzzle;
 
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.GameDAO;
-import org.codedefenders.database.KillmapDAO;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
 import org.codedefenders.database.PuzzleDAO;
-import org.codedefenders.execution.KillMap;
+import org.codedefenders.database.TargetExecutionDAO;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.AbstractGame;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.game.GameLevel;
@@ -64,7 +65,7 @@ public class PuzzleGame extends AbstractGame {
      * Maximum number of allowed assertions per submitted test.
      */
     private int maxAssertionsPerTest;
-    
+
     private boolean forceHamcrest;
 
     /**
@@ -113,9 +114,6 @@ public class PuzzleGame extends AbstractGame {
             return null;
         }
 
-        final List<Test> mappedTests = GameClassDAO.getMappedTestsForClassId(game.classId);
-        final List<Mutant> mappedMutants = GameClassDAO.getMappedMutantsForClassId(game.classId);
-
         if (!game.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER)) {
             logger.error(errorMsg + " Could not add dummy attacker to game.");
             return null;
@@ -127,36 +125,42 @@ public class PuzzleGame extends AbstractGame {
         int dummyAttackerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, game.id);
         int dummyDefenderId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, game.id);
 
+        final List<Test> mappedTests = GameClassDAO.getMappedTestsForClassId(game.classId);
+        final List<Mutant> mappedMutants = GameClassDAO.getMappedMutantsForClassId(game.classId);
+
         /* Add the tests from the puzzle. */
+        Map<Integer, Test> testMap = new HashMap<>();
+
         for (Test test : mappedTests) {
             final Test newTest = Test.newTestForGameAndPlayerIds(game.id, dummyDefenderId, test);
             newTest.insert();
+            testMap.put(test.getId(), newTest);
         }
-        Map<Mutant, Mutant> mutantMap = new HashMap<>();
+        Map<Integer, Mutant> mutantMap = new HashMap<>();
 
         /* Add the mutants from the puzzle. */
         for (Mutant mutant : mappedMutants) {
             final Mutant newMutant = new Mutant(game.id, game.classId, mutant.getJavaFile(), mutant.getClassFile(), true, dummyAttackerId);
             newMutant.insert();
-            mutantMap.put(mutant, newMutant);
+            mutantMap.put(mutant.getId(), newMutant);
         }
-        List<KillMap.KillMapEntry> killmap = KillmapDAO.getKillMapEntriesForClass(game.classId);
-        for (Mutant uploadedMutant : mappedMutants) {
-            boolean alive = true;
-            for (Test uploadedTest : mappedTests) {
-                // Does the test kill the mutant?
-                for (KillMap.KillMapEntry entry : killmap) {
-                    if (entry.mutant.getId() == uploadedMutant.getId() &&
-                            entry.test.getId() == uploadedTest.getId() &&
-                            entry.status == KillMap.KillMapEntry.Status.KILL) {
-                        mutantMap.get(uploadedMutant).kill();
-                        alive = false;
-                        break;
-                    }
+
+        if (!mutantMap.isEmpty() && !testMap.isEmpty()) {
+            for (TargetExecution targetExecution : TargetExecutionDAO.getTargetExecutionsForUploadedWithClass(game.classId)) {
+                Test test = testMap.get(targetExecution.testId);
+                Mutant mutant = mutantMap.get(targetExecution.mutantId);
+
+                targetExecution.testId = test.getId();
+                targetExecution.mutantId = mutant.getId();
+
+                if (targetExecution.status == TargetExecution.Status.FAIL) {
+                    test.killMutant();
+                    mutant.kill();
+                    mutant.setKillMessage(targetExecution.message);
+                    MutantDAO.updateMutantKillMessageForMutant(mutant);
                 }
-                if (!alive) {
-                    break;
-                }
+
+                targetExecution.insert();
             }
         }
 
@@ -193,7 +197,7 @@ public class PuzzleGame extends AbstractGame {
         /* Other game attributes */
         this.maxAssertionsPerTest = puzzle.getMaxAssertionsPerTest();
         this.forceHamcrest = puzzle.isForceHamcrest();
-        
+
         this.mutantValidatorLevel = puzzle.getMutantValidatorLevel();
         this.currentRound = 1;
         this.activeRole = puzzle.getActiveRole();
@@ -311,7 +315,7 @@ public class PuzzleGame extends AbstractGame {
     public int getMaxAssertionsPerTest() {
         return maxAssertionsPerTest;
     }
-    
+
     public boolean isForceHamcrest() {
         return forceHamcrest;
     }

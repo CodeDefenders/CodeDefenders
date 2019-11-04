@@ -26,6 +26,7 @@ import org.codedefenders.game.Test;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.List;
 
 /**
  * This class handles the database logic for target executions.
@@ -116,7 +117,7 @@ public class TargetExecutionDAO {
         } else {
             throw new UncheckedSQLException("Could not store target execution to database.");
         }
-     }
+    }
 
     /**
      * Retrieves the specific {@link TargetExecution} for given test and mutant identifiers.
@@ -185,5 +186,25 @@ public class TargetExecutionDAO {
         };
 
         return DB.executeQueryReturnValue(query, TargetExecutionDAO::targetExecutionFromRS, values);
+    }
+
+    /**
+     * Retrieves all {@link TargetExecution TargetExecutions} which resulted from mutants and tests
+     * being executed against each other after being uploaded with that class.
+     *
+     * @param classId the identifier of the class.
+     * @return a list of target executions of mutants and tests which were uploaded together with the same given class.
+     */
+    public static List<TargetExecution> getTargetExecutionsForUploadedWithClass(int classId) {
+        final String query = String.join("\n",
+            "SELECT te.*",
+            "FROM targetexecutions te, classes c",
+            "WHERE c.Class_ID = ?",
+            "  AND te.Mutant_ID IN (SELECT Mutant_ID FROM mutant_uploaded_with_class up WHERE up.Class_ID = c.Class_ID)",
+            "  AND te.Test_ID IN (SELECT Test_ID FROM test_uploaded_with_class up WHERE up.Class_ID = c.Class_ID)",
+            ";"
+        );
+
+        return DB.executeQueryReturnList(query, TargetExecutionDAO::targetExecutionFromRS, DatabaseValue.of(classId));
     }
 }
