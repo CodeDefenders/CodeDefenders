@@ -27,6 +27,98 @@
     <% request.setAttribute("adminActivePage", "adminPuzzles"); %>
     <%@ include file="/jsp/admin_navigation.jsp"%>
 
-    <h3>Puzzle Management</h3>
+    <h2>Puzzle Management</h2>
+
+    <h3>Puzzle Chapters</h3>
+    <table id="tableChapters"
+           class="table table-striped table-hover table-responsive">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Position</th>
+            <th>Title</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+    </table>
+
+    <h3>Puzzle</h3>
+    <table id="tablePuzzles"
+           class="table table-striped table-hover table-responsive">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Chapter</th>
+            <th>Position</th>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Class</th>
+        </tr>
+        </thead>
+    </table>
+
+    <script type="text/javascript">
+        let puzzleTable;
+        let chapterTable;
+
+        async function fetchPuzzleData () {
+            return await fetch('<%=request.getContextPath() + Paths.API_ADMIN_PUZZLES_ALL%>', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw Error("Response failed")
+                }
+            });
+        }
+
+        $(document).ready(async function() {
+            const puzzleData = await fetchPuzzleData();
+
+            const chapters = puzzleData.puzzleChapters;
+            if (chapters) {
+                chapterTable = $('#tableChapters').DataTable({
+                    "data": chapters,
+                    "columns": [
+                        { "data": "id" },
+                        { "data": "position" },
+                        { "data": "title" },
+                        { "data": "description" },
+                    ],
+                    "pageLength": 10,
+                    "order": [[ 1, "asc" ]]
+                });
+            }
+
+            const puzzles = puzzleData.puzzles;
+            if (puzzles) {
+                puzzleTable = $('#tablePuzzles').DataTable({
+                    "data": puzzles,
+                    "columns": [
+                        { "data": "id" },
+                        { "data": "chapterId" },
+                        { "data": "position" },
+                        { "data": "title" },
+                        { "data": "description" },
+                        { "data": "classId" },
+                        // { "data": "maxAssertionsPerTest" },
+                        // { "data": "forceHamcrest" },
+                        // { "data": "editableLinesStart" },
+                        // { "data": "editableLinesEnd" },
+                    ],
+                    "pageLength": 10,
+                    "order": [[ 1, "asc" ], [ 2, "asc" ]]
+                });
+            }
+        });
+
+    </script>
+
+
+
 </div>
 <%@ include file="/jsp/footer.jsp"%>
