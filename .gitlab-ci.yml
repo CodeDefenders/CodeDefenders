@@ -26,7 +26,7 @@ build:
       cluster.java.home=
       cluster.reservation.name=
       cluster.timeout=2
-      forceLocalExecution=enabled
+      force.local.execution=enabled
       parallelize=disabled
       mutant.coverage=enabled
       block.attacker=enabled
@@ -34,12 +34,12 @@ build:
       tomcat.password=
       tomcat.url=
       tomcat.path=" | tee config.properties
-    - mvn clean compile
+    - mvn --no-transfer-progress clean compile
 
 test:
   stage: test
   script:
-    - mvn test checkstyle:checkstyle
+    - mvn --no-transfer-progress test checkstyle:checkstyle
     - |
       file="";
       first=1;
@@ -75,4 +75,3 @@ test:
         - checkstyle-report.json
       junit:
         - target/surefire-reports/TEST-*.xml
-
