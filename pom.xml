@@ -120,7 +120,7 @@
 								<echo>[cluster.mode] ${cluster.mode}</echo>
 								<echo>[cluster.reservation.name] ${cluster.reservation.name}</echo>
 								<echo>[parallelize] ${parallelize}</echo>
-								<echo>[forceLocalExecution] ${forceLocalExecution}</echo>
+								<echo>[force.local.execution] ${force.local.execution}</echo>
 								<echo>[block.attacker] ${block.attacker}</echo>
 							</tasks>
 						</configuration>
