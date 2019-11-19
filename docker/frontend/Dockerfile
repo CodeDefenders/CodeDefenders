@@ -47,12 +47,13 @@ RUN rm -rf /usr/local/tomcat/webapps/host-manager
 
 # Copy template config files
 COPY templates /usr/local/tomcat/templates
+COPY replaceProperties.py /usr/local/bin
 
 # Install codedefenders in tomcat
 COPY --from=build /CodeDefenders/target/codedefenders.war /usr/local/tomcat/webapps/codedefenders.war
+COPY --from=build /CodeDefenders/src/main/webapp/META-INF/context.xml /usr/local/tomcat/templates/codedefenders-context.xml
 RUN cd /usr/local/tomcat/webapps \
   && unzip codedefenders.war -d codedefenders \
-  && cp codedefenders/META-INF/context.xml ../templates/codedefenders-context.xml \
   && rm -f codedefenders.war
 
 # Copy the data directory from build
