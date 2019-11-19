@@ -84,8 +84,9 @@ if [[ "$1" == catalina* ]]; then
 
         add_remoteIp_valve() {
             local trusted_proxy_ip="$1"
-            local context_file_path="$2"
-            sed -i "/<\/Context>/i<Valve className=\"org.apache.catalina.valves.RemoteIpValve\" remoteIpHeader=\"X-Real-IP\" internalProxies=\"\" trustedProxies=\"${trusted_proxy_ip}\" portHeader=\"X-Forwarded-Port\" hostHeader=\"X-Forwarded-Server\" />" "${context_file_path}"
+            local internal_proxy_ip="$2"
+            local context_file_path="$3"
+            sed -i "/<\/Context>/i<Valve className=\"org.apache.catalina.valves.RemoteIpValve\" remoteIpHeader=\"X-Real-IP\" internalProxies=\"${internal_proxy_ip}\" trustedProxies=\"${trusted_proxy_ip}\" portHeader=\"X-Forwarded-Port\" hostHeader=\"X-Forwarded-Server\" />" "${context_file_path}"
         }
 
         add_remoteAddr_valve() {
@@ -107,14 +108,14 @@ if [[ "$1" == catalina* ]]; then
         cp "/usr/local/tomcat/templates/manager-context.xml" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
 
         if [[ "$CODEDEF_LOAD_BALANCER_IP" != "" ]]; then
-            add_remoteIp_valve "${CODEDEF_LOAD_BALANCER_IP}" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
+            add_remoteIp_valve "" "${CODEDEF_LOAD_BALANCER_IP}" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
         fi
         add_remoteAddr_valve "${CODEDEF_MANAGER_ALLOWED_REMOTE_ADDR}" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
         add_accessLog_valve "manager" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
 
         cp "/usr/local/tomcat/templates/codedefenders-context.xml" "/usr/local/tomcat/webapps/codedefenders/META-INF/context.xml"
         if [[ "$CODEDEF_LOAD_BALANCER_IP" != "" ]]; then
-            add_remoteIp_valve "${CODEDEF_LOAD_BALANCER_IP}" "/usr/local/tomcat/webapps/codedefenders/META-INF/context.xml"
+            add_remoteIp_valve "" "${CODEDEF_LOAD_BALANCER_IP}" "/tmp/context.xml"
         fi
         add_accessLog_valve "codedefenders" "/usr/local/tomcat/webapps/codedefenders/META-INF/context.xml"
     fi
