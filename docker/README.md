@@ -41,6 +41,7 @@ Now you can access to CodeDefenders:
 | CODEDEF_ADMIN_USERNAME              | admin        | Username used to access CodeDefenders administrative interface |
 | CODEDEF_ADMIN_PASSWORD              | password     | CodeDefenders administrative user password |
 | CODEDEF_ADMIN_ROLES                 | manager-gui  | Roles asigned to the CodeDefenders administrative user |
+| CODEDEF_ADMIN_ALLOWED_REMOTE_ADDR | 127.\d+.\d+.\d+ &#124; ::1 &#124; 0:0:0:0:0:0:0:1                                      | [Regular expression to check allowed IPs](https://tomcat.apache.org/tomcat-9.0-doc/config/filter.html#Remote_Address_Filter) to access CodeDefender's Administrative UI |
 | CODEDEF_LOAD_BALANCER_IP            | IP of the "load-balancer" container | IP of the load-balancer use for CodeDefenders. This IP is configured as an [Apache Tomcat remote trusted proxy](https://tomcat.apache.org/tomcat-9.0-doc/config/valve.html#Remote_IP_Valve). |
 
 ## Config.properties / context.xml dynamic properties

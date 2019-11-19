@@ -52,8 +52,12 @@ COPY replaceProperties.py /usr/local/bin
 # Install codedefenders in tomcat
 COPY --from=build /CodeDefenders/target/codedefenders.war /usr/local/tomcat/webapps/codedefenders.war
 COPY --from=build /CodeDefenders/src/main/webapp/META-INF/context.xml /usr/local/tomcat/templates/codedefenders-context.xml
+COPY webxml.patch /usr/local/tomcat/webapps
 RUN cd /usr/local/tomcat/webapps \
   && unzip codedefenders.war -d codedefenders \
+  && git apply webxml.patch \
+  && rm webxml.patch \
+  && cp codedefenders/WEB-INF/web.xml ../templates/codedefenders-web.xml \
   && rm -f codedefenders.war
 
 # Copy the data directory from build

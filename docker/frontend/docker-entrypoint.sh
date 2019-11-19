@@ -48,6 +48,7 @@ if [[ "$1" == catalina* ]]; then
         CODEDEF_ADMIN_USERNAME
         CODEDEF_ADMIN_PASSWORD
         CODEDEF_ADMIN_ROLES
+        CODEDEF_ADMIN_ALLOWED_REMOTE_ADDR
         CODEDEF_LOAD_BALANCER_IP
         "${configProps[@]}"
     )
@@ -89,6 +90,7 @@ if [[ "$1" == catalina* ]]; then
         : "${CODEDEF_ADMIN_USERNAME:=admin}"
         : "${CODEDEF_ADMIN_PASSWORD:=password}"
         : "${CODEDEF_ADMIN_ROLES:=manager-gui}"
+        : "${CODEDEF_ADMIN_ALLOWED_REMOTE_ADDR:=127\\\\.\\\\d+\\\\.\\\\d+\\\\.\\\\d+|::1|0:0:0:0:0:0:0:1}"
         : "${CODEDEF_LOAD_BALANCER_IP:=$(get_loadbalancer_ip)}"
         : "${CODEDEF_CFG_DATA_DIR:=/codedefenders}"
         : "${CODEDEF_CFG_ANT_HOME:=/usr}"
@@ -130,6 +132,14 @@ if [[ "$1" == catalina* ]]; then
             sed -i "/<\/Context>/i<Valve className=\"org.apache.catalina.valves.AccessLogValve\" directory=\"logs\" prefix=\"${host_name}_access_log\" suffix=\".txt\" requestAttributesEnabled=\"true\" pattern=\"%h %l %u %t &quot;%r&quot; %s %b\" />" "${context_file_path}"
         }
 
+
+        add_remoteAddr_filter() {
+            local allowed_regexp="$1"
+            local webxml_file_path="$2"
+            sed -i "s/@@REMOTE_ADDRESS_REGEXP@@/${allowed_regexp}/" "${webxml_file_path}"
+        }
+
+
         cp "/usr/local/tomcat/templates/tomcat-users.xml" "/usr/local/tomcat/conf/tomcat-users.xml"
         add_tomcat_user "${CODEDEF_MANAGER_USERNAME}" "${CODEDEF_MANAGER_PASSWORD}" "${CODEDEF_MANAGER_ROLES}"
         add_tomcat_user "${CODEDEF_ADMIN_USERNAME}" "${CODEDEF_ADMIN_PASSWORD}" "${CODEDEF_ADMIN_ROLES}"
@@ -153,6 +163,8 @@ if [[ "$1" == catalina* ]]; then
         replaceProperties.py "/tmp/context.xml" > "/usr/local/tomcat/webapps/codedefenders/META-INF/context.xml"
         rm "/tmp/context.xml"
 
+        cp "/usr/local/tomcat/templates/codedefenders-web.xml" "/usr/local/tomcat/webapps/codedefenders/WEB-INF/web.xml"
+        add_remoteAddr_filter "${CODEDEF_ADMIN_ALLOWED_REMOTE_ADDR}" "/usr/local/tomcat/webapps/codedefenders/WEB-INF/web.xml"
     fi
 
     # now that we're definitely done writing configuration, let's clear out the relevant environment variables (don't leak secrets)

@@ -1,0 +1,25 @@
+--- a/codedefenders/WEB-INF/web.xml	2020-11-02 10:33:57.073990903 +0100
++++ b/codedefenders/WEB-INF/web.xml	2020-11-02 10:43:35.792165101 +0100
+@@ -111,6 +111,22 @@
+         <filter-name>BeanFilter</filter-name>
+         <url-pattern>/*</url-pattern>
+     </filter-mapping>
++    <filter>
++        <filter-name>Remote Address Filter</filter-name>
++        <filter-class>org.apache.catalina.filters.RemoteAddrFilter</filter-class>
++        <init-param>
++        <param-name>allow</param-name>
++            <param-value>@@REMOTE_ADDRESS_REGEXP@@</param-value>
++        </init-param>
++    </filter>
++    <filter-mapping>
++        <filter-name>Remote Address Filter</filter-name>
++        <url-pattern>/admin</url-pattern>
++    </filter-mapping>
++    <filter-mapping>
++        <filter-name>Remote Address Filter</filter-name>
++        <url-pattern>/admin/*</url-pattern>
++    </filter-mapping>
+     <!-- Filters end -->
+
+     <!-- Servlets-->
