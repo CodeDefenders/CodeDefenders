@@ -36,4 +36,21 @@ Now you can access to CodeDefenders:
 | CODEDEF_ADMIN_ROLES                 | manager-gui  | Roles asigned to the CodeDefenders administrative user |
 | CODEDEF_LOAD_BALANCER_IP            | IP of the "load-balancer" container | IP of the load-balancer use for CodeDefenders. This IP is configured as an [Apache Tomcat remote trusted proxy](https://tomcat.apache.org/tomcat-9.0-doc/config/valve.html#Remote_IP_Valve). |
 
+## Config.properties / context.xml dynamic properties
+| Variable                             | Equivalent in config.properties | Defaul value                  | Meaning |
+| :---:                                | :----:                          | :---:                         | :---: |
+| CODEDEF_CFG_DATA_DIR                 | data.dir                        | /codedefenders                | The main Code Defenders folder. |
+| CODEDEF_CFG_ANT_HOME                 | ant.home                        | /usr                          | Location of Ant command. |
+| CODEDEF_CFG_DB_URL                   | db.url                          | jdbc:mysql://db:3306/defender | JDBC url to connect MySQL server. |
+| CODEDEF_CFG_DB_USERNAME              | db.username                     | defender                      | Database user name |
+| CODEDEF_CFG_DB_PASSWORD              | db.password                     | defender                      | Database password |
+| CODEDEF_CFG_CLUSTER_MODE             | cluster.mode                    | disabled                      | Execute tests in cluster mode (SLURM) (see src/main/java/org/codedefenders/execution/AntRunner.java). |
+| CODEDEF_CFG_CLUSTER_JAVA_HOME        | cluster.java.home               |                               | Java Home on cluster (see src/main/java/org/codedefenders/execution/AntRunner.java). |
+| CODEDEF_CFG_CLUSTER_TIMEOUT          | cluster.timeout                 |                               | SLURM Job timeout (see src/main/java/org/codedefenders/execution/AntRunner.java). |
+| CODEDEF_CFG_CLUSTER_RESERVATION_NAME | cluster.reservation.name        |                               | SLURM reservation name (see src/main/java/org/codedefenders/execution/AntRunner.java). |
+| CODEDEF_CFG_FORCE_LOCAL_EXECUTION    | force.local.execution           | enabled                       | Force compilation and testing of original version on the local machine (see src/main/java/org/codedefenders/execution/AntRunner.java). |
+| CODEDEF_CFG_PARALLELIZE              | parallelize                     | enabled                       | Parallelize Ant task execution (see src/main/java/org/codedefenders/execution/KillMap.java). |
+| CODEDEF_CFG_MUTANT_COVERAGE          | mutant.coverage                 | enabled                       | Skip tests on mutants that are not covered (see src/main/java/org/codedefenders/execution/KillMap.java). |
+| CODEDEF_CFG_BLOCK_ATTACKER           | block.attacker                  | enabled                       | Block the attackers if there are pending equivalence duels. |
+
 

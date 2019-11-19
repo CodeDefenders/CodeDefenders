@@ -25,6 +25,21 @@ file_env() {
 }
 
 if [[ "$1" == catalina* ]]; then
+    configProps=(
+        CODEDEF_CFG_DATA_DIR
+        CODEDEF_CFG_ANT_HOME
+        CODEDEF_CFG_DB_URL
+        CODEDEF_CFG_DB_USERNAME
+        CODEDEF_CFG_DB_PASSWORD
+        CODEDEF_CFG_CLUSTER_MODE
+        CODEDEF_CFG_CLUSTER_JAVA_HOME
+        CODEDEF_CFG_CLUSTER_TIMEOUT
+        CODEDEF_CFG_CLUSTER_RESERVATION_NAME
+        CODEDEF_CFG_PARALLELIZE
+        CODEDEF_CFG_FORCE_LOCAL_EXECUTION
+        CODEDEF_CFG_MUTANT_COVERAGE
+        CODEDEF_CFG_BLOCK_ATTACKER
+	)
     envs=(
         CODEDEF_MANAGER_USERNAME
         CODEDEF_MANAGER_PASSWORD
@@ -34,6 +49,7 @@ if [[ "$1" == catalina* ]]; then
         CODEDEF_ADMIN_PASSWORD
         CODEDEF_ADMIN_ROLES
         CODEDEF_LOAD_BALANCER_IP
+        "${configProps[@]}"
     )
     haveConfig=
     for e in "${envs[@]}"; do
@@ -74,6 +90,19 @@ if [[ "$1" == catalina* ]]; then
         : "${CODEDEF_ADMIN_PASSWORD:=password}"
         : "${CODEDEF_ADMIN_ROLES:=manager-gui}"
         : "${CODEDEF_LOAD_BALANCER_IP:=$(get_loadbalancer_ip)}"
+        : "${CODEDEF_CFG_DATA_DIR:=/codedefenders}"
+        : "${CODEDEF_CFG_ANT_HOME:=/usr}"
+        : "${CODEDEF_CFG_DB_URL:=jdbc:mysql://db:3306/defender}"
+        : "${CODEDEF_CFG_DB_USERNAME:=defender}"
+        : "${CODEDEF_CFG_DB_PASSWORD:=defender}"
+        : "${CODEDEF_CFG_CLUSTER_MODE:=disabled}"
+        : "${CODEDEF_CFG_CLUSTER_JAVA_HOME:=}"
+        : "${CODEDEF_CFG_CLUSTER_TIMEOUT:=}"
+        : "${CODEDEF_CFG_CLUSTER_RESERVATION_NAME:=}"
+        : "${CODEDEF_CFG_PARALLELIZE:=enabled}"
+        : "${CODEDEF_CFG_FORCE_LOCAL_EXECUTION:=enabled}"
+        : "${CODEDEF_CFG_MUTANT_COVERAGE:=enabled}"
+        : "${CODEDEF_CFG_BLOCK_ATTACKER:=enabled}"
 
         add_tomcat_user() {
             local username="$1"
@@ -113,11 +142,14 @@ if [[ "$1" == catalina* ]]; then
         add_remoteAddr_valve "${CODEDEF_MANAGER_ALLOWED_REMOTE_ADDR}" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
         add_accessLog_valve "manager" "/usr/local/tomcat/webapps/manager/META-INF/context.xml"
 
-        cp "/usr/local/tomcat/templates/codedefenders-context.xml" "/usr/local/tomcat/webapps/codedefenders/META-INF/context.xml"
+        cp "/usr/local/tomcat/templates/codedefenders-context.xml" "/tmp/context.xml"
         if [[ "$CODEDEF_LOAD_BALANCER_IP" != "" ]]; then
             add_remoteIp_valve "" "${CODEDEF_LOAD_BALANCER_IP}" "/tmp/context.xml"
         fi
-        add_accessLog_valve "codedefenders" "/usr/local/tomcat/webapps/codedefenders/META-INF/context.xml"
+        add_accessLog_valve "codedefenders" "/tmp/context.xml"
+        replaceProperties.py "/tmp/context.xml" > "/usr/local/tomcat/webapps/codedefenders/META-INF/context.xml"
+        rm "/tmp/context.xml"
+
     fi
 
     # now that we're definitely done writing configuration, let's clear out the relevant environment variables (don't leak secrets)
