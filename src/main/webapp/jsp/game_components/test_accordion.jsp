@@ -64,24 +64,20 @@
     #tests-accordion {
         margin-bottom: 0;
     }
-
-    #tests-accordion .panel-heading {
-        padding-top: .75ex;
-        padding-bottom: .75ex;
-    }
-
     #tests-accordion .panel-body {
         padding: 0;
     }
-
     #tests-accordion thead {
         display: none;
     }
-
     #tests-accordion .dataTables_scrollHead {
         display: none;
     }
 
+    #tests-accordion .panel-heading {
+        padding-top: .375em;
+        padding-bottom: .375em;
+    }
     #tests-accordion td {
         vertical-align: middle;
     }
@@ -89,33 +85,20 @@
     #tests-accordion .panel-title.ta-covered {
         color: black;
     }
-
     #tests-accordion .panel-title:not(.ta-covered) {
         color: #B0B0B0;
     }
-
-    #tests-accordion .ta-test-count {
-        color: #909090;
-    }
-
     #tests-accordion .ta-column-name {
         color: #B0B0B0;
     }
 
-    #tests-accordion .ta-covered-link {
-        color: inherit;
+    #tests-accordion .ta-count {
+        margin-right: .5em;
     }
 
-    #tests-accordion .ta-covered-link:hover {
-        text-decoration: none;
-    }
-
+    #tests-accordion .ta-covered-link,
     #tests-accordion .ta-killed-link {
         color: inherit;
-    }
-
-    #tests-accordion .ta-killed-link:hover {
-        text-decoration: none;
     }
 </style>
 
@@ -130,9 +113,12 @@
                         <a role="button" data-toggle="collapse" aria-expanded="false"
                                 href="#ta-collapse-<%=category.getId()%>"
                                 aria-controls="ta-collapse-<%=category.getId()%>"
-                                class="panel-title <%=category.getTestIds().isEmpty() ? "" : "ta-covered"%>">
+                                class="panel-title <%=category.getTestIds().isEmpty() ? "" : "ta-covered"%>"
+                                style="text-decoration: none;">
+                            <% if (!category.getTestIds().isEmpty()) { %>
+                                <span class="label label-primary ta-count"><%=category.getTestIds().size()%></span>
+                            <% } %>
                             <%=category.getDescription()%>
-                            <span class="ta-test-count"><%="(" + category.getTestIds().size() + ")"%></span>
                         </a>
                     </div>
                     <div class="panel-collapse collapse" data-parent="#tests-accordion"
@@ -238,8 +224,8 @@
          * References to created models are cached in a map so they don't need to be generated again.
          * @param {number} testId The id of the test to display.
          */
-        const viewTestModal = function (testId) {
-            let modal = testModals.get(testId);
+        const viewTestModal = function (test) {
+            let modal = testModals.get(test.id);
             if (modal !== undefined) {
                 modal.modal('show');
                 return;
@@ -247,14 +233,14 @@
 
             modal = $(
                 `<div class="modal mutant-modal fade" role="dialog">
-                    <div class="modal-dialog">
+                    <div class="modal-dialog" style="width: max-content; max-width: 90%; min-width: 500px;">
                         <div class="modal-content">
                             <div class="modal-header">
                                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                                <h4 class="modal-title">Test ` + testId + `</h4>
+                                <h4 class="modal-title">Test ` + test.id + ` (by ` + test.creatorName + `)</h4>
                             </div>
                             <div class="modal-body">
-                                <pre class="readonly-pre"><textarea name="test-` + testId + `"></textarea></pre>
+                                <pre class="readonly-pre"><textarea name="test-` + test.id + `"></textarea></pre>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -263,15 +249,17 @@
                     </div>
                 </div>`);
             modal.appendTo(document.body);
-            testModals.set(testId, modal);
+            testModals.set(test.id, modal);
 
             const textarea = modal.find('textarea').get(0);
             const editor = CodeMirror.fromTextArea(textarea, {
                 lineNumbers: true,
-                matahBrackets: true,
+                matchBrackets: true,
                 mode: "text/x-java",
-                readOnly: true
+                readOnly: true,
+
             });
+            editor.setSize('max-content', 'max-content');
 
             <%-- TODO: Is there a better solution for this. --%>
             /* Refresh the CodeMirror instance once the modal is displayed.
@@ -322,8 +310,8 @@
 
             /* Assign function to the "View" buttons. */
             tableElement.on('click', '.ta-view-button', function () {
-                const testId = rowData(this, dataTable).id;
-                viewTestModal(testId);
+                const test = rowData(this, dataTable);
+                viewTestModal(test);
             });
 
             setupPopovers(
