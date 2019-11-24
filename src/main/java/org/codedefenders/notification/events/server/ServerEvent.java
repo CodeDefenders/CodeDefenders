@@ -1,15 +1,17 @@
 package org.codedefenders.notification.events.server;
 
+import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.notification.web.EventEncoder;
 
 /**
- * A message sent by a client WebSocket.
- * JSON messages from clients are converted into this.
- * <p></p>
- * The client JSON messages must contain all attributes of the Event class
- * annotated by {@code @Expose(deserialize = true)}.
- * <p></p>
- * Client events must have a no-arg constructor and getter/setter methods for all attributes.
+ * <p>
+ * A message sent through the {@link NotificationService}.
+ * Server events are converted to JSON when sent to clients.
+ * </p>
+ *
+ * <p>
+ * Server events must have a no-arg constructor and getter/setter methods for all attributes.
+ * </p>
  * @see EventEncoder
  */
 public abstract class ServerEvent {
@@ -22,6 +24,7 @@ public abstract class ServerEvent {
      *
      * @return A WebSocket ticket, or {@code null}.
      */
+    // TODO: use this?
     public String getTicket() {
         return ticket;
     }
@@ -33,6 +36,7 @@ public abstract class ServerEvent {
      *
      * @param ticket The WebSocket ticket.
      */
+    // TODO: use this?
     public void setTicket(String ticket) {
         this.ticket = ticket;
     }

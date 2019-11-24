@@ -73,10 +73,8 @@ public class TicketingService implements ITicketingService {
     }
 
     /**
-     * Invalidates tickets older than 1 hour.
-     * This is to prevent tickets, that are not invalidated, from piling up.
-     * If a ticket is generated but the WebSocket for it is never opened,
-     * it will not get invalidated right away (at least the way it's currently implemented).
+     * Invalidates tickets older than 1 hour to prevent tickets, that are not invalidated, from piling up.
+     * (If a ticket is generated but the WebSocket for it is never opened, it will not get invalidated right away).
      */
     private void timeoutTickets() {
         Instant now = Instant.now();

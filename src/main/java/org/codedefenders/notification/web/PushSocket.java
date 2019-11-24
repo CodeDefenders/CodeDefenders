@@ -49,10 +49,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Communicates notifications and (game) events with clients through a WebSocket.
+ * <p>
+ * Communicates events with clients through a WebSocket.
+ * </p>
  *
- * <p></p>
- *
+ * <p>
  * <h2>Event format and types</h2>
  * Sent and received messages follow the following JSON format:
  * <pre>
@@ -61,17 +62,23 @@ import org.slf4j.LoggerFactory;
  *     data: &lt;json representation of event object&gt;
  * }
  * </pre>
+ * </p>
  *
+ * <p>
  * <h2>Server-to-client events</h2>
  * Server-to-client events are located in the package events/server.
- * <p></p>
- * Filtering of server-to-client events is done by the event handlers
- * using information (e.g. user ids) stored in the event).
+ * </p>
  *
- * <p></p>
+ * <p>
+ * Filtering of server-to-client events (i.e. deciding which sessions to send the events to)
+ * is done by the event handlers using information (e.g. user ids) stored in the event.
+ * </p>
+ * <br/>
  *
+ * <p>
  * <h2>Client-to-server events</h2>
  * Client-to-server events are located in the package events/client.
+ * </p>
  */
 // @RequestScoped -> TODO What's this?
 @ServerEndpoint(

@@ -1,6 +1,13 @@
 package org.codedefenders.notification.web;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import com.google.gson.annotations.Expose;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.codedefenders.notification.events.EventNames;
@@ -15,6 +22,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 
+/**
+ * Decodes JSON strings with a "{type: string, data: {}}" format to client events.
+ * @see ClientEvent
+ * @see EventNames
+ * @see PushSocket
+ */
 public class EventDecoder implements Decoder.Text<ClientEvent> {
     @Override
     public void init(EndpointConfig endpointConfig) {
@@ -62,7 +75,7 @@ public class EventDecoder implements Decoder.Text<ClientEvent> {
     /**
      * Deserializer that throws a {@link JsonParseException} on missing JSON attributes
      * instead of using {@code null} or {@code 0} as default values.
-     * Uses the the {@link Expose} annotation.
+     * Uses the {@link Expose} annotation.
      */
     private static class ClientEventDeserializer implements JsonDeserializer {
         Class clazz;

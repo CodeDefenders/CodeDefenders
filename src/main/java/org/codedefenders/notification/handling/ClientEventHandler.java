@@ -10,9 +10,13 @@ import org.codedefenders.notification.events.client.registration.GameLifecycleRe
 import org.codedefenders.notification.events.client.registration.MutantProgressBarRegistrationEvent;
 import org.codedefenders.notification.events.client.registration.TestProgressBarRegistrationEvent;
 import org.codedefenders.notification.events.server.chat.ServerGameChatEvent;
+import org.codedefenders.notification.web.PushSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Handles incoming client events from a {@link PushSocket}.
+ */
 public class ClientEventHandler {
     private static final Logger logger = LoggerFactory.getLogger(ClientEventHandler.class);
 

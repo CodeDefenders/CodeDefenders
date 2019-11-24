@@ -14,6 +14,7 @@ import org.codedefenders.notification.handling.server.GameChatEventHandler;
 import org.codedefenders.notification.handling.server.MutantProgressBarEventHandler;
 import org.codedefenders.notification.handling.server.ServerEventHandler;
 import org.codedefenders.notification.handling.server.TestProgressBarEventHandler;
+import org.codedefenders.notification.impl.NotificationService;
 import org.codedefenders.notification.web.PushSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,11 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Container for {@link ServerEventHandler ServerEventHandlers},
+ * that handle server events form a {@link NotificationService}
+ * and send outgoing events with a {@link PushSocket}.
+ */
 public class ServerEventHandlerContainer {
     private static final Logger logger = LoggerFactory.getLogger(ServerEventHandlerContainer.class);
 

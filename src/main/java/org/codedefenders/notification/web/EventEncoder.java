@@ -9,6 +9,12 @@ import com.google.gson.JsonObject;
 import org.codedefenders.notification.events.EventNames;
 import org.codedefenders.notification.events.server.ServerEvent;
 
+/**
+ * Encodes server events to a JSON string with a "{type: string, data: {}}" format.
+ * @see ServerEvent
+ * @see EventNames
+ * @see PushSocket
+ */
 public class EventEncoder implements Encoder.Text<ServerEvent> {
     @Override
     public void init(EndpointConfig endpointConfig) {
