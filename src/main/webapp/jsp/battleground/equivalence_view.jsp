@@ -60,7 +60,6 @@
 
 <div class="row">
     <div class="col-md-6" id="equivmut-div">
-        <%@include file="../game_components/test_progress_bar.jsp"%>
         <h3>Mutant <%= equivMutant.getId() %>
         <!-- check for automatically triggered equivalence duels -->
         <% if (equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID) { %>

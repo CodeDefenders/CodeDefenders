@@ -72,9 +72,6 @@ public class NotificationsHandler extends HttpServlet {
 
         final NotificationType type = NotificationType.valueOf(request.getParameter("type"));
         switch (type) {
-            case PROGRESSBAR:
-                handleProgressBarRequest(session, request, response, userId);
-                break;
             case PUSHEVENT:
                 handlePushEventRequest(session, request, response, userId);
                 break;
@@ -100,56 +97,6 @@ public class NotificationsHandler extends HttpServlet {
     private boolean hasParameters(HttpServletRequest request) {
         final String type = request.getParameter("type");
         return type != null;
-    }
-
-    /**
-     * Handles a progress bar request, which requires the following URL parameters:
-     * <ul>
-     *     <li><code>gameId</code></li>
-     * </ul>
-     *
-     * If parameters are valid, responds with a JSON list of progress bar updates,
-     * depending on the user being an in-game defender or not.
-     */
-    @SuppressWarnings("Duplicates")
-    private void handleProgressBarRequest(HttpSession session, HttpServletRequest request, HttpServletResponse response, int userId) throws IOException {
-        final String gameIdString = request.getParameter("gameId");
-        if (gameIdString == null) {
-            response.setStatus(400);
-            logger.error("Progress Bar: Missing parameter gameId.");
-            return;
-        }
-        int gameId;
-        try {
-            gameId = Integer.parseInt(gameIdString);
-        } catch (NumberFormatException e) {
-            response.setStatus(400);
-            logger.error("Progress Bar: Error trying to format parameter gameId.", e);
-            return;
-        }
-
-        boolean isDefender = request.getParameter("isDefender") != null;
-        final String attributeName = isDefender ? "lastTest" : "lastMutant";
-
-        // Check if we have any data on the last Submitted Test / Mutant
-        int lastSubmissionId;
-        final Object attribute = session.getAttribute(attributeName);
-        if (attribute != null ) {
-            lastSubmissionId = (int) attribute;
-        } else {
-            // Retrieve from the DB, it might be also -1 - none
-            lastSubmissionId = DatabaseAccess.getLastCompletedSubmissionForUserInGame(userId, gameId, isDefender);
-            session.setAttribute(attributeName, lastSubmissionId);
-        }
-
-        final TargetExecution.Target status = DatabaseAccess.getStatusOfRequestForUserInGame(userId, gameId, lastSubmissionId, isDefender);
-        final ArrayList<TargetExecution.Target> progressBarUpdates = new ArrayList<>();
-        if (status != null) {
-            progressBarUpdates.add(status);
-        }
-        final PrintWriter out = response.getWriter();
-        out.print(gson.toJson(progressBarUpdates));
-        out.flush();
     }
 
     /**
