@@ -31,8 +31,11 @@
     <%@ include file="/jsp/admin_navigation.jsp" %>
 
     <h3>Classes</h3>
+    <div>
+        <a href="<%=request.getContextPath() + Paths.CLASS_UPLOAD%>">Click here</a> to uploaded a new class.
+    </div>
 
-        <table id="tableClasses"
+    <table id="tableClasses"
                class="table table-striped table-hover table-responsive table-paragraphs games-table dataTable display">
             <thead>
             <tr>

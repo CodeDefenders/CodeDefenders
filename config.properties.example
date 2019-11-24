@@ -17,7 +17,7 @@ cluster.reservation.name=
 # SLURM Job timeout
 cluster.timeout=2
 # Force compilation and testing of original version on the local machine
-forceLocalExecution=enabled
+force.local.execution=enabled
 
 # Parallelize Ant task execution
 parallelize=disabled

@@ -11,6 +11,6 @@ cluster.timeout=
 cluster.reservation.name=
 
 parallelize=enabled
-forceLocalExecution=enabled
+force.local.execution=enabled
 mutant.coverage=enabled
 block.attacker=enabled

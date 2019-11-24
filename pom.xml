@@ -120,7 +120,7 @@
 								<echo>[cluster.mode] ${cluster.mode}</echo>
 								<echo>[cluster.reservation.name] ${cluster.reservation.name}</echo>
 								<echo>[parallelize] ${parallelize}</echo>
-								<echo>[forceLocalExecution] ${forceLocalExecution}</echo>
+								<echo>[force.local.execution] ${force.local.execution}</echo>
 								<echo>[block.attacker] ${block.attacker}</echo>
 							</tasks>
 						</configuration>
@@ -228,7 +228,47 @@
 			</plugin>
 		</plugins>
 
-		<finalName>${project.artifactId}</finalName>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-checkstyle-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>8.25</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <configLocation>
+                            checkstyle-codedefenders.xml
+                        </configLocation>
+                    </configuration>
+                </plugin>
+
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>3.8.2</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.doxia</groupId>
+                            <artifactId>doxia-site-renderer</artifactId>
+                            <version>1.9.1</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-project-info-reports-plugin</artifactId>
+                            <version>3.0.0</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <finalName>${project.artifactId}</finalName>
 	</build>
 
 	<profiles>

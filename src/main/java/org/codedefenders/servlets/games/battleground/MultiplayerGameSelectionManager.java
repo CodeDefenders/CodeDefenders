@@ -23,11 +23,13 @@ import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
 import org.codedefenders.database.MultiplayerGameDAO;
+import org.codedefenders.database.MutantDAO;
 import org.codedefenders.database.PlayerDAO;
+import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.execution.KillMap;
-import org.codedefenders.execution.KillMap.KillMapEntry;
 import org.codedefenders.execution.KillMapProcessor;
+import org.codedefenders.execution.TargetExecution;
 import org.codedefenders.game.GameLevel;
 import org.codedefenders.game.GameState;
 import org.codedefenders.game.Mutant;
@@ -54,16 +56,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.servlet.ServletException;
@@ -72,10 +71,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 
 import static org.codedefenders.servlets.util.ServletUtils.ctx;
 import static org.codedefenders.servlets.util.ServletUtils.formType;
@@ -180,7 +175,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         boolean chatEnabled = parameterThenOrOther(request, "chatEnabled", true, false);
         boolean capturePlayersIntention = parameterThenOrOther(request, "capturePlayersIntention", true, false);
 
-        MultiplayerGame nGame = new MultiplayerGame.Builder(classId, userId, maxAssertionsPerTest, forceHamcrest)
+        MultiplayerGame newGame = new MultiplayerGame.Builder(classId, userId, maxAssertionsPerTest, forceHamcrest)
                 .level(level)
                 .chatEnabled(chatEnabled)
                 .capturePlayersIntention(capturePlayersIntention)
@@ -190,9 +185,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 .automaticMutantEquivalenceThreshold(automaticEquivalenceTrigger)
                 .build();
 
-        if (nGame.insert()) {
+        if (newGame.insert()) {
             Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-            Event event = new Event(-1, nGame.getId(), userId, "Game Created",
+            Event event = new Event(-1, newGame.getId(), userId, "Game Created",
                     EventType.GAME_CREATED, EventStatus.GAME, timestamp);
             event.insert();
         }
@@ -202,86 +197,68 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         List<Test> uploadedTests = GameClassDAO.getMappedTestsForClassId(classId);
 
         // Always add system player to send mutants and tests at runtime!
-        nGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
-        nGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
+        newGame.addPlayer(DUMMY_ATTACKER_USER_ID, Role.ATTACKER);
+        newGame.addPlayer(DUMMY_DEFENDER_USER_ID, Role.DEFENDER);
 
         // Add selected role to game if the creator participates as attacker/defender
         if (selectedRole.equals(Role.ATTACKER) || selectedRole.equals(Role.DEFENDER)) {
-            nGame.addPlayer(userId, selectedRole);
+            newGame.addPlayer(userId, selectedRole);
         }
 
-        int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, nGame.getId());
-        int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, nGame.getId());
+        int dummyAttackerPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_ATTACKER_USER_ID, newGame.getId());
+        int dummyDefenderPlayerId = PlayerDAO.getPlayerIdForUserAndGame(DUMMY_DEFENDER_USER_ID, newGame.getId());
 
         // this mutant map links the uploaded mutants and the once generated from them here
         // This implements bookkeeping for killmap
-        Map<Mutant, Mutant> mutantMap = new HashMap<>();
-        Map<Test, Test> testMap = new HashMap<>();
+        Map<Integer, Mutant> mutantMap = new HashMap<>();
+        Map<Integer, Test> testMap = new HashMap<>();
 
         boolean withTests = parameterThenOrOther(request, "withTests", true, false);
         boolean withMutants = parameterThenOrOther(request, "withMutants", true, false);
+
         // Register Valid Mutants.
         if (withMutants) {
             // Validate uploaded mutants from the list
             // TODO
             // Link the mutants to the game
             for (Mutant mutant : uploadedMutants) {
-//                          final String mutantCode = new String(Files.readAllBytes();
-                Mutant newMutant = new Mutant(nGame.getId(), classId,
+                Mutant newMutant = new Mutant(newGame.getId(), classId,
                         mutant.getJavaFile(),
                         mutant.getClassFile(),
-                        // Alive be default
-                        true,
-                        //
+                        true, // Alive be default
                         dummyAttackerPlayerId);
-                // insert this into the DB and link the mutant to the game
                 newMutant.insert();
-                // BookKeeping
-                mutantMap.put(mutant, newMutant);
+                mutantMap.put(mutant.getId(), newMutant);
             }
         }
+
         // Register Valid Tests
         if (withTests) {
-            // Validate the tests from the list
-            // TODO
             for (Test test : uploadedTests) {
-                // At this point we need to fill in all the details
-                Test newTest = new Test(-1, classId, nGame.getId(), test.getJavaFile(),
+                Test newTest = new Test(-1, classId, newGame.getId(), test.getJavaFile(),
                         test.getClassFile(), 0, 0, dummyDefenderPlayerId, test.getLineCoverage().getLinesCovered(),
                         test.getLineCoverage().getLinesUncovered(), 0);
                 newTest.insert();
-                testMap.put(test, newTest);
+                testMap.put(test.getId(), newTest);
             }
         }
 
         if (withMutants && withTests) {
-            List<KillMapEntry> killmap = KillmapDAO.getKillMapEntriesForClass(classId);
-            // Filter the killmap and keep only the one created during the upload ...
+            for (TargetExecution targetExecution : TargetExecutionDAO.getTargetExecutionsForUploadedWithClass(classId)) {
+                Test test = testMap.get(targetExecution.testId);
+                Mutant mutant = mutantMap.get(targetExecution.mutantId);
 
-            for (Mutant uploadedMutant : uploadedMutants) {
-                boolean alive = true;
-                for (Test uploadedTest : uploadedTests) {
-                    // Does the test kill the mutant?
-                    for (KillMapEntry entry : killmap) {
-                        if (entry.mutant.getId() == uploadedMutant.getId() &&
-                                entry.test.getId() == uploadedTest.getId() &&
-                                entry.status.equals(KillMapEntry.Status.KILL)) {
+                targetExecution.testId = test.getId();
+                targetExecution.mutantId = mutant.getId();
 
-                            // If the mutant was not yet killed by some other test increment the kill count for the test
-                            // and kill the mutant, otherwise continue
-                            // We need this because the killmap gives us all the possible combinations !
-                            if( mutantMap.get(uploadedMutant).isAlive() ){
-                                testMap.get( uploadedTest).killMutant();
-                                mutantMap.get(uploadedMutant).kill();
-                            }
-                            alive = false;
-                            break;
-                        }
-                    }
-                    if (!alive) {
-                        break;
-                    }
+                if (targetExecution.status == TargetExecution.Status.FAIL) {
+                    test.killMutant();
+                    mutant.kill();
+                    mutant.setKillMessage(targetExecution.message);
+                    MutantDAO.updateMutantKillMessageForMutant(mutant);
                 }
+
+                targetExecution.insert();
             }
         }
 
@@ -289,7 +266,7 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
          * Publish the event that a new game started
          */
         GameCreatedEvent gce = new GameCreatedEvent();
-        gce.setGameId(nGame.getId());
+        gce.setGameId(newGame.getId());
         notificationService.post(gce);
 
 

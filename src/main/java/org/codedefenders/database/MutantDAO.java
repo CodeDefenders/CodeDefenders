@@ -283,9 +283,8 @@ public class MutantDAO {
 
         String query = String.join("\n",
             "UPDATE mutants",
-            "SET",
-            "  KillMessage=?",
-            "WHERE Mutant_ID=?;" // AND Alive=0;" maybe ?
+            "SET KillMessage=?",
+            "WHERE Mutant_ID=?;"
         );
         DatabaseValue[] values = new DatabaseValue[]{
             DatabaseValue.of(killMessage),
