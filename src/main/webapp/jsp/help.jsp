@@ -18,18 +18,20 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<% String pageTitle = "Help"; %>
-
 
 <%
+    /* header_main */
+    request.setAttribute("pageTitle", "Help");
+
 	Object uid = request.getSession().getAttribute("uid");
 	Object username = request.getSession().getAttribute("username");
-	if (uid != null && username != null){
 %>
+
+<% if (uid != null && username != null) { %>
 <%@ include file="/jsp/header.jsp" %>
-<%} else {%>
+<% } else { %>
 <%@ include file="/jsp/header_logout.jsp" %>
-<%}%>
+<% } %>
 
 <div class="container" id="help-main-div">
     <h1>Help</h1>

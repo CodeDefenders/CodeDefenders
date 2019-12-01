@@ -20,7 +20,12 @@
 --%>
 <%@ page import="org.codedefenders.game.leaderboard.Leaderboard" %>
 <%@ page import="org.codedefenders.game.leaderboard.Entry" %>
-<% String pageTitle="Leaderboard"; %>
+
+<%
+	/* header_main */
+	request.setAttribute("pageTitle", "Leaderboard");
+%>
+
 <%@ include file="/jsp/header_main.jsp" %>
 <div class="w-100">
 	<h3>Battlegrounds</h3>

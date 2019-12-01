@@ -21,7 +21,6 @@
 <%@ page import="org.codedefenders.model.UserInfo" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-<% String pageTitle=null; %>
 
 <%@ include file="/jsp/header_main.jsp" %>
 <%

@@ -22,7 +22,11 @@
 <%@ page import="org.codedefenders.database.DatabaseAccess" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.util.Paths" %>
-<% String pageTitle = "Login"; %>
+
+<%
+    /* header_main */
+    request.setAttribute("pageTitle", "Login");
+%>
 
 <%@ include file="/jsp/header_logout.jsp" %>
 

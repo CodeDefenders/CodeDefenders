@@ -18,11 +18,22 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
+<%--
+    @param String pageTitle
+        The title of the page.
+        TODO: change this to a bean?
+--%>
+
+<%
+    String pageTitleTODORENAME3 = (String) request.getAttribute("pageTitle");
+%>
+
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title>Code Defenders<%= pageTitle != null ? " - " + pageTitle : "" %></title>
+    <title>Code Defenders<%= pageTitleTODORENAME3 != null ? " - " + pageTitleTODORENAME3 : "" %></title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">

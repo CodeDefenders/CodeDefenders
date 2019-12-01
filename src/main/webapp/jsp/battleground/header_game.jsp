@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<% pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 </div></div></div></div></div>
 

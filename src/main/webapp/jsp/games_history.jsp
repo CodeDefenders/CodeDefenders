@@ -24,7 +24,9 @@
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%
     {
-    String pageTitle="Game History";
+    /* header_main */
+    request.setAttribute("pageTitle", "Game History");
+
     List<UserMultiplayerGameInfo> games = ((List<UserMultiplayerGameInfo>) request.getAttribute("finishedBattlegroundGames"));
 %>
 <%@ include file="/jsp/header_main.jsp" %>

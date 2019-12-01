@@ -20,7 +20,10 @@
 --%>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
-<%  String pageTitle = "Welcome";
+<%
+    /* header_main */
+    request.setAttribute("pageTitle", "Welcome");
+
     List<MultiplayerGame> openGames = (List<MultiplayerGame>) request.getAttribute("openMultiplayerGames");
     Map<Integer, String> gameCreatorNames = (Map<Integer, String>) request.getAttribute("gameCreatorNames");
 %>

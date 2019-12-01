@@ -22,7 +22,6 @@
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.game.*" %>
-<% String pageTitle=null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <div>
 	<div class="w-100 up">

@@ -24,7 +24,6 @@
 <%@ page import="org.codedefenders.game.puzzle.PuzzleChapter" %>
 <%@ page import="org.codedefenders.model.PuzzleChapterEntry" %>
 <%@ page import="org.codedefenders.model.PuzzleEntry" %>
-<% String pageTitle = null; %>
 
 <%--
     Displays all puzzles for a user. Puzzles may link to active puzzle games

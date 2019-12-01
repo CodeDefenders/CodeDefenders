@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<% String pageTitle="In Game"; %>
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
@@ -33,6 +32,9 @@
 %>
 <%-- Set request attributes for the components. --%>
 <%
+    /* header_main */
+    request.setAttribute("pageTitle", "In Game");
+
     /* playerFeedback & game_notifications */
     request.setAttribute("gameId", game.getId());
     // playerId already set in servlet.

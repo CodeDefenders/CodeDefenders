@@ -28,8 +28,11 @@
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 
 <%
-    String pageTitle="Game History";
+    /* header_main */
+    request.setAttribute("pageTitle", "Game History");
+%>
 
+<%
     MultiplayerGame game;
     {
         final Optional<Integer> gameIdOpt = ServletUtils.gameId(request);

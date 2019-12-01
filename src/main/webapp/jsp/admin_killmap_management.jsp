@@ -25,7 +25,6 @@
 <%@ page import="static org.codedefenders.util.MessageUtils.pluralize" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminKillmapManagement.KillmapPage" %>
 
-<% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
 <%

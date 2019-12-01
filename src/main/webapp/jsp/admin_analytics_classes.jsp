@@ -19,7 +19,6 @@
 
 --%>
 <%@ page import="org.codedefenders.servlets.FeedbackManager" %>
-<% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
 <div class="full-width">

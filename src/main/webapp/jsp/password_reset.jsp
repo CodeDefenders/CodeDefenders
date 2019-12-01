@@ -38,7 +38,10 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<% String pageTitle = "Login"; %>
+<%
+    /* header_main */
+    request.setAttribute("pageTitle", "Login");
+%>
 
 <%@ include file="/jsp/header_logout.jsp" %>
 

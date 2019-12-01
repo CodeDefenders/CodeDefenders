@@ -20,9 +20,11 @@
 --%>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="static org.codedefenders.servlets.admin.AdminSystemSettings.SETTING_NAME.*" %>
-<% String pageTitle = "Contact Us"; %>
 
 <%
+	/* header_main */
+	request.setAttribute("pageTitle", "Contact Us");
+
 	Object uid = request.getSession().getAttribute("uid");
 	Object username = request.getSession().getAttribute("username");
 	if (uid != null && username != null){

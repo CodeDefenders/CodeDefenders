@@ -31,7 +31,6 @@
         The puzzle game to be displayed.
 --%>
 
-<% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
 </div></div></div></div></div>

@@ -21,6 +21,22 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ include file="/jsp/header_base.jsp" %>
+
+<%--
+    @param String pageTitle
+        The title of the page.
+        TODO: change this to a bean?
+        FIXME: don't use pageTitle to identify the page here!
+    @param List<String> messages
+        Messages to display on page load.
+--%>
+
+<%
+    String pageTitleTODORENAME2 = (String) request.getAttribute("pageTitle");
+    ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
+    request.getSession().removeAttribute("messages");
+%>
+
 <script type="text/javascript">
     $(document).ready(function() {
         $('#messages-div').delay(10000).fadeOut();
@@ -54,7 +70,7 @@
             <!-- navigation bar -->
             <div id="bs-example-navbar-collapse-1" class="navbar-collapse collapse">
                 <ul class="crow no-gutter nav navbar-nav" style="display: flow-root; position: relative; z-index: 1000">
-                    <%if (!pageTitle.equals("Login")) {%>
+                    <%if (!pageTitleTODORENAME2.equals("Login")) {%>
                     <li class="col-md-4"><a class="text-white button tab-link bg-minus-1"
                                                href="login" style="width:100%; margin-right: 80px">Login</a></li>
                     <%}%>
@@ -70,8 +86,6 @@
     </div>
 </div>
 <%
-    ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
-    request.getSession().removeAttribute("messages");
     if (messages != null && !messages.isEmpty()) {
 %>
 <div class="alert alert-info" id="messages-div">

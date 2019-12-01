@@ -20,7 +20,6 @@
 --%>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.GameClassInfo" %>
-<% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <%
     List<GameClassInfo> allClasses  = (List<GameClassInfo>) request.getAttribute("classInfos");

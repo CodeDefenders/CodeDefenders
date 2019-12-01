@@ -24,7 +24,6 @@
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserInfo" %>
-<% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
 <div class="full-width">

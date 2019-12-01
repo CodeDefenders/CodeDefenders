@@ -22,17 +22,20 @@
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="java.io.IOException" %>
-<% String pageTitle = "About CodeDefenders"; %>
 
 <%
+    /* header_main */
+    request.setAttribute("pageTitle", "About CodeDefenders");
+
     Object uid = request.getSession().getAttribute("uid");
     Object username = request.getSession().getAttribute("username");
-    if (uid != null && username != null){
 %>
+
+<% if (uid != null && username != null) { %>
 <%@ include file="/jsp/header.jsp" %>
-<%} else {%>
+<% } else { %>
 <%@ include file="/jsp/header_logout.jsp" %>
-<%}%>
+<% } %>
 
 <div class="container" style=" max-width: 50%; min-width: 25%; ">
     <h2 style="text-align: center">About CodeDefenders</h2>

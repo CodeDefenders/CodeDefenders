@@ -29,7 +29,6 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
-<% String pageTitle = null; %>
 <%@ include file="/jsp/header_main.jsp" %>
 
 <div class="full-width">

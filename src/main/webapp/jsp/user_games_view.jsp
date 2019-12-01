@@ -23,7 +23,6 @@
 <%@ page import="org.codedefenders.model.UserMultiplayerGameInfo" %>
 <%@ page import="org.codedefenders.model.Player" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
-<% String pageTitle= null ; %>
 <%@ include file="/jsp/header_main.jsp" %>
 <%
     // Games active for this user (Created or joined)
