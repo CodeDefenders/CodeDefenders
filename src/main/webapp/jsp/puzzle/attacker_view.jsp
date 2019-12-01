@@ -27,6 +27,9 @@
 <%@ page import="java.util.LinkedList" %>
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <%@ page import="org.codedefenders.game.GameMode" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <%--
     Puzzle game view for a attacker. Retrieves the given puzzle game
@@ -35,7 +38,7 @@
     @param PuzzleGame Constants#REQUEST_ATTRIBUTE_PUZZLE_GAME
         The puzzle game to be displayed.
 --%>
-<%@ include file="/jsp/header_main.jsp"%>
+<jsp:include page="/jsp/header_main.jsp"/>
 
 </div></div></div></div></div>
 <div class="game-container">
@@ -118,7 +121,7 @@
     </div>
 
     <div class="col-md-6" id="cut-div">
-        <%@include file="/jsp/game_components/mutant_progress_bar.jsp"%>
+        <jsp:include page="/jsp/game_components/mutant_progress_bar.jsp"/>
         <h3 style="margin-bottom: 0;">Create a mutant here</h3>
 
         <form id="reset" action="<%=request.getContextPath() + Paths.PUZZLE_GAME%>" method="post">
@@ -138,8 +141,8 @@
             <input type="hidden" name="formType" value="createMutant">
             <input type="hidden" name="gameId" value="<%= game.getId() %>">
 
-            <%@include file="/jsp/game_components/mutant_editor.jsp"%>
-            <%@include file="/jsp/game_components/game_highlighting.jsp"%>
+            <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
+            <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
         </form>
         <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
         <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
@@ -148,6 +151,6 @@
 
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
-<%@include file="/jsp/footer_game.jsp"%>
+<jsp:include page="/jsp/footer_game.jsp"/>
 
 <% } %>

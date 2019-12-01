@@ -18,19 +18,24 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
+
 <%@ include file="/jsp/header_main.jsp" %>
 </div></div></div></div></div>
 
 <%
     {
+        MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+        int userId = ServletUtils.userId(request);
+        Role role = game.getRole(userId);
         int gameId = (int) request.getAttribute("gameId");
 %>
 
 <div class="game-container">
     <nav class="nest" style="width: 100%; margin-left: 0; margin-right: auto;">
         <div class="crow fly">
-            <% String userRole = role.getFormattedString(); %>
-            <div><h2 style="margin-top: 7px"><%= "Game " + game.getId() + " (" + userRole + ")" %>
+            <div><h2 style="margin-top: 7px"><%= "Game " + game.getId() + " (" + role.getFormattedString() + ")" %>
             </h2></div>
 
             <%  int userIdCurrent = ((Integer) session.getAttribute("uid"));

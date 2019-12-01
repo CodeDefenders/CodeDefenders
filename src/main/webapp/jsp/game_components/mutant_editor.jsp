@@ -41,7 +41,7 @@
 --%>
 
 <%@ page import="org.codedefenders.model.KeyMap" %>
-<% { %>
+<%@ page import="java.util.Map" %>
 
 <%
     final String mutantCode = (String) request.getAttribute("mutantCode");
@@ -308,6 +308,3 @@
         }
     });
 </script>
-<%
-}
-%>

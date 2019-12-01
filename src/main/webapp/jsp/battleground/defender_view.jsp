@@ -23,6 +23,9 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.GameLevel" %>
+<%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
 
 <%-- TODO: list parameters --%>
 
@@ -89,13 +92,13 @@
 <div class="row">
 	<div class="col-md-6" id="cut-div">
 		<h3>Class Under Test</h3>
-		<%@include file="../game_components/class_viewer.jsp"%>
-		<%@include file="../game_components/game_highlighting.jsp" %>
-		<%@include file="../game_components/mutant_explanation.jsp"%>
+		<jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+		<jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+		<jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
 	</div>
 
 	<div class="col-md-6" id="utest-div">
-		<%@include file="../game_components/test_progress_bar.jsp"%>
+		<jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
 		<%--<%@include file="../game_components/push_test_progress_bar.jsp"%>--%>
 
 		<%-- TODO Why progress bar here is handled differently than mutant submission ?! --%>
@@ -109,12 +112,12 @@
 		</h3>
 
 		<form id="def" action="<%=request.getContextPath() + Paths.BATTLEGROUND_GAME%>" method="post">
-			<%@include file="../game_components/test_editor.jsp"%>
+			<jsp:include page="/jsp/game_components/test_editor.jsp"/>
 			<input type="hidden" name="formType" value="createTest">
 			<input type="hidden" name="gameId" value="<%= game.getId() %>" />
 		</form>
-		<%@include file="../game_components/editor_help_config_toolbar.jsp"%>
-		<%@include file="../game_components/error_highlighting.jsp" %>
+		<jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
+		<jsp:include page="/jsp/game_components/error_highlighting.jsp"/>
 	</div>
 </div>
 
@@ -123,7 +126,7 @@
 <div class="row" style="padding: 0px 15px;">
     <div class="col-md-6" id="mutants-div">
         <h3>Existing Mutants</h3>
-        <%@include file="../game_components/mutants_list.jsp"%>
+        <jsp:include page="/jsp/game_components/mutants_list.jsp"/>
 	</div>
 
     <div class="col-md-6">

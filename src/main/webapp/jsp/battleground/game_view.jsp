@@ -22,9 +22,6 @@
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 <%@ page import="org.codedefenders.util.Paths" %>
-<%@ page import="org.codedefenders.game.GameClass" %>
-<%@ page import="org.codedefenders.game.GameLevel" %>
-<%@ page import="org.codedefenders.game.GameState" %>
 <%
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
     int userId = ServletUtils.userId(request); // required for playerFeedback, too
@@ -32,15 +29,12 @@
 %>
 <%-- Set request attributes for the components. --%>
 <%
-    /* header_main */
-    request.setAttribute("pageTitle", "In Game");
-
     /* playerFeedback & game_notifications */
     request.setAttribute("gameId", game.getId());
     // playerId already set in servlet.
     // request.setAttribute("playerId", playerId);
 %>
-<%@ include file="/jsp/battleground/header_game.jsp" %>
+<jsp:include page="/jsp/battleground/header_game.jsp"/>
 
 <%-- Push notifications using WebSocket --%>
 <%--<%@ include file="/jsp/push_notifications.jsp"%>--%>
@@ -56,8 +50,6 @@
 
 <div class="crow fly no-gutter up">
 <%
-    messages = new ArrayList<>();
-    session.setAttribute("messages", messages);
     boolean openEquivalenceDuel = request.getAttribute("openEquivalenceDuel") != null;
 
     switch (role){

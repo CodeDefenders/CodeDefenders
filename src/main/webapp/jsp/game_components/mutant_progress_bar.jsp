@@ -19,6 +19,7 @@
 
 --%>
 <%@ page import="org.codedefenders.model.NotificationType" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
 <%--
     Adds a JavaScript function progressBar() that inserts and updates a progressbar showing the status of the last

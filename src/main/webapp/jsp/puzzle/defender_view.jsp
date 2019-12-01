@@ -22,6 +22,13 @@
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 <%@ page import="static org.codedefenders.util.Constants.*" %>
 <%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
+<%@ page import="java.util.LinkedList" %>
+<%@ page import="org.codedefenders.util.Constants" %>
 
 <%--
     Puzzle game view for a defender. Retrieves the given puzzle game
@@ -31,7 +38,7 @@
         The puzzle game to be displayed.
 --%>
 
-<%@ include file="/jsp/header_main.jsp" %>
+<jsp:include page="/jsp/header_main.jsp"/>
 
 </div></div></div></div></div>
 
@@ -103,13 +110,13 @@
     <div class="row" style="padding: 0px 15px;">
         <div class="col-md-6" id="cut-div">
             <h3>Class Under Test</h3>
-            <%@include file="../game_components/class_viewer.jsp" %>
-            <%@include file="../game_components/game_highlighting.jsp"%>
-            <%@include file="../game_components/mutant_explanation.jsp" %>
+            <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+            <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+            <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
         </div>
 
         <div class="col-md-6" id="ut-div">
-            <%@include file="../game_components/test_progress_bar.jsp" %>
+            <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
             <h3>Write a new JUnit test here
                 <button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
                         onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
@@ -123,16 +130,16 @@
                 <input type="hidden" name="formType" value="createTest">
                 <input type="hidden" name="gameId" value="<%= game.getId() %>">
 
-                <%@include file="../game_components/test_editor.jsp" %>
+                <jsp:include page="/jsp/game_components/test_editor.jsp"/>
             </form>
-            <%@include file="../game_components/editor_help_config_toolbar.jsp"%>
+            <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
         </div>
     </div>
 
     <div class="row" style="padding: 0px 15px;">
         <div class="col-md-6" id="mutants-div">
             <h3>Existing Mutants</h3>
-            <%@include file="../game_components/mutants_list.jsp" %>
+            <jsp:include page="/jsp/game_components/mutants_list.jsp"/>
         </div>
 
         <div class="col-md-6">
@@ -144,6 +151,6 @@
 
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
-<%@include file="../footer_game.jsp" %>
+<jsp:include page="/jsp/footer_game.jsp"/>
 
 <% } %>

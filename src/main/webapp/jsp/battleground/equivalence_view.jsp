@@ -24,6 +24,7 @@
 <%@ page import="org.codedefenders.game.GameMode" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
 
 <%-- TODO: list parameters --%>
 
@@ -69,7 +70,7 @@
 
 <div class="row">
     <div class="col-md-6" id="equivmut-div">
-        <%@include file="../game_components/test_progress_bar.jsp"%>
+        <jsp:include page="/jsp/game_components/test_progress_bar.jsp"/>
         <h3>Mutant <%= equivMutant.getId() %>
         <!-- check for automatically triggered equivalence duels -->
         <% if (equivDefender.getId() == Constants.DUMMY_CREATOR_USER_ID) { %>
@@ -107,7 +108,7 @@
                 <input type="hidden" name="gameId" value="<%= game.getId() %>">
                 <input type="hidden" id="equivMutantId" name="equivMutantId" value="<%= equivMutant.getId() %>">
 
-                <%@include file="../game_components/test_editor.jsp"%>
+                <jsp:include page="/jsp/game_components/test_editor.jsp"/>
 
                 <button class="btn btn-danger btn-left" name="acceptEquivalent" type="submit" onclick="return confirm('Accepting Equivalence will lose all mutant points. Are you sure?');">Accept Equivalence</button>
                 <button class="btn btn-primary btn-game btn-right" name="rejectEquivalent" type="submit" onclick="progressBar(); return true;">Submit Killing Test</button>
@@ -121,9 +122,9 @@
 
     <div class="col-md-6" id="cut-div">
         <h3>Class Under Test</h3>
-        <%@include file="../game_components/class_viewer.jsp"%>
-        <%@include file="../game_components/game_highlighting.jsp"%>
-        <%@include file="../game_components/mutant_explanation.jsp"%>
+        <jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+        <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
     </div>
 
 </div>

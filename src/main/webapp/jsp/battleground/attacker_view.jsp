@@ -23,6 +23,9 @@
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
+<%@ page import="java.util.List" %>
 
 <%-- TODO: list parameters --%>
 
@@ -83,7 +86,7 @@
     <div class="col-md-6">
         <div id="mutants-div">
             <h3>Existing Mutants</h3>
-            <%@include file="../game_components/mutants_list.jsp"%>
+            <jsp:include page="/jsp/game_components/mutants_list.jsp"/>
         </div>
 
         <% if (game.getLevel().equals(GameLevel.EASY) || game.getState().equals(GameState.FINISHED)) { %>
@@ -96,7 +99,7 @@
 
     <div class="col-md-6" id="newmut-div">
         <%--<%@include file="../game_components/push_mutant_progress_bar.jsp"%>--%>
-        <%@include file="../game_components/mutant_progress_bar.jsp"%>
+        <jsp:include page="/jsp/game_components/mutant_progress_bar.jsp"/>
 
         <div class="row" style="display: contents">
             <h3 style="margin-bottom: 0; display: inline">Create a mutant here</h3>
@@ -124,11 +127,11 @@
             <input type="hidden" name="formType" value="createMutant">
             <input type="hidden" name="gameId" value="<%= game.getId() %>"/>
 
-            <%@include file="../game_components/mutant_editor.jsp"%>
-            <%@include file="../game_components/game_highlighting.jsp" %>
-            <%@include file="../game_components/error_highlighting.jsp" %>
+            <jsp:include page="/jsp/game_components/mutant_editor.jsp"/>
+            <jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+            <jsp:include page="/jsp/game_components/error_highlighting.jsp"/>
         </form>
-        <%@include file="../game_components/mutant_explanation.jsp"%>
-        <%@include file="../game_components/editor_help_config_toolbar.jsp"%>
+        <jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
+        <jsp:include page="/jsp/game_components/editor_help_config_toolbar.jsp"/>
     </div>
 </div>

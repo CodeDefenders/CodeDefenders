@@ -68,7 +68,7 @@
 	<div class="col-md-6">
 		<div id="mutants-div">
 			<h3>Existing Mutants</h3>
-			<%@include file="../game_components/mutants_list.jsp"%>
+			<%@include file="/jsp/game_components/mutants_list.jsp"%>
 		</div>
 
 		<div id="tests-div">
@@ -79,8 +79,8 @@
 
 	<div class="col-md-6" id="cut-div">
 		<h3>Class Under Test</h3>
-		<%@include file="../game_components/class_viewer.jsp"%>
-		<%@ include file="../game_components/game_highlighting.jsp" %>
-		<%@include file="../game_components/mutant_explanation.jsp"%>
+		<jsp:include page="/jsp/game_components/class_viewer.jsp"/>
+		<jsp:include page="/jsp/game_components/game_highlighting.jsp"/>
+		<jsp:include page="/jsp/game_components/mutant_explanation.jsp"/>
 	</div>
 </div>

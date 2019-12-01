@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.util.Paths" %>
+
                         </div>
                     </div><div class="clear">
                 </div>

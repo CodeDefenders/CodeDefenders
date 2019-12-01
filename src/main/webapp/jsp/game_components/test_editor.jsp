@@ -1,4 +1,4 @@
-<%@ page import="org.codedefenders.model.KeyMap" %><%--
+<%--
 
     Copyright (C) 2016-2019 Code Defenders contributors
 
@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.model.KeyMap" %>
+
 <%--
     Displays the test code in a CodeMirror textarea.
 
@@ -31,8 +33,6 @@
     @param KeyMap user-keymap (session attribute)
         The user's preferred key map. Can be {@code null}.
 --%>
-
-<% { %>
 
 <%
     String testCode = (String) request.getAttribute("testCode");
@@ -169,5 +169,3 @@
 
     editorTest.setSize("100%", 500);
 </script>
-
-<% } %>

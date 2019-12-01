@@ -26,6 +26,8 @@
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.Map" %>
 <%@ page import="org.codedefenders.util.JSONUtils" %>
+<%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
 
 <%--
     Adds highlighting of coverage (green lines) and mutants (gutter icons) to a CodeMirror editor.

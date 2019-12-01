@@ -34,8 +34,8 @@
 {
     int gameId = (Integer) request.getAttribute("gameId");
     MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
-    int userId = ServletUtils.userId(request); // required for playerFeedback, too
-    Role role = game.getRole(userId); // required for header_game, too
+    int userId = ServletUtils.userId(request);
+    Role role = game.getRole(userId);
 %>
 <div id="playerFeedback" class="modal fade" role="dialog" style="z-index: 10000; position: absolute;">
 
