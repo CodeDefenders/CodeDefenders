@@ -18,6 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.model.NotificationType" %>
+
 <%--
     Adds a JavaScript function progressBar() that inserts and updates a progressbar showing the status of the last
     submitted test. The progressbar is inserted after #logout. It reads the test status from /api/notifications.

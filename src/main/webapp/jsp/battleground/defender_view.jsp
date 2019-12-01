@@ -19,8 +19,16 @@
 
 --%>
 <%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
 
-<% { %>
+<%-- TODO: list parameters --%>
+
+<%
+	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+%>
 
 <%-- Set request attributes for the components. --%>
 <%
@@ -94,7 +102,7 @@
 		<%-- TODO: change back to registerTestProgressBar() --%>
 		<h3>Write a new JUnit test here
 			<button type="submit" class="btn btn-primary btn-game btn-right" id="submitTest" form="def"
-                onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
+					onClick="progressBar(); this.form.submit(); this.disabled=true; this.value='Defending...';"
                 <% if (game.getState() != GameState.ACTIVE) { %> disabled <% } %>>
 				Defend!
 			</button>
@@ -125,5 +133,3 @@
 </div>
 
 <div>
-
-<% } %>

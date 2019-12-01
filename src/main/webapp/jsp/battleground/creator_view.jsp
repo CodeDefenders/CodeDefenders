@@ -18,7 +18,14 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<% { %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+
+<%-- TODO: list parameters --%>
+
+<%
+	MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+%>
 
 <%-- Set request attributes for the components. --%>
 <%
@@ -77,5 +84,3 @@
 		<%@include file="../game_components/mutant_explanation.jsp"%>
 	</div>
 </div>
-
-<% } %>

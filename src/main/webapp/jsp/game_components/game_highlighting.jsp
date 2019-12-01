@@ -24,6 +24,7 @@
 <%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ page import="org.codedefenders.util.JSONUtils" %>
 
 <%--

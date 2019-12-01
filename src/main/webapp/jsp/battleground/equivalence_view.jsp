@@ -19,10 +19,18 @@
 
 --%>
 <%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="org.codedefenders.model.User" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
+<%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+
+<%-- TODO: list parameters --%>
 
 <%
     Mutant equivMutant = (Mutant) request.getAttribute("equivMutant");
     User equivDefender = (User) request.getAttribute("equivDefender");
+    MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
 %>
 
 <%-- Set request attributes for the components. --%>

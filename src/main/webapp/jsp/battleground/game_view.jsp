@@ -63,17 +63,17 @@
     switch (role){
         case ATTACKER:
             if (openEquivalenceDuel) { %>
-                <%@ include file="/jsp/battleground/equivalence_view.jsp" %>
+                <jsp:include page="/jsp/battleground/equivalence_view.jsp"/>
             <% } else { %>
-                <%@ include file="/jsp/battleground/attacker_view.jsp" %>
+                <jsp:include page="/jsp/battleground/attacker_view.jsp"/>
             <% }
             break;
         case DEFENDER:
-            %><%@ include file="/jsp/battleground/defender_view.jsp" %>
+            %><jsp:include page="/jsp/battleground/defender_view.jsp"/>
             <%
             break;
         case OBSERVER:
-            %><%@ include file="/jsp/battleground/creator_view.jsp" %><%
+            %><jsp:include page="/jsp/battleground/creator_view.jsp"/><%
             break;
         default:
             response.sendRedirect(request.getContextPath()+ Paths.GAMES_OVERVIEW);

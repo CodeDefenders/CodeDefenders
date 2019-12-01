@@ -19,8 +19,12 @@
 
 --%>
 <%@ page import="org.codedefenders.util.Constants" %>
+<%@ page import="org.codedefenders.game.GameLevel" %>
+<%@ page import="org.codedefenders.game.GameState" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
 
-<% { %>
+<%-- TODO: list parameters --%>
 
 <%-- Set request attributes for the components. --%>
 <%
@@ -28,6 +32,7 @@
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
     List<Integer> errorLines = (List<Integer>) request.getSession().getAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
     request.getSession().removeAttribute(Constants.SESSION_ATTRIBUTE_ERROR_LINES);
+    MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
 
     final GameClass cut = game.getCUT();
 
@@ -127,5 +132,3 @@
         <%@include file="../game_components/editor_help_config_toolbar.jsp"%>
     </div>
 </div>
-
-<% } %>
