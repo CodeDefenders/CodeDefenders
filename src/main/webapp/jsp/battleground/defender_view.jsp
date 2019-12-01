@@ -68,13 +68,13 @@
 	// request.setAttribute("mutants", game.getMutants());
 	request.setAttribute("showEquivalenceButton", true);
 	// request.setAttribute("gameType", GameMode.PARTY);
-//    request.setAttribute("gameId", game.getId());
+    // request.setAttribute("gameId", game.getId());
 
 	/* mutant_explanation */
 	request.setAttribute("mutantValidatorLevel", game.getMutantValidatorLevel());
 
 	/* test_progressbar */
-//	request.setAttribute("gameId", game.getId());
+    // request.setAttribute("gameId", game.getId());
 %>
 
 <!--<div class="row" style="padding: 0px 15px;"> TODO change to this after changing the header -->
