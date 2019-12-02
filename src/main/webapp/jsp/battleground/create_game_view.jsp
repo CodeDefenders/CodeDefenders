@@ -23,13 +23,16 @@
 <%@ page import="org.codedefenders.validation.code.CodeValidatorLevel" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="java.util.List" %>
+<%@ page import="org.codedefenders.game.Role" %>
 
 <%
     /* header_main */
     request.setAttribute("pageTitle", "Create Battleground");
 %>
 
-<%@ include file="/jsp/header_main.jsp" %>
+<jsp:include page="/jsp/header_main.jsp"/>
 
 <%
     List<GameClass> gameClasses = GameClassDAO.getAllPlayableClasses();

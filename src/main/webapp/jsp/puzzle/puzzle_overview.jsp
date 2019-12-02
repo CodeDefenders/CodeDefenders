@@ -18,12 +18,13 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="org.codedefenders.game.puzzle.PuzzleGame"%>
-<%@page import="org.codedefenders.database.PuzzleDAO"%>
-<%@page import="org.codedefenders.game.GameState"%>
+<%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
+<%@ page import="org.codedefenders.database.PuzzleDAO" %>
+<%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleChapter" %>
 <%@ page import="org.codedefenders.model.PuzzleChapterEntry" %>
 <%@ page import="org.codedefenders.model.PuzzleEntry" %>
+<%@ page import="java.util.SortedSet" %>
 
 <%--
     Displays all puzzles for a user. Puzzles may link to active puzzle games
@@ -36,8 +37,7 @@
 
 --%>
 <!doctype html>
-<%@ include file="/jsp/header_main.jsp"
-%>
+<jsp:include page="/jsp/header_main.jsp"/>
 <%
 {
     SortedSet<PuzzleChapterEntry> puzzleChapterEntries = (SortedSet<PuzzleChapterEntry>) request.getAttribute("puzzleChapterEntries");
@@ -116,4 +116,4 @@
 <%
 }
 %>
-<%@include file="../footer.jsp" %>
+<%@include file="/jsp/footer.jsp" %>

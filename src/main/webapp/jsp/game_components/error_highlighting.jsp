@@ -18,7 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="com.google.gson.Gson"%>
+<%@ page import="com.google.gson.Gson" %>
 <%@ page import="java.util.List" %>
 
 
@@ -46,7 +46,7 @@
 %>
 
 <%
-if( codeDivSelector != null ) { 
+if( codeDivSelector != null ) {
 %>
 <script>
     /* Wrap in a function so it has it's own scope. Inspired by game_highlighting.jsp*/
@@ -54,7 +54,7 @@ if( codeDivSelector != null ) {
 
         /* Game highlighting data. */
         const errorLines = JSON.parse(`<%=errorLinesAsJSON%>`);
-        
+
         /**
          * Highlights errors on the given CodeMirror instance.
          * @param {object} codeMirror The CodeMirror instance.
@@ -62,7 +62,7 @@ if( codeDivSelector != null ) {
          */
         const highlightErrors = function (codeMirror) {
             for (errorLine of errorLines) {
-            	// Maybe we need to remove the 
+            	// Maybe we need to remove the
                 codeMirror.addLineClass(errorLine - 1, 'background', 'line-error');
             }
         };

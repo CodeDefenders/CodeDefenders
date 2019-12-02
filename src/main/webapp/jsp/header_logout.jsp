@@ -19,8 +19,8 @@
 
 --%>
 <%@ page import="java.util.ArrayList" %>
-<%@ page import="org.codedefenders.util.Paths" %>
-<%@ include file="/jsp/header_base.jsp" %>
+
+<jsp:include page="/jsp/header_base.jsp"/>
 
 <%--
     @param String pageTitle
@@ -32,7 +32,7 @@
 --%>
 
 <%
-    String pageTitleTODORENAME2 = (String) request.getAttribute("pageTitle");
+    String pageTitle = (String) request.getAttribute("pageTitle");
     ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
     request.getSession().removeAttribute("messages");
 %>
@@ -70,7 +70,7 @@
             <!-- navigation bar -->
             <div id="bs-example-navbar-collapse-1" class="navbar-collapse collapse">
                 <ul class="crow no-gutter nav navbar-nav" style="display: flow-root; position: relative; z-index: 1000">
-                    <%if (!pageTitleTODORENAME2.equals("Login")) {%>
+                    <%if (!pageTitle.equals("Login")) {%>
                     <li class="col-md-4"><a class="text-white button tab-link bg-minus-1"
                                                href="login" style="width:100%; margin-right: 80px">Login</a></li>
                     <%}%>

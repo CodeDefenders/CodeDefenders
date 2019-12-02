@@ -22,7 +22,9 @@
 <%@ page import="org.codedefenders.database.GameClassDAO" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.game.*" %>
-<%@ include file="/jsp/header_main.jsp" %>
+
+<jsp:include page="/jsp/header_main.jsp"/>
+
 <div>
 	<div class="w-100 up">
 		<h2>Upload Class</h2>

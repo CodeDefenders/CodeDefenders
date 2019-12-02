@@ -27,12 +27,14 @@
 
 	Object uid = request.getSession().getAttribute("uid");
 	Object username = request.getSession().getAttribute("username");
-	if (uid != null && username != null){
 %>
-<%@ include file="/jsp/header.jsp" %>
-<%} else {%>
-<%@ include file="/jsp/header_logout.jsp" %>
-<%}%>
+
+<% if (uid != null && username != null) { %>
+	<jsp:include page="/jsp/header.jsp"/>
+<% } else { %>
+	<jsp:include page="/jsp/header_logout.jsp"/>
+<% } %>
+
 <%
 	String result = (String)request.getSession().getAttribute("emailSent");
 	request.getSession().removeAttribute("emailSent");

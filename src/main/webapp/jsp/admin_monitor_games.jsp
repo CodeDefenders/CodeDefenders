@@ -25,11 +25,13 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminCreateGames" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.database.*" %>
+<%@ page import="org.codedefenders.util.Constants" %>
 
-<%@ include file="/jsp/header_main.jsp" %>
+<jsp:include page="/jsp/header_main.jsp"/>
+
 <div class="full-width">
     <% request.setAttribute("adminActivePage", "adminMonitorGames"); %>
-    <%@ include file="/jsp/admin_navigation.jsp" %>
+    <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <form id="games" action="<%=request.getContextPath() + Paths.ADMIN_MONITOR%>" method="post">
         <input type="hidden" name="formType" value="startStopGame">

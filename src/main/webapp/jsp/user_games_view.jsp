@@ -23,7 +23,10 @@
 <%@ page import="org.codedefenders.model.UserMultiplayerGameInfo" %>
 <%@ page import="org.codedefenders.model.Player" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
-<%@ include file="/jsp/header_main.jsp" %>
+<%@ page import="java.util.Map" %>
+
+<jsp:include page="/jsp/header_main.jsp"/>
+
 <%
     // Games active for this user (Created or joined)
     List<UserMultiplayerGameInfo> activeGames = ((List<UserMultiplayerGameInfo>) request.getAttribute("activeGames"));

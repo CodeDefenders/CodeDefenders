@@ -18,7 +18,7 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="org.codedefenders.game.GameState"%>
+<%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.game.puzzle.PuzzleGame" %>
 <%@ page import="static org.codedefenders.util.Constants.*" %>
 <%@ page import="org.codedefenders.game.puzzle.Puzzle" %>
@@ -151,6 +151,6 @@
 
 <jsp:include page="/jsp/game_components/editor_help_config_modal.jsp"/>
 
-<jsp:include page="/jsp/footer_game.jsp"/>
+<%@ include file="/jsp/footer_game.jsp"%>
 
 <% } %>

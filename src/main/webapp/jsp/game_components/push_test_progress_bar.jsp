@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.model.NotificationType"%>
 
 <script>
     // Define the handler for the progress bar message and register that to websocket
@@ -64,11 +63,11 @@
                 registration['gameID'] = <%=request.getAttribute("gameId")%>;
                 registration['playerID'] = <%=request.getAttribute("playerId")%>;
                 registration['target'] = "PROGRESSBAR_EVENT";
-        
+
                 // This ensures that connection is open. Will retry otherwise
                 sendMessage(JSON.stringify(registration));
                 console.log("Test progress bar unregistered " + JSON.stringify(registration) )
-                
+
                 break;
             }
 
@@ -83,15 +82,15 @@
         registration['gameID'] = <%=request.getAttribute("gameId")%>;
         registration['playerID'] = <%=request.getAttribute("playerId")%>;
         registration['target'] = "PROGRESSBAR_EVENT";
-        
+
         // This ensures that connection is open. Will retry otherwise
         sendMessage(JSON.stringify(registration));
         console.log("Test progress bar registered " + JSON.stringify(registration) )
-    
+
         // This will be automatically unregisterd @OnClose or via unregistration message
         notificationMessageHandlers.push(progressBarUpdateHandler);
         console.log("Progress bar handler registered")
     }
-    
+
 </script>
 

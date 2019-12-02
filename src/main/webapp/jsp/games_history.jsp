@@ -22,6 +22,7 @@
 <%@ page import="org.codedefenders.model.UserMultiplayerGameInfo" %>
 <%@ page import="org.codedefenders.model.Player" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
+<%@ page import="java.util.Map" %>
 <%
     {
     /* header_main */
@@ -29,7 +30,9 @@
 
     List<UserMultiplayerGameInfo> games = ((List<UserMultiplayerGameInfo>) request.getAttribute("finishedBattlegroundGames"));
 %>
-<%@ include file="/jsp/header_main.jsp" %>
+
+<jsp:include page="/jsp/header_main.jsp"/>
+
 <div>
 
 <h3>Battlegrounds</h3>

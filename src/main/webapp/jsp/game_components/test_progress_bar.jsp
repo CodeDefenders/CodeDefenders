@@ -32,7 +32,7 @@
 <% { %>
 
 <%
-    Integer gameIdTODORENAME = (Integer) request.getAttribute("gameId");
+    Integer gameId = (Integer) request.getAttribute("gameId");
 %>
 
 <script>
@@ -72,7 +72,7 @@
             form.parentNode.insertBefore(progressBar, form.nextSibling);
         }
         // Do a first request right away, such that compilation of this test is hopefully not yet started. This one will set the session...
-        var updateURL = "<%= request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.PROGRESSBAR%>&progressBar=1&gameId=" + <%= gameIdTODORENAME %> +"&isDefender=1";
+        var updateURL = "<%= request.getContextPath() + Paths.API_NOTIFICATION%>?type=<%=NotificationType.PROGRESSBAR%>&progressBar=1&gameId=" + <%= gameId %> +"&isDefender=1";
         updateProgressBar(updateURL);
 
         // Register the requests to start in 1 sec

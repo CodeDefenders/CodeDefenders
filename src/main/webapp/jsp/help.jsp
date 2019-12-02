@@ -28,9 +28,9 @@
 %>
 
 <% if (uid != null && username != null) { %>
-<%@ include file="/jsp/header.jsp" %>
+    <jsp:include page="/jsp/header.jsp"/>
 <% } else { %>
-<%@ include file="/jsp/header_logout.jsp" %>
+    <jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
 <div class="container" id="help-main-div">

@@ -20,6 +20,7 @@
 --%>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
 
 <%-- TODO: list parameters --%>
 
@@ -68,7 +69,7 @@
 	<div class="col-md-6">
 		<div id="mutants-div">
 			<h3>Existing Mutants</h3>
-			<%@include file="/jsp/game_components/mutants_list.jsp"%>
+			<jsp:include page="/jsp/game_components/mutants_list.jsp"/>
 		</div>
 
 		<div id="tests-div">

@@ -18,9 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="org.codedefenders.database.UserDAO"%>
-<%@page import="org.codedefenders.game.GameMode"%>
-<%@page import="org.codedefenders.game.Mutant"%>
+<%@ page import="org.codedefenders.database.UserDAO" %>
+<%@ page import="org.codedefenders.game.GameMode" %>
+<%@ page import="org.codedefenders.game.Mutant" %>
 <%@ page import="org.codedefenders.game.Test" %>
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="org.codedefenders.util.Constants" %>
@@ -52,10 +52,10 @@
 <% { %>
 
 <%
-    List<Mutant> mutantsAliveTODORENAME = (List<Mutant>) request.getAttribute("mutantsAlive");
-    List<Mutant> mutantsKilledTODORENAME = (List<Mutant>) request.getAttribute("mutantsKilled");
-    List<Mutant> mutantsMarkedEquivalentTODORENAME = (List<Mutant>) request.getAttribute("mutantsMarkedEquivalent");
-    List<Mutant> mutantsEquivalentTODORENAME = (List<Mutant>) request.getAttribute("mutantsEquivalent");
+    List<Mutant> mutantsAlive = (List<Mutant>) request.getAttribute("mutantsAlive");
+    List<Mutant> mutantsKilled = (List<Mutant>) request.getAttribute("mutantsKilled");
+    List<Mutant> mutantsMarkedEquivalent = (List<Mutant>) request.getAttribute("mutantsMarkedEquivalent");
+    List<Mutant> mutantsEquivalent = (List<Mutant>) request.getAttribute("mutantsEquivalent");
     Boolean markEquivalent = (Boolean) request.getAttribute("markEquivalent");
     Boolean viewDiff = (Boolean) request.getAttribute("viewDiff");
     GameMode gameType = (GameMode) request.getAttribute("gameType");
@@ -65,25 +65,25 @@
 <div class="tabs bg-minus-3" role="tablist">
     <div class="crow fly no-gutter down">
         <div>
-            <a class="tab-link button text-black" href="#mutalivetab" role="tab" data-toggle="tab">Alive (<%= mutantsAliveTODORENAME.size() %>)</a>
+            <a class="tab-link button text-black" href="#mutalivetab" role="tab" data-toggle="tab">Alive (<%= mutantsAlive.size() %>)</a>
         </div>
 
         <div>
-            <a class="tab-link button text-black" href="#mutkilledtab" role="tab" data-toggle="tab">Killed(<%= mutantsKilledTODORENAME.size() %>)</a>
+            <a class="tab-link button text-black" href="#mutkilledtab" role="tab" data-toggle="tab">Killed(<%= mutantsKilled.size() %>)</a>
         </div>
 
         <div>
-            <a class="tab-link button text-black" href="#mutmarkedequivtab" role="tab" data-toggle="tab">Flagged(<%= mutantsMarkedEquivalentTODORENAME.size() %>)</a>
+            <a class="tab-link button text-black" href="#mutmarkedequivtab" role="tab" data-toggle="tab">Flagged(<%= mutantsMarkedEquivalent.size() %>)</a>
         </div>
 
         <div>
-            <a class="tab-link button text-black" href="#mutequivtab" role="tab" data-toggle="tab">Equivalent(<%= mutantsEquivalentTODORENAME.size() %>)</a>
+            <a class="tab-link button text-black" href="#mutequivtab" role="tab" data-toggle="tab">Equivalent(<%= mutantsEquivalent.size() %>)</a>
         </div>
     </div>
 
     <div class="tab-content">
         <div class="tab-pane fade active in" id="mutalivetab">
-            <% if (! mutantsAliveTODORENAME.isEmpty()) { %>
+            <% if (! mutantsAlive.isEmpty()) { %>
                 <table id="alive-mutants" class="mutant-table display dataTable table table-striped table-hover table-responsive table-paragraphs bg-white">
                     <thead>  <%-- needed for datatable apparently --%>
                         <tr>
@@ -97,7 +97,7 @@
 
                     <%
                         // Sorting mutants
-                        List<Mutant> sortedMutants = new ArrayList<>(mutantsAliveTODORENAME);
+                        List<Mutant> sortedMutants = new ArrayList<>(mutantsAlive);
                         sortedMutants.sort(Mutant.sortByLineNumberAscending());
                         for (Mutant m : sortedMutants) {
                     %>
@@ -174,7 +174,7 @@
         </div>
 
         <div class="tab-pane fade" id="mutkilledtab">
-            <% if (! mutantsKilledTODORENAME.isEmpty()) { %>
+            <% if (! mutantsKilled.isEmpty()) { %>
                 <table id="killed-mutants" class="mutant-table display dataTable table table-striped table-responsive table-paragraphs bg-white">
                     <thead>  <%-- needed for datatable apparently --%>
                         <tr>
@@ -189,7 +189,7 @@
 
                     <%
                         // Sorting mutants
-                        List<Mutant> sortedKilledMutants = new ArrayList<>(mutantsKilledTODORENAME);
+                        List<Mutant> sortedKilledMutants = new ArrayList<>(mutantsKilled);
                         sortedKilledMutants.sort(Mutant.sortByLineNumberAscending());
                         for (Mutant m : sortedKilledMutants) {
                     %>
@@ -298,7 +298,7 @@
         </div>
 
         <div class="tab-pane fade" id="mutmarkedequivtab">
-            <% if (! mutantsMarkedEquivalentTODORENAME.isEmpty()) { %>
+            <% if (! mutantsMarkedEquivalent.isEmpty()) { %>
             <table id="killed-mutants" class="mutant-table display dataTable table table-striped table-responsive table-paragraphs bg-white">
                 <thead>  <%-- needed for datatable apparently --%>
                 <tr>
@@ -313,7 +313,7 @@
 
                 <%
                     // Sorting mutants
-                    List<Mutant> sortedKilledMutants = new ArrayList<>(mutantsMarkedEquivalentTODORENAME);
+                    List<Mutant> sortedKilledMutants = new ArrayList<>(mutantsMarkedEquivalent);
                     sortedKilledMutants.sort(Mutant.sortByLineNumberAscending());
                     for (Mutant m : sortedKilledMutants) {
                 %>
@@ -366,7 +366,7 @@
         </div>
 
         <div class="tab-pane fade" id="mutequivtab">
-            <% if (! mutantsEquivalentTODORENAME.isEmpty()) { %>
+            <% if (! mutantsEquivalent.isEmpty()) { %>
             <table id="equiv-mutants" class="mutant-table display dataTable table table-striped table-hover table-responsive table-paragraphs bg-white">
 
                 <thead>  <%-- needed for datatable apparently --%>
@@ -382,7 +382,7 @@
 
                     <%
                         // Sorting mutants
-                        List<Mutant> sortedMutantsEquiv = new ArrayList<>(mutantsEquivalentTODORENAME);
+                        List<Mutant> sortedMutantsEquiv = new ArrayList<>(mutantsEquivalent);
                         sortedMutantsEquiv.sort(Mutant.sortByLineNumberAscending());
                         for (Mutant m : sortedMutantsEquiv) {
                     %>

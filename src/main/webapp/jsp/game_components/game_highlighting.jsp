@@ -65,15 +65,15 @@
 
 <%
     String codeDivSelector = (String) request.getAttribute("codeDivSelector");
-    List<Test> testsTODORENAME = (List<Test>) request.getAttribute("tests");
-    List<Mutant> mutantsTODORENAME = (List<Mutant>) request.getAttribute("mutants") ;
+    List<Test> tests = (List<Test>) request.getAttribute("tests");
+    List<Mutant> mutants = (List<Mutant>) request.getAttribute("mutants") ;
     Boolean showEquivalenceButton = (Boolean) request.getAttribute("showEquivalenceButton");
     GameMode gameType = (GameMode) request.getAttribute("gameType");
     int gameId = (Integer) request.getAttribute("gameId");
 %>
 
 <%
-    GameHighlightingDTO gh = new GameHighlightingDTO(mutantsTODORENAME, testsTODORENAME);
+    GameHighlightingDTO gh = new GameHighlightingDTO(mutants, tests);
     Gson gson = new GsonBuilder().registerTypeAdapter(Map.class, new JSONUtils.MapSerializer()).create();
     String ghString = gson.toJson(gh);
 %>

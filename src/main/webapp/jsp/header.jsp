@@ -24,7 +24,7 @@
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.servlets.UserProfileManager" %>
 
-<%@ include file="/jsp/header_base.jsp" %>
+<jsp:include page="/jsp/header_base.jsp"/>
 
 <%
     boolean profileEnabled = UserProfileManager.checkEnabled();

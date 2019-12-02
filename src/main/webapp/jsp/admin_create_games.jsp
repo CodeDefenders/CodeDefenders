@@ -29,11 +29,15 @@
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ include file="/jsp/header_main.jsp" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+<%@ page import="org.codedefenders.game.Role" %>
+
+<jsp:include page="/jsp/header_main.jsp"/>
 
 <div class="full-width">
     <% request.setAttribute("adminActivePage", "adminCreateGames"); %>
-    <%@ include file="/jsp/admin_navigation.jsp" %>
+    <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <form id="insertGames" action="<%=request.getContextPath() + Paths.ADMIN_PAGE%>" method="post">
         <input type="hidden" name="formType" value="insertGames"/>

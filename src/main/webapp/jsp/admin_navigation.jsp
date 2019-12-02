@@ -18,16 +18,11 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+<%@ page import="org.codedefenders.util.Paths" %>
+
 <%
-    /* Check what admin page is currently active. */
-
     /* Name of the active page. */
-    String activePage = null;
-
-    Object activePageObject = request.getAttribute("adminActivePage");
-    if (activePageObject instanceof String) {
-        activePage = (String) activePageObject;
-    }
+    String activePage = (String) request.getAttribute("adminActivePage");
 %>
 
 <%!

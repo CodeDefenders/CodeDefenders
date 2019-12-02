@@ -20,8 +20,11 @@
 --%>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.util.Paths" %>
 
-<%@ include file="/jsp/header_main.jsp" %>
+<jsp:include page="/jsp/header_main.jsp"/>
 </div></div></div></div></div>
 
 <%

@@ -18,15 +18,14 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.*" %>
 <%@ page import="org.codedefenders.database.AdminDAO" %>
-<%@ page import="org.apache.commons.lang.StringUtils" %>
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
-<%@ include file="/jsp/header_main.jsp" %>
+
+<jsp:include page="/jsp/header_main.jsp"/>
 
 <div class="full-width">
     <% request.setAttribute("adminActivePage", "adminSystemSettings"); %>
-    <%@ include file="/jsp/admin_navigation.jsp" %>
+    <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <h3>System Settings</h3>
     <form id="changeSettings" name="changeSettings" action="<%=request.getContextPath() + Paths.ADMIN_SETTINGS%>" onsubmit="return validateForm()" method="post">

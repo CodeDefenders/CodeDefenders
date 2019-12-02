@@ -18,10 +18,10 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@page import="org.codedefenders.game.Role"%>
-<%@page import="org.codedefenders.util.Paths"%>
-<%@page import="java.util.Optional"%>
-<%@page import="org.codedefenders.game.multiplayer.MultiplayerGame"%>
+<%@ page import="org.codedefenders.game.Role" %>
+<%@ page import="org.codedefenders.util.Paths" %>
+<%@ page import="java.util.Optional" %>
+<%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
 <%@ page import="org.codedefenders.game.GameMode" %>
 <%@ page import="org.codedefenders.game.GameState" %>
 <%@ page import="org.codedefenders.database.MultiplayerGameDAO" %>
@@ -118,4 +118,4 @@
     </div>
 </div>
 
-<jsp:include page="/jsp/battleground/footer_game.jsp"/>
+<%@ include file="/jsp/battleground/footer_game.jsp" %>

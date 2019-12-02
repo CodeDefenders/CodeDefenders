@@ -18,8 +18,12 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
+
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.game.multiplayer.MultiplayerGame" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="org.codedefenders.game.GameClass" %>
+
 <%
     /* header_main */
     request.setAttribute("pageTitle", "Welcome");
@@ -28,7 +32,7 @@
     Map<Integer, String> gameCreatorNames = (Map<Integer, String>) request.getAttribute("gameCreatorNames");
 %>
 
-<%@ include file="/jsp/header_logout.jsp" %>
+<jsp:include page="/jsp/header_logout.jsp"/>
 
 <div class="nest">
     <div class="crow fly no-gutter">
@@ -107,7 +111,6 @@
             <a id="enter" class="btn btn-primary btn-large" href="login">Log in or sign up</a>
         </div>
     </div>
-    </script>
 </div>
 
 <%@ include file="/jsp/footer_logout.jsp" %>

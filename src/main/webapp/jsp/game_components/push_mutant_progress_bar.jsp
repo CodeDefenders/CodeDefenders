@@ -18,7 +18,6 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.model.NotificationType"%>
 
 <script>
 	// Define the handler for the progress bar message and register that to websocket
@@ -101,11 +100,11 @@
 	    sendMessage(registration);
 	    console.log("Mutant progress bar registered:");
 	    console.log(registration);
-	
+
 	    // This will be automatically unregisterd @OnClose or via unregistration message
 	    pushSocket.register(PushSocket.EventType.PROGRESSBAR, progressBarUpdateHandler);
 	    console.log("Progress bar handler registered")
 	}
-	
+
 </script>
 

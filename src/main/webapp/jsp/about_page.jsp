@@ -22,6 +22,7 @@
 <%@ page import="org.codedefenders.database.AdminDAO" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 <%@ page import="java.io.IOException" %>
+<%@ page import="java.util.Properties" %>
 
 <%
     /* header_main */
@@ -32,9 +33,9 @@
 %>
 
 <% if (uid != null && username != null) { %>
-<%@ include file="/jsp/header.jsp" %>
+    <jsp:include page="/jsp/header.jsp"/>
 <% } else { %>
-<%@ include file="/jsp/header_logout.jsp" %>
+    <jsp:include page="/jsp/header_logout.jsp"/>
 <% } %>
 
 <div class="container" style=" max-width: 50%; min-width: 25%; ">

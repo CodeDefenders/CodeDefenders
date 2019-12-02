@@ -28,7 +28,7 @@
     request.setAttribute("pageTitle", "Login");
 %>
 
-<%@ include file="/jsp/header_logout.jsp" %>
+<jsp:include page="/jsp/header_logout.jsp"/>
 
 <%
     Object uid = request.getSession().getAttribute("uid");

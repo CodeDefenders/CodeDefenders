@@ -24,11 +24,12 @@
 <%@ page import="org.codedefenders.model.User" %>
 <%@ page import="java.util.List" %>
 <%@ page import="org.codedefenders.model.UserInfo" %>
-<%@ include file="/jsp/header_main.jsp" %>
+
+<jsp:include page="/jsp/header_main.jsp"/>
 
 <div class="full-width">
     <% request.setAttribute("adminActivePage", "adminUserMgmt"); %>
-    <%@ include file="/jsp/admin_navigation.jsp" %>
+    <jsp:include page="/jsp/admin_navigation.jsp"/>
 
     <%
         String editUser = request.getParameter("editUser");
