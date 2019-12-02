@@ -94,6 +94,7 @@
 
     #tests-accordion .ta-count {
         margin-right: .5em;
+        padding-bottom: .2em;
     }
 
     #tests-accordion .ta-covered-link,
