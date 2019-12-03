@@ -41,7 +41,7 @@
 <%@ include file="/jsp/battleground/header_game.jsp" %>
 
 <%-- Push notifications using WebSocket --%>
-<%--<%@ include file="/jsp/push_notifications.jsp"%>--%>
+<jsp:include page="/jsp/push_notifications.jsp"/>
 <%-- Show the bell icon with counts of unread notifications: requires push_notifications.jsp --%>
 <%--<%@ include file="/jsp/push_game_notifications.jsp"%>--%>
 <%-- Show the mail icon with counts of unread notifications: requires push_notifications.jsp --%>

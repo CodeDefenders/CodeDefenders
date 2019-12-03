@@ -26,28 +26,68 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.EncodeException;
 import javax.websocket.OnClose;
 import javax.websocket.OnError;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
-import javax.websocket.CloseReason.CloseCode;
-import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
+import org.codedefenders.database.UserDAO;
+import org.codedefenders.model.User;
 import org.codedefenders.notification.INotificationService;
 import org.codedefenders.notification.ITicketingService;
-import org.codedefenders.notification.model.ChatEvent;
+import org.codedefenders.notification.events.client.ClientEvent;
+import org.codedefenders.notification.events.server.ServerEvent;
+import org.codedefenders.notification.handling.ClientEventHandler;
+import org.codedefenders.notification.events.EventNames;
+import org.codedefenders.notification.handling.ServerEventHandlerContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-
-// Since we manage here different message types we cannot have a single decoder
+/**
+ * <p>
+ * Communicates events with clients through a WebSocket.
+ * </p>
+ *
+ * <p>
+ * <h2>Event format and types</h2>
+ * Sent and received messages follow the following JSON format:
+ * <pre>
+ * {
+ *     type: &lt;event name based on the class, given by {@link EventNames}&gt;,
+ *     data: &lt;json representation of event object&gt;
+ * }
+ * </pre>
+ * </p>
+ *
+ * <p>
+ * <h2>Server-to-client events</h2>
+ * Server-to-client events are located in the package events/server.
+ * </p>
+ *
+ * <p>
+ * Filtering of server-to-client events (i.e. deciding which sessions to send the events to)
+ * is done by the event handlers using information (e.g. user ids) stored in the event.
+ * </p>
+ * <br/>
+ *
+ * <p>
+ * <h2>Client-to-server events</h2>
+ * Client-to-server events are located in the package events/client.
+ * </p>
+ */
 // @RequestScoped -> TODO What's this?
-@ServerEndpoint(value = "/notifications/{ticket}/{userId}", encoders = { NotificationEncoder.class })
+@ServerEndpoint(
+        value = "/notifications/{ticket}/{userId}",
+        encoders = { EventEncoder.class },
+        decoders = { EventDecoder.class })
 public class PushSocket {
+    // TODO Make an Inject for this
+    private static final Logger logger = LoggerFactory.getLogger(PushSocket.class);
 
     // @Inject
     private INotificationService notificationService;
@@ -55,18 +95,16 @@ public class PushSocket {
     // @Inject
     private ITicketingService ticketingServices;
 
-    // TODO Make an Inject for this
-    private static final Logger logger = LoggerFactory.getLogger(PushSocket.class);
-
     // Authorization
-    private int userId = -1;
+    private User user;
     private String ticket;
-    private boolean validSession;
+    private boolean open;
 
-    // Events Handlers
-    private ChatEventHandler chatEventHandler;
-    private GameEventHandler gameEventHandler;
-    private ProgressBarEventHandler progressBarEventHandler;
+    // Event handler
+    private ClientEventHandler clientEventHandler;
+    private ServerEventHandlerContainer serverEventHandlerContainer;
+
+    private Session session;
 
     public PushSocket() {
         try {
@@ -87,66 +125,68 @@ public class PushSocket {
         } catch (NamingException e) {
             e.printStackTrace();
         }
-    }
 
-    private boolean validate(Session session, String ticket, Integer owner) throws IOException{
-        if (! ticketingServices.validateTicket(ticket, owner)){
-            logger.info("Invalid ticket for session " + session );
-            session.close( new CloseReason( CloseCodes.CANNOT_ACCEPT, "Invalid ticket"));
-            return false;
-        } else {
-            return true;
-        }
+        open = false;
     }
 
     @OnOpen
-    public void open(Session session, @PathParam("ticket") String ticket, @PathParam("userId") Integer userId)
+    public synchronized void open(Session session, @PathParam("ticket") String ticket, @PathParam("userId") Integer userId)
             throws IOException {
 
-        if (!validate(session, ticket, userId)) {
+        if (! ticketingServices.validateTicket(ticket, userId)) {
+            logger.info("Invalid ticket for session " + session);
+            session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Invalid ticket"));
             return;
         }
 
-        this.userId = userId;
+        User user = UserDAO.getUserById(userId);
+
+        if (user == null) {
+            logger.info("Invalid user id for session " + session);
+            session.close(new CloseReason(CloseCodes.CANNOT_ACCEPT, "Invalid user id"));
+            return;
+        }
+
+        this.user = user;
         this.ticket = ticket;
+        this.serverEventHandlerContainer = new ServerEventHandlerContainer(notificationService, this, user);
+        this.clientEventHandler = new ClientEventHandler(notificationService, serverEventHandlerContainer, user);
+        this.session = session;
+
+        open = true;
     }
 
     @OnClose
-    public void close(Session session) {
-
-        // Invalidate the ticket
-        ticketingServices.invalidateTicket(this.ticket);
-
-        if (this.gameEventHandler != null) {
-            notificationService.unregister(this.gameEventHandler);
-        }
-        if (this.chatEventHandler != null) {
-            notificationService.unregister(this.chatEventHandler);
-        }
-        if (this.progressBarEventHandler != null) {
-            logger.info("Unregistering Progress Bar " + session);
-            notificationService.unregister(this.progressBarEventHandler);
+    public synchronized void close(Session session) {
+        /* Close is called before open when the connection is denied. */
+        if (open) {
+            logger.info("Closing session for user: " + user.getId() + " (ticket: " + ticket + ")");
+            /* Don't invalidate tickets on close, because the connection is opened multiple times
+               for progress-bars on Firefox. */
+            // ticketingServices.invalidateTicket(this.ticket);
+            serverEventHandlerContainer.unregisterAll();
         }
     }
 
     @OnMessage
-    public void onMessage(String json, Session session) {
-        // TODO Create a typeAdapterFactory:
-        // https://stackoverflow.com/questions/22307382/how-do-i-implement-typeadapterfactory-in-gson
-
-        // Registration for event types
-        // PushSocketRegistrationEvent registration = new Gson().fromJson(json, PushSocketRegistrationEvent.class);
-        // this.gameEventHandler = new GameEventHandler(registration.getPlayerID(), registration.getGameID(), session);
-        // notificationService.register(gameEventHandler);
-
-        // Chat messages
-        // ChatEvent chatMessage = new Gson().fromJson(json, ChatEvent.class);
-        // notificationService.post(chatMessage);
+    public synchronized void onMessage(ClientEvent event, Session session) {
+        event.accept(clientEventHandler);
     }
 
     @OnError
     public void onError(Session session, Throwable throwable) {
-        logger.error("Session " + session + " is on error. Cause: ", throwable);
+        logger.error("Session " + session + " caused an error. Cause: ", throwable);
     }
 
+    // TODO: error handling?
+    public synchronized void sendEvent(ServerEvent event) {
+        try {
+            // TODO: asyncRemote?
+            session.getBasicRemote().sendObject(event);
+        } catch (IOException e) {
+            logger.error("Exception while sending event.", e);
+        } catch (EncodeException e) {
+            logger.error("Exception while encoding event.", e);
+        }
+    }
 }

@@ -47,13 +47,13 @@ public class MutationTesterUtilities {
     public static Runnable attack(MultiplayerGame activeGame, String mutantFile, User attacker,
                                   ArrayList<String> messages, Logger logger) throws IOException {
         return new Runnable() {
-            
+
             @Inject
             private GameManagingUtils gameManagingUtils;
-            
+
             @Inject
             private IMutationTester mutationTester;
-            
+
             @Override
             public void run() {
                 try {
@@ -78,13 +78,13 @@ public class MutationTesterUtilities {
     public static Runnable defend(MultiplayerGame activeGame, String testFile, User defender,
                                   ArrayList<String> messages, Logger logger) {
         return new Runnable() {
-            
+
             @Inject
             private GameManagingUtils gameManagingUtils;
-            
+
             @Inject
             private IMutationTester mutationTester;
-            
+
             @Override
             public void run() {
                 try {

@@ -21,9 +21,16 @@ package org.codedefenders.notification.impl;
 import javax.annotation.ManagedBean;
 import javax.enterprise.context.ApplicationScoped;
 
+import com.google.common.eventbus.AsyncEventBus;
+import com.google.common.eventbus.SubscriberExceptionHandler;
+import com.google.gson.Gson;
 import org.codedefenders.notification.INotificationService;
 
 import com.google.common.eventbus.EventBus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.Executors;
 
 /**
  * Notification Service implementation.
@@ -34,32 +41,35 @@ import com.google.common.eventbus.EventBus;
 @ManagedBean
 @ApplicationScoped
 public class NotificationService implements INotificationService {
+    private static final Logger logger = LoggerFactory.getLogger(NotificationService.class);
+    private static final int NUM_THREADS = 8;
 
-    // TODO Maybe there's some better instantiation options
-    private EventBus eventBus = new EventBus();
+    private SubscriberExceptionHandler exceptionHandler = (exception, context) -> {
+        Gson gson = new Gson();
+        logger.warn("Got " + exception.getClass().getSimpleName() + " while calling notification handler.", exception);
+        logger.warn("Event was: " + gson.toJson(context.getEvent()));
+    };
+
+    @SuppressWarnings("UnstableApiUsage")
+    private EventBus eventBus = new AsyncEventBus(Executors.newFixedThreadPool(NUM_THREADS));
 
     // TODO Ensures that event bus is defined in a Tomcat System Listener !
     // public NotificationService(EventBus eventBus) {
     //     this.eventBus = eventBus;
     // }
 
-    public NotificationService() {}
-
     @Override
     public void post(Object message) {
-        // TODO: disable notifications for now
-        // eventBus.post(message);
+        eventBus.post(message);
     }
 
     @Override
     public void register(Object eventHandler) {
-        // TODO: disable notifications for now
-        // eventBus.register(eventHandler);
+        eventBus.register(eventHandler);
     }
 
     @Override
     public void unregister(Object eventHandler) {
-        // TODO: disable notifications for now
-        // eventBus.unregister(eventHandler);
+        eventBus.unregister(eventHandler);
     }
 }

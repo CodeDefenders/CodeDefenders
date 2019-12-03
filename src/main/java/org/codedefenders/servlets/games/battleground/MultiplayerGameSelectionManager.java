@@ -41,11 +41,11 @@ import org.codedefenders.model.EventStatus;
 import org.codedefenders.model.EventType;
 import org.codedefenders.model.User;
 import org.codedefenders.notification.INotificationService;
-import org.codedefenders.notification.model.GameCreatedEvent;
-import org.codedefenders.notification.model.GameJoinedEvent;
-import org.codedefenders.notification.model.GameLeftEvent;
-import org.codedefenders.notification.model.GameStartedEvent;
-import org.codedefenders.notification.model.GameStoppedEvent;
+import org.codedefenders.notification.events.server.game.GameCreatedEvent;
+import org.codedefenders.notification.events.server.game.GameJoinedEvent;
+import org.codedefenders.notification.events.server.game.GameLeftEvent;
+import org.codedefenders.notification.events.server.game.GameStartedEvent;
+import org.codedefenders.notification.events.server.game.GameStoppedEvent;
 import org.codedefenders.servlets.admin.AdminSystemSettings;
 import org.codedefenders.servlets.util.Redirect;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -218,6 +218,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         // Register Valid Mutants.
         if (withMutants) {
+            // Validate uploaded mutants from the list
+            // TODO
+            // Link the mutants to the game
             for (Mutant mutant : uploadedMutants) {
                 Mutant newMutant = new Mutant(newGame.getId(), classId,
                         mutant.getJavaFile(),
@@ -262,7 +265,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         /*
          * Publish the event that a new game started
          */
-        notificationService.post(new GameCreatedEvent(newGame));
+        GameCreatedEvent gce = new GameCreatedEvent();
+        gce.setGameId(newGame.getId());
+        notificationService.post(gce);
 
 
         // Redirect to admin interface
@@ -321,7 +326,11 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 /*
                  * Publish the event about the user
                  */
-                notificationService.post(new GameJoinedEvent(game, user));
+                GameJoinedEvent gje = new GameJoinedEvent();
+                gje.setGameId(game.getId());
+                gje.setUserId(user.getId());
+                gje.setUserName(user.getUsername());
+                notificationService.post(gje);
 
                 response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             } else {
@@ -335,7 +344,11 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
                 /*
                  * Publish the event about the user
                  */
-                notificationService.post(new GameJoinedEvent(game, user));
+                GameJoinedEvent gje = new GameJoinedEvent();
+                gje.setGameId(game.getId());
+                gje.setUserId(userId);
+                gje.setUserName(user.getUsername());
+                notificationService.post(gje);
 
                 response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             } else {
@@ -393,8 +406,11 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
          * Publish the event about the user
          */
         User user = UserDAO.getUserById(userId);
-        notificationService.post(new GameLeftEvent(game, user));
 
+        GameLeftEvent gle = new GameLeftEvent();
+        gle.setGameId(game.getId());
+        gle.setUserId(user.getId());
+        gle.setUserName(user.getUsername());
 
         response.sendRedirect(contextPath + Paths.GAMES_OVERVIEW);
     }
@@ -423,7 +439,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         /*
          * Publish the event about the user
          */
-        notificationService.post(new GameStartedEvent(game));
+        GameStartedEvent gse = new GameStartedEvent();
+        gse.setGameId(game.getId());
+        notificationService.post(gse);
 
         response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
     }
@@ -454,7 +472,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             /*
              * Publish the event about the user
              */
-            notificationService.post(new GameStoppedEvent(game));
+            GameStoppedEvent gse = new GameStoppedEvent();
+            gse.setGameId(game.getId());
+            notificationService.post(gse);
 
             response.sendRedirect(ctx(request) + Paths.BATTLEGROUND_SELECTION);
         } else {
