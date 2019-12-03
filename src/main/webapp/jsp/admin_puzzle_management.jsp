@@ -19,7 +19,7 @@
 
 --%>
 <%
-    String pageTitle = null;
+    String pageTitle = "Admin Puzzles";
 %>
 <%@ include file="/jsp/header_main.jsp"%>
 
@@ -38,6 +38,7 @@
             <th>Position</th>
             <th>Title</th>
             <th>Description</th>
+            <th>Delete</th>
         </tr>
         </thead>
     </table>
@@ -53,31 +54,18 @@
             <th>Title</th>
             <th>Description</th>
             <th>Class</th>
+            <th>Delete</th>
         </tr>
         </thead>
     </table>
 
+    <jsp:include page="/jsp/api/puzzle-api.jsp"/>
     <script type="text/javascript">
         let puzzleTable;
         let chapterTable;
 
-        async function fetchPuzzleData () {
-            return await fetch('<%=request.getContextPath() + Paths.API_ADMIN_PUZZLES_ALL%>', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
-            }).then(response => {
-                if (response.ok) {
-                    return response.json();
-                } else {
-                    throw Error("Response failed")
-                }
-            });
-        }
-
         $(document).ready(async function() {
-            const puzzleData = await fetchPuzzleData();
+            const puzzleData = await PuzzleAPI.fetchPuzzleData();
 
             const chapters = puzzleData.puzzleChapters;
             if (chapters) {
@@ -88,6 +76,16 @@
                         { "data": "position" },
                         { "data": "title" },
                         { "data": "description" },
+                        { "data": null,
+                            "defaultContent": "",
+                            "render": function(data, type, row, meta) {
+                                return `<button class="btn btn-sm btn-danger" ` +
+                                    `onclick="` +
+                                    `removePuzzleChapter(` + data.id + `,` + meta.row + `,` + meta.col + `);">` +
+                                    `<span class="glyphicon glyphicon-trash"></span>` +
+                                    `</button>`;
+                            }
+                        },
                     ],
                     "pageLength": 10,
                     "order": [[ 1, "asc" ]]
@@ -100,15 +98,25 @@
                     "data": puzzles,
                     "columns": [
                         { "data": "id" },
-                        { "data": "chapterId" },
+                        {
+                            "data": "chapterId",
+                            "defaultContent": "none"
+                        },
                         { "data": "position" },
                         { "data": "title" },
                         { "data": "description" },
                         { "data": "classId" },
-                        // { "data": "maxAssertionsPerTest" },
-                        // { "data": "forceHamcrest" },
-                        // { "data": "editableLinesStart" },
-                        // { "data": "editableLinesEnd" },
+                        {
+                            "data": null,
+                            "defaultContent": "",
+                            "render": function(data, type, row, meta) {
+                                return `<button class="btn btn-sm btn-danger" ` +
+                                    `onclick="` +
+                                    `removePuzzle(` + data.id + `,` + meta.row + `,` + meta.col + `);">` +
+                                        `<span class="glyphicon glyphicon-trash"></span>` +
+                                    `</button>`;
+                            }
+                        },
                     ],
                     "pageLength": 10,
                     "order": [[ 1, "asc" ], [ 2, "asc" ]]
@@ -116,6 +124,38 @@
             }
         });
 
+        function removePuzzleChapter(puzzleChapterId, row, column) {
+            let confirmResult = confirm('Are you sure you want to delete puzzle chapter ' + puzzleChapterId + '?'
+                + ' This will not remove the puzzles of the chapter.');
+            if (confirmResult) {
+                PuzzleAPI.deletePuzzleChapter(puzzleChapterId)
+                    .then(responseJSON => {
+                        chapterTable.row(row).remove();
+
+                        // Forces re-rendering to update row index
+                        chapterTable.rows().invalidate('data').draw();
+                    }).catch(error => {
+                    chapterTable.cell(row, column).node().firstChild.disabled = true;
+                    alert('Puzzle chapter ' + puzzleChapterId + ' could not be removed.');
+                });
+            }
+        }
+
+        function removePuzzle(puzzleId, row, column) {
+            let confirmResult = confirm('Are you sure you want to delete puzzle ' + puzzleId + '?');
+            if (confirmResult) {
+                PuzzleAPI.deletePuzzle(puzzleId)
+                    .then(responseJSON => {
+                        puzzleTable.row(row).remove();
+
+                        // Forces re-rendering to update row index
+                        puzzleTable.rows().invalidate('data').draw();
+                    }).catch(error => {
+                    puzzleTable.cell(row, column).node().firstChild.disabled = true;
+                    alert('Puzzle ' + puzzleId + ' could not be removed.');
+                });
+            }
+        }
     </script>
 
 

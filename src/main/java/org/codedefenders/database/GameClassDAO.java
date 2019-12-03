@@ -18,7 +18,13 @@
  */
 package org.codedefenders.database;
 
-import org.codedefenders.game.*;
+import org.codedefenders.game.AbstractGame;
+import org.codedefenders.game.AssertionLibrary;
+import org.codedefenders.game.GameClass;
+import org.codedefenders.game.Mutant;
+import org.codedefenders.game.Test;
+import org.codedefenders.game.TestingFramework;
+import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.model.Dependency;
 import org.codedefenders.model.GameClassInfo;
 import org.codedefenders.util.FileUtils;
@@ -63,6 +69,8 @@ public class GameClassDAO {
         AssertionLibrary assertionLibrary = AssertionLibrary.valueOf(rs.getString("AssertionLibrary"));
         boolean isActive = rs.getBoolean("Active");
         boolean isPuzzleClass = rs.getBoolean("Puzzle");
+        Integer parentClassId = rs.getInt("Parent_Class");
+        if (rs.wasNull()) parentClassId = null;
 
         return GameClass.build()
                 .id(classId)
@@ -75,6 +83,7 @@ public class GameClassDAO {
                 .assertionLibrary(assertionLibrary)
                 .active(isActive)
                 .puzzleClass(isPuzzleClass)
+                .parentClassId(parentClassId)
                 .create();
     }
 
@@ -299,6 +308,7 @@ public class GameClassDAO {
         TestingFramework testingFramework = cut.getTestingFramework();
         AssertionLibrary assertionLibrary = cut.getAssertionLibrary();
         boolean isPuzzleClass = cut.isPuzzleClass();
+        Integer parentClassId = cut.getParentClassId();
         boolean isActive = cut.isActive();
 
         String query = String.join("",
@@ -311,8 +321,9 @@ public class GameClassDAO {
                 "TestingFramework,",
                 "AssertionLibrary,",
                 "Puzzle,",
+                "Parent_Class,",
                 "Active",
-                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
+                ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
         DatabaseValue[] values = new DatabaseValue[]{
                 DatabaseValue.of(name),
                 DatabaseValue.of(alias),
@@ -322,6 +333,7 @@ public class GameClassDAO {
                 DatabaseValue.of(testingFramework.name()),
                 DatabaseValue.of(assertionLibrary.name()),
                 DatabaseValue.of(isPuzzleClass),
+                DatabaseValue.of(parentClassId),
                 DatabaseValue.of(isActive)
         };
 
@@ -373,25 +385,28 @@ public class GameClassDAO {
      * @param id the identifier of the class to be removed.
      * @return {@code true} for successful removal, {@code false} otherwise.
      */
-    public static boolean removeClassForId(Integer id) {
+    public static boolean removeClassForId(int id) {
         String query = "DELETE FROM classes WHERE Class_ID = ?;";
 
         return DB.executeUpdateQuery(query, DatabaseValue.of(id));
     }
 
     /**
-     * <b>This method should be treated with caution.</b>
+     * <b>This method should be treated with caution. Read the first two paragraphs first.</b>
      *
-     * Call {@link #gamesExistsForClass(Integer)} beforehand to make sure the class is
+     * <p>Call {@link #gamesExistsForClass(Integer)} beforehand to make sure the class is
      * not actually used.
      *
-     * Removes a class and all of its corresponding dependencies, mutants and tests
-     * from the database for a given identifier.
+     * <p>If a {@link Puzzle} is referencing the to be deleted class, the puzzle will be removed too.
+     *
+     * <p>Removes a class and all of its corresponding dependencies, mutants and tests
+     * from the database for a given identifier. Does not remove the files associated to the class,
+     * its dependencies, mutants and tests.
      *
      * @param id the identifier of the class to be removed.
      * @return {@code true} for successful removal, {@code false} otherwise.
      */
-    public static boolean forceRemoveClassForId(Integer id) {
+    public static boolean forceRemoveClassForId(int id) {
         final String query1 = "DELETE FROM dependencies WHERE Class_ID = ?;";
         final String query2 = "DELETE FROM mutant_uploaded_with_class WHERE Class_ID = ?;";
         final String query3 = "DELETE FROM test_uploaded_with_class WHERE Class_ID = ?;";

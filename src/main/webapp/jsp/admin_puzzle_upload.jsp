@@ -19,7 +19,7 @@
 
 --%>
 <%
-    String pageTitle = null;
+    String pageTitle = "Admin Puzzle Upload";
 %>
 <%@ include file="/jsp/header_main.jsp"%>
 

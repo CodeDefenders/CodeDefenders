@@ -60,6 +60,7 @@ public class GameClass {
     private AssertionLibrary assertionLibrary;
 
     private boolean isPuzzleClass;
+    private Integer parentClassId; // @see getParentClassId() documentation
     private boolean isActive;
 
     private boolean visitedCode = false;
@@ -97,6 +98,7 @@ public class GameClass {
      * <ul>
      *     <li>isMockingEnabled = false</li>
      *     <li>isPuzzleClass = false</li>
+     *     <li>parentClass = null</li>
      *     <li>isActive = true</li>
      * </ul>
      * @return A GameClass builder.
@@ -119,6 +121,7 @@ public class GameClass {
         this.testingFramework = builder.testingFramework;
         this.assertionLibrary = builder.assertionLibrary;
         this.isPuzzleClass = builder.isPuzzleClass;
+        this.parentClassId = builder.parentClassId;
         this.isActive = builder.isActive;
     }
 
@@ -138,6 +141,7 @@ public class GameClass {
                 .assertionLibrary(other.getAssertionLibrary())
                 .alias(newAlias)
                 .puzzleClass(true)
+                .parentClassId(other.getId())
                 .create();
     }
 
@@ -227,6 +231,16 @@ public class GameClass {
 
     public boolean isPuzzleClass() {
         return isPuzzleClass;
+    }
+
+    /**
+     * Only applies when class is a puzzle class:
+     * The parent class is the original uploaded class. Parent and child class share the same source files.
+     * If a class is no puzzle class, the parent class is {@code null}.
+     *
+     */
+    public Integer getParentClassId() {
+        return parentClassId;
     }
 
     public boolean isActive() {
@@ -444,6 +458,7 @@ public class GameClass {
         private AssertionLibrary assertionLibrary;
 
         private boolean isPuzzleClass;
+        private Integer parentClassId;
         private boolean isActive;
 
         private Builder() {
@@ -495,6 +510,11 @@ public class GameClass {
 
         public Builder puzzleClass(boolean isPuzzleClass) {
             this.isPuzzleClass = isPuzzleClass;
+            return this;
+        }
+
+        public Builder parentClassId(Integer parentClassId) {
+            this.parentClassId = parentClassId;
             return this;
         }
 

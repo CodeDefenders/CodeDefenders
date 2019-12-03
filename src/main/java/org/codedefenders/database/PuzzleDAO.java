@@ -33,6 +33,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 /**
  * This class handles the database logic for puzzles.
  *
@@ -98,7 +100,7 @@ public class PuzzleDAO {
     public static List<Puzzle> getPuzzles() {
         String query = String.join("\n",
                 "SELECT *",
-                "FROM puzzles",
+                "FROM view_active_puzzles as puzzles",
                 "ORDER BY Chapter_ID, Position;"
         );
 
@@ -116,7 +118,7 @@ public class PuzzleDAO {
     public static List<Puzzle> getPuzzlesForChapterId(int chapterId) {
         String query = String.join("\n",
                 "SELECT *",
-                "FROM puzzles",
+                "FROM view_active_puzzles as puzzles",
                 "WHERE Chapter_ID = ?",
                 "ORDER BY Position;"
         );
@@ -356,6 +358,99 @@ public class PuzzleDAO {
     }
 
     /**
+     * Checks for a given puzzle whether at least one game
+     * with this puzzle exists.
+     *
+     * @param puzzle the checked puzzle.
+     * @return {@code true} if at least one game does exist, {@code false} otherwise.
+     */
+    public static boolean gamesExistsForPuzzle(@Nonnull Puzzle puzzle) {
+        String query = String.join("\n",
+                    "SELECT (COUNT(games.ID) > 0) AS games_exist",
+                    "FROM games, puzzles",
+                    "WHERE puzzles.Puzzle_ID = ?",
+                    "AND games.Class_ID = puzzles.Class_ID");
+
+        return DB.executeQueryReturnValue(query, rs -> rs.getBoolean("games_exist"),
+                DatabaseValue.of(puzzle.getPuzzleId()));
+    }
+
+    /**
+     * Sets the 'Active' column of a given puzzle to a given value.
+     *
+     * @param puzzle the given puzzle the active value is set for.
+     * @param active whether the puzzle is active or not.
+     * @return {@code true} if setting active was successful, {@code false} otherwise.
+     */
+    public static boolean setPuzzleActive(@Nonnull Puzzle puzzle, boolean active) {
+        String query = String.join("\n",
+                "UPDATE puzzles",
+                    "SET ACTIVE = ?",
+                    "WHERE Puzzle_ID = ?;"
+        );
+
+        DatabaseValue[] values = new DatabaseValue[]{
+            DatabaseValue.of(active),
+            DatabaseValue.of(puzzle.getPuzzleId())
+        };
+
+        return DB.executeUpdateQuery(query, values);
+    }
+
+    /**
+     * Removes a given puzzle chapter from the database.
+     * All puzzles, which reference this puzzle chapter, have their
+     * puzzle chapter attribute set to {@code null} in the database.
+     *
+     * @param chapter the puzzle chapter to be removed.
+     * @return {@code true} when the removal was successful, {@code false} otherwise.
+     */
+    public static boolean removePuzzleChapter(@Nonnull  PuzzleChapter chapter) {
+        String query = "DELETE FROM puzzle_chapters WHERE Chapter_ID = ?;";
+        return DB.executeUpdateQuery(query, DatabaseValue.of(chapter.getChapterId()));
+    }
+
+    /**
+     * Returns the parent class of a puzzle class.
+     * The puzzle class is a copy of the parent class and still requires
+     * the source files of its parent class.
+     *
+     * @param puzzleClassId the identifier of the puzzle child class.
+     * @return the parent class of the given puzzle class.
+     */
+    public static GameClass getParentGameClass(int puzzleClassId) {
+        String query = String.join("\n",
+                "SELECT classes.*",
+                "FROM classes,",
+                "     view_puzzle_classes puzzle_classes",
+                "WHERE puzzle_classes.Class_ID = ?",
+                "  AND classes.Class_ID = puzzle_classes.Parent_Class;"
+        );
+
+        return DB.executeQueryReturnValue(query, GameClassDAO::gameClassFromRS, DatabaseValue.of(puzzleClassId));
+    }
+
+    /**
+     * Checks whether the source files of a given class are used for puzzle classes.
+     *
+     * @param classId the identifier of the checked game class.
+     * @return {@code true} if class files are used, {@code false} otherwise.
+     */
+    public static boolean classSourceUsedForPuzzleClasses(int classId) {
+        String query = String.join("\n",
+                "SELECT (COUNT(c1.Class_ID)) > 0 as class_used",
+                "FROM classes c1,",
+                "     view_puzzle_classes c2",
+                "WHERE c1.Class_ID = ?",
+                "      AND c1.JavaFile = c2.JavaFile"
+        );
+
+        return DB.executeQueryReturnValue(query, rs -> rs.getBoolean("class_used"),
+                DatabaseValue.of(classId));
+    }
+
+
+    /**
      * Creates a {@link PuzzleChapter} from a {@link ResultSet}.
      *
      * @param rs The {@link ResultSet}.
@@ -400,10 +495,10 @@ public class PuzzleDAO {
             String description = rs.getString("puzzles.Description");
 
             GameLevel level = GameLevel.valueOf(rs.getString("puzzles.Level"));
-            
-            int maxAssertions = rs.getInt("Max_Assertions");
-            boolean forceHamcrest = rs.getBoolean("Force_Hamcrest"); 
-            
+
+            int maxAssertions = rs.getInt("puzzles.Max_Assertions");
+            boolean forceHamcrest = rs.getBoolean("puzzles.Force_Hamcrest");
+
             CodeValidatorLevel mutantValidatorLevel = CodeValidatorLevel.valueOf(rs.getString("puzzles.Mutant_Validator_Level"));
 
             Integer editableLinesStart = rs.getInt("puzzles.Editable_Lines_Start");
