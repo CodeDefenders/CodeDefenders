@@ -24,9 +24,8 @@ import com.google.common.collect.TreeRangeMap;
 import com.google.gson.annotations.Expose;
 import org.codedefenders.database.TestSmellsDAO;
 import org.codedefenders.database.UserDAO;
+import org.codedefenders.game.GameClass.MethodDescription;
 import org.codedefenders.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -53,7 +52,7 @@ public class TestAccordionDTO {
     /**
      * Maps test ids to tests.
      */
-    @Expose private Map<Integer, TATestDTO> tests;
+    @Expose private Map<Integer, TestAccordionTestDTO> tests;
 
     /**
      * Constructs the test accordion data.
@@ -66,24 +65,29 @@ public class TestAccordionDTO {
         categories = new ArrayList<>();
 
         for (Test test : testsList) {
-            tests.put(test.getId(), new TATestDTO(test, mutantsList));
+            tests.put(test.getId(), new TestAccordionTestDTO(test, mutantsList));
         }
 
         TestAccordionCategory allTests = new TestAccordionCategory("All Tests", "all");
         allTests.addTestIds(tests.keySet());
 
-        List<TestAccordionCategory> methods = cut.getTestAccordionMethodDescriptions();
-        categories.add(allTests);
-        categories.addAll(methods);
+        List<MethodDescription> methodDescriptions = cut.getMethodDescriptions();
+        List<TestAccordionCategory> methodCategories = new ArrayList<>();
+        for (int i = 0; i < methodDescriptions.size(); i++) {
+            methodCategories.add(new TestAccordionCategory(methodDescriptions.get(i), String.valueOf(i)));
+        }
 
-        if (methods.isEmpty()) {
+        categories.add(allTests);
+        categories.addAll(methodCategories);
+
+        if (methodCategories.isEmpty()) {
             return;
         }
 
         /* Map ranges of methods to their test accordion infos. */
         @SuppressWarnings("UnstableApiUsage")
         RangeMap<Integer, TestAccordionCategory> methodRanges = TreeRangeMap.create();
-        for (TestAccordionCategory method : methods) {
+        for (TestAccordionCategory method : methodCategories) {
             methodRanges.put(Range.closed(method.startLine, method.endLine), method);
         }
 
@@ -141,10 +145,10 @@ public class TestAccordionDTO {
             this.id = id;
         }
 
-        public TestAccordionCategory(String description, int startLine, int endLine, String id) {
-            this(description, id);
-            this.startLine = startLine;
-            this.endLine = endLine;
+        public TestAccordionCategory(MethodDescription methodDescription, String id) {
+            this(methodDescription.getDescription(), id);
+            this.startLine = methodDescription.getStartLine();
+            this.endLine = methodDescription.getEndLine();
         }
 
         public void addTestId(int testId) {
@@ -171,7 +175,7 @@ public class TestAccordionDTO {
     /**
      * Represents a test for the test accordion.
      */
-    public static class TATestDTO {
+    public static class TestAccordionTestDTO {
         @Expose private int id;
         @Expose private String creatorName;
         @Expose private List<Integer> coveredMutantIds;
@@ -179,7 +183,7 @@ public class TestAccordionDTO {
         @Expose private int points;
         @Expose private List<String> smells;
 
-        public TATestDTO(Test test, List<Mutant> mutants) {
+        public TestAccordionTestDTO(Test test, List<Mutant> mutants) {
             User creator = UserDAO.getUserForPlayer(test.getPlayerId());
             this.id = test.getId();
             this.creatorName = creator.getUsername();
