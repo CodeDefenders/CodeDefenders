@@ -25,6 +25,7 @@ import org.codedefenders.game.Role;
 import org.codedefenders.game.puzzle.Puzzle;
 import org.codedefenders.game.puzzle.PuzzleChapter;
 import org.codedefenders.game.puzzle.PuzzleGame;
+import org.codedefenders.model.PuzzleInfo;
 import org.codedefenders.validation.code.CodeValidatorLevel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -316,11 +317,74 @@ public class PuzzleDAO {
         return DB.executeUpdateQueryGetKeys(query, values);
     }
 
+
+    /**
+     * Updates the given {@link PuzzleInfo puzzle information} in the database.
+     *
+     * @param puzzle The {@link PuzzleInfo}.
+     * @return {@code true} if the update was successful, {@code false} otherwise.
+     */
+    public static boolean updatePuzzle(PuzzleInfo puzzle) {
+        String query = String.join("\n",
+                "UPDATE puzzles",
+                "SET Chapter_ID           = ?,",
+                "    Position             = ?,",
+                "    Title                = ?,",
+                "    Description          = ?,",
+                "    Max_Assertions       = ?,",
+                "    Force_Hamcrest       = ?,",
+                "    Editable_Lines_Start = ?,",
+                "    Editable_Lines_End   = ?",
+                "WHERE Puzzle_ID = ?;"
+        );
+
+        DatabaseValue[] values = new DatabaseValue[]{
+            DatabaseValue.of(puzzle.getChapterId()),
+            DatabaseValue.of(puzzle.getPosition()),
+            DatabaseValue.of(puzzle.getTitle()),
+            DatabaseValue.of(puzzle.getDescription()),
+            DatabaseValue.of(puzzle.getMaxAssertionsPerTest()),
+            DatabaseValue.of(puzzle.isForceHamcrest()),
+            DatabaseValue.of(puzzle.getEditableLinesStart()),
+            DatabaseValue.of(puzzle.getEditableLinesEnd()),
+
+            DatabaseValue.of(puzzle.getPuzzleId()),
+        };
+
+        return DB.executeUpdateQuery(query, values);
+    }
+
+    /**
+     * Updates the given {@link PuzzleChapter}'s values in the database.
+     *
+     * @param chapter The {@link PuzzleChapter}.
+     * @return {@code true} if the update was successful, {@code false} otherwise.
+     */
+    public static boolean updatePuzzleChapter(PuzzleChapter chapter) {
+        String query = String.join("\n",
+                "UPDATE puzzle_chapters",
+                "SET Position    = ?,",
+                "    Title       = ?,",
+                "    Description = ?",
+                "WHERE Chapter_ID = ?;"
+        );
+
+        DatabaseValue[] values = new DatabaseValue[]{
+            DatabaseValue.of(chapter.getPosition()),
+            DatabaseValue.of(chapter.getTitle()),
+            DatabaseValue.of(chapter.getDescription()),
+
+            DatabaseValue.of(chapter.getChapterId()),
+        };
+
+        return DB.executeUpdateQuery(query, values);
+    }
+
     /**
      * Updates the given {@link PuzzleGame}'s values in the database.
      *
      * @param game The {@link PuzzleGame}.
-     * @return {@code true} if the update was successful, {@code false}a otherwise.
+     * @return {@code true} if the update was successful, {@code false} otherwise.
      */
     public static boolean updatePuzzleGame(PuzzleGame game) {
         String query = String.join("\n",
