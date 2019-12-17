@@ -16,29 +16,13 @@ cache:
 build:
   stage: build
   script:
-    - |
-      printf "data.dir=
-      ant.home=
-      db.url=
-      db.username=
-      db.password=
-      cluster.mode=disabled
-      cluster.java.home=
-      cluster.reservation.name=
-      cluster.timeout=2
-      force.local.execution=enabled
-      parallelize=disabled
-      mutant.coverage=enabled
-      block.attacker=enabled
-      tomcat.username=
-      tomcat.password=
-      tomcat.url=
-      tomcat.path=" | tee config.properties
+    - touch config.properties
     - mvn --no-transfer-progress clean compile
 
 test:
   stage: test
   script:
+    - touch config.properties
     - mvn --no-transfer-progress test checkstyle:checkstyle
     - |
       file="";
