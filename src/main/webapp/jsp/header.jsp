@@ -19,10 +19,11 @@
 
 --%>
 <%@ page import="org.codedefenders.util.Constants" %>
-<%@ page import="java.util.ArrayList" %>
 <%@ page import="org.codedefenders.model.NotificationType" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.servlets.UserProfileManager" %>
+<%@ page import="org.codedefenders.beans.MessageBean" %>
+<%@ page import="org.codedefenders.beans.Message" %>
 
 <jsp:include page="/jsp/header_base.jsp"/>
 
@@ -181,29 +182,17 @@
     <input type="hidden" name="formType" value="logOut">
 </form>
 
-<%
-    ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
-    request.getSession().removeAttribute("messages");
-    if (messages != null && !messages.isEmpty()) {
-%>
+<jsp:useBean id="messages" class="org.codedefenders.beans.MessageBean" scope="request" />
+<% if (messages.count() > 0) { %>
+
 <div class="alert alert-info" id="messages-div" style="width: 98.9vw">
     <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a><br/>
-    <%
-        boolean fadeOut = true;
-        for (String m : messages) { %>
-    <pre><strong><%=m%></strong></pre>
-    <%
-            if (m.equals(Constants.MUTANT_UNCOMPILABLE_MESSAGE)
-                    || m.equals(Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE)
-                    || m.equals(Constants.TEST_DID_NOT_COMPILE_MESSAGE)) {
-                fadeOut = false;
-            } else if (m.contains("Congratulations, your") && m.contains("solved the puzzle!")){
-                fadeOut = false;
-            }
-        }
-        if (fadeOut) {
-    %>
-    <script> $('#messages-div').delay(10000).fadeOut(); </script>
+    <% for (Message message : messages) { %>
+        <pre><strong><%=message.getText()%></strong></pre>
+        <% if (message.isFadeOut()) { %>
+            <script> $('#messages-div').delay(10000).fadeOut(); </script>
+        <% } %>
     <% } %>
 </div>
+
 <% } %>

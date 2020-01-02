@@ -19,6 +19,7 @@
 package org.codedefenders.servlets.auth;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.codedefenders.beans.MessageBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.UserDAO;
@@ -31,9 +32,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Random;
 
+import javax.inject.Inject;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.naming.Context;
@@ -53,6 +54,9 @@ import static org.codedefenders.servlets.admin.AdminUserManagement.LOWER;
 @WebServlet("/login")
 public class LoginManager extends HttpServlet {
 
+    @Inject
+    private MessageBean messages;
+
     private static final Logger logger = LoggerFactory.getLogger(LoginManager.class);
     private static final int PW_RESET_SECRET_LENGTH = 20;
     private static final String CHANGE_PASSWORD_MSG = "Hello %s!\n\n" +
@@ -68,7 +72,6 @@ public class LoginManager extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        ArrayList<String> messages = new ArrayList<String>();
         request.getSession().setAttribute("messages", messages);
 
         String username = request.getParameter("username");
@@ -163,14 +166,14 @@ public class LoginManager extends HttpServlet {
                                     redirectTarget = (String) from;
 
                                     // Not sure why this is necessary
-                                    if ( ! redirectTarget.startsWith(request.getContextPath())) {
+                                    if (! redirectTarget.startsWith(request.getContextPath())) {
                                         redirectTarget = request.getContextPath() + "/" + redirectTarget;
                                     }
 
                                     //  #140: after a POST to login we get a 302 to notifications
                                     // This is the only place where we do a redirect to a target from a variable.
                                     // So we avoid to redirect to notifications
-                                    if( redirectTarget.contains( Paths.API_NOTIFICATION) ){
+                                    if (redirectTarget.contains( Paths.API_NOTIFICATION)) {
                                         // Clean up the session to avoid possible recursion
                                         session.removeAttribute("loginFrom");
                                         // Reset to redirect target
@@ -181,7 +184,7 @@ public class LoginManager extends HttpServlet {
                                 }
 
                                 // Do the actual redirect
-                                response.sendRedirect( redirectTarget );
+                                response.sendRedirect(redirectTarget);
 
                             } else {
                                 messages.add("Your account is inactive, login is only possible with an active account.");

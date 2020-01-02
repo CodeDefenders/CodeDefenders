@@ -18,7 +18,8 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="java.util.ArrayList" %>
+<%@ page import="org.codedefenders.beans.MessageBean" %>
+<%@ page import="org.codedefenders.beans.Message" %>
 
 <jsp:include page="/jsp/header_base.jsp"/>
 
@@ -33,8 +34,6 @@
 
 <%
     String pageTitle = (String) request.getAttribute("pageTitle");
-    ArrayList<String> messages = (ArrayList<String>) request.getSession().getAttribute("messages");
-    request.getSession().removeAttribute("messages");
 %>
 
 <script type="text/javascript">
@@ -85,13 +84,18 @@
         </div>
     </div>
 </div>
-<%
-    if (messages != null && !messages.isEmpty()) {
-%>
-<div class="alert alert-info" id="messages-div">
-    <% for (String m : messages) { %>
-    <pre><strong><%=m%></strong></pre>
+
+<jsp:useBean id="messages" class="org.codedefenders.beans.MessageBean" scope="request" />
+<% if (messages.count() > 0) { %>
+
+<div class="alert alert-info" id="messages-div" style="width: 98.9vw">
+    <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a><br/>
+    <% for (Message message : messages) { %>
+        <pre><strong><%=message.getText()%></strong></pre>
+        <% if (message.isFadeOut()) { %>
+            <script> $('#messages-div').delay(10000).fadeOut(); </script>
+        <% } %>
     <% } %>
-    <script> $('#messages-div').delay(10000).fadeOut(); </script>
 </div>
+
 <% } %>
