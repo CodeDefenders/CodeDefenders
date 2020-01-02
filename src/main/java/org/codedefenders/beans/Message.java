@@ -1,33 +1,40 @@
 package org.codedefenders.beans;
 
-import org.codedefenders.util.Constants;
-
+/**
+ * Represents a message shown on to a user on page load.
+ */
 public class Message {
     private String text;
     private boolean fadeOut;
 
+    /**
+     * Constructs a new message with the given text. Use {@link MessageBean#add(String)} instead of calling the
+     * constructor directly.
+     * @param text The text of the message.
+     */
     public Message(String text) {
         this.text = text;
         this.fadeOut = true;
-
-        /* Move fade-out logic from header.jsp here for now (until I change the fade-out to be added explicitly). */
-        if (text.equals(Constants.MUTANT_UNCOMPILABLE_MESSAGE)
-            || text.equals(Constants.TEST_DID_NOT_PASS_ON_CUT_MESSAGE)
-            || text.equals(Constants.TEST_DID_NOT_COMPILE_MESSAGE)
-            || (text.contains("Congratulations, your") && text.contains("solved the puzzle!"))) {
-            this.fadeOut = false;
-        }
     }
 
+    /**
+     * Returns the text of the message.
+     * @return The text of the message.
+     */
     public String getText() {
         return text;
     }
 
+    /**
+     * Returns if the message should fade out or stay on screen.
+     * @return If the message should fade out or stay on screen.
+     */
     public boolean isFadeOut() {
         return fadeOut;
     }
 
     /* Builder-style setter methods. */
+
     public void fadeOut(boolean fadeOut) {
         this.fadeOut = fadeOut;
     }

@@ -272,7 +272,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         final TargetExecution compileTestTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.COMPILE_TEST);
         if (!compileTestTarget.status.equals(TargetExecution.Status.SUCCESS)) {
-            messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+            messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
             messages.add(StringEscapeUtils.escapeHtml(compileTestTarget.message));
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
             Redirect.redirectBack(request, response);
@@ -281,7 +281,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         final TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
         if (!testOriginalTarget.status.equals(TargetExecution.Status.SUCCESS)) {
-            messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
+            messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
             messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
             Redirect.redirectBack(request, response);
@@ -404,7 +404,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         final TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
         if (compileMutantTarget == null || !compileMutantTarget.status.equals(TargetExecution.Status.SUCCESS)) {
-            messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
+            messages.add(MUTANT_UNCOMPILABLE_MESSAGE).fadeOut(false);
             if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty()) {
                 messages.add(compileMutantTarget.message);
             }
@@ -430,7 +430,7 @@ public class PuzzleGameManager extends HttpServlet {
             game.setState(GameState.SOLVED);
             messages.clear();
             boolean isAnAttackGame = true;
-            messages.add( generateWinningMessage(request, userId, game, isAnAttackGame));
+            messages.add(generateWinningMessage(request, userId, game, isAnAttackGame)).fadeOut(false);
         }
         PuzzleDAO.updatePuzzleGame(game);
         Redirect.redirectBack(request, response);

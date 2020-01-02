@@ -399,7 +399,7 @@ public class MultiplayerGameManager extends HttpServlet {
         }
 
         if (compileTestTarget.status != TargetExecution.Status.SUCCESS) {
-            messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+            messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
             // We escape the content of the message for new tests since user can embed there anything
             String escapedHtml = StringEscapeUtils.escapeHtml(compileTestTarget.message);
             // Extract the line numbers of the errors
@@ -417,7 +417,7 @@ public class MultiplayerGameManager extends HttpServlet {
         TargetExecution testOriginalTarget = TargetExecutionDAO.getTargetExecutionForTest(newTest, TargetExecution.Target.TEST_ORIGINAL);
         if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
             // testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
-            messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
+            messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
             messages.add(StringEscapeUtils.escapeHtml(testOriginalTarget.message));
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
@@ -555,7 +555,7 @@ public class MultiplayerGameManager extends HttpServlet {
         }
         TargetExecution compileMutantTarget = TargetExecutionDAO.getTargetExecutionForMutant(newMutant, TargetExecution.Target.COMPILE_MUTANT);
         if (compileMutantTarget == null || compileMutantTarget.status != TargetExecution.Status.SUCCESS) {
-            messages.add(MUTANT_UNCOMPILABLE_MESSAGE);
+            messages.add(MUTANT_UNCOMPILABLE_MESSAGE).fadeOut(false);
             // There's a ton of defensive programming here...
             if (compileMutantTarget != null && compileMutantTarget.message != null && !compileMutantTarget.message.isEmpty()) {
                 // We escape the content of the message for new tests since user can embed there anything
@@ -728,7 +728,7 @@ public class MultiplayerGameManager extends HttpServlet {
 
             if (compileTestTarget == null || compileTestTarget.status != TargetExecution.Status.SUCCESS) {
                 logger.debug("compileTestTarget: " + compileTestTarget);
-                messages.add(TEST_DID_NOT_COMPILE_MESSAGE);
+                messages.add(TEST_DID_NOT_COMPILE_MESSAGE).fadeOut(false);
                 if (compileTestTarget != null) {
                     messages.add(compileTestTarget.message);
                 }
@@ -740,7 +740,7 @@ public class MultiplayerGameManager extends HttpServlet {
             if (testOriginalTarget.status != TargetExecution.Status.SUCCESS) {
                 //  (testOriginalTarget.state.equals(TargetExecution.Status.FAIL) || testOriginalTarget.state.equals(TargetExecution.Status.ERROR)
                 logger.debug("testOriginalTarget: " + testOriginalTarget);
-                messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE);
+                messages.add(TEST_DID_NOT_PASS_ON_CUT_MESSAGE).fadeOut(false);
                 messages.add(testOriginalTarget.message);
                 session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
