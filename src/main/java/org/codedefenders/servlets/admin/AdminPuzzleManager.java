@@ -24,6 +24,7 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.codedefenders.beans.MessageBean;
 import org.codedefenders.execution.BackendExecutorService;
 import org.codedefenders.installer.Installer;
 import org.codedefenders.servlets.util.Redirect;
@@ -64,6 +65,9 @@ public class AdminPuzzleManager extends HttpServlet {
 
     @Inject
     private BackendExecutorService backend;
+
+    @Inject
+    private MessageBean messages;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -128,10 +132,6 @@ public class AdminPuzzleManager extends HttpServlet {
 
     @SuppressWarnings("Duplicates")
     private void createPuzzles(HttpServletRequest request, List<FileItem> fileParameters) throws IOException {
-        HttpSession session = request.getSession();
-        ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
-
         for (FileItem fileParameter : fileParameters) {
             final String fieldName = fileParameter.getFieldName();
             final String fileName = FilenameUtils.getName(fileParameter.getName());

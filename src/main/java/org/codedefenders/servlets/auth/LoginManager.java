@@ -72,8 +72,6 @@ public class LoginManager extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        request.getSession().setAttribute("messages", messages);
-
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String email = request.getParameter("email");
@@ -117,7 +115,6 @@ public class LoginManager extends HttpServlet {
                         session.setAttribute("uid", newUser.getId());
                         session.setAttribute("username", newUser.getUsername());
                         session.setAttribute("user-keymap", newUser.getKeyMap());
-                        session.setAttribute("messages", messages);
                         // Log user activity including the timestamp
                         DatabaseAccess.logSession(newUser.getId(), getClientIpAddress(request));
                         response.sendRedirect(request.getContextPath() + Paths.GAMES_OVERVIEW);

@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets;
 
+import org.codedefenders.beans.MessageBean;
 import org.codedefenders.database.FeedbackDAO;
 import org.codedefenders.model.Feedback;
 import org.codedefenders.servlets.util.Redirect;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -40,11 +42,13 @@ import javax.servlet.http.HttpSession;
 @WebServlet("/api/feedback")
 public class FeedbackManager extends HttpServlet {
 
+    @Inject
+    private MessageBean messages;
+
     private static final Logger logger = LoggerFactory.getLogger(FeedbackManager.class);
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        ArrayList<String> messages = new ArrayList<>();
         HttpSession session = request.getSession();
         int uid = (Integer) session.getAttribute("uid");
 
@@ -54,13 +58,14 @@ public class FeedbackManager extends HttpServlet {
             Redirect.redirectBack(request, response);
             return;
         }
-        session.setAttribute("messages", messages);
+
         int gameId = gameIdOpt.get();
 
         switch (request.getParameter("formType")) {
             case "sendFeedback":
-                if (!saveFeedback(request, uid, gameId))
+                if (!saveFeedback(request, uid, gameId)) {
                     messages.add("Could not save your feedback. Please try again later!");
+                }
         }
 
         Redirect.redirectBack(request, response);

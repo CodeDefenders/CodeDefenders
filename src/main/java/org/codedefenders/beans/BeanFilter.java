@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.annotation.WebFilter;
+import java.io.IOException;
 
 /**
  * Adds various request-scoped beans to the request, so they can be shared between the application and ths JSPs.
@@ -20,7 +21,7 @@ public class BeanFilter implements Filter {
     private static final Logger logger = LoggerFactory.getLogger(BeanFilter.class);
 
     @Inject
-    MessageBean messages;
+    private MessageBean messages;
 
     @Override
     public void init(FilterConfig config) throws ServletException {
@@ -28,8 +29,10 @@ public class BeanFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+            throws IOException, ServletException {
         request.setAttribute("messages", messages);
+        chain.doFilter(request, response);
     }
 
     @Override

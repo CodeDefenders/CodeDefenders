@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets;
 
+import org.codedefenders.beans.MessageBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.KeyMap;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -57,6 +59,9 @@ import javax.servlet.http.HttpSession;
 @WebServlet("/profile")
 public class UserProfileManager extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(UserProfileManager.class);
+
+    @Inject
+    private MessageBean messages;
 
     private static final String DELETED_USER_NAME = "DELETED";
     private static final String DELETED_USER_EMAIL = "%s@deleted-code-defenders";
@@ -99,8 +104,6 @@ public class UserProfileManager extends HttpServlet {
         }
 
         final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
         final int userId = ServletUtils.userId(request);
 
         String responsePath = request.getContextPath() + Paths.USER_PROFILE;

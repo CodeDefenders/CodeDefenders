@@ -18,10 +18,6 @@
  */
 package org.codedefenders.util;
 
-import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
-
 public class MessageUtils {
     /**
      * Choose the singular or plural form of a string according to the given amount.
@@ -37,20 +33,5 @@ public class MessageUtils {
         } else {
             return singular;
         }
-    }
-
-    /**
-     * Adds a message that is displayed on the next page the user sees.
-     * @param session The session of the user.
-     * @param message The message.
-     */
-    public static void addMessage(HttpSession session, String message) {
-        @SuppressWarnings("unchecked")
-        List<String> messages = (List<String>) session.getAttribute("messages");
-        if (messages == null) {
-            messages = new ArrayList<>();
-            session.setAttribute("messages", messages);
-        }
-        messages.add(message);
     }
 }

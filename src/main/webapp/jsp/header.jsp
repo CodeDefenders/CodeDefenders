@@ -18,12 +18,9 @@
     along with Code Defenders. If not, see <http://www.gnu.org/licenses/>.
 
 --%>
-<%@ page import="org.codedefenders.util.Constants" %>
 <%@ page import="org.codedefenders.model.NotificationType" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 <%@ page import="org.codedefenders.servlets.UserProfileManager" %>
-<%@ page import="org.codedefenders.beans.MessageBean" %>
-<%@ page import="org.codedefenders.beans.Message" %>
 
 <jsp:include page="/jsp/header_base.jsp"/>
 
@@ -182,17 +179,4 @@
     <input type="hidden" name="formType" value="logOut">
 </form>
 
-<jsp:useBean id="messages" class="org.codedefenders.beans.MessageBean" scope="request" />
-<% if (messages.count() > 0) { %>
-
-<div class="alert alert-info" id="messages-div" style="width: 98.9vw">
-    <a href="" class="close" data-dismiss="alert" aria-label="close">&times;</a><br/>
-    <% for (Message message : messages) { %>
-        <pre><strong><%=message.getText()%></strong></pre>
-        <% if (message.isFadeOut()) { %>
-            <script> $('#messages-div').delay(10000).fadeOut(); </script>
-        <% } %>
-    <% } %>
-</div>
-
-<% } %>
+<jsp:include page="/jsp/messages.jsp"/>

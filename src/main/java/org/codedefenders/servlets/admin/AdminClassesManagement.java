@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets.admin;
 
+import org.codedefenders.beans.MessageBean;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.game.GameClass;
 import org.codedefenders.servlets.util.ServletUtils;
@@ -31,6 +32,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -50,6 +52,9 @@ import javax.servlet.http.HttpSession;
 public class AdminClassesManagement extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminClassesManagement.class);
 
+    @Inject
+    private MessageBean messages;
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.setAttribute("classInfos", GameClassDAO.getAllClassInfos());
@@ -59,10 +64,6 @@ public class AdminClassesManagement extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
-
         final String formType = ServletUtils.formType(request);
         switch (formType) {
             case "classInactive": {

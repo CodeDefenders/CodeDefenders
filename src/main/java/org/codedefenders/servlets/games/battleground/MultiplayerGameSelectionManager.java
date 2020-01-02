@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets.games.battleground;
 
+import org.codedefenders.beans.MessageBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.GameClassDAO;
@@ -100,6 +101,9 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
     private static final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm");
 
     @Inject
+    private MessageBean messages;
+
+    @Inject
     private INotificationService notificationService;
 
     @Override
@@ -144,10 +148,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
         }
 
         String contextPath = request.getContextPath();
-
-        HttpSession session = request.getSession();
-        ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
         int classId;
         int maxAssertionsPerTest;
@@ -284,10 +284,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
             return;
         }
 
-        HttpSession session = request.getSession();
-        ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
-
         final Optional<Integer> gameIdOpt = gameId(request);
         if (!gameIdOpt.isPresent()) {
             logger.error("No gameId parameter. Aborting request.");
@@ -353,8 +349,6 @@ public class MultiplayerGameSelectionManager extends HttpServlet {
 
         HttpSession session = request.getSession();
         String contextPath = request.getContextPath();
-        ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
         final Optional<Integer> gameIdOpt = gameId(request);
         if (!gameIdOpt.isPresent()) {

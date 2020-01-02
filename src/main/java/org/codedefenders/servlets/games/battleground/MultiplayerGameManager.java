@@ -19,6 +19,7 @@
 package org.codedefenders.servlets.games.battleground;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.beans.MessageBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.DatabaseAccess;
 import org.codedefenders.database.IntentionDAO;
@@ -123,6 +124,9 @@ public class MultiplayerGameManager extends HttpServlet {
 
     @Inject
     private ITestCaseSelector regressionTestCaseSelector;
+
+    @Inject
+    private MessageBean messages;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -290,8 +294,6 @@ public class MultiplayerGameManager extends HttpServlet {
 
         final String contextPath = ctx(request);
         final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
         if (game.getRole(userId) != Role.DEFENDER) {
             messages.add("Can only submit tests if you are an Defender!");
@@ -315,8 +317,8 @@ public class MultiplayerGameManager extends HttpServlet {
         // Do the validation even before creating the mutant
         // TODO Here we need to account for #495
         List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
-        if ( !  validationMessage.isEmpty() ) {
-            messages.addAll( validationMessage );
+        if (! validationMessage.isEmpty()) {
+            messages.getBridge().addAll(validationMessage);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
             response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
             return;
@@ -425,14 +427,14 @@ public class MultiplayerGameManager extends HttpServlet {
         messages.add(TEST_PASSED_ON_CUT_MESSAGE);
 
         // Include Test Smells in the messages back to user
-        includeDetectTestSmellsInMessages(newTest, messages);
+        includeDetectTestSmellsInMessages(newTest);
 
         final String message = UserDAO.getUserById(userId).getUsername() + " created a test";
         final Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         final Event notif = new Event(-1, gameId, userId, message, EventType.DEFENDER_TEST_CREATED, EventStatus.GAME, timestamp);
         notif.insert();
 
-        mutationTester.runTestOnAllMultiplayerMutants(game, newTest, messages);
+        mutationTester.runTestOnAllMultiplayerMutants(game, newTest, messages.getBridge());
         game.update();
         logger.info("Successfully created test {} ", newTest.getId());
 
@@ -452,7 +454,7 @@ public class MultiplayerGameManager extends HttpServlet {
             Matcher m = p.matcher(line);
             if (m.find()) {
                 // TODO may be not robust
-                errorLines.add( Integer.parseInt(m.group(1)));
+                errorLines.add(Integer.parseInt(m.group(1)));
             }
         }
         return errorLines;
@@ -487,8 +489,6 @@ public class MultiplayerGameManager extends HttpServlet {
 
         final String contextPath = ctx(request);
         final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
         if (game.getRole(userId) != Role.ATTACKER) {
             messages.add("Can only submit mutants if you are an Attacker!");
@@ -579,7 +579,7 @@ public class MultiplayerGameManager extends HttpServlet {
         Event notif = new Event(-1, gameId, userId, notificationMsg, EventType.ATTACKER_MUTANT_CREATED, EventStatus.GAME,
                 new Timestamp(System.currentTimeMillis() - 1000));
         notif.insert();
-        mutationTester.runAllTestsOnMutant(game, newMutant, messages);
+        mutationTester.runAllTestsOnMutant(game, newMutant, messages.getBridge());
         game.update();
 
         if (game.isCapturePlayersIntention()) {
@@ -605,8 +605,6 @@ public class MultiplayerGameManager extends HttpServlet {
 
         final String contextPath = ctx(request);
         final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
         if (game.getRole(userId) != Role.ATTACKER) {
             messages.add("Can only resolve equivalence duels if you are an Attacker!");
@@ -698,8 +696,8 @@ public class MultiplayerGameManager extends HttpServlet {
             // Do the validation even before creating the mutant
             // TODO Here we need to account for #495
             List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
-            if ( !  validationMessage.isEmpty() ) {
-                messages.addAll( validationMessage );
+            if (! validationMessage.isEmpty()) {
+                messages.getBridge().addAll(validationMessage);
                 session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, StringEscapeUtils.escapeHtml(testText));
                 response.sendRedirect(contextPath + Paths.BATTLEGROUND_GAME + "?gameId=" + gameId);
                 return;
@@ -830,8 +828,6 @@ public class MultiplayerGameManager extends HttpServlet {
 
         final String contextPath = ctx(request);
         final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
         Role role = game.getRole(userId);
 
@@ -926,7 +922,7 @@ public class MultiplayerGameManager extends HttpServlet {
         }
     }
 
-    private void includeDetectTestSmellsInMessages(Test newTest, ArrayList<String> messages) {
+    private void includeDetectTestSmellsInMessages(Test newTest) {
         List<String> detectedTestSmells = testSmellsDAO.getDetectedTestSmellsForTest(newTest);
         if (!detectedTestSmells.isEmpty()) {
             if (detectedTestSmells.size() == 1) {

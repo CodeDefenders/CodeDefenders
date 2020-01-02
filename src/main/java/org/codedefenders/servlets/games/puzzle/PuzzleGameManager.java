@@ -52,6 +52,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.codedefenders.beans.MessageBean;
 import org.codedefenders.database.PuzzleDAO;
 import org.codedefenders.database.TargetExecutionDAO;
 import org.codedefenders.execution.IMutationTester;
@@ -99,6 +100,9 @@ public class PuzzleGameManager extends HttpServlet {
 
     @Inject
     private IMutationTester mutationTester;
+
+    @Inject
+    private MessageBean messages;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -239,15 +243,12 @@ public class PuzzleGameManager extends HttpServlet {
             return;
         }
 
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
-
         // TODO Why we have testText and not escaped(testText)?
         // Validate the test
         // Do the validation even before creating the mutant
         List<String> validationMessage = CodeValidator.validateTestCodeGetMessage(testText, game.getMaxAssertionsPerTest(), game.isForceHamcrest());
-        if ( !  validationMessage.isEmpty() ) {
-            messages.addAll( validationMessage );
+        if (! validationMessage.isEmpty()) {
+            messages.getBridge().addAll(validationMessage);
             session.setAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST, testText);
             Redirect.redirectBack(request, response);
             return;
@@ -290,7 +291,7 @@ public class PuzzleGameManager extends HttpServlet {
         messages.add(TEST_PASSED_ON_CUT_MESSAGE);
         session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_TEST);
 
-        mutationTester.runTestOnAllMutants(game, newTest, messages);
+        mutationTester.runTestOnAllMutants(game, newTest, messages.getBridge());
 
         // may be // final TestSolvingStrategy solving = Testgame.getTestSolver();
         final TestSolvingStrategy solver = TestSolvingStrategy.get(TestSolvingStrategy.Types.KILLED_ALL_MUTANTS.name());
@@ -373,9 +374,6 @@ public class PuzzleGameManager extends HttpServlet {
 
         final CodeValidatorLevel mutantValidatorLevel = game.getMutantValidatorLevel();
 
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
-
         ValidationMessage validationMessage = CodeValidator.validateMutantGetMessage(game.getCUT().getSourceCode(), mutantText, mutantValidatorLevel);
         if (validationMessage != ValidationMessage.MUTANT_VALIDATION_SUCCESS) {
             // Mutant is either the same as the CUT or it contains invalid code
@@ -417,7 +415,7 @@ public class PuzzleGameManager extends HttpServlet {
 
         messages.add(MUTANT_COMPILED_MESSAGE);
         session.removeAttribute(SESSION_ATTRIBUTE_PREVIOUS_MUTANT);
-        mutationTester.runAllTestsOnMutant(game, newMutant, messages);
+        mutationTester.runAllTestsOnMutant(game, newMutant, messages.getBridge());
 
         // may be // final MutantSolvingStrategy solving = game.getMutantSolver();
         final MutantSolvingStrategy solver = MutantSolvingStrategy.get(MutantSolvingStrategy.Types.SURVIVED_ALL_MUTANTS.name());

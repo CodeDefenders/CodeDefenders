@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets.admin;
 
+import org.codedefenders.beans.MessageBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.ConnectionPool;
 import org.codedefenders.util.Constants;
@@ -26,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -36,6 +38,9 @@ import javax.servlet.http.HttpSession;
 @WebServlet("/admin/settings")
 // TODO Does this enable CDI using @Property@Inject ?
 public class AdminSystemSettings extends HttpServlet {
+
+    @Inject
+    private MessageBean messages;
 
     public enum SETTING_NAME {
         SHOW_PLAYER_FEEDBACK {
@@ -237,16 +242,11 @@ public class AdminSystemSettings extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        HttpSession session = request.getSession();
-        // Get their user id from the session.
-        int currentUserID = (Integer) session.getAttribute("uid");
-        ArrayList<String> messages = new ArrayList<String>();
-        session.setAttribute("messages", messages);
         String responsePath = request.getContextPath() + "/admin/settings";
 
         switch (request.getParameter("formType")) {
             case "saveSettings":
-                updateSystemSettings(request, messages);
+                updateSystemSettings(request);
                 break;
             default:
                 System.err.println("Action not recognised");
@@ -257,7 +257,7 @@ public class AdminSystemSettings extends HttpServlet {
     }
 
     // TODO Those methods should be factored into a class and exposed for reuse
-    public void updateSystemSettings(HttpServletRequest request, List<String> messages) {
+    public void updateSystemSettings(HttpServletRequest request) {
         List<SettingsDTO> settings = AdminDAO.getSystemSettings();
 
         boolean success = true;

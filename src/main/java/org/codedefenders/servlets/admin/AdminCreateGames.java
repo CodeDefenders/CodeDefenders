@@ -18,6 +18,7 @@
  */
 package org.codedefenders.servlets.admin;
 
+import org.codedefenders.beans.MessageBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.GameClassDAO;
 import org.codedefenders.database.KillmapDAO;
@@ -52,6 +53,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -65,6 +67,9 @@ import static org.codedefenders.util.Constants.DUMMY_DEFENDER_USER_ID;
 @WebServlet(urlPatterns = {"/admin", "/admin/games"})
 public class AdminCreateGames extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminCreateGames.class);
+
+    @Inject
+    private MessageBean messages;
 
     public enum RoleAssignmentMethod {RANDOM, OPPOSITE}
 
@@ -109,16 +114,14 @@ public class AdminCreateGames extends HttpServlet {
         HttpSession session = request.getSession();
         // Get their user id from the session.
         currentUserID = (Integer) session.getAttribute("uid");
-        ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
 
         final String action = request.getParameter("formType");
         switch (action) {
             case "createGame":
-                createGame(response, request, messages, session);
+                createGame(response, request, session);
                 break;
             case "insertGames":
-                insertGame(response, request, messages, session);
+                insertGame(response, request, session);
                 break;
             default:
                 logger.error("Action not recognised:{}", action);
@@ -127,7 +130,7 @@ public class AdminCreateGames extends HttpServlet {
         }
     }
 
-    private void insertGame(HttpServletResponse response, HttpServletRequest request, ArrayList<String> messages, HttpSession session) throws IOException {
+    private void insertGame(HttpServletResponse response, HttpServletRequest request, HttpSession session) throws IOException {
         attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE);
         defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE);
         String gameAndUserRemoveId = request.getParameter("tempGameUserRemoveButton");
@@ -140,8 +143,8 @@ public class AdminCreateGames extends HttpServlet {
             String currentGameIdString = request.getParameter("tempGameUserMoveToButton").split("_")[5];
             Role role = Role.valueOf(request.getParameter("role_" + userId));
             // If any of this fail state of staged games will be inconsistent
-            removePlayerFromGame(session, messages, userId, currentGameIdString);
-            associatePlayerToGameWithRole(session, messages, userId, targetGameIdString, role);
+            removePlayerFromGame(session, userId, currentGameIdString);
+            associatePlayerToGameWithRole(session, userId, targetGameIdString, role);
         } else if (gameAndUserRemoveId != null || gameAndUserSwitchId != null ) {
             // admin is removing user  from temp game or switching their role or
             boolean switchUser = gameAndUserSwitchId != null;
@@ -195,7 +198,7 @@ public class AdminCreateGames extends HttpServlet {
         response.sendRedirect(request.getContextPath() + "/admin");
     }
 
-    private void removePlayerFromGame(HttpSession session, ArrayList<String> messages, int removedUserId, String gidString) {
+    private void removePlayerFromGame(HttpSession session, int removedUserId, String gidString) {
         Integer gid;
         List<Integer> userList = new ArrayList<>();
         boolean isTempGame = gidString.startsWith("T");
@@ -233,7 +236,7 @@ public class AdminCreateGames extends HttpServlet {
         }
     }
 
-    private void associatePlayerToGameWithRole(HttpSession session, ArrayList<String> messages, int addedUserId, String gidString, Role role) {
+    private void associatePlayerToGameWithRole(HttpSession session, int addedUserId, String gidString, Role role) {
 
         int gid;
         List<Integer> userList = new ArrayList<>();
@@ -252,7 +255,7 @@ public class AdminCreateGames extends HttpServlet {
             mg = MultiplayerGameDAO.getMultiplayerGame(gid);
         }
         if (mg.getCreatorId() == addedUserId) {
-            messages.add("Cannot add user " + addedUserId + " to game " + String.valueOf(gid) + " because they are it's creator.");
+            messages.add("Cannot add user " + addedUserId + " to game " + gid + " because they are it's creator.");
         } else {
             if (isTempGame) {
                 userList.add(addedUserId);
@@ -267,7 +270,7 @@ public class AdminCreateGames extends HttpServlet {
         }
     }
 
-    private void createGame(HttpServletResponse response, HttpServletRequest request, ArrayList<String> messages, HttpSession session) throws IOException {
+    private void createGame(HttpServletResponse response, HttpServletRequest request, HttpSession session) throws IOException {
         String rowUserId = request.getParameter("userListButton");
         if (rowUserId != null) { // if admin is trying to add a single user to a game
             int addedUserId = Integer.parseInt(rowUserId);
@@ -275,14 +278,14 @@ public class AdminCreateGames extends HttpServlet {
             String gidString = request.getParameter("game_" + addedUserId);
             Role role = Role.valueOf(request.getParameter("role_" + addedUserId));
             //
-            associatePlayerToGameWithRole(session, messages, addedUserId, gidString, role);
+            associatePlayerToGameWithRole(session, addedUserId, gidString, role);
         } else { // if admin is batch creating games
-            batchCreateGames(request, response, session, messages);
+            batchCreateGames(request, response, session);
         }
         response.sendRedirect(request.getContextPath() + "/admin");
     }
 
-    private void batchCreateGames(HttpServletRequest request, HttpServletResponse response, HttpSession session, ArrayList<String> messages) throws IOException {
+    private void batchCreateGames(HttpServletRequest request, HttpServletResponse response, HttpSession session) throws IOException {
         attackerIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.ATTACKER_LISTS_SESSION_ATTRIBUTE);
         defenderIdsList = (List<List<Integer>>) session.getAttribute(AdminCreateGames.DEFENDER_LISTS_SESSION_ATTRIBUTE);
         createdGames = (List<MultiplayerGame>) session.getAttribute(AdminCreateGames.CREATED_GAMES_LISTS_SESSION_ATTRIBUTE);
@@ -328,10 +331,11 @@ public class AdminCreateGames extends HttpServlet {
             for (String uName : userNameListString.split(USER_NAME_LIST_DELIMITER)) {
                 if (uName.length() > 0) {
                     User u = UserDAO.getUserByName(uName);
-                    if (u == null)
+                    if (u == null) {
                         messages.add("No user with name or email \'" + uName + "\'!");
-                    else if (!selectedUserIDs.contains(u.getId()))
+                    } else if (!selectedUserIDs.contains(u.getId())) {
                         selectedUserIDs.add(u.getId());
+                    }
                 }
             }
         }

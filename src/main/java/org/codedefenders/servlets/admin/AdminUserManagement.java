@@ -19,6 +19,7 @@
 package org.codedefenders.servlets.admin;
 
 import org.apache.commons.lang.math.IntRange;
+import org.codedefenders.beans.MessageBean;
 import org.codedefenders.database.AdminDAO;
 import org.codedefenders.database.UserDAO;
 import org.codedefenders.model.User;
@@ -39,6 +40,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -55,6 +57,9 @@ import javax.servlet.http.HttpSession;
 @WebServlet("/admin/users")
 public class AdminUserManagement extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(AdminUserManagement.class);
+
+    @Inject
+    private MessageBean messages;
 
     public static final char[] LOWER = "abcdefghijklmnopqrstuvwxyz".toCharArray();
     public static final char[] DIGITS = "0123456789".toCharArray();
@@ -75,9 +80,6 @@ public class AdminUserManagement extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        final HttpSession session = request.getSession();
-        final ArrayList<String> messages = new ArrayList<>();
-        session.setAttribute("messages", messages);
         String responsePath = request.getContextPath() + Paths.ADMIN_USERS;
 
         final String formType = ServletUtils.formType(request);
@@ -110,7 +112,7 @@ public class AdminUserManagement extends HttpServlet {
                     logger.error("Creating users failed. Missing parameter 'user_name_list'");
                 } else {
                     logger.info("Creating users....");
-                    createUserAccounts(request, userList.get(), messages);
+                    createUserAccounts(request, userList.get());
 					logger.info("Creating users succeeded.");
 				}
 				break;
@@ -184,14 +186,14 @@ public class AdminUserManagement extends HttpServlet {
         return successMsg;
     }
 
-    private void createUserAccounts(HttpServletRequest request, String userNameListString, List<String> messages) {
+    private void createUserAccounts(HttpServletRequest request, String userNameListString) {
         final String[] lines = userNameListString.split(AdminCreateGames.USER_NAME_LIST_DELIMITER);
 
         final boolean sendMail = AdminDAO.getSystemSetting(AdminSystemSettings.SETTING_NAME.EMAILS_ENABLED).getBoolValue();
         final String hostAddress = ServletUtils.getBaseURL(request);
 
         for (String credentials : lines) {
-            createUserAccount(credentials.trim(), messages, sendMail, hostAddress);
+            createUserAccount(credentials.trim(), sendMail, hostAddress);
         }
     }
 
@@ -204,7 +206,7 @@ public class AdminUserManagement extends HttpServlet {
      *
      * Values can be separated by either ',' or ';'.
      */
-    private void createUserAccount(String userCredentials, List<String> messages, boolean sendMail, String hostAddress) {
+    private void createUserAccount(String userCredentials, boolean sendMail, String hostAddress) {
         // credentials have following form: username, password, email (optional)
         final String[] credentials = userCredentials.split("[,;]+");
         if (credentials.length < 2) {
