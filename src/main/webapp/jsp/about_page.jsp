@@ -24,10 +24,10 @@
 <%@ page import="java.io.IOException" %>
 <%@ page import="java.util.Properties" %>
 
-<%
-    /* header_main */
-    request.setAttribute("pageTitle", "About CodeDefenders");
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("About Code Defenders"); %>
 
+<%
     Object uid = request.getSession().getAttribute("uid");
     Object username = request.getSession().getAttribute("username");
 %>

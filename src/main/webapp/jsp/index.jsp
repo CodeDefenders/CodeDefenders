@@ -25,9 +25,6 @@
 <%@ page import="org.codedefenders.game.GameClass" %>
 
 <%
-    /* header_main */
-    request.setAttribute("pageTitle", "Welcome");
-
     List<MultiplayerGame> openGames = (List<MultiplayerGame>) request.getAttribute("openMultiplayerGames");
     Map<Integer, String> gameCreatorNames = (Map<Integer, String>) request.getAttribute("gameCreatorNames");
 %>

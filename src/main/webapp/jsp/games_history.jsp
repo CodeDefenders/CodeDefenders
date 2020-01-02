@@ -23,11 +23,11 @@
 <%@ page import="org.codedefenders.model.Player" %>
 <%@ page import="org.codedefenders.game.multiplayer.PlayerScore" %>
 <%@ page import="java.util.Map" %>
-<%
-    {
-    /* header_main */
-    request.setAttribute("pageTitle", "Game History");
 
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Game History"); %>
+
+<%
     List<UserMultiplayerGameInfo> games = ((List<UserMultiplayerGameInfo>) request.getAttribute("finishedBattlegroundGames"));
 %>
 
@@ -260,6 +260,3 @@
 </div>
 
 <%@ include file="/jsp/footer.jsp" %>
-<%
-    }
-%>

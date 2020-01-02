@@ -28,10 +28,8 @@
 <%@ page import="org.codedefenders.servlets.util.ServletUtils" %>
 <%@ page import="org.codedefenders.game.GameClass" %>
 
-<%
-    /* header_main */
-    request.setAttribute("pageTitle", "Game History");
-%>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Game History"); %>
 
 <%
     MultiplayerGame game;

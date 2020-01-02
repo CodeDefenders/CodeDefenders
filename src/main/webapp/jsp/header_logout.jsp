@@ -30,9 +30,7 @@
         Messages to display on page load.
 --%>
 
-<%
-    String pageTitle = (String) request.getAttribute("pageTitle");
-%>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -67,10 +65,10 @@
             <!-- navigation bar -->
             <div id="bs-example-navbar-collapse-1" class="navbar-collapse collapse">
                 <ul class="crow no-gutter nav navbar-nav" style="display: flow-root; position: relative; z-index: 1000">
-                    <%if (!pageTitle.equals("Login")) {%>
+                    <% if (!request.getRequestURI().contains("login")) { %>
                     <li class="col-md-4"><a class="text-white button tab-link bg-minus-1"
                                                href="login" style="width:100%; margin-right: 80px">Login</a></li>
-                    <%}%>
+                    <% } %>
 
                     <li class="col-md-4"><a
                             class="text-white button tab-link bg-minus-1"

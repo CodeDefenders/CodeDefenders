@@ -19,10 +19,10 @@
 
 --%>
 
-<%
-    /* header_main */
-    request.setAttribute("pageTitle", "Help");
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Help"); %>
 
+<%
 	Object uid = request.getSession().getAttribute("uid");
 	Object username = request.getSession().getAttribute("username");
 %>

@@ -14,7 +14,7 @@ import javax.servlet.annotation.WebFilter;
 import java.io.IOException;
 
 /**
- * Adds various request-scoped beans to the request, so they can be shared between the application and ths JSPs.
+ * Adds various beans to the request, so they can be shared between the application and ths JSPs.
  */
 @WebFilter(filterName = "BeanFilter")
 public class BeanFilter implements Filter {

@@ -23,10 +23,8 @@
 <%@ page import="org.codedefenders.servlets.admin.AdminSystemSettings" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
-<%
-    /* header_main */
-    request.setAttribute("pageTitle", "Login");
-%>
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Login"); %>
 
 <jsp:include page="/jsp/header_logout.jsp"/>
 
