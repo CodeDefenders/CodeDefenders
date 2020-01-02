@@ -24,23 +24,22 @@
 <%@ page import="org.codedefenders.game.Role" %>
 <%@ page import="org.codedefenders.util.Paths" %>
 
+<%
+    MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
+    int userId = ServletUtils.userId(request);
+    Role role = game.getRole(userId);
+    int gameId = (int) request.getAttribute("gameId");
+%>
+
+<jsp:useBean id="pageInfo" class="org.codedefenders.beans.PageInfoBean" scope="request"/>
+<% pageInfo.setPageTitle("Game " + game.getId() + " (" + role.getFormattedString() + ")"); %>
+
 <jsp:include page="/jsp/header_main.jsp"/>
 </div></div></div></div></div>
-
-<%
-    {
-        MultiplayerGame game = (MultiplayerGame) request.getAttribute("game");
-        int userId = ServletUtils.userId(request);
-        Role role = game.getRole(userId);
-        int gameId = (int) request.getAttribute("gameId");
-%>
 
 <div class="game-container">
     <nav class="nest" style="width: 100%; margin-left: 0; margin-right: auto;">
         <div class="crow fly">
-            <div><h2 style="margin-top: 7px"><%= "Game " + game.getId() + " (" + role.getFormattedString() + ")" %>
-            </h2></div>
-
             <%  int userIdCurrent = ((Integer) session.getAttribute("uid"));
                 if (game.getCreatorId() == userIdCurrent) { %>
             <div class="admin-panel col-md-12">
@@ -89,6 +88,3 @@
         </div>
     </nav>
     <div class="clear"></div>
-<%
-    }
-%>
