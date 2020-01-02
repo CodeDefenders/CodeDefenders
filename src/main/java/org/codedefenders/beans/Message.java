@@ -4,6 +4,7 @@ package org.codedefenders.beans;
  * Represents a message shown on to a user on page load.
  */
 public class Message {
+    private long id;
     private String text;
     private boolean fadeOut;
 
@@ -12,9 +13,18 @@ public class Message {
      * constructor directly.
      * @param text The text of the message.
      */
-    public Message(String text) {
+    public Message(String text, long id) {
+        this.id = id;
         this.text = text;
         this.fadeOut = true;
+    }
+
+    /**
+     * Returns the id of the message.
+     * @return The id of the message.
+     */
+    public long getId() {
+        return id;
     }
 
     /**

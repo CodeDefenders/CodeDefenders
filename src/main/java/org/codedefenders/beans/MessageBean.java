@@ -18,7 +18,8 @@ import java.util.List;
 @ManagedBean
 @SessionScoped
 public class MessageBean implements Iterable<Message>, Serializable {
-    private transient List<Message> messages = new ArrayList<>();
+    private long currentId = 0;
+    private List<Message> messages = new ArrayList<>();
 
     /**
      * Returns an iterator over the messages.
@@ -42,8 +43,8 @@ public class MessageBean implements Iterable<Message>, Serializable {
      * @param text The text of the message.
      * @return The newly created message.
      */
-    public Message add(String text) {
-        Message message = new Message(text);
+    public synchronized Message add(String text) {
+        Message message = new Message(text, currentId++);
         messages.add(message);
         return message;
     }
@@ -51,7 +52,7 @@ public class MessageBean implements Iterable<Message>, Serializable {
     /**
      * Clears the messages.
      */
-    public void clear() {
+    public synchronized void clear() {
         messages.clear();
     }
 
